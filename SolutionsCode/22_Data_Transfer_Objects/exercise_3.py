@@ -1,15 +1,16 @@
 # exercise_3.py
 from typing import NamedTuple
 
-class Fraction(NamedTuple):
-    numerator: int
-    denominator: int
+class Recipe(NamedTuple):
+    name: str
+    steps: list[str]
 
-f = Fraction(3, 4)
-print(f)
-#: Fraction(numerator=3, denominator=4)
-print(f[0], f[1])
-#: 3 4
-num, denom = f
-print(num, denom)
-#: 3 4
+toast = Recipe("Toast", ["slice", "heat"])
+toast.steps.append("butter")
+print(toast)
+#: Recipe(name='Toast', steps=['slice', 'heat', 'butter'])
+try:
+    key = {toast: "breakfast"}
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError

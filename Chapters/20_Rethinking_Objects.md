@@ -52,7 +52,8 @@ Rust makes bindings immutable by default.
 Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
 They compose data structures instead of inheriting implementation.
-They let code live outside classes, which reduces duplication.
+They let code live outside classes,
+so one function can serve many types instead of being rewritten as a method on each.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
@@ -60,7 +61,8 @@ The industry has been quietly walking back from "everything is an object" and fr
 The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
-An override accepts the same arguments, returns the same kinds of results,
+An override may accept more than the base does but never less,
+returns a result the caller can use where the base's result was expected,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
@@ -121,6 +123,13 @@ so `@override` is satisfied and `ty` reports nothing.
 `fill()` was written against `Stack`, which never refuses a `push()`,
 and a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matched the signature and broke the contract behind it.
+
+Substitutability is the first thing OOP promised that no tool can check.
+OOP made four promises: encapsulation,
+behavior bundled into the object as methods, reuse through inheritance,
+and polymorphism.
+The next sections take them one at a time,
+and ask in each case what Python actually delivers and what it costs.
 
 ## Encapsulation Leaks
 
@@ -287,7 +296,8 @@ The test goes through `setattr()` because the checker rejects `immutable.bob.nam
 `frozen=True` is the defense that holds at runtime,
 against code the checker never saw.
 
-Two quiet changes in the listing do as much work as `frozen=True`.
+Two quiet changes in the listing do as much work as `frozen=True`:
+`numbers` is a `tuple`, not a `list`, and `Bob` is frozen too.
 `frozen=True` is shallow:
 it stops assignment to the fields of `Immutable` itself,
 but it cannot stop mutation inside a field that is itself mutable.
@@ -310,6 +320,11 @@ try:
 except FrozenInstanceError as e:
     print(type(e).__name__)
 #: FrozenInstanceError
+try:
+    hash(fl)  # A list field makes the whole instance unhashable
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
 ```
 
 Frozen guards the binding, not the object.
@@ -319,7 +334,9 @@ But nothing stops that list from changing, the identical leak `Leaky` had.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
-That is why `numbers` became a `tuple` and `Bob` was also frozen.
+The listing shows all three side by side: the rebinding `frozen=True` catches,
+and the mutation and the failed hash it does not.
+That is why those two changes were needed.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
@@ -461,15 +478,49 @@ so the count is wrong the moment anyone uses the base class's other method.
 Nothing in the subclass is incorrect.
 It inherited an implementation and now depends on how that implementation is written,
 which is a fact about `list` that no signature records and no checker reports.
+This is the *fragile base class* problem:
+a base class cannot change its own internals without risking every subclass that came to depend on them.
 
-Before inheritance, there was composition.
-A type holds other types as fields.
-`dataclasses.replace()` gives you the copy-with-changes that immutability needs,
+Composition answers it by delegation.
+Hold a list instead of being one, and expose only what you meant to expose:
+
+```python
+# counting_box.py
+from dataclasses import dataclass, field
+
+@dataclass
+class CountingBox:
+    items: list[int] = field(default_factory=list)
+    appends: int = 0
+
+    def append(self, item: int) -> None:
+        self.appends += 1
+        self.items.append(item)
+
+    def extend(self, more: list[int]) -> None:
+        for item in more:
+            self.append(item)
+
+box = CountingBox()
+box.append(1)
+box.extend([2, 3])
+print(len(box.items), box.appends)
+#: 3 3
+```
+
+Nothing arrives from a base class, so nothing can slip past the counter:
+the only way into `items` is a method this class wrote.
+The cost is visible and finite.
+Every operation callers need has to be forwarded by hand,
+where the subclass got hundreds for free and got one of them wrong.
+
+Composition does more than repair a broken subclass.
+A type holds other types as fields,
 and frozen instances compare by value and work as keys:
 
 ```python
 # composition.py
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Name:
@@ -495,12 +546,6 @@ print(c.name)
 print(c.address)
 #: Address(city='Sodding-on-the-Wold', postal='12345')
 
-# A copy with one nested field changed leaves c intact
-moved = replace(c,
-    address=replace(c.address, city="Fenwick-under-Custard"))
-print(c.address.city, "->", moved.address.city)
-#: Sodding-on-the-Wold -> Fenwick-under-Custard
-
 twin = Contact(
     Name("Gerald", "Spigot-Farthingale"),
     Address("Sodding-on-the-Wold", "12345")
@@ -513,8 +558,10 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 
 `Contact` inherits nothing, and gains no methods it did not ask for.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
-The nested `replace()` shows the cost of that arrangement:
-changing a city means rebuilding the `Address` and then the `Contact`.
+The arrangement has a cost:
+changing one city means rebuilding the `Address` and then the `Contact`,
+which is what [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
+is for.
 The last two lines are the payoff.
 Two contacts built from equal parts are equal, and the whole structure hashes,
 because value equality and hashing follow from the fields rather than from a base class.
@@ -522,6 +569,70 @@ because value equality and hashing follow from the fields rather than from a bas
 ## Polymorphism Without Inheritance
 
 The fourth OOP promise is polymorphism.
+
+### What Is Polymorphism?
+
+Polymorphism means that a function parameter accepts more than one type.
+Inheritance is only one way to get there.
+The questions are which types it accepts and what the function may do with them.
+
+Type theory defines three kinds of polymorphism.
+Christopher Strachey's 1967 lecture notes,
+[Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf),
+named the first two, parametric and ad-hoc.
+Cardelli and Wegner added the third, subtyping,
+in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
+
+*Subtype polymorphism* is what the four subsections below demonstrate.
+One function accepts any type that fits a shape,
+whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
+You write one function.
+The type varies underneath it.
+
+*Parametric polymorphism* is a single implementation for multiple types.
+[Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
+One body works for any `T`.
+The checker infers the concrete type behind `T` at each call site.
+
+With *ad-hoc polymorphism* (typically *function overloading*),
+a different implementation handles each type, chosen by that type.
+Python's version of ad-hoc polymorphism is `@overload`,
+which lets one function name have multiple typed signatures,
+backed by a single implementation that branches at runtime:
+
+```python
+# overload_example.py
+from typing import overload
+
+@overload
+def stringify(value: int) -> str: ...
+
+@overload
+def stringify(value: list[int]) -> list[str]: ...
+
+def stringify(value: int | list[int]) -> str | list[str]:
+    if isinstance(value, list):
+        return [str(v) for v in value]
+    return str(value)
+
+if __name__ == "__main__":
+    print(stringify(42))
+    print(stringify([1, 2, 3]))
+#: 42
+#: ['1', '2', '3']
+```
+
+Each `@overload` line is a declaration for the type checker,
+not a function that runs.
+Only the last, unmarked definition executes.
+`stringify(42)` checks as returning `str`,
+and `stringify([1, 2, 3])` checks as returning `list[str]`,
+even though both calls run the same branching body.
+
+[`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch)
+is ad-hoc polymorphism's other Python form.
+It uses genuinely separate functions per type,
+instead of one function branching internally.
 
 ### Abstract Base Classes
 
@@ -651,7 +762,7 @@ one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
 Each protocol only names the shape it needs.
 Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
-or `Loggable`.
+or `Describable`.
 
 Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
@@ -671,7 +782,7 @@ class Priced(Protocol):
 class Serializable(Protocol):
     def to_json(self) -> str: ...
 
-class Loggable(Protocol):
+class Describable(Protocol):
     def describe(self) -> str: ...
 
 @dataclass(frozen=True)
@@ -694,7 +805,7 @@ def charge(item: Priced) -> float:
 def persist(item: Serializable) -> str:
     return item.to_json()
 
-def audit(item: Loggable) -> str:
+def audit(item: Describable) -> str:
     return item.describe()
 
 if __name__ == "__main__":
@@ -709,6 +820,8 @@ if __name__ == "__main__":
 
 `Invoice` inherits from `object` alone, yet `charge()`, `persist()`,
 and `audit()` each accept it, because each only checks the one method it needs.
+
+#### What the Shape Does Not Say
 
 That same structural check has a blind spot.
 Two unrelated protocols can share a method name and signature by coincidence,
@@ -862,70 +975,6 @@ which is often not true.
 and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 explore this trade-off.
 
-## What Is Polymorphism?
-
-Inheritance is only one expression of polymorphism.
-More broadly, polymorphism means that a function parameter accepts more than one type.
-The questions are which types it accepts and what the function may do with them.
-
-Type theory defines three kinds of polymorphism.
-Christopher Strachey's 1967 lecture notes,
-[Fundamental Concepts in Programming Languages](http://fpl.cs.depaul.edu/jriely/447/assets/articles/strachey-fundamental-concepts-in-programming-languages.pdf),
-named the first two, parametric and ad-hoc.
-Cardelli and Wegner added the third, subtyping,
-in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where subtyping appears as *inclusion polymorphism*.].
-
-*Subtype polymorphism* was demonstrated in [Polymorphism Without Inheritance](#polymorphism-without-inheritance).
-One function accepts any type that fits a shape,
-whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
-You write one function.
-The type varies underneath it.
-
-*Parametric polymorphism* is a single implementation for multiple types.
-[Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
-One body works for any `T`.
-The checker infers the concrete type behind `T` at each call site.
-
-With *ad-hoc polymorphism* (typically *function overloading*),
-a different implementation handles each type, chosen by that type.
-Python's version of ad-hoc polymorphism is `@overload`,
-which lets one function name have multiple typed signatures,
-backed by a single implementation that branches at runtime:
-
-```python
-# overload_example.py
-from typing import overload
-
-@overload
-def stringify(value: int) -> str: ...
-
-@overload
-def stringify(value: list[int]) -> list[str]: ...
-
-def stringify(value: int | list[int]) -> str | list[str]:
-    if isinstance(value, list):
-        return [str(v) for v in value]
-    return str(value)
-
-if __name__ == "__main__":
-    print(stringify(42))
-    print(stringify([1, 2, 3]))
-#: 42
-#: ['1', '2', '3']
-```
-
-Each `@overload` line is a declaration for the type checker,
-not a function that runs.
-Only the last, unmarked definition executes.
-`stringify(42)` checks as returning `str`,
-and `stringify([1, 2, 3])` checks as returning `list[str]`,
-even though both calls run the same branching body.
-
-[`singledispatch`](33_Visitor.md#the-pythonic-visitor-singledispatch)
-is ad-hoc polymorphism's other Python form.
-It uses genuinely separate functions per type,
-instead of one function branching internally.
-
 ## Null Object
 
 Polymorphism removes the most common conditional, the `None` check.
@@ -1061,10 +1110,11 @@ or whether immutable data, a function, and a protocol already solve the problem.
     exposed through a `@property` the same way `numbers` is,
     and demonstrate the same leak by mutating the list you get back.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
-2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]` and rerun `ty check`.
-    Notice that it does not object:
-    the checker sees nothing wrong with a mutable field in a frozen class.
-    Demonstrate the leak with an `append()`, then restore the `tuple`.
+2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]`.
+    Show that `ty check` still passes, that `append()` works,
+    and that `hash(immutable)` now raises,
+    so the frozen instance can no longer be a dict key.
+    Restore the `tuple`.
     Who, then, is responsible for making immutability go all the way down?
 3.  In `protocol_collision.py`,
     define `Price = NewType("Price", float)` and `Weight = NewType("Weight", float)`,
@@ -1085,3 +1135,13 @@ or whether immutable data, a function, and a protocol already solve the problem.
 6.  In `null_logger.py`, write a second null-object style class, `NullCache`,
     whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
     following the same shape as `NullLogger`.
+7.  In `counting_list.py`, count `__setitem__` as well,
+    then find a second `list` method that changes the contents without going through either override.
+    Rewrite `CountingList` to hold a list instead of inheriting from one,
+    and show that the counts are now correct for every route in.
+8.  In `lsp_violation.py`,
+    make `BoundedStack` obey the Liskov Substitution Principle without removing the limit:
+    keep the base contract that `push()` always succeeds,
+    and expose "full" some other way.
+    Then say what you gave up,
+    and whether `BoundedStack` should have been a subclass of `Stack` at all.

@@ -11,7 +11,8 @@ and use *design patterns* for the concept.
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
-This chapter introduces the concepts; the chapters after it supply the code.
+This chapter introduces the concepts; one listing makes the point,
+and the chapters after it supply the rest of the code.
 
 ## What Is a Pattern?
 
@@ -60,46 +61,19 @@ you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
 You have seen some design patterns in this book.
-For example, inheritance can be thought of as a design pattern
+For example, [inheritance](07_Classes.md) can be thought of as a design pattern
 (albeit one built into the language).
 It allows you to express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
-Composition also qualifies as a pattern, since it allows you to change,
+[Composition](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
+also qualifies as a pattern, since it allows you to change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
-Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Iterators.md),
-which has been implicitly available in `for` loops from the beginning of the language,
-and became an explicit feature in Python 2.2.
+Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Iterators.md).
 An iterator allows you to hide the particular implementation of the container as you're stepping through it.
 You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
 The code works with any object that produces an iterator.
-
-## When a Pattern Dissolves
-
-A pattern is often a sign of something missing in a language.
-Programmers wrote the same scaffolding often enough that it acquired a name.
-It exists only because the language does not write it for them.
-
-The missing piece can arrive in two ways.
-Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
-shows that a Python module already is one.].
-Iterator is the clear case.
-It was implicit in the `for` loop from the start,
-and Python 2.2 made it a protocol the language calls on your behalf.
-More often the language had the piece all along,
-and the pattern was written for one that didn't.
-*Strategy* and *Command* shrink to passing a function,
-because a Python function is an object
-([Function Objects](28_Function_Objects.md) shows both).
-A [Factory](27_Factory.md) becomes a dictionary,
-because a class is an object too.
-[Singleton](24_Singleton.md) becomes a module,
-because Python imports each module once and caches it.
-
-This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md#guidelines)
-posed: how much of each pattern's machinery does Python still need,
-and how much of it becomes functions, data, and protocols?
 
 ## Pattern Evolution
 
@@ -138,6 +112,48 @@ A pattern a language builds in drops back to stage one,
 and the programmers who arrive next learn it as syntax rather than as a design.
 Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
 
+## When a Pattern Dissolves
+
+A pattern is often a sign of something missing in a language.
+Programmers wrote the same scaffolding often enough that it acquired a name.
+It exists only because the language does not write it for them.
+
+A pattern meets its missing piece in two ways.
+Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
+shows that a Python module already is one.].
+Iterator is the clear case.
+It was implicit in the `for` loop from the start,
+and Python 2.2 made it a protocol the language calls on your behalf.
+More often the language had the piece all along,
+and the pattern was written for one that didn't.
+*Strategy* and *Command* shrink to passing a function,
+because a Python function is an object
+([Function Objects](28_Function_Objects.md) shows both).
+A [Factory](27_Factory.md) becomes a dictionary,
+because a class is an object too.
+[Singleton](24_Singleton.md) becomes a module,
+because Python imports each module once and caches it.
+
+Here is the whole of a *Strategy* in Python:
+
+```python
+# strategy_is_a_function.py
+from collections.abc import Callable
+
+def apply(nums: list[int], how: Callable[[list[int]], int]) -> int:
+    return how(nums)
+print(apply([3, 1, 2], max), apply([3, 1, 2], sum))
+#: 3 6
+```
+
+The classic form declares a `Strategy` interface,
+writes one class per algorithm, and adds a context class to hold the chosen one.
+The `how` parameter replaces all three.
+
+This is why the chapters ahead keep asking the question [Rethinking Objects](20_Rethinking_Objects.md#guidelines)
+posed: how much of each pattern's machinery does Python still need,
+and how much of it becomes functions, data, and protocols?
+
 ## Pattern Taxonomy
 
 *GoF Design Patterns* discusses 23 different patterns,
@@ -164,7 +180,8 @@ The three purposes are:
     fulfilling a request, moving through a sequence (as in an iterator),
     or implementing an algorithm.
     This book contains multiple examples including [Observer](30_Observer.md),
-    [State Machines](31_State_Machines.md), and [Visitor](33_Visitor.md).
+    [State](26_Surrogate.md#state), and [Visitor](33_Visitor.md),
+    though *State* appears beside *Proxy*, for reasons given below.
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
@@ -191,9 +208,11 @@ and the remaining difference is intent.
 
 ## Design Principles
 
-Design principles are at least as important as design structures,
-but for a different reason.
-Principles ask questions about your proposed design and test it for quality.
+Design principles are at least as important as design patterns,
+but they do a different job.
+A pattern is a shape of solution.
+A principle is a test you apply to whatever shape you chose:
+a claim you can hold the design up against.
 Most hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 
@@ -203,7 +222,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer can produce.
-    This does not appear to be a linear factor, but an exponential one.
+    The cost does not grow one rule at a time; the rules interact.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,
@@ -220,7 +239,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
--   *Subtraction*: a design is finished when you cannot take anything else away^[Generally attributed to Antoine de Saint-Exupéry, from *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove".].
+-   *Subtraction*: a design is finished when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,

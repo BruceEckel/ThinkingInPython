@@ -1,5 +1,5 @@
 # composition.py
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Name:
@@ -24,12 +24,6 @@ print(c.name)
 #: Name(first='Gerald', last='Spigot-Farthingale')
 print(c.address)
 #: Address(city='Sodding-on-the-Wold', postal='12345')
-
-# A copy with one nested field changed leaves c intact
-moved = replace(c,
-    address=replace(c.address, city="Fenwick-under-Custard"))
-print(c.address.city, "->", moved.address.city)
-#: Sodding-on-the-Wold -> Fenwick-under-Custard
 
 twin = Contact(
     Name("Gerald", "Spigot-Farthingale"),

@@ -9,7 +9,7 @@ class Priced(Protocol):
 class Serializable(Protocol):
     def to_json(self) -> str: ...
 
-class Loggable(Protocol):
+class Describable(Protocol):
     def describe(self) -> str: ...
 
 @dataclass(frozen=True)
@@ -32,7 +32,7 @@ def charge(item: Priced) -> float:
 def persist(item: Serializable) -> str:
     return item.to_json()
 
-def audit(item: Loggable) -> str:
+def audit(item: Describable) -> str:
     return item.describe()
 
 if __name__ == "__main__":

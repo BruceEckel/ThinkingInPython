@@ -187,7 +187,7 @@ Accrued notes from the chapters 18-38 review sweep:
   its exercise 6); exact-type dict dispatch is noted in 31 (engine),
   32 (OUTCOME table), and 37 (`bins[type(t)]`); the registry factory's
   import-time-registration and name-collision caveats live in 27 and
-  back the registries in 20/37; frozen-is-shallow is demonstrated in 20
+  back the registries in 14 (`register.py`) and 37; frozen-is-shallow is demonstrated in 20
   (`frozen_leaky.py`) and assumed by 22's `NamedTuple`-vs-frozen
   contrast and 35/36's immutability arguments; the load-bearing-`Any`
   bargain runs 22 → 33; the constructor-starts-the-engine trap runs
@@ -212,7 +212,15 @@ Each review file has the same name as the chapter it reviewed, so
 It holds the reported findings for Bruce to check and modify.
 Write each finding as a self-contained block that stands or falls on its own:
 the section or line it applies to, what is wrong or missing, and the proposed
-change with its reasoning. Keep the blocks in reading order.
+change with its reasoning.
+
+Order the blocks by decreasing importance, not by position in the chapter.
+Importance means how much the finding needs Bruce's judgment: first the
+critical issues where you cannot determine the right approach and need his
+decision, then, going down the file, findings you are more and more able to
+resolve on your own. Bruce reads the top of the file with full attention and
+tends to accept the confident items lower down, so a finding placed too low
+gets less scrutiny than it deserves.
 
 Begin every block with a reject checkbox on its own line:
 

@@ -11,6 +11,11 @@ print(red)
 #: Color(r=255, g=0, b=0)
 print(red.r, red[0])
 #: 255 255
+try:
+    red.r = 9  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
 print(red._replace(g=128))
 #: Color(r=255, g=128, b=0)
 print(red._asdict(), Color._fields)

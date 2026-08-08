@@ -1681,7 +1681,16 @@ and do not act on its contents.
 Each finding is a self-contained block that stands or falls on its own:
 the section or line it applies to, the pattern name and number, the offending
 text quoted, and the proposed change.
-Keep the blocks in reading order, so they track the chapter top to bottom.
+
+Order the blocks by decreasing importance, not by position in the chapter.
+Importance means how much the finding needs Bruce's judgment:
+first the critical issues where you cannot determine the right approach
+and need his decision,
+then, going down the file,
+findings you are more and more able to resolve on your own.
+Bruce reads the top of the file with full attention
+and tends to accept the confident items lower down,
+so a finding placed too low gets less scrutiny than it deserves.
 
 Begin every block with a reject checkbox on its own line:
 

@@ -1,8 +1,4 @@
-What does this mean?
-Set CLAUDE_CODE_USE_POWERSHELL_TOOL=1 to enable the PowerShell tool
-
-Look in deep_review for files that start with [[Reviewed]] and do those.
-Do them sequentially to prevent edit collisions.
+Apply the hierarchical ordering to all the un-reviewed files in deep_review
 
 New book cover & favicon
 

@@ -53,31 +53,47 @@ generates `__init__()`, `__repr__()`, and `__eq__()` to match. Adding
 `repr()` to three fields, and the equality comparison to three values,
 with no other code to update.
 
-## 3. A `NamedTuple` called `Fraction`
+## 3. A `NamedTuple` holding a list
 
 ```python
 # exercise_3.py
 from typing import NamedTuple
 
-class Fraction(NamedTuple):
-    numerator: int
-    denominator: int
+class Recipe(NamedTuple):
+    name: str
+    steps: list[str]
 
-f = Fraction(3, 4)
-print(f)
-#: Fraction(numerator=3, denominator=4)
-print(f[0], f[1])
-#: 3 4
-num, denom = f
-print(num, denom)
-#: 3 4
+toast = Recipe("Toast", ["slice", "heat"])
+toast.steps.append("butter")
+print(toast)
+#: Recipe(name='Toast', steps=['slice', 'heat', 'butter'])
+try:
+    key = {toast: "breakfast"}
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
 ```
 
-`Fraction` behaves exactly like `Color` does: `f.numerator` and
-`f.denominator` are readable by name, `f[0]` and `f[1]` still work
-because a `NamedTuple` is still a real tuple underneath, and unpacking
-with `num, denom = f` works the same way it would for a plain
-`(3, 4)` tuple.
+The record changed, and nothing objected. `NamedTuple` refuses to
+rebind `toast.steps`, and says nothing about the list that field
+already refers to, so `append()` reaches straight through the record
+and edits its contents. Neither `ty` nor Python reports anything,
+because no assignment to a field ever happens.
+
+Using the record as a `dict` key raises a `TypeError`, whose message
+names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
+'list')`. Hashing a tuple hashes each element, so a `Recipe` is
+hashable only when every field is. The `list` has no hash, so the
+record has none either.
+
+The two results are one fact seen twice. The immutability a
+`NamedTuple` gives you stops at the field, and a field pointing at a
+mutable object hands that object's mutability back. This is the same
+shallowness `frozen=True` has in
+[Rethinking Objects](../Chapters/20_Rethinking_Objects.md#the-immutability-solution).
+Declaring `steps: tuple[str, ...]` fixes both at once: the contents
+stop being editable and the record becomes hashable, which is the clue
+that they were never two problems.
 
 ## 4. A fourth attribute supplied at construction
 

@@ -42,12 +42,18 @@ The `m: Any` annotation is not decoration.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
 `Any` switches the checker off for `m`.
+You can move that `Any` into the class instead of repeating it at every use site,
+by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
+Declaring only the first leaves the write, `m.more = 11`, still rejected.
+The standard library's stub for `SimpleNamespace` declares both,
+using `__getattribute__()` for the reading half.
 The price of an ad-hoc attribute bag is that no checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 ## The Standard-Library Versions
 
-In the standard Python library, `types.SimpleNamespace` is a `Messenger`.
+In the standard Python library,
+`types.SimpleNamespace` is a ready-made Messenger.
 Here, too, keyword arguments become attributes that land in the instance's `__dict__`:
 
 ```python
@@ -118,6 +124,11 @@ print(red)
 #: Color(r=255, g=0, b=0)
 print(red.r, red[0])
 #: 255 255
+try:
+    red.r = 9  # type: ignore
+except AttributeError as e:
+    print(type(e).__name__)
+#: AttributeError
 print(red._replace(g=128))
 #: Color(r=255, g=128, b=0)
 print(red._asdict(), Color._fields)
@@ -126,6 +137,9 @@ print(red._asdict(), Color._fields)
 
 Printing a `NamedTuple` gives the same readable output a data class gives.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
+Assigning to a field raises an `AttributeError`,
+and `ty` reports it before the program runs,
+which is the one place in this chapter where the checker does better than it does for the attribute bag.
 Since the fields cannot be mutated, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
@@ -141,17 +155,6 @@ The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` does not mean private.
 `NamedTuple` marks its own members that way so they cannot collide with a field you name.
 A record is free to declare a field called `replace` or `fields`.
-
-Use `SimpleNamespace` for an ad-hoc bag of attributes,
-a `@dataclass` for a typed mutable record,
-and a `NamedTuple` for a typed immutable one.
-The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
-When the data must stay a dict,
-because it arrives as JSON or goes back out as JSON,
-a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
-names the keys and their types for the checker while the value stays a real dict.
-To make a `@dataclass` guarantee that its values are legal, not merely typed,
-see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
 ## Returning Multiple Values
 
@@ -213,6 +216,8 @@ print(Color(1, 2, 3) == Dimensions(1, 2, 3))
 #: True
 print(Color(1, 2, 3) == (1, 2, 3))
 #: True
+print(Color(1, 2, 3) < Dimensions(1, 2, 4))
+#: True
 
 @dataclass(frozen=True)
 class FrozenColor:
@@ -228,16 +233,58 @@ class FrozenDimensions:
 
 print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
+try:
+    FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
 ```
 
 `Color` and `Dimensions` mean different things,
 but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
-Choose `NamedTuple` when tuple behavior is the goal: unpacking,
-multiple return values, compatibility with code that expects a tuple.
+
+Ordering arrives from `tuple` the same way, and is as type-blind as equality.
+Sorting a list of `Color`s orders them by `r`, then `g`, then `b`,
+with nothing in the code declaring that intent.
+A frozen data class refuses the comparison instead.
+`<` between two `FrozenColor`s raises a `TypeError` unless the decorator receives `order=True`,
+and a comparison between two different frozen types raises one even then.
+
+Tuple behavior reaches serialization too.
+`json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
+since `json` sees a sequence and the field names never reach the output.
+Converting first, `json.dumps(Color(1, 2, 3)._asdict())`,
+writes `{"r": 1, "g": 2, "b": 3}`.
+A data class is not serializable at all:
+`json.dumps()` on one raises a `TypeError`.
+That is the safer failure of the two,
+because the array version loses the names without saying so.
+
+## Which Should You Use?
+
+Use `SimpleNamespace` for an ad-hoc bag of attributes,
+a `@dataclass` for a typed mutable record,
+and a `NamedTuple` for a typed immutable one.
+The hand-rolled `Messenger` is worth writing only to show how `SimpleNamespace` works underneath.
+
+Between the two typed records,
+the deciding question is whether tuple behavior is a feature.
+Choose `NamedTuple` when it is: unpacking, multiple return values,
+compatibility with code that expects a tuple.
 Choose a [frozen dataclass](12_Data_Classes_as_Types.md#immutability)
-when a record should be a distinct type that equals only its own kind.
+when a record should be a distinct type that equals only its own kind,
+and when inherited ordering and array-shaped JSON would be wrong rather than convenient.
+
+When the data must stay a dict,
+because it arrives as JSON or goes back out as JSON,
+a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
+names the keys and their types for the checker while the value stays a real dict.
+When it only has to *become* a dict on the way out,
+`_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
+To make a `@dataclass` guarantee that its values are legal, not merely typed,
+see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
 
 ## Exercises
 
@@ -247,9 +294,9 @@ when a record should be a distinct type that equals only its own kind.
 2.  In `point_dataclass.py`, add a third field, `z: float`,
     to the `Point` dataclass,
     and update the `Point(...)` call to pass three arguments.
-3.  Add a `NamedTuple` called `Fraction` with fields `numerator: int` and `denominator: int` to `color_namedtuple.py`,
-    following `Color`'s shape,
-    and confirm an instance still unpacks and indexes like a tuple.
+3.  Add a `NamedTuple` called `Recipe` with fields `name: str` and `steps: list[str]` to `color_namedtuple.py`.
+    Mutate the `steps` list of an instance and print the record.
+    Then try to use the record as a `dict` key and explain the result.
 4.  In `display_namespace.py`,
     add a fourth attribute to `m` by passing it to the constructor,
     then add it by assignment after the existing `m.more = 11` instead.

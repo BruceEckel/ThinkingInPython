@@ -78,12 +78,26 @@ try:
 except Exception as e:
     print(type(e).__name__)
 #: FrozenInstanceError
+try:
+    hash(data)  # The list field makes the instance unhashable
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
 ```
 
 `ty` reports nothing. `frozen=True` blocks rebinding a field, which is
 why the assignment raises `FrozenInstanceError`, and it says nothing at
 all about what the field refers to. The `append()` never assigns to
 `data.numbers`, so nothing the decorator generated is involved.
+
+The `hash()` failure is the same shallowness seen from another side.
+`frozen=True` generates a `__hash__()` that hashes the tuple of field
+values, so hashing an `Immutable` hashes its `list`, and a `list` has no
+hash. The instance the decorator promised was usable as a dict key is
+not, and nothing said so until the first `hash()`. With `tuple` restored,
+both the mutation and the hash failure go away together, which is the
+clue that they were one problem: a frozen wrapper around a mutable
+value.
 
 Nobody enforces it, which is the answer: making immutability go all the
 way down is the author's job, one field at a time. Declare `tuple`
@@ -263,3 +277,146 @@ nothing, and `get()` always reports "not found," so a function that
 takes an optional cache can take a required `Cache` instead, defaulting
 to a shared `NullCache()` instance, with no `is None` branch anywhere
 that uses it.
+
+## 7. Counting every route into the list
+
+```python
+# exercise_7.py
+from dataclasses import dataclass, field
+from typing import override
+
+class CountingList(list[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self.appends = 0
+        self.sets = 0
+
+    @override
+    def append(self, item: int, /) -> None:
+        self.appends += 1
+        super().append(item)
+
+    @override
+    def __setitem__(self, index, value) -> None:
+        self.sets += 1
+        super().__setitem__(index, value)
+
+counted = CountingList()
+counted.append(1)
+counted.extend([2, 3])  # Past append()
+counted[0] = 99  # Counted
+counted.insert(0, 7)  # Past both overrides
+print(len(counted), counted.appends, counted.sets)
+#: 4 1 1
+
+@dataclass
+class CountingBox:
+    items: list[int] = field(default_factory=list)
+    appends: int = 0
+    sets: int = 0
+
+    def append(self, item: int) -> None:
+        self.appends += 1
+        self.items.append(item)
+
+    def extend(self, more: list[int]) -> None:
+        for item in more:
+            self.append(item)
+
+    def __setitem__(self, index: int, value: int) -> None:
+        self.sets += 1
+        self.items[index] = value
+
+box = CountingBox()
+box.append(1)
+box.extend([2, 3])
+box[0] = 99
+print(len(box.items), box.appends, box.sets)
+#: 3 3 1
+```
+
+The subclass counts one append out of three and misses `insert()`
+entirely. `extend()` and `insert()` both add elements through `list`'s
+own C implementation, which never calls the Python-level `append()` or
+`__setitem__()` you overrode. Other routes past the counters include
+`+=`, slice assignment, and `list.__init__` with an iterable, and the
+list is not fixed: a future CPython could add another.
+
+`CountingBox` reports `3 3 1` because there is no other route. The
+class holds a list rather than being one, so every mutation is a method
+this class wrote. Nothing inherited can bypass a counter that nothing
+inherited knows about.
+
+The trade is explicit. `CountingList` got `sort()`, `index()`,
+`__len__()`, slicing, and everything else `list` offers, and got the
+counting wrong. `CountingBox` gets nothing it did not write, and a
+caller who wants `sort()` has to be given one. That is the choice
+composition asks you to make on purpose, instead of discovering later
+that inheritance made it for you.
+
+## 8. `BoundedStack` without breaking the contract
+
+```python
+# exercise_8.py
+from dataclasses import dataclass, field
+from typing import ClassVar, override
+
+@dataclass
+class Stack:
+    items: list[int] = field(default_factory=list)
+
+    def push(self, item: int) -> None:
+        self.items.append(item)
+
+@dataclass
+class BoundedStack(Stack):
+    limit: ClassVar[int] = 2
+
+    def full(self) -> bool:  # The limit, exposed as a question
+        return len(self.items) >= self.limit
+
+    @override
+    def push(self, item: int) -> None:  # Always succeeds
+        super().push(item)
+        del self.items[:-self.limit]  # Drop the oldest
+
+def fill(stack: Stack, count: int) -> int:
+    for n in range(count):
+        stack.push(n)
+    return len(stack.items)
+
+print(fill(Stack(), 5))
+#: 5
+print(fill(BoundedStack(), 5))  # No exception now
+#: 2
+
+bounded = BoundedStack()
+bounded.push(1)
+print(bounded.full())
+#: False
+bounded.push(2)
+print(bounded.full(), bounded.items)
+#: True [1, 2]
+```
+
+`fill()` was written against a `Stack` whose `push()` always succeeds,
+so the fix keeps that promise. `BoundedStack.push()` accepts every item
+and discards the oldest to stay inside the limit, and callers who care
+about the limit ask `full()` before pushing. `fill()` now runs on both
+classes, which is what substitutability means.
+
+What you gave up is the refusal. The original `BoundedStack` guaranteed
+that no more than two items were ever accepted; this one guarantees
+only that no more than two are ever *kept*. A caller who pushes five
+items loses three of them silently, which is the right behavior for a
+ring buffer of recent events and the wrong behavior for a queue of work
+that must not be dropped.
+
+Should `BoundedStack` have been a subclass at all? Probably not. The
+two versions of this exercise are the two ways out of the same bind:
+either weaken the guarantee until it fits the base contract, or admit
+that "a stack that can refuse" is a different type. A separate class
+with its own `push()` returning `bool`, or raising, is honest about
+that, and nothing then hands it to a `fill()` that was never written
+for it. Inheritance is a claim about substitutability, and this class
+was making a claim it could not keep.
