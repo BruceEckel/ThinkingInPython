@@ -396,6 +396,7 @@ a `set` computes one hash and looks in one place.
 ```python
 # membership_cost.py
 from timeit import timeit
+from benchmark import report
 
 n = 200_000
 items = list(range(n))
@@ -403,6 +404,7 @@ lookup = set(items)
 missing = -1
 list_time = timeit(lambda: missing in items, number=20)
 set_time = timeit(lambda: missing in lookup, number=20)
+report(list_scan=list_time, set_lookup=set_time)
 print(set_time * 100 < list_time)  # Not close
 #: True
 ```
@@ -540,6 +542,7 @@ Timing the two at the left end shows it:
 # deque_timing.py
 from collections import deque
 from timeit import timeit
+from benchmark import report
 
 n = 20_000
 
@@ -559,9 +562,18 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
+report(list_ops=list_time, deque_ops=deque_time)
 print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
+
+A timing depends on the machine that took it,
+so every measured listing in this book prints a comparison rather than a number.
+`report()` comes from a small helper the book supplies,
+and it stays silent unless you ask for the figures:
+run the listing with `--numbers`
+(see [Numbers on Your Machine](18_Performance.md#numbers-on-your-machine))
+and it prints the two times it measured.
 
 Use a `deque` for a single-threaded queue.
 A `deque(maxlen=n)` additionally caps its length,

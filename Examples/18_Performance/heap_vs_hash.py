@@ -1,6 +1,7 @@
 # heap_vs_hash.py
 import heapq
 import timeit
+from benchmark import report
 
 n = 10_000
 data = list(range(n, 0, -1))
@@ -24,6 +25,7 @@ def hash_min_extractions() -> list[int]:
 assert heap_min_extractions() == hash_min_extractions()
 t_heap = timeit.timeit(heap_min_extractions, number=50)
 t_hash = timeit.timeit(hash_min_extractions, number=50)
+report(heap=t_heap, repeated_min=t_hash)
 print(f"heap at least 10x faster than repeated min() on a set: "
       f"{t_heap * 10 < t_hash}")
 #: heap at least 10x faster than repeated min() on a set: True

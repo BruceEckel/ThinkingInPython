@@ -5,6 +5,7 @@
 ```python
 # exercise_1.py
 import random
+import sys
 import timeit
 
 n = 100_000
@@ -23,6 +24,8 @@ def set_lookups():
 
 t_list = timeit.timeit(list_lookups, number=20)
 t_set = timeit.timeit(set_lookups, number=20)
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"list {t_list:.6f}, set {t_set:.6f}")
 print(f"set faster on average-case targets too: {t_set < t_list}")
 #: set faster on average-case targets too: True
 ```
@@ -298,6 +301,7 @@ where the two lists finally meet.
 
 ```python
 # exercise_9.py
+import sys
 import timeit
 from array import array
 
@@ -310,6 +314,8 @@ def best(f: object) -> float:
 
 t_list = best(lambda: sum(as_list))
 t_array = best(lambda: sum(as_array))
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"list {t_list:.6f}, array {t_array:.6f}")
 print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True
 ```
@@ -335,6 +341,7 @@ vectorizing wins where `array` alone does not.
 
 ```python
 # ch18_join_vs_concat.py
+import sys
 import timeit
 
 def build_join(parts: list[str]) -> str:
@@ -352,6 +359,8 @@ assert build_join(many) == build_concat(many)
 
 j_many = timeit.timeit(lambda: build_join(many), number=200)
 c_many = timeit.timeit(lambda: build_concat(many), number=200)
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"join {j_many:.6f}, concat {c_many:.6f}")
 print(f"join wins at 10,000 parts: {j_many < c_many}")
 #: join wins at 10,000 parts: True
 

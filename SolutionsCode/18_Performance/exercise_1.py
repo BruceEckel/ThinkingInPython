@@ -1,5 +1,6 @@
 # exercise_1.py
 import random
+import sys
 import timeit
 
 n = 100_000
@@ -18,5 +19,7 @@ def set_lookups():
 
 t_list = timeit.timeit(list_lookups, number=20)
 t_set = timeit.timeit(set_lookups, number=20)
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"list {t_list:.6f}, set {t_set:.6f}")
 print(f"set faster on average-case targets too: {t_set < t_list}")
 #: set faster on average-case targets too: True

@@ -1,6 +1,7 @@
 # slots_dataclass.py
 import sys
 from dataclasses import dataclass
+from benchmark import report
 from exceptions import ignore
 
 @dataclass(slots=True)
@@ -36,6 +37,7 @@ with ignore(AttributeError):
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
+report(frozen_bytes=frozen_bytes, slotted_bytes=slotted_bytes)
 print(f"slots at least 5x smaller: "
       f"{slotted_bytes * 5 < frozen_bytes}")
 #: slots at least 5x smaller: True

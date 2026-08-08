@@ -1,4 +1,5 @@
 # ch18_join_vs_concat.py
+import sys
 import timeit
 
 def build_join(parts: list[str]) -> str:
@@ -16,6 +17,8 @@ assert build_join(many) == build_concat(many)
 
 j_many = timeit.timeit(lambda: build_join(many), number=200)
 c_many = timeit.timeit(lambda: build_concat(many), number=200)
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"join {j_many:.6f}, concat {c_many:.6f}")
 print(f"join wins at 10,000 parts: {j_many < c_many}")
 #: join wins at 10,000 parts: True
 

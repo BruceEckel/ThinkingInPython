@@ -2,6 +2,7 @@
 import asyncio
 import time
 from collections.abc import Awaitable, Iterable
+from benchmark import report
 
 async def yielding_wait() -> None:
     await asyncio.sleep(0.05)  # Suspends this task only
@@ -17,6 +18,7 @@ async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
 async def main() -> None:
     t_yield = await elapsed(yielding_wait() for _ in range(5))
     t_block = await elapsed(blocking_wait() for _ in range(5))
+    report(awaited=t_yield, blocking=t_block)
     print(f"awaited sleeps overlap: {t_yield < 0.05 * 2}")
     print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
 

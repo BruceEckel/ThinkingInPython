@@ -1,4 +1,5 @@
 # exercise_5.py
+import sys
 import tracemalloc
 from collections.abc import Iterator
 from itertools import tee
@@ -22,6 +23,8 @@ for _ in ahead:  # One branch first, as tee.py does
 drained, _ = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 
+if "--numbers" in sys.argv:  # Exact sizes on your machine
+    print(f"lockstep {lockstep:,}, drained {drained:,}")
 print(f"lockstep under 1% of draining one: "
       f"{lockstep * 100 < drained}")
 #: lockstep under 1% of draining one: True

@@ -3,6 +3,7 @@ import tracemalloc
 from collections.abc import Iterator
 from itertools import tee
 from typing import Final
+from benchmark import report
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
@@ -23,5 +24,6 @@ tracemalloc.start()
 collected = list(squares(N))
 listed, _ = tracemalloc.get_traced_memory()
 tracemalloc.stop()
+report(tee_bytes=buffered, list_bytes=listed)
 print(f"tee held as much as the list: {buffered > listed * 0.9}")
 #: tee held as much as the list: True

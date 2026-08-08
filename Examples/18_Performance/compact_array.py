@@ -1,6 +1,7 @@
 # compact_array.py
 import sys
 from array import array
+from benchmark import report
 from exceptions import ignore
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
@@ -20,6 +21,7 @@ list_bytes = sys.getsizeof(nums) + sum(
 )
 packed = array("d", nums)
 array_bytes = sys.getsizeof(packed)
+report(list_bytes=list_bytes, array_bytes=array_bytes)
 print(f"array at least 3x smaller: "
       f"{array_bytes * 3 < list_bytes}")
 #: array at least 3x smaller: True

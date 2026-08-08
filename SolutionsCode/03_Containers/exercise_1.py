@@ -1,4 +1,5 @@
 # exercise_1.py
+import sys
 from collections import deque
 from timeit import timeit
 
@@ -20,5 +21,7 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"list {list_time:.6f}, deque {deque_time:.6f}")
 print(deque_time < list_time)
 #: True

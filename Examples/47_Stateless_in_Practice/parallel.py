@@ -1,6 +1,7 @@
 # parallel.py
 import time
 from concurrent.futures import Executor, ThreadPoolExecutor
+from benchmark import report
 from stateless import (
     Async,
     Depend,
@@ -37,6 +38,7 @@ with ThreadPoolExecutor(max_workers=5) as pool:
     start = time.perf_counter()
     out = run(supply(as_type(Executor)(pool))(squares)(5))
     elapsed = time.perf_counter() - start
+report(elapsed=elapsed)
 print(out)
 #: [0, 1, 4, 9, 16]
 print(f"five 50ms tasks under 150ms: {elapsed < 0.15}")

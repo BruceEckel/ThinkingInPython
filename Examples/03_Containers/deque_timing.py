@@ -1,6 +1,7 @@
 # deque_timing.py
 from collections import deque
 from timeit import timeit
+from benchmark import report
 
 n = 20_000
 
@@ -20,5 +21,6 @@ def deque_left_ops():
 
 list_time = timeit(list_left_ops, number=1)
 deque_time = timeit(deque_left_ops, number=1)
+report(list_ops=list_time, deque_ops=deque_time)
 print(deque_time * 20 < list_time)  # Not close
 #: True

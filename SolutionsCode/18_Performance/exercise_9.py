@@ -1,4 +1,5 @@
 # exercise_9.py
+import sys
 import timeit
 from array import array
 
@@ -11,5 +12,7 @@ def best(f: object) -> float:
 
 t_list = best(lambda: sum(as_list))
 t_array = best(lambda: sum(as_array))
+if "--numbers" in sys.argv:  # Exact times on your machine
+    print(f"list {t_list:.6f}, array {t_array:.6f}")
 print(f"array is slower to iterate: {t_array > t_list}")
 #: array is slower to iterate: True

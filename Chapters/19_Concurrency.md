@@ -505,6 +505,7 @@ so a coroutine that calls it freezes every task in the program, not just itself:
 import asyncio
 import time
 from collections.abc import Awaitable, Iterable
+from benchmark import report
 
 async def yielding_wait() -> None:
     await asyncio.sleep(0.05)  # Suspends this task only
@@ -520,6 +521,7 @@ async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
 async def main() -> None:
     t_yield = await elapsed(yielding_wait() for _ in range(5))
     t_block = await elapsed(blocking_wait() for _ in range(5))
+    report(awaited=t_yield, blocking=t_block)
     print(f"awaited sleeps overlap: {t_yield < 0.05 * 2}")
     print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
 
@@ -548,6 +550,7 @@ allowing the event loop to keep running:
 # to_thread.py
 import asyncio
 import time
+from benchmark import report
 
 async def offloaded_wait() -> None:
     await asyncio.to_thread(time.sleep, 0.05)  # Runs in a thread
@@ -556,6 +559,7 @@ async def main() -> None:
     start = time.perf_counter()
     await asyncio.gather(*(offloaded_wait() for _ in range(5)))
     elapsed = time.perf_counter() - start
+    report(elapsed=elapsed)
     print(f"offloaded sleeps overlap: {elapsed < 0.05 * 2}")
 
 asyncio.run(main())
@@ -1008,6 +1012,7 @@ and five threads overlap five of those waits even with the GIL in place:
 ```python
 # io_threads.py
 import time
+from benchmark import report
 from thread_compare import compare
 
 def io_price(order: int) -> int:
@@ -1016,6 +1021,7 @@ def io_price(order: int) -> int:
 
 orders = [1, 2, 3, 4, 5]
 times = compare(io_price, orders, number=1)
+report(sequential=times.sequential, threaded=times.threaded)
 print("threads at least 3x faster on I/O: "
       f"{times.threaded * 3 < times.sequential}")
 #: threads at least 3x faster on I/O: True
@@ -1037,6 +1043,7 @@ In contrast, a thread that is computing never releases the GIL for another threa
 
 ```python
 # gil_threads.py
+from benchmark import report
 from thread_compare import compare
 
 def cpu_price(order: int) -> int:
@@ -1047,6 +1054,7 @@ def cpu_price(order: int) -> int:
 
 orders = [1, 2, 3, 4, 5]
 seq, thr = compare(cpu_price, orders, number=5)
+report(sequential=seq, threaded=thr)
 print(f"threads no faster: {thr > seq * 0.9}")
 #: threads no faster: True
 ```
@@ -1231,6 +1239,7 @@ Within a single process, multiple interpreters run in parallel:
 # subinterpreters.py
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
+from benchmark import report
 
 def cpu_price(order: int) -> int:
     total = 0
@@ -1251,6 +1260,7 @@ with InterpreterPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
+report(sequential=t_seq, subinterpreters=t_sub)
 print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
 #: subinterpreters at least 1.5x faster: True
 ```
@@ -1807,6 +1817,7 @@ import asyncio
 import threading
 import time
 from typing import Final
+from benchmark import report
 
 COUNT: Final[int] = 3000
 
@@ -1832,6 +1843,7 @@ async def spawn_async_tasks() -> float:
 
 t_threads = spawn_threads()
 t_tasks = asyncio.run(spawn_async_tasks())
+report(threads=t_threads, tasks=t_tasks)
 print(f"tasks at least 5x faster to spawn: {t_tasks * 5 < t_threads}")
 #: tasks at least 5x faster to spawn: True
 ```

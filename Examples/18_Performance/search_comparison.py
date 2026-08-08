@@ -1,6 +1,7 @@
 # search_comparison.py
 import bisect
 import timeit
+from benchmark import report
 
 n = 100_000
 as_list = list(range(n))
@@ -21,6 +22,7 @@ assert {scan(), binary_search(), hashed()} == {True}
 t_scan = timeit.timeit(scan, number=1000)
 t_search = timeit.timeit(binary_search, number=1000)
 t_hashed = timeit.timeit(hashed, number=1000)
+report(scan=t_scan, binary_search=t_search, hashed=t_hashed)
 print(f"binary search at least 100x faster than scan: "
       f"{t_search * 100 < t_scan}")
 #: binary search at least 100x faster than scan: True

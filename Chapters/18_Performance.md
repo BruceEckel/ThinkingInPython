@@ -246,6 +246,9 @@ insulating the measurement from startup cost and clock granularity.
 
 Timings differ from machine to machine,
 so the following example prints a comparison instead of raw numbers.
+The numbers are one flag away:
+run any measured listing in this book with `--numbers` to see what your machine did
+([Numbers on Your Machine](#numbers-on-your-machine)).
 A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
 comparing each element until it finds a match or reaches the end.
@@ -257,6 +260,7 @@ Hashing stays fast no matter how many elements the set holds:
 ```python
 # membership.py
 import timeit
+from benchmark import report
 
 n = 100_000
 as_list = list(range(n))
@@ -265,6 +269,7 @@ target = n - 1  # Worst case: the last element in the list
 
 t_list = timeit.timeit(lambda: target in as_list, number=100)
 t_set = timeit.timeit(lambda: target in as_set, number=100)
+report(list_scan=t_list, set_lookup=t_set, ratio=t_list / t_set)
 print(f"set at least 100x faster: {t_set * 100 < t_list}")
 #: set at least 100x faster: True
 ```
@@ -302,6 +307,46 @@ so its runs stay repeatable.
 For a benchmark that allocates heavily, that hides a cost production pays,
 so pass `setup="gc.enable()"` when collection pauses are part of what you are comparing.
 
+### Numbers on Your Machine {#numbers-on-your-machine}
+
+Every measured listing in this book prints a threshold rather than a measurement,
+so the book's output is the same on your machine as on mine.
+The measurements are still taken, and one flag prints them:
+
+```python
+# utils/benchmark.py
+import sys
+from typing import Final
+
+NUMBERS: Final[bool] = "--numbers" in sys.argv
+
+def report(**measured: float) -> None:
+    # Print each measurement, but only under --numbers:
+    if not (NUMBERS and measured):
+        return
+    width = max(len(name) for name in measured)
+    for name, value in measured.items():
+        if isinstance(value, int):
+            shown = f"{value:,}"  # Byte counts stay whole
+        else:
+            shown = f"{value:,.6f}"
+        print(f"  {name:<{width}} {shown}")
+```
+
+`report()` prints nothing unless the flag is present,
+so the listing's own output, the line the book shows, never changes.
+Running `membership.py` with the flag adds the measurements above it:
+
+    $ uv run python membership.py --numbers
+      list_scan  0.041807
+      set_lookup 0.000003
+      ratio      13,935.560574
+    set at least 100x faster: True
+
+The names are the keyword arguments at the call site,
+which is why each listing can label its own measurements.
+Your ratio will differ from the one above, which is the point of running it.
+
 ## Write Idiomatic Python
 
 The interpreter is written in C.
@@ -312,6 +357,7 @@ The idiomatic version of a loop is usually also the fast one:
 ```python
 # builtin_sum.py
 import timeit
+from benchmark import report
 
 numbers = list(range(100_000))
 
@@ -324,6 +370,7 @@ def hand_written() -> int:
 assert hand_written() == sum(numbers)
 t_loop = timeit.timeit(hand_written, number=50)
 t_sum = timeit.timeit(lambda: sum(numbers), number=50)
+report(hand_written=t_loop, builtin_sum=t_sum)
 print(f"sum() at least twice as fast: {t_sum * 2 < t_loop}")
 #: sum() at least twice as fast: True
 ```
@@ -350,6 +397,7 @@ That is a micro-optimization, so let a measurement justify it:
 ```python
 # hoist_attribute_lookup.py
 import timeit
+from benchmark import report
 
 n = 100_000
 
@@ -369,6 +417,7 @@ def with_hoisted_local() -> list[int]:
 assert with_attribute_lookup() == with_hoisted_local()
 t_attr = timeit.timeit(with_attribute_lookup, number=100)
 t_local = timeit.timeit(with_hoisted_local, number=100)
+report(attribute_lookup=t_attr, hoisted_local=t_local)
 print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
 #: hoisting did not halve the time: True
 ```
@@ -448,6 +497,7 @@ Timing all three together shows the size of each step:
 # search_comparison.py
 import bisect
 import timeit
+from benchmark import report
 
 n = 100_000
 as_list = list(range(n))
@@ -468,6 +518,7 @@ assert {scan(), binary_search(), hashed()} == {True}
 t_scan = timeit.timeit(scan, number=1000)
 t_search = timeit.timeit(binary_search, number=1000)
 t_hashed = timeit.timeit(hashed, number=1000)
+report(scan=t_scan, binary_search=t_search, hashed=t_hashed)
 print(f"binary search at least 100x faster than scan: "
       f"{t_search * 100 < t_scan}")
 #: binary search at least 100x faster than scan: True
@@ -590,6 +641,7 @@ no matter how many times you repeat it:
 # heap_vs_hash.py
 import heapq
 import timeit
+from benchmark import report
 
 n = 10_000
 data = list(range(n, 0, -1))
@@ -613,6 +665,7 @@ def hash_min_extractions() -> list[int]:
 assert heap_min_extractions() == hash_min_extractions()
 t_heap = timeit.timeit(heap_min_extractions, number=50)
 t_hash = timeit.timeit(hash_min_extractions, number=50)
+report(heap=t_heap, repeated_min=t_hash)
 print(f"heap at least 10x faster than repeated min() on a set: "
       f"{t_heap * 10 < t_hash}")
 #: heap at least 10x faster than repeated min() on a set: True
@@ -649,6 +702,7 @@ and no work happens past the point where the consumer stops.
 # lazy_pipeline.py
 import tracemalloc
 from itertools import islice
+from benchmark import report
 
 n = 1_000_000
 
@@ -674,6 +728,7 @@ tracemalloc.stop()
 
 print(eager, eager == lazy)
 #: [0, 4, 16, 36, 64] True
+report(eager_peak_bytes=eager_peak, lazy_peak_bytes=lazy_peak)
 print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 #: lazy peak under 1% of eager: True
 ```
@@ -807,6 +862,7 @@ A data class can generate the slots.
 # slots_dataclass.py
 import sys
 from dataclasses import dataclass
+from benchmark import report
 from exceptions import ignore
 
 @dataclass(slots=True)
@@ -842,6 +898,7 @@ with ignore(AttributeError):
 
 frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
+report(frozen_bytes=frozen_bytes, slotted_bytes=slotted_bytes)
 print(f"slots at least 5x smaller: "
       f"{slotted_bytes * 5 < frozen_bytes}")
 #: slots at least 5x smaller: True
@@ -882,6 +939,7 @@ The `array` module packs numbers into a single block of C values instead:
 # compact_array.py
 import sys
 from array import array
+from benchmark import report
 from exceptions import ignore
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
@@ -901,6 +959,7 @@ list_bytes = sys.getsizeof(nums) + sum(
 )
 packed = array("d", nums)
 array_bytes = sys.getsizeof(packed)
+report(list_bytes=list_bytes, array_bytes=array_bytes)
 print(f"array at least 3x smaller: "
       f"{array_bytes * 3 < list_bytes}")
 #: array at least 3x smaller: True
@@ -942,10 +1001,13 @@ The saving shows up at a size worth measuring:
 ```python
 # memory_view_size.py
 import sys
+from benchmark import report
 
 big = bytearray(1_000_000)
 copied = big[:500_000]
 viewed = memoryview(big)[:500_000]
+report(copy_bytes=sys.getsizeof(copied),
+       view_bytes=sys.getsizeof(viewed))
 print(f"view under 1% of copy: "
       f"{sys.getsizeof(viewed) * 100 < sys.getsizeof(copied)}")
 #: view under 1% of copy: True

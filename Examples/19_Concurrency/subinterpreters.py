@@ -1,6 +1,7 @@
 # subinterpreters.py
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
+from benchmark import report
 
 def cpu_price(order: int) -> int:
     total = 0
@@ -21,5 +22,6 @@ with InterpreterPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
+report(sequential=t_seq, subinterpreters=t_sub)
 print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
 #: subinterpreters at least 1.5x faster: True

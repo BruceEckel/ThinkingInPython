@@ -1,6 +1,7 @@
 # lazy_pipeline.py
 import tracemalloc
 from itertools import islice
+from benchmark import report
 
 n = 1_000_000
 
@@ -26,5 +27,6 @@ tracemalloc.stop()
 
 print(eager, eager == lazy)
 #: [0, 4, 16, 36, 64] True
+report(eager_peak_bytes=eager_peak, lazy_peak_bytes=lazy_peak)
 print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 #: lazy peak under 1% of eager: True
