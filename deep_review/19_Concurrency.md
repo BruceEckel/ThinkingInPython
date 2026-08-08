@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -36,7 +37,7 @@ historical point but not implying Python implements it:
 > Languages and runtimes responded by taking scheduling back:
 > Go and Java multiplex lightweight tasks onto a pool of OS threads,
 > while Python gives each parallel worker its own interpreter,
-> in a separate process or, since 3.12, inside this one.
+> in a separate process or, since 3.12, inside the current process.
 
 The alternative is to cut the paragraph entirely. It is doing less work than
 the coroutine paragraph above it, and "I/O-Bound vs CPU-Bound" restates the
@@ -260,7 +261,7 @@ for the author to choose:
    `timeit` runs for each side, the same treatment `CLAUDE.md` suggests for
    `thread_compare.py`'s `compare()`. This removes the scheduling noise but not
    the two-core ceiling.
-2. Scale the claim to the machine: compare against `os.cpu_count()`, e.g.
+2. [[do this]] Scale the claim to the machine: compare against `os.cpu_count()`, e.g.
    assert the speedup clears `min(1.5, cores * 0.7)`. This says what the
    listing actually means ("several interpreters really do run at once")
    without pretending a two-core box can show a 1.5x win reliably.
@@ -374,6 +375,10 @@ That loses the concrete numbers, which is a real cost for a section titled
 but move the listing's real assertion into the existing
 `holds over 200 tasks: True` line and mark the exact ones as illustrative in
 the prose ("your numbers will differ; the ratio will not"). Author's call.
+
+[[Add a flag that allows the user to run it on their own machine and get exact numbers.
+The non-flagged run is what the book build uses and it should be basic and fast, just enough to validate.
+use the durable fix.]]
 
 ---
 

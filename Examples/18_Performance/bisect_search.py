@@ -1,5 +1,9 @@
 # bisect_search.py
 import bisect
+from typing import Final
+
+CUTOFFS: Final[list[int]] = [60, 70, 80, 90]
+LETTERS: Final[str] = "FDCBA"
 
 scores = [60, 70, 75, 90]  # Must stay sorted
 i = bisect.bisect(scores, 78)  # Where 78 goes
@@ -11,9 +15,7 @@ print(scores)
 
 def grade(score: int) -> str:
     # Map a score to a letter through its cutoff boundaries:
-    cutoffs = [60, 70, 80, 90]
-    letters = "FDCBA"
-    return letters[bisect.bisect(cutoffs, score)]
+    return LETTERS[bisect.bisect(CUTOFFS, score)]
 
 print([grade(s) for s in (55, 65, 85, 95)])
 #: ['F', 'D', 'B', 'A']

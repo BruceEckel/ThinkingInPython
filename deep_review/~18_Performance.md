@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -439,7 +440,7 @@ Proposed replacement for the last sentence:
 
 > The list of integers `collatz_lengths()` takes and returns crosses 50,000
 > times, which sounds like exactly the thing to avoid — but each crossing
-> buys a hundred-odd loop iterations of real work, so the conversion
+> buys a hundred-odd loop iterations of real work, so the conversion cost
 > disappears into the win. The question is never the object count on its own,
 > it is the work done per object crossed.
 

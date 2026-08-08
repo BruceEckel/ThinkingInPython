@@ -330,3 +330,94 @@ pays off when the loop over it leaves Python. `sum()` over an
 `array` stays in Python and boxes every element; a NumPy `sum` over
 the same bytes never creates a Python object at all, which is why
 vectorizing wins where `array` alone does not.
+
+## 10. `"".join()` against `+=`, at two sizes
+
+```python
+# ch18_join_vs_concat.py
+import timeit
+
+def build_join(parts: list[str]) -> str:
+    return "".join(parts)
+
+def build_concat(parts: list[str]) -> str:
+    out = ""
+    for p in parts:
+        out += p
+    return out
+
+many = ["ab"] * 10_000
+few = ["ab"] * 100
+assert build_join(many) == build_concat(many)
+
+j_many = timeit.timeit(lambda: build_join(many), number=200)
+c_many = timeit.timeit(lambda: build_concat(many), number=200)
+print(f"join wins at 10,000 parts: {j_many < c_many}")
+#: join wins at 10,000 parts: True
+
+j_few = timeit.timeit(lambda: build_join(few), number=200)
+c_few = timeit.timeit(lambda: build_concat(few), number=200)
+print(f"join still wins at 100 parts: {j_few < c_few}")
+#: join still wins at 100 parts: True
+print(f"both under 50 microseconds per call at 100 parts: "
+      f"{max(j_few, c_few) / 200 < 50e-6}")
+#: both under 50 microseconds per call at 100 parts: True
+```
+
+The ratio does not go away. One machine measured `join` about 19
+times faster at 10,000 parts and about 7 times faster at 100. What
+goes away is the amount at stake: at 100 short strings both versions
+finish in a couple of microseconds, so the loop would have to run
+thousands of times before the choice showed up in a profile.
+
+That is the answer to "at which size does it stop mattering": not at
+a size where the two become equally fast, but at a size where both
+are fast enough that the difference is below anything you would
+measure.
+
+Write `join()` anyway. It is one line instead of three, it says what
+the result is rather than how it accumulates, and it is the version
+that keeps working when the 100 parts turn into 100,000. CPython
+does special-case `out += p` when `out` has a single reference,
+resizing in place instead of copying, which is why the loop is merely
+slower rather than quadratic. That optimization is an implementation
+detail, and it disappears the moment a second name refers to the
+string being built.
+
+## 11. `bisect()` and `bisect_left()` against duplicates
+
+```python
+# ch18_bisect_duplicates.py
+import bisect
+
+xs = [1, 3, 5, 5, 5, 7, 9]
+left = bisect.bisect_left(xs, 5)
+right = bisect.bisect(xs, 5)  # bisect() is bisect_right()
+print(left, right)
+#: 2 5
+print(xs[left])  # The first 5
+#: 5
+print(xs[right])  # One past the last 5
+#: 7
+print(xs[left:right])  # Every 5, as a slice
+#: [5, 5, 5]
+
+bisect.insort(xs, 5)  # insort() is insort_right()
+print(xs)
+#: [1, 3, 5, 5, 5, 5, 7, 9]
+```
+
+`bisect_left()` finds the first occurrence. It returns the position
+before any equal elements, so `xs[left]` is the target when the
+target is present, which is what a membership test needs and what
+`search_comparison.py` relies on.
+
+`bisect()`, the alias for `bisect_right()`, returns the position
+after the last equal element. That is the position to insert at when
+you want a new duplicate to land after the existing ones, and it is
+the wrong index to read: `xs[right]` is the next larger value, or an
+`IndexError` when the target is the largest element in the list.
+
+The pair together answers a third question the chapter does not
+raise. `xs[left:right]` is the run of equal values, and
+`right - left` counts them, both in O(log n) with no scan.

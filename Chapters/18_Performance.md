@@ -36,6 +36,14 @@ The interpreter has grown substantially faster since 3.10,
 and moving a project forward two or three point releases costs a test run rather than a rewrite.
 It is the only entry on this whole ladder that requires no code change at all.
 
+CPython itself has an experimental just-in-time compiler.
+Builds that include it, as the official 3.13 and later binaries do,
+keep it switched off unless you set `PYTHON_JIT=1`,
+and the gain today is a single-digit percentage,
+so it is worth a measurement rather than a plan.
+Whether it stays is still being settled
+([PEP 836](https://peps.python.org/pep-0836/)).
+
 Alternative interpreters for Python exist,
 notably PyPy which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
@@ -51,7 +59,8 @@ Although it is tempting to think you "have a pretty good idea where the slowdown
 programmers turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
-The standard library includes two profilers.
+The standard library includes two: a deterministic tracing profiler, and,
+new in Python 3.15, a sampling profiler.
 The classic `cProfile` was introduced in 2006.
 It deterministically records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
@@ -77,14 +86,16 @@ they call everything, so they contain everything.
 Scan down to the first row where `tottime` is large.
 That is the function to attack.
 `ncalls` decides how to attack it:
-one call burning six milliseconds needs a better algorithm,
-ten thousand calls burning a microsecond each need fewer calls.
+the one call burning six milliseconds needs a better algorithm,
+while a row with ten thousand calls and a large `tottime` needs fewer calls rather than a faster body.
 
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
 The deterministic tracing profiler becomes `profiling.tracing`,
 with `cProfile` kept as an alias.
-Python 3.15 also adds a new *sampling* profiler named `profiling.sampling`.
+The old pure-Python `profile` module is deprecated in 3.15 and goes away in 3.17,
+so use `profiling.tracing` or `cProfile` for tracing.
+The sampling profiler is `profiling.sampling`.
 Instead of tracing every call, it takes periodic snapshots of the call stack,
 so the overhead is near zero and the program runs at full speed while you watch.
 You invoke it like this:
@@ -362,9 +373,12 @@ print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
 #: hoisting did not halve the time: True
 ```
 
-Here the hoist does not pay off.
-Modern CPython already caches a repeated attribute lookup like `out.append` inside a loop,
-so it costs little more than the local variable.
+Here the hoist does not pay off, and it can cost.
+`out.append(i)` compiles to a method load that pushes the function and its `self` separately,
+with no bound method built.
+`append = out.append` builds one, and every call then goes through it.
+Two machines measured the hoisted version five and twenty percent slower.
+Measure it on your own machine before believing either direction.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
 so a claim about a small difference measures the machine's mood.
@@ -389,6 +403,10 @@ the `bisect` module finds the insertion point using binary search:
 ```python
 # bisect_search.py
 import bisect
+from typing import Final
+
+CUTOFFS: Final[list[int]] = [60, 70, 80, 90]
+LETTERS: Final[str] = "FDCBA"
 
 scores = [60, 70, 75, 90]  # Must stay sorted
 i = bisect.bisect(scores, 78)  # Where 78 goes
@@ -400,9 +418,7 @@ print(scores)
 
 def grade(score: int) -> str:
     # Map a score to a letter through its cutoff boundaries:
-    cutoffs = [60, 70, 80, 90]
-    letters = "FDCBA"
-    return letters[bisect.bisect(cutoffs, score)]
+    return LETTERS[bisect.bisect(CUTOFFS, score)]
 
 print([grade(s) for s in (55, 65, 85, 95)])
 #: ['F', 'D', 'B', 'A']
@@ -474,13 +490,7 @@ and hashing at about five times faster than `bisect`.
 
 When you repeatedly need the smallest or largest item,
 a *heap* keeps that item reachable in O(log n).
-The `heapq` module treats a `list` as a binary heap.
-Through Python 3.13, `heapq` only built a min-heap;
-getting a max-heap meant negating every value going in and out.
-Python 3.14 added `_max` variants
-(`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
-that keep the largest item at index 0 instead,
-so the negation trick is no longer necessary:
+The `heapq` module treats a `list` as a binary heap:
 
 ```python
 # heap_queue.py
@@ -499,11 +509,26 @@ print(heapq.heappop(nums))  # Remove and return the smallest
 #: 1
 print(nums)
 #: [2, 3, 7, 8, 5]
-# Doesn't make a heap from the list:
+# Does not reorder the argument:
 print(heapq.nsmallest(3, [5, 1, 8, 3, 2]))
 #: [1, 2, 3]
 print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 #: [8, 5]
+```
+
+After `heapify()` the smallest element is placed at index 0.
+`nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
+
+Through Python 3.13, `heapq` only built a min-heap;
+getting a max-heap meant negating every value going in and out.
+Python 3.14 added `_max` variants
+(`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
+that keep the largest item at index 0 instead,
+so the negation trick is no longer necessary:
+
+```python
+# max_heap_queue.py
+import heapq
 
 max_nums = [5, 1, 8, 3, 2]
 heapq.heapify_max(max_nums)  # Rearrange into a max-heap in place
@@ -520,9 +545,8 @@ print(max_nums)  # Heap ordering is maintained
 #: [8, 3, 5, 1, 2]
 ```
 
-After `heapify()` the smallest element is placed at index 0,
-and `heapify_max()` mirrors it with the largest element at index 0.
-`nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
+Every operation mirrors its min-heap partner,
+with `heapify_max()` putting the largest element at index 0.
 
 The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 maintains the list according to its own logic.
@@ -753,7 +777,7 @@ Three tools reduce that overhead.
 
 By default each instance stores its attributes in a `__dict__`.
 Declaring `__slots__` replaces that dict with a fixed set of fields,
-which shrinks each instance and speeds attribute access:
+which shrinks each instance:
 
 ```python
 # slots.py
@@ -822,6 +846,12 @@ print(f"slots at least 5x smaller: "
       f"{slotted_bytes * 5 < frozen_bytes}")
 #: slots at least 5x smaller: True
 ```
+
+The two failed assignments print differently on purpose.
+The slotted message varies between builds,
+so the first block reports only the exception's type,
+while the frozen message is stable and `ignore()` shows it whole.
+That filter catches a `FrozenInstanceError` because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
@@ -905,6 +935,27 @@ print(view.nbytes)
 
 The view shares storage with `data`,
 so writing through it changes the original and copies no bytes.
+`bytes(chunk)` does copy, but only to print the slice; the view never did.
+
+The saving shows up at a size worth measuring:
+
+```python
+# memory_view_size.py
+import sys
+
+big = bytearray(1_000_000)
+copied = big[:500_000]
+viewed = memoryview(big)[:500_000]
+print(f"view under 1% of copy: "
+      f"{sys.getsizeof(viewed) * 100 < sys.getsizeof(copied)}")
+#: view under 1% of copy: True
+print(viewed.nbytes)
+#: 500000
+```
+
+The slice copies half a megabyte.
+The view addresses the same half megabyte while occupying a couple of hundred bytes,
+because it holds a pointer and a shape rather than the data.
 
 ## Vectorize with NumPy
 
@@ -1199,8 +1250,13 @@ Keep the interface coarse.
 A single call that does significant work wins.
 A million calls that each do a little spend the gain on boundary-crossing overhead.
 Shipping millions of small Python objects across the boundary loses it too.
-Numbers, strings, bytes, and NumPy arrays cross cheaply,
-and so does the plain list of integers `collatz_lengths()` takes and returns here.
+Numbers, strings, bytes, and NumPy arrays cross cheaply.
+The list of integers `collatz_lengths()` takes and returns crosses 50,000 times,
+which sounds like the thing to avoid,
+but each crossing buys a hundred-odd loop iterations of real work,
+so the conversion cost disappears into the win.
+The question is never the object count on its own,
+it is the work done per object crossed.
 
 <!-- TODO(py315-deps): once NumPy and Numba are available, extend
 rust/fastcount/demo.py (and this listing)
@@ -1235,8 +1291,8 @@ stopping when the program is fast enough:
 6. Cache the pure functions.
 7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
 8. Vectorize with NumPy, or JIT-compile the loop with Numba.
-9. Restructure for async or parallelism ([Concurrency](19_Concurrency.md)).
-10. Rewrite the proven-hot function in Rust.
+9. Rewrite the proven-hot function in Rust.
+10. Restructure for async or parallelism ([Concurrency](19_Concurrency.md)).
 
 After every change, measure again.
 Optimizations interact, the bottleneck moves,
@@ -1280,3 +1336,11 @@ not just where it sits on that curve:
     Time an element-by-element sum over each with `timeit`.
     The `array` uses a quarter of the memory: is it also faster to iterate,
     and why not?
+10. Time `"".join(parts)` against `+=` in a loop for 10,000 short strings,
+    then repeat at 100 strings.
+    At which size does the difference stop mattering,
+    and which of the two would you write anyway?
+11. `bisect_search.py` uses `bisect()` and `search_comparison.py` uses `bisect_left()`.
+    Build a sorted list with duplicates,
+    run both against a value that appears three times,
+    and explain which one you need to find the first occurrence and which one you need to insert after the last.
