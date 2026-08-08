@@ -9,6 +9,9 @@ They state what the code is supposed to do, and check it.
 
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
+Tests also push back on the design.
+A function you cannot test easily is usually one that goes looking for the clock,
+the filesystem, or the network instead of being handed them.
 
 Perhaps more importantly,
 tests tell you immediately if a change you've made causes a failure.
@@ -41,8 +44,6 @@ Often, however, you are not sure what direction a program will take you.
 You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
-Once you have found a good path,
-AI makes a thorough test suite far cheaper to produce.
 
 ## pytest
 
@@ -62,14 +63,15 @@ The tests in this chapter check the following `Account` class:
 
 ```python
 # account.py
+from dataclasses import dataclass
 
 class InsufficientFunds(Exception):
     def __init__(self, balance: float, amount: float) -> None:
         super().__init__(f"balance {balance} is less than {amount}")
 
+@dataclass
 class Account:
-    def __init__(self, balance: float = 0.0) -> None:
-        self.balance = balance
+    balance: float = 0.0
 
     def deposit(self, amount: float) -> None:
         if amount <= 0:
@@ -134,6 +136,11 @@ and reports success and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
+`pytest -k overdraft` runs only the tests whose names contain "overdraft",
+`pytest -x` stops at the first failure,
+and `pytest --lf` reruns just the tests that failed last time.
+Those three cover most of a working day.
+
 Change the expected value in `test_deposit_increases_balance()` to `10` and the report names the line,
 the expression, and both sides:
 
@@ -145,7 +152,7 @@ ______________ test_deposit_increases_balance ______________
         account.deposit(100)
 >       assert account.balance == 10
 E       assert 100.0 == 10
-E        +  where 100.0 = <account.Account object>.balance
+E        +  where 100.0 = Account(balance=100.0).balance
 
 test_account.py:11: AssertionError
 ```
@@ -153,13 +160,12 @@ test_account.py:11: AssertionError
 The `where` line is the rewriting at work:
 `pytest` kept the sub-expression `account.balance` and its value,
 which a bare `assert` statement would have discarded.
+`Account` is a `@dataclass`,
+so its generated `__repr__()` names the field values;
+a hand-written class with no `__repr__()` would print `<account.Account object>` there instead.
 
-## Testing for Exceptions and Floating Point
+## Testing for Exceptions
 
-Two situations come up repeatedly in testing,
-and both appear in `test_account.py`.
-
-The first is "this call should raise an exception."
 `test_overdraft_raises()` uses `pytest.raises()` as a context manager.
 The test passes only if the block raises the expected exception.
 
@@ -188,11 +194,35 @@ Inside the block it would never run at all:
 the exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then absorbs it.
 
-The second is comparing floating-point numbers,
-where testing for exact equality is unreliable.
+## Comparing Floating-Point Values
+
+Testing floating-point results for exact equality is unreliable.
 `test_interest_uses_approx()` compares with `pytest.approx()`,
 which allows a small tolerance: a relative difference of 1e-6,
 unless you pass `rel=` or `abs=`.
+
+That test would pass with `==` as well.
+`100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,
+and so is every other round rate on a round balance.
+The trouble starts once error accumulates:
+
+```python
+# test_compounding.py
+import pytest
+from account import Account
+
+def test_interest_compounds() -> None:
+    account = Account(100)
+    for _ in range(5):
+        account.add_interest(0.05)
+    assert account.balance == pytest.approx(127.62815625)
+```
+
+Five applications of 5% land on `127.62815624999999`,
+so the same assertion written with `==` against `127.62815625` fails.
+Use `approx()` as the habit rather than as the rescue:
+the first test does not need it,
+and you cannot tell by looking which of the two you are writing.
 
 ## Parametrizing Tests
 
@@ -227,6 +257,13 @@ def test_withdraw_leaves_expected_balance(
 Each tuple supplies all three arguments for one run,
 so this produces three independent tests.
 The names in the string line up, in order, with the values in each tuple.
+
+`parametrize` is a *mark*, and three others turn up in any existing suite.
+`@pytest.mark.skip` and `@pytest.mark.skipif` leave a test out,
+unconditionally or on a condition such as the platform.
+`@pytest.mark.xfail` records a known bug: the test still runs,
+a failure is reported as expected rather than as a break,
+and the suite stays green without anyone deleting the test that proves the bug.
 
 ## Fixtures Replace Setup and Teardown
 
@@ -272,10 +309,12 @@ A failing check there is reported as an error, not as a test failure:
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
 
-You can automatically invoke a fixture for every test
-(without specifying the fixture in each test) by adding the `autouse` flag:
-
-    @pytest.fixture(autouse=True)
+A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scope without any test naming it.
+That suits a fixture whose value is a side effect rather than an object:
+resetting a global registry, or installing a `monkeypatch` every test needs.
+It does not save you from naming a fixture you want to use.
+An autouse fixture still has to appear in the parameter list before the test can see what it returns,
+so marking `funded` autouse and then writing `funded.withdraw(40)` raises a `NameError`.
 
 Fixtures eliminate duplicated setup.
 A test that names `funded` states what it needs and nothing about how to build it.
@@ -286,8 +325,8 @@ A fixture defined in a file named `conftest.py` is available to every test in th
 with no import.
 Place shared setup in `conftest.py`.
 
-You can parametrize fixtures too.
-Every test that requests the fixture runs once for each parameter value:
+A directory has one `conftest.py`, so its fixtures accumulate in that file.
+This one holds two, and they demonstrate different things:
 
 ```python
 # conftest.py
@@ -303,6 +342,7 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
     return Account(request.param)
 ```
 
+Take `bank_name` first.
 `pytest` builds the `scope="session"` fixture once and reuses it,
 which is useful for expensive resources.
 The reuse is the risk as well as the point: every test receives the same object,
@@ -310,24 +350,87 @@ so one test that mutates it changes what the next test sees.
 Keep session fixtures to values nothing modifies, like `bank_name`,
 or to a resource with its own reset,
 and leave anything a test writes to at the default per-test scope.
-`pytest` rebuilds the `preloaded` fixture for each parameter,
+
+`preloaded` shows the other feature: you can parametrize a fixture.
+Every test that requests it runs once for each parameter value,
+with `request.param` holding the value for that run.
+`pytest` rebuilds `preloaded` for each parameter,
 so a test that uses it automatically runs at every starting balance:
 
 ```python
 # test_fixtures.py
 from account import Account
 
-def test_deposit_on_any_balance(
-    preloaded: Account, bank_name: str
-) -> None:
+def test_deposit_on_any_balance(preloaded: Account) -> None:
     start = preloaded.balance
     preloaded.deposit(1)
     assert preloaded.balance == start + 1
-    assert bank_name  # The session fixture is available everywhere
+
+def test_bank_name_is_shared(bank_name: str) -> None:
+    assert bank_name == "Crunchy Frog Credit Union"
 ```
 
 Nothing imports either fixture.
 `pytest` finds them in `conftest.py` and supplies them by name.
+
+`parametrize` multiplies the one test it decorates;
+a parametrized fixture multiplies every test that requests it,
+in this file and every other file that can see the `conftest.py`.
+Use the mark when the cases belong to one test,
+and the fixture when the same variation should sweep across a whole suite.
+
+## White-Box and Black-Box Tests
+
+A *white-box* test reaches into the internals of the code it checks.
+A *black-box* test treats the code as an opaque box and exercises only its public interface,
+the way a client would.
+
+In a language with access control, the compiler enforces the difference.
+Python has no access control, so every attribute is reachable.
+A single leading underscore, as in `self._balance`,
+changes nothing at the language level.
+It is stored under that exact name and reachable like any other attribute.
+It is only a convention that says, "this is private, do not rely on it."
+
+A leading double underscore does something real,
+though it is still not access control.
+Python's compiler rewrites `self.__pin`, written inside a class body,
+into `self._ClassName__pin`, a transformation called *name mangling*.
+`ty` does not model this rewriting,
+so its report on the code below disagrees with what actually runs:
+
+```python
+# name_mangling.py
+
+class Vault:
+    def __init__(self) -> None:
+        self._balance = 0  # Single underscore: convention only
+        self.__pin = "1234"  # Double underscore: gets mangled
+
+v = Vault()
+print(vars(v))
+#: {'_balance': 0, '_Vault__pin': '1234'}
+# ty: unresolved attribute "_Vault__pin":
+print(v._Vault__pin)  # type: ignore
+#: 1234
+```
+
+`vars(v)` shows what actually got stored: `_balance` under its own name,
+and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
+The rewritten name is a real attribute like any other,
+so `v._Vault__pin` reads it successfully.
+Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
+not to hide the attribute.
+In Python the distinction between white-box and black-box remains one of discipline,
+not of compiler enforcement.
+
+That makes black-box testing the sensible default.
+If you test the public surface, the methods a caller is meant to use,
+you can change the internals without rewriting the tests.
+The `Account` tests are black-box,
+which means they never read a private attribute.
+When you do need a white-box test for a tricky internal, nothing stops you,
+but treat each one as a test that may break when you refactor.
 
 ## Isolating Tests from the World
 
@@ -447,6 +550,9 @@ def test_roll_with_seeded_rng() -> None:
 The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
+The `4` here is simply what `Random(0)` produces first,
+and its agreeing with the stubbed value above is a coincidence:
+as with any seed, you record the value it gives you rather than picking one.
 
 ### The Clock
 
@@ -474,25 +580,29 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock is cleaner still.
-Here a `stamp()` function takes a `now` callable:
+The same computation takes `now` as an argument instead of reaching for it:
 
 ```python
-# clock.py
+# clock_injected.py
 from collections.abc import Callable
 
-def stamp(now: Callable[[], float]) -> float:
-    return now()
+def elapsed(start: float, now: Callable[[], float]) -> float:
+    return now() - start
 ```
 
-The test provides a fixed value for `now`:
+The test hands it a fixed value:
 
 ```python
-# test_clock.py
-import clock
+# test_clock_injected.py
+import clock_injected
 
-def test_stamp() -> None:
-    assert clock.stamp(lambda: 100.0) == 100.0
+def test_elapsed() -> None:
+    assert clock_injected.elapsed(40.0, lambda: 100.0) == 60.0
 ```
+
+Both tests check the identical arithmetic.
+Only the injected one needs no `monkeypatch`,
+and only it says in its signature where the time comes from.
 
 `datetime.now()` is harder to patch,
 because `datetime` is an immutable C type that rejects attribute assignment,
@@ -578,59 +688,6 @@ and you will meet it in most existing code.
 This book patches with `monkeypatch` and prefers injection where the code can be changed,
 because a function that takes its clock or its fetcher as an argument needs no patching library at all.
 
-## White-Box and Black-Box Tests
-
-A *white-box* test reaches into the internals of the code it checks.
-A *black-box* test treats the code as an opaque box and exercises only its public interface,
-the way a client would.
-
-In a language with access control, the compiler enforces the difference.
-Python has no access control, so every attribute is reachable.
-A single leading underscore, as in `self._balance`,
-changes nothing at the language level.
-It is stored under that exact name and reachable like any other attribute.
-It is only a convention that says, "this is private, do not rely on it."
-
-A leading double underscore does something real,
-though it is still not access control.
-Python's compiler rewrites `self.__pin`, written inside a class body,
-into `self._ClassName__pin`, a transformation called *name mangling*.
-`ty` does not model this rewriting,
-so its report on the code below disagrees with what actually runs:
-
-```python
-# name_mangling.py
-
-class Vault:
-    def __init__(self) -> None:
-        self._balance = 0  # Single underscore: convention only
-        self.__pin = "1234"  # Double underscore: gets mangled
-
-v = Vault()
-print(vars(v))
-#: {'_balance': 0, '_Vault__pin': '1234'}
-# ty: unresolved attribute "_Vault__pin":
-print(v._Vault__pin)  # type: ignore
-#: 1234
-```
-
-`vars(v)` shows what actually got stored: `_balance` under its own name,
-and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
-The rewritten name is a real attribute like any other,
-so `v._Vault__pin` reads it successfully.
-Mangling exists to stop a subclass from accidentally colliding with a base class's private-looking name,
-not to hide the attribute.
-In Python the distinction between white-box and black-box remains one of discipline,
-not of compiler enforcement.
-
-That makes black-box testing the sensible default.
-If you test the public surface, the methods a caller is meant to use,
-you can change the internals without rewriting the tests.
-The `Account` tests are black-box,
-which means they never read a private attribute.
-When you do need a white-box test for a tricky internal, nothing stops you,
-but treat each one as a test that may break when you refactor.
-
 ## Property-Based Testing
 
 The tests in this chapter check specific examples:
@@ -649,6 +706,8 @@ It runs plain programs and reports their failures.
 It hands files named `test_*.py` and `conftest.py` to `pytest` instead,
 and a failing test fails the build.
 
+## Making Code Testable
+
 You can now take an untested function and make it testable.
 Name what it depends on: the clock, randomness, the filesystem, the environment,
 the network.
@@ -657,6 +716,11 @@ by injection where you can change the code and with `monkeypatch` where you cann
 Then pin the behavior that is left with a handful of parametrized cases.
 The work is mostly in the first step,
 since a function that is hard to test is usually one that goes looking for something it was never handed.
+
+To find out what you have not tested, run the suite under `coverage.py`,
+which `pytest --cov` wires up for you.
+Read the result as a list of lines nothing exercised, not as a score:
+a line a test happened to execute is not the same as a line a test checks.
 
 ## Exercises
 
@@ -672,3 +736,7 @@ since a function that is hard to test is usually one that goes looking for somet
     and test it with `monkeypatch` and `tmp_path`.
     Then rewrite the function to take the directory as an argument and test it again.
     Which test would survive a change to the environment variable's name?
+5.  `weather.current_temp()` calls `urlopen()`.
+    Write a second function that takes a fetcher as an argument instead,
+    and test both: one with `monkeypatch`, one with a plain function passed in.
+    Then rename `weather.urlopen` to `weather.fetch` and see which test still passes.

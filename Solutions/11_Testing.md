@@ -91,10 +91,13 @@ def test_add_interest_rates(funded: Account, rate: float) -> None:
 
 `parametrize` runs this one test body four times, once per rate,
 reported individually as `test_add_interest_rates[0.0]`,
-`test_add_interest_rates[0.05]`, and so on. `pytest.approx()` absorbs
-the ordinary floating-point rounding in `100 * 1.05` versus
-`100 + 100 * 0.05`, so the test checks the intended relationship
-instead of exact bit-for-bit equality.
+`test_add_interest_rates[0.05]`, and so on. `pytest.approx()` is here
+because the relationship the test states is not guaranteed to be
+exact, not because these four rates round. For `0.0`, `0.05`, `0.5`,
+and `1.0` on a balance of `100`, the two forms are bit-identical and
+`==` would pass just as well. A rate that does not land on a binary
+fraction, or interest applied more than once, is where the assertion
+needs the tolerance.
 
 ## 3. A fixture asserting an invariant after the test
 
@@ -194,3 +197,65 @@ The trade is that injection moves the decision outward: somebody has
 to read `APP_CONFIG` and pass the directory in. That somebody is
 usually one function at the program's edge, which is the one place a
 patching test is worth writing.
+
+## 5. Stubbing a boundary, patched and then injected
+
+```python
+# ch11_weather.py
+import io
+from collections.abc import Callable
+from urllib.request import urlopen
+
+def current_temp(city: str) -> str:
+    with urlopen(f"https://example.com/{city}") as response:
+        return response.read().decode()
+
+def current_temp_with(
+    city: str, fetch: Callable[[str], io.IOBase]
+) -> str:
+    with fetch(f"https://example.com/{city}") as response:
+        return response.read().decode()
+```
+
+```python
+# test_ch11_weather.py
+import io
+import ch11_weather
+import pytest
+
+def fake_fetch(url: str) -> io.BytesIO:
+    return io.BytesIO(b"21C")
+
+def test_patched(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(ch11_weather, "urlopen", fake_fetch)
+    assert ch11_weather.current_temp("denver") == "21C"
+
+def test_injected() -> None:
+    got = ch11_weather.current_temp_with("denver", fake_fetch)
+    assert got == "21C"
+```
+
+Both tests pass and neither touches the network. The stub is the same
+function in both: a fetcher returning a `BytesIO` that behaves enough
+like a response to satisfy the `with` block and `.read()`.
+
+Renaming `urlopen` to `fetch` in `ch11_weather.py` separates them.
+`test_injected()` still passes, because it never named the dependency;
+it hands one in, and `current_temp_with()` calls whatever it was
+given. `test_patched()` fails with
+`AttributeError: <module 'ch11_weather'> has no attribute 'urlopen'`,
+because `monkeypatch.setattr()` looks the name up by string and the
+string is now wrong.
+
+That is the same lesson exercise 4 draws from the environment variable,
+applied to a different kind of dependency. A patched test is coupled to
+the *name* of the thing it replaces, in the module where that name
+lives. An injected test is coupled only to the shape of what it passes.
+Rename the import, move the call to a helper, or import `urlopen` a
+different way, and the patched test breaks while the code still works.
+
+`monkeypatch` earns its place where you cannot change the code:
+someone else's library, or a function you are not ready to refactor.
+Where you can change the signature, injection turns the dependency into
+part of the contract, which is what the chapter means by a function
+that goes looking for something it was never handed.
