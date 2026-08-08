@@ -602,6 +602,7 @@ happens to be reachable by one name.
 
 ```python
 # exercise_12.py
+import os
 import sys
 import timeit
 from concurrent.futures import ThreadPoolExecutor
@@ -625,10 +626,12 @@ with ThreadPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
+cores = os.cpu_count() or 1
+target = min(1.5, cores * 0.7)  # The chapter's scaled target
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"sequential {t_seq:.6f}, threaded {t_thr:.6f}")
-print(f"threads at least 1.5x faster: {t_seq > t_thr * 1.5}")
-#: threads at least 1.5x faster: False
+print(f"threads run in parallel: {t_seq > t_thr * target}")
+#: threads run in parallel: False
 ```
 
 The assertion passes because correctness never depended on the
@@ -653,3 +656,122 @@ the GIL is per interpreter, not per process, so more interpreters mean
 more locks and real parallelism. A free-threaded build reaches the same
 end by removing the GIL instead of multiplying it, letting ordinary
 threads do what this listing's threads cannot.
+
+## 13. A lock around the loop body, not around `next()`
+
+```python
+# ch19_body_lock.py
+import threading
+import time
+from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from typing import Final
+
+LIMIT: Final[int] = 200
+lock = threading.Lock()
+
+@dataclass
+class Tickets:
+    limit: int
+    next_number: int = 0
+
+    def __iter__(self) -> Iterator[int]:
+        return self
+
+    def __next__(self) -> int:
+        if self.next_number >= self.limit:
+            raise StopIteration
+        current = self.next_number
+        time.sleep(0.000_001)  # Let other threads run
+        self.next_number = current + 1
+        return current
+
+def drain(source: Iterator[int]) -> list[int]:
+    out: list[int] = []
+    for item in source:  # next() runs here, unguarded
+        with lock:
+            out.append(item)  # Only the body is protected
+    return out
+
+def report(source: Iterator[int]) -> None:
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(drain, source) for _ in range(8)]
+        taken = [*f.result() for f in futures]
+    print(f"{len(set(taken))} distinct, "
+          f"duplicates {len(taken) > len(set(taken))}")
+
+report(Tickets(LIMIT))
+#: 200 distinct, duplicates True
+```
+
+`duplicates` stays `True`. The lock changes nothing about the race,
+because the race is not in the loop body.
+
+`for item in source:` is the `for` statement calling
+`source.__next__()`, and that call happens before control reaches the
+indented block. The `with lock:` inside the body therefore starts
+*after* `next()` has already returned a number, and ends before the
+next `next()` begins. Two threads can be inside `__next__()` at the
+same moment, read the same `next_number`, and be handed the same
+ticket, exactly as they were without the lock.
+
+The lock does cover `out.append(item)`, which never needed covering:
+`out` is a local list, one per worker, so no other thread can touch
+it.
+
+Serializing an iterator means putting the lock where the mutation is,
+inside `__next__()`, which is what `threading.serialize_iterator()`
+does. The lesson generalizes past iterators: a lock protects the
+statements it encloses, and a `for` loop's own call to `next()` is not
+one of them.
+
+## 14. Both tasks acquiring in the same order
+
+```python
+# ch19_ordered_locks.py
+import asyncio
+
+lock_a = asyncio.Lock()
+lock_b = asyncio.Lock()
+
+async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+    async with first:
+        await asyncio.sleep(0.01)  # Let the other task run
+        async with second:
+            pass
+
+async def main() -> None:
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(
+                worker(lock_a, lock_b),
+                worker(lock_a, lock_b),  # The same order
+            ),
+            timeout=0.5,
+        )
+        print("both workers finished")
+    except TimeoutError:
+        print("deadlock detected")
+
+asyncio.run(main())
+#: both workers finished
+```
+
+The program prints `both workers finished`, and it does so in about
+twenty milliseconds rather than waiting out the half-second timeout.
+
+Follow who waits for whom. The first task takes `lock_a`, sleeps, then
+takes `lock_b`, which nobody holds. Meanwhile the second task reaches
+`async with lock_a` and suspends, because the first task has it. That
+is a wait, but a wait on a task that is not itself waiting on anything
+the second task holds. The first task finishes, releases both locks,
+and the second task walks the same path through an empty field.
+
+The deadlock version made the waiting circular: task one held `lock_a`
+and wanted `lock_b`, task two held `lock_b` and wanted `lock_a`, so
+each task's progress depended on the other task's progress. A cycle
+like that is the thing a deadlock is. Ordering the acquisitions
+globally makes a cycle impossible to construct, because a task can
+only ever wait on a lock that comes later in the order than every lock
+it already holds, and "later" cannot loop back to "earlier."

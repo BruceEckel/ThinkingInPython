@@ -7,7 +7,7 @@ Both try to speed progress.
 
 The meaning of "at the same time" depends on context.
 Early machines had a single CPU, and early operating systems (OS)
-were basically just program loaders.
+were little more than program loaders.
 The first step beyond that was *time-sharing*.
 The CPU runs one program for a slice of time,
 then the OS stops it and switches to a different program for another time slice.
@@ -97,15 +97,16 @@ Engineers don't have to fight the threading system.
 The programming language decides, based on its knowledge of the program,
 the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
-This shift in control of context switching greatly simplifies writing and reasoning about the program.
+This shift in control of context switching simplifies writing and reasoning about the program.
 
-The second big shift was in language-level control of parallelism.
+The second big shift changed who decides to use parallelism.
 Mapping every parallel task onto its own OS thread worked,
 but it pushed all scheduling decisions onto the OS and needed extra machinery
 (thread pools, pinning, tuning) to perform well.
-Languages and runtimes responded by taking on more of that scheduling,
-multiplexing many lightweight,
-language-managed tasks onto a smaller number of OS threads.
+Languages and runtimes responded by taking scheduling back:
+Go and Java multiplex lightweight tasks onto a pool of OS threads,
+while Python gives each parallel worker its own interpreter,
+in a separate process or, since 3.12, inside the current process.
 
 ## I/O-Bound vs CPU-Bound
 
@@ -145,7 +146,9 @@ This is captured in two keywords and the `asyncio` library:
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
-   This is the entry point, called once to run the program:
+   This is the entry point, called once to run the program.
+   Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`;
+   inside an `async def`, `await` the coroutine directly:
 
 ```python
 # async_mechanics.py
@@ -416,6 +419,10 @@ not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
 Keeping siblings alive past a failure means catching exceptions inside each task yourself.
 
+A `TaskGroup` can also be stopped deliberately.
+`tg.cancel()` (3.15) cancels every task in the group,
+which is what you want when the answer arrives before the batch finishes and the rest of the work is no longer worth doing.
+
 ## Overlapping the Waits
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
@@ -625,7 +632,48 @@ while a coroutine switch happens only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
 just as the same race between threads needs a `threading.Lock`.
-[Locks](#locks) returns to this listing and adds one.
+
+### Locks
+
+A *lock* grants exclusive access to a shared resource so only one task holds it at a time.
+Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates by serializing access to `counter`:
+
+```python
+# async_locks.py
+import asyncio
+
+counter = 0
+lock = asyncio.Lock()
+
+async def increment(count: int) -> None:
+    global counter
+    for _ in range(count):
+        async with lock:
+            value = counter  # Read
+            await asyncio.sleep(0)  # Yield to the event loop
+            counter = value + 1  # Write
+
+async def main() -> None:
+    await asyncio.gather(*(increment(50) for _ in range(8)))
+    print(counter)
+
+asyncio.run(main())
+#: 400
+```
+
+The only change from `async_race.py` is the addition of `async with lock`.
+This protects the read, the yielding `await`, and the write.
+If a task reaches `async with lock` while another task already holds the lock,
+it suspends itself until that lock becomes available.
+This way, only one task's read-modify-write is ever in progress,
+no matter how many times the event loop switches to another task in between.
+All 400 increments now occur,
+the same fix `threading.Lock` produces for threads.
+An `asyncio.Lock` is not thread-safe either.
+It orders tasks on one event loop;
+a worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
+[Locks, Semaphores, and Failure Modes](#locks-semaphores-and-failure-modes)
+takes up the rest of the coordination primitives, and the ways they fail.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -776,8 +824,11 @@ and all three surface in this short listing:
    and that interpreter *imports* this module to find `cpu_price()`.
    During the import the module's name is not `"__main__"`,
    so the guard keeps each worker from running the guarded block and building a pool of workers of its own.
-   If you leave it out,
-   Python detects the runaway spawning and raises `RuntimeError`.
+   If you leave it out, each worker re-runs the block,
+   tries to build a pool of its own,
+   and dies with `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase`.
+   The parent sees the worker's death as `BrokenProcessPool`,
+   with the worker's `RuntimeError` nested in the traceback above it.
    This used to be a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
    Since 3.14 no platform forks by default, so the guard is required everywhere.
@@ -904,10 +955,9 @@ This way, process startup delays never leak into a timed result.
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
 
-Wall time drops sharply as the split grows from one task to one task per core,
-then keeps dropping a little past that point as smaller,
-more numerous chunks balance the load better across workers,
-before flattening out.
+Wall time drops sharply as the split grows toward one task per core.
+Past that point the curve flattens,
+and can turn back upward once pickling one more chunk costs more than the better load balancing saves.
 
 Task counts double from 1 up to `CORE_MULTIPLIER` times the core count,
 so the sweep covers well below, at, and beyond the number of cores available.
@@ -1124,7 +1174,7 @@ The GIL can move to another thread between instructions.
 When two threads both read before either writes, they compute the same result,
 and one increment vanishes.
 
-Since 3.11 the interpreter only switches threads at a function call or at the jump that closes a loop iteration,
+Since 3.10 the interpreter only switches threads at a function call or at the jump that closes a loop iteration,
 so this particular sequence is no longer interrupted in practice.
 That is scheduling luck, not safety.
 
@@ -1237,6 +1287,7 @@ Within a single process, multiple interpreters run in parallel:
 
 ```python
 # subinterpreters.py
+import os
 import timeit
 from concurrent.futures import InterpreterPoolExecutor
 from benchmark import report
@@ -1260,9 +1311,11 @@ with InterpreterPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
-report(sequential=t_seq, subinterpreters=t_sub)
-print(f"subinterpreters at least 1.5x faster: {t_seq > t_sub * 1.5}")
-#: subinterpreters at least 1.5x faster: True
+cores = os.cpu_count() or 1
+target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
+report(sequential=t_seq, subinterpreters=t_sub, cores=cores)
+print(f"subinterpreters run in parallel: {t_seq > t_sub * target}")
+#: subinterpreters run in parallel: True
 ```
 
 Unlike a thread pool, this genuinely overlaps computation.
@@ -1301,8 +1354,12 @@ def enqueue(jobs: list[Job]) -> None:
         tasks.put(job)
 
 with ThreadPoolExecutor(max_workers=2) as pool:
-    pool.submit(enqueue, [(3, "backup"), (1, "page oncall")])
-    pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")])
+    producers = [
+        pool.submit(enqueue, [(3, "backup"), (1, "page oncall")]),
+        pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")]),
+    ]
+for p in producers:
+    p.result()  # Surface any producer failure
 
 while not tasks.empty():
     print(tasks.get())
@@ -1314,11 +1371,13 @@ while not tasks.empty():
 
 The four jobs arrive from two threads in an unpredictable interleaving,
 but the drain comes out in priority order no matter who won each race.
+Collecting the futures and calling `result()` turns a producer's exception into one you can see,
+as [Parallelism](#parallelism)'s third point describes.
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 
 Producers calling `put()` and consumers calling `get()` is how thread pools distribute work.
-`get()` blocks until an item is available, so an idle consumer simply waits.
+`get()` blocks until an item is available, so an idle consumer waits.
 The [Object Pool](15_Context_Managers.md#an-object-pool)
 in Context Managers uses the same `Queue` as a throttle.
 
@@ -1699,7 +1758,8 @@ divides concurrent work into two kinds, and neither kind needs threads.
 A process pool or [subinterpreter](#subinterpreters)
 overlaps CPU-bound computing.
 
-The remaining role for threads is in creating bridges to code that doesn't cooperate with an event loop.
+Threads remain for one job:
+reaching code that doesn't cooperate with an event loop.
 Most database drivers, most GUI toolkits,
 and plenty of C extensions block the calling thread and expose no `async` entry point.
 
@@ -1753,6 +1813,7 @@ import asyncio
 import threading
 import tracemalloc
 from typing import Final
+from benchmark import report
 
 TASKS: Final[int] = 5_000
 # 1 MiB, a common thread stack reservation:
@@ -1787,12 +1848,11 @@ threading.stack_size(default_stack)  # Restore the previous setting
 
 task_cost = asyncio.run(bytes_per_task())
 tasks_per_stack = configured_stack / task_cost
+report(bytes_per_task=task_cost, tasks_per_stack=tasks_per_stack)
 print(f"one thread's stack reservation: {configured_stack:,} bytes")
 #: one thread's stack reservation: 1,048,576 bytes
-print(f"average bytes per task: {task_cost:.0f}")
-#: average bytes per task: 1350
-print(f"tasks fitting in one thread's stack: {tasks_per_stack:.0f}")
-#: tasks fitting in one thread's stack: 777
+print(f"bytes per task under 4 KiB: {task_cost < 4096}")
+#: bytes per task under 4 KiB: True
 print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 #: holds over 200 tasks: True
 ```
@@ -1808,6 +1868,9 @@ could instead hold hundreds of suspended tasks.
 The stack figure is address space set aside whether every byte is touched or not.
 The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one.
+The exact figures move from machine to machine,
+so the listing asserts the two bounds that hold anywhere and prints what it measured under `--numbers`
+(see [Numbers on Your Machine](18_Performance.md#numbers-on-your-machine)).
 
 A similar difference shows up in time:
 
@@ -1865,8 +1928,9 @@ because a task consumes none of the OS resources that limit threads.
 
 ## Locks, Semaphores, and Failure Modes
 
-`async_race.py` showed shared mutable state losing updates with no coordination in place,
-but using tasks instead of threads.
+`async_race.py` in [A Single Thread Still Races](#a-single-thread-still-races)
+lost updates to shared mutable state, and an `asyncio.Lock` restored them,
+with no thread involved either time.
 Threads are not the source of deadlock and livelock.
 That source is shared mutable state,
 and `asyncio` shares it just as readily as threads do.
@@ -1874,43 +1938,6 @@ Removing the OS thread scheduler does not remove these failure modes.
 It only moves where they can happen.
 With threads, that point is anywhere the OS decides to preempt you.
 `asyncio` narrows this to the `await` points you wrote yourself.
-
-### Locks
-
-A *lock* grants exclusive access to a shared resource so only one task holds it at a time.
-Wrapping the read-modify-write from `async_race.py` in an `asyncio.Lock` restores the missing updates by serializing access to `counter`:
-
-```python
-# async_locks.py
-import asyncio
-
-counter = 0
-lock = asyncio.Lock()
-
-async def increment(count: int) -> None:
-    global counter
-    for _ in range(count):
-        async with lock:
-            value = counter  # Read
-            await asyncio.sleep(0)  # Yield to the event loop
-            counter = value + 1  # Write
-
-async def main() -> None:
-    await asyncio.gather(*(increment(50) for _ in range(8)))
-    print(counter)
-
-asyncio.run(main())
-#: 400
-```
-
-The only change from `async_race.py` is the addition of `async with lock`.
-This protects the read, the yielding `await`, and the write.
-If a task reaches `async with lock` while another task already holds the lock,
-it suspends itself until that lock becomes available.
-This way, only one task's read-modify-write is ever in progress,
-no matter how many times the event loop switches to another task in between.
-All 400 increments now occur,
-the same fix `threading.Lock` produces for threads.
 
 ### Semaphores
 
@@ -2145,7 +2172,7 @@ concurrency means "operating or occurring at the same time."
 This works for both asynchrony and parallelism.
 
 Also, notice how much this chapter has talked about the OS.
-The comfortable abstraction provided by normal programming is pierced to tatters by concurrency.
+Concurrency tears through the comfortable abstraction that normal programming provides.
 Sometimes you even need to go beyond the OS-level abstraction,
 all the way to hardware, to understand a particular bug.
 
@@ -2218,7 +2245,8 @@ Here are a few of the topics beyond it:
     Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     so its body runs unconditionally, and run it.
-    Read the error, then explain it with the import mechanics described in [Parallelism](#parallelism):
+    Read the error, whose useful part is the nested `RuntimeError` rather than the `BrokenProcessPool` at the bottom,
+    then explain it with the import mechanics described in [Parallelism](#parallelism):
     what did each worker process do when it imported the module?
 7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
@@ -2246,6 +2274,18 @@ Here are a few of the topics beyond it:
     replace `InterpreterPoolExecutor` with `ThreadPoolExecutor`.
     The assertion still passes and the printed boolean flips.
     Explain both, using [The GIL and Free Threading](#the-gil-and-free-threading).
+13. In `shared_iterator.py`,
+    drop `threading.serialize_iterator()` and give each worker a function that loops over the shared iterator,
+    holding a `threading.Lock` around the loop *body*,
+    the tempting fix in [Sharing an Iterator Between Threads](#sharing-an-iterator-between-threads).
+    Predict whether `duplicates` becomes `False` before running it,
+    and explain which call the lock does and does not cover.
+14. In `async_deadlock.py`,
+    change the second `worker()` call to `worker(lock_a, lock_b)` so both tasks acquire in the same order,
+    and add a line that prints when both finish.
+    Predict what the program prints before running it, then explain,
+    in terms of who waits for whom,
+    why one shared acquisition order removes the cycle.
 
 [^concurrency-def]: Pike's definition from that talk clarifies what he meant.
     Concurrency is the composition of independently executing computations.

@@ -71,7 +71,7 @@ An unlinked name means the pattern appears only in this catalog.
 | Guarded Suspension | Block a call until a precondition becomes true. |
 | Balking | Refuse an action when the object is not in a suitable state. |
 | [Future/Promise](19_Concurrency.md#one-task-many-backends) | Represent a result that will become available later. |
-| Thread-Specific Storage | Give each thread its own copy of a value. |
+| [Thread-Specific Storage](19_Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value. |
 
 ## Architectural (POSA)
 

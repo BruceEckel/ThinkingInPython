@@ -1,4 +1,5 @@
 # exercise_12.py
+import os
 import sys
 import timeit
 from concurrent.futures import ThreadPoolExecutor
@@ -22,7 +23,9 @@ with ThreadPoolExecutor() as pool:
         lambda: list(pool.map(cpu_price, orders)), number=5
     )
 
+cores = os.cpu_count() or 1
+target = min(1.5, cores * 0.7)  # The chapter's scaled target
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"sequential {t_seq:.6f}, threaded {t_thr:.6f}")
-print(f"threads at least 1.5x faster: {t_seq > t_thr * 1.5}")
-#: threads at least 1.5x faster: False
+print(f"threads run in parallel: {t_seq > t_thr * target}")
+#: threads run in parallel: False

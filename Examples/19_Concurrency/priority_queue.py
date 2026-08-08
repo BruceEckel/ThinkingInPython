@@ -11,8 +11,12 @@ def enqueue(jobs: list[Job]) -> None:
         tasks.put(job)
 
 with ThreadPoolExecutor(max_workers=2) as pool:
-    pool.submit(enqueue, [(3, "backup"), (1, "page oncall")])
-    pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")])
+    producers = [
+        pool.submit(enqueue, [(3, "backup"), (1, "page oncall")]),
+        pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")]),
+    ]
+for p in producers:
+    p.result()  # Surface any producer failure
 
 while not tasks.empty():
     print(tasks.get())

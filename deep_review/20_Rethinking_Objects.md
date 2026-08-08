@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -438,4 +439,4 @@ Nothing in another chapter needs to change. Two things checked and cleared:
 factory's import-time-registration and name-collision caveats live in 27 and
 back the registries in 20/37". Chapter 20 contains no registry; the word
 appears nowhere in it. That half of the note looks stale, probably from a
-renumber. Chapter 37's registry is real.
+renumber. Chapter 37's registry is real. [[fix this]]
