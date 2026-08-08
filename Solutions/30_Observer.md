@@ -189,3 +189,98 @@ what its observers do, so it cannot name their failure modes. It
 still lets `BaseException` through, so a `KeyboardInterrupt` or an
 `asyncio.CancelledError` passing through an observer stops the
 notification instead of being collected as data.
+
+## 4. The same rescue, for the async fan-out
+
+```python
+# exercise_4.py
+import asyncio
+from collections.abc import Awaitable, Callable
+
+type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+
+class Observable[T]:
+    def __init__(self) -> None:
+        self._observers: list[AsyncObserver[T]] = []
+
+    def subscribe(self, observer: AsyncObserver[T]) -> None:
+        self._observers.append(observer)
+
+    async def notify(self, data: T) -> None:
+        results = await asyncio.gather(
+            *(obs(data) for obs in self._observers),
+            return_exceptions=True)
+        failures = [r for r in results if isinstance(r, Exception)]
+        if failures:
+            raise ExceptionGroup("observer failures", failures)
+
+received: list[int] = []
+
+async def broken(data: int) -> None:
+    raise RuntimeError(f"cannot handle {data}")
+
+async def record(data: int) -> None:
+    await asyncio.sleep(0)
+    received.append(data)
+
+async def main() -> None:
+    obs = Observable[int]()
+    obs.subscribe(broken)
+    obs.subscribe(record)
+    try:
+        await obs.notify(7)
+    except* RuntimeError as group:
+        print(len(group.exceptions), received)
+
+asyncio.run(main())
+#: 1 [7]
+```
+
+```python
+# test_async_resilient_notify.py
+import asyncio
+import pytest
+from exercise_4 import Observable
+
+def test_later_observer_still_runs_after_a_failure() -> None:
+    received: list[int] = []
+
+    async def broken(data: int) -> None:
+        raise RuntimeError("boom")
+
+    async def record(data: int) -> None:
+        await asyncio.sleep(0)
+        received.append(data)
+
+    async def run() -> None:
+        obs = Observable[int]()
+        obs.subscribe(broken)
+        obs.subscribe(record)
+        with pytest.raises(ExceptionGroup):
+            await obs.notify(1)
+
+    asyncio.run(run())
+    assert received == [1]
+```
+
+`return_exceptions=True` changes `gather()` from "re-raise the first
+failure immediately" to "run everything and hand back a list." That
+one keyword does what the synchronous version needed a `try` inside a
+loop to do, because `gather()` is already the loop.
+
+The results come back in argument order, so the list is a record of
+which observer produced what. This version only needs the failures, so
+it filters with `isinstance(r, Exception)` and drops the `None`s that
+successful observers returned.
+
+The exception filter uses `Exception`, not `BaseException`, for the
+reason exercise 3 gives, and here it also matters that
+`asyncio.CancelledError` derives from `BaseException`:
+`return_exceptions=True` still returns a cancellation among the
+results, and treating it as an ordinary observer failure would swallow
+a cancellation the event loop meant to propagate.
+
+The synchronous and asynchronous versions now answer the same
+question, and both end in an `ExceptionGroup`. The difference is only
+where the loop lives: written by hand in one, supplied by `gather()`
+in the other.

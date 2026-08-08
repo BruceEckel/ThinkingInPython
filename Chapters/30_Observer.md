@@ -49,9 +49,9 @@ class Observable:
     def notify_observers(self, arg: object = None) -> None:
         if not self._changed:
             return
+        self._changed = False
         for observer in list(self._observers):
             observer.update(self, arg)
-        self._changed = False
 
 class Display(Observer):
     @override
@@ -68,6 +68,12 @@ t.add_observer(Display())
 t.set_celsius(25)
 #: display: 25C
 ```
+
+The flag lets several mutations coalesce into one broadcast,
+and lets a subclass decide a change is not worth announcing;
+`set_celsius()` calls both halves at once, so nothing here needs it.
+Clearing the flag before the loop, not after,
+lets a change raised during notification survive to the next broadcast.
 
 Python expresses this with far less machinery.
 The rest of the chapter shows the Pythonic version first,
@@ -140,6 +146,10 @@ Assigning to `celsius` notifies everyone.
 Four things from the classic version are gone: the interface,
 the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
 and a class per reaction.
+The `source` argument went too.
+An observer that needs to know who changed takes it as part of the payload
+(`notify((self, value))`),
+or subscribes a bound method whose instance already holds the reference.
 
 The type parameter carries the notification's type through to the observers,
 so subscribing a `list[str]`'s `append` to a `Thermometer` fails the checker instead of quietly collecting floats in a list of strings.
@@ -259,6 +269,12 @@ the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
 or weak references (`weakref.WeakMethod`), which forget automatically.
 
+An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
+Two-way bindings are the usual source: the view edits the model,
+the model notifies the view, the view edits the model.
+Either make the write conditional on the value actually changing,
+or guard the setter with a re-entry flag.
+
 ## Observer and I/O
 
 Until now, an observer only prints or appends to a list, then returns.
@@ -284,20 +300,20 @@ For this example, you only need a coroutine that pauses at `await` while others 
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver = Callable[[float], Awaitable[None]]
+type AsyncObserver[T] = Callable[[T], Awaitable[None]]
 
-class Observable:
+class Observable[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver] = []
+        self._observers: list[AsyncObserver[T]] = []
 
-    def subscribe(self, observer: AsyncObserver) -> None:
+    def subscribe(self, observer: AsyncObserver[T]) -> None:
         self._observers.append(observer)
 
-    async def notify(self, data: float) -> None:
+    async def notify(self, data: T) -> None:
         # Fan out to every observer at once, then wait for all
         await asyncio.gather(*(obs(data) for obs in self._observers))
 
-class Thermometer(Observable):
+class Thermometer(Observable[float]):
     def __init__(self) -> None:
         super().__init__()
         self._celsius = 0.0
@@ -336,11 +352,19 @@ asyncio.run(main())
 The `AsyncObserver` alias makes the checker reject a plain function as an observer:
 an observer must return an awaitable,
 which is what calling an `async` function produces.
+Its type parameter does the same job as the synchronous `Observer[T]`'s.
+
+`notify()` needs no `list()` copy here:
+`*` drains the generator into a tuple before `gather()` runs,
+so a detach during the fan-out cannot skip anyone.
+It does mean an observer that unsubscribes mid-notification is still awaited for this change.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence prints in subscribe order, alarm first.
 Concurrent fan-out lets each finish on its own schedule,
 so the faster observer reports first.
+The results `gather()` hands back stay in argument order regardless;
+only the side effects interleave.
 The alarm also shows an observer that can decline to act.
 Below its threshold it returns without sending anything.
 
@@ -495,8 +519,6 @@ if __name__ == "__main__":
 Without that line each notification adds another `size * size` rectangles on top of the last set,
 which looks identical and grows without limit,
 the same quiet accumulation as a lapsed listener.
-`cell_px` is named for what it holds: the model's `cell` is a `Coord`,
-and this one is a pixel count.
 
 The model and the view share only the subscribe-and-notify contract,
 so the test can exercise the model without a display.
@@ -529,4 +551,9 @@ and the Observer is an event bus.
     every other observer still hears the change,
     and the failures are re-raised afterward, together, as an `ExceptionGroup`
     (the container [Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup) introduced).
+    Write a test in which the first observer raises an exception and the second still records its notification.
+4.  Redo exercise 3 for `async_observers.py`.
+    Make `notify()` use `gather(*coros, return_exceptions=True)`,
+    separate the returned exceptions from the successes,
+    and raise them together as an `ExceptionGroup`.
     Write a test in which the first observer raises an exception and the second still records its notification.

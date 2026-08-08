@@ -1,4 +1,4 @@
-# tabledriven/state_machine.py
+# tabledriven/table_machine.py
 # A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
@@ -10,6 +10,9 @@ type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
+
+class NoTransition(RuntimeError):
+    "The table has no row for this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
@@ -24,6 +27,6 @@ class StateMachine:
                     action(event)
                 self.state = next_state
                 return
-        raise RuntimeError(
+        raise NoTransition(
             f"no transition from {self.state!r} "
             f"on {type(event).__name__}")

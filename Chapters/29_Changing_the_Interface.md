@@ -14,13 +14,13 @@ The other half is telling callers that the interface they have been using is goi
 ## Adapter
 
 When you've got "this", and you need "that", *Adapter* solves the problem.
-The only requirement is to produce a "that",
-and there are a number of ways to accomplish this adaptation:
+The only requirement is to produce a "that".
+The smallest version puts the adaptation in an object of its own:
 
 ```python
 # adapter.py
-# Variations on the Adapter pattern.
-from typing import Any, override
+# The object adapter.
+from typing import override
 
 class WhatIHave:
     def g(self) -> None:
@@ -45,6 +45,31 @@ class ProxyAdapter(WhatIWant):
 class WhatIUse:
     def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
+
+if __name__ == "__main__":
+    adapt = ProxyAdapter(WhatIHave())
+    WhatIUse().op(adapt)
+#: WhatIHave.g()
+#: WhatIHave.h()
+```
+
+`WhatIUse` wants an `f()` and `WhatIHave` has none,
+so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
+`WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
+because this listing is about *where* the adaptation lives,
+not how the target interface is declared; [Surrogate](26_Surrogate.md#proxy)
+compares those two.
+The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Surrogate.md#proxy)":
+*GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
+
+The adaptation can live in three other places: the call site,
+the adaptee's own class, or an inner class the adaptee hands out.
+
+```python
+# adapter_variations.py
+# Three more places to put the adaptation.
+from typing import Any, override
+from adapter import ProxyAdapter, WhatIHave, WhatIUse, WhatIWant
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
@@ -73,21 +98,13 @@ class WhatIHave3(WhatIHave):
         return WhatIHave3.InnerAdapter(self)
 
 what_i_use = WhatIUse()
-what_i_have = WhatIHave()
-adapt = ProxyAdapter(what_i_have)
-what_i_use2 = WhatIUse2()
-what_i_have2 = WhatIHave2()
-what_i_have3 = WhatIHave3()
-what_i_use.op(adapt)  # Approach 1: separate adapter
+WhatIUse2().op(WhatIHave())  # Approach 2: adapting op()
 #: WhatIHave.g()
 #: WhatIHave.h()
-what_i_use2.op(what_i_have)  # Approach 2: adapting op()
+what_i_use.op(WhatIHave2())  # Approach 3: adapter built in
 #: WhatIHave.g()
 #: WhatIHave.h()
-what_i_use.op(what_i_have2)  # Approach 3: adapter built in
-#: WhatIHave.g()
-#: WhatIHave.h()
-what_i_use.op(what_i_have3.what_i_want())  # Approach 4
+what_i_use.op(WhatIHave3().what_i_want())  # Approach 4
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
@@ -95,18 +112,11 @@ what_i_use.op(what_i_have3.what_i_want())  # Approach 4
 The output is deliberately monotonous.
 Four different structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
-The approaches differ only in where the adaptation lives, a separate object,
-the call site, the adaptee's own class, or an inner class the adaptee hands out.
-When the output cannot tell the approaches apart,
-the choice among them is purely one of packaging,
-and the next section argues Python lets you skip most of the packaging too.
+The approaches differ only in where the adaptation lives.
+When the output cannot tell them apart,
+the choice among them is purely one of packaging.
 
-This takes liberty with the term "[Proxy](26_Surrogate.md#proxy),"
-because *GoF Design Patterns* asserts that a Proxy must have an identical interface with the object for which it is a surrogate.
-
-Two details in the listing repay attention.
-
-First, the approaches split into two families *GoF Design Patterns* names.
+The four also split into two families *GoF Design Patterns* names.
 `ProxyAdapter` is an *object adapter*:
 it holds the adaptee and can wrap any instance handed to it at runtime.
 `WhatIHave2` is a *class adapter*: it inherits from the adaptee,
@@ -114,8 +124,9 @@ which fixes the adapted class at definition time and exposes the adaptee's entir
 `g()` and `h()` included, to every client of the adapter.
 Composition keeps the two interfaces separate; inheritance merges them.
 
-Second, the `/` in `WhatIUse.op()` makes its parameter positional-only,
-and removing it breaks the override below:
+One detail in the second listing needs a closer look.
+The `/` in `WhatIUse.op()` makes its parameter positional-only,
+and removing it breaks the override:
 `WhatIUse2.op()` renames the parameter to `what_i_have`,
 and renaming a keyword-callable parameter in an override breaks substitutability,
 so the checker rejects it without the `/`.
@@ -131,6 +142,7 @@ It allows an override that cannot substitute for its base to pass the type check
 Approach 2 is a different operation wearing an inherited name.
 Code holding a `WhatIUse` cannot safely be handed a `WhatIUse2`,
 and that is the price of building the adapter into the operation.
+The next section argues Python lets you skip most of this packaging too.
 
 ### Adapter in Python
 
@@ -164,10 +176,11 @@ class Adapter:
     def __getattr__(self, name: str) -> Any:  # Forwards the rest
         return getattr(self._adaptee, name)
 
-a = Adapter(WhatIHave())
-print(a.f())  # Adapted method
+if __name__ == "__main__":
+    a = Adapter(WhatIHave())
+    print(a.f())  # Adapted method
+    print(a.g())  # Forwarded to the adaptee unchanged
 #: gh
-print(a.g())  # Forwarded to the adaptee unchanged
 #: g
 ```
 
@@ -226,7 +239,7 @@ You can easily get this effect by creating a class containing static factory met
 # facade.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class A:
     x: object
 
@@ -292,7 +305,8 @@ and the façade can rearrange them without touching a caller.
 The underscore is a convention, not a barrier.
 `checkout._PriceEngine` still resolves for anyone who types it.
 What the underscore does mechanically is keep the name out of `from checkout import *`,
-and an `__all__` list of the public names states the same boundary explicitly.
+and an [`__all__`](06_Modules_and_Packages.md#what-a-module-exports)
+list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call, not a lock on the rest.
 A `Facade` class full of static methods only reproduces, with more ceremony,
 what a module gives you.
@@ -330,7 +344,9 @@ Every interface change has a second half.
 Once the better interface exists, the old one is still there,
 and callers keep using it until something tells them not to.
 Deleting it breaks them; leaving it undocumented means nobody notices.
-`warnings.deprecated()` marks a function, method, or class as on its way out,
+`warnings.deprecated()`
+(Python 3.13 and later; `typing_extensions.deprecated` before that)
+marks a function, method, or class as on its way out,
 and both a type checker and the runtime understand the mark:
 
 ```python
@@ -404,3 +420,9 @@ and marking the old interface is how you make the risk visible on a schedule ins
     Put its classes behind leading-underscore names in one module,
     expose functions that build them, and import only those from a second file.
     Compare what a caller can see in each version.
+4.  Here are three wrappers: one logs each call and forwards it unchanged,
+    one exposes a `read()` over an object that only has `next_chunk()`,
+    and one refuses calls unless a flag is set.
+    Classify each as Proxy, Decorator, Adapter,
+    or Façade using the "remove it and you lose" test from the table,
+    and say what you would lose in each case.

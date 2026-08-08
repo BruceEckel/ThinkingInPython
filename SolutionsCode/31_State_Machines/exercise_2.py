@@ -1,6 +1,6 @@
 # exercise_2.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class WashState(Enum):
     IDLE = auto()

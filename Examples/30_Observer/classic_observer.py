@@ -20,9 +20,9 @@ class Observable:
     def notify_observers(self, arg: object = None) -> None:
         if not self._changed:
             return
+        self._changed = False
         for observer in list(self._observers):
             observer.update(self, arg)
-        self._changed = False
 
 class Display(Observer):
     @override

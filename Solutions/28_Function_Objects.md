@@ -57,32 +57,49 @@ Undo forces one, because a command now answers two requests,
 
 `Deposit` also has to remember what it did, here the account and the
 amount, so it can reverse that action later: a fresh call to the same
-function cannot know what a previous call changed. That is the step
-the chapter names, where the `Command` class earns its keep because
-the command needs a second operation.
+function cannot know what a previous call changed.
+
+The second operation costs a type rather than a hierarchy.
+`Callable[[], None]` has room for one call, so a list of undoable
+commands needs a name for "callable, plus `undo()`", and in Python
+that name is a `Protocol` declaring both members. `Macro` would then
+annotate `self.commands` against that `Protocol` and `Deposit` would
+inherit nothing. `UndoableCommand` above is the *GoF Design Patterns*
+shape, and its two `raise NotImplementedError` bodies show what it
+costs: a base class pays for itself when the commands share
+implementation, and these do not.
 
 ## 2. `chain.py`, reporting every attempt
 
 ```python
 # exercise_2.py
-TOLERANCE = 1e-12
-MAX_ITER = 200
+from collections.abc import Callable
+from typing import Final, Protocol
 
-def bisection(f, a, b):
+type Fn = Callable[[float], float]
+
+class Finder(Protocol):
+    __name__: str
+    def __call__(self, f: Fn, a: float,
+                 b: float) -> float | None: ...
+
+TOLERANCE: Final[float] = 1e-12
+MAX_ITER: Final[int] = 200
+
+def bisection(f: Fn, a: float, b: float) -> float | None:
     if f(a) * f(b) > 0:
         return None
-    mid = (a + b) / 2
     for _ in range(MAX_ITER):
+        mid = (a + b) / 2
         if abs(f(mid)) < TOLERANCE:
             return mid
-        if f(a) * f(mid) < 0:
+        if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid
-        mid = (a + b) / 2
-    return mid
+    return None
 
-def secant(f, a, b):
+def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
@@ -94,7 +111,7 @@ def secant(f, a, b):
         x0, x1 = x1, x2
     return None
 
-def newton(f, a, b):
+def newton(f: Fn, a: float, b: float) -> float | None:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -107,7 +124,8 @@ def newton(f, a, b):
             return x
     return None
 
-def solve(f, a, b, chain):
+def solve(f: Fn, a: float, b: float,
+          chain: list[Finder]) -> float | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
@@ -117,7 +135,7 @@ def solve(f, a, b, chain):
     print("all finders failed")
     return None
 
-def f(x):
+def f(x: float) -> float:
     return x * x - 2
 
 solve(f, 1.0, 1.3, [bisection, secant, newton])
@@ -132,6 +150,15 @@ each handler for a separate explanation. `finder.__name__` reads the
 function's own name, since every ordinary Python function carries its
 name as an attribute, so the report needs no extra bookkeeping to say
 *which* handler just ran.
+
+The report is why `chain` is typed against a `Protocol` here instead
+of the chapter's `RootFinder` alias. `Callable[...]` describes what a
+handler accepts and returns, and a checker rejects `finder.__name__`
+on one, because nothing about `Callable` states that the object has a
+name. `Finder` declares `__name__` alongside `__call__()`, and a plain
+function satisfies both, so the copies below need no change and the
+annotation stops lying. The finders are copied from `algorithms.py`
+rather than imported, since a solution listing runs on its own.
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
@@ -312,3 +339,80 @@ that counts events, now sees more than it did.
 that was never subscribed. Whether that should be silent or loud is a
 design decision: silent matches the bus's existing habit of letting an
 unmatched event pass without complaint.
+
+## 6. Three fixes for late binding, and what none of them fix
+
+```python
+# exercise_6.py
+from collections.abc import Callable
+from functools import partial
+
+broken: list[Callable[[], None]] = []
+for n in range(3):
+    broken.append(lambda: print(n))
+for command in broken:
+    command()
+#: 2
+#: 2
+#: 2
+
+by_default: list[Callable[[], None]] = []
+for n in range(3):
+    by_default.append(lambda n=n: print(n))
+
+by_partial: list[Callable[[], None]] = []
+for n in range(3):
+    by_partial.append(partial(print, n))
+
+def make(n: int) -> Callable[[], None]:
+    return lambda: print(n)
+
+by_factory: list[Callable[[], None]] = [make(n) for n in range(3)]
+
+for fixed in (by_default, by_partial, by_factory):
+    for command in fixed:
+        command()
+#: 0
+#: 1
+#: 2
+#: 0
+#: 1
+#: 2
+#: 0
+#: 1
+#: 2
+
+# Late lookup, kept on purpose:
+settings = {"level": "low"}
+
+def report() -> None:
+    print(settings["level"])
+
+settings["level"] = "high"
+report()
+#: high
+```
+
+A `for` loop does not create a scope, so `n` is one variable that the
+loop rebinds three times. All three lambdas close over that one
+variable rather than over its value, and by the time anything calls
+them the loop has finished and `n` holds 2. Nothing is wrong with the
+lambdas; they are reading the variable they were told to read, at the
+moment they are asked.
+
+The three fixes all work, and all work the same way: each one
+evaluates `n` while the loop is still running and stores the result.
+`lambda n=n:` evaluates the default at definition. `partial(print, n)`
+evaluates the argument where it is written. `make(n)` gives each
+lambda its own `n` in its own function scope, which is the only one of
+the three that would still read correctly if the body needed the
+variable for more than one purpose.
+
+None of the three preserves late lookup, and that is the point of the
+last clause. If the value must be computed when the command runs, all
+three are wrong: they froze it when the command was built. What you
+want then is the original behavior aimed at something that outlives
+the loop, as `report()` does by reading `settings` at call time. The
+late-binding trap and late binding as a feature are the same mechanism.
+Which one you have depends on whether the name you close over still
+means what you wanted when the call finally happens.

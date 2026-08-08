@@ -1,6 +1,6 @@
 # exercise_5.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class MoodState(Enum):
     HAPPY = auto()

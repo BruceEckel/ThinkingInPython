@@ -1,22 +1,31 @@
 # exercise_2.py
-TOLERANCE = 1e-12
-MAX_ITER = 200
+from collections.abc import Callable
+from typing import Final, Protocol
 
-def bisection(f, a, b):
+type Fn = Callable[[float], float]
+
+class Finder(Protocol):
+    __name__: str
+    def __call__(self, f: Fn, a: float,
+                 b: float) -> float | None: ...
+
+TOLERANCE: Final[float] = 1e-12
+MAX_ITER: Final[int] = 200
+
+def bisection(f: Fn, a: float, b: float) -> float | None:
     if f(a) * f(b) > 0:
         return None
-    mid = (a + b) / 2
     for _ in range(MAX_ITER):
+        mid = (a + b) / 2
         if abs(f(mid)) < TOLERANCE:
             return mid
-        if f(a) * f(mid) < 0:
+        if f(a) * f(mid) <= 0:
             b = mid
         else:
             a = mid
-        mid = (a + b) / 2
-    return mid
+    return None
 
-def secant(f, a, b):
+def secant(f: Fn, a: float, b: float) -> float | None:
     x0, x1 = a, b
     for _ in range(MAX_ITER):
         f0, f1 = f(x0), f(x1)
@@ -28,7 +37,7 @@ def secant(f, a, b):
         x0, x1 = x1, x2
     return None
 
-def newton(f, a, b):
+def newton(f: Fn, a: float, b: float) -> float | None:
     x = (a + b) / 2
     h = 1e-7
     for _ in range(MAX_ITER):
@@ -41,7 +50,8 @@ def newton(f, a, b):
             return x
     return None
 
-def solve(f, a, b, chain):
+def solve(f: Fn, a: float, b: float,
+          chain: list[Finder]) -> float | None:
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
@@ -51,7 +61,7 @@ def solve(f, a, b, chain):
     print("all finders failed")
     return None
 
-def f(x):
+def f(x: float) -> float:
     return x * x - 2
 
 solve(f, 1.0, 1.3, [bisection, secant, newton])

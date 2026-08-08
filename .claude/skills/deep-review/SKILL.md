@@ -192,9 +192,9 @@ Accrued notes from the chapters 18-38 review sweep:
   (`frozen_leaky.py`) and assumed by 22's `NamedTuple`-vs-frozen
   contrast and 35/36's immutability arguments; the load-bearing-`Any`
   bargain runs 22 → 33; the constructor-starts-the-engine trap runs
-  25 (`premature_engine.py`) → 31 (StateMachine's `__init__`); 29 ends
-  with the wrapper disambiguation map (Proxy/Decorator/Adapter/Façade)
-  that leans on 26 and 14; 21's dissolves-into-the-language thesis
+  25 (`premature_engine.py`) → 31 (StateMachine's `__init__`); 29's
+  wrapper disambiguation map (Proxy/Decorator/Adapter/Façade)
+  leans on 26 and 14; 21's dissolves-into-the-language thesis
   (Norvig footnote) is what 23/24/27/28's "Pythonic" sections cash in.
 
 ## Review-file workflow

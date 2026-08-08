@@ -19,12 +19,13 @@ class CountingProxy:
             return counted
         return attr
 
-p = CountingProxy(Implementation())
-p.f()
+if __name__ == "__main__":
+    p = CountingProxy(Implementation())
+    p.f()
+    p.g()
+    p.f()
+    print("calls:", p.calls)
 #: f()
-p.g()
 #: g()
-p.f()
 #: f()
-print("calls:", p.calls)
 #: calls: 3

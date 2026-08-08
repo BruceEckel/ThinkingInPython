@@ -1,3 +1,7 @@
+Add to /do-reviews command:
+At the end of /do-reviews, recheck both directories for files that have added [[Reviewed]] tags.
+Do not complete /do-reviews until there are no more [[Reviewed]] tags.
+
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
@@ -11,6 +15,9 @@ Review all the exercises and make sure they all have solutions that work.
 Add Epub link info on README and bottom of index page.
 
 Look for places display_object could be replaced with print(vars(obj))
+
+Pong game, autoplay with builtin gui
+Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 

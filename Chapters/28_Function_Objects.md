@@ -105,7 +105,9 @@ carrying its state without any `Command` class.
 An object can be callable too.
 Give a class `__call__()`
 ([Decorators](14_Decorators.md#a-stateless-class-decorator))
-and its instances carry state and still satisfy `Callable[[], None]`:
+and its instances carry state and still satisfy `Callable[[], None]`.
+`Repeat` below is a [frozen data class](12_Data_Classes_as_Types.md#immutability),
+so its configuration cannot change after it is built:
 
 ```python
 # callable_command.py
@@ -133,10 +135,13 @@ for command in macro:
 
 `Repeat` holds configuration and drops into the same list as `loony`,
 with no `Command` base class to derive from.
-That is the rung the classic form skips.
-The `Command` class earns its keep only at the next step,
-when the command needs a *second* operation, `undo()`,
-which no single callable can express.
+The classic form skips this middle step:
+it goes from a plain function straight to a base class.
+A callable alone cannot express a second operation, `undo()`.
+`Callable[[], None]` has room for one call,
+so a list of commands that also undo needs a name for "callable, plus `undo()`".
+In Python that name is a `Protocol` with both members.
+A `Command` base class becomes worth writing when the commands also want shared implementation.
 
 Building commands in a loop springs Python's best-known closure trap:
 
@@ -315,7 +320,10 @@ def f(x: float) -> float:
     return x * x - 2
 
 solver = RootSolver(Bisection())
-for algorithm in (Bisection(), Newton(), Secant()):
+root = solver.solve(f, 0.0, 2.0)  # The constructor's strategy
+assert root is not None
+print(f"{root:.6f}")
+for algorithm in (Newton(), Secant()):
     solver.change_algorithm(algorithm)
     root = solver.solve(f, 0.0, 2.0)
     assert root is not None
@@ -417,15 +425,20 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 
 Each handler is a *Strategy* function, the chain is the list,
 and success is a non-`None` return.
+The second call shows the fall-through.
+The interval `[1.0, 1.3]` does not straddle the root,
+so bisection declines by returning `None` and the chain moves on to a method that needs no bracket.
+Adding, removing, or reordering handlers means editing a list.
+
 The test is `root is not None`, not `if root`.
 A function with a root at zero returns `0.0`, which is falsy,
 so a truthiness test would throw away a correct answer and hand the problem to the next finder.
 Any sentinel-versus-value check on a numeric result has this hazard.
 
-Adding, removing, or reordering handlers means editing a list.
-The second call shows the fall-through.
-The interval `[1.0, 1.3]` does not straddle the root,
-so bisection declines by returning `None` and the chain moves on to a method that needs no bracket.
+A handler is trusted to know when it failed.
+`secant()` and `newton()` stop when their step stops shrinking,
+which is not quite the same as landing on a root,
+so a chain is only as reliable as its handlers.
 
 These tests confirm that the first finder that converges wins,
 a later finder rescues one that fails, an empty chain returns `None`,
@@ -588,6 +601,27 @@ that is `functools.singledispatch`,
 used by [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it).
 
+## Choosing the Lightest Callable
+
+Each section of this chapter replaced a class hierarchy with something smaller,
+and the replacements form one list.
+Go down it and stop at the first form that carries what you need:
+
+1.  A plain function, when the behavior needs no state of its own
+    (`command.py`, `strategy.py`).
+2.  A bound method, when the state already belongs to an object.
+    `account.deposit` is a command with its instance attached.
+3.  A closure or a `functools.partial`, when the state is a fixed configuration
+    (`configured_strategy.py`).
+4.  A callable object, when that configuration wants a name and a `repr`
+    (`callable_command.py`).
+5.  A class, when one call is not enough: the second operation `undo()` needs,
+    or the several related methods and mutable state the *Strategy* section describes.
+
+The *GoF Design Patterns* forms of Command, Strategy,
+and Chain of Responsibility all start at the last entry,
+because the languages they were written for have no entries above it.
+
 ## Exercises
 
 1.  Add an "undo" capability to `command.py`.
@@ -608,3 +642,9 @@ and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-an
     parents last.
     Then add `unsubscribe()`.
     Which of the two changes can break an existing caller, and why?
+6.  Build a list of three commands in a `for` loop (not a comprehension)
+    with `lambda: print(n)`.
+    Call them and explain the output.
+    Fix it three ways: with a default argument, with `functools.partial`,
+    and with a factory function that takes `n` and returns the command.
+    Which one still works if the value must be computed at call time rather than at build time?

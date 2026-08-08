@@ -1,6 +1,6 @@
 # exercise_6.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class ElevatorState(Enum):
     IDLE = auto()

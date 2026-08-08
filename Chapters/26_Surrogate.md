@@ -63,9 +63,10 @@ It isn't necessary that `Implementation` have the same interface as `Proxy`.
 As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea.
 That is a looser definition than *GoF Design Patterns* uses.
-Under GoF's stricter one,
-the interface is the test that separates *Proxy* from *Adapter*:
-[Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+Under GoF's stricter definition the interface separates *Proxy* from *Adapter*;
+under the looser one used here it is the intent.
+[Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
+sorts out both readings.
 
 However, it is convenient to have a common interface that forces `Implementation` to fulfill all the methods that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
@@ -419,16 +420,17 @@ def run(b: Any) -> None:
     b.h()
     b.g()
 
-first: Behavior = Implementation1()
-second: Behavior = Implementation2()
-b = Surrogate(first)
-run(b)
+if __name__ == "__main__":
+    first: Behavior = Implementation1()
+    second: Behavior = Implementation2()
+    b = Surrogate(first)
+    run(b)
+    b.change_to(second)
+    run(b)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
-b.change_to(second)
-run(b)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.
 #: We do routines and chorus scenes
@@ -555,14 +557,15 @@ class CountingProxy:
             return counted
         return attr
 
-p = CountingProxy(Implementation())
-p.f()
+if __name__ == "__main__":
+    p = CountingProxy(Implementation())
+    p.f()
+    p.g()
+    p.f()
+    print("calls:", p.calls)
 #: f()
-p.g()
 #: g()
-p.f()
 #: f()
-print("calls:", p.calls)
 #: calls: 3
 ```
 

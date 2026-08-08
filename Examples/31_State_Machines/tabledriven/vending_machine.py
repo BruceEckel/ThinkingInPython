@@ -1,7 +1,7 @@
 # tabledriven/vending_machine.py
 from dataclasses import dataclass
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class State(Enum):
     QUIESCENT = auto()

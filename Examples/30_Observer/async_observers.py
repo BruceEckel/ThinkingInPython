@@ -2,20 +2,20 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver = Callable[[float], Awaitable[None]]
+type AsyncObserver[T] = Callable[[T], Awaitable[None]]
 
-class Observable:
+class Observable[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver] = []
+        self._observers: list[AsyncObserver[T]] = []
 
-    def subscribe(self, observer: AsyncObserver) -> None:
+    def subscribe(self, observer: AsyncObserver[T]) -> None:
         self._observers.append(observer)
 
-    async def notify(self, data: float) -> None:
+    async def notify(self, data: T) -> None:
         # Fan out to every observer at once, then wait for all
         await asyncio.gather(*(obs(data) for obs in self._observers))
 
-class Thermometer(Observable):
+class Thermometer(Observable[float]):
     def __init__(self) -> None:
         super().__init__()
         self._celsius = 0.0

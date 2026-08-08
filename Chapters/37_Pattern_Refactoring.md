@@ -327,7 +327,8 @@ including ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class,
 the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
-and [Multiple Dispatching](32_Multiple_Dispatching.md).
+and [Multiple Dispatching](32_Multiple_Dispatching.md),
+and first seen in [Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`, it sorts into its own bin,
 not its parent's, which a sorter usually needs,
 but is worth knowing before you subclass a material.

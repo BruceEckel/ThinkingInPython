@@ -1,35 +1,56 @@
 # exercise_9.py
-import random
-from collections.abc import Iterator
-from enum import StrEnum
+from dataclasses import dataclass
+from enum import Enum, auto
+from table_machine import NoTransition, StateMachine, Table
 
-class MouseAction(StrEnum):
-    APPEARS = "mouse appears"
-    RUNS_AWAY = "mouse runs away"
-    ENTERS = "mouse enters trap"
-    ESCAPES = "mouse escapes"
-    TRAPPED = "mouse trapped"
-    REMOVED = "mouse removed"
+class State(Enum):
+    QUIESCENT = auto()
+    COLLECTING = auto()
 
-NEXT_ACTIONS: dict[MouseAction | None, list[MouseAction]] = {
-    None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY, MouseAction.ENTERS],
-    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES, MouseAction.TRAPPED],
-    MouseAction.ESCAPES: [MouseAction.APPEARS],
-    MouseAction.TRAPPED: [MouseAction.REMOVED],
-    MouseAction.REMOVED: [MouseAction.APPEARS],
-}
+@dataclass
+class Money:
+    name: str
+    value: int
 
-def mouse_move_generator(
-    count: int, seed: int = 0
-) -> Iterator[MouseAction]:
-    rng = random.Random(seed)
-    previous: MouseAction | None = None
-    for _ in range(count):
-        previous = rng.choice(NEXT_ACTIONS[previous])
-        yield previous
+@dataclass
+class Nickel(Money):  # A subclass, not a new instance
+    pass
 
-moves = list(mouse_move_generator(8, seed=1))
-print(" ".join(m.name for m in moves))
-#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY APPEARS ENTERS TRAPPED REMOVED
+class Machine(StateMachine):
+    def __init__(self, *, accept_nickels: bool = False) -> None:
+        self.amount = 0
+        rows = [(None, self.add, State.COLLECTING)]
+        table: Table = {
+            (State.QUIESCENT, Money): rows,
+            (State.COLLECTING, Money): rows,
+        }
+        if accept_nickels:  # Fix 1: a row keyed on Nickel
+            table[(State.QUIESCENT, Nickel)] = rows
+            table[(State.COLLECTING, Nickel)] = rows
+        super().__init__(State.QUIESCENT, table)
+
+    def add(self, event: Money) -> None:
+        self.amount += event.value
+
+m = Machine()
+m.handle(Money("quarter", 25))
+print(m.state, m.amount)
+#: State.COLLECTING 25
+try:
+    m.handle(Nickel("nickel", 5))
+except NoTransition as e:
+    print(type(e).__name__, e)
+#: NoTransition no transition from <State.COLLECTING: 2> on Nickel
+
+# Fix 1: the table names Nickel too
+m1 = Machine(accept_nickels=True)
+m1.handle(Nickel("nickel", 5))
+print(m1.amount)
+#: 5
+
+# Fix 2: a Nickel that is a Money, not a subclass of one
+NICKEL = Money("nickel", 5)
+m2 = Machine()
+m2.handle(NICKEL)
+print(m2.amount)
+#: 5

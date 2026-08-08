@@ -1,7 +1,7 @@
 # facade.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class A:
     x: object
 

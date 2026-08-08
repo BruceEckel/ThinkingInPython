@@ -38,7 +38,10 @@ def f(x: float) -> float:
     return x * x - 2
 
 solver = RootSolver(Bisection())
-for algorithm in (Bisection(), Newton(), Secant()):
+root = solver.solve(f, 0.0, 2.0)  # The constructor's strategy
+assert root is not None
+print(f"{root:.6f}")
+for algorithm in (Newton(), Secant()):
     solver.change_algorithm(algorithm)
     root = solver.solve(f, 0.0, 2.0)
     assert root is not None

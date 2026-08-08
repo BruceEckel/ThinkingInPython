@@ -4,7 +4,7 @@ Several exercises below reuse the book's generic table-driven engine,
 so it is defined once, here, as its own file that the others import:
 
 ```python
-# state_machine.py
+# table_machine.py
 from collections.abc import Callable
 from enum import Enum
 from typing import Any
@@ -13,6 +13,9 @@ type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
+
+class NoTransition(RuntimeError):
+    "The table has no row for this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
@@ -27,7 +30,7 @@ class StateMachine:
                     action(event)
                 self.state = next_state
                 return
-        raise RuntimeError(
+        raise NoTransition(
             f"no transition from {self.state!r} "
             f"on {type(event).__name__}")
 ```
@@ -85,7 +88,7 @@ surrogate itself, only which `Mood` object gets swapped in through
 ```python
 # exercise_2.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class WashState(Enum):
     IDLE = auto()
@@ -144,7 +147,7 @@ print(wm.log)
 Each wash cycle stage is a straight line, one event type per state
 with no branching, unlike the vending machine's conditional
 transitions. The washing machine still uses the exact same
-`state_machine.py` engine; only the table and the small marker event
+`table_machine.py` engine; only the table and the small marker event
 classes are specific to washing laundry.
 
 ## 3. A word-driven state machine with per-state transition tables
@@ -243,12 +246,12 @@ easier to audit and edit as a unit, the same trade-off the chapter's
 own [table-driven state machine](../Chapters/31_State_Machines.md#table-driven-state-machine) makes
 over the per-state `mouse_trap.py`.
 
-## 5. The mood machine, rebuilt on `state_machine.py`
+## 5. The mood machine, rebuilt on `table_machine.py`
 
 ```python
 # exercise_5.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class MoodState(Enum):
     HAPPY = auto()
@@ -307,7 +310,7 @@ worth making explicit and easy to audit.
 ```python
 # exercise_6.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class ElevatorState(Enum):
     IDLE = auto()
@@ -379,7 +382,7 @@ doors immediately with no travel at all.
 ```python
 # exercise_7.py
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class HVACState(Enum):
     OFF = auto()
@@ -479,3 +482,93 @@ and remembers it for the following call. Because every choice is
 constrained by `NEXT_ACTIONS`, any sequence this generator produces is
 automatically a legal one, the same guarantee `mouse_trap.py`'s
 `next()` methods enforce by hand, one state class at a time.
+
+## 9. A `Nickel` the table has never heard of
+
+```python
+# exercise_9.py
+from dataclasses import dataclass
+from enum import Enum, auto
+from table_machine import NoTransition, StateMachine, Table
+
+class State(Enum):
+    QUIESCENT = auto()
+    COLLECTING = auto()
+
+@dataclass
+class Money:
+    name: str
+    value: int
+
+@dataclass
+class Nickel(Money):  # A subclass, not a new instance
+    pass
+
+class Machine(StateMachine):
+    def __init__(self, *, accept_nickels: bool = False) -> None:
+        self.amount = 0
+        rows = [(None, self.add, State.COLLECTING)]
+        table: Table = {
+            (State.QUIESCENT, Money): rows,
+            (State.COLLECTING, Money): rows,
+        }
+        if accept_nickels:  # Fix 1: a row keyed on Nickel
+            table[(State.QUIESCENT, Nickel)] = rows
+            table[(State.COLLECTING, Nickel)] = rows
+        super().__init__(State.QUIESCENT, table)
+
+    def add(self, event: Money) -> None:
+        self.amount += event.value
+
+m = Machine()
+m.handle(Money("quarter", 25))
+print(m.state, m.amount)
+#: State.COLLECTING 25
+try:
+    m.handle(Nickel("nickel", 5))
+except NoTransition as e:
+    print(type(e).__name__, e)
+#: NoTransition no transition from <State.COLLECTING: 2> on Nickel
+
+# Fix 1: the table names Nickel too
+m1 = Machine(accept_nickels=True)
+m1.handle(Nickel("nickel", 5))
+print(m1.amount)
+#: 5
+
+# Fix 2: a Nickel that is a Money, not a subclass of one
+NICKEL = Money("nickel", 5)
+m2 = Machine()
+m2.handle(NICKEL)
+print(m2.amount)
+#: 5
+```
+
+The exception is `NoTransition`, not a `TypeError` or a silent
+no-op, and it names the class that was not found. `handle()` looks up
+`(self.state, type(event))`, and `type(Nickel("nickel", 5))` is
+`Nickel`. A dictionary probe compares keys by equality, so `Nickel`
+does not match the `Money` key however closely the two are related.
+Nothing walks the MRO. That is the exact-type dispatch the chapter
+describes, and a subclass of an event type is the way most readers
+first meet it.
+
+**Fix 1** adds `(state, Nickel)` rows. This works, and it scales
+badly: every new denomination needs a row for every state that accepts
+money, so a machine with five states and six coins carries thirty
+rows that all do the same thing. It is the right fix when the new
+subclass really does behave differently, which is what `FirstDigit`
+and `SecondDigit` do in `vending_machine.py`. There the subclassing
+exists precisely so the two arrive under different keys.
+
+**Fix 2** stops making a class for something that is a value. A
+nickel is not a new kind of money; it is a `Money` whose `value` is 5.
+`Money("nickel", 5)` needs no table change, no new row, and no new
+class, because it arrives under the key the table already has.
+
+Ship fix 2. A subclass is worth creating when the machine must treat
+the input differently, and a nickel differs from a quarter only in a
+number the existing action already reads. The general rule the two
+fixes illustrate: under exact-type dispatch, a class is a dispatch
+key, so create one when you want a separate row and not when you want
+a separate value.

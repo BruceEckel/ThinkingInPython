@@ -44,14 +44,15 @@ With it, a `NotImplementedError` that names what is missing.
 make `State` an `ABC` with `@abstractmethod` on both methods,
 and an incomplete subclass cannot be constructed at all.
 The version here fails later than that, at the call rather than at construction,
-which is enough for a design where every state is created once at module level.
+which is enough for a design where every state is created once,
+as a class attribute.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
 For each one it moves to the next state, then calls that state's `run()`.
-Thus you can see it's an expansion of the idea of the *State* pattern,
-since `run()` does something different depending on the state that the system is in:
+It expands the *State* pattern:
+`run()` does something different depending on the state that the system is in:
 
 ```python
 # state_machine.py
@@ -64,9 +65,9 @@ class StateMachine:
         self.current_state.run()
     # Template method:
     def run_all(self, inputs: Iterable[object]) -> None:
-        for i in inputs:
-            print(i)
-            self.current_state = self.current_state.next(i)
+        for event in inputs:
+            print(event)
+            self.current_state = self.current_state.next(event)
             self.current_state.run()
 ```
 
@@ -77,8 +78,9 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
 the construction-starts-the-engine choice that [drew a warning in that chapter](25_Template_Method.md#dont-start-the-engine-in-the-constructor).
-It is safe here because the state objects are stateless singletons,
-fully formed before any machine exists.
+It is safe here for two reasons that are easy to lose:
+`MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
+and no state's `run()` reads anything off the machine.
 A `State` whose `run()` reads attributes off the machine revives the trap,
 which is worth remembering during exercise 3.
 
@@ -103,12 +105,12 @@ Each possible move by a mouse is a member of the `MouseAction` enumeration
 ([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces `Enum`).
 Because it is a `StrEnum`, each member *is* a `str`,
 and compares equal to and prints as its value.
-That is why `print(i)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
+That is why `print(event)` in `run_all()` shows `mouse appears` rather than `MouseAction.APPEARS`.
 The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
 which is how the code below parses the test input.
 
-For test code, a text file provides the sequence of mouse inputs:
+A text file supplies the sequence of mouse inputs:
 
 ```text
 # mouse_moves.txt
@@ -128,6 +130,8 @@ mouse enters trap
 mouse trapped
 mouse removed
 ```
+
+### One State Class per Behavior
 
 Here's the first version of the mousetrap program.
 Each `State` subclass defines its `run()` behavior,
@@ -246,19 +250,22 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
+### A Table Inside Each State
+
 While the use of `match` inside the `next()` methods is perfectly reasonable,
 managing a large number of these could become difficult.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
 You cannot write a table inside its class,
 because its entries name the other states,
 which do not all exist until every class definition runs.
-In Python that is no obstacle.
 Define the classes first, then fill in the tables at module level,
 after all the state objects exist.
 
 The `TableState` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
 (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
+`TableState.__init__()` exists to give every state that empty dict:
+a state whose table you forgot to fill then reports `TableState has no transition for ...` rather than an `AttributeError`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
 
@@ -363,6 +370,8 @@ so the output continues as in the first version.
 If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
+`next()` raises `from None` rather than chaining,
+which drops a `KeyError` that would only repeat the event the message already names.
 
 ### An Unexpected Input
 
@@ -385,7 +394,7 @@ and it is the policy the table-driven engine below adopts as well.
 ## Table-Driven State Machine
 
 The previous design keeps each state's transitions inside the state class.
-A pure state machine can go further and represent the entire machine as a single transition table.
+A fully table-driven design can go further and represent the entire machine as a single transition table.
 All the behavior then lives in one place,
 so you can build and maintain it directly from a state-transition diagram.
 
@@ -409,11 +418,17 @@ A vending machine's inputs carry values: what a coin is worth,
 which digit was pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
-An enum member has no room for the twenty-five cents.
+An enum fixes its members in advance,
+so it can carry only the values you knew about when you wrote it,
+and every member of one enum arrives under the same dispatch key.
 
 The names restart here.
-`tabledriven/state_machine.py` holds a different `StateMachine` from the one above,
+`tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
 and `State` is now an `Enum` of names rather than a base class with behavior.
+The file has a different name from the first engine's `state_machine.py` on purpose.
+A module already in `sys.modules` is never re-resolved from `sys.path`,
+so two modules sharing a basename in one program means whichever imported first wins,
+and the second import silently receives the wrong one.
 The states in this design do nothing; the table holds all the behavior.
 
 ### The Engine
@@ -424,7 +439,7 @@ takes the first whose condition passes (or has no condition),
 runs that transition's action, and moves to the next state:
 
 ```python
-# tabledriven/state_machine.py
+# tabledriven/table_machine.py
 # A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
@@ -436,6 +451,9 @@ type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
+
+class NoTransition(RuntimeError):
+    "The table has no row for this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
@@ -450,10 +468,15 @@ class StateMachine:
                     action(event)
                 self.state = next_state
                 return
-        raise RuntimeError(
+        raise NoTransition(
             f"no transition from {self.state!r} "
             f"on {type(event).__name__}")
 ```
+
+`StateMachine` is written out by hand rather than as a `@dataclass` because a reader is meant to subclass it,
+and the manual form puts the two attributes it owns in view.
+`NoTransition` derives from `RuntimeError`,
+so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 Several candidate transitions can share one `(state, input)` key,
 told apart by their conditions.
@@ -466,7 +489,8 @@ not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
 and it cuts the other way too:
 define a further subclass of an event type and it matches none of its parent's rows.
-An event's dispatch class must appear in the table verbatim.
+An event's dispatch class must appear in the table by name;
+a subclass will not do.
 
 Both callables receive the event, whether they need it or not,
 which is why `refund()` takes an argument it ignores.
@@ -493,7 +517,7 @@ so the type checker catches a misspelled state name instead of letting it fail s
 # tabledriven/vending_machine.py
 from dataclasses import dataclass
 from enum import Enum, auto
-from state_machine import StateMachine, Table
+from table_machine import StateMachine, Table
 
 class State(Enum):
     QUIESCENT = auto()
@@ -653,6 +677,7 @@ and the error when no transition matches:
 ```python
 # tabledriven/test_vending.py
 import pytest
+from table_machine import NoTransition
 from vending_machine import (
     FirstDigit,
     Money,
@@ -702,7 +727,7 @@ def test_quit_refunds_and_resets() -> None:
 
 def test_no_transition_raises() -> None:
     vm = VendingMachine()  # QUIESCENT has no transition for Quit
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NoTransition):
         vm.handle(Quit())
 ```
 
@@ -732,6 +757,7 @@ Because it requires user interaction the harness skips it
 # tabledriven/vending_view.py
 import tkinter as tk
 from functools import partial
+from table_machine import NoTransition
 from vending_machine import (
     FirstDigit,
     Money,
@@ -761,7 +787,7 @@ def show() -> None:
     def send(event: object) -> None:
         try:
             vm.handle(event)
-        except RuntimeError:
+        except NoTransition:
             vm.message = "not allowed yet"
         render()
 
@@ -795,12 +821,34 @@ if __name__ == "__main__":
     show()
 ```
 
+## Which Design Should You Use?
+
+The two designs answer the same question and put the answer in different places.
+
+Each-state-decides suits a machine whose states have real behavior and few transitions apiece.
+The state class owns both halves,
+so reading `Luring` tells you what luring does and where it can go next,
+and adding a state is one class.
+It reads best when the transitions are obvious from the state's own name.
+
+One-table suits a machine you build from a diagram, whose inputs carry data,
+or whose transitions need conditions.
+Everything is in one place, in the same order as the diagram,
+and adding a state or an input is an entry in the table and a method or two.
+The states themselves shrink to `Enum` members with no behavior at all.
+
+The tell is which reading you would rather do: the transitions for one state,
+gathered in that state, or every transition in the machine,
+gathered in one table.
+A machine small enough to hold in your head goes either way,
+and a machine that arrived as a diagram wants the table.
+
 ## Exercises
 
 1.  Using [State](26_Surrogate.md#state),
     make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add an additional kind of `Mood` called `Prozac`.
-2.  Apply the table-driven `StateMachine` from `tabledriven/state_machine.py` to a washing-machine problem.
+2.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
     Give one `(state, input)` pair two rows told apart by a condition,
     such as a load too heavy for the fast spin.
 3.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
@@ -813,11 +861,18 @@ if __name__ == "__main__":
 5.  Modify the "mood" exercise (exercise 1)
     so that it becomes a state machine using `state_machine.py`,
     the first design, where each state decides the next one.
-6.  Create an elevator state machine system using `tabledriven/state_machine.py`,
-    whose transitions can carry conditions.
-7.  Create a heating/air-conditioning system using `tabledriven/state_machine.py`.
+6.  Create an elevator state machine using `tabledriven/table_machine.py`.
+    Give the "doors closing" state two rows for the same input,
+    one guarded by a door-obstruction condition.
+7.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+    A single `TemperatureReading` input must be able to lead to heating,
+    cooling, or idle, decided entirely by conditions on one `(state, input)` key.
 8.  Write a `mouse_move_generator()` ([Iterators](23_Iterators.md#generators))
     that yields valid `MouseAction` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
+9.  Add a `Nickel` class deriving from `Money` to `vending_machine.py` and feed one to the machine without touching the table.
+    Explain the exception, then make it work two ways: by adding a row,
+    and by making `Nickel` an instance of `Money` rather than a subclass.
+    Say which you would ship.

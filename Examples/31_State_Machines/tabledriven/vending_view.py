@@ -1,6 +1,7 @@
 # tabledriven/vending_view.py
 import tkinter as tk
 from functools import partial
+from table_machine import NoTransition
 from vending_machine import (
     FirstDigit,
     Money,
@@ -30,7 +31,7 @@ def show() -> None:
     def send(event: object) -> None:
         try:
             vm.handle(event)
-        except RuntimeError:
+        except NoTransition:
             vm.message = "not allowed yet"
         render()
 

@@ -359,6 +359,33 @@ an `if TYPE_CHECKING:` import breaks it,
 because annotations are not evaluated at import time
 (see [Simulation](38_Simulation.md#a-robot-in-a-maze)).
 
+## What a Module Exports
+
+Every name at a module's top level is importable,
+because Python has no `private` keyword.
+A module states its boundary by convention and by one optional list.
+
+A leading underscore marks a name as internal.
+It is a signal to a reader rather than a barrier.
+`accounting._Engine` still resolves,
+and `from accounting import _Engine` still works.
+The underscore changes one mechanical thing:
+`from accounting import *` skips every name that begins with one.
+
+`__all__` states the export list explicitly.
+Assign it at module level as a list of strings naming the public names,
+and `from module import *` imports those and no others, underscore or not.
+An `__all__` also documents the intended surface in one readable place,
+which a scattering of underscores does not,
+and it is what documentation tools read when they ask what a module offers.
+
+Neither mechanism stops `module._name`.
+Both say which names a caller is meant to use,
+which is enough to treat a module as a façade over its internals
+([Changing the Interface](29_Changing_the_Interface.md))
+or as a shared single instance
+([Singleton](24_Singleton.md#a-module-is-already-a-singleton)).
+
 ## File Names
 
 To be the target of an `import` statement,

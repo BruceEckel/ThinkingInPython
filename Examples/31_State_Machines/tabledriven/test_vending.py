@@ -1,5 +1,6 @@
 # tabledriven/test_vending.py
 import pytest
+from table_machine import NoTransition
 from vending_machine import (
     FirstDigit,
     Money,
@@ -49,5 +50,5 @@ def test_quit_refunds_and_resets() -> None:
 
 def test_no_transition_raises() -> None:
     vm = VendingMachine()  # QUIESCENT has no transition for Quit
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NoTransition):
         vm.handle(Quit())

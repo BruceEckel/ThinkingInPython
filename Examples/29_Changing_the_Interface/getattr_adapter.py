@@ -15,8 +15,9 @@ class Adapter:
     def __getattr__(self, name: str) -> Any:  # Forwards the rest
         return getattr(self._adaptee, name)
 
-a = Adapter(WhatIHave())
-print(a.f())  # Adapted method
+if __name__ == "__main__":
+    a = Adapter(WhatIHave())
+    print(a.f())  # Adapted method
+    print(a.g())  # Forwarded to the adaptee unchanged
 #: gh
-print(a.g())  # Forwarded to the adaptee unchanged
 #: g

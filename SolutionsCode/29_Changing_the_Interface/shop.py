@@ -1,11 +1,11 @@
 # shop.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class _A:
     x: object
 
-@dataclass
+@dataclass(frozen=True)
 class _B:
     x: object
 

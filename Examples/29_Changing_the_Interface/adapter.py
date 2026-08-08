@@ -1,6 +1,6 @@
 # adapter.py
-# Variations on the Adapter pattern.
-from typing import Any, override
+# The object adapter.
+from typing import override
 
 class WhatIHave:
     def g(self) -> None:
@@ -26,47 +26,8 @@ class WhatIUse:
     def op(self, what_i_want: WhatIWant, /) -> None:
         what_i_want.f()
 
-# Approach 2: build adapter use into op():
-class WhatIUse2(WhatIUse):
-    @override
-    def op(self, what_i_have: Any) -> None:
-        ProxyAdapter(what_i_have).f()
-
-# Approach 3: build adapter into WhatIHave:
-class WhatIHave2(WhatIHave, WhatIWant):
-    @override
-    def f(self) -> None:
-        self.g()
-        self.h()
-
-# Approach 4: use an inner class:
-class WhatIHave3(WhatIHave):
-    class InnerAdapter(WhatIWant):
-        def __init__(self, outer: WhatIHave3) -> None:
-            self.outer = outer
-        @override
-        def f(self) -> None:
-            self.outer.g()
-            self.outer.h()
-
-    def what_i_want(self) -> WhatIWant:
-        return WhatIHave3.InnerAdapter(self)
-
-what_i_use = WhatIUse()
-what_i_have = WhatIHave()
-adapt = ProxyAdapter(what_i_have)
-what_i_use2 = WhatIUse2()
-what_i_have2 = WhatIHave2()
-what_i_have3 = WhatIHave3()
-what_i_use.op(adapt)  # Approach 1: separate adapter
-#: WhatIHave.g()
-#: WhatIHave.h()
-what_i_use2.op(what_i_have)  # Approach 2: adapting op()
-#: WhatIHave.g()
-#: WhatIHave.h()
-what_i_use.op(what_i_have2)  # Approach 3: adapter built in
-#: WhatIHave.g()
-#: WhatIHave.h()
-what_i_use.op(what_i_have3.what_i_want())  # Approach 4
+if __name__ == "__main__":
+    adapt = ProxyAdapter(WhatIHave())
+    WhatIUse().op(adapt)
 #: WhatIHave.g()
 #: WhatIHave.h()
