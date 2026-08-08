@@ -14,18 +14,12 @@ class Counter:
     def live_count(cls) -> int:
         return len(cls._instances)
 
-counters = {}
+counters = []
 for name in ["First", "Second", "Third"]:
-    counters[name] = Counter(name)
+    counters.append(Counter(name))
 
 print(Counter.live_count())
 #: 3
-del counters["Third"]
-print(Counter.live_count())
-#: 2
-del counters["Second"]
-print(Counter.live_count())
-#: 1
-counters.clear()
+counters = []  # Rebind the name instead of calling .clear()
 print(Counter.live_count())
 #: 0

@@ -1,26 +1,24 @@
 # exercise_5.py
-from typing import ClassVar
+from weakref import finalize
 
-class Counter:
-    _instances: ClassVar[dict[int, Counter]] = {}
-
+class Connection:
     def __init__(self, name: str) -> None:
         self.name = name
-        self._instances[id(self)] = self
+        print(name, "opened")
+        self.closer = finalize(self, self.close)
 
-    @classmethod
-    def live_count(cls) -> int:
-        return len(cls._instances)
+    def close(self) -> None:
+        print(self.name, "closed")
 
-counters = [Counter(name) for name in ("First", "Second", "Third")]
-print(Counter.live_count())
-#: 3
-counters.pop()
-print(Counter.live_count())
-#: 3
-counters.pop()
-print(Counter.live_count())
-#: 3
-counters.clear()
-print(Counter.live_count())
-#: 3
+a = Connection("A")
+#: A opened
+b = Connection("B")
+#: B opened
+a.closer()
+#: A closed
+a.closer()
+print(a.closer.alive, b.closer.alive)
+#: False True
+del b
+print("End of program")
+#: End of program

@@ -11,15 +11,9 @@ class Counter:
         self._instances[id(self)] = self
 
     @classmethod
-    def live_count(cls) -> int:
-        return len(cls._instances)
+    def live_names(cls) -> list[str]:
+        return sorted(c.name for c in cls._instances.values())
 
-counters = []
-for name in ["First", "Second", "Third"]:
-    counters.append(Counter(name))
-
-print(Counter.live_count())
-#: 3
-counters = []  # Rebind the name instead of calling .clear()
-print(Counter.live_count())
-#: 0
+counters = [Counter(name) for name in ("Charlie", "Alpha", "Bravo")]
+print(Counter.live_names())
+#: ['Alpha', 'Bravo', 'Charlie']

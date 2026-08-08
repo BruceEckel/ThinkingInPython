@@ -1,19 +1,35 @@
 # exercise_3.py
 from typing import ClassVar
-from weakref import WeakValueDictionary
 
 class Counter:
-    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
-        WeakValueDictionary())
+    count: ClassVar[int] = 0
 
     def __init__(self, name: str) -> None:
         self.name = name
-        self._instances[id(self)] = self
+        print(name, "created")
+        Counter.count += 1
 
-    @classmethod
-    def live_names(cls) -> list[str]:
-        return sorted(c.name for c in cls._instances.values())
+    def __del__(self) -> None:
+        print(self.name, "deleted")
+        Counter.count -= 1
+        if Counter.count == 0:
+            print("Last Counter object deleted")
+        else:
+            print(Counter.count, "Counter objects remaining")
 
-counters = [Counter(name) for name in ("Charlie", "Alpha", "Bravo")]
-print(Counter.live_names())
-#: ['Alpha', 'Bravo', 'Charlie']
+    def __repr__(self) -> str:
+        return f"Counter({self.name!r} {self.count})"
+
+counters = [Counter(name) for name in ["First", "Second", "Third"]]
+
+for c in counters:
+    print(c)
+    del c
+print("End of delete loop")
+#: First created
+#: Second created
+#: Third created
+#: Counter('First' 3)
+#: Counter('Second' 3)
+#: Counter('Third' 3)
+#: End of delete loop

@@ -108,11 +108,41 @@ The Python documentation warns:
 >   that imported modules are still available at the time when the
 >   `__del__()` method is called.
 
+<!-- The indented transcript above is the chapter's only output that no
+     gate checks: it is prose, not a `#:` marker, because it arrives after
+     the program's last statement. If CPython changes the order
+     list_dealloc drops its items, this block goes stale silently. Verified
+     against 3.15.0rc1. -->
+
 In the direct run the objects are destroyed during shutdown,
 which is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
 `__del__()` should do as little as possible, and you should not depend on it.
+
+The swallowed exception is the failure that costs most in production:
+
+```python
+# del_swallows.py
+
+class Resource:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def __del__(self) -> None:
+        raise RuntimeError(f"{self.name} not released")
+
+resource = Resource("db")
+del resource
+print("still running")
+#: still running
+```
+
+The release failed, and stdout says nothing about it.
+A traceback goes to `sys.stderr` labelled "Exception ignored",
+but nothing propagates: no caller can catch it, no `finally` runs,
+the exit status is still `0`, and a test asserting on stdout passes.
+A `close()` call in a `with` block fails loudly instead.
 
 ## Reference Cycles Delay Destruction
 
@@ -158,18 +188,62 @@ a separate mechanism triggered by allocation counts rather than by the object be
 `gc.disable()` above keeps that collector from running on its own,
 and `gc.collect()` then forces a run, so the moment of destruction is visible;
 in a real program nothing tells you when it happens.
+Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()` at all,
+leaving the objects in `gc.garbage`;
+[PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
+so the only thing a cycle costs now is the delay.
+
 This is a second reason not to put cleanup in `__del__()`:
 one back-reference between two objects is enough to postpone it,
 and the code that creates the cycle is often not the code that owns the resource.
 
 ## Reliable Alternatives
 
-Three approaches are more reliable:
+Two approaches are more reliable:
 
 1. An explicit finalizer such as the `close()` that file objects provide,
    called from a `with` block.
-   This runs even when an error interrupts the code.
-   [Context Managers](15_Context_Managers.md) covers `with` in full.
+   This runs even when an error interrupts the code:
+
+```python
+# closable.py
+
+class Socket:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        print(name, "opened")
+
+    def close(self) -> None:
+        print(self.name, "closed")
+
+    def __enter__(self) -> Socket:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()
+
+with Socket("A") as sock:
+    print("using", sock.name)
+#: A opened
+#: using A
+#: A closed
+try:
+    with Socket("B"):
+        raise RuntimeError("boom")
+except RuntimeError as e:
+    print("caught", e)
+#: B opened
+#: B closed
+#: caught boom
+```
+
+`close()` runs at the end of the `with` block, at a line you can point at,
+and the second half shows it running when the body raises.
+Compare `cleanup.py`,
+where the release happened at an unknowable moment after the program's last statement.
+[Context Managers](15_Context_Managers.md) covers the protocol,
+the `@contextmanager` shorthand, and what `__exit__`'s arguments are for.
+This chapter shows the shape; that one explains it.
 
 2. `weakref.finalize()`,
    which registers a cleanup callback for an object without giving that callback a reference to the object:
@@ -219,9 +293,47 @@ For an object still alive when the program ends,
 `finalize()` runs the callback from `atexit`,
 ahead of the teardown that makes `__del__()` unreliable.
 
-3. A weak reference, which tracks an object without keeping it alive.
-   Here, a `WeakValueDictionary` counts live instances,
-   using `id(self)` as each object's key:
+The `self.close` mistake produces no error, only an object that never goes away:
+
+```python
+# finalize_trap.py
+import gc
+from weakref import finalize, ref
+
+class Leaky:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        finalize(self, self.close).atexit = False
+
+    def close(self) -> None:
+        print(self.name, "closed")
+
+class Safe:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        finalize(self, print, name, "closed")
+
+leaky, safe = ref(Leaky("L")), ref(Safe("S"))
+gc.collect()
+#: S closed
+print(leaky() is None, safe() is None)
+#: False True
+```
+
+A `ref()` reports `None` once its object is gone,
+so `False True` says `Safe` was collected and `Leaky` was not.
+`Safe` printed on the way out; `Leaky` printed nothing,
+because its callback never ran and nothing failed.
+Turning `atexit` off on `Leaky`'s finalizer keeps the question to the one being asked,
+whether the collector reclaimed the object,
+rather than whether the callback eventually ran at exit.
+
+## Watching Objects Without Holding Them
+
+The weak-reference machinery behind `finalize()` also solves a different problem:
+observing which objects are alive without being the reason they are.
+Here, a `WeakValueDictionary` counts live instances,
+using `id(self)` as each object's key:
 
 ```python
 # weak_value.py
@@ -257,11 +369,14 @@ print(Counter.live_count())
 #: 0
 ```
 
-The key is `id(self)` because the registry needs a key per object, not per name:
-two counters could share a name, and one would then displace the other.
-Reused `id()` values are not a hazard here,
+A `WeakSet` would do for counting alone.
+The dictionary is what you want as soon as you look instances up rather than count them,
+which is what [Flyweight](35_Flyweight.md) does with a pool keyed by name.
+`id(self)` is the key here because the registry needs one entry per object,
+not per name: two counters could share a name,
+and one would then displace the other.
+Reused `id()` values are not a hazard,
 since the dictionary only ever holds live objects and no two live objects share an id.
-When the values need no key at all, `weakref.WeakSet` is the simpler container.
 `live_count()` is the size of that registry,
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
@@ -288,21 +403,28 @@ Give a class that owns a resource a `close()` method and a `with` block that cal
 so the release happens at a point in the program you can see.
 Where a callback must still run if the caller forgets,
 add `weakref.finalize()` as the backstop, not as the plan.
+To track objects without owning them, hold them weakly,
+so the registry cannot become the leak it is watching for.
 
 ## Exercises
 
-1.  In `weak_value.py`, change `counters` from a `list` to a `dict` keyed by name,
-    then pop entries from that `dict` one at a time and confirm `live_count()` still falls correctly.
-2.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
+1.  In `weak_value.py`, replace the final `counters.clear()` with `counters = []`
     (rebinding the name) and confirm `live_count()` still reaches `0`.
     The two do different things to the list object.
     Say what each one does,
     then say what a second name bound to the same list would see after each.
-3.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
+2.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
     by reading `cls._instances.values()`.
-4.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
+3.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
     and confirm the output is unchanged:
     nothing is deleted before `End of delete loop` prints.
-5.  In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
+4.  In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
     Report what `live_count()` prints after each `pop()`,
     and explain the difference in terms of what each container holds.
+5.  In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)` and run the file again.
+    Report when `B closed` now prints relative to `End of program`,
+    and say what keeps the `Connection` alive.
+6.  In `cycle.py`, change `self_link()` to build a two-object cycle
+    (`a.peer = b` and `b.peer = a`) instead of a self-reference.
+    Confirm both finalizers run at `gc.collect()`,
+    then remove the `gc.disable()`/`gc.enable()` pair and explain why the output is no longer predictable.

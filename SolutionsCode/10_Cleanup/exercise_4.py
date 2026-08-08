@@ -2,30 +2,25 @@
 from typing import ClassVar
 
 class Counter:
-    count: ClassVar[int] = 0
+    _instances: ClassVar[dict[int, Counter]] = {}
 
     def __init__(self, name: str) -> None:
         self.name = name
-        print(name, "created")
-        Counter.count += 1
+        self._instances[id(self)] = self
 
-    def __del__(self) -> None:
-        print(self.name, "deleted")
-        Counter.count -= 1
+    @classmethod
+    def live_count(cls) -> int:
+        return len(cls._instances)
 
-    def __repr__(self) -> str:
-        return f"Counter({self.name!r} {self.count})"
-
-counters = [Counter(name) for name in ["First", "Second", "Third"]]
-
-for c in counters:
-    print(c)
-    del c
-print("End of delete loop")
-#: First created
-#: Second created
-#: Third created
-#: Counter('First' 3)
-#: Counter('Second' 3)
-#: Counter('Third' 3)
-#: End of delete loop
+counters = [Counter(name) for name in ("First", "Second", "Third")]
+print(Counter.live_count())
+#: 3
+counters.pop()
+print(Counter.live_count())
+#: 3
+counters.pop()
+print(Counter.live_count())
+#: 3
+counters.clear()
+print(Counter.live_count())
+#: 3

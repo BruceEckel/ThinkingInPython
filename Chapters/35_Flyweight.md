@@ -300,7 +300,7 @@ For tile kinds and colors that is fine, since the universe of values is small.
 When the universe is unbounded, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
-the live-instance registry from [Cleanup](10_Cleanup.md#reliable-alternatives),
+the live-instance registry from [Cleanup](10_Cleanup.md#watching-objects-without-holding-them),
 fixes this.
 It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
