@@ -187,7 +187,8 @@ Accrued notes from the chapters 18-38 review sweep:
   its exercise 6); exact-type dict dispatch is noted in 31 (engine),
   32 (OUTCOME table), and 37 (`bins[type(t)]`); the registry factory's
   import-time-registration and name-collision caveats live in 27 and
-  back the registries in 14 (`register.py`) and 37; frozen-is-shallow is demonstrated in 20
+  back the registries in 14 (`register.py`), 17 (`init_subclass.py`),
+  and 37; frozen-is-shallow is demonstrated in 20
   (`frozen_leaky.py`) and assumed by 22's `NamedTuple`-vs-frozen
   contrast and 35/36's immutability arguments; the load-bearing-`Any`
   bargain runs 22 → 33; the constructor-starts-the-engine trap runs

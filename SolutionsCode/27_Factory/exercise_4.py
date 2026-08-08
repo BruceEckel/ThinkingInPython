@@ -1,4 +1,6 @@
 # exercise_4.py
+from typing import override
+
 class Shape:
     def draw(self) -> None: ...
 
@@ -6,6 +8,7 @@ class Circle(Shape):
     def __init__(self, thickness: str) -> None:
         self.thickness = thickness
 
+    @override
     def draw(self) -> None:
         print(f"{self.thickness} Circle.draw")
 
@@ -13,6 +16,7 @@ class Square(Shape):
     def __init__(self, thickness: str) -> None:
         self.thickness = thickness
 
+    @override
     def draw(self) -> None:
         print(f"{self.thickness} Square.draw")
 
@@ -24,16 +28,20 @@ class ShapeAbstractFactory:
         raise NotImplementedError
 
 class ThickShapeFactory(ShapeAbstractFactory):
+    @override
     def make_circle(self) -> Shape:
         return Circle("thick")
 
+    @override
     def make_square(self) -> Shape:
         return Square("thick")
 
 class ThinShapeFactory(ShapeAbstractFactory):
+    @override
     def make_circle(self) -> Shape:
         return Circle("thin")
 
+    @override
     def make_square(self) -> Shape:
         return Square("thin")
 

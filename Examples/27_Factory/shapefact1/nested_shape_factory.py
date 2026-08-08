@@ -29,7 +29,7 @@ def factory(kind: str) -> Shape:
             raise ValueError(f"Bad shape creation: {kind}")
 
 def shape_gen(n: int) -> Iterator[Shape]:
-    for i in range(n):
+    for _ in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 if __name__ == "__main__":
@@ -38,6 +38,8 @@ if __name__ == "__main__":
     for shape in shape_gen(4):
         shape.draw()
         shape.erase()
+    a, b = factory("Circle"), factory("Circle")
+    print(type(a) is type(b), isinstance(a, type(b)))
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
@@ -46,3 +48,4 @@ if __name__ == "__main__":
 #: Circle.erase
 #: Square.draw
 #: Square.erase
+#: False False

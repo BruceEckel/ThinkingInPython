@@ -17,10 +17,11 @@ PROTOTYPES: Final[dict[str, Monster]] = {
 def spawn(kind: str) -> Monster:
     return copy.deepcopy(PROTOTYPES[kind])
 
-a = spawn("goblin")
-b = spawn("goblin")
-b.hp = 5
-print(a.hp, b.hp)  # The copies are independent
+if __name__ == "__main__":
+    a = spawn("goblin")
+    b = spawn("goblin")
+    b.hp = 5
+    print(a.hp, b.hp)  # The copies are independent
+    print(spawn("troll"))
 #: 10 5
-print(spawn("troll"))
 #: Monster(name='Troll', hp=40, powers=['smash', 'regenerate'])

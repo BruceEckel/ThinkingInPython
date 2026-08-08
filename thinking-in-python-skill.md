@@ -347,9 +347,11 @@ legal value** (PEP 661, Python 3.15+).
   combined test module. When a test carries the verification, the
   inline demo can stay short.
 
-- **Importable modules carry no top-level demo.** If a module is both
-  a library and a demonstration, split it: a demo-free library module
-  plus a separate runnable file that imports it and holds the demo.
+- **Importable modules can carry a top-level demo if it is guarded by
+  `__main__`.** A module that another file imports must not print on
+  import, so put its demo under `if __name__ == "__main__":`. Split it
+  into a demo-free library module plus a separate runnable file when
+  the demo is long enough to obscure the library.
 
 - **Nondeterministic output needs taming** before it can be asserted
   or displayed: round floats (`f"{x:.6f}"`), print

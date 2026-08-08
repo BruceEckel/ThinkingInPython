@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -198,7 +199,7 @@ before that) marks a function, method, or class as on its way out".
 `Chapters/`. It is correct English but a shade more literary than the
 surrounding voice. Minor; flagging it for your ear rather than proposing a
 specific replacement, since the obvious plainer versions ("are worth a closer
-look") are blander than the original.
+look") are blander than the original. [[rewrite]]
 
 ---
 

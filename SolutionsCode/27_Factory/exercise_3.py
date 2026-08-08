@@ -1,4 +1,6 @@
 # exercise_3.py
+from typing import override
+
 class Obstacle:
     def action(self) -> str:
         raise NotImplementedError
@@ -23,17 +25,21 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 class Gnome(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Gnome discovers a", obstacle.action())
 
 class Riddle(Obstacle):
+    @override
     def action(self) -> str:
         return "Riddle"
 
 class GnomesAndFairies(GameElementFactory):
+    @override
     def make_character(self) -> Character:
         return Gnome()
 
+    @override
     def make_obstacle(self) -> Obstacle:
         return Riddle()
 

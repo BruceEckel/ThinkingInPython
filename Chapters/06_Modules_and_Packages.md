@@ -483,6 +483,10 @@ The body of `noisy` runs at `noisy.announce()`, the first access,
 which is why `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
+An import that exists only for a side effect, such as registering a plugin class
+([Factory](27_Factory.md#the-pythonic-factory-a-dictionary)),
+never uses the imported name, so `lazy` stops it from running at all.
+Keep those imports eager.
 `sys.lazy_modules` holds the names that are currently deferred,
 so you can check what a run actually put off without instrumenting the modules.
 

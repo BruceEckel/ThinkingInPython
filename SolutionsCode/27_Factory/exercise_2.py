@@ -1,6 +1,5 @@
 # exercise_2.py
-from __future__ import annotations
-from typing import Any, ClassVar
+from typing import Any, ClassVar, override
 
 class ShapeFactory:
     factories: ClassVar[dict[str, Any]] = {}
@@ -15,6 +14,7 @@ class Shape:
     def draw(self) -> None: ...
 
 class Triangle(Shape):
+    @override
     def draw(self) -> None:
         print("Triangle.draw")
 

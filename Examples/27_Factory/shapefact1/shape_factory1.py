@@ -30,12 +30,12 @@ class Square(Shape):
     def erase(self) -> None: print("Square.erase")
 
 def shape_name_gen(n: int) -> Iterator[str]:
-    for i in range(n):
+    for _ in range(n):
         yield random.choice(Shape.__subclasses__()).__name__
 
 if __name__ == "__main__":
     random.seed(4)  # Reproducible shape sequence
-    shapes = [Shape.factory(i) for i in shape_name_gen(4)]
+    shapes = [Shape.factory(kind) for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()

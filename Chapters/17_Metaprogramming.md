@@ -520,6 +520,12 @@ def test_independent_hierarchies_have_separate_registries() -> None:
     assert shapes == {"Square", "Circle"}  # Round is no longer a leaf
 ```
 
+The mechanism is reliable;
+the registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
+[Factory](27_Factory.md#the-pythonic-factory-a-dictionary) covers both:
+a class in a module nobody imports never registers,
+and keying on `cls.__name__` lets two same-named classes overwrite each other.
+
 ## Making a Class Final
 
 It is sometimes useful to forbid inheritance.

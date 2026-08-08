@@ -63,12 +63,12 @@ class Square(Shape):
     def erase(self) -> None: print("Square.erase")
 
 def shape_name_gen(n: int) -> Iterator[str]:
-    for i in range(n):
+    for _ in range(n):
         yield random.choice(Shape.__subclasses__()).__name__
 
 if __name__ == "__main__":
     random.seed(4)  # Reproducible shape sequence
-    shapes = [Shape.factory(i) for i in shape_name_gen(4)]
+    shapes = [Shape.factory(kind) for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
@@ -88,7 +88,6 @@ The `factory()` is now the only other code in the system that needs to change wh
 (the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
-A generator is a special case of a factory.
 A factory takes information telling it what to build;
 a generator object holds an internal algorithm and produces the next value with no argument at all.
 `shape_name_gen()` takes `n` and returns a generator object,
@@ -100,25 +99,6 @@ Inside `shape_name_gen()`,
 It covers only the first level of inheritance,
 so a class inheriting from `Circle` does not show up in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
-
-You can drive the generator by hand:
-
-```python
-# explicit_generator.py
-import random
-from shapefact1.shape_factory1 import shape_name_gen
-
-random.seed(47)
-
-gen = shape_name_gen(7)
-print(next(gen))
-#: Square
-print(next(gen))
-#: Circle
-```
-
-`next(gen)` produces the next name from the generator.
-`shape_name_gen()` is the factory, and `gen` is the generator.
 
 ### Preventing Direct Creation
 
@@ -157,7 +137,7 @@ def factory(kind: str) -> Shape:
             raise ValueError(f"Bad shape creation: {kind}")
 
 def shape_gen(n: int) -> Iterator[Shape]:
-    for i in range(n):
+    for _ in range(n):
         yield factory(random.choice(["Circle", "Square"]))
 
 if __name__ == "__main__":
@@ -166,6 +146,8 @@ if __name__ == "__main__":
     for shape in shape_gen(4):
         shape.draw()
         shape.erase()
+    a, b = factory("Circle"), factory("Circle")
+    print(type(a) is type(b), isinstance(a, type(b)))
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
@@ -174,6 +156,7 @@ if __name__ == "__main__":
 #: Circle.erase
 #: Square.draw
 #: Square.erase
+#: False False
 ```
 
 The privacy has a price.
@@ -261,10 +244,11 @@ class Square(Shape):
 def make(kind: str) -> Shape:
     return Shape.registry[kind]()
 
-print(sorted(Shape.registry))
+if __name__ == "__main__":
+    print(sorted(Shape.registry))
+    for kind in ["Circle", "Square", "Circle"]:
+        make(kind).draw()
 #: ['Circle', 'Square']
-for kind in ["Circle", "Square", "Circle"]:
-    make(kind).draw()
 #: Circle.draw
 #: Square.draw
 #: Circle.draw
@@ -275,8 +259,9 @@ The two `class` statements filled `Shape.registry` on their own,
 which is what the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
-This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler),
-and it is the most common form of factory in idiomatic Python.
+This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler).
+A dictionary of classes, filled by hand or filled by the classes themselves,
+is the ordinary Python factory.
 Creating objects through a dictionary of classes is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
 the pattern does not go away, it stops needing a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
@@ -298,6 +283,9 @@ The registry also keys on `cls.__name__` alone,
 so two classes that share a name, from different modules,
 silently overwrite each other.
 Key on a qualified name if that can happen.
+Registration names `Shape.registry` rather than `cls.registry` on purpose:
+`cls.registry` resolves through the MRO,
+so a subclass that gave itself a `registry` of its own would quietly start a second table that `make()` never reads.
 
 Testing confirms that every subclass registers itself,
 and a new subclass needs no change to `make()`.
@@ -388,15 +376,20 @@ class Square(Shape):
 
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
-    for i in range(n):
+    for _ in range(n):
         yield random.choice(types).__name__
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(4)]
+    print(sorted(ShapeFactory.factories))
+    shapes = [ShapeFactory.create_shape(kind)
+              for kind in shape_name_gen(4)]
+    print(sorted(ShapeFactory.factories))
     for shape in shapes:
         shape.draw()
         shape.erase()
+#: []
+#: ['Circle', 'Square']
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
@@ -527,8 +520,9 @@ and then the `GameEnvironment` controls the setup and play of the game.
 In this example, the setup and play is simple, but those activities
 (the *initial conditions* and the *state change*)
 can determine much of the game's outcome.
-`GameEnvironment` is not designed to be subclassed,
-though a real game would probably subclass it to vary the rules of play.
+`GameEnvironment` has no hook for varying the rules of play,
+so a real game would need one,
+either a subclass overriding `play()` or a rules object passed alongside the factory.
 
 `interact_with()` dispatches on the character's type,
 and `obstacle.action()` dispatches again on the obstacle's,
@@ -695,12 +689,13 @@ PROTOTYPES: Final[dict[str, Monster]] = {
 def spawn(kind: str) -> Monster:
     return copy.deepcopy(PROTOTYPES[kind])
 
-a = spawn("goblin")
-b = spawn("goblin")
-b.hp = 5
-print(a.hp, b.hp)  # The copies are independent
+if __name__ == "__main__":
+    a = spawn("goblin")
+    b = spawn("goblin")
+    b.hp = 5
+    print(a.hp, b.hp)  # The copies are independent
+    print(spawn("troll"))
 #: 10 5
-print(spawn("troll"))
 #: Monster(name='Troll', hp=40, powers=['smash', 'regenerate'])
 ```
 
@@ -733,7 +728,8 @@ def test_prototype_untouched() -> None:
 
 ## Builder
 
-The remaining creational pattern in *GoF Design Patterns* is *Builder*:
+The last creational pattern in *GoF Design Patterns* this chapter has not covered is *Builder*
+([Singleton](24_Singleton.md) has its own chapter):
 separate the construction of a complex object from its representation,
 assembling it in steps.
 In Java and C++ it cures the *telescoping constructor*.
@@ -897,7 +893,10 @@ Both exist to work around languages where a class is not an object you can put i
 
 1.  Add a class `Triangle` to `shape_factory1.py`.
 2.  Add a class `Triangle` to `shape_factory2.py`.
-3.  Add a new type of `GameElementFactory` called `GnomesAndFairies` to `games.py`.
+3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
+    first to `games.py` and then to `games2.py`.
+    In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports;
+    then add it.
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes
     (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
@@ -914,3 +913,7 @@ Both exist to work around languages where a class is not an object you can put i
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
     run `test_prototype.py`, and explain which assertion fails and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
+8.  In `shape_factory2.py`,
+    call `ShapeFactory.create_shape()` with a `kind` string that is not a shape name but a Python expression with a side effect,
+    and show that `create_shape()` runs it.
+    Then replace the `eval()` with a dictionary of the nested `Factory` classes and show that the same string now raises `KeyError`.

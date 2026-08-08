@@ -6,7 +6,7 @@
 
 ```python
 # exercise_1.py
-from __future__ import annotations
+from typing import override
 
 class Shape:
     def draw(self) -> None: ...
@@ -25,23 +25,29 @@ class Shape:
                 raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
+    @override
     def draw(self) -> None:
         print("Circle.draw")
 
+    @override
     def erase(self) -> None:
         print("Circle.erase")
 
 class Square(Shape):
+    @override
     def draw(self) -> None:
         print("Square.draw")
 
+    @override
     def erase(self) -> None:
         print("Square.erase")
 
 class Triangle(Shape):
+    @override
     def draw(self) -> None:
         print("Triangle.draw")
 
+    @override
     def erase(self) -> None:
         print("Triangle.erase")
 
@@ -59,8 +65,7 @@ given and expects that name's own `Factory` class to build it:
 
 ```python
 # exercise_2.py
-from __future__ import annotations
-from typing import Any, ClassVar
+from typing import Any, ClassVar, override
 
 class ShapeFactory:
     factories: ClassVar[dict[str, Any]] = {}
@@ -75,6 +80,7 @@ class Shape:
     def draw(self) -> None: ...
 
 class Triangle(Shape):
+    @override
     def draw(self) -> None:
         print("Triangle.draw")
 
@@ -96,6 +102,8 @@ exchange for a central dispatcher that never needs to change again.
 
 ```python
 # exercise_3.py
+from typing import override
+
 class Obstacle:
     def action(self) -> str:
         raise NotImplementedError
@@ -120,17 +128,21 @@ class GameEnvironment:
         self.p.interact_with(self.ob)
 
 class Gnome(Character):
+    @override
     def interact_with(self, obstacle: Obstacle) -> None:
         print("Gnome discovers a", obstacle.action())
 
 class Riddle(Obstacle):
+    @override
     def action(self) -> str:
         return "Riddle"
 
 class GnomesAndFairies(GameElementFactory):
+    @override
     def make_character(self) -> Character:
         return Gnome()
 
+    @override
     def make_obstacle(self) -> Obstacle:
         return Riddle()
 
@@ -148,6 +160,8 @@ third concrete factory slots in beside `KittiesAndPuzzles` and
 
 ```python
 # exercise_4.py
+from typing import override
+
 class Shape:
     def draw(self) -> None: ...
 
@@ -155,6 +169,7 @@ class Circle(Shape):
     def __init__(self, thickness: str) -> None:
         self.thickness = thickness
 
+    @override
     def draw(self) -> None:
         print(f"{self.thickness} Circle.draw")
 
@@ -162,6 +177,7 @@ class Square(Shape):
     def __init__(self, thickness: str) -> None:
         self.thickness = thickness
 
+    @override
     def draw(self) -> None:
         print(f"{self.thickness} Square.draw")
 
@@ -173,16 +189,20 @@ class ShapeAbstractFactory:
         raise NotImplementedError
 
 class ThickShapeFactory(ShapeAbstractFactory):
+    @override
     def make_circle(self) -> Shape:
         return Circle("thick")
 
+    @override
     def make_square(self) -> Shape:
         return Square("thick")
 
 class ThinShapeFactory(ShapeAbstractFactory):
+    @override
     def make_circle(self) -> Shape:
         return Circle("thin")
 
+    @override
     def make_square(self) -> Shape:
         return Square("thin")
 
@@ -429,3 +449,70 @@ The second assertion is the one worth writing. Checking that the
 prototype survived is good; checking that the *next* spawn is still
 correct is what a user of the registry actually depends on, and it
 fails loudly under `copy.copy()`.
+
+## 8. What the `eval()` in `shape_factory2.py` accepts
+
+```python
+# exercise_8.py
+from typing import ClassVar, Final, Protocol, override
+
+class Shape:
+    def draw(self) -> None: ...
+
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
+
+class Circle(Shape):
+    @override
+    def draw(self) -> None: print("Circle.draw")
+    class Factory:
+        def create(self) -> Circle: return Circle()
+
+class EvalFactory:
+    factories: ClassVar[dict[str, ShapeMaker]] = {}
+
+    @classmethod
+    def create_shape(cls, kind: str) -> Shape:
+        if kind not in cls.factories:
+            cls.factories[kind] = eval(f"{kind}.Factory()")
+        return cls.factories[kind].create()
+
+# A shape "name" that is really an expression:
+ATTACK: Final[str] = "print('side effect!') or Circle"
+EvalFactory.create_shape(ATTACK).draw()
+#: side effect!
+#: Circle.draw
+
+class TableFactory:
+    factories: ClassVar[dict[str, ShapeMaker]] = {
+        "Circle": Circle.Factory(),
+    }
+
+    @classmethod
+    def create_shape(cls, kind: str) -> Shape:
+        return cls.factories[kind].create()
+
+TableFactory.create_shape("Circle").draw()
+#: Circle.draw
+try:
+    TableFactory.create_shape(ATTACK)
+except KeyError as e:
+    print(type(e).__name__, e)
+#: KeyError "print('side effect!') or Circle"
+```
+
+`create_shape()` builds the string `print('side effect!') or
+Circle.Factory()` and hands it to `eval()`. Python evaluates the
+`print()` call first, which is the side effect, and `None or
+Circle.Factory()` then produces a perfectly good factory, so the
+attack leaves no trace: the caller receives the `Circle` it asked
+for and the injected code has already run. Anything reachable from
+the module's namespace, and anything `__import__()` can reach, is
+available to that string.
+
+`TableFactory` keys a dictionary on the same names. A `kind` that is
+not a key is a `KeyError` naming the string, and nothing evaluates it.
+The dictionary is also shorter, needs no `Factory` lookup by name, and
+lets a type checker see that every value is a `ShapeMaker`. Whenever
+`kind` can come from a configuration file, a request, or a command
+line, this is the only acceptable version of the two.

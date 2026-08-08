@@ -2,7 +2,7 @@ New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
-Look through the patterns for sections that show a alternate approaches that are only being shown for pedagogical purposes.
+Look through the patterns chapters for sections that show a alternate approaches that are only being shown for pedagogical purposes.
 Do they teach something valuable enough, would anybody ever use these?
 Make a review list that proposes removal of the ones that don't pull their weight.
 

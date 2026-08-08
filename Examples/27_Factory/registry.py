@@ -21,10 +21,11 @@ class Square(Shape):
 def make(kind: str) -> Shape:
     return Shape.registry[kind]()
 
-print(sorted(Shape.registry))
+if __name__ == "__main__":
+    print(sorted(Shape.registry))
+    for kind in ["Circle", "Square", "Circle"]:
+        make(kind).draw()
 #: ['Circle', 'Square']
-for kind in ["Circle", "Square", "Circle"]:
-    make(kind).draw()
 #: Circle.draw
 #: Square.draw
 #: Circle.draw

@@ -41,15 +41,20 @@ class Square(Shape):
 
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
-    for i in range(n):
+    for _ in range(n):
         yield random.choice(types).__name__
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [ShapeFactory.create_shape(i) for i in shape_name_gen(4)]
+    print(sorted(ShapeFactory.factories))
+    shapes = [ShapeFactory.create_shape(kind)
+              for kind in shape_name_gen(4)]
+    print(sorted(ShapeFactory.factories))
     for shape in shapes:
         shape.draw()
         shape.erase()
+#: []
+#: ['Circle', 'Square']
 #: Circle.draw
 #: Circle.erase
 #: Square.draw

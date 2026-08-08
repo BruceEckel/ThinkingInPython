@@ -1,5 +1,5 @@
 # exercise_1.py
-from __future__ import annotations
+from typing import override
 
 class Shape:
     def draw(self) -> None: ...
@@ -18,23 +18,29 @@ class Shape:
                 raise ValueError(f"Bad shape creation: {kind}")
 
 class Circle(Shape):
+    @override
     def draw(self) -> None:
         print("Circle.draw")
 
+    @override
     def erase(self) -> None:
         print("Circle.erase")
 
 class Square(Shape):
+    @override
     def draw(self) -> None:
         print("Square.draw")
 
+    @override
     def erase(self) -> None:
         print("Square.erase")
 
 class Triangle(Shape):
+    @override
     def draw(self) -> None:
         print("Triangle.draw")
 
+    @override
     def erase(self) -> None:
         print("Triangle.erase")
 
