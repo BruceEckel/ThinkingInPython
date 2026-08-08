@@ -64,69 +64,6 @@ the conclusion is where the reader is counting what they learned.
 
 [] Reject
 
-**"The Simplest Effect": "Nothing computes until `run()` is called" is
-contradicted by the listing it annotates.**
-
-`double(21)` evaluates `21 * 2` and hands the result to `success()`, all
-before `run()` is reached.
-The sentence is about Effects and `n * 2` is arguably not part of what the
-Effect describes, but this is the chapter's opening statement of its central
-idea and the reader has exactly one listing in front of them, in which
-something plainly does compute.
-
-Proposed change: make the subject the Effect rather than the program.
-
-> Nothing the Effect describes happens until `run()` is called,
-> and a program calls `run()` only once, at its outermost edge.
-
-Same paragraph, second half: "a program calls `run()` only once, at its
-outermost edge" is stated absolutely here and then qualified 800 lines later
-in [Where `run()` Can Be Called](#where-run-can-be-called): "A synchronous
-program calls `run()` once at its outermost edge. A program that is already
-asynchronous, a web service or a bot, awaits `run_async()` at the edge of each
-request."
-Adding "synchronous" here would cost one word and remove the contradiction:
-"and a synchronous program calls `run()` only once, at its outermost edge."
-
----
-
-[] Reject
-
-**`unsupplied.py`: the marker prints a type name where the message names the
-missing Ability.**
-
-The listing ends
-
-```python
-except MissingAbilityError as e:
-    print(type(e).__name__)
-#: MissingAbilityError
-```
-
-`print(e)` gives `Need(t=<class 'greeter.Console'>)`, which names *which*
-Ability went unanswered.
-That is the whole content of the error, and it is the same information the
-`ty` diagnostic under the listing carries, so the two halves of the section
-would line up: the checker says `Need[Console]` is left over, and the runtime
-says the same thing.
-
-I checked determinism specifically, since CLAUDE.md recommends
-`type(e).__name__` for messages that can vary.
-`MissingAbilityError`'s argument is the frozen dataclass `Need`, so `str(e)` is
-its generated `repr`, with the module-qualified class inside.
-Two consecutive runs on the pinned 3.15 build produced the identical string.
-
-Proposed change: `print(e)` and `#: Need(t=<class 'greeter.Console'>)`.
-Reported rather than applied because it changes an existing output marker.
-
-Note if you take it: `MissingAbilityError` then no longer appears in the
-output, only in the `except` clause, which is fine because the prose names it
-in the very next line.
-
----
-
-[] Reject
-
 **Order: "Where `run()` Can Be Called" opens by re-establishing context from
 eight sections back, and would read better after "Waiting on a Coroutine."**
 
@@ -281,6 +218,62 @@ it also answers "does `@throws` work on something that is already an Effect?"
 
 [] Reject
 
+**"The Simplest Effect": "Nothing computes until `run()` is called" is
+contradicted by the listing it annotates.**
+
+`double(21)` evaluates `21 * 2` and hands the result to `success()`, all
+before `run()` is reached.
+The sentence is about Effects and `n * 2` is arguably not part of what the
+Effect describes, but this is the chapter's opening statement of its central
+idea and the reader has exactly one listing in front of them, in which
+something plainly does compute.
+
+Proposed change: make the subject the Effect rather than the program.
+
+> Nothing the Effect describes happens until `run()` is called,
+> and a program calls `run()` only once, at its outermost edge.
+
+Same paragraph, second half: "a program calls `run()` only once, at its
+outermost edge" is stated absolutely here and then qualified 800 lines later
+in [Where `run()` Can Be Called](#where-run-can-be-called): "A synchronous
+program calls `run()` once at its outermost edge. A program that is already
+asynchronous, a web service or a bot, awaits `run_async()` at the edge of each
+request."
+Adding "synchronous" here would cost one word and remove the contradiction:
+"and a synchronous program calls `run()` only once, at its outermost edge."
+
+---
+
+[] Reject
+
+**`test_instant_clock.py`: a wall-clock assertion with a 30 ms budget.**
+
+```python
+assert time.perf_counter() - start < 0.03
+```
+
+The work being timed is three appends to a list, so the honest margin is
+enormous, but 30 ms of wall clock is not much when `make sweep` is running
+`pytest`, `ty`, and `ruff` over two trees at once, and this is a `pytest`
+assertion rather than a `#:` marker, so nothing self-heals it --- it just goes
+red with a message that looks like a real failure.
+
+The number is presumably 0.03 because that is what `real_clock.py` asserts the
+real clock exceeds, which is a nice symmetry.
+The symmetry survives a looser bound: `real_clock.py` proves
+`elapsed >= 0.03`, and this test only needs to prove the instant clock is
+nowhere near it.
+
+Proposed change: `< 0.5`, and if you want the symmetry stated, say it in the
+prose ("the same three sleeps take at least 30 milliseconds in
+`real_clock.py`" already does) rather than in the threshold.
+Reported rather than applied because loosening a test's bound is a judgment
+call about what the test is for.
+
+---
+
+[] Reject
+
 **Five different types named `Console`, and the chapter never counts them.**
 
 By the end of the chapter the reader has met:
@@ -317,57 +310,6 @@ left bare.
 
 [] Reject
 
-**"Dependency Injection": "Type checking is the optimal time to discover
-errors."**
-
-Two problems with *optimal*.
-It is inflated where the surrounding paragraphs are plain, and the chapter
-does not believe it: [Effect Management](44_Effect_Management.md#make-the-bad-value-impossible)
-argues for removing the failure at construction, which is earlier than type
-checking, and this chapter's own
-[Turning an Error Into a Value](#turning-an-error-into-a-value) ends on making
-an error impossible to ignore rather than impossible to have.
-
-Proposed change:
-
-> Type checking is the earliest practical time to discover these errors.
-
-"these errors" also narrows the claim to the ones under discussion, which is
-what the next sentence ("The trade is not about correctness, but churn and
-coupling") assumes.
-
----
-
-[] Reject
-
-**`test_instant_clock.py`: a wall-clock assertion with a 30 ms budget.**
-
-```python
-assert time.perf_counter() - start < 0.03
-```
-
-The work being timed is three appends to a list, so the honest margin is
-enormous, but 30 ms of wall clock is not much when `make sweep` is running
-`pytest`, `ty`, and `ruff` over two trees at once, and this is a `pytest`
-assertion rather than a `#:` marker, so nothing self-heals it --- it just goes
-red with a message that looks like a real failure.
-
-The number is presumably 0.03 because that is what `real_clock.py` asserts the
-real clock exceeds, which is a nice symmetry.
-The symmetry survives a looser bound: `real_clock.py` proves
-`elapsed >= 0.03`, and this test only needs to prove the instant clock is
-nowhere near it.
-
-Proposed change: `< 0.5`, and if you want the symmetry stated, say it in the
-prose ("the same three sleeps take at least 30 milliseconds in
-`real_clock.py`" already does) rather than in the threshold.
-Reported rather than applied because loosening a test's bound is a judgment
-call about what the test is for.
-
----
-
-[] Reject
-
 **Exercises: nothing exercises "When Two Implementations Match."**
 
 Ten exercises cover the interface (1), the propagation check (2, 7), `catch()`
@@ -391,6 +333,64 @@ The second half is the part that earns its place: the section says "Give
 abilities distinct method names when that ambiguity is possible" without
 showing what that buys, and the exercise makes the reader produce the
 diagnostic.
+
+---
+
+[] Reject
+
+**"Dependency Injection": "Type checking is the optimal time to discover
+errors."**
+
+Two problems with *optimal*.
+It is inflated where the surrounding paragraphs are plain, and the chapter
+does not believe it: [Effect Management](44_Effect_Management.md#make-the-bad-value-impossible)
+argues for removing the failure at construction, which is earlier than type
+checking, and this chapter's own
+[Turning an Error Into a Value](#turning-an-error-into-a-value) ends on making
+an error impossible to ignore rather than impossible to have.
+
+Proposed change:
+
+> Type checking is the earliest practical time to discover these errors.
+
+"these errors" also narrows the claim to the ones under discussion, which is
+what the next sentence ("The trade is not about correctness, but churn and
+coupling") assumes.
+
+---
+
+[] Reject
+
+**`unsupplied.py`: the marker prints a type name where the message names the
+missing Ability.**
+
+The listing ends
+
+```python
+except MissingAbilityError as e:
+    print(type(e).__name__)
+#: MissingAbilityError
+```
+
+`print(e)` gives `Need(t=<class 'greeter.Console'>)`, which names *which*
+Ability went unanswered.
+That is the whole content of the error, and it is the same information the
+`ty` diagnostic under the listing carries, so the two halves of the section
+would line up: the checker says `Need[Console]` is left over, and the runtime
+says the same thing.
+
+I checked determinism specifically, since CLAUDE.md recommends
+`type(e).__name__` for messages that can vary.
+`MissingAbilityError`'s argument is the frozen dataclass `Need`, so `str(e)` is
+its generated `repr`, with the module-qualified class inside.
+Two consecutive runs on the pinned 3.15 build produced the identical string.
+
+Proposed change: `print(e)` and `#: Need(t=<class 'greeter.Console'>)`.
+Reported rather than applied because it changes an existing output marker.
+
+Note if you take it: `MissingAbilityError` then no longer appears in the
+output, only in the `except` clause, which is fine because the prose names it
+in the very next line.
 
 ---
 
@@ -462,6 +462,28 @@ left undone.
 
 [] Reject
 
+**`Chapters/47_Stateless_in_Practice.md`, "### `repeat()` and `memoize()`":
+this heading is now linked from chapter 46.**
+
+I added a paragraph to [An Effect Runs Once](#an-effect-runs-once) pointing at
+`memoize()`, because the chapter previously told the reader that a Stateless
+Effect can be run exactly once and that "that decision belongs to whoever
+still holds the function," with no mention that the library ships the one
+tool that makes a second `run()` produce the value again.
+The link is `47_Stateless_in_Practice.md#repeat-and-memoize` and
+`heading_links.py` passes on it now.
+
+No change is needed in 47. This is a note so that renaming that heading is
+known to have a consumer outside the chapter.
+The two ends agree: 47 says "`memoize()` solves the spent-generator problem"
+and "it wraps the Effect in an object that records the result and replays it
+rather than driving the spent generator again," which is what 46 now says in
+one sentence.
+
+---
+
+[] Reject
+
 **`CLAUDE.md`, the Traps list: `validate_output.py` also breaks on a relative
 `--tree`, and only `run_examples.py` is documented.**
 
@@ -495,28 +517,6 @@ Change I would make in `CLAUDE.md`: generalize the bullet to
 and add that the second one manifests as `ModuleNotFoundError` on
 `utils/` helpers.
 I did not touch it, per the scope rules.
-
----
-
-[] Reject
-
-**`Chapters/47_Stateless_in_Practice.md`, "### `repeat()` and `memoize()`":
-this heading is now linked from chapter 46.**
-
-I added a paragraph to [An Effect Runs Once](#an-effect-runs-once) pointing at
-`memoize()`, because the chapter previously told the reader that a Stateless
-Effect can be run exactly once and that "that decision belongs to whoever
-still holds the function," with no mention that the library ships the one
-tool that makes a second `run()` produce the value again.
-The link is `47_Stateless_in_Practice.md#repeat-and-memoize` and
-`heading_links.py` passes on it now.
-
-No change is needed in 47. This is a note so that renaming that heading is
-known to have a consumer outside the chapter.
-The two ends agree: 47 says "`memoize()` solves the spent-generator problem"
-and "it wraps the Effect in an object that records the result and replays it
-rather than driving the spent generator again," which is what 46 now says in
-one sentence.
 
 ---
 

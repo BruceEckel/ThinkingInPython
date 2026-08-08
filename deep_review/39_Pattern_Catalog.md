@@ -5,58 +5,6 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Opening paragraph: POSA is the only source cited without an author.**
-
-> It draws from *Pattern-Oriented Software Architecture* (POSA),
-> *Patterns of Enterprise Application Architecture* (Fowler),
-> *Enterprise Integration Patterns* (Hohpe and Woolf),
-
-The other three sources are attributed: GoF in the line above, then Fowler,
-then Hohpe and Woolf.
-POSA gets only its acronym, which reads as an oversight rather than a choice,
-and POSA is the one source a reader is least likely to be able to name.
-It is also a five-volume series rather than one book,
-so the bare title is doing less work than the others.
-
-Proposed change:
-
-> It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
-
-Reported rather than applied because attribution style is an authorial call,
-and because chapter 21 names all four GoF authors in full,
-so you may prefer the fuller form here too.
-
----
-
-[] Reject
-
-**Second paragraph: "find it elsewhere" does not say where "elsewhere" is.**
-
-> Each entry has a one-line intent so you can recognize a pattern by name and find it elsewhere.
-
-Two readings compete.
-"Elsewhere" could mean elsewhere in this book (which the link column already
-handles, and which the paragraph's last two sentences describe),
-or it could mean in the source literature the previous paragraph just listed.
-The second is the intended one, and it is the more useful promise,
-but the sentence leaves the reader to guess.
-
-Proposed change:
-
-> Each entry has a one-line intent so you can recognize a pattern by name
-> and look it up in the literature that documents it.
-
-An alternative, if you want the sentence to carry the catalog's other job too:
-
-> Each entry has a one-line intent,
-> enough to recognize a pattern by name and to look it up in the source that documents it.
-
-I recommend the first.
-
----
-
-[] Reject
-
 **Second paragraph, the biggest item: the catalog is organized by source, and
 chapter 21 has just told the reader that two of those groupings are not
 useful.**
@@ -109,6 +57,58 @@ keyed by the question a reader actually arrives with.
 Something like:
 
 ```
+
+---
+
+[] Reject
+
+**Second paragraph: "find it elsewhere" does not say where "elsewhere" is.**
+
+> Each entry has a one-line intent so you can recognize a pattern by name and find it elsewhere.
+
+Two readings compete.
+"Elsewhere" could mean elsewhere in this book (which the link column already
+handles, and which the paragraph's last two sentences describe),
+or it could mean in the source literature the previous paragraph just listed.
+The second is the intended one, and it is the more useful promise,
+but the sentence leaves the reader to guess.
+
+Proposed change:
+
+> Each entry has a one-line intent so you can recognize a pattern by name
+> and look it up in the literature that documents it.
+
+An alternative, if you want the sentence to carry the catalog's other job too:
+
+> Each entry has a one-line intent,
+> enough to recognize a pattern by name and to look it up in the source that documents it.
+
+I recommend the first.
+
+---
+
+[] Reject
+
+**Opening paragraph: POSA is the only source cited without an author.**
+
+> It draws from *Pattern-Oriented Software Architecture* (POSA),
+> *Patterns of Enterprise Application Architecture* (Fowler),
+> *Enterprise Integration Patterns* (Hohpe and Woolf),
+
+The other three sources are attributed: GoF in the line above, then Fowler,
+then Hohpe and Woolf.
+POSA gets only its acronym, which reads as an oversight rather than a choice,
+and POSA is the one source a reader is least likely to be able to name.
+It is also a five-volume series rather than one book,
+so the bare title is doing less work than the others.
+
+Proposed change:
+
+> It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
+
+Reported rather than applied because attribution style is an authorial call,
+and because chapter 21 names all four GoF authors in full,
+so you may prefer the fuller form here too.
 ## Finding a Pattern by Problem
 
 | If the problem is | Look at |
@@ -199,6 +199,72 @@ target chapter, and all nine resolve today.
 
 [] Reject
 
+**"Foundational Idioms": the heading uses "idiom" in a sense chapter 21
+defines differently.**
+
+Chapter 21's [Pattern Evolution](21_The_Pattern_Concept.md#pattern-evolution)
+gives *idiom* a precise, stage-one meaning:
+
+> **Idiom**: how you write code in a particular language to do this particular
+> type of thing.
+
+and gives `with open(...)` as the example, "meaningless outside a language that
+provides `with`".
+Under that definition Monad, Dependency Injection, Null Object, Specification,
+Type Object and Double Dispatch are not idioms.
+They are stage-four design patterns that happen not to belong to any of the
+five sources above.
+Only RAII, Pimpl and CRTP fit chapter 21's sense of the word, and those are
+C++ idioms, not Python ones.
+
+Recommended: rename the heading to `## Other Patterns and Idioms`,
+which is accurate and keeps the table's mixed contents honest.
+Alternatives: `## Cross-Cutting Patterns`, or split the table in two
+(language-independent patterns, then language-specific idioms),
+which is more precise but costs a second table for three rows.
+
+Nothing links to this heading, so the anchor change is free.
+Reported rather than applied because renaming a section is your call.
+
+---
+
+[] Reject
+
+**Concurrency table onward: only the three GoF tables are in a findable
+order.**
+
+Creational, Structural, and Behavioral are alphabetical, which is also GoF's
+own order.
+Every table after them is not.
+Concurrency runs Active Object, Monitor Object, Half-Sync/Half-Async,
+Leader/Followers, Thread Pool, Reactor, Proactor, ... , which splits the
+Reactor/Proactor pair with Thread Pool between them and puts Future/Promise
+twelve rows down.
+Enterprise Application is roughly Fowler's book order but strands Service
+Layer after Value Object, five rows from the other three domain-logic patterns
+it belongs with.
+Foundational Idioms has no discernible order at all.
+
+For a name-lookup reference this matters: the reader knows the name and has to
+scan.
+
+Recommended: alphabetize the five non-GoF tables, and say so in the intro:
+
+> Within each table, GoF's own order is kept for the classic patterns;
+> the rest are alphabetical.
+
+Alternative: keep source order everywhere and drop the alphabetical GoF
+tables into GoF's book order too (which is the same order, so nothing moves),
+then say the tables follow each source.
+That is cheaper and less useful.
+
+Reported rather than applied because reordering rows is a structural change.
+Nothing links into these tables, so the move breaks nothing.
+
+---
+
+[] Reject
+
 **Behavioral (GoF), the State row: chapter 31 is invisible in this catalog.**
 
 > | [State](26_Surrogate.md#state) | Change an object's behavior when its internal state changes. |
@@ -267,111 +333,6 @@ gap: every Part III pattern chapter would then be reachable from the catalog.
 
 [] Reject
 
-**Concurrency table: the Thread Pool row lands the reader in a section about
-the GIL.**
-
-> | [Thread Pool](19_Concurrency.md#the-gil-and-free-threading) | Reuse a fixed set of worker threads across many tasks. |
-
-The target is defensible — `io_threads.py` lives there and the section says
-"That release is why a thread pool helps with I/O-bound work" — but the
-heading a reader arrives at is "The GIL and Free Threading",
-which does not look like an answer to "Thread Pool".
-The section that treats the pool as a reusable component is
-[One Task, Many Backends](19_Concurrency.md#one-task-many-backends),
-where `ThreadPoolExecutor` is one of three interchangeable `Executor`
-subclasses and the `submit()`/`map()` interface is explained.
-
-Recommended: point it at `#one-task-many-backends`.
-Alternative: leave it, since the GIL section is where a reader learns *when* a
-thread pool helps, which is arguably the more useful thing.
-This was also noticed independently by the readability pass
-(`readability/~39_Pattern_Catalog.md`), which recorded it and left it alone.
-
-(Applied in this pass, and related: the Future/Promise row moved from
-`#parallelism` to `#one-task-many-backends`.
-`#parallelism` only mentions the `Future` interface in passing while explaining
-`ProcessPoolExecutor`; `#one-task-many-backends` is where the book actually
-teaches what a Future is, including the `concurrent.futures.Future` versus
-`asyncio.Future` distinction and the `TypeError` a reader hits by awaiting the
-wrong one.)
-
----
-
-[] Reject
-
-**Concurrency table: Thread-Specific Storage is covered, thinly.**
-
-> | Thread-Specific Storage | Give each thread its own copy of a value. |
-
-The intro promises that "An unlinked name means the pattern appears only in
-this catalog", and chapter 19 does discuss `threading.local` by name:
-
-> The middle line is the reason `ContextVar` rather than `threading.local` is
-> the modern answer.
-> `threading.local` gives each *thread* its own value,
-
-Two sentences of contrast is thin, and linking it would send a reader to a
-section that recommends *against* the pattern.
-That is arguably the most useful thing the catalog could tell them.
-
-Recommended: link it to
-[Context That Follows the Call Chain](19_Concurrency.md#context-that-follows-the-call-chain).
-Alternative: leave it unlinked and accept that the intro's rule means "covers"
-rather than "mentions".
-Reported rather than applied because it is your line to draw, and drawing it
-loosely here invites the same argument for Half-Sync/Half-Async
-(`to_thread()` plus an executor queue), Guarded Suspension
-(a blocking `Queue.get()`), and Message Channel / Point-to-Point Channel
-(chapter 19's queues).
-I would link none of those four; they are structural resemblances rather than
-the book teaching the pattern.
-
-(Applied in this pass, because it is not a borderline case:
-Double-Checked Locking is now linked to
-[Tests, Threads, and Locks](24_Singleton.md#tests-threads-and-locks).
-Chapter 24 names the pattern, explains the two tests and what each is for,
-and recommends against it — a full paragraph, not a mention.
-It was the one unlinked row that made the intro's rule flatly untrue.)
-
----
-
-[] Reject
-
-**Concurrency table onward: only the three GoF tables are in a findable
-order.**
-
-Creational, Structural, and Behavioral are alphabetical, which is also GoF's
-own order.
-Every table after them is not.
-Concurrency runs Active Object, Monitor Object, Half-Sync/Half-Async,
-Leader/Followers, Thread Pool, Reactor, Proactor, ... , which splits the
-Reactor/Proactor pair with Thread Pool between them and puts Future/Promise
-twelve rows down.
-Enterprise Application is roughly Fowler's book order but strands Service
-Layer after Value Object, five rows from the other three domain-logic patterns
-it belongs with.
-Foundational Idioms has no discernible order at all.
-
-For a name-lookup reference this matters: the reader knows the name and has to
-scan.
-
-Recommended: alphabetize the five non-GoF tables, and say so in the intro:
-
-> Within each table, GoF's own order is kept for the classic patterns;
-> the rest are alphabetical.
-
-Alternative: keep source order everywhere and drop the alphabetical GoF
-tables into GoF's book order too (which is the same order, so nothing moves),
-then say the tables follow each source.
-That is cheaper and less useful.
-
-Reported rather than applied because reordering rows is a structural change.
-Nothing links into these tables, so the move breaks nothing.
-
----
-
-[] Reject
-
 **Enterprise Application table: Lazy Load and Plugin are borderline
 unlinked rows worth a decision.**
 
@@ -405,92 +366,38 @@ I slightly prefer the alternative; it is the more honest of the two.
 
 [] Reject
 
-**Distributed and Cloud table: Retry is covered in chapter 47.**
+**End of chapter: it stops on a table row, and there are no exercises.**
 
-> | Retry | Re-attempt a failed operation, often with backoff. |
+The last thing a reader sees is
+`| Pointer to Implementation (Pimpl) | Hide a class's implementation ... |`,
+and then Part III is over.
+Chapter 39 and chapter 41 are the only two chapters in the book with no
+Exercises section, and both are reference chapters, so the absence looks
+deliberate for 41 and I would not force one here.
 
-Chapter 47 teaches it directly:
-`retrying.py` under
-[Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
-followed by two subsections,
-"Why `retry()` Decorates the Function" and "What Retry Costs the Signature".
-That is more coverage than several already-linked rows get.
+The missing conclusion is a different matter, since this chapter closes
+Part III as well as itself.
+The "Patterns Python Absorbed" section proposed earlier in this file would
+serve as that conclusion.
+If you would rather not add a table, three sentences would do:
 
-Recommended:
+> Most of the names above will never appear in your code, and that is the
+> point of having them collected.
+> A catalog is for recognizing a name someone else used,
+> and for noticing that the problem in front of you already has a worked
+> answer.
+> It is not a list of things to build.
 
-> | [Retry](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect) | Re-attempt a failed operation, often with backoff. |
+If you want exercises after all, two that are answerable from this chapter
+plus chapter 21:
 
-Reported rather than applied for one reason only: chapter 47 is being edited
-in the same sweep as this one, so the heading could move under me.
-Verify the anchor with `uv run python tools/heading_links.py` after applying.
-The section title as of this review is exactly
-`## Adding Behavior to an Existing Effect`.
-
----
-
-[] Reject
-
-**"Foundational Idioms": the heading uses "idiom" in a sense chapter 21
-defines differently.**
-
-Chapter 21's [Pattern Evolution](21_The_Pattern_Concept.md#pattern-evolution)
-gives *idiom* a precise, stage-one meaning:
-
-> **Idiom**: how you write code in a particular language to do this particular
-> type of thing.
-
-and gives `with open(...)` as the example, "meaningless outside a language that
-provides `with`".
-Under that definition Monad, Dependency Injection, Null Object, Specification,
-Type Object and Double Dispatch are not idioms.
-They are stage-four design patterns that happen not to belong to any of the
-five sources above.
-Only RAII, Pimpl and CRTP fit chapter 21's sense of the word, and those are
-C++ idioms, not Python ones.
-
-Recommended: rename the heading to `## Other Patterns and Idioms`,
-which is accurate and keeps the table's mixed contents honest.
-Alternatives: `## Cross-Cutting Patterns`, or split the table in two
-(language-independent patterns, then language-specific idioms),
-which is more precise but costs a second table for three rows.
-
-Nothing links to this heading, so the anchor change is free.
-Reported rather than applied because renaming a section is your call.
-
----
-
-[] Reject
-
-**Foundational Idioms: Service Locator and Dependency Injection both point
-away from the chapter that treats them together.**
-
-Chapter 46 has a section titled exactly
-[Dependency Injection](46_Stateless.md#dependency-injection), which opens
-
-> Dependency injection (DI) has one goal:
-> separate a function from the choice of what it uses.
-
-and then builds `DI_CONTAINER` with `register()` and `resolve()`, which is a
-Service Locator in Fowler's sense, before arguing for the ability-based
-alternative.
-
-Today the catalog sends Dependency Injection to
-`11_Testing.md#isolating-tests-from-the-world`
-(a section that is mostly `monkeypatch`, with the real injection example one
-subsection down at
-[Random Numbers](11_Testing.md#random-numbers)),
-and leaves Service Locator unlinked.
-
-Recommended: link Service Locator to `46_Stateless.md#dependency-injection`,
-and leave the Dependency Injection row pointing at chapter 11,
-so the two rows cover the testing motivation and the container machinery
-between them.
-Alternative: move Dependency Injection to `46_Stateless.md#dependency-injection`
-as well, on the grounds that a section with the pattern's exact name is the
-better target, and accept that both rows then point at one place.
-
-Reported rather than applied because chapter 46 is being edited in this same
-sweep; re-check the anchor before committing.
+1.  Pick three unlinked patterns from the tables above.
+    For each, decide whether Python supplies the missing piece the pattern was
+    invented to supply, and say which language feature does it.
+2.  Two rows in the Structural table describe objects that forward calls to
+    something behind them.
+    Say what distinguishes them, then check your answer against
+    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
 
 ---
 
@@ -535,6 +442,136 @@ Reported rather than applied because each is a placement decision, and because
 
 [] Reject
 
+**Foundational Idioms: Service Locator and Dependency Injection both point
+away from the chapter that treats them together.**
+
+Chapter 46 has a section titled exactly
+[Dependency Injection](46_Stateless.md#dependency-injection), which opens
+
+> Dependency injection (DI) has one goal:
+> separate a function from the choice of what it uses.
+
+and then builds `DI_CONTAINER` with `register()` and `resolve()`, which is a
+Service Locator in Fowler's sense, before arguing for the ability-based
+alternative.
+
+Today the catalog sends Dependency Injection to
+`11_Testing.md#isolating-tests-from-the-world`
+(a section that is mostly `monkeypatch`, with the real injection example one
+subsection down at
+[Random Numbers](11_Testing.md#random-numbers)),
+and leaves Service Locator unlinked.
+
+Recommended: link Service Locator to `46_Stateless.md#dependency-injection`,
+and leave the Dependency Injection row pointing at chapter 11,
+so the two rows cover the testing motivation and the container machinery
+between them.
+Alternative: move Dependency Injection to `46_Stateless.md#dependency-injection`
+as well, on the grounds that a section with the pattern's exact name is the
+better target, and accept that both rows then point at one place.
+
+Reported rather than applied because chapter 46 is being edited in this same
+sweep; re-check the anchor before committing.
+
+---
+
+[] Reject
+
+**Concurrency table: the Thread Pool row lands the reader in a section about
+the GIL.**
+
+> | [Thread Pool](19_Concurrency.md#the-gil-and-free-threading) | Reuse a fixed set of worker threads across many tasks. |
+
+The target is defensible — `io_threads.py` lives there and the section says
+"That release is why a thread pool helps with I/O-bound work" — but the
+heading a reader arrives at is "The GIL and Free Threading",
+which does not look like an answer to "Thread Pool".
+The section that treats the pool as a reusable component is
+[One Task, Many Backends](19_Concurrency.md#one-task-many-backends),
+where `ThreadPoolExecutor` is one of three interchangeable `Executor`
+subclasses and the `submit()`/`map()` interface is explained.
+
+Recommended: point it at `#one-task-many-backends`.
+Alternative: leave it, since the GIL section is where a reader learns *when* a
+thread pool helps, which is arguably the more useful thing.
+This was also noticed independently by the readability pass
+(`readability/~39_Pattern_Catalog.md`), which recorded it and left it alone.
+
+(Applied in this pass, and related: the Future/Promise row moved from
+`#parallelism` to `#one-task-many-backends`.
+`#parallelism` only mentions the `Future` interface in passing while explaining
+`ProcessPoolExecutor`; `#one-task-many-backends` is where the book actually
+teaches what a Future is, including the `concurrent.futures.Future` versus
+`asyncio.Future` distinction and the `TypeError` a reader hits by awaiting the
+wrong one.)
+
+---
+
+[] Reject
+
+**Distributed and Cloud table: Retry is covered in chapter 47.**
+
+> | Retry | Re-attempt a failed operation, often with backoff. |
+
+Chapter 47 teaches it directly:
+`retrying.py` under
+[Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect),
+followed by two subsections,
+"Why `retry()` Decorates the Function" and "What Retry Costs the Signature".
+That is more coverage than several already-linked rows get.
+
+Recommended:
+
+> | [Retry](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect) | Re-attempt a failed operation, often with backoff. |
+
+Reported rather than applied for one reason only: chapter 47 is being edited
+in the same sweep as this one, so the heading could move under me.
+Verify the anchor with `uv run python tools/heading_links.py` after applying.
+The section title as of this review is exactly
+`## Adding Behavior to an Existing Effect`.
+
+---
+
+[] Reject
+
+**Concurrency table: Thread-Specific Storage is covered, thinly.**
+
+> | Thread-Specific Storage | Give each thread its own copy of a value. |
+
+The intro promises that "An unlinked name means the pattern appears only in
+this catalog", and chapter 19 does discuss `threading.local` by name:
+
+> The middle line is the reason `ContextVar` rather than `threading.local` is
+> the modern answer.
+> `threading.local` gives each *thread* its own value,
+
+Two sentences of contrast is thin, and linking it would send a reader to a
+section that recommends *against* the pattern.
+That is arguably the most useful thing the catalog could tell them.
+
+Recommended: link it to
+[Context That Follows the Call Chain](19_Concurrency.md#context-that-follows-the-call-chain).
+Alternative: leave it unlinked and accept that the intro's rule means "covers"
+rather than "mentions".
+Reported rather than applied because it is your line to draw, and drawing it
+loosely here invites the same argument for Half-Sync/Half-Async
+(`to_thread()` plus an executor queue), Guarded Suspension
+(a blocking `Queue.get()`), and Message Channel / Point-to-Point Channel
+(chapter 19's queues).
+I would link none of those four; they are structural resemblances rather than
+the book teaching the pattern.
+
+(Applied in this pass, because it is not a borderline case:
+Double-Checked Locking is now linked to
+[Tests, Threads, and Locks](24_Singleton.md#tests-threads-and-locks).
+Chapter 24 names the pattern, explains the two tests and what each is for,
+and recommends against it — a full paragraph, not a mention.
+It was the one unlinked row that made the intro's rule flatly untrue.)
+
+---
+
+[] Reject
+
 **Row format: two small consistency items across all eight tables.**
 
 1.  Acronyms are given for four patterns
@@ -564,43 +601,6 @@ about the book's voice rather than errors.
 old text, "An object whose sole purpose is to wrap a single function," is not
 what chapter 28 means by the term and is close to backwards in Python, where a
 function already is an object.)
-
----
-
-[] Reject
-
-**End of chapter: it stops on a table row, and there are no exercises.**
-
-The last thing a reader sees is
-`| Pointer to Implementation (Pimpl) | Hide a class's implementation ... |`,
-and then Part III is over.
-Chapter 39 and chapter 41 are the only two chapters in the book with no
-Exercises section, and both are reference chapters, so the absence looks
-deliberate for 41 and I would not force one here.
-
-The missing conclusion is a different matter, since this chapter closes
-Part III as well as itself.
-The "Patterns Python Absorbed" section proposed earlier in this file would
-serve as that conclusion.
-If you would rather not add a table, three sentences would do:
-
-> Most of the names above will never appear in your code, and that is the
-> point of having them collected.
-> A catalog is for recognizing a name someone else used,
-> and for noticing that the problem in front of you already has a worked
-> answer.
-> It is not a list of things to build.
-
-If you want exercises after all, two that are answerable from this chapter
-plus chapter 21:
-
-1.  Pick three unlinked patterns from the tables above.
-    For each, decide whether Python supplies the missing piece the pattern was
-    invented to supply, and say which language feature does it.
-2.  Two rows in the Structural table describe objects that forward calls to
-    something behind them.
-    Say what distinguishes them, then check your answer against
-    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
 
 ---
 

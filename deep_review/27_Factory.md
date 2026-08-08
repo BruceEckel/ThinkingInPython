@@ -5,57 +5,24 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**`shape_factory1.py` (line 66, 71) and `shape_factory2.py` (line 391, 396):
-`i` names a shape-name string, not an index.**
+**Exercise 3 (line 900) sends the reader to the version the chapter argues
+against.**
 
-Both listings write `shapes = [Shape.factory(i) for i in shape_name_gen(4)]`,
-where `i` is a `str` like `"Circle"`. `i` reads as a loop counter everywhere
-else in the book, so the comprehension looks like it is indexing when it is
-naming. The same two functions also write `for i in range(n):` with `i`
-unused in the body.
+"Add a new type of `GameElementFactory` called `GnomesAndFairies` to
+`games.py`." `games.py` is the `raise NotImplementedError` translation whose
+weaknesses the chapter spends a paragraph on; `games2.py` is the form it
+recommends. As written the exercise drills the discarded design, and it never
+exercises the `Protocol`, which is the section's actual teaching.
 
-Proposed change, in both listings:
+Proposed change: ask for both, so the contrast is the exercise.
 
-- `for i in range(n):` becomes `for _ in range(n):`
-- `[Shape.factory(i) for i in shape_name_gen(4)]` becomes
-  `[Shape.factory(kind) for kind in shape_name_gen(4)]`
-- `[ShapeFactory.create_shape(i) for i in shape_name_gen(4)]` becomes
-  `[ShapeFactory.create_shape(kind) for kind in shape_name_gen(4)]`
+> 3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
+>     first to `games.py` and then to `games2.py`.
+>     In `games2.py`, leave out `make_obstacle()` at first and confirm the
+>     error your type checker reports; then add it.
 
-`kind` is already the parameter name on `Shape.factory()` and
-`ShapeFactory.create_shape()`, so the call site would then use the same word
-the signature does. `nested_shape_factory.py`'s `for i in range(n):`
-(line 160) has the same unused `i` and should get `_` too. No output changes.
-
-Reported rather than applied only because it edits three listings for
-readability alone; the change itself is mechanical and safe.
-
----
-
-[] Reject
-
-**"Simple Factory Method", lines 90-121: the chapter gives three different
-answers to "what is the factory here?"**
-
-Within thirty lines the reader gets:
-
-- line 91: "A generator is a special case of a factory."
-- lines 92-93: a factory and a generator are *contrasted* — "A factory takes
-  information telling it what to build; a generator object holds an internal
-  algorithm and produces the next value with no argument at all."
-- line 121: "`shape_name_gen()` is the factory, and `gen` is the generator" —
-  now the generator is the *product* of a factory, not a kind of factory.
-
-Each sentence is defensible alone. Read in sequence they do not settle what
-relationship the chapter is claiming, and this is a reader's first encounter
-with the distinction in a chapter whose whole subject is factories.
-
-Proposed change: pick the framing in lines 92-93 (they are the clearest) and
-make the other two agree with it. Drop line 91 outright, and rewrite line 121
-as "`shape_name_gen()` builds the generator; `gen` produces the names."
-That leaves one claim: a factory is asked *what* to build, a generator is
-asked only for *the next* value, and a generator function is one more thing
-that returns an object.
+That turns the near-miss in `BrokenFactory` into something the reader
+performs rather than reads.
 
 ---
 
@@ -89,53 +56,50 @@ explanation at line 96 so the section does not restart after the
 
 [] Reject
 
-**"Preventing Direct Creation", lines 182-184: the listing never shows the
-identity failure the prose describes.**
+**Exercises: nothing exercises the chapter's strongest safety claim.**
 
-The prose says "`type(a) is type(b)` is `False`, and `isinstance()`
-comparisons across calls fail with it", but `nested_shape_factory.py`'s
-output is eight `draw`/`erase` lines identical to the previous listing's.
-Nothing in the run distinguishes the nested version from the module-level
-one, so the price of the privacy is asserted rather than demonstrated. This
-is the section's whole point, and it is the one claim a reader is most likely
-to doubt.
+The `eval()` critique at lines 424-433 is the sharpest practical warning in
+the chapter — a `kind` from a config file or a request is arbitrary code —
+and no exercise touches it. Exercises 2 and 4 ask the reader to *extend*
+`shape_factory2.py`, entrenching the `eval()` without questioning it.
 
-Proposed change: add two lines to the `__main__` block and their markers:
+Proposed addition, as a new exercise 8:
 
-```python
-    a, b = factory("Circle"), factory("Circle")
-    print(type(a) is type(b), isinstance(a, type(b)))
-#: False False
-```
+> 8.  In `shape_factory2.py`, call `ShapeFactory.create_shape()` with a
+>     `kind` string that is not a shape name but a Python expression with a
+>     side effect, and show that `create_shape()` runs it.
+>     Then replace the `eval()` with a dictionary of the nested `Factory`
+>     classes and show that the same string now raises `KeyError`.
 
-Verified on the pinned 3.15 build: both print `False`.
-
-Reported rather than applied because it grows a listing the chapter is
-arguing against, which is an author's call about how much space a
-cautionary example deserves.
+Verified that the attack works as described on the pinned build: a `kind` of
+`__import__('sys').stderr.write('pwned\n') or Circle` is evaluated before the
+`.Factory()` attribute lookup fails.
 
 ---
 
 [] Reject
 
-**"The Pythonic Factory: a Dictionary", line 279: "the most common form of
-factory in idiomatic Python" is an unsupported superlative, and "it" is
-ambiguous.**
+**"Abstract Factories", lines 530-531: the sentence contradicts itself.**
 
-The sentence reads "This is the same self-registration used in [Pattern
-Refactoring](...), and it is the most common form of factory in idiomatic
-Python." "It" can attach to self-registration or to the dictionary factory of
-the previous listing. Read as self-registration, the claim is doubtful:
-`__init_subclass__()` registries are a specialist tool, and the far more
-common Python factory is the plain dict two listings up — or just calling the
-class. Read as the dictionary, the sentence contradicts its own first half.
+> `GameEnvironment` is not designed to be subclassed,
+> though a real game would probably subclass it to vary the rules of play.
 
-Proposed change: split the claims and drop the superlative.
+A reader cannot act on this. Either the class is unsuitable for subclassing,
+in which case a real game should not subclass it, or it is fine to subclass
+and the first clause is wrong. (The Java original said "not designed to be
+inherited from, although it could make sense to do that," which has the same
+problem.)
 
-> This is the same self-registration used in
-> [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler).
-> A dictionary of classes, filled by hand or filled by the classes
-> themselves, is the ordinary Python factory.
+Proposed change, stating the actual limitation:
+
+> `GameEnvironment` has no hook for varying the rules of play, so a real game
+> would need one, either a subclass overriding `play()` or a rules object
+> passed alongside the factory.
+
+Alternative, if the point is only that the listing is deliberately minimal:
+drop the sentence. It is the only place in the section that discusses
+`GameEnvironment`'s extensibility, and the section's subject is the factory,
+not the environment.
 
 ---
 
@@ -167,26 +131,57 @@ a chapter where the registry contents are the lesson.
 
 [] Reject
 
-**`registry.py`, line 254 (`Shape.registry[cls.__name__] = cls`): why the
-hard-coded `Shape` rather than `cls`, unexplained.**
+**"Simple Factory Method", lines 90-121: the chapter gives three different
+answers to "what is the factory here?"**
 
-Writing `cls.registry[cls.__name__] = cls` behaves identically here, so a
-reader has no way to see why the base class is named explicitly. The reason
-is that `cls.registry` resolves through the MRO, so a subclass that ever
-assigns its own `registry = {}` would silently start a second table and
-`make()` would stop finding its descendants. Chapter 37's `trash.py` makes
-the same choice with the same silence.
+Within thirty lines the reader gets:
 
-Proposed change: one sentence in the caveat paragraph after
-"Key on a qualified name if that can happen."
+- line 91: "A generator is a special case of a factory."
+- lines 92-93: a factory and a generator are *contrasted* — "A factory takes
+  information telling it what to build; a generator object holds an internal
+  algorithm and produces the next value with no argument at all."
+- line 121: "`shape_name_gen()` is the factory, and `gen` is the generator" —
+  now the generator is the *product* of a factory, not a kind of factory.
 
-> Registration names `Shape.registry` rather than `cls.registry` on purpose:
-> `cls.registry` resolves through the MRO, so a subclass that gave itself a
-> `registry` of its own would quietly start a second table that `make()`
-> never reads.
+Each sentence is defensible alone. Read in sequence they do not settle what
+relationship the chapter is claiming, and this is a reader's first encounter
+with the distinction in a chapter whose whole subject is factories.
 
-Since this chapter owns the registry caveats for chapters 14, 17, and 37,
-this is the right place for it if it is stated anywhere.
+Proposed change: pick the framing in lines 92-93 (they are the clearest) and
+make the other two agree with it. Drop line 91 outright, and rewrite line 121
+as "`shape_name_gen()` builds the generator; `gen` produces the names."
+That leaves one claim: a factory is asked *what* to build, a generator is
+asked only for *the next* value, and a generator function is one more thing
+that returns an object.
+
+---
+
+[] Reject
+
+**"Preventing Direct Creation", lines 182-184: the listing never shows the
+identity failure the prose describes.**
+
+The prose says "`type(a) is type(b)` is `False`, and `isinstance()`
+comparisons across calls fail with it", but `nested_shape_factory.py`'s
+output is eight `draw`/`erase` lines identical to the previous listing's.
+Nothing in the run distinguishes the nested version from the module-level
+one, so the price of the privacy is asserted rather than demonstrated. This
+is the section's whole point, and it is the one claim a reader is most likely
+to doubt.
+
+Proposed change: add two lines to the `__main__` block and their markers:
+
+```python
+    a, b = factory("Circle"), factory("Circle")
+    print(type(a) is type(b), isinstance(a, type(b)))
+#: False False
+```
+
+Verified on the pinned 3.15 build: both print `False`.
+
+Reported rather than applied because it grows a listing the chapter is
+arguing against, which is an author's call about how much space a
+cautionary example deserves.
 
 ---
 
@@ -226,27 +221,49 @@ use.
 
 [] Reject
 
-**"Abstract Factories", lines 530-531: the sentence contradicts itself.**
+**`registry.py`, line 254 (`Shape.registry[cls.__name__] = cls`): why the
+hard-coded `Shape` rather than `cls`, unexplained.**
 
-> `GameEnvironment` is not designed to be subclassed,
-> though a real game would probably subclass it to vary the rules of play.
+Writing `cls.registry[cls.__name__] = cls` behaves identically here, so a
+reader has no way to see why the base class is named explicitly. The reason
+is that `cls.registry` resolves through the MRO, so a subclass that ever
+assigns its own `registry = {}` would silently start a second table and
+`make()` would stop finding its descendants. Chapter 37's `trash.py` makes
+the same choice with the same silence.
 
-A reader cannot act on this. Either the class is unsuitable for subclassing,
-in which case a real game should not subclass it, or it is fine to subclass
-and the first clause is wrong. (The Java original said "not designed to be
-inherited from, although it could make sense to do that," which has the same
-problem.)
+Proposed change: one sentence in the caveat paragraph after
+"Key on a qualified name if that can happen."
 
-Proposed change, stating the actual limitation:
+> Registration names `Shape.registry` rather than `cls.registry` on purpose:
+> `cls.registry` resolves through the MRO, so a subclass that gave itself a
+> `registry` of its own would quietly start a second table that `make()`
+> never reads.
 
-> `GameEnvironment` has no hook for varying the rules of play, so a real game
-> would need one, either a subclass overriding `play()` or a rules object
-> passed alongside the factory.
+Since this chapter owns the registry caveats for chapters 14, 17, and 37,
+this is the right place for it if it is stated anywhere.
 
-Alternative, if the point is only that the listing is deliberately minimal:
-drop the sentence. It is the only place in the section that discusses
-`GameEnvironment`'s extensibility, and the section's subject is the factory,
-not the environment.
+---
+
+[] Reject
+
+**"The Pythonic Factory: a Dictionary", line 279: "the most common form of
+factory in idiomatic Python" is an unsupported superlative, and "it" is
+ambiguous.**
+
+The sentence reads "This is the same self-registration used in [Pattern
+Refactoring](...), and it is the most common form of factory in idiomatic
+Python." "It" can attach to self-registration or to the dictionary factory of
+the previous listing. Read as self-registration, the claim is doubtful:
+`__init_subclass__()` registries are a specialist tool, and the far more
+common Python factory is the plain dict two listings up — or just calling the
+class. Read as the dictionary, the sentence contradicts its own first half.
+
+Proposed change: split the claims and drop the superlative.
+
+> This is the same self-registration used in
+> [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler).
+> A dictionary of classes, filled by hand or filled by the classes
+> themselves, is the ordinary Python factory.
 
 ---
 
@@ -269,47 +286,30 @@ Proposed change:
 
 [] Reject
 
-**Exercise 3 (line 900) sends the reader to the version the chapter argues
-against.**
+**`shape_factory1.py` (line 66, 71) and `shape_factory2.py` (line 391, 396):
+`i` names a shape-name string, not an index.**
 
-"Add a new type of `GameElementFactory` called `GnomesAndFairies` to
-`games.py`." `games.py` is the `raise NotImplementedError` translation whose
-weaknesses the chapter spends a paragraph on; `games2.py` is the form it
-recommends. As written the exercise drills the discarded design, and it never
-exercises the `Protocol`, which is the section's actual teaching.
+Both listings write `shapes = [Shape.factory(i) for i in shape_name_gen(4)]`,
+where `i` is a `str` like `"Circle"`. `i` reads as a loop counter everywhere
+else in the book, so the comprehension looks like it is indexing when it is
+naming. The same two functions also write `for i in range(n):` with `i`
+unused in the body.
 
-Proposed change: ask for both, so the contrast is the exercise.
+Proposed change, in both listings:
 
-> 3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
->     first to `games.py` and then to `games2.py`.
->     In `games2.py`, leave out `make_obstacle()` at first and confirm the
->     error your type checker reports; then add it.
+- `for i in range(n):` becomes `for _ in range(n):`
+- `[Shape.factory(i) for i in shape_name_gen(4)]` becomes
+  `[Shape.factory(kind) for kind in shape_name_gen(4)]`
+- `[ShapeFactory.create_shape(i) for i in shape_name_gen(4)]` becomes
+  `[ShapeFactory.create_shape(kind) for kind in shape_name_gen(4)]`
 
-That turns the near-miss in `BrokenFactory` into something the reader
-performs rather than reads.
+`kind` is already the parameter name on `Shape.factory()` and
+`ShapeFactory.create_shape()`, so the call site would then use the same word
+the signature does. `nested_shape_factory.py`'s `for i in range(n):`
+(line 160) has the same unused `i` and should get `_` too. No output changes.
 
----
-
-[] Reject
-
-**Exercises: nothing exercises the chapter's strongest safety claim.**
-
-The `eval()` critique at lines 424-433 is the sharpest practical warning in
-the chapter — a `kind` from a config file or a request is arbitrary code —
-and no exercise touches it. Exercises 2 and 4 ask the reader to *extend*
-`shape_factory2.py`, entrenching the `eval()` without questioning it.
-
-Proposed addition, as a new exercise 8:
-
-> 8.  In `shape_factory2.py`, call `ShapeFactory.create_shape()` with a
->     `kind` string that is not a shape name but a Python expression with a
->     side effect, and show that `create_shape()` runs it.
->     Then replace the `eval()` with a dictionary of the nested `Factory`
->     classes and show that the same string now raises `KeyError`.
-
-Verified that the attack works as described on the pinned build: a `kind` of
-`__import__('sys').stderr.write('pwned\n') or Circle` is evaluated before the
-`.Factory()` attribute lookup fails.
+Reported rather than applied only because it edits three listings for
+readability alone; the change itself is mechanical and safe.
 
 ---
 

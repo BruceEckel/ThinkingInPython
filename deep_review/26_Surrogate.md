@@ -5,30 +5,42 @@ Line numbers below refer to `Chapters/26_Surrogate.md` **after** the four fixes
 I already applied (listed at the end of this file, under "Already applied").
 
 [] Reject
-**Lines 62-68 — the Proxy/Adapter sentence contradicts the paragraph it ends.**
+**Lines 511-513 — the conclusion's last claim reads backwards.**
 
-    It isn't necessary that `Implementation` have the same interface as `Proxy`.
-    ...
-    When you are choosing between *Proxy* and *Adapter*,
-    the interface is still the question that separates them:
-    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+    The separate implementation hierarchy that *GoF Design Patterns* uses
+    earns its keep when you do not control the implementing code.
+    When you do, the single generic surrogate above is simpler
+    and just as flexible.
 
-Three sentences say the interface does not have to match, then the fourth says
-the interface is what separates Proxy from Adapter. A reader who takes the
-first three at face value has just been told the distinguishing test is one
-this chapter rejects, with no signal that the two sentences are speaking from
-different definitions. Chapter 29 resolves it explicitly ("Surrogate takes the
-looser view of the first row"), but that is 250 pages of reading away.
+If you do not control the implementing code, a shared base class is the one
+thing you cannot impose on it — that is precisely when you need structural
+conformance (`Protocol`) or bare `__getattr__()` forwarding. As written the
+sentence recommends the option the circumstance rules out, and it also
+undercuts the chapter's own `Protocol` section, which introduced structural
+typing as the answer for "the implementation needs no base class."
 
-Proposed: make the change of frame visible in the sentence itself.
+I can see the reading that makes it true — *others* write the implementations
+against a base class *you* own, as plugin authors do — but "do not control"
+normally means "cannot modify," and the two readings point opposite ways.
 
-    That is a looser definition than *GoF Design Patterns* uses,
-    and under GoF's stricter one the interface is exactly what separates
-    *Proxy* from *Adapter*:
-    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+Proposed, if the plugin reading is what you meant:
 
-That keeps the forward link, keeps the parenthetical's point, and stops the
-paragraph from arguing with itself.
+    The separate implementation hierarchy that *GoF Design Patterns* uses
+    earns its keep when other people write the implementations
+    and you need the base class to state what they owe you.
+    When you write both sides, the single generic surrogate above is simpler
+    and just as flexible.
+
+Proposed, if the wrapping-third-party-code reading is what you meant, the
+conclusion inverts:
+
+    The separate implementation hierarchy that *GoF Design Patterns* uses
+    needs both sides under your control.
+    A `Protocol` gets the same guarantee without the inheritance,
+    and the single generic surrogate above gives up the guarantee entirely
+    in exchange for working on anything.
+
+I did not pick one because the two say different things about the chapter.
 
 [] Reject
 **Lines 70-108 — `proxy_interface.py` contains no proxy.**
@@ -55,169 +67,6 @@ Proposed, in order of preference:
 
 I did not do either, because (1) adds a listing and (2) changes the framing of
 the opening, and both are pacing calls.
-
-[] Reject
-**Lines 150-165, 243-250, 287-295 — the numbered class names are noise, and
-they run out of order.**
-Reading order gives `Proxy` (`proxy_1.py`), `Proxy2` (`proxy_2.py`), `Proxy`
-again (`dunder_bypass.py`), `Proxy4` (`proxy_writes.py`), then `Proxy3`
-(`proxy_identity.py`); implementations run `Implementation`,
-`Implementation2`, `Words`, `Settings`, `Implementation3`, `Implementation`.
-Each listing is its own module, so nothing collides and the suffixes buy
-nothing. Two concrete costs:
-
-- `Proxy4` is introduced before `Proxy3`, which reads like a missing listing.
-- `Implementation2.f()` prints `Implementation.f()`. A reader who is checking
-  the output against the code has to stop and decide whether that is a bug.
-
-Proposed: drop every numeric suffix. `Implementation` and `Proxy` in each
-file, `Settings`/`Words` where the domain name is better. Prose that has to
-change with it: line 177 (`Proxy2` names no method of `Implementation2`),
-line 183 (`_Proxy2__implementation` becomes `_Proxy__implementation`),
-line 265 (`Proxy4` declares no `level`), and the `proxy_identity.py` marker
-`#: False False` is unaffected because `isinstance(p, Implementation3)`
-becomes `isinstance(p, Implementation)` with the same answer.
-`dunder_bypass.py`'s `#: True` marker depends on the class being named
-`Proxy`, which the rename preserves.
-Reported rather than applied because it touches five listings and four prose
-sentences, and the suffixes may be a deliberate hand-hold.
-
-[] Reject
-**Lines 138-148 — the interface material's payoff evaporates one listing
-later, and the chapter does not say so until line 368.**
-Lines 70-144 spend two listings teaching how to pin down the implementation's
-shape, with an ABC and with a `Protocol`. Line 146 then switches to
-`__getattr__()`, which erases the entire benefit at the proxy boundary: no
-declaration on `Proxy2` can make `p.f()` checkable. The chapter states this
-correctly, but in the *State* section, 220 lines later ("The hop through the
-surrogate is where the guarantee is lost"). A reader who has just been sold on
-`Protocol` and is now writing a `__getattr__()` proxy has no idea the two
-choices trade off, and no reason to expect the answer that far away.
-
-Proposed: two sentences after line 184, where the question arises.
-
-    The interface work above still pays on the implementation side:
-    the checker verifies that whatever you hand the proxy has the methods.
-    It stops paying at the proxy itself.
-    `p.f()` goes through `__getattr__()`, whose return type is unknown,
-    so nothing the proxy declares can make that call checkable.
-    Explicit forwarding, as in `proxy_1.py`, is the version a checker can see
-    through; `__getattr__()` trades that for reach.
-
-Then line 368-373 in the State section can shorten to a back-reference. This
-is the single change in this file I would most like made; I left it as a
-proposal only because it adds a paragraph and shortens another, which is a
-pacing decision.
-
-[] Reject
-**Lines 267-268 — the forwarding `__setattr__()` is described but never
-shown, and the described version is the one that fails.**
-
-    A surrogate that must forward writes defines `__setattr__()` as well,
-    and that method has to let the proxy's own attributes through
-    or the assignment in `__init__()` recurses.
-
-That is accurate and I verified the failure, but it leaves the reader with a
-warning and no working idiom, immediately after a listing that showed the
-broken behavior. The chapter's own "near-miss" is the obvious next thing a
-reader writes, and it dies with `RecursionError` rather than a useful message.
-I confirmed on the pinned 3.15:
-
-    class Naive:
-        def __init__(self, impl: Any) -> None:
-            self._impl = impl                 # RecursionError right here
-        def __getattr__(self, name: str) -> Any:
-            return getattr(self._impl, name)
-        def __setattr__(self, name: str, value: Any) -> None:
-            setattr(self._impl, name, value)
-
-Proposed listing, verified clean under `ty`, `ruff` (70 cols), and its
-markers, to follow line 268:
-
-```python
-# proxy_setattr.py
-from typing import Any
-
-class Settings2:
-    def __init__(self) -> None:
-        self.level = "low"
-
-class WriteProxy:
-    def __init__(self, impl: Any) -> None:
-        object.__setattr__(self, "_impl", impl)
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._impl, name)
-    def __setattr__(self, name: str, value: Any) -> None:
-        setattr(self._impl, name, value)
-
-settings = Settings2()
-p = WriteProxy(settings)
-p.level = "high"
-print(p.level, settings.level)
-#: high high
-```
-
-Worth noting in the prose: the `# type: ignore` that `proxy_writes.py` needed
-is gone, because declaring `__setattr__()` is what tells the checker the proxy
-accepts arbitrary attributes. That is the static half closing at the same time
-as the runtime half, and it makes the point of line 264-266 land.
-(Rename `Settings2`/`WriteProxy` if the suffix-dropping finding above is
-taken.)
-
-[] Reject
-**Lines 270-308 — the identity gap is diagnosed with no escape hatch.**
-The section proves `isinstance()` never sees through a surrogate, ends on
-"code that asks `isinstance()` sees only the proxy's own class," and stops. The
-reader whose framework calls `isinstance()` is left with a dead end. Two exits
-exist and I verified both on the pinned 3.15:
-
-- `Service.register(Proxy3)` makes `isinstance(p, Service)` `True`. It works
-  for a `Protocol` too, because `_ProtocolMeta.__instancecheck__` tries
-  `_abc_instancecheck` before it reaches `getattr_static()`.
-- A `__class__` property returning the implementation's class makes both
-  `isinstance(p, Implementation)` and `isinstance(p, Service)` `True`.
-
-Proposed: two sentences after line 306, no listing.
-
-    Two escapes exist, and both lie.
-    `Service.register(Proxy3)` tells the ABC machinery to answer `True`
-    without checking anything,
-    and a `__class__` property returning the implementation's class makes
-    `isinstance()` answer for the wrong object.
-    Each satisfies the runtime check and neither satisfies a type checker,
-    which is the honest summary: a surrogate is not the thing it fronts for,
-    and code that needs it to be should ask for a method instead.
-
-If you would rather not hand a reader `__class__`-spoofing at all, keep only
-the `register()` half.
-
-[] Reject
-**Lines 365-373 — two claims in the State typing paragraph overstate, and the
-paragraph recommends something the listing does not do.**
-
-1.  "Every annotation here is `Any`" — `state.py` also has `name: str` and
-    four `-> None`s. "Every annotation that carries the implementation is
-    `Any`" is what is meant.
-2.  "which the Proxy section argued against" — the Proxy section argued *for*
-    a declared interface, but four of its own listings (`proxy_2.py`,
-    `dunder_bypass.py`, `proxy_writes.py`, `proxy_identity.py`) annotate with
-    `Any`, so pointing back at it as the authority is confusing. The book's
-    typing guidance is the real referent.
-3.  "Declaring the implementations against a `Protocol` still pays, because
-    the checker then verifies each one has the methods `run()` calls" —
-    `state.py` does not declare a `Protocol`, so the chapter advises a step it
-    then omits, with no note that it omitted it.
-
-Proposed for (1) and (2):
-
-    The annotations that carry the implementation are all `Any`,
-    which the book's typing guidance treats as a last resort.
-
-Proposed for (3): either add a three-line `Protocol` to `state.py` and
-annotate `run(b: ...)` against it (which would also demonstrate the split the
-paragraph describes), or add "`state.py` skips it to keep the delegation in
-view" so the omission is deliberate on the page. I lean toward the first: it
-turns the paragraph's advice into something the reader can see.
 
 [] Reject
 **Lines 397-455 — the chapter never shows a Proxy controlling access, which is
@@ -281,29 +130,6 @@ exercises build the other three, so the reader knows the omission is
 deliberate.
 
 [] Reject
-**Lines 427-433 — `counting_proxy.py` uses `self._impl` 250 lines after the
-chapter argued the double underscore earns its place.**
-Line 181-184 says the double underscore on `self.__implementation` "earns its
-place here: the name mangles ... so it cannot collide with an attribute the
-implementation carries." Every other proxy in the chapter follows that
-(`proxy_1.py`, `proxy_2.py`, `dunder_bypass.py`, `proxy_writes.py`,
-`proxy_identity.py` all use `self.__implementation`). `CountingProxy` uses
-`self._impl` and `self.calls`, both single-underscore, and both shadow an
-implementation attribute of the same name, which is the collision the earlier
-paragraph warned about.
-
-This is the house-style trigger: an unexplained deviation from an idiom the
-book just justified.
-
-Proposed: leave it as it is and add one clause where the reader will notice,
-after line 455 — something like "`CountingProxy` uses single underscores so
-the recursion trap below can name `self._imp` without the mangling getting in
-the way." Renaming to `self.__impl` is the other option, but it drags exercise
-4 and line 468 (`a misspelled self._imp`) along with it, and mangled names in
-a typo demo are harder to read, so I do not recommend it. Either way the
-deviation should stop being silent.
-
-[] Reject
 **Lines 457-465 — `__getattr__()` vs `__getattribute__()` answers a question
 the reader asked 300 lines earlier.**
 `__getattr__()` is introduced at line 146. Any reader who has met
@@ -329,42 +155,59 @@ Price of the move, checked:
   the `RecursionError` trap, both of which stay put.
 
 [] Reject
-**Lines 511-513 — the conclusion's last claim reads backwards.**
+**Lines 138-148 — the interface material's payoff evaporates one listing
+later, and the chapter does not say so until line 368.**
+Lines 70-144 spend two listings teaching how to pin down the implementation's
+shape, with an ABC and with a `Protocol`. Line 146 then switches to
+`__getattr__()`, which erases the entire benefit at the proxy boundary: no
+declaration on `Proxy2` can make `p.f()` checkable. The chapter states this
+correctly, but in the *State* section, 220 lines later ("The hop through the
+surrogate is where the guarantee is lost"). A reader who has just been sold on
+`Protocol` and is now writing a `__getattr__()` proxy has no idea the two
+choices trade off, and no reason to expect the answer that far away.
 
-    The separate implementation hierarchy that *GoF Design Patterns* uses
-    earns its keep when you do not control the implementing code.
-    When you do, the single generic surrogate above is simpler
-    and just as flexible.
+Proposed: two sentences after line 184, where the question arises.
 
-If you do not control the implementing code, a shared base class is the one
-thing you cannot impose on it — that is precisely when you need structural
-conformance (`Protocol`) or bare `__getattr__()` forwarding. As written the
-sentence recommends the option the circumstance rules out, and it also
-undercuts the chapter's own `Protocol` section, which introduced structural
-typing as the answer for "the implementation needs no base class."
+    The interface work above still pays on the implementation side:
+    the checker verifies that whatever you hand the proxy has the methods.
+    It stops paying at the proxy itself.
+    `p.f()` goes through `__getattr__()`, whose return type is unknown,
+    so nothing the proxy declares can make that call checkable.
+    Explicit forwarding, as in `proxy_1.py`, is the version a checker can see
+    through; `__getattr__()` trades that for reach.
 
-I can see the reading that makes it true — *others* write the implementations
-against a base class *you* own, as plugin authors do — but "do not control"
-normally means "cannot modify," and the two readings point opposite ways.
+Then line 368-373 in the State section can shorten to a back-reference. This
+is the single change in this file I would most like made; I left it as a
+proposal only because it adds a paragraph and shortens another, which is a
+pacing decision.
 
-Proposed, if the plugin reading is what you meant:
+[] Reject
+**Lines 365-373 — two claims in the State typing paragraph overstate, and the
+paragraph recommends something the listing does not do.**
 
-    The separate implementation hierarchy that *GoF Design Patterns* uses
-    earns its keep when other people write the implementations
-    and you need the base class to state what they owe you.
-    When you write both sides, the single generic surrogate above is simpler
-    and just as flexible.
+1.  "Every annotation here is `Any`" — `state.py` also has `name: str` and
+    four `-> None`s. "Every annotation that carries the implementation is
+    `Any`" is what is meant.
+2.  "which the Proxy section argued against" — the Proxy section argued *for*
+    a declared interface, but four of its own listings (`proxy_2.py`,
+    `dunder_bypass.py`, `proxy_writes.py`, `proxy_identity.py`) annotate with
+    `Any`, so pointing back at it as the authority is confusing. The book's
+    typing guidance is the real referent.
+3.  "Declaring the implementations against a `Protocol` still pays, because
+    the checker then verifies each one has the methods `run()` calls" —
+    `state.py` does not declare a `Protocol`, so the chapter advises a step it
+    then omits, with no note that it omitted it.
 
-Proposed, if the wrapping-third-party-code reading is what you meant, the
-conclusion inverts:
+Proposed for (1) and (2):
 
-    The separate implementation hierarchy that *GoF Design Patterns* uses
-    needs both sides under your control.
-    A `Protocol` gets the same guarantee without the inheritance,
-    and the single generic surrogate above gives up the guarantee entirely
-    in exchange for working on anything.
+    The annotations that carry the implementation are all `Any`,
+    which the book's typing guidance treats as a last resort.
 
-I did not pick one because the two say different things about the chapter.
+Proposed for (3): either add a three-line `Protocol` to `state.py` and
+annotate `run(b: ...)` against it (which would also demonstrate the split the
+paragraph describes), or add "`state.py` skips it to keep the delegation in
+view" so the omission is deliberate on the page. I lean toward the first: it
+turns the paragraph's advice into something the reader can see.
 
 [] Reject
 **Lines 516-536 — no exercise touches *State*, and exercise 3 has no support
@@ -394,6 +237,163 @@ Also unexercised: the write gap (`__setattr__()`) and the identity gap
 (`isinstance()`), both of which got a listing each. Exercise 6 covers the
 dunder gap; a parallel exercise for one of the other two would even out the
 coverage of the "three things delegation does not forward" run.
+
+[] Reject
+**Lines 62-68 — the Proxy/Adapter sentence contradicts the paragraph it ends.**
+
+    It isn't necessary that `Implementation` have the same interface as `Proxy`.
+    ...
+    When you are choosing between *Proxy* and *Adapter*,
+    the interface is still the question that separates them:
+    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+
+Three sentences say the interface does not have to match, then the fourth says
+the interface is what separates Proxy from Adapter. A reader who takes the
+first three at face value has just been told the distinguishing test is one
+this chapter rejects, with no signal that the two sentences are speaking from
+different definitions. Chapter 29 resolves it explicitly ("Surrogate takes the
+looser view of the first row"), but that is 250 pages of reading away.
+
+Proposed: make the change of frame visible in the sentence itself.
+
+    That is a looser definition than *GoF Design Patterns* uses,
+    and under GoF's stricter one the interface is exactly what separates
+    *Proxy* from *Adapter*:
+    [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
+
+That keeps the forward link, keeps the parenthetical's point, and stops the
+paragraph from arguing with itself.
+
+[] Reject
+**Lines 270-308 — the identity gap is diagnosed with no escape hatch.**
+The section proves `isinstance()` never sees through a surrogate, ends on
+"code that asks `isinstance()` sees only the proxy's own class," and stops. The
+reader whose framework calls `isinstance()` is left with a dead end. Two exits
+exist and I verified both on the pinned 3.15:
+
+- `Service.register(Proxy3)` makes `isinstance(p, Service)` `True`. It works
+  for a `Protocol` too, because `_ProtocolMeta.__instancecheck__` tries
+  `_abc_instancecheck` before it reaches `getattr_static()`.
+- A `__class__` property returning the implementation's class makes both
+  `isinstance(p, Implementation)` and `isinstance(p, Service)` `True`.
+
+Proposed: two sentences after line 306, no listing.
+
+    Two escapes exist, and both lie.
+    `Service.register(Proxy3)` tells the ABC machinery to answer `True`
+    without checking anything,
+    and a `__class__` property returning the implementation's class makes
+    `isinstance()` answer for the wrong object.
+    Each satisfies the runtime check and neither satisfies a type checker,
+    which is the honest summary: a surrogate is not the thing it fronts for,
+    and code that needs it to be should ask for a method instead.
+
+If you would rather not hand a reader `__class__`-spoofing at all, keep only
+the `register()` half.
+
+[] Reject
+**Lines 267-268 — the forwarding `__setattr__()` is described but never
+shown, and the described version is the one that fails.**
+
+    A surrogate that must forward writes defines `__setattr__()` as well,
+    and that method has to let the proxy's own attributes through
+    or the assignment in `__init__()` recurses.
+
+That is accurate and I verified the failure, but it leaves the reader with a
+warning and no working idiom, immediately after a listing that showed the
+broken behavior. The chapter's own "near-miss" is the obvious next thing a
+reader writes, and it dies with `RecursionError` rather than a useful message.
+I confirmed on the pinned 3.15:
+
+    class Naive:
+        def __init__(self, impl: Any) -> None:
+            self._impl = impl                 # RecursionError right here
+        def __getattr__(self, name: str) -> Any:
+            return getattr(self._impl, name)
+        def __setattr__(self, name: str, value: Any) -> None:
+            setattr(self._impl, name, value)
+
+Proposed listing, verified clean under `ty`, `ruff` (70 cols), and its
+markers, to follow line 268:
+
+```python
+# proxy_setattr.py
+from typing import Any
+
+class Settings2:
+    def __init__(self) -> None:
+        self.level = "low"
+
+class WriteProxy:
+    def __init__(self, impl: Any) -> None:
+        object.__setattr__(self, "_impl", impl)
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._impl, name)
+    def __setattr__(self, name: str, value: Any) -> None:
+        setattr(self._impl, name, value)
+
+settings = Settings2()
+p = WriteProxy(settings)
+p.level = "high"
+print(p.level, settings.level)
+#: high high
+```
+
+Worth noting in the prose: the `# type: ignore` that `proxy_writes.py` needed
+is gone, because declaring `__setattr__()` is what tells the checker the proxy
+accepts arbitrary attributes. That is the static half closing at the same time
+as the runtime half, and it makes the point of line 264-266 land.
+(Rename `Settings2`/`WriteProxy` if the suffix-dropping finding above is
+taken.)
+
+[] Reject
+**Lines 427-433 — `counting_proxy.py` uses `self._impl` 250 lines after the
+chapter argued the double underscore earns its place.**
+Line 181-184 says the double underscore on `self.__implementation` "earns its
+place here: the name mangles ... so it cannot collide with an attribute the
+implementation carries." Every other proxy in the chapter follows that
+(`proxy_1.py`, `proxy_2.py`, `dunder_bypass.py`, `proxy_writes.py`,
+`proxy_identity.py` all use `self.__implementation`). `CountingProxy` uses
+`self._impl` and `self.calls`, both single-underscore, and both shadow an
+implementation attribute of the same name, which is the collision the earlier
+paragraph warned about.
+
+This is the house-style trigger: an unexplained deviation from an idiom the
+book just justified.
+
+Proposed: leave it as it is and add one clause where the reader will notice,
+after line 455 — something like "`CountingProxy` uses single underscores so
+the recursion trap below can name `self._imp` without the mangling getting in
+the way." Renaming to `self.__impl` is the other option, but it drags exercise
+4 and line 468 (`a misspelled self._imp`) along with it, and mangled names in
+a typo demo are harder to read, so I do not recommend it. Either way the
+deviation should stop being silent.
+
+[] Reject
+**Lines 150-165, 243-250, 287-295 — the numbered class names are noise, and
+they run out of order.**
+Reading order gives `Proxy` (`proxy_1.py`), `Proxy2` (`proxy_2.py`), `Proxy`
+again (`dunder_bypass.py`), `Proxy4` (`proxy_writes.py`), then `Proxy3`
+(`proxy_identity.py`); implementations run `Implementation`,
+`Implementation2`, `Words`, `Settings`, `Implementation3`, `Implementation`.
+Each listing is its own module, so nothing collides and the suffixes buy
+nothing. Two concrete costs:
+
+- `Proxy4` is introduced before `Proxy3`, which reads like a missing listing.
+- `Implementation2.f()` prints `Implementation.f()`. A reader who is checking
+  the output against the code has to stop and decide whether that is a bug.
+
+Proposed: drop every numeric suffix. `Implementation` and `Proxy` in each
+file, `Settings`/`Words` where the domain name is better. Prose that has to
+change with it: line 177 (`Proxy2` names no method of `Implementation2`),
+line 183 (`_Proxy2__implementation` becomes `_Proxy__implementation`),
+line 265 (`Proxy4` declares no `level`), and the `proxy_identity.py` marker
+`#: False False` is unaffected because `isinstance(p, Implementation3)`
+becomes `isinstance(p, Implementation)` with the same answer.
+`dunder_bypass.py`'s `#: True` marker depends on the class being named
+`Proxy`, which the rename preserves.
+Reported rather than applied because it touches five listings and four prose
+sentences, and the suffixes may be a deliberate hand-hold.
 
 ## Other files
 

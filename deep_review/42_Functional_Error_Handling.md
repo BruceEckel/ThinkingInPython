@@ -5,100 +5,47 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Intro, third paragraph: "the type checker reminds every caller to handle it"
-is the weakest form of the chapter's strongest claim.**
+**`utils/result.py`, `Err.bind`: binding the class's own `E` makes a chain
+that changes error type fail the checker, and `Ok.bind` allows it.**
 
-The line currently reads:
+```python
+    def bind[B](
+        self, func: Callable[..., Result[B, E]]
+    ) -> Err[E]:
+```
 
-> Failure appears in the return type,
-> so the type checker reminds every caller to handle it,
-> and a reviewer sees it without reading the body.
+`E` here is the class parameter, so `Err[str].bind(f)` requires `f` to return
+`Result[B, str]`.
+`Ok.bind` declares its own `[B, E]`, so it accepts any error type.
+The result is that a chain whose steps report different error types is
+rejected, on the `Err` half of the union only:
 
-"Reminds" is a metaphor for something the checker does literally, and the
-literal version is more convincing.
-Verified on `ty` 0.0.65 / Python 3.15.0b2: with `func_a` returning
-`Result[int, str]`, `func_a(2).unwrap()` is
-`error[unresolved-attribute]: Attribute 'unwrap' is not defined on 'Err[str]'
-in union 'Result[int, str]'`, and `func_a(2) + 1` is
-`error[unsupported-operator]`.
-The checker does not remind; it refuses.
+```python
+def start(i: int) -> Result[int, str]: ...
+def next_step(n: int) -> Result[int, ValueError]: ...
+start(1).bind(next_step)   # error, from Err.bind
+```
 
-Proposed change:
+`ty` reports `element 'Err[ValueError]' of union 'Ok[int] | Err[ValueError]'
+is not assignable to 'Ok[Unknown] | Err[str]'`, even though its own inferred
+answer for the expression, `Ok[int] | Err[ValueError] | Err[str]`, is exactly
+right.
 
-> Failure appears in the return type,
-> so the type checker will not let a caller read the answer without dealing
-> with the failure first,
-> and a reviewer sees it without reading the body.
+Proposed change (verified: chapters 42 and 44 both still check clean, and the
+mixed chain above then type-checks):
 
-Reported rather than applied because it is the chapter's opening sentence of
-argument and the wording is voice.
-(The mechanism itself is now stated in "A Result Type" and the caller-side
-hole in the totality paragraph; see the manifest, items 2 and 3.)
+```python
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
+    ) -> Err[E]:
+```
 
----
-
-[] Reject
-
-**"Return the Error as a Value", line 63: `int | str` is called a *sum type*,
-and the next paragraph explains why it isn't quite one.**
-
-> A union like this is a *sum type*: a value that is one thing or another.
-
-Three sentences later:
-
-> But the distinction depends on the types `int` and `str`, which is fragile.
-> If a successful answer were also a string, the two cases collide.
-
-A sum type is a *disjoint* union: the two sides stay apart no matter what they
-carry. `int | str` does not, which is the whole reason the next section exists.
-Naming it a sum type here and then dismantling it makes the term feel like it
-moved.
-
-Proposed change:
-
-> A union like this is Python's untagged spelling of a *sum type*:
-> a value that is one thing or another.
-
-The following section now says explicitly that `Ok`/`Err` supply the tag
-(manifest item 1), so the two halves of the contrast line up.
-
-Reported rather than applied because "sum type" is the term the PyCon talk
-this chapter comes from uses, and you may want it unqualified.
-
----
-
-[] Reject
-
-**"A Result Type": the chapter says "Ignore `bind()` for the moment" and then,
-two paragraphs later, shows a test that asserts what `bind()` does.**
-
-Line 144: "Ignore `bind()` for the moment."
-Line 204-205: "The tests check `unwrap()`, and that `bind()` chains a success
-and short-circuits a failure", followed by `test_result.py`, two of whose three
-tests are about `bind()`.
-`bind()` is not explained until "Composing With bind", two sections later.
-A reader who took the instruction literally cannot read two thirds of the
-listing; one who did not was told to.
-
-Two ways out. I recommend the first.
-
-**Option A: move the whole `test_result.py` listing and its lead-in paragraph
-into "Composing With bind",** placed after `composing_with_bind.py` and before
-`test_composing.py`.
-The lead-in ("Because failures are values, you can assert on them directly,
-with no `pytest.raises()`") reads at least as well there, since by that point
-the reader has seen three failures travel through a chain.
-"Ignore `bind()` for the moment" then means what it says, and the reader meets
-`bind()` once, in one place.
-Cost: nothing outside this chapter. `test_result.py` imports only `result`, so
-it does not care where it sits, and no chapter links to a heading between the
-two points.
-
-**Option B: split the listing.** Keep `test_success_unwrap` where it is
-(renaming the file, since one test per file is the book's rule and a
-one-assert `test_result.py` in two places would collide), and put the two
-`bind` tests in "Composing With bind".
-Cheaper to read, more files to carry.
+`utils/` again, so reported rather than applied.
+The counter-argument, which is why I am not pushing hard: forcing one error
+type per chain is defensible discipline, and the chapter's running example
+never mixes them. But if that is the intent it should be stated, because right
+now the restriction reads as an accident of which method declared its own
+parameters.
 
 ---
 
@@ -167,52 +114,6 @@ narrowing; the listing grows one import and two lines.
 
 [] Reject
 
-**`utils/result.py`, `Err.bind`: binding the class's own `E` makes a chain
-that changes error type fail the checker, and `Ok.bind` allows it.**
-
-```python
-    def bind[B](
-        self, func: Callable[..., Result[B, E]]
-    ) -> Err[E]:
-```
-
-`E` here is the class parameter, so `Err[str].bind(f)` requires `f` to return
-`Result[B, str]`.
-`Ok.bind` declares its own `[B, E]`, so it accepts any error type.
-The result is that a chain whose steps report different error types is
-rejected, on the `Err` half of the union only:
-
-```python
-def start(i: int) -> Result[int, str]: ...
-def next_step(n: int) -> Result[int, ValueError]: ...
-start(1).bind(next_step)   # error, from Err.bind
-```
-
-`ty` reports `element 'Err[ValueError]' of union 'Ok[int] | Err[ValueError]'
-is not assignable to 'Ok[Unknown] | Err[str]'`, even though its own inferred
-answer for the expression, `Ok[int] | Err[ValueError] | Err[str]`, is exactly
-right.
-
-Proposed change (verified: chapters 42 and 44 both still check clean, and the
-mixed chain above then type-checks):
-
-```python
-    def bind[B, F](
-        self, func: Callable[..., Result[B, F]]
-    ) -> Err[E]:
-```
-
-`utils/` again, so reported rather than applied.
-The counter-argument, which is why I am not pushing hard: forcing one error
-type per chain is defensible discipline, and the chapter's running example
-never mixes them. But if that is the intent it should be stated, because right
-now the restriction reads as an accident of which method declared its own
-parameters.
-
----
-
-[] Reject
-
 **New listing proposal: `must_unwrap.py`, the near-miss the reader will write
 first.**
 
@@ -256,6 +157,80 @@ chapter first claims it.
 Alternative, if you would rather not spend a listing: drop the `hasattr` line
 and fold the remaining four lines into the existing `returning_result.py`
 block, which costs no new file but gives that listing two jobs.
+
+---
+
+[] Reject
+
+**"A Result Type": the chapter says "Ignore `bind()` for the moment" and then,
+two paragraphs later, shows a test that asserts what `bind()` does.**
+
+Line 144: "Ignore `bind()` for the moment."
+Line 204-205: "The tests check `unwrap()`, and that `bind()` chains a success
+and short-circuits a failure", followed by `test_result.py`, two of whose three
+tests are about `bind()`.
+`bind()` is not explained until "Composing With bind", two sections later.
+A reader who took the instruction literally cannot read two thirds of the
+listing; one who did not was told to.
+
+Two ways out. I recommend the first.
+
+**Option A: move the whole `test_result.py` listing and its lead-in paragraph
+into "Composing With bind",** placed after `composing_with_bind.py` and before
+`test_composing.py`.
+The lead-in ("Because failures are values, you can assert on them directly,
+with no `pytest.raises()`") reads at least as well there, since by that point
+the reader has seen three failures travel through a chain.
+"Ignore `bind()` for the moment" then means what it says, and the reader meets
+`bind()` once, in one place.
+Cost: nothing outside this chapter. `test_result.py` imports only `result`, so
+it does not care where it sits, and no chapter links to a heading between the
+two points.
+
+**Option B: split the listing.** Keep `test_success_unwrap` where it is
+(renaming the file, since one test per file is the book's rule and a
+one-assert `test_result.py` in two places would collide), and put the two
+`bind` tests in "Composing With bind".
+Cheaper to read, more files to carry.
+
+---
+
+[] Reject
+
+**"The returns Library" holds the chapter's conclusion under a heading about a
+third-party library.**
+
+The section is three paragraphs. The first is about `returns`. The second and
+third are the chapter's closing argument — exceptions for the truly
+exceptional, `Result` for the failures that are part of a function's job —
+and have nothing to do with the library. A reader skimming headings for "so
+when do I use this?" finds a library name.
+
+Proposed change: split after the first paragraph and give the remainder its
+own heading, e.g.
+
+> ## Which Failures Get a Result
+>
+> This style does not replace exceptions everywhere.
+> ...
+
+Checked before proposing: the inbound anchors from other chapters are
+`#a-result-type` (20, 46, 47), `#matching-on-the-error` (43),
+`#turning-exceptions-into-results` (44, 46) and `#composing-with-bind` (47).
+Nothing links to `#the-returns-library`, and the new heading is additive, so
+the split breaks nothing.
+The one in-chapter link to `#the-returns-library` is the forward pointer I
+added at the end of "Combining Multiple Results" (manifest item 6), which
+still lands on the library paragraph and should stay pointing there.
+
+Reported because splitting a section and naming the new one is structure and
+voice.
+A second thing to consider while you are there: the conclusion states a rule
+but names no capability. The deep-review question is what the reader can do at
+the end that they could not do at the start, and the honest answer here is
+"write a function whose signature admits it can fail, and chain three of
+them" — which is worth saying, because it is a real answer and most chapters
+cannot give one that concrete.
 
 ---
 
@@ -306,83 +281,37 @@ listing.
 
 [] Reject
 
-**`utils/safe.py` carries a top-level demo, against the book's own rule, and
-`test_safe.py` re-declares `parse()` because of it.**
+**Exercises: three, all in the `bind` cluster; `@safe`, `add_note()` and the
+`Result`-versus-`| None` decision get none.**
 
-`thinking-in-python-skill.md`: "Importable modules carry no top-level demo. If
-a module is both a library and a demonstration, split it: a demo-free library
-module plus a separate runnable file that imports it and holds the demo."
-`utils/safe.py` is the chapter's shared helper *and* holds `@safe def
-parse()` plus an `if __name__ == "__main__":` block.
-`utils/result.py`, the sibling helper, correctly holds neither.
+Coverage today: 1 extends the `bind` chain, 2 adds `map_error()`, 3 collects
+failures instead of short-circuiting. Sections with no exercise: "Turning
+Exceptions into Results", "Matching on the Error", "Attaching Context to an
+Exception", and the `| None` comparison in "A Result Type".
 
-The cost is visible three listings later: `test_safe.py` opens by defining its
-own `parse()` rather than `from safe import parse`, so the same four lines
-appear twice in one chapter and the test does not exercise the thing the
-chapter just showed.
+Proposed additions:
 
-Proposed change: move the demo out of `utils/safe.py` into a chapter-local
-`safe_demo.py` that does `from safe import safe`, leaving `utils/safe.py` as
-the decorator alone; then `test_safe.py` imports `parse` from `safe_demo`
-instead of redefining it.
+> 4.  Change `@safe` so it takes the exception types it should catch, as in
+>     `@safe(ValueError)`, and lets anything else propagate.
+>     Show that a `TypeError` raised inside the wrapped function now escapes
+>     instead of arriving as an `Err`.
+> 5.  Write `load_setting(name, text)` that returns `Result[int, Exception]`
+>     and attaches a note naming the setting.
+>     Chain two of them with `bind()` and print the notes from whichever one
+>     failed. What happens to the note the successful call would have added?
+> 6.  Rewrite `func_a()` to return `int | None` instead of `Result[int, str]`
+>     and adjust `composing.py` to match.
+>     Which of the three failures in the chain can the caller still tell apart,
+>     and which have collapsed into each other?
 
-`utils/` again, so reported rather than applied.
-Note that this affects the prose too: the sentence "Like `result.py`, it lives
-in `utils/` and any chapter can import it" currently introduces a listing that
-is two things at once, and would introduce one thing after the split.
+Exercise 4 is the one I would keep if you take only one: it is the direct
+follow-through on the `@safe`-catches-everything paragraph I added (manifest
+item 8), and it is the difference between the chapter's toy decorator and one
+you would ship.
+Exercise 6 is the near-miss for the `| None` comparison, which the chapter
+currently settles by assertion.
 
----
-
-[] Reject
-
-**`add_note()` is Python 3.11 and later, and the chapter does not say so.**
-
-Same house-style question raised against chapter 40's `functools.Placeholder`
-section: the book targets 3.15, several chapters mark 3.13+/3.15 features
-inline, and several do not.
-`BaseException.add_note()` (PEP 678) arrived in 3.11, which is old enough that
-a call-out may be noise, so this is your convention call rather than a
-correction. If you do mark it, the natural spot is
-"`BaseException.add_note()` (Python 3.11 and later) avoids the trade."
-
----
-
-[] Reject
-
-**"The returns Library" holds the chapter's conclusion under a heading about a
-third-party library.**
-
-The section is three paragraphs. The first is about `returns`. The second and
-third are the chapter's closing argument — exceptions for the truly
-exceptional, `Result` for the failures that are part of a function's job —
-and have nothing to do with the library. A reader skimming headings for "so
-when do I use this?" finds a library name.
-
-Proposed change: split after the first paragraph and give the remainder its
-own heading, e.g.
-
-> ## Which Failures Get a Result
->
-> This style does not replace exceptions everywhere.
-> ...
-
-Checked before proposing: the inbound anchors from other chapters are
-`#a-result-type` (20, 46, 47), `#matching-on-the-error` (43),
-`#turning-exceptions-into-results` (44, 46) and `#composing-with-bind` (47).
-Nothing links to `#the-returns-library`, and the new heading is additive, so
-the split breaks nothing.
-The one in-chapter link to `#the-returns-library` is the forward pointer I
-added at the end of "Combining Multiple Results" (manifest item 6), which
-still lands on the library paragraph and should stay pointing there.
-
-Reported because splitting a section and naming the new one is structure and
-voice.
-A second thing to consider while you are there: the conclusion states a rule
-but names no capability. The deep-review question is what the reader can do at
-the end that they could not do at the start, and the honest answer here is
-"write a function whose signature admits it can fail, and chain three of
-them" — which is worth saying, because it is a real answer and most chapters
-cannot give one that concrete.
+Reported rather than applied because the size of the exercise set is pacing.
 
 ---
 
@@ -421,37 +350,108 @@ and lengthening it argues against its own last sentence.
 
 [] Reject
 
-**Exercises: three, all in the `bind` cluster; `@safe`, `add_note()` and the
-`Result`-versus-`| None` decision get none.**
+**Intro, third paragraph: "the type checker reminds every caller to handle it"
+is the weakest form of the chapter's strongest claim.**
 
-Coverage today: 1 extends the `bind` chain, 2 adds `map_error()`, 3 collects
-failures instead of short-circuiting. Sections with no exercise: "Turning
-Exceptions into Results", "Matching on the Error", "Attaching Context to an
-Exception", and the `| None` comparison in "A Result Type".
+The line currently reads:
 
-Proposed additions:
+> Failure appears in the return type,
+> so the type checker reminds every caller to handle it,
+> and a reviewer sees it without reading the body.
 
-> 4.  Change `@safe` so it takes the exception types it should catch, as in
->     `@safe(ValueError)`, and lets anything else propagate.
->     Show that a `TypeError` raised inside the wrapped function now escapes
->     instead of arriving as an `Err`.
-> 5.  Write `load_setting(name, text)` that returns `Result[int, Exception]`
->     and attaches a note naming the setting.
->     Chain two of them with `bind()` and print the notes from whichever one
->     failed. What happens to the note the successful call would have added?
-> 6.  Rewrite `func_a()` to return `int | None` instead of `Result[int, str]`
->     and adjust `composing.py` to match.
->     Which of the three failures in the chain can the caller still tell apart,
->     and which have collapsed into each other?
+"Reminds" is a metaphor for something the checker does literally, and the
+literal version is more convincing.
+Verified on `ty` 0.0.65 / Python 3.15.0b2: with `func_a` returning
+`Result[int, str]`, `func_a(2).unwrap()` is
+`error[unresolved-attribute]: Attribute 'unwrap' is not defined on 'Err[str]'
+in union 'Result[int, str]'`, and `func_a(2) + 1` is
+`error[unsupported-operator]`.
+The checker does not remind; it refuses.
 
-Exercise 4 is the one I would keep if you take only one: it is the direct
-follow-through on the `@safe`-catches-everything paragraph I added (manifest
-item 8), and it is the difference between the chapter's toy decorator and one
-you would ship.
-Exercise 6 is the near-miss for the `| None` comparison, which the chapter
-currently settles by assertion.
+Proposed change:
 
-Reported rather than applied because the size of the exercise set is pacing.
+> Failure appears in the return type,
+> so the type checker will not let a caller read the answer without dealing
+> with the failure first,
+> and a reviewer sees it without reading the body.
+
+Reported rather than applied because it is the chapter's opening sentence of
+argument and the wording is voice.
+(The mechanism itself is now stated in "A Result Type" and the caller-side
+hole in the totality paragraph; see the manifest, items 2 and 3.)
+
+---
+
+[] Reject
+
+**`utils/safe.py` carries a top-level demo, against the book's own rule, and
+`test_safe.py` re-declares `parse()` because of it.**
+
+`thinking-in-python-skill.md`: "Importable modules carry no top-level demo. If
+a module is both a library and a demonstration, split it: a demo-free library
+module plus a separate runnable file that imports it and holds the demo."
+`utils/safe.py` is the chapter's shared helper *and* holds `@safe def
+parse()` plus an `if __name__ == "__main__":` block.
+`utils/result.py`, the sibling helper, correctly holds neither.
+
+The cost is visible three listings later: `test_safe.py` opens by defining its
+own `parse()` rather than `from safe import parse`, so the same four lines
+appear twice in one chapter and the test does not exercise the thing the
+chapter just showed.
+
+Proposed change: move the demo out of `utils/safe.py` into a chapter-local
+`safe_demo.py` that does `from safe import safe`, leaving `utils/safe.py` as
+the decorator alone; then `test_safe.py` imports `parse` from `safe_demo`
+instead of redefining it.
+
+`utils/` again, so reported rather than applied.
+Note that this affects the prose too: the sentence "Like `result.py`, it lives
+in `utils/` and any chapter can import it" currently introduces a listing that
+is two things at once, and would introduce one thing after the split.
+
+---
+
+[] Reject
+
+**"Return the Error as a Value", line 63: `int | str` is called a *sum type*,
+and the next paragraph explains why it isn't quite one.**
+
+> A union like this is a *sum type*: a value that is one thing or another.
+
+Three sentences later:
+
+> But the distinction depends on the types `int` and `str`, which is fragile.
+> If a successful answer were also a string, the two cases collide.
+
+A sum type is a *disjoint* union: the two sides stay apart no matter what they
+carry. `int | str` does not, which is the whole reason the next section exists.
+Naming it a sum type here and then dismantling it makes the term feel like it
+moved.
+
+Proposed change:
+
+> A union like this is Python's untagged spelling of a *sum type*:
+> a value that is one thing or another.
+
+The following section now says explicitly that `Ok`/`Err` supply the tag
+(manifest item 1), so the two halves of the contrast line up.
+
+Reported rather than applied because "sum type" is the term the PyCon talk
+this chapter comes from uses, and you may want it unqualified.
+
+---
+
+[] Reject
+
+**`add_note()` is Python 3.11 and later, and the chapter does not say so.**
+
+Same house-style question raised against chapter 40's `functools.Placeholder`
+section: the book targets 3.15, several chapters mark 3.13+/3.15 features
+inline, and several do not.
+`BaseException.add_note()` (PEP 678) arrived in 3.11, which is old enough that
+a call-out may be noise, so this is your convention call rather than a
+correction. If you do mark it, the natural spot is
+"`BaseException.add_note()` (Python 3.11 and later) avoids the trade."
 
 ---
 

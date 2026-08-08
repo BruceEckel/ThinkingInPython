@@ -5,6 +5,52 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
+**Exercises 1 to 4 belong to chapter 32, not this chapter.**
+
+Four of the six exercises are *Multiple Dispatching* problems inherited from
+*Thinking in Patterns*, where Visitor and Multiple Dispatching shared a chapter:
+
+- 1 and 2 build the `Dwarf`/`Elf`/`Troll` interaction system "using *Multiple
+  Dispatching*." Nothing in chapter 33 teaches how to build one; the technique
+  is chapter 32's `paper_scissors_rock.py`.
+- 3 and 4 are explicitly about `paper_scissors_rock.py` versus
+  `paper_scissors_rock_table.py`, both of which are chapter 32 listings, and
+  exercise 3 opens by linking to chapter 32 to establish its own premise.
+
+Apply the skill's test: each exercise should be answerable from this chapter.
+Only 5 and 6 are. Meanwhile chapter 33's actual content — double dispatch in
+`flower_visitors.py`, the `Any`/`Protocol` trade, the silent default, the
+"one dispatch is enough" argument — is covered by two exercises, both of them
+about `singledispatch`.
+
+Proposed change: move exercises 1 to 4, and their solutions, to chapter 32,
+where they would follow the existing `Lizard` exercises naturally (32's
+exercise 2 already asks the reader to compare the method version against the
+table version, which is exercise 3's question in miniature). Renumber 5 and 6
+to 1 and 2 here, and add the two new exercises below.
+
+Price of the move, which is real and worth weighing:
+
+- `Solutions/33_Visitor.md` sections 1 to 4 move to `Solutions/32_Multiple_Dispatching.md`
+  and renumber; sections 5 and 6 renumber to 1 and 2.
+- `Solutions/33_Visitor.md`'s exercise 4 answer links to
+  `32_Multiple_Dispatching.md#one-type-or-many`; that link becomes same-file
+  `#one-type-or-many` once moved.
+- The exercise files themselves (`exercise_1.py` through `exercise_4.py`) move
+  between solution trees, so `make prune-examples` will want a run afterward.
+- Chapter 32 would then have nine exercises and chapter 33 four, which is
+  lopsided but honest about where the material lives.
+
+I did not touch either file, per the scope rules. If you would rather not move
+them, the cheaper alternative is to leave them where they are and add a line to
+the exercise heading saying they carry chapter 32's material forward, so a
+reader who cannot answer them knows to go back rather than concluding they
+missed something here.
+
+---
+
+[] Reject
+
 **Chapter-level, order: the `Any`/`Protocol` discussion should come before
 "Notice where the behavior lives," not after it.**
 
@@ -195,38 +241,6 @@ still sits directly over it.
 
 [] Reject
 
-**"The default is also the risk" paragraph: the union-annotation sentence is
-wedged into the wrong argument.**
-
-The paragraph runs: default is a risk → raise `NotImplementedError` instead →
-`match` plus `assert_never()` catches it statically → **union annotation
-registers several types at once** → adding an operation costs a function →
-adding a flower costs a class plus registrations → use `singledispatchmethod`
-for a method.
-
-The union sentence is a registration mechanic. It answers "how do I write a
-registration," not "what do I do about the silent default," and it sits between
-two sentences that are both about the default. A reader tracking the argument
-has to park it and resume.
-
-Proposed change: move
-
-> A union annotation, `flower: Gladiolus | Ranunculus`,
-> registers one implementation for several types at once.
-
-up into the `_` paragraph, which is already the chapter's account of how a
-registration is written, appending it after "so nothing is lost." I verified the
-form still works on the pinned 3.15 build: registering
-`def _(flower: Gladiolus | Ranunculus)` puts both classes in `nectar.registry`
-and both dispatch to that one implementation.
-
-Reported rather than applied because moving a sentence between paragraphs
-changes the pacing of both.
-
----
-
-[] Reject
-
 **`test_visitor.py` sits after what reads like the section's closing
 paragraph.**
 
@@ -259,52 +273,6 @@ I prefer the first.
 
 [] Reject
 
-**Exercises 1 to 4 belong to chapter 32, not this chapter.**
-
-Four of the six exercises are *Multiple Dispatching* problems inherited from
-*Thinking in Patterns*, where Visitor and Multiple Dispatching shared a chapter:
-
-- 1 and 2 build the `Dwarf`/`Elf`/`Troll` interaction system "using *Multiple
-  Dispatching*." Nothing in chapter 33 teaches how to build one; the technique
-  is chapter 32's `paper_scissors_rock.py`.
-- 3 and 4 are explicitly about `paper_scissors_rock.py` versus
-  `paper_scissors_rock_table.py`, both of which are chapter 32 listings, and
-  exercise 3 opens by linking to chapter 32 to establish its own premise.
-
-Apply the skill's test: each exercise should be answerable from this chapter.
-Only 5 and 6 are. Meanwhile chapter 33's actual content — double dispatch in
-`flower_visitors.py`, the `Any`/`Protocol` trade, the silent default, the
-"one dispatch is enough" argument — is covered by two exercises, both of them
-about `singledispatch`.
-
-Proposed change: move exercises 1 to 4, and their solutions, to chapter 32,
-where they would follow the existing `Lizard` exercises naturally (32's
-exercise 2 already asks the reader to compare the method version against the
-table version, which is exercise 3's question in miniature). Renumber 5 and 6
-to 1 and 2 here, and add the two new exercises below.
-
-Price of the move, which is real and worth weighing:
-
-- `Solutions/33_Visitor.md` sections 1 to 4 move to `Solutions/32_Multiple_Dispatching.md`
-  and renumber; sections 5 and 6 renumber to 1 and 2.
-- `Solutions/33_Visitor.md`'s exercise 4 answer links to
-  `32_Multiple_Dispatching.md#one-type-or-many`; that link becomes same-file
-  `#one-type-or-many` once moved.
-- The exercise files themselves (`exercise_1.py` through `exercise_4.py`) move
-  between solution trees, so `make prune-examples` will want a run afterward.
-- Chapter 32 would then have nine exercises and chapter 33 four, which is
-  lopsided but honest about where the material lives.
-
-I did not touch either file, per the scope rules. If you would rather not move
-them, the cheaper alternative is to leave them where they are and add a line to
-the exercise heading saying they carry chapter 32's material forward, so a
-reader who cannot answer them knows to go back rather than concluding they
-missed something here.
-
----
-
-[] Reject
-
 **No exercise covers the `Any`-to-`Protocol` swap, which is a whole subsection
 of the chapter.**
 
@@ -326,6 +294,38 @@ I verified both halves against the pinned 3.15 build and `ty` 0.0.65: the
 `visit()`-less `Bug` is accepted by the checker under `Any` and fails at runtime
 with `AttributeError: 'Bug' object has no attribute 'visit'` (that failure is
 now named in the chapter prose; see the manifest).
+
+---
+
+[] Reject
+
+**"The default is also the risk" paragraph: the union-annotation sentence is
+wedged into the wrong argument.**
+
+The paragraph runs: default is a risk → raise `NotImplementedError` instead →
+`match` plus `assert_never()` catches it statically → **union annotation
+registers several types at once** → adding an operation costs a function →
+adding a flower costs a class plus registrations → use `singledispatchmethod`
+for a method.
+
+The union sentence is a registration mechanic. It answers "how do I write a
+registration," not "what do I do about the silent default," and it sits between
+two sentences that are both about the default. A reader tracking the argument
+has to park it and resume.
+
+Proposed change: move
+
+> A union annotation, `flower: Gladiolus | Ranunculus`,
+> registers one implementation for several types at once.
+
+up into the `_` paragraph, which is already the chapter's account of how a
+registration is written, appending it after "so nothing is lost." I verified the
+form still works on the pinned 3.15 build: registering
+`def _(flower: Gladiolus | Ranunculus)` puts both classes in `nectar.registry`
+and both dispatch to that one implementation.
+
+Reported rather than applied because moving a sentence between paragraphs
+changes the pacing of both.
 
 ---
 

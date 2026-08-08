@@ -46,7 +46,7 @@ You can move that `Any` into the class instead of repeating it at every use site
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
 Declaring only the first leaves the write, `m.more = 11`, still rejected.
 The standard library's stub for `SimpleNamespace` declares both,
-using `__getattribute__()` for the reading half.
+which is why the next listing needs no annotation.
 The price of an ad-hoc attribute bag is that no checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
@@ -80,7 +80,7 @@ because it inherits `object`'s identity-based equality.
 A `SimpleNamespace` also accepts any name you invent,
 so no checker can know which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
-which is why this listing needs no annotation to type-check and why `m.inof` goes unreported here as well.
+and `m.inof` goes unreported here as well.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
@@ -138,8 +138,8 @@ print(red._asdict(), Color._fields)
 Printing a `NamedTuple` gives the same readable output a data class gives.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
-and `ty` reports it before the program runs,
-which is the one place in this chapter where the checker does better than it does for the attribute bag.
+and `ty` reports it before the program runs.
+The attribute bag caught nothing; a declared field catches this.
 Since the fields cannot be mutated, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
@@ -245,14 +245,14 @@ but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 
-Ordering arrives from `tuple` the same way, and is as type-blind as equality.
+Ordering is inherited the same way, and is as type-blind as equality.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`,
 with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.
 `<` between two `FrozenColor`s raises a `TypeError` unless the decorator receives `order=True`,
 and a comparison between two different frozen types raises one even then.
 
-Tuple behavior reaches serialization too.
+Tuple behavior shows up in serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
 since `json` sees a sequence and the field names never reach the output.
 Converting first, `json.dumps(Color(1, 2, 3)._asdict())`,

@@ -8,20 +8,76 @@ this review already applied (see the note at the end for what those were).
 
 [] Reject
 
-**Opening, line 15 — "effectively" hedges a sentence that already trails off.**
+**Line 4-9 vs. line 258 — the opening promises an expression system that
+chapter 34 delivers.**
 
-> You end up detecting some types manually and effectively producing your own
-> dynamic binding behavior.
+The chapter opens on "a system that parses and executes mathematical
+expressions ... `Number + Number`", and line 258 says the reflected-operator
+section "answers the `Number + Number` question that opened this chapter." It
+answers the dispatch half. The expression system itself is `expr.py` in
+[Composite and Interpreter](34_Composite_and_Interpreter.md), which builds
+exactly that and links back here for the mechanism.
 
-"effectively" is a hedge with no work to do, and "producing your own dynamic
-binding behavior" restates the previous sentence without adding the concrete
-thing the reader will actually write. Proposed replacement:
+Proposed, appended to the `radd_dispatch.py` discussion:
 
-> You end up testing the remaining types by hand,
-> writing out the dispatch the language performs for the first one.
+> [Composite and Interpreter](34_Composite_and_Interpreter.md#the-interpreter-pattern)
+> builds the expression system this chapter opened with, using these two
+> methods to let Python's own parser assemble the tree.
 
-Reason for reporting rather than applying: this sentence carries over from
-*Thinking in Java* and you may want it verbatim.
+Check the anchor against that chapter's actual heading before applying.
+
+---
+
+[] Reject
+
+**Line 225 — `## One Type or Many` holds three unrelated topics, and chapter 34
+links into the wrong one.**
+
+Everything from line 225 to line 403 sits under one heading:
+
+| lines | topic |
+|---|---|
+| 227-240 | `singledispatch` (MRO) vs. the table (exact) |
+| 242-256 | the `isinstance()` ladder, and when the method version wins |
+| 258-350 | Python's reflected operators, `NotImplemented`, `radd_dispatch.py` |
+| 352-403 | testing the two versions against each other |
+
+Only the first two are "one type or many." The third is the chapter's second
+big idea and gets no heading; the fourth is a testing section.
+
+This is not only a table-of-contents problem. `Chapters/34_Composite_and_
+Interpreter.md` links to `32_Multiple_Dispatching.md#one-type-or-many` twice
+(line 280 and exercise 6, line 616), both times meaning the reflected-operator
+idiom. A reader following either link lands on the `singledispatch` comparison
+and has to scroll past two more topics to reach what the link promised.
+
+Proposed:
+
+- `## One Type or Many` keeps lines 227-256.
+- New `## Operators Dispatch Twice` (or `## Reflected Operators`) at line 258.
+- New `## Testing Both Versions` at line 352.
+
+Price: chapter 34's two links must be repointed (logged under Cross-chapter
+below). `heading_links.py` will not catch it, because `#one-type-or-many` still
+exists — it just means something narrower.
+
+---
+
+[] Reject
+
+**No conclusion.**
+
+The chapter ends on the testing paragraph and goes straight to `## Exercises`.
+Every claim is made, but nothing collects them, and the last thing a reader
+sees is a note about `if __name__ == "__main__"`.
+
+The insight worth ending on is already latent in the chapter and never stated:
+all three techniques here — the `eval_*()` family, the `OUTCOME` table, and
+`__add__`/`__radd__` — are the same move, which is turning one unresolved type
+into a second dispatch. Python gives you that second dispatch for free in
+exactly one place, the binary operators, and everywhere else you choose between
+paying for it in methods or paying for it in data. Four or five lines under a
+heading named for that idea, rather than "Conclusion."
 
 ---
 
@@ -72,43 +128,6 @@ versions unchanged. If you want only one change here, take that one.
 
 [] Reject
 
-**`paper_scissors_rock.py`, lines 85-123 — the `eval_*()` comments invite
-exactly the misreading the prose warns about.**
-
-Every `eval_*()` body carries a comment of the form
-
-```python
-    def eval_scissors(self, item: Any) -> Outcome:
-        # Item was Scissors; this is Paper's case
-        return Outcome.WIN
-```
-
-and then lines 148-154 tell the reader that `WIN` is *Scissors'* result, not
-Paper's, and that "if you misread that convention, every result in the class
-appears backward." "this is Paper's case" is that misreading spelled out in the
-code: it reads as "this is Paper's answer," which is the opposite of what the
-line returns. The prose is fighting the comments.
-
-Proposed: make the comments say whose answer it is, e.g.
-
-```python
-    def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it wins
-        return Outcome.WIN
-```
-
-with the same shape in all nine bodies (`... and it loses`, `... and it draws`).
-That also makes the `# First dispatch:` comments on `compete()` read as one
-series with the second-dispatch comments.
-
-Reported rather than applied because the house-style skill says not to edit
-existing example comments without being asked about those specific comments.
-This block is the ask.
-
----
-
-[] Reject
-
 **Lines 156-160 — a `Protocol` *would* catch the missing method, and the
 chapter should say so plainly.**
 
@@ -153,37 +172,6 @@ Two ways to cash this in; recommending the first:
 
 [] Reject
 
-**`paper_scissors_rock_table.py`, lines 176-179 — `self.__class__` where the
-rest of this cross-chapter thread uses `type(x)`.**
-
-The exact-type dict-dispatch thread runs 31 → 32 → 37. Chapter 31 writes
-`self.transitions[type(event)]` and its prose says "the lookup keys on
-`type(event)` exactly"; chapter 37 writes `bins[type(t)]`. Chapter 32 writes
-`OUTCOME[self.__class__, item.__class__]` and `self.__class__.__name__`. Same
-idea, three spellings; a reader following the thread has to notice they are the
-same operation.
-
-Across `Chapters/`, `type(self)` appears in 12, 14, 31, and 33; `self.__class__`
-appears only in 32 (three times) and 33 (twice), so 32 is most of the minority
-spelling.
-
-Proposed, in both listings in this chapter:
-
-```python
-        return OUTCOME[type(self), type(item)]
-    def __str__(self) -> str:
-        return type(self).__name__
-```
-
-Reported rather than applied because `Solutions/32_Multiple_Dispatching.md`
-carries three more copies of `self.__class__` (exercises 1 and 4) and this
-review may not edit `Solutions/`; the two should change together, and the
-choice is a book-wide one.
-
----
-
-[] Reject
-
 **Line 218-223 — the exact-match claim is asserted three times in the book and
 demonstrated nowhere.**
 
@@ -218,36 +206,67 @@ Recommending the separate listing.
 
 [] Reject
 
-**Line 225 — `## One Type or Many` holds three unrelated topics, and chapter 34
-links into the wrong one.**
+**`test_paper_scissors.py`, lines 378-390 — the loops hide every failure after
+the first.**
 
-Everything from line 225 to line 403 sits under one heading:
+```python
+@pytest.mark.parametrize("module", [table, methods])
+def test_matches_expected(module: ModuleType) -> None:
+    for (player, opponent), result in EXPECTED.items():
+        assert compete(module, player, opponent) == result
+```
 
-| lines | topic |
-|---|---|
-| 227-240 | `singledispatch` (MRO) vs. the table (exact) |
-| 242-256 | the `isinstance()` ladder, and when the method version wins |
-| 258-350 | Python's reflected operators, `NotImplemented`, `radd_dispatch.py` |
-| 352-403 | testing the two versions against each other |
+The style skill's rule is "so pytest reports each case independently rather
+than a single test hiding after the first failing input." Here the
+parametrization is over the *module*, and the nine matchups are a loop inside,
+so one wrong cell reports as one failed test and conceals the other eight —
+which is exactly the situation exercise 1 puts a reader into while filling in
+`Lizard`'s rows. Proposed:
 
-Only the first two are "one type or many." The third is the chapter's second
-big idea and gets no heading; the fourth is a testing section.
+```python
+MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
+    (p, o, r) for (p, o), r in EXPECTED.items()
+]
 
-This is not only a table-of-contents problem. `Chapters/34_Composite_and_
-Interpreter.md` links to `32_Multiple_Dispatching.md#one-type-or-many` twice
-(line 280 and exercise 6, line 616), both times meaning the reflected-operator
-idiom. A reader following either link lands on the `singledispatch` comparison
-and has to scroll past two more topics to reach what the link promised.
+@pytest.mark.parametrize("module", [table, methods])
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_matches_expected(module: ModuleType, player: str,
+                          opponent: str, expected: Outcome) -> None:
+    assert compete(module, player, opponent) == expected
 
-Proposed:
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_both_versions_agree(player: str, opponent: str,
+                             expected: Outcome) -> None:
+    assert (compete(methods, player, opponent)
+            == compete(table, player, opponent))
+```
 
-- `## One Type or Many` keeps lines 227-256.
-- New `## Operators Dispatch Twice` (or `## Reflected Operators`) at line 258.
-- New `## Testing Both Versions` at line 352.
+Reported rather than applied: it takes the run from 6 dots to 33, and whether
+that reads as thoroughness or as noise in a printed book is your call.
 
-Price: chapter 34's two links must be repointed (logged under Cross-chapter
-below). `heading_links.py` will not catch it, because `#one-type-or-many` still
-exists — it just means something narrower.
+---
+
+[] Reject
+
+**Exercise 4 — it exercises the helper, not the chapter.**
+
+Exercise 4 asks for a `Counter` parameter on `item_pair_gen()` and a tally of
+how often `Lizard` appears. It is a fine exercise about optional mutable
+parameters and lazy generators, and it teaches nothing about dispatching on two
+types. The set otherwise runs 1-2-3 on `Lizard` and 5 on reflected operators,
+so nothing covers the two claims the chapter argues hardest for: exact-type
+matching, and `singledispatch`'s MRO matching as the contrast.
+
+Proposed replacement or addition:
+
+> Subclass `Paper` as `Origami` and duel it against `Rock` in the table version.
+> Explain the `KeyError` in terms of how the lookup matches.
+> Then make the table tolerate subclasses by walking `type(item).__mro__` for
+> the first class that has a row, and say what that costs: which of the two
+> properties on page N you have just given up.
+
+Keeping exercise 4 as well is fine; the point is that the set should cover
+exact matching somewhere.
 
 ---
 
@@ -336,6 +355,37 @@ naming the construct and the shared-dispatcher trap, no listing.
 
 [] Reject
 
+**`paper_scissors_rock_table.py`, lines 176-179 — `self.__class__` where the
+rest of this cross-chapter thread uses `type(x)`.**
+
+The exact-type dict-dispatch thread runs 31 → 32 → 37. Chapter 31 writes
+`self.transitions[type(event)]` and its prose says "the lookup keys on
+`type(event)` exactly"; chapter 37 writes `bins[type(t)]`. Chapter 32 writes
+`OUTCOME[self.__class__, item.__class__]` and `self.__class__.__name__`. Same
+idea, three spellings; a reader following the thread has to notice they are the
+same operation.
+
+Across `Chapters/`, `type(self)` appears in 12, 14, 31, and 33; `self.__class__`
+appears only in 32 (three times) and 33 (twice), so 32 is most of the minority
+spelling.
+
+Proposed, in both listings in this chapter:
+
+```python
+        return OUTCOME[type(self), type(item)]
+    def __str__(self) -> str:
+        return type(self).__name__
+```
+
+Reported rather than applied because `Solutions/32_Multiple_Dispatching.md`
+carries three more copies of `self.__class__` (exercises 1 and 4) and this
+review may not edit `Solutions/`; the two should change together, and the
+choice is a book-wide one.
+
+---
+
+[] Reject
+
 **Lines 254-256 — "will not fit in a table cell" is not a real constraint, and
 chapter 31 already showed why.**
 
@@ -361,64 +411,38 @@ Proposed replacement:
 
 [] Reject
 
-**Lines 265-268 — the `r` prefix invites a collision with the `i` prefix.**
+**`paper_scissors_rock.py`, lines 85-123 — the `eval_*()` comments invite
+exactly the misreading the prose warns about.**
 
-> Every arithmetic and bitwise operator has a reflected form,
-> named by inserting an `r` before the operator's name: `__rsub__()`,
-> `__rmul__()`, `__rtruediv__()`.
-
-The same operators also have an in-place form named by inserting an `i`
-(`__isub__()`, `__imul__()`), and the two prefixes are one letter apart in
-otherwise identical names. A reader who has met `__iadd__()` will guess the
-prefixes mean variations on the same theme; they are unrelated mechanisms, and
-`__iadd__()` never participates in the two-step dispatch this section is about.
-
-Proposed, appended to that sentence:
-
-> Do not confuse this with the in-place forms, `__iadd__()` and its siblings,
-> which serve `+=` and take no part in the reflected fallback.
-
----
-
-[] Reject
-
-**`test_paper_scissors.py`, lines 378-390 — the loops hide every failure after
-the first.**
+Every `eval_*()` body carries a comment of the form
 
 ```python
-@pytest.mark.parametrize("module", [table, methods])
-def test_matches_expected(module: ModuleType) -> None:
-    for (player, opponent), result in EXPECTED.items():
-        assert compete(module, player, opponent) == result
+    def eval_scissors(self, item: Any) -> Outcome:
+        # Item was Scissors; this is Paper's case
+        return Outcome.WIN
 ```
 
-The style skill's rule is "so pytest reports each case independently rather
-than a single test hiding after the first failing input." Here the
-parametrization is over the *module*, and the nine matchups are a loop inside,
-so one wrong cell reports as one failed test and conceals the other eight —
-which is exactly the situation exercise 1 puts a reader into while filling in
-`Lizard`'s rows. Proposed:
+and then lines 148-154 tell the reader that `WIN` is *Scissors'* result, not
+Paper's, and that "if you misread that convention, every result in the class
+appears backward." "this is Paper's case" is that misreading spelled out in the
+code: it reads as "this is Paper's answer," which is the opposite of what the
+line returns. The prose is fighting the comments.
+
+Proposed: make the comments say whose answer it is, e.g.
 
 ```python
-MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
-    (p, o, r) for (p, o), r in EXPECTED.items()
-]
-
-@pytest.mark.parametrize("module", [table, methods])
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
-def test_matches_expected(module: ModuleType, player: str,
-                          opponent: str, expected: Outcome) -> None:
-    assert compete(module, player, opponent) == expected
-
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
-def test_both_versions_agree(player: str, opponent: str,
-                             expected: Outcome) -> None:
-    assert (compete(methods, player, opponent)
-            == compete(table, player, opponent))
+    def eval_scissors(self, item: Any) -> Outcome:
+        # Second dispatch: the caller was Scissors, and it wins
+        return Outcome.WIN
 ```
 
-Reported rather than applied: it takes the run from 6 dots to 33, and whether
-that reads as thoroughness or as noise in a printed book is your call.
+with the same shape in all nine bodies (`... and it loses`, `... and it draws`).
+That also makes the `# First dispatch:` comments on `compete()` read as one
+series with the second-dispatch comments.
+
+Reported rather than applied because the house-style skill says not to edit
+existing example comments without being asked about those specific comments.
+This block is the ask.
 
 ---
 
@@ -452,65 +476,41 @@ before the existing one:
 
 [] Reject
 
-**Exercise 4 — it exercises the helper, not the chapter.**
+**Lines 265-268 — the `r` prefix invites a collision with the `i` prefix.**
 
-Exercise 4 asks for a `Counter` parameter on `item_pair_gen()` and a tally of
-how often `Lizard` appears. It is a fine exercise about optional mutable
-parameters and lazy generators, and it teaches nothing about dispatching on two
-types. The set otherwise runs 1-2-3 on `Lizard` and 5 on reflected operators,
-so nothing covers the two claims the chapter argues hardest for: exact-type
-matching, and `singledispatch`'s MRO matching as the contrast.
+> Every arithmetic and bitwise operator has a reflected form,
+> named by inserting an `r` before the operator's name: `__rsub__()`,
+> `__rmul__()`, `__rtruediv__()`.
 
-Proposed replacement or addition:
+The same operators also have an in-place form named by inserting an `i`
+(`__isub__()`, `__imul__()`), and the two prefixes are one letter apart in
+otherwise identical names. A reader who has met `__iadd__()` will guess the
+prefixes mean variations on the same theme; they are unrelated mechanisms, and
+`__iadd__()` never participates in the two-step dispatch this section is about.
 
-> Subclass `Paper` as `Origami` and duel it against `Rock` in the table version.
-> Explain the `KeyError` in terms of how the lookup matches.
-> Then make the table tolerate subclasses by walking `type(item).__mro__` for
-> the first class that has a row, and say what that costs: which of the two
-> properties on page N you have just given up.
+Proposed, appended to that sentence:
 
-Keeping exercise 4 as well is fine; the point is that the set should cover
-exact matching somewhere.
+> Do not confuse this with the in-place forms, `__iadd__()` and its siblings,
+> which serve `+=` and take no part in the reflected fallback.
 
 ---
 
 [] Reject
 
-**No conclusion.**
+**Opening, line 15 — "effectively" hedges a sentence that already trails off.**
 
-The chapter ends on the testing paragraph and goes straight to `## Exercises`.
-Every claim is made, but nothing collects them, and the last thing a reader
-sees is a note about `if __name__ == "__main__"`.
+> You end up detecting some types manually and effectively producing your own
+> dynamic binding behavior.
 
-The insight worth ending on is already latent in the chapter and never stated:
-all three techniques here — the `eval_*()` family, the `OUTCOME` table, and
-`__add__`/`__radd__` — are the same move, which is turning one unresolved type
-into a second dispatch. Python gives you that second dispatch for free in
-exactly one place, the binary operators, and everywhere else you choose between
-paying for it in methods or paying for it in data. Four or five lines under a
-heading named for that idea, rather than "Conclusion."
+"effectively" is a hedge with no work to do, and "producing your own dynamic
+binding behavior" restates the previous sentence without adding the concrete
+thing the reader will actually write. Proposed replacement:
 
----
+> You end up testing the remaining types by hand,
+> writing out the dispatch the language performs for the first one.
 
-[] Reject
-
-**Line 4-9 vs. line 258 — the opening promises an expression system that
-chapter 34 delivers.**
-
-The chapter opens on "a system that parses and executes mathematical
-expressions ... `Number + Number`", and line 258 says the reflected-operator
-section "answers the `Number + Number` question that opened this chapter." It
-answers the dispatch half. The expression system itself is `expr.py` in
-[Composite and Interpreter](34_Composite_and_Interpreter.md), which builds
-exactly that and links back here for the mechanism.
-
-Proposed, appended to the `radd_dispatch.py` discussion:
-
-> [Composite and Interpreter](34_Composite_and_Interpreter.md#the-interpreter-pattern)
-> builds the expression system this chapter opened with, using these two
-> methods to let Python's own parser assemble the tree.
-
-Check the anchor against that chapter's actual heading before applying.
+Reason for reporting rather than applying: this sentence carries over from
+*Thinking in Java* and you may want it verbatim.
 
 ---
 

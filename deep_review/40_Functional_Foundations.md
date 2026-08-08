@@ -5,148 +5,6 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Intro, second paragraph: the arc preview stops at 44 and omits the last
-three chapters, so the reader's map of Part IV/V is wrong from line 21.**
-
-The paragraph currently names Toolkits (41), Error Handling (42), Assurance
-(43), and Effect Management (44).
-The functional arc actually runs 40 through 47:
-44 *opens* Part V ("Effects" in `build_site.py`'s `PARTS`), and 45
-(Generators), 46 (Stateless) and 47 (Stateless in Practice) are the chapters
-where the machinery this chapter builds is finally cashed in.
-Chapter 47 closes by pointing back here
-("That is the property this book has been circling since
-[Foundations](40_Functional_Foundations.md#pure-functions)"), so the far end
-of the thread already exists; only this end is missing.
-
-A reader finishing 43 has no idea three more chapters are coming, and a
-reader who wants to know where purity actually *buys* something is sent to
-43 (an argument) rather than 46/47 (a working system).
-
-Proposed change: end the paragraph with one more sentence, e.g.
-
-> Those four chapters are Part IV.
-> Part V then takes the same discipline further:
-> [Effect Management](44_Effect_Management.md) tracks a function's effects in
-> its type, [Generators](45_Generators.md) supplies the mechanism Python
-> already has for describing a computation without running it, and
-> [Stateless](46_Stateless.md) and
-> [Stateless in Practice](47_Stateless_in_Practice.md) build a checked Effect
-> system on top of it.
-
-(That means moving the existing Effect Management clause out of the Part IV
-list, which is the substantive part of the change: right now 44 is presented
-as the fourth chapter of this part when it is the first chapter of the next.)
-
-Reported rather than applied because it changes the shape of the chapter's
-opening promise-of-contents paragraph, which is pacing, and because you may
-prefer to keep the preview short on purpose.
-
----
-
-[] Reject
-
-**"Pure Functions", `why_pure.py`: the listing proves the easy half and the
-convincing half is missing.**
-
-The lead-in now ends "And you test it with a single assertion and no fixture,
-since there is nothing to set up or restore:", and the listing shows exactly
-that — two asserts on a second pure function.
-But "no fixture" only means something next to the code that *does* need one,
-and the chapter has that code sitting twenty lines above in `withdraw()`.
-As written, `why_pure.py` introduces a new function (`slope`) to re-prove
-what `double()` already proved, and the section ends with no prose after it.
-
-Proposed replacement (verified: runs, `ruff` clean at 70, `ty` clean,
-prints `ok`):
-
-```python
-# why_pure.py
-def slope(rise: int, run: int) -> float:
-    return rise / run
-
-total = 0
-def running_total(n: int) -> int:
-    global total
-    total += n
-    return total
-
-# The pure function needs no setup and no teardown:
-assert slope(10, 2) == 5.0
-assert slope(10, 2) == 5.0
-# The impure one needs a reset before each check:
-total = 0
-assert running_total(5) == 5
-total = 0
-assert running_total(5) == 5
-print("ok")
-#: ok
-```
-
-with a following line such as
-"Delete either `total = 0` and the second assertion fails.
-That line is the whole fixture, and purity is what removes it."
-
-Two alternatives if you dislike a second impure function in the chapter:
-
-- Reuse `withdraw()` directly, resetting `balance` between asserts. Cheaper
-  conceptually, but the listing then either duplicates `withdraw()` or
-  imports `pure_functions`, whose module-level `print()` calls would land in
-  this listing's output.
-- Convert it to `test_purity.py` with two pytest functions, which matches the
-  book's "tests live in their own `test_*.py` file" rule and would give this
-  chapter its first test. Costs a `pytest` step the chapter does not
-  currently need, and loses the `#:` marker.
-
-I recommend the first.
-
-Separately, worth knowing when you touch this listing: `slope(rise, run)` is
-character-for-character the function chapter 44 opens
-`divide_by_zero_impurity.py` with, where it is used to ask whether raising
-an exception breaks purity. If `slope` stays here, a forward pointer
-("[Are Exceptions Impure?](44_Effect_Management.md#are-exceptions-impure)
-comes back to this exact function") turns an accidental repeat into a thread.
-
----
-
-[] Reject
-
-**"Functions as First-Class Objects", after `dispatch.py`: the chapter's
-biggest untaught lookalike pair is a dict of functions versus `match`/`case`.**
-
-`dispatch.py`'s prose says a table of functions "replaces a long `if`/`elif`
-chain."
-Chapter 13 says the same thing about `match`, and its very first listing
-(`http_status.py`) is literally a dispatch on a literal `int`.
-The repo's own style skill states the rule the other way round: "Dispatch on
-a literal with `match`/`case`, with a `case _:` default, not an `if`/`elif`
-chain."
-A reader arriving from 13 will ask which one they are supposed to use, and
-this chapter never says.
-
-The distinction is real and short: a `match` is code, so a new case means
-editing the function; the table is data, so a new case means adding a row,
-possibly at import time from another module, possibly at runtime. That is
-exactly why the registry in 27 is a dict and not a `match`.
-
-Proposed addition after "The dispatch code never changes.":
-
-> [Pattern Matching](13_Pattern_Matching.md) solves the same `if`/`elif`
-> problem with `match`, and the two are not interchangeable.
-> A `match` is code: adding an operator means editing the function, and the
-> checker sees every case.
-> The table is data: adding an operator means adding a row, which another
-> module can do at import time and a test can do at runtime.
-> Choose `match` when the set of cases is fixed and known to the compiler,
-> and a table when the set is meant to grow from outside.
-
-Reported rather than applied because it adds a paragraph to a short section
-and because you may be deliberately holding the contrast for chapter 27.
-
----
-
-[] Reject
-
 **"Lambdas" sits after "Higher-Order Functions", which has already used three
 of them.**
 
@@ -183,193 +41,6 @@ Either way, note the overlap with chapter 5's own Lambdas section (lines
 repeats `sorted(words, key=len)` with a different word list. The new content
 here is the locality argument and the "for anything larger, write a `def`"
 rule, which is worth keeping; the `sorted(key=len)` line is not.
-
----
-
-[] Reject
-
-**`closures.py` shows the outcome but not the mechanism, and the prose now
-depends on the mechanism.**
-
-The listing prints `20 30`, from which a reader cannot tell whether `factor`
-is stored on the function, recomputed, or looked up in some enclosing frame
-that is still alive.
-The corrected prose in this pass ("`inspect.getclosurevars(tally).nonlocals`
-reports `{'count': 3}`") now asserts something the chapter never shows.
-
-Proposed change to `closures.py` (verified on the pinned 3.15 build: runs,
-deterministic, `ruff` clean, `ty` clean with no ignore needed —
-`getclosurevars()` takes a plain callable, unlike `__closure__`, which `ty`
-refuses on a value annotated `Callable[[int], int]`):
-
-```python
-# closures.py
-import inspect
-from collections.abc import Callable
-
-def multiplier(factor: int) -> Callable[[int], int]:
-    # The inner function captures factor from this scope:
-    def multiply(n: int) -> int:
-        return n * factor
-    return multiply
-
-double = multiplier(2)
-triple = multiplier(3)
-print(double(10), triple(10))
-#: 20 30
-print(inspect.getclosurevars(double).nonlocals)
-#: {'factor': 2}
-print(inspect.getclosurevars(triple).nonlocals)
-#: {'factor': 3}
-```
-
-The two dicts make "each returned function remembers its own `factor`" a
-thing the reader can see rather than a thing the prose claims.
-
-Reported rather than applied because it changes an existing listing's output
-markers and adds an import to a deliberately minimal listing, both of which
-are your call. If you take it, the sentence "`double` and `triple` are the
-same code with different captured values" can point at the output instead of
-asserting it.
-
----
-
-[] Reject
-
-**"Closures": the missing-`nonlocal` failure cannot become a listing, which is
-why it was handled in prose instead. Here is what I tried, in case you want to
-push it further.**
-
-Forgetting `nonlocal` is the most likely thing the reader does next, so I
-drafted a `forgot_nonlocal.py` near-miss listing using the `exceptions.ignore`
-helper that `immutability.py` and `hashable.py` already use. It cannot ship:
-
-- `ty` rejects the code outright with
-  `error[unresolved-reference]: Name 'count' used when not defined`, so the
-  listing would need a `# type: ignore` to pass the gate — on the one line the
-  listing exists to draw attention to.
-- The runtime message is 74 characters, so the `#:` marker line is 77 and
-  fails `ruff`'s 70-character limit. Truncating the message throws away the
-  half that makes the point.
-
-So I applied the prose form instead (manifest item 19): the paragraph now
-quotes the runtime message verbatim and adds that `ty` catches the same
-mistake statically, on the offending line, before the program runs. Both
-strings are verified on the pinned 3.15 / `ty` 0.0.65 build.
-
-If you want the demonstration anyway, the workable shape is a listing whose
-*point* is the checker rather than the traceback: keep the `# type: ignore`,
-add `# noqa: E501` to the marker line, and let the prose say that the ignore
-comment is suppressing a real error. I did not draft it because a listing that
-needs two suppressions to exist is usually the chapter telling you it should
-stay prose.
-
----
-
-[] Reject
-
-**"Partial Application": `.func`, `.args` and `.keywords` are claimed here and
-demonstrated one subsection later, only partly.**
-
-The prose says `partial()` "keeps the bound arguments as data you can
-inspect, through its `.func`, `.args`, and `.keywords` attributes."
-`partial.py` shows none of them. `placeholder.py` then shows `.args` alone,
-and for the `Placeholder` case rather than the keyword case, so the reader
-never sees the `.keywords` dict the sentence is actually about.
-
-Proposed two lines at the end of `partial.py` (verified output):
-
-```python
-print(square.func.__name__, square.keywords)
-#: power {'exponent': 2}
-```
-
-This is the difference from a lambda the sentence is selling: `lambda n:
-power(n, 2)` is opaque, and `square` tells you what it wrapped and with what.
-
-Reported rather than applied because it lengthens an existing listing whose
-current job is one clean idea.
-
----
-
-[] Reject
-
-**"Leaving a Gap with `Placeholder`": the section is written in a past tense
-that raises a version question it never answers.**
-
-"so fixing the third argument *used to mean* fixing the first two", "had no
-recourse", "the one `partial()` *could not previously* express."
-`functools.Placeholder` arrived in Python 3.14. A reader on 3.12 or 3.13 will
-copy this listing and get an `ImportError`, and nothing on the page tells them
-why.
-
-Proposed change: add the version to the sentence that introduces it, e.g.
-"`functools.Placeholder` (Python 3.14 and later) is a marker that reserves a
-position for the caller:".
-
-Reported rather than applied because I could not find a settled convention in
-the book for when a version is called out inline — chapter 41's `partial`
-entry gives none, while several chapters do mark 3.13+/3.15 features — so
-this is a house-style call rather than a correction.
-
----
-
-[] Reject
-
-**`composing.py`: `compose()` is hard-wired to `Callable[[int], int]` where the
-book's own style rule asks for PEP 695 type parameters.**
-
-`thinking-in-python-skill.md`: "Use type parameters (`def f[T](...)`,
-`class C[T]`) when a function or wrapper should carry the element type
-through." `compose()` is the textbook case of a wrapper that should carry
-types through, and the monomorphic version quietly teaches that composition
-only works within one type — which is the opposite of the section's claim
-that "you build larger behavior by naming a new composition."
-
-Verified generic version (runs, `ruff` clean at 70, `ty` clean, and
-`reveal_type(compose(label, increment))` gives `(int, /) -> str`):
-
-```python
-# composing.py
-from collections.abc import Callable
-
-def compose[T, U, V](
-    f: Callable[[U], V], g: Callable[[T], U]
-) -> Callable[[T], V]:
-    # Return a function that runs g, then feeds the result to f:
-    def composed(x: T) -> V:
-        return f(g(x))
-    return composed
-
-def increment(n: int) -> int:
-    return n + 1
-def double(n: int) -> int:
-    return n * 2
-def label(n: int) -> str:
-    return f"<{n}>"
-
-increment_then_double = compose(double, increment)
-print(increment_then_double(10))
-#: 22
-print(compose(label, increment_then_double)(10))
-#: <22>
-```
-
-The second `print()` is what earns the generics: the checker verifies that
-`label` accepts what `increment_then_double` produces, and the composed
-function's own type is `(int) -> str`, not `(int) -> int`.
-
-Two reasons you might not want this. It adds three type parameters to the
-chapter's last listing, when "one new thing per listing" argues for keeping
-it plain. And exercise 4 asks the reader to build
-`compose(square, increment_then_double)`, which still works verbatim either
-way but reads differently once composition can change the type.
-
-Alternative if you want the point without the listing change: leave
-`composing.py` alone and add the generic version as exercise 6
-("Rewrite `compose()` with type parameters so that
-`compose(str, increment)` type-checks. What does `ty` report for the result's
-type?").
 
 ---
 
@@ -443,6 +114,151 @@ heading and add three sentences, with no new listing.
 
 [] Reject
 
+**`closures.py` shows the outcome but not the mechanism, and the prose now
+depends on the mechanism.**
+
+The listing prints `20 30`, from which a reader cannot tell whether `factor`
+is stored on the function, recomputed, or looked up in some enclosing frame
+that is still alive.
+The corrected prose in this pass ("`inspect.getclosurevars(tally).nonlocals`
+reports `{'count': 3}`") now asserts something the chapter never shows.
+
+Proposed change to `closures.py` (verified on the pinned 3.15 build: runs,
+deterministic, `ruff` clean, `ty` clean with no ignore needed —
+`getclosurevars()` takes a plain callable, unlike `__closure__`, which `ty`
+refuses on a value annotated `Callable[[int], int]`):
+
+```python
+# closures.py
+import inspect
+from collections.abc import Callable
+
+def multiplier(factor: int) -> Callable[[int], int]:
+    # The inner function captures factor from this scope:
+    def multiply(n: int) -> int:
+        return n * factor
+    return multiply
+
+double = multiplier(2)
+triple = multiplier(3)
+print(double(10), triple(10))
+#: 20 30
+print(inspect.getclosurevars(double).nonlocals)
+#: {'factor': 2}
+print(inspect.getclosurevars(triple).nonlocals)
+#: {'factor': 3}
+```
+
+The two dicts make "each returned function remembers its own `factor`" a
+thing the reader can see rather than a thing the prose claims.
+
+Reported rather than applied because it changes an existing listing's output
+markers and adds an import to a deliberately minimal listing, both of which
+are your call. If you take it, the sentence "`double` and `triple` are the
+same code with different captured values" can point at the output instead of
+asserting it.
+
+---
+
+[] Reject
+
+**"Pure Functions", `why_pure.py`: the listing proves the easy half and the
+convincing half is missing.**
+
+The lead-in now ends "And you test it with a single assertion and no fixture,
+since there is nothing to set up or restore:", and the listing shows exactly
+that — two asserts on a second pure function.
+But "no fixture" only means something next to the code that *does* need one,
+and the chapter has that code sitting twenty lines above in `withdraw()`.
+As written, `why_pure.py` introduces a new function (`slope`) to re-prove
+what `double()` already proved, and the section ends with no prose after it.
+
+Proposed replacement (verified: runs, `ruff` clean at 70, `ty` clean,
+prints `ok`):
+
+```python
+# why_pure.py
+def slope(rise: int, run: int) -> float:
+    return rise / run
+
+total = 0
+def running_total(n: int) -> int:
+    global total
+    total += n
+    return total
+
+# The pure function needs no setup and no teardown:
+assert slope(10, 2) == 5.0
+assert slope(10, 2) == 5.0
+# The impure one needs a reset before each check:
+total = 0
+assert running_total(5) == 5
+total = 0
+assert running_total(5) == 5
+print("ok")
+#: ok
+```
+
+with a following line such as
+"Delete either `total = 0` and the second assertion fails.
+That line is the whole fixture, and purity is what removes it."
+
+Two alternatives if you dislike a second impure function in the chapter:
+
+- Reuse `withdraw()` directly, resetting `balance` between asserts. Cheaper
+  conceptually, but the listing then either duplicates `withdraw()` or
+  imports `pure_functions`, whose module-level `print()` calls would land in
+  this listing's output.
+- Convert it to `test_purity.py` with two pytest functions, which matches the
+  book's "tests live in their own `test_*.py` file" rule and would give this
+  chapter its first test. Costs a `pytest` step the chapter does not
+  currently need, and loses the `#:` marker.
+
+I recommend the first.
+
+Separately, worth knowing when you touch this listing: `slope(rise, run)` is
+character-for-character the function chapter 44 opens
+`divide_by_zero_impurity.py` with, where it is used to ask whether raising
+an exception breaks purity. If `slope` stays here, a forward pointer
+("[Are Exceptions Impure?](44_Effect_Management.md#are-exceptions-impure)
+comes back to this exact function") turns an accidental repeat into a thread.
+
+---
+
+[] Reject
+
+**"Closures": the missing-`nonlocal` failure cannot become a listing, which is
+why it was handled in prose instead. Here is what I tried, in case you want to
+push it further.**
+
+Forgetting `nonlocal` is the most likely thing the reader does next, so I
+drafted a `forgot_nonlocal.py` near-miss listing using the `exceptions.ignore`
+helper that `immutability.py` and `hashable.py` already use. It cannot ship:
+
+- `ty` rejects the code outright with
+  `error[unresolved-reference]: Name 'count' used when not defined`, so the
+  listing would need a `# type: ignore` to pass the gate — on the one line the
+  listing exists to draw attention to.
+- The runtime message is 74 characters, so the `#:` marker line is 77 and
+  fails `ruff`'s 70-character limit. Truncating the message throws away the
+  half that makes the point.
+
+So I applied the prose form instead (manifest item 19): the paragraph now
+quotes the runtime message verbatim and adds that `ty` catches the same
+mistake statically, on the offending line, before the program runs. Both
+strings are verified on the pinned 3.15 / `ty` 0.0.65 build.
+
+If you want the demonstration anyway, the workable shape is a listing whose
+*point* is the checker rather than the traceback: keep the `# type: ignore`,
+add `# noqa: E501` to the marker line, and let the prose say that the ignore
+comment is suppressing a real error. I did not draft it because a listing that
+needs two suppressions to exist is usually the chapter telling you it should
+stay prose.
+
+---
+
+[] Reject
+
 **Exercises: two full sections have none, and `Placeholder` has one of five.**
 
 Coverage today: 1 Pure Functions, 2 Functions as First-Class Objects,
@@ -469,6 +285,190 @@ Exercise 7 is deliberately the near-miss: the reader produces
 
 Reported rather than applied because the exercise set's size and difficulty
 curve are a pacing decision.
+
+---
+
+[] Reject
+
+**"Functions as First-Class Objects", after `dispatch.py`: the chapter's
+biggest untaught lookalike pair is a dict of functions versus `match`/`case`.**
+
+`dispatch.py`'s prose says a table of functions "replaces a long `if`/`elif`
+chain."
+Chapter 13 says the same thing about `match`, and its very first listing
+(`http_status.py`) is literally a dispatch on a literal `int`.
+The repo's own style skill states the rule the other way round: "Dispatch on
+a literal with `match`/`case`, with a `case _:` default, not an `if`/`elif`
+chain."
+A reader arriving from 13 will ask which one they are supposed to use, and
+this chapter never says.
+
+The distinction is real and short: a `match` is code, so a new case means
+editing the function; the table is data, so a new case means adding a row,
+possibly at import time from another module, possibly at runtime. That is
+exactly why the registry in 27 is a dict and not a `match`.
+
+Proposed addition after "The dispatch code never changes.":
+
+> [Pattern Matching](13_Pattern_Matching.md) solves the same `if`/`elif`
+> problem with `match`, and the two are not interchangeable.
+> A `match` is code: adding an operator means editing the function, and the
+> checker sees every case.
+> The table is data: adding an operator means adding a row, which another
+> module can do at import time and a test can do at runtime.
+> Choose `match` when the set of cases is fixed and known to the compiler,
+> and a table when the set is meant to grow from outside.
+
+Reported rather than applied because it adds a paragraph to a short section
+and because you may be deliberately holding the contrast for chapter 27.
+
+---
+
+[] Reject
+
+**`composing.py`: `compose()` is hard-wired to `Callable[[int], int]` where the
+book's own style rule asks for PEP 695 type parameters.**
+
+`thinking-in-python-skill.md`: "Use type parameters (`def f[T](...)`,
+`class C[T]`) when a function or wrapper should carry the element type
+through." `compose()` is the textbook case of a wrapper that should carry
+types through, and the monomorphic version quietly teaches that composition
+only works within one type — which is the opposite of the section's claim
+that "you build larger behavior by naming a new composition."
+
+Verified generic version (runs, `ruff` clean at 70, `ty` clean, and
+`reveal_type(compose(label, increment))` gives `(int, /) -> str`):
+
+```python
+# composing.py
+from collections.abc import Callable
+
+def compose[T, U, V](
+    f: Callable[[U], V], g: Callable[[T], U]
+) -> Callable[[T], V]:
+    # Return a function that runs g, then feeds the result to f:
+    def composed(x: T) -> V:
+        return f(g(x))
+    return composed
+
+def increment(n: int) -> int:
+    return n + 1
+def double(n: int) -> int:
+    return n * 2
+def label(n: int) -> str:
+    return f"<{n}>"
+
+increment_then_double = compose(double, increment)
+print(increment_then_double(10))
+#: 22
+print(compose(label, increment_then_double)(10))
+#: <22>
+```
+
+The second `print()` is what earns the generics: the checker verifies that
+`label` accepts what `increment_then_double` produces, and the composed
+function's own type is `(int) -> str`, not `(int) -> int`.
+
+Two reasons you might not want this. It adds three type parameters to the
+chapter's last listing, when "one new thing per listing" argues for keeping
+it plain. And exercise 4 asks the reader to build
+`compose(square, increment_then_double)`, which still works verbatim either
+way but reads differently once composition can change the type.
+
+Alternative if you want the point without the listing change: leave
+`composing.py` alone and add the generic version as exercise 6
+("Rewrite `compose()` with type parameters so that
+`compose(str, increment)` type-checks. What does `ty` report for the result's
+type?").
+
+---
+
+[] Reject
+
+**"Partial Application": `.func`, `.args` and `.keywords` are claimed here and
+demonstrated one subsection later, only partly.**
+
+The prose says `partial()` "keeps the bound arguments as data you can
+inspect, through its `.func`, `.args`, and `.keywords` attributes."
+`partial.py` shows none of them. `placeholder.py` then shows `.args` alone,
+and for the `Placeholder` case rather than the keyword case, so the reader
+never sees the `.keywords` dict the sentence is actually about.
+
+Proposed two lines at the end of `partial.py` (verified output):
+
+```python
+print(square.func.__name__, square.keywords)
+#: power {'exponent': 2}
+```
+
+This is the difference from a lambda the sentence is selling: `lambda n:
+power(n, 2)` is opaque, and `square` tells you what it wrapped and with what.
+
+Reported rather than applied because it lengthens an existing listing whose
+current job is one clean idea.
+
+---
+
+[] Reject
+
+**"Leaving a Gap with `Placeholder`": the section is written in a past tense
+that raises a version question it never answers.**
+
+"so fixing the third argument *used to mean* fixing the first two", "had no
+recourse", "the one `partial()` *could not previously* express."
+`functools.Placeholder` arrived in Python 3.14. A reader on 3.12 or 3.13 will
+copy this listing and get an `ImportError`, and nothing on the page tells them
+why.
+
+Proposed change: add the version to the sentence that introduces it, e.g.
+"`functools.Placeholder` (Python 3.14 and later) is a marker that reserves a
+position for the caller:".
+
+Reported rather than applied because I could not find a settled convention in
+the book for when a version is called out inline — chapter 41's `partial`
+entry gives none, while several chapters do mark 3.13+/3.15 features — so
+this is a house-style call rather than a correction.
+
+---
+
+[] Reject
+
+**Intro, second paragraph: the arc preview stops at 44 and omits the last
+three chapters, so the reader's map of Part IV/V is wrong from line 21.**
+
+The paragraph currently names Toolkits (41), Error Handling (42), Assurance
+(43), and Effect Management (44).
+The functional arc actually runs 40 through 47:
+44 *opens* Part V ("Effects" in `build_site.py`'s `PARTS`), and 45
+(Generators), 46 (Stateless) and 47 (Stateless in Practice) are the chapters
+where the machinery this chapter builds is finally cashed in.
+Chapter 47 closes by pointing back here
+("That is the property this book has been circling since
+[Foundations](40_Functional_Foundations.md#pure-functions)"), so the far end
+of the thread already exists; only this end is missing.
+
+A reader finishing 43 has no idea three more chapters are coming, and a
+reader who wants to know where purity actually *buys* something is sent to
+43 (an argument) rather than 46/47 (a working system).
+
+Proposed change: end the paragraph with one more sentence, e.g.
+
+> Those four chapters are Part IV.
+> Part V then takes the same discipline further:
+> [Effect Management](44_Effect_Management.md) tracks a function's effects in
+> its type, [Generators](45_Generators.md) supplies the mechanism Python
+> already has for describing a computation without running it, and
+> [Stateless](46_Stateless.md) and
+> [Stateless in Practice](47_Stateless_in_Practice.md) build a checked Effect
+> system on top of it.
+
+(That means moving the existing Effect Management clause out of the Part IV
+list, which is the substantive part of the change: right now 44 is presented
+as the fourth chapter of this part when it is the first chapter of the next.)
+
+Reported rather than applied because it changes the shape of the chapter's
+opening promise-of-contents paragraph, which is pacing, and because you may
+prefer to keep the preview short on purpose.
 
 ---
 

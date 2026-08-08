@@ -24,28 +24,32 @@ Fixes already applied to `Chapters/30_Observer.md` (not listed as findings):
 
 [] Reject
 
-**Opening, `classic_observer.py`: the `changed` flag is dismissed without ever
-saying what it buys.**
+**"The Pythonic Observer": re-entrant notification is never mentioned.**
 
-The listing shows `set_changed()` / `notify_observers()` as "a two-phase
-notification", and later the Pythonic section counts "the `changed` flag" and
-"the two-phase `set_changed()` then `notify_observers()`" among the four things
-that are gone. But in the demo `set_celsius()` calls both back to back, so the
-flag does nothing observable and the reader cannot tell what was discarded.
-The flag exists to coalesce several mutations into one notification (change
-three fields, then broadcast once) and to let a subclass decide that a change
-is not worth announcing.
+The chapter covers three ways a naive `notify()` goes wrong -- an observer
+detaching mid-loop, an observer raising, and the lapsed-listener leak -- but
+not the fourth and most common one: an observer that writes back to the
+observable. `t.celsius = c + 1` inside a subscriber re-enters `notify()` from
+inside `notify()` and recurses until the stack limit. This matters more here
+than in most chapters because the closing line of the visual section invites
+exactly the setup that triggers it: "You can also attach a second view to the
+same model and keep both in step." A two-way binding (view edits model, model
+notifies view, view edits model) is where readers meet this.
 
-Proposed: one sentence after the classic listing, before "Python expresses
-this with far less machinery":
+Proposed: extend the "Two more things about Observer need saying" paragraph to
+three, or add a short paragraph after it:
 
-> The flag lets several mutations coalesce into one broadcast, and lets a
-> subclass decide a change is not worth announcing; `set_celsius()` calls both
-> halves at once, so nothing here needs it.
+> An observer that writes back to the observable re-enters `notify()` from
+> inside `notify()`. Two-way bindings are the usual source: the view edits the
+> model, the model notifies the view, the view edits the model. Either make
+> the write conditional on the value actually changing, or guard the setter
+> with a re-entry flag.
 
-Without this the "four things gone" list reads as pure subtraction, and a
-reader who later needs batched notification will not know the classic design
-had an answer for it.
+I did not apply this because it turns a "two more things" paragraph into three
+and adds a third caveat to a section that already carries two, which is a
+pacing call. The alternative placement is the paragraph after `box_view.py`,
+next to the sentence about a second view, where it is more concrete but
+arrives long after the reader could have used it.
 
 ---
 
@@ -75,61 +79,6 @@ unaffected).
 
 Low priority: the listing is a straw man that the next section dismantles. But
 it is presented as "the classic design", so it should be the classic design.
-
----
-
-[] Reject
-
-**"The Pythonic Observer": the `source` argument disappears and is not
-counted.**
-
-The classic `update(self, source: Observable, arg: object)` hands the observer
-both the payload and the object that changed. The Pythonic `Observer[T]` takes
-only the payload. The prose lists "four things from the classic version are
-gone" -- interface, flag, two-phase notify, class per reaction -- and all four
-are pure wins. The fifth removal is not: an observer subscribed to two
-thermometers can no longer tell which one fired.
-
-Proposed: add after the four-things sentence:
-
-> The `source` argument went too. An observer that needs to know who changed
-> takes it as part of the payload (`notify((self, value))`) or subscribes a
-> bound method whose instance already holds the reference.
-
-This closes the most likely reader question at the exact point it arises,
-instead of leaving the impression that the classic signature carried nothing
-the Pythonic one lacks.
-
----
-
-[] Reject
-
-**"The Pythonic Observer": re-entrant notification is never mentioned.**
-
-The chapter covers three ways a naive `notify()` goes wrong -- an observer
-detaching mid-loop, an observer raising, and the lapsed-listener leak -- but
-not the fourth and most common one: an observer that writes back to the
-observable. `t.celsius = c + 1` inside a subscriber re-enters `notify()` from
-inside `notify()` and recurses until the stack limit. This matters more here
-than in most chapters because the closing line of the visual section invites
-exactly the setup that triggers it: "You can also attach a second view to the
-same model and keep both in step." A two-way binding (view edits model, model
-notifies view, view edits model) is where readers meet this.
-
-Proposed: extend the "Two more things about Observer need saying" paragraph to
-three, or add a short paragraph after it:
-
-> An observer that writes back to the observable re-enters `notify()` from
-> inside `notify()`. Two-way bindings are the usual source: the view edits the
-> model, the model notifies the view, the view edits the model. Either make
-> the write conditional on the value actually changing, or guard the setter
-> with a re-entry flag.
-
-I did not apply this because it turns a "two more things" paragraph into three
-and adds a third caveat to a section that already carries two, which is a
-pacing call. The alternative placement is the paragraph after `box_view.py`,
-next to the sentence about a second view, where it is more concrete but
-arrives long after the reader could have used it.
 
 ---
 
@@ -170,23 +119,77 @@ method costs three lines that no listing exercises.
 
 [] Reject
 
-**"Observer and I/O": `gather()` completion order vs. result order is the
-near-miss here.**
+**Exercises: nothing exercises the async section.**
 
-"The `alarm` is slower than the log, yet the log prints first. [...] Concurrent
-fan-out lets each finish on its own schedule, so the faster observer reports
-first." That is right about side-effect order, and a reader will generalize it
-to the return value. `gather()` returns its results in argument order, not
-completion order. Nothing here reads the results, so no listing is wrong, but
-the reader who moves this shape to observers that return something will get it
-backwards.
+Exercise 1 covers the minimal Observer/Observable, 2 covers the box model, 3
+covers the exception gap the prose explicitly flags. "Observer and I/O" is one
+of the chapter's three sections and has no exercise, even though the prose
+hands one over ready-made: "`gather(*coros, return_exceptions=True)` returns
+the failures as data instead, which is the async form of the
+catch-collect-continue that exercise 3 asks for."
 
-Proposed: append to that paragraph:
+Proposed exercise 4:
 
-> The results `gather()` hands back stay in argument order regardless; only
-> the side effects interleave.
+> 4.  Redo exercise 3 for `async_observers.py`. Make `notify()` use
+>     `gather(*coros, return_exceptions=True)`, separate the returned
+>     exceptions from the successes, and raise them together as an
+>     `ExceptionGroup`. Write a test in which the first observer raises and
+>     the second still records its notification.
 
-Low priority, one clause.
+This makes the sync and async halves answer the same question, which is the
+chapter's thesis ("One `Observable` served three jobs"), and it needs a
+solution written for `Solutions/30_Observer.md`, which is the cost.
+
+---
+
+[] Reject
+
+**Opening, `classic_observer.py`: the `changed` flag is dismissed without ever
+saying what it buys.**
+
+The listing shows `set_changed()` / `notify_observers()` as "a two-phase
+notification", and later the Pythonic section counts "the `changed` flag" and
+"the two-phase `set_changed()` then `notify_observers()`" among the four things
+that are gone. But in the demo `set_celsius()` calls both back to back, so the
+flag does nothing observable and the reader cannot tell what was discarded.
+The flag exists to coalesce several mutations into one notification (change
+three fields, then broadcast once) and to let a subclass decide that a change
+is not worth announcing.
+
+Proposed: one sentence after the classic listing, before "Python expresses
+this with far less machinery":
+
+> The flag lets several mutations coalesce into one broadcast, and lets a
+> subclass decide a change is not worth announcing; `set_celsius()` calls both
+> halves at once, so nothing here needs it.
+
+Without this the "four things gone" list reads as pure subtraction, and a
+reader who later needs batched notification will not know the classic design
+had an answer for it.
+
+---
+
+[] Reject
+
+**"The Pythonic Observer": the `source` argument disappears and is not
+counted.**
+
+The classic `update(self, source: Observable, arg: object)` hands the observer
+both the payload and the object that changed. The Pythonic `Observer[T]` takes
+only the payload. The prose lists "four things from the classic version are
+gone" -- interface, flag, two-phase notify, class per reaction -- and all four
+are pure wins. The fifth removal is not: an observer subscribed to two
+thermometers can no longer tell which one fired.
+
+Proposed: add after the four-things sentence:
+
+> The `source` argument went too. An observer that needs to know who changed
+> takes it as part of the payload (`notify((self, value))`) or subscribes a
+> bound method whose instance already holds the reference.
+
+This closes the most likely reader question at the exact point it arises,
+instead of leaving the impression that the classic signature carried nothing
+the Pythonic one lacks.
 
 ---
 
@@ -214,6 +217,28 @@ because as written it looks like the generic version was forgotten.
 
 [] Reject
 
+**"Observer and I/O": `gather()` completion order vs. result order is the
+near-miss here.**
+
+"The `alarm` is slower than the log, yet the log prints first. [...] Concurrent
+fan-out lets each finish on its own schedule, so the faster observer reports
+first." That is right about side-effect order, and a reader will generalize it
+to the return value. `gather()` returns its results in argument order, not
+completion order. Nothing here reads the results, so no listing is wrong, but
+the reader who moves this shape to observers that return something will get it
+backwards.
+
+Proposed: append to that paragraph:
+
+> The results `gather()` hands back stay in argument order regardless; only
+> the side effects interleave.
+
+Low priority, one clause.
+
+---
+
+[] Reject
+
 **"A Visual Example of Observers": the `cell_px` naming sentence.**
 
 > `cell_px` is named for what it holds: the model's `cell` is a `Coord`,
@@ -227,31 +252,6 @@ the canvas-clearing point, which is the one that teaches something.
 If you want to keep the model/view vocabulary separation explicit, the place
 for it is the sentence introducing the two files, not a postscript after the
 listing.
-
----
-
-[] Reject
-
-**Exercises: nothing exercises the async section.**
-
-Exercise 1 covers the minimal Observer/Observable, 2 covers the box model, 3
-covers the exception gap the prose explicitly flags. "Observer and I/O" is one
-of the chapter's three sections and has no exercise, even though the prose
-hands one over ready-made: "`gather(*coros, return_exceptions=True)` returns
-the failures as data instead, which is the async form of the
-catch-collect-continue that exercise 3 asks for."
-
-Proposed exercise 4:
-
-> 4.  Redo exercise 3 for `async_observers.py`. Make `notify()` use
->     `gather(*coros, return_exceptions=True)`, separate the returned
->     exceptions from the successes, and raise them together as an
->     `ExceptionGroup`. Write a test in which the first observer raises and
->     the second still records its notification.
-
-This makes the sync and async halves answer the same question, which is the
-chapter's thesis ("One `Observable` served three jobs"), and it needs a
-solution written for `Solutions/30_Observer.md`, which is the cost.
 
 ## Cross-chapter
 

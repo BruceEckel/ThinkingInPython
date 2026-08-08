@@ -94,52 +94,27 @@ to it.)
 
 [] Reject
 
-**"The Fixed Algorithm," first paragraph: the `@final` link points at the
-class form.**
+**"Passing the Steps as Functions": the section stops without a chapter
+conclusion.**
 
-> The `@final` decorator from `typing` locks the template method so a subclass
-> cannot change the overall flow
-> (see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
+Every neighbouring pattern chapter closes with a short section that names
+what the reader now knows: 23 "The Pattern That Disappeared," 24 "Which
+Should You Use?", 26 "One Surrogate, Two Intents," 27 "Which Factory Should
+You Use?", 30 "What Stayed Constant." Chapter 25 runs straight from the
+class-versus-function trade-off into Exercises. It is also the shortest
+chapter in this part by a wide margin (~260 lines against 530-900).
 
-That section of chapter 17 only ever puts `@final` on a class
-(`@final class B`), and its title says so.
-A reader who follows the link to check the decorator finds no example of
-`@final` on a method and has to infer that it applies there too.
-The later paragraph in this chapter does the same thing for
-`__init_subclass__()` but says explicitly "applies to a method too," which is
-the right move.
+A closing section would be the natural home for the one insight the chapter
+currently leaves implicit: the fixed algorithm is only ever as fixed as the
+mechanism holding it. Structure fixes it (the function version), a checker
+fixes it (`@final`), the interpreter fixes it (`__init_subclass__`), and
+discipline fixes it (LSP, which no tool checks at all). Those four are
+already in the chapter, scattered; naming them together in four sentences
+under a heading like "What Actually Fixes the Algorithm" would let the reader
+leave with a way to choose, not just a pattern they recognize.
 
-Proposed change: make the first reference say the same thing, e.g.
-
-> The `@final` decorator from `typing`, used on a class in
-> [Making a Class Final](17_Metaprogramming.md#making-a-class-final), works on
-> a single method too: it locks the template method so a subclass cannot
-> change the overall flow.
-
-Verified: `ty` 0.0.65 reports
-`error[override-of-final-method]: Cannot override \`Framework.run\`` for a
-subclass that overrides a `@final` method, so the claim is sound; only the
-cross-reference is doing less work than it looks like.
-
----
-
-[] Reject
-
-**"A caution about the `@final` lock" paragraph: two small precision items.**
-
-1.  "it binds only under the type checker" — *binds* is legalistic and is
-    the only place in the chapter that reaches for a metaphor instead of the
-    literal statement. Suggest "it holds only under the type checker."
-
-2.  "At runtime Python ignores it" contradicts chapter 17, which is more
-    precise about the same decorator: "At runtime it only marks the class,
-    setting `__final__ = True` ... Nothing enforces it."
-    The method form behaves the same way; I confirmed
-    `Framework.run.__final__` is `True` on the pinned 3.15 build.
-    "Ignores" is defensible shorthand, but the two chapters describing the
-    same decorator differently is the kind of thing a careful reader notices.
-    Suggest "At runtime Python only records the mark and enforces nothing,"
-    which also sets up exercise 3's question about who objects.
+Reported rather than drafted, since a new section changes the chapter's
+pacing and that is your call.
 
 ---
 
@@ -177,6 +152,27 @@ marker, which is your call rather than mine.
 
 [] Reject
 
+**Exercises: nothing exercises Substitutability.**
+
+The three exercises cover the two mechanisms (1), the constructor trap (2),
+and `@final`'s enforcement boundary (3). "Substitutability" is a full
+section of the chapter with no exercise against it, and it is the part of
+the chapter that no tool can check for the reader, which is exactly why
+practising it matters.
+
+Proposed exercise 4:
+
+> 4. Write two subclasses of `ApplicationFramework` that both type-check but
+>    break the fixed algorithm: one whose `customize1()` raises an exception
+>    the base never raises, and one that leaves `customize2()` at its `...`
+>    default when the flow depends on it.
+>    Neither is reported by `ty`. What would have to be true of the base
+>    class for a checker to catch either one?
+
+---
+
+[] Reject
+
 **End of "Substitutability": `test_template_method.py` is in the wrong
 section, or needs a bridge.**
 
@@ -203,48 +199,52 @@ I prefer the move.
 
 [] Reject
 
-**"Passing the Steps as Functions": the section stops without a chapter
-conclusion.**
+**"A caution about the `@final` lock" paragraph: two small precision items.**
 
-Every neighbouring pattern chapter closes with a short section that names
-what the reader now knows: 23 "The Pattern That Disappeared," 24 "Which
-Should You Use?", 26 "One Surrogate, Two Intents," 27 "Which Factory Should
-You Use?", 30 "What Stayed Constant." Chapter 25 runs straight from the
-class-versus-function trade-off into Exercises. It is also the shortest
-chapter in this part by a wide margin (~260 lines against 530-900).
+1.  "it binds only under the type checker" — *binds* is legalistic and is
+    the only place in the chapter that reaches for a metaphor instead of the
+    literal statement. Suggest "it holds only under the type checker."
 
-A closing section would be the natural home for the one insight the chapter
-currently leaves implicit: the fixed algorithm is only ever as fixed as the
-mechanism holding it. Structure fixes it (the function version), a checker
-fixes it (`@final`), the interpreter fixes it (`__init_subclass__`), and
-discipline fixes it (LSP, which no tool checks at all). Those four are
-already in the chapter, scattered; naming them together in four sentences
-under a heading like "What Actually Fixes the Algorithm" would let the reader
-leave with a way to choose, not just a pattern they recognize.
-
-Reported rather than drafted, since a new section changes the chapter's
-pacing and that is your call.
+2.  "At runtime Python ignores it" contradicts chapter 17, which is more
+    precise about the same decorator: "At runtime it only marks the class,
+    setting `__final__ = True` ... Nothing enforces it."
+    The method form behaves the same way; I confirmed
+    `Framework.run.__final__` is `True` on the pinned 3.15 build.
+    "Ignores" is defensible shorthand, but the two chapters describing the
+    same decorator differently is the kind of thing a careful reader notices.
+    Suggest "At runtime Python only records the mark and enforces nothing,"
+    which also sets up exercise 3's question about who objects.
 
 ---
 
 [] Reject
 
-**Exercises: nothing exercises Substitutability.**
+**"The Fixed Algorithm," first paragraph: the `@final` link points at the
+class form.**
 
-The three exercises cover the two mechanisms (1), the constructor trap (2),
-and `@final`'s enforcement boundary (3). "Substitutability" is a full
-section of the chapter with no exercise against it, and it is the part of
-the chapter that no tool can check for the reader, which is exactly why
-practising it matters.
+> The `@final` decorator from `typing` locks the template method so a subclass
+> cannot change the overall flow
+> (see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
 
-Proposed exercise 4:
+That section of chapter 17 only ever puts `@final` on a class
+(`@final class B`), and its title says so.
+A reader who follows the link to check the decorator finds no example of
+`@final` on a method and has to infer that it applies there too.
+The later paragraph in this chapter does the same thing for
+`__init_subclass__()` but says explicitly "applies to a method too," which is
+the right move.
 
-> 4. Write two subclasses of `ApplicationFramework` that both type-check but
->    break the fixed algorithm: one whose `customize1()` raises an exception
->    the base never raises, and one that leaves `customize2()` at its `...`
->    default when the flow depends on it.
->    Neither is reported by `ty`. What would have to be true of the base
->    class for a checker to catch either one?
+Proposed change: make the first reference say the same thing, e.g.
+
+> The `@final` decorator from `typing`, used on a class in
+> [Making a Class Final](17_Metaprogramming.md#making-a-class-final), works on
+> a single method too: it locks the template method so a subclass cannot
+> change the overall flow.
+
+Verified: `ty` 0.0.65 reports
+`error[override-of-final-method]: Cannot override \`Framework.run\`` for a
+subclass that overrides a `@final` method, so the claim is sound; only the
+cross-reference is doing less work than it looks like.
 
 ---
 

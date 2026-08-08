@@ -106,58 +106,6 @@ heading.
 
 [] Reject
 
-**"The `itertools` Toolkit" intro promises composition and the section never
-shows a pipeline more than two stages deep.**
-
-The intro says "Combine them the way you combine any small function, by
-feeding one's output to the next."
-The deepest composition anywhere in the section is
-`islice(count(10, 2), 5)` and `islice(cycle("AB"), 5)`, two stages, in entries
-whose point is `count` and `cycle` rather than composition.
-Twenty entries later the claim has not been demonstrated.
-
-Proposed listing (verified on the pinned build: runs, `ruff` clean at 70,
-`ty` clean, output exactly as shown):
-
-```python
-# itertools_pipeline.py
-from itertools import batched, count, islice, takewhile
-
-squares = (n * n for n in count(1))
-batches = batched(squares, 3)
-totals = (sum(b) for b in batches)
-print(list(takewhile(lambda t: t < 500, totals)))
-#: [14, 77, 194, 365]
-print(list(islice(squares, 3)))
-#: [256, 289, 324]
-```
-
-Four stages over an infinite source, and nothing runs until `list()` pulls.
-The second `print()` is the part that teaches: the source is still alive and
-sitting at 16, not 13, because `takewhile()` had to pull and discard the
-batch `(169, 196, 225)` to discover that its total exceeded 500.
-That one line makes the pull model visible in a way no single entry does.
-
-Where it goes is the decision I am leaving to you.
-Two candidates:
-
-- **At the end of the `itertools` section**, as a `### Composing the Pieces`
-  subsection, so it reads as the payoff for the catalog. Costs a subsection
-  heading at a different level from the twenty function entries around it.
-- **Immediately after the section intro**, before `repeat`, as the
-  front-loaded payoff the deep-review checklist asks for: the reader sees what
-  the catalog buys before decoding twenty entries. Costs forward references to
-  `batched`, `count`, `takewhile` and `islice` in the chapter's first
-  `itertools` listing, which is the "nothing used before it is taught" rule
-  going the other way.
-
-I recommend the first, because the second breaks the escalating-difficulty
-rule harder than it fixes the front-loading one.
-
----
-
-[] Reject
-
 **Order: "Recursion" sits between the `itertools` catalog and "Lazy
 Evaluation", separating the two sections that are about the same thing.**
 
@@ -286,48 +234,72 @@ stronger lesson than another `itertools` call.
 
 [] Reject
 
-**`repeat`: the entry says "forever or a fixed number of times" and shows only
-the fixed form, which is the less useful one.**
+**"The `itertools` Toolkit" intro promises composition and the section never
+shows a pipeline more than two stages deep.**
 
-`repeat("x", 3)` is a list you would have written as `["x"] * 3`.
-The reason `repeat` exists is the infinite form as a constant column:
-`map(pow, range(5), repeat(2))`, or `zip(names, repeat(default))`, where it
-supplies an argument that never changes without materializing anything.
+The intro says "Combine them the way you combine any small function, by
+feeding one's output to the next."
+The deepest composition anywhere in the section is
+`islice(count(10, 2), 5)` and `islice(cycle("AB"), 5)`, two stages, in entries
+whose point is `count` and `cycle` rather than composition.
+Twenty entries later the claim has not been demonstrated.
 
-Proposed second line for `itertools_repeat.py`:
+Proposed listing (verified on the pinned build: runs, `ruff` clean at 70,
+`ty` clean, output exactly as shown):
 
 ```python
-print(list(map(pow, range(5), repeat(2))))
-#: [0, 1, 4, 9, 16]
+# itertools_pipeline.py
+from itertools import batched, count, islice, takewhile
+
+squares = (n * n for n in count(1))
+batches = batched(squares, 3)
+totals = (sum(b) for b in batches)
+print(list(takewhile(lambda t: t < 500, totals)))
+#: [14, 77, 194, 365]
+print(list(islice(squares, 3)))
+#: [256, 289, 324]
 ```
 
-with a sentence saying that the infinite `repeat(2)` stops when `range(5)`
-does, because `map()` stops at the shortest input.
+Four stages over an infinite source, and nothing runs until `list()` pulls.
+The second `print()` is the part that teaches: the source is still alive and
+sitting at 16, not 13, because `takewhile()` had to pull and discard the
+batch `(169, 196, 225)` to discover that its total exceeded 500.
+That one line makes the pull model visible in a way no single entry does.
 
-Reported rather than applied because it doubles a deliberately one-line entry,
-and because the same "shortest input wins" rule is now stated three entries
-later under `zip_longest`, so you may prefer to keep them together.
+Where it goes is the decision I am leaving to you.
+Two candidates:
+
+- **At the end of the `itertools` section**, as a `### Composing the Pieces`
+  subsection, so it reads as the payoff for the catalog. Costs a subsection
+  heading at a different level from the twenty function entries around it.
+- **Immediately after the section intro**, before `repeat`, as the
+  front-loaded payoff the deep-review checklist asks for: the reader sees what
+  the catalog buys before decoding twenty entries. Costs forward references to
+  `batched`, `count`, `takewhile` and `islice` in the chapter's first
+  `itertools` listing, which is the "nothing used before it is taught" rule
+  going the other way.
+
+I recommend the first, because the second breaks the escalating-difficulty
+rule harder than it fixes the front-loading one.
 
 ---
 
 [] Reject
 
-**Two claims in the `itertools` catalog are stated and never shown.**
+**`recursion.py` teaches two things at once.**
 
-- `chain`: "`chain.from_iterable(iterables)` does the same when the iterables
-  themselves arrive as one lazy sequence" — the listing shows only
-  `chain([1, 2], [3, 4])`.
-- `accumulate`: "or the running result of any two-argument function" — the
-  listing shows only the default sum.
+The listing is `factorial()` plus `sys.getrecursionlimit()`, so it carries the
+base-case/recursive-case lesson and the depth-limit fact in one block, with an
+`import sys` that exists only for the second.
+The chapter's own rule elsewhere is one new thing per listing.
 
-Both would take one line each
-(`print(list(chain.from_iterable([[1, 2], [3, 4]])))` giving `[1, 2, 3, 4]`,
-and `print(list(accumulate([1, 2, 3, 4], mul)))` giving `[1, 2, 6, 24]` with
-`from operator import mul`).
-Neither carries a trap, which is why I backed the `groupby` and `batched`
-claims in this pass and left these two.
-If you want the catalog to be uniform about demonstrating what it asserts,
-these are the remaining two.
+Splitting it would mean a two-line second listing, which is probably worse
+than the current arrangement.
+Recording it as a known, deliberate-looking deviation rather than proposing a
+change: the depth limit is discussed in the very next paragraph, so the
+proximity earns the extra line.
+Reject this block if you agree; it exists so a later review does not raise it
+again.
 
 ---
 
@@ -356,20 +328,48 @@ because the `singledispatch`/Visitor thread is chapter 33's to own.
 
 [] Reject
 
-**`recursion.py` teaches two things at once.**
+**Two claims in the `itertools` catalog are stated and never shown.**
 
-The listing is `factorial()` plus `sys.getrecursionlimit()`, so it carries the
-base-case/recursive-case lesson and the depth-limit fact in one block, with an
-`import sys` that exists only for the second.
-The chapter's own rule elsewhere is one new thing per listing.
+- `chain`: "`chain.from_iterable(iterables)` does the same when the iterables
+  themselves arrive as one lazy sequence" — the listing shows only
+  `chain([1, 2], [3, 4])`.
+- `accumulate`: "or the running result of any two-argument function" — the
+  listing shows only the default sum.
 
-Splitting it would mean a two-line second listing, which is probably worse
-than the current arrangement.
-Recording it as a known, deliberate-looking deviation rather than proposing a
-change: the depth limit is discussed in the very next paragraph, so the
-proximity earns the extra line.
-Reject this block if you agree; it exists so a later review does not raise it
-again.
+Both would take one line each
+(`print(list(chain.from_iterable([[1, 2], [3, 4]])))` giving `[1, 2, 3, 4]`,
+and `print(list(accumulate([1, 2, 3, 4], mul)))` giving `[1, 2, 6, 24]` with
+`from operator import mul`).
+Neither carries a trap, which is why I backed the `groupby` and `batched`
+claims in this pass and left these two.
+If you want the catalog to be uniform about demonstrating what it asserts,
+these are the remaining two.
+
+---
+
+[] Reject
+
+**`repeat`: the entry says "forever or a fixed number of times" and shows only
+the fixed form, which is the less useful one.**
+
+`repeat("x", 3)` is a list you would have written as `["x"] * 3`.
+The reason `repeat` exists is the infinite form as a constant column:
+`map(pow, range(5), repeat(2))`, or `zip(names, repeat(default))`, where it
+supplies an argument that never changes without materializing anything.
+
+Proposed second line for `itertools_repeat.py`:
+
+```python
+print(list(map(pow, range(5), repeat(2))))
+#: [0, 1, 4, 9, 16]
+```
+
+with a sentence saying that the infinite `repeat(2)` stops when `range(5)`
+does, because `map()` stops at the shortest input.
+
+Reported rather than applied because it doubles a deliberately one-line entry,
+and because the same "shortest input wins" rule is now stated three entries
+later under `zip_longest`, so you may prefer to keep them together.
 
 ---
 

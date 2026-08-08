@@ -65,34 +65,41 @@ and deletes an anchor chapter 18 links to.
 
 [] Reject
 
-**Intro, second paragraph: this chapter closes Part IV and never says what
-comes next.**
+**`property_check.py`: `encode()` and `decode()` are the same function, so the
+law it demonstrates cannot fail.**
 
-The paragraph names 40, 41 and 42 and then says "This chapter asks what that
-machinery lets you claim about your code."
-`build_site.py`'s `PARTS` makes 44 the start of Part V, so a reader finishing
-43 is at a part boundary with no signpost: they do not know that
-[Effect Management](44_Effect_Management.md), [Generators](45_Generators.md),
-[Stateless](46_Stateless.md) and
-[Stateless in Practice](47_Stateless_in_Practice.md) exist, or that 44 opens by
-listing every place the book has argued for purity — this chapter's own
-argument, continued.
+```python
+def encode(text: str) -> str:
+    return text[::-1]
 
-The natural place is the last paragraph of the chapter rather than the intro,
-since that paragraph is already the Part IV summation
-("The thread running through these chapters is not that functions are
-special").
-Proposed sentence to end it:
+def decode(text: str) -> str:
+    return text[::-1]
+```
 
-> Part V takes the same discipline one step further and asks the type checker
-> to enforce it: [Effect Management](44_Effect_Management.md) puts a function's
-> effects in its signature, and the chapters after it build a checked system on
-> that idea.
+`decode(encode(s)) == s` is then true by algebra for every `s`, with or without
+the loop.
+The prose says "it holds for every input the loop tries," which is accurate and
+undersells the problem: it holds for every input there is, so the thousand
+iterations are theater. A reader who notices this learns that property tests
+pass, not that they catch anything.
 
-Reported rather than applied because it changes the chapter's closing beat,
-which is pacing.
-(This is the other end of the finding in `deep_review/40_Functional_Foundations.md`
-about the arc preview stopping at 44; take them together or not at all.)
+`test_property.py` repeats both functions, so the same objection applies twice.
+
+Proposed: make the pair a real inverse that is not an involution, so the
+roundtrip is a genuine claim. A shift of one character is enough and keeps the
+listing tiny:
+
+> `encode()` returns `"".join(chr(ord(c) + 1) for c in text)` and `decode()`
+> subtracts one.
+
+Then the law says something, and the "avoid a property that restates the
+implementation" warning later in the section has a body to be about.
+
+Reported rather than applied because it touches two listings and their markers,
+and because you may want `[::-1]` precisely for being obviously reversible at a
+glance. If you keep `[::-1]`, one sentence would close the gap: "Both functions
+are the same reversal, so this law cannot fail; it is here to show the shape of
+a property, not to catch a bug."
 
 ---
 
@@ -174,85 +181,6 @@ it here buys the reader nothing they have not seen.
 
 [] Reject
 
-**"Declarative Style": "functionality" is used in a second, incompatible
-sense.**
-
-The intro sets the word up as a claim about science: "One definition of science
-is 'what works'... theories that fit the data, are predictive, and are
-falsifiable," and the conclusion cashes it as "code you can read, check, and
-test as statements about what is true."
-Line 72 uses it for something else entirely: "This is the broader
-'functionality' you want. Describe the result, and let the machine arrange the
-steps."
-Describing a result rather than a sequence has nothing to do with
-falsifiability, so the word carries two meanings twelve lines apart, with the
-quotation marks implying they are the same one.
-
-Proposed change: drop the sentence, or replace it with a claim that is true of
-declarative code, e.g. "A description of the result is also easier to check
-than a sequence of steps, because there is less of it to be wrong about."
-
-Reported rather than applied because "functionality" is the chapter's thesis
-word and only you can say which sense you meant.
-
----
-
-[] Reject
-
-**"Automatic Parallelism": `parallel_pure.py` proves the answers agree and
-never shows that anything ran in parallel.**
-
-The listing's payoff is `assert parallel == serial`, which would also pass if
-`pool.map()` silently ran everything in the main process.
-The reader has to take "which the operating system places on separate cores" on
-faith. Apply the mechanism-vs-outcome test: from the output `[1229, 2262, 3245,
-4203]` alone, nobody can narrate the mechanism.
-
-Wall-clock timing is out (the house rule in `thinking-in-python-skill.md` says
-so, and this chapter would need a warm pool to be fair).
-The cheap honest alternative is process identity: have `count_primes()` return
-`(count, os.getpid())` and print `len(pids) > 1`.
-I did not propose it as a chapter listing because that boolean is `False` on a
-one-core machine and the self-healing marker gate would quietly rewrite it,
-which is exactly the failure mode `CLAUDE.md` warns about for
-`gil_threads.py`.
-
-Recommendation: put it in the exercises instead of the chapter, replacing
-exercise 1 (see the exercises block below), so the reader produces the evidence
-on their own machine and no marker depends on the core count.
-
----
-
-[] Reject
-
-**"An Assurance Spectrum": the rung most readers actually stand on is missing.**
-
-The four rungs are local reasoning, type checking, property-based testing, and
-formal proof. Ordinary example-based tests — the entire subject of
-[Testing](11_Testing.md) — appear nowhere, even though rung 3 is introduced by
-contrast with them ("instead of forcing you to write one example at a time")
-and chapter 11 sends the reader here.
-A reader who has just finished 11 will read this list and conclude their unit
-tests were not on the ladder at all.
-
-Proposed: insert a rung between 1 and 2, numbered 2, and renumber the rest:
-
-> 2. Next are tests over chosen examples, the subject of
->    [Testing](11_Testing.md).
->    Each one pins a single input to a single answer, so the assurance you get
->    is exactly as wide as the examples you thought of.
-
-That also makes rung 4's "instead of forcing you to write one example at a
-time" a comparison with something the list has named.
-
-Reported rather than applied because adding a rung changes the shape of the
-chapter's central list, and because you may have left tests out deliberately on
-the grounds that a test is not a claim about *every* input.
-
----
-
-[] Reject
-
 **"Property-Based Testing" is a `###` under another section, and it is the only
 thing in the chapter the reader can go and do.**
 
@@ -282,46 +210,6 @@ differently once the target is a sibling section rather than a child.
 which lands the reader on the four-rung list one screen above the actual
 material. It should point at `#property-based-testing`, whether or not the
 heading is promoted.
-
----
-
-[] Reject
-
-**`property_check.py`: `encode()` and `decode()` are the same function, so the
-law it demonstrates cannot fail.**
-
-```python
-def encode(text: str) -> str:
-    return text[::-1]
-
-def decode(text: str) -> str:
-    return text[::-1]
-```
-
-`decode(encode(s)) == s` is then true by algebra for every `s`, with or without
-the loop.
-The prose says "it holds for every input the loop tries," which is accurate and
-undersells the problem: it holds for every input there is, so the thousand
-iterations are theater. A reader who notices this learns that property tests
-pass, not that they catch anything.
-
-`test_property.py` repeats both functions, so the same objection applies twice.
-
-Proposed: make the pair a real inverse that is not an involution, so the
-roundtrip is a genuine claim. A shift of one character is enough and keeps the
-listing tiny:
-
-> `encode()` returns `"".join(chr(ord(c) + 1) for c in text)` and `decode()`
-> subtracts one.
-
-Then the law says something, and the "avoid a property that restates the
-implementation" warning later in the section has a body to be about.
-
-Reported rather than applied because it touches two listings and their markers,
-and because you may want `[::-1]` precisely for being obviously reversible at a
-glance. If you keep `[::-1]`, one sentence would close the gap: "Both functions
-are the same reversal, so this law cannot fail; it is here to show the shape of
-a property, not to catch a bug."
 
 ---
 
@@ -399,6 +287,93 @@ beginning "`@given(strategies.text())` feeds `test_roundtrip()`", before the
 
 [] Reject
 
+**Intro, second paragraph: this chapter closes Part IV and never says what
+comes next.**
+
+The paragraph names 40, 41 and 42 and then says "This chapter asks what that
+machinery lets you claim about your code."
+`build_site.py`'s `PARTS` makes 44 the start of Part V, so a reader finishing
+43 is at a part boundary with no signpost: they do not know that
+[Effect Management](44_Effect_Management.md), [Generators](45_Generators.md),
+[Stateless](46_Stateless.md) and
+[Stateless in Practice](47_Stateless_in_Practice.md) exist, or that 44 opens by
+listing every place the book has argued for purity — this chapter's own
+argument, continued.
+
+The natural place is the last paragraph of the chapter rather than the intro,
+since that paragraph is already the Part IV summation
+("The thread running through these chapters is not that functions are
+special").
+Proposed sentence to end it:
+
+> Part V takes the same discipline one step further and asks the type checker
+> to enforce it: [Effect Management](44_Effect_Management.md) puts a function's
+> effects in its signature, and the chapters after it build a checked system on
+> that idea.
+
+Reported rather than applied because it changes the chapter's closing beat,
+which is pacing.
+(This is the other end of the finding in `deep_review/40_Functional_Foundations.md`
+about the arc preview stopping at 44; take them together or not at all.)
+
+---
+
+[] Reject
+
+**"An Assurance Spectrum": the rung most readers actually stand on is missing.**
+
+The four rungs are local reasoning, type checking, property-based testing, and
+formal proof. Ordinary example-based tests — the entire subject of
+[Testing](11_Testing.md) — appear nowhere, even though rung 3 is introduced by
+contrast with them ("instead of forcing you to write one example at a time")
+and chapter 11 sends the reader here.
+A reader who has just finished 11 will read this list and conclude their unit
+tests were not on the ladder at all.
+
+Proposed: insert a rung between 1 and 2, numbered 2, and renumber the rest:
+
+> 2. Next are tests over chosen examples, the subject of
+>    [Testing](11_Testing.md).
+>    Each one pins a single input to a single answer, so the assurance you get
+>    is exactly as wide as the examples you thought of.
+
+That also makes rung 4's "instead of forcing you to write one example at a
+time" a comparison with something the list has named.
+
+Reported rather than applied because adding a rung changes the shape of the
+chapter's central list, and because you may have left tests out deliberately on
+the grounds that a test is not a claim about *every* input.
+
+---
+
+[] Reject
+
+**"Automatic Parallelism": `parallel_pure.py` proves the answers agree and
+never shows that anything ran in parallel.**
+
+The listing's payoff is `assert parallel == serial`, which would also pass if
+`pool.map()` silently ran everything in the main process.
+The reader has to take "which the operating system places on separate cores" on
+faith. Apply the mechanism-vs-outcome test: from the output `[1229, 2262, 3245,
+4203]` alone, nobody can narrate the mechanism.
+
+Wall-clock timing is out (the house rule in `thinking-in-python-skill.md` says
+so, and this chapter would need a warm pool to be fair).
+The cheap honest alternative is process identity: have `count_primes()` return
+`(count, os.getpid())` and print `len(pids) > 1`.
+I did not propose it as a chapter listing because that boolean is `False` on a
+one-core machine and the self-healing marker gate would quietly rewrite it,
+which is exactly the failure mode `CLAUDE.md` warns about for
+`gil_threads.py`.
+
+Recommendation: put it in the exercises instead of the chapter, replacing
+exercise 1 (see the exercises block below), so the reader produces the evidence
+on their own machine and no marker depends on the core count.
+
+---
+
+[] Reject
+
 **`test_property.py` copies `encode()` and `decode()` out of
 `property_check.py` and the chapter does not say why.**
 
@@ -460,6 +435,31 @@ which is the honest finding and the one the section now mentions.
 
 Reported rather than applied because the size and difficulty curve of an
 exercise set is a pacing decision.
+
+---
+
+[] Reject
+
+**"Declarative Style": "functionality" is used in a second, incompatible
+sense.**
+
+The intro sets the word up as a claim about science: "One definition of science
+is 'what works'... theories that fit the data, are predictive, and are
+falsifiable," and the conclusion cashes it as "code you can read, check, and
+test as statements about what is true."
+Line 72 uses it for something else entirely: "This is the broader
+'functionality' you want. Describe the result, and let the machine arrange the
+steps."
+Describing a result rather than a sequence has nothing to do with
+falsifiability, so the word carries two meanings twelve lines apart, with the
+quotation marks implying they are the same one.
+
+Proposed change: drop the sentence, or replace it with a claim that is true of
+declarative code, e.g. "A description of the result is also easier to check
+than a sequence of steps, because there is less of it to be wrong about."
+
+Reported rather than applied because "functionality" is the chapter's thesis
+word and only you can say which sense you meant.
 
 ---
 

@@ -5,38 +5,6 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Intro, lines 23-30: "potentially pure function" and the shifting subject of
-"that function".**
-
-Two sentences in the opening do more work than their wording supports.
-
-> There's one important thing these all have in common:
-> you can verify function purity just by examining the code in that function.
-
-"these" is a list of six chapter references, and "that function" then names a
-function that has not been introduced.
-The reader has to reconstruct "in each of those cases, the function you are
-checking is self-contained."
-
-> What happens if your potentially pure function calls other functions?
-
-"potentially pure" is not a category the book has defined, and the sentence is
-really asking about a function you believe is pure.
-
-Proposed replacement for both:
-
-> In every one of those cases you can settle the question by reading one
-> function.
->
-> What happens when a function you believe is pure calls other functions?
-
-Reported rather than applied because this is the chapter's first paragraph and
-sets its voice, which is your call, not mine.
-
----
-
-[] Reject
-
 **Chapter order: "Converting Effectful to Pure" (line 194) picks up a listing
 from three sections back.**
 
@@ -100,32 +68,6 @@ decide.
 
 [] Reject
 
-**"A Taxonomy of Benefits" (line 155): the heading names something the section
-does not contain, and the section is one heading plus one subheading.**
-
-The body is not a taxonomy of benefits, it is a two-phase account of how far
-you have pushed the analysis: phase one splits pure from impure, phase two
-subdivides the impure part into exceptions, side causes, and side effects.
-The only actual taxonomy in the chapter is the three-kinds-of-Effect list in
-"What Is an Effect?" and "Are Exceptions Impure?".
-
-Proposed: retitle to **"What Tracking Buys You"** or **"Two Phases of Effect
-Analysis"**, and either fold `### Subdividing the Impure Portion` up into the
-parent (it is the section's only subheading) or give the parent a second
-subheading so the level earns its place.
-
-Cost: `#subdividing-the-impure-portion` is linked from
-`47_Stateless_in_Practice.md:394`, so **that subheading's title must not
-change**; only the `##` above it is free. `#a-taxonomy-of-benefits` has no
-inbound links anywhere in `Chapters/` or `Solutions/`, so the `##` can be
-renamed with nothing to update.
-
-Reported, not applied: a heading is voice.
-
----
-
-[] Reject
-
 **Front-load the payoff: the chapter's most convincing motivation sits at line
 332, and the opening is a table of contents.**
 
@@ -153,6 +95,169 @@ The full story stays where it is at line 332; it is doing different work there
 meets it twice, once in miniature and once in full, is not being repeated at.
 
 Reported, not applied: this is the chapter's opening and its pacing.
+
+---
+
+[] Reject
+
+**"A Taxonomy of Benefits" (line 155): the heading names something the section
+does not contain, and the section is one heading plus one subheading.**
+
+The body is not a taxonomy of benefits, it is a two-phase account of how far
+you have pushed the analysis: phase one splits pure from impure, phase two
+subdivides the impure part into exceptions, side causes, and side effects.
+The only actual taxonomy in the chapter is the three-kinds-of-Effect list in
+"What Is an Effect?" and "Are Exceptions Impure?".
+
+Proposed: retitle to **"What Tracking Buys You"** or **"Two Phases of Effect
+Analysis"**, and either fold `### Subdividing the Impure Portion` up into the
+parent (it is the section's only subheading) or give the parent a second
+subheading so the level earns its place.
+
+Cost: `#subdividing-the-impure-portion` is linked from
+`47_Stateless_in_Practice.md:394`, so **that subheading's title must not
+change**; only the `##` above it is free. `#a-taxonomy-of-benefits` has no
+inbound links anywhere in `Chapters/` or `Solutions/`, so the `##` can be
+renamed with nothing to update.
+
+Reported, not applied: a heading is voice.
+
+---
+
+[] Reject
+
+**Intro, lines 23-30: "potentially pure function" and the shifting subject of
+"that function".**
+
+Two sentences in the opening do more work than their wording supports.
+
+> There's one important thing these all have in common:
+> you can verify function purity just by examining the code in that function.
+
+"these" is a list of six chapter references, and "that function" then names a
+function that has not been introduced.
+The reader has to reconstruct "in each of those cases, the function you are
+checking is self-contained."
+
+> What happens if your potentially pure function calls other functions?
+
+"potentially pure" is not a category the book has defined, and the sentence is
+really asking about a function you believe is pure.
+
+Proposed replacement for both:
+
+> In every one of those cases you can settle the question by reading one
+> function.
+>
+> What happens when a function you believe is pure calls other functions?
+
+Reported rather than applied because this is the chapter's first paragraph and
+sets its voice, which is your call, not mine.
+
+---
+
+[] Reject
+
+**"Custom AI Languages with Effects" (line 692): the section holds the reader
+off for ten bullets before giving a reason it could give immediately.**
+
+Line 700: "Most of these only **track** Effects, rather than providing a full
+EMS, for reasons the end of this section explains:" and then the reason arrives
+at line 728, after the list:
+
+> For their purpose the other two parts are liabilities,
+> since a host that pins the implementations itself can guarantee
+> what generated code is able to do.
+
+That reason is one clause long. Holding it back does not build anything; it
+just makes the reader carry a question through ten bullets. The closing
+paragraph then has to restate the setup ("By the definition above, most of
+these are Effect-tracking systems rather than full EMSs") to reconnect.
+
+Proposed: move the reason into the lead-in and shorten the closing paragraph to
+its remaining content (the Pact/Lumen exceptions):
+
+> Most of these only **track** Effects rather than providing a full EMS,
+> and for their purpose the other two parts are liabilities:
+> a host that pins the implementations itself can guarantee
+> what generated code is able to do.
+>
+> [ten bullets]
+>
+> Pact and Lumen are the exceptions.
+> Each separates an effect's interface from its implementation
+> and binds the implementation later,
+> the second and third properties of a full EMS.
+
+Reported, not applied: it moves a paragraph, which is pacing.
+
+Separate, smaller note on the same section: "Effect" names three different
+things within 120 lines. The chapter's concept (capital-E Effect), the
+TypeScript library at line 643, and the PyPI `effect` library at line 783. The
+distinction is carried entirely by backticks and links. A half-sentence at the
+PyPI mention ("no relation to the TypeScript library of the same name") would
+save a reader the double-take, if you agree it is a real one.
+
+---
+
+[] Reject
+
+**The chapter never hands off to chapter 45, and 45 is what comes next.**
+
+"Effects Are the Next Barrier" ends on "future programmers will regard a
+function with hidden Effects the way you regard a program written in one global
+namespace." That is a good last line for a chapter and a bad last line for the
+first chapter of Part V. The reader turns the page and lands on Generators with
+no idea why.
+
+I fixed the mid-chapter half of this (see the manifest: the Library Effect
+Management sign-off now names 45, 46 and 47 in order), but the conclusion is
+still a dead end.
+
+Proposed: one short paragraph before "## Exercises", after the current last
+line:
+
+> Python cannot give you the language half of that today.
+> It can give you the library half.
+> The next three chapters build one:
+> [Generators](45_Generators.md) supplies the mechanism,
+> [Stateless](46_Stateless.md) builds the Effect type on top of it,
+> and [Stateless in Practice](47_Stateless_in_Practice.md)
+> puts it to work.
+
+Reported, not applied: a chapter's closing paragraph is voice, and you may
+prefer the current ending to stand undiluted.
+
+---
+
+[] Reject
+
+**Exercises: nothing exercises "Effect Management for Python?", the chapter's
+one Python-specific insight.**
+
+Coverage today: exercises 1 and 2 hit "Effects by Hand", 3 hits "What Is an
+Effect?" and "Converting Effectful to Pure", 4 hits "Make the Bad Value
+Impossible". The `async`-is-already-Effect-tracking argument, which is the
+chapter's strongest claim about Python and the one chapter 45 links back to
+(`45_Generators.md:169`), gets nothing.
+
+Proposed exercise 5 (safe to append; it does not renumber exercise 2):
+
+> 5.  `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
+>     Write a synchronous `total_price()` that calls a helper,
+>     then make the helper `async` and follow what the checker and the
+>     interpreter force you to change, all the way up to `asyncio.run()`.
+>     Name the two properties of a full EMS that `async` does *not* have,
+>     using the three-item list in
+>     [Effect Management Systems](#effect-management-systems).
+
+The last sentence is the point: `async` tracks, but it does not separate
+interface from implementation and it does not let you bind the implementation
+later, so it is an Effect-tracking system in exactly the sense the AI-languages
+section uses.
+
+Reported rather than applied: the size of the exercise set is a pacing
+decision.
 
 ---
 
@@ -221,79 +326,6 @@ that is deliberately all non-Python, which is a pacing judgement.
 
 [] Reject
 
-**"Library Effect Management", ZIO listing (line 597): Scala 2 and Scala 3
-syntax in the same twenty lines.**
-
-The listing opens `import zio._` (Scala 2 wildcard) and then uses Scala 3
-significant indentation throughout: `trait Tell:`, `object Main extends
-ZIOAppDefault:`, and `ZLayer.succeed(new Tell: ... )`. Scala 3 still accepts
-`_` as a wildcard, so this compiles, but a Scala reader will read the mix as an
-error and stop to work out which dialect the listing is in, which is attention
-spent on nothing.
-
-Proposed: change both imports to Scala 3 form.
-
-```scala
-import zio.*
-import zio.Console.printLine
-```
-
-Also worth a second look while you are in there: `ZLayer.succeed(new Tell: ...
-)` puts a Scala 3 anonymous-class body inside a parenthesized argument, which
-is legal only with the closing paren where it is. If this listing was
-transcribed rather than compiled, that is the line most likely to be wrong.
-
-Reported rather than applied because I have no Scala toolchain here and will
-not silently edit code I cannot compile.
-
----
-
-[] Reject
-
-**"Custom AI Languages with Effects" (line 692): the section holds the reader
-off for ten bullets before giving a reason it could give immediately.**
-
-Line 700: "Most of these only **track** Effects, rather than providing a full
-EMS, for reasons the end of this section explains:" and then the reason arrives
-at line 728, after the list:
-
-> For their purpose the other two parts are liabilities,
-> since a host that pins the implementations itself can guarantee
-> what generated code is able to do.
-
-That reason is one clause long. Holding it back does not build anything; it
-just makes the reader carry a question through ten bullets. The closing
-paragraph then has to restate the setup ("By the definition above, most of
-these are Effect-tracking systems rather than full EMSs") to reconnect.
-
-Proposed: move the reason into the lead-in and shorten the closing paragraph to
-its remaining content (the Pact/Lumen exceptions):
-
-> Most of these only **track** Effects rather than providing a full EMS,
-> and for their purpose the other two parts are liabilities:
-> a host that pins the implementations itself can guarantee
-> what generated code is able to do.
->
-> [ten bullets]
->
-> Pact and Lumen are the exceptions.
-> Each separates an effect's interface from its implementation
-> and binds the implementation later,
-> the second and third properties of a full EMS.
-
-Reported, not applied: it moves a paragraph, which is pacing.
-
-Separate, smaller note on the same section: "Effect" names three different
-things within 120 lines. The chapter's concept (capital-E Effect), the
-TypeScript library at line 643, and the PyPI `effect` library at line 783. The
-distinction is carried entirely by backticks and links. A half-sentence at the
-PyPI mention ("no relation to the TypeScript library of the same name") would
-save a reader the double-take, if you agree it is a real one.
-
----
-
-[] Reject
-
 **Exercise 2 asks the reader to count edited signatures, but the chain is two
 functions long.**
 
@@ -333,62 +365,30 @@ Reported, not applied: exercise difficulty is pacing.
 
 [] Reject
 
-**Exercises: nothing exercises "Effect Management for Python?", the chapter's
-one Python-specific insight.**
+**"Library Effect Management", ZIO listing (line 597): Scala 2 and Scala 3
+syntax in the same twenty lines.**
 
-Coverage today: exercises 1 and 2 hit "Effects by Hand", 3 hits "What Is an
-Effect?" and "Converting Effectful to Pure", 4 hits "Make the Bad Value
-Impossible". The `async`-is-already-Effect-tracking argument, which is the
-chapter's strongest claim about Python and the one chapter 45 links back to
-(`45_Generators.md:169`), gets nothing.
+The listing opens `import zio._` (Scala 2 wildcard) and then uses Scala 3
+significant indentation throughout: `trait Tell:`, `object Main extends
+ZIOAppDefault:`, and `ZLayer.succeed(new Tell: ... )`. Scala 3 still accepts
+`_` as a wildcard, so this compiles, but a Scala reader will read the mix as an
+error and stop to work out which dialect the listing is in, which is attention
+spent on nothing.
 
-Proposed exercise 5 (safe to append; it does not renumber exercise 2):
+Proposed: change both imports to Scala 3 form.
 
-> 5.  `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
->     Write a synchronous `total_price()` that calls a helper,
->     then make the helper `async` and follow what the checker and the
->     interpreter force you to change, all the way up to `asyncio.run()`.
->     Name the two properties of a full EMS that `async` does *not* have,
->     using the three-item list in
->     [Effect Management Systems](#effect-management-systems).
+```scala
+import zio.*
+import zio.Console.printLine
+```
 
-The last sentence is the point: `async` tracks, but it does not separate
-interface from implementation and it does not let you bind the implementation
-later, so it is an Effect-tracking system in exactly the sense the AI-languages
-section uses.
+Also worth a second look while you are in there: `ZLayer.succeed(new Tell: ...
+)` puts a Scala 3 anonymous-class body inside a parenthesized argument, which
+is legal only with the closing paren where it is. If this listing was
+transcribed rather than compiled, that is the line most likely to be wrong.
 
-Reported rather than applied: the size of the exercise set is a pacing
-decision.
-
----
-
-[] Reject
-
-**The chapter never hands off to chapter 45, and 45 is what comes next.**
-
-"Effects Are the Next Barrier" ends on "future programmers will regard a
-function with hidden Effects the way you regard a program written in one global
-namespace." That is a good last line for a chapter and a bad last line for the
-first chapter of Part V. The reader turns the page and lands on Generators with
-no idea why.
-
-I fixed the mid-chapter half of this (see the manifest: the Library Effect
-Management sign-off now names 45, 46 and 47 in order), but the conclusion is
-still a dead end.
-
-Proposed: one short paragraph before "## Exercises", after the current last
-line:
-
-> Python cannot give you the language half of that today.
-> It can give you the library half.
-> The next three chapters build one:
-> [Generators](45_Generators.md) supplies the mechanism,
-> [Stateless](46_Stateless.md) builds the Effect type on top of it,
-> and [Stateless in Practice](47_Stateless_in_Practice.md)
-> puts it to work.
-
-Reported, not applied: a chapter's closing paragraph is voice, and you may
-prefer the current ending to stand undiluted.
+Reported rather than applied because I have no Scala toolchain here and will
+not silently edit code I cannot compile.
 
 ---
 

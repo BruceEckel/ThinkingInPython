@@ -5,46 +5,32 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**`callable_command.py` (line 115): `@dataclass(frozen=True)` is used before the
-chapter points at where it is taught.**
+**`algorithms.py`: the three "interchangeable" finders do not use the same
+definition of success, and in a chain that matters.**
 
-The first frozen data class in the chapter is `Repeat`, at line 115.
-The chapter's only cross-reference for the construct sits at line 469, in the
-event-bus section: "written as [frozen data classes](12_Data_Classes_as_Types.md#immutability)".
-A reader who needs the link needs it at the first use, not four sections later.
+`bisection()` returns only when the *residual* is small (`abs(f(mid)) < TOLERANCE`).
+`secant()` and `newton()` return when the *step* is small (`abs(x2 - x1) < TOLERANCE`,
+`abs(step) < TOLERANCE`). A step-size test can converge on a point that is not a
+root: on a function that flattens out, the step shrinks below tolerance while `f(x)`
+is still far from zero, and the finder returns a wrong answer instead of `None`.
 
-Proposed change: move the reference to the sentence introducing `callable_command.py`
-("An object can be callable too. Give a class `__call__()` ..."), so it reads
-along the lines of
+That is worth a sentence precisely because the chain section says "success is a
+non-`None` return". The chain's contract is only as good as each handler's
+self-assessment, and two of the three handlers can report success wrongly.
 
-> An object can be callable too.
-> Give a class `__call__()`
-> ([Decorators](14_Decorators.md#a-stateless-class-decorator))
-> and its instances carry state and still satisfy `Callable[[], None]`.
-> `Repeat` below is a [frozen data class](12_Data_Classes_as_Types.md#immutability),
-> so its configuration cannot change after it is built:
+Proposed change: either
 
-and drop the link at line 469 down to bare words ("written as frozen data classes"),
-since by then it has already been given.
-Alternative, if you would rather not lengthen the introduction: leave line 469
-as the link and add nothing, accepting that the first use is unannotated.
+1. add a residual check before the successful return in `secant()` and
+   `newton()`, e.g. `if abs(x2 - x1) < TOLERANCE: return x2 if abs(f(x2)) < 1e-6 else None`
+   (this makes all three agree on what "found" means), or
+2. leave the code and add one sentence after the chain listing: "A handler is
+   trusted to know when it failed. `secant()` and `newton()` stop when their
+   step stops shrinking, which is not quite the same as landing on a root, so a
+   chain is only as honest as its handlers."
 
----
-
-[] Reject
-
-**Line 136: "That is the rung the classic form skips" is a metaphor standing in
-for a literal statement.**
-
-No ladder has been established, so "rung" asks the reader to reconstruct the
-progression (plain function, callable object, `Command` hierarchy) from a single
-word. The chapter does walk that progression, so the literal version is short:
-
-> The classic form skips this middle step: it goes from a plain function
-> straight to a base class.
-
-Proposed change: replace line 136 with that sentence, or with any plain
-restatement that names the step being skipped.
+I recommend (2): the chapter is teaching dispatch, not numerics, and the caveat
+is the transferable lesson. I did not implement either, because both change what
+the listings claim.
 
 ---
 
@@ -93,32 +79,65 @@ alongside the base class. I did not touch `Solutions/`.
 
 [] Reject
 
-**`algorithms.py`: the three "interchangeable" finders do not use the same
-definition of success, and in a chain that matters.**
+**The chapter has no conclusion.**
 
-`bisection()` returns only when the *residual* is small (`abs(f(mid)) < TOLERANCE`).
-`secant()` and `newton()` return when the *step* is small (`abs(x2 - x1) < TOLERANCE`,
-`abs(step) < TOLERANCE`). A step-size test can converge on a point that is not a
-root: on a function that flattens out, the step shrinks below tolerance while `f(x)`
-is still far from zero, and the finder returns a wrong answer instead of `None`.
+It ends on the event bus's cross-reference paragraph and goes straight into
+Exercises. Its neighbors all close deliberately: 24 "Which Should You Use?",
+27 "Which Factory Should You Use?", 29 "Telling the Wrappers Apart",
+30 "What Stayed Constant", 37 "Choosing the Lightest Construct". The gap shows,
+because chapter 28 has an unusually clean answer to give and never gives it: the
+chapter is a ladder, and the reader who has climbed it deserves to be shown the
+rungs in one place.
 
-That is worth a sentence precisely because the chain section says "success is a
-non-`None` return". The chain's contract is only as good as each handler's
-self-assessment, and two of the three handlers can report success wrongly.
+The rungs, in the order the chapter presents them:
 
-Proposed change: either
+1. a plain function (`command.py`, `strategy.py`)
+2. a bound method, when the state is already an object's
+3. a `partial` or a closure, when the state is a fixed configuration
+   (`configured_strategy.py`)
+4. a callable object, when the configuration wants a name and a `repr`
+   (`callable_command.py`)
+5. a class with two or more operations, when one call is not enough
+   (`command_pattern.py`'s `undo()` argument)
 
-1. add a residual check before the successful return in `secant()` and
-   `newton()`, e.g. `if abs(x2 - x1) < TOLERANCE: return x2 if abs(f(x2)) < 1e-6 else None`
-   (this makes all three agree on what "found" means), or
-2. leave the code and add one sentence after the chain listing: "A handler is
-   trusted to know when it failed. `secant()` and `newton()` stop when their
-   step stops shrinking, which is not quite the same as landing on a root, so a
-   chain is only as honest as its handlers."
+Proposed change: add a short closing section, "Choosing the Lightest Callable"
+or similar, holding that list and one sentence of the rule ("go down the list and
+stop at the first rung that carries what you need"). No new listing; the section
+should be prose only, naming the listings the reader has already seen.
 
-I recommend (2): the chapter is teaching dispatch, not numerics, and the caveat
-is the transferable lesson. I did not implement either, because both change what
-the listings claim.
+Cost of the change: it lengthens the chapter by roughly fifteen lines, and the
+list overlaps the per-section verdicts already in the text (lines 137-139,
+"Save the strategy class for an algorithm that carries several related methods or
+mutable state"). If you take it, those verdicts should stay where they are and
+the closing section should reference rather than restate them.
+
+---
+
+[] Reject
+
+**`callable_command.py` (line 115): `@dataclass(frozen=True)` is used before the
+chapter points at where it is taught.**
+
+The first frozen data class in the chapter is `Repeat`, at line 115.
+The chapter's only cross-reference for the construct sits at line 469, in the
+event-bus section: "written as [frozen data classes](12_Data_Classes_as_Types.md#immutability)".
+A reader who needs the link needs it at the first use, not four sections later.
+
+Proposed change: move the reference to the sentence introducing `callable_command.py`
+("An object can be callable too. Give a class `__call__()` ..."), so it reads
+along the lines of
+
+> An object can be callable too.
+> Give a class `__call__()`
+> ([Decorators](14_Decorators.md#a-stateless-class-decorator))
+> and its instances carry state and still satisfy `Callable[[], None]`.
+> `Repeat` below is a [frozen data class](12_Data_Classes_as_Types.md#immutability),
+> so its configuration cannot change after it is built:
+
+and drop the link at line 469 down to bare words ("written as frozen data classes"),
+since by then it has already been given.
+Alternative, if you would rather not lengthen the introduction: leave line 469
+as the link and add nothing, accepting that the first use is unannotated.
 
 ---
 
@@ -143,6 +162,30 @@ tuple, so each line in the output corresponds to one strategy that was actually
 installed on purpose. Either is a two-line edit; I left it alone because the
 current form does show the constructor-takes-a-strategy half of the classic
 Context, which the alternatives lose.
+
+---
+
+[] Reject
+
+**Exercises: nothing exercises `late_binding.py`, which is the chapter's most
+directly reusable listing.**
+
+The five exercises cover Command (1), Chain (2), Strategy (3, 4), and the event
+bus (5). The late-binding trap gets no exercise, even though it is the one thing
+in the chapter a reader is likely to hit in their own code this week, and even
+though `Functional Foundations` links back to it by name
+(`40_Functional_Foundations.md` line 406).
+
+Proposed change: add an exercise along the lines of
+
+> Build a list of three commands in a `for` loop (not a comprehension) with
+> `lambda: print(n)`. Call them and explain the output. Fix it three ways:
+> with a default argument, with `functools.partial`, and with a factory
+> function that takes `n` and returns the command. Which one still works if
+> the value must be computed at call time rather than at build time?
+
+The last clause is the part with teeth: none of the three fixes preserve
+late lookup, which is what makes the trap a trap rather than a bug.
 
 ---
 
@@ -177,61 +220,18 @@ paragraph, where it lands as the conclusion the demo has just earned.
 
 [] Reject
 
-**Exercises: nothing exercises `late_binding.py`, which is the chapter's most
-directly reusable listing.**
+**Line 136: "That is the rung the classic form skips" is a metaphor standing in
+for a literal statement.**
 
-The five exercises cover Command (1), Chain (2), Strategy (3, 4), and the event
-bus (5). The late-binding trap gets no exercise, even though it is the one thing
-in the chapter a reader is likely to hit in their own code this week, and even
-though `Functional Foundations` links back to it by name
-(`40_Functional_Foundations.md` line 406).
+No ladder has been established, so "rung" asks the reader to reconstruct the
+progression (plain function, callable object, `Command` hierarchy) from a single
+word. The chapter does walk that progression, so the literal version is short:
 
-Proposed change: add an exercise along the lines of
+> The classic form skips this middle step: it goes from a plain function
+> straight to a base class.
 
-> Build a list of three commands in a `for` loop (not a comprehension) with
-> `lambda: print(n)`. Call them and explain the output. Fix it three ways:
-> with a default argument, with `functools.partial`, and with a factory
-> function that takes `n` and returns the command. Which one still works if
-> the value must be computed at call time rather than at build time?
-
-The last clause is the part with teeth: none of the three fixes preserve
-late lookup, which is what makes the trap a trap rather than a bug.
-
----
-
-[] Reject
-
-**The chapter has no conclusion.**
-
-It ends on the event bus's cross-reference paragraph and goes straight into
-Exercises. Its neighbors all close deliberately: 24 "Which Should You Use?",
-27 "Which Factory Should You Use?", 29 "Telling the Wrappers Apart",
-30 "What Stayed Constant", 37 "Choosing the Lightest Construct". The gap shows,
-because chapter 28 has an unusually clean answer to give and never gives it: the
-chapter is a ladder, and the reader who has climbed it deserves to be shown the
-rungs in one place.
-
-The rungs, in the order the chapter presents them:
-
-1. a plain function (`command.py`, `strategy.py`)
-2. a bound method, when the state is already an object's
-3. a `partial` or a closure, when the state is a fixed configuration
-   (`configured_strategy.py`)
-4. a callable object, when the configuration wants a name and a `repr`
-   (`callable_command.py`)
-5. a class with two or more operations, when one call is not enough
-   (`command_pattern.py`'s `undo()` argument)
-
-Proposed change: add a short closing section, "Choosing the Lightest Callable"
-or similar, holding that list and one sentence of the rule ("go down the list and
-stop at the first rung that carries what you need"). No new listing; the section
-should be prose only, naming the listings the reader has already seen.
-
-Cost of the change: it lengthens the chapter by roughly fifteen lines, and the
-list overlaps the per-section verdicts already in the text (lines 137-139,
-"Save the strategy class for an algorithm that carries several related methods or
-mutable state"). If you take it, those verdicts should stay where they are and
-the closing section should reference rather than restate them.
+Proposed change: replace line 136 with that sentence, or with any plain
+restatement that names the step being skipped.
 
 ---
 

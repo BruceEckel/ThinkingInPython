@@ -54,33 +54,6 @@ Two lines, no new code, and the chapter stops claiming an arc it does not have.
 
 [] Reject
 
-**`parse_trash.py`: the header comment restates the prose directly above it.**
-
-The listing opens with
-
-```python
-# parse_trash.py
-# Read "Name:weight" lines into Trash objects through the registry.
-```
-
-and the sentence immediately before the block is
-
-> Parsing it into `Trash` objects goes through the registry,
-> so the parser never mentions a concrete material.
-
-`thinking-in-python-skill.md` ("New descriptions belong in prose, not comments")
-puts descriptions like this in the prose and keeps only the `# path/slug.py`
-marker in the code, and here the prose already carries it word for word.
-It is the only descriptive header comment in the chapter's five listings.
-
-Proposed change: delete the second comment line.
-Reported rather than applied because the style skill also says not to edit
-comments already sitting in existing example code without being asked.
-
----
-
-[] Reject
-
 **`parse_trash.py`: `filename: str` makes the test stringify a `Path`.**
 
 ```python
@@ -115,71 +88,43 @@ rather than mine on a judgment item.
 
 [] Reject
 
-**`trash.py`: `create()` is a `@classmethod` that never uses `cls`.**
+**Exercise 1 asks the reader to confirm the wrong two files, and understates
+what changes.**
 
-```python
-@classmethod
-def create(cls, name: str, weight: float) -> Trash:
-    return Trash.registry[name](weight)
-```
+> 1.  Add a `Plastic` material with a per-pound value.
+>     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
+>     and that only `trash.dat` and (optionally)
+>     a one-line `recycling_note()` registration do.
 
-`cls` is bound and discarded; the body hard-codes `Trash`.
-Nothing catches this (`ruff` has no rule on it here, `ty` is happy), but the
-decorator is doing no work, and a reader who has just been told that
-`__init_subclass__()` is *implicitly* a classmethod is primed to look closely
-at the explicit one two lines below.
+Two problems.
 
-Recommended fix: `return cls.registry[name](weight)`.
-The dict is found through the MRO and is the same object either way, so
-behavior is identical and the decorator earns its place.
+First, `recycle_rtti.py` is the file the exercise should be about.
+The section that introduces it stakes its whole argument on "Any you miss will
+silently drop trash on the floor," and the reader is never asked to watch that
+happen. Confirming that `recycle_dict.py` is unaffected proves the easy half;
+watching `recycle_rtti.py` print correct-looking totals with every piece of
+plastic missing proves the half the chapter cares about.
 
-Alternative: make it a module-level `def create(name, weight)`, which is what
-[Factory](27_Factory.md#the-pythonic-factory-a-dictionary)'s `make()` does with
-the same registry. That is more consistent with chapter 27 but loses the
-`Trash.create(...)` reading the parser depends on.
+Second, "only `trash.dat` and (optionally) a one-line registration" is not
+true: `test_trash.py::test_subclasses_self_register` asserts the registry is
+exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and fails the moment
+`Plastic` is defined. That is a *good* failure — a self-registering design
+telling you it registered — and worth saying, not worth hiding.
 
----
+Proposed replacement:
 
-[] Reject
+> 1.  Add a `Plastic` material with a per-pound value and some `Plastic:NN`
+>     lines to `trash.dat`.
+>     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
+>     then run `recycle_rtti.py` and account for every pound of plastic it
+>     reports. Which test in `test_trash.py` fails, and why is that the right
+>     behavior for it?
 
-**`recycling_note.py`: the `seen` set is bookkeeping unrelated to the point.**
-
-```python
-seen: set[type[Trash]] = set()
-for t in parse("trash.dat"):
-    if type(t) not in seen:
-        seen.add(type(t))
-        print(recycling_note(t))
-```
-
-Four lines and a second data structure exist only to stop the demo printing
-twenty-two nearly identical lines.
-The listing's subject is single dispatch; the deduplication is a distraction,
-and it is the one part of the listing a reader has to decode before they can
-read the part that matters.
-
-Proposed change: drop `seen` and the `parse()` call and iterate the registry
-the chapter already built:
-
-```python
-for cls in Trash.registry.values():
-    print(recycling_note(cls(1.0)))
-```
-
-That is two lines instead of five, it prints exactly one note per material,
-and it re-uses the registry rather than introducing a new mechanism.
-The `#:` markers change to registry insertion order:
-
-```
-#: Aluminum: crush and bale
-#: Paper: no special handling
-#: Glass: sort by color, then crush
-#: Cardboard: flatten and bundle
-```
-
-Cost: `parse` and `parse_trash` drop out of this listing's imports, so the
-chapter's last listing no longer touches the data file.
-Reported rather than applied because it rewrites an existing listing's output.
+If you take this, `Solutions/37_Pattern_Refactoring.md`'s exercise 1 needs the
+extra two answers (the `match` sorter silently discards plastic because no
+`case` matches it and there is no `case _`; `test_subclasses_self_register`
+fails because it pins the exact registry contents).
+I did not touch `Solutions/`, per the scope rules.
 
 ---
 
@@ -278,6 +223,76 @@ rhythm is deliberate.
 
 [] Reject
 
+**`recycling_note.py`: the `seen` set is bookkeeping unrelated to the point.**
+
+```python
+seen: set[type[Trash]] = set()
+for t in parse("trash.dat"):
+    if type(t) not in seen:
+        seen.add(type(t))
+        print(recycling_note(t))
+```
+
+Four lines and a second data structure exist only to stop the demo printing
+twenty-two nearly identical lines.
+The listing's subject is single dispatch; the deduplication is a distraction,
+and it is the one part of the listing a reader has to decode before they can
+read the part that matters.
+
+Proposed change: drop `seen` and the `parse()` call and iterate the registry
+the chapter already built:
+
+```python
+for cls in Trash.registry.values():
+    print(recycling_note(cls(1.0)))
+```
+
+That is two lines instead of five, it prints exactly one note per material,
+and it re-uses the registry rather than introducing a new mechanism.
+The `#:` markers change to registry insertion order:
+
+```
+#: Aluminum: crush and bale
+#: Paper: no special handling
+#: Glass: sort by color, then crush
+#: Cardboard: flatten and bundle
+```
+
+Cost: `parse` and `parse_trash` drop out of this listing's imports, so the
+chapter's last listing no longer touches the data file.
+Reported rather than applied because it rewrites an existing listing's output.
+
+---
+
+[] Reject
+
+**`trash.py`: `create()` is a `@classmethod` that never uses `cls`.**
+
+```python
+@classmethod
+def create(cls, name: str, weight: float) -> Trash:
+    return Trash.registry[name](weight)
+```
+
+`cls` is bound and discarded; the body hard-codes `Trash`.
+Nothing catches this (`ruff` has no rule on it here, `ty` is happy), but the
+decorator is doing no work, and a reader who has just been told that
+`__init_subclass__()` is *implicitly* a classmethod is primed to look closely
+at the explicit one two lines below.
+
+Recommended fix: `return cls.registry[name](weight)`.
+The dict is found through the MRO and is the same object either way, so
+behavior is identical and the decorator earns its place.
+
+Alternative: make it a module-level `def create(name, weight)`, which is what
+[Factory](27_Factory.md#the-pythonic-factory-a-dictionary)'s `make()` does with
+the same registry. That is more consistent with chapter 27 but loses the
+`Trash.create(...)` reading the parser depends on.
+
+---
+
+[] Reject
+
 **"Choosing the Lightest Construct" never names the two constructs the chapter
 chose.**
 
@@ -305,48 +320,6 @@ section, which is yours to set.
 
 [] Reject
 
-**Exercise 1 asks the reader to confirm the wrong two files, and understates
-what changes.**
-
-> 1.  Add a `Plastic` material with a per-pound value.
->     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
->     and that only `trash.dat` and (optionally)
->     a one-line `recycling_note()` registration do.
-
-Two problems.
-
-First, `recycle_rtti.py` is the file the exercise should be about.
-The section that introduces it stakes its whole argument on "Any you miss will
-silently drop trash on the floor," and the reader is never asked to watch that
-happen. Confirming that `recycle_dict.py` is unaffected proves the easy half;
-watching `recycle_rtti.py` print correct-looking totals with every piece of
-plastic missing proves the half the chapter cares about.
-
-Second, "only `trash.dat` and (optionally) a one-line registration" is not
-true: `test_trash.py::test_subclasses_self_register` asserts the registry is
-exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and fails the moment
-`Plastic` is defined. That is a *good* failure — a self-registering design
-telling you it registered — and worth saying, not worth hiding.
-
-Proposed replacement:
-
-> 1.  Add a `Plastic` material with a per-pound value and some `Plastic:NN`
->     lines to `trash.dat`.
->     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
->     then run `recycle_rtti.py` and account for every pound of plastic it
->     reports. Which test in `test_trash.py` fails, and why is that the right
->     behavior for it?
-
-If you take this, `Solutions/37_Pattern_Refactoring.md`'s exercise 1 needs the
-extra two answers (the `match` sorter silently discards plastic because no
-`case` matches it and there is no `case _`; `test_subclasses_self_register`
-fails because it pins the exact registry contents).
-I did not touch `Solutions/`, per the scope rules.
-
----
-
-[] Reject
-
 **Exercises: nothing exercises the chapter's own lookalike pair.**
 
 The three exercises cover adding a type (1), when *not* to use single dispatch
@@ -368,6 +341,33 @@ The last clause has a clean answer (give `Trash` a
 `bin: ClassVar[type[Trash]]` that each material sets, and key on `t.bin`),
 which is also a small lesson in choosing your own key instead of accepting
 `type(t)`.
+
+---
+
+[] Reject
+
+**`parse_trash.py`: the header comment restates the prose directly above it.**
+
+The listing opens with
+
+```python
+# parse_trash.py
+# Read "Name:weight" lines into Trash objects through the registry.
+```
+
+and the sentence immediately before the block is
+
+> Parsing it into `Trash` objects goes through the registry,
+> so the parser never mentions a concrete material.
+
+`thinking-in-python-skill.md` ("New descriptions belong in prose, not comments")
+puts descriptions like this in the prose and keeps only the `# path/slug.py`
+marker in the code, and here the prose already carries it word for word.
+It is the only descriptive header comment in the chapter's five listings.
+
+Proposed change: delete the second comment line.
+Reported rather than applied because the style skill also says not to edit
+comments already sitting in existing example code without being asked.
 
 ---
 

@@ -116,68 +116,6 @@ goes.
 
 [] Reject
 
-**"A Snapshot Is Not a Reference": `nested_mutation.py` teaches
-`copy.deepcopy()` and nothing in the chapter ever uses it.**
-
-`deepcopy()` appears in that one listing, is explained well, and then never
-returns. `Sketch.save()` uses `tuple(self.strokes)`, one level; `History`
-stores whole immutable values; nothing else copies at all. By the deep-review
-test — a section that could be cut with nothing downstream noticing — that
-listing currently has no downstream.
-
-It should not be cut, because the shallow/deep distinction is exactly the trap
-the pattern exists around. It should be connected. Proposed one-sentence bridge
-under `sketch.py`, after "rebuilding a fresh list so the sketch and the memento
-never share one":
-
-> One level is enough because a stroke is a string.
-> An originator holding containers inside containers needs `copy.deepcopy()` in
-> `save()`, at the cost the previous section showed.
-
-That makes the earlier listing pay for itself and warns the reader whose state
-is not flat.
-
----
-
-[] Reject
-
-**Line 120: the alias paragraph opens with a garden-path sentence, and skips
-the near-miss a typed-Python reader would actually write.**
-
-> A `type Memento = tuple[str, ...]` alias would type-check at every call site
-> instead of the class.
-
-"instead of the class" attaches to "call site" on the first reading, which is
-not the meaning. Suggested rewrite:
-
-> You could skip the class and write `type Memento = tuple[str, ...]`.
-> Every call site would still type-check.
-
-Second item in the same paragraph: the reader who knows the typing toolkit
-does not stop at a `type` alias, they think of `NewType("Memento",
-tuple[str, ...])`, which *is* nominal for the checker and is the obvious
-counter to "an alias is structural, not nominal". The paragraph's argument
-survives, but it has to be made, and it is the stronger version of the point:
-
-> `NewType("Memento", tuple[str, ...])` answers the checker but nothing else.
-> It vanishes at runtime, so the caretaker still holds a plain tuple it can
-> index, unpack, or build from scratch.
-> Wrapping the tuple in a one-field data class gives `Memento` an identity that
-> exists while the program runs.
-
-This also lines up with the book's own rule (`thinking-in-python-skill.md`:
-prefer a frozen data class over `NewType`, because `NewType` only satisfies the
-checker), so the chapter would be demonstrating a rule the skill states.
-
-Minor, same paragraph: "an alias is *structural*, not *nominal*" is doing the
-job but is slightly off — a `type` alias is not a structural type, it is a
-transparent second name for the same type. "An alias creates no new type" is
-the literal statement and needs no italics.
-
----
-
-[] Reject
-
 **Lines 117-118: `frozen=True` does not stop the mistake the sentence
 attributes to it.**
 
@@ -196,107 +134,6 @@ Proposed change: make the parenthetical name the right mistake.
 
 > though freezing the memento means an honest mistake, swapping the snapshot's
 > strokes for different ones, fails loudly.
-
----
-
-[] Reject
-
-**`sketch.py` and `frozen_sketch.py` both define a class named `Sketch`, with
-different fields, and the chapter never says so.**
-
-They are two different classes: `Sketch()` takes no arguments and holds a
-`list`; `Sketch("Duck")` takes a title and holds a tuple. Both files sit in the
-same extracted directory, `from sketch import Sketch` and
-`from frozen_sketch import Sketch` are both live imports in this chapter, and
-exercise 1 asks the reader to modify "both sketches", which is the only place
-the duplication is acknowledged.
-
-Related, and the reason the reuse costs something: `title` is a brand-new field
-that `frozen_sketch.py` introduces silently. It does no work in that listing
-(`Sketch("Duck")` could as easily be `Sketch()`), no work in `history.py`, and
-only earns its keep in "Restoring Part of a State" 170 lines later, where a
-second field is needed so one can be restored without the other. That is a
-"one new thing per listing" split: the listing is teaching the frozen-value
-idiom, and the reader has to also absorb an unmotivated field.
-
-Two fixes, either is fine, I marginally prefer the first:
-
-- Add half a sentence under `frozen_sketch.py`: "`title` is a second field so a
-  later section can restore one field and keep the other." That costs one line
-  and removes the puzzle.
-- Rename the frozen class (`Drawing`, say) so the two are visibly different
-  objects, and note in one clause that it is the same idea with the mutation
-  removed. This costs edits to `frozen_sketch.py`, `test_frozen_sketch.py`,
-  `history.py`'s demo, `partial_restore.py`, `round_trip.py`, exercise 1,
-  exercise 3, and `Solutions/36_Memento.md`, so it is only worth it if the
-  name collision bothers you independently.
-
----
-
-[] Reject
-
-**"The Caretaker: a Generic History": the near-miss is forgetting `do()`, and
-nothing warns about it.**
-
-The demo reads `history.do(history.present.draw("circle"))`, which is a mouthful
-and invites the shorter thing a reader will write:
-
-```python
-sketch = history.present
-sketch = sketch.draw("circle")   # never recorded
-```
-
-With the classic mutable memento, forgetting to call `save()` costs you a
-snapshot and the object still changes. With the immutable form the failure is
-the other way round and quieter: the state changes only in the caller's local
-name, and `history.present` is still the old one, so undo appears to work while
-the drawing appears to vanish. That inversion is worth one sentence, and it is
-the kind of thing only a chapter that has just switched idioms can point out.
-
-Proposed sentence after "`undo()` and `redo()` just shuttle the present between
-the two stacks":
-
-> Every change must go through `do()`.
-> A new state built from `history.present` and never handed back is simply not
-> in the history, and since nothing mutated, nothing else shows it is missing.
-
-An alternative worth considering instead of the sentence: give `History` an
-`apply()` that takes a callable, `history.apply(lambda s: s.draw("circle"))`,
-so the round trip cannot be broken. I would not add it to the class — it makes
-`History` less obviously a pure store of states, which is the point of the
-section — but it is a good exercise (see the exercises block below).
-
----
-
-[] Reject
-
-**Prose pass, five small items outside the blocks above.**
-
-Each stands alone; reject individually by striking the line.
-
-1.  Line 15, "and obviates the pattern when state is immutable."
-    "Obviates" appears exactly once in the whole book and reads as inflated
-    diction next to "Undo is a feature users expect and programmers dread."
-    Suggest "and removes the need for it when state is immutable."
-
-2.  Line 298, "That works for any state type, `int` to full `Sketch`, with one
-    condition". Reads as a dropped word. Suggest "from `int` to a full
-    `Sketch`".
-
-3.  Line 301, "It is a stack of aliases, the bug with which this chapter
-    opened." The pied-piped "with which" is out of character for the
-    surrounding prose. Suggest "the bug this chapter opened with."
-
-4.  Line 349, "The state has to answer it, / and `copy.replace()` is how any
-    immutable value does:" The elliptical "does" leaves the verb two lines
-    back. Suggest "and `copy.replace()` is how any immutable value answers it".
-
-5.  Line 492, "When either limitation rules out `pickle`, there are open-source
-    libraries." Vague, and it does not say which library answers which
-    limitation. Suggest "When either limitation rules out `pickle`, other
-    libraries answer them separately." followed by the existing sentences,
-    which already do the pairing (`msgspec`/`pydantic` for drift, Protocol
-    Buffers for drift across languages, all three for the security half).
 
 ---
 
@@ -382,6 +219,41 @@ to the chapter directory.
 
 [] Reject
 
+**"The Caretaker: a Generic History": the near-miss is forgetting `do()`, and
+nothing warns about it.**
+
+The demo reads `history.do(history.present.draw("circle"))`, which is a mouthful
+and invites the shorter thing a reader will write:
+
+```python
+sketch = history.present
+sketch = sketch.draw("circle")   # never recorded
+```
+
+With the classic mutable memento, forgetting to call `save()` costs you a
+snapshot and the object still changes. With the immutable form the failure is
+the other way round and quieter: the state changes only in the caller's local
+name, and `history.present` is still the old one, so undo appears to work while
+the drawing appears to vanish. That inversion is worth one sentence, and it is
+the kind of thing only a chapter that has just switched idioms can point out.
+
+Proposed sentence after "`undo()` and `redo()` just shuttle the present between
+the two stacks":
+
+> Every change must go through `do()`.
+> A new state built from `history.present` and never handed back is simply not
+> in the history, and since nothing mutated, nothing else shows it is missing.
+
+An alternative worth considering instead of the sentence: give `History` an
+`apply()` that takes a callable, `history.apply(lambda s: s.draw("circle"))`,
+so the round trip cannot be broken. I would not add it to the class — it makes
+`History` less obviously a pure store of states, which is the point of the
+section — but it is a good exercise (see the exercises block below).
+
+---
+
+[] Reject
+
 **Exercises: two sections have none, and the set clusters on the two `Sketch`
 classes.**
 
@@ -410,6 +282,134 @@ which forward-links to this chapter for exactly that question.
 A third candidate, if you want one against `History`'s contract rather than its
 mechanics: add `apply(fn)` (see the `do()` block above) and say what it buys and
 what it costs.
+
+---
+
+[] Reject
+
+**"A Snapshot Is Not a Reference": `nested_mutation.py` teaches
+`copy.deepcopy()` and nothing in the chapter ever uses it.**
+
+`deepcopy()` appears in that one listing, is explained well, and then never
+returns. `Sketch.save()` uses `tuple(self.strokes)`, one level; `History`
+stores whole immutable values; nothing else copies at all. By the deep-review
+test — a section that could be cut with nothing downstream noticing — that
+listing currently has no downstream.
+
+It should not be cut, because the shallow/deep distinction is exactly the trap
+the pattern exists around. It should be connected. Proposed one-sentence bridge
+under `sketch.py`, after "rebuilding a fresh list so the sketch and the memento
+never share one":
+
+> One level is enough because a stroke is a string.
+> An originator holding containers inside containers needs `copy.deepcopy()` in
+> `save()`, at the cost the previous section showed.
+
+That makes the earlier listing pay for itself and warns the reader whose state
+is not flat.
+
+---
+
+[] Reject
+
+**`sketch.py` and `frozen_sketch.py` both define a class named `Sketch`, with
+different fields, and the chapter never says so.**
+
+They are two different classes: `Sketch()` takes no arguments and holds a
+`list`; `Sketch("Duck")` takes a title and holds a tuple. Both files sit in the
+same extracted directory, `from sketch import Sketch` and
+`from frozen_sketch import Sketch` are both live imports in this chapter, and
+exercise 1 asks the reader to modify "both sketches", which is the only place
+the duplication is acknowledged.
+
+Related, and the reason the reuse costs something: `title` is a brand-new field
+that `frozen_sketch.py` introduces silently. It does no work in that listing
+(`Sketch("Duck")` could as easily be `Sketch()`), no work in `history.py`, and
+only earns its keep in "Restoring Part of a State" 170 lines later, where a
+second field is needed so one can be restored without the other. That is a
+"one new thing per listing" split: the listing is teaching the frozen-value
+idiom, and the reader has to also absorb an unmotivated field.
+
+Two fixes, either is fine, I marginally prefer the first:
+
+- Add half a sentence under `frozen_sketch.py`: "`title` is a second field so a
+  later section can restore one field and keep the other." That costs one line
+  and removes the puzzle.
+- Rename the frozen class (`Drawing`, say) so the two are visibly different
+  objects, and note in one clause that it is the same idea with the mutation
+  removed. This costs edits to `frozen_sketch.py`, `test_frozen_sketch.py`,
+  `history.py`'s demo, `partial_restore.py`, `round_trip.py`, exercise 1,
+  exercise 3, and `Solutions/36_Memento.md`, so it is only worth it if the
+  name collision bothers you independently.
+
+---
+
+[] Reject
+
+**Line 120: the alias paragraph opens with a garden-path sentence, and skips
+the near-miss a typed-Python reader would actually write.**
+
+> A `type Memento = tuple[str, ...]` alias would type-check at every call site
+> instead of the class.
+
+"instead of the class" attaches to "call site" on the first reading, which is
+not the meaning. Suggested rewrite:
+
+> You could skip the class and write `type Memento = tuple[str, ...]`.
+> Every call site would still type-check.
+
+Second item in the same paragraph: the reader who knows the typing toolkit
+does not stop at a `type` alias, they think of `NewType("Memento",
+tuple[str, ...])`, which *is* nominal for the checker and is the obvious
+counter to "an alias is structural, not nominal". The paragraph's argument
+survives, but it has to be made, and it is the stronger version of the point:
+
+> `NewType("Memento", tuple[str, ...])` answers the checker but nothing else.
+> It vanishes at runtime, so the caretaker still holds a plain tuple it can
+> index, unpack, or build from scratch.
+> Wrapping the tuple in a one-field data class gives `Memento` an identity that
+> exists while the program runs.
+
+This also lines up with the book's own rule (`thinking-in-python-skill.md`:
+prefer a frozen data class over `NewType`, because `NewType` only satisfies the
+checker), so the chapter would be demonstrating a rule the skill states.
+
+Minor, same paragraph: "an alias is *structural*, not *nominal*" is doing the
+job but is slightly off — a `type` alias is not a structural type, it is a
+transparent second name for the same type. "An alias creates no new type" is
+the literal statement and needs no italics.
+
+---
+
+[] Reject
+
+**Prose pass, five small items outside the blocks above.**
+
+Each stands alone; reject individually by striking the line.
+
+1.  Line 15, "and obviates the pattern when state is immutable."
+    "Obviates" appears exactly once in the whole book and reads as inflated
+    diction next to "Undo is a feature users expect and programmers dread."
+    Suggest "and removes the need for it when state is immutable."
+
+2.  Line 298, "That works for any state type, `int` to full `Sketch`, with one
+    condition". Reads as a dropped word. Suggest "from `int` to a full
+    `Sketch`".
+
+3.  Line 301, "It is a stack of aliases, the bug with which this chapter
+    opened." The pied-piped "with which" is out of character for the
+    surrounding prose. Suggest "the bug this chapter opened with."
+
+4.  Line 349, "The state has to answer it, / and `copy.replace()` is how any
+    immutable value does:" The elliptical "does" leaves the verb two lines
+    back. Suggest "and `copy.replace()` is how any immutable value answers it".
+
+5.  Line 492, "When either limitation rules out `pickle`, there are open-source
+    libraries." Vague, and it does not say which library answers which
+    limitation. Suggest "When either limitation rules out `pickle`, other
+    libraries answer them separately." followed by the existing sentences,
+    which already do the pairing (`msgspec`/`pydantic` for drift, Protocol
+    Buffers for drift across languages, all three for the security half).
 
 ---
 

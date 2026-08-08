@@ -43,19 +43,46 @@ type-checker digression.
 
 `[] Reject`
 
-**Adapter — the forward pointer fires two paragraphs early.**
+**Adapter — `WhatIWant` is a third, weakest form of "declared interface", unremarked.**
 
-"...and the next section argues Python lets you skip most of the packaging too."
-ends the "output is deliberately monotonous" paragraph,
-but two more paragraphs follow before `### Adapter in Python`.
-A reader who takes the pointer at face value reads the next two paragraphs
-looking for the argument it promised.
+`class WhatIWant: def f(self) -> None: ...` is instantiable, and its `f()`
+silently does nothing. [Surrogate](26_Surrogate.md#proxy) spends two listings
+on exactly this choice for a surrogate's implementation: an ABC forces
+completeness at construction, a `Protocol` needs no base class at all.
+Here the reader is shown the one form that neither book chapter recommends,
+with nothing said about it, in a chapter titled "Changing the Interface".
 
-Proposed change: move the "The output is deliberately monotonous..." paragraph
-down so it sits immediately above `### Adapter in Python`,
-after the Proxy aside and after "Two details in the listing repay attention".
-The forward pointer then lands on the section it names.
-(If the `adapter.py` split above is applied instead, this resolves on its own.)
+Proposed change: one sentence after the listing, e.g.
+"`WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
+because this listing is about *where* the adaptation lives, not how the target
+interface is declared; [Surrogate](26_Surrogate.md#proxy) compares those two."
+
+I did not apply this because the silence may be deliberate: the listing is the
+GoF shape translated, and naming every way it is un-Pythonic before the
+"Adapter in Python" section could steal that section's punchline.
+
+---
+
+`[] Reject`
+
+**Exercises — nothing exercises the chapter's two conceptual claims.**
+
+The three exercises cover `getattr_adapter.py`, `deprecating.py` and
+`facade.py`, one listing each. Neither the object-adapter/class-adapter
+distinction (the point of `adapter.py`) nor the wrapper disambiguation table
+(the point of "Telling the Wrappers Apart") is exercised, and those are the two
+things a reader should be able to *do* after this chapter.
+
+Proposed exercise 4:
+
+> 4.  Here are three wrappers: one logs each call and forwards it unchanged,
+>     one exposes a `read()` over an object that only has `next_chunk()`,
+>     and one refuses calls unless a flag is set. Classify each as Proxy,
+>     Decorator, Adapter, or Façade using the "remove it and you lose" test
+>     from the table, and say what you would lose in each case.
+
+Not applied: a new exercise needs a matching entry in
+`Solutions/29_Changing_the_Interface.md`, which is outside this review's scope.
 
 ---
 
@@ -86,23 +113,43 @@ standalone one-sentence paragraph.
 
 `[] Reject`
 
-**Adapter — `WhatIWant` is a third, weakest form of "declared interface", unremarked.**
+**Adapter in Python — `getattr_adapter.py` runs a demo when the test imports it.**
 
-`class WhatIWant: def f(self) -> None: ...` is instantiable, and its `f()`
-silently does nothing. [Surrogate](26_Surrogate.md#proxy) spends two listings
-on exactly this choice for a surrogate's implementation: an ABC forces
-completeness at construction, a `Protocol` needs no base class at all.
-Here the reader is shown the one form that neither book chapter recommends,
-with nothing said about it, in a chapter titled "Changing the Interface".
+`test_adapter.py` does `from getattr_adapter import Adapter, WhatIHave`,
+and `getattr_adapter.py`'s top level prints `gh` and `g`, so those two lines are
+emitted during collection on every pytest run. The house style is explicit:
+"Importable modules carry no top-level demo. If a module is both a library and
+a demonstration, split it."
 
-Proposed change: one sentence after the listing, e.g.
-"`WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
-because this listing is about *where* the adaptation lives, not how the target
-interface is declared; [Surrogate](26_Surrogate.md#proxy) compares those two."
+I did **not** apply the usual `if __name__ == "__main__":` guard, because this is
+a two-chapter convention rather than a chapter-29 defect:
+[Surrogate](26_Surrogate.md)'s `state.py` and `counting_proxy.py` have the same
+shape (top-level demo plus a `test_*.py` that imports them), and 31's
+`StateMachine` listings do too. Fixing 29 alone makes the pair inconsistent.
 
-I did not apply this because the silence may be deliberate: the listing is the
-GoF shape translated, and naming every way it is un-Pythonic before the
-"Adapter in Python" section could steal that section's punchline.
+Proposed change, if you want it: add the guard to `getattr_adapter.py`,
+`state.py`, `counting_proxy.py` and the chapter-31 pair together,
+in a single pass, and check that `validate_output.py` still matches the `#:`
+markers (it `exec()`s each block, so `__name__` inside a guarded block needs
+verifying before committing to this).
+
+---
+
+`[] Reject`
+
+**Adapter — the forward pointer fires two paragraphs early.**
+
+"...and the next section argues Python lets you skip most of the packaging too."
+ends the "output is deliberately monotonous" paragraph,
+but two more paragraphs follow before `### Adapter in Python`.
+A reader who takes the pointer at face value reads the next two paragraphs
+looking for the argument it promised.
+
+Proposed change: move the "The output is deliberately monotonous..." paragraph
+down so it sits immediately above `### Adapter in Python`,
+after the Proxy aside and after "Two details in the listing repay attention".
+The forward pointer then lands on the section it names.
+(If the `adapter.py` split above is applied instead, this resolves on its own.)
 
 ---
 
@@ -130,30 +177,6 @@ frozen, those should follow.
 
 `[] Reject`
 
-**Adapter in Python — `getattr_adapter.py` runs a demo when the test imports it.**
-
-`test_adapter.py` does `from getattr_adapter import Adapter, WhatIHave`,
-and `getattr_adapter.py`'s top level prints `gh` and `g`, so those two lines are
-emitted during collection on every pytest run. The house style is explicit:
-"Importable modules carry no top-level demo. If a module is both a library and
-a demonstration, split it."
-
-I did **not** apply the usual `if __name__ == "__main__":` guard, because this is
-a two-chapter convention rather than a chapter-29 defect:
-[Surrogate](26_Surrogate.md)'s `state.py` and `counting_proxy.py` have the same
-shape (top-level demo plus a `test_*.py` that imports them), and 31's
-`StateMachine` listings do too. Fixing 29 alone makes the pair inconsistent.
-
-Proposed change, if you want it: add the guard to `getattr_adapter.py`,
-`state.py`, `counting_proxy.py` and the chapter-31 pair together,
-in a single pass, and check that `validate_output.py` still matches the `#:`
-markers (it `exec()`s each block, so `__name__` inside a guarded block needs
-verifying before committing to this).
-
----
-
-`[] Reject`
-
 **Retiring the Old Interface — `warnings.deprecated()`'s version is never stated.**
 
 `warnings.deprecated()` arrived in Python 3.13 (PEP 702);
@@ -164,29 +187,6 @@ other recent features and a reader on 3.11 or 3.12 will try this and fail.
 Proposed change: one clause on first mention, e.g.
 "`warnings.deprecated()` (Python 3.13 and later; `typing_extensions.deprecated`
 before that) marks a function, method, or class as on its way out".
-
----
-
-`[] Reject`
-
-**Exercises — nothing exercises the chapter's two conceptual claims.**
-
-The three exercises cover `getattr_adapter.py`, `deprecating.py` and
-`facade.py`, one listing each. Neither the object-adapter/class-adapter
-distinction (the point of `adapter.py`) nor the wrapper disambiguation table
-(the point of "Telling the Wrappers Apart") is exercised, and those are the two
-things a reader should be able to *do* after this chapter.
-
-Proposed exercise 4:
-
-> 4.  Here are three wrappers: one logs each call and forwards it unchanged,
->     one exposes a `read()` over an object that only has `next_chunk()`,
->     and one refuses calls unless a flag is set. Classify each as Proxy,
->     Decorator, Adapter, or Façade using the "remove it and you lose" test
->     from the table, and say what you would lose in each case.
-
-Not applied: a new exercise needs a matching entry in
-`Solutions/29_Changing_the_Interface.md`, which is outside this review's scope.
 
 ---
 
@@ -203,6 +203,29 @@ look") are blander than the original.
 ---
 
 ## Cross-chapter
+
+`[] Reject`
+
+**`Chapters/06_Modules_and_Packages.md` — `__all__` is never taught anywhere in
+the book, but the module-façade material depends on it.**
+
+`__all__` appears in no chapter. `Solutions/29_Changing_the_Interface.md` uses
+it twice in the exercise-3 answer ("a real module either sets `__all__` or
+imports as `import dataclasses`", and "it comes with the underscore convention,
+`__all__`, and one-time initialization built in") with no prior definition,
+which is a "used before it is taught" case.
+
+My 29 edit now names it in one clause in the module-façade paragraph
+("an `__all__` list of the public names states the same boundary explicitly"),
+which is enough for that section but is not where the term belongs.
+
+Change to make: a short paragraph in chapter 6 covering what module-level
+export control actually is — the leading underscore is a convention that only
+affects `from module import *`, `__all__` is the explicit list, and neither
+prevents `module._name` — so that 24 (module as singleton), 29 (module as
+façade) and the 29 solutions can all point at one place.
+
+---
 
 `[] Reject`
 
@@ -267,29 +290,6 @@ own `Pizza`" paragraph):
 > Proxy, Adapter and Façade wrap the same way and differ in intent;
 > [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
 > sorts the four.
-
----
-
-`[] Reject`
-
-**`Chapters/06_Modules_and_Packages.md` — `__all__` is never taught anywhere in
-the book, but the module-façade material depends on it.**
-
-`__all__` appears in no chapter. `Solutions/29_Changing_the_Interface.md` uses
-it twice in the exercise-3 answer ("a real module either sets `__all__` or
-imports as `import dataclasses`", and "it comes with the underscore convention,
-`__all__`, and one-time initialization built in") with no prior definition,
-which is a "used before it is taught" case.
-
-My 29 edit now names it in one clause in the module-façade paragraph
-("an `__all__` list of the public names states the same boundary explicitly"),
-which is enough for that section but is not where the term belongs.
-
-Change to make: a short paragraph in chapter 6 covering what module-level
-export control actually is — the leading underscore is a convention that only
-affects `from module import *`, `__all__` is the explicit list, and neither
-prevents `module._name` — so that 24 (module as singleton), 29 (module as
-façade) and the 29 solutions can all point at one place.
 
 ---
 

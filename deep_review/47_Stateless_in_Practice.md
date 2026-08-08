@@ -5,23 +5,47 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Intro, the bullet preview: it stops three sections short, and this is the last
-chapter in the book.**
+**"Costs and Benefits": the book's last section is titled for its middle, and
+never names what the reader can now do.**
 
-The eight bullets map cleanly onto "Scripting an Unpredictable Source" through
-"Where the Guarantee Stops", and then stop.
-Nothing announces [The Toolkit](#the-toolkit) (the one page a reader will come
-back to) or [Costs and Benefits](#costs-and-benefits) (the verdict, and the
-book's last section).
-A reader arriving at the toolkit table has no idea a consolidated reference was
-coming, and a reader who wants the verdict has to scroll for it.
+Two of the deep-review closing questions land here.
 
-Proposed change: add one line after the last bullet, e.g.
+*Titled for its content.* The section's argument is not a balance sheet. It
+runs: Stateless shows what language-level Effect tracking would look like in
+Python today → a signature states dependency, failure, and result before you
+read the body → and, the part nothing else in the book says, Python has a
+*separate, non-composing mechanism* for each of those concerns while
+`Effect[A, E, R]` is one type and `yield from` is one operator → the price →
+the direction. The costs occupy four lines of a 34-line section, and one of
+them duplicates `### 4` above. Candidate titles that name the payoff:
+"One Type for Four Mechanisms", or, taking the closing line,
+"What Is Missing Is Not the Capacity".
+`#costs-and-benefits` is referenced from nowhere, so the rename is free.
 
-> The chapter then collects every tool in one table and weighs what the whole
-> approach costs.
+*The capability the reader gained.* The chapter never says it, and it has a
+good answer sitting unused at the end of
+[A Clock](#a-clock): "Name each contact with the outside as an Ability and bind
+it at the edge to whatever the context needs." That is the thing a reader can
+do on Monday, in a codebase with no Stateless in it at all — it is what
+`at()`, `crossing`, `controller()`, and `Script` all are. Right now that
+sentence is buried at the 400-line mark and the last section talks only about
+whether to adopt the library.
 
-Reported rather than applied because the preview's length is a pacing decision.
+Proposed change: three sentences before "But the direction is worth watching",
+e.g.
+
+> Whatever you decide about the library, the habit survives it.
+> Name each contact with the outside — the clock, the feed, the pool, the
+> console — and bind it at the edge instead of reaching for it in the middle.
+> `at()` and `crossing` and `controller()` are all that habit, and none of them
+> needs an Effect type to work.
+
+(Watch the wording if you take this: "reaching for" is in
+`banned_phrases.txt`. Use "instead of calling it in the middle".)
+
+Reported rather than applied on both counts: a retitle and a new closing
+paragraph are voice and pacing decisions, and this is the paragraph the book
+ends on.
 
 ---
 
@@ -59,41 +83,6 @@ then have no prose of its own before `### A Coin Toss`, which reads oddly.
 
 [] Reject
 
-**"Abilities Are Not Special", lines 108-119: the type-bound paragraph is
-almost verbatim chapter 46.**
-
-46's "Waiting on a Coroutine" already says:
-
-> The channel holds Abilities, and `Async` is one, so it sits there bare.
-> `Console` never was one: it is an ordinary class,
-> and `Need[Console]` is the Ability that asks for it.
-> The first type parameter accepts only `Ability` subclasses,
-> so `Depend[Console, None]` is rejected at the annotation.
-
-47 repeats all five clauses. The only new content is
-"before any `yield` is examined: `Console` is not assignable to the bound",
-which is the part 46 promised ("takes that type bound apart").
-
-I did not cut it, because 46 explicitly forward-links here and a reader who
-skipped 46's async section needs the setup.
-If you want it tighter, the three-line version is:
-
-> That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
-> the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
-> drew for `Async`.
-> `Ask` is an Ability, so it sits in the channel bare, and the bound is what
-> makes that more than a convention: `Depend[Console, None]` is rejected at the
-> annotation, before any `yield` is examined, because `Console` is not
-> assignable to `Ability[Any]`.
-
-Verified against `ty` 0.0.65: the diagnostic is
-`error[invalid-type-arguments]: Type \`Console\` is not assignable to upper
-bound \`Ability[Any]\` of type variable \`A\``, reported on the annotation.
-
----
-
-[] Reject
-
 **"Switching Implementations Mid-Run": `microgrid.py` never produces the
 `Blackout` the prose spends a paragraph on, and exercise 3 asks the reader to
 find out what happens.**
@@ -126,25 +115,36 @@ Two options. I lean toward the first.
 
 [] Reject
 
-**"The Success Path": `research_by_hand.py` redefines `topic_of()` and the
-chapter does not say why.**
+**"Abilities Are Not Special", lines 108-119: the type-bound paragraph is
+almost verbatim chapter 46.**
 
-The listing imports `TOPICS` from `research` and then writes `topic_of()` out
-again, four lines identical to the original.
-It looks like an oversight, and it isn't: `research.py`'s `topic_of()` is
-decorated with `@throws(NotInteresting)`, so it returns an Effect and cannot be
-called from ordinary `try`/`except` code.
-That is the comparison's whole point in miniature — once a function is lifted,
-its ordinary callers cannot have it back — and the chapter passes over it.
+46's "Waiting on a Coroutine" already says:
 
-Proposed change: one sentence after the listing, e.g.
+> The channel holds Abilities, and `Async` is one, so it sits there bare.
+> `Console` never was one: it is an ordinary class,
+> and `Need[Console]` is the Ability that asks for it.
+> The first type parameter accepts only `Ability` subclasses,
+> so `Depend[Console, None]` is rejected at the annotation.
 
-> `topic_of()` is written out again because `research.py`'s version is
-> decorated: it returns an Effect, and ordinary `try`/`except` code cannot call
-> it. Lifting a function takes it away from its unlifted callers.
+47 repeats all five clauses. The only new content is
+"before any `yield` is examined: `Console` is not assignable to the bound",
+which is the part 46 promised ("takes that type bound apart").
 
-Reported rather than applied because it adds a paragraph to a section whose
-argument is deliberately compressed.
+I did not cut it, because 46 explicitly forward-links here and a reader who
+skipped 46's async section needs the setup.
+If you want it tighter, the three-line version is:
+
+> That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
+> the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
+> drew for `Async`.
+> `Ask` is an Ability, so it sits in the channel bare, and the bound is what
+> makes that more than a convention: `Depend[Console, None]` is rejected at the
+> annotation, before any `yield` is examined, because `Console` is not
+> assignable to `Ability[Any]`.
+
+Verified against `ty` 0.0.65: the diagnostic is
+`error[invalid-type-arguments]: Type \`Console\` is not assignable to upper
+bound \`Ability[Any]\` of type variable \`A\``, reported on the annotation.
 
 ---
 
@@ -204,123 +204,23 @@ re-teaching.
 
 [] Reject
 
-**"Where the Guarantee Stops", `### 4. Cost`: the heading is a noun where its
-four siblings are sentences.**
+**Intro, the bullet preview: it stops three sections short, and this is the last
+chapter in the book.**
 
-The five read: "Nothing stops an undeclared Effect", "The checker can give up
-quietly", "Handlers cannot capture the continuation", "Cost", "Much of a mature
-Effect system is missing".
-Four of them state a limit; the fourth names a topic.
-Scanning the five headings is how a reader uses this section, and one of them
-does not participate.
+The eight bullets map cleanly onto "Scripting an Unpredictable Source" through
+"Where the Guarantee Stops", and then stop.
+Nothing announces [The Toolkit](#the-toolkit) (the one page a reader will come
+back to) or [Costs and Benefits](#costs-and-benefits) (the verdict, and the
+book's last section).
+A reader arriving at the toolkit table has no idea a consolidated reference was
+coming, and a reader who wants the verdict has to scroll for it.
 
-Proposed change: `### 4. The discipline is all-or-nothing`, which is what the
-paragraph actually argues ("An EMS is a decision about a whole codebase, not a
-utility you import for one module").
+Proposed change: add one line after the last bullet, e.g.
 
-Anchor cost: none. `#cost` is referenced from nowhere in `Chapters/`,
-`Solutions/`, or `README.md`; the only chapter-47 anchor any other file links to
-in this section is `#nothing-stops-an-undeclared-effect`, from 46.
+> The chapter then collects every tool in one table and weighs what the whole
+> approach costs.
 
-Reported rather than applied because a heading is voice.
-
----
-
-[] Reject
-
-**"Costs and Benefits": the book's last section is titled for its middle, and
-never names what the reader can now do.**
-
-Two of the deep-review closing questions land here.
-
-*Titled for its content.* The section's argument is not a balance sheet. It
-runs: Stateless shows what language-level Effect tracking would look like in
-Python today → a signature states dependency, failure, and result before you
-read the body → and, the part nothing else in the book says, Python has a
-*separate, non-composing mechanism* for each of those concerns while
-`Effect[A, E, R]` is one type and `yield from` is one operator → the price →
-the direction. The costs occupy four lines of a 34-line section, and one of
-them duplicates `### 4` above. Candidate titles that name the payoff:
-"One Type for Four Mechanisms", or, taking the closing line,
-"What Is Missing Is Not the Capacity".
-`#costs-and-benefits` is referenced from nowhere, so the rename is free.
-
-*The capability the reader gained.* The chapter never says it, and it has a
-good answer sitting unused at the end of
-[A Clock](#a-clock): "Name each contact with the outside as an Ability and bind
-it at the edge to whatever the context needs." That is the thing a reader can
-do on Monday, in a codebase with no Stateless in it at all — it is what
-`at()`, `crossing`, `controller()`, and `Script` all are. Right now that
-sentence is buried at the 400-line mark and the last section talks only about
-whether to adopt the library.
-
-Proposed change: three sentences before "But the direction is worth watching",
-e.g.
-
-> Whatever you decide about the library, the habit survives it.
-> Name each contact with the outside — the clock, the feed, the pool, the
-> console — and bind it at the edge instead of reaching for it in the middle.
-> `at()` and `crossing` and `controller()` are all that habit, and none of them
-> needs an Effect type to work.
-
-(Watch the wording if you take this: "reaching for" is in
-`banned_phrases.txt`. Use "instead of calling it in the middle".)
-
-Reported rather than applied on both counts: a retitle and a new closing
-paragraph are voice and pacing decisions, and this is the paragraph the book
-ends on.
-
----
-
-[] Reject
-
-**Order and pacing: the assumes/introduces table, and what it shows.**
-
-Chapter claim in one sentence: *once every contact with the outside is an
-Ability and every failure is lifted into the error channel, a function's
-signature is its complete interface — here is what that buys, and here is where
-it stops.*
-
-| Section | Assumes | Introduces |
-|---|---|---|
-| Abilities Are Not Special | 46 (Effect/Depend/handle/run/supply), 45 (return channel) | writing an `Ability[T]`; accessors; `handle()`'s annotation dispatch; Ability vs `Need`; the type bound; naming intermediates |
-| A Coin Toss | the above | a handler that answers differently per request; parenthesized `yield from` |
-| A Clock | the above | handler factories (`at()`); Effect tests under `pytest`; the twice-read clock |
-| Switching Implementations Mid-Run | 46's `@throws`/`catch`; 15 (context managers) | a handler answering with an implementation; mid-run swap; a handler sits outside the channel |
-| State as an Ability | the above | paired `Get`/`Put`; the State effect; the unguarded cell |
-| Composing a Program | 46 (`need`/`supply`/`as_type`/Protocols) | a three-error signature; scenarios; the boundary function; `catch` + `match` + `assert_never` |
-| The Success Path | the previous section's code | the by-hand contrast |
-| Two More Doors | the error channel | `throw()`; `catch_all()`; entry/exit symmetry |
-| Dependencies That Need Dependencies | `need`, `yield from` composition | nested graphs; `invalid-yield`; the `ZLayer` contrast |
-| Supplying a Whole Cast | `supply`, Protocols, 27 (Abstract Factory) | wide casts; the lost matched set; the nine-overload ceiling |
-| Adding Behavior to an Existing Effect | Effects, `catch` | `retry()`; schedules; what retry costs the signature; `repeat()`; `memoize()` |
-| — Why `retry()` Decorates the Function | 46's An Effect Runs Once | *nothing* (see the block above) |
-| Running Effects in Parallel | 46's `wait()`, 19 (executors) | `fork()`; `Task`; the resource-scoping gap |
-| The Toolkit | everything | *nothing* (consolidation) |
-| Where the Guarantee Stops | everything | the five limits |
-| Costs and Benefits | everything | the composition argument; the verdict |
-
-Reading the two columns down: nothing later appears in an earlier "assumes"
-column, which is unusual for a chapter this size, and the transitions are all
-justified by something other than "it is also about this topic" — deep graph
-then wide cast, one channel then the other door on each side, what it does then
-what it cannot do. The arc holds.
-
-Two things the table does surface, both already written up as their own blocks:
-one subsection introduces nothing (`Why retry() Decorates the Function`), and
-one item introduced in the first section ("naming intermediates") is not
-justified until `### 2` of the last technical section, about 1800 lines later.
-I closed the second with a named link (manifest item 3) rather than a move,
-because moving `### 2` earlier costs more than it buys: it is written as one of
-three gaps of the same shape, and the other two (the direct-Ability-yield
-`Unknown` and 46's `type`-alias hole) genuinely belong at the end, where the
-reader has seen enough green checks to be told to distrust them.
-
-If you want the answer nearer the question anyway, the cheap version is two
-sentences in "Abilities Are Not Special" stating the rule without the
-explanation — "Name each stage. `ty` infers `Unknown` for
-`handle(scripted)(handle(capture)(greet))` and the checking stops" — leaving
-`### 2` to explain why. That duplicates one fact and closes a 1800-line gap.
+Reported rather than applied because the preview's length is a pacing decision.
 
 ---
 
@@ -378,7 +278,134 @@ curve are yours.
 
 ---
 
+[] Reject
+
+**"The Success Path": `research_by_hand.py` redefines `topic_of()` and the
+chapter does not say why.**
+
+The listing imports `TOPICS` from `research` and then writes `topic_of()` out
+again, four lines identical to the original.
+It looks like an oversight, and it isn't: `research.py`'s `topic_of()` is
+decorated with `@throws(NotInteresting)`, so it returns an Effect and cannot be
+called from ordinary `try`/`except` code.
+That is the comparison's whole point in miniature — once a function is lifted,
+its ordinary callers cannot have it back — and the chapter passes over it.
+
+Proposed change: one sentence after the listing, e.g.
+
+> `topic_of()` is written out again because `research.py`'s version is
+> decorated: it returns an Effect, and ordinary `try`/`except` code cannot call
+> it. Lifting a function takes it away from its unlifted callers.
+
+Reported rather than applied because it adds a paragraph to a section whose
+argument is deliberately compressed.
+
+---
+
+[] Reject
+
+**Order and pacing: the assumes/introduces table, and what it shows.**
+
+Chapter claim in one sentence: *once every contact with the outside is an
+Ability and every failure is lifted into the error channel, a function's
+signature is its complete interface — here is what that buys, and here is where
+it stops.*
+
+| Section | Assumes | Introduces |
+|---|---|---|
+| Abilities Are Not Special | 46 (Effect/Depend/handle/run/supply), 45 (return channel) | writing an `Ability[T]`; accessors; `handle()`'s annotation dispatch; Ability vs `Need`; the type bound; naming intermediates |
+| A Coin Toss | the above | a handler that answers differently per request; parenthesized `yield from` |
+| A Clock | the above | handler factories (`at()`); Effect tests under `pytest`; the twice-read clock |
+| Switching Implementations Mid-Run | 46's `@throws`/`catch`; 15 (context managers) | a handler answering with an implementation; mid-run swap; a handler sits outside the channel |
+| State as an Ability | the above | paired `Get`/`Put`; the State effect; the unguarded cell |
+| Composing a Program | 46 (`need`/`supply`/`as_type`/Protocols) | a three-error signature; scenarios; the boundary function; `catch` + `match` + `assert_never` |
+| The Success Path | the previous section's code | the by-hand contrast |
+| Two More Doors | the error channel | `throw()`; `catch_all()`; entry/exit symmetry |
+| Dependencies That Need Dependencies | `need`, `yield from` composition | nested graphs; `invalid-yield`; the `ZLayer` contrast |
+| Supplying a Whole Cast | `supply`, Protocols, 27 (Abstract Factory) | wide casts; the lost matched set; the nine-overload ceiling |
+| Adding Behavior to an Existing Effect | Effects, `catch` | `retry()`; schedules; what retry costs the signature; `repeat()`; `memoize()` |
+| — Why `retry()` Decorates the Function | 46's An Effect Runs Once | *nothing* (see the block above) |
+| Running Effects in Parallel | 46's `wait()`, 19 (executors) | `fork()`; `Task`; the resource-scoping gap |
+| The Toolkit | everything | *nothing* (consolidation) |
+| Where the Guarantee Stops | everything | the five limits |
+| Costs and Benefits | everything | the composition argument; the verdict |
+
+Reading the two columns down: nothing later appears in an earlier "assumes"
+column, which is unusual for a chapter this size, and the transitions are all
+justified by something other than "it is also about this topic" — deep graph
+then wide cast, one channel then the other door on each side, what it does then
+what it cannot do. The arc holds.
+
+Two things the table does surface, both already written up as their own blocks:
+one subsection introduces nothing (`Why retry() Decorates the Function`), and
+one item introduced in the first section ("naming intermediates") is not
+justified until `### 2` of the last technical section, about 1800 lines later.
+I closed the second with a named link (manifest item 3) rather than a move,
+because moving `### 2` earlier costs more than it buys: it is written as one of
+three gaps of the same shape, and the other two (the direct-Ability-yield
+`Unknown` and 46's `type`-alias hole) genuinely belong at the end, where the
+reader has seen enough green checks to be told to distrust them.
+
+If you want the answer nearer the question anyway, the cheap version is two
+sentences in "Abilities Are Not Special" stating the rule without the
+explanation — "Name each stage. `ty` infers `Unknown` for
+`handle(scripted)(handle(capture)(greet))` and the checking stops" — leaving
+`### 2` to explain why. That duplicates one fact and closes a 1800-line gap.
+
+---
+
+[] Reject
+
+**"Where the Guarantee Stops", `### 4. Cost`: the heading is a noun where its
+four siblings are sentences.**
+
+The five read: "Nothing stops an undeclared Effect", "The checker can give up
+quietly", "Handlers cannot capture the continuation", "Cost", "Much of a mature
+Effect system is missing".
+Four of them state a limit; the fourth names a topic.
+Scanning the five headings is how a reader uses this section, and one of them
+does not participate.
+
+Proposed change: `### 4. The discipline is all-or-nothing`, which is what the
+paragraph actually argues ("An EMS is a decision about a whole codebase, not a
+utility you import for one module").
+
+Anchor cost: none. `#cost` is referenced from nowhere in `Chapters/`,
+`Solutions/`, or `README.md`; the only chapter-47 anchor any other file links to
+in this section is `#nothing-stops-an-undeclared-effect`, from 46.
+
+Reported rather than applied because a heading is voice.
+
+---
+
 ## Cross-chapter
+
+[] Reject
+
+**`Solutions/47_Stateless_in_Practice.md` answers exercise 1 of eleven.**
+
+The file is 79 lines and stops after "1. An advancing handler, and the fix it
+cannot break". Chapters 40, 42, and 43 in this part all carry fuller solution
+sets, and this chapter's exercises are the heaviest in the book — several ask
+the reader to run `ty` and compare a diagnostic, which is exactly where a
+published answer matters, because the diagnostic text changes with the checker
+version.
+
+The three with the highest cost of being unanswered, in order: exercise 5
+("list every line you had to edit" — a reader cannot check a list against
+nothing), exercise 11 (asks for a prediction of `ty` output, then confirmation),
+and exercise 2's second half (the `catch(KeyError)`-does-nothing demonstration,
+which is the chapter's most important trap).
+
+I did not add them, per the scope rules. One thing worth recording while it is
+verified: exercise 7's premise holds under `ty` 0.0.65 —
+`retry(recurs(3, spaced(...)))(research)` type-checks and reveals
+`() -> Generator[Need[Feed] | Need[Encyclopedia] | Need[Time] | Async |
+RetryError[Unavailable | NotInteresting | NoArticle], Any, str]`, so the
+exercise's "supply a `Time()`" instruction is right and the `RetryError`
+wrapping the union is the thing the reader is meant to notice.
+
+---
 
 [] Reject
 
@@ -412,33 +439,6 @@ before the retitle. I did not touch chapter 46, per the scope rules.
 (I fixed 47's own instance of the same slip: `Running Effects in Parallel`
 said "the library's own `Files` Ability", now "the library's own `Files`
 class". Manifest item 15.)
-
----
-
-[] Reject
-
-**`Solutions/47_Stateless_in_Practice.md` answers exercise 1 of eleven.**
-
-The file is 79 lines and stops after "1. An advancing handler, and the fix it
-cannot break". Chapters 40, 42, and 43 in this part all carry fuller solution
-sets, and this chapter's exercises are the heaviest in the book — several ask
-the reader to run `ty` and compare a diagnostic, which is exactly where a
-published answer matters, because the diagnostic text changes with the checker
-version.
-
-The three with the highest cost of being unanswered, in order: exercise 5
-("list every line you had to edit" — a reader cannot check a list against
-nothing), exercise 11 (asks for a prediction of `ty` output, then confirmation),
-and exercise 2's second half (the `catch(KeyError)`-does-nothing demonstration,
-which is the chapter's most important trap).
-
-I did not add them, per the scope rules. One thing worth recording while it is
-verified: exercise 7's premise holds under `ty` 0.0.65 —
-`retry(recurs(3, spaced(...)))(research)` type-checks and reveals
-`() -> Generator[Need[Feed] | Need[Encyclopedia] | Need[Time] | Async |
-RetryError[Unavailable | NotInteresting | NoArticle], Any, str]`, so the
-exercise's "supply a `Time()`" instruction is right and the `RetryError`
-wrapping the union is the thing the reader is meant to notice.
 
 ---
 

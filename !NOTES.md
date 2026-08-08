@@ -1,5 +1,3 @@
-Apply the hierarchical ordering to all the un-reviewed files in deep_review
-
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience

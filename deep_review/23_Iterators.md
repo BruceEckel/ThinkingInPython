@@ -1,61 +1,6 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
-
-[] Reject
-
-**"Iteration Is Built In", after `basic_iteration.py` (around line 42).
-Missing: the `for` loop desugaring the section describes but never shows.**
-
-The prose says "A `for` loop makes one `iter()` call, then calls `next()` until
-`StopIteration` occurs," and `basic_iteration.py` shows `iter()`, `next()`, and
-the `except StopIteration` separately. The reader never sees the three assembled
-into the loop they replace, which is the one thing that makes the protocol click.
-This is the chapter's cheapest mechanism-vs-outcome win.
-
-Proposed: add a non-extracted fence (no `# slug.py` first line, so no gate runs
-on it) immediately after the paragraph at line 42-46, with one sentence of lead-in:
-
-> Written out, `for x in nums:` is this loop:
->
-> ```
-> it = iter(nums)          # Once, before the loop
-> while True:
->     try:
->         x = next(it)     # Once per step
->     except StopIteration:
->         break
->     ...                  # The loop body
-> ```
-
-An unfenced-language block is used elsewhere in the book for exactly this kind of
-non-runnable sketch (chapter 19's "The tempting fix is a lock inside the loop"
-block). Alternative if you would rather not add a block: fold the same three
-steps into the existing prose sentence. I recommend the block; the indentation is
-doing the teaching.
-
-[] Reject
-
-**"Generators" section, `test_iterators.py` (block starts at line 277).
-The test sits 190 lines after the code it tests, and the prose forward-references
-it across that gap.**
-
-Line 112 says `Countdown` "can be iterated repeatedly, as the re-iteration test
-below confirms." The test that confirms it does not appear until after the
-laziness discussion, `eager_validation.py`, `walked_twice.py`, and all of `tee`.
-Every other test listing in this chapter sits immediately after the code it
-exercises (`test_yield_from.py`, `test_endless.py`, `test_typed.py`), so this one
-is the outlier.
-
-Proposed: move the `test_iterators.py` block and its two-sentence lead-in
-("These tests collect each iterator into a list and compare them...") up to
-directly after the paragraph ending "...as the re-iteration test below confirms"
-at line 112, and change that clause to "as the tests below confirm."
-
-Cost of the move: nothing downstream names `test_iterators.py`, and it imports
-only from `iterators.py`, which is already defined above the new position. The
-`tee` paragraph then ends the section, which is a slightly weaker landing than a
-test block; if that matters, the alternative is to leave the block where it is and
-change line 112's forward reference to name the section it lands in.
 
 [] Reject
 
@@ -98,44 +43,59 @@ conclusion to do, and it also gives the two "surprises" paragraphs a destination
 
 [] Reject
 
-**Line 736: "The protocol is free, and quiet."**
+**"Generators" section, `test_iterators.py` (block starts at line 277).
+The test sits 190 lines after the code it tests, and the prose forward-references
+it across that gap.**
 
-The same paragraph opens with "the protocol answers no question for free," where
-*free* means "without cost." Five lines later *free* means "costs you nothing to
-use." The two senses are opposite in effect and the reader has to stop and decide
-which one the closing line means.
+Line 112 says `Countdown` "can be iterated repeatedly, as the re-iteration test
+below confirms." The test that confirms it does not appear until after the
+laziness discussion, `eager_validation.py`, `walked_twice.py`, and all of `tee`.
+Every other test listing in this chapter sits immediately after the code it
+exercises (`test_yield_from.py`, `test_endless.py`, `test_typed.py`), so this one
+is the outlier.
 
-Proposed: "The protocol costs you nothing, and tells you nothing." That keeps the
-two-beat rhythm and drops the collision. Alternative: "The protocol is cheap, and
-quiet."
+Proposed: move the `test_iterators.py` block and its two-sentence lead-in
+("These tests collect each iterator into a list and compare them...") up to
+directly after the paragraph ending "...as the re-iteration test below confirms"
+at line 112, and change that clause to "as the tests below confirm."
 
-[] Reject
-
-**Line 481: "Nothing in the toolchain (except an AI) will discover problems like
-this."**
-
-An AI is not part of the toolchain, so the parenthetical contradicts the sentence
-it sits in, and the claim is unverified in a paragraph where the two neighbouring
-claims (`ty` accepts `list(count(1))`; ruff's only relevant rule is the
-comprehension one) are both demonstrably checked. "AI" appears in only one other
-place in the book (chapter 44, line 683), so the aside also reads as
-out-of-character here.
-
-Proposed: either cut the parenthetical, leaving "Nothing in the toolchain will
-discover problems like this," or make the claim its own sentence and own it:
-"No static tool will find this. A reader, or a model reading the code, has to
-notice that `count(1)` never ends." I recommend the plain cut.
+Cost of the move: nothing downstream names `test_iterators.py`, and it imports
+only from `iterators.py`, which is already defined above the new position. The
+`tee` paragraph then ends the section, which is a slightly weaker landing than a
+test block; if that matters, the alternative is to leave the block where it is and
+change line 112's forward reference to name the section it lands in.
 
 [] Reject
 
-**Line 143, `generator_lifecycle.py`: the comment `# Remainder of list`.**
+**"Iteration Is Built In", after `basic_iteration.py` (around line 42).
+Missing: the `for` loop desugaring the section describes but never shows.**
 
-There is no list at that point; `sq` is a generator, and the line is what builds
-the first list. The comment means "the values that are left." As written it
-invites the reader to think `sq` is a list, which is exactly the confusion the
-listing exists to remove.
+The prose says "A `for` loop makes one `iter()` call, then calls `next()` until
+`StopIteration` occurs," and `basic_iteration.py` shows `iter()`, `next()`, and
+the `except StopIteration` separately. The reader never sees the three assembled
+into the loop they replace, which is the one thing that makes the protocol click.
+This is the chapter's cheapest mechanism-vs-outcome win.
 
-Proposed: `# The values that are left`.
+Proposed: add a non-extracted fence (no `# slug.py` first line, so no gate runs
+on it) immediately after the paragraph at line 42-46, with one sentence of lead-in:
+
+> Written out, `for x in nums:` is this loop:
+>
+> ```python
+> it = iter(nums)          # Once, before the loop
+> while True:
+>     try:
+>         x = next(it)     # Once per step
+>     except StopIteration:
+>         break
+>     ...                  # The loop body
+> ```
+
+An unfenced-language block is used elsewhere in the book for exactly this kind of
+non-runnable sketch (chapter 19's "The tempting fix is a lock inside the loop"
+block). Alternative if you would rather not add a block: fold the same three
+steps into the existing prose sentence. I recommend the block; the indentation is
+doing the teaching.
 
 [] Reject
 
@@ -164,25 +124,6 @@ appending them as 9 and 10 is the cheaper option; your call.
 
 [] Reject
 
-**Chapter-level, low priority: the chapter never mentions the two-argument
-`iter(callable, sentinel)` form.**
-
-The chapter builds `DONE = sentinel("DONE")` twice and explains at lines 711-713
-why the answer must be distinguishable from every value the source could yield.
-The standard library has a builtin that is exactly that idea,
-`iter(callable, sentinel)`, which calls `callable` until it returns the sentinel.
-It would land naturally in one sentence next to the `DONE` explanation in
-`asking_costs.py`'s prose and would let a reader recognize the form in real code.
-
-Proposed, after "…into the same reply." at line 713:
-"The builtin `iter()` takes the same bargain in its two-argument form:
-`iter(callable, DONE)` calls `callable` until it hands back `DONE`."
-
-I am reporting rather than applying this because the chapter is already dense and
-the addition is an extra topic rather than a repair.
-
-[] Reject
-
 **Chapter-level, low priority: three different functions named `squares()`, with
 three different mechanisms, and the chapter never connects them.**
 
@@ -199,6 +140,66 @@ plain-function form from `eager_validation.py`, with the genexp standing in for
 `produce()`. Alternative, if the echo is unintentional: rename `tee.py`'s to
 something neutral like `stream()`, which also stops the reader from expecting the
 `print` tracing behavior of the first one.
+
+[] Reject
+
+**Chapter-level, low priority: the chapter never mentions the two-argument
+`iter(callable, sentinel)` form.**
+
+The chapter builds `DONE = sentinel("DONE")` twice and explains at lines 711-713
+why the answer must be distinguishable from every value the source could yield.
+The standard library has a builtin that is exactly that idea,
+`iter(callable, sentinel)`, which calls `callable` until it returns the sentinel.
+It would land naturally in one sentence next to the `DONE` explanation in
+`asking_costs.py`'s prose and would let a reader recognize the form in real code.
+
+Proposed, after "…into the same reply." at line 713:
+"The builtin `iter()` takes the same bargain in its two-argument form:
+`iter(callable, DONE)` calls `callable` until it hands back `DONE`." [[do this but rewrite "takes the same bargain"]]
+
+I am reporting rather than applying this because the chapter is already dense and
+the addition is an extra topic rather than a repair.
+
+[] Reject
+
+**Line 481: "Nothing in the toolchain (except an AI) will discover problems like
+this."**
+
+An AI is not part of the toolchain, so the parenthetical contradicts the sentence
+it sits in, and the claim is unverified in a paragraph where the two neighbouring
+claims (`ty` accepts `list(count(1))`; ruff's only relevant rule is the
+comprehension one) are both demonstrably checked. "AI" appears in only one other
+place in the book (chapter 44, line 683), so the aside also reads as
+out-of-character here.
+
+Proposed: either [[cut the parenthetical]], leaving "Nothing in the toolchain will
+discover problems like this," or make the claim its own sentence and own it:
+"No static tool will find this. A reader, or a model reading the code, has to
+notice that `count(1)` never ends." I recommend the plain cut.
+
+[] Reject
+
+**Line 736: "The protocol is free, and quiet."**
+
+The same paragraph opens with "the protocol answers no question for free," where
+*free* means "without cost." Five lines later *free* means "costs you nothing to
+use." The two senses are opposite in effect and the reader has to stop and decide
+which one the closing line means.
+
+Proposed: "The protocol costs you nothing, and tells you nothing." That keeps the
+two-beat rhythm and drops the collision. Alternative: "The protocol is cheap, and
+quiet."
+
+[] Reject
+
+**Line 143, `generator_lifecycle.py`: the comment `# Remainder of list`.**
+
+There is no list at that point; `sq` is a generator, and the line is what builds
+the first list. The comment means "the values that are left." As written it
+invites the reader to think `sq` is a list, which is exactly the confusion the
+listing exists to remove.
+
+Proposed: `# The values that are left`.
 
 ## Cross-chapter
 

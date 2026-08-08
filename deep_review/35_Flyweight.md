@@ -5,77 +5,6 @@ When this file has been applied, change this file's name so it has a leading
 
 [] Reject
 
-**Chapter-level: the chapter argues memory and never shows a number.**
-
-Every claim about what Flyweight buys is stated, never measured.
-"A map can hold millions of cells, but only a handful of tile kinds."
-"Memory proportional to the number of distinct values, not the number of uses."
-The only real number in the chapter is `24 3`, an object count.
-The one place the book actually weighs a shared map against an unshared one is
-`Solutions/35_Flyweight.md` exercise 2, which the reader reaches only after
-finishing the chapter and only if they do the exercise.
-
-The deep-review skill's "front-load the payoff" test applies:
-the most convincing artifact is outside the chapter entirely.
-
-Proposed change, recommended form:
-a short listing immediately after `tile_map.py`'s commentary that measures the
-same 24-cell grid two ways, using `sys.getsizeof()` rather than `tracemalloc`
-so the number is deterministic and the marker is stable.
-Something like:
-
-```python
-# tile_memory.py
-import sys
-from tile_map import Tile, parse_map
-
-def footprint(cells: list[Tile]) -> int:
-    unique = {id(t): t for t in cells}
-    per_object = sys.getsizeof(next(iter(unique.values())))
-    per_dict = sys.getsizeof(next(iter(unique.values())).__dict__)
-    return len(unique) * (per_object + per_dict)
-```
-
-I have deliberately not drafted this as a finished listing, because where it
-goes and whether the chapter wants a measurement at all is a pacing decision.
-Two things to know if you take it:
-`sys.getsizeof(Tile(...))` is 48 bytes and its `__dict__` another 280 on the
-pinned 3.15 build, so a shared 24-cell grid costs 3 x 328 against an unshared
-24 x 328, which is a clean 8x with no timing involved;
-and the alternative (drop it, and instead point at exercise 2 from the prose)
-costs one sentence and no listing.
-
----
-
-[] Reject
-
-**"Intrinsic and Extrinsic State": the typing discussion is a 19-line
-digression inside the chapter's flagship section.**
-
-Between `tile_map.py` and its test sits a block that starts at
-"`Symbol` names the closed set of valid map characters" and ends at
-"`cast()` is believed rather than verified."
-It is good material and chapter 08's `cast(T, x)` table row links directly to
-this section for it.
-But it is about `Literal`, boundary functions and narrowing, not about
-intrinsic versus extrinsic state, and a reader following the pattern has to
-push through it to reach "Because `Tile` is frozen, sharing is invisible to
-clients," which is the section's actual conclusion.
-
-Proposed change: give it its own `###` heading, e.g.
-`### Typing the Symbol Set`, placed exactly where the block already begins.
-Price of the rearrangement: nothing moves, so no listing or test is affected;
-the existing `#intrinsic-and-extrinsic-state` anchor is unchanged, so chapter
-08's link and `heading_links.py` stay green; the new heading only adds an
-anchor.
-The alternative is to move the block after the test listing so the frozen
-paragraph follows the code directly, but that separates the typing prose from
-the code it describes, which is worse.
-
----
-
-[] Reject
-
 **`tile_map.py`: a memory chapter whose shared object still carries a
 `__dict__`.**
 
@@ -198,81 +127,45 @@ edit chapter 39.
 
 [] Reject
 
-**"A Pool That Does Not Leak": `weak_pool.py`'s `Symbol` collides with
-`tile_map.py`'s `Symbol`, in the same chapter.**
+**Chapter-level: the chapter argues memory and never shows a number.**
 
-`tile_map.py` has `type Symbol = Literal[".", "~", "#"]`, a type alias naming
-map characters.
-`weak_pool.py` has `class Symbol` with a `name: str`, a parser's interned
-identifier.
-Different kinds of thing, same word, ~150 lines apart, both extracted into the
-same `Examples/35_Flyweight/` directory.
-Nothing breaks (separate modules), but a reader skimming back for "what was a
-`Symbol` again" finds two answers.
+Every claim about what Flyweight buys is stated, never measured.
+"A map can hold millions of cells, but only a handful of tile kinds."
+"Memory proportional to the number of distinct values, not the number of uses."
+The only real number in the chapter is `24 3`, an object count.
+The one place the book actually weighs a shared map against an unshared one is
+`Solutions/35_Flyweight.md` exercise 2, which the reader reaches only after
+finishing the chapter and only if they do the exercise.
 
-Proposed change: rename the weak-pool class to `Name`, with `_pool:
-Final[WeakValueDictionary[str, Name]]` and `def name(text: str) -> Name`.
-Cost: `test_weak_pool.py` in the chapter, plus `Solutions/35_Flyweight.md`
-exercise 5, which uses the technique but defines its own `Color`, so it is
-probably unaffected. Check before applying.
-Alternative: leave the code and add "(this `Symbol` is the parser's, not
-`tile_map.py`'s type alias)" to the prose, which is cheaper and uglier.
-Reported rather than applied because renaming a listing's public name is not
-mine to decide.
+The deep-review skill's "front-load the payoff" test applies:
+the most convincing artifact is outside the chapter entirely.
 
----
+Proposed change, recommended form:
+a short listing immediately after `tile_map.py`'s commentary that measures the
+same 24-cell grid two ways, using `sys.getsizeof()` rather than `tracemalloc`
+so the number is deterministic and the marker is stable.
+Something like:
 
-[] Reject
+```python
+# tile_memory.py
+import sys
+from tile_map import Tile, parse_map
 
-**"A Fixed Set: Enum": the section shows a second, different `Tile` without
-saying it is the same tile.**
+def footprint(cells: list[Tile]) -> int:
+    unique = {id(t): t for t in cells}
+    per_object = sys.getsizeof(next(iter(unique.values())))
+    per_dict = sys.getsizeof(next(iter(unique.values())).__dict__)
+    return len(unique) * (per_object + per_dict)
+```
 
-`tile_enum.py` defines `class Tile(Enum)`; `tile_map.py` defines a frozen
-dataclass `Tile`. The section opens on the general principle
-("When you know the full set of shared values as you write the program, you do
-not need a pool at runtime") and goes straight into the listing.
-The comparison is real and good, but it arrives four paragraphs later, at
-"`tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code."
-
-Proposed change: one clause on the section's opening, so the reader knows they
-are looking at the same domain rebuilt, e.g.
-
-> Python constructs each member once, at class creation,
-> and any reference produces that one object.
-> Here is `tile_map.py`'s `Tile` again, with the pool moved into the language:
-
-Reported rather than applied because it is the section's opening line and that
-is voice.
-
----
-
-[] Reject
-
-**"A Fixed Set: Enum", last paragraph: "The constraint is less flexibility."**
-
-The sentence is grammatical but the noun is doing no work; the chapter
-elsewhere writes the plain form ("The cost is bookkeeping by hand.").
-Suggest "The cost is flexibility." so the two trade-off sentences in the
-chapter read the same way.
-
----
-
-[] Reject
-
-**"Flyweights in the Wild": "equality checks that collapse to identity" is
-true of interned strings and not of the chapter's own `Tile`.**
-
-`Tile` is a frozen dataclass, so `==` runs the generated `__eq__()` and
-compares three fields; it does not become a pointer check just because the
-objects happen to be shared.
-The collapse is available (`is` answers correctly for a perfectly interned
-type, which the chapter says of `Color`), but it is something the caller opts
-into, not something interning does for them.
-
-Proposed change: "...and, for a type where every instance comes from the pool,
-equality checks you can write as `is`."
-This also closes the loop with the new paragraph in "Interning in the
-Constructor" about `tile()` interning only the calls that go through it.
+I have deliberately not drafted this as a finished listing, because where it
+goes and whether the chapter wants a measurement at all is a pacing decision.
+Two things to know if you take it:
+`sys.getsizeof(Tile(...))` is 48 bytes and its `__dict__` another 280 on the
+pinned 3.15 build, so a shared 24-cell grid costs 3 x 328 against an unshared
+24 x 328, which is a clean 8x with no timing involved;
+and the alternative (drop it, and instead point at exercise 2 from the prose)
+costs one sentence and no listing.
 
 ---
 
@@ -302,6 +195,59 @@ mechanism, organized by the question that decides it:
 - Otherwise, a `@cache` factory.
 
 Reported rather than drafted, since a new section changes the chapter's pacing.
+
+---
+
+[] Reject
+
+**"Intrinsic and Extrinsic State": the typing discussion is a 19-line
+digression inside the chapter's flagship section.**
+
+Between `tile_map.py` and its test sits a block that starts at
+"`Symbol` names the closed set of valid map characters" and ends at
+"`cast()` is believed rather than verified."
+It is good material and chapter 08's `cast(T, x)` table row links directly to
+this section for it.
+But it is about `Literal`, boundary functions and narrowing, not about
+intrinsic versus extrinsic state, and a reader following the pattern has to
+push through it to reach "Because `Tile` is frozen, sharing is invisible to
+clients," which is the section's actual conclusion.
+
+Proposed change: give it its own `###` heading, e.g.
+`### Typing the Symbol Set`, placed exactly where the block already begins.
+Price of the rearrangement: nothing moves, so no listing or test is affected;
+the existing `#intrinsic-and-extrinsic-state` anchor is unchanged, so chapter
+08's link and `heading_links.py` stay green; the new heading only adds an
+anchor.
+The alternative is to move the block after the test listing so the frozen
+paragraph follows the code directly, but that separates the typing prose from
+the code it describes, which is worse.
+
+---
+
+[] Reject
+
+**"A Pool That Does Not Leak": `weak_pool.py`'s `Symbol` collides with
+`tile_map.py`'s `Symbol`, in the same chapter.**
+
+`tile_map.py` has `type Symbol = Literal[".", "~", "#"]`, a type alias naming
+map characters.
+`weak_pool.py` has `class Symbol` with a `name: str`, a parser's interned
+identifier.
+Different kinds of thing, same word, ~150 lines apart, both extracted into the
+same `Examples/35_Flyweight/` directory.
+Nothing breaks (separate modules), but a reader skimming back for "what was a
+`Symbol` again" finds two answers.
+
+Proposed change: rename the weak-pool class to `Name`, with `_pool:
+Final[WeakValueDictionary[str, Name]]` and `def name(text: str) -> Name`.
+Cost: `test_weak_pool.py` in the chapter, plus `Solutions/35_Flyweight.md`
+exercise 5, which uses the technique but defines its own `Color`, so it is
+probably unaffected. Check before applying.
+Alternative: leave the code and add "(this `Symbol` is the parser's, not
+`tile_map.py`'s type alias)" to the prose, which is cheaper and uglier.
+Reported rather than applied because renaming a listing's public name is not
+mine to decide.
 
 ---
 
@@ -337,32 +283,61 @@ four.
 
 ---
 
-## Cross-chapter (not edited, per the review's scope rules)
+[] Reject
+
+**"A Fixed Set: Enum": the section shows a second, different `Tile` without
+saying it is the same tile.**
+
+`tile_enum.py` defines `class Tile(Enum)`; `tile_map.py` defines a frozen
+dataclass `Tile`. The section opens on the general principle
+("When you know the full set of shared values as you write the program, you do
+not need a pool at runtime") and goes straight into the listing.
+The comparison is real and good, but it arrives four paragraphs later, at
+"`tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code."
+
+Proposed change: one clause on the section's opening, so the reader knows they
+are looking at the same domain rebuilt, e.g.
+
+> Python constructs each member once, at class creation,
+> and any reference produces that one object.
+> Here is `tile_map.py`'s `Tile` again, with the pool moved into the language:
+
+Reported rather than applied because it is the section's opening line and that
+is voice.
+
+---
 
 [] Reject
 
-**`Solutions/35_Flyweight.md`: the two test files are named for the old
-chapter number.**
+**"Flyweights in the Wild": "equality checks that collapse to identity" is
+true of interned strings and not of the chapter's own `Tile`.**
 
-They are `test_ch36_mutation_leak.py` and `test_ch36_out_of_range.py`, in
-`Solutions/35_Flyweight.md`.
-The convention everywhere else is `test_chNN_` matching the chapter
-(`test_ch11_transfer.py`, `test_ch23_filter.py`), so these are leftovers from
-the renumbering that moved Flyweight from 36 to 35.
+`Tile` is a frozen dataclass, so `==` runs the generated `__eq__()` and
+compares three fields; it does not become a pointer check just because the
+objects happen to be shared.
+The collapse is available (`is` answers correctly for a perfectly interned
+type, which the chapter says of `Color`), but it is something the caller opts
+into, not something interning does for them.
 
-This is not unique to my chapter, so it wants one sweep rather than a local
-patch. The full set of mismatches in `Solutions/`:
-
-    Solutions/35_Flyweight.md               test_ch36_mutation_leak.py
-    Solutions/35_Flyweight.md               test_ch36_out_of_range.py
-    Solutions/36_Memento.md                 test_ch37_erase_mutable.py
-    Solutions/36_Memento.md                 test_ch37_erase_frozen.py
-    Solutions/42_Functional_Error_Handling.md  test_ch14_combined.py
-
-Renaming touches the fenced `# slug.py` first lines and then needs
-`make prune-examples` for the orphaned files under `Examples/`, per CLAUDE.md.
+Proposed change: "...and, for a type where every instance comes from the pool,
+equality checks you can write as `is`."
+This also closes the loop with the new paragraph in "Interning in the
+Constructor" about `tile()` interning only the calls that go through it.
 
 ---
+
+[] Reject
+
+**"A Fixed Set: Enum", last paragraph: "The constraint is less flexibility."**
+
+The sentence is grammatical but the noun is doing no work; the chapter
+elsewhere writes the plain form ("The cost is bookkeeping by hand.").
+Suggest "The cost is flexibility." so the two trade-off sentences in the
+chapter read the same way.
+
+---
+
+## Cross-chapter (not edited, per the review's scope rules)
 
 [] Reject
 
@@ -402,6 +377,31 @@ prefer over it."
 If the `### Typing the Symbol Set` subsection above is adopted, retarget the
 link at that anchor at the same time.
 I did not touch chapter 08, per the scope rules.
+
+---
+
+[] Reject
+
+**`Solutions/35_Flyweight.md`: the two test files are named for the old
+chapter number.**
+
+They are `test_ch36_mutation_leak.py` and `test_ch36_out_of_range.py`, in
+`Solutions/35_Flyweight.md`.
+The convention everywhere else is `test_chNN_` matching the chapter
+(`test_ch11_transfer.py`, `test_ch23_filter.py`), so these are leftovers from
+the renumbering that moved Flyweight from 36 to 35.
+
+This is not unique to my chapter, so it wants one sweep rather than a local
+patch. The full set of mismatches in `Solutions/`:
+
+    Solutions/35_Flyweight.md               test_ch36_mutation_leak.py
+    Solutions/35_Flyweight.md               test_ch36_out_of_range.py
+    Solutions/36_Memento.md                 test_ch37_erase_mutable.py
+    Solutions/36_Memento.md                 test_ch37_erase_frozen.py
+    Solutions/42_Functional_Error_Handling.md  test_ch14_combined.py
+
+Renaming touches the fenced `# slug.py` first lines and then needs
+`make prune-examples` for the orphaned files under `Examples/`, per CLAUDE.md.
 
 ---
 
