@@ -8,8 +8,8 @@ def handle(event: dict[str, object]) -> str:
             return f"Key {key}"
         case {"type": kind}:
             return f"Other event: {kind}"
-        case nonevent:
-            return f"Not an event: {nonevent}"
+        case unknown:
+            return f"Unrecognized event: {unknown}"
 
 print(handle({"type": "click", "x": 10, "y": 20}))
 #: Click at (10, 20)
@@ -18,4 +18,4 @@ print(handle({"type": "key", "key": "Enter"}))
 print(handle({"type": "scroll", "delta": 3}))
 #: Other event: scroll
 print(handle({"button": 1}))
-#: Not an event: {'button': 1}
+#: Unrecognized event: {'button': 1}

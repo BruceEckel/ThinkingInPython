@@ -1,5 +1,5 @@
-# dataclass_features.py
-from dataclasses import KW_ONLY, asdict, astuple, dataclass
+# asdict_astuple.py
+from dataclasses import asdict, astuple, dataclass
 
 @dataclass(frozen=True)
 class Point:
@@ -19,14 +19,3 @@ class Line:
 line = Line([Point(2, 7), Point(10, 4)])
 print(asdict(line))  # Recurses into the list of Points
 #: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
-
-@dataclass
-class Config:
-    source: str
-    # Everything after this must be passed by keyword:
-    _: KW_ONLY
-    verbose: bool = False
-    retries: int = 3
-
-print(Config("data.csv", retries=5))
-#: Config(source='data.csv', verbose=False, retries=5)

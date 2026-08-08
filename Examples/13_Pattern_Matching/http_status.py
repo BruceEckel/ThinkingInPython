@@ -8,7 +8,7 @@ def describe(status: int) -> str:
             return "Not Found"
         case 500:
             return "Server Error"
-        case _:  # Default
+        case _:
             return f"Status {status}"
 
 print(describe(200))

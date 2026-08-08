@@ -1,5 +1,7 @@
 # exercise_3.py
+import copy
 from dataclasses import dataclass
+from typing import NamedTuple
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -14,20 +16,23 @@ def check(condition: bool, subject: str, reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
-@dataclass(frozen=True)
-class Stars:
+class _Stars(NamedTuple):
     number: int
 
-    def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+class Stars(_Stars):
+    def __new__(cls, number: int) -> Stars:
+        check(1 <= number <= 10, f"Stars({number})")
+        return super().__new__(cls, number)
 
-    def f1(self) -> Stars:
-        return Stars(self.number + 5)
-
-print(Stars(2).f1())
-#: Stars(number=7)
+print(Stars(5))
+#: Stars(number=5)
 try:
-    Stars(4).f1().f1()  # 4+5=9 legal, then 9+5=14 illegal
+    Stars(11)
 except TypeFailure as e:
-    print("caught postcondition failure:", e)
-#: caught postcondition failure: Stars(14)
+    print(f"{type(e).__name__}: {e}")
+#: TypeFailure: Stars(11)
+
+print(Stars(5)._replace(number=99))
+#: Stars(number=99)
+print(copy.replace(Stars(5), number=99))
+#: Stars(number=99)

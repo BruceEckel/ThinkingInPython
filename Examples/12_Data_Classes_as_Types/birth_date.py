@@ -42,8 +42,8 @@ class Month(Enum):
         return self.value[1]
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days,
-              f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
     def __repr__(self) -> str:
         return self.name

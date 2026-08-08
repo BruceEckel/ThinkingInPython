@@ -16,8 +16,6 @@ def f3(stars: int) -> int:  # The check is missing here
     return stars * 100
 
 rating = 6
-print(rating)
-#: 6
 print(f1(rating))
 #: 11
 print(f2(rating))

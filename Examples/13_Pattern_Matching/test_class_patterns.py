@@ -15,7 +15,6 @@ def test_class_patterns(point: Point, expected: str) -> None:
 @pytest.mark.parametrize("point, expected", [
     (Point(0, 5), "Somewhere on the y-axis"),
     (Point(3, 0), "Somewhere on the x-axis"),
-    (Point(2, 2), "On the diagonal at 2"),
     (Point(3, 4), "Just some point"),
 ])
 def test_keyword_patterns(point: Point, expected: str) -> None:

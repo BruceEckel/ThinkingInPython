@@ -73,7 +73,8 @@ class Month(Enum):
         max_days = self.max_days
         if self is Month.FEBRUARY and year.is_leap():
             max_days = 29
-        check(day.n <= max_days, f"{self.name} has no day {day.n}")
+        check(day.n <= max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
 @dataclass(frozen=True)
 class BirthDate:
@@ -153,11 +154,13 @@ somewhere. `count("@") == 1` additionally rejects two-`@` strings like
 `"b@@x.com"`, and splitting on `@` and checking both halves are
 non-empty rejects an `@` with nothing before or after it.
 
-## 3. `Stars` as a frozen data class, guarantees replace checks
+## 3. The `NamedTuple` subclass workaround, and the hole it leaves
 
 ```python
 # exercise_3.py
+import copy
 from dataclasses import dataclass
+from typing import NamedTuple
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -172,35 +175,41 @@ def check(condition: bool, subject: str, reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
-@dataclass(frozen=True)
-class Stars:
+class _Stars(NamedTuple):
     number: int
 
-    def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+class Stars(_Stars):
+    def __new__(cls, number: int) -> Stars:
+        check(1 <= number <= 10, f"Stars({number})")
+        return super().__new__(cls, number)
 
-    def f1(self) -> Stars:
-        return Stars(self.number + 5)
-
-print(Stars(2).f1())
-#: Stars(number=7)
+print(Stars(5))
+#: Stars(number=5)
 try:
-    Stars(4).f1().f1()  # 4+5=9 legal, then 9+5=14 illegal
+    Stars(11)
 except TypeFailure as e:
-    print("caught postcondition failure:", e)
-#: caught postcondition failure: Stars(14)
+    print(f"{type(e).__name__}: {e}")
+#: TypeFailure: Stars(11)
+
+print(Stars(5)._replace(number=99))
+#: Stars(number=99)
+print(copy.replace(Stars(5), number=99))
+#: Stars(number=99)
 ```
 
-Compare this to `stars_class.py`'s mutable `f1()`, which needs an
-explicit `self._validate()` call after mutating `self._number`, its
-postcondition written out by hand. Here `f1()` just returns
-`Stars(self.number + 5)`. Building that new `Stars` runs
-`__post_init__()` automatically, so the postcondition is enforced by
-construction rather than a separate call. A version taking a second
-rating would need no precondition either: any `Stars` handed to it is
-already known legal, since it could not exist otherwise. The check
-moves from "written in every method, easy to forget" to "run once, in
-the constructor, impossible to skip."
+`typing.NamedTuple` refuses a `__new__()` in its own class body, but it
+does not refuse one in a subclass, so `Stars(11)` now raises a
+`TypeFailure` the factory function could only advise against.
+
+The guarantee still leaks. `_replace()` builds the new tuple through
+`tuple.__new__()` rather than through `cls.__new__()`, so it never sees
+the check, and `copy.replace()` calls `_replace()`. A validated `Stars`
+therefore produces an unvalidated one, which is worse than no check at
+all: the type now looks like it guarantees its values.
+
+A frozen data class has no equivalent hole because there is only one
+construction path. `copy.replace()` calls the constructor, the
+constructor calls `__post_init__()`, and the check runs.
 
 ## 4. `from_json()` rejects a bad email
 
@@ -380,3 +389,56 @@ instances. `Wrong` writes the same intent a different way, and fails.
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance, which is the assignment
 `frozen=True` refuses.
+
+## 7. A `dict` field default, three ways
+
+```python
+# exercise_7.py
+from dataclasses import dataclass, field
+
+@dataclass(frozen=True)
+class Month:
+    name: str
+    n: int
+
+def make_months() -> list[Month]:
+    return [Month("January", 1), Month("February", 2)]
+
+try:
+    @dataclass(frozen=True)
+    class Broken:
+        months: list[Month] = field(default_factory=make_months)
+        index: dict[str, Month] = {}
+except ValueError as e:
+    print(f"{type(e).__name__}: {str(e).split(': ')[-1]}")
+#: ValueError: use default_factory
+
+@dataclass(frozen=True)
+class Bare:
+    months: list[Month] = field(default_factory=make_months)
+    index: dict[str, Month] = field(default_factory=dict)
+
+@dataclass(frozen=True)
+class Subscripted:
+    months: list[Month] = field(default_factory=make_months)
+    index: dict[str, Month] = field(default_factory=dict[str, Month])
+
+print(Bare().index, Subscripted().index)
+#: {} {}
+```
+
+`= {}` never reaches a running program. `@dataclass` inspects the
+default while the class is being created, finds an unhashable object,
+and raises a `ValueError` naming the fix. The full message is `mutable
+default <class 'dict'> for field index is not allowed: use
+default_factory`.
+
+`Bare` and `Subscripted` both work, and they differ in what a checker
+can see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
+loose enough to satisfy any `dict` annotation, so a checker cannot
+compare the factory against the field. `dict[str, Month]` is callable
+too, and its return type is concrete, so writing
+`field(default_factory=dict[int, int])` on this field is an error
+before the program runs. The bare form is fine where the factory and
+the annotation obviously agree; subscript it when you want the
+agreement checked.

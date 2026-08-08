@@ -6,7 +6,7 @@ A type you define, like a rating from one to ten, is a smaller set:
 the allowed values.
 Programmers have historically been bad at keeping objects inside that set.
 It's too easy to construct or mutate an object in an illegal state.
-Checks to defend against the mess become scattered throughout your code.
+Defensive checks then spread through your code.
 
 This chapter shows a better approach, built from frozen data classes.
 You validate the value once, at construction,
@@ -76,8 +76,6 @@ def f3(stars: int) -> int:  # The check is missing here
     return stars * 100
 
 rating = 6
-print(rating)
-#: 6
 print(f1(rating))
 #: 11
 print(f2(rating))
@@ -89,6 +87,8 @@ print(f3(11))
 Each function duplicates the check, the check is easy to forget,
 and the type system is no help.
 The `int` annotation says "any integer," which is not what you mean.
+Checking the argument also says nothing about the result: `f1(6)` returns 11,
+which no rating may be.
 `f3()` is what forgetting looks like.
 `11` was never a legal rating, and nothing objected: not the annotation,
 not the type checker, not the running program.
@@ -149,18 +149,21 @@ That check runs after the mutation, not instead of it:
 `Stars(8).f1()` sets `_number` to 13, then raises,
 and the object goes on holding that illegal value.
 Catching the exception does not undo the damage.
-Checking arguments on the way in and results on the way out is the practice known as *Design by Contract*
-(DbC).
+Checking arguments on the way in and results on the way out,
+with a class invariant that must hold between calls,
+is the practice known as *Design by Contract* (DbC).
 `f1()` takes no argument, so only the postcondition appears here.
 A method that accepted a second rating would need a precondition for it as well.
 The problem with DbC is that the contract is spread across every method that touches the value.
+The invariant is the part this chapter replaces.
+`_validate()` states it, and every mutating method has to remember to call it.
 That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value.
 It does not constrain it to a set of legal values.
 
 ## Data Classes
 
-A *data class* writes the boilerplate for a class that holds data.
+A *data class* removes the boilerplate from a class that holds data.
 The `@dataclass` decorator generates `__init__()`, `__repr__()`,
 and `__eq__()` from the fields you declare:
 
@@ -258,10 +261,293 @@ display_object(Messenger("foo", 12, 3.14))
 The default `display_object()` does not show the generated `__init__()`,
 `__repr__()`, and `__eq__()`.
 
+## Immutability
+
+Passing `frozen=True` makes the data class immutable.
+Attempting to assign to a field raises `FrozenInstanceError`.
+As a bonus, a frozen instance is hashable,
+so you can use it as a dictionary key or put it in a set:
+
+```python
+# frozen_messenger.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Messenger:
+    name: str
+    number: int
+    depth: float = 0.0
+
+m = Messenger("foo", 12, 3.14)
+print(m)
+#: Messenger(name='foo', number=12, depth=3.14)
+
+try:
+    setattr(m, "name", "bar")
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: FrozenInstanceError: cannot assign to field 'name'
+
+cache = {m: "Ni!"}  # Frozen instances are hashable
+print(cache[m])
+#: Ni!
+```
+
+The listing goes through `setattr()` because the type checker rejects `m.name = "bar"` before the program runs,
+which is the earlier of the two defenses.
+`frozen=True` is the one that holds at runtime,
+against code the checker never saw.
+
+`frozen=True` guards the binding, not the object behind it.
+A field holding a `list` can still be mutated in place,
+and a frozen instance is hashable only when every field it holds is.
+[Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+demonstrates that leak.
+The types this chapter validates hold `int`s and `str`s,
+so for them the guarantee is total.
+`Months` and `Line`, both later in this chapter, each hold a `list`:
+neither is hashable, and neither is safe from a change made through that list.
+
+A frozen data class still carries a per-instance `__dict__`.
+Adding `slots=True` drops it, for less memory and faster attribute access;
+[Performance](18_Performance.md#slots) measures the difference.
+
+A frozen data class is not the only immutable record in the standard library.
+A `typing.NamedTuple` also rejects assignment and is also hashable.
+The two differ in equality.
+A frozen data class equals only another instance of its own class,
+while a `NamedTuple` equals any tuple holding the same values,
+a difference [Data Transfer Objects](22_Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
+covers.
+They differ again in what this chapter cares about most,
+shown in [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate).
+
+If nothing about an object can change after it is built,
+then validating it at construction makes it valid for its lifetime.
+
+## A Type Is a Set of Values
+
+If you make `Stars` a frozen data class,
+you can guarantee that every `Stars` object is legal.
+To validate it after the fields receive their values, define `__post_init__()`.
+The generated `__init__()` calls this automatically:
+
+```python
+# stars.py
+from dataclasses import dataclass
+from validation import check
+
+@dataclass(frozen=True)
+class Stars:
+    number: int
+
+    def __post_init__(self) -> None:
+        check(1 <= self.number <= 10, f"Stars({self.number})")
+
+def f1(s: Stars) -> Stars:
+    return Stars(s.number + 5)
+
+def f2(s: Stars) -> Stars:
+    return Stars(s.number * 5)
+
+if __name__ == "__main__":
+    print(Stars(4))
+    print(f1(Stars(2)))
+    print(f2(Stars(2)))
+#: Stars(number=4)
+#: Stars(number=7)
+#: Stars(number=10)
+```
+
+The `number` in `Stars` is now constrained to a set of values:
+the integers one through ten.
+The only way to make a `Stars` is through the constructor,
+and the constructor refuses anything outside that set.
+If you are holding a `Stars`, it is legal.
+You know it without checking.
+
+This changes how you write the functions.
+`f1()` and `f2()` take a `Stars` and return a `Stars`.
+They do not check their argument, because every `Stars` is already good.
+They do not test their result,
+because building the returned `Stars` runs the check.
+
+The validation lives in one place: the constructor.
+This makes it easy to change.
+Immutability guarantees no one can rebind the fields after construction,
+and when the fields are immutable too, no one can damage the value.
+
+`__post_init__()` can check a field but cannot change one.
+`frozen=True` works by installing a `__setattr__()` that rejects every assignment,
+including the ones arriving from inside the class,
+so normalizing a value there raises `FrozenInstanceError`:
+
+```python
+# post_init_normalize.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Email:
+    text: str
+
+    def __post_init__(self) -> None:
+        self.text = self.text.lower()  # type: ignore
+
+try:
+    Email("Bruce@Example.com")
+except Exception as e:
+    print(f"{type(e).__name__}: {e}")
+#: FrozenInstanceError: cannot assign to field 'text'
+
+@dataclass(frozen=True)
+class Normalized:
+    text: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "text", self.text.lower())
+
+print(Normalized("Bruce@Example.com"))
+#: Normalized(text='bruce@example.com')
+```
+
+Both defenses fire here, as they did for `frozen_messenger.py`.
+The checker reports the assignment before the program runs,
+which the `# type: ignore` silences so the listing can reach the runtime failure.
+
+`object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
+It works, and it says what it is doing.
+The alternative is to refuse the unnormalized value and normalize before construction.
+Which one you want depends on the type.
+Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
+which is usually what an email address should mean.
+Refusing instead keeps the constructor a gate and leaves the cleanup to the caller.
+
+Validating once, at construction, often goes by the name *parse,
+don't validate*.^[Coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
+Instead of checking a changeable value everywhere and hoping you never miss a spot,
+you parse it once into a precise type.
+After that, holding the type is proof the check passed.
+No other code repeats the check, because it cannot fail.
+Illegal values are unrepresentable.
+
+This is one aspect of functional programming
+(see [Functional Foundations](40_Functional_Foundations.md#immutability)).
+Instead of mutating an object and re-guarding it,
+you transform one legal value into a new legal value.
+[Static Typing](08_Static_Typing.md#type-hints)
+argues for letting the type carry the meaning.
+Here the type carries a guarantee.
+
+Testing demonstrates that illegal values cannot exist.
+`pytest.raises()` confirms that the constructor rejects values outside the set:
+
+```python
+# test_stars.py
+import pytest
+from stars import Stars, f1, f2
+from validation import TypeFailure
+
+def test_legal_stars() -> None:
+    assert Stars(1).number == 1
+    assert Stars(10).number == 10
+
+@pytest.mark.parametrize("n", [0, 11, -1, 100])
+def test_illegal_stars_rejected(n: int) -> None:
+    with pytest.raises(TypeFailure):
+        Stars(n)
+
+def test_transformations_return_legal_values() -> None:
+    assert f1(Stars(2)) == Stars(7)
+    assert f2(Stars(2)) == Stars(10)
+
+def test_transformation_can_produce_illegal_value() -> None:
+    # f2 multiplies, so its result can be outside the legal set.
+    # Construction of the returned Stars catches it: no illegal
+    # Stars can ever exist.
+    with pytest.raises(TypeFailure):
+        f2(Stars(4))  # 4 * 5 = 20
+```
+
+## Composing Types from Types
+
+Once each small type guarantees its own values,
+you can safely build larger types out of them.
+A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction,
+with no extra work:
+
+```python
+# person.py
+from dataclasses import dataclass
+from validation import check
+
+@dataclass(frozen=True)
+class FullName:
+    text: str
+
+    def __post_init__(self) -> None:
+        check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
+              "needs a first and last name")
+
+@dataclass(frozen=True)
+class EmailAddress:
+    text: str
+
+    def __post_init__(self) -> None:
+        check("@" in self.text, f"EmailAddress({self.text!r})",
+              "needs an @")
+
+@dataclass(frozen=True)
+class Person:
+    name: FullName
+    email: EmailAddress
+
+if __name__ == "__main__":
+    person = Person(
+        FullName("Bruce Eckel"),
+        EmailAddress("bruce@example.com"),
+    )
+    print(person.name)
+    print(person.email)
+#: FullName(text='Bruce Eckel')
+#: EmailAddress(text='bruce@example.com')
+```
+
+`Person` declares no checks of its own.
+You cannot build it from an illegal name or an illegal email,
+because those values cannot exist:
+
+```python
+# test_person.py
+import pytest
+from person import EmailAddress, FullName
+from validation import TypeFailure
+
+@pytest.mark.parametrize("bad", ["Bruce", "", "   "])
+def test_full_name_needs_two_parts(bad: str) -> None:
+    with pytest.raises(TypeFailure):
+        FullName(bad)
+
+@pytest.mark.parametrize("bad", ["bruce", "example.com", ""])
+def test_email_needs_at_sign(bad: str) -> None:
+    with pytest.raises(TypeFailure):
+        EmailAddress(bad)
+```
+
+When validation grows complicated, libraries make it lighter.
+The [attrs](https://www.attrs.org)
+library predates and inspired data classes and offers richer validators and converters.
+[Pydantic](https://docs.pydantic.dev)
+builds validation and parsing into the type,
+which is especially useful at the edges of a program where untrusted data can enter.
+The principle is the same.
+Make the type responsible for guaranteeing its own values.
+
 ## Comparing Ordinary Classes and Data Classes
 
-Four small classes make the differences concrete,
-and add some insight to [Class Attributes](09_Class_Attributes.md):
+So far `@dataclass` has been used without opening it up:
+you declare fields and a constructor appears.
+Four small classes show the difference between a class body that declares fields and one that stores them,
+and go further than [Class Attributes](09_Class_Attributes.md) did:
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
@@ -286,7 +572,7 @@ For clarity, `show()` also excludes `__hash__` from these reports
 
 ### `A`: Annotations Only
 
-`A` is the plain case, with no defaults and no constructor,
+`A` is the simplest case, with no defaults and no constructor,
 but with field declarations that look like class variables:
 
 ```python
@@ -448,7 +734,7 @@ so each new `D` gets its own copy the moment it is constructed.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 
-`s`, declared `ClassVar[str]`, is a different story.
+`s`, declared `ClassVar[str]`, behaves differently.
 `@dataclass` treats a `ClassVar` field as belonging to the class,
 not to any instance, and leaves it out of `__init__()`.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
@@ -462,274 +748,6 @@ with no value stored anywhere to report.
 `D.f` raises `AttributeError`, for the same reason `A().x` would.
 Declaring a field `ClassVar` does not, by itself, create anything.
 Only assigning it a value does.
-
-## Immutability
-
-Passing `frozen=True` makes the data class immutable.
-Attempting to assign to a field raises `FrozenInstanceError`.
-As a bonus, a frozen instance is hashable,
-so you can use it as a dictionary key or put it in a set:
-
-```python
-# frozen_messenger.py
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class Messenger:
-    name: str
-    number: int
-    depth: float = 0.0
-
-m = Messenger("foo", 12, 3.14)
-print(m)
-#: Messenger(name='foo', number=12, depth=3.14)
-
-try:
-    setattr(m, "name", "bar")
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'name'
-
-cache = {m: "Ni!"}  # Frozen instances are hashable
-print(cache[m])
-#: Ni!
-```
-
-The listing goes through `setattr()` because the type checker rejects `m.name = "bar"` before the program runs,
-which is the earlier of the two defenses.
-`frozen=True` is the one that holds at runtime,
-against code the checker never saw.
-
-`frozen=True` guards the binding, not the object behind it.
-A field holding a `list` can still be mutated in place,
-and a frozen instance is hashable only when every field it holds is.
-[Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
-demonstrates that leak.
-The types this chapter validates hold `int`s and `str`s,
-so for them the guarantee is total.
-`Months` and `Line`, both later in this chapter, each hold a `list`:
-neither is hashable, and neither is safe from a change made through that list.
-
-A frozen data class is not the only immutable record in the standard library.
-A `typing.NamedTuple` also rejects assignment and is also hashable.
-The two differ in equality.
-A frozen data class equals only another instance of its own class,
-while a `NamedTuple` equals any tuple holding the same values,
-a difference [Data Transfer Objects](22_Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
-covers.
-They differ again in what this chapter cares about most,
-shown in [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate).
-
-If nothing about an object can change after it is built,
-then validating it at construction makes it valid for its lifetime.
-
-## A Type Is a Set of Values
-
-If you make `Stars` a frozen data class,
-you can guarantee that every `Stars` object is legal.
-To validate it after the fields receive their values, define `__post_init__()`.
-The generated `__init__()` calls this automatically:
-
-```python
-# stars.py
-from dataclasses import dataclass
-from validation import check
-
-@dataclass(frozen=True)
-class Stars:
-    number: int
-
-    def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
-
-def f1(s: Stars) -> Stars:
-    return Stars(s.number + 5)
-
-def f2(s: Stars) -> Stars:
-    return Stars(s.number * 5)
-
-if __name__ == "__main__":
-    print(Stars(4))
-    print(f1(Stars(2)))
-    print(f2(Stars(2)))
-#: Stars(number=4)
-#: Stars(number=7)
-#: Stars(number=10)
-```
-
-The `number` in `Stars` is now constrained to a set of values:
-the integers one through ten.
-The only way to make a `Stars` is through the constructor,
-and the constructor refuses anything outside that set.
-If you are holding a `Stars`, it is legal.
-You know it without checking.
-
-This changes how you write the functions.
-`f1()` and `f2()` take a `Stars` and return a `Stars`.
-They do not check their argument, because every `Stars` is already good.
-They do not test their result,
-because building the returned `Stars` runs the check.
-
-The validation lives in one place: the constructor.
-This makes it easy to change.
-Immutability guarantees no one can rebind the fields after construction,
-and when the fields are immutable too, no one can damage the value at all.
-
-`__post_init__()` can check a field but cannot change one.
-`frozen=True` works by installing a `__setattr__()` that rejects every assignment,
-including the ones arriving from inside the class,
-so normalizing a value there raises `FrozenInstanceError`:
-
-```python
-# post_init_normalize.py
-from dataclasses import dataclass
-
-@dataclass(frozen=True)
-class Email:
-    text: str
-
-    def __post_init__(self) -> None:
-        self.text = self.text.lower()  # type: ignore
-
-try:
-    Email("Bruce@Example.com")
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'text'
-
-@dataclass(frozen=True)
-class Normalized:
-    text: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "text", self.text.lower())
-
-print(Normalized("Bruce@Example.com"))
-#: Normalized(text='bruce@example.com')
-```
-
-Both defenses fire here, as they did for `frozen_messenger.py`.
-The checker reports the assignment before the program runs,
-which the `# type: ignore` silences so the listing can reach the runtime failure.
-
-`object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
-It works, and it says what it is doing.
-The alternative is to refuse the unnormalized value and normalize before construction.
-Which one you want depends on the type.
-Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
-which is usually what an email address should mean.
-Refusing instead keeps the constructor a gate and leaves the cleanup to the caller.
-
-Validating once, at construction, often goes by the name *parse,
-don't validate*.^[Coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
-Instead of checking a changeable value everywhere and hoping you never miss a spot,
-you parse it once into a precise type.
-After that, holding the type is proof the check passed.
-No other code repeats the check, because it cannot fail.
-Illegal values are unrepresentable.
-
-This is one aspect of functional programming
-(see [Foundations](40_Functional_Foundations.md#immutability)).
-Instead of mutating an object and re-guarding it,
-you transform one legal value into a new legal value.
-[Static Typing](08_Static_Typing.md#type-hints)
-argues for letting the type carry the meaning.
-Here the type carries a guarantee.
-
-Testing demonstrates that illegal values cannot exist.
-`pytest.raises()` confirms that the constructor rejects values outside the set:
-
-```python
-# test_stars.py
-import pytest
-from stars import Stars, f1, f2
-from validation import TypeFailure
-
-def test_legal_stars() -> None:
-    assert Stars(1).number == 1
-    assert Stars(10).number == 10
-
-@pytest.mark.parametrize("n", [0, 11, -1, 100])
-def test_illegal_stars_rejected(n: int) -> None:
-    with pytest.raises(TypeFailure):
-        Stars(n)
-
-def test_transformations_return_legal_values() -> None:
-    assert f1(Stars(2)) == Stars(7)
-    assert f2(Stars(2)) == Stars(10)
-
-def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can be outside the legal set.
-    # Construction of the returned Stars catches it: no illegal
-    # Stars can ever exist.
-    with pytest.raises(TypeFailure):
-        f2(Stars(4))  # 4 * 5 = 20
-```
-
-## Composing Types from Types
-
-Once each small type guarantees its own values,
-you can safely build larger types out of them.
-A `Person` made of a valid `FullName` and a valid `EmailAddress` is valid by construction,
-with no extra work:
-
-```python
-# person.py
-from dataclasses import dataclass
-from validation import check
-
-@dataclass(frozen=True)
-class FullName:
-    text: str
-
-    def __post_init__(self) -> None:
-        check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
-              "needs a first and last name")
-
-@dataclass(frozen=True)
-class EmailAddress:
-    text: str
-
-    def __post_init__(self) -> None:
-        check("@" in self.text, f"EmailAddress({self.text!r})",
-              "needs an @")
-
-@dataclass(frozen=True)
-class Person:
-    name: FullName
-    email: EmailAddress
-
-if __name__ == "__main__":
-    person = Person(
-        FullName("Bruce Eckel"),
-        EmailAddress("bruce@example.com"),
-    )
-    print(person.name)
-    print(person.email)
-#: FullName(text='Bruce Eckel')
-#: EmailAddress(text='bruce@example.com')
-```
-
-`Person` declares no checks of its own.
-You cannot build it from an illegal name or an illegal email,
-because those values cannot exist:
-
-```python
-# test_person.py
-import pytest
-from person import EmailAddress, FullName
-from validation import TypeFailure
-
-@pytest.mark.parametrize("bad", ["Bruce", "", "   "])
-def test_full_name_needs_two_parts(bad: str) -> None:
-    with pytest.raises(TypeFailure):
-        FullName(bad)
-
-@pytest.mark.parametrize("bad", ["bruce", "example.com", ""])
-def test_email_needs_at_sign(bad: str) -> None:
-    with pytest.raises(TypeFailure):
-        EmailAddress(bad)
-```
 
 ## Enums Are Types Too
 
@@ -785,8 +803,8 @@ class Month(Enum):
         return self.value[1]
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days,
-              f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
     def __repr__(self) -> str:
         return self.name
@@ -814,6 +832,9 @@ and only three day counts are distinct,
 so `list(Month)` would return three members instead of twelve.
 Pairing each month with its number keeps all twelve values distinct,
 which is what `of()` relies on when it indexes `list(Month)`.
+The cost is that the member's value is no longer the month number,
+so `Month(7)` raises a `ValueError`.
+`of()` is the replacement lookup.
 
 ```python
 # test_birth_date.py
@@ -868,11 +889,12 @@ class Month:
     def __post_init__(self) -> None:
         check(1 <= self.n <= 12, f"Month({self.n})")
         check(self.max_days in (28, 30, 31),
-              f"max_days {self.max_days}")
+              f"Month(max_days={self.max_days})",
+              "is not a month length")
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days,
-              f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([
@@ -897,20 +919,77 @@ if __name__ == "__main__":
 ```
 
 `Months` carries a list of its twelve `Month`s,
-so its `months` field needs `field(default_factory=make_months)` rather than a default value,
-for reasons covered in [Defaults That Are Built, Not Shared](#defaults-built-not-shared).
+so its `months` field needs `field(default_factory=make_months)` rather than a default value.
 
 Choose the tool that makes the legal set easiest to express.
 For a small fixed set, that is an `Enum`.
 
-When validation grows complicated, libraries make it lighter.
-The [attrs](https://www.attrs.org)
-library predates and inspired data classes and offers richer validators and converters.
-[Pydantic](https://docs.pydantic.dev)
-builds validation and parsing into the type,
-which is especially useful at the edges of a program where untrusted data can enter.
-The principle is the same.
-Make the type responsible for guaranteeing its own values.
+## Defaults That Are Built, Not Shared {#defaults-built-not-shared}
+
+`Months` declares `months: list[Month] = field(default_factory=make_months)`.
+Writing `= make_months()` instead is refused at class-definition time,
+with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
+A default value is evaluated once, when the class is defined,
+so every `Months` would read and write that one list,
+the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments).
+`field(default_factory=make_months)` supplies a function instead of a value,
+and each new `Months` calls it and gets its own fresh list.
+
+That rejection is narrower than it looks.
+`@dataclass` refuses a default it can tell is shared storage,
+which covers `list`, `dict`, and `set`.
+The test is hashability, not mutability,
+so a mutable object of a class you wrote passes as a default and is shared by every instance,
+which is the same bug the check exists to prevent.
+Use `default_factory` for anything that is not obviously a constant.
+
+`default_factory` accepts any callable that takes no arguments.
+A named function like `make_months` is one.
+A type is another, which is why `field(default_factory=list)` appears throughout this book:
+calling `list` builds an empty one.
+A subscripted generic is callable too,
+so `field(default_factory=dict[str, str])` is legal and does what it looks like.
+That form seems redundant,
+because the annotation on the left already names the type,
+and the subscript is erased at runtime.
+It gains one thing:
+
+```python
+# factory_checking.py
+from dataclasses import dataclass, field
+
+@dataclass
+class Unchecked:
+    data: dict[str, str] = field(default_factory=set)  # A set
+
+@dataclass
+class Checked:
+    data: dict[str, str] = field(default_factory=dict[str, str])
+
+print(type(Unchecked().data).__name__)
+#: set
+try:
+    Unchecked().data["theme"] = "dark"
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+print(Checked().data)
+#: {}
+```
+
+Nothing objects to `Unchecked`.
+The type checker accepts it, the linter accepts it,
+and the field is declared `dict[str, str]`, so every reader expects a dict.
+What arrives is a `set`, and the mistake surfaces at the first item assignment,
+which can be far from the declaration that caused it.
+A bare `list`, `dict`,
+or `set` produces a type loose enough that a checker accepts it against any annotation,
+so it never compares the factory with the field.
+Subscripting makes the factory's return type concrete,
+and `field(default_factory=dict[int, int])` on this field is then a type error before the program runs.
+Use the bare form when the factory and the annotation obviously agree,
+which is most of the time.
+Subscript it when you want that agreement checked.
 
 ## A `NamedTuple` Cannot Validate Itself {#namedtuple-cannot-validate}
 
@@ -961,8 +1040,16 @@ and the class never finishes being created:
 the error arrives while Python is still reading the `class` statement.
 A checker reports it as `invalid-named-tuple` before the program runs,
 which the `# type: ignore` silences.
+
+Subclassing the `NamedTuple` and defining `__new__()` on the subclass gets past the prohibition,
+and moves the hole rather than closing it.
+`_replace()` rebuilds through `tuple.__new__()`, not through your `__new__()`,
+so `copy.replace()` on a validated instance quietly produces an unvalidated one.
+
 A frozen data class runs `__post_init__()` on every construction,
-including the ones you did not anticipate.
+including the ones you did not anticipate, and it has no such back door:
+`copy.replace()` goes through the constructor,
+as [The General Form of `replace()`](#the-general-form-of-replace) shows.
 That is the deciding difference whenever a type must guarantee its own values.
 When it need not, a `NamedTuple` is a fine immutable record,
 as [Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions)
@@ -1027,7 +1114,7 @@ print(c.url, c.name)
 
 `url` is derived state that no field declaration produces,
 so printing it is proof that `Connection.__init__` ran.
-Delete `__post_init__()` and the same line raises an `AttributeError`.
+If you delete `__post_init__()`, the same line raises an `AttributeError`.
 
 If a base `__init__` instead replaces `self.__dict__`,
 calling it from `__post_init__()` discards the fields the data class just assigned.
@@ -1106,12 +1193,11 @@ so anything you derive from one must be frozen too.
 ## More Data Class Tools
 
 `asdict()` and `astuple()` convert an instance to a dictionary or tuple,
-recursing into nested data classes.
-`KW_ONLY` forces callers to pass the fields after it by keyword:
+recursing into nested data classes:
 
 ```python
-# dataclass_features.py
-from dataclasses import KW_ONLY, asdict, astuple, dataclass
+# asdict_astuple.py
+from dataclasses import asdict, astuple, dataclass
 
 @dataclass(frozen=True)
 class Point:
@@ -1131,6 +1217,17 @@ class Line:
 line = Line([Point(2, 7), Point(10, 4)])
 print(asdict(line))  # Recurses into the list of Points
 #: {'points': [{'x': 2, 'y': 7}, {'x': 10, 'y': 4}]}
+```
+
+`asdict()` and `astuple()` copy as they go,
+so every list and dict in the result is a new object rather than the one inside the instance.
+Changing the result never reaches back into the original.
+
+`KW_ONLY` forces callers to pass the fields after it by keyword:
+
+```python
+# kw_only_config.py
+from dataclasses import KW_ONLY, dataclass
 
 @dataclass
 class Config:
@@ -1144,84 +1241,12 @@ print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
 
-`asdict()` and `astuple()` copy as they go,
-so every list and dict in the result is a new object rather than the one inside the instance.
-Changing the result never reaches back into the original.
-
 `KW_ONLY` also lifts the ordering rule.
 A field with no default normally cannot follow one that has a default,
 because the generated `__init__()` would then need a required parameter after an optional one,
 which Python refuses with `TypeError: non-default argument 'b' follows default argument 'a'`.
 Fields after `_: KW_ONLY` are keyword-only,
 so their order no longer matters and the rule stops applying.
-
-## Defaults That Are Built, Not Shared {#defaults-built-not-shared}
-
-`Months` in [When an `Enum` Beats a Data Class](#when-an-enum-beats-a-data-class)
-declares `months: list[Month] = field(default_factory=make_months)`.
-Writing `= make_months()` instead is refused at class-definition time,
-with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
-A default value is evaluated once, when the class is defined,
-so every `Months` would read and write that one list,
-the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments).
-`field(default_factory=make_months)` supplies a function instead of a value,
-and each new `Months` calls it and gets its own fresh list.
-
-That rejection is narrower than it looks.
-`@dataclass` refuses a default it can tell is shared storage,
-which covers `list`, `dict`, and `set`.
-The test is hashability, not mutability,
-so a mutable object of a class you wrote passes as a default and is shared by every instance,
-which is the same bug the check exists to prevent.
-Use `default_factory` for anything that is not obviously a constant.
-
-`default_factory` accepts any callable that takes no arguments.
-A named function like `make_months` is one.
-A type is another, which is why `field(default_factory=list)` appears throughout this book:
-calling `list` builds an empty one.
-A subscripted generic is callable too,
-so `field(default_factory=dict[str, str])` is legal and does what it looks like.
-That form seems redundant,
-because the annotation on the left already names the type,
-and the subscript is erased at runtime.
-It gains one small but real thing:
-
-```python
-# factory_checking.py
-from dataclasses import dataclass, field
-
-@dataclass
-class Unchecked:
-    data: dict[str, str] = field(default_factory=set)  # A set
-
-@dataclass
-class Checked:
-    data: dict[str, str] = field(default_factory=dict[str, str])
-
-print(type(Unchecked().data).__name__)
-#: set
-try:
-    Unchecked().data["theme"] = "dark"
-except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
-print(Checked().data)
-#: {}
-```
-
-Nothing objects to `Unchecked`.
-The type checker accepts it, the linter accepts it,
-and the field is declared `dict[str, str]`, so every reader expects a dict.
-What arrives is a `set`, and the mistake surfaces at the first item assignment,
-which can be far from the declaration that caused it.
-A bare `list`, `dict`,
-or `set` produces a type loose enough that a checker accepts it against any annotation,
-so it never compares the factory with the field.
-Subscripting makes the factory's return type concrete,
-and `field(default_factory=dict[int, int])` on this field is then a type error before the program runs.
-Use the bare form when the factory and the annotation obviously agree,
-which is most of the time.
-Subscript it when you want that agreement checked.
 
 ## The General Form of `replace()` {#the-general-form-of-replace}
 
@@ -1313,7 +1338,8 @@ MASK: Final[int] = 0xFF
 
 class Color:
     def __init__(self, red: int, green: int, blue: int) -> None:
-        self.packed = (red << 16) | (green << 8) | blue
+        channels = {"red": red, "green": green, "blue": blue}
+        self.packed = sum(v << SHIFTS[k] for k, v in channels.items())
 
     @property
     def channels(self) -> dict[str, int]:
@@ -1339,6 +1365,8 @@ so `dataclasses.replace()` has nothing to work with.
 and hands the result back through the constructor,
 which is the same shape every implementation takes:
 recover the constructor arguments, override the named ones, rebuild.
+`__init__()` packs a channel dictionary using `SHIFTS`,
+and `channels` unpacks one with the same table, so the two are inverses.
 Returning `Self` from `type(self)(...)` means a subclass gets a copy of its own class.
 
 Define `__replace__()` when your type is immutable and callers will need variants of it.
@@ -1480,8 +1508,11 @@ and a function receiving one does its work without asking whether the value make
 2.  Give `EmailAddress` a stricter check
     (a single `@`, with text on both sides).
     Add tests for the values the check should now reject.
-3.  Rewrite `stars_class.py`'s `Stars` as a frozen data class with a method that returns a new `Stars`,
-    and show that the hand-written postcondition disappears.
+3.  Take `test_namedtuple_no_hook.py`'s `Stars` and build the subclass workaround:
+    a `_Stars(NamedTuple)` holding the field,
+    and a `Stars(_Stars)` whose `__new__()` runs the check.
+    Show that `Stars(11)` now raises a `TypeFailure` while `copy.replace(Stars(5), number=99)` does not,
+    and explain why a frozen data class has no equivalent hole.
 4.  Feed `from_json()` a JSON string whose email has no `@`,
     and confirm that it raises `TypeFailure`.
     The validation you wrote once, in `EmailAddress`,
@@ -1494,3 +1525,9 @@ and a function receiving one does its work without asking whether the value make
     then check with `display_object()`.
     Incrementing the counter from `__post_init__()` works on a frozen class.
     Explain why.
+7.  Give `Months` a second field,
+    a `dict[str, Month]` index written with a `= {}` default,
+    and read the error `@dataclass` reports.
+    Then fix it two ways,
+    with `default_factory=dict` and with `default_factory=dict[str, Month]`,
+    and say which one a checker can verify.

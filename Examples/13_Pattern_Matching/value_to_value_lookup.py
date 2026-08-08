@@ -5,7 +5,10 @@ STATUS: Final[dict[int, str]] = {
     200: "OK", 404: "Not Found", 500: "Server Error"}
 
 def describe(status: int) -> str:
-    return STATUS.get(status, f"Status {status}")
+    try:
+        return STATUS[status]
+    except KeyError:
+        return f"Status {status}"
 
 print(describe(200))
 #: OK

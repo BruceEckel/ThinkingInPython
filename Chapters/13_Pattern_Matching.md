@@ -3,8 +3,25 @@
 The `match` statement compares a value against a series of *patterns* and runs the first one that fits.
 A `match` is far more than a `switch` because a pattern can test a value's shape,
 look inside it, and pull out the parts you need, all in one step.
+No C-style `switch` can express this:
+
+```python
+match event:
+    case {"type": "click", "x": x, "y": y}:
+        ...
+```
+
+That case matches only a dictionary whose `"type"` is `"click"`,
+and it binds `x` and `y` from that dictionary as it matches.
+`match` becomes valuable once the patterns do more than test equality.
 
 Pattern matching was briefly introduced in [Control Flow](04_Control_Flow.md#pattern-matching).
+
+`match` and `case` are *soft* keywords:
+they act as keywords only inside this statement,
+so existing code that uses `match` as a variable name still runs.
+That is also a reason not to write such code.
+A local named `match` shadows nothing, but it reads like the statement.
 
 ## Matching Values
 
@@ -25,7 +42,7 @@ def describe(status: int) -> str:
             return "Not Found"
         case 500:
             return "Server Error"
-        case _:  # Default
+        case _:
             return f"Status {status}"
 
 print(describe(200))
@@ -42,11 +59,11 @@ so `case 200:` also matches `200.0` and `case 1:` matches `True`.
 
 For a value-to-value lookup like this, a dictionary is often shorter
 (see [When Not to Match](#when-not-to-match)).
-`match` becomes valuable once the patterns do more than test equality.
 
 ## Alternatives and Capture
 
 An alternative combines several patterns in one `case` with `|`.
+Every alternative in a `|` must bind the same set of names.
 
 A bare name is a *capture pattern*.
 Like `_`, it matches any value unconditionally; unlike `_`,
@@ -164,8 +181,18 @@ Iterating a string a character at a time is almost never what a pattern means,
 so the language rules it out.
 A tuple does match: `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
+Parentheses group a pattern rather than build a tuple: `case (x)` is `case x`,
+an unconditional capture, while `case (x,)` is a one-element sequence pattern.
 The subject must be a sequence, though, not merely iterable:
 `case [a, b]` matches a `range` but not a generator and not a `set`.
+
+The brackets are optional in a sequence pattern,
+so `case 0, 0:` and `case [0, 0]` are the same pattern.
+The subject is any expression, not only a parameter,
+and a comma builds a tuple there too,
+so `match sign(x), sign(y):` matches on a pair computed on the spot.
+Transforming the subject this way turns a set of comparisons into literal patterns,
+which usually reads better than the guards you would write otherwise.
 
 ```python
 # test_sequence_patterns.py
@@ -232,6 +259,7 @@ so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
 `NamedTuple` generates it too; an ordinary class must assign it by hand.
 Without a `__match_args__` long enough to cover the positions you supply,
 a positional pattern raises a `TypeError`.
+An ordinary class that never assigns one reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
 Keyword patterns work differently.
 `Point(x=0, y=y)` matches by attribute name directly, through attribute access,
@@ -249,8 +277,6 @@ def describe(p: Point) -> str:
             return "Somewhere on the y-axis"
         case Point(y=0):
             return "Somewhere on the x-axis"
-        case Point(x=x, y=y) if x == y:
-            return f"On the diagonal at {x}"
         case Point():
             return "Just some point"
 
@@ -258,13 +284,9 @@ print(describe(Point(0, 5)))
 #: Somewhere on the y-axis
 print(describe(Point(3, 0)))
 #: Somewhere on the x-axis
-print(describe(Point(2, 2)))
-#: On the diagonal at 2
 print(describe(Point(3, 4)))
 #: Just some point
 ```
-
-The `if x == y` on the third case is a *guard*, covered in the next section.
 
 `Point(x=0)` matches any point whose `x` attribute is zero, ignoring `y`.
 A positional pattern can leave fields unchecked too:
@@ -275,7 +297,7 @@ and it survives a change to the field order that would silently redefine every p
 `Point()` with no arguments matches any `Point` instance, keyword or positional,
 and works as a type-only check or a final catch-all.
 
-The type test is `isinstance()`, which has consequences worth knowing:
+The type test is `isinstance()`, which has two consequences:
 
 ```python
 # type_patterns.py
@@ -336,7 +358,6 @@ def test_class_patterns(point: Point, expected: str) -> None:
 @pytest.mark.parametrize("point, expected", [
     (Point(0, 5), "Somewhere on the y-axis"),
     (Point(3, 0), "Somewhere on the x-axis"),
-    (Point(2, 2), "On the diagonal at 2"),
     (Point(3, 4), "Just some point"),
 ])
 def test_keyword_patterns(point: Point, expected: str) -> None:
@@ -374,7 +395,7 @@ print(quadrant(Point(-1, -1)))
 ```
 
 The guard runs only after the pattern matches,
-which is what lets it use the names the pattern bound.
+which lets it use the names the pattern bound.
 A false guard moves on to the next `case`, but the names stay bound:
 once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
@@ -406,8 +427,8 @@ def handle(event: dict[str, object]) -> str:
             return f"Key {key}"
         case {"type": kind}:
             return f"Other event: {kind}"
-        case nonevent:
-            return f"Not an event: {nonevent}"
+        case unknown:
+            return f"Unrecognized event: {unknown}"
 
 print(handle({"type": "click", "x": 10, "y": 20}))
 #: Click at (10, 20)
@@ -416,7 +437,7 @@ print(handle({"type": "key", "key": "Enter"}))
 print(handle({"type": "scroll", "delta": 3}))
 #: Other event: scroll
 print(handle({"button": 1}))
-#: Not an event: {'button': 1}
+#: Unrecognized event: {'button': 1}
 ```
 
 Testing verifies a matched event and the fall-through:
@@ -427,12 +448,12 @@ from mapping_patterns import handle
 
 def test_mapping_patterns() -> None:
     assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle({"nope": 1}) == "Not an event: {'nope': 1}"
+    assert handle({"nope": 1}) == "Unrecognized event: {'nope': 1}"
 ```
 
 ## Patterns Nest
 
-Everything so far has been one pattern at a time.
+Each section so far introduced one pattern form on its own.
 A sub-pattern is itself a pattern,
 so any of these forms can sit inside any other:
 
@@ -467,10 +488,11 @@ with a starred capture beside it.
 so `start` is the whole `Point` while `0, 0` checks its fields.
 Without `as` you would have to choose between testing the shape and keeping the object.
 
-The second case alternates two class patterns and binds `n` from either.
-Every branch of a `|` must bind the same set of names,
-which the compiler enforces: adding a third alternative `| Point(1, 1)`,
-which binds nothing,
+The second case alternates two class patterns and binds `n` from either,
+inside a one-element sequence pattern: `survey([Point(0, 5)])` matches,
+while a list of two points does not.
+The compiler enforces the same-names rule stated earlier.
+Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
 ## Exhaustive Matching
@@ -518,11 +540,16 @@ print(area(Square(2.0)))
 
 If you add a `Triangle` to `Shape` without adding the appropriate `case`,
 the checker flags `assert_never(shape)`.
+`assert_never()` acts at runtime as well as at check time.
+If a value that lied about its type reaches it,
+it raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
+naming the value it received.
 
 A `switch` in C, JavaScript, or traditional Java cannot do this.
 Nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions do check this,
+as an error in Java and Kotlin and a warning in Scala,
 as long as the matched type is a sealed hierarchy the compiler can see in full.
 
 Python has no `sealed` keyword.
@@ -556,13 +583,19 @@ STATUS: Final[dict[int, str]] = {
     200: "OK", 404: "Not Found", 500: "Server Error"}
 
 def describe(status: int) -> str:
-    return STATUS.get(status, f"Status {status}")
+    try:
+        return STATUS[status]
+    except KeyError:
+        return f"Status {status}"
 
 print(describe(200))
 #: OK
 print(describe(301))
 #: Status 301
 ```
+
+The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because `get()` builds its default argument on every call,
+including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases while a dictionary lookup's does not.
@@ -775,3 +808,7 @@ explore it further.
 5.  Rewrite `guards.py`'s `quadrant()` so the third and fourth quadrants are handled too.
     Then write it a second time with one `case` per sign combination,
     using `|` alternations and no guards, and say which version reads better.
+6.  Give `value_patterns.py`'s `Signal` a third member,
+    and write `act()` so that it compares against a module-level `FALLBACK: Final[Signal]`.
+    Run it and confirm that the constant captures instead of comparing.
+    Then fix it two ways, with a dotted name and with a guard.

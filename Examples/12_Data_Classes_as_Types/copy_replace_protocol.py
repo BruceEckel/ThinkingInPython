@@ -7,7 +7,8 @@ MASK: Final[int] = 0xFF
 
 class Color:
     def __init__(self, red: int, green: int, blue: int) -> None:
-        self.packed = (red << 16) | (green << 8) | blue
+        channels = {"red": red, "green": green, "blue": blue}
+        self.packed = sum(v << SHIFTS[k] for k, v in channels.items())
 
     @property
     def channels(self) -> dict[str, int]:

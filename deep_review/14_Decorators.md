@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -221,7 +222,7 @@ callable"). But the next four sections open with no reason:
 - "Decorators Are Just Function Calls": restates the intro's desugaring.
 - "The Decorator Pattern": this one *is* justified, by contrast with `@`.
 
-Proposal, in order of how much I would do:
+Proposal, in order of how much I would do: [[do 1 & 2]]
 
 1. Move "Stacking Decorators" up, to directly follow "Decorators That Take
    Arguments", and rewrite `stacking.py` and `test_stacking.py` to import from
@@ -242,8 +243,7 @@ Proposal, in order of how much I would do:
    e.g. "Everything so far decorated a function. The `@` line does not care:
    a `class` statement is decorated the same way, and the decorator receives
    the class object."
-3. Leave "Decorators Are Just Function Calls" where it is but retitle it (see
-   the next block).
+
 
 If you take only one of these, take (1).
 
@@ -352,17 +352,14 @@ exercise is answerable from this chapter. `Solutions/14_Decorators.md` has
 solutions 1, 2, 3, 4, and 6 — 5 is the only gap, which suggests it was hard to
 answer from here too.
 
-Proposal, either:
+Proposal:
 
-- keep it and make the dependency explicit, e.g. "Using the descriptor protocol
-  from [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__),
-  give `trace_class.trace` a `__get__()` method ..."; or
 - replace it with an exercise the chapter does support. The best unclaimed
   candidate is the decorator that works both with and without parentheses
   (`@memo` and `@memo(maxsize=10)`), which is a real thing readers need to write
   and which exercises the two-step call the chapter spends a page on.
 
-Either way, `Solutions/14_Decorators.md` needs the missing entry. I did not
+`Solutions/14_Decorators.md` needs the missing entry. I did not
 touch `Solutions/`.
 
 ---

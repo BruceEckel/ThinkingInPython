@@ -1,3 +1,6 @@
+What does this mean?
+Set CLAUDE_CODE_USE_POWERSHELL_TOOL=1 to enable the PowerShell tool
+
 Look in deep_review for files that start with [[Reviewed]] and do those.
 Do them sequentially to prevent edit collisions.
 
@@ -119,3 +122,46 @@ Short monty python phrases
 - "Run away!"
 - "Fetchez la vache"
 - "Nudge, wink, say no more"
+
+
+## Review process analysis by Fable
+
+```
+do deep_review/12_X.md, then run readability on the chapter
+```
+
+
+❯ I've been using Opus to apply the 'deep-review' skill to all the chapters, and then once I've integrated that, I apply the 'readability' skill and integrate that. I'm wondering if it would make sense and/or be practical to apply both skills at once. Also if there's any better strategies to use to improve the book.
+
+Let me look at both skills to understand what each pass does before weighing in.
+
+  Searched for 1 pattern, read 2 files
+
+Short answer: keep them as two distinct passes, because your current order does something a merged pass can't, but you can collapse the sessions to save most of the overhead. Here's the reasoning, based on reading both skill files.
+
+Why the sequence matters
+
+Your order (deep-review, integrate, then readability) has a property that's easy to miss: readability reviews prose that deep-review created. Deep-review adds new material: teaching additions, warnings about near-miss code, new listings with surrounding prose. That newly drafted prose is the most likely place for AI tells to appear; the readability skill's own "out-of-character" section says newly drafted prose is the usual source. If you run both skills against the same original text at once, readability audits the old prose and the deep-review additions arrive unaudited.
+
+Two more practical problems with a true merge:
+
+- Conflicting anchors. Both skills quote offending lines and cite sections. Deep-review restructures; readability's findings would then point at text that no longer exists, or exists in a different form, by the time you apply them. Sequential passes keep every finding anchored to text that's current when it's applied.
+- Attention split. Deep-review is four passes with a chapter-level pedagogy checklist; readability is seventy patterns plus structural rhythm tests. Asking one session to hold both means each gets a shallower read. Deep-review's fourth pass (prose language) overlaps readability a little, but readability is far more granular, and the overlap is not a substitute.
+
+What you can collapse
+
+The real cost of your current workflow is the repeated setup: each skill run re-reads the chapter, re-runs gates, and you do two vetting rounds. Two ways to cut that without losing the ordering benefit:
+
+1. Fold readability into the deep-review apply step. When you hand back do deep_review/NN.md, the session applies the blocks, and the chapter is now in its post-integration state with the context warm. That is the ideal moment to run readability: same session, chapter fresh in context, and it sees every addition the apply step just made. You'd say something like do deep_review/12_X.md, then run readability on the chapter. One session instead of two, and readability covers the new prose, which is the whole point of running it second.
+2. Pipeline across chapters. While you vet chapter N's deep-review file, a session can be producing chapter N+1's. The vetting is your time; the reviewing is the model's. Overlapping them roughly halves the wall-clock without touching either skill.
+
+I'd take option 1 and skip merging the skills.
+
+Other strategies worth considering
+
+- A part-level or book-level pass. Deep-review works at chapter altitude, and nothing in the current workflow reviews above it. Your project memory records the failure modes this leaves open: cross-chapter threads whose ends drift apart, "previous chapter" references broken by splits, terminology that shifts between chapters, concepts explained twice or assumed before taught across a chapter boundary. A dedicated pass that reads a whole Part (or the section-heading outline of the whole book) and checks arc, redundancy, and terminology consistency would catch a class of problems no number of chapter reviews will. The "assumes/introduces two-column" technique from deep-review's ordering bullet scales up to chapters as the units.
+- A final whole-book readability sweep, late. Every integration round adds prose, so whatever chapter you readability-reviewed first has accumulated unaudited edits since. One cheap sweep near the end, after chapter-level work settles, mops that up. Density-based tells (vocabulary clusters, sentence-length uniformity) also read better over long stretches than a chapter at a time.
+- Use acceptance rate as a stopping rule. The reject-checkbox history gives you a free signal: when a chapter's review round comes back and you reject most of it, that chapter is done and further rounds are churn. Move the effort to the book-level pass instead. Your memory note that repeated audits should widen scope rather than re-run the same check points the same direction.
+- A fresh-reader pass for exercises. Deep-review checks that exercises are answerable from the chapter, but a session that actually attempts each exercise cold, using nothing but the chapter, is a stronger test and would also surface Solutions drift, which your memory notes is still partly ungated.
+
+So: same two skills, same order, one fewer session per chapter, and consider adding the book-altitude pass, which is the review neither skill currently gives you.

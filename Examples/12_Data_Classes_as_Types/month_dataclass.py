@@ -18,11 +18,12 @@ class Month:
     def __post_init__(self) -> None:
         check(1 <= self.n <= 12, f"Month({self.n})")
         check(self.max_days in (28, 30, 31),
-              f"max_days {self.max_days}")
+              f"Month(max_days={self.max_days})",
+              "is not a month length")
 
     def check_day(self, day: Day) -> None:
-        check(day.n <= self.max_days,
-              f"{self.name} has no day {day.n}")
+        check(day.n <= self.max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
 def make_months() -> list[Month]:
     return [Month(name, n, days) for n, (name, days) in enumerate([

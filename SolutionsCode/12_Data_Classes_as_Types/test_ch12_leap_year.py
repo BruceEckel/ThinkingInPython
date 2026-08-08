@@ -63,7 +63,8 @@ class Month(Enum):
         max_days = self.max_days
         if self is Month.FEBRUARY and year.is_leap():
             max_days = 29
-        check(day.n <= max_days, f"{self.name} has no day {day.n}")
+        check(day.n <= max_days, f"Day({day.n})",
+              f"is past the end of {self.name}")
 
 @dataclass(frozen=True)
 class BirthDate:

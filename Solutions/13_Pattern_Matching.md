@@ -255,3 +255,76 @@ the `match` no longer mentions `Point` at all. That trade is usually
 worth it when the guards are all testing the same handful of
 derived facts, and not worth it when each guard asks a different
 question.
+
+## 6. A constant that captures, and two ways to fix it
+
+```python
+# ch13_fallback_capture.py
+from enum import Enum
+from typing import Final
+
+class Signal(Enum):
+    STOP = "stop"
+    GO = "go"
+    CAUTION = "caution"
+
+FALLBACK: Final[Signal] = Signal.CAUTION
+
+class Defaults:
+    FALLBACK: Final[Signal] = Signal.CAUTION
+
+def broken(s: Signal) -> str:
+    match s:
+        case Signal.GO:
+            return "accelerate"
+        case FALLBACK:
+            return f"fallback, FALLBACK is now {FALLBACK}"
+    return "unreachable"
+
+def dotted(s: Signal) -> str:
+    match s:
+        case Signal.GO:
+            return "accelerate"
+        case Defaults.FALLBACK:
+            return "fallback"
+        case _:
+            return "brake"
+
+def guarded(s: Signal) -> str:
+    match s:
+        case Signal.GO:
+            return "accelerate"
+        case other if other is FALLBACK:
+            return "fallback"
+        case _:
+            return "brake"
+
+print(broken(Signal.STOP))
+#: fallback, FALLBACK is now Signal.STOP
+print(FALLBACK)
+#: Signal.CAUTION
+print(dotted(Signal.STOP), dotted(Signal.CAUTION))
+#: brake fallback
+print(guarded(Signal.STOP), guarded(Signal.CAUTION))
+#: brake fallback
+```
+
+`broken()` answers "fallback" for `Signal.STOP`, which is not the
+fallback value. `case FALLBACK:` is a bare name, so it captures: it
+matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
+`broken()`, and never compares anything. The module-level constant
+still holds `Signal.CAUTION` afterward, which is why the mistake is
+easy to miss. Python allows this only because the capture is the last
+case; another case after it fails to compile.
+
+The first fix gives the constant a dotted name by putting it in a
+namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
+compares against it and answers "brake" for `Signal.STOP`. Any dotted
+name works, including `Signal.CAUTION` itself, and moving the constant
+into a class keeps one definition for the rest of the program to use.
+
+The second fix keeps the bare constant and moves the comparison into a
+guard, where `FALLBACK` is an ordinary expression rather than a
+pattern. `case other if other is FALLBACK:` is more verbose than the
+dotted name, and it is what you want when the test is more than
+equality.
