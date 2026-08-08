@@ -4,16 +4,16 @@
 
 ```python
 # exercise_1.py
-def slots_report[T: type](cls: T) -> T:
+def announce[T: type](cls: T) -> T:
     print(f"decorating {cls.__name__}")
     return cls
 
-@slots_report
+@announce
 class Point:
     x: int
     y: int
 
-@slots_report
+@announce
 class Empty:
     pass
 
@@ -25,7 +25,7 @@ print(Point.__name__, Empty.__name__)
 
 Both `decorating` lines print before anything else, because a class
 decorator runs when the `class` statement finishes, not when an
-instance is made. `slots_report` returns `cls` unchanged, so `Point`
+instance is made. `announce` returns `cls` unchanged, so `Point`
 is the same class object it would have been without the decorator;
 the only effect is the side effect.
 
@@ -207,77 +207,90 @@ nothing and lives per-instance, while `total_calls`, read and written
 through the class name, is one value the whole family of decorated
 functions shares.
 
-## 5. `trace` with a `__get__()` so it works on methods
+## 5. A `memo` that works with and without parentheses
 
 ```python
-# trace_descriptor.py
+# exercise_5.py
 from collections.abc import Callable
-from dataclasses import dataclass
-from functools import update_wrapper
-from types import MethodType
+from functools import wraps
+from typing import Any, overload
 
-class trace[**P, R]:
-    __name__: str  # Set by update_wrapper(), not __init__
+@overload
+def memo[**P, R](func: Callable[P, R]) -> Callable[P, R]: ...
 
-    def __init__(self, func: Callable[P, R]) -> None:
-        self.func = func
-        update_wrapper(self, func)
+@overload
+def memo[**P, R](
+    *, maxsize: int = ...
+) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        positional = [repr(a) for a in args]
-        named = [f"{k}={v!r}" for k, v in kwargs.items()]
-        arglist = ", ".join(positional + named)
-        print(f"-> {self.__name__}({arglist})")
-        result = self.func(*args, **kwargs)
-        print(f"<- {self.__name__} = {result!r}")
-        return result
+def memo[**P, R](
+    func: Callable[P, R] | None = None, *, maxsize: int = 128
+) -> Any:
+    def decorate(target: Callable[P, R]) -> Callable[P, R]:
+        cache: dict[tuple[Any, ...], R] = {}
 
-    def __get__(
-            self, obj: object, owner: type | None = None
-    ) -> Callable[..., R]:
-        if obj is None:
-            return self  # Through the class, so nothing to bind
-        return MethodType(self, obj)
+        @wraps(target)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            key = (args, tuple(kwargs.items()))
+            if key not in cache:
+                cache[key] = target(*args, **kwargs)
+                if len(cache) > maxsize:
+                    del cache[next(iter(cache))]
+            return cache[key]
+        return wrapper
+    return decorate if func is None else decorate(func)
 
-@dataclass
-class Greeter:
-    name: str
+@memo
+def square(n: int) -> int:
+    print(f"computing square({n})")
+    return n * n
 
-    @trace
-    def greet(self, greeting: str) -> str:
-        return f"{greeting}, {self.name}"
+@memo(maxsize=2)
+def add(a: int, b: int) -> int:
+    print(f"computing add({a}, {b})")
+    return a + b
 
-print(Greeter("Bob").greet("Hello"))
-#: -> greet(Greeter(name='Bob'), 'Hello')
-#: <- greet = 'Hello, Bob'
-#: Hello, Bob
+print(square(4), square(4))
+#: computing square(4)
+#: 16 16
+add(1, 2)
+#: computing add(1, 2)
+add(3, 4)
+#: computing add(3, 4)
+add(5, 6)  # A third entry, so add(1, 2) is evicted
+#: computing add(5, 6)
+add(5, 6)  # Still cached, so nothing prints
+add(1, 2)  # Gone from the cache, so it runs again
+#: computing add(1, 2)
+print(square.__name__, add.__name__)
+#: square add
 ```
 
-`Greeter.greet` is a `trace` instance stored as a class attribute.
-Without `__get__()`, `Greeter("Bob").greet("Hello")` passes only
-`"Hello"`, and the missing `self` shows up as the confusing `TypeError`
-the chapter's `Logged` example produces. Adding `__get__()` makes
-`trace` a descriptor, so attribute access on an instance now runs
-`trace.__get__(greeter_instance, Greeter)` instead of handing back the
-decorator unchanged.
+`memo` is called two different ways, and the body tells them apart by
+what arrives in `func`. Used bare, `@memo` calls `memo(square)`, so
+`func` is the function and the decoration finishes immediately with
+`decorate(func)`. Used with parentheses, `@memo(maxsize=2)` calls
+`memo(maxsize=2)` first, `func` is `None`, and `memo` returns
+`decorate` for Python to apply to `add`. Making `func` keyword-free
+and everything after it keyword-only is what keeps the two calls
+unambiguous: `maxsize` can never be mistaken for the function.
 
-`MethodType(self, obj)` builds the same kind of bound object Python
-builds for an ordinary method: a callable that remembers `obj` and
-prepends it to every later call. So `__call__()` receives
-`(greeter, "Hello")`, and the trace line shows `self` arriving as the
-first argument. `Greeter` is a dataclass so that argument prints as
-`Greeter(name='Bob')` rather than an address that changes every run.
+The two `@overload` declarations are for the checker, which cannot
+otherwise tell which of the two shapes a given call has. The first
+says "given a function, return a function of the same signature." The
+second says "given only `maxsize`, return a decorator." The
+implementation returns `Any` because it satisfies both, and the
+overloads are what callers see: `square(4)` type-checks as an `int`,
+and `memo(maxsize=2)` type-checks as something you can apply to a
+function.
 
-The `obj is None` branch covers `Greeter.greet`, the access through the
-class rather than an instance. There is no instance to bind, so
-returning `self` leaves the decorator reachable as a normal function,
-which is how an ordinary method behaves too.
-
-The return type is `Callable[..., R]` rather than the exact signature.
-`MethodType` drops the first parameter, and `**P` names the whole
-parameter list with no way to subtract its head, so the checker keeps
-the return type and gives up on the arguments. The runtime binding is
-correct either way; the annotation is where the loss shows.
+The cache key pairs the positional arguments with the keyword items,
+since `add(1, 2)` and `add(a=1, b=2)` are different keys and both are
+legal calls. Eviction relies on a dictionary preserving insertion
+order, so `next(iter(cache))` is the oldest key. That makes this a
+first-in-first-out cache rather than the least-recently-used cache
+`functools.lru_cache` gives you, which is the trade a real
+implementation would have to reconsider.
 
 ## 6. `retry(times)` in the function form
 

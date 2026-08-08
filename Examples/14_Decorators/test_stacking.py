@@ -1,6 +1,6 @@
 # test_stacking.py
-from repeat_class import repeat
-from trace_class import trace
+from repeat import repeat
+from tracer import trace
 
 def test_stacked_decorators_preserve_name() -> None:
     @trace

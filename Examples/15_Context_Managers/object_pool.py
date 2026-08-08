@@ -34,7 +34,7 @@ if __name__ == "__main__":
         print(conn.query("SELECT name FROM users"))
         print("available during lease:", pool.available())
     print("available after lease:", pool.available())
-    with suppress(RuntimeError), pool.lease() as conn:
+    with suppress(RuntimeError), pool.lease():
         raise RuntimeError("crash during query")
     print("available after crash:", pool.available())
 #: connection 1: SELECT name FROM users

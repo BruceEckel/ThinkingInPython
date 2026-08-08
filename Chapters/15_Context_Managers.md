@@ -2,14 +2,23 @@
 
 The `with` statement,
 introduced in [Control Flow](04_Control_Flow.md#context-managers),
-runs setup before a block and cleanup after it,
+marks out a span of execution:
+it runs setup before a block and cleanup after it,
 even if the block raises an exception.
+That is far more reliable than the `__del__()` approach in [Cleanup](10_Cleanup.md).
 This chapter shows how to write your own context managers, and how `with` works.
 
-A context manager marks out a span of execution,
-running setup at its start and cleanup at its end.
-This is far more reliable than using `__del__()`,
-as shown in [Cleanup](10_Cleanup.md).
+The payoff is a borrower's contract two lines long:
+
+```python
+with pool.lease() as conn:
+    conn.query("SELECT name FROM users")
+```
+
+The connection returns to the pool on every path out of that block,
+including the exception path,
+and the borrower writes nothing to make that happen.
+[An Object Pool](#an-object-pool) builds it.
 
 ## A Basic Context Manager
 
@@ -84,7 +93,8 @@ without exception.
 
 One caution: the manager object `trace("A")` returns is single-use.
 Its generator runs once,
-so reusing the same object in a second `with` raises an exception.
+so reusing the same object in a second `with` fails with a message that names nothing useful:
+`AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
 Construct a fresh manager for each `with` statement.
 
 ## The Protocol
@@ -95,7 +105,7 @@ A *context manager* is any object that implements two methods: `__enter__()`,
 which runs at the start of the block, and `__exit__()`, which runs at the end.
 `@contextmanager` manufactures such an object from a generator function.
 Writing the class by hand shows the machinery directly.
-`__init__()` stays in its longhand form here rather than becoming a `@dataclass`,
+Every hand-written context manager class in this chapter keeps `__init__()` in longhand rather than becoming a `@dataclass`,
 so nothing between the class statement and the two protocol methods needs decoding:
 
 ```python
@@ -270,7 +280,48 @@ print("survived")
 See [Naming Conventions](02_Tour.md#naming-conventions)
 for when a class departs from `CapWords`.
 
-A fuller version of the same idea reports which exception it swallowed,
+Writing your own version as a class shows the suppression directly,
+in the two lines that decide the return value:
+
+```python
+# ignore_one.py
+
+class ignore_one:
+    def __init__(self, kind: type[BaseException]) -> None:
+        self.kind = kind
+
+    def __enter__(self) -> None:
+        return None
+
+    def __exit__(self, exc_type: type[BaseException] | None,
+                 exc: BaseException | None, tb: object) -> bool:
+        if exc_type is not None and issubclass(exc_type, self.kind):
+            print(f"{exc!r}")
+            return True
+        return False
+
+with ignore_one(ZeroDivisionError):
+    print("before")
+    1 / 0
+    print("after")  # Never runs: the error jumps to __exit__
+print("survived")
+#: before
+#: ZeroDivisionError('division by zero')
+#: survived
+```
+
+`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
+or `None` when the block finished cleanly.
+[`type[...]`](08_Static_Typing.md#classes-as-values-type) means the class,
+such as `ZeroDivisionError`, not an instance of it.
+`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it,
+so a `ZeroDivisionError` still matches `ignore_one(ArithmeticError)`.
+`exc!r` prints the exception's `repr()`,
+which includes both its type and its arguments, not just `exc_type.__name__`.
+`__enter__()` returns `None` because this manager is not meant to be used with `as`.
+You can still write `as`, but it binds `None`.
+
+A fuller version of the same idea takes several types at once,
 and accepts no argument to mean "ignore everything."
 It turns out to be useful enough to reuse elsewhere in the book,
 so it lives in `utils/`, where any chapter can import it:
@@ -299,28 +350,16 @@ class ignore:
         return True
 ```
 
-The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments).
-This makes `ignore()` with no argument catch all exceptions.
-`ignore(ZeroDivisionError)` restricts that to one type.
-`ignore((ZeroDivisionError, TypeError))` restricts it to several.
+`ignore` adds two things to `ignore_one`.
+The first is the tuple form:
+`issubclass()` accepts a tuple of classes as its second argument,
+matching if `cls` is a subclass of any one of them,
+so `ignore((ZeroDivisionError, TypeError))` covers several types in one manager.
+The `Types` alias names that "one class or a tuple of classes" shape once instead of spelling it out at every use.
 
-`suppress` reads the same call the opposite way:
-`suppress()` with no argument suppresses nothing,
-because no type is there for the raised exception to match.
-An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
-so name the types you expect unless you really want a block that nothing escapes.
-
-`__enter__()` returns `None` because `ignore` is not meant to be used with `as`.
-You can still write `as`, but it binds `None`.
-
-`__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
-or `None` when the block finished cleanly.
-[`type[...]`](08_Static_Typing.md#classes-as-values-type) means the class,
-such as `ZeroDivisionError`, not an instance of it.
-
-`issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it.
-It also accepts a tuple of classes for `classinfo`,
-matching if `cls` is a subclass of any one of them.
+The second is the default.
+The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments),
+which makes `ignore()` with no argument catch everything.
 `self.types is not ALL` [narrows](08_Static_Typing.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,
 since ruling out `ALL` leaves only `Types`.
@@ -328,8 +367,11 @@ By the time `issubclass(exc_type, self.types)` runs,
 narrowing has confirmed `self.types` is a `Types`,
 and the earlier `if exc_type is None: return False` has confirmed `exc_type` is not `None`.
 
-`exc!r` prints the exception's `repr()`,
-which includes both its type and its arguments, not just `exc_type.__name__`.
+`suppress` reads the same call the opposite way:
+`suppress()` with no argument suppresses nothing,
+because no type is there for the raised exception to match.
+An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
+so name the types you expect unless you really want a block that nothing escapes.
 
 ```python
 # demo_exceptions.py
@@ -610,6 +652,49 @@ so one variable can hold the open file in one branch and a `nullcontext` in the 
 A stream the caller handed over stays open, which is what the caller expects;
 the `nullcontext` wrapper is what lets one `with` block serve both cases without an `if` around the whole body.
 
+## The Async Protocol
+
+`with` calls `__enter__()` and `__exit__()`.
+`async with` calls `__aenter__()` and `__aexit__()`, which are coroutines,
+so the setup and the cleanup can both await.
+`contextlib.asynccontextmanager` builds one from an async generator,
+the same way `@contextmanager` builds the synchronous form,
+and `AsyncExitStack` is the `ExitStack` equivalent:
+
+```python
+# async_manager.py
+import asyncio
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def session(name: str) -> AsyncIterator[str]:
+    print(f"open {name}")
+    await asyncio.sleep(0.01)  # Setup that waits
+    try:
+        yield name
+    finally:
+        await asyncio.sleep(0.01)  # Cleanup that waits
+        print(f"close {name}")
+
+async def main() -> None:
+    async with session("db") as s:
+        print(f"using {s}")
+
+asyncio.run(main())
+#: open db
+#: using db
+#: close db
+```
+
+This is the generator form with `async` in front of it.
+`asyncio.run()` starts the event loop those awaits need,
+which [Concurrency](19_Concurrency.md) covers.
+Everything this chapter says about ordering, the three exception arguments,
+and suppression through a truthy return applies unchanged.
+That chapter uses `async with` throughout, for `asyncio.TaskGroup`, locks,
+and semaphores; each of those is an object with the two `a`-prefixed methods.
+
 ## An Object Pool
 
 Some objects are expensive to create or rationed by the outside world:
@@ -659,7 +744,7 @@ if __name__ == "__main__":
         print(conn.query("SELECT name FROM users"))
         print("available during lease:", pool.available())
     print("available after lease:", pool.available())
-    with suppress(RuntimeError), pool.lease() as conn:
+    with suppress(RuntimeError), pool.lease():
         raise RuntimeError("crash during query")
     print("available after crash:", pool.available())
 #: connection 1: SELECT name FROM users
@@ -682,6 +767,9 @@ so a borrower waits until someone else's `with` block ends and a return makes an
 This means you can hand the same pool to several threads.
 The pool becomes the throttle that limits concurrent use,
 which is how real database connection pools behave.
+`available()` is a snapshot for the demo, not a synchronization primitive:
+`Queue.qsize()` is only approximate once more than one thread is borrowing,
+because another thread can lease or return between the count and its use.
 
 This differs from [Flyweight](35_Flyweight.md), its nearest neighbor.
 A flyweight is immutable and shared by everyone at once.
@@ -730,6 +818,23 @@ invisible to every `with pool.lease()` in the codebase.
 That is what the protocol buys:
 the borrower's contract is two lines long and impossible to get wrong,
 and everything hard about custody lives on the other side of the `yield`.
+
+## Choosing a Form
+
+There are four ways to get a context manager.
+Try them in this order.
+Use a `contextlib` manager when one fits, since `suppress`, `closing`,
+`nullcontext`, and `ExitStack` cover most of what people write by hand.
+Otherwise write a generator with `@contextmanager`,
+which is the shortest thing that can express setup, teardown,
+and a `try`/`finally` between them.
+Write a class with `__enter__()` and `__exit__()` when the manager needs state,
+methods beyond the two protocol ones, or reuse across several `with` statements,
+which the generator form cannot do.
+Add `ContextDecorator` only when the same bracket should also wrap whole functions.
+
+Whichever form you choose, the borrower's side contains two lines,
+and every change you make later happens inside the manager.
 
 ## Exercises
 

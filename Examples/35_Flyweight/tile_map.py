@@ -39,7 +39,7 @@ if __name__ == "__main__":
         ......
         ##..~~
     """)
-    cells = [t for row in field for t in row]
+    cells = [*row for row in field]
     print(len(cells), len({id(t) for t in cells}))
     print(field[0][2] is field[3][5])
 #: 24 3

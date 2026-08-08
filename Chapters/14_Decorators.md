@@ -225,6 +225,8 @@ from functools import wraps
 
 def repeat[**P, R](
         times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    if times < 1:
+        raise ValueError(f"times must be >= 1, got {times}")
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -273,16 +275,21 @@ Forgetting the parentheses is the common mistake here.
 `@repeat` without them binds `greet` to `decorate`,
 so calling `greet("Bob")` passes `"Bob"` where `decorate` expects a function and hands back a wrapper instead of printing anything.
 Nothing raises an exception, so the only symptom is missing output.
-The annotations catch it:
-`ty` reports that `greet` expected a callable and got a `str`.
+The annotations catch it,
+and they catch it at the decoration rather than at the call:
+`ty` reports that `repeat` expected an `int` for `times` and got a function.
+A second diagnostic follows at `greet("Bob")`,
+but that one is harder to read back to the missing `()`.
 
 Inside `wrapper()`, the first call to `func` happens before the loop,
 so `result` always holds a value of type `R` to return;
 the loop adds the remaining `times - 1` calls.
-That first call happens unconditionally,
-so `times=0` and a negative `times` still call `func` once, not zero times.
-`test_repeat.py` parametrizes over `times`,
-checking the ordinary case and both edge cases in one test:
+That first call is unconditional,
+so a `times` below one would still call `func` once rather than zero times.
+`repeat()` rejects those values rather than quietly rounding them up to one.
+The check runs at decoration,
+so the failure is reported at the `@` line rather than at some later call.
+`test_repeat.py` parametrizes over `times` and covers the rejection:
 
 ```python
 # test_repeat.py
@@ -292,8 +299,6 @@ from repeat import repeat
 @pytest.mark.parametrize("times, expected", [
     (3, 3),
     (1, 1),
-    (0, 1),
-    (-1, 1),
 ])
 def test_repeat_call_count(times: int, expected: int) -> None:
     calls: list[str] = []
@@ -304,6 +309,72 @@ def test_repeat_call_count(times: int, expected: int) -> None:
 
     record()
     assert len(calls) == expected
+
+@pytest.mark.parametrize("times", [0, -1])
+def test_repeat_rejects_times_below_one(times: int) -> None:
+    with pytest.raises(ValueError):
+        repeat(times=times)
+```
+
+## Stacking Decorators
+
+A wrapper that keeps the wrapped interface can itself be wrapped.
+Decorators stack, nesting from the bottom up:
+
+```python
+# stacking.py
+from repeat import repeat
+from tracer import trace
+
+@trace
+@repeat(times=2)
+def greet(name: str) -> str:
+    print(f"Hello, {name}")
+    return name
+
+if __name__ == "__main__":
+    greet("Bob")
+#: -> greet('Bob')
+#: Hello, Bob
+#: Hello, Bob
+#: <- greet = 'Bob'
+```
+
+This is `greet = trace(repeat(times=2)(greet))`.
+`@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
+so a single `greet("Bob")` traces one call whose body runs twice.
+Each decorator wraps the result of the one below it.
+Stacking works because each wrapper preserves the interface of what it wraps:
+every layer looks like the original function,
+so the layers compose to any depth.
+
+`test_stacking.py` confirms both claims:
+the name survives two layers of wrapping,
+and the inner decorator's repeat still happens once per outer call:
+
+```python
+# test_stacking.py
+from repeat import repeat
+from tracer import trace
+
+def test_stacked_decorators_preserve_name() -> None:
+    @trace
+    @repeat(times=2)
+    def greet(name: str) -> str:
+        return name
+
+    assert greet.__name__ == "greet"
+
+def test_stacked_decorators_repeat_the_call() -> None:
+    calls: list[str] = []
+
+    @trace
+    @repeat(times=2)
+    def record() -> None:
+        calls.append("call")
+
+    record()
+    assert calls == ["call", "call"]
 ```
 
 ## Decorators as Classes
@@ -461,6 +532,8 @@ from functools import wraps
 
 class repeat:
     def __init__(self, times: int) -> None:
+        if times < 1:
+            raise ValueError(f"times must be >= 1, got {times}")
         self.times = times  # The decoration arguments
 
     def __call__[**P, R](
@@ -487,8 +560,8 @@ if __name__ == "__main__":
 With decorator arguments,
 the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
 
-This shares `repeat.py`'s edge case: the first call happens before the loop,
-so `times=0` or a negative `times` still calls `func` once.
+This validates `times` the same way `repeat.py` does,
+in the constructor rather than in the outer function.
 `test_repeat_class.py` checks the same cases:
 
 ```python
@@ -499,8 +572,6 @@ from repeat_class import repeat
 @pytest.mark.parametrize("times, expected", [
     (3, 3),
     (1, 1),
-    (0, 1),
-    (-1, 1),
 ])
 def test_repeat_call_count(times: int, expected: int) -> None:
     calls: list[str] = []
@@ -511,6 +582,11 @@ def test_repeat_call_count(times: int, expected: int) -> None:
 
     record()
     assert len(calls) == expected
+
+@pytest.mark.parametrize("times", [0, -1])
+def test_repeat_rejects_times_below_one(times: int) -> None:
+    with pytest.raises(ValueError):
+        repeat(times=times)
 ```
 
 ### A Limitation: Methods Need a Descriptor
@@ -524,7 +600,7 @@ only to a bare function, and that was not an accident:
 # method_decoration.py
 from collections.abc import Callable
 
-class Logged:
+class logged:
     def __init__(self, func: Callable) -> None:
         self.func = func
 
@@ -532,7 +608,7 @@ class Logged:
         return self.func(*args, **kwargs)
 
 class Example:
-    @Logged
+    @logged
     def method(self, x: int) -> int:
         return x
 
@@ -544,12 +620,12 @@ except TypeError as e:
 #: Example.method() missing 1 required positional argument: 'x'
 ```
 
-`Example.method` is a `Logged` instance, stored as a class attribute.
+`Example.method` is a `logged` instance, stored as a class attribute.
 Accessing it through `example.method` does not bind it to `example`,
 because a plain object is not a *descriptor*:
 Python performs that binding only for things implementing `__get__()`,
 which every ordinary function does automatically.
-So `example.method(5)` really calls `Logged.__call__(logged_instance, 5)`.
+So `example.method(5)` really calls `logged.__call__(logged_instance, 5)`.
 `self.func` runs with `5` as its only argument,
 and the `Example` instance never arrives.
 The `TypeError` blames a missing `x`,
@@ -559,7 +635,30 @@ shows the descriptor protocol,
 which a class-based decorator needs to implement to work on methods.
 
 A function needs none of this: it is already a descriptor,
-so `wrapper()` in the function form binds to an instance like any other method.
+so `wrapper()` in the function form binds to an instance like any other method:
+
+```python
+# method_function_form.py
+from tracer import trace
+
+class Example:
+    @trace
+    def method(self, x: int) -> int:
+        return x
+
+    def __repr__(self) -> str:
+        return "Example()"
+
+example = Example()
+print(example.method(5))
+#: -> method(Example(), 5)
+#: <- method = 5
+#: 5
+```
+
+`self` arrives as the first traced argument,
+printed as `Example()` by the `__repr__()` the class defines,
+so the same decoration that failed as a class works here with no descriptor of your own.
 For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
@@ -576,23 +675,23 @@ The function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
 then applies that instance to `greet`.
 The arguments go to the constructor, and the function arrives later,
-at `__call__()`.
+at `__call__()`, moving from `__init__()` to `__call__()` as soon as the decorator gains arguments.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible.
-The function moves from `__init__()` to `__call__()` when the decorator gains arguments.
 
 Outside of methods, the form you choose is mostly a matter of taste.
 Both forms preserve the wrapped function's exact signature for the type checker,
-using the same `**P` and `R` type parameters.
+using the same `**P` and `R` type parameters, and both stack,
+the way `stacking.py` stacks two function-form decorators.
 The function form is more compact.
 The class form reads better when the decorator carries state or grows complicated,
 because the phases are separate methods instead of nested closures.
-That argument-capturing class-based decorator scales up to small frameworks.
-A build tool or task runner can offer a `@rule(target, *deps)` decorator.
-Its constructor records the target and dependencies.
-Its `__call__()` registers the decorated function in a class-level table with that metadata.
-A driver later walks the table to run things in order.
-The decorator becomes the registration mechanism for the whole system.
+
+The class form with arguments scales up to small frameworks.
+A build tool can offer a `@rule(target, *deps)` decorator whose constructor records the target and its dependencies,
+and whose `__call__()` registers the decorated function in a class-level table with that metadata.
+A driver walks the table later and runs the rules in order,
+so the decorator becomes the registration mechanism for the whole system.
 
 The descriptor limitation above is the one hard reason to choose the function form.
 A decorator meant for methods either returns a function,
@@ -604,70 +703,11 @@ bracketing every call with its setup and cleanup code.
 [Context Managers](15_Context_Managers.md#context-manager-as-decorator)
 shows `contextlib.ContextDecorator`.
 
-## Stacking Decorators
-
-You can apply more than one decorator.
-They nest from the bottom up:
-
-```python
-# stacking.py
-from repeat_class import repeat
-from trace_class import trace
-
-@trace
-@repeat(times=2)
-def greet(name: str) -> str:
-    print(f"Hello, {name}")
-    return name
-
-if __name__ == "__main__":
-    greet("Bob")
-#: -> greet('Bob')
-#: Hello, Bob
-#: Hello, Bob
-#: <- greet = 'Bob'
-```
-
-This is `greet = trace(repeat(times=2)(greet))`.
-`@repeat(times=2)` wraps `greet()` first, then `@trace` wraps that result,
-so a single `greet("Bob")` traces one call whose body runs twice.
-Each decorator wraps the result of the one below it.
-Stacking works because each wrapper preserves the interface of what it wraps:
-every layer looks like the original function,
-so the layers compose to any depth.
-
-`test_stacking.py` confirms both claims:
-the name survives two layers of wrapping,
-and the inner decorator's repeat still happens once per outer call:
-
-```python
-# test_stacking.py
-from repeat_class import repeat
-from trace_class import trace
-
-def test_stacked_decorators_preserve_name() -> None:
-    @trace
-    @repeat(times=2)
-    def greet(name: str) -> str:
-        return name
-
-    assert greet.__name__ == "greet"
-
-def test_stacked_decorators_repeat_the_call() -> None:
-    calls: list[str] = []
-
-    @trace
-    @repeat(times=2)
-    def record() -> None:
-        calls.append("call")
-
-    record()
-    assert calls == ["call", "call"]
-```
-
 ## Decorating Classes
 
-You can apply a decorator to a class instead of a function.
+Everything so far decorated a function.
+The `@` line does not care: a `class` statement is decorated the same way,
+and the decorator receives the class object.
 This one registers every class it decorates, in `registry`:
 
 ```python
@@ -695,11 +735,16 @@ if __name__ == "__main__":
 `register()` returns `cls` unchanged, so this decoration adds no wrapper;
 it exists only for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
-Annotated `(cls: type) -> type` instead,
-`register` would hand back a bare `type`,
-and the checker would then see `Espresso()` as an `Any`.
+If `register` were annotated `(cls: type) -> type`,
+it would hand back a bare `type`,
+and the checker would see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
+
+A registry filled this way is as complete as the imports that ran:
+a class in a module nobody imported never registers.
+Keying on `cls.__name__` also means two same-named classes from different modules overwrite each other.
+[Factory](27_Factory.md#the-pythonic-factory-a-dictionary) returns to both.
 
 [Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses)
 shows `__init_subclass__()`,
@@ -717,15 +762,14 @@ def test_registry_looks_up_by_name() -> None:
     assert registry["Latte"] is Latte
 ```
 
-## Decorators Are Just Function Calls
+## What `@` Does Not Require
 
-`@decorator` above a `def` is shorthand for `name = decorator(name)`,
-as the `@hijack` example showed at the start of this chapter.
+`@` constrains the statement below it and nothing else.
 A decorator line must sit directly above a `def` or a `class`;
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
-But the decorator is only a function,
-and nothing requires the callable it wraps to come from a `def`:
+Past that, the sugar asks for nothing.
+The callable being decorated need not come from a `def`:
 
 ```python
 # lambda_decoration.py
@@ -760,7 +804,7 @@ The same call decorates a `functools.partial`, a bound method,
 or an instance of a class with `__call__()`,
 since a decorator only cares that its argument is callable.
 
-A second surprise sits on the return side.
+The return side is equally unconstrained.
 This chapter opened by saying a decorator "returns a result,
 which Python binds to the original name."
 That result does not have to be callable:
@@ -929,7 +973,7 @@ each wrap a function the same way `trace` does,
 but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
 and it also makes them work correctly on methods,
-where a `__call__`-based class, like `Logged` above, does not.
+where a `__call__`-based class, like `logged` above, does not.
 `@dataclass` (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
 is a class decorator like `register`,
 except it returns a modified class instead of the same one unchanged,
@@ -939,12 +983,14 @@ adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
 wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
-They are ordinary decorators,
-built from the closures and callables this chapter covered.
+They are ordinary decorators;
+the only machinery this chapter did not cover is the descriptor protocol the first four of them return,
+which [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
+takes up.
 
 ## Exercises
 
-1.  Write a class decorator `slots_report` that prints the name of each class it decorates and returns it unchanged,
+1.  Write a class decorator `announce` that prints the name of each class it decorates and returns it unchanged,
     then apply it to two small classes.
     Compare what it can do to what `register` does.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
@@ -958,8 +1004,11 @@ built from the closures and callables this chapter covered.
 4.  Write `trace` as a class-based decorator that also keeps a class-level counter shared across every decorated function,
     and report the total number of traced calls in the program.
     Note where the shared state lives compared to the per-instance `count` in `count_calls`.
-5.  Give `trace_class.trace` a `__get__()` method so it works correctly when applied to an instance method.
-    Apply it to a method on a small class and confirm `self` arrives correctly.
+5.  Write a `memo` decorator that works both with and without parentheses,
+    so `@memo` and `@memo(maxsize=10)` both decorate a function.
+    Cache each result in a dictionary keyed by the arguments,
+    and drop the oldest entry once the cache holds more than `maxsize` of them.
+    The trick is to check whether the decorator's first argument is callable.
 6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
     up to `times` attempts, and re-raises the last exception when they all fail.
     Check that `__name__` survives.

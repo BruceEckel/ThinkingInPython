@@ -409,6 +409,9 @@ print(list(islice(cycle("AB"), 5)))
 Iterates several iterables one after another, as if they were one.
 `chain.from_iterable(iterables)` does the same when the iterables themselves arrive as one lazy sequence,
 rather than as separate arguments.
+Where the iterables come from a loop,
+[unpacking in a comprehension](16_Comprehensions.md#unpacking-in-comprehensions)
+says the same thing without the import.
 
 ```python
 # itertools_chain.py

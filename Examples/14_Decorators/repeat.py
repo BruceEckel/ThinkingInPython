@@ -4,6 +4,8 @@ from functools import wraps
 
 def repeat[**P, R](
         times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    if times < 1:
+        raise ValueError(f"times must be >= 1, got {times}")
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:

@@ -1,6 +1,6 @@
 # stacking.py
-from repeat_class import repeat
-from trace_class import trace
+from repeat import repeat
+from tracer import trace
 
 @trace
 @repeat(times=2)

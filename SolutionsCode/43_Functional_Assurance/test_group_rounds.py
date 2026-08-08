@@ -46,5 +46,5 @@ rosters = strategies.lists(
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
     for grouping in islice(group_rounds(names, size), 3):
-        placed = [n for group in grouping for n in group]
+        placed = [*group for group in grouping]
         assert sorted(placed) == sorted(names)

@@ -1,14 +1,14 @@
 # exercise_1.py
-def slots_report[T: type](cls: T) -> T:
+def announce[T: type](cls: T) -> T:
     print(f"decorating {cls.__name__}")
     return cls
 
-@slots_report
+@announce
 class Point:
     x: int
     y: int
 
-@slots_report
+@announce
 class Empty:
     pass
 

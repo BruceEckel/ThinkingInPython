@@ -27,7 +27,7 @@ class Tickets:
 def report(label: str, source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(list, source) for _ in range(8)]
-        taken = [n for f in futures for n in f.result()]
+        taken = [*f.result() for f in futures]
     print(f"{label}: {len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
 

@@ -1,7 +1,7 @@
 # method_decoration.py
 from collections.abc import Callable
 
-class Logged:
+class logged:
     def __init__(self, func: Callable) -> None:
         self.func = func
 
@@ -9,7 +9,7 @@ class Logged:
         return self.func(*args, **kwargs)
 
 class Example:
-    @Logged
+    @logged
     def method(self, x: int) -> int:
         return x
 

@@ -1142,10 +1142,8 @@ INTERESTING_DUNDERS: Final[tuple[str, ...]] = (
 
 def _annotations(cls: type) -> dict[str, object]:
     # Annotations declared on the class or any of its bases:
-    merged: dict[str, object] = {}
-    for base in reversed(cls.__mro__):
-        merged.update(inspect.get_annotations(base))
-    return merged
+    return {**inspect.get_annotations(base)
+            for base in reversed(cls.__mro__)}
 
 def _type_name(annotation: object) -> str:
     # A readable name for a type annotation, keeping any [parameters]:

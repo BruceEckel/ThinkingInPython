@@ -56,7 +56,7 @@ field = parse_map("""
     ......
     ##..~~
 """)
-cells = [t for row in field for t in row]
+cells = [*row for row in field]
 print(len(cells), len({id(t) for t in cells}))
 #: 24 5
 ```

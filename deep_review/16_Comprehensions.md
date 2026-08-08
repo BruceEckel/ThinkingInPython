@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -81,7 +82,7 @@ choice.
 
 Proposed change: after line 93 ("The comprehension inlines the test and the
 expression."), add:
-"`map()` and `filter()` do earn their keep when the function already exists,
+"`map()` and `filter()` are beneficial when the function already exists,
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`;
 [Functional Foundations](40_Functional_Foundations.md) returns to the choice.
 The `lambda` is what makes the versions above worse, not `map()` itself."

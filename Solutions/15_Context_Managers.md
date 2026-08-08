@@ -40,34 +40,56 @@ no difference to the order.
 ## 2. Suppressing a second exception type
 
 ```python
-# exercise_2.py
-class Ignore:
-    def __init__(self, *types) -> None:
+# ch15_ignore_types.py
+
+class ignore:
+    def __init__(self, types: type[BaseException] |
+                 tuple[type[BaseException], ...]) -> None:
         self.types = types
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         return None
 
-    def __exit__(self, exc_type, exc, tb) -> bool:
-        return (exc_type is not None
-                and issubclass(exc_type, self.types))
+    def __exit__(self, exc_type: type[BaseException] | None,
+                 exc: BaseException | None, tb: object) -> bool:
+        if exc_type is None or not issubclass(exc_type, self.types):
+            return False
+        print(f"{exc!r}")
+        return True
 
-with Ignore(ZeroDivisionError, TypeError):
+with ignore((ZeroDivisionError, TypeError)):
     print("before")
-    raise TypeError("boom")
+    raise TypeError("not a number")
 print("survived")
 #: before
+#: TypeError('not a number')
+#: survived
+
+with ignore((ZeroDivisionError, TypeError)):
+    print("before")
+    1 / 0
+print("survived")
+#: before
+#: ZeroDivisionError('division by zero')
 #: survived
 ```
 
-`Ignore.__init__` already collects every type you pass it into the
-`self.types` tuple through `*types`, so adding `TypeError` needed no
-change to the class itself, only to the call site. `issubclass(exc_type,
-self.types)` accepts a tuple of types and returns `True` if `exc_type`
-matches any of them, so `TypeError` is now suppressed exactly like
-`ZeroDivisionError` was.
+The class is the chapter's `ignore` with the `ALL` default left out,
+since the exercise never calls it with no argument. Everything the
+exercise asks for happens at the call site: `ignore` takes one `types`
+argument that is either an exception class or a tuple of them, and
+`issubclass(exc_type, self.types)` accepts either shape. Passing
+`(ZeroDivisionError, TypeError)` therefore suppresses both, and the
+`TypeError` block prints the same `repr()` line the `ZeroDivisionError`
+block printed before the change.
 
-## 3. A fourth manager on one `with` line
+Note the double parentheses. `ignore((ZeroDivisionError, TypeError))`
+passes one argument, a tuple. `ignore(ZeroDivisionError, TypeError)`
+passes two, which is a `TypeError` at the call itself, since `ignore`
+declares a single parameter. A version taking `*types` would accept the
+second spelling, and that is the design `contextlib.suppress` chose.
+
+## 3. A third manager on one `with` line
 
 ```python
 # exercise_3.py
