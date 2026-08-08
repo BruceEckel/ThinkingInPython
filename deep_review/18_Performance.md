@@ -110,7 +110,7 @@ Two related facts you may or may not want:
   3.15 starts deprecating it. Verified here: `import profile` raises
   `DeprecationWarning: The profile module is deprecated and will be removed in
   Python 3.17. Use profiling.tracing (or cProfile) for tracing profilers
-  instead.` One clause would keep a reader from reaching for it.
+  instead.` One clause would keep a reader from reaching for it. [[add this]]
 - `python -m profiling.sampling` also has `dump <pid>` (one stack snapshot of
   a live process) and a `--live` flag on both `run` and `attach` (an
   interactive top-style view). `--live` in particular is the thing a reader
@@ -290,7 +290,7 @@ listing in the chapter by some margin. If you want it split, the natural cut
 is at `max_nums = [5, 1, 8, 3, 2]`: min-heap plus top-N in one listing, the
 max-heap mirror in a second, with the "Through Python 3.13, `heapq` only built
 a min-heap" paragraph moving down to sit above the second. That is a pacing
-call, so it stays a proposal.
+call, so it stays a proposal. [[do the split]]
 
 [] Reject
 
@@ -370,7 +370,7 @@ While you are there, a second unremarked fact in the same three lines:
 object`). The output shows a `FrozenInstanceError` arriving from a filter
 written for `AttributeError`, which looks like a bug until you know that. Half
 a sentence fixes it: "`FrozenInstanceError` is an `AttributeError` subclass,
-which is why the filter catches it."
+which is why the filter catches it." [[do that]]
 
 [] Reject
 

@@ -1,7 +1,9 @@
 # function_is_descriptor.py
+from dataclasses import dataclass
+
+@dataclass
 class Person:
-    def __init__(self, name: str) -> None:
-        self.name = name
+    name: str
 
     def greet(self) -> str:
         return f"Hello, {self.name}"

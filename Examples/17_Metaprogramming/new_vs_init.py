@@ -6,12 +6,12 @@ class Tag:
     pass
 
 class Meta(type):
-    def __new__(mcl, name: str, bases: tuple[type, ...],
+    def __new__(mcls, name: str, bases: tuple[type, ...],
                 nmspc: dict[str, Any]) -> type:
         # Before creation: these changes take effect
         nmspc["added_in_new"] = 42
         bases += (Tag,)
-        return super().__new__(mcl, name, bases, nmspc)
+        return super().__new__(mcls, name, bases, nmspc)
 
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:

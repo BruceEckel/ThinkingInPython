@@ -93,10 +93,12 @@ from typing import Any, ClassVar
 class Singleton(type):
     _instances: ClassVar[dict[type, Any]] = {}
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__[T](
+            cls: type[T], *args: Any, **kwargs: Any) -> T:
+        if cls not in Singleton._instances:
+            Singleton._instances[cls] = type.__call__(
+                cls, *args, **kwargs)
+        return Singleton._instances[cls]
 
 class ASingleton(metaclass=Singleton):
     pass
@@ -119,6 +121,15 @@ slot: `ASingleton`'s single instance, `BSingleton`'s single instance
 Calling `CSingleton()` twice returns the same object both times, but
 that object is unrelated to `ASingleton`'s instance, since they live
 under different keys in the same dictionary.
+
+The `__call__[T]` signature is the chapter's, and it is worth keeping
+here rather than simplifying to `-> Any`. It ties the return type to
+`cls`, so `CSingleton()` type-checks as a `CSingleton` and a misspelled
+attribute on the result is still an error. Two details follow from that
+annotation: `cls: type[T]` hides the fact that `cls` is a `Singleton`,
+so the body writes `type.__call__(cls, ...)` where a zero-argument
+`super()` would be rejected, and it reads the cache through the class
+name, `Singleton._instances`, rather than through `cls`.
 
 ## 4. Declaring finality with a keyword in the class header
 
@@ -338,3 +349,110 @@ seen from the other side. Anything that decides *what the class is*,
 its name, its bases, or the namespace it is built from, has to happen
 in `__new__()`. `__init__()` can only modify the object that already
 exists, which is why `setattr(cls, ...)` still works there.
+
+## 9. Removing the `KNOWN_COMMANDS` check
+
+```python
+# ch17_exec_injection.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any, cast
+
+@dataclass
+class Command:
+    label: str
+
+    def run(self) -> str:
+        return f"Running {self.label}"
+
+    @classmethod
+    def make_class(cls, class_name: str) -> Callable[[], Command]:
+        # The KNOWN_COMMANDS check has been removed:
+        klass = f"""
+class {class_name}(Command):
+    def __init__(self) -> None:
+        super().__init__("{class_name}")
+"""
+        namespace: dict[str, Any] = {"Command": Command}
+        exec(klass, namespace)
+        return cast(Callable[[], Command], namespace[class_name])
+
+attack = (
+    'X(Command):\n'
+    '    pass\n'
+    'print("injected code ran")\n'
+    'Y = """  #'
+)
+try:
+    Command.make_class(attack)
+except KeyError:
+    print("lookup failed, after the injection ran")
+#: injected code ran
+#: lookup failed, after the injection ran
+```
+
+`print("injected code ran")` is not part of any class body. It runs at
+module level inside `exec()`, which is the whole point: a name that
+reaches `make_class()` unchecked becomes source code, and source code
+can do anything the program can do.
+
+The payload has to be built with a little care, because `class_name` is
+spliced in twice. The first splice supplies the attack lines. The
+second lands inside the `super().__init__("...")` string literal, where
+a bare newline would be a `SyntaxError` before anything runs, so the
+payload's last line opens a triple-quoted string, `Y = """`. That
+string swallows the second splice, and the trailing `#` comments out
+the `")` left over after it closes. The result compiles, and the
+injected `print()` runs while `exec()` is executing the class body.
+
+The `KeyError` afterward is incidental damage, not protection.
+`namespace[class_name]` looks for a class named after the whole
+payload, which was never defined. The injected statement already ran
+before that lookup happened, so failing the lookup rescues nothing.
+Restoring the `if class_name not in cls.KNOWN_COMMANDS` check closes
+the hole at the only place it can be closed: before the string is
+built.
+
+## 10. Keeping the first definition instead of raising an exception
+
+```python
+# ch17_keep_first.py
+from typing import Any
+
+class KeepFirst(dict[str, Any]):
+    def __setitem__(self, key: str, value: Any) -> None:
+        if key in self:
+            return  # Discard the later definition
+        super().__setitem__(key, value)
+
+class First(type):
+    @classmethod
+    def __prepare__(cls, name: str, bases: tuple[type, ...],
+                    **kwargs: Any) -> KeepFirst:
+        return KeepFirst()
+
+class Handlers(metaclass=First):
+    def on_open(self) -> None:
+        print("first on_open")
+    def on_open(self) -> None:  # noqa: F811
+        print("second on_open")
+
+Handlers().on_open()
+#: first on_open
+```
+
+`NoDuplicates` raised an exception on a repeated key. `KeepFirst`
+returns instead, so the second `def on_open` evaluates its function
+object, hands it to `__setitem__()`, and watches it go nowhere. The
+name still refers to the first function when the body finishes, which
+is what `Handlers().on_open()` proves.
+
+No class decorator can do this, and neither can `__init_subclass__()`
+or `__set_name__()`. All three receive the class after its body has
+finished executing, and the body executed `on_open = <second function>`
+as an ordinary assignment into the namespace mapping. By then the first
+function has no name pointing at it and no reference anywhere, so there
+is nothing left for a later hook to restore. `__prepare__()` is the
+only hook that sees the assignments one at a time, while they happen,
+which is exactly why the chapter calls it the one with no simpler
+substitute.

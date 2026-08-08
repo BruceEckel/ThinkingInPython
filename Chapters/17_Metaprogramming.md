@@ -86,8 +86,10 @@ but simpler hooks cover almost every case a metaclass used to handle:
   ([Decorating Classes](14_Decorators.md#decorating-classes)).
 
 Use a metaclass only when these cannot do the job.
-This chapter shows the simpler tools first,
-then metaclasses for situations that still need them.
+This chapter starts by building classes by hand,
+so you can see what a `class` statement actually does.
+Then come the simpler hooks,
+and finally metaclasses for the jobs that still need them.
 
 ## Generating Classes with `type`
 
@@ -162,7 +164,55 @@ Printing the class of the class produces the metaclass.
 
 Generating classes programmatically with `type` pays off when a family of classes differs only by name.
 Where you might otherwise write many near-identical subclasses by hand,
-you can instead generate them dynamically:
+you can instead generate them dynamically.
+A greenhouse controller runs scheduled events, one class per kind of event,
+and a dict comprehension builds all of them:
+
+```python
+# eager_event_classes.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Final, cast
+
+@dataclass
+class Event:
+    action: str
+    hour: int
+    minute: int
+
+type EventMaker = Callable[[int, int], Event]
+NAMES: Final[tuple[str, ...]] = (
+    "ThermostatDay", "ThermostatNight", "LightOn", "LightOff",
+    "WaterOn", "WaterOff", "RingBell",
+)
+
+def make(name: str) -> EventMaker:
+    def init(self: Event, hour: int, minute: int) -> None:
+        Event.__init__(self, name, hour, minute)
+    new_cls = type(name, (Event,), {"__init__": init})
+    return cast(EventMaker, new_cls)
+
+makers = {name: make(name) for name in NAMES}
+print(len(makers))
+#: 7
+print(makers["LightOn"](1, 0))
+#: LightOn(action='LightOn', hour=1, minute=0)
+```
+
+Each generated class is a real type, not a label.
+`LightOn` and `WaterOff` are distinct subclasses of `Event`,
+so `isinstance()` tells them apart and either one can later be given behavior of its own.
+
+The checker cannot follow a class built by `type()`,
+so it reads `make()`'s result as `Event` itself,
+whose `__init__()` takes three arguments.
+`EventMaker` names the two-argument signature the generated classes really have,
+and the `cast()` records it at the one place a class is created.
+
+The dict comprehension builds all seven classes whether the schedule uses them or not.
+Seven is cheap and hundreds would not be,
+so the next version defers each construction until the first lookup asks for it,
+which costs a `dict` subclass and a placeholder for the classes that do not exist yet:
 
 ```python
 # greenhouse.py
@@ -259,9 +309,6 @@ ThermostatDay 6:00
 LightOn 8:00
 ```
 
-Each generated class is a real type, not a label.
-`LightOn` and `WaterOff` are distinct subclasses of `Event`,
-so `isinstance()` tells them apart and either one can later be given behavior of its own.
 Calling `Event(class_name, hour, minute)` directly would print the same schedule,
 but every entry would be the same type with its kind reduced to a string.
 
@@ -309,7 +356,7 @@ is easier to read and modify than a namespace dict:
 # commander.py
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import ClassVar, cast
+from typing import Any, ClassVar, cast
 from exceptions import ignore
 
 @dataclass
@@ -329,7 +376,7 @@ class {class_name}(Command):
     def __init__(self) -> None:
         super().__init__("{class_name}")
 """
-        namespace: dict[str, type[Command]] = {"Command": Command}
+        namespace: dict[str, Any] = {"Command": Command}
         exec(klass, namespace)
         return cast(Callable[[], Command], namespace[class_name])
 
@@ -348,7 +395,9 @@ if __name__ == "__main__":
 `make_class()` execs `klass` into a private `namespace` dict rather than the module's namespace,
 seeded with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
-so it believes `namespace[class_name]` is a plain `type[Command]` whose constructor takes a `label` argument.
+so `namespace[class_name]` is just `Any` to it.
+`exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
+which is the other reason the values cannot be typed more precisely than `Any`.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place the class is created,
 the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
@@ -568,9 +617,11 @@ which makes every function a descriptor:
 
 ```python
 # function_is_descriptor.py
+from dataclasses import dataclass
+
+@dataclass
 class Person:
-    def __init__(self, name: str) -> None:
-        self.name = name
+    name: str
 
     def greet(self) -> str:
         return f"Hello, {self.name}"
@@ -748,7 +799,8 @@ A subclass repeats `metaclass=` only if its bases do not already carry the same 
 since Python computes a new class's metaclass from all of its bases.
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
-except for `__new__()`, which uses `mcl` (metaclass);
+except for `__new__()`,
+whose first argument is the metaclass and is usually written `mcls` or `mcs`;
 here `cls` is the class object under construction, `Simple`.
 As with any subclass, call the base-class version first through `super()`.
 
@@ -788,12 +840,12 @@ class Tag:
     pass
 
 class Meta(type):
-    def __new__(mcl, name: str, bases: tuple[type, ...],
+    def __new__(mcls, name: str, bases: tuple[type, ...],
                 nmspc: dict[str, Any]) -> type:
         # Before creation: these changes take effect
         nmspc["added_in_new"] = 42
         bases += (Tag,)
-        return super().__new__(mcl, name, bases, nmspc)
+        return super().__new__(mcls, name, bases, nmspc)
 
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:
@@ -920,7 +972,7 @@ This works, but it is heavier than the problem usually requires.
 from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 
-### Multiple Inheritance in a Metaclass
+### Multiple Inheritance and Metaclasses
 
 `Singleton` stores its cache in `_instances`, which is a `dict` attribute.
 It doesn't inherit from `dict` directly.
@@ -956,6 +1008,8 @@ as long as the extra class is a mixin with no competing layout:
 
 ```python
 # mixin.py
+from exceptions import ignore
+
 class Mixin:
     def helper(self) -> str:
         return "hi"
@@ -968,12 +1022,60 @@ class Derived(metaclass=Base):
 
 print(Derived.helper())
 #: hi
+
+with ignore(AttributeError):  # A metamethod: class only
+    Derived().helper()  # type: ignore
+#: AttributeError("'Derived' object has no attribute 'helper'")
 ```
+
+`helper()` arrives through the metaclass,
+so `Derived` has it and a `Derived` instance does not.
+That is the metamethod rule from the start of [Intercepting Instance Creation](#intercepting-instance-creation),
+failing out loud: an instance of `Derived` is not an instance of `Base`,
+so nothing in its lookup chain reaches `Mixin`.
+A `classmethod` would answer on both.
 
 The constraint here is the ordinary "at most one layout-bearing base" rule that governs every Python class,
 not something specific to metaclasses.
 Composing a `dict`, the way `Singleton._instances` already does,
 sidesteps the conflict.
+
+Multiple inheritance fails a second way, from the other direction.
+A class has a single metaclass,
+so inheriting from two classes built by different metaclasses has no answer:
+
+```python
+# multiple_metaclass_inheritance.py
+class MetaA(type):
+    pass
+
+class MetaB(type):
+    pass
+
+class A(metaclass=MetaA):
+    pass
+
+class B(metaclass=MetaB):
+    pass
+
+try:
+    class C(A, B):  # type: ignore
+        pass
+except TypeError as error:
+    print(type(error).__name__)
+#: TypeError
+```
+
+This creates a metaclass conflict you must resolve,
+by giving `C` a metaclass that inherits both.
+As with the layout conflict just shown,
+ty sees this without running the program,
+reporting `conflicting-metaclass` and naming both `MetaA` and `MetaB`,
+which is why the line carries a `# type: ignore`.
+Both failures have the same shape:
+an inheritance graph that looks legal until you notice what the bases carry with them.
+It's one more reason to avoid metaclasses (and, arguably, multiple inheritance)
+unless you truly need them.
 
 ## When You Still Need a Metaclass
 
@@ -1036,38 +1138,8 @@ or inspect members, but it cannot change the name, the bases, or the namespace,
 and it cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes *instances* callable;
 only a metaclass makes the class callable in a new way.
-
-One caution: a class has a single metaclass.
-Multiple inheritance can accidentally combine classes with different metaclasses:
-
-```python
-# multiple_metaclass_inheritance.py
-class MetaA(type):
-    pass
-
-class MetaB(type):
-    pass
-
-class A(metaclass=MetaA):
-    pass
-
-class B(metaclass=MetaB):
-    pass
-
-try:
-    class C(A, B):  # type: ignore
-        pass
-except TypeError as error:
-    print(type(error).__name__)
-#: TypeError
-```
-
-This creates a metaclass conflict you must resolve.
-As with the layout conflict above, ty sees this without running the program,
-reporting `conflicting-metaclass` and naming both `MetaA` and `MetaB`,
-which is why the line carries a `# type: ignore`.
-It's one more reason to avoid metaclasses (and, arguably, multiple inheritance)
-unless you truly need them.
+That is the whole case for a metaclass: the class object needs behavior,
+and nothing that runs after the class exists can give it any.
 
 ## The `inspect` Module
 
@@ -1182,6 +1254,8 @@ def _truncate(text: str, budget: int) -> str:
     # Keep text within budget, marking a cut with an ellipsis:
     if len(text) <= budget:
         return text
+    if budget < 4:  # No room for text plus the ellipsis
+        return "..."[:max(budget, 0)]
     return text[:budget - 3] + "..."
 
 def _format_method(
@@ -1305,6 +1379,65 @@ it keeps only the ones whose value differs from `object`'s own,
 so a class that overrides none of them shows no dunders.
 `_redefined()` checks membership in `INTERESTING_DUNDERS` before comparing,
 deliberately narrowing the comparison to those four.
+The two modes side by side,
+on a class that redefines nothing and one that redefines almost everything:
+
+```python
+# dunder_modes.py
+from dataclasses import dataclass
+from display import (
+    INTERESTING_DUNDERS,
+    REDEFINED_DUNDERS,
+    display_object,
+)
+
+class Plain:
+    pass
+
+@dataclass
+class Point:
+    x: int
+    y: int
+
+display_object(Plain, INTERESTING_DUNDERS)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   • __eq__(self, value, /)
+#:   • __hash__(self, /)
+#:   • __init__(self, /, *args, **kwargs)
+#:   • __repr__(self, /)
+
+display_object(Plain, REDEFINED_DUNDERS)
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
+
+display_object(Point, REDEFINED_DUNDERS)
+#: [Attributes]
+#:   • __hash__ = None [CV]
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int, y: int) -> None
+#:   • __repr__(self)
+
+display_object(Point, REDEFINED_DUNDERS, exclude=("__hash__",))
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int, y: int) -> None
+#:   • __repr__(self)
+```
+
+`Plain` writes none of the four,
+so `INTERESTING_DUNDERS` shows `object`'s versions and `REDEFINED_DUNDERS` shows nothing.
+`@dataclass` writes three of them and sets `__hash__` to `None`,
+which is why `Point` reports a `__hash__` attribute rather than a method.
+The last call drops that row,
+the same reason `comparison.py` in [Data Classes as Types](12_Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes)
+passes `exclude=("__hash__",)`.
 
 Every class, even an empty one, has its own `__module__`, `__dict__`,
 and a handful of other bookkeeping dunders that never match `object`'s,
@@ -1435,7 +1568,75 @@ The rest is the bookkeeping every class carries.
 
 ## Which Hook for Which Job
 
-The chapter's advice is one line long: use the lightest tool that does the job.
+Every hook in this chapter is an ordinary function called at a known moment while a class is built.
+Putting them all in one class shows the sequence:
+
+```python
+# hook_order.py
+from typing import Any
+
+class Watched:
+    def __set_name__(self, owner: type, name: str) -> None:
+        print(f"__set_name__({owner.__name__}, {name})")
+
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, name: str, bases: tuple[type, ...],
+                    **kwargs: Any) -> dict[str, Any]:
+        print(f"__prepare__ {name}")
+        return {}
+
+    def __new__(mcls, name: str, bases: tuple[type, ...],
+                nmspc: dict[str, Any]) -> type:
+        print(f"__new__ {name} enter")
+        cls = super().__new__(mcls, name, bases, nmspc)
+        print(f"__new__ {name} exit")
+        return cls
+
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 nmspc: dict[str, Any]) -> None:
+        super().__init__(name, bases, nmspc)
+        print(f"__init__ {name}")
+
+def tag[T: type](cls: T) -> T:
+    print(f"decorator {cls.__name__}")
+    return cls
+
+class Base(metaclass=Meta):
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        print(f"__init_subclass__ {cls.__name__}")
+#: __prepare__ Base
+#: __new__ Base enter
+#: __new__ Base exit
+#: __init__ Base
+
+@tag
+class Derived(Base):
+    field = Watched()
+    print("class body")
+#: __prepare__ Derived
+#: class body
+#: __new__ Derived enter
+#: __set_name__(Derived, field)
+#: __init_subclass__ Derived
+#: __new__ Derived exit
+#: __init__ Derived
+#: decorator Derived
+```
+
+`Base`'s four lines are the bare sequence,
+and they also show that `Base.__init_subclass__()` never runs for `Base` itself,
+the rule [Making a Class Final](#making-a-class-final) depends on.
+`Derived` adds the rest.
+`__prepare__()` runs before the body, which is why its line comes first.
+The body then executes, printing `class body`.
+`__set_name__()` and `__init_subclass__()` both land between `__new__ Derived enter` and `__new__ Derived exit`,
+because `type.__new__()` calls them as it assembles the class,
+so they are not merely "after the body" but inside the metaclass's own construction step.
+The decorator is last, because it receives a class that is already finished.
+
+Knowing that sequence picks the hook.
 Here is the job list:
 
 - React to each new subclass: `__init_subclass__()`.
@@ -1451,12 +1652,9 @@ Here is the job list:
 
 None of this is a special facility bolted onto the language.
 A class is an object, built at run time by executing its body,
-so every hook in that list is an ordinary function called at a known moment in that sequence.
-`__prepare__()` runs before the body,
-`__set_name__()` and `__init_subclass__()` run as it finishes,
-a decorator runs after, and `__call__()` runs later still,
-each time someone uses the result.
-Knowing the sequence is what tells you which one to write.
+and `hook_order.py` displays each step of that construction as it happens.
+The one hook missing from its trace is `__call__()`, which runs later still,
+each time someone calls the finished class.
 
 ## Exercises
 
@@ -1487,6 +1685,14 @@ Knowing the sequence is what tells you which one to write.
 8.  In `new_vs_init.py`,
     move the `bases += (Tag,)` line from `__new__()` into `__init__()` and predict what happens before running it.
     Explain the result in terms of when the class object comes into existence.
+9.  `commander.py` validates `class_name` against `KNOWN_COMMANDS` before splicing it into source text.
+    Remove that check, call `Command.make_class()` with a name containing a newline and a second statement,
+    and confirm that the injected statement runs.
+    Restore the check.
+10. Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
+    it keeps the *first* definition of a duplicated name and discards the later one.
+    Confirm that `Handlers().on_open()` then runs the first `on_open`.
+    Explain why no class decorator could achieve the same thing.
 
 [^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern*
 (CRTP):

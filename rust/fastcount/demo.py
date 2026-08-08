@@ -26,13 +26,17 @@ def collatz_lengths(values: list[int]) -> list[int]:
 limit = 200_000
 assert fastcount.count_primes(limit) == count_primes(limit)
 t_python = timeit.timeit(lambda: count_primes(limit), number=1)
-t_rust = timeit.timeit(lambda: fastcount.count_primes(limit), number=1)
+t_rust = timeit.timeit(
+    lambda: fastcount.count_primes(limit), number=1
+)
 print(f"count_primes Rust speedup: {t_python / t_rust:.1f}x")
 # Sample run: count_primes Rust speedup: 12.2x
 
 values = list(range(1, 50_000))
 assert fastcount.collatz_lengths(values) == collatz_lengths(values)
 t_python = timeit.timeit(lambda: collatz_lengths(values), number=1)
-t_rust = timeit.timeit(lambda: fastcount.collatz_lengths(values), number=1)
+t_rust = timeit.timeit(
+    lambda: fastcount.collatz_lengths(values), number=1
+)
 print(f"collatz_lengths Rust speedup: {t_python / t_rust:.1f}x")
 # Sample run: collatz_lengths Rust speedup: 34.3x

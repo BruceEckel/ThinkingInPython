@@ -51,6 +51,8 @@ def _truncate(text: str, budget: int) -> str:
     # Keep text within budget, marking a cut with an ellipsis:
     if len(text) <= budget:
         return text
+    if budget < 4:  # No room for text plus the ellipsis
+        return "..."[:max(budget, 0)]
     return text[:budget - 3] + "..."
 
 def _format_method(
