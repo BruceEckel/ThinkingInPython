@@ -39,8 +39,8 @@ It is the only entry on this whole ladder that requires no code change at all.
 CPython itself has an experimental just-in-time compiler.
 Builds that include it, as the official 3.13 and later binaries do,
 keep it switched off unless you set `PYTHON_JIT=1`,
-and the gain today is a single-digit percentage,
-so it is worth a measurement rather than a plan.
+and the gain is currently a single-digit percentage,
+so measure it before planning around it.
 Whether it stays is still being settled
 ([PEP 836](https://peps.python.org/pep-0836/)).
 
@@ -59,8 +59,9 @@ Although it is tempting to think you "have a pretty good idea where the slowdown
 programmers turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
-The standard library includes two: a deterministic tracing profiler, and,
-new in Python 3.15, a sampling profiler.
+The standard library includes two.
+The first is a deterministic tracing profiler; the second, new in Python 3.15,
+is a sampling profiler.
 The classic `cProfile` was introduced in 2006.
 It deterministically records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
@@ -426,7 +427,7 @@ Here the hoist does not pay off, and it can cost.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
 with no bound method built.
 `append = out.append` builds one, and every call then goes through it.
-Two machines measured the hoisted version five and twenty percent slower.
+One machine measured the hoisted version five percent slower, another twenty.
 Measure it on your own machine before believing either direction.
 The threshold is deliberately loose.
 Timing noise on a busy machine easily reaches ten or twenty percent,
@@ -908,7 +909,7 @@ The two failed assignments print differently on purpose.
 The slotted message varies between builds,
 so the first block reports only the exception's type,
 while the frozen message is stable and `ignore()` shows it whole.
-That filter catches a `FrozenInstanceError` because `FrozenInstanceError` subclasses `AttributeError`.
+The filter catches it because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
@@ -1315,8 +1316,8 @@ Shipping millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The list of integers `collatz_lengths()` takes and returns crosses 50,000 times,
 which sounds like the thing to avoid,
-but each crossing buys a hundred-odd loop iterations of real work,
-so the conversion cost disappears into the win.
+but a hundred-odd loop iterations of real work follow each crossing,
+so the conversion cost disappears.
 The question is never the object count on its own,
 it is the work done per object crossed.
 

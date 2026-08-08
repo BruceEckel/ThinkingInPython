@@ -1,3 +1,4 @@
+[[Reviewed]]
 > When this file has been applied, change this file's name so it has a leading
 > `~` to indicate completion.
 
@@ -78,7 +79,7 @@ Current:
 
 Proposed:
 > but a hundred-odd loop iterations of real work follow each crossing,
-> so the conversion cost disappears into the win.
+> so the conversion cost disappears.
 
 Why: "buys" is on the avoid-if-possible list, and the sentence reads more
 directly with the work as its subject, since the work is what the paragraph is

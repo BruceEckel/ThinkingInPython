@@ -376,10 +376,6 @@ but move the listing's real assertion into the existing
 `holds over 200 tasks: True` line and mark the exact ones as illustrative in
 the prose ("your numbers will differ; the ratio will not"). Author's call.
 
-[[Add a flag that allows the user to run it on their own machine and get exact numbers.
-The non-flagged run is what the book build uses and it should be basic and fast, just enough to validate.
-use the durable fix.]]
-
 ---
 
 [] Reject
