@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -37,7 +38,7 @@ nothing in the chapter warns them.
 `@override`, the `...` step defaults, and the constructor-starts-the-engine
 idiom), one of which the chapter later disavows.
 
-Two ways out. I recommend the first.
+Two ways out. I recommend the first [[do this]].
 
 **Option A (recommended): make `ApplicationFramework` the good design.**
 Drop `__init__()` from `ApplicationFramework` entirely and end the listing
@@ -193,7 +194,7 @@ Two fixes, pick one:
   "`Recorder` is the faithful substitute the section describes: it fills the
   steps and changes nothing about the flow, so the test can assert the flow."
 
-I prefer the move.
+I prefer the move.[[do that]]
 
 ---
 

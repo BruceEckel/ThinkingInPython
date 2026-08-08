@@ -1,7 +1,7 @@
 # proxy_2.py
 from typing import Any
 
-class Implementation2:
+class Implementation:
     def f(self) -> None:
         print("Implementation.f()")
     def g(self) -> None:
@@ -9,13 +9,13 @@ class Implementation2:
     def h(self) -> None:
         print("Implementation.h()")
 
-class Proxy2:
+class Proxy:
     def __init__(self) -> None:
-        self.__implementation = Implementation2()
+        self.__implementation = Implementation()
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
-p = Proxy2()
+p = Proxy()
 p.f()
 #: Implementation.f()
 p.g()

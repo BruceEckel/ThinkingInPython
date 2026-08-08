@@ -30,7 +30,7 @@ settings: dict[str, str] = {}
 ```
 
 ```python
-# import_once.py
+# module_singleton.py
 import config
 import config as again
 
@@ -117,7 +117,8 @@ You can't prevent a caller from writing `Settings()` and getting a second instan
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
 which is as far as Python goes.
 A second underscore is not a stronger version of that.
-At module level nothing is mangled, so it hides nothing,
+At module level nothing is [mangled](11_Testing.md#white-box-and-black-box-tests),
+so it hides nothing,
 and inside a class body the compiler rewrites `m.__Settings` into a lookup for `_TheClass__Settings`,
 which breaks the reference.
 
@@ -137,14 +138,16 @@ so there is exactly one instance and no module-level name.
 `type(settings())` recovers it anyway.
 
 Nesting costs the return annotation as well.
-Quoting the name, `def settings() -> "Settings"`, is the obvious approach.
-It parses and runs because an annotation is evaluated only when something reads it.
-A clean run is therefore no evidence, since nothing has looked the name up yet.
+`def settings() -> Settings` still parses and runs,
+because an annotation is evaluated only when something reads it,
+and nothing has read this one yet.
+A clean run is therefore no evidence.
 When something does look, it searches the scope containing the function,
 not the function's own locals, and the class is not there.
 A checker reports an unresolved reference,
 and `inspect.get_annotations(eval_str=True)` raises a `NameError`.
-The signature must name something reachable, which means a `Protocol`.
+The signature must name something reachable,
+so nesting costs you either the annotation or a separate `Protocol` to name in its place.
 
 Privacy in Python is advice, not enforcement.
 An underscore asks callers to stay out, and nothing makes them.
@@ -279,14 +282,38 @@ test `_instance` before taking the lock,
 take it only when the test says the object is missing, then test again inside.
 The second test is the one note 3 insists on;
 the first exists to skip the lock once the object is there.
-It works, and it asks the reader to reason about which reads an interpreter may reorder,
-which is a bad trade for saving a lock acquisition.
-Eager creation is a better answer when the object can be built at import time.
+It works, but it asks the reader to reason about what a [free-threaded](19_Concurrency.md#free-threading)
+interpreter may reorder, which is a bad trade for saving a lock acquisition.
+Eager creation is a better answer when the object can be built at import time:
+
+```python
+# singleton_eager_factory.py
+from dataclasses import dataclass, field
+from functools import cache
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+@cache
+def settings() -> Settings:
+    return Settings()
+
+settings()  # Build it before any thread can race for it
+print(settings() is settings())
+#: True
+```
+
+The priming call is safe for the reason the chapter opened with:
+the import system runs a module body once,
+so the object exists before any thread can ask for it.
+Laziness is what the race needs, and this gives it up on purpose.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
-Modules and cached factories should cover your singleton needs.
+Modules and cached factories, primed at import time if threads are involved,
+should cover your singleton needs.
 The rest of this chapter is here for the techniques it demonstrates,
 not because you need these forms.
 
@@ -297,7 +324,9 @@ To address languages like C++ and Java,
 The variations shown here are worth understanding,
 but each does more work than the module or the cached factory above.
 
-The classic approach takes control of creation by delegating to a single instance of a private nested class.
+The first three take control of creation by delegating to a single instance of a private nested class.
+The rest reach the same guarantee by other means: a class variable,
+a shared `__dict__`, a decorator, and a metaclass.
 
 ### Lazy Creation
 
@@ -340,7 +369,7 @@ print(x is y, x.instance is y.instance is z.instance)
 
 Because the inner class's name starts with a double underscore,
 Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
-This is [name mangling](11_Testing.md#white-box-and-black-box-tests).
+This is name mangling.
 `OnlyOne.__OnlyOne`, written from outside the class,
 asks for an attribute that was never stored under that name,
 so it fails at runtime with `AttributeError`, not at type-checking time.
@@ -549,6 +578,13 @@ That runs after `__init__` assigns the fields, so it discards them.
 The hand-written `__init__` makes the shared state work,
 and silently losing the sharing is worse than failing outright.
 
+The sharing also reaches further than it looks.
+`_shared_state` is one dict on `Borg`, so every subclass shares it,
+not merely every instance of a single subclass.
+Constructing an `A("apple")` and then a `B("banana")` leaves both objects reading `"banana"`.
+A subclass that needs storage of its own declares it:
+`class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
+
 Testing confirms the objects differ but share one set of state:
 
 ```python
@@ -664,6 +700,9 @@ which is the reason to prefer those.
 Finally, a metaclass can intercept construction.
 [Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation)
 shows another metaclass singleton, one that overrides `__call__()`.
+Overriding `__call__()` skips `__init__()` on every later construction,
+so the first call's arguments win; the version here replaces `__new__()`,
+so `__init__()` reruns and the last call's arguments win.
 That chapter also covers `__init_subclass__()` and `__set_name__()`,
 the simpler hooks that replace most metaclasses.
 This version is here for completeness:
@@ -731,7 +770,8 @@ Use the lightest tool that fits:
 - For almost everything, use a module with module-level state.
   It is the default Python singleton and needs no class.
 - If you want a class, hide construction behind a cached factory (`@cache`),
-  or override `__new__()`.
+  or override `__new__()` as `singleton_class_variable.py` does.
+  Under threads, prime the factory at import time or use the module form.
 - If you really want many handles sharing one set of state, use *Borg*.
 - The decorator and metaclass versions work,
   but they are more machinery than the problem usually justifies.
@@ -757,3 +797,10 @@ In Python, most of the ceremony falls away.
     and add `import config` plus `print(config.settings)` at the end.
     Predict both printed values before running it,
     and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a Singleton](#a-module-is-already-a-singleton).
+5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
+    wrapping only the body of the cached function, and run it.
+    Explain why the object count does not drop to one,
+    then fix it without a lock.
+6.  Give `singleton_borg.py` a second `Borg` subclass and construct one of each.
+    Explain the value you get back,
+    and change the code so the two subclasses keep separate shared state.

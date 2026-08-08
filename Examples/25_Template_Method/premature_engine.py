@@ -23,5 +23,5 @@ class Greeter(Framework):
 try:
     Greeter("Bruce")
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(e)
+#: 'Greeter' object has no attribute 'name'

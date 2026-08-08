@@ -67,7 +67,7 @@ Proposed change: rewrite the passage as something like
 > has room for exactly one call, so the list needs a name for "callable, plus
 > `undo()`". In Python that name is a `Protocol` with both members, and the
 > `Command` base class earns its keep only when the commands also want shared
-> implementation.
+> implementation. [[rewrite "earns its keep"]]
 
 Note this also affects `Solutions/28_Function_Objects.md` §1, whose prose repeats
 the same reasoning ("a callable has only one call ... that is the step the chapter

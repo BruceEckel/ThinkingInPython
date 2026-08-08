@@ -1449,7 +1449,8 @@ a producer decides what each consumer gets.
 The pull half looks simpler.
 Hand every worker the same iterator and let each one take the next item when it is ready.
 Nothing in the language stops you, and nothing in the language makes it work.
-An iterator has never been thread-safe:
+An iterator has never been thread-safe
+([Iterators](23_Iterators.md) covers the protocol itself):
 
 ```python
 # shared_iterator.py

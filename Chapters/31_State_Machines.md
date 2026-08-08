@@ -76,7 +76,7 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 [Template Method](25_Template_Method.md) puts the varying steps in a subclass;
 here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
-the construction-starts-the-engine choice that drew a warning in that chapter.
+the construction-starts-the-engine choice that [drew a warning in that chapter](25_Template_Method.md#dont-start-the-engine-in-the-constructor).
 It is safe here because the state objects are stateless singletons,
 fully formed before any machine exists.
 A `State` whose `run()` reads attributes off the machine revives the trap,

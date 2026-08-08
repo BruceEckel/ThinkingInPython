@@ -12,7 +12,7 @@ print("created")
 print(next(sq))
 #: first next() reached the body
 #: 0
-print(list(sq))  # Remainder of list
+print(list(sq))  # The values that are left
 #: [1, 4, 9, 16, 25]
 print(list(sq))  # Exhausted: empty, and no error
 #: []

@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -241,6 +242,7 @@ sequence is: change the `# import_once.py` first line in the fence, then
 `make sync && make prune-examples`.
 I did add the back-link to chapter 6 (line 13), which was the other half of
 this gap.
+[[Also modify the build system to ensure every file name is unique]]
 
 ## Cross-chapter
 

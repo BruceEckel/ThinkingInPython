@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -29,7 +30,7 @@ Proposed, if the plugin reading is what you meant:
     earns its keep when other people write the implementations
     and you need the base class to state what they owe you.
     When you write both sides, the single generic surrogate above is simpler
-    and just as flexible.
+    and just as flexible.  [[ this one, but get rid of "earns its keep"]]
 
 Proposed, if the wrapping-third-party-code reading is what you meant, the
 conclusion inverts:
@@ -174,7 +175,7 @@ Proposed: two sentences after line 184, where the question arises.
     `p.f()` goes through `__getattr__()`, whose return type is unknown,
     so nothing the proxy declares can make that call checkable.
     Explicit forwarding, as in `proxy_1.py`, is the version a checker can see
-    through; `__getattr__()` trades that for reach.
+    through; `__getattr__()` trades that for reach. [[yes but don't use the "pay" metaphor]]
 
 Then line 368-373 in the State section can shorten to a back-reference. This
 is the single change in this file I would most like made; I left it as a

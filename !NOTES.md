@@ -2,6 +2,12 @@ New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
+Look through the patterns for sections that show a alternate approaches that are only being shown for pedagogical purposes.
+Do they teach something valuable enough, would anybody ever use these?
+Make a review list that proposes removal of the ones that don't pull their weight.
+
+Review all the exercises and make sure they all have solutions that work.
+
 Add Epub link info on README and bottom of index page.
 
 Look for places display_object could be replaced with print(vars(obj))
@@ -11,8 +17,6 @@ Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapt
 Examples that demonstrate probability or statistics, very simply
 
 Fatal vs recoverable errors
-
-Review all the exercises and make sure they all have solutions that work.
 
 Review the book looking for consistency issues
 

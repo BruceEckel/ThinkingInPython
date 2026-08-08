@@ -1730,6 +1730,26 @@ When Bruce hands the file back with an instruction like
    calls for. Use `git mv` when the file is tracked. The `~` marks it done.
 4. Remind Bruce to run `make verify`.
 
+**Which variant to apply.**
+A live block that offers several fixes gets the one the block recommends,
+unless Bruce says otherwise.
+He annotates a choice inline, in double brackets
+(`[[do this]]`, `[[cut the parenthetical]]`),
+and that annotation outranks the recommendation.
+
+**A block that argues against itself is declined.**
+When the recommendation is not "which fix" but "do not make this change at
+all" (`I lean toward not doing this`, `I would not do it`,
+`I do not recommend this`), leave the chapter alone even though the checkbox
+is empty, and say in the report that the block was skipped for that reason.
+An empty checkbox means Bruce did not veto it;
+it does not mean he asked for a change the block itself argues against.
+Only an explicit annotation turns such a block back on.
+
+The cleaner move is to avoid the collision when writing the review:
+a finding worth recording but not worth making belongs under a heading that
+marks it as considered and declined, not in a live block.
+
 A `~`-prefixed file in `readability/` is a completed review.
 Leave it alone unless Bruce asks.
 

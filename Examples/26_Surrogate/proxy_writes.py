@@ -5,14 +5,14 @@ class Settings:
     def __init__(self) -> None:
         self.level = "low"
 
-class Proxy4:
+class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
 settings = Settings()
-p = Proxy4(settings)
+p = Proxy(settings)
 print(p.level)
 #: low
 p.level = "high"  # type: ignore

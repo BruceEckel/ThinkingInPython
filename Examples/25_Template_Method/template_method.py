@@ -2,9 +2,6 @@
 from typing import final, override
 
 class ApplicationFramework:
-    def __init__(self) -> None:
-        self.run()
-
     # The fixed algorithm. Subclasses supply the steps, not the flow:
     @final
     def run(self) -> None:
@@ -25,7 +22,7 @@ class MyApp(ApplicationFramework):
     def customize2(self) -> None:
         print("Say no more, say no more!")
 
-MyApp()
+MyApp().run()
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
 #: Nudge, nudge, wink, wink!

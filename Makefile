@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -450,6 +450,16 @@ fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
 	$(PY) tools/heading_links.py Chapters $(GATE_DOCS)
+
+# Fail if two chapters give different listings the same filename. Nothing
+# else catches this: the two files land in different Examples/ directories,
+# so the drift check passes, while a repo search for the name returns two
+# unrelated listings and a pytest run can import the wrong one. Deliberately
+# not in `gate` yet: six pre-existing collisions have to be renamed first,
+# and which side renames is an authorial call. Add it to GATE_CHECKS once
+# this target is green.
+unique-slugs:  ## Fail if two chapters name two listings the same
+	$(PY) tools/check_unique_slugs.py
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.

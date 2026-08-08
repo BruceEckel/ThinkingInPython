@@ -121,7 +121,7 @@ It exists only because the language does not write it for them.
 A pattern meets its missing piece in two ways.
 Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
 shows that a Python module already is one.].
-Iterator is the clear case.
+[Iterator](23_Iterators.md#the-pattern-that-disappeared) is the clear case.
 It was implicit in the `for` loop from the start,
 and Python 2.2 made it a protocol the language calls on your behalf.
 More often the language had the piece all along,

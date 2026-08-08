@@ -15,6 +15,7 @@ class Connection:
 
 class Pool:
     def __init__(self, size: int) -> None:
+        self._size = size
         self._free = [Connection(n) for n in range(size)]
 
     def available(self) -> int:
@@ -22,7 +23,7 @@ class Pool:
 
     def acquire(self) -> ConnectionProxy:
         if not self._free:
-            raise PoolExhausted(f"all {POOL_SIZE} in use")
+            raise PoolExhausted(f"all {self._size} in use")
         return ConnectionProxy(self, self._free.pop(0))
 
     def release(self, connection: Connection) -> None:

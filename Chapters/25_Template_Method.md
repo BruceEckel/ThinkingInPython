@@ -21,8 +21,10 @@ a separation this chapter returns to in [Don't Start the Engine in the Construct
 
 The defining trait of a Template Method is that the base class fixes the shape of the algorithm.
 Subclasses complete the individual steps.
-The `@final` decorator from `typing` locks the template method so a subclass cannot change the overall flow
-(see [Making a Class Final](17_Metaprogramming.md#making-a-class-final)).
+The `@final` decorator from `typing`,
+used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
+works on a single method too:
+it locks the template method so a subclass cannot change the overall flow.
 Here, `@final` marks `run()`,
 so the checker rejects any subclass that overrides it,
 while leaving the step methods open:
@@ -32,9 +34,6 @@ while leaving the step methods open:
 from typing import final, override
 
 class ApplicationFramework:
-    def __init__(self) -> None:
-        self.run()
-
     # The fixed algorithm. Subclasses supply the steps, not the flow:
     @final
     def run(self) -> None:
@@ -55,15 +54,15 @@ class MyApp(ApplicationFramework):
     def customize2(self) -> None:
         print("Say no more, say no more!")
 
-MyApp()
+MyApp().run()
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
 ```
 
-The base-class constructor starts the engine (`run()`),
-which drives the application.
+Construction builds the object;
+`run()` starts the engine that drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
@@ -80,8 +79,8 @@ The general name for this reversal is *Inversion of Control*:
 the framework holds the flow of control and calls into your code,
 rather than your code calling into a library.
 
-A caution about the `@final` lock: it binds only under the type checker.
-At runtime Python ignores it,
+A caution about the `@final` lock: it holds only under the type checker.
+At runtime Python only records the mark and enforces nothing,
 and a subclass override of `run()` replaces the fixed algorithm without complaint.
 The guarantee is real, but it is the checker's guarantee,
 one more reason to make `ty` or another checker part of the build.
@@ -102,9 +101,34 @@ inherit from `ABC` and declare the step with `@abstractmethod`,
 as in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance);
 then Python refuses to instantiate a subclass that forgot it.
 
+The test supplies a recording subclass and verifies the fixed flow:
+
+```python
+# test_template_method.py
+from typing import override
+from template_method import ApplicationFramework
+
+def test_template_method_runs_steps_in_order() -> None:
+    calls: list[str] = []
+
+    class Recorder(ApplicationFramework):
+        @override
+        def customize1(self) -> None:
+            calls.append("one")
+
+        @override
+        def customize2(self) -> None:
+            calls.append("two")
+
+    Recorder().run()  # The client starts the engine
+    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
+```
+
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
-Starting the engine from the constructor carries a trap.
+`ApplicationFramework` leaves starting to the client for a reason.
+A framework can call `run()` from its own constructor,
+and the `Framework` below does, which is where the trap lives.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
 If you call it first, in the usual style,
@@ -136,8 +160,8 @@ class Greeter(Framework):
 try:
     Greeter("Bruce")
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(e)
+#: 'Greeter' object has no attribute 'name'
 ```
 
 `Greeter("Bruce")` never gets to greet.
@@ -149,6 +173,7 @@ That works, but it inverts the convention every Python programmer carries,
 and the next subclass author will restore the usual order without thinking.
 The reliable fix changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
+That is why `ApplicationFramework` has no `__init__()` and the client writes `MyApp().run()`.
 
 ### Substitutability
 
@@ -163,29 +188,6 @@ That last case is the price of the `...` defaults above.
 They make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten."
 The Template Method works only when every subclass is a faithful substitute for its base.
-
-The test supplies a recording subclass and verifies the fixed flow:
-
-```python
-# test_template_method.py
-from typing import override
-from template_method import ApplicationFramework
-
-def test_template_method_runs_steps_in_order() -> None:
-    calls: list[str] = []
-
-    class Recorder(ApplicationFramework):
-        @override
-        def customize1(self) -> None:
-            calls.append("one")
-
-        @override
-        def customize2(self) -> None:
-            calls.append("two")
-
-    Recorder()  # Constructing it runs the framework
-    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
-```
 
 ## Passing the Steps as Functions
 
@@ -245,6 +247,29 @@ Here the algorithm stays where it is and only its steps arrive from outside.
 The choice between a class and a function is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
+## What Actually Fixes the Algorithm
+
+The fixed algorithm is only ever as fixed as the mechanism holding it,
+and this chapter has shown four of them.
+Structure fixes it in `template_function.py`,
+where there is no subclass through which to replace the loop.
+A checker fixes it with `@final`,
+which reports an override and stops nothing at runtime.
+The interpreter fixes it with `__init_subclass__()`,
+which refuses the subclass outright.
+Discipline fixes the rest:
+the Liskov Substitution Principle governs whether a step is a faithful substitute,
+and no tool checks that at all.
+
+They are listed in increasing cost and decreasing reach.
+Structure is free and covers only the case where you can pass functions instead of subclassing.
+`@final` costs a decorator and covers everyone who runs the checker.
+`__init_subclass__()` costs a base-class method and covers everyone,
+including the caller who skips the checker.
+Discipline covers what none of them can reach,
+which is what the steps do once the flow is safe.
+Choose by asking who you are protecting the algorithm from.
+
 ## Exercises
 
 1.  Create a framework that takes a list of file names.
@@ -264,3 +289,8 @@ A hook that holds no state is usually better as a function than as a method to o
     Run it, then run `ty` over it.
     Which of the two, Python or `ty`, objects to the change?
     What does that tell you about where the fixed algorithm's guarantee comes from?
+4.  Write two subclasses of `ApplicationFramework` that both type-check but break the fixed algorithm:
+    one whose `customize1()` raises an exception the base never raises,
+    and one that leaves `customize2()` at its `...` default when the flow depends on it.
+    Neither is reported by `ty`.
+    What would have to be true of the base class for a checker to catch either one?

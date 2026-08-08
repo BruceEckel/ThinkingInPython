@@ -1,13 +1,13 @@
 # exercise_3.py
-from __future__ import annotations
+from collections.abc import Sequence
 
 class Box:
-    def __init__(self, data: list) -> None:
+    def __init__(self, data: list[object]) -> None:
         self.data = data
         self.owners = 1
 
 class CowList:
-    def __init__(self, data: list | None = None,
+    def __init__(self, data: Sequence[object] | None = None,
                  _box: Box | None = None) -> None:
         self._box = (
             _box if _box is not None else Box(list(data or [])))

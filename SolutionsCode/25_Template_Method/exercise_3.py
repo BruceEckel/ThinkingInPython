@@ -2,9 +2,6 @@
 from typing import final, override
 
 class ApplicationFramework:
-    def __init__(self) -> None:
-        self.run()
-
     @final
     def run(self) -> None:
         for _ in range(2):
@@ -29,7 +26,7 @@ class Reversed(ApplicationFramework):
     def customize2(self) -> None:
         print("two")
 
-Reversed()
+Reversed().run()
 #: two
 #: one
 #: two

@@ -381,3 +381,138 @@ computed whether or not it is ever used, and a source that blocks on
 its first read blocks at construction. That is the same eagerness
 `tee`, `OverStream`, and this chapter's other lookahead all pay: a
 question about the future is answered by fetching the future.
+
+## 9. A string that never bottoms out
+
+```python
+# exercise_9.py
+from collections.abc import Iterator, Sequence
+
+type Nested = int | Sequence[Nested]
+
+def flatten(nested: Sequence[Nested]) -> Iterator[int]:
+    for item in nested:
+        if isinstance(item, int):
+            yield item
+        else:
+            yield from flatten(item)
+
+def flatten_str(nested: Sequence[Nested]) -> Iterator[int | str]:
+    for item in nested:
+        if isinstance(item, int | str):  # A str is one item
+            yield item
+        else:
+            yield from flatten_str(item)
+
+mixed: Sequence[Nested] = [1, "ab", 2]
+try:
+    list(flatten(mixed))
+except RecursionError as e:
+    print(type(e).__name__)
+#: RecursionError
+print(list(flatten_str(mixed)))
+#: [1, 'ab', 2]
+print(list(flatten_str([1, ["ab", [2]], 3])))
+#: [1, 'ab', 2, 3]
+```
+
+`flatten()` asks one question, "is this an `int`?", and treats every
+other answer as something to recurse into. A `str` is not an `int`, so
+`"ab"` goes to `flatten("ab")`, which iterates it into `"a"`. That is
+also not an `int`, so it recurses into `flatten("a")`, which iterates
+`"a"` into `"a"`. The string has stopped getting shorter. Every other
+sequence bottoms out because indexing it eventually yields a non-
+sequence, and `str` is the one built-in that never does: a
+one-character string is still a `Sequence` of one-character strings.
+The recursion has no base case, so it runs until the stack is gone.
+
+The fix widens the base case rather than the recursive one. Testing
+`isinstance(item, int | str)` makes `str` a leaf, so it is yielded
+whole and never iterated. The return type widens to
+`Iterator[int | str]` to say so.
+
+`flatten_loop()` takes the identical fix, since the two differ only in
+how they re-yield: `if isinstance(item, int | str)` in the same place,
+and the `for x in flatten_loop(item)` branch left alone. The bug is in
+the question each version asks, not in the delegation, which is why
+`yield from` neither causes it nor cures it.
+
+Worth noting what did not help: `Nested` says a leaf is an `int`, so
+the type already claims `"ab"` cannot be there. `ty` accepts the call
+anyway. A recursive alias of this shape is checked loosely enough that
+the annotation documents the intent without enforcing it, which is why
+the failure arrives as a `RecursionError` at runtime rather than an
+error at the call.
+
+## 10. Skipping instead of raising
+
+```python
+# exercise_10.py
+from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
+from typing import override
+
+def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
+    for obj in it:
+        if not isinstance(obj, expected):
+            raise TypeError(
+                f"expected {expected}, got {type(obj).__name__}")
+        yield obj
+
+def typed_skipping[T](
+        it: Iterable[object], expected: type[T]) -> Iterator[T]:
+    for obj in it:
+        if isinstance(obj, expected):
+            yield obj
+
+@dataclass(eq=False)
+class SkippingIterator[T](Iterator[T]):
+    imp: Iterator[object]
+    expected: type[T]
+
+    @override
+    def __next__(self) -> T:
+        for obj in self.imp:  # Pull until one matches
+            if isinstance(obj, self.expected):
+                return obj
+        raise StopIteration
+
+items: list[object] = [1, "two", 3, None, 4]
+try:
+    print(list(typed(items, int)))
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+print(list(typed_skipping(items, int)))
+#: [1, 3, 4]
+print(list(SkippingIterator(iter(items), int)))
+#: [1, 3, 4]
+```
+
+`typed()` and `typed_skipping()` differ by one word, and the
+difference decides what a bad item costs. `typed()` ends the stream:
+the `1` before `"two"` is delivered, everything after it is not, and
+the caller gets an exception instead of a list. `typed_skipping()`
+delivers `[1, 3, 4]` and never mentions `"two"` or the `None`.
+
+For a parsed log file, take the skipping version. A log is an
+append-only record written by many processes, so a malformed line is
+an expected event rather than a broken contract, and one truncated
+line should not cost you the rest of the file. The raising version
+gives the caller no way to resume: the generator is spent, so
+continuing means parsing the file again and somehow starting past the
+line that failed.
+
+That choice has a price, and it is the one this chapter keeps
+returning to. Skipping is silent, so a filter that quietly drops every
+line cannot be told from a file with nothing to report. If you take
+the skipping version, count what it drops and report the count.
+
+The class form is harder to write, and the reason is instructive.
+A generator may decline to produce: `typed_skipping()` reaches an item
+it does not want and simply does not `yield`, and the `for` loop
+continues. `__next__()` has no such option. Every call must return a
+value or raise `StopIteration`, so `SkippingIterator` needs its own
+loop to keep pulling until a match arrives. The raising version needs
+no loop at all, since it acts on the one item it just read. Generators
+write the state machine for you, and skipping is where you notice.

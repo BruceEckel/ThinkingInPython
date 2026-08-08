@@ -6,7 +6,7 @@ class ExpensiveResource:
         print("creating ExpensiveResource (slow!)")
         self.data = [1, 2, 3]
 
-    def query(self) -> list:
+    def query(self) -> list[int]:
         return self.data
 
 class LazyProxy:

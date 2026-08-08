@@ -1,5 +1,10 @@
 # state.py
-from typing import Any
+from typing import Any, Protocol
+
+class Behavior(Protocol):
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+    def h(self) -> None: ...
 
 class Surrogate:
     def __init__(self, implementation: Any) -> None:
@@ -32,13 +37,15 @@ def run(b: Any) -> None:
     b.h()
     b.g()
 
-b = Surrogate(Implementation1())
+first: Behavior = Implementation1()
+second: Behavior = Implementation2()
+b = Surrogate(first)
 run(b)
 #: Fiddle de dum, Fiddle de dee,
 #: Eric the half a bee.
 #: Ho ho ho, tee hee hee,
 #: Eric the half a bee.
-b.change_to(Implementation2())
+b.change_to(second)
 run(b)
 #: We're Knights of the Round Table.
 #: We dance whene'er we're able.

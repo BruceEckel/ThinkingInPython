@@ -167,9 +167,6 @@ where the timing of a hidden step makes the difference.
 from typing import final, override
 
 class ApplicationFramework:
-    def __init__(self) -> None:
-        self.run()
-
     @final
     def run(self) -> None:
         for _ in range(2):
@@ -194,7 +191,7 @@ class Reversed(ApplicationFramework):
     def customize2(self) -> None:
         print("two")
 
-Reversed()
+Reversed().run()
 #: two
 #: one
 #: two
@@ -209,7 +206,8 @@ no longer being fixed.
 `# type: ignore` to keep this listing in the book's build:
 
 ```
-error[invalid-override]: Cannot override final method `run`
+error[override-of-final-method]: Cannot override `ApplicationFramework.run`
+info: `ApplicationFramework.run` is decorated with `@final`, forbidding overrides
 ```
 
 The guarantee comes from the checker, not the language. `@final` sets
@@ -224,3 +222,91 @@ When the interpreter itself must refuse the override, use the
 `__init_subclass__()` technique the chapter points at, which raises a
 `TypeError` while the subclass's own class body is executing, long
 before anyone constructs one.
+
+## 4. Two faithless substitutes the checker accepts
+
+```python
+# exercise_4.py
+from typing import final, override
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+class Exploder(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        raise RuntimeError("step 1 refuses")
+
+class HalfDone(ApplicationFramework):
+    def __init__(self) -> None:
+        self.pending: list[str] = []
+
+    @override
+    def customize1(self) -> None:
+        self.pending.append("work")
+    # customize2() keeps its `...` default, so nothing drains pending
+
+try:
+    Exploder().run()
+except RuntimeError as e:
+    print(e)
+#: step 1 refuses
+
+app = HalfDone()
+app.run()
+print(app.pending)
+#: ['work', 'work']
+```
+
+`ty` reports nothing about either class. Both override with the right
+name, the right parameters, and the right return type, so both satisfy
+`@override` and every signature rule the base class states.
+
+`Exploder` breaks the algorithm on the first step of the first pass.
+Code written against `ApplicationFramework` sees `run()` return
+normally for every subclass the base contemplates, and this one raises
+instead, so a caller who wrapped `run()` in nothing finds an exception
+coming out of a method that never advertised one.
+
+`HalfDone` breaks it more quietly, which makes it the worse of the two.
+`customize1()` accumulates work and `customize2()` is supposed to
+consume it, so the pair is a two-step flow. Leaving `customize2()` at
+its default breaks the second half, and the program neither raises nor
+prints anything wrong. `pending` simply grows forever. Nothing is
+visible from outside until whatever `pending` feeds runs out of memory
+or reports stale data.
+
+The two need different things from a checker, and only one of them is
+available.
+
+The omission is fixable. `...` is what makes the step optional, and it
+is a decision the base class makes: it declares that a subclass may
+skip this step. Declare instead that a subclass may not, by inheriting
+from `ABC` and marking `customize2()` with `@abstractmethod`, and both
+tools object. `ty` reports the instantiation of an abstract class, and
+Python refuses to construct `HalfDone` at all. The checker could not
+catch it before, because "deliberately empty" and "forgotten" were the
+same code, and the base class was the only place that difference could
+have been written down.
+
+The exception is not fixable this way. Catching it would require the
+base class to state which exceptions a step may raise and the checker
+to hold every override to that list, which is Java's `throws` clause.
+Python has no such declaration, and no annotation expresses "this
+raises nothing." An exception type in a docstring is a note to a human.
+So the first subclass is caught by discipline, review, or a test, and
+by nothing else.
+
+That split is the chapter's point stated from the other side. `@final`
+protects the shape of the algorithm, and `@abstractmethod` protects the
+presence of a step, because both are properties of the class structure
+that a base class can declare. What a step *does* once called is
+behavior, and Liskov substitution is a rule about behavior, so it
+stays where the chapter left it: with you.

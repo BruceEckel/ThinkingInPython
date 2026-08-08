@@ -45,6 +45,18 @@ A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
 
+Written out, `for x in nums:` is this loop:
+
+```
+it = iter(nums)          # Once, before the loop
+while True:
+    try:
+        x = next(it)     # Once per step
+    except StopIteration:
+        break
+    ...                  # The loop body
+```
+
 One legacy path bypasses `__iter__()`.
 A class that defines only `__getitem__()` taking integers from zero is still iterable:
 `iter()` builds an iterator that indexes it until `IndexError`.
@@ -109,7 +121,40 @@ the list, and the custom `Countdown`.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
-so it can be iterated repeatedly, as the re-iteration test below confirms.
+so it can be iterated repeatedly, as the tests below confirm.
+
+These tests collect each iterator into a list and compare them,
+covering the sequences and their empty edge cases.
+This confirms that a custom iterable can be re-iterated,
+and that `total()` works on every source:
+
+```python
+# test_iterators.py
+import pytest
+from iterators import Countdown, fibonacci, total
+
+@pytest.mark.parametrize("n, expected", [
+    (8, [0, 1, 1, 2, 3, 5, 8, 13]),
+    (0, []),
+    (1, [0]),
+])
+def test_fibonacci_sequence(n: int, expected: list[int]) -> None:
+    assert list(fibonacci(n)) == expected
+
+def test_countdown_sequence() -> None:
+    assert list(Countdown(5)) == [5, 4, 3, 2, 1]
+    assert list(Countdown(0)) == []
+
+def test_countdown_is_reiterable() -> None:
+    c = Countdown(3)
+    assert list(c) == [3, 2, 1]
+    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
+
+def test_total_over_any_iterable() -> None:
+    assert total([1, 2, 3, 4]) == 10
+    assert total(fibonacci(8)) == 33
+    assert total(Countdown(5)) == 15
+```
 
 Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
@@ -121,6 +166,8 @@ A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take only as many as you need (see `itertools.islice()` below),
 which a list cannot do.
+
+## The Costs of Laziness
 
 There are two surprising consequences of laziness.
 Both are silent:
@@ -140,7 +187,7 @@ print("created")
 print(next(sq))
 #: first next() reached the body
 #: 0
-print(list(sq))  # Remainder of list
+print(list(sq))  # The values that are left
 #: [1, 4, 9, 16, 25]
 print(list(sq))  # Exhausted: empty, and no error
 #: []
@@ -220,7 +267,9 @@ which is why the listing cannot show it: a chapter listing must type-check.
 `total()` above stays `Iterable[int]` because it sums once.
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones,
-which looks like a third option but is rarely cheaper:
+which looks like a third option but is rarely cheaper.
+This `squares()` is the plain-function form from `eager_validation.py`,
+with the generator expression standing in for `produce()`:
 
 ```python
 # tee.py
@@ -270,39 +319,6 @@ so handing them to separate threads corrupts it.
 [Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
 covers `threading.concurrent_tee()`, the thread-safe version,
 along with what goes wrong when two threads call `next()` on the same iterator.
-
-These tests collect each iterator into a list and compare them,
-covering the sequences and their empty edge cases.
-This confirms that a custom iterable can be re-iterated,
-and that `total()` works on every source:
-
-```python
-# test_iterators.py
-import pytest
-from iterators import Countdown, fibonacci, total
-
-@pytest.mark.parametrize("n, expected", [
-    (8, [0, 1, 1, 2, 3, 5, 8, 13]),
-    (0, []),
-    (1, [0]),
-])
-def test_fibonacci_sequence(n: int, expected: list[int]) -> None:
-    assert list(fibonacci(n)) == expected
-
-def test_countdown_sequence() -> None:
-    assert list(Countdown(5)) == [5, 4, 3, 2, 1]
-    assert list(Countdown(0)) == []
-
-def test_countdown_is_reiterable() -> None:
-    c = Countdown(3)
-    assert list(c) == [3, 2, 1]
-    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
-
-def test_total_over_any_iterable() -> None:
-    assert total([1, 2, 3, 4]) == 10
-    assert total(fibonacci(8)) == 33
-    assert total(Countdown(5)) == 15
-```
 
 ## Delegating with `yield from`
 
@@ -480,7 +496,7 @@ and a generator built from `while True` is indistinguishable from a finite one u
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.
-Nothing in the toolchain (except an AI) will discover problems like this.
+Nothing in the toolchain will discover problems like this.
 
 ## A Type-Checking Iterator
 
@@ -713,6 +729,8 @@ and why `tee` buffered a whole stream earlier in this chapter.
 `DONE` is a [sentinel](05_Functions.md#default-and-keyword-arguments),
 because the answer must be distinguishable from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
+The builtin `iter()` uses a sentinel the same way in its two-argument form:
+`iter(callable, DONE)` calls `callable` until it hands back `DONE`.
 `doubled()` shows the other half of the price.
 Letting `StopIteration` escape a generator body does not end that generator politely.
 Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
@@ -729,13 +747,15 @@ which absorbs the exception as every loop in this chapter has.
 The fix is almost never a `try`.
 It is to let the loop do the asking.
 
-Both surprises earlier in this chapter come from the same rule:
-the protocol answers no question for free.
+## The Protocol Answers Nothing for Free
+
+Both surprises in [The Costs of Laziness](#the-costs-of-laziness)
+come from the same rule: the protocol answers no question for free.
 The only way to find out whether the body accepts its arguments is to pull a value and let it run,
 and the only way to find out whether the source is spent is to pull and be told nothing came back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
-The protocol is free, and quiet.
+The protocol costs you nothing, and tells you nothing.
 
 ## Exercises
 
@@ -767,3 +787,13 @@ The protocol is free, and quiet.
 8.  Write `peek(it)` that reports an iterator's next value without consuming it.
     You cannot, so write a `Peekable` wrapper that can,
     and name what it stores that a bare iterator does not.
+9.  `flatten()` recurses on anything that is not an `int`.
+    Call it on `[1, "ab", 2]` and explain the `RecursionError` you get,
+    using the fact that a one-character string is still a `Sequence`.
+    Then fix `flatten()` so a `str` yields as one item,
+    and say what the same fix would look like in `flatten_loop()`.
+10. `typed()` raises on the first item of the wrong type, which ends the stream.
+    Write `typed_skipping()`, which drops mismatched items and keeps going,
+    then say which of the two you would want wrapping a parsed log file,
+    and why.
+    Which one is easier to write as `TypedIterator`?

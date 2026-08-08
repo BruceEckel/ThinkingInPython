@@ -11,7 +11,7 @@ class ExpensiveResource:
         print("creating ExpensiveResource (slow!)")
         self.data = [1, 2, 3]
 
-    def query(self) -> list:
+    def query(self) -> list[int]:
         return self.data
 
 class LazyProxy:
@@ -87,15 +87,15 @@ The single `calls` integer becomes a `Counter`, and the report shows
 
 ```python
 # exercise_3.py
-from __future__ import annotations
+from collections.abc import Sequence
 
 class Box:
-    def __init__(self, data: list) -> None:
+    def __init__(self, data: list[object]) -> None:
         self.data = data
         self.owners = 1
 
 class CowList:
-    def __init__(self, data: list | None = None,
+    def __init__(self, data: Sequence[object] | None = None,
                  _box: Box | None = None) -> None:
         self._box = (
             _box if _box is not None else Box(list(data or [])))
@@ -206,6 +206,7 @@ class Connection:
 
 class Pool:
     def __init__(self, size: int) -> None:
+        self._size = size
         self._free = [Connection(n) for n in range(size)]
 
     def available(self) -> int:
@@ -213,7 +214,7 @@ class Pool:
 
     def acquire(self) -> ConnectionProxy:
         if not self._free:
-            raise PoolExhausted(f"all {POOL_SIZE} in use")
+            raise PoolExhausted(f"all {self._size} in use")
         return ConnectionProxy(self, self._free.pop(0))
 
     def release(self, connection: Connection) -> None:
@@ -311,3 +312,64 @@ than `self.__implementation.__len__()`, which reads better and gives
 the same answer. A proxy that must forward many dunders writes one
 such method per dunder, or generates them in a loop over a list of
 names and assigns them onto the class.
+
+## 7. A `change_to()` that refuses a narrower implementation
+
+```python
+# exercise_7.py
+from typing import Any
+
+def methods(obj: object) -> set[str]:
+    return {
+        name
+        for name in dir(obj)
+        if not name.startswith("_") and callable(getattr(obj, name))
+    }
+
+class Surrogate:
+    def __init__(self, implementation: Any) -> None:
+        self.__implementation = implementation
+
+    def change_to(self, new: Any) -> None:
+        missing = methods(self.__implementation) - methods(new)
+        if missing:
+            raise TypeError(f"missing: {sorted(missing)}")
+        self.__implementation = new
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+class Full:
+    def f(self) -> None: print("Full.f()")
+    def g(self) -> None: print("Full.g()")
+
+class Lacking:
+    def f(self) -> None: print("Lacking.f()")
+
+s = Surrogate(Full())
+s.f()
+#: Full.f()
+try:
+    s.change_to(Lacking())
+except TypeError as e:
+    print(type(e).__name__, e)
+#: TypeError missing: ['g']
+s.g()  # The old implementation is still in place
+#: Full.g()
+```
+
+`methods()` reports the public callables an object carries, which is
+what a caller can reach through the surrogate's `__getattr__()`.
+`change_to()` compares the two sets and refuses the swap when the
+replacement drops a name the current implementation answered. The
+surrogate keeps what it had, so `s.g()` still works after the
+rejected swap.
+
+The type checker cannot make this decision. It would have to compare
+the type of the value the surrogate is holding right now against the
+type of the argument, and the surrogate's attribute is `Any`: the
+point of `__getattr__()` delegation is that the implementation's type
+is not tracked. Annotating both against a `Protocol` states a fixed
+shape that every implementation must meet, which is a different
+guarantee. It cannot express "at least what the last one had," because
+that relates two runtime values rather than two declarations.

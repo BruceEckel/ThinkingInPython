@@ -187,3 +187,147 @@ you get that a shared name has stopped being shared.
 This is the difference between a name and the object it refers to,
 which every singleton built on module state depends on. Mutate through
 any name, rebind only through the module.
+
+## 5. A lock in the wrong place
+
+```python
+# exercise_5.py
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from functools import cache
+from typing import Final
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        time.sleep(0.05)  # Widen the first-call window
+
+_lock: Final[threading.Lock] = threading.Lock()
+
+@cache
+def settings() -> Settings:
+    with _lock:  # Too late: the cache miss already happened
+        return Settings()
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    built = list(pool.map(lambda _: settings(), range(8)))
+print(len({id(s) for s in built}) > 1)
+#: True
+
+@cache
+def primed() -> Settings:
+    return Settings()
+
+primed()  # Built once, before any thread asks
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    shared = list(pool.map(lambda _: primed(), range(8)))
+print(len({id(s) for s in shared}))
+#: 1
+```
+
+The count does not drop, because the lock guards the wrong step. Two
+things happen on a call to `settings()`: `@cache` looks for a stored
+result, and, on a miss, the body runs. The lock is inside the body, so
+it can only order the second step. All eight threads reach the lookup
+before any of them has stored anything, so all eight miss, and all
+eight are already committed to running the body before the first one
+takes the lock.
+
+What the lock changes is the timing, not the outcome. Without it the
+eight constructors overlap and the whole thing takes about 50
+milliseconds; with it they queue and it takes about 400. Each thread
+still builds its own `Settings` and still returns the one it built.
+`@cache` keeps whichever finished last, so seven callers walk away
+holding objects the cache has never heard of. The lock made the
+program slower and no more correct, which is the worst of the two
+outcomes it could have had.
+
+The lock cannot be moved to the right place either, because the right
+place is inside `functools.cache`, which is where the check and the
+store live and is not code you can reach. That is why the chapter's
+`singleton_locked_settings.py` drops `@cache` and hand-writes the
+check: once you need the test and the construction inside one lock,
+you need to own both.
+
+Without a lock, the fix is to remove the race rather than to order it.
+A race needs two threads arriving before the object exists, so build
+it first. `primed()` is called once at import time, while the module
+body is still running and no worker thread has started, and by the
+time the pool exists every call is a cache hit. The count is `1`. This
+is `singleton_eager_factory.py` from the chapter, and it works for the
+same reason the module form does: the import system runs a module body
+exactly once, so import time is a place where being single-threaded is
+guaranteed rather than hoped for.
+
+The trade is that the object is built whether or not anything uses it.
+For settings that is nothing; for a database connection it may be a
+real cost, and then the hand-written lock is the honest answer.
+
+## 6. Two Borg subclasses share one namespace
+
+```python
+# exercise_6.py
+from typing import Any, ClassVar
+
+class Borg:
+    _shared_state: ClassVar[dict[str, Any]] = {}
+
+    def __init__(self) -> None:
+        self.__dict__ = self._shared_state
+
+class Singleton(Borg):
+    def __init__(self, arg: str) -> None:
+        super().__init__()
+        self.val = arg
+
+class Other(Borg):  # A second subclass, sharing Borg's one dict
+    def __init__(self, arg: str) -> None:
+        super().__init__()
+        self.val = arg
+
+x = Singleton("sausage")
+y = Other("eggs")
+print(x.val, y.val, x.__dict__ is y.__dict__)
+#: eggs eggs True
+
+class Separate(Borg):
+    _shared_state: ClassVar[dict[str, Any]] = {}  # Its own storage
+
+    def __init__(self, arg: str) -> None:
+        super().__init__()
+        self.val = arg
+
+a = Singleton("spam")
+b = Separate("beans")
+print(a.val, b.val, a.__dict__ is b.__dict__)
+#: spam beans False
+```
+
+`x.val` is `"eggs"`, the value the `Other` set. Constructing an
+unrelated subclass overwrote a value belonging to `Singleton`, and
+nothing reported it.
+
+`_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
+`Other` do not declare their own, so the attribute lookup for
+`self._shared_state` walks up to `Borg` from both, finds the same dict,
+and points both instances' `__dict__` at it. The sharing the pattern
+promises is per-`Borg`, not per-subclass, and the class hierarchy hides
+that: the two subclasses have no visible connection to each other.
+
+The fix is one line per subclass. `Separate` declares its own
+`_shared_state`, so the lookup stops there instead of reaching `Borg`,
+and its instances share with each other and with nobody else. Martelli
+makes the same point in the article the chapter links: a subclass that
+needs state of its own says so.
+
+This is the general shape of a mutable `ClassVar` on a base class, not
+a quirk of *Borg*. The base declares one object, every subclass
+inherits the same one, and a subclass that assigns to it instead of
+mutating it gets a private copy while the others keep sharing. What
+makes it sharper here is that the mutation is the whole design, so
+there is no version of the pattern that avoids the trap by accident.

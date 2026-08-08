@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -126,6 +127,9 @@ markers keep validating unchanged.
 Reported rather than applied because it is a consistency decision across
 four listings, and the unguarded form may be deliberate for readability in
 a chapter where the registry contents are the lesson.
+
+[[change `thinking-in-python-skill.md` to say "Importable modules can carry a top-level
+demo if it is guarded by __main__"]]
 
 ---
 

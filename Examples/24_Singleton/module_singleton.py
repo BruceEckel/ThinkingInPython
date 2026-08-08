@@ -1,4 +1,4 @@
-# import_once.py
+# module_singleton.py
 import config
 import config as again
 
