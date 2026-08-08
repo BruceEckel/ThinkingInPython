@@ -24,7 +24,6 @@ A list comprehension consists of:
 -   An optional predicate expression.
 -   An output expression producing elements of the output list from members of the input sequence that satisfy the predicate.
 
-Select the integers from a mixed list and square them.
 Several examples in this chapter use the same input list:
 
 ```python
@@ -88,9 +87,13 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 #: [1, 81, 0, 16]
 ```
 
-The nested form funnels every element through `lambda` calls,
+The `map()`/`filter()` form funnels every element through `lambda` calls,
 and is harder to read.
 The comprehension inlines the test and the expression.
+`map()` and `filter()` pay off when the function already exists,
+`map(str.strip, lines)` rather than `[line.strip() for line in lines]`;
+[Functional Foundations](40_Functional_Foundations.md) returns to the choice.
+The `lambda` makes the versions above worse, not `map()`.
 
 The `# type: ignore` comments mark a cost that readability alone does not show.
 `filter()` with a `lambda` predicate does not narrow the element type,
@@ -99,6 +102,8 @@ The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` rather than `bool`.
+`filter(None, items)` is the other narrowing form;
+it drops the falsy values and the checker knows `None` is gone.
 
 List brackets (`[]`) enclose the list comprehension,
 so you can see at a glance that it produces a list.
@@ -129,6 +134,9 @@ The walrus operator is the exception.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
 That is deliberate, and it lets a comprehension accumulate a value without a separate loop.
+The walrus cannot rebind the comprehension's own iteration variable,
+and it cannot appear in a comprehension inside a class body.
+Both are a `SyntaxError`.
 
 ## Set Comprehensions
 
@@ -243,10 +251,16 @@ and a comprehension needing both writes them in both places,
 
 Nesting one comprehension inside another builds a list of lists.
 Writing two `for` clauses in one comprehension flattens instead,
-producing a single list:
-`[x for row in matrix for x in row]` turns the identity matrix into 36 numbers.
+producing a single list.
 Those clauses *do* read left to right,
-in the order the equivalent nested loops would appear.
+in the order the equivalent nested loops would appear:
+
+```python
+# flatten.py
+rows = [[1, 2], [3, 4], [5]]
+print([x for row in rows for x in row])
+#: [1, 2, 3, 4, 5]
+```
 
 ## Feeding the Iterator Clause
 
@@ -266,22 +280,24 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 `zip()` stops at the end of the shorter sequence;
 pass `strict=True` to make a length mismatch raise `ValueError` instead of silently truncating.
 
-Unpack a tuple in the iterator,
+Unpack a tuple in the `for` clause's target,
 here a `(name, function)` pair applied to a value:
 
 ```python
 # zip_unpack.py
-all_slots = [
+operations = [
     ("doubled", lambda v: v * 2),
     ("squared", lambda v: v ** 2),
 ]
 values = [10, 3, 42]
 print([
     f"{name}({v}) = {f(v)}"
-    for (name, f), v in zip(all_slots, values)
+    for (name, f), v in zip(operations, values)
 ])
 #: ['doubled(10) = 20', 'squared(3) = 9']
 ```
+
+`values` has a third element, and `zip()` drops it, as it did above.
 
 Here's a two-level list comprehension using `Path.walk()`:
 
@@ -328,6 +344,10 @@ in the `for path in sorted(py_paths):` line below it.
 By then the directory is gone.
 The comprehension finished building `py_paths` as strings while the directory still existed,
 so nothing later needs the files.
+Turning those brackets into parentheses would break it:
+a generator expression would not start walking until `sorted()` pulled on it,
+and that pull happens outside the `with`.
+[Generator Expressions](#generator-expressions) returns to this.
 
 ## Breaking Up a Complex Comprehension
 
@@ -427,11 +447,11 @@ print(wasted)
 #: [None, None, None]
 ```
 
-`wasted` runs `print()` for its side effect.
-`print()` returns `None`, so `wasted` ends up holding three `None`s.
-`wasted` is a list built only to be thrown away.
+The comprehension calls `print()` for its side effect.
+`print()` returns `None`, so `wasted` ends up holding three `None`s,
+a list built only to be thrown away.
 Worse, a reader scanning `[...]` expects a meaningful collection,
-not a loop wearing a disguise.
+and this is a loop written with the wrong punctuation.
 
 The idiomatic version says what it does:
 
@@ -542,6 +562,36 @@ so `any()` saw no elements and reported `False` instead of `True`,
 with no exception to say the question was never asked.
 When something must be traversed twice,
 either materialize it with `list()` or write the generator expression again.
+
+Deferral is not total.
+Creating a generator expression evaluates one thing immediately,
+the outermost iterable:
+
+```python
+# genexp_timing.py
+def source() -> list[int]:
+    print("source() called")
+    return [1, 2, 3]
+
+factor = 2
+gen = (n * factor for n in source())
+#: source() called
+print("generator created")
+#: generator created
+factor = 10
+print(list(gen))
+#: [10, 20, 30]
+```
+
+`source()` runs while the generator expression is being built,
+before the line below it prints.
+The output expression waits,
+so `factor` is read when `list()` pulls the values rather than when the generator was written,
+and the answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
+A list comprehension has no such gap: it reads everything at once.
+This is also why `path_walk_comprehension.py` uses brackets.
+Its outermost iterable, `root.walk()`, would be evaluated at creation,
+but the walking and the filtering would wait for a consumer that arrives after the directory is deleted.
 [Iterators](23_Iterators.md#generators) explores generators further,
 and [Generators](45_Generators.md)
 covers the values they receive as well as the ones they produce.
@@ -563,15 +613,15 @@ and `itertools.chain.from_iterable()`:
 rows = [[1, 2], [3, 4], [5]]
 dicts = [{"a": 1}, {"b": 2}, {"a": 3}]
 
-# * splices each iterable into the result:
+# *
 print([*row for row in rows])
 #: [1, 2, 3, 4, 5]
 
-# ** merges each mapping. Later keys win, order preserved:
+# **
 print({**d for d in dicts})
 #: {'a': 3, 'b': 2}
 
-# The same syntax works in a generator expression:
+# In a generator expression
 flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
@@ -624,9 +674,12 @@ and pays it only for the values they ask for.
 3.  In `dict_comprehension.py`, add `"Galahad"` to `names`,
     then predict which entries the comprehension produces before running it,
     given the `len(name) > 3` filter.
-4.  In `generator_expression.py`,
-    replace `islice(squares, 3)` with `islice(squares, 5)` and predict which five values it produces,
-    given that `next(squares)` was called twice before that line.
-5.  In `unpacking_comprehensions.py`,
+4.  In `set_comprehension.py`, drop the `if len(name) > 1` filter,
+    and predict how many entries `unique` holds before running it.
+    Explain why `"J"` does not collide with `"JOHN"`.
+5.  `comprehension_side_effects.py` builds a list of `None`s.
+    Write a version that keeps the printing but produces a list the caller would actually want,
+    then say whether a comprehension or a `for` loop is the right shape for it.
+6.  In `unpacking_comprehensions.py`,
     add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,
     paying attention to which value wins for the key `"a"`.

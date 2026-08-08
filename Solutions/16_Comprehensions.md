@@ -62,32 +62,81 @@ one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
 not two, and the value comes from whichever name appears last in the
 list.
 
-## 4. Predicting `islice()` after two `next()` calls
+## 4. Dropping the length filter from `set_comprehension.py`
 
 ```python
 # exercise_4.py
-from itertools import islice
+names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
-squares = (n ** 2 for n in range(1_000_000))
-print(next(squares))
-#: 0
-print(next(squares))
-#: 1
-print(list(islice(squares, 5)))
-#: [4, 9, 16, 25, 36]
+unique = {name[0].upper() + name[1:].lower() for name in names}
+
+print(len(unique))
+#: 4
+print(sorted(unique))
+#: ['Alice', 'Bob', 'J', 'John']
 ```
 
-The two `next()` calls already consumed `0` and `1` (`0**2` and
-`1**2`), so the generator's next unconsumed value is `4` (`2**2`).
-`islice(squares, 5)` then pulls the next five values in sequence from
-wherever the generator currently stands, `4, 9, 16, 25, 36`
-(`2**2` through `6**2`), not the first five values of the whole
-sequence.
+Four entries, one more than the filtered version. The seven names
+normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`, `Bob`, and a
+set keeps one of each, so the duplicates and the case variants collapse
+and `J` joins the three that were already there.
 
-## 5. Predicting a merge where a key repeats
+`"J"` does not collide with `"JOHN"` because the normalization is a
+string transformation, not a truncation: `"J"` becomes `"J"` and
+`"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
+empty string, so nothing is appended to the capital. Two distinct
+strings hash differently, so both survive.
+
+The filter existed to drop the initial `"J"` as noise. Removing it
+shows what the set is doing on its own: it collapses only exact
+duplicates of the normalized form, and it has no notion that `"J"`
+might be an abbreviation of `"John"`.
+
+## 5. A comprehension that produces something worth keeping
 
 ```python
 # exercise_5.py
+def show(n: int) -> str:
+    line = f"item {n}"
+    print(line)
+    return line
+
+lines = [show(n) for n in [1, 2, 3]]
+#: item 1
+#: item 2
+#: item 3
+print(lines)
+#: ['item 1', 'item 2', 'item 3']
+
+for n in [1, 2, 3]:  # Printing alone stays a loop
+    print(f"item {n}")
+#: item 1
+#: item 2
+#: item 3
+```
+
+The original comprehension collected `print()`'s return value, which is
+always `None`, so the list it built was worthless and the brackets
+misled the reader. Giving the output expression something to return
+fixes both: `show()` prints and hands back the line, so `lines` holds
+the three strings a caller can assert on, write to a file, or join.
+
+Which shape is right depends on whether you want the list. Here the
+comprehension is correct, because `lines` is the point and the printing
+is incidental. The `for` loop at the end is the right shape for the
+original code, where printing was the whole purpose. The rule from the
+chapter decides it: use a comprehension when you want the collection it
+produces, and a loop when you want the side effect.
+
+A comprehension whose output expression has a side effect is still
+worth a second look, even when it returns something useful. `show()`
+does two jobs, and a reader has to open it to learn that one of them is
+printing.
+
+## 6. Predicting a merge where a key repeats
+
+```python
+# exercise_6.py
 dicts = [{"a": 1}, {"b": 2}, {"a": 3}, {"a": 5, "c": 9}]
 print({**d for d in dicts})
 #: {'a': 5, 'b': 2, 'c': 9}

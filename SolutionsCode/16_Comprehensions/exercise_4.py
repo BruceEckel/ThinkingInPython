@@ -1,10 +1,9 @@
 # exercise_4.py
-from itertools import islice
+names = ["Bob", "JOHN", "alice", "bob", "ALICE", "J", "Bob"]
 
-squares = (n ** 2 for n in range(1_000_000))
-print(next(squares))
-#: 0
-print(next(squares))
-#: 1
-print(list(islice(squares, 5)))
-#: [4, 9, 16, 25, 36]
+unique = {name[0].upper() + name[1:].lower() for name in names}
+
+print(len(unique))
+#: 4
+print(sorted(unique))
+#: ['Alice', 'Bob', 'J', 'John']

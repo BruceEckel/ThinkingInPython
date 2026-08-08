@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -471,10 +472,7 @@ Placement, and why this stays a proposal:
    list, with the final paragraph rewritten to read off the trace instead of
    asserting it. This is what I would do: the chapter earns the summary rather
    than announcing it.
-2. **Near the front, as motivation** (the skill's "front-load the payoff"),
-   right after the `abc.ABC`/`EnumType` paragraph. Against: every name in the
-   trace is unfamiliar at that point, so it would read as a table of contents
-   in code form.
+
 
 Either way the chapter grows by about a page, which is the cost to weigh.
 
