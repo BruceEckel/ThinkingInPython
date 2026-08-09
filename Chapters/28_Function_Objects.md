@@ -14,8 +14,9 @@ You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
 the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
-*Command* and *Strategy* each appear twice below, first as a function,
-then as the classic class-based form for contrast.
+*Command* appears twice below, first as a function,
+then as the classic class-based form for contrast,
+a contrast that holds for *Strategy* as well.
 *Chain of Responsibility* needs only the function form:
 its class version is the same idea with the list written as a linked chain.
 A closing section keys the chain's handlers by event type instead of by position,
@@ -276,66 +277,13 @@ the caller does not change when the algorithm does.
 The algorithms are not equivalent, though,
 and the chain below turns the difference between them into a fallback.
 
-The classic form makes each algorithm a class deriving from a common interface,
-and adds a "Context" object to hold the current strategy:
-
-```python
-# strategy_pattern.py
-from typing import override
-from algorithms import Fn, bisection, newton, secant
-
-# The strategy interface:
-class FindRoot:
-    def find(self, f: Fn, a: float, b: float) -> float | None:
-        raise NotImplementedError
-
-# Each strategy wraps one algorithm from algorithms.py:
-class Bisection(FindRoot):
-    @override
-    def find(self, f: Fn, a: float, b: float) -> float | None:
-        return bisection(f, a, b)
-
-class Newton(FindRoot):
-    @override
-    def find(self, f: Fn, a: float, b: float) -> float | None:
-        return newton(f, a, b)
-
-class Secant(FindRoot):
-    @override
-    def find(self, f: Fn, a: float, b: float) -> float | None:
-        return secant(f, a, b)
-
-# The "Context" controls the strategy:
-class RootSolver:
-    def __init__(self, strategy: FindRoot) -> None:
-        self.strategy = strategy
-
-    def solve(self, f: Fn, a: float, b: float) -> float | None:
-        return self.strategy.find(f, a, b)
-
-    def change_algorithm(self, new_algorithm: FindRoot) -> None:
-        self.strategy = new_algorithm
-
-def f(x: float) -> float:
-    return x * x - 2
-
-solver = RootSolver(Bisection())
-root = solver.solve(f, 0.0, 2.0)  # The constructor's strategy
-assert root is not None
-print(f"{root:.6f}")
-for algorithm in (Newton(), Secant()):
-    solver.change_algorithm(algorithm)
-    root = solver.solve(f, 0.0, 2.0)
-    assert root is not None
-    print(f"{root:.6f}")
-#: 1.414214
-#: 1.414214
-#: 1.414214
-```
-
-Five classes produce the same three lines that one function argument produced.
+The classic form repeats the move `command_pattern.py` made, at larger scale.
+Each algorithm becomes a class with a `find()` method deriving from a `FindRoot` interface,
+and a "Context" class holds the chosen one:
+five classes to produce the same three lines that one function argument produced.
 The Context becomes useful when something must hold the current algorithm between calls,
-which a parameter cannot do.
+which a parameter cannot do; until then,
+the `finder` parameter is the whole pattern.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.

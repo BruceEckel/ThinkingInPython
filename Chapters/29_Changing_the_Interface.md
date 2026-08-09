@@ -62,12 +62,12 @@ compares those two.
 The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Surrogate.md#proxy)":
 *GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
 
-The adaptation can live in three other places: the call site,
-the adaptee's own class, or an inner class the adaptee hands out.
+The adaptation can live in two other places: the call site,
+or the adaptee's own class.
 
 ```python
 # adapter_variations.py
-# Three more places to put the adaptation.
+# Two more places to put the adaptation.
 from typing import Any, override
 from adapter import ProxyAdapter, WhatIHave, WhatIUse, WhatIWant
 
@@ -84,39 +84,23 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.g()
         self.h()
 
-# Approach 4: use an inner class:
-class WhatIHave3(WhatIHave):
-    class InnerAdapter(WhatIWant):
-        def __init__(self, outer: WhatIHave3) -> None:
-            self.outer = outer
-        @override
-        def f(self) -> None:
-            self.outer.g()
-            self.outer.h()
-
-    def what_i_want(self) -> WhatIWant:
-        return WhatIHave3.InnerAdapter(self)
-
-what_i_use = WhatIUse()
 WhatIUse2().op(WhatIHave())  # Approach 2: adapting op()
 #: WhatIHave.g()
 #: WhatIHave.h()
-what_i_use.op(WhatIHave2())  # Approach 3: adapter built in
-#: WhatIHave.g()
-#: WhatIHave.h()
-what_i_use.op(WhatIHave3().what_i_want())  # Approach 4
+WhatIUse().op(WhatIHave2())  # Approach 3: adapter built in
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
 
 The output is deliberately monotonous.
-Counting the object adapter above, four structures produce one behavior:
+Counting the object adapter above, three structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
 The approaches differ only in where the adaptation lives.
 When the output cannot tell them apart,
 the choice among them is purely one of packaging.
+(GoF adds a fourth placement, an inner-class adapter the adaptee hands out, which is Java packaging for the same forwarding.)
 
-The four also split into two families *GoF Design Patterns* names.
+The three split into two families *GoF Design Patterns* names.
 `ProxyAdapter` is an *object adapter*:
 it holds the adaptee and can wrap any instance handed to it at runtime.
 `WhatIHave2` is a *class adapter*: it inherits from the adaptee,
@@ -145,7 +129,7 @@ The next section argues Python lets you skip most of this packaging too.
 
 ### Adapter in Python
 
-The four variations above are Java habits.
+The variations above are Java habits.
 At runtime `WhatIUse.op()` only calls `f()`,
 so any object with an `f()` works and no shared base class is involved.
 A type checker still holds you to the annotation,

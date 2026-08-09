@@ -1,9 +1,14 @@
 # Pedagogical Alternates Review
 
-**Status (2026-08-09):** the five removals below are applied,
+**Status (2026-08-09):** everything below is applied.
+The five removals landed first,
 item 5 via its rebuild-small option
 (chapter 17's reference to the removed metaclass listing was inlined as part of item 3).
-The two trims (items 6 and 7) are proposals only.
+The two trims followed:
+item 6 cut `strategy_pattern.py` to a paragraph
+(keeping the Context's when-useful note and fixing the Solutions reference),
+and item 7 cut `adapter_variations.py` to approaches 2 and 3,
+with a parenthetical noting GoF's inner-class fourth placement.
 
 A survey of Part III (chapters 21-39) for sections that present an
 alternate approach for teaching purposes:

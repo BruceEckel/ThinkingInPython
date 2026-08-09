@@ -178,9 +178,9 @@ comparing names. `key` is exactly a *Strategy*: `sorted()` fixes the
 interchangeable *policy* that decides what "in order" means for this
 particular call, without `sorted()` itself needing to know anything
 about tuples, scores, or names. Passing a different `key` swaps the
-ordering strategy the same way `strategy_pattern.py` swaps
-`RootSolver`'s algorithm, except here the "context" object holding the
-current strategy is just the call to `sorted()` itself.
+ordering strategy the same way the chapter's classic Strategy form
+swaps the algorithm its Context holds, except here the "context"
+holding the current strategy is just the call to `sorted()` itself.
 
 ## 4. A configurable `newton()`, closed over and partially applied
 
