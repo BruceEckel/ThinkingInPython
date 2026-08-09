@@ -239,9 +239,9 @@ Importing the package alone does not import what is inside it:
 ```python
 # package_only.py
 import a_package
+#: initializing a_package
 
 print(hasattr(a_package, "module1"))
-#: initializing a_package
 #: False
 ```
 
@@ -425,10 +425,10 @@ Python searches `sys.path`, a list of directories it builds at startup.
 Its first entry is the directory of the script you ran
 (the current directory when you use `-m` or the REPL),
 which is why `use_module.py` could `import module` with no setup at all;
-running with `-P` drops that first entry,
-so a local `random.py` can no longer shadow the standard library;
 the entries from `PYTHONPATH` come next,
 and installed packages sit further down.
+Running with `-P` drops that first entry,
+so a local `random.py` can no longer shadow the standard library.
 
 What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
 The original solution to this was to set an environment variable called `PYTHONPATH`,

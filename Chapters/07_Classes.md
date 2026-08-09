@@ -297,10 +297,9 @@ Verification comes from a separate tool,
 introduced in [Static Typing](08_Static_Typing.md).
 
 At run time `@override` adds no wrapper.
-It tries to set an `__override__` attribute on the method
-(some callables refuse it),
-for anything that wants to find overrides by introspection,
-and returns the same function object.
+It returns the same function object,
+after trying to set an `__override__` attribute on it (some callables refuse it)
+so that code can find overrides by introspection.
 
 Apply `@override` to any method that replaces an inherited method.
 Two kinds stay undecorated by convention: constructors,

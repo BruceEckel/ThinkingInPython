@@ -23,7 +23,10 @@ No unapplied `deep_review/` file exists for any chapter, so nothing was blocked.
 | 03_Containers | done | 1 |
 | 04_Control_Flow | done | 2 |
 | 05_Functions | done | 0 (annealed clean) |
-| 06 through 47 | pending | |
+| 06_Modules_and_Packages | done | 2 |
+| 07_Classes | done | 1 |
+| 08_Static_Typing | done | 0 (annealed clean) |
+| 09 through 47 | pending | |
 
 ---
 
@@ -135,9 +138,73 @@ orderings in `lambdas.py`.
 
 ---
 
+## 06_Modules_and_Packages
+
+**Verified clean:** the `from`-snapshot behavior in `from_snapshot.py`; the
+`sys.modules` identity claims; every package listing's load-order markers.
+`sys.lazy_modules` is real on the pinned build and reports deferred names, so the
+PEP 810 paragraph is accurate.
+
+**Applied:**
+
+- **`PYTHONPATH` section.** The `-P` clause was moved out of the middle of the
+  `sys.path` ordering into its own sentence at the end. The paragraph enumerates
+  the search order (script directory, then `PYTHONPATH`, then installed
+  packages), and the `-P` aside was spliced between the first and second items,
+  so the reader lost the list mid-count. Every fact is retained.
+- **`package_only.py`** (code block). `#: initializing a_package` moved from the
+  clump at the listing's end up to the `import a_package` line that produces it.
+  Every neighboring package listing in this chapter already hugs its markers this
+  way; this one was the outlier. Re-synced and re-validated (`1 ok, 0 failed`).
+
+---
+
+## 07_Classes
+
+**Verified clean:** the full `Simple2` override chain in `demo_simple2.py`
+(including the four-line `show_twice()` trace); `cached_property` staleness and
+the `del`-then-recompute sequence; `Circle(10).area` at 314.159 through both the
+plain-attribute and validated-property versions; the `from_fahrenheit(212)`
+conversion.
+
+**Applied:**
+
+- **`@override` at run time.** "It tries to set an `__override__` attribute on the
+  method (some callables refuse it), for anything that wants to find overrides by
+  introspection, and returns the same function object." → main clause first ("It
+  returns the same function object"), with the attribute-setting subordinated and
+  the purpose clause reattached to what it modifies. The original stranded "for
+  anything that wants to find overrides" behind a parenthetical, so the sentence
+  needed a second reading; it also used "wants" for a non-agent.
+
+---
+
+## 08_Static_Typing
+
+**Annealed clean.** No finding cleared the bar.
+
+Two things worth recording so a later pass does not undo them:
+
+- **"where they earn their keep" (Gradual Typing) stays.** It looked like a
+  candidate, since the chapter-26 deep review removed "earns its keep" from that
+  chapter's conclusion at your instruction. But the figure appears **12 times**
+  across the book (9 in `Chapters/`, 3 in `Solutions/`: 16, 21, 34, 40 twice, 41
+  twice, 47, and this one). That makes it established vocabulary rather than a
+  slip, and rewriting one instance would be a voice change, which annealing puts
+  out of bounds. The chapter-26 removal was local to that chapter's conclusion.
+- **The missing blank line after `# area.py` is load-bearing.** House style would
+  suggest adding one, but the chapter quotes `ty`'s diagnostic verbatim including
+  `--> area.py:6:12`, and the call sits on line 6 only because that blank line is
+  absent. Adding it would silently falsify the quoted error block.
+
+---
+
 ## Verification
 
-`make reflow` on 01 through 05 (one paragraph rewrapped in 02, from the edit),
+`make reflow` on 01 through 08 (one paragraph rewrapped in 02 and one in 07, both
+from the edits), `heading_links.py` → "Anchor links OK", `banned_phrases.py` →
+"No banned phrases found".
+The one code-block edit (06) was re-extracted and re-validated against a real run.
 `heading_links.py` → "Anchor links OK", `banned_phrases.py` → "No banned phrases
 found".
 No fenced ```python block and no `#:` marker was touched in any of the three, so

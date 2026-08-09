@@ -1,10 +1,12 @@
-run /annealing
-
 I would like to do a clean-slate: deep_review, readability, and annealing on the whole book.
 Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
 helpful for you to keep?
 
-What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
+Review ADDITIONAL_IMPROVEMENTS.md
+
+Use Fable for deep-review
+
+Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
 
 New book cover & favicon
 
