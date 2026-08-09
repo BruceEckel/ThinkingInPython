@@ -7,12 +7,10 @@ class OnlyOne:
     class __OnlyOne:
         val: list[str] = field(default_factory=list)
 
-    instance: ClassVar[__OnlyOne | None] = None  # Nothing built yet
+    # Created once, when the class is defined:
+    instance: ClassVar[__OnlyOne] = __OnlyOne()
 
     def __init__(self, arg: str) -> None:
-        if OnlyOne.instance is None:
-            # Built on first use:
-            OnlyOne.instance = OnlyOne.__OnlyOne()
         OnlyOne.instance.val.append(arg)
 
     def __getattr__(self, name: str) -> Any:

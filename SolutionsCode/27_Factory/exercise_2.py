@@ -1,14 +1,8 @@
 # exercise_2.py
-from typing import Any, ClassVar, override
+from typing import Final, Protocol, override
 
-class ShapeFactory:
-    factories: ClassVar[dict[str, Any]] = {}
-
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        if kind not in cls.factories:
-            cls.factories[kind] = eval(kind + ".Factory()")
-        return cls.factories[kind].create()
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
 
 class Shape:
     def draw(self) -> None: ...
@@ -22,5 +16,12 @@ class Triangle(Shape):
         def create(self) -> Triangle:
             return Triangle()
 
-ShapeFactory.create_shape("Triangle").draw()
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Triangle": Triangle.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    return FACTORIES[kind].create()
+
+create_shape("Triangle").draw()
 #: Triangle.draw

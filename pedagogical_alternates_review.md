@@ -1,5 +1,10 @@
 # Pedagogical Alternates Review
 
+**Status (2026-08-09):** the five removals below are applied,
+item 5 via its rebuild-small option
+(chapter 17's reference to the removed metaclass listing was inlined as part of item 3).
+The two trims (items 6 and 7) are proposals only.
+
 A survey of Part III (chapters 21-39) for sections that present an
 alternate approach for teaching purposes:
 the classic GoF form shown beside the Pythonic one,

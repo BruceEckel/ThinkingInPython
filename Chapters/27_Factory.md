@@ -100,77 +100,16 @@ It covers only the first level of inheritance,
 so a class inheriting from `Circle` does not show up in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
-### Preventing Direct Creation
-
-To disallow direct access to the classes,
-you can nest the classes within the factory method, like this:
-
-```python
-# shapefact1/nested_shape_factory.py
-import random
-from collections.abc import Iterator
-from typing import override
-
-class Shape:
-    def draw(self) -> None: ...
-    def erase(self) -> None: ...
-
-def factory(kind: str) -> Shape:
-    class Circle(Shape):
-        @override
-        def draw(self) -> None: print("Circle.draw")
-        @override
-        def erase(self) -> None: print("Circle.erase")
-
-    class Square(Shape):
-        @override
-        def draw(self) -> None: print("Square.draw")
-        @override
-        def erase(self) -> None: print("Square.erase")
-
-    match kind:
-        case "Circle":
-            return Circle()
-        case "Square":
-            return Square()
-        case _:
-            raise ValueError(f"Bad shape creation: {kind}")
-
-def shape_gen(n: int) -> Iterator[Shape]:
-    for _ in range(n):
-        yield factory(random.choice(["Circle", "Square"]))
-
-if __name__ == "__main__":
-    random.seed(4)
-    # Circle()  # Not defined outside factory()
-    for shape in shape_gen(4):
-        shape.draw()
-        shape.erase()
-    a, b = factory("Circle"), factory("Circle")
-    print(type(a) is type(b), isinstance(a, type(b)))
-#: Circle.draw
-#: Circle.erase
-#: Square.draw
-#: Square.erase
-#: Circle.draw
-#: Circle.erase
-#: Square.draw
-#: Square.erase
-#: False False
-```
-
-The privacy has a price.
-The nested `class` statements run again on every call,
-so every call to `factory()` defines fresh `Circle` and `Square` classes.
-Two shapes from different calls share behavior but not a class.
-The last line of the listing shows both checks failing:
-`type(a) is type(b)` is `False`, and so is `isinstance(a, type(b))`.
-`shape_gen()` also has to name the shapes as strings.
-`Shape.__subclasses__()` no longer identifies the two kinds:
-each call adds the two classes it just defined,
-and those disappear again once the shapes built from them are collected.
-When that matters, the practical compromise is module-level classes with a leading underscore:
-discouraged by convention rather than hidden, but defined once.
+To discourage direct construction of the concrete shapes,
+give them module-level names with a leading underscore:
+discouraged by convention rather than hidden, which is as far as Python goes
+([Singleton](24_Singleton.md#nothing-keeps-the-class-private) makes the same case).
+Nesting the classes inside `factory()` looks stronger and is worse.
+A `class` statement is executable code,
+so every call would define fresh `Circle` and `Square` classes:
+two shapes from different calls would share behavior but not a class,
+failing `type(a) is type(b)` and `isinstance()` alike,
+and `Shape.__subclasses__()` would no longer name the kinds.
 
 ## The Pythonic Factory: a Dictionary
 
@@ -330,29 +269,17 @@ However, *GoF Design Patterns* emphasizes that the reason for the *Factory Metho
 instead repeating the example used for the *Abstract Factory*
 (you'll see this in the next section).
 Here is `shape_factory1.py` modified so the factory methods live in separate classes,
-called polymorphically.
-Notice also that each kind's factory object is built the first time that kind is asked for,
-rather than up front:
+called polymorphically:
 
 ```python
 # shapefact2/shape_factory2.py
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import ClassVar, Protocol, override
+from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
-
-class ShapeFactory:
-    factories: ClassVar[dict[str, ShapeMaker]] = {}
-
-    # Build and cache each kind's factory on first request:
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        if kind not in cls.factories:
-            cls.factories[kind] = eval(f"{kind}.Factory()")
-        return cls.factories[kind].create()
 
 class Shape:
     def draw(self) -> None: ...
@@ -368,13 +295,19 @@ class Circle(Shape):
 
 class Square(Shape):
     @override
-    def draw(self) -> None:
-        print("Square.draw")
+    def draw(self) -> None: print("Square.draw")
     @override
-    def erase(self) -> None:
-        print("Square.erase")
+    def erase(self) -> None: print("Square.erase")
     class Factory:
         def create(self) -> Square: return Square()
+
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Circle": Circle.Factory(),
+    "Square": Square.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    return FACTORIES[kind].create()
 
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
@@ -383,15 +316,10 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)
-    print(sorted(ShapeFactory.factories))
-    shapes = [ShapeFactory.create_shape(kind)
-              for kind in shape_name_gen(4)]
-    print(sorted(ShapeFactory.factories))
+    shapes = [create_shape(kind) for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
-#: []
-#: ['Circle', 'Square']
 #: Circle.draw
 #: Circle.erase
 #: Square.draw
@@ -404,30 +332,24 @@ if __name__ == "__main__":
 
 Now the factory methods are polymorphic:
 each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeFactory.create_shape()` is a class method.
-It reaches the registry through `cls`,
-finds the factory object for the identifier you pass, and calls it right away.
-A more complex design would hand that factory object back to the caller,
+`FACTORIES` maps each kind's name to an instance of its factory,
+and `create_shape()` looks that factory up and calls it right away.
+A more complex design would hand the factory object back to the caller,
 who could hold it and create objects from it later.
 However, much of the time you don't need the complexity of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`)
 will work fine.
 
-`ShapeFactory` fills its dictionary lazily.
-The first request for a kind builds that kind's factory object (via `eval()`)
-and caches it for later requests.
-The two printed key lists show it: empty before any request,
-two entries after four requests for two kinds.
-
-This version uses `eval()` and a `Factory` class nested in every shape,
-neither of which Python needs.
-The `eval()` is worse than unnecessary.
-`create_shape()` compiles and runs whatever string it receives,
+A `Factory` class nested in every shape is machinery Python does not need,
+kept here to show the structure *GoF Design Patterns* intends;
+the registry shown above does the same job with no nested classes.
+An earlier version of this example did without `FACTORIES` by dispatching through `eval(f"{kind}.Factory()")`,
+which is worse than unnecessary.
+`create_shape()` then compiles and runs whatever string it receives,
 so a `kind` arriving from a configuration file, a request,
 or a command line is arbitrary code rather than a shape name.
-The registry shown above does the same job with a dictionary lookup,
-which either produces a class or raises a `KeyError`.
-Prefer that.
+The dictionary lookup either produces a factory or raises a `KeyError`;
+exercise 8 stages the attack against both.
 A separate factory class is worth writing when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
 
@@ -918,7 +840,8 @@ Both exist to work around languages where a class is not an object you can put i
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
     run `test_prototype.py`, and explain which assertion fails and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
-8.  In `shape_factory2.py`,
-    call `ShapeFactory.create_shape()` with a `kind` string that is not a shape name but a Python expression with a side effect,
-    and show that `create_shape()` runs it.
-    Then replace the `eval()` with a dictionary of the nested `Factory` classes and show that the same string now raises `KeyError`.
+8.  Recreate the `eval()` dispatcher described after `shape_factory2.py`'s listing:
+    a `create_shape()` that builds each factory with `eval(f"{kind}.Factory()")` instead of consulting `FACTORIES`.
+    Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
+    and show that it runs the expression.
+    Then show that the `FACTORIES` version raises `KeyError` for the same string.

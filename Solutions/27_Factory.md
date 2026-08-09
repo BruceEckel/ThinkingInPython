@@ -59,22 +59,17 @@ s.erase()
 ```
 
 `shape_factory2.py`'s polymorphic version instead needs a `Triangle`
-that carries its own nested `Factory`, since `ShapeFactory` never
-names concrete shapes itself, it only `eval()`s whatever name it is
-given and expects that name's own `Factory` class to build it:
+that carries its own nested `Factory`, plus one `FACTORIES` entry
+mapping the name to an instance of it (shown here with only the new
+shape; in the chapter file the entry joins `Circle`'s and
+`Square`'s):
 
 ```python
 # exercise_2.py
-from typing import Any, ClassVar, override
+from typing import Final, Protocol, override
 
-class ShapeFactory:
-    factories: ClassVar[dict[str, Any]] = {}
-
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        if kind not in cls.factories:
-            cls.factories[kind] = eval(kind + ".Factory()")
-        return cls.factories[kind].create()
+class ShapeMaker(Protocol):
+    def create(self) -> Shape: ...
 
 class Shape:
     def draw(self) -> None: ...
@@ -88,15 +83,25 @@ class Triangle(Shape):
         def create(self) -> Triangle:
             return Triangle()
 
-ShapeFactory.create_shape("Triangle").draw()
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Triangle": Triangle.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    return FACTORIES[kind].create()
+
+create_shape("Triangle").draw()
 #: Triangle.draw
 ```
 
 The first version required touching one function
-(`Shape.factory()`). The second required touching nothing outside the
-new class itself, which is the trade-off the chapter draws between
+(`Shape.factory()`), where the new `case` sits inside logic that
+must be re-read. The second touches the new class and one data line
+in `FACTORIES`. That is the trade-off the chapter draws between
 them: more ceremony up front (a nested `Factory` per shape) in
-exchange for a central dispatcher that never needs to change again.
+exchange for a dispatcher that changes by table entry rather than by
+code. The chapter's `registry.py` goes one step further and removes
+even the table entry, by letting each class register itself.
 
 ## 3. `GnomesAndFairies`
 
@@ -450,7 +455,7 @@ prototype survived is good; checking that the *next* spawn is still
 correct is what a user of the registry actually depends on, and it
 fails loudly under `copy.copy()`.
 
-## 8. What the `eval()` in `shape_factory2.py` accepts
+## 8. What the `eval()` dispatcher accepts
 
 ```python
 # exercise_8.py

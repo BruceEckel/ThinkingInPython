@@ -324,9 +324,9 @@ To address languages like C++ and Java,
 The variations shown here are worth understanding,
 but each does more work than the module or the cached factory above.
 
-The first three take control of creation by delegating to a single instance of a private nested class.
+The first takes control of creation by delegating to a single instance of a private nested class.
 The rest reach the same guarantee by other means: a class variable,
-a shared `__dict__`, a decorator, and a metaclass.
+a shared `__dict__`, and a decorator.
 
 ### Lazy Creation
 
@@ -383,119 +383,32 @@ so a name the wrapper does not have, such as `val`,
 falls through to the inner object.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 
-### Eager Creation
-
-When the object needs nothing from that first call,
-you can create the inner instance *eagerly* in the class body instead,
-which removes the sentinel and the guard:
-
-```python
-# singleton_eager.py
-from dataclasses import dataclass, field
-from typing import Any, ClassVar
-
-class OnlyOne:
-    @dataclass
-    class __OnlyOne:
-        val: list[str] = field(default_factory=list)
-
-    # Created once, when the class is defined:
-    instance: ClassVar[__OnlyOne] = __OnlyOne()
-
-    def __init__(self, arg: str) -> None:
-        OnlyOne.instance.val.append(arg)
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.instance, name)
-
-x = OnlyOne("sausage")
-y = OnlyOne("eggs")
-# Distinct wrappers (x is not y), one shared inner list:
-print(x.val, x is y, x.instance is y.instance)
-#: ['sausage', 'eggs'] False True
-```
-
-The bare `__OnlyOne()` works because the nested class is already defined at that point in the body.
-The qualified `OnlyOne.__OnlyOne()` fails,
-because the name `OnlyOne` stays unbound until its own class body finishes running.
-
-`__getattr__()` returns `Any` in both versions, and unlike `instance`,
+`__getattr__()` returns `Any`, and unlike `instance`,
 that one cannot be tightened away.
 It answers for every name Python fails to find on the wrapper,
 so its return type is whatever the inner object happens to hold under that name.
-`instance` is a single declared field and can say `__OnlyOne`.
+`instance` is a single declared field and can say `__OnlyOne | None`.
 `__getattr__()` covers an open set of names and cannot.
 Delegation trades static knowledge for reach,
 which is the cost [Surrogate](26_Surrogate.md#proxy) pays throughout.
 
-The two forms differ only in when they create the inner object.
-The lazy form defers it to the first `OnlyOne(...)` call,
-so it can wait for data not available at import time,
-but it carries the sentinel and the guard,
-and two threads racing on that first call can both see `None`.
-The eager form creates the object once, at module import: no sentinel, no guard,
-and no race, at the cost of building it whether or not anything uses it.
+The laziness is a choice.
+When the inner object needs nothing from that first call,
+you can create it *eagerly* in the class body instead,
+`instance: ClassVar[__OnlyOne] = __OnlyOne()`, which removes the sentinel,
+the guard, and the first-call race the cached factory met under threads,
+at the cost of building the object whether or not anything uses it.
+(The bare `__OnlyOne()` works because the nested class is defined at that point in the body; the qualified `OnlyOne.__OnlyOne()` fails, since the name `OnlyOne` stays unbound until its own class body finishes running.)
+Exercise 1 makes that change.
 
 Either way, this is a lot of code for what a module does on its own.
-
-### Overriding `__new__`
-
-You can use `__new__()`, the method that creates an instance,
-to return the same object every time:
-
-```python
-# singleton_with_new.py
-from dataclasses import dataclass, field
-from typing import Any, ClassVar
-
-class OnlyOne:
-    @dataclass
-    class __OnlyOne:
-        val: list[str] = field(default_factory=list)
-
-    instance: ClassVar[__OnlyOne | None] = None
-
-    def __new__(cls) -> Any:  # Implicitly a staticmethod
-        if OnlyOne.instance is None:
-            OnlyOne.instance = OnlyOne.__OnlyOne()
-        return OnlyOne.instance
-
-x = OnlyOne()
-x.val.append("sausage")
-y = OnlyOne()
-y.val.append("eggs")
-z = OnlyOne()
-z.val.append("spam")
-# __new__ returns the one instance every time, so all three share val:
-print(x.val, x is y is z, isinstance(x, OnlyOne))
-#: ['sausage', 'eggs', 'spam'] True False
-assert OnlyOne() is OnlyOne()
-```
-
-Because `__new__()` returns the inner `__OnlyOne` object,
-that is what `OnlyOne()` hands back, so `x` is the shared instance,
-not a wrapper around it.
-This is why no `__getattr__()` appears here,
-while the two versions above need one.
-Those return an `OnlyOne` wrapper that has no `val` of its own,
-so the lookup must be forwarded to the inner object.
-Here `x.val` is an ordinary attribute access on the object that owns it.
-In the two wrapper versions above, `x is y` is `False`.
-Here, where `__new__()` produces the inner object directly,
-`x is y is z` is `True`.
-
-Python calls `__init__()` only when `__new__()` returns an instance of the class being constructed.
-Here it returns something else, the inner object, so no `__init__()` ever runs.
-That has a second consequence, and the last printed value shows it:
-`x` is not an `OnlyOne`, so `isinstance(x, OnlyOne)` is `False`.
-The metaclass version at the end of this chapter returns the class's own instance,
-which puts it on the other side of the rule.
 
 ### One Instance in a Class Variable
 
 The nested private class is not required.
 Here you keep the single instance in a class variable.
-`__new__` builds it, when needed, from the class being constructed:
+`__new__()`, the method that creates an instance,
+builds it when needed and returns it as the result of every construction:
 
 ```python
 # singleton_class_variable.py
@@ -519,13 +432,16 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 #: ['sausage', 'eggs', 'spam'] True True
 ```
 
-`object.__new__(cls)` builds a `SingletonClassVar`, not a foreign object,
-which puts this version on the other side of the rule from `singleton_with_new.py`.
-There, `__new__()` handed back the inner class,
-so `__init__()` never ran and `isinstance(x, OnlyOne)` was `False`.
-Here the same check prints `True`,
-and Python calls `__init__()` on the shared instance after every construction if the class defines one.
+`object.__new__(cls)` builds a `SingletonClassVar`,
+so every construction hands back that same instance and `isinstance()` reports `True`.
+Python honors whatever object `__new__()` returns,
+and the return value carries a rule worth knowing:
+`__init__()` runs only when `__new__()` returns an instance of the class being constructed,
+and then it runs on that shared instance after *every* construction,
+if the class defines one.
 `SingletonClassVar` defines none, so all the work happens in `__new__()`.
+A `__new__()` that returned some other object instead would skip `__init__()`,
+and fail `isinstance()` as well.
 
 ### Borg: Singleton By Inheritance
 
@@ -693,76 +609,19 @@ and Python takes that metaclass from the type of the base, which is `singleton`.
 Nothing in `class Sub(Registry)` mentions `singleton`,
 so the error names a class that does not appear in the failing line.
 That is the confusion a class decorator costs you.
-The `__new__()` versions above and the metaclass version below keep the name pointing at a real class,
-which is the reason to prefer those.
+The `__new__()` version above keeps the name pointing at a real class,
+which is the reason to prefer it.
 
-### Singleton Using Metaclasses
-
-Finally, a metaclass can intercept construction.
+A metaclass can also intercept construction.
 [Metaprogramming](17_Metaprogramming.md#intercepting-instance-creation)
-shows another metaclass singleton, one that overrides `__call__()`.
-Overriding `__call__()` skips `__init__()` on every later construction,
-so the first call's arguments win; the version here replaces `__new__()`,
-so `__init__()` reruns and the last call's arguments win.
+shows that singleton: its metaclass overrides `__call__()`,
+which skips `__init__()` on every later construction,
+so the first call's arguments win.
+A metaclass that replaces `__new__()` instead leaves `__init__()` rerunning on the shared instance,
+so the last call's arguments win.
 That chapter also covers `__init_subclass__()` and `__set_name__()`,
-the simpler hooks that replace most metaclasses.
-This version is here for completeness:
-
-```python
-# singleton_metaclass.py
-from collections.abc import Callable
-from typing import Any
-
-class SingletonMetaClass(type):
-    def __init__(cls, name: str, bases: tuple[type, ...],
-                 namespace: dict[str, Any]) -> None:
-        super().__init__(name, bases, namespace)
-        klass: Any = cls
-        original_new: Callable[..., Any] = klass.__new__
-
-        def my_new(c: Any, *args: Any, **kwargs: Any) -> Any:
-            if c.instance is None:
-                c.instance = original_new(c)
-            return c.instance
-
-        klass.instance = None
-        klass.__new__ = staticmethod(my_new)
-
-class Bar(metaclass=SingletonMetaClass):
-    def __init__(self, val: str) -> None:
-        self.val = val
-
-    def __str__(self) -> str:
-        return self.val
-
-x = Bar("sausage")
-y = Bar("eggs")
-z = Bar("spam")
-# Each Bar(...) reruns __init__ on the one instance, so val is spam:
-print(x, x is y is z)
-#: spam True
-```
-
-`cls` is the class being created,
-and the metaclass modifies it in ways no annotation describes.
-It attaches an `instance` attribute that does not exist yet,
-and it replaces `__new__()`.
-`klass: Any = cls` is the escape hatch that lets those assignments past the type checker.
-Annotating `klass` as `type` fails.
-The checker then resolves `klass.__new__` to `type.__new__`,
-the constructor that builds classes,
-but the line actually captures `Bar.__new__`, which is `object.__new__`.
-
-This is the other side of the `__new__()` rule.
-`my_new()` returns an instance of `Bar`,
-so Python calls `__init__()` after every construction,
-on the same shared object.
-Each `Bar(...)` call therefore overwrites `val`,
-which is why `x` prints as `spam`.
-The [Overriding `__new__`](#overriding-__new__)
-version returned a foreign object, so its `__init__()` never ran.
-Same pattern, opposite `__init__()` behavior,
-and the difference is only what `__new__()` returns.
+the simpler hooks that replace most metaclasses;
+a singleton needs none of this machinery.
 
 ## Which Should You Use?
 
@@ -774,7 +633,7 @@ Use the lightest tool that fits:
   or override `__new__()` as `singleton_class_variable.py` does.
   Under threads, prime the factory at import time or use the module form.
 - If you really want many handles sharing one set of state, use *Borg*.
-- The decorator and metaclass versions work,
+- The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.
 
 The elaborate *GoF Design Patterns* singleton is largely a workaround for languages where a module is not a first-class,
@@ -783,10 +642,13 @@ In Python, most of the ceremony falls away.
 
 ## Exercises
 
-1.  `singleton_eager.py` always creates its inner object,
-    even if nothing ever uses it.
-    Modify it to use *lazy initialization*,
-    then compare your result with `singleton_pattern.py`.
+1.  `singleton_pattern.py` waits for the first construction to build its inner object.
+    Modify it to use *eager initialization*,
+    creating the inner instance in the class body,
+    and remove the sentinel and the guard.
+    What did the change cost,
+    and which failure from [Tests, Threads, and Locks](#tests-threads-and-locks)
+    can no longer occur?
 2.  Using `singleton_cached_factory.py` as a starting point,
     create a factory that manages a fixed pool of objects
     (say, database connections) and hands them out,

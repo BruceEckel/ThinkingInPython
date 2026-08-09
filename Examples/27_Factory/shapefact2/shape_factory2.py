@@ -2,20 +2,10 @@
 # Polymorphic factory methods.
 import random
 from collections.abc import Iterator
-from typing import ClassVar, Protocol, override
+from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
-
-class ShapeFactory:
-    factories: ClassVar[dict[str, ShapeMaker]] = {}
-
-    # Build and cache each kind's factory on first request:
-    @classmethod
-    def create_shape(cls, kind: str) -> Shape:
-        if kind not in cls.factories:
-            cls.factories[kind] = eval(f"{kind}.Factory()")
-        return cls.factories[kind].create()
 
 class Shape:
     def draw(self) -> None: ...
@@ -31,13 +21,19 @@ class Circle(Shape):
 
 class Square(Shape):
     @override
-    def draw(self) -> None:
-        print("Square.draw")
+    def draw(self) -> None: print("Square.draw")
     @override
-    def erase(self) -> None:
-        print("Square.erase")
+    def erase(self) -> None: print("Square.erase")
     class Factory:
         def create(self) -> Square: return Square()
+
+FACTORIES: Final[dict[str, ShapeMaker]] = {
+    "Circle": Circle.Factory(),
+    "Square": Square.Factory(),
+}
+
+def create_shape(kind: str) -> Shape:
+    return FACTORIES[kind].create()
 
 def shape_name_gen(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
@@ -46,15 +42,10 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)
-    print(sorted(ShapeFactory.factories))
-    shapes = [ShapeFactory.create_shape(kind)
-              for kind in shape_name_gen(4)]
-    print(sorted(ShapeFactory.factories))
+    shapes = [create_shape(kind) for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
-#: []
-#: ['Circle', 'Square']
 #: Circle.draw
 #: Circle.erase
 #: Square.draw

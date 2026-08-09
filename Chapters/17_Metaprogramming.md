@@ -820,10 +820,8 @@ Three ways quiet it, from narrowest to broadest:
 `setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
 a localized `# type: ignore` silences one line,
 as on `Simple().uses_metaclass()` above;
-and copying the class into an `Any`-typed name stops attribute checking for everything reached through that name.
-The [singleton metaclass](24_Singleton.md#singleton-using-metaclasses)
-uses that last form, `klass: Any = cls`,
-to add an `instance` attribute and swap `__new__()`.
+and copying the class into an `Any`-typed name, `klass: Any = cls`,
+stops attribute checking for everything reached through that name.
 Prefer the narrowest escape that fits,
 because a broad `Any` also hides genuine mistakes.
 

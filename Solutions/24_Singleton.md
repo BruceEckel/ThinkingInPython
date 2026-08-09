@@ -1,6 +1,6 @@
 # Singleton: Solutions
 
-## 1. `singleton_eager.py` rewritten to lazy initialization
+## 1. `singleton_pattern.py` rewritten to eager initialization
 
 ```python
 # exercise_1.py
@@ -12,12 +12,10 @@ class OnlyOne:
     class __OnlyOne:
         val: list[str] = field(default_factory=list)
 
-    instance: ClassVar[__OnlyOne | None] = None  # Nothing built yet
+    # Created once, when the class is defined:
+    instance: ClassVar[__OnlyOne] = __OnlyOne()
 
     def __init__(self, arg: str) -> None:
-        if OnlyOne.instance is None:
-            # Built on first use:
-            OnlyOne.instance = OnlyOne.__OnlyOne()
         OnlyOne.instance.val.append(arg)
 
     def __getattr__(self, name: str) -> Any:
@@ -29,17 +27,22 @@ print(x.val, x is y, x.instance is y.instance)
 #: ['sausage', 'eggs'] False True
 ```
 
-This is `singleton_pattern.py` itself: the change from eager to lazy
-is exactly reintroducing the `None` sentinel and the `if
-OnlyOne.instance is None:` guard that the eager version removed. Both
-versions produce identical externally-visible behavior, `x.val`
-accumulates the same way, `x is y` is still `False`, and
-`x.instance is y.instance` is still `True`. The only difference is
-*when* the shared inner object comes into existence: at the first
-`OnlyOne(...)` call for the lazy version, versus at class-definition
-time (module import) for the eager one. Comparing the two files
-side by side shows that "lazy vs. eager" is a small, local decision
-that does not otherwise change how callers use the class.
+The sentinel and the guard existed to defer creation, so removing
+the deferral removes both. `instance` is declared
+`ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]` and
+is assigned the inner instance in the class body (the bare
+`__OnlyOne()` works there; the qualified `OnlyOne.__OnlyOne()` would
+fail, since `OnlyOne` is unbound until its own body finishes), and
+`__init__()` shrinks to the one `append`. Externally nothing
+changes: `x.val` accumulates the same way, `x is y` is still
+`False`, and `x.instance is y.instance` is still `True`. The cost is
+that the inner object is built at class definition, during module
+import, whether or not anything ever constructs an `OnlyOne`. What
+can no longer occur is the first-call race from
+[Tests, Threads, and Locks](../Chapters/24_Singleton.md#tests-threads-and-locks):
+two threads racing the first construction could each see the `None`
+sentinel and each build an inner object. With the object built by
+the single-threaded import, no first call is left to race.
 
 ## 2. A pool of connections instead of one instance
 
