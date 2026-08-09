@@ -79,7 +79,7 @@ I ask what problem you are solving and whether the language already does the pat
 Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
 building a simulation out of the pieces,
-and cataloging the patterns that the literature added after the classic set.
+and cataloging the classic patterns together with the ones the literature added later.
 
 Part IV, *Functional Programming*, covers pure functions,
 the `functools` and `itertools` toolkits,

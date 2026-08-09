@@ -2,11 +2,11 @@
 import random
 
 def encode(text: str) -> str:
-    # A trivial reversible transform:
-    return text[::-1]
+    # Reversible, and not its own inverse:
+    return text.encode().hex()
 
 def decode(text: str) -> str:
-    return text[::-1]
+    return bytes.fromhex(text).decode()
 
 random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"

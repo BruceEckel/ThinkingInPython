@@ -20,10 +20,17 @@ This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
 [Toolkits](41_Functional_Toolkits.md) tours the standard library's support,
 [Error Handling](42_Functional_Error_Handling.md)
-turns failure into an ordinary value, [Assurance](43_Functional_Assurance.md)
-examines what the discipline lets you claim about your code,
-and [Effect Management](44_Effect_Management.md)
-tracks a function's effects in its type.
+turns failure into an ordinary value,
+and [Assurance](43_Functional_Assurance.md)
+examines what the discipline lets you claim about your code.
+Those four chapters are Part IV.
+Part V then takes the same discipline further:
+[Effect Management](44_Effect_Management.md)
+tracks a function's effects in its type, [Generators](45_Generators.md)
+supplies the mechanism Python already has for describing a computation without running it,
+and [Stateless](46_Stateless.md)
+and [Stateless in Practice](47_Stateless_in_Practice.md)
+build a checked Effect system on top of it.
 
 ## Pure Functions
 
@@ -79,12 +86,29 @@ since there is nothing to set up or restore:
 def slope(rise: int, run: int) -> float:
     return rise / run
 
-# No setup or teardown: assert the result directly:
+total = 0
+def running_total(n: int) -> int:
+    global total
+    total += n
+    return total
+
+# The pure function needs no setup and no teardown:
 assert slope(10, 2) == 5.0
-assert slope(9, 3) == 3.0
+assert slope(10, 2) == 5.0
+# The impure one needs a reset before each check:
+total = 0
+assert running_total(5) == 5
+total = 0
+assert running_total(5) == 5
 print("ok")
 #: ok
 ```
+
+If you delete either `total = 0`, the second assertion fails.
+That line is the whole fixture, and purity removes it.
+`slope()` appears again later in the book:
+[Are Exceptions Impure?](44_Effect_Management.md#are-exceptions-impure)
+asks of this same function whether raising an exception breaks its purity.
 
 ## Immutability
 
@@ -260,6 +284,33 @@ The dispatch code never changes.
 The same structure is behind [the dictionary factory](27_Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
+[Pattern Matching](13_Pattern_Matching.md)
+solves the same `if`/`elif` problem with `match`,
+and the two are not interchangeable.
+A `match` is code: adding an operator means editing the function,
+and the checker sees every case.
+The table is data: adding an operator means adding a row,
+which another module can do at import time and a test can do at runtime.
+Choose `match` when the set of cases is fixed and known to the compiler,
+and a table when the set is meant to grow from outside.
+
+## Lambdas
+
+A *lambda* is an unnamed function written as a single expression,
+introduced in [Functions](05_Functions.md#lambdas).
+The higher-order functions below take them as inline arguments,
+which is where they fit best.
+Their value is locality.
+When a transformation is one short expression,
+a lambda keeps it at the call site, where the reader already is,
+instead of sending them to a named function defined elsewhere.
+`sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
+Naming that one-liner costs a line, a name to invent,
+and a definition to look up, with nothing gained in clarity.
+For anything larger, write a `def`.
+A named function carries a docstring, a readable name in tracebacks,
+and room to grow.
+
 ## Higher-Order Functions
 
 A *higher-order function* takes a function as an argument, returns one, or both.
@@ -323,23 +374,6 @@ A function that takes a function can wrap it with operations like timing,
 retries, or logging.
 This is what a decorator does in [Decorators](14_Decorators.md).
 
-## Lambdas
-
-A *lambda* is an unnamed function written as a single expression,
-introduced in [Functions](05_Functions.md#lambdas).
-The examples above used lambdas as inline arguments,
-which is where they fit best.
-Their value is locality.
-When a transformation is one short expression,
-a lambda keeps it at the call site, where the reader already is,
-instead of sending them to a named function defined elsewhere.
-`sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
-Naming that one-liner costs a line, a name to invent,
-and a definition to look up, with nothing gained in clarity.
-For anything larger, write a `def`.
-A named function carries a docstring, a readable name in tracebacks,
-and room to grow.
-
 ## Closures
 
 When an inner function refers to a variable from the function that created it,
@@ -349,6 +383,7 @@ This way, a function can carry state without a class:
 
 ```python
 # closures.py
+import inspect
 from collections.abc import Callable
 
 def multiplier(factor: int) -> Callable[[int], int]:
@@ -361,11 +396,16 @@ double = multiplier(2)
 triple = multiplier(3)
 print(double(10), triple(10))
 #: 20 30
+print(inspect.getclosurevars(double).nonlocals)
+#: {'factor': 2}
+print(inspect.getclosurevars(triple).nonlocals)
+#: {'factor': 3}
 ```
 
 `multiplier()` returns `multiply()`,
 and each returned function remembers its own `factor`.
-`double` and `triple` are the same code with different captured values.
+The last two lines show that memory directly:
+`double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure:
@@ -443,6 +483,8 @@ square = partial(power, exponent=2)
 cube = partial(power, exponent=3)
 print(square(5), cube(5))
 #: 25 125
+print(square.func.__name__, square.keywords)
+#: power {'exponent': 2}
 ```
 
 `square` and `cube` are specializations of `power`,
@@ -469,7 +511,8 @@ so fixing the third argument used to mean fixing the first two.
 A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters))
 had no recourse.
-`functools.Placeholder` is a marker that reserves a position for the caller:
+`functools.Placeholder` (Python 3.14 and later)
+is a marker that reserves a position for the caller:
 
 ```python
 # placeholder.py
@@ -511,11 +554,11 @@ the way a pipeline reads as a sequence of steps:
 # composing.py
 from collections.abc import Callable
 
-def compose(
-    f: Callable[[int], int], g: Callable[[int], int]
-) -> Callable[[int], int]:
+def compose[T, U, V](
+    f: Callable[[U], V], g: Callable[[T], U]
+) -> Callable[[T], V]:
     # Return a function that runs g, then feeds the result to f:
-    def composed(x: int) -> int:
+    def composed(x: T) -> V:
         return f(g(x))
     return composed
 
@@ -523,16 +566,23 @@ def increment(n: int) -> int:
     return n + 1
 def double(n: int) -> int:
     return n * 2
+def label(n: int) -> str:
+    return f"<{n}>"
 
 increment_then_double = compose(double, increment)
 print(increment_then_double(10))
 #: 22
+print(compose(label, increment_then_double)(10))
+#: <22>
 ```
 
 `compose(double, increment)` returns a function that increments first,
 then doubles.
 Each piece stays small and pure,
 and you combine them without touching their internals.
+The type parameters earn their place on the second `print()`:
+the checker verifies that `label` accepts what `increment_then_double` produces,
+and types the composed function `(int) -> str` rather than `(int) -> int`.
 
 Composition grows by adding a stage rather than by enlarging one.
 Each stage is also testable on its own,
@@ -542,6 +592,53 @@ you insert or swap a single stage and leave every other one untouched.
 
 The standard library provides these building blocks ready-made;
 [Toolkits](41_Functional_Toolkits.md) tours them.
+
+## Putting the Pieces Together
+
+Every section above showed one construct on its own.
+They were built to combine:
+
+```python
+# pipeline.py
+from collections.abc import Sequence
+from dataclasses import dataclass
+from functools import partial
+
+@dataclass(frozen=True)
+class Reading:
+    sensor: str
+    celsius: float
+
+def warmer_than(limit: float, r: Reading) -> bool:
+    return r.celsius > limit
+
+def to_fahrenheit(r: Reading) -> Reading:
+    return Reading(r.sensor, r.celsius * 9 / 5 + 32)
+
+def report(readings: Sequence[Reading]) -> list[str]:
+    warm = filter(partial(warmer_than, 20.0), readings)
+    return [f"{r.sensor} {r.celsius:.1f}"
+            for r in map(to_fahrenheit, warm)]
+
+data = [Reading("a", 18.0), Reading("b", 25.0), Reading("c", 30.5)]
+print(report(data))
+#: ['b 77.0', 'c 86.9']
+print(data[0])
+#: Reading(sensor='a', celsius=18.0)
+```
+
+Five of the chapter's ideas are doing work at once:
+a frozen dataclass for the value,
+`Sequence` to state that `report()` only reads, two pure functions,
+`partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
+and `map()` and `filter()` for the traversal.
+The second `print()` is the payoff.
+The input list is unchanged, so the whole report can be recomputed, cached,
+or run on another core with no coordination.
+
+None of this is a different language.
+It is ordinary Python in which each piece depends on its arguments alone,
+and that single property is what the chapters ahead keep spending.
 
 ## Exercises
 
@@ -558,3 +655,12 @@ The standard library provides these building blocks ready-made;
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
     that fixes only `low` to 10 and leaves both other arguments to the caller.
     Then try to fix only `high` without a `Placeholder` and explain why it cannot be done.
+6.  In `immutable_types.py`,
+    add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
+    Run `ty`, and explain why it reports nothing when `MAX_SIZE = 200` on the next line is an error.
+    Then change the annotation so appending *is* rejected.
+7.  In `higher_order.py`,
+    replace the `map()` and `filter()` calls with comprehensions,
+    and the `sorted(key=len)` call with one that sorts by last letter.
+    Then delete the `list()` around the `map()` call, print the result,
+    and say what you see and why.

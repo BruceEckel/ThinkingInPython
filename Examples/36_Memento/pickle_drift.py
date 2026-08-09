@@ -1,17 +1,11 @@
 # pickle_drift.py
 import pickle
-from dataclasses import dataclass
 import sketch_v1
 from exceptions import ignore
 from sketch_v1 import SketchV1
+from sketch_v2 import SketchV2
 
 blob = pickle.dumps(SketchV1(("circle", "beak")))
-
-@dataclass(frozen=True)
-class SketchV2:
-    strokes: tuple[str, ...]
-    title: str
-
 sketch_v1.SketchV1 = SketchV2  # type: ignore
 restored = pickle.loads(blob)
 print(restored.strokes)

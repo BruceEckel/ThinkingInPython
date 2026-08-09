@@ -7,7 +7,8 @@ This is the spirit of Martin Fowler's *Refactoring*,
 applied to patterns rather than single statements.
 
 It is also a Python lesson.
-Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages without multiple dispatch.
+Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages:
+single dispatch, closed classes, and types that are not values.
 Python lacks those limitations, so some of those patterns become unnecessary.
 This chapter points that out as it happens.
 
@@ -50,7 +51,7 @@ class Trash:
 
     @classmethod
     def create(cls, name: str, weight: float) -> Trash:
-        return Trash.registry[name](weight)
+        return cls.registry[name](weight)
 
 class Aluminum(Trash):
     value = 1.67
@@ -162,11 +163,10 @@ If you add a new kind of trash, the parser keeps working unchanged:
 
 ```python
 # parse_trash.py
-# Read "Name:weight" lines into Trash objects through the registry.
 from pathlib import Path
 from trash import Trash
 
-def parse(filename: str) -> list[Trash]:
+def parse(filename: str | Path) -> list[Trash]:
     items: list[Trash] = []
     for line in Path(filename).read_text().splitlines():
         line = line.strip()
@@ -192,7 +192,7 @@ Aluminum:2.0
 
 Glass:3.0
 """)
-    items = parse(str(data))
+    items = parse(data)
     assert [type(t).__name__ for t in items] == ["Aluminum", "Glass"]
     assert items[0].weight == 2.0
     assert items[1].weight == 3.0
@@ -262,7 +262,7 @@ Any you miss will silently drop trash on the floor.
 Readers of [Composite and Interpreter](34_Composite_and_Interpreter.md)
 may expect `assert_never()` to make the checker catch the missed case,
 and here it cannot help: exhaustiveness checking needs a *closed* union,
-and the registry keeps `Trash` deliberately open,
+and `Trash` is deliberately open, which is the point of the registry,
 so no checker can know the set is complete.
 This is a `match` over an open set,
 which is what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
@@ -270,7 +270,71 @@ warned against.
 When the set is open, sorting must not enumerate it,
 which is what the next section does.
 Testing for one type, or a small subset that needs special handling, is fine.
-Testing for all of them means you are doing polymorphism's job by hand.
+Testing for all of them means you are doing dispatch's job by hand.
+
+That is the argument.
+Here is the requirement that makes it concrete.
+The plant starts accepting plastic,
+which arrives as a new material class and some new lines in the data:
+
+```text
+# plastic.dat
+Glass:10
+Plastic:20
+Aluminum:30
+Plastic:40
+```
+
+```python
+# plastic_dropped.py
+from collections import defaultdict
+from parse_trash import parse
+from trash import (
+    Aluminum,
+    Bins,
+    Cardboard,
+    Glass,
+    Paper,
+    Trash,
+    sum_value,
+)
+
+class Plastic(Trash):
+    value = 0.15
+
+pieces = parse("plastic.dat")
+bins: Bins = defaultdict(list)
+for t in pieces:
+    match t:
+        case Aluminum():
+            bins[Aluminum].append(t)
+        case Paper():
+            bins[Paper].append(t)
+        case Glass():
+            bins[Glass].append(t)
+        case Cardboard():
+            bins[Cardboard].append(t)
+for kind, items in bins.items():
+    print(f"--- {kind.__name__} ---")
+    sum_value(items)
+binned = sum(len(v) for v in bins.values())
+print(f"parsed {len(pieces)}, binned {binned}")
+#: --- Glass ---
+#: weight of Glass = 10.0
+#: Total value = 2.30
+#: --- Aluminum ---
+#: weight of Aluminum = 30.0
+#: Total value = 50.10
+#: parsed 4, binned 2
+```
+
+Nothing failed.
+The parser built two `Plastic` objects, the sorter matched neither,
+and the report totals the trash it happened to recognize.
+Two of four pieces reached a bin,
+and the sixty pounds of plastic left no trace in any total the plant will act on.
+That is what "silently drop trash on the floor" means:
+not an exception to debug, but a number that is wrong and looks right.
 
 ## Let a Dictionary Do the Sorting
 
@@ -348,17 +412,21 @@ So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
 and the two ordinarily pull against each other:
 that trade is the expression problem from [Pattern Matching](13_Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
-Suppose the `Trash` hierarchy is fixed
-(maybe it comes from a third-party library)
-and you want to add new behaviors to it without editing it:
-print recycling instructions, flag a disposal hazard, and more later.
+`Trash` should not grow a method for every question the plant learns to ask.
+Recycling instructions, disposal hazards,
+and transport volume are all operations that vary by material,
+and none of them belongs in `trash.py`.
+Visitor is the classic way to add them from outside,
+and it is the harder way of the two available here.
 
 [Visitor](33_Visitor.md) solves this problem.
-Visitor is elaborate:
-a `Visitor` base class with one `visit()` overload per material,
-an `accept()` method added to every element,
-and *double dispatch* to route each piece to the correct `visit()`.
-It exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
+Visitor is elaborate.
+In its C++ and Java form a `Visitor` base class declares one overload per material,
+every element grows an `accept()` method,
+and *double dispatch* routes each piece to the correct overload.
+Python has no method overloading, so even writing that down takes work
+([Visitor](33_Visitor.md) shows the shape the book's version settles on).
+That design exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation.
 The standard library provides `functools.singledispatch`,
 which dispatches on the type of its first argument,
@@ -369,7 +437,6 @@ In Python, a single-dispatch function implements *Visitor*:
 ```python
 # recycling_note.py
 from functools import singledispatch
-from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash
 
 @singledispatch
@@ -388,14 +455,11 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-seen: set[type[Trash]] = set()
-for t in parse("trash.dat"):
-    if type(t) not in seen:
-        seen.add(type(t))
-        print(recycling_note(t))
-#: Glass: sort by color, then crush
-#: Paper: no special handling
+for cls in Trash.registry.values():
+    print(recycling_note(cls(1.0)))
 #: Aluminum: crush and bale
+#: Paper: no special handling
+#: Glass: sort by color, then crush
 #: Cardboard: flatten and bundle
 ```
 
@@ -414,7 +478,7 @@ It makes both sides of it cost a line instead of an edit spread across classes.
 
 Compare this to a Visitor implementation.
 No `Visitor` class exists, no `accept()` method bolted onto every material,
-and no decorator gymnastics to fake overloading.
+and no second dispatch to arrange.
 
 The chapter now holds two kinds of dispatch that disagree about subclasses.
 `bins[type(t)]` keys on the exact class,
@@ -439,6 +503,11 @@ The deeper skill is spotting the *vector of change*
 ([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
 in a problem (here, new types versus new operations)
 and choosing the lightest construct that isolates it.
+Here that meant two lines of Python.
+A dictionary keyed by `type(t)` absorbs new materials,
+and a `@singledispatch` function absorbs new operations.
+Neither is a pattern in the *GoF* sense,
+and between them they cover both vectors of change the trash sorter has.
 This chapter discovered its vectors one requirement at a time,
 rather than predicting them up front.
 In Python that construct is often a language feature, not a multi-class pattern.
@@ -446,12 +515,17 @@ A pattern is worth keeping only when it is still useful once the language does p
 
 ## Exercises
 
-1.  Add a `Plastic` material with a per-pound value.
+1.  Add the `Plastic` material and its `plastic.dat` lines to `recycle_dict.py`.
     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
-    and that only `trash.dat` and (optionally)
-    a one-line `recycling_note()` registration do.
+    then account for every pound of plastic `plastic_dropped.py` reports.
+    Which test in `test_trash.py` fails,
+    and why is that the right behavior for it?
 2.  Write a `price()` operation as a function over a list of `Trash`,
     and a `heaviest()` operation that returns the single heaviest piece.
     Decide for each whether it needs `singledispatch`.
 3.  Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
     and explain what changed.
+4.  Derive `CrushedAluminum` from `Aluminum` and run both `recycle_dict.py` and `recycling_note.py` over data containing it.
+    Explain why it gets its own bin but not its own note.
+    Then change `recycle_dict.py` so a subclass shares its parent's bin,
+    without naming any material in the sorting loop.

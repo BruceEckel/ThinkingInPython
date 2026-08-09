@@ -118,8 +118,7 @@ It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
 though freezing the memento means an honest mistake,
-swapping the snapshot's strokes for different ones,
-fails loudly.
+swapping the snapshot's strokes for different ones, fails loudly.
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
 Every call site would still type-check.
@@ -127,8 +126,8 @@ But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
 `NewType("Memento", tuple[str, ...])` answers the checker but nothing else.
-It vanishes at runtime,
-so the caretaker still holds a plain tuple it can index, unpack, or build from scratch.
+It vanishes at runtime, so the caretaker still holds a plain tuple it can index,
+unpack, or build from scratch.
 Wrapping the tuple in a one-field data class gives `Memento` an identity that exists while the program runs.
 The only way to see the strokes is through `.strokes`,
 so reaching inside becomes visible in the code, not just a convention to honor.
@@ -231,8 +230,7 @@ Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
 so a history of `k` edits costs pointers, not `k` copies of the text.
 That is why snapshots stay cheap, and also why they are not free:
 a state whose changed field is large pays for that field on every edit.
-The stroke is built with `"".join([...])` rather than written as the literal `"circle"`
-because the compiler interns a literal,
+The stroke is built with `"".join([...])` rather than written as the literal `"circle"` because the compiler interns a literal,
 which would make the identity check print `True` whether the tuple shared the string or rebuilt it.
 
 This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution).
@@ -246,7 +244,8 @@ and Memento shares them across time.
 The classic form has not disappeared, it has narrowed.
 Freezing rebuilds the changed field on every edit,
 so a state large enough that copying it per keystroke is unaffordable still needs a mutable originator and an explicit `save()`.
-So does a state you do not own: a widget tree, a database row, or any object whose class you cannot redesign.
+So does a state you do not own: a widget tree, a database row,
+or any object whose class you cannot redesign.
 Everywhere else, prefer the frozen value.
 
 ```python
@@ -339,8 +338,8 @@ undoing with no past raises `IndexError` from `pop()`.
 which is how an editor knows to gray out the menu item.
 `History` stores whole states, not descriptions of changes,
 so it never interprets anything.
-That works for any state type, from `int` to a full `Drawing`, with one condition:
-states must be immutable.
+That works for any state type, from `int` to a full `Drawing`,
+with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place.
 It is a stack of aliases, the bug this chapter opened with.
 
@@ -379,8 +378,7 @@ the Command variation mentioned in [Function Objects](28_Function_Objects.md).
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
-because immutable states make snapshots inexpensive,
-as `sharing.py` showed.
+because immutable states make snapshots inexpensive, as `sharing.py` showed.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
@@ -543,13 +541,15 @@ from sketch_v2 import SketchV2
 blob = pickle.dumps(SketchV2(("circle",), "Duck"))
 sketch_v2.SketchV2 = SketchV1  # type: ignore
 restored = pickle.loads(blob)
-print(restored, restored.__dict__)
-#: SketchV1(strokes=('circle',)) {'strokes': ('circle',), 'title': 'Duck'}
+print(restored)
+#: SketchV1(strokes=('circle',))
+print(restored.__dict__)
+#: {'strokes': ('circle',), 'title': 'Duck'}
 print(restored == SketchV1(("circle",)))
 #: True
 ```
 
-The two prints are the lesson side by side.
+The three prints are the lesson side by side.
 The `repr()` shows a one-field object while the `__dict__` shows two entries,
 and the loaded object is `==` to a `SketchV1` that never had a title,
 so nothing downstream can tell them apart.
@@ -559,7 +559,8 @@ A *schema migration* is the disciplined version of this drift, a versioned,
 deliberate step that moves the table shape and its data forward together,
 instead of discovering the mismatch when a query runs.
 
-When either limitation rules out `pickle`, other libraries answer them separately.
+When either limitation rules out `pickle`,
+other libraries answer them separately.
 `msgspec` and `pydantic` both validate on load.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
@@ -599,3 +600,11 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 5.  Add `goto(steps_back)` to `History`:
     jump the present several states into the past in one call,
     keeping redo consistent.
+6.  A `History` of `Drawing` states records a rename and three strokes.
+    Write `restore_field(history, name, past)` that pushes a new state taking one named field from `past` and the rest from `history.present`.
+    Why must it go through `do()` rather than editing `_past` directly?
+7.  Save a `Drawing` with `pickle`,
+    then add a field with a default to `Drawing` and load the old bytes.
+    Does the default appear?
+    Now add a `__post_init__()` that rejects an empty title, and load again.
+    What did pickle skip, and what would `copy.replace()` have caught?

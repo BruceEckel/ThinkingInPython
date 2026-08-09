@@ -7,7 +7,7 @@ The standard library supplies two modules of such pieces.
 `itertools` assembles lazy iterators from composable parts.
 This chapter tours both toolkits,
 then turns to two techniques that pair naturally with them,
-recursion and lazy evaluation,
+lazy evaluation and recursion,
 and closes with a case study that puts several of the pieces to work on one problem.
 
 ## The `functools` Toolkit
@@ -305,6 +305,10 @@ print(describe("hi"), "|", describe(5))
 #: a str | the number 5
 ```
 
+`singledispatch()` examines only the first argument,
+so a rule that depends on two types needs [Multiple Dispatching](32_Multiple_Dispatching.md),
+and a keyword-only argument cannot drive the dispatch at all.
+
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
@@ -359,7 +363,15 @@ from itertools import repeat
 
 print(list(repeat("x", 3)))
 #: ['x', 'x', 'x']
+print(list(map(pow, range(5), repeat(2))))
+#: [0, 1, 4, 9, 16]
 ```
+
+The fixed form is a list you would have written as `["x"] * 3`.
+The infinite form is the one that earns the import:
+it supplies an argument that never changes without materializing anything,
+and here it stops when `range(5)` does,
+because `map()` stops at its shortest input.
 
 ### `islice`
 
@@ -419,6 +431,8 @@ from itertools import chain
 
 print(list(chain([1, 2], [3, 4])))
 #: [1, 2, 3, 4]
+print(list(chain.from_iterable([[1, 2], [3, 4]])))
+#: [1, 2, 3, 4]
 ```
 
 ### `pairwise`
@@ -460,9 +474,12 @@ or the running result of any two-argument function.
 ```python
 # itertools_accumulate.py
 from itertools import accumulate
+from operator import mul
 
 print(list(accumulate([1, 2, 3, 4])))
 #: [1, 3, 6, 10]
+print(list(accumulate([1, 2, 3, 4], mul)))
+#: [1, 2, 6, 24]
 ```
 
 ### `compress`
@@ -674,6 +691,84 @@ print(list(combinations_with_replacement("AB", 2)))
 #: [('A', 'A'), ('A', 'B'), ('B', 'B')]
 ```
 
+### Composing the Pieces
+
+Each entry above is one stage.
+This section opened by saying they combine,
+and combining them is where the catalog pays off:
+
+```python
+# itertools_pipeline.py
+from itertools import batched, count, islice, takewhile
+
+squares = (n * n for n in count(1))
+batches = batched(squares, 3)
+totals = (sum(b) for b in batches)
+print(list(takewhile(lambda t: t < 500, totals)))
+#: [14, 77, 194, 365]
+print(list(islice(squares, 3)))
+#: [256, 289, 324]
+```
+
+Four stages sit on top of an infinite source,
+and none of them run until `list()` pulls.
+The second `print()` is the one that teaches.
+The source resumes at 16 rather than 13,
+because `takewhile()` had to pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeded the limit.
+A pull-based pipeline reads one item further than it keeps.
+
+## Lazy Evaluation
+
+*Lazy evaluation* computes a value only when something needs it.
+A generator is the canonical example.
+It yields one value at a time instead of building a whole list up front.
+Combined with `itertools`,
+you can describe an infinite sequence and take only the part you use:
+
+```python
+# lazy.py
+from collections.abc import Iterator
+from itertools import count, islice
+
+def squares() -> Iterator[int]:
+    for n in count(1):
+        print(f"computing square {n}")  # Proves this runs on demand
+        yield n * n
+
+# count() is infinite; islice() pulls only what's needed:
+first_five = list(islice(squares(), 5))
+print(first_five)
+#: computing square 1
+#: computing square 2
+#: computing square 3
+#: computing square 4
+#: computing square 5
+#: [1, 4, 9, 16, 25]
+```
+
+`squares()` never finishes on its own,
+yet the program terminates because `islice()` requests five values.
+Each `computing square N` line appears only when `islice()` pulls that value,
+one at a time, the same way any `for` loop consumes a generator.
+`squares()` never runs ahead to precompute several values before handing one back.
+No sixth `computing square` line appears,
+because `islice()` stops asking when it has delivered five.
+The obvious-looking `list(squares())[:5]` is not the same program.
+It slices after building the list,
+so it asks `squares()` for every value before taking five,
+and the program never gets past that line.
+Slice lazily and the source can be infinite;
+slice a list and the source has to end.
+[Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
+looks at the same idea from the perspective of memory and speed.
+
+Laziness matters most at scale.
+A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
+so memory use doesn't grow with the size of the source.
+Stages chain together without building intermediate lists between them,
+and a consumer that stops early, such as `any()` or `next()`,
+means no upstream work for the items it never reaches.
+
 ## Recursion
 
 *Recursion* expresses a repeated computation as a function that calls itself.
@@ -746,58 +841,6 @@ The recursive version gets that bookkeeping from the call stack for free,
 so the body says only what to do with one element and where to descend,
 and says nothing at all about depth.
 
-## Lazy Evaluation
-
-*Lazy evaluation* computes a value only when something needs it.
-A generator is the canonical example.
-It yields one value at a time instead of building a whole list up front.
-Combined with `itertools`,
-you can describe an infinite sequence and take only the part you use:
-
-```python
-# lazy.py
-from collections.abc import Iterator
-from itertools import count, islice
-
-def squares() -> Iterator[int]:
-    for n in count(1):
-        print(f"computing square {n}")  # Proves this runs on demand
-        yield n * n
-
-# count() is infinite; islice() pulls only what's needed:
-first_five = list(islice(squares(), 5))
-print(first_five)
-#: computing square 1
-#: computing square 2
-#: computing square 3
-#: computing square 4
-#: computing square 5
-#: [1, 4, 9, 16, 25]
-```
-
-`squares()` never finishes on its own,
-yet the program terminates because `islice()` requests five values.
-Each `computing square N` line appears only when `islice()` pulls that value,
-one at a time, the same way any `for` loop consumes a generator.
-`squares()` never runs ahead to precompute several values before handing one back.
-No sixth `computing square` line appears,
-because `islice()` stops asking when it has delivered five.
-The obvious-looking `list(squares())[:5]` is not the same program.
-It slices after building the list,
-so it asks `squares()` for every value before taking five,
-and the program never gets past that line.
-Slice lazily and the source can be infinite;
-slice a list and the source has to end.
-[Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
-looks at the same idea from the perspective of memory and speed.
-
-Laziness matters most at scale.
-A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
-so memory use doesn't grow with the size of the source.
-Stages chain together without building intermediate lists between them,
-and a consumer that stops early, such as `any()` or `next()`,
-means no upstream work for the items it never reaches.
-
 ## Case Study: Pairing Rotations
 
 Pair up participants for an activity across several rounds,
@@ -844,6 +887,10 @@ def group_rounds(
 ) -> Iterator[Round]:
     history: Counter[frozenset[str]] = Counter()
     rng = random.Random(seed)
+
+    def met(group: list[str], candidate: str) -> int:
+        return sum(history[frozenset((m, candidate))] for m in group)
+
     while True:
         pool = list(students)
         rng.shuffle(pool)
@@ -852,16 +899,14 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                closest = min(pool, key=lambda c: sum(
-                    history[frozenset((m, c))] for m in group))
+                closest = min(pool, key=lambda c: met(group, c))
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
         if pool and not groups:  # Roster smaller than one group
             groups.append([])
         for extra in pool:  # Too few left for a full group of `size`
-            roomiest = min(groups, key=lambda g: sum(
-                history[frozenset((m, extra))] for m in g))
+            roomiest = min(groups, key=lambda g: met(g, extra))
             roomiest.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:
@@ -917,6 +962,15 @@ Without it, `min()` is asked for the smallest of no groups and raises a `ValueEr
 Two students and a requested size of five produce one group of two,
 because the alternative is a round in which nobody meets anyone.
 
+`met()` is called once per candidate per slot,
+which makes it the obvious place to put `@cache` from earlier in this chapter.
+Doing so would be wrong.
+`met()` reads `history`, and `history` changes at the end of every round,
+so a cached answer from round 0 would still be reported in round 6 after every count it summed had moved.
+The `cache` entry's rule that caching only works for pure functions is not a formality;
+this is the shape the mistake takes in practice.
+A function that reads mutable state is not pure, however simple its body looks.
+
 Generality cost something.
 The circle method needed no memory.
 Which pair sits where in round `r` followed from `r` alone.
@@ -932,3 +986,43 @@ where the circle method could compute round `100` directly,
 from its arithmetic alone.
 That trade, memory for generality, is the same one [Recursion](#recursion)
 makes when a loop's simple counter is not enough and the problem needs a stack instead.
+
+## Choosing From the Toolkits
+
+The rule for both modules is the same: before writing a loop,
+ask whether the loop already has a name.
+A running total is `accumulate()`, a sliding window is `pairwise()`,
+a remainder-safe chunking is `batched()`,
+and a memoized pure function is `@cache`.
+Each of those replaces a small piece of code that works the first time and fails on the empty input,
+the single element, or the last partial batch.
+
+The second rule is that the pieces are meant to be stacked.
+`islice(count(10, 2), 5)` in this chapter is two stages;
+a real pipeline is five or six, and it still holds one item in memory at a time.
+[Error Handling](42_Functional_Error_Handling.md)
+asks what happens to such a pipeline when one stage fails,
+which is the question a chain of pure functions leaves open.
+
+## Exercises
+
+1.  Rewrite `deep_sum()` from `nested_sum.py` without recursion,
+    using a list as an explicit stack.
+    Compare the two versions for length,
+    and name the places an off-by-one can hide in the loop version that do not exist in the recursive one.
+2.  `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
+    Change `maxsize` to `3`, predict the four numbers before running it,
+    then run it and account for any difference.
+3.  Write `batch_totals(source, n)`,
+    which takes an iterator and yields the sum of each `n`-element batch,
+    built only from `itertools` pieces and a generator expression.
+    Show that it stays lazy by passing it `count(1)` and taking five values.
+4.  `groupby()` on unsorted input silently returns the same key more than once.
+    Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
+    and say what it costs relative to `groupby()`.
+5.  Decorate `deep_sum()` with `@cache` and explain the exception.
+    What would have to change about the `Nested` alias for caching to be possible at all?
+6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.
+    Replace that with an `rng: random.Random` parameter.
+    Which property of the function does that preserve,
+    and which one does it hand to the caller?

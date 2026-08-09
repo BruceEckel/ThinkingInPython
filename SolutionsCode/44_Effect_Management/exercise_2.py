@@ -20,6 +20,15 @@ def greet(ask: Ask, tell: Tell, log: Log) -> None:
     name = ask.ask("What is your name? ")
     tell.tell(format_greeting(name, log))
 
+def session(ask: Ask, tell: Tell, log: Log) -> None:
+    greet(ask, tell, log)
+
+def menu(ask: Ask, tell: Tell, log: Log) -> None:
+    session(ask, tell, log)
+
+def main(ask: Ask, tell: Tell, log: Log) -> None:
+    menu(ask, tell, log)
+
 class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
@@ -35,7 +44,7 @@ class Capture:
         self.messages.append(f"LOG: {message}")
 
 captured = Capture()
-greet(Scripted(), captured, captured)
+main(Scripted(), captured, captured)
 for line in captured.messages:
     print(line)
 #: LOG: greet started

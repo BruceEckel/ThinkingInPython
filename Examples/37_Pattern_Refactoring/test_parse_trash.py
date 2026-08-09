@@ -10,7 +10,7 @@ Aluminum:2.0
 
 Glass:3.0
 """)
-    items = parse(str(data))
+    items = parse(data)
     assert [type(t).__name__ for t in items] == ["Aluminum", "Glass"]
     assert items[0].weight == 2.0
     assert items[1].weight == 3.0

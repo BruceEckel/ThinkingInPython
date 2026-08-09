@@ -463,6 +463,12 @@ def main(argv: list[str] | None = None) -> int:
     add_jobs_arg(ap, 'files')
     args = ap.parse_args(argv)
 
+    # run_location() puts the tree on sys.path and then chdir()s into the
+    # chapter directory, so a relative --tree stops resolving the moment
+    # the chdir happens and every sibling import fails. run_examples.py has
+    # the same trap; here it is fixed once for every caller.
+    args.tree = args.tree.resolve()
+
     files = collect_files(args.targets)
     if not files:
         print("No .py or .md files found.")

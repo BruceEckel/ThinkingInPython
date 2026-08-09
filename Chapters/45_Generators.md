@@ -175,14 +175,7 @@ the same three-part shape as a `Generator`, and the match is deliberate.
 Calling `interview()` returns a generator object but doesn't run anything in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
-One generator, one driver.
-Nothing states that pairing, but the runtime protects it:
-a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
-[Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
-shows the failure and `threading.synchronized_iterator()`,
-which serializes the conversation.
-
-A generator is more interesting than a coroutine here because `yield` is a two-way channel.
+A generator is the more useful of the two here because you can be its driver.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
@@ -204,9 +197,10 @@ def drive(conversation: Generator[Question, Answer, Result],
           answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
-        print(f"{request = }, {answers[request] = }")
+        answer = answers[request]
+        print(f"{request = }, {answer = }")
         try:
-            request = conversation.send(answers[request])
+            request = conversation.send(answer)
         except StopIteration as stop:
             return stop.value
 
@@ -216,9 +210,9 @@ if __name__ == "__main__":
     result = drive(conversation, ANSWERS)
     print(f"{result = }")
 #: <class 'generator'>: interview
-#: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'friend', answer = 'Rabbit'
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
@@ -252,6 +246,13 @@ Swapping the dictionary for a database changes a single argument.
 
 That is EMS in miniature.
 The generator declares Effects, the driver interprets them.
+
+One generator, one driver.
+Nothing states that pairing, but the runtime protects it:
+a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
+[Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
+shows the failure and `threading.synchronized_iterator()`,
+which serializes the conversation.
 
 ## `yield from` Composes Descriptions
 
@@ -298,6 +299,8 @@ so the line delegating to `one()` contributes one value and the line delegating 
 The number of contributions is a property of the target.
 The `from` is what makes this delegation:
 `yield one()` would hand the generator object itself to the driver as one value.
+"Exhausted" describes where the delegation ends, not when it happens:
+each value still leaves the inner generator only when the driver asks for the next one.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -389,6 +392,41 @@ The numbers travel down to the `yield` that asked for them.
 `g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
 `both()` contains no code that forwards the value because `yield from` does that forwarding.
 
+Writing the loop by hand is the natural first attempt, and it fails quietly:
+
+```python
+# manual_forwarding.py
+from collections.abc import Generator
+
+def collect(name: str) -> Generator[str, int]:
+    first = yield f"{name} needs a value"
+    second = yield f"{name} needs another"
+    print(f"{name} got {first} and {second}")
+
+def manual() -> Generator[str, int]:
+    for prompt in collect("alpha"):  # noqa: UP028
+        yield prompt
+
+g = manual()
+print(next(g))
+#: alpha needs a value
+try:
+    for value in [1, 2, 3]:
+        print(g.send(value))
+except StopIteration:
+    print("manual() is exhausted")
+#: alpha needs another
+#: alpha got None and None
+#: manual() is exhausted
+```
+
+`manual()` forwards what it receives from `collect()` and nothing in the other direction.
+Each `send()` delivers its value to `manual()`'s own `yield`, which throws it away,
+and the `for` loop resumes `collect()` with `next()`,
+so both of `collect()`'s `yield` expressions produce `None`.
+The checker says nothing: `manual()` is a valid `Generator[str, int]`.
+`yield from` is not shorthand for this loop, and the difference is the send channel.
+
 `g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
 which completes the first `yield from`, which starts the second one.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
@@ -417,11 +455,11 @@ def interview() -> Generator[Question, Answer, Result]:
 
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
-#: request = 'name', answers[request] = 'Alice'
+#: request = 'name', answer = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
+#: request = 'town', answer = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'friend', answer = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit
 ```
@@ -468,13 +506,13 @@ def survey() -> Generator[Question, Answer, Result]:
 
 print(drive(survey(),
             ANSWERS | {Question("color"): Answer("blue")}))
-#: request = 'name', answers[request] = 'Alice'
+#: request = 'name', answer = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
+#: request = 'town', answer = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'friend', answer = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
-#: request = 'color', answers[request] = 'blue'
+#: request = 'color', answer = 'blue'
 #: ask(question = 'color') -> answer = 'blue'
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
@@ -499,6 +537,9 @@ and the request stops there.
 `yield from` answers nothing.
 It relays the request upward and passes the reply back down untouched,
 so `survey()` has no idea what a `Question` means.
+`yield from` relays `throw()` and `close()` the same way,
+so an exception thrown at the driver surfaces inside the innermost generator,
+and a `close()` unwinds every frame in the chain.
 `StopIteration` splits the same way.
 Both catch it and both take `stop.value`, but they hand it to different places.
 `drive()` returns the `Result` to its own caller, ending the conversation.
@@ -544,6 +585,8 @@ That is the question the next chapter puts into the type system.
     Write a second driver that answers from an `Iterator[Answer]`, in order,
     and run `interview()` under both.
     Explain what had to change in `interview()`, and why.
+    Give your driver fewer answers than there are questions and say what it returns.
+    `StopIteration` now means two different things in the same loop; keep them apart.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,

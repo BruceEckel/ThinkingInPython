@@ -849,7 +849,7 @@ The steps must happen in an order, later steps depend on earlier ones,
 and rules span the steps.
 `GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze) qualifies.
 It assembles a maze in three stages, creating rooms, connecting doors,
-then placing the robot,
+then pairing the teleports that share a target letter,
 and each stage relies on what the previous stage established.
 No single constructor call can express that.
 The standard library's `argparse.ArgumentParser` has the same shape.

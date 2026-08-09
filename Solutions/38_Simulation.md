@@ -246,10 +246,14 @@ both membership tests pass. Only after both have already committed to
 succeeding does either one actually call `self.visited.add((2, 2))`.
 The result is two rats that each believe they alone claimed the same
 cell: both move into it, which breaks the invariant that "no two rats
-ever cover the same ground" and, when run inside `test_rats_and_mazes.py`'s
-full maze, can leave some other reachable cell unclaimed entirely,
-since one of the two rats that collided on `(2, 2)` would otherwise
-have gone on to claim a different cell instead.
+ever cover the same ground." Nothing goes unexplored. Both rats proceed
+from the shared cell and duplicate each other's work from there, while
+`visited` stays exactly correct, which is why
+`test_rats_and_mazes.py` passes on the broken version every time: it
+asserts the set of cells reached, and the set is a set. Counting the
+`True` results against `len(blackboard.visited)` is what exposes the
+collision, since the broken `claim()` succeeds more often than there
+are cells.
 
 The original `claim()` needs no lock precisely because it has no
 `await` between the test and the add. A coroutine only ever yields

@@ -54,9 +54,25 @@ dictionary has never seen before, which `defaultdict` handles the same
 way it handles every other new key. `parse_trash.py` needs no change
 because it only ever calls `Trash.create(name, weight)` with a name
 string read from the file; it never names a concrete material itself.
-The only files that change are `trash.dat` (adding `Plastic:NN` lines)
+The only files that change are the data (adding `Plastic:NN` lines)
 and, if `Plastic` deserves special handling, one
 `@recycling_note.register` function.
+
+Accounting for the plastic in `plastic_dropped.py` is the other half.
+It parses four pieces and bins two, so twenty and forty pounds of
+plastic are missing from every total the report prints. No `case`
+matches a `Plastic`, and the `match` has no `case _`, so the loop body
+runs zero times for those pieces and the program continues. The plant
+gets a report that balances against nothing.
+
+`test_subclasses_self_register` is the test that fails, because it pins
+the registry to exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}`
+and `Plastic` is now a fifth entry. That failure is correct behavior
+for it. The test exists to prove that defining a subclass registers it,
+so a new material *should* move the assertion; a test that passed here
+would mean `__init_subclass__()` had stopped doing its job. Update the
+expected set and the test goes back to guarding what it was written to
+guard.
 
 ## 2. `price()` and `heaviest()`
 
@@ -182,3 +198,79 @@ dispatch. When no such state exists, as here, the free-function
 version from `recycling_note.py` is simpler and does the identical
 job; use `singledispatchmethod` only once the operation needs a home
 on an object.
+
+## 4. Exact-type bins against MRO dispatch
+
+```python
+# exercise_4.py
+from collections import defaultdict
+from functools import singledispatch
+from typing import ClassVar
+
+class Trash:
+    value: ClassVar[float] = 0.0
+    bin: ClassVar[type[Trash]]
+
+    def __init__(self, weight: float) -> None:
+        self.weight = weight
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        if "bin" not in cls.__dict__:
+            cls.bin = cls
+
+class Aluminum(Trash):
+    value = 1.67
+
+class CrushedAluminum(Aluminum):
+    value = 1.67
+    bin = Aluminum
+
+class Glass(Trash):
+    value = 0.23
+
+@singledispatch
+def recycling_note(t: Trash) -> str:
+    return f"{type(t).__name__}: no special handling"
+
+@recycling_note.register
+def _(t: Aluminum) -> str:
+    return "Aluminum: crush and bale"
+
+pieces: list[Trash] = [
+    Aluminum(30.0), CrushedAluminum(20.0), Glass(10.0)]
+
+exact: dict[type[Trash], list[Trash]] = defaultdict(list)
+for t in pieces:
+    exact[type(t)].append(t)
+print(sorted(k.__name__ for k in exact))
+#: ['Aluminum', 'CrushedAluminum', 'Glass']
+
+print(recycling_note(CrushedAluminum(1.0)))
+#: Aluminum: crush and bale
+
+shared: dict[type[Trash], list[Trash]] = defaultdict(list)
+for t in pieces:
+    shared[t.bin].append(t)
+print(sorted(k.__name__ for k in shared))
+#: ['Aluminum', 'Glass']
+```
+
+`bins[type(t)]` is a dictionary probe on the exact class, so
+`CrushedAluminum` is a key the dictionary has never seen and gets a bin
+of its own. `singledispatch` resolves through the MRO instead, finds no
+registration for `CrushedAluminum`, and takes `Aluminum`'s. Both
+behaviors are deliberate and neither is a fallback: the sorter wants to
+know precisely what arrived, and the note wants the nearest answer
+anyone has written.
+
+Sharing a parent's bin without naming a material in the loop means
+choosing your own key instead of accepting `type(t)`. A `bin` class
+variable does it: `__init_subclass__()` defaults each class to itself,
+so nothing changes for a material that does not opt in, and
+`CrushedAluminum` sets `bin = Aluminum` to opt in. The sorting loop
+becomes `shared[t.bin].append(t)` and still names nothing.
+
+The lesson generalizes past this exercise. `type(t)` is a convenient
+key, not an inevitable one, and a design that declares its key can
+express groupings the type hierarchy does not.

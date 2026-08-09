@@ -16,7 +16,7 @@ class Trash:
 
     @classmethod
     def create(cls, name: str, weight: float) -> Trash:
-        return Trash.registry[name](weight)
+        return cls.registry[name](weight)
 
 class Aluminum(Trash):
     value = 1.67

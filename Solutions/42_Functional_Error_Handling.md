@@ -24,8 +24,8 @@ class Ok[A]:
 class Err[E]:
     error: E
 
-    def bind[B](
-        self, func: Callable[..., Result[B, E]]
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
     ) -> Err[E]:
         return self  # Pass the failure forward unchanged
 
@@ -102,8 +102,8 @@ class Ok[A]:
 class Err[E]:
     error: E
 
-    def bind[B](
-        self, func: Callable[..., Result[B, E]]
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
     ) -> Err[E]:
         return self
 
@@ -222,3 +222,211 @@ from a plain `isinstance()` check, which Python's runtime type
 erasure makes impossible in general; `ty` reports that gap as
 an error. Two small concrete classes sidestep the problem entirely,
 since there is no parameter to lose.
+
+## 4. `@safe(ValueError)`, catching only what you name
+
+```python
+# exercise_4.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import wraps
+from typing import Protocol, final
+
+@final
+@dataclass(frozen=True)
+class Ok[A]:
+    answer: A
+
+@final
+@dataclass(frozen=True)
+class Err[E]:
+    error: E
+
+type Result[A, E] = Ok[A] | Err[E]
+
+class SafeDecorator(Protocol):
+    def __call__[**P, A](
+        self, func: Callable[P, A]
+    ) -> Callable[P, Result[A, Exception]]: ...
+
+def safe(*catch: type[Exception]) -> SafeDecorator:
+    def decorate[**P, A](
+        func: Callable[P, A]
+    ) -> Callable[P, Result[A, Exception]]:
+        @wraps(func)
+        def wrapper(
+            *args: P.args, **kwargs: P.kwargs
+        ) -> Result[A, Exception]:
+            try:
+                return Ok(func(*args, **kwargs))
+            except catch as e:
+                return Err(e)
+        return wrapper
+    return decorate
+
+@safe(ValueError)
+def parse(text: str) -> int:
+    if not text.isdigit():
+        raise TypeError(f"{text!r} is not digits")
+    return int(text)
+
+print(parse("42"))
+#: Ok(answer=42)
+try:
+    parse("oops")
+except TypeError as e:
+    print(f"escaped: {type(e).__name__}: {e}")
+#: escaped: TypeError: 'oops' is not digits
+```
+
+`safe()` gains a layer: it now takes the exception types and returns
+the decorator, instead of being the decorator. The `except catch`
+clause accepts the tuple directly, which is why the whole change is
+one parameter and one word.
+
+`parse("42")` still comes back as an `Ok`. `parse("oops")` raises a
+`TypeError`, which is not in the caught tuple, so it propagates
+through `wrapper` untouched and the caller sees an ordinary traceback.
+Under the chapter's `@safe` it would have arrived as
+`Err(TypeError(...))`, indistinguishable from a bad-input failure.
+
+The `SafeDecorator` protocol is what keeps the types honest. `safe()`
+returns a function that is itself generic over the function it
+decorates, and there is no way to say that with a plain
+`Callable[...]` annotation: the type parameters belong to the returned
+callable, not to `safe()`. A protocol with a generic `__call__` says
+exactly that, and it is why `parse` keeps the signature
+`(str) -> Result[int, Exception]` rather than degrading to `Any`.
+
+## 5. Notes that survive as data
+
+```python
+# exercise_5.py
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import final
+
+@final
+@dataclass(frozen=True)
+class Ok[A]:
+    answer: A
+
+    def bind[B, E](
+        self, func: Callable[[A], Result[B, E]]
+    ) -> Result[B, E]:
+        return func(self.answer)
+
+@final
+@dataclass(frozen=True)
+class Err[E]:
+    error: E
+
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
+    ) -> Err[E]:
+        return self
+
+type Result[A, E] = Ok[A] | Err[E]
+
+def load_setting(name: str, text: str) -> Result[int, Exception]:
+    try:
+        return Ok(int(text))
+    except ValueError as e:
+        e.add_note(f"setting {name!r} received {text!r}")
+        return Err(e)
+
+def report(result: Result[int, Exception]) -> None:
+    match result:
+        case Ok(answer):
+            print(f"ok: {answer}")
+        case Err(error):
+            print(f"failed: {type(error).__name__}")
+            for note in error.__notes__:
+                print(f"  {note}")
+
+report(load_setting("timeout", "30").bind(
+    lambda _: load_setting("retries", "3")))
+#: ok: 3
+report(load_setting("timeout", "soon").bind(
+    lambda _: load_setting("retries", "3")))
+#: failed: ValueError
+#:   setting 'timeout' received 'soon'
+report(load_setting("timeout", "30").bind(
+    lambda _: load_setting("retries", "many")))
+#: failed: ValueError
+#:   setting 'retries' received 'many'
+```
+
+Each failure reports the setting that caused it, and the second and
+third runs differ only in which name appears in the note. The note
+travels inside the `Err` as ordinary data, so `report()` can print it
+long after the frame that knew the setting name has returned. Nothing
+is reconstructed from a traceback, because there is no traceback.
+
+The answer to the question is that there is no note to lose. A
+successful `load_setting()` never enters the `except` branch, so it
+never calls `add_note()`, and an `Ok` carries no exception to hang a
+note on. Notes attach to exceptions, so only the failing path has
+one, which is the reason the failing path is the only one that needs
+to explain itself.
+
+The lambdas ignore their parameter, since the second setting does not
+depend on the first one's value. That is the case `bind()` reads worst
+for: it exists to thread an answer forward, and here there is no
+answer to thread, only an ordering. This is where the do-notation
+mentioned in [The returns Library](../Chapters/42_Functional_Error_Handling.md#the-returns-library)
+reads better than nested binds.
+
+## 6. `int | None` collapses the three failures into one
+
+```python
+# exercise_6.py
+def func_a(i: int) -> int | None:
+    if i == 1:
+        return None
+    return i
+
+def func_b(i: int) -> int | None:
+    if i == 2:
+        return None
+    return i
+
+def func_c(i: int) -> int | None:
+    try:
+        1 / (i - 3)
+    except ZeroDivisionError:
+        return None
+    return i
+
+def composed(i: int) -> int | None:
+    a = func_a(i)
+    if a is None:
+        return None
+    b = func_b(a)
+    if b is None:
+        return None
+    return func_c(b)
+
+for i in range(5):
+    print(i, composed(i))
+#: 0 0
+#: 1 None
+#: 2 None
+#: 3 None
+#: 4 4
+```
+
+The caller can tell apart nothing at all. Inputs `1`, `2`, and `3`
+fail in three different functions for three different reasons, and
+all three arrive as the same `None`. Compare the `Result` version,
+where the same three inputs report `func_a(1)`, `func_b(2)`, and
+`func_c(3): division by zero`.
+
+The structure of `composed()` barely changed: `if a is None` replaced
+`if isinstance(a, Err)`, and the early returns stayed. What changed is
+what survives the return. `None` is a single value with no room to
+carry a reason, so every failure that reaches it becomes the same
+failure. This is the trade the chapter names: use `| None` when
+absence is the whole story, and a `Result` when the caller may need to
+act on which failure occurred, or when a person reading a bug report
+needs to know which of three steps went wrong.

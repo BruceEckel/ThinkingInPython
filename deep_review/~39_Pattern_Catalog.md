@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -397,7 +398,7 @@ plus chapter 21:
     Say what distinguishes them, then check your answer against
     [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
 
-[] Reject
+[X] Reject
 
 ---
 

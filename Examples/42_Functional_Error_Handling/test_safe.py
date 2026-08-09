@@ -1,10 +1,6 @@
 # test_safe.py
 from result import Err, Ok
-from safe import safe
-
-@safe
-def parse(text: str) -> int:
-    return int(text)
+from safe_demo import parse
 
 def test_safe_wraps_a_success() -> None:
     assert parse("42") == Ok(42)

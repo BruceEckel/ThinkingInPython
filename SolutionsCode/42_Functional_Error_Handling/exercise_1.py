@@ -19,8 +19,8 @@ class Ok[A]:
 class Err[E]:
     error: E
 
-    def bind[B](
-        self, func: Callable[..., Result[B, E]]
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
     ) -> Err[E]:
         return self  # Pass the failure forward unchanged
 

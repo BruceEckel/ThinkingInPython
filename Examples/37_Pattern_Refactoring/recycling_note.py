@@ -1,6 +1,5 @@
 # recycling_note.py
 from functools import singledispatch
-from parse_trash import parse
 from trash import Aluminum, Cardboard, Glass, Trash
 
 @singledispatch
@@ -19,12 +18,9 @@ def _(t: Glass) -> str:
 def _(t: Cardboard) -> str:
     return "Cardboard: flatten and bundle"
 
-seen: set[type[Trash]] = set()
-for t in parse("trash.dat"):
-    if type(t) not in seen:
-        seen.add(type(t))
-        print(recycling_note(t))
-#: Glass: sort by color, then crush
-#: Paper: no special handling
+for cls in Trash.registry.values():
+    print(recycling_note(cls(1.0)))
 #: Aluminum: crush and bale
+#: Paper: no special handling
+#: Glass: sort by color, then crush
 #: Cardboard: flatten and bundle

@@ -50,6 +50,31 @@ the same move you make in algebra.
 This property lets you check parts of a program,
 and sometimes prove them correct.
 
+An impure function shows what the property is worth by lacking it:
+
+```python
+# not_transparent.py
+balance = 100
+
+def withdraw(amount: int) -> int:
+    global balance
+    balance -= amount
+    return balance
+
+print(withdraw(30) + withdraw(30))
+#: 110
+balance = 100
+print(70 + withdraw(30))
+#: 140
+```
+
+The first `withdraw(30)` evaluates to `70`,
+so substituting `70` for it ought to change nothing.
+It changes `110` into `140`.
+`withdraw()` is not referentially transparent,
+and neither is any expression containing it,
+which is why the substitution reasoning above stops at the first impure call.
+
 This property is also the quiet reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
 is safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
@@ -58,45 +83,6 @@ from a cache to a database query planner,
 benefits from referential transparency.
 The more your program is referentially transparent, the more of it a machine,
 or a proof, can verify.
-
-## Declarative Style
-
-*Declarative* code states the result you want.
-*Imperative* code spells out each step to produce it.
-A comprehension is the everyday example
-(see [Comprehensions](16_Comprehensions.md)).
-The loop that filters and appends says *how*.
-`[n * n for n in numbers if n % 2 == 0]` says *what*,
-which is "the squares of the even numbers."
-It leaves the looping to Python.
-This is the broader "functionality" you want.
-Describe the result, and let the machine arrange the steps.
-By naming the result instead of the steps,
-you hand the reader your intent and give the runtime freedom to choose how to deliver it.
-That freedom is why a SQL query, a NumPy expression,
-or a dataframe operation can run on an optimized or parallel engine you never see.
-You described the what, not a fixed sequence of moves.
-
-## Pattern Matching as Destructuring
-
-The `match` statement, covered in [Pattern Matching](13_Pattern_Matching.md),
-is a declarative tool for taking data apart.
-You describe the structures you expect, and Python binds the pieces.
-One `match` collapses a stack of `isinstance()` tests, length checks,
-and key or index lookups into a single readable description of each shape.
-The test and the extraction happen together,
-so there is no gap where you have confirmed the shape but not yet pulled out its parts.
-This pays off most on shaped data, such as parsed JSON, an abstract syntax tree,
-or the messages of a protocol,
-where the alternative is a thicket of nested conditionals.
-[Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
-put this to work, taking a `Result` apart with one branch per kind of failure.
-
-That is a runtime win rather than a checking win.
-`ty` narrows `case Ok(answer)` on a `Result[float, Exception]` to `object`,
-losing the `float`, which is why a later listing in that chapter tests with `isinstance()` instead.
-Destructuring makes the shape test and the extraction one step;
-it does not extend what a checker can prove.
 
 ## Automatic Parallelism
 
@@ -163,6 +149,41 @@ and without the guard every worker would build a pool of its own.
 [Concurrency](19_Concurrency.md#parallelism) covers all of this,
 along with the reasons Python parallelism uses processes rather than threads.
 
+## Declarative Style
+
+*Declarative* code states the result you want.
+*Imperative* code spells out each step to produce it.
+A comprehension is the everyday example
+(see [Comprehensions](16_Comprehensions.md)).
+`squares = []`, then `for n in numbers:`, then `if n % 2 == 0:`,
+then `squares.append(n * n)` says *how*.
+`[n * n for n in numbers if n % 2 == 0]` says *what*,
+which is "the squares of the even numbers."
+It leaves the looping to Python.
+A description of the result is also easier to check than a sequence of steps,
+because there is less of it to be wrong about.
+By naming the result instead of the steps,
+you hand the reader your intent and give the runtime freedom to choose how to deliver it.
+That freedom is why a SQL query, a NumPy expression,
+or a dataframe operation can run on an optimized or parallel engine you never see.
+You described the what, not a fixed sequence of moves.
+
+`match` applies the same idea to taking data apart
+(see [Pattern Matching](13_Pattern_Matching.md)).
+You describe the shapes you expect and Python binds the pieces,
+so one `match` replaces a stack of `isinstance()` tests, length checks,
+and key or index lookups,
+with no gap between confirming a shape and pulling out its parts.
+[Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+put that to work, taking a `Result` apart with one branch per kind of failure.
+The win is in the reading rather than in what a checker can prove.
+On a `Result[float, Exception]`,
+`match` and a chain of `isinstance()` tests narrow equally well,
+both reaching `float` inside the `Ok`,
+because `@final` on the two classes is what lets either one land on a single class.
+Destructuring makes the shape test and the extraction one step;
+it does not extend what the checker knows.
+
 ## An Assurance Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
@@ -175,7 +196,10 @@ You decide how far to take it.
    Pure functions and immutable values let you understand one piece at a time,
    with no hidden state to carry in your head.
    Most code never needs more.
-2. Next is type checking.
+2. Next are tests over chosen examples, the subject of [Testing](11_Testing.md).
+   Each one pins a single input to a single answer,
+   so the assurance you get is exactly as wide as the examples you think of.
+3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
    Python's version of it is partial.
@@ -184,17 +208,17 @@ You decide how far to take it.
    so the theorem holds only as far as the annotations do.
    Running `ty` over the examples in this book still rules out a useful class of mistakes,
    which is most of what this rung is for.
-3. Above that is [*property-based testing*](#property-based-testing).
+4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
    It does not prove the law.
    It works to falsify it, which is the falsifiability the opening asked for.
-4. At the top is formal proof.
+5. At the top is formal proof.
    Dependently-typed languages such as Lean, Idris, and Rocq (formerly Coq)
    prove a program correct for every possible input, checked by machine.
    This is real, but rare outside specialized work.
 
-### Property-Based Testing
+## Property-Based Testing
 
 You can write a property check by hand,
 looping over random inputs and asserting the law.
@@ -207,11 +231,11 @@ and shrinks any failure to a minimal counterexample:
 import random
 
 def encode(text: str) -> str:
-    # A trivial reversible transform:
-    return text[::-1]
+    # Reversible, and not its own inverse:
+    return text.encode().hex()
 
 def decode(text: str) -> str:
-    return text[::-1]
+    return bytes.fromhex(text).decode()
 
 random.seed(42)  # A failing search must be reproducible
 alphabet = "abcde"
@@ -241,15 +265,18 @@ so it reaches inputs the loop can never produce, such as unusual Unicode:
 from hypothesis import given, strategies
 
 def encode(text: str) -> str:
-    return text[::-1]
+    return text.encode().hex()
 
 def decode(text: str) -> str:
-    return text[::-1]
+    return bytes.fromhex(text).decode()
 
 @given(strategies.text())
 def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample
 ```
+
+The two functions are repeated here rather than imported,
+because importing `property_check.py` would run its thousand-iteration loop inside the test run.
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
 By default there are a hundred of them,
@@ -258,6 +285,43 @@ because Hypothesis aims at boundaries and oddities instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
+
+Shrinking is easier to believe once you watch it happen,
+so here is a codec with a real bug in it:
+
+```python
+# shrinking.py
+from hypothesis import given, settings, strategies
+
+def encode(text: str) -> str:
+    return text.replace(" ", "_")
+
+def decode(text: str) -> str:
+    return text.replace("_", " ")
+
+@settings(derandomize=True, database=None)
+@given(strategies.text())
+def roundtrip(sample: str) -> None:
+    assert decode(encode(sample)) == sample
+
+try:
+    roundtrip()
+except AssertionError as e:
+    print(e.__notes__[0])
+#: Failing test case: roundtrip(
+#:     sample='_',
+#: )
+```
+
+An underscore that was in the input comes back as a space.
+Hypothesis finds a failing string and then keeps cutting it down until nothing more can be removed without the test passing again,
+so what it reports is `'_'` rather than the longer string it happened to fail on first.
+That single character is the whole bug statement.
+`derandomize=True` fixes the search so this book gets the same answer every run,
+and `database=None` keeps it from replaying a case saved by an earlier run;
+a real test wants neither.
+`roundtrip()` is called directly, inside a `try`,
+because a `test_` function that fails is supposed to fail the build.
 
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
@@ -269,7 +333,7 @@ An *oracle* states that two implementations agree: the simple,
 obviously correct version matches the fast one,
 which is exactly what `parallel_pure.py`'s `assert parallel == serial` already claimed.
 The trap to avoid is a property that restates the implementation:
-asserting `encode(text) == text[::-1]` tests nothing,
+asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
@@ -296,10 +360,17 @@ and test as statements about what is true.
 That, more than the presence of functions,
 is the "functionality" the introduction set out to find.
 
+Part V takes the same discipline one step further and asks the type checker to enforce it:
+[Effect Management](44_Effect_Management.md)
+puts a function's effects in its signature,
+and the chapters after it build a checked system on that idea.
+
 ## Exercises
 
-1.  In `parallel_pure.py`, add a fifth limit, `50_000`, to the `limits` list,
-    and confirm `parallel == serial` still holds after the change.
+1.  Change `count_primes()` to return `(count, os.getpid())` and print the set of process IDs alongside the counts.
+    How many distinct IDs do you get,
+    and how does that compare to `os.process_cpu_count()`?
+    Then replace `ProcessPoolExecutor` with `ThreadPoolExecutor` and explain the IDs you see instead.
 2.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
     an invariant (every adjacent pair of the output is ordered) and idempotence
     (sorting a sorted list changes nothing).
@@ -315,3 +386,10 @@ is the "functionality" the introduction set out to find.
     Then break `group_rounds()` on purpose, run the test twice,
     and confirm the same counterexample arrives both times:
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
+5.  Write a function that is *not* referentially transparent without using `global`:
+    one that reads `datetime.now()`, and one that reads an environment variable.
+    For each, name the substitution that would change the program's behavior,
+    then rewrite it so the value arrives as an argument.
+6.  Take the `describe()` function from [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+    and rewrite its `match` as `isinstance()` tests.
+    Count the lines, then run `ty` on both and compare what each one knows about the value inside the `Ok`.

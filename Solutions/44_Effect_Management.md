@@ -87,6 +87,15 @@ def greet(ask: Ask, tell: Tell, log: Log) -> None:
     name = ask.ask("What is your name? ")
     tell.tell(format_greeting(name, log))
 
+def session(ask: Ask, tell: Tell, log: Log) -> None:
+    greet(ask, tell, log)
+
+def menu(ask: Ask, tell: Tell, log: Log) -> None:
+    session(ask, tell, log)
+
+def main(ask: Ask, tell: Tell, log: Log) -> None:
+    menu(ask, tell, log)
+
 class Scripted:
     def ask(self, prompt: str) -> str:
         return "Alice"
@@ -102,7 +111,7 @@ class Capture:
         self.messages.append(f"LOG: {message}")
 
 captured = Capture()
-greet(Scripted(), captured, captured)
+main(Scripted(), captured, captured)
 for line in captured.messages:
     print(line)
 #: LOG: greet started
@@ -110,22 +119,24 @@ for line in captured.messages:
 #: Hello, Alice!
 ```
 
-Two signatures had to change: `format_greeting()`, which uses the new
-Effect, and `greet()`, which uses it and also has to accept it so it
-can pass it down. Every call site of `greet()` changed too, so the
-edit count is two definitions plus however many callers exist. In this
-listing that is one caller. In a program where `greet()` sits four
-levels down from `main()`, it would be two definitions plus three
-intermediate functions that neither log nor care, each gaining a
-parameter it only forwards.
+Five signatures had to change, and only two of them wanted to.
+`format_greeting()` uses the new Effect. `greet()` uses it and also
+has to accept it so it can pass it down. Then `session()`, `menu()`,
+and `main()` each gained a `log` parameter they do nothing with except
+hand to the next function.
 
-That is the bookkeeping the chapter describes, and its cost scales the
-wrong way. The functions that pay are the ones between the Effect's
-user and the place the binding is chosen, and they pay for an Effect
-they do not use. Adding a fifth Effect later means walking the same
-chain again. The alternative most codebases pick, a module-level
-logger, removes the parameter by removing the choice: the function no
-longer says it logs, and a test can no longer bind it differently.
+Three of five is the number worth sitting with. The functions that pay
+are the ones between the Effect's user and the place the binding is
+chosen, and they pay for an Effect they never mention again. Their
+signatures now describe a capability they do not exercise, so a reader
+of `menu()` learns something false about what `menu()` does.
+
+The cost also scales the wrong way. Adding a fifth Effect later means
+walking the same chain again, and the chain is longer in a real
+program than in this one. The alternative most codebases pick, a
+module-level logger, removes the parameter by removing the choice: the
+function no longer says it logs, and a test can no longer bind it
+differently.
 
 An Effect Management System collapses this to one edit. `format_greeting()`
 declares in its return type that it needs a `Log`, and that requirement
@@ -238,3 +249,81 @@ every function that touches the value. Every function downstream of a
 `PositiveInt` is pure with respect to this failure without writing a
 line about it, and its signature says which values it accepts instead
 of leaving that to a docstring.
+
+## 5. What `async` tracks, and what it does not
+
+```python
+# exercise_5.py
+import asyncio
+
+PRICES = {"apple": 1.5, "pear": 2.0}
+
+def price_of(item: str) -> float:
+    return PRICES[item]
+
+def total_price(items: list[str]) -> float:
+    return sum(price_of(item) for item in items)
+
+async def price_of_async(item: str) -> float:
+    await asyncio.sleep(0)
+    return PRICES[item]
+
+async def total_price_async(items: list[str]) -> float:
+    return sum([await price_of_async(item) for item in items])
+
+basket = ["apple", "pear"]
+print(total_price(basket))
+#: 3.5
+print(asyncio.run(total_price_async(basket)))
+#: 3.5
+description = price_of_async("apple")
+print(type(description).__name__)
+#: coroutine
+description.close()  # Never awaited, so close it explicitly
+```
+
+Making the helper `async` forces four changes, and none of them is
+optional. `price_of_async("apple")` no longer returns a `float`, it
+returns a coroutine, which the last `print()` shows. `total_price()`
+therefore cannot sum the results, so every call needs `await`. Only an
+`async def` may contain `await`, so `total_price()` becomes
+`total_price_async()`. Its callers then face the same choice, and the
+propagation stops only at `asyncio.run()`, which is the boundary where
+the Effect is discharged.
+
+That propagation is Effect tracking, and it is worth naming as such.
+The Effect appears in the type: `ty` reports
+`price_of_async`'s return as `Coroutine[Any, Any, float]`, not
+`float`, and a caller that forgets `await` gets a type error rather
+than a mysterious value. The Effect travels outward automatically,
+exactly as the chapter says an EMS should propagate, and it reaches
+the edge of the program where a single call binds it. `async` satisfies
+property 1 of the three-item list without anyone calling it an Effect
+system.
+
+It satisfies neither of the other two.
+
+It does not **separate the interface from the implementation**.
+`await price_of_async(item)` names no capability. It says "run this
+particular coroutine," and the coroutine's body decides what awaiting
+means. Compare `Ask` in `ask_tell.py`, where `greet()` names the
+capability and stays silent about how a name is obtained. There is no
+`async` equivalent of writing a function against "something awaitable
+that yields a price" and choosing later which one.
+
+It does not **bind the implementation later**. `asyncio.run()` chooses
+an event loop, which sounds like late binding until you ask what it
+lets you swap. It does not let a test substitute a different meaning
+for the awaits inside; those are fixed when the coroutine is written.
+A test that wants fake prices still has to inject
+`price_of_async` itself, by the same hand-threading this chapter's
+exercise 2 measures. The event loop is a scheduler, not a handler.
+
+So `async` is an Effect-tracking system rather than a full EMS, in the
+same sense as most of the AI languages in
+[Custom AI Languages with Effects](../Chapters/44_Effect_Management.md#custom-ai-languages-with-effects).
+It tracks one fixed Effect, chosen by the language, with the
+implementation welded to the call site. That is also why the
+propagation is experienced as a nuisance rather than a benefit: you
+get the bookkeeping cost of Effect tracking without the delayed
+binding that would repay it.

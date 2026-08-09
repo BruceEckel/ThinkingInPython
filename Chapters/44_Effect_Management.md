@@ -1,5 +1,11 @@
 # Effect Management
 
+A test you wrote last week starts failing about one run in five.
+The function it calls computes a total price, the math is right,
+and three calls down, inside a helper that formats currency,
+there is a read from a configuration service and a write to an audit log.
+None of that is in any signature on the path.
+
 This book has emphasized the benefits of pure functions in numerous places:
 
 - [Foundations](40_Functional_Foundations.md#pure-functions)
@@ -20,10 +26,9 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Composite and Interpreter](34_Composite_and_Interpreter.md#simplification-rewrites-the-tree)
   has `simplify()` return a new tree instead of editing the one it receives.
 
-There's one important thing these all have in common:
-you can verify function purity just by examining the code in that function.
+In every one of those cases you can settle the question by reading one function.
 
-What happens if your potentially pure function calls other functions?
+What happens when a function you believe is pure calls other functions?
 If one or more of those other functions have side effects,
 their impurity causes the calling function to also be impure.
 To discover whether a function is impure,
@@ -112,86 +117,6 @@ To know the Effects that your function has,
 exceptions must be tracked as Effects on all functions.
 Effects therefore come in three kinds: side effects, side causes,
 and exceptions.
-
-## A Program Can Never Be Pure
-
-A perfectly pure program computes something but never lets anyone see it.
-It reads nothing from its environment and changes nothing in its environment,
-so its result never reaches a screen, a file, a socket,
-or even the exit code the operating system checks.
-From outside the process,
-that program is indistinguishable from a program that computes nothing.
-
-```python
-# pure_and_pointless.py
-import timeit
-from benchmark import report
-
-def compute_and_discard() -> None:
-    total = 0
-    for i in range(2_000_000):
-        total += i * i
-
-def do_nothing() -> None:
-    pass
-
-busy = timeit.timeit(compute_and_discard, number=5)
-idle = timeit.timeit(do_nothing, number=5)
-report(busy_loop=busy, empty_function=idle)
-print(f"burned real CPU time for nothing: {busy > idle * 100}")
-#: burned real CPU time for nothing: True
-```
-
-Neither `compute_and_discard()` nor `do_nothing()` prints, writes,
-or returns anything a caller can act on.
-But `compute_and_discard()` still takes measurably longer to run,
-because Python cannot recognize the work as worthless and skip it.
-A perfectly pure computation, followed to its logical end,
-is a space heater with extra steps.
-
-Effects are not a defect to design away.
-They are the reason a program exists.
-The goal of Effect Management is not to eliminate Effects but to isolate them so the rest of the program can stay pure
-(this is sometimes called "pushing the Effects to the edges").
-
-## A Taxonomy of Benefits
-
-The initial and most obvious reason to track Effects is parallelism.
-A function with no Effects touches nothing shared and runs in parallel.
-The same guarantee makes testing trivial.
-A pure function needs no setup, no mocks, and no teardown.
-Call it with arguments and check the result.
-
-Think of Effect analysis as a series of phases.
-The first phase separates pure from impure, and produces parallelism, caching,
-and easy testing for the pure part.
-
-### Subdividing the Impure Portion
-
-The next phase produces one benefit per subdivision:
-
-- **Exceptions** become data,
-  via [Error Handling](42_Functional_Error_Handling.md).
-  Failures turn into values the type checker can see,
-  and a test checks for an `Err` as easily as an `Ok`.
-- **Side causes** become replaceable inputs.
-  A test substitutes a fixed clock for the real one,
-  or a seeded generator for true randomness,
-  and the function under test becomes repeatable.
-- **Side effects** become replaceable outputs.
-  A test swaps the real database or console for a stand-in that records what was written,
-  then inspects the recording.
-
-In almost every case, testing is a benefit of Effect Management.
-That is not a coincidence.
-A test must run in an environment it completely controls.
-Untracked Effects are the parts of the environment a test cannot control.
-Every Effect you isolate becomes controllable by your tests.
-
-You only get these benefits if you know where the Effects are.
-In a small program you find them by inspection.
-As programs grow, inspection stops scaling.
-That failure motivates the machinery in the rest of this chapter.
 
 ## Converting Effectful to Pure
 
@@ -329,6 +254,87 @@ A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
 What changes is how many functions have to know about it.
 
+## A Program Can Never Be Pure
+
+A perfectly pure program computes something but never lets anyone see it.
+It reads nothing from its environment and changes nothing in its environment,
+so its result never reaches a screen, a file, a socket,
+or even the exit code the operating system checks.
+From outside the process,
+that program is indistinguishable from a program that computes nothing.
+
+```python
+# pure_and_pointless.py
+import timeit
+from benchmark import report
+
+def compute_and_discard() -> None:
+    total = 0
+    for i in range(2_000_000):
+        total += i * i
+
+def do_nothing() -> None:
+    pass
+
+busy = timeit.timeit(compute_and_discard, number=5)
+idle = timeit.timeit(do_nothing, number=5)
+report(busy_loop=busy, empty_function=idle)
+print(f"burned real CPU time for nothing: {busy > idle * 100}")
+#: burned real CPU time for nothing: True
+```
+
+Neither `compute_and_discard()` nor `do_nothing()` prints, writes,
+or returns anything a caller can act on.
+But `compute_and_discard()` still takes measurably longer to run,
+because Python cannot recognize the work as worthless and skip it.
+A perfectly pure computation, followed to its logical end,
+is a space heater with extra steps.
+
+Effects are not a defect to design away.
+They are the reason a program exists.
+The goal of Effect Management is not to eliminate Effects but to isolate them so the rest of the program can stay pure
+(this is sometimes called "pushing the Effects to the edges").
+
+## Two Phases of Effect Analysis
+
+The initial and most obvious reason to track Effects is parallelism.
+A function with no Effects touches nothing shared and runs in parallel.
+The same guarantee makes testing trivial.
+A pure function needs no setup, no mocks, and no teardown.
+Call it with arguments and check the result.
+
+Think of Effect analysis as a series of phases.
+The first phase separates pure from impure, and produces parallelism, caching,
+and easy testing for the pure part.
+
+### Subdividing the Impure Portion
+
+The next phase produces one benefit per subdivision:
+
+- **Exceptions** become data,
+  the move [Converting Effectful to Pure](#converting-effectful-to-pure)
+  just made three ways.
+  Failures turn into values the type checker can see,
+  and a test checks for an `Err` as easily as an `Ok`.
+- **Side causes** become replaceable inputs.
+  A test substitutes a fixed clock for the real one,
+  or a seeded generator for true randomness,
+  and the function under test becomes repeatable.
+- **Side effects** become replaceable outputs.
+  A test swaps the real database or console for a stand-in that records what was written,
+  then inspects the recording.
+
+In almost every case, testing is a benefit of Effect Management.
+That is not a coincidence.
+A test must run in an environment it completely controls.
+Untracked Effects are the parts of the environment a test cannot control.
+Every Effect you isolate becomes controllable by your tests.
+
+You only get these benefits if you know where the Effects are.
+In a small program you find them by inspection.
+As programs grow, inspection stops scaling.
+That failure motivates the machinery in the rest of this chapter.
+
 ## Effect Management Systems
 
 Suppose a test starts failing intermittently.
@@ -452,6 +458,10 @@ print(captured.messages)
 
 `greet()` performs an `Ask` Effect and a `Tell` Effect,
 and its signature says so.
+It says what `greet()` needs, not everything `greet()` might do:
+a `print()` in the body would still be invisible.
+[Effect Management for Python?](#effect-management-for-python)
+returns to that limit.
 This moves the Effects into explicit arguments.
 The bindings are delayed.
 The demo binds them to test stand-ins, `Scripted` and `Capture`,
@@ -569,6 +579,12 @@ It can discard the continuation, which behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 
+Python has a construct that suspends a computation and hands control to whoever is driving it,
+then resumes it with a value: the generator.
+[Generators](45_Generators.md) covers the full two-way form,
+and it is the mechanism the Python Effect library in [Stateless](46_Stateless.md)
+is built from.
+
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect set follows a backslash:
 
@@ -597,7 +613,7 @@ you build a *description* of a computation, and execute the description later.
 Here is "Hello, World!" in Scala using the [ZIO](https://zio.dev/) library:
 
 ```scala
-import zio._
+import zio.*
 import zio.Console.printLine
 
 // The Effect's interface
@@ -699,8 +715,9 @@ Adoption is not gated by how long humans take to learn them.
 A language written for an AI doesn't need the conveniences that help a person read code,
 and if it works, an AI can start using it immediately.
 
-Most of these only **track** Effects, rather than providing a full EMS,
-for reasons the end of this section explains:
+Most of these only **track** Effects rather than providing a full EMS,
+and for their purpose the other two parts are liabilities:
+a host that pins the implementations itself can guarantee what generated code is able to do.
 
 - [Vera](https://veralang.dev):
   mandatory contracts checked with Z3 SMT verification.
@@ -726,11 +743,7 @@ for reasons the end of this section explains:
 - [Boruna](https://github.com/escapeboy/boruna):
   effects declared and policy-gated at the VM level, with tamper-evident replay.
 
-By the definition above,
-most of these are Effect-tracking systems rather than full EMSs.
-For their purpose the other two parts are liabilities,
-since a host that pins the implementations itself can guarantee what generated code is able to do.
-Pact and Lumen are exceptions.
+Pact and Lumen are the exceptions.
 Each separates an effect's interface from its implementation and binds the implementation later,
 the second and third properties of a full EMS.
 
@@ -782,8 +795,9 @@ The [returns](https://github.com/dry-python/returns)
 library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional_Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
-The [effect](https://pypi.org/project/effect/)
-library ports the description/execution split to Python.
+The [effect](https://pypi.org/project/effect/) library,
+no relation to the TypeScript library of the same name,
+ports the description/execution split to Python.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff)
@@ -879,6 +893,13 @@ Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
+Python cannot give you the language half of that today.
+It can give you the library half.
+The next three chapters build one: [Generators](45_Generators.md)
+supplies the mechanism, [Stateless](46_Stateless.md)
+builds the Effect type on top of it,
+and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
+
 ## Exercises
 
 1.  Write the production bindings for `ask_tell.py`:
@@ -887,10 +908,13 @@ and future programmers will regard a function with hidden Effects the way you re
     Confirm `greet()` itself required no change,
     which is the delayed-binding payoff.
 2.  Feel the bookkeeping the chapter describes.
-    Add a `Log` Effect (a protocol with `log(message)`)
+    Wrap `greet()` in three callers, `session()`, `menu()`, and `main()`,
+    each calling the next and none of them using `Ask` or `Tell`.
+    Now add a `Log` Effect (a protocol with `log(message)`)
     used by a new helper that `greet()` calls.
-    Count how many signatures you had to edit to pass it down,
-    then explain what an EMS would do instead.
+    Count the signatures you had to edit,
+    and note how many of them mention an Effect they never use.
+    Then say what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions),
     and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,
@@ -902,3 +926,9 @@ and future programmers will regard a function with hidden Effects the way you re
     Build a `PositiveInt` that makes both bad values unconstructable,
     rewrite `slope()` to take it,
     and note which checks disappear from `slope()` as a result.
+5.  `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
+    Write a synchronous `total_price()` that calls a helper,
+    then make the helper `async` and follow what the checker and the interpreter force you to change,
+    all the way up to `asyncio.run()`.
+    Name the two properties of a full EMS that `async` does *not* have,
+    using the three-item list in [Effect Management Systems](#effect-management-systems).

@@ -279,6 +279,10 @@ and it is usually the intent rather than the structure.
 A pattern that subtracts to nothing was not a mistake.
 It was the right answer for a language missing the piece Python has.
 
+Part III closes with a [Pattern Catalog](39_Pattern_Catalog.md),
+a name-and-intent index of the wider literature,
+with a link to this book's coverage wherever there is one.
+
 ## Exercises
 
 1.  Pick a program you have written that changed more than once.

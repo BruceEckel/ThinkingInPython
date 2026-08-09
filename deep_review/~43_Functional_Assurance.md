@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -333,7 +334,7 @@ Proposed: insert a rung between 1 and 2, numbered 2, and renumber the rest:
 > 2. Next are tests over chosen examples, the subject of
 >    [Testing](11_Testing.md).
 >    Each one pins a single input to a single answer, so the assurance you get
->    is exactly as wide as the examples you thought of.
+>    is exactly as wide as the examples you think of.
 
 That also makes rung 4's "instead of forcing you to write one example at a
 time" a comparison with something the list has named.

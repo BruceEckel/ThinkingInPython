@@ -15,7 +15,7 @@ And it is easy to forget to handle.
 
 Returning the failure as a value reverses those costs.
 Failure appears in the return type,
-so the type checker reminds every caller to handle it,
+so the type checker will not let a caller read the answer without dealing with the failure first,
 and a reviewer sees it without reading the body.
 Control flow stays local,
 with no exception leaping past intermediate frames to a distant handler.
@@ -60,7 +60,8 @@ flags as a problem.
 ## Return the Error as a Value
 
 The function's return type becomes a union of the answer type and the error type.
-A union like this is a *sum type*: a value that is one thing or another.
+A union like this is Python's untagged spelling of a *sum type*
+(a *disjoint* union): a value that is one thing or another.
 Nothing disappears, because the error is just another return value:
 
 ```python
@@ -105,6 +106,8 @@ so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
+`@final` states that neither will be subclassed,
+which lets the checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
@@ -116,7 +119,9 @@ so it lives in `utils/` and any chapter can import it:
 # utils/result.py
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import final
 
+@final
 @dataclass(frozen=True)
 class Ok[A]:
     answer: A
@@ -129,12 +134,13 @@ class Ok[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
+@final
 @dataclass(frozen=True)
 class Err[E]:
     error: E
 
-    def bind[B](
-        self, func: Callable[..., Result[B, E]]
+    def bind[B, F](
+        self, func: Callable[..., Result[B, F]]
     ) -> Err[E]:
         return self  # Pass the failure forward unchanged
 
@@ -176,6 +182,28 @@ so `func_a(i).unwrap()` fails the checker,
 which reports that `unwrap` is not defined on `Err[str]` in the union.
 Using the `Result` as if it were a number fails the same way.
 Narrowing to one of the two classes is the only route to the answer.
+The asymmetry is visible at runtime as well as to the checker:
+
+```python
+# must_unwrap.py
+from result import Err, Ok
+from returning_result import func_a
+
+print(hasattr(Ok(1), "unwrap"), hasattr(Err("x"), "unwrap"))
+#: True False
+try:
+    func_a(1).unwrap()  # type: ignore
+except AttributeError as e:
+    print(e)
+#: 'Err' object has no attribute 'unwrap'
+```
+
+The `# type: ignore` is the point of the listing rather than an apology for it.
+Without that comment `ty` refuses the line,
+reporting that `unwrap` is not defined on `Err[str]` in the union,
+and a reader who writes this in their own code never reaches the traceback.
+The comment suppresses a real error so the listing can show what the checker was preventing.
+
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
 Python's humbler form of the same idea is `int | None`.
@@ -198,26 +226,6 @@ not a guarantee the checker provides.
 The caller has a matching hole:
 a statement that calls the function and discards what comes back draws no complaint.
 The checker stops you from misreading a `Result`, not from ignoring one.
-
-Because failures are values, you can assert on them directly,
-with no `pytest.raises()`.
-The tests check `unwrap()`,
-and that `bind()` chains a success and short-circuits a failure:
-
-```python
-# test_result.py
-from result import Err, Ok
-
-def test_success_unwrap() -> None:
-    assert Ok(5).unwrap() == 5
-
-def test_bind_chains_a_success() -> None:
-    assert Ok(1).bind(lambda x: Ok(x + 1)) == Ok(2)
-
-def test_bind_short_circuits_a_failure() -> None:
-    failure: Err[str] = Err("boom")
-    assert failure.bind(lambda x: Ok(x + 1)) is failure
-```
 
 ## Composing by Hand
 
@@ -315,6 +323,11 @@ It moved into `bind()`, where it appears once.
 Functional programmers have a name for a type that carries a value plus this chaining operation:
 a *monad*.
 You do not need to know that word to use functional error handling.
+What the word buys you is that the shape is reusable:
+`Maybe` chains a value that might be absent,
+`Result` chains one that might have failed,
+and an async container chains one that has not arrived yet,
+all with the same `bind()`.
 
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
@@ -325,6 +338,26 @@ To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that cannot fail,
 and exercise 2's `map_error()` is the same idea aimed at the error side.
+
+Because failures are values, you can assert on them directly,
+with no `pytest.raises()`.
+The tests check `unwrap()`,
+and that `bind()` chains a success and short-circuits a failure:
+
+```python
+# test_result.py
+from result import Err, Ok
+
+def test_success_unwrap() -> None:
+    assert Ok(5).unwrap() == 5
+
+def test_bind_chains_a_success() -> None:
+    assert Ok(1).bind(lambda x: Ok(x + 1)) == Ok(2)
+
+def test_bind_short_circuits_a_failure() -> None:
+    failure: Err[str] = Err("boom")
+    assert failure.bind(lambda x: Ok(x + 1)) is failure
+```
 
 Testing confirms that the hand-written and `bind()` versions agree on every input:
 
@@ -342,7 +375,35 @@ def test_manual_and_bind_agree() -> None:
 
 `bind()` threads one value through a chain.
 When you have several independent inputs,
-nest the binds so each answer stays in scope for the next step:
+nest the binds so each answer stays in scope for the next step.
+Two inputs show the shape:
+
+```python
+# combining_two.py
+from composing import func_b
+from result import Ok, Result
+from returning_result import func_a
+
+def pair(i: int, j: int) -> Result[str, str]:
+    return func_a(i).bind(
+        lambda a: func_b(j).bind(
+            lambda b: Ok(f"{a} and {b}")))
+
+if __name__ == "__main__":
+    for args in [(7, 5), (1, 5), (7, 2)]:
+        print(args, pair(*args))
+#: (7, 5) Ok(answer='7 and 5')
+#: (1, 5) Err(error='func_a(1)')
+#: (7, 2) Err(error='func_b(2)')
+```
+
+Each lambda's parameter is the previous step's answer,
+and the answers stay reachable because the nesting keeps them in scope:
+`a` is still visible inside the inner lambda where `b` arrives.
+That scoping is the reason for the nesting,
+and it is what a flat sequence of `bind()` calls could not give you.
+
+A third input adds a third level:
 
 ```python
 # combining.py
@@ -425,6 +486,14 @@ def safe[**P, A](
         except Exception as e:
             return Err(e)
     return wrapper
+```
+
+Decorating a function that raises an exception is all it takes:
+
+```python
+# safe_demo.py
+from result import Err, Ok
+from safe import safe
 
 @safe
 def parse(text: str) -> int:
@@ -470,11 +539,7 @@ and a raised exception becomes an `Err` holding that exception:
 ```python
 # test_safe.py
 from result import Err, Ok
-from safe import safe
-
-@safe
-def parse(text: str) -> int:
-    return int(text)
+from safe_demo import parse
 
 def test_safe_wraps_a_success() -> None:
     assert parse("42") == Ok(42)
@@ -542,7 +607,7 @@ the local names that would explain it are gone.
 
 The usual repair is to catch the exception and raise a new one carrying a better message,
 which costs you the original type and gives every caller a wrapper to unwrap.
-`BaseException.add_note()` avoids the trade.
+`BaseException.add_note()` (Python 3.11 and later) avoids the trade.
 It appends a line to the exception you already have,
 and the traceback prints it:
 
@@ -615,14 +680,8 @@ This is the same argument the chapter opened with, applied one level down:
 and a note says which piece of work it belonged to.
 
 The `Err` branch reads `error.__notes__`,
-which works only because `match` recovers the exception's type.
-Write `if isinstance(result, Err)` instead and `result.error` comes back as `object`,
-so the same line stops checking.
-`Ok` and `Err` are ordinary classes,
-and a positive `isinstance()` test cannot rule out a value that inherits from both,
-so the checker keeps that possibility alive and erases what it knows about the field.
-Asking about `Ok` and reading the error in the `else` branch works for the mirror-image reason:
-ruling `Ok` out leaves `Err` alone.
+which checks because `@final` on the two classes lets the checker narrow a `Result` to exactly one of them,
+whether you use `match` or `isinstance()`.
 
 ## The returns Library
 
@@ -631,6 +690,8 @@ The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases it calls `Success` and `Failure`,
 the same `@safe` decorator built earlier in the chapter,
 and do-notation that makes combining multiple results read more directly than nested binds.
+
+## Which Failures Get a Result
 
 This style does not replace exceptions everywhere.
 Exceptions are still appropriate for truly exceptional conditions,
@@ -642,6 +703,12 @@ Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
 Those are not exceptional.
 They are expected, and the type should say so.
+
+What you can do now that you could not at the start of the chapter:
+write a function whose signature admits it can fail,
+and chain three of them without a single `try` in the calling code.
+The chain either delivers an answer or hands back the first failure,
+and the checker will not let a caller confuse the two.
 
 ## Exercises
 
@@ -655,3 +722,12 @@ They are expected, and the type should say so.
 3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
     Write the tests first.
+4.  Change `@safe` so it takes the exception types it should catch,
+    as in `@safe(ValueError)`, and lets anything else propagate.
+    Show that a `TypeError` raised inside the wrapped function now escapes instead of arriving as an `Err`.
+5.  Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
+    Chain two of them with `bind()` and print the notes from whichever one failed.
+    What happens to the note the successful call would have added?
+6.  Rewrite `func_a()` to return `int | None` instead of `Result[int, str]` and adjust `composing.py` to match.
+    Which of the three failures in the chain can the caller still tell apart,
+    and which have collapsed into each other?

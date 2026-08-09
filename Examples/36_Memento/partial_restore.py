@@ -1,9 +1,9 @@
 # partial_restore.py
 import copy
-from frozen_sketch import Sketch
+from frozen_sketch import Drawing
 from history import History
 
-history = History(Sketch("Duck"))
+history = History(Drawing("Duck"))
 history.do(history.present.draw("circle"))
 checkpoint = history.present
 history.do(copy.replace(history.present, title="Goose"))

@@ -81,17 +81,17 @@ erase included, can reach back and change a memento already taken.
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
-class Sketch:
+class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
 
-    def draw(self, stroke: str) -> Sketch:
+    def draw(self, stroke: str) -> Drawing:
         return replace(self, strokes=(*self.strokes, stroke))
 
-    def erase(self) -> Sketch:
+    def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])
 
-before = Sketch("Duck").draw("circle").draw("beak")
+before = Drawing("Duck").draw("circle").draw("beak")
 after = before.erase()
 print(before.strokes, after.strokes)
 #: ('circle', 'beak') ('circle',)
@@ -102,25 +102,25 @@ print(before.strokes, after.strokes)
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
-class Sketch:
+class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
 
-    def draw(self, stroke: str) -> Sketch:
+    def draw(self, stroke: str) -> Drawing:
         return replace(self, strokes=(*self.strokes, stroke))
 
-    def erase(self) -> Sketch:
+    def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])
 
-def test_erase_returns_new_sketch_leaving_original() -> None:
-    before = Sketch("Duck").draw("circle").draw("beak")
+def test_erase_returns_new_drawing_leaving_original() -> None:
+    before = Drawing("Duck").draw("circle").draw("beak")
     after = before.erase()
     assert before.strokes == ("circle", "beak")  # Untouched
     assert after.strokes == ("circle",)
 ```
 
 The frozen version's `erase()` follows `draw()`'s shape too: it
-returns a new `Sketch` via `replace()`, this time with the last stroke
+returns a new `Drawing` via `replace()`, this time with the last stroke
 sliced off, so `before` is never mutated and any `History` holding
 `before` as a past state is automatically safe.
 
@@ -170,7 +170,7 @@ states are the only ones left to go back to; there is no way to
 recover state `0` once it has fallen off the bound, and `can_undo()`
 reporting `False` at that point is the honest answer, not a bug.
 
-## 3. Serializing a `Sketch` to JSON
+## 3. Serializing a `Drawing` to JSON
 
 ```python
 # exercise_3.py
@@ -178,19 +178,19 @@ import json
 from dataclasses import asdict, dataclass, replace
 
 @dataclass(frozen=True)
-class Sketch:
+class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
 
-    def draw(self, stroke: str) -> Sketch:
+    def draw(self, stroke: str) -> Drawing:
         return replace(self, strokes=(*self.strokes, stroke))
 
-drawing = Sketch("Duck").draw("circle").draw("beak")
+drawing = Drawing("Duck").draw("circle").draw("beak")
 as_json = json.dumps(asdict(drawing))
 data = json.loads(as_json)
 print(type(data["strokes"]))
 #: <class 'list'>
-reconstructed = Sketch(data["title"], tuple(data["strokes"]))
+reconstructed = Drawing(data["title"], tuple(data["strokes"]))
 print(reconstructed == drawing)
 #: True
 ```
@@ -201,8 +201,8 @@ JSON has no tuple type, only arrays, so `strokes`, a `tuple[str,
 because it serializes Python's own object representations rather than
 translating into a shared, language-neutral format. The reconstruction
 has to compensate for what JSON lost: wrapping `data["strokes"]` back
-in `tuple(...)` before passing it to `Sketch`, since `Sketch.strokes`
-is declared `tuple[str, ...]` and a `Sketch` built with a `list`
+in `tuple(...)` before passing it to `Drawing`, since `Drawing.strokes`
+is declared `tuple[str, ...]` and a `Drawing` built with a `list`
 there fails `ty check`, and is also no longer hashable the
 way the rest of the chapter relies on frozen dataclasses being.
 
@@ -296,3 +296,153 @@ at a time as it goes, so redo still works exactly as if you had called
 then `3`, retracing the same path forward. Jumping several states back
 "in one call" is a convenience for the caller; the underlying stacks
 stay in the same consistent state either way.
+
+## 6. Restoring one named field
+
+```python
+# exercise_6.py
+import copy
+from dataclasses import dataclass, replace
+
+@dataclass(frozen=True)
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()
+
+    def draw(self, stroke: str) -> Drawing:
+        return replace(self, strokes=(*self.strokes, stroke))
+
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        self._present = initial
+        self._past: list[S] = []
+        self._future: list[S] = []
+
+    @property
+    def present(self) -> S:
+        return self._present
+
+    def do(self, new_state: S) -> None:
+        self._past.append(self._present)
+        self._present = new_state
+        self._future.clear()
+
+    def undo(self) -> S:
+        self._future.append(self._present)
+        self._present = self._past.pop()
+        return self._present
+
+def restore_field(
+    history: History[Drawing], name: str, past: Drawing
+) -> None:
+    change = {name: getattr(past, name)}
+    history.do(copy.replace(history.present, **change))
+
+history = History(Drawing("Duck"))
+history.do(history.present.draw("circle"))
+checkpoint = history.present
+history.do(copy.replace(history.present, title="Goose"))
+history.do(history.present.draw("beak"))
+history.do(history.present.draw("tail"))
+print(history.present)
+#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+restore_field(history, "strokes", checkpoint)
+print(history.present)
+#: Drawing(title='Goose', strokes=('circle',))
+print(history.undo())
+#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+```
+
+`restore_field()` is `partial_restore.py` with the field name lifted
+into a parameter. It reads one attribute off the past state, hands it
+to `copy.replace()` as the single change, and pushes the result. The
+title survives the rename because `copy.replace()` carries every field
+it was not asked about.
+
+It is annotated for `Drawing` rather than written generically, and that
+is a typing constraint rather than a design choice. `copy.replace()`
+requires a `__replace__()` method, which a bare `S` does not promise, so
+a generic version needs a `Protocol` declaring `__replace__()` as the
+type variable's bound. Worth doing in a library; noise in a solution.
+
+It must go through `do()` for the reason the section gives and the last
+line proves: the partial restore is itself an action, so it belongs on
+the timeline. Editing `_past` directly would rewrite history rather
+than extend it, and the user who wanted the strokes back would have no
+way to change their mind. It would also desynchronize the caretaker's
+own bookkeeping, since `do()` is where `_future` gets cleared, and a
+`_past` edited behind its back leaves a redo stack pointing at states
+that are no longer reachable.
+
+## 7. What pickle skips on load
+
+```python
+# drawing_v1.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()
+```
+
+```python
+# exercise_7.py
+import copy
+import pickle
+from dataclasses import dataclass
+import drawing_v1
+from drawing_v1 import Drawing
+
+blob = pickle.dumps(Drawing("Duck", ("circle",)))
+blank = pickle.dumps(Drawing("", ("circle",)))
+
+@dataclass(frozen=True)
+class DrawingV2:
+    title: str
+    strokes: tuple[str, ...] = ()
+    layer: int = 1
+
+    def __post_init__(self) -> None:
+        if not self.title:
+            raise ValueError("title must not be empty")
+
+drawing_v1.Drawing = DrawingV2  # type: ignore
+
+restored = pickle.loads(blob)
+print(type(restored).__name__, restored.layer)
+#: DrawingV2 1
+print("layer" in restored.__dict__)
+#: False
+
+empty = pickle.loads(blank)
+print(repr(empty.title))
+#: ''
+try:
+    copy.replace(empty, strokes=())
+except ValueError as e:
+    print(type(e).__name__, e)
+#: ValueError title must not be empty
+```
+
+The default appears, and not because pickle supplied it. A dataclass
+field with a simple default stores that default as a *class* attribute,
+so `restored.layer` finds `DrawingV2.layer` by ordinary attribute
+lookup while `restored.__dict__` has no `layer` at all. Change the
+field to `layer: list[str] = field(default_factory=list)` and the
+illusion collapses: a `default_factory` leaves no class attribute, so
+the loaded object raises `AttributeError` the first time anything asks.
+
+What pickle skipped is every line of code the class runs at
+construction. `pickle.loads()` builds a bare instance and writes the
+saved `__dict__` into it, so `__init__()` never runs and neither does
+`__post_init__()`. The empty title sails through a class written to
+reject it.
+
+`copy.replace()` is the contrast the chapter's partial restore relies
+on. It goes through `__replace__()`, which constructs a real instance,
+which runs `__post_init__()`, so the invalid state is caught the moment
+anything tries to derive a new state from it. That is the general
+shape: a value that enters your program through a constructor is
+validated, and one that enters through a deserializer is not, which is
+why `msgspec` and `pydantic` exist.

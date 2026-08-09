@@ -1,24 +1,28 @@
 # Assurance: Solutions
 
-## 1. A fifth limit added to the parallel prime count
+## 1. Which process ran each call
 
 ```python
-from concurrent.futures import ProcessPoolExecutor
+import os
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
-def count_primes(limit):
+def count_primes(limit: int) -> tuple[int, int]:
     count = 0
     for n in range(2, limit):
         if all(n % d for d in range(2, int(n ** 0.5) + 1)):
             count += 1
-    return count
+    return count, os.getpid()
 
-def main():
-    limits = [10_000, 20_000, 30_000, 40_000, 50_000]
-    serial = list(map(count_primes, limits))
+def main() -> None:
+    limits = [10_000, 20_000, 30_000, 40_000]
     with ProcessPoolExecutor() as pool:
-        parallel = list(pool.map(count_primes, limits))
-    assert parallel == serial
-    print(parallel)
+        by_process = list(pool.map(count_primes, limits))
+    with ThreadPoolExecutor() as pool:
+        by_thread = list(pool.map(count_primes, limits))
+    print([count for count, _ in by_process])
+    print("process pool:", len({pid for _, pid in by_process}), "IDs")
+    print("thread pool:", len({pid for _, pid in by_thread}), "IDs")
+    print("cores:", os.process_cpu_count())
 
 if __name__ == "__main__":
     main()
@@ -26,17 +30,38 @@ if __name__ == "__main__":
 
 `ProcessPoolExecutor` needs `count_primes` picklable and importable
 from `__main__` in a worker process, which only holds for a real
-script file, not a fenced block executed in place; run as a script,
-this prints `[1229, 2262, 3245, 4203, 5133]`. The `assert` still passes
-with a fifth limit added, for the same reason it passed with four:
-`count_primes()` is pure, so calling it with `50_000` returns the
-identical result whether the call runs in the main process (as part
-of `serial`) or in a worker process (as part
-of `parallel`). Growing the input list needed no change to
-`count_primes()` itself, no new locks, and no new coordination code,
-because purity was the only thing making the original four calls safe
-to parallelize, and that property does not weaken as more calls are
-added.
+script file, not a fenced block executed in place.
+
+The counts are unchanged, `[1229, 2262, 3245, 4203]`, which is the
+point of the original listing: the same pure function gives the same
+answers wherever it ran. The interesting number is the second line.
+On the machine this was written on, three consecutive runs reported
+`2`, `3`, and `3` distinct process IDs against `32` cores.
+
+Two things follow, and neither is the one most people predict. The
+count is greater than one, so the work genuinely left the main
+process, which is what the exercise set out to show and what
+`assert parallel == serial` alone could never prove. But it is far
+below the core count, and it moves between runs. `ProcessPoolExecutor`
+starts a worker per core, then hands out tasks as workers become free;
+with only four tasks, each short enough to finish before the pool has
+finished starting up, the first worker to become idle takes the next
+one. The pool never needed thirty-two processes, so it never used
+them. A distinct-ID count is evidence that parallelism is available,
+not a measure of how much was used.
+
+The thread pool reports exactly `1`. Threads share their process, so
+`os.getpid()` returns the same value in every one of them, and the
+technique that revealed process parallelism is blind to thread
+parallelism. `threading.get_ident()` is the equivalent for threads.
+That the two pools present the identical `map()` interface while
+differing this fundamentally underneath is the substitutable-backend
+point from
+[Concurrency](../Chapters/19_Concurrency.md#one-task-many-backends).
+
+This is also why the number does not belong in a `#:` marker in the
+book: it depends on the core count and on scheduling, so it is
+reproducible on your machine and nowhere else.
 
 ## 2. Three property shapes for `sorted()`
 
@@ -280,3 +305,129 @@ have to be rediscovered by chance on each run. The practical effect is
 that the shrunk case behaves like a regression test you never had to
 write: it keeps failing until the bug is fixed, then rejoins the pool
 of examples and is tried again on every later run.
+
+## 5. Two impure functions with no `global` in sight
+
+```python
+# opaque_inputs.py
+import os
+from collections.abc import Mapping
+from datetime import datetime, timedelta
+
+def stale(created: datetime, limit: timedelta) -> bool:
+    return datetime.now() - created > limit
+
+def timeout() -> int:
+    return int(os.environ.get("TIMEOUT", "30"))
+
+def stale_pure(
+    created: datetime, limit: timedelta, now: datetime
+) -> bool:
+    return now - created > limit
+
+def timeout_pure(env: Mapping[str, str]) -> int:
+    return int(env.get("TIMEOUT", "30"))
+
+made = datetime(2020, 1, 1)
+noon = datetime(2020, 1, 1, 12)
+print(stale_pure(made, timedelta(days=1), noon))
+#: False
+print(timeout_pure({"TIMEOUT": "5"}), timeout_pure({}))
+#: 5 30
+```
+
+Neither impure function assigns to anything, which is the lesson.
+`global` is the loud way to break referential transparency, and these
+are the quiet ones: both *read* state the caller cannot see.
+
+The substitution that breaks `stale()` is replacing a call with the
+answer it just gave. `stale(made, one_day)` returns `False` at
+11:00 and `True` at 13:00, so writing down `False` and substituting it
+changes the program the moment the clock passes noon. Nothing in the
+signature warns you, because `datetime.now()` is an argument the
+function takes without declaring.
+
+`timeout()` breaks the same way across a boundary that is easier to
+miss, since the environment usually holds still during a run.
+Substituting `30` for `timeout()` is correct until someone sets
+`TIMEOUT`, and then the substituted version and the original disagree
+while both still look right. Tests are where this bites first: one
+test that sets the variable changes the answer for every test after
+it, in a way no argument list records.
+
+The repair is the same for both, and it is the one this part of the
+book keeps making. Move the hidden input into the parameter list.
+`stale_pure()` takes the current time, and `timeout_pure()` takes the
+mapping to read. Both are now referentially transparent, both are
+testable without a clock or a monkeypatched environment, and the
+caller that does reach for the real clock or the real `os.environ` is
+one line at the edge of the program instead of a dependency buried in
+the middle of it. [Testing](../Chapters/11_Testing.md#random-numbers)
+makes the same move for a random source.
+
+## 6. `match` against `isinstance()` on the same function
+
+```python
+# describe_isinstance.py
+from dataclasses import dataclass
+from typing import final
+
+@final
+@dataclass(frozen=True)
+class Ok[A]:
+    answer: A
+
+@final
+@dataclass(frozen=True)
+class Err[E]:
+    error: E
+
+type Result[A, E] = Ok[A] | Err[E]
+
+def reciprocal(text: str) -> Result[float, Exception]:
+    try:
+        return Ok(1 / int(text))
+    except (ValueError, ZeroDivisionError) as e:
+        return Err(e)
+
+def describe(text: str) -> str:
+    result: Result[float, Exception] = reciprocal(text)
+    if isinstance(result, Ok):
+        return f"{text}: {result.answer}"
+    if isinstance(result.error, ValueError):
+        return f"{text}: Not a number"
+    if isinstance(result.error, ZeroDivisionError):
+        return f"{text}: Cannot divide by zero"
+    return f"{text}: {type(result.error).__name__}"
+
+for sample in ("4", "0", "OOPS"):
+    print(describe(sample))
+#: 4: 0.25
+#: 0: Cannot divide by zero
+#: OOPS: Not a number
+```
+
+The two versions produce identical output and are the same length in
+statements, but the `match` reads as one description of four shapes
+while this reads as four separate questions. The difference shows in
+what each version repeats: `result.error` appears three times here and
+never in the `match`, because the pattern binds it once per branch.
+The final `return` is also weaker than the `match`'s `case Err(error)`.
+It is a fallthrough that happens to be correct rather than a branch
+stating what it matches, so a reader has to reconstruct that
+`result` must be an `Err` by ruling out the branch above.
+
+`ty` reports the same thing about both. Inside the `Ok` it knows
+`float` either way, and in the error branches it knows `Exception`
+narrowed to `ValueError` or `ZeroDivisionError`. That agreement is
+recent and it is not free: it holds because `Ok` and `Err` are
+declared `@final` in `utils/result.py`. Without that decorator a
+checker cannot rule out a class inheriting from both, so a positive
+`isinstance()` leaves the intersection alive and `result.answer` comes
+back as `object`. The measurement the exercise asks for therefore has
+two answers depending on one decorator, which is the more useful
+finding than either version winning.
+
+What survives is that the choice is about reading, not about proving.
+Neither form tells the checker anything the other cannot, so pick the
+one that states the shapes you expect, which is the `match`.

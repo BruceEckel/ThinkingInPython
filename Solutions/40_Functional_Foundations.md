@@ -128,3 +128,98 @@ name. Passing it positionally means passing `low` and `value` first,
 which is the opposite of leaving them to the caller.
 `partial(clamp, Placeholder, Placeholder, 100)` is the version that
 works, and it is what `Placeholder` exists for.
+
+## 6. `Final` locks the name, not the object
+
+```python
+from typing import Final
+
+CONFIG: Final[list[int]] = [1, 2]
+CONFIG.append(3)
+MAX_SIZE: Final[int] = 100
+MAX_SIZE = 200
+print(CONFIG, MAX_SIZE)
+#: [1, 2, 3] 200
+```
+
+`ty` reports one error here, not two, and the one it reports is the
+assignment:
+
+```
+error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allowed
+ --> immutable_types.py:6:1
+  |
+5 | MAX_SIZE: Final[int] = 100
+  |           ---------- Symbol declared as `Final` here
+6 | MAX_SIZE = 200
+  | ^^^^^^^^^^^^^^ Symbol later reassigned here
+```
+
+`CONFIG.append(3)` passes because it is not a reassignment. `Final`
+constrains the binding between a name and an object: `CONFIG` must
+keep pointing at the same list forever. It says nothing about that
+list's contents, and `append()` mutates the object while leaving the
+binding alone. `MAX_SIZE = 200` is the operation `Final` exists to
+reject, because it points the name at a different object.
+
+To reject the append, the value's own type has to be immutable:
+
+```python
+from typing import Final
+
+CONFIG: Final[tuple[int, ...]] = (1, 2)
+print(CONFIG)
+#: (1, 2)
+```
+
+Adding `CONFIG.append(3)` to that version reports:
+
+```
+error[unresolved-attribute]: Object of type `tuple[Literal[1], Literal[2]]` has no attribute `append`
+```
+
+The error arrives from the tuple rather than from `Final`, which is
+the chapter's point: `Final` guards the name, and the element type
+guards the contents. You need both.
+
+## 7. Comprehensions, a different `key`, and a bare `map` object
+
+```python
+numbers = [1, 2, 3, 4, 5]
+squares = [n * n for n in numbers]
+print(squares)
+#: [1, 4, 9, 16, 25]
+evens = [n for n in numbers if n % 2 == 0]
+print(evens)
+#: [2, 4]
+words = ["banana", "pie", "kiwi", "watermelon"]
+print(sorted(words, key=lambda w: w[-1]))
+#: ['banana', 'pie', 'kiwi', 'watermelon']
+```
+
+Both comprehensions say what `map()` and `filter()` said, without the
+lambda, which is the chapter's rule for an expression written on the
+spot. Sorting by last letter happens to produce the same order as
+sorting by length for this word list (`a`, `e`, `i`, `n` ascending),
+a coincidence worth checking rather than assuming.
+
+Dropping the `list()` is the part that surprises:
+
+```python
+numbers = [1, 2, 3, 4, 5]
+raw = map(lambda n: n * n, numbers)
+print(type(raw).__name__)
+#: map
+print(list(raw))
+#: [1, 4, 9, 16, 25]
+print(list(raw))
+#: []
+```
+
+Printing `raw` directly shows `<map object at 0x...>` rather than any
+values, because `map()` returns a lazy iterator and its `__repr__` has
+nothing to report. The second `list(raw)` is the more dangerous half:
+it returns `[]` with no error at all. The iterator was consumed by the
+first pass and cannot be rewound, so any later pass sees an exhausted
+object and silently produces nothing. A comprehension hands back a
+finished list, which can be walked as many times as you like.

@@ -2,11 +2,11 @@
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
-class Sketch:
+class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
 
-    def draw(self, stroke: str) -> Sketch:
+    def draw(self, stroke: str) -> Drawing:
         return replace(
             self, strokes=(*self.strokes, stroke))
 
@@ -15,7 +15,7 @@ class Sketch:
         return f"{self.title}: {drawn}"
 
 if __name__ == "__main__":
-    before = Sketch("Duck").draw("circle").draw("beak")
+    before = Drawing("Duck").draw("circle").draw("beak")
     after = before.draw("scribble")
     print(after)
     print(before)

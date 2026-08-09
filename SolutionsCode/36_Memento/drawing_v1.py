@@ -1,0 +1,7 @@
+# drawing_v1.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Drawing:
+    title: str
+    strokes: tuple[str, ...] = ()

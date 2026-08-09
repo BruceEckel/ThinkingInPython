@@ -16,10 +16,10 @@ def interview() -> Generator[Question, Answer, Result]:
 
 if __name__ == "__main__":
     print(drive(interview(), ANSWERS))
-#: request = 'name', answers[request] = 'Alice'
+#: request = 'name', answer = 'Alice'
 #: ask(question = 'name') -> answer = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
+#: request = 'town', answer = 'Wonderland'
 #: ask(question = 'town') -> answer = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'friend', answer = 'Rabbit'
 #: ask(question = 'friend') -> answer = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit

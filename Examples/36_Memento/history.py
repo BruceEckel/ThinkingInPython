@@ -32,8 +32,8 @@ class History[S]:
         return bool(self._future)
 
 if __name__ == "__main__":
-    from frozen_sketch import Sketch
-    history = History(Sketch("Duck"))
+    from frozen_sketch import Drawing
+    history = History(Drawing("Duck"))
     history.do(history.present.draw("circle"))
     history.do(history.present.draw("beak"))
     print(history.present)

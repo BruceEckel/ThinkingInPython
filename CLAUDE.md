@@ -34,6 +34,10 @@ The full deep-review procedure (editing pass, teaching pass, style
 audit, prose pass, third-party-library rules, accrued review notes) lives in
 the `deep-review` skill (`.claude/skills/deep-review/SKILL.md`).
 Invoke it for any chapter review request.
+`/annealing` (`.claude/skills/annealing/SKILL.md`) is the follow-up
+settling pass, run after a review is applied: it re-runs the same passes
+over the whole chapter but applies the confident findings directly and
+discards the rest unreported, with no review file.
 
 ## The verify loop after editing a chapter
 

@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -428,7 +429,7 @@ moved.
 
 Proposed change:
 
-> A union like this is Python's untagged spelling of a *sum type*:
+> A union like this is Python's untagged spelling of a *sum type* (a *disjoint* union):
 > a value that is one thing or another.
 
 The following section now says explicitly that `Ok`/`Err` supply the tag

@@ -1,16 +1,20 @@
 # rats_and_mazes/blackboard.py
 import asyncio
 import itertools
+from collections.abc import Iterator
+from dataclasses import dataclass, field
 from maze import Coord, Maze
 from rat import Rat
 
+@dataclass
 class Blackboard:
-    def __init__(self, maze: Maze) -> None:
-        self.maze = maze
-        self.visited: set[Coord] = set()
-        self.tasks: list[asyncio.Task[None]] = []
-        self.messages: list[str] = []
-        self._numbers = itertools.count(1)
+    maze: Maze
+    visited: set[Coord] = field(default_factory=set)
+    tasks: list[asyncio.Task[None]] = field(default_factory=list)
+    messages: list[str] = field(default_factory=list)
+    _numbers: Iterator[int] = field(
+        init=False, default_factory=lambda: itertools.count(1))
+    group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
         # No await between the test and the add, so this is atomic
@@ -21,7 +25,7 @@ class Blackboard:
 
     def spawn(self, x: int, y: int) -> None:
         rat = Rat(self, x, y)
-        self.tasks.append(asyncio.create_task(rat.run()))
+        self.tasks.append(self.group.create_task(rat.run()))
 
     def next_number(self) -> int:
         return next(self._numbers)
@@ -32,10 +36,9 @@ class Blackboard:
     async def explore(self) -> None:
         start = self.maze.entry()
         self.claim(*start)
-        self.spawn(*start)
-        # Wait for every rat, including ones spawned while we wait
-        while pending := [t for t in self.tasks if not t.done()]:
-            await asyncio.gather(*pending)
+        async with asyncio.TaskGroup() as group:
+            self.group = group
+            self.spawn(*start)
 
     def render(self) -> str:
         lines = []

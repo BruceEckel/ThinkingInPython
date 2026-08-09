@@ -7,6 +7,14 @@ and structural typing together in one small program.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
 introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
+Three simulations follow,
+each giving its agents less to work with than the last.
+A pack of rats coordinates through a shared blackboard,
+a single robot walks a maze where each object it meets decides what happens,
+and a plate of vibrating sand runs on grains that know nothing at all.
+The first two confirm a design you can predict from the code.
+The third does not, which is simulation's other purpose.
+
 ## Rats & Mazes
 
 The problem has three types.
@@ -37,6 +45,8 @@ it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.
 When it can claim nothing, it has reached a dead end and its task ends.
 When the last rat dies, every cell reachable from the entry has been mapped.
+
+### The Rat and the Blackboard
 
 The rat does not import the blackboard.
 It only needs an object with matching methods,
@@ -160,23 +170,26 @@ so the atomicity comes from the shape of the code rather than from a lock
 (exercise 3 inserts a suspension point and looks at what breaks).
 `next_number()` hands out rat numbers from `itertools.count()`,
 the endless counter from [Iterators](23_Iterators.md#reusable-algorithms).
-`explore()` claims the entry, releases the first rat, then awaits every task,
-including the ones spawned along the way:
+`explore()` claims the entry and releases the first rat inside an `asyncio.TaskGroup`:
 
 ```python
 # rats_and_mazes/blackboard.py
 import asyncio
 import itertools
+from collections.abc import Iterator
+from dataclasses import dataclass, field
 from maze import Coord, Maze
 from rat import Rat
 
+@dataclass
 class Blackboard:
-    def __init__(self, maze: Maze) -> None:
-        self.maze = maze
-        self.visited: set[Coord] = set()
-        self.tasks: list[asyncio.Task[None]] = []
-        self.messages: list[str] = []
-        self._numbers = itertools.count(1)
+    maze: Maze
+    visited: set[Coord] = field(default_factory=set)
+    tasks: list[asyncio.Task[None]] = field(default_factory=list)
+    messages: list[str] = field(default_factory=list)
+    _numbers: Iterator[int] = field(
+        init=False, default_factory=lambda: itertools.count(1))
+    group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
         # No await between the test and the add, so this is atomic
@@ -187,7 +200,7 @@ class Blackboard:
 
     def spawn(self, x: int, y: int) -> None:
         rat = Rat(self, x, y)
-        self.tasks.append(asyncio.create_task(rat.run()))
+        self.tasks.append(self.group.create_task(rat.run()))
 
     def next_number(self) -> int:
         return next(self._numbers)
@@ -198,10 +211,9 @@ class Blackboard:
     async def explore(self) -> None:
         start = self.maze.entry()
         self.claim(*start)
-        self.spawn(*start)
-        # Wait for every rat, including ones spawned while we wait
-        while pending := [t for t in self.tasks if not t.done()]:
-            await asyncio.gather(*pending)
+        async with asyncio.TaskGroup() as group:
+            self.group = group
+            self.spawn(*start)
 
     def render(self) -> str:
         lines = []
@@ -217,6 +229,17 @@ class Blackboard:
             lines.append("".join(row))
         return "\n".join(lines)
 ```
+
+A `TaskGroup` does not close until every task inside it has finished,
+including tasks created after the block was entered,
+which is the shape this problem has: each rat can create more rats.
+A single `asyncio.gather(*self.tasks)` would not do,
+because `gather()` fixes its argument list at the moment it is called,
+and half the rats do not exist yet.
+`group` is declared with `field(init=False)` and assigned only while `explore()` runs,
+the same declaration-without-assignment the robot example uses for `Robot.room`.
+The other four fields are internal bookkeeping rather than constructor arguments,
+which is why they carry `default_factory` instead of appearing in the signature.
 
 The maze layout lives in a text file.
 The loader drops blank lines and any line beginning with `#`,
@@ -242,6 +265,11 @@ so the first line naming the file's path is ignored and the rest is the maze.
 ```
 
 Running it turns the rats loose and prints what they mapped.
+The first eight log messages come first,
+a trace of the run that nothing else in the chapter needs.
+They show what the map cannot: rat 1 spawns rat 2 and then dies before it,
+numbers are handed out in spawn order rather than completion order,
+and eighteen messages cover all nine rats.
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
@@ -253,12 +281,22 @@ async def main() -> None:
     maze = Maze.from_file("amaze.txt")
     blackboard = Blackboard(maze)
     await blackboard.explore()
+    for message in blackboard.messages[:8]:
+        print(message)
     print("Mapped maze (# wall, . visited):")
     print(blackboard.render())
     print(f"{len(blackboard.tasks)} rats mapped "
           f"{len(blackboard.visited)} cells.")
 
 asyncio.run(main())
+#: Rat 1 starts at (1, 1).
+#: Rat 2 starts at (6, 3).
+#: Rat 1 dead-ends at (7, 5).
+#: Rat 3 starts at (6, 1).
+#: Rat 2 dead-ends at (3, 3).
+#: Rat 4 starts at (18, 1).
+#: Rat 3 dead-ends at (15, 1).
+#: Rat 5 starts at (12, 13).
 #: Mapped maze (# wall, . visited):
 #: #####################
 #: #.#...........#.....#
@@ -277,6 +315,8 @@ asyncio.run(main())
 #: #####################
 #: 9 rats mapped 139 cells.
 ```
+
+### Testing Full Coverage
 
 Because claiming is atomic,
 the rats always cover every cell reachable from the entry,
@@ -317,6 +357,8 @@ def test_rats_map_every_reachable_cell() -> None:
     asyncio.run(blackboard.explore())
     assert blackboard.visited == flood(maze, maze.entry())
 ```
+
+### Watching the Pack
 
 You can create a GUI demonstration using the same model.
 `rats_view.py` runs the exploration to completion,
@@ -401,6 +443,8 @@ walks a single robot through a maze.
 It shows how polymorphism removes conditionals.
 A `Room` asks its occupant what to do,
 and each type of occupant answers for itself.
+
+### Rooms, Robots, and the Item Factory
 
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
@@ -500,8 +544,6 @@ def item_factory(symbol: str) -> Item:
             return item_type()
     return Teleport(symbol)  # Anything else is a teleport target
 ```
-
-### Rooms, Robots, and the Item Factory
 
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
 so `from world import Room` here is circular.
@@ -690,6 +732,13 @@ solution = (
     "eesswwsswwwwsseesseeeesswwwwwwwwwwwwwwnnnneennnnnnnnnneessss"
     "eesssswwsseesswwww"
 )
+```
+
+Running the demo prints the maze before and after the walk:
+
+```python
+# robot_explorer/robot_demo.py
+from game import GameBuilder, solution, string_maze
 
 game = GameBuilder(string_maze)
 print("start:")
@@ -747,7 +796,6 @@ print(game.show_maze())
 #: ###############################
 ```
 
-Running it prints the maze before and after the walk.
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
 
@@ -889,6 +937,11 @@ builds objects from data,
 and a [Null Object](20_Rethinking_Objects.md#null-object)
 removes the check for a missing door.
 None of them needs concurrency.
+
+Two further resources on mazes:
+a survey of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm),
+and Craig Reynolds on [steering behavior for autonomous moving objects](https://www.red3d.com/cwr/steer/),
+which is where a robot that decided its own route would start.
 
 ## Order from Noise
 
@@ -1150,6 +1203,8 @@ It yields elements from the source in sequence and cycles back to the beginning 
 The first argument is the starting point, the second is the step size
 (defaults to one).
 
+## The Less the Agents Know
+
 The chapter began by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.
@@ -1166,12 +1221,6 @@ because the outcome lives in the interactions rather than the instructions.
 When behavior emerges, reading the code is not enough.
 Run it.
 
-## Other Maze Resources
-
-A discussion of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm).
-
-A discussion of algorithms for collision detection and [steering behavior for autonomous moving objects](http://www.red3d.com/cwr/steer/).
-
 ## Exercises
 
 1.  Test a `Rat` with a fake blackboard.
@@ -1187,21 +1236,30 @@ A discussion of algorithms for collision detection and [steering behavior for au
     Build a maze for which that set is not empty,
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.
-    Insert an `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`,
-    then run `test_rats_and_mazes.py` several times.
-    What goes wrong when two rats reach the same cell during that gap,
+    Make `claim()` an `async def`, which pulls the `Recorder` protocol,
+    `Rat.run()`'s comprehension and `explore()` along with it,
+    and put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
+    Then count how many calls return `True` and compare that count with `len(blackboard.visited)`.
+    `test_rats_and_mazes.py` still passes, because `visited` is a set:
+    the guarantee that broke is "one rat per cell", not "every cell is reached".
+    What does the extra success cost the rats,
     and why does the original `claim()`, with no `await` inside it,
     need no lock?
 4.  Add a new kind of `Item` to the robot maze.
-    Define a `Coin` subclass with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+    Define a `Coin` subclass of `Item` with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
     Place a few `$` characters in the maze and report how many the robot collects.
     You shouldn't need to touch `item_factory()`, `Room`, or `GameBuilder`.
-    Explain why the factory finds your new item on its own.
+    Explain why the factory finds your new item on its own,
+    and what happens if you derive `Coin` from `Food` instead.
 5.  Compute the solution instead of hard-coding it.
     Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,
     the way `flood()` searches maze cells in `test_rats_and_mazes.py`.
-    Turn that path into a move string, feed it to `run()`,
-    and assert that the robot finishes on the `!` square,
+    The room graph has no `is_open()`,
+    so passability is a property of the occupant:
+    refuse any room holding a `Wall` or an `Edge`.
+    Turning the room path back into `n`/`s`/`e`/`w` means tracking which `Urge` produced each step.
+    Your path will be shorter than the hard-coded `solution` and need not use the teleports,
+    so assert only that the robot finishes on the `!` square,
     as `test_robot.py` does.
 6.  Freeze the plate.
     Run the Chladni view with `MODES` starting at `(2, 2)`.
