@@ -259,7 +259,8 @@ A proxy that must forward special methods defines them explicitly.
 `len(p)` reports the miss because nothing supplies a default `__len__()`.
 `print(p)` cannot: `object` already defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
-A bypassed dunder that `object` defines fails silently, with no error pointing at the miss.
+A bypassed dunder that `object` defines fails silently,
+with no error pointing at the miss.
 
 Delegation forwards reads, not writes:
 
