@@ -164,8 +164,7 @@ The nested `class` statements run again on every call,
 so every call to `factory()` defines fresh `Circle` and `Square` classes.
 Two shapes from different calls share behavior but not a class.
 The last line of the listing shows both checks failing:
-`type(a) is type(b)` is `False`,
-and so is `isinstance(a, type(b))`.
+`type(a) is type(b)` is `False`, and so is `isinstance(a, type(b))`.
 `shape_gen()` also has to name the shapes as strings.
 `Shape.__subclasses__()` no longer identifies the two kinds:
 each call adds the two classes it just defined,
@@ -407,8 +406,7 @@ Now the factory methods are polymorphic:
 each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
 `ShapeFactory.create_shape()` is a class method.
 It reaches the registry through `cls`,
-finds the factory object for the identifier you pass,
-and calls it right away.
+finds the factory object for the identifier you pass, and calls it right away.
 A more complex design would hand that factory object back to the caller,
 who could hold it and create objects from it later.
 However, much of the time you don't need the complexity of the polymorphic factory method,

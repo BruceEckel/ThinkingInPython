@@ -369,8 +369,7 @@ and the chapters after it build a checked system on that idea.
 1.  Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
     Compare that number to `os.process_cpu_count()`,
     and run it three times before deciding what it means.
-2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise
-    and explain the IDs you see instead.
+2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
 3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
     an invariant (every adjacent pair of the output is ordered) and idempotence
     (sorting a sorted list changes nothing).

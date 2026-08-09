@@ -581,8 +581,7 @@ It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 
 A Python generator suspends a computation,
-hands control to whoever is driving it,
-and resumes it with a value.
+hands control to whoever is driving it, and resumes it with a value.
 [Generators](45_Generators.md) covers the full two-way form,
 and it is the mechanism the Python Effect library in [Stateless](46_Stateless.md)
 is built from.

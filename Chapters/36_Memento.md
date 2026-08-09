@@ -118,8 +118,7 @@ It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
 though freezing the memento means an honest mistake
-(swapping the snapshot's strokes for different ones)
-fails loudly.
+(swapping the snapshot's strokes for different ones) fails loudly.
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
 Every call site would still type-check.
@@ -242,7 +241,8 @@ as `frozen_leaky.py` shows there.
 [Flyweight](35_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
-The classic form has not disappeared. It has narrowed.
+The classic form has not disappeared.
+It has narrowed.
 Freezing rebuilds the changed field on every edit,
 so a state large enough that copying it per keystroke is unaffordable still needs a mutable originator and an explicit `save()`.
 So does a state you do not own: a widget tree, a database row,

@@ -26,11 +26,10 @@ examines what the discipline lets you claim about your code.
 Those four chapters are Part IV.
 Part V then takes the same discipline further.
 [Effect Management](44_Effect_Management.md)
-tracks a function's effects in its type,
-and [Generators](45_Generators.md) supplies the mechanism Python already has
-for describing a computation without running it.
-[Stateless](46_Stateless.md) and
-[Stateless in Practice](47_Stateless_in_Practice.md)
+tracks a function's effects in its type, and [Generators](45_Generators.md)
+supplies the mechanism Python already has for describing a computation without running it.
+[Stateless](46_Stateless.md)
+and [Stateless in Practice](47_Stateless_in_Practice.md)
 then build a checked Effect system on that mechanism.
 
 ## Pure Functions

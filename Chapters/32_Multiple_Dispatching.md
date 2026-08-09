@@ -293,7 +293,8 @@ The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
 belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
 Python makes the table cheap, so it is both shorter and easier to maintain.
-A table cell can hold a function, so the size of the behavior never forces the choice.
+A table cell can hold a function,
+so the size of the behavior never forces the choice.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.

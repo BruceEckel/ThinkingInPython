@@ -429,7 +429,8 @@ The file has a different name from the first engine's `state_machine.py` on purp
 Python caches a module in `sys.modules` under its basename,
 and never looks it up again once it is there.
 Two files named `state_machine.py` in one program therefore collapse into one:
-whichever imported first wins, and the second import silently gets the wrong module.
+whichever imported first wins,
+and the second import silently gets the wrong module.
 The states in this design do nothing; the table holds all the behavior.
 
 ### The Engine

@@ -648,7 +648,8 @@ One thing stays outside the types.
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifted it,
 so it travels through `run()` untracked and no signature mentions it.
-`catch()` matches values an Effect yields, and a handler is not part of the Effect,
+`catch()` matches values an Effect yields,
+and a handler is not part of the Effect,
 so no `catch()` around this program intercepts it.
 A handler sits outside the channel it feeds.
 

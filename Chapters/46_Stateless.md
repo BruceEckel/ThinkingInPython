@@ -1679,7 +1679,8 @@ Failures cannot be lost, only relocated.
 
 ## Emptying the Channels
 
-The two halves of this chapter taught two vocabularies, and a third case that needs none:
+The two halves of this chapter taught two vocabularies,
+and a third case that needs none:
 
 1. A dependency is an object created elsewhere.
    `need()` records the request as a `Need` in the type,

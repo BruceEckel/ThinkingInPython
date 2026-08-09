@@ -151,8 +151,7 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the coordinates supplied by the asker.
-The listing can show the object count;
-exercise 2 measures the memory behind it.
+The listing can show the object count; exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
 
@@ -447,8 +446,8 @@ exploits the same property, using members as shared, comparable states.
 
 ## Which Pool Should You Use?
 
-The chapter showed four mechanisms, and the question that decides between them
-is how much you know about the set of values.
+The chapter showed four mechanisms,
+and the question that decides between them is how much you know about the set of values.
 If you know it as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,

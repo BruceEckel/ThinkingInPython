@@ -344,8 +344,8 @@ if __name__ == "__main__":
 
 Data classes generate `__eq__()`, so two trees compare by value,
 and the demo confirms that the operators build the tree you would assemble by hand.
-Printing `expr.left` shows the nesting:
-the `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
+Printing `expr.left` shows the nesting: the `Add` at the root holds a `Mul`,
+which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` did not compute a number.
