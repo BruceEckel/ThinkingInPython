@@ -73,9 +73,22 @@ def drive_from_dict(
         answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
-        print(f"{request = }, {answers[request] = }")
+        answer = answers[request]
+        print(f"{request = }, {answer = }")
         try:
-            request = conversation.send(answers[request])
+            request = conversation.send(answer)
+        except StopIteration as stop:
+            return stop.value
+
+def drive_naive(
+        conversation: Generator[Question, Answer, Result],
+        answers: Iterator[Answer]) -> Result:
+    request = next(conversation)
+    while True:
+        try:  # Both next() calls share one except clause
+            reply = next(answers)
+            print(f"{request = }, {reply = }")
+            request = conversation.send(reply)
         except StopIteration as stop:
             return stop.value
 
@@ -97,9 +110,9 @@ by_name = {
     Question("friend"): Answer("Rabbit"),
 }
 print(drive_from_dict(interview(), by_name))
-#: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'friend', answer = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit
 in_order = iter([Answer("Alice"), Answer("Wonderland"),
                  Answer("Rabbit")])
@@ -108,6 +121,16 @@ print(drive_in_order(interview(), in_order))
 #: request = 'town', reply = 'Wonderland'
 #: request = 'friend', reply = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit
+# One answer, three questions:
+try:
+    drive_in_order(interview(), iter([Answer("Alice")]))
+except StopIteration:
+    print("answer source ran out")
+#: request = 'name', reply = 'Alice'
+#: answer source ran out
+print(repr(drive_naive(interview(), iter([Answer("Alice")]))))
+#: request = 'name', reply = 'Alice'
+#: None
 ```
 
 Nothing in `interview()` changed, and nothing could have. It yields a
@@ -127,10 +150,26 @@ travels, not what the driver knows.
 One detail in `drive_in_order()` earns its comment. `next(answers)` sits
 outside the `try` because a `StopIteration` from an exhausted answer
 list would otherwise be caught by the `except StopIteration` meant for
-the conversation, and the driver would return `stop.value`, which is
-`None` for that exception, as though the interview had finished. Two
-different generators raising one exception type is a real hazard when a
-driver holds both.
+the conversation. Two different iterators raising one exception type is
+a real hazard when a driver holds both.
+
+The last two lines are what that hazard looks like. Given one answer and
+three questions, `drive_in_order()` lets the `StopIteration` escape, so
+the caller learns the answer source ran dry. `drive_naive()`, which
+differs only in having `next(answers)` inside the `try`, catches that
+same exception, reads it as "the conversation finished," and returns
+`stop.value`, which is `None`.
+
+`None` is the wrong answer twice over. The interview never finished, so
+no `Result` exists, and `None` is not a `Result` in any case. Nothing
+catches it: `StopIteration.value` is typed `Any`, so `return stop.value`
+satisfies a declared `Result` and `ty` reports nothing. The failure is
+silent at the checker and silent at runtime, and it surfaces later as a
+`None` where a string was expected, far from the driver that produced
+it.
+
+Keeping the two meanings apart is a one-line discipline: put inside the
+`try` only the call whose `StopIteration` you mean to interpret.
 
 ## 3. A third delegation in `yield_from_send.py`
 

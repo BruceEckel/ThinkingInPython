@@ -163,8 +163,12 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `extract_examples.py --write` dies with `PermissionError [WinError 32]`. Keep the
   shell at the repo root and run chapter-dir commands in a subshell, e.g.
   `(cd build/examples && uv run ty check NN_Chapter)`.
-- **`run_examples.py`: never pass a relative `--tree`.** It goes on `PYTHONPATH`
-  and breaks once an example changes cwd. GUI/interactive examples are skipped via
+- **`run_examples.py` and `validate_output.py`: never pass a relative
+  `--tree`.** It goes on `PYTHONPATH` and breaks once an example changes cwd.
+  `validate_output.py` manifests this as `ModuleNotFoundError` on a `utils/`
+  helper (`No module named 'greeter'` across every block that imports one),
+  which reads as a broken listing rather than a bad flag; an absolute
+  `--tree` fixes all of them at once. GUI/interactive examples are skipped via
   `tools/data/norun.txt` (keep those paths current when chapters are renumbered).
 - **Renumbering a chapter** touches: `Chapters/` and `Examples/` filenames, every
   `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/data/norun.txt`, and the
@@ -221,8 +225,8 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   literal narrowing (ch35 + solutions), `frozendict` support arriving
   (two of ch03's three ignores went unused), `filter(lambda ...)` no
   longer narrowing its element type (ch16's `map`/`filter` listings broke),
-  and higher-order union subtraction starting to work (ch45's documented
-  limitation was half-obsolete). After `make upgrade-tools`, run
+  and higher-order union subtraction starting to work (the caveat that
+  invalidated has since been removed from the text). After `make upgrade-tools`, run
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
   before assuming the first failure is the only one: `make all` stops at
   the first failing gate and `solutions-gate` runs last.
@@ -235,10 +239,15 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   as a return annotation let an undeclared `Need[Log]` yield through with
   zero diagnostics; spelling the same annotation out caught it at the
   offending `yield from`. Old-style `TypeAlias` assignments (stateless's
-  own `Effect`/`Depend`) check fine. Chapter 45 wraps long Effect
-  signatures across lines instead of aliasing them, and warns the reader;
-  don't "clean up" those signatures into aliases. Re-test on each `ty`
-  upgrade (`stateless-partial-handling-ty-support` in project memory has
+  own `Effect`/`Depend`) check fine. Chapter 46 carries the warning
+  ("Write Effect signatures out in full until your checker proves that
+  it sees through the alias") and chapter 47 has the wrapped five-way
+  union; don't "clean up" those signatures into aliases. Chapter 45 has
+  no Effect signature at all, so this entry never applied there.
+  Re-confirmed on `ty` 0.0.65: spelled-out and old-style `TypeAlias`
+  annotations still report `invalid-yield`, the `type X = ...` form
+  still reports nothing. Re-test on each `ty` upgrade
+  (`stateless-partial-handling-ty-support` in project memory has
   the probe).
 - **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and

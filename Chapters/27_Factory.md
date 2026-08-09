@@ -11,7 +11,7 @@ and at the point of creation you must specify the exact constructor to use.
 Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
 You must still chase down all the places in your code where type matters.
-It happens to be the creation of the type that matters here rather than the use of the type
+Creation of the type matters here, not use of the type
 (which polymorphism takes care of).
 The effect is the same.
 Adding a new type can cause problems.
@@ -83,13 +83,13 @@ if __name__ == "__main__":
 ```
 
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create.
-It happens to be a string here but it could be any set of data.
+Here it is a string, but it could be any set of data.
 The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
 (the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
 A factory takes information telling it what to build;
-a generator object holds an internal algorithm and produces the next value with no argument at all.
+a generator object holds an internal algorithm and produces the next value with no argument.
 `shape_name_gen()` takes `n` and returns a generator object,
 and that object then produces names on demand.
 Those names are the data driving `Shape.factory()`.
@@ -162,9 +162,10 @@ if __name__ == "__main__":
 The privacy has a price.
 The nested `class` statements run again on every call,
 so every call to `factory()` defines fresh `Circle` and `Square` classes.
-Two shapes from different calls share behavior but not a class:
+Two shapes from different calls share behavior but not a class.
+The last line of the listing shows both checks failing:
 `type(a) is type(b)` is `False`,
-and `isinstance()` comparisons across calls fail with it.
+and so is `isinstance(a, type(b))`.
 `shape_gen()` also has to name the shapes as strings.
 `Shape.__subclasses__()` no longer identifies the two kinds:
 each call adds the two classes it just defined,
@@ -256,13 +257,13 @@ if __name__ == "__main__":
 
 Nothing in the listing calls a register function.
 The two `class` statements filled `Shape.registry` on their own,
-which is what the printed key list shows.
+as the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler).
 A dictionary of classes, filled by hand or filled by the classes themselves,
 is the ordinary Python factory.
-Creating objects through a dictionary of classes is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
+That is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
 the pattern does not go away, it stops needing a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
@@ -271,9 +272,9 @@ for contrast.
 In one file that timing is invisible,
 but a subclass defined in another module joins the registry only when that module is imported.
 The classic failure is a plugin that "never registered": the class is fine,
-the registry is fine, and nothing ever imported the module that defines it.
+the registry is fine, and nothing imported the module that defines it.
 A [lazy import](06_Modules_and_Packages.md#lazy-imports)
-produces that same failure from an import statement sitting right there in the file.
+produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
 waits for the first use of the imported name,
 and an import written only to trigger registration never uses that name.
@@ -413,8 +414,10 @@ will work fine.
 `ShapeFactory` fills its dictionary lazily.
 The first request for a kind builds that kind's factory object (via `eval()`)
 and caches it for later requests.
+The two printed key lists show it: empty before any request,
+two entries after four requests for two kinds.
 
-This version leans on `eval()` and a `Factory` class nested in every shape,
+This version uses `eval()` and a `Factory` class nested in every shape,
 neither of which Python needs.
 The `eval()` is worse than unnecessary.
 `create_shape()` compiles and runs whatever string it receives,
@@ -863,7 +866,7 @@ That is the Builder structure.
 `PizzaBuilder` collecting toppings in a list and freezing them into a tuple at `build()` is the same move.
 Reserve the pattern, and the name,
 for construction that is a process with intermediate state and rules of its own.
-When the "steps" are just optional values,
+When the "steps" are optional values,
 keyword arguments and a data class are the builder.
 
 ## Which Factory Should You Use?

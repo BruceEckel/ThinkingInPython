@@ -15,110 +15,28 @@ The chapter reads as human prose with good rhythm, and the deflating one-liners
 one list of functions says directly") are the best writing in it.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation.
-Three findings are in prose written during this pass; the rest are watch-list
-words and one repeated phrase.
 
-Line numbers refer to the chapter as it stands now.
+The clear-cut fixes were applied to the chapter directly (listed below);
+the blocks that remain are the ones needing your judgment.
 
-***
+## Applied directly
 
-**Line 144 — "want" applied to code**
-**Pattern:** watch list, "don't use"; §35 moral/volitional adjective on a
-non-agent
+- Line 27: "the action is just a function" → "the action is a function"
+  (empty adverb, and it repeated line 98's opening; line 98 keeps its "just,"
+  where the word answers *GoF* calling commands "an object-oriented
+  replacement for callbacks").
+- Line 144: "when the commands also want shared implementation" → "when the
+  commands also share implementation" (watched "want" applied to code).
+- Line 438: "A handler is trusted to know when it failed" → "The chain trusts
+  each handler to know when it failed"; "only as reliable as its handlers" →
+  "no more reliable than its handlers" (subjectless passive hiding the actor;
+  drops a watched "only").
+- Line 616: "when that configuration wants a name and a `repr`" → "needs a
+  name and a `repr`" (watched "want"; lines 598 and 629 address the reader,
+  so their "want"s stay).
 
-Current:
-> A `Command` base class becomes worth writing when the commands also want shared implementation.
-
-Commands do not want anything.
-This is prose written during the deep-review pass, replacing the "earns its
-keep" sentence you asked to be rewritten, so the tic came in with the fix.
-
-Proposed:
-> A `Command` base class becomes worth writing when the commands also share implementation.
-
-Line 616 in the new closing section has the same verb:
-> 4.  A callable object, when that configuration wants a name and a `repr`
-
-Proposed:
-> 4.  A callable object, when that configuration needs a name and a `repr`
-
-Line 598 ("If you instead want a single handler per type") and line 629 ("do
-you now want an object?") address the reader, so they stay.
-
-[] Reject
-
-***
-
-**Line 337 — "earns its keep" survives here**
-**Pattern:** stock phrase, now inconsistent
-
-Current:
-> The Context earns its keep when something has to hold the current algorithm between calls,
-> which a parameter cannot do.
-
-You had the phrase cut from chapter 26's conclusion and rewritten out of this
-chapter's `Command` paragraph.
-This is the last instance in the chapter, and it sits in a sentence that would
-read more directly without it.
-"Has to" is also on the watch list.
-
-Proposed:
-> The Context becomes useful when something must hold the current algorithm between calls,
-> which a parameter cannot do.
-
-If you would rather keep one home for the phrase, this is a defensible one:
-the Context is being weighed against a cheaper alternative, which is the
-comparison the idiom exists for. Then mark this rejected.
-
-[] Reject
-
-***
-
-**Line 438 — "A handler is trusted to know when it failed"**
-**Pattern:** §13 subjectless passive, hiding who trusts
-
-Current (prose added this pass):
-> A handler is trusted to know when it failed.
-> `secant()` and `newton()` stop when their step stops shrinking,
-> which is not quite the same as landing on a root,
-> so a chain is only as reliable as its handlers.
-
-The passive hides the actor, and the actor is the point: the chain does the
-trusting, and that is why a bad self-assessment propagates.
-
-Proposed:
-> The chain trusts each handler to know when it failed.
-> `secant()` and `newton()` stop when their step stops shrinking,
-> which is not quite the same as landing on a root,
-> so a chain is no more reliable than its handlers.
-
-"Only as reliable as" also becomes "no more reliable than," which drops the
-watched "only" and says the same thing.
-
-[] Reject
-
-***
-
-**Lines 27 and 98 — "just a function" twice**
-**Pattern:** §23 empty adverb, and repetition seventy lines apart
-
-Current:
-> In Python the action is just a function, and a "macro" is a list of actions:
-
-and
-> In Python a callback is just a function, so the replacement is unnecessary.
-
-Both sentences open the same way and lean on the same word.
-"Just" is doing deflating work in the second one, where it answers *GoF Design
-Patterns* calling commands "an object-oriented replacement for callbacks," so
-that is the one to keep.
-
-Proposed for line 27:
-> In Python the action is a function, and a "macro" is a list of actions:
-
-Leave line 98 as it stands.
-
-[] Reject
+Line numbers below refer to the chapter as it stood before these edits
+(none of the edits changed line counts).
 
 ***
 
@@ -149,19 +67,40 @@ version needs different wording if you prefer its shape.
 
 ***
 
-**Line 146 — "springs" and "best-known"**
-**Pattern:** metaphor plus superlative in one clause
+**Line 337 — "earns its keep"**
+**Pattern:** stock phrase, now inconsistent
+
+Current:
+> The Context earns its keep when something has to hold the current algorithm between calls,
+> which a parameter cannot do.
+
+You had the phrase cut from chapter 26's conclusion and rewritten out of this
+chapter's `Command` paragraph.
+This is the last instance in the chapter, and it sits in a sentence that would
+read more directly without it.
+"Has to" is also on the watch list.
+
+Proposed:
+> The Context becomes useful when something must hold the current algorithm between calls,
+> which a parameter cannot do.
+
+If you would rather keep one home for the phrase, this is a defensible one:
+the Context is being weighed against a cheaper alternative, which is the
+comparison the idiom exists for. Then mark this rejected.
+
+[] Reject
+
+***
+
+**Line 146 — "best-known"**
+**Pattern:** unsupported superlative
 
 Current:
 > Building commands in a loop springs Python's best-known closure trap:
 
 "Springs" is the right verb for a trap and reads well.
 "Best-known" is an unsupported superlative, and the sentence loses nothing
-without it.
-
-Proposed:
-> Building commands in a loop springs Python's best-known closure trap:
-> becomes
+without it:
 > Building commands in a loop springs Python's closure trap:
 
 Low confidence: "best-known" tells a reader this is the trap they have heard
@@ -171,12 +110,8 @@ about, which is useful orientation. Reject if you read it that way.
 
 ***
 
-**Line 96 — "to say what one list of functions says directly"**
-**Pattern:** none; noting it as a keeper
+## Noted, no change
 
-No change proposed.
-This is the sharpest sentence in the chapter and the reason the *Command*
-section works.
-Recorded here so a later pass does not "tighten" it.
-
-[] Reject
+**Line 96 — "to say what one list of functions says directly."**
+The sharpest sentence in the chapter and the reason the *Command* section
+works. Recorded here so a later pass does not "tighten" it.

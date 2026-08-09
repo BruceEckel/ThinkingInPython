@@ -8,6 +8,8 @@ New book cover & favicon
 Do they teach something valuable enough, would anybody ever use these?
 Make a review list that proposes removal of the ones that don't pull their weight.
 
+Active voice
+
 Add Epub link info on README and bottom of index page.
 
 Look for places display_object could be replaced with print(vars(obj))

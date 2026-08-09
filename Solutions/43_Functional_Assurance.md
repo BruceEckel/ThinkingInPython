@@ -360,9 +360,9 @@ book keeps making. Move the hidden input into the parameter list.
 `stale_pure()` takes the current time, and `timeout_pure()` takes the
 mapping to read. Both are now referentially transparent, both are
 testable without a clock or a monkeypatched environment, and the
-caller that does reach for the real clock or the real `os.environ` is
-one line at the edge of the program instead of a dependency buried in
-the middle of it. [Testing](../Chapters/11_Testing.md#random-numbers)
+caller that does read the real clock or the real `os.environ` is one
+line at the edge of the program instead of a dependency buried in the
+middle of it. [Testing](../Chapters/11_Testing.md#random-numbers)
 makes the same move for a random source.
 
 ## 6. `match` against `isinstance()` on the same function

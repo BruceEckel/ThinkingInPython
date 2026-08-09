@@ -1,3 +1,4 @@
+[[Reviewed]]
 > When this file has been applied, change this file's name so it has a leading
 > `~` to indicate completion.
 
@@ -36,7 +37,7 @@ the summary just denied.
 This needs your call because there are two defensible repairs and they say
 different things.
 Cutting the sentence is the cheap one and loses nothing, since the paragraph
-was already making the comparison item by item.
+was already making the comparison item by item.[[do tthis]]
 Correcting it to "increasing cost and increasing reach" keeps the summary and
 makes the trade explicit, which is the more useful sentence if you want the
 reader to leave with a rule.

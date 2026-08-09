@@ -124,9 +124,8 @@ the list, and the custom `Countdown`.
 so it can be iterated repeatedly, as the tests below confirm.
 
 These tests collect each iterator into a list and compare them,
-covering the sequences and their empty edge cases.
-This confirms that a custom iterable can be re-iterated,
-and that `total()` works on every source:
+covering the sequences and their empty edge cases,
+and check that `total()` works on every source:
 
 ```python
 # test_iterators.py
@@ -169,8 +168,7 @@ which a list cannot do.
 
 ## The Costs of Laziness
 
-There are two surprising consequences of laziness.
-Both are silent:
+Two of those consequences are surprising, and both are silent:
 
 ```python
 # generator_lifecycle.py
@@ -268,7 +266,7 @@ which is why the listing cannot show it: a chapter listing must type-check.
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones,
 which looks like a third option but is rarely cheaper.
-This `squares()` is the plain-function form from `eager_validation.py`,
+The `squares()` below is the plain-function form from `eager_validation.py`,
 with the generator expression standing in for `produce()`:
 
 ```python
@@ -750,7 +748,7 @@ It is to let the loop do the asking.
 ## The Protocol Answers Nothing for Free
 
 Both surprises in [The Costs of Laziness](#the-costs-of-laziness)
-come from the same rule: the protocol answers no question for free.
+come from the same rule.
 The only way to find out whether the body accepts its arguments is to pull a value and let it run,
 and the only way to find out whether the source is spent is to pull and be told nothing came back.
 `for` and `list()` catch that second answer and report nothing,

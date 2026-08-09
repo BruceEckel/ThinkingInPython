@@ -1,3 +1,4 @@
+[[Reviewed]]
 > When this file has been applied, change this file's name so it has a leading
 > `~` to indicate completion.
 
@@ -84,7 +85,7 @@ that the same paragraph is justifying, so the chapter now uses the family once
 after having it cut once.
 
 Proposed:
-> The double underscore on `self.__implementation` matters here:
+> The double underscore on `self.__implementation` matters:
 
 If you want the phrase kept somewhere in the book, this is the better of the
 two places to keep it, since the paragraph does argue that the name pays for
@@ -294,7 +295,7 @@ Proposed for 586:
 
 The sentence after it states the idea, so this one only announces that a
 statement is coming.
-Cutting it starts the paragraph on the content:
+Cutting it starts the paragraph on the content:[[do this]]
 > From a base class, you derive the surrogate along with the class or classes that provide the actual implementation:
 
 Low confidence: this reads like first-edition voice, and a one-line breath

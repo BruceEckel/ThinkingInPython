@@ -9,6 +9,10 @@ have decided not to care about, chapters you want re-run, and so on.
 
 - `readability/NN_Name.md` is an active review, one per chapter, findings in
   reading order.
+- A review only files the findings that need your decision. The clear-cut
+  fixes are applied to the chapter during the review run and listed under
+  `## Applied directly` at the top of the file, as a record with no checkbox.
+  Undo any of those from the `git diff`.
 - Each finding block starts with `[] Reject` on its own line.
   Leave the box empty to accept the change.
   Put an `X` in it, `[X] Reject`, to decline it, and leave the block in place

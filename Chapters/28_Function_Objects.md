@@ -24,7 +24,7 @@ which turns the list into an *event bus*.
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
-In Python the action is just a function, and a "macro" is a list of actions:
+In Python the action is a function, and a "macro" is a list of actions:
 
 ```python
 # command.py
@@ -141,7 +141,7 @@ A callable alone cannot express a second operation, `undo()`.
 `Callable[[], None]` has room for one call,
 so a list of commands that also undo needs a name for "callable, plus `undo()`".
 In Python that name is a `Protocol` with both members.
-A `Command` base class becomes worth writing when the commands also want shared implementation.
+A `Command` base class becomes worth writing when the commands also share implementation.
 
 Building commands in a loop springs Python's best-known closure trap:
 
@@ -435,10 +435,10 @@ A function with a root at zero returns `0.0`, which is falsy,
 so a truthiness test would throw away a correct answer and hand the problem to the next finder.
 Any sentinel-versus-value check on a numeric result has this hazard.
 
-A handler is trusted to know when it failed.
+The chain trusts each handler to know when it failed.
 `secant()` and `newton()` stop when their step stops shrinking,
 which is not quite the same as landing on a root,
-so a chain is only as reliable as its handlers.
+so a chain is no more reliable than its handlers.
 
 These tests confirm that the first finder that converges wins,
 a later finder rescues one that fails, an empty chain returns `None`,
@@ -613,7 +613,7 @@ Go down it and stop at the first form that carries what you need:
     `account.deposit` is a command with its instance attached.
 3.  A closure or a `functools.partial`, when the state is a fixed configuration
     (`configured_strategy.py`).
-4.  A callable object, when that configuration wants a name and a `repr`
+4.  A callable object, when that configuration needs a name and a `repr`
     (`callable_command.py`).
 5.  A class, when one call is not enough: the second operation `undo()` needs,
     or the several related methods and mutable state the *Strategy* section describes.

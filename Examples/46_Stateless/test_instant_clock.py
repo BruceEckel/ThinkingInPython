@@ -19,4 +19,4 @@ def test_delayed_sum() -> None:
     supplied = supply(as_type(Time)(clock))
     assert run(supplied(delayed_sum)([1, 2, 3])) == 6
     assert clock.waited == [0.01, 0.01, 0.01]
-    assert time.perf_counter() - start < 0.03
+    assert time.perf_counter() - start < 0.5

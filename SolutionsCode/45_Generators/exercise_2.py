@@ -17,9 +17,22 @@ def drive_from_dict(
         answers: dict[Question, Answer]) -> Result:
     request = next(conversation)
     while True:
-        print(f"{request = }, {answers[request] = }")
+        answer = answers[request]
+        print(f"{request = }, {answer = }")
         try:
-            request = conversation.send(answers[request])
+            request = conversation.send(answer)
+        except StopIteration as stop:
+            return stop.value
+
+def drive_naive(
+        conversation: Generator[Question, Answer, Result],
+        answers: Iterator[Answer]) -> Result:
+    request = next(conversation)
+    while True:
+        try:  # Both next() calls share one except clause
+            reply = next(answers)
+            print(f"{request = }, {reply = }")
+            request = conversation.send(reply)
         except StopIteration as stop:
             return stop.value
 
@@ -41,9 +54,9 @@ by_name = {
     Question("friend"): Answer("Rabbit"),
 }
 print(drive_from_dict(interview(), by_name))
-#: request = 'name', answers[request] = 'Alice'
-#: request = 'town', answers[request] = 'Wonderland'
-#: request = 'friend', answers[request] = 'Rabbit'
+#: request = 'name', answer = 'Alice'
+#: request = 'town', answer = 'Wonderland'
+#: request = 'friend', answer = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit
 in_order = iter([Answer("Alice"), Answer("Wonderland"),
                  Answer("Rabbit")])
@@ -52,3 +65,13 @@ print(drive_in_order(interview(), in_order))
 #: request = 'town', reply = 'Wonderland'
 #: request = 'friend', reply = 'Rabbit'
 #: Alice of Wonderland, friend Rabbit
+# One answer, three questions:
+try:
+    drive_in_order(interview(), iter([Answer("Alice")]))
+except StopIteration:
+    print("answer source ran out")
+#: request = 'name', reply = 'Alice'
+#: answer source ran out
+print(repr(drive_naive(interview(), iter([Answer("Alice")]))))
+#: request = 'name', reply = 'Alice'
+#: None

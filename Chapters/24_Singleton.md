@@ -304,10 +304,10 @@ print(settings() is settings())
 #: True
 ```
 
-The priming call is safe for the reason the chapter opened with:
+The priming call is safe for the same reason the module form is:
 the import system runs a module body once,
 so the object exists before any thread can ask for it.
-Laziness is what the race needs, and this gives it up on purpose.
+The race needs laziness, and this listing gives it up on purpose.
 
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
@@ -581,7 +581,8 @@ and silently losing the sharing is worse than failing outright.
 The sharing also reaches further than it looks.
 `_shared_state` is one dict on `Borg`, so every subclass shares it,
 not merely every instance of a single subclass.
-Constructing an `A("apple")` and then a `B("banana")` leaves both objects reading `"banana"`.
+A second subclass alongside `Singleton` writes into the same dict,
+so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
 

@@ -714,3 +714,90 @@ undeclared failure, not on the signature and not at the call site. That
 is the useful place for it: the diagnostic names both the failure that
 escaped and the delegation it escaped through, so the fix is either to
 declare it or to catch it, right there.
+
+## 11. Making the ambiguity a type error
+
+With three implementations there are six orderings, and the prediction
+is short: `supply()` scans its arguments and takes the first that
+satisfies the request, so whichever recording implementation appears
+before the other wins, and `Terminal` wins whenever it comes first.
+Three of the six send the greeting to the screen, and the other three
+split evenly between the two recorders. No ordering produces an error,
+and no ordering produces a warning.
+
+The fix is to stop letting one structural check match three objects:
+
+```python
+# exercise_11.py
+from dataclasses import dataclass, field
+from typing import Protocol, runtime_checkable
+from stateless import Depend, Need, as_type, need, run, supply
+
+@runtime_checkable
+class Screen(Protocol):
+    def print(self, message: str) -> None: ...
+
+@runtime_checkable
+class Recorder(Protocol):
+    def record(self, message: str) -> None: ...
+
+@dataclass
+class Terminal:
+    def print(self, message: str) -> None:
+        print(message)
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+    def record(self, message: str) -> None:
+        self.messages.append(message)
+
+def to_screen(name: str) -> Depend[Need[Screen], None]:
+    device = yield from need(Screen)
+    device.print(f"Hello, {name}!")
+
+def to_log(name: str) -> Depend[Need[Recorder], None]:
+    device = yield from need(Recorder)
+    device.record(f"Hello, {name}!")
+
+capture = Capture()
+run(supply(as_type(Screen)(Terminal()))(to_screen)("Alice"))
+#: Hello, Alice!
+run(supply(as_type(Recorder)(capture))(to_log)("Bob"))
+print(capture.messages)
+#: ['Hello, Bob!']
+```
+
+Renaming `Capture.print()` to `record()` is the whole change. The two
+`Protocol`s no longer overlap, so no object satisfies both, and each
+Effect names the one it needs.
+
+What that buys is a diagnostic where there used to be a coin flip.
+Supplying the wrong implementation is now rejected before the program
+runs:
+
+```text
+error[invalid-argument-type]: Argument is incorrect
+ --> exercise_11.py:31:30
+  |
+  | run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))
+  |                              ^^^^^^^^^^ Expected `Recorder`, found `Terminal`
+info: type `Terminal` is not assignable to protocol `Recorder`
+info: └── protocol member `record` is not defined on type `Terminal`
+```
+
+The second `info` line is the part worth reading. The checker names the
+missing method rather than the missing type, which is what structural
+typing means: `Terminal` fails not because of what it is but because of
+what it does not do.
+
+One honest limit. Distinct method names remove the ambiguity *between*
+abilities; they do nothing about two implementations of the *same*
+ability. Add a second recorder, an `Audit` that also defines
+`record()`, and `supply(capture, audit)` is ambiguous again by argument
+order, with no diagnostic. The section's advice has two halves for that
+reason, and the second half, "supply one implementation per Ability,"
+is the one no type can enforce for you. Stateless resolves by scanning
+arguments at runtime, so a duplicate is a fact about the call rather
+than about the types, and ZIO's compile-time rejection of exactly this
+case is the difference the section names.

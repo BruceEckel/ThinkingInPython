@@ -421,11 +421,12 @@ except StopIteration:
 ```
 
 `manual()` forwards what it receives from `collect()` and nothing in the other direction.
-Each `send()` delivers its value to `manual()`'s own `yield`, which throws it away,
-and the `for` loop resumes `collect()` with `next()`,
+Each `send()` delivers its value to `manual()`'s own `yield`,
+which throws it away, and the `for` loop resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
 The checker says nothing: `manual()` is a valid `Generator[str, int]`.
-`yield from` is not shorthand for this loop, and the difference is the send channel.
+`yield from` is not shorthand for this loop,
+and the difference is the send channel.
 
 `g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
 which completes the first `yield from`, which starts the second one.
@@ -586,7 +587,8 @@ That is the question the next chapter puts into the type system.
     and run `interview()` under both.
     Explain what had to change in `interview()`, and why.
     Give your driver fewer answers than there are questions and say what it returns.
-    `StopIteration` now means two different things in the same loop; keep them apart.
+    `StopIteration` now means two different things in the same loop;
+    keep them apart.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,

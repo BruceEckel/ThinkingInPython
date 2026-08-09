@@ -23,7 +23,14 @@ The rest of the chapter applies the machinery:
 - Decorators that add retry and parallelism to code they never edit
 - An account of what the guarantee does not cover
 
+The chapter then collects every tool in one table and weighs what the whole approach costs.
+
 ## Abilities Are Not Special
+
+A `Need` asks for an instance and gets whatever was supplied.
+Your own Ability can ask for anything you can name,
+and the handler answering it is an ordinary function,
+so the answer can differ every time it is asked.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
@@ -105,15 +112,14 @@ so the annotation is an assertion the checker takes on faith rather than a type 
 and writing it at the binding keeps the accessor's claim in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
-That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`.
-`Ask` is an Ability, so it sits in the channel bare.
-`Console` never was one.
-It is an ordinary class, and `Need[Console]` is the Ability:
-a request object carrying the class it asks for.
-A type bound enforces the distinction.
-`Effect`'s first type parameter accepts only `Ability` subclasses,
-so writing `Depend[Console, None]` is rejected at the annotation,
-before any `yield` is examined: `Console` is not assignable to the bound.
+That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
+the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
+drew for `Async`.
+`Ask` is an Ability, so it sits in the channel bare,
+and the type bound is what makes that more than a convention:
+`Depend[Console, None]` is rejected at the annotation,
+before any `yield` is examined,
+because `Console` is not assignable to `Ability[Any]`.
 
 `handle()` reads the annotation on its argument to decide which Ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
@@ -224,7 +230,7 @@ That state brings one trap, and it is silent.
 and `StopIteration` is how a driver learns that an Effect has finished,
 so `handle()` reads the exhausted script as the end of the program.
 Ask `count_heads()` for six tosses from this five-value script and `run()` produces `None` instead of a count,
-with no exception, the same silent `None` that [Why `retry()` Decorates the Function](#why-retry-decorates-the-function)
+with no exception, the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
 Every other exception a handler raises travels out of `run()` normally;
 this one collides with the protocol.
@@ -641,6 +647,8 @@ One thing stays outside the types.
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifted it,
 so it travels through `run()` untracked and no signature mentions it.
+`catch()` matches yielded values, and a handler yields nothing,
+so no `catch()` around this program intercepts it.
 A handler sits outside the channel it feeds.
 
 ## State as an Ability
@@ -992,6 +1000,10 @@ def research_and_report(
     except NoArticle:
         return "no article on that topic"
 ```
+
+`topic_of()` is written out again because `research.py`'s version is decorated:
+it returns an Effect, and ordinary `try`/`except` code cannot call it.
+Lifting a function takes it away from its unlifted callers.
 
 Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
@@ -1465,8 +1477,7 @@ print(len(script.lines), script.lines[1])
 One engine, four runs, and the only difference is what was supplied.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `Weapon` across a `Wasteland`; it type-checks,
-and it runs.
+A `Kitty` bats at a `Weapon` across a `Wasteland`; it type-checks, and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
@@ -1589,38 +1600,11 @@ because `Effect[A, E, R]` tracks what a function needs and how it fails,
 not whether running it twice means the same as running it once.
 That judgment stays with you.
 
-### Why `retry()` Decorates the Function
-
 `retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
-and the reason is the substrate.
-A Stateless Effect is a generator, so it runs once and is then spent:
-
-```python
-# spent.py
-from flaky import Database, save_user
-from stateless import run, supply
-
-effect = supply(Database(failures=0))(save_user)("Morty")
-print(repr(run(effect)))
-#: attempt 1: saving Morty
-#: 'Morty saved'
-print(repr(run(effect)))
-#: None
-```
-
-Re-running the spent Effect does not fail loudly.
-The exhausted generator has nothing left to do,
-so the second `run()` returns `None` where the signature declares a `str`,
-with no exception and no complaint from the checker.
-A retry therefore has to rebuild the description from the function,
-which `retry()` does internally.
-The special case is `success()`: it builds a constant rather than a generator,
-and a constant answers every `run()` with the same value.
-The one-shot behavior belongs to any Effect that contains a `yield`,
-which is any Effect that does work.
-Where ZIO attaches `retryN` to an Effect value it can replay,
-Stateless attaches it one level up.
+for the reason [An Effect Runs Once](46_Stateless.md#an-effect-runs-once) gave:
+the Effect is a generator, it is spent after one `run()`,
+and only the function can build a second description.
 
 ### What Retry Costs the Signature
 
@@ -2036,7 +2020,7 @@ Native systems derive asynchronous execution from Effects,
 while Stateless provides `Async` as a built-in that `run()` interprets,
 because the driver loop can await where a handler cannot.
 
-### 4. Cost
+### 4. The discipline is all-or-nothing
 
 Every effectful function becomes a generator function,
 which means it cannot also be a plain function,
@@ -2075,7 +2059,7 @@ rate limiting, bulkheads, and circuit breakers, none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 and that is different from a platform for building distributed systems.
 
-## Costs and Benefits
+## One Type for Four Mechanisms
 
 [Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
 argued that Effects are the next scaling barrier,
@@ -2132,6 +2116,12 @@ capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
 and when the team will hold the line at every boundary.
 Below that scale, the discipline matters and the machinery is optional.
+
+Whatever you decide about the library, the habit survives it.
+Name each contact with the outside, the clock, the feed, the pool, the console,
+and bind it at the edge instead of calling it in the middle.
+`at()` and `crossing` and `controller()` are all that habit,
+and none of them needs an Effect type to work.
 
 But the direction is worth watching.
 Python got one Effect tracked into its type system with `async`.
@@ -2196,3 +2186,19 @@ It is a language that does the encoding for you.
     predict what `ty` reports in `outcome()`, then confirm.
     Remove `outcome()`'s return annotation and rerun `ty`,
     and explain what stopped being checked.
+12. Write a `Random` Ability whose handler returns an `int` in a range carried on the request,
+    and an accessor `roll(low, high)` for it.
+    Use it to write a dice game as an Effect, then run the game twice:
+    once with a handler that calls `random.randint()`,
+    and once with a handler that walks a scripted sequence.
+    Then delete the `low: int` annotation from the accessor's parameter and say what changes,
+    and delete the annotation on the *handler's* parameter and say what changes.
+13. Add a `Butter` appliance to `bakery.py` and a `buttered()` Effect that needs it and calls `toast()`.
+    Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
+    and read the diagnostic before fixing it.
+    Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
+14. `play()` in `casts.py` accepts any five actors, matched or not.
+    Give `kitties_and_puzzles()` and `warriors_and_weapons()` a shared signature so a caller can pass either one where a cast is wanted,
+    and say what that recovers of the Abstract Factory and what it does not.
+    Then add a sixth actor to `encounter()` and count the lines you edit in `arena.py`,
+    `casts.py`, and `two_games.py`.

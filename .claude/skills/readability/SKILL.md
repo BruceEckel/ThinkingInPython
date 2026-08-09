@@ -1666,10 +1666,61 @@ This is the standard way to run readability over a chapter:
 detect first, let Bruce vet the findings on disk, then apply only what he keeps.
 It mirrors the existing `deep_review/` convention.
 
+**The bar for putting a finding in the file.**
+The review file is a decision queue.
+Every block in it costs Bruce a decision, so a block that has only one sensible
+answer wastes the attention the hard blocks need.
+Most findings have only one sensible answer.
+Apply those to the chapter yourself during the review run and record them in a
+list at the top of the review file, so the change stays visible and a later
+review does not re-propose it.
+
+Apply directly, without asking, when all of these hold:
+
+- The fix is local: one sentence, or a phrase inside one.
+- The meaning survives unchanged.
+  No claim is added, dropped, softened, or sharpened.
+- One fix is clearly right.
+  Choosing between two defensible wordings is a decision, not a cleanup.
+- The rule is already settled: the global watch list in `~/.claude/CLAUDE.md`,
+  the banned-phrase gate, a §7 Tier 1A word, a curly quote, a spaced ` -- `,
+  an empty adverb, a cleft that only delays its verb, a stranded preposition,
+  an imperative-plus-consequence sentence.
+- The sentence is not doing something on purpose.
+  First-edition voice, a deliberate aside, an em dash, a word repeated for
+  rhythm: leave these alone even when a rule technically fires.
+
+Escalate to a block when any of these hold:
+
+- The change alters what the chapter claims, or how strongly it claims it.
+- It moves structure: splitting or merging paragraphs, reordering, cutting a
+  sentence, changing the pacing of a section that carries the argument.
+- Two or more fixes are defensible and the choice is taste.
+- The fix needs a fact you do not have, or depends on what a listing prints.
+- It touches a heading, an anchor, a cross-reference, a code block, or an
+  example's output.
+- The finding is real but you think the change should not be made.
+  That goes under "Considered and declined," not into a live block.
+
+The test when a finding sits on the line: write the block's case in your head.
+If it takes one sentence and no reasonable reader answers "well, it depends,"
+it did not need to be a block.
+Err toward applying rather than asking.
+A wrong small edit costs Bruce one line of `git diff`;
+a needless block costs him the attention he owes the real questions.
+
+**The applied-directly list.**
+After the rename instruction and the review's opening paragraph, write a
+section titled `## Applied directly`, one line per change: the line number,
+the rule, and the before and after in a few words.
+It is a record, not a request, so no checkbox.
+Bruce reverts anything he dislikes from the `git diff`.
+Leave the section out when a run produces no direct changes.
+
 **Producing a review file.**
 When asked to review a chapter rather than rewrite it in place,
-do not touch `Chapters/NN_name.md`.
-Write the findings to `readability/NN_name.md`,
+apply the findings that clear the bar above,
+and write the rest to `readability/NN_name.md`,
 a file whose name matches the chapter it reviews.
 So `readability/12_Data_Classes_as_Types.md` reviews
 `Chapters/12_Data_Classes_as_Types.md`.
@@ -1684,13 +1735,13 @@ text quoted, and the proposed change.
 
 Order the blocks by decreasing importance, not by position in the chapter.
 Importance means how much the finding needs Bruce's judgment:
-first the critical issues where you cannot determine the right approach
-and need his decision,
-then, going down the file,
-findings you are more and more able to resolve on your own.
-Bruce reads the top of the file with full attention
-and tends to accept the confident items lower down,
+first the questions where the answer changes what the chapter says or how it
+reads, then the smaller calls where either answer is defensible.
+Bruce reads the top of the file with full attention,
 so a finding placed too low gets less scrutiny than it deserves.
+Nothing in the file should be a change you could have made yourself:
+those went in the applied-directly list.
+A file with two blocks in it is a good outcome, not a thin review.
 
 End every block with a reject checkbox on its own line,
 after the finding it governs:
@@ -1711,6 +1762,9 @@ most recent `~`-prefixed file for it (see Successive reviews below).
 Any block marked `[X] Reject` there is a suggestion Bruce already declined, so
 do not raise it again. Carry those rejections forward, so a new review does not
 re-propose what a past one settled.
+Read that file's applied-directly list and its declined section the same way:
+the first records edits already in the chapter, the second records findings a
+past run judged not worth making.
 
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
@@ -1725,6 +1779,8 @@ When Bruce hands the file back with an instruction like
 1. Read the review file. Apply every block whose checkbox is empty (`[]`).
    Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
    record, not a change to make. Leave the rejected blocks in the file.
+   The applied-directly list and the declined section are records of the review
+   run, already settled. Do not re-apply either.
 2. Apply the live changes to `Chapters/NN_name.md`, not to the review file.
    Respect the file-mode constraints above:
    never touch a fenced ```python block,

@@ -126,9 +126,10 @@ def test_template_method_runs_steps_in_order() -> None:
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
-`ApplicationFramework` leaves starting to the client for a reason.
+`ApplicationFramework` leaves starting to the client,
+and the `Framework` below shows what happens when a framework does not.
 A framework can call `run()` from its own constructor,
-and the `Framework` below does, which is where the trap lives.
+and a subclass with its own `__init__()` then has a trap to avoid.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
 If you call it first, in the usual style,
@@ -249,7 +250,7 @@ A hook that holds no state is usually better as a function than as a method to o
 
 ## What Actually Fixes the Algorithm
 
-The fixed algorithm is only ever as fixed as the mechanism holding it,
+The fixed algorithm is only as fixed as the mechanism holding it,
 and this chapter has shown four of them.
 Structure fixes it in `template_function.py`,
 where there is no subclass through which to replace the loop.
@@ -259,16 +260,15 @@ The interpreter fixes it with `__init_subclass__()`,
 which refuses the subclass outright.
 Discipline fixes the rest:
 the Liskov Substitution Principle governs whether a step is a faithful substitute,
-and no tool checks that at all.
+and no tool checks it.
 
-They are listed in increasing cost and decreasing reach.
 Structure is free and covers only the case where you can pass functions instead of subclassing.
 `@final` costs a decorator and covers everyone who runs the checker.
 `__init_subclass__()` costs a base-class method and covers everyone,
 including the caller who skips the checker.
 Discipline covers what none of them can reach,
 which is what the steps do once the flow is safe.
-Choose by asking who you are protecting the algorithm from.
+Choose by asking whom you are protecting the algorithm against.
 
 ## Exercises
 

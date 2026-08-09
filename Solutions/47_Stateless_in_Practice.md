@@ -1041,3 +1041,300 @@ outward until it reaches something with an annotation. That is the same reason
 exercise 4 of [Generators](../Chapters/45_Generators.md) needed a declared type
 to catch a missing `yield from`: a checker verifies claims, and an inferred type
 is not a claim.
+
+## 12. A `Random` Ability
+
+```python
+# exercise_12.py
+import random
+from collections.abc import Callable, Iterator
+from dataclasses import dataclass
+from stateless import Ability, Depend, handle, run
+
+@dataclass(frozen=True)
+class Random(Ability[int]):
+    low: int
+    high: int
+
+def roll(low: int, high: int) -> Depend[Random, int]:
+    return (yield Random(low, high))
+
+def game() -> Depend[Random, str]:
+    first = yield from roll(1, 6)
+    second = yield from roll(1, 6)
+    return f"{first} + {second} = {first + second}"
+
+def real(request: Random) -> int:
+    return random.randint(request.low, request.high)
+
+def scripted_from(
+    values: Iterator[int],
+) -> Callable[[Random], int]:
+    def scripted(request: Random) -> int:
+        return next(values)
+    return scripted
+
+random.seed(0)
+print(run(handle(real)(game)()))
+#: 4 + 4 = 8
+print(run(handle(scripted_from(iter([3, 4])))(game)()))
+#: 3 + 4 = 7
+```
+
+The request carries the range, which is the difference from a `Need`.
+`Need[T]` asks for an instance of `T` and there is nothing else to say;
+`Random(1, 6)` asks a question with arguments, and the handler reads them off
+the request. That is why an Ability is a dataclass rather than a marker: its
+fields are the parameters of the question.
+
+`game()` is written once and runs under both handlers unchanged. The scripted
+handler is the testable one, and it is a closure over an iterator rather than a
+class, because a handler is an ordinary function.
+
+Deleting `low: int` from the accessor changes nothing that `ty` reports about
+this file. It changes what `ty` reports about callers. With the annotation,
+`roll("a", 6)` is `error[invalid-argument-type]`. Without it, the parameter is
+untyped, `roll("a", 6)` type-checks, and the mistake surfaces at runtime inside
+`random.randint()`, one frame away from the code that made it. The accessor is
+the only place a caller's arguments are checked, since after that they are
+fields on a dataclass that nobody inspects.
+
+Deleting the annotation on the handler's parameter fails much louder, and
+earlier:
+
+```text
+ValueError: Not enough annotated arguments to handler function 'scripted'.
+Expected 1, got 0. 'handle' uses type annotations to match handlers with
+abilities, so the argument to 'scripted' must be annotated.
+```
+
+This is raised by `handle()` at the moment of decoration, before any Effect
+runs, because `handle()` reads `get_type_hints()` on the function to learn which
+Ability it answers. The two annotations therefore do different jobs: the
+accessor's is for the checker, and the handler's is data the library reads at
+runtime. Only one of them is optional, and it is not the one that looks like
+bookkeeping.
+
+## Shared code: the bakery
+
+Exercise 13 extends the chapter's bakery, repeated here without its demo so the
+solution can import it:
+
+```python
+# kitchen.py
+from dataclasses import dataclass
+from stateless import Depend, Need, need
+
+@dataclass(frozen=True)
+class Dough:
+    flour: str
+    def risen(self) -> str:
+        print("dough: risen")
+        return f"{self.flour} dough"
+
+@dataclass(frozen=True)
+class Oven:
+    celsius: int
+    def bake(self, dough: str) -> str:
+        print(f"oven: baking at {self.celsius}")
+        return f"loaf of {dough}"
+
+@dataclass(frozen=True)
+class Toaster:
+    setting: int
+    def brown(self, loaf: str) -> str:
+        print(f"toaster: setting {self.setting}")
+        return f"toasted {loaf}"
+
+def bread() -> Depend[Need[Dough] | Need[Oven], str]:
+    dough = yield from need(Dough)
+    oven = yield from need(Oven)
+    return oven.bake(dough.risen())
+
+def toast() -> Depend[
+    Need[Dough] | Need[Oven] | Need[Toaster], str
+]:
+    loaf = yield from bread()
+    toaster = yield from need(Toaster)
+    return toaster.brown(loaf)
+```
+
+## 13. A dependency two levels down
+
+```python
+# exercise_13.py
+from dataclasses import dataclass
+from kitchen import Dough, Oven, Toaster, toast
+from stateless import Depend, Need, need, run, supply
+
+@dataclass(frozen=True)
+class Butter:
+    grams: int
+    def spread(self, slice_: str) -> str:
+        print(f"butter: {self.grams}g")
+        return f"buttered {slice_}"
+
+def buttered() -> Depend[
+    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter], str
+]:
+    slice_ = yield from toast()
+    butter = yield from need(Butter)
+    return butter.spread(slice_)
+
+kitchen = supply(Dough("rye"), Oven(220), Toaster(3), Butter(10))
+print(run(kitchen(buttered)()))
+#: dough: risen
+#: oven: baking at 220
+#: toaster: setting 3
+#: butter: 10g
+#: buttered toasted loaf of rye dough
+```
+
+Writing the signature as `Depend[Need[Butter], str]` first is the instructive
+half:
+
+```text
+error[invalid-yield]: Yield expression type does not match annotation
+  --> exercise_13.py:13:25
+   |
+12 | def buttered() -> Depend[Need[Butter], str]:
+   |                   ------------------------- Function annotated with yield
+   |                   type `Need[Butter]` here
+13 |     slice_ = yield from toast()
+   |                         ^^^^^^^ expression of type
+   |                         `Need[Dough] | Need[Oven] | Need[Toaster]`,
+   |                         expected `Need[Butter]`
+```
+
+The diagnostic points at the `yield from`, not at the signature, and it prints
+the whole union that arrived. That union is the answer to "what does
+`buttered()` actually need," and the fix is to write it down. `buttered()` names
+`Dough` and `Oven` in its type without mentioning either in its body, which is
+the propagation the chapter describes: a caller inherits every requirement of
+everything it delegates to.
+
+Removing `Toaster(3)` from `supply()` produces the second diagnostic, and it is
+a different shape:
+
+```text
+error[invalid-argument-type]: Argument to function `run` is incorrect
+  |
+  | print(run(kitchen(buttered)()))
+  |           ^^^^^^^^^^^^^^^^^^^ Expected `Generator[Async | Exception, Any, Unknown]`,
+  |                               found `Generator[Need[Toaster], Any, str]`
+```
+
+This one tells you about the dependency two levels down. `Need[Toaster]` is
+what `supply()` failed to subtract, and it reaches `run()` still in the
+channel. Nothing in `buttered()`'s body mentions a toaster; the requirement
+came from `toast()`, which `buttered()` calls, and the error names it at the
+edge where the last chance to answer it was missed.
+
+The two diagnostics divide the work cleanly. `invalid-yield` catches an
+under-declared signature at the delegation that broke it. `invalid-argument-type`
+at `run()` catches an under-supplied environment at the program's edge. Neither
+one required a comment or a docstring to say what depends on what.
+
+## 14. A shared signature for a cast
+
+The two factories in `casts.py` already have the same signature. The exercise
+is to name it and see what naming it buys. Here is the chapter's arrangement
+reduced to three actors so the whole thing fits in one listing:
+
+```python
+# exercise_14.py
+from collections.abc import Callable
+from typing import Protocol, runtime_checkable
+from stateless import Depend, Need, need, run, supply
+
+@runtime_checkable
+class Narrator(Protocol):
+    def say(self, line: str) -> None: ...
+
+@runtime_checkable
+class Hero(Protocol):
+    def name(self) -> str: ...
+
+@runtime_checkable
+class Reward(Protocol):
+    def prize(self) -> str: ...
+
+def encounter() -> Depend[
+    Need[Narrator] | Need[Hero] | Need[Reward], None
+]:
+    narrator = yield from need(Narrator)
+    hero = yield from need(Hero)
+    reward = yield from need(Reward)
+    narrator.say(f"{hero.name()} wins {reward.prize()}")
+
+class Kitty:
+    def name(self) -> str: return "Kitty"
+
+class Yarn:
+    def prize(self) -> str: return "a ball of yarn"
+
+class Warrior:
+    def name(self) -> str: return "Warrior"
+
+class Gold:
+    def prize(self) -> str: return "a chest of gold"
+
+class Loud:
+    def say(self, line: str) -> None: print(line)
+
+def play(narrator: Narrator, hero: Hero, reward: Reward) -> None:
+    run(supply(narrator, hero, reward)(encounter)())
+
+def kitties(narrator: Narrator) -> None:
+    play(narrator, Kitty(), Yarn())
+
+def warriors(narrator: Narrator) -> None:
+    play(narrator, Warrior(), Gold())
+
+type Cast = Callable[[Narrator], None]
+
+def run_season(casts: list[Cast]) -> None:
+    for cast in casts:
+        cast(Loud())
+
+run_season([kitties, warriors])
+#: Kitty wins a ball of yarn
+#: Warrior wins a chest of gold
+play(Loud(), Kitty(), Gold())
+#: Kitty wins a chest of gold
+```
+
+What the shared signature recovers is the Abstract Factory's *interface*.
+`run_season()` accepts anything that can stage a scene and stays ignorant of
+which family it gets, which is the property the pattern exists to provide.
+Python gives it away for free, because a function is already an object with a
+type, and no abstract factory class was needed to say it.
+
+What it does not recover is the guarantee that made the pattern worth naming.
+`Cast` says "give me a narrator and I will stage something." It says nothing
+about the actors inside agreeing with each other. The last line is the proof,
+and the chapter runs the same line in `two_games.py`: `play()` accepts a
+`Kitty` winning a chest of gold, both satisfy their `Protocol`s, and nothing
+objects. An Abstract Factory in a language with a family type expresses "these
+come from one world" in the type itself. Here the matching lives inside
+`kitties()`'s body, where it is a fact about how the function happens to be
+written and is checked by nobody.
+
+So the shared signature narrows the loss without closing it. A caller that
+takes a `Cast` can no longer assemble a mismatched set by accident, because it
+never sees the actors. `play()` is still there and still accepts any of them.
+
+Adding a sixth actor to the chapter's five-actor version shows where the cost
+falls. `arena.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
+union, and a `yield from`, so four edits. `casts.py` gains a parameter on
+`play()`, an argument in the `supply()` call, a class for each family, and an
+argument in each of the two factory calls, so seven. `two_games.py` needs one
+edit, for its direct `play()` call, and none for its two factory calls. The
+`Cast` alias does not change at all, because the new actor never reaches the
+caller.
+
+That distribution is the argument for the factory. The functions that name a
+whole cast absorb the change, and the code that only wants a scene does not
+notice. It is also why the chapter uses a factory function rather than more
+`supply()` arguments: `supply()` tops out at nine overloads, and a wide cast is
+what a positional interface handles worst.

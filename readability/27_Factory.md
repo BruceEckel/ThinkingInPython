@@ -14,11 +14,43 @@ The chapter reads as human prose, and much of it is first-edition voice with a
 recognizable rhythm.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or
 bullet inflation, no formulaic conclusions.
-The findings split three ways: one paragraph that has grown past what a reader
-can hold, two sentences whose grammar tangles, and a run of single watch-list
-words.
 
-Line numbers refer to the chapter as it stands now.
+The clear-cut fixes were applied to the chapter directly (listed below);
+the two blocks that remain are the ones needing your judgment.
+
+## Applied directly
+
+- Line 14: "It happens to be the creation of the type that matters here rather
+  than the use of the type" → "Creation of the type matters here, not use of
+  the type" (watched "happen" plus an "It ... that" cleft).
+- Line 86: "It happens to be a string here but" → "Here it is a string, but"
+  (watched "happen").
+- Line 92: dropped "at all" after "with no argument" (watch list; the contrast
+  is already in the sentence's first half).
+- Lines 165-167: the prose now points at the listing's `False False` line
+  instead of asserting the same fact: "The last line of the listing shows both
+  checks failing: `type(a) is type(b)` is `False`, and so is
+  `isinstance(a, type(b))`."
+- Line 259: "which is what the printed key list shows" → "as the printed key
+  list shows" (cleft that only delays the verb).
+- Line 265: "Creating objects through a dictionary of classes is the
+  dissolution" → "That is the dissolution" (the phrase opened two consecutive
+  sentences).
+- Line 274: "nothing ever imported the module" → "nothing imported the module"
+  (watched "ever"; deletion changes nothing).
+- Line 276: "from an import statement sitting right there in the file" →
+  "even when the import statement is in the file" (conversational flourish;
+  now states the surprise).
+- Lines 413-415: added the pointer to the new cache-key output: "The two
+  printed key lists show it: empty before any request, two entries after four
+  requests for two kinds."
+- Line 417: "leans on `eval()`" → "uses `eval()`" (metaphor for a literal
+  verb).
+- Line 866: dropped "just" in "steps are just optional values," matching the
+  summary bullet's wording.
+
+Line numbers below refer to the chapter before these edits;
+the two 165-167 and 413-415 insertions shift later lines down by one each.
 
 ***
 
@@ -75,212 +107,19 @@ Proposed:
 > who could hold it and create objects from it later.
 
 That keeps both points, names who does what, and drops one "appropriate."
+This is first-edition prose rewritten wholesale, so it stays a block rather
+than a direct edit: the fix is clear but the voice is yours to trade away.
 
 [] Reject
 
 ***
 
-**Line 26**
-**Pattern:** unsupported superlative
+## Considered and declined
 
-Current:
-> Factory might be the most common design pattern.
-
+**Line 26 — "Factory might be the most common design pattern."**
 The deep-review pass removed "the most common form of factory in idiomatic
-Python" from line 262 as an unsupported superlative.
-This one is hedged with "might" and is about the pattern rather than about a
-form of it, so it is defensible, but the two sat in the same chapter making the
-same kind of claim.
-
-Proposed, if you want them consistent:
-> Factory may be the design pattern you use most.
-
-That keeps the hedge and drops the ranking claim about the whole field.
-I lean toward leaving line 26 alone: it opens the chapter, the hedge is
-explicit, and the sentence is first-edition voice.
-If you agree, mark this rejected.
-
-[] Reject
-
-***
-
-**Lines 262-266**
-**Pattern:** repetition in consecutive sentences
-
-Current:
-> A dictionary of classes, filled by hand or filled by the classes themselves,
-> is the ordinary Python factory.
-> Creating objects through a dictionary of classes is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
-
-"A dictionary of classes" opens two sentences in a row.
-This is prose written during the deep-review pass, replacing a single sentence,
-so the collision is new.
-
-Proposed for the second sentence:
-> That is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
-
-[] Reject
-
-***
-
-**Lines 165-167 (after `nested_shape_factory.py`)**
-**Pattern:** a claim that now has evidence the prose does not point at
-
-Current:
-> Two shapes from different calls share behavior but not a class:
-> `type(a) is type(b)` is `False`,
-> and `isinstance()` comparisons across calls fail with it.
-
-The listing now prints `False False` for exactly this, added during the
-deep-review pass, but the prose still reads as an assertion.
-"Fail with it" is also vague about what "it" is.
-
-Proposed:
-> Two shapes from different calls share behavior but not a class.
-> The last line of the listing shows both checks failing:
-> `type(a) is type(b)` is `False`,
-> and so is `isinstance(a, type(b))`.
-
-[] Reject
-
-***
-
-**Lines 413-415**
-**Pattern:** same, for the cache
-
-Current:
-> `ShapeFactory` fills its dictionary lazily.
-> The first request for a kind builds that kind's factory object (via `eval()`)
-> and caches it for later requests.
-
-The listing now prints the cache keys before and after, added this pass.
-
-Proposed, adding one sentence at the end:
-> The two printed key lists show it: empty before any request,
-> two entries after four requests for two kinds.
-
-[] Reject
-
-***
-
-**Line 259 — "which is what"**
-**Pattern:** cleft that delays the verb (global rule on "is what")
-
-Current:
-> The two `class` statements filled `Shape.registry` on their own,
-> which is what the printed key list shows.
-
-Proposed:
-> The two `class` statements filled `Shape.registry` on their own,
-> as the printed key list shows.
-
-[] Reject
-
-***
-
-**Lines 14 and 86 — "happens to be" twice**
-**Pattern:** watch list, "consider rewriting"
-
-Line 14:
-> It happens to be the creation of the type that matters here rather than the use of the type
-
-This is also an "It ... that" cleft on top of the watched verb.
-
-Proposed:
-> Creation of the type matters here, not use of the type
-
-Line 86:
-> It happens to be a string here but it could be any set of data.
-
-Proposed:
-> Here it is a string, but it could be any set of data.
-
-Both are first-edition sentences, so take them together or leave them together.
-
-[] Reject
-
-***
-
-**Line 92 — "at all"**
-**Pattern:** watch list, "avoid if possible"
-
-Current:
-> a generator object holds an internal algorithm and produces the next value with no argument at all.
-
-The contrast with the factory taking information is already in the first half
-of the sentence, so "at all" repeats it.
-
-Proposed:
-> a generator object holds an internal algorithm and produces the next value with no argument.
-
-[] Reject
-
-***
-
-**Line 276 — "sitting right there in the file"**
-**Pattern:** §31 conversational flourish in explanatory prose
-
-Current:
-> A [lazy import](06_Modules_and_Packages.md#lazy-imports)
-> produces that same failure from an import statement sitting right there in the file.
-
-Proposed:
-> A [lazy import](06_Modules_and_Packages.md#lazy-imports)
-> produces the same failure even when the import statement is in the file.
-
-That states the surprise (the import is present and still does not register)
-instead of gesturing at it.
-
-[] Reject
-
-***
-
-**Line 417 — "leans on"**
-**Pattern:** metaphor standing in for a literal verb
-
-Current:
-> This version leans on `eval()` and a `Factory` class nested in every shape,
-> neither of which Python needs.
-
-Proposed:
-> This version uses `eval()` and a `Factory` class nested in every shape,
-> neither of which Python needs.
-
-[] Reject
-
-***
-
-**Line 866 — "just"**
-**Pattern:** §23 empty adverb, and inconsistent with the summary bullet
-
-Current:
-> When the "steps" are just optional values,
-> keyword arguments and a data class are the builder.
-
-The summary bullet at the end of the chapter states the same rule without
-"just": "When the 'steps' are optional values, keyword arguments are the
-builder."
-
-Proposed: drop "just" here so the two agree.
-
-[] Reject
-
-***
-
-**Lines 273-274 — "nothing ever imported"**
-**Pattern:** watch list, "avoid if possible"
-
-Current:
-> the class is fine,
-> the registry is fine, and nothing ever imported the module that defines it.
-
-Deleting "ever" changes nothing: "nothing imported the module that defines it"
-is already absolute.
-
-Proposed:
-> the class is fine,
-> the registry is fine, and nothing imported the module that defines it.
-
-Lowest-priority item in the file; the sentence reads well either way.
-
-[] Reject
+Python" from line 262 as an unsupported superlative, and this sentence makes
+the same kind of claim.
+But it is hedged with "might," opens the chapter, and is first-edition voice,
+so I left it alone.
+Recorded here so a later review does not re-raise it.

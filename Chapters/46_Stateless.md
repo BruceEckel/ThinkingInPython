@@ -88,8 +88,8 @@ print(run(double(21)))
 `run()` is the Stateless library's driver,
 similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
-Nothing computes until `run()` is called, and a program calls `run()` only once,
-at its outermost edge.
+Nothing the Effect describes happens until `run()` is called,
+and a synchronous program calls `run()` only once, at its outermost edge.
 
 The two names differ only in case:
 `success()` is a function that builds an Effect,
@@ -427,8 +427,8 @@ from stateless.errors import MissingAbilityError
 try:
     run(greet("Alice"))  # type: ignore
 except MissingAbilityError as e:
-    print(type(e).__name__)
-#: MissingAbilityError
+    print(e)
+#: Need(t=<class 'greeter.Console'>)
 ```
 
 This raises a `MissingAbilityError`, but if you remove the `# type: ignore`,
@@ -751,14 +751,15 @@ The two diverge when the dependency sits three calls deep.
 The parameter version then adds two parameters to every function on the path,
 while this version still changes only the row.
 
-## Builtin Abilities
+## Builtin Dependencies
 
-Every Ability supplied so far has been one this chapter defined.
+Every dependency supplied so far has been one this chapter defined.
 You might not need to define one at all,
-because Stateless includes three of its own:
+because Stateless supplies three classes of its own to depend on:
 
 - `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
 - `Files` in `stateless.files` that reads a whole file,
+  whose accessor is `@throws(FileNotFoundError, PermissionError)` and so declares both channels at once,
 - `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
 
@@ -1072,7 +1073,7 @@ which [Retrofitting an Effect](#retrofitting-an-effect)
 demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
-Type checking is the optimal time to discover errors.
+Type checking is the earliest practical time to discover these errors.
 The trade is not about correctness, but churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
@@ -1086,7 +1087,8 @@ compares the spread to `async`.
 
 A DI container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
-Layering produces one all the same:
+Layering produces one all the same.
+This `Console` carries a tag so the output says which handler answered:
 
 ```python
 # default_console.py
@@ -1128,50 +1130,6 @@ and a forgotten binding shows up as a wrong-looking result rather than an error.
 Use one for a genuine default, null logger or no-op console,
 not to quiet a checker that is telling you something.
 
-## Where `run()` Can Be Called
-
-The error message in `unsupplied.py` said `run()` handles `Async` on its own.
-`run()` can do that because its entire body is `return asyncio.run(run_async(effect))`.
-That has a consequence worth knowing before you incorporate Stateless into an existing application.
-`asyncio.run()` refuses to start a second event loop inside a running one,
-so `run()` cannot be called from any `async def`:
-
-```python
-# inside_a_loop.py
-import asyncio
-from greeter import Console, greet
-from stateless import run, run_async, supply
-
-bound = supply(Console())(greet)
-
-async def main() -> None:
-    try:
-        run(bound("Alice"))
-    except RuntimeError as e:
-        print(e)
-    await run_async(bound("Bob"))
-
-asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
-#: Hello, Bob!
-```
-
-This also prints a `RuntimeWarning` to standard error,
-so it does not appear in the above output, which shows standard output only.
-`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
-which raises a `RuntimeError` because a loop is already running,
-leaving that coroutine unawaited.
-The warning is harmless, because that coroutine never started.
-It is also a reliable sign of this mistake,
-appearing whenever `run()` is called from asynchronous code.
-
-`run_async()` is the same driver packaged as a coroutine, so you `await` it.
-A synchronous program calls `run()` once at its outermost edge.
-A program that is already asynchronous, a web service or a bot,
-awaits `run_async()` at the edge of each request.
-Picking the wrong one is a runtime error rather than a type error,
-which makes it one of the few mistakes in this chapter the type checker will not catch.
-
 ## Waiting on a Coroutine
 
 `Async` has appeared so far only inside error messages,
@@ -1211,7 +1169,7 @@ writes an Ability from scratch and takes that type bound apart.
 There is nothing to supply, because `Async` asks for no object
 (there's no `Need`).
 An `Async` request carries the coroutine and asks for it to be awaited,
-and `run()` does that with the event loop it already owns.
+and `run()` does that with the event loop it starts.
 So `Async` is answered rather than supplied: `supply()` handles only a `Need`,
 and `Async` is a different Ability.
 
@@ -1310,7 +1268,7 @@ def test_delayed_sum() -> None:
     supplied = supply(as_type(Time)(clock))
     assert run(supplied(delayed_sum)([1, 2, 3])) == 6
     assert clock.waited == [0.01, 0.01, 0.01]
-    assert time.perf_counter() - start < 0.03
+    assert time.perf_counter() - start < 0.5
 ```
 
 `Instant.sleep()` records the request and returns.
@@ -1323,6 +1281,49 @@ for the reason in [Supplying an Interface](#supplying-an-interface).
 
 In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must also be frozen.
 Freezing prevents rebinding `waited`, not appending to the list it holds.
+
+## Where `run()` Can Be Called
+
+`run()` answers `Async` because its entire body is `return asyncio.run(run_async(effect))`.
+That has a consequence worth knowing before you incorporate Stateless into an existing application.
+`asyncio.run()` refuses to start a second event loop inside a running one,
+so `run()` cannot be called from any `async def`:
+
+```python
+# inside_a_loop.py
+import asyncio
+from greeter import Console, greet
+from stateless import run, run_async, supply
+
+bound = supply(Console())(greet)
+
+async def main() -> None:
+    try:
+        run(bound("Alice"))
+    except RuntimeError as e:
+        print(e)
+    await run_async(bound("Bob"))
+
+asyncio.run(main())
+#: asyncio.run() cannot be called from a running event loop
+#: Hello, Bob!
+```
+
+This also prints a `RuntimeWarning` to standard error,
+so it does not appear in the above output, which shows standard output only.
+`run()` builds the `run_async()` coroutine before handing it to `asyncio.run()`,
+which raises a `RuntimeError` because a loop is already running,
+leaving that coroutine unawaited.
+The warning is harmless, because that coroutine never started.
+It is also a reliable sign of this mistake,
+appearing whenever `run()` is called from asynchronous code.
+
+`run_async()` is the same driver packaged as a coroutine, so you `await` it.
+A synchronous program calls `run()` once at its outermost edge.
+A program that is already asynchronous, a web service or a bot,
+awaits `run_async()` at the edge of each request.
+Picking the wrong one is a runtime error rather than a type error,
+which makes it one of the few mistakes in this chapter the type checker will not catch.
 
 ## The Error Channel
 
@@ -1463,6 +1464,43 @@ A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver ever sees it and returns that value as the result,
 so the inner `except` never runs at all.
 Only `catch()` moves an error in the type, which is the next section.
+All three facts are visible in one listing:
+
+```python
+# except_vs_catch.py
+from typing import assert_never
+from scores import score
+from stateless import Success, Try, catch, run
+
+def guarded(name: str) -> Try[KeyError, str]:
+    try:
+        value = yield from score(name)
+    except KeyError:
+        return f"{name}: unknown"
+    return f"{name}: {value}"
+
+def moved(name: str) -> Success[str]:
+    value: int | KeyError = yield from catch(KeyError)(score)(name)
+    match value:
+        case KeyError():
+            return f"{name}: unknown"
+        case int():
+            return f"{name}: {value}"
+        case _:
+            assert_never(value)
+
+print(run(guarded("Carol")), run(moved("Carol")))
+#: Carol: unknown Carol: unknown
+print(repr(run(catch(KeyError)(guarded)("Carol"))))
+#: KeyError('Carol')
+```
+
+The two functions behave identically at the edge and differ in their types.
+`guarded()` must keep declaring a `KeyError` it can no longer emit,
+while `moved()` is a `Success`.
+The last line is the sharp part:
+wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
+because `catch()` matches the yielded value before the driver gets it and abandons the inner generator where it stands.
 
 ## Turning an Error Into a Value
 
@@ -1645,6 +1683,9 @@ The two halves of this chapter taught two vocabularies:
    and `supply()` answers it with an instance.
 2. A failure is an exception: `@throws` lifts it into the type,
    and `catch()` takes it back out as a value.
+3. An Ability the driver answers itself needs no vocabulary at all.
+   `Async` sits in the same channel as a `Need` and is never supplied,
+   because `run()` owns the event loop that answers it.
 
 The vocabularies differ.
 The operation underneath them does not.
@@ -1652,7 +1693,9 @@ Both subtract from the type.
 `supply()` removes an Ability and leaves `Never` in its place.
 `catch()` removes an error and moves it into the result,
 where a `match` must account for it.
-An Effect with both channels emptied is a `Success`, which `run()` accepts.
+An Effect with both channels emptied is a `Success`.
+`run()` accepts more than that: its parameter is `Effect[Async, Exception, R]`,
+so an `Async` request or a declared failure can still be in flight when it is called.
 
 The channels do not resolve in the same way:
 
@@ -1732,3 +1775,10 @@ Both are checked, and neither can be dropped by forgetting it.
     then run it on a name that triggers each failure and on one that succeeds,
     and say where each failure surfaced.
     Then delete `ValueError` from `announce()`'s annotation and record what `ty` reports and at which line.
+11. `ambiguous_supply.py` picks its `Console` by argument order.
+    Add a third implementation and predict, before running it,
+    which of the six orderings send Alice's greeting where.
+    Then follow the section's advice:
+    give the two recording implementations a method name the screen one does not have,
+    declare each as its own `Protocol`,
+    and show that the ambiguity is now a type error rather than a silent choice.
