@@ -288,6 +288,14 @@ Read that file's applied-directly list and its "Considered and declined"
 section the same way: the first records edits already in the chapter, the
 second records findings a past run judged not worth acting on.
 
+When no `~`-prefixed file exists for the chapter, read `deep_review_db.md` in
+the repo root instead. It is the distillate of the previous review round, kept
+when `deep_review/` was cleared for a clean-slate pass. It holds the rejections
+Bruce made, the standing exemptions (deliberate choices that look like rule
+violations, so they keep drawing findings), and one open question never settled.
+All of it binds exactly as a `~` file's contents would. Read it even when a `~`
+file does exist, since it carries decisions older than that file.
+
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
 

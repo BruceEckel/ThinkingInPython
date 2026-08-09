@@ -1774,6 +1774,15 @@ Read that file's applied-directly list and its declined section the same way:
 the first records edits already in the chapter, the second records findings a
 past run judged not worth making.
 
+When no `~`-prefixed file exists for the chapter, read `readability_db.md` in
+the repo root instead. It is the distillate of the previous review round, kept
+when `readability/` was cleared for a clean-slate pass: the rejections Bruce
+made, and the watch-list hits a past run examined and deliberately kept. Both
+bind exactly as a `~` file's would. Its entries are the ones a mechanical sweep
+finds every time, so check a candidate finding against it before filing the
+block. Read it even when a `~` file does exist, since it carries decisions
+older than that file.
+
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
 

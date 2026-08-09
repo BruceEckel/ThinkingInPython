@@ -8,7 +8,7 @@ New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
-I would like to do a clean slate: deep_review, readability, and annealing, on the whole book.
+[[doing now]]I would like to do a clean slate: deep_review, readability, and annealing, on the whole book.
 Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
 helpful for you to keep? If the latter, distill that information into a single file for each, in the root directory:
 deep_review_db.md and readability_db.md, and once you've done that delete the directories 'deep_review' and 'readability'

@@ -60,6 +60,12 @@ Otherwise, before applying anything, read the chapter's most recent
 completed review, the highest-numbered `deep_review/~NN_name*.md`.
 A block marked `[X] Reject` there is a change Bruce declined:
 do not apply it, or anything equivalent to it, however confident.
+Also read `deep_review_db.md` and `readability_db.md` in the repo root,
+which carry the rejections and standing exemptions
+from review rounds whose files have been cleared.
+Both bind the same way, and the standing exemptions matter most here:
+each one is a deliberate choice that reads as a rule violation,
+so it is the kind of thing a confident annealing pass would "fix" on sight.
 
 **Verify.** Every change follows the verify loop in `CLAUDE.md`.
 A new listing gets the full treatment
