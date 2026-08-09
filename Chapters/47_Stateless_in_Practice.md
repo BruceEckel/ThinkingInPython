@@ -27,8 +27,9 @@ The chapter then collects every tool in one table and weighs what the whole appr
 
 ## Abilities Are Not Special
 
-A `Need` asks for an instance and gets whatever was supplied.
-Your own Ability can ask for anything you can name,
+A custom Ability is a request you design.
+A `Need` asks for an instance and gets whatever was supplied;
+your own Ability can ask for anything you can name,
 and the handler answering it is an ordinary function,
 so the answer can differ every time it is asked.
 
@@ -647,7 +648,7 @@ One thing stays outside the types.
 and that is ordinary code raising an ordinary exception.
 No `@throws` lifted it,
 so it travels through `run()` untracked and no signature mentions it.
-`catch()` matches yielded values, and a handler yields nothing,
+`catch()` matches values an Effect yields, and a handler is not part of the Effect,
 so no `catch()` around this program intercepts it.
 A handler sits outside the channel it feeds.
 
@@ -1002,8 +1003,7 @@ def research_and_report(
 ```
 
 `topic_of()` is written out again because `research.py`'s version is decorated:
-it returns an Effect, and ordinary `try`/`except` code cannot call it.
-Lifting a function takes it away from its unlifted callers.
+it returns an Effect, and ordinary `try`/`except` code cannot call it directly.
 
 Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
@@ -2118,7 +2118,7 @@ and when the team will hold the line at every boundary.
 Below that scale, the discipline matters and the machinery is optional.
 
 Whatever you decide about the library, the habit survives it.
-Name each contact with the outside, the clock, the feed, the pool, the console,
+Name each contact with the outside (the clock, the feed, the pool, the console)
 and bind it at the edge instead of calling it in the middle.
 `at()` and `crossing` and `controller()` are all that habit,
 and none of them needs an Effect type to work.

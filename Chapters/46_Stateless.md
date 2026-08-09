@@ -88,8 +88,8 @@ print(run(double(21)))
 `run()` is the Stateless library's driver,
 similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
-Nothing the Effect describes happens until `run()` is called,
-and a synchronous program calls `run()` only once, at its outermost edge.
+Nothing the Effect describes happens until `run()` is called.
+In a synchronous program that happens once, at the outermost edge.
 
 The two names differ only in case:
 `success()` is a function that builds an Effect,
@@ -759,7 +759,6 @@ because Stateless supplies three classes of its own to depend on:
 
 - `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
 - `Files` in `stateless.files` that reads a whole file,
-  whose accessor is `@throws(FileNotFoundError, PermissionError)` and so declares both channels at once,
 - `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
 
@@ -772,6 +771,10 @@ and that `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 [Supplying an Interface](#supplying-an-interface), next,
 explains where that cost comes from and how an interface avoids it.
+
+`read_file()` is also the library's own example of both channels at once:
+its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
+so its type declares an Ability and two failures together.
 
 For illustration, this chapter builds a `Console` rather than using the one from Stateless.
 In your own code, check what the library already declares first.
@@ -1284,7 +1287,8 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 ## Where `run()` Can Be Called
 
-`run()` answers `Async` because its entire body is `return asyncio.run(run_async(effect))`.
+`run()` starts an event loop and drives the Effect inside it:
+its entire body is `return asyncio.run(run_async(effect))`.
 That has a consequence worth knowing before you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so `run()` cannot be called from any `async def`:
@@ -1498,8 +1502,7 @@ print(repr(run(catch(KeyError)(guarded)("Carol"))))
 The two functions behave identically at the edge and differ in their types.
 `guarded()` must keep declaring a `KeyError` it can no longer emit,
 while `moved()` is a `Success`.
-The last line is the sharp part:
-wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
+Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
 because `catch()` matches the yielded value before the driver gets it and abandons the inner generator where it stands.
 
 ## Turning an Error Into a Value
@@ -1676,7 +1679,7 @@ Failures cannot be lost, only relocated.
 
 ## Emptying the Channels
 
-The two halves of this chapter taught two vocabularies:
+The two halves of this chapter taught two vocabularies, and a third case that needs none:
 
 1. A dependency is an object created elsewhere.
    `need()` records the request as a `Need` in the type,

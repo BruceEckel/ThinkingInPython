@@ -151,15 +151,37 @@ listing shows only by its outcome. Report the rest, and say what you
 would do and why so the author can decide in one reading rather than
 asking you what you meant.
 
+The review file is a decision queue, and every block in it costs Bruce a
+decision, so hold reporting to a high bar: a block that has only one
+sensible answer wastes the attention the hard blocks need. Most findings
+have only one sensible answer. When in doubt, write the block's case in
+your head: if it takes one sentence and no reasonable reader answers
+"well, it depends," implement it and record it in the applied-directly
+list instead. Err toward implementing. A wrong small edit costs Bruce one
+line of `git diff`; a needless block costs him the attention he owes the
+real questions.
+
 Confidence here means you know the fix is right, not that the fix is
 small. A missing warning about a construct you have verified is a
 confident addition; the same warning is not confident when the chapter's
-silence might be deliberate. Deciding where a new listing goes, cutting a
-section, and anything that changes the chapter's voice or pacing stay
-proposals whatever your confidence: rejecting candidates that would bloat
-the chapter is part of the author's role. When one finding admits several
-reasonable fixes, recommend one and report the alternatives rather than
-picking silently.
+silence might be deliberate. Some findings stay proposals whatever your
+confidence, because the answer is Bruce's to give:
+
+- Deciding where a new listing goes, cutting a section, and anything
+  that changes the chapter's voice or pacing: rejecting candidates that
+  would bloat the chapter is part of the author's role.
+- A change to what the chapter claims or how strongly it claims it,
+  beyond fixing a verified factual error (verified errors are confident
+  fixes; soften-or-sharpen judgment calls are not).
+- A choice between two or more defensible fixes where the difference is
+  taste. When one finding admits several reasonable fixes, recommend one
+  and report the alternatives rather than picking silently.
+- A change that touches a heading or anchor, renumbers exercises, or
+  otherwise drags another file (`Solutions/`, cross-references) along
+  with it.
+- A finding that is real but that you think should not be acted on.
+  That goes under a "Considered and declined" heading, not into a live
+  block, so it is recorded without costing a decision.
 
 Any new listing follows the full verify loop in `CLAUDE.md` (fenced
 block with `# slug.py` first line, deterministic markers or wide-margin
@@ -215,13 +237,23 @@ Write each finding as a self-contained block that stands or falls on its own:
 the section or line it applies to, what is wrong or missing, and the proposed
 change with its reasoning.
 
+**The applied-directly list.** The changes you implemented during the
+review also get a record in the same file: after the rename instruction
+and the review's opening paragraph, a section titled `## Applied
+directly`, one line per change naming the place, the fix, and the reason
+in a few words. It is a record, not a request, so no checkbox; Bruce
+reverts anything he dislikes from the `git diff`, and a later review
+reads the list so it does not re-propose what is already in the chapter.
+Leave the section out when a run implements nothing.
+
 Order the blocks by decreasing importance, not by position in the chapter.
 Importance means how much the finding needs Bruce's judgment: first the
-critical issues where you cannot determine the right approach and need his
-decision, then, going down the file, findings you are more and more able to
-resolve on your own. Bruce reads the top of the file with full attention and
-tends to accept the confident items lower down, so a finding placed too low
-gets less scrutiny than it deserves.
+questions where the answer changes what the chapter says or how it reads,
+then the smaller calls where either answer is defensible. Bruce reads the
+top of the file with full attention, so a finding placed too low gets
+less scrutiny than it deserves. Nothing in the file should be a change
+you could have made yourself: those went in the applied-directly list.
+A file with two blocks in it is a good outcome, not a thin review.
 
 End every block with a reject checkbox on its own line, after the finding it
 governs:
@@ -241,6 +273,9 @@ most recent `~`-prefixed file for it (see Successive reviews below).
 Any block marked `[X] Reject` there is a suggestion Bruce already declined, so
 do not raise it again. Carry those rejections forward, so a new review does not
 re-propose what a past one settled.
+Read that file's applied-directly list and its "Considered and declined"
+section the same way: the first records edits already in the chapter, the
+second records findings a past run judged not worth acting on.
 
 Begin the review file with this instruction, verbatim, so it travels with the
 file:
@@ -254,6 +289,8 @@ When Bruce finishes editing, he hands the file back with an instruction like
 1. Read the review file. Apply every block whose checkbox is empty (`[]`).
    Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
    record, not a change to make. Leave the rejected blocks in the file.
+   The applied-directly list and the "Considered and declined" section are
+   records of the review run, already settled. Do not re-apply either.
 2. Apply the live changes to `Chapters/NN_name.md`, following the same
    verify loop any new listing or prose edit follows in `CLAUDE.md`.
 3. Rename the review file to the next name in the completed-review series (see

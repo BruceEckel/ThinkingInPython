@@ -50,7 +50,7 @@ the same move you make in algebra.
 This property lets you check parts of a program,
 and sometimes prove them correct.
 
-An impure function shows what the property is worth by lacking it:
+Substitution stops working the moment a function reads or writes outside itself:
 
 ```python
 # not_transparent.py
@@ -180,7 +180,7 @@ The win is in the reading rather than in what a checker can prove.
 On a `Result[float, Exception]`,
 `match` and a chain of `isinstance()` tests narrow equally well,
 both reaching `float` inside the `Ok`,
-because `@final` on the two classes is what lets either one land on a single class.
+because `@final` on the two classes lets either one narrow to a single class.
 Destructuring makes the shape test and the extraction one step;
 it does not extend what the checker knows.
 
@@ -250,8 +250,7 @@ print("1000 random cases passed")
 The law is "decoding an encoding returns the original,"
 and it holds for every input the loop tries.
 A property test states what must always be true.
-The machine searches for a counterexample,
-instead of forcing you to write one example at a time.
+The machine searches for a counterexample.
 
 Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
@@ -286,8 +285,8 @@ When a law fails, Hypothesis reports the failing input and shrinks it to the sma
 so the bug surfaces as the clearest case rather than a random one.
 This is automated falsification machinery.
 
-Shrinking is easier to believe once you watch it happen,
-so here is a codec with a real bug in it:
+The two listings above both pass, so nothing has shrunk yet.
+This codec has a bug:
 
 ```python
 # shrinking.py

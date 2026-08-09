@@ -12,7 +12,7 @@ Parallelism moved up to sit against Referential Transparency, Pattern Matching
 was folded into Declarative Style, Property-Based Testing was promoted to a
 top-level section, a fifth rung was inserted into the spectrum, and three
 listings were added or rewritten (`not_transparent.py`, `shrinking.py`, and the
-codec inside `property_check.py`). Every finding below is in that new prose.
+codec inside `property_check.py`). Every finding was in that new prose.
 
 One correction was made during the apply rather than recorded here, because it
 was a false claim rather than a style judgment. The chapter said `ty` narrows
@@ -21,108 +21,32 @@ being true earlier in this same run, when the chapter-42 review added `@final`
 to `Ok` and `Err`: `match` now reaches `float`, exactly as `isinstance()` does.
 The sentence now says the two narrow equally well and credits `@final`.
 
----
+The clear-cut fixes were applied to the chapter directly (listed below);
+one block remains for your judgment.
 
-**Declarative Style, folded-in `match` paragraph: "is what lets either one land
-on a single class" is a cleft the global rules name.**
+## Applied directly
 
-> because `@final` on the two classes is what lets either one land on a single class.
+- "because `@final` on the two classes is what lets either one land on a
+  single class." → "lets either one narrow to a single class." (the cleft
+  the global rule names, and "land on" is a "Don't use" metaphor; "narrow"
+  is the literal verb the surrounding sentences use).
+- `not_transparent.py` lead-in: "An impure function shows what the property
+  is worth by lacking it:" → "Substitution stops working the moment a
+  function reads or writes outside itself:" (the old sentence held three
+  abstractions and an ambiguous "it"; the new one states the claim the
+  listing then demonstrates, matching how the neighboring paragraphs open).
+- Property-Based Testing: "Shrinking is easier to believe once you watch it
+  happen, so here is a codec with a real bug in it:" → "The two listings
+  above both pass, so nothing has shrunk yet. This codec has a bug:" (names
+  the actual contrast, drops the §34 intensifier and the "here is a"
+  announcement).
+- "The machine searches for a counterexample, instead of forcing you to
+  write one example at a time." → "The machine searches for a
+  counterexample." (the trailing clause predates the new rung 2, which now
+  states the example-at-a-time contrast where a reader coming from
+  [Testing](11_Testing.md) is looking for their own practice on the ladder).
 
-Deleting "is what" leaves "because `@final` on the two classes lets either one
-land on a single class," which means the same thing. The giveaway the rules
-describe is present: a verb ("lets") immediately after the cleft.
-
-This one is mine, from the correction described above, so it is a fair thing to
-fix without ceremony.
-
-Proposed change:
-
-> because `@final` on the two classes lets either one land on a single class.
-
-[] Reject
-
----
-
-**Referential Transparency: `not_transparent.py`'s lead-in is a riddle.**
-
-> An impure function shows what the property is worth by lacking it:
-
-The sentence asks the reader to hold three abstractions at once (a function, a
-property, the worth of the property) before they have seen the code, and
-"by lacking it" arrives with two candidate referents for "it." A reader has to
-reach the listing and come back.
-
-Proposed change:
-
-> The property is easier to see in a function that does not have it:
-
-Alternative, naming the mechanism up front, which matches how the neighboring
-paragraphs open:
-
-> Substitution stops working the moment a function reads or writes outside itself:
-
-I recommend the second. It states the claim the listing then demonstrates,
-rather than promising that a demonstration is coming.
-
-[] Reject
-
----
-
-**Property-Based Testing: "so here is a codec with a real bug in it" is a
-presentational aside, and "real" is doing no work.**
-
-> Shrinking is easier to believe once you watch it happen,
-> so here is a codec with a real bug in it:
-
-"Here is a..." is the signposting pattern, and §34 covers the bare intensifier:
-calling the bug "real" implies the chapter's other examples carry fake ones,
-which is not the contrast intended. The contrast that *is* intended is with the
-two passing listings above, where nothing fails.
-
-Proposed change:
-
-> The two listings above both pass, so nothing has shrunk yet.
-> This codec has a bug:
-
-That names the actual contrast, drops the intensifier, and cuts the
-announcement.
-
-[] Reject
-
----
-
-**An Assurance Spectrum: the new rung 2 and rung 4 now explain the same
-contrast twice.**
-
-Rung 2, added by this pass:
-
-> Each one pins a single input to a single answer,
-> so the assurance you get is exactly as wide as the examples you think of.
-
-Rung 4, which was already there:
-
-> You state a law the code must obey,
-> then check it against many generated inputs.
-
-and then the section below it:
-
-> The machine searches for a counterexample,
-> instead of forcing you to write one example at a time.
-
-The third quote was written when the list had no example-based rung, so it had
-to introduce the contrast itself. Now that rung 2 states it, "instead of forcing
-you to write one example at a time" is the second telling.
-
-Proposed change: cut the trailing clause from the Property-Based Testing
-section, leaving "The machine searches for a counterexample."
-
-The rung 2 addition is the right place for the contrast, because it is where a
-reader coming from [Testing](11_Testing.md) is looking for their own practice on
-the ladder.
-
-[] Reject
-
----
+***
 
 **Exercise 1: three questions in one numbered item.**
 
@@ -149,8 +73,8 @@ Proposed change: split into two exercises, 1 and 2, and renumber the rest.
 
 Note the cost: renumbering exercises means renumbering every `## N.` heading in
 `Solutions/43_Functional_Assurance.md`, and `check_solutions.py` gates that, so
-the two files have to move together. That is the reason this is a proposal
-rather than something I applied.
+the two files have to move together. That is the reason this is a block rather
+than a direct edit.
 
 "Run it three times before deciding what it means" is added deliberately: a
 single run makes the number look like a constant, and the whole lesson is that
@@ -158,7 +82,7 @@ it is not.
 
 [] Reject
 
----
+***
 
 ## Checked and clean
 

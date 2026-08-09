@@ -12,54 +12,39 @@ Pure" up ahead of "A Program Can Never Be Pure", renamed "A Taxonomy of
 Benefits" to "Two Phases of Effect Analysis", opened the chapter with the
 failing-test story, rewrote two sentences in the first paragraph, added a
 generators aside, a `print()`-is-still-invisible qualification, a closing
-handoff to Part V, and a fifth exercise. Every finding below is in that new
+handoff to Part V, and a fifth exercise. Every finding was in that new
 prose or in a seam the moves opened.
 
----
+The clear-cut fixes were applied to the chapter directly (listed below);
+one block remains for your judgment.
 
-**Opening: the new cold-open and the paragraph under it now both explain why
-purity is hard to verify, in opposite directions.**
+## Applied directly
 
-The chapter now begins:
+- Opening: cut "What happens when a function you believe is pure calls other
+  functions?" and joined the seam: "...settle the question by reading one
+  function. That stops working as soon as the function calls others."
+  (the new cold open already asks that question in a form the reader felt,
+  so the abstract restatement twenty lines later was the second telling;
+  "causes the calling function to also be impure" also tightened to "makes
+  the calling function impure too").
+- "Effects by Hand": the `print()`-is-still-invisible qualification moved
+  from mid-paragraph to its own paragraph after the delayed-binding point
+  lands, now opening "The signature says what `greet()` needs..." (a caveat
+  placed after the claim reads as a boundary on it; placed inside, it read
+  as a retraction of a claim the reader had not finished hearing).
+- Generators aside: "Python has a construct that suspends a computation and
+  hands control to whoever is driving it, then resumes it with a value: the
+  generator." → "A Python generator suspends a computation, hands control to
+  whoever is driving it, and resumes it with a value." (§69 reveal
+  withholding a name every reader has known since chapter 23; naming it
+  first also connects the aside to the continuation sentence above it).
+- Closing handoff: "Python cannot give you the language half of that today.
+  It can give you the library half. The next three chapters build one:" →
+  "Python offers no native version of this, and will not soon. The next
+  three chapters build the library version:" (the halved contrast restated
+  a section the chapter already spent on native versus library systems).
 
-> A test you wrote last week starts failing about one run in five.
-> ...
-> None of that is in any signature on the path.
-
-and then, twenty lines later, after the bulleted list:
-
-> In every one of those cases you can settle the question by reading one function.
->
-> What happens when a function you believe is pure calls other functions?
-
-The cold open is a concrete case of the problem. The question after the list is
-the same problem stated abstractly. Between them sits a six-item list of things
-the book already did, which is the throat-clearing the cold open was added to
-displace. As it stands the reader gets the hook, waits through the list, and
-receives the hook again as a question.
-
-This is not an argument against the cold open, which is the strongest writing in
-the chapter's first page. It is an argument that the question has become the
-second telling.
-
-Proposed change: cut the question and let the paragraph continue from the
-one-function sentence.
-
-> In every one of those cases you can settle the question by reading one function.
-> That stops working as soon as the function calls others.
-> If one or more of those have side effects,
-> their impurity makes the calling function impure too.
-
-The opening story already asked the question in a form the reader felt, so the
-prose can move straight to the answer.
-
-Alternative: keep the question and cut the cold open. I do not recommend it, but
-it is the coherent other choice, and it is worth naming because the two are
-solving the same problem.
-
-[] Reject
-
----
+***
 
 **"Two Phases of Effect Analysis": the new heading is accurate and the old one
 is still doing its job three lines later.**
@@ -93,98 +78,7 @@ reordering settle before moving more, this is a reasonable one to defer.
 
 [] Reject
 
----
-
-**"Effects by Hand": the new qualification arrives mid-paragraph and interrupts
-the delayed-binding point.**
-
-> and its signature says so.
-> It says what `greet()` needs, not everything `greet()` might do:
-> a `print()` in the body would still be invisible.
-> [Effect Management for Python?](#effect-management-for-python)
-> returns to that limit.
-> This moves the Effects into explicit arguments.
-> The bindings are delayed.
-
-The qualification is correct and belongs in the chapter. Where it sits, it
-splits "its signature says so" from "This moves the Effects into explicit
-arguments," which is the sentence that continues the thought, and the reader
-resumes the delayed-binding argument three sentences later having been sent to a
-section 300 lines away.
-
-Proposed change: move the qualification to the end of the paragraph, after the
-delayed-binding point lands.
-
-> and its signature says so.
-> This moves the Effects into explicit arguments.
-> The bindings are delayed.
-> ...
->
-> The signature says what `greet()` needs, not everything `greet()` might do:
-> a `print()` in the body would still be invisible.
-> [Effect Management for Python?](#effect-management-for-python)
-> returns to that limit.
-
-A caveat placed after the claim reads as a boundary on it. Placed inside the
-claim, it reads as a retraction of a claim the reader has not finished hearing.
-
-[] Reject
-
----
-
-**"Native Effect Management", the generators aside: "Python has a construct"
-announces a reveal it then makes.**
-
-> Python has a construct that suspends a computation and hands control to whoever is driving it,
-> then resumes it with a value: the generator.
-
-The sentence withholds the name until after the colon, which is §69: the
-noun-phrase-then-colon-then-reveal shape. Here the reveal is a word every reader
-of this book has known since chapter 23, so the suspense buys nothing and the
-delay costs a re-read of the clause to attach it to the right noun.
-
-Proposed change:
-
-> A Python generator does exactly this.
-> It suspends a computation, hands control to whoever is driving it,
-> and resumes it with a value.
-> [Generators](45_Generators.md) covers the full two-way form,
-> and it is the mechanism the Python Effect library in
-> [Stateless](46_Stateless.md) is built from.
-
-Naming it first also connects the aside to the sentence above it, which is about
-what handlers do with continuations.
-
-[] Reject
-
----
-
-**Closing handoff: "Python cannot give you the language half of that today. It
-can give you the library half." states the split twice before naming it.**
-
-> Python cannot give you the language half of that today.
-> It can give you the library half.
-> The next three chapters build one:
-
-Three sentences to say "the next three chapters build a library version." The
-first two are a matched pair whose only content is the contrast between the two
-halves, and the chapter has already spent a full section on native versus
-library Effect systems, so the contrast is familiar rather than new.
-
-Proposed change:
-
-> Python offers no native version of this, and will not soon.
-> The next three chapters build the library version:
-> [Generators](45_Generators.md) supplies the mechanism,
-> [Stateless](46_Stateless.md) builds the Effect type on top of it,
-> and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
-
-"the library version" leans on the section that defined the term rather than
-re-deriving it, and the paragraph drops from six lines to five with nothing lost.
-
-[] Reject
-
----
+***
 
 ## Checked and clean
 

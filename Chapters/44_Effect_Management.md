@@ -27,10 +27,9 @@ This book has emphasized the benefits of pure functions in numerous places:
   has `simplify()` return a new tree instead of editing the one it receives.
 
 In every one of those cases you can settle the question by reading one function.
-
-What happens when a function you believe is pure calls other functions?
+That stops working as soon as the function calls others.
 If one or more of those other functions have side effects,
-their impurity causes the calling function to also be impure.
+their impurity makes the calling function impure too.
 To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
@@ -458,10 +457,6 @@ print(captured.messages)
 
 `greet()` performs an `Ask` Effect and a `Tell` Effect,
 and its signature says so.
-It says what `greet()` needs, not everything `greet()` might do:
-a `print()` in the body would still be invisible.
-[Effect Management for Python?](#effect-management-for-python)
-returns to that limit.
 This moves the Effects into explicit arguments.
 The bindings are delayed.
 The demo binds them to test stand-ins, `Scripted` and `Capture`,
@@ -470,6 +465,11 @@ A production caller passes objects that read with `input()` and write with `prin
 and `greet()` never changes.
 This is delayed binding by hand,
 and it is why "pass in your dependencies" is such durable advice.
+
+The signature says what `greet()` needs, not everything `greet()` might do:
+a `print()` in the body would still be invisible.
+[Effect Management for Python?](#effect-management-for-python)
+returns to that limit.
 
 The technique works, but the bookkeeping falls on you.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down,
@@ -579,8 +579,9 @@ It can discard the continuation, which behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 
-Python has a construct that suspends a computation and hands control to whoever is driving it,
-then resumes it with a value: the generator.
+A Python generator suspends a computation,
+hands control to whoever is driving it,
+and resumes it with a value.
 [Generators](45_Generators.md) covers the full two-way form,
 and it is the mechanism the Python Effect library in [Stateless](46_Stateless.md)
 is built from.
@@ -893,11 +894,10 @@ Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
-Python cannot give you the language half of that today.
-It can give you the library half.
-The next three chapters build one: [Generators](45_Generators.md)
-supplies the mechanism, [Stateless](46_Stateless.md)
-builds the Effect type on top of it,
+Python offers no native version of this, and will not soon.
+The next three chapters build the library version:
+[Generators](45_Generators.md) supplies the mechanism,
+[Stateless](46_Stateless.md) builds the Effect type on top of it,
 and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
 
 ## Exercises

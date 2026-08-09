@@ -175,7 +175,9 @@ the same three-part shape as a `Generator`, and the match is deliberate.
 Calling `interview()` returns a generator object but doesn't run anything in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
-A generator is the more useful of the two here because you can be its driver.
+A generator is the more useful of the two here because the driver can be yours.
+A coroutine's requests are addressed to the event loop;
+a generator's are addressed to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
@@ -299,8 +301,8 @@ so the line delegating to `one()` contributes one value and the line delegating 
 The number of contributions is a property of the target.
 The `from` is what makes this delegation:
 `yield one()` would hand the generator object itself to the driver as one value.
-"Exhausted" describes where the delegation ends, not when it happens:
-each value still leaves the inner generator only when the driver asks for the next one.
+"Exhausted" describes where the delegation ends, not when it happens.
+Each value still leaves the inner generator only when the driver asks for the next one.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -420,13 +422,13 @@ except StopIteration:
 #: manual() is exhausted
 ```
 
-`manual()` forwards what it receives from `collect()` and nothing in the other direction.
 Each `send()` delivers its value to `manual()`'s own `yield`,
-which throws it away, and the `for` loop resumes `collect()` with `next()`,
+which throws it away.
+The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
-The checker says nothing: `manual()` is a valid `Generator[str, int]`.
-`yield from` is not shorthand for this loop,
-and the difference is the send channel.
+The checker says nothing, because `manual()` is a valid `Generator[str, int]`:
+the send channel is declared and simply never used.
+`yield from` is not shorthand for this loop.
 
 `g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
 which completes the first `yield from`, which starts the second one.
@@ -538,8 +540,9 @@ and the request stops there.
 `yield from` answers nothing.
 It relays the request upward and passes the reply back down untouched,
 so `survey()` has no idea what a `Question` means.
-`yield from` relays `throw()` and `close()` the same way,
-so an exception thrown at the driver surfaces inside the innermost generator,
+A driver can also `throw()` an exception into a generator or `close()` it,
+and `yield from` relays both:
+a thrown exception surfaces inside the innermost generator rather than at the delegating one,
 and a `close()` unwinds every frame in the chain.
 `StopIteration` splits the same way.
 Both catch it and both take `stop.value`, but they hand it to different places.

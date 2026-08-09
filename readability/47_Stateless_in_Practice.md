@@ -11,9 +11,33 @@ The deep review that ran just before this one cut the
 `Why retry() Decorates the Function` subsection, retitled two headings, added a
 motivation sentence to "Abilities Are Not Special", tightened the type-bound
 paragraph, added three explanatory sentences and a closing paragraph, and added
-three exercises. Every finding below is in that new or rewritten prose.
+three exercises. Every finding was in that new or rewritten prose.
 
----
+The clear-cut fixes were applied to the chapter directly (listed below);
+one block remains for your judgment.
+
+## Applied directly
+
+- Closing paragraph: "Name each contact with the outside, the clock, the
+  feed, the pool, the console, and bind it at the edge..." → the example
+  list moved into parentheses, so the resumption at "and bind it" no longer
+  reads as a fifth list item. (The deep review's draft used em dashes here,
+  which are yours to write rather than mine; parentheses do the same
+  structural work.)
+- "Abilities Are Not Special" opening: added "A custom Ability is a request
+  you design." ahead of the `Need` contrast, so the section's first sentence
+  states its own topic instead of comparing to the previous chapter.
+- "Switching Implementations Mid-Run": "`catch()` matches yielded values,
+  and a handler yields nothing" → "`catch()` matches values an Effect
+  yields, and a handler is not part of the Effect" (kills the yield-yield-
+  yield tongue-twister and states the real reason, which now agrees with
+  "A handler sits outside the channel it feeds" in the next sentence).
+- "The Success Path": cut "Lifting a function takes it away from its
+  unlifted callers." and added "directly" to the sentence before it (the
+  aphorism overstated: an unlifted caller can still `run()` a lifted
+  function, as the chapter shows a dozen times).
+
+***
 
 **The renamed final section: "One Type for Four Mechanisms" names an argument
 the section makes third, not first.**
@@ -44,121 +68,12 @@ Mechanisms" and move the composition paragraph to the top of the section, so
 the heading describes the opening rather than the middle. That is a bigger
 edit and reorders the book's last section, which is why I list it second.
 
-[] Reject
-
----
-
-**The new closing paragraph: "Name each contact with the outside, the clock,
-the feed, the pool, the console, and bind it at the edge" has four commas doing
-two different jobs.**
-
-> Name each contact with the outside, the clock, the feed, the pool, the console,
-> and bind it at the edge instead of calling it in the middle.
-
-The middle four commas separate a list of examples; the outer two attach that
-list as an appositive and then resume the sentence. The reader meets "the
-clock" and cannot yet tell whether it is a second thing to name or a gloss on
-the first, and the resumption at "and bind it" reads at first as the fifth list
-item.
-
-The deep review's draft used em dashes here, which would have solved it, and
-those are yours to write rather than mine.
-
-Proposed change without them, using parentheses:
-
-> Name each contact with the outside (the clock, the feed, the pool, the console)
-> and bind it at the edge instead of calling it in the middle.
-
-Alternative, splitting into two sentences:
-
-> Name each contact with the outside and bind it at the edge,
-> instead of calling it in the middle.
-> The clock, the feed, the pool, and the console are all such contacts.
-
-I recommend the parentheses. The list is an aside, and the second version gives
-it more weight than it needs at the end of a book.
+This stays a block because it is a heading: the anchor changes with it, and
+`heading_links.py` gates whatever links to it.
 
 [] Reject
 
----
-
-**"Abilities Are Not Special": the new motivation paragraph answers a question
-the reader has not been asked yet.**
-
-The section now opens:
-
-> A `Need` asks for an instance and gets whatever was supplied.
-> Your own Ability can ask for anything you can name,
-> and the handler answering it is an ordinary function,
-> so the answer can differ every time it is asked.
-
-This is the right content and it fixed a real problem: the section used to open
-with reassurance rather than motivation. The seam is that it opens on a
-contrast with `Need` before saying what the section is about, so the first
-sentence of the last chapter's last major idea is a comparison to something
-from the previous chapter.
-
-Proposed change: state the subject, then the contrast.
-
-> A custom Ability is a request you design.
-> A `Need` asks for an instance and gets whatever was supplied;
-> your own Ability can ask for anything you can name,
-> and the handler answering it is an ordinary function,
-> so the answer can differ every time it is asked.
-
-One added sentence, and the paragraph now opens on its own topic.
-
-[] Reject
-
----
-
-**"Switching Implementations Mid-Run": the new `catch()` sentence repeats the
-word "yield" three times in two lines.**
-
-> `catch()` matches yielded values, and a handler yields nothing,
-> so no `catch()` around this program intercepts it.
-
-The sentence is doing exactly the job the deep review wanted (naming the
-mechanism rather than only the outcome), and the repetition is the cost of
-saying it compactly. It reads as a tongue-twister on the first pass.
-
-Proposed change:
-
-> `catch()` matches values an Effect yields, and a handler is not part of the
-> Effect, so no `catch()` around this program intercepts it.
-
-That also states the more useful fact. The reason is not that handlers happen
-not to yield, it is that a handler sits outside the channel entirely, which is
-what the sentence after it already says ("A handler sits outside the channel it
-feeds"). The two now agree instead of offering two different reasons.
-
-[] Reject
-
----
-
-**"The Success Path": the new `topic_of()` explanation ends on a sentence that
-generalizes further than the paragraph earns.**
-
-> `topic_of()` is written out again because `research.py`'s version is decorated:
-> it returns an Effect, and ordinary `try`/`except` code cannot call it.
-> Lifting a function takes it away from its unlifted callers.
-
-The first two lines are the explanation and they are exactly what the listing
-needed. The third is an aphorism, and it overstates: an unlifted caller can
-still call a lifted function, it just has to `run()` it, which this chapter has
-shown a dozen times.
-
-Proposed change: cut the third line, or make it accurate.
-
-> `topic_of()` is written out again because `research.py`'s version is decorated:
-> it returns an Effect, and ordinary `try`/`except` code cannot call it directly.
-
-I recommend the cut with "directly" added, since that one word carries the
-qualification the aphorism was missing.
-
-[] Reject
-
----
+***
 
 ## Checked and clean
 
