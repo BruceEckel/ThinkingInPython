@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Chapter-level, the largest item: the chapter has no Exercises section and no
 `Solutions/41_Functional_Toolkits.md`, and chapter 43 has already borrowed
 this chapter's case study for one of its own exercises.**
@@ -57,9 +55,9 @@ Reported rather than applied because the size and difficulty curve of an
 exercise set is a pacing decision, and because adding one implies creating
 `Solutions/41_Functional_Toolkits.md`, which is outside this chapter.
 
----
-
 [] Reject
+
+---
 
 **Chapter-level: the chapter has no conclusion. It stops inside the case
 study, and the reader is never told what they can now do.**
@@ -102,9 +100,9 @@ pacing and shape, which is your call.
 A cheaper version is three sentences appended to the case study with no new
 heading.
 
----
-
 [] Reject
+
+---
 
 **Order: "Recursion" sits between the `itertools` catalog and "Lazy
 Evaluation", separating the two sections that are about the same thing.**
@@ -142,9 +140,9 @@ need its order flipped too. That is a one-line edit.
 Reported rather than applied because reordering sections is a pacing decision
 however clear the case.
 
----
-
 [] Reject
+
+---
 
 **Case Study: `group_rounds()` raises `ValueError` for any roster smaller than
 `size`, and chapter 43 asks the reader to property-test it "for any roster and
@@ -198,9 +196,9 @@ the second and third involve `Chapters/43_Functional_Assurance.md`, which is
 out of bounds for this pass. Either way, chapter 43's exercise 4 should be
 re-read once this is settled.
 
----
-
 [] Reject
+
+---
 
 **Case Study: the section closes the chapter but uses almost none of it.**
 
@@ -230,9 +228,9 @@ I recommend 1: it is the only one that teaches something rather than
 decorating the listing, and "here is where caching would be wrong" is a
 stronger lesson than another `itertools` call.
 
----
-
 [] Reject
+
+---
 
 **"The `itertools` Toolkit" intro promises composition and the section never
 shows a pipeline more than two stages deep.**
@@ -282,9 +280,9 @@ Two candidates:
 I recommend the first, because the second breaks the escalating-difficulty
 rule harder than it fixes the front-loading one.
 
----
-
 [] Reject
+
+---
 
 **`recursion.py` teaches two things at once.**
 
@@ -301,9 +299,9 @@ proximity earns the extra line.
 Reject this block if you agree; it exists so a later review does not raise it
 again.
 
----
-
 [] Reject
+
+---
 
 **`singledispatch`: the entry does not say what it cannot do, which is the
 reader's next question.**
@@ -324,9 +322,9 @@ Reported rather than applied because I did not want to add a third
 cross-reference to a four-line catalog entry that already carries two, and
 because the `singledispatch`/Visitor thread is chapter 33's to own.
 
----
-
 [] Reject
+
+---
 
 **Two claims in the `itertools` catalog are stated and never shown.**
 
@@ -345,9 +343,9 @@ claims in this pass and left these two.
 If you want the catalog to be uniform about demonstrating what it asserts,
 these are the remaining two.
 
----
-
 [] Reject
+
+---
 
 **`repeat`: the entry says "forever or a fixed number of times" and shows only
 the fixed form, which is the less useful one.**
@@ -371,9 +369,9 @@ Reported rather than applied because it doubles a deliberately one-line entry,
 and because the same "shortest input wins" rule is now stated three entries
 later under `zip_longest`, so you may prefer to keep them together.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Changes applied to
 `Chapters/41_Functional_Toolkits.md` in this pass.**
@@ -525,3 +523,5 @@ explained deviation from the dataclass rule and stays; the `sentinel()` call in
 `itertools_zip_longest.py` is the PEP 661 builtin and needs no import on 3.15;
 and the chapter's cross-references into 07, 14, 18, 23, 30, 33 and 40 all
 resolve under `heading_links.py`.
+
+[] Reject

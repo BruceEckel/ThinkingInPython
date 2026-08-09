@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Lines 270-288 (the `__init_subclass__()` caveat paragraph)**
 **Pattern:** §57 excessive density, treadmill effect
 
@@ -48,9 +46,9 @@ give a reader somewhere to stop.
 I did not do it because paragraphing is pacing, and this section is the
 chapter's argumentative center.
 
-***
-
 [] Reject
+
+***
 
 **Lines 405-408 (after `shape_factory2.py`)**
 **Pattern:** dangling apposition, then §13 hidden actor
@@ -78,9 +76,9 @@ Proposed:
 
 That keeps both points, names who does what, and drops one "appropriate."
 
-***
-
 [] Reject
+
+***
 
 **Line 26**
 **Pattern:** unsupported superlative
@@ -102,9 +100,9 @@ I lean toward leaving line 26 alone: it opens the chapter, the hedge is
 explicit, and the sentence is first-edition voice.
 If you agree, mark this rejected.
 
-***
-
 [] Reject
+
+***
 
 **Lines 262-266**
 **Pattern:** repetition in consecutive sentences
@@ -121,9 +119,9 @@ so the collision is new.
 Proposed for the second sentence:
 > That is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
 
-***
-
 [] Reject
+
+***
 
 **Lines 165-167 (after `nested_shape_factory.py`)**
 **Pattern:** a claim that now has evidence the prose does not point at
@@ -143,9 +141,9 @@ Proposed:
 > `type(a) is type(b)` is `False`,
 > and so is `isinstance(a, type(b))`.
 
-***
-
 [] Reject
+
+***
 
 **Lines 413-415**
 **Pattern:** same, for the cache
@@ -161,9 +159,9 @@ Proposed, adding one sentence at the end:
 > The two printed key lists show it: empty before any request,
 > two entries after four requests for two kinds.
 
-***
-
 [] Reject
+
+***
 
 **Line 259 — "which is what"**
 **Pattern:** cleft that delays the verb (global rule on "is what")
@@ -176,9 +174,9 @@ Proposed:
 > The two `class` statements filled `Shape.registry` on their own,
 > as the printed key list shows.
 
-***
-
 [] Reject
+
+***
 
 **Lines 14 and 86 — "happens to be" twice**
 **Pattern:** watch list, "consider rewriting"
@@ -199,9 +197,9 @@ Proposed:
 
 Both are first-edition sentences, so take them together or leave them together.
 
-***
-
 [] Reject
+
+***
 
 **Line 92 — "at all"**
 **Pattern:** watch list, "avoid if possible"
@@ -215,9 +213,9 @@ of the sentence, so "at all" repeats it.
 Proposed:
 > a generator object holds an internal algorithm and produces the next value with no argument.
 
-***
-
 [] Reject
+
+***
 
 **Line 276 — "sitting right there in the file"**
 **Pattern:** §31 conversational flourish in explanatory prose
@@ -233,9 +231,9 @@ Proposed:
 That states the surprise (the import is present and still does not register)
 instead of gesturing at it.
 
-***
-
 [] Reject
+
+***
 
 **Line 417 — "leans on"**
 **Pattern:** metaphor standing in for a literal verb
@@ -248,9 +246,9 @@ Proposed:
 > This version uses `eval()` and a `Factory` class nested in every shape,
 > neither of which Python needs.
 
-***
-
 [] Reject
+
+***
 
 **Line 866 — "just"**
 **Pattern:** §23 empty adverb, and inconsistent with the summary bullet
@@ -265,9 +263,9 @@ builder."
 
 Proposed: drop "just" here so the two agree.
 
-***
-
 [] Reject
+
+***
 
 **Lines 273-274 — "nothing ever imported"**
 **Pattern:** watch list, "avoid if possible"
@@ -284,3 +282,5 @@ Proposed:
 > the registry is fine, and nothing imported the module that defines it.
 
 Lowest-priority item in the file; the sentence reads well either way.
+
+[] Reject

@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **"The Send Channel": the chapter's biggest missing near-miss is the
 hand-written forwarding loop, and chapter 23 already promised it lives here.**
 
@@ -77,9 +75,9 @@ this listing's output. The alternative is to add a guard to
 `yield_from_send.py`, which would need its interleaved column-0 `#:` markers
 to sit inside an indented block; duplicating six lines is the smaller change.
 
----
-
 [] Reject
+
+---
 
 **Exercise 2 sets a silent trap the chapter does not arm the reader for.**
 
@@ -110,9 +108,9 @@ existing question ("explain what had to change in `interview()`") has the
 answer "nothing," so the exercise currently has one insight and room for a
 second.
 
----
-
 [] Reject
+
+---
 
 **Chapter-level structure: the order holds, with one local exception.**
 
@@ -154,9 +152,9 @@ Cost: nothing. No anchor changes, no other chapter names it, and the ch19
 link travels with the paragraph. Reported rather than applied because moving
 a paragraph is pacing.
 
----
-
 [] Reject
+
+---
 
 **"Running to Exhaustion": `list()` hides that `yield from` is lazy, and the
 section title invites the wrong reading.**
@@ -186,9 +184,9 @@ shows the alternation instead of the totals. That teaches the mechanism rather
 than asserting it, at the cost of a longer listing in the chapter's simplest
 section. I recommend the sentence.
 
----
-
 [] Reject
+
+---
 
 **"The Driver You Already Use": `throw()` and `close()` appear for the first
 and only time in the conclusion.**
@@ -221,9 +219,9 @@ Three ways out, in increasing cost:
 I recommend 2. It is one sentence, it sits where the reader is already
 thinking about relaying, and it makes chapter 23's cross-reference true.
 
----
-
 [] Reject
+
+---
 
 **Cross-file: `Chapters/23_Iterators.md:354-357` promises more than chapter 45
 delivers.**
@@ -240,9 +238,9 @@ return) and never mentions `throw()`. A reader who follows that link to see
 names from 45's conclusion), then 23's sentence should drop "and `throw()`"
 instead. I did not touch chapter 23, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **Exercises: no `Solutions/45_Generators.md` exists.**
 
@@ -259,9 +257,9 @@ manifest): the annotation now stays on `profile`, so the checker reports one
 `invalid-assignment` and the run prints `<generator object interview at ...>,
 color blue`.
 
----
-
 [] Reject
+
+---
 
 **`two_way_generator.py`: `drive()` looks the answer up twice, and the
 single-lookup form is the one exercise 2 needs.**
@@ -303,9 +301,9 @@ as it now stands and add one clause to exercise 2 warning that the answer
 source is consumed once per question. Cheaper, but the reader still copies a
 double lookup.
 
----
-
 [] Reject
+
+---
 
 **Cross-file: `CLAUDE.md`'s two chapter-45 trap entries are misfiled, and one
 of them re-verifies clean on ty 0.0.65.**
@@ -344,9 +342,9 @@ version-history fact ("0.0.63 made higher-order union subtraction work; the
 caveat it invalidated has already been removed from the text"). I did not
 touch `CLAUDE.md`, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **"A Generator Is a Description," first line of the third paragraph:
 "more interesting than a coroutine" is not quite the difference.**
@@ -375,9 +373,9 @@ sentence carry the two-way point, which it already does. Reported rather than
 applied because it rewrites the sentence that opens the chapter's central
 argument, and the phrasing is yours.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST, not a proposal: everything applied to
 `Chapters/45_Generators.md` in this pass.**
@@ -411,3 +409,5 @@ item 6 below).
 16. Ran `tools/reflow_prose.py --write` on the chapter so the new prose matches Semantic Line Breaks; it rewrapped two paragraphs and now reports clean.
 </content>
 </invoke>
+
+[] Reject

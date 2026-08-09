@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Intro, third paragraph: the chapter promises requirement-driven evolution and
 never delivers a requirement.**
 
@@ -50,9 +48,9 @@ and "discovered its vectors one requirement at a time" to
 "named its vectors one at a time, by asking what the next change would cost."
 Two lines, no new code, and the chapter stops claiming an arc it does not have.
 
----
-
 [] Reject
+
+---
 
 **`parse_trash.py`: `filename: str` makes the test stringify a `Path`.**
 
@@ -84,9 +82,9 @@ listings whose subject is sorting, not file handling.
 Not applied because it edits code in four listings, which felt like your call
 rather than mine on a judgment item.
 
----
-
 [] Reject
+
+---
 
 **Exercise 1 asks the reader to confirm the wrong two files, and understates
 what changes.**
@@ -126,9 +124,9 @@ extra two answers (the `match` sorter silently discards plastic because no
 fails because it pins the exact registry contents).
 I did not touch `Solutions/`, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **"Adding Operations", first paragraph: the motivating premise contradicts the
 chapter it sits in.**
@@ -165,9 +163,9 @@ are exactly the two operations exercise 2 concludes must *not* use single
 dispatch. They now read "print recycling instructions, flag a disposal hazard."
 See the manifest at the end.)
 
----
-
 [] Reject
+
+---
 
 **"Visitor is elaborate: a `Visitor` base class with one `visit()` overload per
 material" describes a Visitor the book never shows.**
@@ -219,9 +217,9 @@ to it, and change the third clause of the later sentence to
 Not applied because it rewrites four lines of your prose in a section whose
 rhythm is deliberate.
 
----
-
 [] Reject
+
+---
 
 **`recycling_note.py`: the `seen` set is bookkeeping unrelated to the point.**
 
@@ -262,9 +260,9 @@ Cost: `parse` and `parse_trash` drop out of this listing's imports, so the
 chapter's last listing no longer touches the data file.
 Reported rather than applied because it rewrites an existing listing's output.
 
----
-
 [] Reject
+
+---
 
 **`trash.py`: `create()` is a `@classmethod` that never uses `cls`.**
 
@@ -289,9 +287,9 @@ Alternative: make it a module-level `def create(name, weight)`, which is what
 the same registry. That is more consistent with chapter 27 but loses the
 `Trash.create(...)` reading the parser depends on.
 
----
-
 [] Reject
+
+---
 
 **"Choosing the Lightest Construct" never names the two constructs the chapter
 chose.**
@@ -316,9 +314,9 @@ and choosing the lightest construct that isolates it.":
 Reported rather than applied because it changes the pacing of the closing
 section, which is yours to set.
 
----
-
 [] Reject
+
+---
 
 **Exercises: nothing exercises the chapter's own lookalike pair.**
 
@@ -342,9 +340,9 @@ The last clause has a clean answer (give `Trash` a
 which is also a small lesson in choosing your own key instead of accepting
 `type(t)`.
 
----
-
 [] Reject
+
+---
 
 **`parse_trash.py`: the header comment restates the prose directly above it.**
 
@@ -369,9 +367,9 @@ Proposed change: delete the second comment line.
 Reported rather than applied because the style skill also says not to edit
 comments already sitting in existing example code without being asked.
 
----
-
 [] Reject
+
+---
 
 **Minor prose and reference notes, none applied.**
 
@@ -406,9 +404,9 @@ comments already sitting in existing example code without being asked.
     The harness chdir's, so no gate notices. Not worth `Path(__file__).parent`
     clutter in three listings, but worth knowing if a reader reports it.
 
----
-
 [] Reject
+
+---
 
 **Cross-chapter thread checks: results.**
 
@@ -439,9 +437,9 @@ thread backs "the registries in 20/37."
 `__init_subclass__`; its only related links are two pointers to 33's
 `singledispatch` section. The "20" end of that thread appears to be stale.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Everything applied to
 `Chapters/37_Pattern_Refactoring.md` in this pass, in file order.**
@@ -514,3 +512,5 @@ No listing, `#:` marker, test, or heading changed, so no anchor moved and no
 other chapter's cross-references are affected.
 `validate_output.py`, `ruff`, `ty`, `pytest`, `heading_links.py`,
 `banned_phrases.py`, and `reflow_prose.py --diff` are all clean.
+
+[] Reject

@@ -24,8 +24,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Lines 280 and 283 — "the version a reader writes first," twice, meaning
 different things**
 **Pattern:** repetition that reads as a contradiction
@@ -51,9 +49,9 @@ Proposed for the first:
 That keeps the warning and leaves "the version most programmers write first"
 to the paragraph that earns it.
 
-***
-
 [] Reject
+
+***
 
 **Line 231 — "worth watching happen"**
 **Pattern:** §53 endorsement frame
@@ -74,9 +72,9 @@ Or, if that reads too clipped:
 
 I recommend the second.
 
-***
-
 [] Reject
+
+***
 
 **Lines 296-299 (the rewritten double-dispatch criterion)**
 **Pattern:** a three-part sentence whose last clause answers a question the
@@ -98,9 +96,9 @@ Proposed: put the rebuttal first, as the thing being corrected.
 > when it reads the object's own state,
 > or when a subclass should be able to override one combination and inherit the rest.
 
-***
-
 [] Reject
+
+***
 
 **Line 316 — "a type written decades after `int` was"**
 **Pattern:** none flagged; noting a keeper
@@ -111,9 +109,9 @@ the end ("after `int` was") is the kind of thing a person writes and a model
 does not.
 Recorded so a later tightening pass leaves it alone.
 
-***
-
 [] Reject
+
+***
 
 **Line 303 — "already perform"**
 **Pattern:** watch list, "already"
@@ -133,9 +131,9 @@ Proposed:
 > Python's own operators already perform a two-step dispatch,
 > which answers the `Number + Number` question that opened this chapter.
 
-***
-
 [] Reject
+
+***
 
 **Line 222 — "just as easily"**
 **Pattern:** §23 filler
@@ -153,9 +151,9 @@ Proposed:
 Or drop the comparison: "A tuple works as a key." The two-line version above is
 the one I would take, since the contrast with a single object is the point.
 
-***
-
 [] Reject
+
+***
 
 **Line 11 — "something you probably never consider"**
 **Pattern:** §68 faux-insight setup
@@ -176,9 +174,9 @@ Or cut the line and open on "Python dispatches on one type at a time."
 Low confidence: this sentence carries over from *Thinking in Java* and the
 voice call is yours. The second option is the stronger edit if you want one.
 
-***
-
 [] Reject
+
+***
 
 **Line 393 — "describes nothing at all"**
 **Pattern:** watch list, "at all"
@@ -190,3 +188,5 @@ The second half already states the consequence, so "at all" only intensifies.
 
 Proposed:
 > Widening the return to `Any` describes nothing and turns off checking for every caller.
+
+[] Reject

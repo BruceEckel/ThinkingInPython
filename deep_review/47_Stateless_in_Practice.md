@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **"Costs and Benefits": the book's last section is titled for its middle, and
 never names what the reader can now do.**
 
@@ -47,9 +45,9 @@ Reported rather than applied on both counts: a retitle and a new closing
 paragraph are voice and pacing decisions, and this is the paragraph the book
 ends on.
 
----
-
 [] Reject
+
+---
 
 **"Abilities Are Not Special": the section opens with machinery and the reason
 to care arrives a section later.**
@@ -79,9 +77,9 @@ up into this section's lead and let that section open on the coin toss.
 Price of that move: the "Scripting an Unpredictable Source" `##` section would
 then have no prose of its own before `### A Coin Toss`, which reads oddly.
 
----
-
 [] Reject
+
+---
 
 **"Switching Implementations Mid-Run": `microgrid.py` never produces the
 `Blackout` the prose spends a paragraph on, and exercise 3 asks the reader to
@@ -111,9 +109,9 @@ Two options. I lean toward the first.
   site with nothing available and let the `Blackout` escape. Costs the listing
   its clean two-run symmetry, and exercise 3 then has nothing left to discover.
 
----
-
 [] Reject
+
+---
 
 **"Abilities Are Not Special", lines 108-119: the type-bound paragraph is
 almost verbatim chapter 46.**
@@ -146,9 +144,9 @@ Verified against `ty` 0.0.65: the diagnostic is
 `error[invalid-type-arguments]: Type \`Console\` is not assignable to upper
 bound \`Ability[Any]\` of type variable \`A\``, reported on the annotation.
 
----
-
 [] Reject
+
+---
 
 **"Adding Behavior to an Existing Effect", `### Why \`retry()\` Decorates the
 Function`: this subsection re-teaches chapter 46's "An Effect Runs Once"
@@ -200,9 +198,9 @@ the four paragraphs of explanation to one line ("The second `run()` returns
 listing where a reader studying `retry()` will see it, and removes the
 re-teaching.
 
----
-
 [] Reject
+
+---
 
 **Intro, the bullet preview: it stops three sections short, and this is the last
 chapter in the book.**
@@ -222,9 +220,9 @@ Proposed change: add one line after the last bullet, e.g.
 
 Reported rather than applied because the preview's length is a pacing decision.
 
----
-
 [] Reject
+
+---
 
 **Exercises: three sections have none, and two of the three are the chapter's
 pattern-book payoff.**
@@ -276,9 +274,9 @@ shows, with a second half: "Then `fork()` two `spree()` Effects that share one
 Reported rather than applied because the exercise set's size and difficulty
 curve are yours.
 
----
-
 [] Reject
+
+---
 
 **"The Success Path": `research_by_hand.py` redefines `topic_of()` and the
 chapter does not say why.**
@@ -300,9 +298,9 @@ Proposed change: one sentence after the listing, e.g.
 Reported rather than applied because it adds a paragraph to a section whose
 argument is deliberately compressed.
 
----
-
 [] Reject
+
+---
 
 **Order and pacing: the assumes/introduces table, and what it shows.**
 
@@ -352,9 +350,9 @@ explanation — "Name each stage. `ty` infers `Unknown` for
 `handle(scripted)(handle(capture)(greet))` and the checking stops" — leaving
 `### 2` to explain why. That duplicates one fact and closes a 1800-line gap.
 
----
-
 [] Reject
+
+---
 
 **"Where the Guarantee Stops", `### 4. Cost`: the heading is a noun where its
 four siblings are sentences.**
@@ -376,11 +374,11 @@ in this section is `#nothing-stops-an-undeclared-effect`, from 46.
 
 Reported rather than applied because a heading is voice.
 
+[] Reject
+
 ---
 
 ## Cross-chapter
-
-[] Reject
 
 **`Solutions/47_Stateless_in_Practice.md` answers exercise 1 of eleven.**
 
@@ -405,9 +403,9 @@ RetryError[Unavailable | NotInteresting | NoArticle], Any, str]`, so the
 exercise's "supply a `Time()`" instruction is right and the `RetryError`
 wrapping the union is the thing the reader is meant to notice.
 
----
-
 [] Reject
+
+---
 
 **`Chapters/46_Stateless.md`, "Builtin Abilities": the section calls three
 ordinary classes Abilities, and chapter 47 then corrects it.**
@@ -440,9 +438,9 @@ before the retitle. I did not touch chapter 46, per the scope rules.
 said "the library's own `Files` Ability", now "the library's own `Files`
 class". Manifest item 15.)
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Changes already applied to
 `Chapters/47_Stateless_in_Practice.md` in this pass.**
@@ -619,3 +617,5 @@ Also checked and found clean, so no change was made:
   `supply()`'s tenth-argument `no-matching-overload` also reproduce as quoted,
   as does `report()` annotated `Success[str]` naming the `yield from` that
   still carries `Need[Feed] | Need[Encyclopedia]`.
+
+[] Reject

@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Chapter-level, "one claim, one arc": the chapter's stated claim covers two
 of its three topics.**
 
@@ -60,9 +58,9 @@ still leaves the conclusion silent on `Async`.
 I prefer the conclusion fix: the intro's sentence is a good short claim and
 the conclusion is where the reader is counting what they learned.
 
----
-
 [] Reject
+
+---
 
 **Order: "Where `run()` Can Be Called" opens by re-establishing context from
 eight sections back, and would read better after "Waiting on a Coroutine."**
@@ -106,9 +104,9 @@ Price of the move, checked:
 
 Total cost is two rewritten sentences. I recommend the swap.
 
----
-
 [] Reject
+
+---
 
 **New listing: the chapter now says `try`/`except` is not `catch()`, but does
 not show it.**
@@ -177,9 +175,9 @@ counterexample under `catch_score.py`. That costs the setup, since
 `catch_score.py` also drags in `Console` and `supply()`, and the contrast gets
 buried under the parts that are not the point.
 
----
-
 [] Reject
+
+---
 
 **"Builtin Abilities": `Files` is the library's own example of both channels
 at once, and the bullet hides it.**
@@ -214,9 +212,9 @@ would rather not point forward here, the same fact would fit as a sentence in
 [Declaring a Failure with `@throws`](#declaring-a-failure-with-throws), where
 it also answers "does `@throws` work on something that is already an Effect?"
 
----
-
 [] Reject
+
+---
 
 **"The Simplest Effect": "Nothing computes until `run()` is called" is
 contradicted by the listing it annotates.**
@@ -242,9 +240,9 @@ request."
 Adding "synchronous" here would cost one word and remove the contradiction:
 "and a synchronous program calls `run()` only once, at its outermost edge."
 
----
-
 [] Reject
+
+---
 
 **`test_instant_clock.py`: a wall-clock assertion with a 30 ms budget.**
 
@@ -270,9 +268,9 @@ prose ("the same three sleeps take at least 30 milliseconds in
 Reported rather than applied because loosening a test's bound is a judgment
 call about what the test is for.
 
----
-
 [] Reject
+
+---
 
 **Five different types named `Console`, and the chapter never counts them.**
 
@@ -306,9 +304,9 @@ Proposed change: one clause in "A Default Binding," after
 Not applied because it edits the lead-in of a listing you may have deliberately
 left bare.
 
----
-
 [] Reject
+
+---
 
 **Exercises: nothing exercises "When Two Implementations Match."**
 
@@ -334,9 +332,9 @@ abilities distinct method names when that ambiguity is possible" without
 showing what that buys, and the exercise makes the reader produce the
 diagnostic.
 
----
-
 [] Reject
+
+---
 
 **"Dependency Injection": "Type checking is the optimal time to discover
 errors."**
@@ -357,9 +355,9 @@ Proposed change:
 what the next sentence ("The trade is not about correctness, but churn and
 coupling") assumes.
 
----
-
 [] Reject
+
+---
 
 **`unsupplied.py`: the marker prints a type name where the message names the
 missing Ability.**
@@ -392,9 +390,9 @@ Note if you take it: `MissingAbilityError` then no longer appears in the
 output, only in the `except` clause, which is fine because the prose names it
 in the very next line.
 
----
-
 [] Reject
+
+---
 
 **Order: the assumes/introduces table, and what it does *not* show.**
 
@@ -456,11 +454,11 @@ Everything else justifies its transition explicitly, which is unusual and
 worth saying: most sections open with a sentence naming what the previous one
 left undone.
 
+[] Reject
+
 ---
 
 ## Cross-chapter
-
-[] Reject
 
 **`Chapters/47_Stateless_in_Practice.md`, "### `repeat()` and `memoize()`":
 this heading is now linked from chapter 46.**
@@ -480,9 +478,9 @@ and "it wraps the Effect in an object that records the result and replays it
 rather than driving the spent generator again," which is what 46 now says in
 one sentence.
 
----
-
 [] Reject
+
+---
 
 **`CLAUDE.md`, the Traps list: `validate_output.py` also breaks on a relative
 `--tree`, and only `run_examples.py` is documented.**
@@ -518,11 +516,11 @@ and add that the second one manifests as `ModuleNotFoundError` on
 `utils/` helpers.
 I did not touch it, per the scope rules.
 
+[] Reject
+
 ---
 
 ## Manifest: applied to `Chapters/46_Stateless.md` in this pass
-
-[] Reject
 
 *This block is a record of what already changed, not a proposal. Rejecting it
 does nothing; to undo an item, revert it in the chapter.*
@@ -586,3 +584,5 @@ does not occur in this chapter at all --- no `promise`, `promises`,
 The chapter already prefers the literal verbs the note asks for: an annotation
 *states* or *declares* a dependency, `ty` *rejects* and *reports*, `supply()`
 *answers* a request, and `@throws` *lifts* an exception into the type.
+
+[] Reject

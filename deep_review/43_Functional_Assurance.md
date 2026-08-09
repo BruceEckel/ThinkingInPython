@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Chapter-level, the biggest item: two of the five sections do not serve the
 claim the intro makes, and the order buries the consequence that does.**
 
@@ -61,9 +59,9 @@ is free to choose how" is already the point.
 This is the honest minimum, but it takes the chapter from 12 KB to about 9 KB
 and deletes an anchor chapter 18 links to.
 
----
-
 [] Reject
+
+---
 
 **`property_check.py`: `encode()` and `decode()` are the same function, so the
 law it demonstrates cannot fail.**
@@ -101,9 +99,9 @@ glance. If you keep `[::-1]`, one sentence would close the gap: "Both functions
 are the same reversal, so this law cannot fail; it is here to show the shape of
 a property, not to catch a bug."
 
----
-
 [] Reject
+
+---
 
 **"Referential Transparency": the section defines the property and then only
 shows a case where it holds. The near-miss is missing.**
@@ -151,9 +149,9 @@ chapter 40. A cheaper alternative is one sentence with no listing:
 "Substitute `70` for the first `withdraw(30)` in `withdraw(30) + withdraw(30)`
 and the answer moves from `110` to `140`."
 
----
-
 [] Reject
+
+---
 
 **"Declarative Style": the section shows the *what* and only describes the
 *how*, and it is the one section in the chapter with no listing.**
@@ -177,9 +175,9 @@ Alternative, a listing: four lines of loop and one comprehension with a shared
 [Comprehensions](16_Comprehensions.md) already owns that listing and repeating
 it here buys the reader nothing they have not seen.
 
----
-
 [] Reject
+
+---
 
 **"Property-Based Testing" is a `###` under another section, and it is the only
 thing in the chapter the reader can go and do.**
@@ -211,9 +209,9 @@ which lands the reader on the four-rung list one screen above the actual
 material. It should point at `#property-based-testing`, whether or not the
 heading is promoted.
 
----
-
 [] Reject
+
+---
 
 **"Property-Based Testing": shrinking is the reason to use Hypothesis, and the
 chapter only asserts it.**
@@ -283,9 +281,9 @@ Where it goes is your call; my suggestion is immediately after the paragraph
 beginning "`@given(strategies.text())` feeds `test_roundtrip()`", before the
 "family of reusable property shapes" paragraph.
 
----
-
 [] Reject
+
+---
 
 **Intro, second paragraph: this chapter closes Part IV and never says what
 comes next.**
@@ -316,9 +314,9 @@ which is pacing.
 (This is the other end of the finding in `deep_review/40_Functional_Foundations.md`
 about the arc preview stopping at 44; take them together or not at all.)
 
----
-
 [] Reject
+
+---
 
 **"An Assurance Spectrum": the rung most readers actually stand on is missing.**
 
@@ -344,9 +342,9 @@ Reported rather than applied because adding a rung changes the shape of the
 chapter's central list, and because you may have left tests out deliberately on
 the grounds that a test is not a claim about *every* input.
 
----
-
 [] Reject
+
+---
 
 **"Automatic Parallelism": `parallel_pure.py` proves the answers agree and
 never shows that anything ran in parallel.**
@@ -370,9 +368,9 @@ Recommendation: put it in the exercises instead of the chapter, replacing
 exercise 1 (see the exercises block below), so the reader produces the evidence
 on their own machine and no marker depends on the core count.
 
----
-
 [] Reject
+
+---
 
 **`test_property.py` copies `encode()` and `decode()` out of
 `property_check.py` and the chapter does not say why.**
@@ -393,9 +391,9 @@ Two fixes. I recommend the first.
   `test_property.py` importing the same module. Correct, and three files for a
   four-line point.
 
----
-
 [] Reject
+
+---
 
 **Exercises: three of four exercise one subsection, and exercise 1 is already
 answered in the Solutions file.**
@@ -436,9 +434,9 @@ which is the honest finding and the one the section now mentions.
 Reported rather than applied because the size and difficulty curve of an
 exercise set is a pacing decision.
 
----
-
 [] Reject
+
+---
 
 **"Declarative Style": "functionality" is used in a second, incompatible
 sense.**
@@ -461,9 +459,9 @@ than a sequence of steps, because there is less of it to be wrong about."
 Reported rather than applied because "functionality" is the chapter's thesis
 word and only you can say which sense you meant.
 
----
-
 [] Reject
+
+---
 
 **A change in another file, which I did not make:
 `Solutions/43_Functional_Assurance.md` answers exercise 1 only.**
@@ -483,9 +481,9 @@ database already holding a hit it is `'µ'` (U+00B5, whose `.upper()` is Greek
 capital mu). Both are correct answers, which is itself a useful thing for the
 solution to say.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Changes already applied to
 `Chapters/43_Functional_Assurance.md` in this pass.**
@@ -563,3 +561,5 @@ correct and `[1229, 2262, 3245, 4203]` is right for the four limits; every
 under `pytest`; every cross-chapter link resolves (`heading_links.py`); no
 listing deviates from `thinking-in-python-skill.md` unexplained; headings are
 title case and untouched; no em dash was added or removed.
+
+[] Reject

@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -165,7 +166,7 @@ Two things to know if you take it:
 pinned 3.15 build, so a shared 24-cell grid costs 3 x 328 against an unshared
 24 x 328, which is a clean 8x with no timing involved;
 and the alternative (drop it, and instead point at exercise 2 from the prose)
-costs one sentence and no listing.
+costs one sentence and no listing.[[do it]]
 
 ---
 

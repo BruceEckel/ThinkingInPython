@@ -2,8 +2,8 @@
 from dataclasses import dataclass, field
 from casts import (
     Kitty,
-    NastyWeapon,
     Wasteland,
+    Weapon,
     Yarn,
     kitties_and_puzzles,
     play,
@@ -27,7 +27,7 @@ warriors_and_weapons(Loud())
 #: Warrior crosses the cracked wasteland
 #: and battles the nasty weapon
 #: and wins a chest of gold
-play(Loud(), Kitty(), NastyWeapon(), Wasteland(), Yarn())
+play(Loud(), Kitty(), Weapon(), Wasteland(), Yarn())
 #: Kitty crosses the cracked wasteland
 #: and bats at the nasty weapon
 #: and wins a ball of yarn

@@ -549,3 +549,213 @@ intervene, because by the time any function receives that string the
 tag and the paragraph markup are the same kind of text. The template
 version never loses the distinction, so escaping is a decision the
 renderer can still make.
+
+## 8. An iterative walk over a deep tree
+
+```python
+# exercise_8.py
+from dataclasses import dataclass
+from enum import Enum
+from typing import assert_never
+
+class Operators:
+    def __add__(self: Expr, other: Expr | int) -> Add:
+        return Add(self, wrap(other))
+
+    def __radd__(self: Expr, other: int) -> Add:
+        return Add(Num(other), self)
+
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
+        return Mul(self, wrap(other))
+
+    def __rmul__(self: Expr, other: int) -> Mul:
+        return Mul(Num(other), self)
+
+@dataclass(frozen=True)
+class Num(Operators):
+    value: int
+
+@dataclass(frozen=True)
+class Var(Operators):
+    name: str
+
+@dataclass(frozen=True)
+class Add(Operators):
+    left: Expr
+    right: Expr
+
+@dataclass(frozen=True)
+class Mul(Operators):
+    left: Expr
+    right: Expr
+
+type Expr = Num | Var | Add | Mul
+
+def wrap(value: Expr | int) -> Expr:
+    return Num(value) if isinstance(value, int) else value
+
+def evaluate(e: Expr, /, **env: int) -> int:
+    match e:
+        case Num(value):
+            return value
+        case Var(name):
+            return env[name]
+        case Add(left, right):
+            return evaluate(left, **env) + evaluate(right, **env)
+        case Mul(left, right):
+            return evaluate(left, **env) * evaluate(right, **env)
+        case _:
+            assert_never(e)
+
+# A pending combine, stacked behind the children it consumes:
+class Op(Enum):
+    ADD = "+"
+    MUL = "*"
+
+def evaluate_iterative(e: Expr, /, **env: int) -> int:
+    work: list[Expr | Op] = [e]
+    values: list[int] = []
+    while work:
+        item = work.pop()
+        match item:
+            case Op.ADD:
+                right_value, left_value = values.pop(), values.pop()
+                values.append(left_value + right_value)
+            case Op.MUL:
+                right_value, left_value = values.pop(), values.pop()
+                values.append(left_value * right_value)
+            case Num(value):
+                values.append(value)
+            case Var(name):
+                values.append(env[name])
+            case Add(left, right):
+                work += [Op.ADD, right, left]
+            case Mul(left, right):
+                work += [Op.MUL, right, left]
+            case _:
+                assert_never(item)
+    return values.pop()
+
+deep: Expr = Num(0)
+for n in range(1, 2001):
+    deep = deep + Num(n)
+
+try:
+    evaluate(deep)
+except RecursionError as e:
+    print(type(e).__name__)
+#: RecursionError
+print(evaluate_iterative(deep))
+#: 2001000
+
+x = Var("x")
+small = 2 * x + 1
+print(evaluate(small, x=3), evaluate_iterative(small, x=3))
+#: 7 7
+```
+
+The tree is 2000 `Add` nodes deep, and `evaluate()` needs one frame
+per level against a limit of 1000, so it fails before reaching the
+bottom. Nothing about the expression is unusual; only its shape is.
+
+The stack version cannot be a straight translation, and this is where
+the exercise bites. Pushing children and popping them in a loop gives
+a pre-order walk that visits every node and computes nothing, because
+`Add` needs both of its results *after* the children have produced
+them. The fix is to stack the pending operation behind its own
+children: `work += [Op.ADD, right, left]` puts `Op.ADD` deepest, so it
+comes off last, by which point the two values it needs are on
+`values`. Pushing `right` before `left` makes `left` pop first, which
+matters for the subtraction and division a fuller language would add.
+
+`Op` is an enum rather than a string so the `match` stays exhaustive:
+`work` holds `Expr | Op`, every member of both is a case, and
+`assert_never()` still type-checks. A string marker would leave
+`case _` reachable and the guarantee gone.
+
+`sys.setrecursionlimit()` is the other escape, and it is a worse one.
+The limit is a guard rather than a budget: it exists because each
+Python frame consumes C stack, and raising it past what the thread's
+stack can hold turns a catchable `RecursionError` into a segmentation
+fault with no traceback. It is also a global setting, so a library
+that raises it changes the failure mode of code that never asked. The
+iterative walk moves the frames onto the heap, where the only limit
+is memory.
+
+## 9. Reopening the set of node types
+
+```python
+# exercise_9.py
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import override
+
+class Entry(ABC):
+    name: str
+
+    @abstractmethod
+    def disk_usage(self) -> int: ...
+
+@dataclass(frozen=True)
+class File(Entry):
+    name: str
+    size: int
+
+    @override
+    def disk_usage(self) -> int:
+        return self.size
+
+@dataclass(frozen=True)
+class Directory(Entry):
+    name: str
+    entries: tuple[Entry, ...]
+
+    @override
+    def disk_usage(self) -> int:
+        return sum(e.disk_usage() for e in self.entries)
+
+# A plugin package adds a node type, editing nothing above:
+@dataclass(frozen=True)
+class Symlink(Entry):
+    name: str
+    target: str
+
+    @override
+    def disk_usage(self) -> int:
+        return 0
+
+src = Directory("src", (File("main.py", 400), File("util.py", 250)))
+root = Directory("root", (
+    File("readme.md", 90), src, Symlink("latest", "src")))
+print(root.disk_usage())
+#: 740
+```
+
+What breaks in the closed version is not subtle. `type Node = File |
+Directory` lives in your source, so a plugin cannot extend it, and a
+`Symlink` passed to `disk_usage()` falls through every case to
+`assert_never()`. The checker cannot warn the plugin author, because
+from its side the union is complete: the mismatch only exists at the
+call. The plugin's alternatives are to vendor a patched copy of your
+module or to persuade you to add the case, which is the coupling the
+open design removes.
+
+Moving the operation back onto the classes reverses the trade the
+chapter spent the first two sections making. Adding `Symlink` now
+costs nothing to existing code, and adding a *new operation* costs a
+method in every class, including the ones you do not own. The
+`@abstractmethod` is what keeps the plugin honest: a subclass with no
+`disk_usage()` cannot be instantiated at all.
+
+For a file system, use the open design. The set of things an entry can
+be is a fact about the operating system and about whatever the next
+version adds, not a decision your code gets to make, and third-party
+node types are the normal case.
+
+For `expr.py`, use the closed one. The four node types *are* the
+grammar, so a plugin adding a fifth is not extending the language, it
+is defining a different one, and every walker would then be silently
+wrong rather than helpfully extended. The `assert_never()` that reads
+as an obstacle in the file system reads as the point here: when the
+grammar does grow a `Neg`, the checker hands you the list of walkers
+to update.

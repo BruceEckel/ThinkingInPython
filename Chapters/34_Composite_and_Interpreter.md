@@ -19,7 +19,8 @@ A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
 The payoff is uniformity.
 
-The traditional version puts the operation in a class hierarchy:
+The traditional version puts the operation in a class hierarchy,
+hand-written constructors and all:
 
 ```python
 # filesystem_classic.py
@@ -126,9 +127,13 @@ if __name__ == "__main__":
 #: root/data.csv
 ```
 
+`Directory` now takes its entries as one tuple rather than as varargs,
+which makes the tree immutable;
+a paragraph below says why a `list` would not do.
+
 `Node` is named in `Directory` before it is defined below,
 which works because annotations and `type` aliases are both evaluated lazily
-(see [Static Typing](08_Static_Typing.md)).
+(see [Naming Types: The `type` Statement](08_Static_Typing.md#the-type-statement)).
 
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed is where operations live.
@@ -331,14 +336,16 @@ if __name__ == "__main__":
     x = Var("x")
     expr = 2 * x + 1
     by_hand = Add(Mul(Num(2), x), Num(1))
-    print(expr == by_hand)
+    print(expr == by_hand, expr.left)
     print(evaluate(expr, x=3), evaluate(expr, x=10))
-#: True
+#: True Mul(left=Num(value=2), right=Var(name='x'))
 #: 7 21
 ```
 
 Data classes generate `__eq__()`, so two trees compare by value,
 and the demo confirms that the operators build the tree you would assemble by hand.
+Printing `expr.left` shows the composite claim directly:
+the `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
 Building `2 * x + 1` did not compute a number.
@@ -479,6 +486,9 @@ every alternative in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
 (see [Alternatives and Capture](13_Pattern_Matching.md#alternatives-and-capture)).
 `(Num(a), Num(b))` captures two constants for folding.
+The same syntax runs in both directions here:
+a `Num(0)` on the left of a `case` is a pattern that never calls `Num`,
+while the one on the right of a `return` is the constructor.
 
 Matching the pair of simplified children, rather than the original node,
 is what lets the rules compose.
@@ -648,3 +658,13 @@ here it is a way to keep a decision available to whoever is qualified to make it
     that emits the literal pieces unchanged and replaces `<`, `>`,
     and `&` in every interpolated value with their HTML entities.
     Show that `t"<p>{comment}</p>"` survives a `comment` containing a `<script>` tag.
+8.  Build a left-deep expression by folding `+` over a few thousand `Num` nodes,
+    and confirm that `evaluate()` raises a `RecursionError`.
+    Then write `evaluate_iterative()`,
+    which walks the same tree with an explicit stack and no recursion,
+    and check that the two agree on a small expression.
+    Raising `sys.setrecursionlimit()` is the other escape; say what it costs.
+9.  A plugin package wants to add its own entry types to `filesystem.py` without editing your code.
+    Sketch what breaks, then write the version of `disk_usage()` that supports it.
+    Which of the two designs would you use for a file system,
+    and which for the expression language in `expr.py`?

@@ -17,8 +17,6 @@ readability tells.
 
 ***
 
-[] Reject
-
 **Section:** `## The Price of the Empty Base` (heading), and the paragraph
 beginning "Notice where the behavior lives"
 **Pattern:** §29 Fragmented Headers / §57 Excessive Structure (P2)
@@ -49,9 +47,9 @@ I would not do this one.
 I lean toward A if you want the heading honest, B if you want the chapter to
 stop changing shape. Not C.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Paragraph after `dispatch_trace.py`
 **Pattern:** Global watch list, "Don't use" tier (P1)
@@ -70,9 +68,9 @@ makes the two hops parallel.
 
 Nothing gates this word, so it got through the deep review's own checks.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Paragraph after `dispatch_trace.py`
 **Pattern:** §39 Self-Labeling Significance (P1)
@@ -106,9 +104,9 @@ second hop reaches the override, and for `Gladiolus` it reaches `Flower.eat`,
 ..." That drops a sentence and loses nothing, and it is what I would do if you
 dislike "the interesting one."
 
-***
-
 [] Reject
+
+***
 
 **Section:** Lead-in above `dispatch_trace.py`
 **Pattern:** §70 Interpretive Metadiscourse (P2)
@@ -131,9 +129,9 @@ whose whole content is method names.
 Lower confidence than the two above. If "mechanism" reads as established
 vocabulary to you (it is a word the book uses elsewhere), this is a decline.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Paragraph beginning "*Visitor* still has a place"
 **Pattern:** Global watch list, "Avoid if possible" tier (P2)
@@ -152,3 +150,5 @@ driving.
 
 Reasonable to decline if you read "already" as the temporal claim (the
 framework was calling it before you arrived) rather than the concessive one.
+
+[] Reject

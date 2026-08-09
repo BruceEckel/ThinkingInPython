@@ -1384,7 +1384,7 @@ class Warrior:
     def approach(self, obstacle: str) -> str:
         return f"and battles the {obstacle}"
 
-class NastyWeapon:
+class Weapon:
     def blocks(self) -> str: return "nasty weapon"
 
 class Wasteland:
@@ -1407,7 +1407,7 @@ def kitties_and_puzzles(narrator: Narrator) -> None:
     play(narrator, Kitty(), Puzzle(), Garden(), Yarn())
 
 def warriors_and_weapons(narrator: Narrator) -> None:
-    play(narrator, Warrior(), NastyWeapon(), Wasteland(), Gold())
+    play(narrator, Warrior(), Weapon(), Wasteland(), Gold())
 ```
 
 `play()` is the boundary function of [Composing a Program](#composing-a-program),
@@ -1427,8 +1427,8 @@ and no class is named in the engine:
 from dataclasses import dataclass, field
 from casts import (
     Kitty,
-    NastyWeapon,
     Wasteland,
+    Weapon,
     Yarn,
     kitties_and_puzzles,
     play,
@@ -1452,7 +1452,7 @@ warriors_and_weapons(Loud())
 #: Warrior crosses the cracked wasteland
 #: and battles the nasty weapon
 #: and wins a chest of gold
-play(Loud(), Kitty(), NastyWeapon(), Wasteland(), Yarn())
+play(Loud(), Kitty(), Weapon(), Wasteland(), Yarn())
 #: Kitty crosses the cracked wasteland
 #: and bats at the nasty weapon
 #: and wins a ball of yarn
@@ -1465,11 +1465,11 @@ print(len(script.lines), script.lines[1])
 One engine, four runs, and the only difference is what was supplied.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `NastyWeapon` across a `Wasteland`; it type-checks,
+A `Kitty` bats at a `Weapon` across a `Wasteland`; it type-checks,
 and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
-`KittiesAndPuzzles.make_obstacle()` cannot return a `NastyWeapon`,
+`KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
 because the pairing is built into the class.
 `supply()` takes a flat list and checks each argument against one Ability,
 never against the others.

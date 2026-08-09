@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Second paragraph, the biggest item: the catalog is organized by source, and
 chapter 21 has just told the reader that two of those groupings are not
 useful.**
@@ -57,58 +55,6 @@ keyed by the question a reader actually arrives with.
 Something like:
 
 ```
-
----
-
-[] Reject
-
-**Second paragraph: "find it elsewhere" does not say where "elsewhere" is.**
-
-> Each entry has a one-line intent so you can recognize a pattern by name and find it elsewhere.
-
-Two readings compete.
-"Elsewhere" could mean elsewhere in this book (which the link column already
-handles, and which the paragraph's last two sentences describe),
-or it could mean in the source literature the previous paragraph just listed.
-The second is the intended one, and it is the more useful promise,
-but the sentence leaves the reader to guess.
-
-Proposed change:
-
-> Each entry has a one-line intent so you can recognize a pattern by name
-> and look it up in the literature that documents it.
-
-An alternative, if you want the sentence to carry the catalog's other job too:
-
-> Each entry has a one-line intent,
-> enough to recognize a pattern by name and to look it up in the source that documents it.
-
-I recommend the first.
-
----
-
-[] Reject
-
-**Opening paragraph: POSA is the only source cited without an author.**
-
-> It draws from *Pattern-Oriented Software Architecture* (POSA),
-> *Patterns of Enterprise Application Architecture* (Fowler),
-> *Enterprise Integration Patterns* (Hohpe and Woolf),
-
-The other three sources are attributed: GoF in the line above, then Fowler,
-then Hohpe and Woolf.
-POSA gets only its acronym, which reads as an oversight rather than a choice,
-and POSA is the one source a reader is least likely to be able to name.
-It is also a five-volume series rather than one book,
-so the bare title is doing less work than the others.
-
-Proposed change:
-
-> It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
-
-Reported rather than applied because attribution style is an authorial call,
-and because chapter 21 names all four GoF authors in full,
-so you may prefer the fuller form here too.
 ## Finding a Pattern by Problem
 
 | If the problem is | Look at |
@@ -137,9 +83,61 @@ not already know the name they want.
 More precise, much heavier, and it widens every table past comfortable reading
 width. I do not recommend it.
 
+[] Reject
+
 ---
 
+**Second paragraph: "find it elsewhere" does not say where "elsewhere" is.**
+
+> Each entry has a one-line intent so you can recognize a pattern by name and find it elsewhere.
+
+Two readings compete.
+"Elsewhere" could mean elsewhere in this book (which the link column already
+handles, and which the paragraph's last two sentences describe),
+or it could mean in the source literature the previous paragraph just listed.
+The second is the intended one, and it is the more useful promise,
+but the sentence leaves the reader to guess.
+
+Proposed change:
+
+> Each entry has a one-line intent so you can recognize a pattern by name
+> and look it up in the literature that documents it.
+
+An alternative, if you want the sentence to carry the catalog's other job too:
+
+> Each entry has a one-line intent,
+> enough to recognize a pattern by name and to look it up in the source that documents it.
+
+I recommend the first.
+
 [] Reject
+
+---
+
+**Opening paragraph: POSA is the only source cited without an author.**
+
+> It draws from *Pattern-Oriented Software Architecture* (POSA),
+> *Patterns of Enterprise Application Architecture* (Fowler),
+> *Enterprise Integration Patterns* (Hohpe and Woolf),
+
+The other three sources are attributed: GoF in the line above, then Fowler,
+then Hohpe and Woolf.
+POSA gets only its acronym, which reads as an oversight rather than a choice,
+and POSA is the one source a reader is least likely to be able to name.
+It is also a five-volume series rather than one book,
+so the bare title is doing less work than the others.
+
+Proposed change:
+
+> It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
+
+Reported rather than applied because attribution style is an authorial call,
+and because chapter 21 names all four GoF authors in full,
+so you may prefer the fuller form here too.
+
+[] Reject
+
+---
 
 **Second paragraph: "a number of them are unnecessary in Python" never says
 which, and the catalog is the one place a reader would want the list.**
@@ -195,9 +193,9 @@ and pacing, and because you may prefer the catalog to stay purely a lookup.
 I verified every anchor in the draft table against the current text of each
 target chapter, and all nine resolve today.
 
----
-
 [] Reject
+
+---
 
 **"Foundational Idioms": the heading uses "idiom" in a sense chapter 21
 defines differently.**
@@ -226,9 +224,9 @@ which is more precise but costs a second table for three rows.
 Nothing links to this heading, so the anchor change is free.
 Reported rather than applied because renaming a section is your call.
 
----
-
 [] Reject
+
+---
 
 **Concurrency table onward: only the three GoF tables are in a findable
 order.**
@@ -261,9 +259,9 @@ That is cheaper and less useful.
 Reported rather than applied because reordering rows is a structural change.
 Nothing links into these tables, so the move breaks nothing.
 
----
-
 [] Reject
+
+---
 
 **Behavioral (GoF), the State row: chapter 31 is invisible in this catalog.**
 
@@ -300,9 +298,9 @@ A cheaper alternative that adds no row: change the State intent to
 I do not recommend this, because it makes the Intent column carry a
 cross-reference no other row carries.
 
----
-
 [] Reject
+
+---
 
 **Behavioral (GoF): Multiple Dispatching, the book's other missing Part III
 chapter.**
@@ -329,9 +327,9 @@ If you take both this and the State Machine row, the two together close the
 gap: every Part III pattern chapter would then be reachable from the catalog.
 (37 is a refactoring case study rather than a pattern, so it stays unlinked.)
 
----
-
 [] Reject
+
+---
 
 **Enterprise Application table: Lazy Load and Plugin are borderline
 unlinked rows worth a decision.**
@@ -362,9 +360,9 @@ Alternative: leave both unlinked and narrow the Lazy Load intent to
 non-coverage obvious from the text.
 I slightly prefer the alternative; it is the more honest of the two.
 
----
-
 [] Reject
+
+---
 
 **End of chapter: it stops on a table row, and there are no exercises.**
 
@@ -399,9 +397,9 @@ plus chapter 21:
     Say what distinguishes them, then check your answer against
     [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart).
 
----
-
 [] Reject
+
+---
 
 **Foundational Idioms: five more candidate rows, from chapters the catalog
 never reaches.**
@@ -438,9 +436,9 @@ Recommended: take 1, 2 and 3, skip 4 and 5.
 Reported rather than applied because each is a placement decision, and because
 2, 3 and 5 point into chapters being edited in this sweep.
 
----
-
 [] Reject
+
+---
 
 **Foundational Idioms: Service Locator and Dependency Injection both point
 away from the chapter that treats them together.**
@@ -473,9 +471,9 @@ better target, and accept that both rows then point at one place.
 Reported rather than applied because chapter 46 is being edited in this same
 sweep; re-check the anchor before committing.
 
----
-
 [] Reject
+
+---
 
 **Concurrency table: the Thread Pool row lands the reader in a section about
 the GIL.**
@@ -505,9 +503,9 @@ teaches what a Future is, including the `concurrent.futures.Future` versus
 `asyncio.Future` distinction and the `TypeError` a reader hits by awaiting the
 wrong one.)
 
----
-
 [] Reject
+
+---
 
 **Distributed and Cloud table: Retry is covered in chapter 47.**
 
@@ -530,9 +528,9 @@ Verify the anchor with `uv run python tools/heading_links.py` after applying.
 The section title as of this review is exactly
 `## Adding Behavior to an Existing Effect`.
 
----
-
 [] Reject
+
+---
 
 **Concurrency table: Thread-Specific Storage is covered, thinly.**
 
@@ -568,9 +566,9 @@ Chapter 24 names the pattern, explains the two tests and what each is for,
 and recommends against it — a full paragraph, not a mention.
 It was the one unlinked row that made the intro's rule flatly untrue.)
 
----
-
 [] Reject
+
+---
 
 **Row format: two small consistency items across all eight tables.**
 
@@ -602,11 +600,11 @@ old text, "An object whose sole purpose is to wrap a single function," is not
 what chapter 28 means by the term and is close to backwards in Python, where a
 function already is an object.)
 
+[] Reject
+
 ---
 
 ## Cross-chapter
-
-[] Reject
 
 **`Chapters/01_Introduction.md`, "How the Book Is Organized": the description
 of this chapter is inaccurate.**
@@ -629,9 +627,9 @@ Change I would make in `Chapters/01_Introduction.md`:
 
 I did not touch chapter 01, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **`Chapters/21_The_Pattern_Concept.md`: nothing in the book points at the
 catalog.**
@@ -660,9 +658,9 @@ I prefer the closing section, because a forward link there is the chapter's
 existing job.
 I did not touch chapter 21, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST, not a proposal. Applied to `Chapters/39_Pattern_Catalog.md` in
 this pass:**
@@ -680,3 +678,5 @@ Gates run clean on the chapter after these edits: `heading_links.py`,
 `reflow_prose.py --diff` (0 paragraphs), and
 `validate_output.py --tree build/private/39` (no listings in this chapter).
 `heading_links.py` over all of `Chapters/` also passes as of this review.
+
+[] Reject

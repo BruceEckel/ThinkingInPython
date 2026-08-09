@@ -23,8 +23,8 @@ class Warrior:
 class Puzzle:
     def action(self) -> str: return "Puzzle"
 
-class NastyWeapon:
-    def action(self) -> str: return "NastyWeapon"
+class Weapon:
+    def action(self) -> str: return "Weapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:
@@ -33,7 +33,7 @@ class KittiesAndPuzzles:
 
 class WarriorsAndWeapons:
     def make_character(self) -> Warrior: return Warrior()
-    def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
+    def make_obstacle(self) -> Weapon: return Weapon()
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
@@ -51,4 +51,4 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()
-#: Warrior now battles a NastyWeapon
+#: Warrior now battles a Weapon

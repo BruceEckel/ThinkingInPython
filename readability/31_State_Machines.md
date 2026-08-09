@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Line 844 — "a machine that arrived as a diagram wants the table"**
 **Pattern:** watch list, "don't use"; §35 volition on a non-agent
 
@@ -37,9 +35,9 @@ Proposed:
 > A machine small enough to hold in your head goes either way,
 > and a machine that arrived as a diagram belongs in the table.
 
-***
-
 [] Reject
+
+***
 
 **Lines 33-36 — "This class is unnecessary. However, it lets you say..."**
 **Pattern:** a concession that reverses itself in two sentences
@@ -65,9 +63,9 @@ one. Note this reintroduces "earns its," which you have been cutting elsewhere;
 if you would rather avoid it, "It is worth its two lines because it names
 `State` as a type..." says the same.
 
-***
-
 [] Reject
+
+***
 
 **Line 255 — "perfectly reasonable"**
 **Pattern:** §24 hedge, and a compliment paid to code the section is about to
@@ -85,9 +83,9 @@ Proposed:
 > The `match` statements inside `next()` work,
 > but a machine with many states means many of them, spread across many classes.
 
-***
-
 [] Reject
+
+***
 
 **Line 391 — "a bug you want flagged"**
 **Pattern:** watch list, "want"
@@ -106,9 +104,9 @@ Proposed:
 Low confidence: the current sentence is clear, and this may be a change for its
 own sake. Reject if it reads fine to you.
 
-***
-
 [] Reject
+
+***
 
 **Lines 427-432 (the new module-shadowing note)**
 **Pattern:** density; three mechanisms in one sentence
@@ -129,9 +127,9 @@ Proposed:
 > Two files named `state_machine.py` in one program therefore collapse into one:
 > whichever imported first wins, and the second import silently gets the wrong module.
 
-***
-
 [] Reject
+
+***
 
 **Line 828 — "real behavior"**
 **Pattern:** §34 real-adjective inflation
@@ -147,9 +145,9 @@ Proposed:
 > Each-state-decides suits a machine whose states do something,
 > and have few transitions apiece.
 
-***
-
 [] Reject
+
+***
 
 **Line 85 — "worth remembering during exercise 3"**
 **Pattern:** §53 endorsement frame
@@ -165,9 +163,9 @@ Proposed:
 > A `State` whose `run()` reads attributes off the machine revives the trap,
 > as exercise 3 will show.
 
-***
-
 [] Reject
+
+***
 
 **Line 487 — "keys on `type(event)` exactly"**
 **Pattern:** watch list, "exactly"
@@ -185,9 +183,9 @@ match," which this is.
 > The lookup keys on `type(event)` exactly: a dictionary probe,
 > not an `isinstance()` walk.
 
-***
-
 [] Reject
+
+***
 
 **Line 509 — "plain methods"**
 **Pattern:** watch list, "plain"
@@ -200,3 +198,5 @@ class hierarchies the Java version needed, named a few paragraphs earlier.
 The rule's carve-out covers it.
 
 No change proposed. Recorded so a mechanical sweep does not cut it.
+
+[] Reject

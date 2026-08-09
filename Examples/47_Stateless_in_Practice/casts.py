@@ -21,7 +21,7 @@ class Warrior:
     def approach(self, obstacle: str) -> str:
         return f"and battles the {obstacle}"
 
-class NastyWeapon:
+class Weapon:
     def blocks(self) -> str: return "nasty weapon"
 
 class Wasteland:
@@ -44,4 +44,4 @@ def kitties_and_puzzles(narrator: Narrator) -> None:
     play(narrator, Kitty(), Puzzle(), Garden(), Yarn())
 
 def warriors_and_weapons(narrator: Narrator) -> None:
-    play(narrator, Warrior(), NastyWeapon(), Wasteland(), Gold())
+    play(narrator, Warrior(), Weapon(), Wasteland(), Gold())

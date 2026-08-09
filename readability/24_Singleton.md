@@ -15,8 +15,6 @@ Three findings, all in sentences written during this pass.
 
 ***
 
-[] Reject
-
 **Section:** Borg: Singleton By Inheritance (the new sharing warning)
 **Pattern:** names used that appear in no listing (P1)
 
@@ -43,9 +41,9 @@ leaving the prose short and letting the exercise carry it: that is why I did
 not propose a second listing here.
 The rewording above works either way.
 
-***
-
 [] Reject
+
+***
 
 **Section:** When You Want a Class, Cache the Instance (after `singleton_eager_factory.py`)
 **Pattern:** stranded preposition (P2)
@@ -64,9 +62,9 @@ Why: "the reason the chapter opened with" strands "with" on a moved object.
 Naming the module form instead of "the chapter" also points at the thing that
 carries the guarantee, which is what the colon then explains.
 
-***
-
 [] Reject
+
+***
 
 **Section:** When You Want a Class, Cache the Instance (after `singleton_eager_factory.py`)
 **Pattern:** "is what" cleft, and a vague "it" (P2)
@@ -80,3 +78,5 @@ Proposed:
 Why: deleting the cleft changes nothing, which is the test for it.
 "this" also had no clear referent, since the nearest noun was the guarantee
 rather than the listing.
+
+[] Reject

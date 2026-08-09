@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Chapter order: "Converting Effectful to Pure" (line 194) picks up a listing
 from three sections back.**
 
@@ -64,9 +62,9 @@ That removes the reader's page-flip without moving anything.
 I recommend the move; reordering is a proposal on principle, so it is yours to
 decide.
 
----
-
 [] Reject
+
+---
 
 **Front-load the payoff: the chapter's most convincing motivation sits at line
 332, and the opening is a table of contents.**
@@ -96,9 +94,9 @@ meets it twice, once in miniature and once in full, is not being repeated at.
 
 Reported, not applied: this is the chapter's opening and its pacing.
 
----
-
 [] Reject
+
+---
 
 **"A Taxonomy of Benefits" (line 155): the heading names something the section
 does not contain, and the section is one heading plus one subheading.**
@@ -122,9 +120,9 @@ renamed with nothing to update.
 
 Reported, not applied: a heading is voice.
 
----
-
 [] Reject
+
+---
 
 **Intro, lines 23-30: "potentially pure function" and the shifting subject of
 "that function".**
@@ -154,9 +152,9 @@ Proposed replacement for both:
 Reported rather than applied because this is the chapter's first paragraph and
 sets its voice, which is your call, not mine.
 
----
-
 [] Reject
+
+---
 
 **"Custom AI Languages with Effects" (line 692): the section holds the reader
 off for ten bullets before giving a reason it could give immediately.**
@@ -198,9 +196,9 @@ distinction is carried entirely by backticks and links. A half-sentence at the
 PyPI mention ("no relation to the TypeScript library of the same name") would
 save a reader the double-take, if you agree it is a real one.
 
----
-
 [] Reject
+
+---
 
 **The chapter never hands off to chapter 45, and 45 is what comes next.**
 
@@ -228,9 +226,9 @@ line:
 Reported, not applied: a chapter's closing paragraph is voice, and you may
 prefer the current ending to stand undiluted.
 
----
-
 [] Reject
+
+---
 
 **Exercises: nothing exercises "Effect Management for Python?", the chapter's
 one Python-specific insight.**
@@ -259,9 +257,9 @@ section uses.
 Reported rather than applied: the size of the exercise set is a pacing
 decision.
 
----
-
 [] Reject
+
+---
 
 **"Effects by Hand", line 451-452: "its signature says so" claims more than the
 signature can deliver, and the chapter itself says so 350 lines later.**
@@ -294,9 +292,9 @@ Reported rather than applied because you may be deliberately holding the
 qualification until the Stateless discussion, so the by-hand section can make
 its point cleanly first.
 
----
-
 [] Reject
+
+---
 
 **"Native Effect Management", after the continuation paragraph (line 566-568):
 Python's own pause-and-resume mechanism is never named, and it is the subject
@@ -322,9 +320,9 @@ Proposed addition at the end of that paragraph:
 Reported rather than applied because it inserts a Python aside into a section
 that is deliberately all non-Python, which is a pacing judgement.
 
----
-
 [] Reject
+
+---
 
 **Exercise 2 asks the reader to count edited signatures, but the chain is two
 functions long.**
@@ -361,9 +359,9 @@ so it must stay number two and must stay the `Log`-Effect exercise.
 
 Reported, not applied: exercise difficulty is pacing.
 
----
-
 [] Reject
+
+---
 
 **"Library Effect Management", ZIO listing (line 597): Scala 2 and Scala 3
 syntax in the same twenty lines.**
@@ -390,9 +388,9 @@ transcribed rather than compiled, that is the line most likely to be wrong.
 Reported rather than applied because I have no Scala toolchain here and will
 not silently edit code I cannot compile.
 
----
-
 [] Reject
+
+---
 
 **CROSS-TREE, do not apply here: `Examples/` needs a sync.**
 
@@ -404,9 +402,9 @@ reviewers are working in this clone.
 
 Run `make sync` (or `make verify`) once this review sweep is finished.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST, not a proposal. Changes already applied to
 `Chapters/44_Effect_Management.md` in this pass.**
@@ -614,3 +612,5 @@ The chapter has no tests, so no `pytest` step.
   track Effects in function types") is still accurate for upstream OCaml.
   Typed-effect work exists but lives in Jane Street's OxCaml fork, not in the
   OCaml 5 releases the sentence is about.
+
+[] Reject

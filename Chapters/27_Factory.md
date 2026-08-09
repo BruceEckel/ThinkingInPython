@@ -444,7 +444,7 @@ the effect of changing from one GUI to another.
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
 
-![Two parallel hierarchies, Character and Obstacle, with each concrete factory producing the one matched pair its game needs: KittiesAndPuzzles always pairs Kitty with Puzzle, WarriorsAndWeapons always pairs Warrior with NastyWeapon](_images/abstract_factory)
+![Two parallel hierarchies, Character and Obstacle, with each concrete factory producing the one matched pair its game needs: KittiesAndPuzzles always pairs Kitty with Puzzle, WarriorsAndWeapons always pairs Warrior with Weapon](_images/abstract_factory)
 
 ```python
 # games.py
@@ -473,10 +473,10 @@ class Puzzle(Obstacle):
     def action(self) -> str:
         return "Puzzle"
 
-class NastyWeapon(Obstacle):
+class Weapon(Obstacle):
     @override
     def action(self) -> str:
-        return "NastyWeapon"
+        return "Weapon"
 
 # The Abstract Factory:
 class GameElementFactory:
@@ -496,7 +496,7 @@ class WarriorsAndWeapons(GameElementFactory):
     @override
     def make_character(self) -> Character: return Warrior()
     @override
-    def make_obstacle(self) -> Obstacle: return NastyWeapon()
+    def make_obstacle(self) -> Obstacle: return Weapon()
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
@@ -510,7 +510,7 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()
-#: Warrior now battles a NastyWeapon
+#: Warrior now battles a Weapon
 ```
 
 In this environment, `Character` objects interact with `Obstacle` objects,
@@ -570,8 +570,8 @@ class Warrior:
 class Puzzle:
     def action(self) -> str: return "Puzzle"
 
-class NastyWeapon:
-    def action(self) -> str: return "NastyWeapon"
+class Weapon:
+    def action(self) -> str: return "Weapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:
@@ -580,7 +580,7 @@ class KittiesAndPuzzles:
 
 class WarriorsAndWeapons:
     def make_character(self) -> Warrior: return Warrior()
-    def make_obstacle(self) -> NastyWeapon: return NastyWeapon()
+    def make_obstacle(self) -> Weapon: return Weapon()
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
@@ -598,7 +598,7 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()
-#: Warrior now battles a NastyWeapon
+#: Warrior now battles a Weapon
 ```
 
 The concrete classes inherit nothing,

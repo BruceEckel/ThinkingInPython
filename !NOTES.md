@@ -1,7 +1,3 @@
-Change "NastyWeapon" to "Weapon"
-
-Add to both skills: put the "Reject []" at the end of each item rather than the beginning.
-
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience

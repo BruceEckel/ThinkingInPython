@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **"Lambdas" sits after "Higher-Order Functions", which has already used three
 of them.**
 
@@ -42,9 +40,9 @@ repeats `sorted(words, key=len)` with a different word list. The new content
 here is the locality argument and the "for anything larger, write a `def`"
 rule, which is worth keeping; the `sorted(key=len)` line is not.
 
----
-
 [] Reject
+
+---
 
 **The chapter has no conclusion, and no listing the reader could adapt.**
 
@@ -110,9 +108,9 @@ pacing, and where it goes is your decision. A cheaper version of the same fix
 is to move the two-line Toolkits sign-off under a `## What You Can Now Do`
 heading and add three sentences, with no new listing.
 
----
-
 [] Reject
+
+---
 
 **`closures.py` shows the outcome but not the mechanism, and the prose now
 depends on the mechanism.**
@@ -158,9 +156,9 @@ are your call. If you take it, the sentence "`double` and `triple` are the
 same code with different captured values" can point at the output instead of
 asserting it.
 
----
-
 [] Reject
+
+---
 
 **"Pure Functions", `why_pure.py`: the listing proves the easy half and the
 convincing half is missing.**
@@ -223,9 +221,9 @@ an exception breaks purity. If `slope` stays here, a forward pointer
 ("[Are Exceptions Impure?](44_Effect_Management.md#are-exceptions-impure)
 comes back to this exact function") turns an accidental repeat into a thread.
 
----
-
 [] Reject
+
+---
 
 **"Closures": the missing-`nonlocal` failure cannot become a listing, which is
 why it was handled in prose instead. Here is what I tried, in case you want to
@@ -255,9 +253,9 @@ comment is suppressing a real error. I did not draft it because a listing that
 needs two suppressions to exist is usually the chapter telling you it should
 stay prose.
 
----
-
 [] Reject
+
+---
 
 **Exercises: two full sections have none, and `Placeholder` has one of five.**
 
@@ -286,9 +284,9 @@ Exercise 7 is deliberately the near-miss: the reader produces
 Reported rather than applied because the exercise set's size and difficulty
 curve are a pacing decision.
 
----
-
 [] Reject
+
+---
 
 **"Functions as First-Class Objects", after `dispatch.py`: the chapter's
 biggest untaught lookalike pair is a dict of functions versus `match`/`case`.**
@@ -322,9 +320,9 @@ Proposed addition after "The dispatch code never changes.":
 Reported rather than applied because it adds a paragraph to a short section
 and because you may be deliberately holding the contrast for chapter 27.
 
----
-
 [] Reject
+
+---
 
 **`composing.py`: `compose()` is hard-wired to `Callable[[int], int]` where the
 book's own style rule asks for PEP 695 type parameters.**
@@ -381,9 +379,9 @@ Alternative if you want the point without the listing change: leave
 `compose(str, increment)` type-checks. What does `ty` report for the result's
 type?").
 
----
-
 [] Reject
+
+---
 
 **"Partial Application": `.func`, `.args` and `.keywords` are claimed here and
 demonstrated one subsection later, only partly.**
@@ -407,9 +405,9 @@ power(n, 2)` is opaque, and `square` tells you what it wrapped and with what.
 Reported rather than applied because it lengthens an existing listing whose
 current job is one clean idea.
 
----
-
 [] Reject
+
+---
 
 **"Leaving a Gap with `Placeholder`": the section is written in a past tense
 that raises a version question it never answers.**
@@ -429,9 +427,9 @@ the book for when a version is called out inline — chapter 41's `partial`
 entry gives none, while several chapters do mark 3.13+/3.15 features — so
 this is a house-style call rather than a correction.
 
----
-
 [] Reject
+
+---
 
 **Intro, second paragraph: the arc preview stops at 44 and omits the last
 three chapters, so the reader's map of Part IV/V is wrong from line 21.**
@@ -470,9 +468,9 @@ Reported rather than applied because it changes the shape of the chapter's
 opening promise-of-contents paragraph, which is pacing, and because you may
 prefer to keep the preview short on purpose.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Changes already applied to
 `Chapters/40_Functional_Foundations.md` in this pass.**
@@ -580,3 +578,5 @@ listing deviates from `thinking-in-python-skill.md` unexplained (the two
 `Final`-is-shallow, frozen-dataclass and closure threads agree with their
 other ends in chapters 20, 22, 28 and 44; and chapter 41 defers to this
 chapter for both `partial` and `Placeholder` rather than contradicting it.
+
+[] Reject

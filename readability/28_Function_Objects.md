@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Line 144 — "want" applied to code**
 **Pattern:** watch list, "don't use"; §35 moral/volitional adjective on a
 non-agent
@@ -47,9 +45,9 @@ Proposed:
 Line 598 ("If you instead want a single handler per type") and line 629 ("do
 you now want an object?") address the reader, so they stay.
 
-***
-
 [] Reject
+
+***
 
 **Line 337 — "earns its keep" survives here**
 **Pattern:** stock phrase, now inconsistent
@@ -72,9 +70,9 @@ If you would rather keep one home for the phrase, this is a defensible one:
 the Context is being weighed against a cheaper alternative, which is the
 comparison the idiom exists for. Then mark this rejected.
 
-***
-
 [] Reject
+
+***
 
 **Line 438 — "A handler is trusted to know when it failed"**
 **Pattern:** §13 subjectless passive, hiding who trusts
@@ -97,9 +95,9 @@ Proposed:
 "Only as reliable as" also becomes "no more reliable than," which drops the
 watched "only" and says the same thing.
 
-***
-
 [] Reject
+
+***
 
 **Lines 27 and 98 — "just a function" twice**
 **Pattern:** §23 empty adverb, and repetition seventy lines apart
@@ -120,9 +118,9 @@ Proposed for line 27:
 
 Leave line 98 as it stands.
 
-***
-
 [] Reject
+
+***
 
 **Lines 610-611 (the new closing section's opening)**
 **Pattern:** a summary claim wider than what the chapter did
@@ -147,9 +145,9 @@ I recommend the second: it is shorter, and the list immediately after it makes
 the point on its own. Note that "reached for" is a banned phrase, so the first
 version needs different wording if you prefer its shape.
 
-***
-
 [] Reject
+
+***
 
 **Line 146 — "springs" and "best-known"**
 **Pattern:** metaphor plus superlative in one clause
@@ -169,9 +167,9 @@ Proposed:
 Low confidence: "best-known" tells a reader this is the trap they have heard
 about, which is useful orientation. Reject if you read it that way.
 
-***
-
 [] Reject
+
+***
 
 **Line 96 — "to say what one list of functions says directly"**
 **Pattern:** none; noting it as a keeper
@@ -180,3 +178,5 @@ No change proposed.
 This is the sharpest sentence in the chapter and the reason the *Command*
 section works.
 Recorded here so a later pass does not "tighten" it.
+
+[] Reject

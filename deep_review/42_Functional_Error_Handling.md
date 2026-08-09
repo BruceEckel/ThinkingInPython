@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **`utils/result.py`, `Err.bind`: binding the class's own `E` makes a chain
 that changes error type fail the checker, and `Ok.bind` allows it.**
 
@@ -47,9 +45,9 @@ never mixes them. But if that is the intent it should be stated, because right
 now the restriction reads as an accident of which method declared its own
 parameters.
 
----
-
 [] Reject
+
+---
 
 **`utils/result.py`: adding `@final` to `Ok` and `Err` removes the narrowing
 limitation this chapter apologises for, and improves chapter 44 too.
@@ -110,9 +108,9 @@ Cost: `make sync` regenerates `Examples/utils/result.py`; chapter 44's
 `slope_result.py` is the only other importer and it gets strictly better
 narrowing; the listing grows one import and two lines.
 
----
-
 [] Reject
+
+---
 
 **New listing proposal: `must_unwrap.py`, the near-miss the reader will write
 first.**
@@ -158,9 +156,9 @@ Alternative, if you would rather not spend a listing: drop the `hasattr` line
 and fold the remaining four lines into the existing `returning_result.py`
 block, which costs no new file but gives that listing two jobs.
 
----
-
 [] Reject
+
+---
 
 **"A Result Type": the chapter says "Ignore `bind()` for the moment" and then,
 two paragraphs later, shows a test that asserts what `bind()` does.**
@@ -193,9 +191,9 @@ one-assert `test_result.py` in two places would collide), and put the two
 `bind` tests in "Composing With bind".
 Cheaper to read, more files to carry.
 
----
-
 [] Reject
+
+---
 
 **"The returns Library" holds the chapter's conclusion under a heading about a
 third-party library.**
@@ -232,9 +230,9 @@ the end that they could not do at the start, and the honest answer here is
 them" — which is worth saying, because it is a real answer and most chapters
 cannot give one that concrete.
 
----
-
 [] Reject
+
+---
 
 **"Combining Multiple Results" opens at its own maximum difficulty.**
 
@@ -277,9 +275,9 @@ Cheaper alternative: keep one listing and add the sentence about lambda
 parameters and scope, which is the actual teaching content of the extra
 listing.
 
----
-
 [] Reject
+
+---
 
 **Exercises: three, all in the `bind` cluster; `@safe`, `add_note()` and the
 `Result`-versus-`| None` decision get none.**
@@ -313,9 +311,9 @@ currently settles by assertion.
 
 Reported rather than applied because the size of the exercise set is pacing.
 
----
-
 [] Reject
+
+---
 
 **The `monad` paragraph is one sentence of dismissal, and chapter 39 sends
 readers here specifically for that word.**
@@ -346,9 +344,9 @@ Proposed addition of one sentence after the existing two:
 Reported rather than applied because the paragraph's brevity looks deliberate
 and lengthening it argues against its own last sentence.
 
----
-
 [] Reject
+
+---
 
 **Intro, third paragraph: "the type checker reminds every caller to handle it"
 is the weakest form of the chapter's strongest claim.**
@@ -380,9 +378,9 @@ argument and the wording is voice.
 (The mechanism itself is now stated in "A Result Type" and the caller-side
 hole in the totality paragraph; see the manifest, items 2 and 3.)
 
----
-
 [] Reject
+
+---
 
 **`utils/safe.py` carries a top-level demo, against the book's own rule, and
 `test_safe.py` re-declares `parse()` because of it.**
@@ -409,9 +407,9 @@ Note that this affects the prose too: the sentence "Like `result.py`, it lives
 in `utils/` and any chapter can import it" currently introduces a listing that
 is two things at once, and would introduce one thing after the split.
 
----
-
 [] Reject
+
+---
 
 **"Return the Error as a Value", line 63: `int | str` is called a *sum type*,
 and the next paragraph explains why it isn't quite one.**
@@ -439,9 +437,9 @@ The following section now says explicitly that `Ok`/`Err` supply the tag
 Reported rather than applied because "sum type" is the term the PyCon talk
 this chapter comes from uses, and you may want it unqualified.
 
----
-
 [] Reject
+
+---
 
 **`add_note()` is Python 3.11 and later, and the chapter does not say so.**
 
@@ -453,9 +451,9 @@ a call-out may be noise, so this is your convention call rather than a
 correction. If you do mark it, the natural spot is
 "`BaseException.add_note()` (Python 3.11 and later) avoids the trade."
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal.
 Changes already applied to `Chapters/42_Functional_Error_Handling.md` in this
@@ -555,3 +553,5 @@ rather than its source; the blank line after the `# slug.py` marker in
 listings in the book and is not a deviation; and the chapter's `Result`,
 `@safe` and `add_note` threads agree with their other ends in chapters 20, 39,
 43, 44, 46 and 47.
+
+[] Reject

@@ -24,10 +24,10 @@ class Puzzle(Obstacle):
     def action(self) -> str:
         return "Puzzle"
 
-class NastyWeapon(Obstacle):
+class Weapon(Obstacle):
     @override
     def action(self) -> str:
-        return "NastyWeapon"
+        return "Weapon"
 
 # The Abstract Factory:
 class GameElementFactory:
@@ -47,7 +47,7 @@ class WarriorsAndWeapons(GameElementFactory):
     @override
     def make_character(self) -> Character: return Warrior()
     @override
-    def make_obstacle(self) -> Obstacle: return NastyWeapon()
+    def make_obstacle(self) -> Obstacle: return Weapon()
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
@@ -61,4 +61,4 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()
-#: Warrior now battles a NastyWeapon
+#: Warrior now battles a Weapon

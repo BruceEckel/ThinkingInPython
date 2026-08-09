@@ -151,7 +151,7 @@ GameEnvironment(GnomesAndFairies()).play()
 ```
 
 `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
-`NastyWeapon` directly; it only calls `make_character()` and
+`Weapon` directly; it only calls `make_character()` and
 `make_obstacle()` on whatever `GameElementFactory` it was handed. A
 third concrete factory slots in beside `KittiesAndPuzzles` and
 `WarriorsAndWeapons` with no change to `GameEnvironment` at all.

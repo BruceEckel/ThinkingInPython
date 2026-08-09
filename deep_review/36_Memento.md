@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **Chapter-level, the biggest item: the intro promises the classic form "when
 you need it" and the chapter never says when.**
 
@@ -49,9 +47,9 @@ I recommend the first, because the reader asks the question the instant
 
 Cost of the addition: nothing else moves, no anchors change, no listing changes.
 
----
-
 [] Reject
+
+---
 
 **Chapter-level, order: the cost objection arises at `frozen_sketch.py`
 (line 195) and is answered at line 339, one and a half sections later. The
@@ -112,9 +110,9 @@ in one clause, or the demo silently stops demonstrating.
 Reported rather than applied because it adds a listing and decides where it
 goes.
 
----
-
 [] Reject
+
+---
 
 **Lines 117-118: `frozen=True` does not stop the mistake the sentence
 attributes to it.**
@@ -135,9 +133,9 @@ Proposed change: make the parenthetical name the right mistake.
 > though freezing the memento means an honest mistake, swapping the snapshot's
 > strokes for different ones, fails loudly.
 
----
-
 [] Reject
+
+---
 
 **"Mementos That Outlive the Process": the quieter half of the drift story is
 prose-only, and it is the half that matters. Proposed listing (verified).**
@@ -215,9 +213,9 @@ the paragraph describes the behavior and the listing shows it. Reported rather
 than applied because it adds a listing, edits an existing one, and adds a file
 to the chapter directory.
 
----
-
 [] Reject
+
+---
 
 **"The Caretaker: a Generic History": the near-miss is forgetting `do()`, and
 nothing warns about it.**
@@ -250,9 +248,9 @@ so the round trip cannot be broken. I would not add it to the class — it makes
 `History` less obviously a pure store of states, which is the point of the
 section — but it is a good exercise (see the exercises block below).
 
----
-
 [] Reject
+
+---
 
 **Exercises: two sections have none, and the set clusters on the two `Sketch`
 classes.**
@@ -283,9 +281,9 @@ A third candidate, if you want one against `History`'s contract rather than its
 mechanics: add `apply(fn)` (see the `do()` block above) and say what it buys and
 what it costs.
 
----
-
 [] Reject
+
+---
 
 **"A Snapshot Is Not a Reference": `nested_mutation.py` teaches
 `copy.deepcopy()` and nothing in the chapter ever uses it.**
@@ -308,9 +306,9 @@ never share one":
 That makes the earlier listing pay for itself and warns the reader whose state
 is not flat.
 
----
-
 [] Reject
+
+---
 
 **`sketch.py` and `frozen_sketch.py` both define a class named `Sketch`, with
 different fields, and the chapter never says so.**
@@ -340,11 +338,11 @@ Two fixes, either is fine, I marginally prefer the first:
   removed. This costs edits to `frozen_sketch.py`, `test_frozen_sketch.py`,
   `history.py`'s demo, `partial_restore.py`, `round_trip.py`, exercise 1,
   exercise 3, and `Solutions/36_Memento.md`, so it is only worth it if the
-  name collision bothers you independently.
-
----
+  name collision bothers you independently. [[do this]]
 
 [] Reject
+
+---
 
 **Line 120: the alias paragraph opens with a garden-path sentence, and skips
 the near-miss a typed-Python reader would actually write.**
@@ -379,9 +377,9 @@ job but is slightly off — a `type` alias is not a structural type, it is a
 transparent second name for the same type. "An alias creates no new type" is
 the literal statement and needs no italics.
 
----
-
 [] Reject
+
+---
 
 **Prose pass, five small items outside the blocks above.**
 
@@ -411,11 +409,11 @@ Each stands alone; reject individually by striking the line.
     which already do the pairing (`msgspec`/`pydantic` for drift, Protocol
     Buffers for drift across languages, all three for the security half).
 
+[] Reject
+
 ---
 
 ## Cross-file (not touched, per the review's scope rules)
-
-[] Reject
 
 **`tools/validate_output.py`: a relative `--tree` silently breaks every block
 that imports a sibling.**
@@ -442,9 +440,9 @@ Change I would make in `tools/validate_output.py`: resolve the tree once in
 rather than adding a second warning to `CLAUDE.md`. I did not touch the tool,
 per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **MANIFEST — not a proposal. Everything this pass applied to
 `Chapters/36_Memento.md`, so you can find it in the diff.**
@@ -481,3 +479,5 @@ the private tree `build/private/36`: `extract_examples.py --write -o`,
 `pytest` (9 passed), `heading_links.py` (OK), `banned_phrases.py` (none), and
 `reflow_prose.py --diff` (0 paragraphs, so the new prose is already on
 semantic line breaks).
+
+[] Reject

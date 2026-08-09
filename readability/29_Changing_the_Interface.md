@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Line 56 — "wants" applied to a class**
 **Pattern:** watch list, "don't use"
 
@@ -41,9 +39,9 @@ Proposed:
 "Calls" is also more precise than "requires" here: the requirement exists
 because `op()` makes the call.
 
-***
-
 [] Reject
+
+***
 
 **Line 334 — "the Adapter is what a Proxy becomes"**
 **Pattern:** "is what" cleft (global rule)
@@ -59,9 +57,9 @@ Proposed:
 > Under that reading a Proxy becomes an Adapter once you stop insisting on the interface,
 > which is why the `ProxyAdapter` above answers to both names.
 
-***
-
 [] Reject
+
+***
 
 **Line 230 — "That is what *Façade* accomplishes"**
 **Pattern:** "is what" cleft, plus a §29 warm-up line after the epigraph
@@ -88,9 +86,9 @@ epigraph run straight into "If you have a confusing collection...". I
 recommend the shortened version; the naming sentence does connect the quote to
 the pattern.
 
-***
-
 [] Reject
+
+***
 
 **Lines 112-117 (after `adapter_variations.py`)**
 **Pattern:** a paragraph whose subject shifted when the listing split
@@ -118,9 +116,9 @@ Proposed:
 The next paragraph already opens "The four also split into two families," so
 that one reads correctly once this fixes the count.
 
-***
-
 [] Reject
+
+***
 
 **Line 127 — "needs a closer look"**
 **Pattern:** the replacement for "repay attention" is blander than what it replaced
@@ -139,9 +137,9 @@ Proposed: cut the sentence and let the paragraph open on the detail.
 The paragraph is already the only place the `/` is discussed, so nothing
 orients the reader that the sentence was providing.
 
-***
-
 [] Reject
+
+***
 
 **Line 201 — "which is what `copy.copy()` and `pickle` do"**
 **Pattern:** "is what" cleft
@@ -159,9 +157,9 @@ Note the identical phrasing exists in `Chapters/26_Surrogate.md` around the
 should match. Chapter 26's readability review does not raise it, so it would
 need a small follow-up there.
 
-***
-
 [] Reject
+
+***
 
 **Line 197 — "defines those dunders itself"**
 **Pattern:** watch list, "itself" as a flourish
@@ -175,9 +173,9 @@ them, and the sentence already names it as the subject.
 Proposed:
 > so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 
-***
-
 [] Reject
+
+***
 
 **Line 10 — "a later section sorts the four apart"**
 **Pattern:** none; noting a claim that is now correct
@@ -188,3 +186,5 @@ which was wrong once "Retiring the Old Interface" became the closing section.
 The deep-review pass corrected it to "a later section," and the accrued note in
 `deep-review/SKILL.md` was corrected to match.
 Recorded so a later pass does not restore the tidier-sounding but false version.
+
+[] Reject

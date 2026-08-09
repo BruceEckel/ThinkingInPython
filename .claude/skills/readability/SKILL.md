@@ -1692,9 +1692,14 @@ Bruce reads the top of the file with full attention
 and tends to accept the confident items lower down,
 so a finding placed too low gets less scrutiny than it deserves.
 
-Begin every block with a reject checkbox on its own line:
+End every block with a reject checkbox on its own line,
+after the finding it governs:
 
 > `[] Reject`
+
+Putting it last means Bruce reads the case before the verdict,
+so the checkbox sits where the decision gets made
+rather than before he knows what it is about.
 
 An empty `[]` means the change is live and will be applied.
 Bruce rejects a change by putting an `X` in the box, `[X] Reject`, instead of

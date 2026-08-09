@@ -16,8 +16,6 @@ because a heading arrived or a block moved.
 
 ***
 
-[] Reject
-
 **Section:** The Protocol Answers Nothing for Free (the new closing section)
 **Pattern:** §29 Fragmented Header, a heading and its first clause saying the same thing (P1)
 
@@ -48,9 +46,9 @@ still free; once a later chapter points at `#the-protocol-answers-nothing-for-fr
 it is not.
 I lean toward the cut, because the heading is the better of the two phrasings.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Generators (the moved `test_iterators.py` lead-in)
 **Pattern:** §11 repetition, the same claim three times in four lines (P2)
@@ -81,9 +79,9 @@ Your call on which of the two sentences keeps the claim: I cut it from the
 lead-in because the forward reference reads better attached to `Countdown`,
 but the opposite trim works if you would rather the lead-in stand alone.
 
-***
-
 [] Reject
+
+***
 
 **Section:** The Costs of Laziness (the new heading)
 **Pattern:** §29 Fragmented Header, heading echoed by the line beneath it (P2)
@@ -106,9 +104,9 @@ The replacement also links the new section to the paragraph above it, which
 ends on what laziness buys, so the heading reads as the turn from benefit to
 cost rather than as a fresh start.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Generators, the `tee` lead-in
 **Pattern:** a forward-pointing "this" before the thing it points at (P2)
@@ -126,3 +124,5 @@ nearest `squares()` on the page is the generator function from
 `generator_lifecycle.py`, which is the one the sentence exists to distinguish
 it from.
 Naming the direction removes the momentary wrong referent.
+
+[] Reject

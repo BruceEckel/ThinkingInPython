@@ -62,7 +62,7 @@
   <text x="550" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Puzzle</text>
 
   <rect x="650" y="360" width="150" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="725" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">NastyWeapon</text>
+  <text x="725" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Weapon</text>
 
   <text x="410" y="490" font-size="11.5" fill="#7a6e62" text-anchor="middle">Each concrete factory's two products are the matched pair GameEnvironment.play() relies on</text>
 </svg>

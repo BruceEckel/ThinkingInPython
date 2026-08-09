@@ -3,8 +3,6 @@ When this file has been applied, change this file's name so it has a leading
 
 ---
 
-[] Reject
-
 **`blackboard.py`, `explore()`: the `while`/`gather()` loop contradicts the book's own
 guideline, and `TaskGroup` produces byte-identical output.**
 
@@ -77,9 +75,9 @@ object on the blackboard.
 This keeps the listing but leaves the book recommending one thing in 19 and doing
 another in 38.
 
----
-
 [] Reject
+
+---
 
 **Exercise 3 cannot be done as written, and doing it literally leaves a green test.**
 
@@ -131,9 +129,9 @@ than the current one, since it demonstrates a standalone `BrokenBlackboard` rath
 than running the chapter's test. See the cross-chapter block below for the one
 sentence in it that needs correcting.
 
----
-
 [] Reject
+
+---
 
 **Chapter intro (lines 1-8): the chapter's real claim arrives on the last page.**
 
@@ -174,9 +172,9 @@ It does duplicate the "confirm versus discover" beat that currently opens
 so that paragraph would want a light trim to avoid saying it twice.
 Reported rather than applied because it changes the chapter's pacing.
 
----
-
 [] Reject
+
+---
 
 **"Other Maze Resources" (line 1134 in the edited file) buries the chapter's payoff.**
 
@@ -215,9 +213,9 @@ While you are in there: the second resource link is `http://`, not `https://`,
 and its text promises "collision detection" that the linked page (Craig Reynolds on
 steering behaviors) does not really cover.
 
----
-
 [] Reject
+
+---
 
 **"Rats & Mazes" is the only `##` section with no subsections.**
 
@@ -235,9 +233,9 @@ Cost: three new anchors, none of them referenced from anywhere
 (I checked; only `#a-robot-in-a-maze` is linked from outside, by 08, 09 and 27).
 Reported rather than applied because adding headings changes the chapter's pacing.
 
----
-
 [] Reject
+
+---
 
 **`### Rooms, Robots, and the Item Factory` sits after the commentary it names.**
 
@@ -263,9 +261,9 @@ Alternative if you prefer smaller sections: leave the heading where it is and
 rename it `### Rooms and Doors`, moving the `items.py` commentary above it.
 That changes the anchor, which nothing references.
 
----
-
 [] Reject
+
+---
 
 **`rat.py`: the `Recorder` protocol is named for its least important method.**
 
@@ -282,9 +280,9 @@ the `Protocol` import stays), one in the exercise-1 wording,
 and `Solutions/38_Simulation.md` exercise 1, which names `Recorder` in its fake.
 Low value on its own; worth doing only if you are already touching `rat.py`.
 
----
-
 [] Reject
+
+---
 
 **`rats_and_mazes.py`: `blackboard.messages` is collected and never read,
 and printing it is the chapter's cheapest teaching win.**
@@ -326,9 +324,9 @@ never needs it.
 Reported rather than applied because it adds output and `#:` markers to an existing
 listing, and because you may prefer `blackboard.messages[:8]` versus all 18.
 
----
-
 [] Reject
+
+---
 
 **`game.py` is a library and a demo in one file, which the house style forbids
 and the chapter's other two examples already avoid.**
@@ -365,9 +363,9 @@ the new listing.
 `Examples/38_Simulation/robot_explorer/robot_demo.py` appears on the next `make sync`.
 Reported rather than applied because it places a new listing.
 
----
-
 [] Reject
+
+---
 
 **`blackboard.py`: `Blackboard.__init__()` only assigns parameters and defaults,
 so the house rule makes it a `@dataclass`.**
@@ -415,9 +413,9 @@ The same rule catches two smaller classes in `world.py`,
 than the field list, and `Doors` has none.
 Both are minor next to `Blackboard`.
 
----
-
 [] Reject
+
+---
 
 **Exercise 5's hint under-describes the search.**
 
@@ -441,9 +439,9 @@ A reader who expects to reproduce `solution` will think they have failed.
 Suggest adding one sentence: "Your path will be shorter than the hard-coded
 `solution` and need not use the teleports; assert only that the robot finishes."
 
----
-
 [] Reject
+
+---
 
 **Exercise 4 should say "direct subclass of `Item`".**
 
@@ -466,11 +464,11 @@ change "Define a `Coin` subclass" to "Define a `Coin` subclass of `Item`",
 and consider adding "What happens if you derive it from `Food` instead?" as the
 follow-up question, since the answer is the point.
 
+[] Reject
+
 ---
 
 ## Cross-chapter
-
-[] Reject
 
 **`Solutions/38_Simulation.md`, exercise 3: one claim in the explanation is false.**
 
@@ -497,9 +495,9 @@ If exercise 3 is rewritten as proposed above, this paragraph should also pick up
 `True`-count-versus-`len(visited)` measurement.
 I did not touch `Solutions/`, per the scope rules.
 
----
-
 [] Reject
+
+---
 
 **`Chapters/27_Factory.md`, the Builder section (around line 854): `GameBuilder`'s
 three stages are described wrongly.**
@@ -518,11 +516,11 @@ Change I would make in `Chapters/27_Factory.md`:
 letter".
 I did not touch chapter 27, per the scope rules.
 
+[] Reject
+
 ---
 
 ## Manifest: applied to `Chapters/38_Simulation.md` in this pass
-
-[] Reject
 
 *(Not a proposal. This block records what was already changed, so the edits are
 findable in the diff. All gates re-run and green: `extract_examples`,
@@ -571,3 +569,5 @@ findable in the diff. All gates re-run and green: `extract_examples`,
     bare relative phrase.
 14. Chladni demo lead-in: "displays the agitation as it happens" to "printing
     agitation at four checkpoints along the way", which is what the listing does.
+
+[] Reject

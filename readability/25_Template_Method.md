@@ -16,8 +16,6 @@ an accuracy problem rather than a style one.
 
 ***
 
-[] Reject
-
 **Section:** What Actually Fixes the Algorithm (second paragraph)
 **Pattern:** a summary line that misdescribes the list under it (P1)
 
@@ -46,9 +44,9 @@ I did not pick, because the second version asserts a tidy relationship between
 cost and coverage that holds for the first three mechanisms and breaks on
 discipline, which costs the most and guarantees the least.
 
-***
-
 [] Reject
+
+***
 
 **Section:** Don't Start the Engine in the Constructor (opening)
 **Pattern:** §39 self-labeling, a withheld reason used as a hook (P2)
@@ -70,9 +68,9 @@ the reason arrives at the end of the section.
 "where the trap lives" is also a metaphor standing in for the literal statement.
 The replacement names the contrast the subsection exists to draw and drops both.
 
-***
-
 [] Reject
+
+***
 
 **Section:** What Actually Fixes the Algorithm (last line)
 **Pattern:** stranded preposition (P2)
@@ -87,9 +85,9 @@ Why: the sentence ends on "from" with its object moved, which the style rules
 rule out.
 "Against" also fits the verb better than "from" does.
 
-***
-
 [] Reject
+
+***
 
 **Section:** What Actually Fixes the Algorithm (first paragraph)
 **Pattern:** watch-list words, two in one paragraph (P2)
@@ -108,3 +106,5 @@ Why: "ever" and "at all" are both on the watch list, and both delete cleanly
 here.
 "checks that at all" also has a vague "that"; naming it "it", the substitution,
 is shorter and clearer.
+
+[] Reject

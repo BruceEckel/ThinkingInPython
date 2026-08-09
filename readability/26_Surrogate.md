@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Line 370 (identity escapes, first sentence)**
 **Pattern:** §35 moral-adjective category error, plus §31 manufactured punchline
 
@@ -45,9 +43,9 @@ An alternative, if you would rather not restate the mechanism this early:
 cut the clause and open with "Two escapes exist." on its own.
 I recommend the first.
 
-***
-
 [] Reject
+
+***
 
 **Line 186 (after `proxy_2.py`)**
 **Pattern:** §4 promotional framing, §8 copula avoidance, §23 empty adverb
@@ -70,9 +68,9 @@ I flag this at the top rather than lower down because it may be original voice
 carried forward from the first edition rather than drafted prose, and that is
 your call, not mine.
 
-***
-
 [] Reject
+
+***
 
 **Line 191 (double-underscore paragraph)**
 **Pattern:** stock phrase, and now inconsistent with the conclusion
@@ -92,9 +90,9 @@ If you want the phrase kept somewhere in the book, this is the better of the
 two places to keep it, since the paragraph does argue that the name pays for
 its awkwardness. Then this block is a reject.
 
-***
-
 [] Reject
+
+***
 
 **Lines 438-439 (after `state.py`)**
 **Pattern:** §70 interpretive metadiscourse, low information density
@@ -114,9 +112,9 @@ Proposed, replacing it with the observation the demo actually earns:
 That states what *State* buys and leads into the typing paragraph, which is
 about what the checker can see through that same surrogate.
 
-***
-
 [] Reject
+
+***
 
 **Line 208 (interface-payoff paragraph)**
 **Pattern:** pronoun with two possible referents
@@ -131,9 +129,9 @@ Current:
 Proposed:
 > That verification stops at the proxy.
 
-***
-
 [] Reject
+
+***
 
 **Line 451 (end of the State typing paragraph)**
 **Pattern:** "is where" cleft, the cousin of the banned "is what"
@@ -146,9 +144,9 @@ The cleft delays the verb and the sentence means the same without it.
 Proposed:
 > The hop through the surrogate loses the guarantee.
 
-***
-
 [] Reject
+
+***
 
 **Lines 330 and 374 — stranded "fronts for"**
 **Pattern:** stranded preposition (global rule)
@@ -173,9 +171,9 @@ Proposed for 330:
 I would fix 374 for certain, since it is new prose.
 Line 330 has read that way through earlier passes, so it is more your call.
 
-***
-
 [] Reject
+
+***
 
 **Line 533 — "ever"**
 **Pattern:** watch list, "avoid if possible"
@@ -186,9 +184,9 @@ Current:
 Proposed:
 > A *Smart reference* proxy adds behavior around each access without refusing any.
 
-***
-
 [] Reject
+
+***
 
 **Line 494 — "at all"**
 **Pattern:** watch list, "avoid if possible"
@@ -202,9 +200,9 @@ listing, so "at all" is not doing the work here that it does there.
 Proposed:
 > A *Protection proxy* decides whether a call reaches the implementation.
 
-***
-
 [] Reject
+
+***
 
 **Line 296 — "has to"**
 **Pattern:** watch list, "consider rewriting"
@@ -219,9 +217,9 @@ Proposed:
 The added comma also splits a sentence that currently reads as one clause until
 the reader hits "or."
 
-***
-
 [] Reject
+
+***
 
 **Line 587 — "plain"**
 **Pattern:** watch list, use only when the sentence fails without it
@@ -235,9 +233,9 @@ nothing.
 Proposed:
 > and that it counts calls without counting an attribute read:
 
-***
-
 [] Reject
+
+***
 
 **Line 618 — "really"**
 **Pattern:** §34 intensifier inflation, §23 empty adverb
@@ -251,9 +249,9 @@ definition.
 Proposed:
 > But both are a *Surrogate*:
 
-***
-
 [] Reject
+
+***
 
 **Lines 574-575 (the `CountingProxy` underscore note)**
 **Pattern:** repetition inside one sentence
@@ -269,9 +267,9 @@ Proposed:
 > `CountingProxy` uses single underscores rather than the earlier proxies' `self.__implementation`,
 > so the trap below can misspell `self._imp` without name mangling obscuring the typo.
 
-***
-
 [] Reject
+
+***
 
 **Lines 453 and 586 — the same test sentence twice**
 **Pattern:** formulaic repetition
@@ -287,9 +285,9 @@ identical and the second one is the weaker sentence.
 Proposed for 586:
 > The counting proxy's test confirms that a call reaches the implementation and returns its result,
 
-***
-
 [] Reject
+
+***
 
 **Line 9 — "The basic idea is simple."**
 **Pattern:** §29 warm-up sentence
@@ -302,9 +300,9 @@ Cutting it starts the paragraph on the content:
 Low confidence: this reads like first-edition voice, and a one-line breath
 before a diagram is a reasonable thing to want.
 
-***
-
 [] Reject
+
+***
 
 **Line 262 — "which is the worse case"**
 **Pattern:** §70 interpretive metadiscourse
@@ -321,3 +319,5 @@ Proposed:
 I lean toward making this change, though the current version is defensible: the
 `TypeError` two paragraphs up is the thing being ranked against, and the reader
 has it in view.
+
+[] Reject

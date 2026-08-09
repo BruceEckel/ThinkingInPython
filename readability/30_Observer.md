@@ -22,8 +22,6 @@ Line numbers refer to the chapter as it stands now.
 
 ***
 
-[] Reject
-
 **Lines 264-277 (the caveats paragraph, now four items)**
 **Pattern:** §57 density, and a heading sentence that no longer counts correctly
 
@@ -45,9 +43,9 @@ Note this is the same defect the deep review flagged in its own words when it
 declined to apply the re-entrancy paragraph. The paragraph is now in and the
 opener was not updated with it.
 
-***
-
 [] Reject
+
+***
 
 **Line 275 — "the value actually changing"**
 **Pattern:** §23 empty adverb, watch list
@@ -63,9 +61,9 @@ Proposed:
 > Either make the write conditional on the value changing,
 > or guard the setter with a re-entry flag.
 
-***
-
 [] Reject
+
+***
 
 **Line 86 — "It is simply a callable"**
 **Pattern:** §23 empty adverb
@@ -84,9 +82,9 @@ Proposed:
 Low confidence: this is a rhetorical beat in a two-sentence pair, and the pair
 is doing the chapter's central move. Reject if you hear it as rhythm.
 
-***
-
 [] Reject
+
+***
 
 **Line 354 — "which is what calling an `async` function produces"**
 **Pattern:** "is what" cleft (global rule)
@@ -99,9 +97,9 @@ Proposed:
 > an observer must return an awaitable,
 > which calling an `async` function produces.
 
-***
-
 [] Reject
+
+***
 
 **Line 231 — "a one-shot listener detaching itself is the natural example"**
 **Pattern:** watch list, "itself" as flourish; also a comma splice into the
@@ -122,9 +120,9 @@ Proposed:
 
 That also names what "that" was pointing at.
 
-***
-
 [] Reject
+
+***
 
 **Lines 72-76 (the new `changed`-flag paragraph)**
 **Pattern:** two claims of different kinds in one paragraph
@@ -148,9 +146,9 @@ detail is only visible to a reader who knows `java.util.Observable`. I
 recommend the split; the sentence explains a line that would otherwise look
 arbitrary.
 
-***
-
 [] Reject
+
+***
 
 **Line 163 — "amounts to nothing more than a list of callbacks"**
 **Pattern:** none; noting a keeper
@@ -160,9 +158,9 @@ No change proposed.
 this exact construction: a comparative where the diminishing is the point, and
 its example is this sentence. Recorded so a later pass does not cut it.
 
-***
-
 [] Reject
+
+***
 
 **Line 174 — "a lambda equals only itself"**
 **Pattern:** watch list, "only" and "itself" in four words
@@ -175,3 +173,5 @@ equals itself" without "only" would be trivially true of everything.
 
 No change proposed. Recorded because a mechanical watch-list sweep would flag
 it, and it should survive that sweep.
+
+[] Reject
