@@ -127,7 +127,7 @@ which is often better expressed with a `tuple`,
 a [data class](12_Data_Classes_as_Types.md#data-classes), or distinct lists,
 each holding a single type.
 
-Two ways of building a `list` produce surprises.
+Two list operations produce surprises.
 `*` repeats a reference rather than copying what it points at,
 so a grid built that way has one row under three names:
 

@@ -466,8 +466,7 @@ as in `this_is_snake_case`.
 If something represents a constant, use all uppercase letters,
 as in `THIS_IS_A_CONSTANT`.
 
-The one exception is class names, which are `CapWords` (Pascal cased),
-starting with a capital letter,
+Class names are `CapWords` (Pascal cased), starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
 

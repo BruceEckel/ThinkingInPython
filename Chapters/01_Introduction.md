@@ -194,7 +194,7 @@ one line of output per marker.
 A run of markers shows everything the code above it printed since the previous run,
 in order.
 Output produced inside a loop, or by an `import`,
-therefore appears in the run of markers below the block,
+therefore appears in the run of markers after the loop or the `import`,
 not next to the line that produced it.
 A `print("affirmative")` followed by a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build regenerates these markers from a real run,

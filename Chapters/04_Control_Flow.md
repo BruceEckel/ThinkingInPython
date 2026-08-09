@@ -44,7 +44,7 @@ print(classify(-3), classify(0), classify(7))
 ## Placeholders: `pass` and `...` {#placeholders}
 
 The `pass` statement does nothing.
-Use it where Python's syntax requires a statement but you have none to run yet:
+Use it where Python's syntax requires a statement but you have none to run yet.
 
 `...` (the *Ellipsis* literal) is a second placeholder.
 Using it alone as a statement does nothing, the same as `pass`:
@@ -184,7 +184,7 @@ for index, name in enumerate(names):
 `enumerate()` yields `(index, item)` pairs counting from zero,
 which the loop here unpacks into `index` and `name`.
 A loop written as `for i in range(len(names)):` and then indexing `names[i]` does the same job,
-but it names the index and re-looks-up the item on every line that needs it.
+but it names the index and looks the item up again on every line that needs it.
 `enumerate()` hands you both.
 `zip()` walks several sequences at once:
 
