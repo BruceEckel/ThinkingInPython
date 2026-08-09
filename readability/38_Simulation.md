@@ -5,9 +5,30 @@
 
 A sweep of the Tier 1A, 1B, 2 and 3 vocabulary tables returns zero hits, and
 there is no boldface, no curly quote, and no spaced ` -- `.
-Everything below is in prose added since the first review: the deep review's
+Everything below was in prose added since the first review: the deep review's
 manifest edits and today's apply, which added an intro paragraph, four
 headings, a conclusion section, and the `TaskGroup` and log commentary.
+
+The clear-cut fixes were applied to the chapter directly (listed below);
+one block remains for your judgment.
+
+## Applied directly
+
+- "When a grain lands on a still line" → "When a grain comes to rest on a
+  still line" ("lands" is on the global "Don't use" list; the grain's
+  stillness is the point, so the literal verb is also more accurate).
+- "where a particular grain lands after a million random kicks" → "where a
+  particular grain ends up after a million random kicks" (same word, the
+  metaphor proper).
+- The `TaskGroup` paragraph after `blackboard.py` split after "and half the
+  rats do not exist yet": the concurrency argument and the dataclass note
+  arrived from two separate review blocks and were doing two jobs in one
+  paragraph. No wording changed.
+- Intro: "The third does not, which is simulation's other purpose." → "The
+  third produces a pattern nobody wrote down." (§70 metadiscourse that filed
+  the example before the reader saw it; the concrete version is the better
+  hook and removes the overlap with "Order from Noise," which already draws
+  the confirm-versus-discover distinction at length).
 
 ***
 
@@ -21,7 +42,7 @@ The conclusion now repeats the intro almost claim for claim. The intro says:
 > each giving its agents less to work with than the last.
 > ...
 > The first two confirm a design you can predict from the code.
-> The third does not, which is simulation's other purpose.
+> The third produces a pattern nobody wrote down.
 
 and the conclusion says:
 
@@ -55,68 +76,5 @@ deep review's block was buying.
 
 I lean toward trimming the conclusion. Your call, since it is your closing
 paragraph either way.
-
-[] Reject
-
-***
-
-**Section:** "Order from Noise," and the paragraph after `rats_and_mazes.py`
-**Pattern:** Global watch list, "Don't use" tier: `lands` (P1)
-
-Two occurrences, both in prose this pass did not add but which has not been
-scanned for this word:
-
-> When a grain lands on a still line, nothing kicks it away again.
-
-> A test cannot guess where a particular grain lands after a million random
-> kicks.
-
-Proposed: "When a grain comes to rest on a still line" for the first, and "where
-a particular grain ends up" for the second.
-
-Why: `lands` is on the "Don't use" list in `~/.claude/CLAUDE.md`. The first
-sentence has a literal verb available that is also more accurate, since the
-grain's stillness is the point. The second is the metaphor proper.
-
-[] Reject
-
-***
-
-**Section:** "Rats & Mazes," the new `TaskGroup` paragraph
-**Pattern:** Paragraph-length uniformity / one idea per paragraph (P2)
-
-The paragraph after `blackboard.py` now carries four separate facts: what a
-`TaskGroup` guarantees, why `gather()` cannot, why `group` is `field(init=False)`,
-and why the other four fields carry `default_factory`. The first two are one
-argument about concurrency; the last two are a note about the dataclass.
-
-Proposed split after "and half the rats do not exist yet," so the dataclass note
-stands as its own short paragraph. Nothing else changes.
-
-Low stakes. The paragraph is not wrong, only doing two jobs, and the two jobs
-arrived from two separate review blocks.
-
-[] Reject
-
-***
-
-**Section:** Intro, new paragraph
-**Pattern:** §70 Interpretive Metadiscourse (P2)
-
-Current:
-> The first two confirm a design you can predict from the code.
-> The third does not, which is simulation's other purpose.
-
-Proposed:
-> The first two confirm a design you can predict from the code.
-> The third produces a pattern nobody wrote down.
-
-Why: "which is simulation's other purpose" tells the reader how to file the
-third example before they have seen it, and the noun it lands on is abstract.
-Saying what the third one does is both concrete and a better hook, and it does
-not spoil the Chladni figure any more than the current version does.
-
-This also removes the overlap with "Order from Noise," whose opening paragraph
-already draws the confirm-versus-discover distinction at length.
 
 [] Reject

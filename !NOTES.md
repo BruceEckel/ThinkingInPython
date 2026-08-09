@@ -1,3 +1,11 @@
+Make the same adjustment to /deep-review: do the ones that are obvious and only include the ones you definitely need a decision on in the review file. Do not modify the files in "deep_review" as they have all been accepted.
+
+run /annealing
+
+I would like to do a clean-slate: deep_review, readability, and annealing on the whole book.
+Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
+helpful for you to keep?
+
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience

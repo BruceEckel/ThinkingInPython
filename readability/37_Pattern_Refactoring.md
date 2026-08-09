@@ -5,8 +5,25 @@
 
 A sweep of the Tier 1A, 1B, 2 and 3 vocabulary tables returns zero hits, and
 there is no boldface, no curly quote, and no spaced ` -- `.
-Everything below is in prose that has never had a readability pass: the deep
+Everything below was in prose that had never had a readability pass: the deep
 review's manifest edits and today's apply.
+
+The clear-cut fixes were applied to the chapter directly (listed below);
+the two blocks that remain are the ones needing your judgment.
+
+## Applied directly
+
+- "so a `CrushedAluminum` derived from `Aluminum` lands in a bin of its own"
+  → "gets a bin of its own" ("lands" is on the global "Don't use" list; "it
+  sorts into its own bin" nearby keeps its own verb, so the two stay
+  consistent without repeating).
+- Three `is what` clefts, each followed by a verb, each passing the deletion
+  test unchanged:
+  - "which is what [Pattern Matching] warned against" → "which [Pattern
+    Matching] warned against."
+  - "which is what the next section does" → "which the next section does."
+  - "The `defaultdict(list)` is what creates a bin the first time a material
+    turns up." → "The `defaultdict(list)` creates a bin..."
 
 ***
 
@@ -46,56 +63,9 @@ I lean toward B, because the per-use cost is the thing the chapter measured and
 
 ***
 
-**Section:** "Adding Operations," the subclass-dispatch paragraph
-**Pattern:** Global watch list, "Don't use" tier (P1)
-
-Current:
-> so a `CrushedAluminum` derived from `Aluminum` lands in a bin of its own.
-
-Proposed:
-> so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
-
-Why: `lands` is on the "Don't use" list in `~/.claude/CLAUDE.md`, one of the
-metaphors standing in for a literal statement. "Gets" is the literal verb, and
-the same paragraph in "Let a Dictionary Do the Sorting" already writes "it
-sorts into its own bin," so "gets" keeps the two consistent without repeating.
-
-Nothing gates this word, so it survived the deep review's own checks.
-
-[] Reject
-
-***
-
-**Section:** four places, chapter-wide
-**Pattern:** Global watch list, "Consider rewriting" tier: `is what` (P2)
-
-The chapter now carries four `is what` clefts, three of them added by the deep
-review's manifest. Each is followed by a verb, which is the giveaway the global
-rule names: the cleft only delays the verb.
-
-> which is what [Pattern Matching](...) warned against.
-
-becomes "which [Pattern Matching](...) warned against."
-
-> which is what the next section does.
-
-becomes "which the next section does."
-
-> The `defaultdict(list)` is what creates a bin the first time a material turns up.
-
-becomes "The `defaultdict(list)` creates a bin the first time a material turns
-up."
-
-All three pass the deletion test unchanged. The fourth is in the next block,
-where the fix is not a deletion.
-
-[] Reject
-
-***
-
 **Section:** "The First Cut," the last paragraph of the new `plastic_dropped.py`
 commentary
-**Pattern:** §69 Colon Reveals, §9 Negative Parallelisms, and the fourth
+**Pattern:** §69 Colon Reveals, §9 Negative Parallelisms, and a fourth
 `is what` (P2)
 
 Current:
@@ -116,7 +86,5 @@ Lower confidence than the rest. The current version has a rhythm the rewrite
 loses, and if you want to keep the shape, taking the colon out is enough:
 "'Silently drop trash on the floor' means a number that is wrong and looks
 right, not an exception to debug."
-
-New with today's apply.
 
 [] Reject

@@ -219,7 +219,7 @@ if __name__ == "__main__":
 ```
 
 Notice the flexibility of dictionaries.
-A tuple works as a key just as easily as a single object.
+A tuple works as a key, the same as a single object.
 Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
 The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
@@ -227,8 +227,8 @@ And a missing pair raises `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction,
 as you will see while adding `Lizard` in exercise 1.
 
-Exact matching is the property that surprises people,
-so it is worth watching happen.
+Exact matching is the property that surprises people.
+This listing shows it refusing a subclass.
 `Origami` derives from `Paper` and inherits its `compete()`,
 but the table has no row for it:
 
@@ -276,8 +276,8 @@ then again on its first argument through `singledispatch`,
 which is the pair of dispatches the `eval_*()` family hand-rolls.
 Each class needs its own `@singledispatchmethod`;
 registering on a shared base gives every subclass one dispatcher,
-so the first dispatch never happens,
-and that is the version a reader writes first.
+so the first dispatch never happens.
+That mistake is easy to make and hard to see.
 Like `singledispatch`, it matches on the MRO rather than exactly.
 
 The version most programmers write first is neither of these:
@@ -293,15 +293,15 @@ The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
 belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
 Python makes the table cheap, so it is both shorter and easier to maintain.
+A table cell can hold a function, so the size of the behavior never forces the choice.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
-A table cell can hold a function, so size alone never forces the choice.
 
 ## Operators Dispatch Twice
 
 Python's own operators already perform a two-step dispatch,
-and it answers the `Number + Number` question that opened this chapter.
+which answers the `Number + Number` question that opened this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
 Python turns around and tries `type(b).__radd__(b, a)`,
@@ -390,7 +390,7 @@ makes a checker reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 The sentinel signals the interpreter and never reaches a caller,
 so an annotation that names it describes the wrong thing.
-Widening the return to `Any` describes nothing at all and turns off checking for every caller.
+Widening the return to `Any` describes nothing and turns off checking for every caller.
 
 [Composite and Interpreter](34_Composite_and_Interpreter.md#interpreter)
 builds the expression system this chapter opened with,

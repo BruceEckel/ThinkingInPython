@@ -117,8 +117,9 @@ Whoever holds `checkpoint` stores it and gives it back.
 It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means an honest mistake,
-swapping the snapshot's strokes for different ones, fails loudly.
+though freezing the memento means an honest mistake
+(swapping the snapshot's strokes for different ones)
+fails loudly.
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
 Every call site would still type-check.
@@ -200,8 +201,8 @@ if __name__ == "__main__":
 ```
 
 `Drawing` is the same idea as `Sketch` with the mutation removed,
-under a different name so the two never get confused;
-its extra `title` field is there so a later section can restore one field and keep the other.
+under a different name so a reader never has to ask which one a listing means.
+Its extra `title` field is there so a later section can restore one field and keep the other.
 `draw()` returns a new `Drawing` instead of editing this one,
 using `dataclasses.replace()` to change one field and carry the rest along.
 Since each call returns a `Drawing`, the calls can be chained.
@@ -241,7 +242,7 @@ as `frozen_leaky.py` shows there.
 [Flyweight](35_Flyweight.md) shares immutable values across space,
 and Memento shares them across time.
 
-The classic form has not disappeared, it has narrowed.
+The classic form has not disappeared. It has narrowed.
 Freezing rebuilds the changed field on every edit,
 so a state large enough that copying it per keystroke is unaffordable still needs a mutable originator and an explicit `save()`.
 So does a state you do not own: a widget tree, a database row,
@@ -549,7 +550,7 @@ print(restored == SketchV1(("circle",)))
 #: True
 ```
 
-The three prints are the lesson side by side.
+Each print contradicts the one before it.
 The `repr()` shows a one-field object while the `__dict__` shows two entries,
 and the loaded object is `==` to a `SketchV1` that never had a title,
 so nothing downstream can tell them apart.
@@ -560,7 +561,7 @@ deliberate step that moves the table shape and its data forward together,
 instead of discovering the mismatch when a query runs.
 
 When either limitation rules out `pickle`,
-other libraries answer them separately.
+other libraries answer drift and security separately.
 `msgspec` and `pydantic` both validate on load.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.

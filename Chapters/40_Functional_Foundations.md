@@ -24,13 +24,14 @@ turns failure into an ordinary value,
 and [Assurance](43_Functional_Assurance.md)
 examines what the discipline lets you claim about your code.
 Those four chapters are Part IV.
-Part V then takes the same discipline further:
+Part V then takes the same discipline further.
 [Effect Management](44_Effect_Management.md)
-tracks a function's effects in its type, [Generators](45_Generators.md)
-supplies the mechanism Python already has for describing a computation without running it,
-and [Stateless](46_Stateless.md)
-and [Stateless in Practice](47_Stateless_in_Practice.md)
-build a checked Effect system on top of it.
+tracks a function's effects in its type,
+and [Generators](45_Generators.md) supplies the mechanism Python already has
+for describing a computation without running it.
+[Stateless](46_Stateless.md) and
+[Stateless in Practice](47_Stateless_in_Practice.md)
+then build a checked Effect system on that mechanism.
 
 ## Pure Functions
 
@@ -596,7 +597,7 @@ The standard library provides these building blocks ready-made;
 ## Putting the Pieces Together
 
 Every section above showed one construct on its own.
-They were built to combine:
+Here they work together:
 
 ```python
 # pipeline.py
@@ -638,7 +639,7 @@ or run on another core with no coordination.
 
 None of this is a different language.
 It is ordinary Python in which each piece depends on its arguments alone,
-and that single property is what the chapters ahead keep spending.
+and that single property is what the chapters ahead build on.
 
 ## Exercises
 

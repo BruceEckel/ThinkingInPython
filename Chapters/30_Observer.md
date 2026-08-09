@@ -227,9 +227,9 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 
 The `list()` copy inside `notify()` looks redundant.
 It is not.
-An observer may react to a notification by unsubscribing,
-a one-shot listener detaching itself is the natural example,
-and that mutates `self._observers` in the middle of the loop walking it.
+An observer may react to a notification by unsubscribing.
+A one-shot listener that detaches after its first call is the natural example,
+and the detach mutates `self._observers` in the middle of the loop walking it.
 If you iterate the list directly,
 removing the current observer shifts every later one left,
 so the next observer is silently skipped, and nothing signals the loss.
@@ -258,7 +258,7 @@ print(seen)
 `once` hears the first change and detaches; `always` hears both.
 Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
 
-Two more things about Observer need saying.
+A few more things about Observer need saying.
 An observer that raises an exception stops the loop,
 and every observer after it never hears the change;
 decide whether `notify()` should catch, collect, and continue
@@ -272,7 +272,7 @@ or weak references (`weakref.WeakMethod`), which forget automatically.
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
 Two-way bindings are the usual source: the view edits the model,
 the model notifies the view, the view edits the model.
-Either make the write conditional on the value actually changing,
+Either make the write conditional on the value changing,
 or guard the setter with a re-entry flag.
 
 ## Observer and I/O
@@ -351,7 +351,7 @@ asyncio.run(main())
 
 The `AsyncObserver` alias makes the checker reject a plain function as an observer:
 an observer must return an awaitable,
-which is what calling an `async` function produces.
+which calling an `async` function produces.
 Its type parameter does the same job as the synchronous `Observer[T]`'s.
 
 `notify()` needs no `list()` copy here:

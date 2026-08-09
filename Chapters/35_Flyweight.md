@@ -151,7 +151,7 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the coordinates supplied by the asker.
-The object count is what the listing can show;
+The listing can show the object count;
 exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
@@ -206,7 +206,7 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 It blocks assignment to a field, not mutation inside one,
 so a `Tile` holding a `list` would leak that list to every cell that shares the tile
 (the shallow-freezing trap in [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
-Every field here is immutable, which is what makes the sharing safe.
+Every field here is immutable, which makes the sharing safe.
 
 ## Interning in the Constructor
 
@@ -216,8 +216,8 @@ If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses.
-Here the cache is keyed by the constructor arguments instead of a single fixed key,
-a pool of singletons sometimes called *Multiton*:
+Here the cache is keyed by the constructor arguments instead of a single fixed key.
+A pool of singletons keyed this way is sometimes called *Multiton*:
 
 ```python
 # interned_color.py
@@ -276,7 +276,8 @@ because building a `Color` needs the three color components,
 not just the key that names them.
 
 `_pool` is keyed by the components alone and inherited by every subclass,
-so `Color` here is a leaf: a subclass would collide with it,
+so `Color` cannot be subclassed safely.
+A subclass would collide with it,
 receiving whichever object asked for those components first.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
@@ -446,7 +447,8 @@ exploits the same property, using members as shared, comparable states.
 
 ## Which Pool Should You Use?
 
-Four mechanisms, and the question that decides between them is how much you know about the set of values.
+The chapter showed four mechanisms, and the question that decides between them
+is how much you know about the set of values.
 If you know it as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,

@@ -14,28 +14,41 @@ Much of this chapter is first-edition prose translated from *Thinking in Java*,
 and it reads differently from the newer material around it: longer sentences,
 more "you can see that," more hedging.
 That is a voice question rather than an AI-tell question, and I have kept the
-findings to places where it actually costs the reader something.
+findings to places where it costs the reader something.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation.
 
-Line numbers refer to the chapter as it stands now.
+The clear-cut fixes were applied to the chapter directly (listed below);
+one block remains for your judgment.
 
-***
+## Applied directly
 
-**Line 844 — "a machine that arrived as a diagram wants the table"**
-**Pattern:** watch list, "don't use"; §35 volition on a non-agent
+- Line 85: "which is worth remembering during exercise 3" → "as exercise 3
+  will show" (§53 endorsement frame; the clause rated the information instead
+  of using it).
+- Line 255: "While the use of `match` inside the `next()` methods is
+  perfectly reasonable, managing a large number of these could become
+  difficult." → "The `match` statements inside `next()` work, but a machine
+  with many states means many of them, spread across many classes." (hedges
+  in both directions replaced by the concrete point).
+- Lines 427-432: the module-shadowing sentence now unpacks into three:
+  "Python caches a module in `sys.modules` under its basename, and never
+  looks it up again once it is there. Two files named `state_machine.py` in
+  one program therefore collapse into one: whichever imported first wins,
+  and the second import silently gets the wrong module." (one sentence
+  carried the cache, the resolution rule, the collision, and the
+  consequence).
+- Line 487: dropped "Note that" from "Note that the lookup keys on
+  `type(event)` exactly" (the "exactly" stays; the colon spells out the
+  precise-match claim it makes).
+- Line 828: "states have real behavior" → "states do something" (§34
+  real-adjective inflation; nothing named what unreal behavior would be).
+- Line 844: "a machine that arrived as a diagram wants the table" →
+  "belongs in the table" (watched "wants" on a non-agent, in the chapter's
+  last sentence).
 
-Current (the closing sentence of the new section):
-> A machine small enough to hold in your head goes either way,
-> and a machine that arrived as a diagram wants the table.
-
-This is the chapter's last sentence, so the tic lands where it is most visible.
-
-Proposed:
-> A machine small enough to hold in your head goes either way,
-> and a machine that arrived as a diagram belongs in the table.
-
-[] Reject
+Line numbers below refer to the chapter before these edits;
+the module-shadowing rewrite added one line, shifting later lines down.
 
 ***
 
@@ -67,136 +80,16 @@ if you would rather avoid it, "It is worth its two lines because it names
 
 ***
 
-**Line 255 — "perfectly reasonable"**
-**Pattern:** §24 hedge, and a compliment paid to code the section is about to
-replace
+## Considered and declined
 
-Current:
-> While the use of `match` inside the `next()` methods is perfectly reasonable,
-> managing a large number of these could become difficult.
+**Line 391 — "a bug you want flagged."**
+"Want" is addressed to the reader, so the rule's carve-out covers it, and the
+alternative ("a bug the machine should report") may be a change for its own
+sake. Left alone; recorded so a later sweep does not re-raise it.
 
-"Perfectly reasonable" and "could become difficult" hedge in both directions, so
-the sentence commits to nothing. The point is concrete: the `match` version
-scales badly in the number of states.
+## Noted, no change
 
-Proposed:
-> The `match` statements inside `next()` work,
-> but a machine with many states means many of them, spread across many classes.
-
-[] Reject
-
-***
-
-**Line 391 — "a bug you want flagged"**
-**Pattern:** watch list, "want"
-
-Current:
-> Failing fast suits a table you are still building,
-> where a missing entry is a bug you want flagged,
-
-Addressed to the reader, so "want" is defensible under the rule's carve-out for
-second-person address, but the passive "flagged" leaves the flagger unnamed.
-
-Proposed:
-> Failing fast suits a table you are still building,
-> where a missing entry is a bug the machine should report,
-
-Low confidence: the current sentence is clear, and this may be a change for its
-own sake. Reject if it reads fine to you.
-
-[] Reject
-
-***
-
-**Lines 427-432 (the new module-shadowing note)**
-**Pattern:** density; three mechanisms in one sentence
-
-Current:
-> The file has a different name from the first engine's `state_machine.py` on purpose.
-> A module already in `sys.modules` is never re-resolved from `sys.path`,
-> so two modules sharing a basename in one program means whichever imported first wins,
-> and the second import silently receives the wrong one.
-
-The second sentence carries the cache, the resolution rule, the collision, and
-the consequence. It is correct and it needs two readings.
-
-Proposed:
-> The file has a different name from the first engine's `state_machine.py` on purpose.
-> Python caches a module in `sys.modules` under its basename,
-> and never looks it up again once it is there.
-> Two files named `state_machine.py` in one program therefore collapse into one:
-> whichever imported first wins, and the second import silently gets the wrong module.
-
-[] Reject
-
-***
-
-**Line 828 — "real behavior"**
-**Pattern:** §34 real-adjective inflation
-
-Current (new section):
-> Each-state-decides suits a machine whose states have real behavior and few transitions apiece.
-
-Nothing names what unreal behavior would be. The contrast the section draws two
-paragraphs later is concrete: the table-driven states "shrink to `Enum` members
-with no behavior at all."
-
-Proposed:
-> Each-state-decides suits a machine whose states do something,
-> and have few transitions apiece.
-
-[] Reject
-
-***
-
-**Line 85 — "worth remembering during exercise 3"**
-**Pattern:** §53 endorsement frame
-
-Current:
-> A `State` whose `run()` reads attributes off the machine revives the trap,
-> which is worth remembering during exercise 3.
-
-The clause rates the information instead of using it; the instruction is
-"exercise 3 will hit this."
-
-Proposed:
-> A `State` whose `run()` reads attributes off the machine revives the trap,
-> as exercise 3 will show.
-
-[] Reject
-
-***
-
-**Line 487 — "keys on `type(event)` exactly"**
-**Pattern:** watch list, "exactly"
-
-Current:
-> Note that the lookup keys on `type(event)` exactly: a dictionary probe,
-> not an `isinstance()` walk.
-
-Here "exactly" survives the test: the colon spells out the precise-match claim,
-and the whole paragraph exists because the match is exact rather than
-approximate. The global rule allows it for "a precise numeric or logical
-match," which this is.
-
-"Note that" is the part worth cutting:
-> The lookup keys on `type(event)` exactly: a dictionary probe,
-> not an `isinstance()` walk.
-
-[] Reject
-
-***
-
-**Line 509 — "plain methods"**
-**Pattern:** watch list, "plain"
-
-Current:
-> The conditions and actions are plain methods, stored directly in the table.
-
+**Line 509 — "The conditions and actions are plain methods."**
 "Plain" draws a real contrast here: against the `Condition` and `Transition`
 class hierarchies the Java version needed, named a few paragraphs earlier.
-The rule's carve-out covers it.
-
-No change proposed. Recorded so a mechanical sweep does not cut it.
-
-[] Reject
+The rule's carve-out covers it. Recorded so a mechanical sweep does not cut it.

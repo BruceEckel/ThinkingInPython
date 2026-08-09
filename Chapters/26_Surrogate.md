@@ -581,7 +581,7 @@ The fallback hook has a trap of its own:
 if `__getattr__()`'s body touches a proxy attribute that does not exist,
 a misspelled `self._imp`,
 or any attribute on an instance built without `__init__()`,
-which is what `copy.copy()` and `pickle` do when they rebuild one,
+which `copy.copy()` and `pickle` do when they rebuild one,
 that failed lookup calls `__getattr__()` again,
 and the error surfaces as `RecursionError`,
 not the `AttributeError` that would point at the typo.

@@ -265,10 +265,10 @@ and here it cannot help: exhaustiveness checking needs a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
 so no checker can know the set is complete.
 This is a `match` over an open set,
-which is what [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
+which [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 warned against.
 When the set is open, sorting must not enumerate it,
-which is what the next section does.
+which the next section does.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you are doing dispatch's job by hand.
 
@@ -401,7 +401,7 @@ This is the one place where the two versions disagree:
 so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
 Swapping the `match` for the dictionary is a redesign, not a rename.
 
-The `defaultdict(list)` is what creates a bin the first time a material turns up.
+The `defaultdict(list)` creates a bin the first time a material turns up.
 `Bins` is an alias for a plain `dict`,
 so a checker accepts `bins: Bins = {}` just as happily,
 and that version raises `KeyError` on the first piece of trash.
@@ -482,7 +482,7 @@ and no second dispatch to arrange.
 
 The chapter now holds two kinds of dispatch that disagree about subclasses.
 `bins[type(t)]` keys on the exact class,
-so a `CrushedAluminum` derived from `Aluminum` lands in a bin of its own.
+so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the MRO,
 so that same piece answers with `Aluminum`'s note.
 Neither is wrong for its job,

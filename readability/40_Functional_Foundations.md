@@ -10,7 +10,7 @@ and applied, and none were rejected, so nothing is carried forward.
 The deep review that ran just before this one added a lot of new prose: a
 rewritten Part IV/V preview in the intro, a follow-up under `why_pure.py`, a
 `match`-versus-table paragraph, follow-ups under `closures.py` and
-`composing.py`, and a whole new closing section. Every finding below is in that
+`composing.py`, and a whole new closing section. Every finding was in that
 new prose. The chapter's older prose is unchanged since the last review and
 still reads clean.
 
@@ -22,127 +22,36 @@ uses no closure, lambda, `Placeholder`, or `compose()`), and is now
 "`slope()` returns here as well" read as a function return rather than a
 reappearance, and is now "`slope()` appears again later in the book".
 
----
+Every remaining finding cleared the direct-application bar, so this run leaves
+no blocks: the fixes are listed for the record, and the `git diff` is the
+place to veto any of them.
 
-**"Putting the Pieces Together", closing line: "keep spending" is a metaphor
-standing in for a literal statement.**
+## Applied directly
 
-> It is ordinary Python in which each piece depends on its arguments alone,
-> and that single property is what the chapters ahead keep spending.
+- Closing line of "Putting the Pieces Together": "that single property is
+  what the chapters ahead keep spending" → "build on" (you do not spend a
+  property; "build on" echoes "Purity is the foundation on which everything
+  else in these chapters builds" from the Pure Functions section, so the
+  closing line becomes a callback to the chapter's own thesis instead of a
+  new figure).
+- Lead-in to the same section: "They were built to combine:" → "Here they
+  work together:" (the passive left it unclear who built them, and read
+  literally the claim was about Python's designers rather than the chapter).
+- Intro, Part V preview: split into three sentences, with the tail now
+  "[Stateless] and [Stateless in Practice] then build a checked Effect
+  system on that mechanism." (the old single sentence ran two `and`s and two
+  links in a row, and "on top of it" had two candidate referents; "that
+  mechanism" removes the ambiguity).
 
-You do not spend a property. The image is presumably of purity as a balance the
-later chapters draw down, but nothing earlier in the chapter sets up that
-figure, so the verb arrives with no support and the reader has to reconstruct
-it. This is the "odd word" case from the deep-review prose pass: technically
-placed, but not the word this book would use.
+## Considered and declined
 
-Proposed change:
-
-> and that single property is what the chapters ahead build on.
-
-Alternative, if you want to keep the sense of the later chapters drawing on a
-resource this one establishes:
-
-> and that single property is what every chapter ahead depends on.
-
-I recommend the first. It is the plainest statement of the claim, and "build on"
-already matches "Purity is the foundation on which everything else in these
-chapters builds" from the Pure Functions section, which makes the closing line
-an echo of the chapter's own opening thesis rather than a new figure.
-
-[] Reject
-
----
-
-**"Putting the Pieces Together", lead-in: "They were built to combine" hides
-the actor and overstates the design.**
-
-> Every section above showed one construct on its own.
-> They were built to combine:
-
-The passive leaves it unclear who built them, and read literally the claim is
-about Python's designers rather than about the chapter. §13 allows the passive
-in technical prose when the actor is obvious; here it is not, and the active
-version is both shorter and truer.
-
-Proposed change:
-
-> Every section above showed one construct on its own.
-> Here they work together:
-
-Alternative:
-
-> Every section above showed one construct on its own.
-> They compose:
-
-I recommend the first. "They compose" is tempting because composition is the
-section immediately above, but it would read as a claim about
-`compose()` specifically, which `pipeline.py` does not use.
-
-[] Reject
-
----
-
-**Intro, second paragraph: the Part V preview is one sentence carrying four
-chapters and three clauses.**
-
-> Part V then takes the same discipline further:
-> [Effect Management](44_Effect_Management.md)
-> tracks a function's effects in its type, [Generators](45_Generators.md)
-> supplies the mechanism Python already has for describing a computation without running it,
-> and [Stateless](46_Stateless.md)
-> and [Stateless in Practice](47_Stateless_in_Practice.md)
-> build a checked Effect system on top of it.
-
-The sentence is correct and the information in it is the point of the deep-review
-block that added it. The trouble is the tail: "and [Stateless] and [Stateless in
-Practice] build" puts two `and`s and two links in a row, and "on top of it" has
-two candidate referents (the mechanism generators supply, or generators
-themselves).
-
-Proposed change: split after the Generators clause.
-
-> Part V then takes the same discipline further.
-> [Effect Management](44_Effect_Management.md)
-> tracks a function's effects in its type,
-> and [Generators](45_Generators.md) supplies the mechanism Python already has
-> for describing a computation without running it.
-> [Stateless](46_Stateless.md) and
-> [Stateless in Practice](47_Stateless_in_Practice.md)
-> then build a checked Effect system on that mechanism.
-
-Naming "that mechanism" removes the ambiguous "it", and the colon becomes a
-period so the paragraph does not run to six clauses.
-
-[] Reject
-
----
-
-**"Functions as First-Class Objects": the new `match` paragraph ends on a rule
-the preceding sentences already gave.**
-
-> Choose `match` when the set of cases is fixed and known to the compiler,
-> and a table when the set is meant to grow from outside.
-
-The two sentences above it already draw the distinction concretely ("adding an
-operator means editing the function" against "adding a row, which another module
-can do at import time"). The closing sentence restates that in the abstract, which
-is §70: the gloss that tells the reader what to take from a passage that already
-said it.
-
-It is a close call, because a "choose X when Y" line is a genuinely useful thing
-to be able to scan for, and this book does end several comparisons that way.
-
-Proposed change: cut the sentence.
-
-I lean toward not doing this. The abstraction is short, it is the sentence a
-reader will come back for, and the two sentences above it are examples rather
-than a statement of the rule. Recorded so the next review does not raise it
-again as though it had not been considered.
-
-[] Reject
-
----
+**"Functions as First-Class Objects," the closing rule of the `match`
+paragraph:** "Choose `match` when the set of cases is fixed and known to the
+compiler, and a table when the set is meant to grow from outside." The two
+sentences above it draw the same distinction concretely, so this is §70 by
+shape. Left alone: the abstraction is short, it is the sentence a reader will
+come back for, and the sentences above it are examples rather than a statement
+of the rule. Recorded so the next review does not raise it again.
 
 ## Checked and clean
 

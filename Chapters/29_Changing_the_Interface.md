@@ -53,7 +53,7 @@ if __name__ == "__main__":
 #: WhatIHave.h()
 ```
 
-`WhatIUse` wants an `f()` and `WhatIHave` has none,
+`WhatIUse` calls `f()` and `WhatIHave` has none,
 so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
@@ -110,7 +110,7 @@ what_i_use.op(WhatIHave3().what_i_want())  # Approach 4
 ```
 
 The output is deliberately monotonous.
-Four different structures produce one behavior:
+Counting the object adapter above, four structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
 The approaches differ only in where the adaptation lives.
 When the output cannot tell them apart,
@@ -194,11 +194,11 @@ It is a frozen dataclass with two properties,
 written because the type it was handed did not fit the function it had to call.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
 special methods bypass `__getattr__()`,
-so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders itself,
+so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 as exercise 1 does with `__getitem__()`.
 That chapter's other trap applies here too:
 `__getattr__()` reading `self._adaptee` recurses forever on an instance built without `__init__()`,
-which is what `copy.copy()` and `pickle` do,
+which `copy.copy()` and `pickle` do,
 so an adapter that must be copied or pickled defines `__reduce__()` or guards the lookup.
 
 Testing verifies both halves of that behavior.
@@ -227,7 +227,7 @@ def test_forwarding_targets_the_wrapped_object() -> None:
 
 > If something is ugly, hide it inside an object.
 
-That is what *Façade* accomplishes.
+That is *Façade*.
 If you have a confusing collection of classes and interactions the client programmer doesn't need to see,
 create an interface that presents only what's necessary.
 
@@ -331,7 +331,7 @@ ask what breaks if you remove it:
 
 [Surrogate](26_Surrogate.md#proxy) takes the looser view of the first row:
 a surrogate speaking for its implementation is a Proxy whether or not the interfaces match.
-Under that reading the Adapter is what a Proxy becomes once you stop insisting on the interface,
+Under that reading a Proxy becomes an Adapter once you stop insisting on the interface,
 which is why the `ProxyAdapter` above answers to both names.
 That leaves the "What it adds" column to separate them:
 a Proxy controls access to one implementation,

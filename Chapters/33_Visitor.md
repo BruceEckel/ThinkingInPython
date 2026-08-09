@@ -135,7 +135,7 @@ for flower in (Chrysanthemum(), Gladiolus()):
 #: Gladiolus eaten by Worm
 ```
 
-The first hop lands on `Predator.visit` rather than `Worm.visit`,
+The first hop reaches `Predator.visit` rather than `Worm.visit`,
 because `Worm` inherits the operation from the class that defines it.
 The second hop is the one that earns the listing.
 For `Chrysanthemum` it reaches the override,

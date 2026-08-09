@@ -177,9 +177,8 @@ success by returning an `Ok` object.
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()` is what makes that literal: it is defined on `Ok` and not on `Err`,
-so `func_a(i).unwrap()` fails the checker,
-which reports that `unwrap` is not defined on `Err[str]` in the union.
+`unwrap()` makes that literal: it is defined on `Ok` and not on `Err`,
+so `func_a(i).unwrap()` fails the checker.
 Using the `Result` as if it were a number fails the same way.
 Narrowing to one of the two classes is the only route to the answer.
 The asymmetry is visible at runtime as well as to the checker:
@@ -202,7 +201,6 @@ The `# type: ignore` is the point of the listing rather than an apology for it.
 Without that comment `ty` refuses the line,
 reporting that `unwrap` is not defined on `Err[str]` in the union,
 and a reader who writes this in their own code never reaches the traceback.
-The comment suppresses a real error so the listing can show what the checker was preventing.
 
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
 put the meaning in the type.
@@ -400,8 +398,8 @@ if __name__ == "__main__":
 Each lambda's parameter is the previous step's answer,
 and the answers stay reachable because the nesting keeps them in scope:
 `a` is still visible inside the inner lambda where `b` arrives.
-That scoping is the reason for the nesting,
-and it is what a flat sequence of `bind()` calls could not give you.
+A flat sequence of `bind()` calls could not give you that,
+because each step would see only the value handed to it.
 
 A third input adds a third level:
 
@@ -704,8 +702,7 @@ bad input, a missing file, a value out of range.
 Those are not exceptional.
 They are expected, and the type should say so.
 
-What you can do now that you could not at the start of the chapter:
-write a function whose signature admits it can fail,
+You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.
 The chain either delivers an answer or hands back the first failure,
 and the checker will not let a caller confuse the two.

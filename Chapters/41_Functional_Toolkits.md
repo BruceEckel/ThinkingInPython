@@ -369,7 +369,7 @@ print(list(map(pow, range(5), repeat(2))))
 
 The fixed form is a list you would have written as `["x"] * 3`.
 The infinite form is the one that earns the import:
-it supplies an argument that never changes without materializing anything,
+it supplies an argument that never changes, without building a list to hold it,
 and here it stops when `range(5)` does,
 because `map()` stops at its shortest input.
 
@@ -694,8 +694,7 @@ print(list(combinations_with_replacement("AB", 2)))
 ### Composing the Pieces
 
 Each entry above is one stage.
-This section opened by saying they combine,
-and combining them is where the catalog pays off:
+Stacked, they are a pipeline:
 
 ```python
 # itertools_pipeline.py
@@ -712,10 +711,10 @@ print(list(islice(squares, 3)))
 
 Four stages sit on top of an infinite source,
 and none of them run until `list()` pulls.
-The second `print()` is the one that teaches.
-The source resumes at 16 rather than 13,
+The second `print()` shows the source resuming at 16 rather than 13,
 because `takewhile()` had to pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeded the limit.
-A pull-based pipeline reads one item further than it keeps.
+A pull-based pipeline reads one value further than it keeps,
+and that one value cost three squares.
 
 ## Lazy Evaluation
 
@@ -967,8 +966,7 @@ which makes it the obvious place to put `@cache` from earlier in this chapter.
 Doing so would be wrong.
 `met()` reads `history`, and `history` changes at the end of every round,
 so a cached answer from round 0 would still be reported in round 6 after every count it summed had moved.
-The `cache` entry's rule that caching only works for pure functions is not a formality;
-this is the shape the mistake takes in practice.
+The `cache` entry's rule that caching only works for pure functions is not a formality.
 A function that reads mutable state is not pure, however simple its body looks.
 
 Generality cost something.

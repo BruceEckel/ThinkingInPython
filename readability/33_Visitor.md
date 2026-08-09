@@ -12,8 +12,16 @@ Everything below sits in prose added or moved by the deep review that ran just
 before this pass: the `dispatch_trace.py` lead-in and follow-through, the new
 `The Price of the Empty Base` heading, the registry paragraph, and the reworked
 `*Visitor* still has a place` sentence.
-Two of the five are watch-list violations from the global rules rather than
-readability tells.
+
+The clear-cut fix was applied to the chapter directly (listed below);
+the two blocks that remain are the ones needing your judgment.
+
+## Applied directly
+
+- Paragraph after `dispatch_trace.py`: "The first hop lands on
+  `Predator.visit`" → "The first hop reaches `Predator.visit`" ("lands" is on
+  the global "Don't use" list; the same paragraph already uses "reaches" two
+  sentences later, so the two hops now read parallel).
 
 ***
 
@@ -52,27 +60,6 @@ stop changing shape. Not C.
 ***
 
 **Section:** Paragraph after `dispatch_trace.py`
-**Pattern:** Global watch list, "Don't use" tier (P1)
-
-Current:
-> The first hop lands on `Predator.visit` rather than `Worm.visit`,
-
-Proposed:
-> The first hop reaches `Predator.visit` rather than `Worm.visit`,
-
-Why: `lands` is on the "Don't use" list in `~/.claude/CLAUDE.md`, where it is
-one of the metaphors standing in for a literal statement. The literal verb is
-`reaches`, which the same paragraph already uses two sentences later ("For
-`Chrysanthemum` it reaches the override"), so the replacement costs nothing and
-makes the two hops parallel.
-
-Nothing gates this word, so it got through the deep review's own checks.
-
-[] Reject
-
-***
-
-**Section:** Paragraph after `dispatch_trace.py`
 **Pattern:** §39 Self-Labeling Significance (P1)
 
 Current:
@@ -104,51 +91,24 @@ second hop reaches the override, and for `Gladiolus` it reaches `Flower.eat`,
 ..." That drops a sentence and loses nothing, and it is what I would do if you
 dislike "the interesting one."
 
-[] Reject
-
-***
-
-**Section:** Lead-in above `dispatch_trace.py`
-**Pattern:** §70 Interpretive Metadiscourse (P2)
-
-Current:
-> The output above shows results, not mechanism.
-> Printing the qualified name of the method each hop reaches makes the pair visible:
-
-Proposed:
-> The output above names what happened, not which methods ran.
-> Printing the qualified name of the method each hop reaches makes the pair visible:
-
-Why: "results, not mechanism" is the vocabulary of a review checklist rather
-than of the chapter. Neither word has been used in the chapter before this
-line, so the contrast asks the reader to accept two abstractions in order to
-understand why a listing follows. "what happened" against "which methods ran"
-says the same thing in the chapter's own terms, and it sets up the listing,
-whose whole content is method names.
-
-Lower confidence than the two above. If "mechanism" reads as established
-vocabulary to you (it is a word the book uses elsewhere), this is a decline.
+This stays a block because both fixes are defensible and the first line of the
+replacement is itself a (milder) self-label: the choice between softening the
+sentence and cutting it is yours.
 
 [] Reject
 
 ***
 
-**Section:** Paragraph beginning "*Visitor* still has a place"
-**Pattern:** Global watch list, "Avoid if possible" tier (P2)
+## Considered and declined
 
-Current:
-> or when a framework you do not own already calls that hook.
+**Lead-in above `dispatch_trace.py` — "The output above shows results, not
+mechanism."**
+Flagged as §70 metadiscourse, with "names what happened, not which methods
+ran" as the candidate. Declined by the block's own criterion: "mechanism" is
+established book vocabulary (thirty-plus uses across the chapters, including
+"the open-method mechanism that *Visitor* fakes" later in this chapter).
 
-Proposed:
-> or when a framework you do not own calls that hook for you.
-
-Why: `already` is on the "Avoid if possible" list. Here it is doing real work,
-saying the call site exists whether you want it or not, so this is not a
-delete-on-sight case. "for you" carries the same sense with a word that is not
-on the list, and it points at the reason the hook matters: someone else is
-driving.
-
-Reasonable to decline if you read "already" as the temporal claim (the
-framework was calling it before you arrived) rather than the concessive one.
-
-[] Reject
+**"or when a framework you do not own already calls that hook."**
+"Already" is on the "Avoid if possible" list, but here it earns its place:
+the call site exists whether you want it or not. The global rule keeps a
+watched word that draws a real contrast. Left alone.

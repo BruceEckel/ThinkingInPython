@@ -15,17 +15,16 @@ The body of this book argues that a number of them are unnecessary in Python
 ([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
 The tables still follow each source's own grouping,
 including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy)
-that chapter questions, so each name sits where its source puts it.
-Within each table, GoF's own order is kept for the classic patterns;
-the rest are alphabetical.
+questioned there, so each name sits where its source puts it.
+Rows are alphabetical within each table,
+which for the classic patterns is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the pattern appears only in this catalog.
 
 ## Finding a Pattern by Problem
 
 The tables below are grouped by source.
-This one is grouped by the question you arrive with,
-for when you know the problem but not the name.
+This one is for when you know the problem but not the name.
 
 | If the problem is | Look at |
 |-------------------|---------|
@@ -201,7 +200,7 @@ Several entries above are in the catalog because the literature documents them,
 not because you need to write them.
 Python already supplies the piece they were invented to supply.
 
-| Pattern | What Python supplies instead |
+| Pattern | What Python gives you instead |
 |---------|------------------------------|
 | [Iterator](23_Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |
 | [Singleton](24_Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |

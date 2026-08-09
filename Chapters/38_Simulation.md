@@ -13,7 +13,7 @@ A pack of rats coordinates through a shared blackboard,
 a single robot walks a maze where each object it meets decides what happens,
 and a plate of vibrating sand runs on grains that know nothing at all.
 The first two confirm a design you can predict from the code.
-The third does not, which is simulation's other purpose.
+The third produces a pattern nobody wrote down.
 
 ## Rats & Mazes
 
@@ -236,6 +236,7 @@ which is the shape this problem has: each rat can create more rats.
 A single `asyncio.gather(*self.tasks)` would not do,
 because `gather()` fixes its argument list at the moment it is called,
 and half the rats do not exist yet.
+
 `group` is declared with `field(init=False)` and assigned only while `explore()` runs,
 the same declaration-without-assignment the robot example uses for `Robot.room`.
 The other four fields are internal bookkeeping rather than constructor arguments,
@@ -960,7 +961,7 @@ A ringing plate does not move evenly.
 Standing waves divide it into regions that swing up and down,
 separated by *nodal lines* that stay still.
 The vibration bounces sand out of the moving regions.
-When a grain lands on a still line, nothing kicks it away again.
+When a grain comes to rest on a still line, nothing kicks it away again.
 Within seconds the random motion sweeps the sand into sharp, symmetric curves.
 Bowing a different spot rings the plate in a different mode and draws a different figure.
 
@@ -1114,7 +1115,7 @@ The randomness is not fighting the order but producing it.
 
 ### Testing a Random Process
 
-A test cannot guess where a particular grain lands after a million random kicks.
+A test cannot guess where a particular grain ends up after a million random kicks.
 It pins down the aggregate instead.
 Shaking must collapse agitation, and no kick may throw a grain off the plate.
 Seeding `random.Random` makes any failure reproducible.

@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
 Data classes generate `__eq__()`, so two trees compare by value,
 and the demo confirms that the operators build the tree you would assemble by hand.
-Printing `expr.left` shows the composite claim directly:
+Printing `expr.left` shows the nesting:
 the `Add` at the root holds a `Mul`, which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
@@ -486,12 +486,12 @@ every alternative in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
 (see [Alternatives and Capture](13_Pattern_Matching.md#alternatives-and-capture)).
 `(Num(a), Num(b))` captures two constants for folding.
-The same syntax runs in both directions here:
+The same syntax does two opposite jobs:
 a `Num(0)` on the left of a `case` is a pattern that never calls `Num`,
 while the one on the right of a `return` is the constructor.
 
 Matching the pair of simplified children, rather than the original node,
-is what lets the rules compose.
+lets the rules compose.
 A `case Add(Num(0), other)` at the top of the function would test the tree as the caller wrote it,
 and `(0 * y) + x` would keep its zero:
 the left child is a `Mul` and only becomes a `Num` once something simplifies it.
@@ -570,8 +570,9 @@ The grammar is flat rather than nested,
 so the walk is a loop instead of a recursion,
 but everything else about it is this chapter's shape.
 Iterating a `Template` produces `str | Interpolation`,
-a closed union like `Node` with only two members,
-so an `isinstance` test narrows it as well as a `match` would and the `else` branch is the `str` case.
+a closed union like `Node` with two members,
+so an `isinstance` test narrows it as well as a `match` would,
+and the `else` branch is the `str` case.
 The structure is data, and what it means is whatever a function decides:
 
 ```python

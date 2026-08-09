@@ -82,7 +82,7 @@ It is safe here for two reasons that are easy to lose:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
 A `State` whose `run()` reads attributes off the machine revives the trap,
-which is worth remembering during exercise 3.
+as exercise 3 will show.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
@@ -252,8 +252,8 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 
 ### A Table Inside Each State
 
-While the use of `match` inside the `next()` methods is perfectly reasonable,
-managing a large number of these could become difficult.
+The `match` statements inside `next()` work,
+but a machine with many states means many of them, spread across many classes.
 Another approach is to create tables inside each `State` object defining the various next states based on the input.
 You cannot write a table inside its class,
 because its entries name the other states,
@@ -426,9 +426,10 @@ The names restart here.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
 and `State` is now an `Enum` of names rather than a base class with behavior.
 The file has a different name from the first engine's `state_machine.py` on purpose.
-A module already in `sys.modules` is never re-resolved from `sys.path`,
-so two modules sharing a basename in one program means whichever imported first wins,
-and the second import silently receives the wrong one.
+Python caches a module in `sys.modules` under its basename,
+and never looks it up again once it is there.
+Two files named `state_machine.py` in one program therefore collapse into one:
+whichever imported first wins, and the second import silently gets the wrong module.
 The states in this design do nothing; the table holds all the behavior.
 
 ### The Engine
@@ -484,7 +485,7 @@ The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` the earlier rows fall through to.
-Note that the lookup keys on `type(event)` exactly: a dictionary probe,
+The lookup keys on `type(event)` exactly: a dictionary probe,
 not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
 and it cuts the other way too:
@@ -825,7 +826,7 @@ if __name__ == "__main__":
 
 The two designs answer the same question and put the answer in different places.
 
-Each-state-decides suits a machine whose states have real behavior and few transitions apiece.
+Each-state-decides suits a machine whose states do something and have few transitions apiece.
 The state class owns both halves,
 so reading `Luring` tells you what luring does and where it can go next,
 and adding a state is one class.
@@ -841,7 +842,7 @@ The tell is which reading you would rather do: the transitions for one state,
 gathered in that state, or every transition in the machine,
 gathered in one table.
 A machine small enough to hold in your head goes either way,
-and a machine that arrived as a diagram wants the table.
+and a machine that arrived as a diagram belongs in the table.
 
 ## Exercises
 
