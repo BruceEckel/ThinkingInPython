@@ -1,24 +1,23 @@
 # exercise_6.py
 from dataclasses import dataclass
-from typing import Any
 
 class Operators:
-    def __add__(self: Expr, other: Expr | int) -> Any:
+    def __add__(self: Expr, other: Expr | int) -> Add:
         if isinstance(other, Operators | int):
             return Add(self, wrap(other))
         return NotImplemented
 
-    def __radd__(self: Expr, other: int) -> Any:
+    def __radd__(self: Expr, other: int) -> Add:
         if isinstance(other, int):
             return Add(Num(other), self)
         return NotImplemented
 
-    def __mul__(self: Expr, other: Expr | int) -> Any:
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
         if isinstance(other, Operators | int):
             return Mul(self, wrap(other))
         return NotImplemented
 
-    def __rmul__(self: Expr, other: int) -> Any:
+    def __rmul__(self: Expr, other: int) -> Mul:
         if isinstance(other, int):
             return Mul(Num(other), self)
         return NotImplemented

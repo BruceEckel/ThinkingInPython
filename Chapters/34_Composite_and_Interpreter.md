@@ -277,7 +277,7 @@ and `wrap()` promotes integers to `Num` nodes,
 so `2 * x + 1` is a valid sentence in the little language.
 Python has parsed it, honoring precedence, before the interpreter ever runs.
 
-The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many):
+The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#operators-dispatch-twice):
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods trust their operand completely.
@@ -642,7 +642,7 @@ here it is a way to keep a decision available to whoever is qualified to make it
 6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
     an ill-typed tree the checker rejects in source it can see.
     Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
-    ([Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many) shows the idiom),
+    ([Multiple Dispatching](32_Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
     and confirm `"a" + x` now raises `TypeError`.
 7.  Write a third walker over `Template` in `template_query.py`, `to_html()`,
     that emits the literal pieces unchanged and replaces `<`, `>`,

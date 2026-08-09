@@ -428,25 +428,24 @@ to render tidily; left for a further exercise, the same way exercise
 ```python
 # exercise_6.py
 from dataclasses import dataclass
-from typing import Any
 
 class Operators:
-    def __add__(self: Expr, other: Expr | int) -> Any:
+    def __add__(self: Expr, other: Expr | int) -> Add:
         if isinstance(other, Operators | int):
             return Add(self, wrap(other))
         return NotImplemented
 
-    def __radd__(self: Expr, other: int) -> Any:
+    def __radd__(self: Expr, other: int) -> Add:
         if isinstance(other, int):
             return Add(Num(other), self)
         return NotImplemented
 
-    def __mul__(self: Expr, other: Expr | int) -> Any:
+    def __mul__(self: Expr, other: Expr | int) -> Mul:
         if isinstance(other, Operators | int):
             return Mul(self, wrap(other))
         return NotImplemented
 
-    def __rmul__(self: Expr, other: int) -> Any:
+    def __rmul__(self: Expr, other: int) -> Mul:
         if isinstance(other, int):
             return Mul(Num(other), self)
         return NotImplemented
@@ -497,11 +496,12 @@ mismatched pair. The message comes from `str`, which is right: the
 left operand is what the caller wrote first, and nothing in this
 expression language ever claimed to extend it.
 
-The return annotations widen to `Any` for the reason
-[Multiple Dispatching](../Chapters/32_Multiple_Dispatching.md#one-type-or-many)
-gives: the precise type is `Add | NotImplementedType`, and declaring
-that makes every downstream `.left` a checker error, even though the
-sentinel never reaches a caller.
+Each method declares the type it really returns, `Add` or `Mul`,
+even though it can also return `NotImplemented`. That is the
+convention [Multiple Dispatching](../Chapters/32_Multiple_Dispatching.md#operators-dispatch-twice)
+explains: typeshed gives the sentinel a type inheriting `Any`, so
+returning it satisfies any declared return type, and the declaration
+is what lets `(2 * x + 1).right` resolve for a caller.
 
 Note what this does not fix. `ty` already rejected `"a" + x` in source
 it can see, which is why the line above carries a `# type: ignore` to

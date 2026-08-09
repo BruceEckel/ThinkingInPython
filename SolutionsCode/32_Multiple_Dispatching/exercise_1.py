@@ -9,10 +9,10 @@ class Outcome(StrEnum):
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        return OUTCOME[self.__class__, item.__class__]
+        return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     pass
@@ -23,7 +23,7 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
+OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,

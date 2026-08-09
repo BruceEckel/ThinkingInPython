@@ -7,9 +7,9 @@ from outcome import Outcome
 class Item:
     def compete(self, item: Any) -> Outcome:
         # Use a tuple of types to index into the table:
-        return OUTCOME[self.__class__, item.__class__]
+        return OUTCOME[type(self), type(item)]
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     pass

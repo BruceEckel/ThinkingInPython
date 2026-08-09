@@ -26,15 +26,21 @@ def compete(module: ModuleType, player: str,
     assert isinstance(result, Outcome)
     return result
 
-@pytest.mark.parametrize("module", [table, methods])
-def test_matches_expected(module: ModuleType) -> None:
-    for (player, opponent), result in EXPECTED.items():
-        assert compete(module, player, opponent) == result
+MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
+    (p, o, r) for (p, o), r in EXPECTED.items()
+]
 
-def test_both_versions_agree() -> None:
-    for player, opponent in EXPECTED:
-        assert (compete(methods, player, opponent)
-                == compete(table, player, opponent))
+@pytest.mark.parametrize("module", [table, methods])
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_matches_expected(module: ModuleType, player: str,
+                          opponent: str, expected: Outcome) -> None:
+    assert compete(module, player, opponent) == expected
+
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_both_versions_agree(player: str, opponent: str,
+                             expected: Outcome) -> None:
+    assert (compete(methods, player, opponent)
+            == compete(table, player, opponent))
 
 @pytest.mark.parametrize("outcome, expected", [
     (Outcome.WIN, "win"),

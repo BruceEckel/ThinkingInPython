@@ -21,7 +21,12 @@ finishing each apply before starting the next, so edits cannot collide.
    series. A readability review file created in step 1 has no
    `[[Reviewed]]` marker yet, so it waits for Bruce's pass rather than
    being applied in the same run.
-3. When every file is applied, remind Bruce to run `make verify` once,
+3. Bruce may mark more files `[[Reviewed]]` while the run is in progress,
+   so rescan both directories after finishing step 2. If either holds an
+   unprefixed `[[Reviewed]]` file that has not been applied yet, go back
+   to step 1 and work through it the same way. Repeat until a full rescan
+   of both directories turns up no remaining `[[Reviewed]]` files.
+4. When every file is applied, remind Bruce to run `make verify` once,
    rather than after each file.
 
 If neither directory holds a `[[Reviewed]]` file, say so and stop.

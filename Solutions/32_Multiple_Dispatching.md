@@ -17,10 +17,10 @@ class Outcome(StrEnum):
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        return OUTCOME[self.__class__, item.__class__]
+        return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     pass
@@ -31,7 +31,7 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type, type], Outcome]] = {
+OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -74,7 +74,7 @@ class Outcome(StrEnum):
 
 class Item:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     def compete(self, item: Any) -> Outcome:
@@ -199,12 +199,13 @@ print(len(EXPECTED))
 #: 16
 ```
 
-With this `EXPECTED` in place, `test_table_version_matches_expected()`,
-`test_method_version_matches_expected()`, and
-`test_both_versions_agree()` all pass unchanged: none of the three
-tests hardcodes the number of item types, only iterates over whatever
-`EXPECTED` contains, so growing it from nine entries to sixteen tests
-more combinations with no change to the test functions themselves.
+With this `EXPECTED` in place, `test_matches_expected()`,
+parametrized over both modules, and `test_both_versions_agree()` pass
+unchanged: neither hardcodes the number of item types. Both are
+parametrized from `MATCHUPS`, which is built from whatever `EXPECTED`
+contains, so growing it from nine entries to sixteen produces sixteen
+independently reported cases per module with no change to the test
+functions themselves.
 
 ## 4. Counting how often each item type appears
 
@@ -214,7 +215,7 @@ import random
 from collections import Counter
 from collections.abc import Iterator
 from enum import StrEnum
-from typing import Any
+from typing import Any, Final
 
 class Outcome(StrEnum):
     WIN = "win"
@@ -223,10 +224,10 @@ class Outcome(StrEnum):
 
 class Item:
     def compete(self, item: Any) -> Outcome:
-        return OUTCOME[self.__class__, item.__class__]
+        return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     pass
@@ -237,7 +238,7 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: dict[tuple[type, type], Outcome] = {
+OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -347,3 +348,100 @@ the message names both types. Returning `NotImplemented` rather than
 raising an exception is what makes that message possible: an exception
 raised inside `__rsub__()` would report `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
+
+## 6. Making the table tolerate subclasses
+
+```python
+# exercise_6.py
+from enum import StrEnum
+from typing import Any, Final
+
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Any) -> Outcome:
+        return OUTCOME[type(self), type(item)]
+    def __str__(self) -> str:
+        return type(self).__name__
+
+class Paper(Item):
+    pass
+class Rock(Item):
+    pass
+
+OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+    (Paper, Rock): Outcome.WIN,
+    (Rock, Paper): Outcome.LOSE,
+}
+
+class Origami(Paper):
+    pass
+
+try:
+    Origami().compete(Rock())
+except KeyError as e:
+    print(type(e).__name__, [c.__name__ for c in e.args[0]])
+#: KeyError ['Origami', 'Rock']
+
+class TolerantItem(Item):
+    def compete(self, item: Any) -> Outcome:
+        for left in type(self).__mro__:
+            for right in type(item).__mro__:
+                if not (issubclass(left, Item)
+                        and issubclass(right, Item)):
+                    continue  # object is not an Item
+                if (left, right) in OUTCOME:
+                    return OUTCOME[left, right]
+        raise KeyError((type(self), type(item)))
+
+class TolerantPaper(TolerantItem):
+    pass
+class TolerantRock(TolerantItem):
+    pass
+class TolerantOrigami(TolerantPaper):
+    pass
+
+OUTCOME[TolerantPaper, TolerantRock] = Outcome.WIN
+OUTCOME[TolerantRock, TolerantPaper] = Outcome.LOSE
+
+print(TolerantOrigami().compete(TolerantRock()))
+#: win
+```
+
+The `KeyError` comes from a dictionary probe, which compares keys by
+equality. `(Origami, Rock)` is not `(Paper, Rock)`, because `Origami`
+is not `Paper`, however closely the two are related. Inheritance never
+enters the lookup: a `dict` hashes the key and compares, and neither
+step consults an MRO. That is what "the match is on classes exactly"
+means, and it is the property `singledispatch` does not share.
+
+The tolerant version walks both MROs and takes the first pair that has
+a row, so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one
+step up on the left. What it gives up is exactly the property the
+chapter names first: the match is no longer exact. Three consequences
+follow, and only the first is obvious.
+
+The lookup is no longer one probe. It is a nested loop over two MROs,
+so a miss now costs the product of the two depths instead of a single
+hash. For a table consulted once per duel that is nothing, and for one
+consulted in an inner loop it is not.
+
+Order now decides the answer. `(TolerantPaper, TolerantRock)` and
+`(TolerantOrigami, TolerantItem)` could both match, and which one wins
+depends on the order the loops happen to walk, not on anything a
+reader of the table can see. The exact version has no such question:
+either the pair is in the table or it is not.
+
+The failure that made the exact version safe is gone. A `Lizard` whose
+rows you forgot to write no longer raises `KeyError`; it silently
+inherits its parent's answers and plays as whatever it derives from.
+That is the fail-fast policy the chapter recommends for a table under
+construction, traded away for the convenience of not writing rows.
+
+Which behavior you want depends on whether a subclass is a new
+competitor or a variation on an existing one. `Origami` really is
+paper for the purposes of this game, and a `WetPaper` that loses to
+everything is not.

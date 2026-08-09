@@ -9,7 +9,7 @@ class Outcome(StrEnum):
 
 class Item:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Paper(Item):
     def compete(self, item: Any) -> Outcome:
