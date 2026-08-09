@@ -82,10 +82,13 @@ meeting the topic for the first time, and ask:
   one, consider a stripped-down version near the opening as motivation,
   with the full version staying where it is. A reader who sees what the
   chapter buys them decodes the machinery with a reason to care.
-- **Price the rearrangement.** A proposed move is not free. Check what
-  it breaks: terms the moved section defines, listings that build on its
+- **Price the rearrangement.** A move is not free. Check what it
+  breaks: terms the moved section defines, listings that build on its
   code, cross-references from other chapters that name a section title.
-  Report the cost with the proposal and let the author decide.
+  Paying that price is part of making the move, so fix everything the
+  move touches in the same change; a move whose price you cannot settle
+  (because only the author knows what a dependent passage should now
+  say) is one of the few findings that stays a block.
 - **Exercises earn their place.** Each exercise should be answerable
   from this chapter, and the set should cover the chapter's main claims
   instead of clustering on whichever section was most fun to write.
@@ -162,26 +165,34 @@ line of `git diff`; a needless block costs him the attention he owes the
 real questions.
 
 Confidence here means you know the fix is right, not that the fix is
-small. A missing warning about a construct you have verified is a
-confident addition; the same warning is not confident when the chapter's
-silence might be deliberate. Some findings stay proposals whatever your
-confidence, because the answer is Bruce's to give:
+small, and no category of finding is off-limits to implementing.
+Listing placement, section cuts, voice and pacing changes,
+claim-strength adjustments, taste choices between defensible fixes, and
+changes that touch a heading or drag another file along are all yours to
+make when you can decide them. Decide them the way the author would:
+pick the fix you would defend, make it, and record it in the
+applied-directly list with the alternative noted in a few words when one
+was close. The structural ones carry mechanical follow-through, and
+doing the change means doing all of it: a moved or cut section takes its
+cross-references and defined terms with it (the "price the
+rearrangement" check is work you do, not a cost you report); a changed
+heading updates every link to its anchor, gated by `heading_links.py`;
+renumbered exercises renumber `Solutions/NN_name.md` in the same change,
+gated by `check_solutions.py`; and any of these ends with the full
+verify loop.
 
-- Deciding where a new listing goes, cutting a section, and anything
-  that changes the chapter's voice or pacing: rejecting candidates that
-  would bloat the chapter is part of the author's role.
-- A change to what the chapter claims or how strongly it claims it,
-  beyond fixing a verified factual error (verified errors are confident
-  fixes; soften-or-sharpen judgment calls are not).
-- A choice between two or more defensible fixes where the difference is
-  taste. When one finding admits several reasonable fixes, recommend one
-  and report the alternatives rather than picking silently.
-- A change that touches a heading or anchor, renumbers exercises, or
-  otherwise drags another file (`Solutions/`, cross-references) along
-  with it.
-- A finding that is real but that you think should not be acted on.
-  That goes under a "Considered and declined" heading, not into a live
-  block, so it is recorded without costing a decision.
+A block is reserved for the two cases you cannot close yourself:
+
+- The answer needs something only Bruce has: whether a silence is
+  deliberate, what he intends a section to claim, a fact or number the
+  chapter does not contain.
+- You tried to decide and genuinely could not: the defensible fixes
+  change the chapter's meaning in different directions, and nothing in
+  the book settles which one it wants.
+
+A finding that is real but that you judge should not be acted on goes
+under a "Considered and declined" heading, not into a live block, so it
+is recorded without costing a decision.
 
 Any new listing follows the full verify loop in `CLAUDE.md` (fenced
 block with `# slug.py` first line, deterministic markers or wide-margin

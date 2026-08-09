@@ -1675,38 +1675,46 @@ Apply those to the chapter yourself during the review run and record them in a
 list at the top of the review file, so the change stays visible and a later
 review does not re-propose it.
 
-Apply directly, without asking, when all of these hold:
+Apply directly everything you can decide, and no category of fix is
+off-limits.
+That includes the settled mechanical rules
+(the global watch list in `~/.claude/CLAUDE.md`, the banned-phrase gate,
+a §7 Tier 1A word, a curly quote, a spaced ` -- `, an empty adverb,
+a cleft that only delays its verb, a stranded preposition,
+an imperative-plus-consequence sentence),
+and it also includes the judgment calls:
+splitting or merging paragraphs, reordering, cutting a sentence,
+adjusting how strongly a claim is stated,
+and choosing between two defensible wordings.
+Decide them the way the author would: pick the fix you would defend,
+make it, and note the close alternative in the applied-directly line
+when there was one.
+A changed heading updates every link to its anchor
+(`heading_links.py` gates this), and a fix whose claim depends on what a
+listing prints gets verified against the listing, not guessed.
 
-- The fix is local: one sentence, or a phrase inside one.
-- The meaning survives unchanged.
-  No claim is added, dropped, softened, or sharpened.
-- One fix is clearly right.
-  Choosing between two defensible wordings is a decision, not a cleanup.
-- The rule is already settled: the global watch list in `~/.claude/CLAUDE.md`,
-  the banned-phrase gate, a §7 Tier 1A word, a curly quote, a spaced ` -- `,
-  an empty adverb, a cleft that only delays its verb, a stranded preposition,
-  an imperative-plus-consequence sentence.
-- The sentence is not doing something on purpose.
-  First-edition voice, a deliberate aside, an em dash, a word repeated for
-  rhythm: leave these alone even when a rule technically fires.
+Two standing limits.
+Never touch a fenced ```python block or a `#:` marker: this skill edits
+prose, so a finding whose fix needs a code or output change is a block
+or a decline, never a direct edit.
+And a sentence doing something on purpose, first-edition voice,
+a deliberate aside, an em dash, a word repeated for rhythm,
+is left alone even when a rule technically fires;
+if it deserves a record, it goes under "Considered and declined."
 
-Escalate to a block when any of these hold:
+A block is reserved for the two cases you cannot close yourself:
 
-- The change alters what the chapter claims, or how strongly it claims it.
-- It moves structure: splitting or merging paragraphs, reordering, cutting a
-  sentence, changing the pacing of a section that carries the argument.
-- Two or more fixes are defensible and the choice is taste.
-- The fix needs a fact you do not have, or depends on what a listing prints.
-- It touches a heading, an anchor, a cross-reference, a code block, or an
-  example's output.
-- The finding is real but you think the change should not be made.
-  That goes under "Considered and declined," not into a live block.
+- The answer needs something only Bruce has: whether a phrasing is
+  deliberate voice, what he intends a passage to claim, a fact the
+  chapter does not contain.
+- You tried to decide and genuinely could not: the defensible fixes
+  change the meaning in different directions, and nothing in the book
+  settles which one it wants.
 
-The test when a finding sits on the line: write the block's case in your head.
-If it takes one sentence and no reasonable reader answers "well, it depends,"
-it did not need to be a block.
+A finding that is real but that you judge should not be acted on goes
+under "Considered and declined," not into a live block.
 Err toward applying rather than asking.
-A wrong small edit costs Bruce one line of `git diff`;
+A wrong edit costs Bruce a `git diff` revert;
 a needless block costs him the attention he owes the real questions.
 
 **The applied-directly list.**
