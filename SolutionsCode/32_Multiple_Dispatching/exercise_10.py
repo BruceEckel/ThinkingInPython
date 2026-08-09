@@ -1,4 +1,4 @@
-# exercise_4.py
+# exercise_10.py
 import random
 from enum import StrEnum
 

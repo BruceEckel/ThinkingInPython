@@ -153,6 +153,12 @@ and that you will experience some of the same satisfaction that I've had while w
 I think most programmers will regularly use AI, if they don't already.
 I have found that the knowledge in this book has helped me guide AIs toward better solutions.
 
+Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
+However, Python seems to be the most popular language (at the time of this writing)
+for AI-generated code.
+Some small percentage of people might still be interested in analyzing what the AIs are generating.
+This book might have some value yet.
+
 ## The Examples
 
 The book targets Python 3.15 and later, uses type hints,

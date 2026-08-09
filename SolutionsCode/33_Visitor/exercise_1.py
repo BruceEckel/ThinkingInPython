@@ -1,38 +1,33 @@
 # exercise_1.py
-import random
-from typing import Any
+from functools import singledispatch
 
-class Inhabitant:
-    def interact(self, other: Any) -> str:
-        raise NotImplementedError
-
+class Flower:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
-class Dwarf(Inhabitant):
-    def interact(self, other: Any) -> str:
-        return f"{self} (engineer) negotiates with {other}"
+class Gladiolus(Flower):
+    pass
+class Ranunculus(Flower):
+    pass
+class Chrysanthemum(Flower):
+    pass
 
-class Elf(Inhabitant):
-    def interact(self, other: Any) -> str:
-        return f"{self} (marketer) pitches to {other}"
+@singledispatch
+def pollinate(flower: Flower, agent: str) -> str:
+    return f"{flower} pollinated by {agent}"
 
-class Troll(Inhabitant):
-    def interact(self, other: Any) -> str:
-        return f"{self} (manager) directs {other}"
+@singledispatch
+def eat(flower: Flower) -> str:
+    return f"{flower} eaten by Worm"
 
-class Project:
-    def __init__(self, seed: int = 0) -> None:
-        self.rng = random.Random(seed)
+@eat.register
+def _(flower: Chrysanthemum) -> str:
+    return f"{flower} is toxic to Worm"
 
-    def gather(self, n: int) -> list[Inhabitant]:
-        kinds = [Dwarf, Elf, Troll]
-        return [self.rng.choice(kinds)() for _ in range(n)]
-
-project = Project(seed=1)
-team = project.gather(4)
-for a, b in zip(team, team[1:]):
-    print(a.interact(b))
-#: Dwarf (engineer) negotiates with Troll
-#: Troll (manager) directs Dwarf
-#: Dwarf (engineer) negotiates with Elf
+for flower in (Ranunculus(), Chrysanthemum()):
+    print(pollinate(flower, "Bee"))
+    print(eat(flower))
+#: Ranunculus pollinated by Bee
+#: Ranunculus eaten by Worm
+#: Chrysanthemum pollinated by Bee
+#: Chrysanthemum is toxic to Worm

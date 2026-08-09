@@ -54,25 +54,23 @@ class Visitor:
 
 class Bug(Visitor):
     pass
+
+# The middle layer names the operation:
 class Pollinator(Bug):
-    pass
+    def visit(self, flower: Flower) -> None:
+        flower.pollinate(self)
+
 class Predator(Bug):
-    pass
-
-# Bee pollinates:
-class Bee(Pollinator):
-    def visit(self, flower: Flower) -> None:
-        flower.pollinate(self)
-
-# Fly also pollinates:
-class Fly(Pollinator):
-    def visit(self, flower: Flower) -> None:
-        flower.pollinate(self)
-
-# Worm eats instead:
-class Worm(Predator):
     def visit(self, flower: Flower) -> None:
         flower.eat(self)
+
+# Concrete visitors, grouped by the operation they perform:
+class Bee(Pollinator):
+    pass
+class Fly(Pollinator):
+    pass
+class Worm(Predator):
+    pass
 
 def flower_gen(n: int) -> Iterator[Flower]:
     flowers = Flower.__subclasses__()
@@ -119,17 +117,34 @@ the worm's type chose `eat()`, and the flower's type chose which `eat()` runs.
 If you delete the override, the program still runs;
 the flower-side dispatch goes back to having nothing to say.
 
-Notice where the behavior lives.
-The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
-so the only addition to the primary hierarchy is `accept()`.
-Python has no method overloading,
-since a second `def visit()` replaces the first,
-so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
-and the visitors choose between them.
-Whichever way you write it,
-the primary hierarchy ends up carrying code it was supposed to be spared.
+The output above shows results, not mechanism.
+Printing the qualified name of the method each hop reaches makes the pair visible:
 
-One annotation in the listing looks like a shortcut and is not.
+```python
+# dispatch_trace.py
+from flower_visitors import Chrysanthemum, Gladiolus, Worm
+
+worm = Worm()
+for flower in (Chrysanthemum(), Gladiolus()):
+    print(type(worm).visit.__qualname__,
+          "then", type(flower).eat.__qualname__)
+    flower.accept(worm)
+#: Predator.visit then Chrysanthemum.eat
+#: Chrysanthemum is toxic to Worm
+#: Predator.visit then Flower.eat
+#: Gladiolus eaten by Worm
+```
+
+The first hop lands on `Predator.visit` rather than `Worm.visit`,
+because `Worm` inherits the operation from the class that defines it.
+The second hop is the one that earns the listing.
+For `Chrysanthemum` it reaches the override,
+and for `Gladiolus` it reaches `Flower.eat`,
+which is the visible form of the flower-side dispatch having nothing to say.
+
+## The Price of the Empty Base
+
+One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any`,
 because the `Visitor` base class declares no `visit()` method,
 so declaring that parameter as `Visitor` instead of `Any` fails the type checker.
@@ -143,7 +158,7 @@ A `Protocol` removes the `Any` for two new lines and an import:
         def accept(self, visitor: Visits) -> None:
             visitor.visit(self)
 
-The listing keeps `Any` because the empty `Visitor` base is what the classic pattern looks like,
+The chapter keeps `Any` because the empty `Visitor` base is what the classic pattern looks like,
 and seeing the price is part of the point.
 The price is that nothing checks the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
@@ -151,6 +166,16 @@ That is the same gap the `Any` in `paper_scissors_rock.py` left in [Multiple Dis
 This `Any` is chosen,
 unlike the one in [Data Transfer Objects](22_Data_Transfer_Objects.md),
 where a bag of attributes named at runtime leaves no precise type to write.
+
+Notice where the behavior lives.
+The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
+so the only addition to the primary hierarchy is `accept()`.
+Python has no method overloading,
+since a second `def visit()` replaces the first,
+so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
+and the visitors choose between them.
+Whichever way you write it,
+the primary hierarchy ends up carrying code it was supposed to be spared.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -206,9 +231,13 @@ if __name__ == "__main__":
         Gladiolus(), Ranunculus(), Chrysanthemum()]
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
+    print(sorted(t.__name__ for t in nectar.registry))
+    print(nectar.dispatch(Ranunculus) is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
 #: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
+#: ['Chrysanthemum', 'Gladiolus', 'object']
+#: True
 ```
 
 Each registered implementation above is named `_`.
@@ -218,14 +247,23 @@ so the name carries no meaning.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
 so nothing is lost.
+A union annotation, `flower: Gladiolus | Ranunculus`,
+registers one implementation for several types at once.
 
 Nothing touches `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
 Dispatch follows inheritance:
 an unregistered subclass uses its nearest registered ancestor,
-falling back to the `Flower` default only when no ancestor is registered
+falling back to the base implementation only when no ancestor is registered
 (the tests below pin this down).
+
+The listing's last two output lines print the dispatch table the decorator built.
+`nectar.registry` maps each registered type to its implementation,
+and `nectar.dispatch(cls)` reports which implementation `cls` resolves to.
+`Ranunculus` was never registered,
+so it resolves to the same implementation `Flower` does,
+the one filed under `object`.
 
 The default is also the risk.
 A new `Flower` subclass that nobody registers gets the default answer with no exception and no static complaint,
@@ -243,21 +281,12 @@ A `match` over a closed union of types, with `assert_never()` in the `case _`,
 goes further and catches it before the program runs
 ([Composite and Interpreter](34_Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
-A union annotation, `flower: Gladiolus | Ranunculus`,
-registers one implementation for several types at once.
 Adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
 When the operation should read like a method,
 use [`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
 instead, which dispatches on the first argument after `self`.
-
-*Visitor* still has a place:
-when the elements must drive the traversal themselves from inside `accept()`,
-or when a framework you do not own already calls that hook.
-But in Python that is rare.
-As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example,
-`singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 Because each operation is a plain function, testing is direct.
 Call it with each flower type and assert the result.
@@ -314,6 +343,13 @@ def test_dispatch_follows_inheritance() -> None:
     assert nectar(Hybrid()) == "Hybrid: abundant nectar"
 ```
 
+*Visitor* still has a place:
+when the elements must drive the traversal themselves from inside `accept()`,
+or when a framework you do not own already calls that hook.
+But in Python that is rare.
+As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example,
+`singledispatch` is the open-method mechanism that *Visitor* fakes.
+
 ## One Dispatch Is Enough
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
@@ -340,30 +376,15 @@ use the table keyed by a tuple of types from [Multiple Dispatching](32_Multiple_
 
 ## Exercises
 
-1.  Create a business-modeling environment with three types of `Inhabitant`:
-    `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
-    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using *Multiple Dispatching*.
-2.  Modify the above example to make the interactions more detailed.
-    Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
-    a `Dwarf` uses `Jargon` or `Play`,
-    an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
-    and a `Troll` uses `Edict` and `Schedule`.
-    You must decide which weapons "win" and "lose" in each interaction
-    (as in `paper_scissors_rock.py`).
-    Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
-    Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
-    `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
-    These are the "winners."
-3.  [Multiple Dispatching](32_Multiple_Dispatching.md)
-    replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
-    When is the table lookup more appropriate than hard-coding the dynamic dispatch?
-    Can you keep the syntactic simplicity of the dispatch while using a table underneath?
-4.  Modify Exercise 2 to use the table lookup technique of `paper_scissors_rock_table.py`.
-5.  Rewrite `flower_visitors.py` with `singledispatch`:
+1.  Rewrite `flower_visitors.py` with `singledispatch`:
     make `pollinate()` and `eat()` functions defined outside the `Flower` hierarchy,
     with `Chrysanthemum`'s toxicity a registered implementation of `eat()`.
     Which classes and which methods disappear?
-6.  Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
+2.  Add a `Rose` to `visitor_singledispatch.py` with abundant nectar and a strong fragrance,
     then add a third operation, `thorns()`, over all four flowers.
     Count the lines each change costs,
     and say which of the two `@singledispatch` makes cheaper.
+3.  Rewrite `flower_visitors.py` with the `Visits` protocol in place of `Any`,
+    so `accept()` declares what it needs.
+    Then add a `Beetle(Bug)` with no `visit()` method and pass it to `accept()`.
+    Which version reports the mistake, and when?

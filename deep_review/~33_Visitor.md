@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -349,7 +350,7 @@ asserted in prose and pinned only by a pytest assertion. Three lines appended to
 Verified output. I am reporting rather than applying it because it lengthens the
 listing's demo for a point the tests already make, and because the `object` in
 that first line needs the explanation I added to the prose anyway. Take it only
-if you want the mechanism visible in the listing itself.
+if you want the mechanism visible in the listing itself.[[yes]]
 
 ---
 

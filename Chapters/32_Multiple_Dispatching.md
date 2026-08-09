@@ -509,3 +509,21 @@ Everywhere else you choose between paying for the second dispatch in methods or 
     Explain the `KeyError` in terms of how the lookup matches.
     Then make the table tolerate subclasses by walking `type(item).__mro__` for the first class that has a row,
     and say which of the two properties named after the table listing you have just given up.
+7.  Create a business-modeling environment with three types of `Inhabitant`:
+    `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
+    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using *Multiple Dispatching*.
+8.  Modify the above example to make the interactions more detailed.
+    Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
+    a `Dwarf` uses `Jargon` or `Play`,
+    an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
+    and a `Troll` uses `Edict` and `Schedule`.
+    You must decide which weapons "win" and "lose" in each interaction
+    (as in `paper_scissors_rock.py`).
+    Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
+    Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
+    `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
+    These are the "winners."
+9.  This chapter replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
+    When is the table lookup more appropriate than hard-coding the dynamic dispatch?
+    Can you keep the syntactic simplicity of the dispatch while using a table underneath?
+10. Modify Exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.

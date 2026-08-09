@@ -31,25 +31,23 @@ class Visitor:
 
 class Bug(Visitor):
     pass
+
+# The middle layer names the operation:
 class Pollinator(Bug):
-    pass
+    def visit(self, flower: Flower) -> None:
+        flower.pollinate(self)
+
 class Predator(Bug):
-    pass
-
-# Bee pollinates:
-class Bee(Pollinator):
-    def visit(self, flower: Flower) -> None:
-        flower.pollinate(self)
-
-# Fly also pollinates:
-class Fly(Pollinator):
-    def visit(self, flower: Flower) -> None:
-        flower.pollinate(self)
-
-# Worm eats instead:
-class Worm(Predator):
     def visit(self, flower: Flower) -> None:
         flower.eat(self)
+
+# Concrete visitors, grouped by the operation they perform:
+class Bee(Pollinator):
+    pass
+class Fly(Pollinator):
+    pass
+class Worm(Predator):
+    pass
 
 def flower_gen(n: int) -> Iterator[Flower]:
     flowers = Flower.__subclasses__()

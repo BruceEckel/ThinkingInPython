@@ -1,6 +1,6 @@
-Add to /do-reviews command:
-At the end of /do-reviews, recheck both directories for files that have added [[Reviewed]] tags.
-Do not complete /do-reviews until there are no more [[Reviewed]] tags.
+Change "NastyWeapon" to "Weapon"
+
+Add to both skills: put the "Reject []" at the end of each item rather than the beginning.
 
 New book cover & favicon
 

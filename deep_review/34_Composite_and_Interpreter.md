@@ -51,7 +51,7 @@ confusion, and it costs one clause to defuse:
 > the one on the right of `return` is the constructor.
 
 I did not apply it because the chapter's silence here may be deliberate — 13
-is a prerequisite and the book generally does not re-teach prerequisites.
+is a prerequisite and the book generally does not re-teach prerequisites.[[do it]]
 
 ---
 
