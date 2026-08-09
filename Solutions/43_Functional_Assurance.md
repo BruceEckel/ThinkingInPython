@@ -4,7 +4,7 @@
 
 ```python
 import os
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 def count_primes(limit: int) -> tuple[int, int]:
     count = 0
@@ -16,12 +16,9 @@ def count_primes(limit: int) -> tuple[int, int]:
 def main() -> None:
     limits = [10_000, 20_000, 30_000, 40_000]
     with ProcessPoolExecutor() as pool:
-        by_process = list(pool.map(count_primes, limits))
-    with ThreadPoolExecutor() as pool:
-        by_thread = list(pool.map(count_primes, limits))
-    print([count for count, _ in by_process])
-    print("process pool:", len({pid for _, pid in by_process}), "IDs")
-    print("thread pool:", len({pid for _, pid in by_thread}), "IDs")
+        results = list(pool.map(count_primes, limits))
+    print([count for count, _ in results])
+    print("distinct process IDs:", len({pid for _, pid in results}))
     print("cores:", os.process_cpu_count())
 
 if __name__ == "__main__":
@@ -50,20 +47,44 @@ one. The pool never needed thirty-two processes, so it never used
 them. A distinct-ID count is evidence that parallelism is available,
 not a measure of how much was used.
 
-The thread pool reports exactly `1`. Threads share their process, so
-`os.getpid()` returns the same value in every one of them, and the
-technique that revealed process parallelism is blind to thread
-parallelism. `threading.get_ident()` is the equivalent for threads.
-That the two pools present the identical `map()` interface while
-differing this fundamentally underneath is the substitutable-backend
-point from
-[Concurrency](../Chapters/19_Concurrency.md#one-task-many-backends).
-
 This is also why the number does not belong in a `#:` marker in the
 book: it depends on the core count and on scheduling, so it is
 reproducible on your machine and nowhere else.
 
-## 2. Three property shapes for `sorted()`
+## 2. Which thread ran each call
+
+```python
+import os
+from concurrent.futures import ThreadPoolExecutor
+
+def count_primes(limit: int) -> tuple[int, int]:
+    count = 0
+    for n in range(2, limit):
+        if all(n % d for d in range(2, int(n ** 0.5) + 1)):
+            count += 1
+    return count, os.getpid()
+
+def main() -> None:
+    limits = [10_000, 20_000, 30_000, 40_000]
+    with ThreadPoolExecutor() as pool:
+        results = list(pool.map(count_primes, limits))
+    print([count for count, _ in results])
+    print("distinct process IDs:", len({pid for _, pid in results}))
+
+if __name__ == "__main__":
+    main()
+```
+
+The thread pool reports exactly `1`. Threads share their process, so
+`os.getpid()` returns the same value in every one of them, and the
+technique that revealed process parallelism in the previous exercise
+is blind to thread parallelism. `threading.get_ident()` is the
+equivalent for threads. That the two pools present the identical
+`map()` interface while differing this fundamentally underneath is
+the substitutable-backend point from
+[Concurrency](../Chapters/19_Concurrency.md#one-task-many-backends).
+
+## 3. Three property shapes for `sorted()`
 
 ```python
 # test_sorted_laws.py
@@ -121,7 +142,7 @@ makes an oracle worth having and makes
 keeps the quadratic oracle cheap, since the bugs it would catch do not
 need long inputs to show up.
 
-## 3. A law that is false
+## 4. A law that is false
 
 ```python
 from hypothesis import given, strategies
@@ -187,7 +208,7 @@ A hand-written loop over `"abcde"` would never have found this. The
 generated strings reach the parts of the repertoire nobody thinks to
 type, which is the argument for property testing in one example.
 
-## 4. A property test for `group_rounds()`
+## 5. A property test for `group_rounds()`
 
 ```python
 # test_group_rounds.py
@@ -306,7 +327,7 @@ that the shrunk case behaves like a regression test you never had to
 write: it keeps failing until the bug is fixed, then rejoins the pool
 of examples and is tried again on every later run.
 
-## 5. Two impure functions with no `global` in sight
+## 6. Two impure functions with no `global` in sight
 
 ```python
 # opaque_inputs.py
@@ -365,7 +386,7 @@ line at the edge of the program instead of a dependency buried in the
 middle of it. [Testing](../Chapters/11_Testing.md#random-numbers)
 makes the same move for a random source.
 
-## 6. `match` against `isinstance()` on the same function
+## 7. `match` against `isinstance()` on the same function
 
 ```python
 # describe_isinstance.py

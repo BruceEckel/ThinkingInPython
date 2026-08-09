@@ -294,13 +294,14 @@ They are the reason a program exists.
 The goal of Effect Management is not to eliminate Effects but to isolate them so the rest of the program can stay pure
 (this is sometimes called "pushing the Effects to the edges").
 
-## Two Phases of Effect Analysis
-
-The initial and most obvious reason to track Effects is parallelism.
+So why track them at all?
+The initial and most obvious reason is parallelism.
 A function with no Effects touches nothing shared and runs in parallel.
 The same guarantee makes testing trivial.
 A pure function needs no setup, no mocks, and no teardown.
 Call it with arguments and check the result.
+
+## Two Phases of Effect Analysis
 
 Think of Effect analysis as a series of phases.
 The first phase separates pure from impure, and produces parallelism, caching,

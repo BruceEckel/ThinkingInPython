@@ -18,8 +18,8 @@ written and says why not.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly: applied (listed below) or declined
+with the reason recorded. No blocks remain.
 
 ## Applied directly
 
@@ -47,31 +47,15 @@ one block remains for your judgment.
 - Line 393: "describes nothing at all" → "describes nothing" (watched "at
   all"; the second half of the sentence already states the consequence).
 
-Line numbers below refer to the chapter before these edits
+- Line 11: "The answer starts with something you probably never consider."
+  → "The answer starts with a fact about the language that rarely comes
+  up." (§68 faux-insight setup told the reader they had not thought about
+  it; the fix keeps the bridge from the opening question rather than
+  cutting the line, since the sentence carries over from *Thinking in
+  Java* and the bridge is doing work).
+
+Line numbers above refer to the chapter before these edits
 (none of the edits changed line counts).
-
-***
-
-**Line 11 — "something you probably never consider"**
-**Pattern:** §68 faux-insight setup
-
-Current:
-> The answer starts with something you probably never consider.
-> Python dispatches on one type at a time.
-
-The sentence tells the reader they have not thought about this, then states an
-ordinary fact about the language. Cutting it costs nothing.
-
-Proposed:
-> The answer starts with a fact about the language that rarely comes up.
-> Python dispatches on one type at a time.
-
-Or cut the line and open on "Python dispatches on one type at a time."
-
-Low confidence: this sentence carries over from *Thinking in Java* and the
-voice call is yours. The second option is the stronger edit if you want one.
-
-[] Reject
 
 ***
 

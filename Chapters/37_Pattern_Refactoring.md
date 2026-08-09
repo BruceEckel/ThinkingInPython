@@ -333,8 +333,8 @@ The parser built two `Plastic` objects, the sorter matched neither,
 and the report totals the trash it happened to recognize.
 Two of four pieces reached a bin,
 and the sixty pounds of plastic left no trace in any total the plant will act on.
-That is what "silently drop trash on the floor" means:
-not an exception to debug, but a number that is wrong and looks right.
+"Silently drop trash on the floor" means a number that is wrong and looks right,
+not an exception to debug.
 
 ## Let a Dictionary Do the Sorting
 
@@ -503,7 +503,9 @@ The deeper skill is spotting the *vector of change*
 ([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
 in a problem (here, new types versus new operations)
 and choosing the lightest construct that isolates it.
-Here that meant two lines of Python.
+Here each vector cost one line at the point of use:
+`bins[type(t)]` for a new material,
+one `@recycling_note.register` for a new operation.
 A dictionary keyed by `type(t)` absorbs new materials,
 and a `@singledispatch` function absorbs new operations.
 Neither is a pattern in the *GoF* sense,

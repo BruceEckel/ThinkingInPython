@@ -14,8 +14,8 @@ listing, a `safe_demo.py` split out of `utils/safe.py`, three exercises, a new
 It also moved `test_result.py` into "Composing With bind" and shrank the
 narrowing paragraph after `noted_result.py` from nine lines to three.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -39,42 +39,15 @@ one block remains for your judgment.
   a function whose signature admits it can fail, and chain three of them
   without a single `try` in the calling code." (§70: the old opener was the
   review checklist's question quoted into the chapter).
-
-***
-
-**`@final` explanation: "narrow a `Result` to exactly one of the two" states the
-effect without the cause, three sections before the cause matters.**
-
-> `@final` states that neither will be subclassed,
-> which lets the checker narrow a `Result` to exactly one of the two.
-
-A reader meeting this at the class definition has no reason to care yet, and no
-way to see why subclassing would prevent narrowing. The mechanism (a value could
-otherwise inherit from both classes, so a positive `isinstance()` cannot rule
-either out) was in the chapter until this pass, in the paragraph after
-`noted_result.py`, and the shrink removed it.
-
-Proposed change: keep this sentence as the short forward reference it is, and
-restore one clause of the mechanism where it now pays off, in the narrowing
-paragraph:
-
-> The `Err` branch reads `error.__notes__`,
-> which checks because `@final` on the two classes rules out a value that
-> inherits from both, leaving the checker one class to narrow to,
-> whether you use `match` or `isinstance()`.
-
-This costs one line and puts the reason where the reader is looking at the
-consequence.
-
-Alternative: leave both as they are. The chapter is correct either way, and the
-deep review shrank this paragraph deliberately. I recommend the change, because
-"lets the checker narrow" is currently asserted twice and explained nowhere.
-This stays a block because it reverses part of a shrink the deep review made
-deliberately.
-
-[] Reject
-
-***
+- Narrowing paragraph after `noted_result.py`: "which checks because
+  `@final` on the two classes lets the checker narrow a `Result` to exactly
+  one of them" → "which checks because `@final` on the two classes rules
+  out a value that inherits from both, leaving the checker one class to
+  narrow to" (the narrowing effect was asserted twice in the chapter and
+  explained nowhere; this restores one clause of the mechanism the deep
+  review's shrink removed, at the point where the reader sees the
+  consequence. The class-definition sentence stays as the short forward
+  reference it is.)
 
 ## Checked and clean
 

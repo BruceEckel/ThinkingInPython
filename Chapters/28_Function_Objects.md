@@ -334,7 +334,7 @@ for algorithm in (Newton(), Secant()):
 ```
 
 Five classes produce the same three lines that one function argument produced.
-The Context earns its keep when something has to hold the current algorithm between calls,
+The Context becomes useful when something must hold the current algorithm between calls,
 which a parameter cannot do.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
@@ -603,8 +603,7 @@ and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-an
 
 ## Choosing the Lightest Callable
 
-Each section of this chapter replaced a class hierarchy with something smaller,
-and the replacements form one list.
+The alternatives this chapter showed form one list.
 Go down it and stop at the first form that carries what you need:
 
 1.  A plain function, when the behavior needs no state of its own

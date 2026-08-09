@@ -30,9 +30,9 @@ class State:
         raise NotImplementedError("next not implemented")
 ```
 
-This class is unnecessary.
-However, it lets you say that something is a `State` object in code,
-and provide a slightly different error message when a derived class fails to implement all the methods.
+Python does not require this class.
+It is worth its two lines because it names `State` as a type in annotations,
+and because it produces a better error message when a derived class leaves a method out.
 You could get nearly the same effect by saying:
 
     class State: pass

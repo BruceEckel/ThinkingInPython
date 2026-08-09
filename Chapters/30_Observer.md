@@ -72,6 +72,7 @@ t.set_celsius(25)
 The flag lets several mutations coalesce into one broadcast,
 and lets a subclass decide a change is not worth announcing;
 `set_celsius()` calls both halves at once, so nothing here needs it.
+
 Clearing the flag before the loop, not after,
 lets a change raised during notification survive to the next broadcast.
 

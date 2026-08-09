@@ -366,29 +366,30 @@ and the chapters after it build a checked system on that idea.
 
 ## Exercises
 
-1.  Change `count_primes()` to return `(count, os.getpid())` and print the set of process IDs alongside the counts.
-    How many distinct IDs do you get,
-    and how does that compare to `os.process_cpu_count()`?
-    Then replace `ProcessPoolExecutor` with `ThreadPoolExecutor` and explain the IDs you see instead.
-2.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
+1.  Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
+    Compare that number to `os.process_cpu_count()`,
+    and run it three times before deciding what it means.
+2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise
+    and explain the IDs you see instead.
+3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
     an invariant (every adjacent pair of the output is ordered) and idempotence
     (sorting a sorted list changes nothing).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
-3.  State a law that is false and watch Hypothesis falsify it:
+4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
     and explain what it reveals about Unicode case mapping.
-4.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
+5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
     Then break `group_rounds()` on purpose, run the test twice,
     and confirm the same counterexample arrives both times:
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
-5.  Write a function that is *not* referentially transparent without using `global`:
+6.  Write a function that is *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that would change the program's behavior,
     then rewrite it so the value arrives as an argument.
-6.  Take the `describe()` function from [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+7.  Take the `describe()` function from [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
     Count the lines, then run `ty` on both and compare what each one knows about the value inside the `Ok`.

@@ -2059,7 +2059,7 @@ rate limiting, bulkheads, and circuit breakers, none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 and that is different from a platform for building distributed systems.
 
-## One Type for Four Mechanisms
+## What Survives the Library
 
 [Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
 argued that Effects are the next scaling barrier,

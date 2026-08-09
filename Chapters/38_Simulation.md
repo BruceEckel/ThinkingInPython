@@ -1213,10 +1213,6 @@ They never sense each other.
 Even so, structure that no agent encodes appears in the aggregate.
 This is *emergence*:
 global order arising from local rules that never mention it.
-The three simulations form a progression.
-The rats cooperate through a blackboard.
-The robot follows a script.
-The grains know nothing.
 The less the agents understand, the more the run can tell you,
 because the outcome lives in the interactions rather than the instructions.
 When behavior emerges, reading the code is not enough.

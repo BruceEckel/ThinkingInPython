@@ -13,8 +13,8 @@ motivation sentence to "Abilities Are Not Special", tightened the type-bound
 paragraph, added three explanatory sentences and a closing paragraph, and added
 three exercises. Every finding was in that new or rewritten prose.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -36,44 +36,17 @@ one block remains for your judgment.
   unlifted callers." and added "directly" to the sentence before it (the
   aphorism overstated: an unlifted caller can still `run()` a lifted
   function, as the chapter shows a dozen times).
-
-***
-
-**The renamed final section: "One Type for Four Mechanisms" names an argument
-the section makes third, not first.**
-
-The section now opens on adoption advice ("Use Stateless when a system is large
-enough that hidden Effects have already cost you a production incident"), then
-the new habit paragraph, then the direction, and the four-mechanisms argument
-sits in the middle. A reader who arrives via the heading looks for the four
-mechanisms and finds a verdict.
-
-The deep review offered two candidate titles and did not pick one. Having read
-the section again with the new closing paragraph in place, I think neither
-quite fits, because the section now does three things: it weighs adoption, it
-names the habit that outlives the library, and it makes the composition
-argument.
-
-Proposed change: title it for the thing the reader takes away rather than for
-any one of the three.
-
-> ## What Survives the Library
-
-That covers the habit paragraph (which is now the section's most useful
-sentence-for-sentence content), sets up the adoption advice as the question it
-answers, and still fits the closing line about capacity.
-
-Alternative, if you prefer the deep review's framing: keep "One Type for Four
-Mechanisms" and move the composition paragraph to the top of the section, so
-the heading describes the opening rather than the middle. That is a bigger
-edit and reorders the book's last section, which is why I list it second.
-
-This stays a block because it is a heading: the anchor changes with it, and
-`heading_links.py` gates whatever links to it.
-
-[] Reject
-
-***
+- Final section retitled: "One Type for Four Mechanisms" → "What Survives
+  the Library" (the section opens on adoption advice, then a habit
+  paragraph, then the four-mechanisms argument in the middle, so the old
+  heading named an argument the section makes third rather than first. The
+  new title covers the habit paragraph, which is the section's most useful
+  content and sets up the adoption advice as the question it answers, and
+  still fits the closing line about capacity. The deep review's alternative,
+  moving the composition paragraph to the section's top, would reorder the
+  book's last section for a smaller gain, so the retitle was the cheaper
+  correct fix. `heading_links.py` confirms nothing links to the old
+  anchor.)
 
 ## Checked and clean
 

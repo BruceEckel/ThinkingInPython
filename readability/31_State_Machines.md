@@ -18,8 +18,8 @@ findings to places where it costs the reader something.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly: applied (listed below) or declined
+with the reason recorded. No blocks remain.
 
 ## Applied directly
 
@@ -47,36 +47,18 @@ one block remains for your judgment.
   "belongs in the table" (watched "wants" on a non-agent, in the chapter's
   last sentence).
 
-Line numbers below refer to the chapter before these edits;
+- Lines 33-36: "This class is unnecessary. However, it lets you say that
+  something is a `State` object in code, and provide a slightly different
+  error message..." → "Python does not require this class. It is worth its
+  two lines because it names `State` as a type in annotations, and because
+  it produces a better error message when a derived class leaves a method
+  out." (the old paragraph called the class unnecessary and then argued
+  for it, so a reader could not tell whether to write it; the "worth its
+  two lines" variant was chosen over "earns its two lines," a phrase you
+  have been cutting elsewhere).
+
+Line numbers above refer to the chapter before these edits;
 the module-shadowing rewrite added one line, shifting later lines down.
-
-***
-
-**Lines 33-36 — "This class is unnecessary. However, it lets you say..."**
-**Pattern:** a concession that reverses itself in two sentences
-
-Current:
-> This class is unnecessary.
-> However, it lets you say that something is a `State` object in code,
-> and provide a slightly different error message when a derived class fails to implement all the methods.
-> You could get nearly the same effect by saying:
-
-The paragraph says the class is unnecessary, then spends four sentences on what
-it does for you, then offers a weaker alternative.
-A reader cannot tell whether they are being told to write it or not.
-
-Proposed:
-> Python does not require this class.
-> It earns its two lines by naming `State` as a type in annotations,
-> and by producing a better error message when a derived class leaves a method out.
-> You could get nearly the same effect by saying:
-
-That states the same facts and stops the sentence from arguing with the next
-one. Note this reintroduces "earns its," which you have been cutting elsewhere;
-if you would rather avoid it, "It is worth its two lines because it names
-`State` as a type..." says the same.
-
-[] Reject
 
 ***
 

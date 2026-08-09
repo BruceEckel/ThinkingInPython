@@ -569,6 +569,7 @@ so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
 The grammar is flat rather than nested,
 so the walk is a loop instead of a recursion,
 but everything else about it is this chapter's shape.
+
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
 so an `isinstance` test narrows it as well as a `match` would,

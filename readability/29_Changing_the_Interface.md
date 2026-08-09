@@ -16,8 +16,8 @@ lines in it.
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation, no formulaic conclusion.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly: applied (listed below) or declined
+with the reason recorded. No blocks remain.
 
 ## Applied directly
 
@@ -38,31 +38,13 @@ one block remains for your judgment.
 - Line 334: "the Adapter is what a Proxy becomes once you stop insisting" →
   "a Proxy becomes an Adapter once you stop insisting" (cleft delaying the
   verb).
+- Line 127: cut "One detail in the second listing needs a closer look."
+  (§29 warm-up: it announced the explanation instead of starting it, and
+  the paragraph is the only place the `/` is discussed, so it provided no
+  orientation. It replaced "repay attention" at your request; the request
+  was to lose that phrase, which the cut still honors.)
 
-Line numbers below refer to the chapter before these edits
-(none of the edits changed line counts).
-
-***
-
-**Line 127 — "needs a closer look"**
-**Pattern:** §29 warm-up line
-
-Current:
-> One detail in the second listing needs a closer look.
-
-You asked for "repay attention" to be rewritten and this is what went in.
-It announces that an explanation follows instead of starting it.
-
-Proposed: cut the sentence and let the paragraph open on the detail.
-> The `/` in `WhatIUse.op()` makes its parameter positional-only,
-> and removing it breaks the override:
-
-The paragraph is already the only place the `/` is discussed, so nothing
-orients the reader that the sentence was providing.
-This stays a block rather than a direct edit because the sentence is the
-replacement you asked for by name; deleting it reverses a call you made.
-
-[] Reject
+Line numbers above refer to the chapter before these edits.
 
 ***
 

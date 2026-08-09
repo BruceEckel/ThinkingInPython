@@ -15,8 +15,8 @@ generators aside, a `print()`-is-still-invisible qualification, a closing
 handoff to Part V, and a fifth exercise. Every finding was in that new
 prose or in a seam the moves opened.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -43,42 +43,17 @@ one block remains for your judgment.
   "Python offers no native version of this, and will not soon. The next
   three chapters build the library version:" (the halved contrast restated
   a section the chapter already spent on native versus library systems).
-
-***
-
-**"Two Phases of Effect Analysis": the new heading is accurate and the old one
-is still doing its job three lines later.**
-
-The section now opens:
-
-> The initial and most obvious reason to track Effects is parallelism.
-> ...
-> The same guarantee makes testing trivial.
-
-Those two paragraphs are the benefits the old heading promised. The phases
-material begins only at "Think of Effect analysis as a series of phases."
-
-So the rename fixed the mismatch by moving it: the heading now describes the
-back half of the section and the front half is orphaned under it.
-
-Proposed change: move the parallelism and testing paragraphs up into the end of
-the preceding section, "A Program Can Never Be Pure", which argues that Effects
-are the point rather than a defect and has no closing beat of its own. The
-benefits paragraph reads as the natural answer to "so why track them at all?"
-
-Then this section opens on "Think of Effect analysis as a series of phases,"
-which is what its heading now names.
-
-Alternative, cheaper and less good: retitle again to something covering both,
-which is the position the chapter was already in.
-
-I recommend the move. Note the cost, which is real: it makes two structural
-edits to a chapter that just had one, and if you would rather let the
-reordering settle before moving more, this is a reasonable one to defer.
-
-[] Reject
-
-***
+- "Two Phases of Effect Analysis" no longer opens on the parallelism/testing
+  paragraph. That paragraph moved to the end of the preceding section, "A
+  Program Can Never Be Pure" (with a new bridging sentence, "So why track
+  them at all?"), which argues Effects are the point rather than a defect
+  and had no closing beat of its own. "Two Phases of Effect Analysis" now
+  opens on "Think of Effect analysis as a series of phases," which is what
+  its renamed heading actually names; the parallelism/testing content was
+  the benefit the section's old name promised, not the phases material its
+  new name describes. No text changed beyond the move and the one bridging
+  sentence, and the heading text itself, and therefore its anchor, is
+  unchanged.
 
 ## Checked and clean
 

@@ -13,6 +13,7 @@ Many overlap, some compete,
 and several exist only to work around limits of a particular language.
 The body of this book argues that a number of them are unnecessary in Python
 ([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
+
 The tables still follow each source's own grouping,
 including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy)
 questioned there, so each name sits where its source puts it.

@@ -16,8 +16,8 @@ The chapter reads as human prose and its explanations are unusually concrete:
 No §7 vocabulary hits, no curly quotes, no spaced ` -- `, no boldface or bullet
 inflation.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-the two blocks that remain are the ones needing your judgment.
+Every finding was resolved directly: applied (listed below) or declined
+with the reason recorded. No blocks remain.
 
 ## Applied directly
 
@@ -34,58 +34,21 @@ the two blocks that remain are the ones needing your judgment.
   the value changing" (empty adverb; deletion changes nothing).
 - Line 354: "which is what calling an `async` function produces" → "which
   calling an `async` function produces" (cleft; the deletion test passes).
+- Lines 72-76: the `changed`-flag paragraph split after "nothing here needs
+  it," so what the flag buys and why the clearing line sits where it does
+  read as the two thoughts they are. No wording changed; the
+  clearing-order sentence stays because it explains a line that would
+  otherwise look arbitrary.
 
-Line numbers below refer to the chapter before these edits
-(the line-231 fix did not change line counts).
+Line numbers above refer to the chapter before these edits.
 
-***
+## Considered and declined
 
-**Lines 72-76 (the new `changed`-flag paragraph)**
-**Pattern:** two claims of different kinds in one paragraph
-
-Current:
-> The flag lets several mutations coalesce into one broadcast,
-> and lets a subclass decide a change is not worth announcing;
-> `set_celsius()` calls both halves at once, so nothing here needs it.
-> Clearing the flag before the loop, not after,
-> lets a change raised during notification survive to the next broadcast.
-
-The first two lines say what the flag buys; the last two say why one line of
-the listing sits where it does. They read as one thought and are two.
-
-Proposed: split after "nothing here needs it," so the ordering point stands on
-its own. No wording change.
-
-Alternative, if you want the section shorter: cut the clearing-order sentence
-entirely. The listing is a straw man the next section dismantles, and the
-detail is only visible to a reader who knows `java.util.Observable`. I
-recommend the split; the sentence explains a line that would otherwise look
-arbitrary.
-
-[] Reject
-
-***
-
-**Line 86 — "It is simply a callable"**
-**Pattern:** §23 empty adverb
-
-Current:
-> In Python an *observer* need not be an object implementing an `Observer` interface.
-> It is simply a callable.
-
-The contrast with the preceding sentence already carries the deflation, so
-"simply" repeats it.
-
-Proposed:
-> In Python an *observer* need not be an object implementing an `Observer` interface.
-> It is a callable.
-
-Low confidence: this is a rhetorical beat in a two-sentence pair, and the pair
-is doing the chapter's central move. Reject if you hear it as rhythm.
-
-[] Reject
-
-***
+**Line 86 — "It is simply a callable."**
+"Simply" is an empty adverb by the deletion test, but the sentence is the
+deflating beat in the two-sentence pair doing the chapter's central move,
+and the word carries that spoken rhythm. Left alone; recorded so a later
+sweep does not re-raise it.
 
 ## Noted, no change
 

@@ -9,8 +9,8 @@ Everything below was in prose added since the first review: the deep review's
 manifest edits and today's apply, which added an intro paragraph, four
 headings, a conclusion section, and the `TaskGroup` and log commentary.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -29,52 +29,13 @@ one block remains for your judgment.
   the example before the reader saw it; the concrete version is the better
   hook and removes the overlap with "Order from Noise," which already draws
   the confirm-versus-discover distinction at length).
-
-***
-
-**Section:** `## The Less the Agents Know` (the promoted conclusion) against the
-new intro paragraph
-**Pattern:** Treadmill effect (Structure and Rhythm Tests) (P2)
-
-The conclusion now repeats the intro almost claim for claim. The intro says:
-
-> Three simulations follow,
-> each giving its agents less to work with than the last.
-> ...
-> The first two confirm a design you can predict from the code.
-> The third produces a pattern nobody wrote down.
-
-and the conclusion says:
-
-> The three simulations form a progression.
-> The rats cooperate through a blackboard.
-> The robot follows a script.
-> The grains know nothing.
-> The less the agents understand, the more the run can tell you,
-
-Before today the progression was stated once, at the end. The deep review moved
-it to the front so it could organize the reading, which was right; nothing
-trimmed the original. A reader now meets the same arc twice, ninety listings
-apart, in nearly the same words.
-
-The conclusion is the half to trim, since the intro's version does work the
-conclusion's cannot. Cutting its three-sentence recap leaves:
-
-> ... This is *emergence*:
-> global order arising from local rules that never mention it.
-> The less the agents understand, the more the run can tell you,
-> because the outcome lives in the interactions rather than the instructions.
-> When behavior emerges, reading the code is not enough.
-> Run it.
-
-which still names the progression's payoff and ends where it ended before.
-
-The alternative is to trim the intro instead, keeping only "Three simulations
-follow, each giving its agents less to work with than the last" and letting the
-conclusion spell it out. That keeps the reveal but gives up most of what the
-deep review's block was buying.
-
-I lean toward trimming the conclusion. Your call, since it is your closing
-paragraph either way.
-
-[] Reject
+- `The Less the Agents Know` conclusion: cut the four-sentence progression
+  recap ("The three simulations form a progression. The rats cooperate
+  through a blackboard. The robot follows a script. The grains know
+  nothing."). The deep review moved the progression to the intro so it
+  could organize the reading, and nothing trimmed the original, so the
+  reader met the same arc twice in nearly the same words. The conclusion
+  still names the payoff ("The less the agents understand, the more the
+  run can tell you") and ends where it ended before ("Run it."). The
+  alternative was trimming the intro instead, which would give back most
+  of what the move bought.

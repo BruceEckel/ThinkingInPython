@@ -12,8 +12,8 @@ and the whole "Patterns Python Absorbed" closing section.
 Every finding sat in that new prose.
 The chapter's original fourteen lines still read clean.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -37,48 +37,10 @@ one block remains for your judgment.
   questions" → "questioned there" (the demonstrative "that" read for a
   moment as a relative pronoun, making "questions" a noun; the passive is
   fine here because the actor is the chapter named one line up).
-
-***
-
-**Intro, second paragraph: it now does five jobs in thirteen lines.**
-
-The paragraph was already carrying three ideas, and the deep review added two
-more. It now runs:
-
-1.  what an entry gives you,
-2.  that listing is not endorsement, and why,
-3.  that this book argues many are unnecessary,
-4.  how the tables are grouped, and why, despite chapter 21,
-5.  how rows are ordered inside a table,
-6.  what a link and a missing link mean.
-
-Items 1 to 3 tell the reader how to take the catalog.
-Items 4 to 6 tell them how to read it.
-Those are two different jobs, and one paragraph doing both is the
-paragraph-length uniformity problem in reverse: a single block where the reader
-needs a breath.
-
-Proposed change: break it after the chapter-21 sentence, so the second
-paragraph becomes the caveat and the third becomes the reading instructions.
-
-> The body of this book argues that a number of them are unnecessary in Python
-> ([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
->
-> The tables still follow each source's own grouping,
-> including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy)
-> questioned there, so each name sits where its source puts it.
-> Rows are alphabetical within each table,
-> which for the classic patterns is also GoF's own order.
-> When this book covers a pattern, its name links to that coverage.
-> An unlinked name means the pattern appears only in this catalog.
-
-(The quoted lines reflect the sentence fixes already applied above.)
-Nothing else moves; this is one blank line.
-Reported rather than applied because paragraph shape is your call.
-
-[] Reject
-
-***
+- Intro, second paragraph: broken after the chapter-21 sentence (one blank
+  line, nothing else moves). The paragraph was doing five jobs in thirteen
+  lines; the break separates how to take the catalog (entries, endorsement,
+  the book's argument) from how to read it (grouping, ordering, links).
 
 ## Checked and clean
 

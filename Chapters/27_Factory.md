@@ -280,10 +280,12 @@ waits for the first use of the imported name,
 and an import written only to trigger registration never uses that name.
 Running with `-X lazy_imports=all` does this to ordinary imports too.
 Import a plugin module eagerly when the import exists for its side effect.
+
 The registry also keys on `cls.__name__` alone,
 so two classes that share a name, from different modules,
 silently overwrite each other.
 Key on a qualified name if that can happen.
+
 Registration names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
 so a subclass that gave itself a `registry` of its own would quietly start a second table that `make()` never reads.
@@ -403,10 +405,12 @@ if __name__ == "__main__":
 
 Now the factory methods are polymorphic:
 each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeFactory.create_shape()` creates the shapes,
-a class method that reaches the registry through `cls` and finds the appropriate factory object based on an identifier that you pass it.
-The factory is immediately used to create the shape object,
-but you could imagine a more complex problem where the caller receives the appropriate factory object and then uses it to create an object in a more sophisticated way.
+`ShapeFactory.create_shape()` is a class method.
+It reaches the registry through `cls`,
+finds the factory object for the identifier you pass,
+and calls it right away.
+A more complex design would hand that factory object back to the caller,
+who could hold it and create objects from it later.
 However, much of the time you don't need the complexity of the polymorphic factory method,
 and a single static method in the base class (as shown in `shape_factory1.py`)
 will work fine.

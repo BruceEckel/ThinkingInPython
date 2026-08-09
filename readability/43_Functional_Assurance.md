@@ -21,8 +21,8 @@ being true earlier in this same run, when the chapter-42 review added `@final`
 to `Ok` and `Err`: `match` now reaches `float`, exactly as `isinstance()` does.
 The sentence now says the two narrow equally well and credits `@final`.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -46,43 +46,21 @@ one block remains for your judgment.
   states the example-at-a-time contrast where a reader coming from
   [Testing](11_Testing.md) is looking for their own practice on the ladder).
 
-***
-
-**Exercise 1: three questions in one numbered item.**
-
-> Change `count_primes()` to return `(count, os.getpid())` and print the
-> set of process IDs alongside the counts. How many distinct IDs do you
-> get, and how does that compare to `os.process_cpu_count()`? Then replace
-> `ProcessPoolExecutor` with `ThreadPoolExecutor` and explain the IDs you
-> see instead.
-
-The exercise is good and the answer is genuinely surprising (the solution
-records 2, 3, and 3 distinct IDs across three runs on a 32-core machine). The
-packaging is the problem: one item carries a code change, two questions, a
-second code change, and a third question, and the reader has to keep the thread
-while doing all four.
-
-Proposed change: split into two exercises, 1 and 2, and renumber the rest.
-
-> 1.  Change `count_primes()` to return `(count, os.getpid())` and print the
->     distinct process IDs alongside the counts. Compare that number to
->     `os.process_cpu_count()`, and run it three times before deciding what
->     it means.
-> 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous
->     exercise and explain the IDs you see instead.
-
-Note the cost: renumbering exercises means renumbering every `## N.` heading in
-`Solutions/43_Functional_Assurance.md`, and `check_solutions.py` gates that, so
-the two files have to move together. That is the reason this is a block rather
-than a direct edit.
-
-"Run it three times before deciding what it means" is added deliberately: a
-single run makes the number look like a constant, and the whole lesson is that
-it is not.
-
-[] Reject
-
-***
+- Exercise 1 split into two: "Change `count_primes()`... How many distinct
+  IDs do you get... Then replace `ProcessPoolExecutor` with
+  `ThreadPoolExecutor` and explain the IDs you see instead" was one item
+  carrying a code change, two questions, a second code change, and a third
+  question. It is now exercise 1 (the process-pool change, comparison, and
+  "run it three times before deciding what it means") and exercise 2 (the
+  `ThreadPoolExecutor` swap), with exercises 2-6 renumbered to 3-7.
+  `Solutions/43_Functional_Assurance.md` was split and renumbered to match:
+  its old `## 1` became `## 1` (process pool only) and a new `## 2` (the
+  thread-pool half, carrying the "thread pool reports exactly 1" paragraph
+  that used to close the combined solution), and its old `## 2`-`## 6`
+  became `## 3`-`## 7`. `check_solutions.py` confirms the two files line
+  up. "Run it three times before deciding what it means" is new text: a
+  single run makes the number look like a constant, and the whole lesson is
+  that it is not.
 
 ## Checked and clean
 

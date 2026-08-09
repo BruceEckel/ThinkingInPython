@@ -8,7 +8,7 @@ But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
-The answer starts with something you probably never consider.
+The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
 That is, if you are performing an operation on more than one object whose type is unknown,
 Python can invoke the dynamic binding mechanism on only one of those types.

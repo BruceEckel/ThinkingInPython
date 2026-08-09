@@ -12,8 +12,8 @@ Everything below sat in prose that had never had a readability pass: the ten
 manifest edits the deep review made while it was being written, and the seven
 prose additions today's apply made.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly: applied (listed below) or declined
+with the reason recorded. No blocks remain.
 
 ## Applied directly
 
@@ -36,28 +36,12 @@ one block remains for your judgment.
   appositive had no head: neither the cache nor the key is a pool of
   singletons).
 
-***
+## Considered and declined
 
-**Section:** `## Which Pool Should You Use?` (the new closing section)
-**Pattern:** Sentence-length uniformity (Structure and Rhythm Tests) (P2)
-
-With the opener fixed, the remaining question is rhythm. Three consecutive
-`If X, do Y` sentences and then an `Otherwise` is a decision table written as
-prose, and the parallelism is exact enough that the four run together on a
-read-aloud. The deep review asked for four sentences organized by the deciding
-question, so the shape is deliberate; the question is whether it is too
-regular. Breaking one of the four fixes it, and the `Enum` case is the natural
-one because it is the only mechanism that needs no runtime pool at all:
-
-> If you know it as you write the program, an `Enum` holds the pool for you and
-> nothing runs at all.
-> If callers must keep writing `C(...)`, intern in `__new__()` and pay the
-> bookkeeping.
-> If the set is unbounded, use a `WeakValueDictionary` so the pool cannot become
-> a leak.
-> Otherwise use a `@cache` factory, which is the least machinery for the job.
-
-This is a voice call, and a case can be made that a decision table *should*
-read as one.
-
-[] Reject
+**`## Which Pool Should You Use?` — the four-way `If X, do Y` parallelism.**
+Flagged under sentence-length uniformity: three `If` sentences and an
+`Otherwise` with identical shape. Declined: the section is a decision table
+written as prose, the deep review asked for four sentences organized by the
+deciding question, and the exact parallelism is what makes the four
+scannable. Breaking one line to vary the rhythm would trade a reader
+convenience for a style score.

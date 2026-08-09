@@ -137,10 +137,9 @@ for flower in (Chrysanthemum(), Gladiolus()):
 
 The first hop reaches `Predator.visit` rather than `Worm.visit`,
 because `Worm` inherits the operation from the class that defines it.
-The second hop is the one that earns the listing.
-For `Chrysanthemum` it reaches the override,
-and for `Gladiolus` it reaches `Flower.eat`,
-which is the visible form of the flower-side dispatch having nothing to say.
+For `Chrysanthemum` the second hop reaches the override,
+and for `Gladiolus` it reaches `Flower.eat`:
+the flower-side dispatch has nothing to say, and the output now shows it.
 
 ## The Price of the Empty Base
 

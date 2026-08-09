@@ -124,7 +124,6 @@ which fixes the adapted class at definition time and exposes the adaptee's entir
 `g()` and `h()` included, to every client of the adapter.
 Composition keeps the two interfaces separate; inheritance merges them.
 
-One detail in the second listing needs a closer look.
 The `/` in `WhatIUse.op()` makes its parameter positional-only,
 and removing it breaks the override:
 `WhatIUse2.op()` renames the parameter to `what_i_have`,

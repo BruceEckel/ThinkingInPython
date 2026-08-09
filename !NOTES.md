@@ -13,7 +13,7 @@ New book cover & favicon
 1. Review all the exercises and make sure they (A) make sense and (B) all have solutions that work.
 
 2. Look through the patterns chapters for sections that show a alternate approaches that are only being shown for pedagogical purposes.
-Do they teach something valuable enough, would anybody ever use these?
+Do they teach something valuable enough OR would anybody ever use these?
 Make a review list that proposes removal of the ones that don't pull their weight.
 
 Active voice

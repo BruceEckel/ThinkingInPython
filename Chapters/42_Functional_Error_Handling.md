@@ -678,7 +678,8 @@ This is the same argument the chapter opened with, applied one level down:
 and a note says which piece of work it belonged to.
 
 The `Err` branch reads `error.__notes__`,
-which checks because `@final` on the two classes lets the checker narrow a `Result` to exactly one of them,
+which checks because `@final` on the two classes rules out a value that inherits from both,
+leaving the checker one class to narrow to,
 whether you use `match` or `isinstance()`.
 
 ## The returns Library

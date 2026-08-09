@@ -12,8 +12,8 @@ All the findings sat in prose that had never been through a readability
 pass: the paragraphs the deep review added while it was being written, plus the
 sentences today's apply added. Nothing in the chapter's older prose came up.
 
-The clear-cut fixes were applied to the chapter directly (listed below);
-one block remains for your judgment.
+Every finding was resolved directly and applied (listed below).
+No blocks remain.
 
 ## Applied directly
 
@@ -31,36 +31,7 @@ one block remains for your judgment.
 - "Matching the pair of simplified children ... is what lets the rules
   compose" → "... lets the rules compose" (the cleft the global rule names;
   the deletion test passes).
-
-***
-
-**Section:** `## A Template Is a Tree`, lead-in paragraph
-**Pattern:** Paragraph-length uniformity / read-aloud test (P2)
-
-The lead-in has grown to fifteen lines and carries five separate facts
-before the reader reaches a listing: what a `Template` is, that iteration skips
-empty literal pieces, that `template.strings` keeps them, that the grammar is
-flat rather than nested, that iteration produces `str | Interpolation`, and that
-the `else` branch is therefore the `str` case. Two of those arrived as separate
-patches (the `strings` clause, then the `str | Interpolation` clause), and the
-paragraph has been absorbing them rather than reorganizing around them.
-
-Proposed split, after "but everything else about it is this chapter's shape":
-
-> ... The grammar is flat rather than nested,
-> so the walk is a loop instead of a recursion,
-> but everything else about it is this chapter's shape.
->
-> Iterating a `Template` produces `str | Interpolation`,
-> a closed union like `Node` with two members,
-> so an `isinstance` test narrows it as well as a `match` would,
-> and the `else` branch is the `str` case.
-> The structure is data, and what it means is whatever a function decides:
-
-This is the one finding here I cannot settle for you. The split is cosmetic and
-the paragraph is not wrong, so declining costs nothing; I raise it because the
-paragraph is the chapter's longest and it now reads as a list rather than an
-argument. (The comma and the "only" fixes the earlier version of this block
-bundled are already applied, so only the paragraph break is in question.)
-
-[] Reject
+- `A Template Is a Tree` lead-in: split after "but everything else about it
+  is this chapter's shape." (the paragraph had grown to fifteen lines and
+  five facts as patches accumulated; the break separates what a `Template`
+  is from how iterating one narrows, with no wording changed).
