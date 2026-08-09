@@ -180,7 +180,7 @@ one `MutableTile` object; there is only one grass tile in memory, and
 every cell just holds a reference to it. A test that pins down the bug:
 
 ```python
-# test_ch36_mutation_leak.py
+# test_ch35_mutation_leak.py
 from dataclasses import dataclass
 from functools import cache
 from typing import Final
@@ -336,7 +336,7 @@ print(len(_pool))
 ```
 
 This is `weak_pool.py`'s exact shape applied to colors instead of
-symbols: a factory function, `make_color()`, replacing the
+names: a factory function, `make_color()`, replacing the
 `Color(...)` constructor call, and a `WeakValueDictionary` instead of
 a plain `dict`. Being a plain function rather than an overridden
 `__new__()` means `Color` can stay an ordinary frozen `@dataclass`,
@@ -384,7 +384,7 @@ except ValueError as e:
 ```
 
 ```python
-# test_ch36_out_of_range.py
+# test_ch35_out_of_range.py
 from typing import ClassVar
 import pytest
 
@@ -427,3 +427,159 @@ returned. This is the same *parse, don't validate* move
 makes with `__post_init__()`, applied to a class that validates in
 `__new__()` instead because it needs to intercept construction for
 interning.
+
+## 7. `tile_map.py` rebuilt on the enum
+
+```python
+# exercise_7.py
+from enum import Enum
+
+class Tile(Enum):
+    GRASS = (".", True)
+    WATER = ("~", False)
+    ROCK = ("#", False)
+
+    walkable: bool
+
+    def __new__(cls, symbol: str, walkable: bool) -> Tile:
+        member = object.__new__(cls)
+        member._value_ = symbol
+        member.walkable = walkable
+        return member
+
+def parse_map(text: str) -> list[list[Tile]]:
+    return [[Tile(s) for s in line] for line in text.split()]
+
+field = parse_map("""
+    ..~~..
+    ..~~.#
+    ......
+    ##..~~
+""")
+cells = [*row for row in field]
+print(len(cells), len({id(t) for t in cells}))
+#: 24 3
+print(field[0][2] is field[3][5], field[0][2].walkable)
+#: True False
+try:
+    parse_map("?")
+except ValueError as e:
+    print(type(e).__name__, e)
+#: ValueError '?' is not a valid Tile
+```
+
+`SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
+are the spec table, `Tile(s)` is the pool lookup, and the value-to-member
+table the metaclass builds is the runtime membership check `to_symbol()`
+was written to perform.
+
+The `Literal` version caught a `Symbol` that `SPECS` did not cover, and
+the enum catches the same class of mistake, since a symbol with no member
+has no way into the map. What the enum adds is that the *set itself* is
+one declaration rather than two kept in step: the `Literal` version could
+drift, with `Symbol` and `SPECS` disagreeing, and the checker only caught
+that because the two were annotated against each other. Here there is
+nothing to disagree with.
+
+What the enum gives up is the moment of failure. `to_symbol()` raised a
+`KeyError` at a named boundary the chapter could point at; `Tile("?")`
+raises a `ValueError` from deep inside `parse_map()`'s comprehension. If
+the boundary matters, keep a `to_tile()` wrapper that catches the
+`ValueError` and re-raises with the offending line and column.
+
+## 8. Four threads on a cold key
+
+```python
+# exercise_8.py
+import threading
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
+from functools import cache
+from typing import Final
+
+@dataclass(frozen=True)
+class Tile:
+    symbol: str
+    name: str
+    walkable: bool
+
+SPECS: Final[dict[str, tuple[str, bool]]] = {
+    ".": ("grass", True),
+    "~": ("water", False),
+    "^": ("hill", True),
+    "*": ("sand", True),
+}
+
+@cache
+def tile(symbol: str) -> Tile:
+    time.sleep(0.1)  # Widen the window between miss and store
+    name, walkable = SPECS[symbol]
+    return Tile(symbol, name, walkable)
+
+def gather(
+    factory: Callable[[str], Tile], symbol: str
+) -> list[Tile]:
+    "Call factory(symbol) from four threads at once."
+    out: list[Tile] = []
+    lock = threading.Lock()
+
+    def worker() -> None:
+        found = factory(symbol)
+        with lock:
+            out.append(found)
+
+    threads = [threading.Thread(target=worker) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    return out
+
+raced = gather(tile, "^")
+print(len(raced), len({id(t) for t in raced}))
+#: 4 4
+
+EAGER: Final[dict[str, Tile]] = {
+    s: Tile(s, *spec) for s, spec in SPECS.items()}
+
+def eager_tile(symbol: str) -> Tile:
+    return EAGER[symbol]
+
+print(len({id(t) for t in gather(eager_tile, "*")}))
+#: 1
+
+guard = threading.Lock()
+
+def locked_tile(symbol: str) -> Tile:
+    with guard:
+        return tile(symbol)
+
+print(len({id(t) for t in gather(locked_tile, "~")}))
+#: 1
+```
+
+Four objects get built and each thread keeps its own, so `is` fails
+between all four results. `@cache` looks up the key, misses, calls the
+function, and stores the result, and nothing holds a lock across those
+three steps. Four threads that all miss on the same cold key therefore
+all run the body. The last store wins the cache, so every later caller
+agrees with each other and with none of the four.
+
+Nothing here is a `@cache` defect. A cache that held a lock across the
+call would serialize every miss in the program, which is a worse default
+than occasionally building a value twice. For an ordinary memoized
+computation, a duplicate build costs time and no correctness. It is
+Flyweight that raises the stakes, because the whole point is that
+`tile("^") is tile("^")`.
+
+The eager fix builds every value before any thread exists, so there is no
+miss to race on. It is the better answer whenever the value set is known
+and small, which is the same condition that makes an `Enum` work, and it
+costs nothing at runtime.
+
+The lock fix handles an unbounded value set, and its cost is real: every
+lookup now serializes, including the hits, which are the overwhelming
+majority once the pool is warm. If that matters, lock only on the miss
+path with a hand-written pool, checking the key again inside the lock,
+since another thread may have filled it while this one waited.

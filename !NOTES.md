@@ -6,7 +6,7 @@ Look through the patterns chapters for sections that show a alternate approaches
 Do they teach something valuable enough, would anybody ever use these?
 Make a review list that proposes removal of the ones that don't pull their weight.
 
-Review all the exercises and make sure they all have solutions that work.
+Review all the exercises and make sure they (A) make sense and (B) all have solutions that work.
 
 Add Epub link info on README and bottom of index page.
 

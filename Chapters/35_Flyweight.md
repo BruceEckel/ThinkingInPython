@@ -151,6 +151,10 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the coordinates supplied by the asker.
+The object count is what the listing can show;
+exercise 2 measures the memory behind it.
+
+### Typing the Symbol Set
 
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and `SPECS` can only hold one of them.
@@ -212,7 +216,8 @@ If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses.
-Here the cache is keyed by the constructor arguments instead of a single fixed key:
+Here the cache is keyed by the constructor arguments instead of a single fixed key,
+a pool of singletons sometimes called *Multiton*:
 
 ```python
 # interned_color.py
@@ -270,6 +275,11 @@ A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
 not just the key that names them.
 
+`_pool` is keyed by the components alone and inherited by every subclass,
+so `Color` here is a leaf: a subclass would collide with it,
+receiving whichever object asked for those components first.
+Key the pool by `(cls, red, green, blue)` if you need to subclass.
+
 The two forms are not quite interchangeable.
 `tile()` interns only the calls that go through it,
 so `Tile("~", "water", False)` still builds a separate object,
@@ -312,22 +322,22 @@ from typing import Final
 from weakref import WeakValueDictionary
 
 @dataclass(frozen=True)
-class Symbol:
-    name: str
+class Name:
+    text: str
 
-_pool: Final[WeakValueDictionary[str, Symbol]] = (
+_pool: Final[WeakValueDictionary[str, Name]] = (
     WeakValueDictionary())
 
-def symbol(name: str) -> Symbol:
-    found: Symbol | None = _pool.get(name)
+def name(text: str) -> Name:
+    found: Name | None = _pool.get(text)
     if found is None:
-        found = Symbol(name)
-        _pool[name] = found
+        found = Name(text)
+        _pool[text] = found
     return found
 
 if __name__ == "__main__":
-    alpha = symbol("alpha")
-    alias = symbol("alpha")
+    alpha = name("alpha")
+    alias = name("alpha")
     print(alpha is alias, len(_pool))
     del alpha, alias
     print(len(_pool))
@@ -335,8 +345,8 @@ if __name__ == "__main__":
 #: 0
 ```
 
-While any reference to the `Symbol` survives,
-every call to `symbol("alpha")` returns that same object.
+While any reference to the `Name` survives,
+every call to `name("alpha")` returns that same object.
 When the last reference dies,
 CPython's reference counting frees the object and the pool entry evaporates with it.
 The pool guarantees sharing without extending lifetimes,
@@ -345,17 +355,24 @@ If you want bounded memory with fixed construction cost instead,
 `functools.lru_cache(maxsize=n)` gives the factory an eviction policy,
 at the price of keeping the most recent `n` alive.
 
+Flyweight cuts the number of objects, and `slots=True`
+([Performance](18_Performance.md#slots)) cuts the size of each one,
+so the two are worth combining once memory is the point.
+The two techniques in this chapter collide at one spot:
+a slotted class has no `__weakref__` unless you also pass `weakref_slot=True`,
+so slotting `Name` without it makes `_pool[text] = found` raise a `TypeError`.
+
 ```python
 # test_weak_pool.py
-from weak_pool import _pool, symbol
+from weak_pool import _pool, name
 
-def test_symbols_are_shared() -> None:
-    keep = symbol("x")
-    assert symbol("x") is keep
-    assert symbol("y") is not keep
+def test_names_are_shared() -> None:
+    keep = name("x")
+    assert name("x") is keep
+    assert name("y") is not keep
 
 def test_pool_releases_unused() -> None:
-    temp = symbol("temp")
+    temp = name("temp")
     assert "temp" in _pool
     del temp
     assert "temp" not in _pool
@@ -369,6 +386,7 @@ An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains.
 Python constructs each member once, at class creation,
 and any reference produces that one object.
+Here is `tile_map.py`'s `Tile` again, with the pool moved into the language:
 
 ```python
 # tile_enum.py
@@ -421,10 +439,21 @@ so it keeps that exact name rather than something like `_symbol_`.
 Name, symbol, and attribute access all land on the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
-The constraint is less flexibility.
+The cost is flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The table-driven state machine in [State Machines](31_State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
+
+## Which Pool Should You Use?
+
+Four mechanisms, and the question that decides between them is how much you know about the set of values.
+If you know it as you write the program,
+use an `Enum` and let the language hold the pool.
+If callers must keep writing `C(...)`,
+intern in `__new__()` and pay the bookkeeping.
+If the set is unbounded,
+use a `WeakValueDictionary` so the pool cannot become a leak.
+Otherwise use a `@cache` factory, which is the least machinery for the job.
 
 ## Flyweights in the Wild
 
@@ -435,7 +464,8 @@ Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
 In every case the benefit is the same:
 memory proportional to the number of distinct values, not the number of uses,
-and equality checks that collapse to identity.
+and, for a type where every instance comes from the pool,
+equality checks you can write as `is`.
 
 ## Exercises
 
@@ -459,3 +489,14 @@ and equality checks that collapse to identity.
 6.  Constrain `red`, `green`, and `blue` to `0`-`255` in `interned_color.py`.
     Raise `ValueError` from `__new__()` for an out-of-range component,
     and write a test for it.
+7.  Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
+    so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
+    What does the checker now catch that the `Literal` version caught,
+    and what does it catch that the `Literal` version did not?
+8.  Make `tile()`'s body slow,
+    with a `time.sleep(0.05)` before it builds the `Tile`,
+    and call it from four threads with the same, previously unseen symbol.
+    How many `Tile` objects get built,
+    and how many distinct objects do the four threads hold?
+    Fix it two ways: populate the pool eagerly at import,
+    and guard the factory with a `threading.Lock`.

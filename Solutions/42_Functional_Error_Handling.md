@@ -134,7 +134,7 @@ function that might produce one.
 ## 3. `combined()` that collects every failure
 
 ```python
-# test_ch14_combined.py
+# test_ch42_combined.py
 from __future__ import annotations
 from dataclasses import dataclass
 

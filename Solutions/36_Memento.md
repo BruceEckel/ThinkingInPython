@@ -37,7 +37,7 @@ print(sketch.strokes, checkpoint.strokes)
 ```
 
 ```python
-# test_ch37_erase_mutable.py
+# test_ch36_erase_mutable.py
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -98,7 +98,7 @@ print(before.strokes, after.strokes)
 ```
 
 ```python
-# test_ch37_erase_frozen.py
+# test_ch36_erase_frozen.py
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)

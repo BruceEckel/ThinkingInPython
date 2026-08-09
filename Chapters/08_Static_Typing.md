@@ -663,7 +663,7 @@ The abstract container types come from `collections.abc`.
 | `@overload` | Several typed signatures for one function name |
 | `@override` | Declares that a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Metaprogramming.md#making-a-class-final) |
-| `cast(T, x)` | Tells the checker to treat `x` as `T`, see [Flyweight](35_Flyweight.md#intrinsic-and-extrinsic-state) |
+| `cast(T, x)` | Tells the checker to treat `x` as `T`; [Flyweight](35_Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports, see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 

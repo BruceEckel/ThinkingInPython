@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -400,7 +401,7 @@ Recommendation: I am not certain this is an improvement.
 `field(init=False, default_factory=lambda: itertools.count(1))` is harder to read
 than `self._numbers = itertools.count(1)`,
 and this listing is the one the reader studies hardest.
-Either convert it, or add one clause of prose saying why the manual form stays
+Either [[convert it]], or add one clause of prose saying why the manual form stays
 (for example, that the four collections are internal bookkeeping rather than
 constructor parameters, so putting them in the signature would misdescribe them).
 The one thing not to leave is silence, since the book's own style rule is being broken

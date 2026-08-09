@@ -1,4 +1,4 @@
-# test_ch37_erase_mutable.py
+# test_ch36_erase_mutable.py
 from dataclasses import dataclass
 
 @dataclass(frozen=True)

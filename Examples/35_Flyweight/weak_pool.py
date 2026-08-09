@@ -4,22 +4,22 @@ from typing import Final
 from weakref import WeakValueDictionary
 
 @dataclass(frozen=True)
-class Symbol:
-    name: str
+class Name:
+    text: str
 
-_pool: Final[WeakValueDictionary[str, Symbol]] = (
+_pool: Final[WeakValueDictionary[str, Name]] = (
     WeakValueDictionary())
 
-def symbol(name: str) -> Symbol:
-    found: Symbol | None = _pool.get(name)
+def name(text: str) -> Name:
+    found: Name | None = _pool.get(text)
     if found is None:
-        found = Symbol(name)
-        _pool[name] = found
+        found = Name(text)
+        _pool[text] = found
     return found
 
 if __name__ == "__main__":
-    alpha = symbol("alpha")
-    alias = symbol("alpha")
+    alpha = name("alpha")
+    alias = name("alpha")
     print(alpha is alias, len(_pool))
     del alpha, alias
     print(len(_pool))

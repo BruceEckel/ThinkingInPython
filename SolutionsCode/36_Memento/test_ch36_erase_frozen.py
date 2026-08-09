@@ -1,4 +1,4 @@
-# test_ch37_erase_frozen.py
+# test_ch36_erase_frozen.py
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)

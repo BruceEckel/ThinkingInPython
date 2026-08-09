@@ -1,3 +1,4 @@
+[[Reviewed]]
 When this file has been applied, change this file's name so it has a leading
 `~` to indicate completion.
 
@@ -400,7 +401,7 @@ Each stands alone; reject individually by striking the line.
 
 4.  Line 349, "The state has to answer it, / and `copy.replace()` is how any
     immutable value does:" The elliptical "does" leaves the verb two lines
-    back. Suggest "and `copy.replace()` is how any immutable value answers it".
+    back. Suggest "and `copy.replace()` is how any immutable value answers it". [[yes and get rid of "answers it"]]
 
 5.  Line 492, "When either limitation rules out `pickle`, there are open-source
     libraries." Vague, and it does not say which library answers which
