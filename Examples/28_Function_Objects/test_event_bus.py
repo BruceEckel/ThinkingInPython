@@ -18,4 +18,4 @@ def test_only_the_matching_type_is_called() -> None:
     assert calls == ["withdraw"]
 
 def test_no_handler_is_a_noop() -> None:
-    EventBus().publish(Closed("done"))  # Must not raise
+    EventBus().publish(Closed("done"))  # Must not raise anything

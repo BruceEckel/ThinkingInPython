@@ -139,13 +139,13 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-![Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, landing execution inside Paper.eval_scissors() rather than Scissors's own code](_images/double_dispatch)
+![Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, putting execution inside Paper.eval_scissors() rather than Scissors's own code](_images/double_dispatch)
 
 Follow one duel to keep the perspective straight.
 `scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch: it resolves `paper`,
-landing in `Paper.eval_scissors()`, the one method that knows both types.
+arriving in `Paper.eval_scissors()`, the one method that knows both types.
 Now note whose result it returns.
 `Paper.eval_scissors()` returns `WIN`,
 and that is the outcome for the scissors that started the duel,

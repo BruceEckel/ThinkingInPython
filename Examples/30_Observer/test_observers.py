@@ -10,7 +10,7 @@ def test_notify_calls_every_subscriber() -> None:
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable[str]().notify("anything")  # Must not raise
+    Observable[str]().notify("anything")  # Must not raise anything
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []

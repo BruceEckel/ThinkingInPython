@@ -1466,7 +1466,7 @@ Nothing removed the `KeyError` from the channel, though,
 so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver ever sees it and returns that value as the result,
-so the inner `except` never runs at all.
+so the inner `except` never runs.
 Only `catch()` moves an error in the type, which is the next section.
 All three facts are visible in one listing:
 
@@ -1687,7 +1687,7 @@ and a third case that needs none:
    and `supply()` answers it with an instance.
 2. A failure is an exception: `@throws` lifts it into the type,
    and `catch()` takes it back out as a value.
-3. An Ability the driver answers itself needs no vocabulary at all.
+3. An Ability that the driver answers on its own needs no vocabulary.
    `Async` sits in the same channel as a `Need` and is never supplied,
    because `run()` owns the event loop that answers it.
 

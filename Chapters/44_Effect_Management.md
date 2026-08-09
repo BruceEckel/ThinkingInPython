@@ -352,7 +352,7 @@ To discover what the function does, you had to read every line of it,
 and every line of everything it calls.
 
 Most functions in most programs have this hidden life,
-and it is what makes code hard to understand:
+and it makes code hard to understand:
 
 - Can you call this function in a test without mocking half the world?
 - If you call it twice with the same arguments, do you get the same result?
@@ -718,7 +718,7 @@ and if it works, an AI can start using it immediately.
 
 Most of these only **track** Effects rather than providing a full EMS,
 and for their purpose the other two parts are liabilities:
-a host that pins the implementations itself can guarantee what generated code is able to do.
+a host that pins the implementations can guarantee what generated code is able to do.
 
 - [Vera](https://veralang.dev):
   mandatory contracts checked with Z3 SMT verification.

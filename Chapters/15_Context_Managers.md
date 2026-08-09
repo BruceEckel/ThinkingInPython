@@ -650,7 +650,7 @@ so one variable can hold the open file in one branch and a `nullcontext` in the 
 
 `emit()` closes only the file it opened.
 A stream the caller handed over stays open, which is what the caller expects;
-the `nullcontext` wrapper is what lets one `with` block serve both cases without an `if` around the whole body.
+the `nullcontext` wrapper lets one `with` block serve both cases without an `if` around the whole body.
 
 ## The Async Protocol
 

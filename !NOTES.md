@@ -1,50 +1,40 @@
-I would like to do a clean-slate: deep_review, readability, and annealing on the whole book.
-Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
-helpful for you to keep?
+Do ADDITIONAL_IMPROVEMENTS.md
 
-Review ADDITIONAL_IMPROVEMENTS.md
+Look for places display_object could be replaced with print(vars(obj))
 
-Use Fable for deep-review
-
-Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
+Fable: Review the book to find and fix consistency issues
 
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
-1. Review all the exercises and make sure they (A) make sense and (B) all have solutions that work.
+I would like to do a clean slate: deep_review, readability, and annealing, on the whole book.
+Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
+helpful for you to keep? If the latter, distill that information into a single file for each, in the root directory:
+deep_review_db.md and readability_db.md, and once you've done that delete the directories 'deep_review' and 'readability'
 
-2. Look through the patterns chapters for sections that show a alternate approaches that are only being shown for pedagogical purposes.
-Do they teach something valuable enough OR would anybody ever use these?
-Make a review list that proposes removal of the ones that don't pull their weight.
+Use Fable for deep-review
 
-Active voice
+Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
+
+Active voice (Fable)
 
 Add Epub link info on README and bottom of index page.
 
-Look for places display_object could be replaced with print(vars(obj))
-
 Pong game, autoplay with builtin gui
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
+Examples that demonstrate probability or statistics, very simply
 
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
-Examples that demonstrate probability or statistics, very simply
-
 Fatal vs recoverable errors
 
-Review the book looking for consistency issues
+Have we learned anything new that should be added to thinking-in-python-skill.md?
 
 Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
 Put the result at the root in ADVERSARIAL.md
 
-Have we learned anything here that should be added to thinking-in-python-skill.md?
-
 Run 'make prose' on each chapter
-
-Update thinking-in-python skill
-
-Review all exercises to make sure they refer to existing examples and that all  exercises have solutions
 
 - Is full polymorphism covered? (Not just inheritance-based). for example, @overload
 

@@ -358,7 +358,7 @@ so the task still stops the way the group intended.
 The mistake runs the other way:
 a bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
 which is how a `TaskGroup` block ends up waiting on a task that was told to stop.
-If a task must clean up on the way out, catch `asyncio.CancelledError` by name,
+If a task must clean up as it stops, catch `asyncio.CancelledError` by name,
 do the cleanup, and re-raise it.
 
 When failure is not termination but data,
@@ -842,7 +842,7 @@ and all three surface in this short listing:
 3. `pool.map()` raises nothing itself.
    It returns a generator,
    and a worker's exception is re-raised in the calling process when you consume that worker's result.
-   The `list(...)` around the call is what turns a failure in any worker into an exception here,
+   The `list(...)` around the call turns a failure in any worker into an exception here,
    at a point you can catch it.
    That third point is true of every `Executor`, not only a process pool.
 
@@ -2032,9 +2032,9 @@ asyncio.run(main())
 #: deadlock detected
 ```
 
-The first task takes `lock_a` then reaches for `lock_b`.
-The second takes `lock_b` then reaches for `lock_a`.
-The `sleep(0.01)` gives each task time to grab its first lock before either reaches for its second.
+The first task takes `lock_a` then tries to acquire `lock_b`.
+The second takes `lock_b` then tries to acquire `lock_a`.
+The `sleep(0.01)` gives each task time to grab its first lock before either asks for its second.
 Tasks, unlike threads, run one at a time,
 so no OS scheduler can interleave the two tasks' first lines in an unlucky order.
 
@@ -2198,7 +2198,7 @@ Here are a few of the topics beyond it:
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
   Unlike `gather()` or `TaskGroup`,
-  a barrier is a rendezvous point the running code reaches and blocks on itself,
+  a barrier is a rendezvous point that the running code reaches and blocks at,
   often reused across repeated phases,
   not a supervisor waiting from outside for everything to finish.
 - **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory directly.

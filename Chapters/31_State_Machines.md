@@ -370,7 +370,7 @@ so the output continues as in the first version.
 If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to quickly read and understand the state transitions from looking at the table.
-`next()` raises `from None` rather than chaining,
+`next()` raises its `RuntimeError` `from None` rather than chaining,
 which drops a `KeyError` that would only repeat the event the message already names.
 
 ### An Unexpected Input
@@ -490,7 +490,8 @@ The lookup keys on `type(event)` exactly: a dictionary probe,
 not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
 and it cuts the other way too:
-define a further subclass of an event type and it matches none of its parent's rows.
+if you define a further subclass of an event type,
+it matches none of its parent's rows.
 An event's dispatch class must appear in the table by name;
 a subclass will not do.
 

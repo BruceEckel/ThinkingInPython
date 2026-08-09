@@ -187,7 +187,7 @@ it does not extend what the checker knows.
 ## An Assurance Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
-Functional programming's honest answer is not one guarantee but a spectrum.
+Functional programming's answer is not one guarantee but a spectrum.
 The properties built up here, purity, immutability,
 and referential transparency, buy assurance at every level.
 You decide how far to take it.
@@ -318,7 +318,7 @@ so what it reports is `'_'` rather than the longer string it happened to fail on
 That single character is the whole bug statement.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 and `database=None` keeps it from replaying a case saved by an earlier run;
-a real test wants neither.
+a real test needs neither.
 `roundtrip()` is called directly, inside a `try`,
 because a `test_` function that fails is supposed to fail the build.
 
@@ -330,7 +330,7 @@ sorting produces an ordered list.
 sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree: the simple,
 obviously correct version matches the fast one,
-which is exactly what `parallel_pure.py`'s `assert parallel == serial` already claimed.
+which is what `parallel_pure.py`'s `assert parallel == serial` already claimed.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
@@ -339,7 +339,7 @@ constrains the function's behavior without repeating its body.
 All of these lean on purity.
 Hypothesis can rerun and shrink freely only because each call is independent of every other.
 
-Two caveats keep this honest.
+Two caveats keep the claim from overreaching.
 First, proof is not exclusive to functional code.
 Hoare logic and tools like Dafny verify imperative programs too.
 What purity changes is the cost.

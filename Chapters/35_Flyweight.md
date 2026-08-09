@@ -436,7 +436,7 @@ skipping `Tile.__new__()` so the call does not recurse.
 Enum's metaclass reads it to build the `Tile(".")` lookup table and the member's `repr()`,
 so it keeps that exact name rather than something like `_symbol_`.
 
-Name, symbol, and attribute access all land on the same shared member.
+Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
 The cost is flexibility.

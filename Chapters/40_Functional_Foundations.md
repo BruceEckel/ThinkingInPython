@@ -76,7 +76,7 @@ because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional_Assurance.md#automatic-parallelism)
 turns that safety into speed.
 A cache can store its results, knowing the answer will never go stale.
-That is what makes [`functools.cache`](41_Functional_Toolkits.md#cache)
+That makes [`functools.cache`](41_Functional_Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
 And you test it with a single assertion and no fixture,
 since there is nothing to set up or restore:
@@ -225,7 +225,7 @@ What removes hashing is equality based on *contents*.
 A `list` and an unfrozen `@dataclass` both compare that way,
 so Python sets their `__hash__` to `None`:
 a key whose contents changed would no longer be found in the dictionary that stored it.
-`frozen=True` is what lets a dataclass keep contents-based equality and a hash at the same time.
+`frozen=True` lets a dataclass keep contents-based equality and a hash at the same time.
 That combination is why a value that must be a dictionary key, a cache entry,
 or a shared read across threads is normally a tuple or a frozen dataclass.
 
@@ -463,8 +463,9 @@ and the runtime message, complaining about a local variable
 ("cannot access local variable 'count' where it is not associated with a value"),
 points nowhere near the missing declaration.
 The checker is the better guide here.
-Delete the `nonlocal` line and `ty` reports `Name 'count' used when not defined` on the `count += 1` line itself,
-before the program runs at all.
+If you delete the `nonlocal` line,
+`ty` reports `Name 'count' used when not defined` on the `count += 1` line itself,
+before the program runs.
 
 ## Partial Application
 
@@ -638,7 +639,7 @@ or run on another core with no coordination.
 
 None of this is a different language.
 It is ordinary Python in which each piece depends on its arguments alone,
-and that single property is what the chapters ahead build on.
+and the chapters ahead build on that single property.
 
 ## Exercises
 

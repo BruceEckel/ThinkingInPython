@@ -302,6 +302,27 @@ legal value** (PEP 661, Python 3.15+).
   grouped and sorted (stdlib, third-party, local) but contiguous. Do
   not run a formatter that re-expands to two blanks (Black-style).
 
+- **Expected output goes in `#:` markers, next to the code that
+  produced it.** A listing records what it prints as `#:` comment
+  lines, one per line of stdout, and the build verifies them against a
+  real run. Each run of markers sits directly after the statement that
+  produced that output, never gathered at the end of the listing: the
+  reader should see a result beside the code responsible for it. A
+  single run of many `#:` lines is still right when one statement
+  produced all of it (a `for` loop, one multi-line `print()`), so do
+  not split those.
+
+- **A marker for output an `import` produced is the exception.**
+  Placed directly after the last import, it sits inside the import
+  block and trips ruff's `I001`. Close the import block with its blank
+  line first, then put the marker below it, still directly above the
+  code it precedes:
+
+      import a_package
+
+      #: initializing a_package
+      print(hasattr(a_package, "module1"))
+
 - **Line length is 70.** Long inline comments are the usual culprit.
   Move the comment to its own line or wrap the statement.
 

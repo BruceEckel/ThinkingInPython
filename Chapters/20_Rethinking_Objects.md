@@ -61,8 +61,8 @@ The industry has been quietly walking back from "everything is an object" and fr
 The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
-An override may accept more than the base does but never less,
-returns a result the caller can use where the base's result was expected,
+An override may accept more than the base does but never less.
+It returns a result the caller can use where the base's result was expected,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
@@ -898,7 +898,7 @@ def test_newtype_has_no_runtime_effect() -> None:
 
 Nothing in that test can fail.
 The `NewType` protection lives in the checker alone.
-A caller who passes a raw `int` where `UserId` is expected raises no exception.
+Passing a raw `int` where `UserId` is expected raises no exception.
 Only the checker sees it, and only at edit time.
 Here, that diagnostic is silenced by the same `# type: ignore` that passes the book build.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
@@ -1112,7 +1112,7 @@ or whether immutable data, a function, and a protocol already solve the problem.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
 2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]`.
     Show that `ty check` still passes, that `append()` works,
-    and that `hash(immutable)` now raises,
+    and that `hash(immutable)` now raises a `TypeError`,
     so the frozen instance can no longer be a dict key.
     Restore the `tuple`.
     Who, then, is responsible for making immutability go all the way down?

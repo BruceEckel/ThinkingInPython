@@ -342,8 +342,8 @@ so a *mutable* default argument brings the sharing straight back.
 `100` cannot be mutated, so it is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
-The annotation is what marks a field.
-Write `x = 100` with no `x: int` and `@dataclass` sees nothing:
+The annotation marks a field.
+If you write `x = 100` with no `x: int`, `@dataclass` sees nothing:
 
 ```python
 # dataclass_no_annotation.py

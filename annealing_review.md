@@ -26,7 +26,89 @@ No unapplied `deep_review/` file exists for any chapter, so nothing was blocked.
 | 06_Modules_and_Packages | done | 2 |
 | 07_Classes | done | 1 |
 | 08_Static_Typing | done | 0 (annealed clean) |
-| 09 through 47 | pending | |
+| 09_Class_Attributes | done | 2 |
+| 10_Cleanup | done | 1 |
+| 11_Testing | done | 2 |
+| 12_Data_Classes_as_Types | done | 0 (annealed clean) |
+| 13_Pattern_Matching | done | 0 (annealed clean) |
+| 14_Decorators | done | 0 (annealed clean) |
+| 15_Context_Managers | done | 1 |
+| 16_Comprehensions | done | 0 (annealed clean) |
+| 17_Metaprogramming | done | 0 (annealed clean) |
+| 18_Performance | done | 1 |
+| 19_Concurrency | done | 4 |
+| 20_Rethinking_Objects | done | 3 |
+| 21_The_Pattern_Concept | done | 0 (annealed clean) |
+| 22_Data_Transfer_Objects | done | 1 |
+| 23_Iterators | done | 2 |
+| 24_Singleton | done | 0 (annealed clean) |
+| 25_Template_Method | done | 0 (annealed clean) |
+| 26_Surrogate | done | 0 (annealed clean) |
+| 27_Factory | done | 2 |
+| 28_Function_Objects | done | 2 |
+| 29_Changing_the_Interface | done | 0 (annealed clean) |
+| 30_Observer | done | 1 |
+| 31_State_Machines | done | 2 |
+| 32_Multiple_Dispatching | done | 2 |
+| 33_Visitor | done | 2 |
+| 34_Composite_and_Interpreter | done | 2 |
+| 35_Flyweight | done | 1 |
+| 36_Memento | done | 4 |
+| 37_Pattern_Refactoring | done | 0 (annealed clean) |
+| 38_Simulation | done | 0 (annealed clean) |
+| 39_Pattern_Catalog | done | 0 (annealed clean) |
+| 40_Functional_Foundations | done | 4 |
+| 41_Functional_Toolkits | done | 4 |
+| 42_Functional_Error_Handling | done | 1 |
+| 43_Functional_Assurance | done | 4 |
+| 44_Effect_Management | done | 2 |
+| 45_Generators | done | 3 |
+| 46_Stateless | done | 2 |
+| 47_Stateless_in_Practice | done | 5 |
+| 06_Modules_and_Packages (revisited) | done | 1 |
+
+**The book is annealed end to end.** Every chapter has been through the pass.
+
+These stayed declined throughout, as established book vocabulary rather than
+slips:
+
+- "earns its keep" / "earns its place" — 12 uses book-wide. Leave.
+- `spell` / `spelling` — 10 uses across nine chapters. Leave.
+
+The two open items carried forward for chapter 19 were both resolved: the three
+"reaches for" uses became "tries to acquire" / "asks for" (the surrounding text
+already says "acquire"), and `19:845`'s "is what turns" lost the cleft.
+
+---
+
+## 17_Metaprogramming
+
+**Annealed clean** across 1,739 lines.
+
+Two things independently confirm the traps recorded in `CLAUDE.md`, so leave them
+alone: `greenhouse.py` and `utils/display.py` both annotate unions as
+`EventMaker | NOT_CREATED` and `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
+naming the specific sentinel **values** rather than the generic `sentinel` class,
+which is what makes `ty` narrow the other branch; and `_redefined()` restricts its
+comparison to `INTERESTING_DUNDERS` with a comment explaining that every class
+carries bookkeeping dunders differing from `object`'s.
+
+---
+
+## 18_Performance
+
+**Verified clean:** every threshold boolean has a wide margin (100x, 3x, 10x, 5x,
+2x against real order-of-magnitude gaps), so none is at risk of the silent flip
+`CLAUDE.md` warns about. The NumPy, Numba and combined listings are indented
+blocks rather than fenced ones, deliberately un-run because neither package
+installs on the pinned 3.15 — matching the project-memory note, with `TODO(py315-deps)`
+comments marking the conversion.
+
+**Applied:**
+
+- **Bisect.** "but only `bisect_left()` lands on an existing value" → "points at
+  an existing value." "lands" is on the don't-use list; "points at" is the book's
+  own word for this (chapter 14 uses it for `__wrapped__`).
 
 ---
 
@@ -199,9 +281,99 @@ Two things worth recording so a later pass does not undo them:
 
 ---
 
+## 09_Class_Attributes
+
+**Applied:**
+
+- **A `@dataclass` reads annotations.** "The annotation is what marks a field." →
+  "The annotation marks a field." A cleft with the verb right behind it; deleting
+  the words changes nothing.
+- Same paragraph: "Write `x = 100` with no `x: int` and `@dataclass` sees
+  nothing:" → "If you write `x = 100` with no `x: int`, `@dataclass` sees
+  nothing:" (imperative-plus-consequence; the listing below is the demonstration,
+  so this was a hypothetical, not an instruction).
+
+**Declined:** "write the spelling that says so" (Which Dictionary?) stays. The
+global rule bans the noun, but the book uses `spell`/`spelling` 10 times across
+nine chapters, so it is vocabulary; changing one instance would be inconsistent.
+
+---
+
+## 10_Cleanup
+
+**Applied:**
+
+- **`finalize_trap.py` commentary.** "keeps the question to the one being asked" →
+  "narrows the listing to the question being asked". A question cannot be kept to
+  itself; the sentence needed a second reading.
+
+---
+
+## 11_Testing
+
+**Verified clean:** `test_account.py:11` in the quoted pytest failure really is
+the assert line. Both numeric claims check out against the pinned interpreter:
+five 5% applications land on `127.62815624999999`, and `random.Random(0).randint(1, 6)`
+is `4` (so the chapter's note that its agreeing with the stubbed `4` is a
+coincidence is itself correct).
+
+**Applied:**
+
+- **"instead of reaching for it"** → "instead of going looking for it". "reach
+  for" is in `tools/data/banned_phrases.txt`, but the gate matches **literally**,
+  so the inflected form passes it. The replacement is the chapter's own idiom for
+  this exact idea, used twice elsewhere ("goes looking for the clock"). A
+  book-wide sweep for inflected forms found only three others, all in chapter 19
+  and all the literal sense (a task trying to acquire a lock).
+- **Before the quoted pytest failure.** "Change the expected value ... and the
+  report names the line" → "If you change the expected value ..., the report
+  names the line" (imperative-plus-consequence).
+
+---
+
+## 12_Data_Classes_as_Types
+
+**Annealed clean.** Nothing cleared the bar across 1,533 lines.
+
+---
+
+## 13_Pattern_Matching
+
+**Annealed clean.**
+
+---
+
+## 14_Decorators
+
+**Annealed clean.**
+
+---
+
+## 15_Context_Managers
+
+**Verified clean:** `utils/exceptions.py` annotates `types: Types | ALL = ALL`,
+naming the specific sentinel value rather than the generic `sentinel` class,
+which is what `CLAUDE.md`'s narrowing trap requires; the prose explaining that
+narrowing is correct.
+
+**Applied:**
+
+- **After `nullcontext_demo.py`.** "the `nullcontext` wrapper is what lets one
+  `with` block serve both cases" → "the `nullcontext` wrapper lets one `with`
+  block serve both cases." Cleft with the verb right behind it.
+
+---
+
+## 16_Comprehensions
+
+**Annealed clean.** The note that `filter()` narrows only with a named
+`TypeIs[int]` predicate matches the `ty` behavior recorded in `CLAUDE.md`.
+
+---
+
 ## Verification
 
-`make reflow` on 01 through 08 (one paragraph rewrapped in 02 and one in 07, both
+`make reflow` on 01 through 16 (one paragraph rewrapped in 02 and one in 07, both
 from the edits), `heading_links.py` → "Anchor links OK", `banned_phrases.py` →
 "No banned phrases found".
 The one code-block edit (06) was re-extracted and re-validated against a real run.
@@ -209,3 +381,332 @@ The one code-block edit (06) was re-extracted and re-validated against a real ru
 found".
 No fenced ```python block and no `#:` marker was touched in any of the three, so
 the example tree is unaffected.
+
+---
+
+## 19_Concurrency
+
+**Applied:**
+
+- **Cancellation cleanup.** "If a task must clean up on the way out" → "as it
+  stops". "the way out" is on the don't-use list, and the replacement names what
+  is actually happening.
+- **`pool.map()`, note 3.** "The `list(...)` around the call is what turns a
+  failure ... into an exception here" → "turns a failure ...". A cleft with the
+  verb right behind it.
+- **`async_deadlock.py` commentary.** Three uses of "reaches for" became "tries
+  to acquire" / "asks for", matching the section's own vocabulary ("acquire
+  shared locks in the same global order" four paragraphs below).
+- **Barriers bullet.** "a rendezvous point the running code reaches and blocks on
+  itself" → "that the running code reaches and blocks at". The original read as
+  code blocking on itself.
+
+---
+
+## 20_Rethinking_Objects
+
+**Applied:**
+
+- **LSP definition.** "An override may accept more than the base does but never
+  less, returns a result ..., and raises ..." split into two sentences. The modal
+  in the first clause did not carry into the two indicative ones, so the list
+  read as broken parallelism.
+- **`NewType` section.** "A caller who passes a raw `int` ... raises no
+  exception" → "Passing a raw `int` ... raises no exception." A caller does not
+  raise; the call does.
+- **Exercise 2.** "`hash(immutable)` now raises" → "raises a `TypeError`."
+  Objectless "raises"; `frozen_leaky.py` names the type two sections earlier.
+
+---
+
+## 21_The_Pattern_Concept
+
+**Annealed clean.**
+
+---
+
+## 22_Data_Transfer_Objects
+
+**Applied:**
+
+- **`SimpleNamespace` intro.** "attributes that land in the instance's
+  `__dict__`" → "attributes in the instance's `__dict__`". "land" is on the
+  don't-use list and the sentence loses nothing.
+
+**Declined:** "become a dict on the way out" (Which Should You Use?) stays. There
+the phrase is directional and literal, and every replacement read worse.
+
+---
+
+## 23_Iterators
+
+**Applied:**
+
+- **The Costs of Laziness, opening.** "Two of those consequences are surprising"
+  → "Laziness has two surprising consequences". "those consequences" had no
+  antecedent noun; the section heading was carrying the reference.
+- **Exercise 10.** "`typed()` raises on the first item of the wrong type" →
+  "raises a `TypeError` on the first item".
+
+---
+
+## 24_Singleton, 25_Template_Method, 26_Surrogate
+
+**Annealed clean.** In 25 and 26, "hook" is a defined term (an optional step, and
+`__getattr__`'s fallback), so it stays; the casual uses elsewhere in the book did
+not.
+
+---
+
+## 27_Factory
+
+**Applied:**
+
+- **`games2.py` commentary.** "`BrokenFactory` is the near-miss. It supplies
+  `make_character()` and forgets ..." merged into one sentence. "near-miss" is on
+  the don't-use list, and the sentence it opened only restated the next one.
+- **Abstract Factory commentary.** "no hook for varying the rules of play" → "no
+  place to vary the rules of play".
+
+---
+
+## 28_Function_Objects
+
+**Applied:**
+
+- **Chain of Responsibility.** "not quite the same as landing on a root" →
+  "reaching a root".
+- **`test_event_bus.py`** (code block). `# Must not raise` → `# Must not raise
+  anything`, an objectless "raise" in a comment. Re-synced and re-run.
+
+---
+
+## 29_Changing_the_Interface
+
+**Annealed clean.**
+
+---
+
+## 30_Observer
+
+**Applied:**
+
+- **`test_observers.py`** (code block). The same `# Must not raise` → `# Must not
+  raise anything`, so the two listings stay consistent. Re-synced and re-run.
+
+---
+
+## 31_State_Machines
+
+**Applied:**
+
+- **After `mouse_trap2.py`.** "`next()` raises `from None` rather than chaining"
+  → "raises its `RuntimeError` `from None`". The object was missing.
+- **The engine's exact-type lookup.** "define a further subclass of an event type
+  and it matches none of its parent's rows" → "if you define a further subclass
+  ..., it matches none". Imperative-plus-consequence.
+
+---
+
+## 32_Multiple_Dispatching
+
+**Applied:**
+
+- **`double_dispatch` image alt text.** "landing execution inside
+  `Paper.eval_scissors()`" → "putting execution inside".
+- **Following the duel.** "landing in `Paper.eval_scissors()`" → "arriving in".
+
+---
+
+## 33_Visitor
+
+**Applied:**
+
+- **Two uses of "the `accept()` hook"** → "the `accept()` method". `accept()` is
+  required rather than optional, so "method" is both plainer and more accurate.
+
+---
+
+## 34_Composite_and_Interpreter
+
+**Applied:**
+
+- **After `infix.py`.** "needs no `accept()` hook" → "needs no `accept()`
+  method", matching chapter 33.
+- **Exercise 9.** "A plugin package wants to add its own entry types" → "needs to
+  add". A package is not an agent.
+
+---
+
+## 35_Flyweight
+
+**Applied:**
+
+- **After `tile_enum.py`.** "Name, symbol, and attribute access all land on the
+  same shared member" → "all reach the same shared member".
+
+---
+
+## 36_Memento
+
+**Applied:**
+
+- **The caretaker's restraint.** "an honest mistake (swapping the snapshot's
+  strokes ...)" → "an accidental edit", which is what the parenthetical
+  describes.
+- **Pickle drift setup.** "keeps the simulation honest" → "keeps the simulation
+  faithful".
+- **Drift in the other direction.** "Delete a field and the old bytes load with
+  no error anywhere" → "If you delete a field, ...". Imperative-plus-consequence.
+- Same paragraph: "never raises an exception at all" → "never raises an
+  exception".
+
+---
+
+## 37_Pattern_Refactoring, 38_Simulation, 39_Pattern_Catalog
+
+**Annealed clean.** 39's completed review carries an `[X] Reject` on adding a
+conclusion or exercises to it, so that was left alone.
+
+---
+
+## 40_Functional_Foundations
+
+**Applied:**
+
+- **Pure Functions.** "That is what makes `functools.cache` safe" → "That makes
+  `functools.cache` safe". A cleft with the verb behind it.
+- **Immutability.** "`frozen=True` is what lets a dataclass keep ..." →
+  "`frozen=True` lets a dataclass keep ...". Same construction.
+- **Closures.** "Delete the `nonlocal` line and `ty` reports ..." → "If you
+  delete the `nonlocal` line, `ty` reports ...", and "before the program runs at
+  all" → "before the program runs".
+- **Closing sentence.** "that single property is what the chapters ahead build
+  on" → "the chapters ahead build on that single property", which also removes a
+  stranded preposition.
+
+---
+
+## 41_Functional_Toolkits
+
+**Applied:**
+
+- **`wraps`.** "Delete the `@wraps(func)` line and that same `print()` reports
+  ..." → "If you delete the `@wraps(func)` line, ...".
+- **`islice`.** "give it an iterator rather than a list, and that iterator
+  resumes ..." → "if you give it an iterator rather than a list, that iterator
+  resumes ...".
+- **`singledispatchmethod`.** "exactly as the plain function above does" → "the
+  same way the plain function above does". "exactly" as an intensifier.
+- **Lazy Evaluation.** "Slice lazily and the source can be infinite; slice a list
+  and the source has to end" → "Slicing lazily lets the source be infinite;
+  slicing a list requires a source that ends." Two imperative-plus-consequence
+  clauses in one sentence; the gerund form reads better than two conditionals.
+
+---
+
+## 42_Functional_Error_Handling
+
+**Applied:**
+
+- **`@safe`'s breadth.** "Misspell a name inside the wrapped function and the
+  resulting `NameError` arrives as an ordinary `Err`" → "If you misspell a name
+  ...".
+
+---
+
+## 43_Functional_Assurance
+
+**Applied:**
+
+- **An Assurance Spectrum.** "Functional programming's honest answer" →
+  "Functional programming's answer".
+- **The property-shape family.** "which is exactly what `parallel_pure.py`'s
+  assert already claimed" → "which is what ... already claimed".
+- **Shrinking.** "a real test wants neither" → "needs neither".
+- **Two caveats.** "Two caveats keep this honest" → "Two caveats keep the claim
+  from overreaching", which also says what the caveats do.
+
+---
+
+## 44_Effect_Management
+
+**Applied:**
+
+- **Effect Management Systems.** "and it is what makes code hard to understand" →
+  "and it makes code hard to understand".
+- **AI languages.** "a host that pins the implementations itself can guarantee
+  ..." → "a host that pins the implementations can guarantee ...". The "itself"
+  could attach to either noun and changed nothing.
+
+---
+
+## 45_Generators
+
+**Applied:**
+
+- **Running to Exhaustion.** "The `from` is what makes this delegation" → "The
+  `from` makes this delegation".
+- **All Three Channels.** "arrives as the value of the `yield` expression and
+  lands in `answer`" → "and is bound to `answer`".
+- **Composing Is Not Interpreting.** "Stack delegations as deep as you like and
+  the number of drivers stays at one" → "However deep you stack delegations, the
+  number of drivers stays at one."
+
+---
+
+## 46_Stateless
+
+**Verified clean:** the `type`-alias warning in Retrofitting an Effect matches
+the `ty` behavior recorded in `CLAUDE.md`, and the spelled-out unions elsewhere
+are deliberate, so no Effect signature was "cleaned up" into an alias.
+
+**Applied:**
+
+- **Emptying the Channels, item 3.** "An Ability the driver answers itself needs
+  no vocabulary at all" → "An Ability that the driver answers on its own needs no
+  vocabulary." The original read as the Ability answering itself.
+- **Declaring Is Not Handling.** "so the inner `except` never runs at all" → "so
+  the inner `except` never runs."
+
+---
+
+## 47_Stateless_in_Practice
+
+**Applied:**
+
+- **Abilities Are Not Special.** "the type bound is what makes that more than a
+  convention" → "the type bound makes that more than a convention".
+- Same section: "Leave the annotation off and `handle()` raises a `ValueError`" →
+  "If you leave the annotation off, `handle()` raises a `ValueError`".
+- **The scripted-handler trap.** "Ask `count_heads()` for six tosses ... and
+  `run()` produces `None`" → "Asking `count_heads()` for six tosses ... makes
+  `run()` produce `None`".
+- **Running Effects in Parallel.** "Fork and wait inside a single loop and each
+  `wait()` blocks ..." → "Forking and waiting inside a single loop makes each
+  `wait()` block ...".
+- **Exercise 14.** "where a cast is wanted" → "where a cast is expected".
+
+---
+
+## 06_Modules_and_Packages (revisited)
+
+The previous pass moved `#: initializing a_package` up to hug its `import` in
+`package_only.py`, which left `make verify` red: ruff's `I001` wants a blank line
+after an import block, and the marker was sitting inside one. Both neighboring
+listings (`using_packages.py`, `from_packages.py`) already put a blank line after
+their imports and the markers below it, so `package_only.py` now matches them.
+The marker still sits directly above the code it belongs to.
+
+---
+
+## Verification (chapters 19-47)
+
+`make reflow` on every touched chapter (five paragraphs rewrapped, in 31, 40, 41,
+42 and 47), then a green `make verify`: markers refreshed, tree synced,
+`heading_links.py` OK, `banned_phrases.py` clean, `ty` and `ruff` clean over
+`build/examples`, 256 tests passing, and every runnable example executed.
+
+No `#:` output marker changed value anywhere in `git diff`, so no timing boolean
+flipped. The only code touched was two test comments (28 and 30) and the blank
+line in 06; all three are re-synced into `Examples/`.

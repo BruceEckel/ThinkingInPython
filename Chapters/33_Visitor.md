@@ -183,7 +183,7 @@ using `functools.singledispatch`.
 It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
 That's how *Visitor* works,
-but without the `accept()` hook or the `Visitor` class hierarchy.
+but without the `accept()` method or the `Visitor` class hierarchy.
 The flowers below are the same three.
 The operations are new, and there are two of them,
 added independently of each other:
@@ -344,7 +344,7 @@ def test_dispatch_follows_inheritance() -> None:
 
 *Visitor* still has a place:
 when the elements must drive the traversal themselves from inside `accept()`,
-or when a framework you do not own already calls that hook.
+or when a framework you do not own already calls that method.
 But in Python that is rare.
 As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example,
 `singledispatch` is the open-method mechanism that *Visitor* fakes.

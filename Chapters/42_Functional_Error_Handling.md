@@ -524,7 +524,8 @@ including `functools.wraps`.
 `@safe` catches `Exception`,
 which is every failure the wrapped function can produce,
 including the ones that are defects rather than expected outcomes.
-Misspell a name inside the wrapped function and the resulting `NameError` arrives as an ordinary `Err`,
+If you misspell a name inside the wrapped function,
+the resulting `NameError` arrives as an ordinary `Err`,
 indistinguishable from bad input.
 The version here is deliberately small.
 A production one takes the exception types it should catch as an argument and lets the rest propagate,

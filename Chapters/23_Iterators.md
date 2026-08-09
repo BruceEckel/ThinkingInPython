@@ -168,7 +168,7 @@ which a list cannot do.
 
 ## The Costs of Laziness
 
-Two of those consequences are surprising, and both are silent:
+Laziness has two surprising consequences, and both are silent:
 
 ```python
 # generator_lifecycle.py
@@ -790,7 +790,8 @@ The protocol costs you nothing, and tells you nothing.
     using the fact that a one-character string is still a `Sequence`.
     Then fix `flatten()` so a `str` yields as one item,
     and say what the same fix would look like in `flatten_loop()`.
-10. `typed()` raises on the first item of the wrong type, which ends the stream.
+10. `typed()` raises a `TypeError` on the first item of the wrong type,
+    which ends the stream.
     Write `typed_skipping()`, which drops mismatched items and keeps going,
     then say which of the two you would want wrapping a parsed log file,
     and why.

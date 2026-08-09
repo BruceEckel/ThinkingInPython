@@ -108,6 +108,16 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   is repo drift; run the extracted script directly first
   (`build/examples/<chapter>/<file>.py`) to check whether the value is
   actually stable before accepting an auto-fix.
+- **A `#:` marker for output an `import` produced cannot hug that import.**
+  Markers otherwise sit directly after the statement that produced them, but a
+  marker placed after the last import sits *inside* the import block, and ruff's
+  `I001` ("Import block is un-sorted or un-formatted") fails the gate.
+  `validate_output.py` accepts either arrangement, so this surfaces at `make
+  lint`/`make verify`, a step after the edit looked correct. Close the import
+  block with its blank line first, then put the marker below it, directly above
+  the code it precedes. Chapter 6's `package_only.py` was annealed into the
+  hugging form and broke the build; its neighbors `using_packages.py` and
+  `from_packages.py` already had the right shape.
 - **Async timing markers flip silently on Windows timers.** A `#:` trace
   that depends on ordering between asyncio deadlines needs wide margins.
   Chapter 19's `task_group.py` cancellation demo with 0.01/0.02/0.03s

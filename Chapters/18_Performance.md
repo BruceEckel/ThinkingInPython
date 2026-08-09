@@ -481,7 +481,7 @@ which returns the position after any elements equal to the target,
 while `bisect_left()` returns the position before them
 (`insort()` is likewise an alias for `insort_right()`).
 Either one answers "where does this go,"
-but only `bisect_left()` lands on an existing value,
+but only `bisect_left()` points at an existing value,
 so a membership test must use it, as `search_comparison.py` does below.
 Only the search is fast,
 because `insort()` still shifts everything after the insertion point.

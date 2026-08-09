@@ -141,8 +141,8 @@ so you rarely need a debugger to see what went wrong.
 and `pytest --lf` reruns just the tests that failed last time.
 Those three cover most of a working day.
 
-Change the expected value in `test_deposit_increases_balance()` to `10` and the report names the line,
-the expression, and both sides:
+If you change the expected value in `test_deposit_increases_balance()` to `10`,
+the report names the line, the expression, and both sides:
 
 ```text
 ______________ test_deposit_increases_balance ______________
@@ -580,7 +580,7 @@ def test_elapsed(monkeypatch: pytest.MonkeyPatch) -> None:
 ```
 
 As with randomness, injecting the clock is cleaner still.
-The same computation takes `now` as an argument instead of reaching for it:
+The same computation takes `now` as an argument instead of going looking for it:
 
 ```python
 # clock_injected.py

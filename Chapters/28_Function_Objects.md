@@ -385,7 +385,7 @@ Any sentinel-versus-value check on a numeric result has this hazard.
 
 The chain trusts each handler to know when it failed.
 `secant()` and `newton()` stop when their step stops shrinking,
-which is not quite the same as landing on a root,
+which is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
 These tests confirm that the first finder that converges wins,
@@ -536,7 +536,7 @@ def test_only_the_matching_type_is_called() -> None:
     assert calls == ["withdraw"]
 
 def test_no_handler_is_a_noop() -> None:
-    EventBus().publish(Closed("done"))  # Must not raise
+    EventBus().publish(Closed("done"))  # Must not raise anything
 ```
 
 This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)

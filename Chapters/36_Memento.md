@@ -117,7 +117,7 @@ Whoever holds `checkpoint` stores it and gives it back.
 It does not reach inside and edit the strokes.
 Languages with access control enforce this opacity.
 In Python it is a convention,
-though freezing the memento means an honest mistake
+though freezing the memento means an accidental edit
 (swapping the snapshot's strokes for different ones) fails loudly.
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
@@ -458,7 +458,7 @@ not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load happens,
 `pickle.loads()` still succeeds.
 What breaks is whatever later touches a field the bytes never carried.
-Splitting the class into its own module keeps the simulation honest,
+Splitting the class into its own module keeps the simulation faithful,
 since real drift happens between two separate runs of a program,
 not inside one script:
 
@@ -518,14 +518,14 @@ Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
 Drift in the other direction is quieter still.
-Delete a field and the old bytes load with no error anywhere.
+If you delete a field, the old bytes load with no error anywhere.
 The dropped name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
 so `repr()` never shows it and `==` never compares it.
 The loaded object is equal to, and hashes the same as,
 one built fresh without that field.
 The added-field drift above at least fails when something touches the gap;
-this one never raises an exception at all.
+this one never raises an exception.
 The data is just quietly wrong.
 Renaming a field is a delete and an add at once, and does both:
 the old name becomes a ghost and the new one is missing,

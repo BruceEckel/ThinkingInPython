@@ -299,7 +299,7 @@ print(list(top()))
 Each `yield from` runs its target until that generator is exhausted,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The number of contributions is a property of the target.
-The `from` is what makes this delegation:
+The `from` makes this delegation:
 `yield one()` would hand the generator object itself to the driver as one value.
 "Exhausted" describes where the delegation ends, not when it happens.
 Each value still leaves the inner generator only when the driver asks for the next one.
@@ -472,7 +472,7 @@ Only the generator portion changed.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
-which arrives as the value of the `yield` expression and lands in `answer`.
+which arrives as the value of the `yield` expression and is bound to `answer`.
 As the `ReturnType` it is the value `ask()` hands back when it finishes,
 which `yield from` produces as the value of the whole `yield from` expression.
 The inner generator asks one question and hands back one answer,
@@ -532,7 +532,7 @@ so the call merges one more pair into `ANSWERS` with the dictionary union operat
 but not as its runner.
 Something must still call `next()` and `send()` at the top,
 which is why the example ends with a `drive()` call.
-Stack delegations as deep as you like and the number of drivers stays at one.
+However deep you stack delegations, the number of drivers stays at one.
 
 What separates them is the response to a request.
 `drive()` answers it: a `Question` comes out, the driver looks it up,

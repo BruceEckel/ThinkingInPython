@@ -117,14 +117,15 @@ That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
 the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
 drew for `Async`.
 `Ask` is an Ability, so it sits in the channel bare,
-and the type bound is what makes that more than a convention:
+and the type bound makes that more than a convention:
 `Depend[Console, None]` is rejected at the annotation,
 before any `yield` is examined,
 because `Console` is not assignable to `Ability[Any]`.
 
 `handle()` reads the annotation on its argument to decide which Ability it answers,
 which is why `scripted` and `capture` must annotate their parameters.
-Leave the annotation off and `handle()` raises a `ValueError` at the point of decoration,
+If you leave the annotation off,
+`handle()` raises a `ValueError` at the point of decoration,
 since there is nothing to match a request against.
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
@@ -230,7 +231,7 @@ That state brings one trap, and it is silent.
 `next(script)` raises `StopIteration` once the sequence runs out,
 and `StopIteration` is how a driver learns that an Effect has finished,
 so `handle()` reads the exhausted script as the end of the program.
-Ask `count_heads()` for six tosses from this five-value script and `run()` produces `None` instead of a count,
+Asking `count_heads()` for six tosses from this five-value script makes `run()` produce `None` instead of a count,
 with no exception, the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
 Every other exception a handler raises travels out of `run()` normally;
@@ -1754,7 +1755,7 @@ Five tasks that each sleep 50 milliseconds finish in about the time of one.
 That comes from the two loops.
 `squares()` forks every task before it waits for any of them,
 so the five sleeps overlap.
-Fork and wait inside a single loop and each `wait()` blocks on the task the same iteration just created,
+Forking and waiting inside a single loop makes each `wait()` block on the task the same iteration just created,
 which runs the sleeps one after another and takes about five times as long.
 The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
@@ -2199,7 +2200,7 @@ It is a language that does the encoding for you.
     and read the diagnostic before fixing it.
     Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
 14. `play()` in `casts.py` accepts any five actors, matched or not.
-    Give `kitties_and_puzzles()` and `warriors_and_weapons()` a shared signature so a caller can pass either one where a cast is wanted,
+    Give `kitties_and_puzzles()` and `warriors_and_weapons()` a shared signature so a caller can pass either one where a cast is expected,
     and say what that recovers of the Abstract Factory and what it does not.
     Then add a sixth actor to `encounter()` and count the lines you edit in `arena.py`,
     `casts.py`, and `two_games.py`.

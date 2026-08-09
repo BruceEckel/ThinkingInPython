@@ -447,7 +447,7 @@ and then the `GameEnvironment` controls the setup and play of the game.
 In this example, the setup and play is simple, but those activities
 (the *initial conditions* and the *state change*)
 can determine much of the game's outcome.
-`GameEnvironment` has no hook for varying the rules of play,
+`GameEnvironment` has no place to vary the rules of play,
 so a real game would need one,
 either a subclass overriding `play()` or a rules object passed alongside the factory.
 
@@ -530,8 +530,7 @@ g2.play()
 
 The concrete classes inherit nothing,
 but the type checker still verifies that each one fits the appropriate `Protocol`.
-`BrokenFactory` is the near-miss.
-It supplies `make_character()` and forgets `make_obstacle()`,
+`BrokenFactory` supplies `make_character()` and forgets `make_obstacle()`,
 and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
 The Protocol catches the omission before the program runs,
 earlier than either `@abstractmethod` or `raise NotImplementedError` can.

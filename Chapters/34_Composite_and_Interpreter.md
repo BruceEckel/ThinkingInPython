@@ -419,7 +419,7 @@ if __name__ == "__main__":
 
 This is the ability [Visitor](33_Visitor.md) fights to provide:
 new operations over a fixed hierarchy, defined outside it.
-The `match` version needs no `accept()` hook and no visitor classes,
+The `match` version needs no `accept()` method and no visitor classes,
 and unlike `singledispatch` it looks inside the nodes,
 binding their fields in the patterns.
 
@@ -666,7 +666,7 @@ here it is a way to keep a decision available to whoever is qualified to make it
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
     Raising `sys.setrecursionlimit()` is the other escape; say what it costs.
-9.  A plugin package wants to add its own entry types to `filesystem.py` without editing your code.
+9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports it.
     Which of the two designs would you use for a file system,
     and which for the expression language in `expr.py`?

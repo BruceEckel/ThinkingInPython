@@ -224,7 +224,8 @@ print(greet.__name__, "-", greet.__doc__)
 #: greet - Say hello.
 ```
 
-Delete the `@wraps(func)` line and that same `print()` reports `wrapper - None`,
+If you delete the `@wraps(func)` line,
+that same `print()` reports `wrapper - None`,
 because `greet` is now bound to the inner function and nothing copied the original's identity onto it.
 Everything that reads those attributes reads the wrapper instead: `help()`,
 a traceback, a debugger, and a test framework that collects functions by name.
@@ -334,7 +335,7 @@ print(d.describe("hi"), "|", d.describe(5))
 ```
 
 Dispatch is on the first argument after `self`, never on `self` itself,
-so this selects an implementation by the type of `value` exactly as the plain function above does.
+so this selects an implementation by the type of `value` the same way the plain function above does.
 
 `itertools` does the same for iteration: ready-made pieces you compose,
 instead of loops you write and test again.
@@ -389,8 +390,9 @@ print(list(islice(range(10), 2, 8, 2)))
 Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
 since it cannot count back from an end it may never reach.
-And it consumes what it passes over: give it an iterator rather than a list,
-and that iterator resumes where the slice stopped instead of at the beginning.
+And it consumes what it passes over:
+if you give it an iterator rather than a list,
+that iterator resumes where the slice stopped instead of at the beginning.
 
 ### `count`
 
@@ -756,8 +758,8 @@ The obvious-looking `list(squares())[:5]` is not the same program.
 It slices after building the list,
 so it asks `squares()` for every value before taking five,
 and the program never gets past that line.
-Slice lazily and the source can be infinite;
-slice a list and the source has to end.
+Slicing lazily lets the source be infinite;
+slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
 looks at the same idea from the perspective of memory and speed.
 

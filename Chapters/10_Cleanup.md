@@ -324,7 +324,7 @@ A `ref()` reports `None` once its object is gone,
 so `False True` says `Safe` was collected and `Leaky` was not.
 `Safe` printed on the way out; `Leaky` printed nothing,
 because its callback never ran and nothing failed.
-Turning `atexit` off on `Leaky`'s finalizer keeps the question to the one being asked,
+Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question being asked,
 whether the collector reclaimed the object,
 rather than whether the callback eventually ran at exit.
 

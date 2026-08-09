@@ -54,7 +54,7 @@ A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 In the standard Python library,
 `types.SimpleNamespace` is a ready-made Messenger.
-Here, too, keyword arguments become attributes that land in the instance's `__dict__`:
+Here, too, keyword arguments become attributes in the instance's `__dict__`:
 
 ```python
 # display_namespace.py
