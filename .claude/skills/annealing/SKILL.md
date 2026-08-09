@@ -37,10 +37,18 @@ A confident teaching addition is in bounds:
 a lookalike pair that needs contrasting,
 a near-miss the reader would write,
 a mechanism a listing shows by its outcome alone.
-What deep-review reserves as a proposal regardless of confidence
-is out of bounds here, since there is no channel to propose through:
-cutting a section, reordering, anything that changes the chapter's
-voice or pacing, and a new listing whose placement is a judgment call.
+Structural change stays out of bounds, for a reason of annealing's own.
+Deep-review implements a section cut or a reordering when it can decide one,
+and records that decision in the review file's applied-directly list,
+where the next review reads it.
+Annealing writes no file,
+so the same change would move the chapter's shape with no record of why.
+It also runs when a deep review has just settled that shape,
+and reopening it a pass later is churn rather than settling.
+So leave these alone:
+cutting a section, reordering,
+anything that changes the chapter's voice or pacing,
+and a new listing whose placement is a judgment call.
 When a confident finding admits several reasonable fixes,
 make the one you would have recommended.
 
