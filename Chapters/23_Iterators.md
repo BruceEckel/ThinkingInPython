@@ -787,7 +787,7 @@ The protocol costs you nothing, and tells you nothing.
     and name what it stores that a bare iterator does not.
 9.  `flatten()` recurses on anything that is not an `int`.
     Call it on `[1, "ab", 2]` and explain the `RecursionError` you get,
-    using the fact that a one-character string is still a `Sequence`.
+    given that a one-character string is still a `Sequence`.
     Then fix `flatten()` so a `str` yields as one item,
     and say what the same fix would look like in `flatten_loop()`.
 10. `typed()` raises a `TypeError` on the first item of the wrong type,

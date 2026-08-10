@@ -111,7 +111,7 @@ A parameter with a default cannot come before one without.
 are exempt, because the caller names them.
 
 Python evaluates a default value once, at function definition.
-This means all calls share one mutable default:
+So all calls share one mutable default:
 
 ```python
 # mutable_default.py

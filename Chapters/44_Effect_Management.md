@@ -196,7 +196,7 @@ Because `slope()` calls it, `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand is only as complete as your knowledge of every exception that a callee can raise,
 which is the tracking problem an Effect Management System exists to solve.
 
-Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,
+Languages like C++ and Java attempted to track exceptions using *exception specifications*,
 but did not make those first-class in the function type.
 Nothing computed a specification from the functions a body called,
 so an exception introduced three levels down had to appear by hand in every signature above it.
@@ -381,7 +381,7 @@ the EMS adds that Effect to your function's type.
 If another function then calls yours,
 the EMS carries the Effect into that function's type as well,
 and so on out to the edge of the program.
-An EMS allows you to look at the function signature and know whether it is pure.
+An EMS lets you look at the function signature and know whether it is pure.
 If it is not, the signature names the kinds of impurity involved.
 
 A full EMS does three things:
@@ -717,7 +717,7 @@ and if it works, an AI can start using it immediately.
 
 Most of these only **track** Effects rather than providing a full EMS,
 and for their purpose the other two parts are liabilities:
-a host that pins the implementations can guarantee what generated code is able to do.
+a host that pins the implementations can guarantee what generated code can do.
 
 - [Vera](https://veralang.dev):
   mandatory contracts checked with Z3 SMT verification.

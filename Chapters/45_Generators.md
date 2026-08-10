@@ -613,7 +613,7 @@ That is the question the next chapter puts into the type system.
     takes two digits, then dispenses or refuses,
     yielding its current state and receiving each event with `send()`,
     so the position in the generator's body carries the state.
-    Notice that this generator's `yield` reports where the machine got to rather than requesting something the machine needs,
+    This generator's `yield` reports where the machine got to rather than requesting something the machine needs,
     the opposite direction from `interview()`.
     Say which of the two versions you would rather extend with a sixth state,
     and why.

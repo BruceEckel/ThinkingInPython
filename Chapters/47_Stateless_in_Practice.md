@@ -2025,7 +2025,7 @@ because the driver loop can await where a handler cannot.
 ### 4. The discipline is all-or-nothing
 
 Every effectful function becomes a generator function,
-which means it cannot also be a plain function,
+so it cannot also be a plain function,
 and calling it returns a description that somebody must run.
 Type errors from a library this generic are long and mention internals.
 And a third-party function that knows nothing about Effects needs a `@throws` wrapper or a `need()` route before it can participate.

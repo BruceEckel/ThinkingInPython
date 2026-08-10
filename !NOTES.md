@@ -39,6 +39,7 @@ Fatal vs recoverable errors
 - Run 'make prose' on each chapter
 - Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
   Put the result at the root in ADVERSARIAL.md
+- Pass through looking for metadiscourse phrases, empty frames, and expletive constructions
 
 
 

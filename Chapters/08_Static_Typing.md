@@ -254,7 +254,7 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 
 A class is also a value, so you can pass it to a function,
 store it in a variable, and call it to make an instance.
-This means an annotation needs a way to distinguish the class from an instance of that class.
+So an annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an instance of `SomeType`.
 The form `type[SomeType]` means the class object, or any subclass of it:
@@ -688,8 +688,8 @@ The forms above are the modern ones.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
 5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
     Remove the `= str` default and run it again.
-    Note that `ty` reports no error either way,
-    and say what that means for a bare `Stack` annotation.
+    `ty` reports no error either way;
+    say what that means for a bare `Stack` annotation.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
     Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.

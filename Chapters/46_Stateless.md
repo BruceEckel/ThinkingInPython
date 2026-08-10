@@ -51,7 +51,7 @@ Effect[Need[Console], KeyError, None]
 
 This particular Effect needs a `Console`, can fail with a `KeyError`,
 and produces nothing.
-Notice that the first parameter is `Need[Console]`, not `Console`.
+The first parameter is `Need[Console]`, not `Console`.
 The Effect asks for a console; it does not carry one.
 Something else supplies the console later,
 and [Nothing Runs Yet](#nothing-runs-yet)
@@ -97,7 +97,7 @@ and `Success` is the alias from the table, the type of that Effect.
 `Success[int]` says `double()` is pure.
 It cannot read anything, and it cannot fail.
 
-Notice that `double()` contains no `yield`, so it is not a generator function.
+`double()` contains no `yield`, so it is not a generator function.
 Python decides generator-function status from the body alone:
 `yield` in the body makes a function a generator function,
 and nothing else does, not the return annotation and not the object returned.
@@ -1025,7 +1025,7 @@ The two `greet()` calls are identical.
 No type information indicates whether a `Console` registration exists,
 so the type checker cannot report that something has gone wrong.
 
-Notice that this `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
+This `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
 
 DI met its goal, because the `Console` is swappable.
@@ -1158,7 +1158,7 @@ print(run(report("http://example.com")))
 ```
 
 `Depend[Async, str]` needs `Async`, cannot fail, and produces a `str`.
-Notice that it reads `Depend[Async, str]` and not `Depend[Need[Async], str]`,
+It reads `Depend[Async, str]` and not `Depend[Need[Async], str]`,
 where every dependency so far carried a wrapper.
 The wrapping is not optional, and this is not an exception to it.
 The channel holds Abilities, and `Async` is one, so it sits there bare.
@@ -1644,7 +1644,7 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moved into the result, so nothing remains in the error channel.
-`all_handled()` returns `Success[str]` which means that no failure can escape as a thrown exception.
+`all_handled()` returns `Success[str]`: no failure can escape as a thrown exception.
 
 ```python
 # test_catch_subset.py

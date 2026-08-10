@@ -88,7 +88,7 @@ but simpler hooks cover almost every case a metaclass used to handle:
 
 Use a metaclass only when these cannot do the job.
 This chapter starts by building classes by hand,
-so you can see what a `class` statement actually does.
+to show what a `class` statement actually does.
 Then come the simpler hooks,
 and finally metaclasses for the jobs that still need them.
 
@@ -956,7 +956,7 @@ so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
 Without it, every singleton loses its type and a type checker can no longer catch a misspelled attribute access on the result.
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
-Annotating the first parameter as `type[T]` hides the fact that `cls` is a `Singleton`,
+Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
 which is exactly what a checker must confirm before it will accept a zero-argument `super()`.
 Both forms do the same work at run time.
 

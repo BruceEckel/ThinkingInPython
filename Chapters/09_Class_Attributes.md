@@ -44,7 +44,7 @@ creating the instance attribute on first assignment.
 Assigning through the class name, as `Stars.rating = 9` did,
 changes the shared value.
 `vars(obj)` returns that dictionary,
-so you can see the split by inspecting the class with `vars(A)` and the instance with `vars(a)`:
+so inspecting the class with `vars(A)` and the instance with `vars(a)` shows the split:
 
 ```python
 # inside_objects.py

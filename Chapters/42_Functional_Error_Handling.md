@@ -272,7 +272,7 @@ if __name__ == "__main__":
 ```
 
 Each step returns early when it encounters an `Err`.
-Notice that the check names `Err` and not `Result`.
+The check names `Err` and not `Result`.
 `Result` is a `type` alias rather than a class,
 so `isinstance(a, Result)` raises `TypeError` at runtime,
 and the checker rejects it before that.

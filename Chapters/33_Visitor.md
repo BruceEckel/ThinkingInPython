@@ -12,7 +12,7 @@ How do you get around this?
 
 *Visitor*, the final pattern in *GoF Design Patterns*,
 solves this kind of problem.
-It allows you to extend the interface of the primary class hierarchy.
+It lets you extend the interface of the primary class hierarchy.
 It requires that the primary class hierarchy have a method,
 typically called `accept()`,
 which takes an object of a secondary class hierarchy called `Visitor`.

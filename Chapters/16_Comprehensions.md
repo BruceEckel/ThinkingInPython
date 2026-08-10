@@ -474,7 +474,7 @@ that's a sign it should be a loop instead.
 ## Generator Expressions {#generator-expressions}
 
 A comprehension evaluates eagerly,
-which means it immediately builds the entire result in memory.
+so it immediately builds the entire result in memory.
 For a large data set, that wastes time and space,
 especially if you consume the result only once.
 A *generator expression* uses the same syntax with parentheses instead of brackets,

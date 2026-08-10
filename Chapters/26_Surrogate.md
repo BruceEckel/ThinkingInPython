@@ -22,7 +22,7 @@ Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has only one implementation, while *State* has more than one.
 *GoF Design Patterns* considers the applications of the two patterns distinct.
 *Proxy* controls access to its implementation,
-while *State* allows you to change the implementation dynamically.
+while *State* lets you change the implementation dynamically.
 However, if you expand your notion of "controlling access to implementation,"
 the two fit neatly together.
 

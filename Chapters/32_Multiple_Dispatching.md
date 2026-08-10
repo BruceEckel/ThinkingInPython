@@ -225,7 +225,7 @@ The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction,
-as you will see while adding `Lizard` in exercise 1.
+as adding `Lizard` in exercise 1 demonstrates.
 
 Exact matching is the property that surprises people.
 This listing shows it refusing a subclass.
@@ -400,7 +400,7 @@ using these two methods to let Python's own parser assemble the tree.
 ## Testing Both Versions
 
 The win/lose/draw result is pure logic,
-which makes it easy to validate through testing.
+so tests validate it easily.
 The spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
 If they diverge, one of them has a bug.
 

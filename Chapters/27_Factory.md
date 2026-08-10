@@ -267,7 +267,7 @@ However, *GoF Design Patterns* emphasizes that the reason for the *Factory Metho
 (the above design is a special case).
 *GoF Design Patterns* provides no example of this,
 instead repeating the example used for the *Abstract Factory*
-(you'll see this in the next section).
+(the next section shows this).
 Here is `shape_factory1.py` modified so the factory methods live in separate classes,
 called polymorphically:
 

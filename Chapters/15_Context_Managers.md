@@ -323,7 +323,7 @@ You can still write `as`, but it binds `None`.
 
 A fuller version of the same idea takes several types at once,
 and accepts no argument to mean "ignore everything."
-It turns out to be useful enough to reuse elsewhere in the book,
+It is useful enough to reuse elsewhere in the book,
 so it lives in `utils/`, where any chapter can import it:
 
 ```python
@@ -764,7 +764,7 @@ It only tracks custody.
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and a return makes an item available.
-This means you can hand the same pool to several threads.
+So you can hand the same pool to several threads.
 The pool becomes the throttle that limits concurrent use,
 which is how real database connection pools behave.
 `available()` is a snapshot for the demo, not a synchronization primitive:

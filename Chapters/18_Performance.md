@@ -602,7 +602,7 @@ with `heapify_max()` putting the largest element at index 0.
 
 The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 maintains the list according to its own logic.
-This means you must always use the heap version of an operation,
+So you must always use the heap version of an operation,
 not the list version.
 Although calling the list's own `pop(0)` does produce the smallest value the first time,
 it also destroys the heap ordering,
@@ -1050,7 +1050,7 @@ The NumPy version states it once for the whole array:
 
 `np.arange(n, dtype=np.float64)` is NumPy's version of the `list(range(n))` line above it.
 Both build the same sequence of `n` numbers
-(notice that it's `arange` not `arrange`).
+(it's `arange`, not `arrange`).
 `list(range(n))` boxes each one as a Python `int`.
 `np.arange()` packs them into one contiguous block of C doubles,
 the same layout `array` used earlier in this chapter,

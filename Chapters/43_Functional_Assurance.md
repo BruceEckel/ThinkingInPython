@@ -129,7 +129,7 @@ Run as a script, this prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
-Notice there are no locks, no queues, no shared state,
+No locks, no queues, no shared state,
 and no changes to `count_primes()`.
 The function needed no preparation for parallel execution.
 It was ready on day one, because it was pure.

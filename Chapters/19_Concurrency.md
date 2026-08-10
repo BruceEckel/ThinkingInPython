@@ -25,7 +25,7 @@ gets one thread and its own heap.
 Every thread has its own stack.
 The program can request more threads from the OS,
 but all threads within a process share the same heap.
-This means each thread must not corrupt parts of the heap used by other threads.
+So each thread must not corrupt parts of the heap used by other threads.
 
 When a program requests an additional thread from the OS,
 that thread gets its own function-call stack,
@@ -131,7 +131,7 @@ each running inside a single process.
 ## `async def`, `await`, and the Event Loop {#asyncio-mechanics}
 
 Instead of using threads for I/O-bound problems,
-asynchrony allows you to create coroutines.
+asynchrony lets you create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
 Instead, control goes to the *event loop*, which discovers the next available task to run.
@@ -210,7 +210,7 @@ so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
 `gather()` returns `['A', 'B', 'C']`,
 showing that the results follow the argument order, not the finishing order.
-Note that the total wait is the longest delay (0.03 seconds),
+The total wait is the longest delay (0.03 seconds),
 not the sum of all three.
 
 An `await` is only legal inside an `async def`,
@@ -501,7 +501,7 @@ peak 1.
 
 The event loop overlaps waiting, not computing.
 
-Notice that `asyncio.sleep()` in `io_price` is different from `time.sleep()`.
+`asyncio.sleep()` in `io_price` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
 which is what let all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
@@ -541,7 +541,7 @@ Five awaited sleeps finish together in about the time of one.
 Five blocking sleeps cannot overlap: each stalls the loop for its full duration,
 so the total is never less than their sum.
 
-Notice that you cannot `await time.sleep()`,
+You cannot `await time.sleep()`,
 which is an extra indicator that it is the wrong function to use.
 
 ## Escaping to a Thread
@@ -1999,7 +1999,7 @@ Four conditions must all hold at once:
 
 If you break any one of the four, deadlock becomes impossible.
 None of these conditions mentions threads or an OS scheduler,
-which means `asyncio` can also produce deadlock.
+so `asyncio` can also produce deadlock.
 This example has two tasks and two `asyncio.Lock` objects.
 The two tasks acquire the locks in opposite order:
 
@@ -2107,7 +2107,7 @@ for example letting only the task with the lower ID give.
 
 ## Guidelines
 
-- **Remember that concurrency is a performance tool.**
+- **Concurrency is a performance tool.**
   Explore [Performance](18_Performance.md)
   before deciding you require a concurrent solution.
 - **Don't wrap a lone wait in `async`/`await` machinery.**

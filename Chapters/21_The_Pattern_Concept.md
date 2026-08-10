@@ -20,7 +20,7 @@ Initially, you can think of a pattern as an especially clever and insightful way
 Many people have worked out all the angles of a problem and have come up with the most general,
 flexible solution.
 You may have seen and solved something like it before,
-but your solution probably doesn't have the kind of completeness you'll see embodied in a pattern.
+but your solution probably doesn't have the kind of completeness a pattern embodies.
 
 That completeness has a failure mode.
 Once you know a catalog of patterns, it is tempting to treat it as a checklist,
@@ -63,15 +63,15 @@ The goal of design patterns is to isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Classes.md) as a design pattern
 (albeit one built into the language).
-It allows you to express differences in behavior (that's the thing that changes)
+It lets you express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
 [Composition](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
-also qualifies as a pattern, since it allows you to change,
+also qualifies as a pattern, since it lets you change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
 Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Iterators.md).
-An iterator allows you to hide the particular implementation of the container as you're stepping through it.
+An iterator lets you hide the particular implementation of the container as you're stepping through it.
 You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
 The code works with any object that produces an iterator.
 
@@ -165,8 +165,8 @@ The three purposes are:
     By isolating the details of object creation,
     your code isn't dependent on what types of objects there are and thus won't change when you add a new type of object.
     [Singleton](24_Singleton.md) counts as a *Creational* pattern,
-    and later in this book you'll see [Factory](27_Factory.md)
-    methods and factory classes.
+    and [Factory](27_Factory.md), later in this book,
+    covers factory methods and factory classes.
 2.  **Structural**: designing objects to satisfy particular project constraints.
     How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
     [Surrogate](26_Surrogate.md),

@@ -975,7 +975,7 @@ Generality cost something.
 The circle method needed no memory.
 Which pair sits where in round `r` followed from `r` alone.
 `group_rounds()` needs the `history` `Counter`,
-because there is no formula that predicts, from a round number alone,
+because no formula predicts, from a round number alone,
 which grouping of arbitrary size keeps every pair's meeting count lowest.
 It is still a pure function in the sense that matters for testing.
 The same `students`, `size`,
