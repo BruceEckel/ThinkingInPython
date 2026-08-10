@@ -5,7 +5,7 @@ syntax and the built-in numbers, strings, and `None` here, then containers,
 control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.
 It assumes you have programming experience.
-You can find supplementary information in [the official language documentation](https://www.python.org/doc/).
+Find supplementary information in [the official language documentation](https://www.python.org/doc/).
 
 ## Scripting vs. Programming
 
@@ -19,12 +19,13 @@ but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
 Python is a programming language that also supports scripting.
 It is marvelous for scripting,
-and you may find yourself replacing all your batch files, shell scripts,
+and you may replace all your batch files, shell scripts,
 and simple programs with Python scripts.
 
 Python is clean to write.
-You will find it easy to read your own code long after you've written it.
-A major factor in code readability is that indentation determines how statements group into blocks.
+Your own code stays easy to read long after you've written it.
+Indentation determines how statements group into blocks,
+a major factor in code readability.
 Here is a script that runs with `python if.py`:
 
 ```python
@@ -50,12 +51,11 @@ just like C++ and Java '`//`' comments.
 ## Indentation and Blocks
 
 A C/C++ `if` requires parentheses around the conditional.
-Parentheses are not necessary in Python,
+Python needs no parentheses,
 although it won't complain if you use them.
 
 The conditional clause ends with a colon.
-This indicates that what follows will be a group of indented statements,
-which are the "then" part of the `if` statement.
+A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its argument to standard output.
 The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
@@ -114,7 +114,7 @@ it duplicates the list but not the objects inside it,
 so `a` and `c` would still share a nested list.
 
 You can assign several names at once,
-which makes it easy to swap without a temporary:
+so a swap needs no temporary:
 
 ```python
 # multiple_assignment.py
@@ -131,8 +131,8 @@ print(first, rest)
 `*rest` collects whatever remains.
 [Containers](03_Containers.md#tuples-and-unpacking) covers the general form.
 
-Numbers, strings, and tuples are *immutable*,
-which means that operations produce new objects rather than changing the original.
+Numbers, strings, and tuples are *immutable*:
+operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Knowing which is which explains when a change is visible through another name,
 as with `a` and `b` above.
@@ -331,7 +331,7 @@ of which the language creator Guido van Rossum is a fan.
 Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
-This makes it useful for any block of literal text,
+That suits any block of literal text,
 such as an embedded template, a SQL query, or a chunk of HTML,
 which you can write out in full without escaping line breaks.
 
@@ -343,8 +343,8 @@ because the backslash escapes the closing quote even here.
 ### Common String Operations
 
 Strings are immutable sequences with a large set of methods.
-You can also use [slicing](03_Containers.md#lists)
-to select portions and `in` to test membership:
+[Slicing](03_Containers.md#lists) also selects portions,
+and `in` tests membership:
 
 ```python
 # string_methods.py
@@ -397,7 +397,7 @@ The format spec after a colon controls width, precision, and alignment.
 A `!r` on the expression, as in `{name!r}`,
 formats the value with `repr()` instead of `str()`.
 
-You will also see two older styles in existing code: C's `printf()` syntax,
+Existing code also carries two older styles: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,
 as in `"val: {}".format(val)`.
 Both still work, and both use the same format mini-language.
@@ -458,9 +458,8 @@ builds a query from the parts that way.
 
 ## Naming Conventions
 
-The basic strategy for naming is to use `snake_case` for variables, functions,
-methods, and file names.
-This means lower case with words separated by underscores,
+Use `snake_case` for variables, functions, methods, and file names:
+lower case with words separated by underscores,
 as in `this_is_snake_case`.
 
 If something represents a constant, use all uppercase letters,
