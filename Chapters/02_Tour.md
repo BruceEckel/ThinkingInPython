@@ -9,7 +9,7 @@ You can find supplementary information in [the official language documentation](
 
 ## Scripting vs. Programming
 
-The goal of Python is improved productivity.
+Python exists to improve your productivity.
 The language aims to aid you as much as possible.
 It tries to hinder you as little as possible.
 It does not impose arbitrary rules or force a particular set of features.
@@ -45,7 +45,7 @@ print(val)
 
 The '`#`' denotes a comment that goes until the end of the line,
 just like C++ and Java '`//`' comments.
-The filename first line and the `#:` output markers are explained in [The Examples](01_Introduction.md#the-examples).
+[The Examples](01_Introduction.md#the-examples) explains the filename first line and the `#:` output markers.
 
 ## Indentation and Blocks
 
@@ -61,7 +61,7 @@ The next line assigns to a variable named `val`.
 The subsequent statement is not indented so it is no longer part of the `if`.
 
 An indented block groups statements but does not create a scope.
-`val` is assigned inside the `if` and is still visible after it,
+Assigning `val` inside the `if` leaves it visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 Functions, classes, and modules introduce new scopes;
 an `if` or a `for` block does not.
@@ -111,7 +111,7 @@ Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
 `a[:]` is a *shallow* copy:
 it duplicates the list but not the objects inside it,
-so a nested list would still be shared between `a` and `c`.
+so `a` and `c` would still share a nested list.
 
 You can assign several names at once,
 which makes it easy to swap without a temporary:
@@ -128,7 +128,7 @@ print(first, rest)
 #: 10 [20, 30, 40]
 ```
 
-`*rest` collects whatever is left over.
+`*rest` collects whatever remains.
 [Containers](03_Containers.md#tuples-and-unpacking) covers the general form.
 
 Numbers, strings, and tuples are *immutable*,
@@ -239,7 +239,7 @@ so `~0b1100` reads as `-0b1101` rather than a row of ones.
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
 The built-in numeric types do not implement it but array libraries such as NumPy do.
-The same character in front of a `def` or a `class` is unrelated:
+The same character in front of a `def` or a `class` means something else:
 that is decorator syntax, covered in [Decorators](14_Decorators.md).
 
 ## Booleans, None, and Truthiness
@@ -289,7 +289,7 @@ not a coerced boolean.
 `x or default` is a common way to supply a fallback.
 It has a sharp edge.
 It replaces every falsy `x`, not only a missing one,
-so a legitimate `0` or `""` is thrown away.
+so it throws away a legitimate `0` or `""`.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
 
@@ -406,7 +406,7 @@ F-strings replaced them, so this book does not use them.
 ### t-Strings {#t-strings}
 
 An f-string produces a finished `str`,
-and the decision about how each value becomes text is made before anything else sees it.
+deciding how each value becomes text before anything else sees it.
 A `t`-string produces a `Template` instead:
 the literal pieces and the interpolated values, kept apart,
 for a consumer to assemble.
@@ -470,8 +470,8 @@ Class names are `CapWords` (Pascal cased), starting with a capital letter,
 without underscores and capitalizing intermediate words.
 For example: `ThisIsMyClass`.
 
-A class may instead use `snake_case` when it is documented and used primarily as a callable,
-the way a function is.
+A class may instead use `snake_case` when it serves primarily as a callable,
+documented and used the way a function is.
 The standard library does this for `contextlib.suppress` and `functools.partial`,
 and for builtins like `property` and `staticmethod`.
 Reserve it for classes that behave like a function to their users.
