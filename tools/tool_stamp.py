@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 """Record when the dev tools were last upgraded, and say so when that was a while ago.
 
-`make upgrade-tools` is deliberately manual. It rewrites the tracked
+`make tools-upgrade` is deliberately manual. It rewrites the tracked
 uv.lock and can invoke winget or Homebrew, so nothing runs it on a
 schedule and nothing should. The cost of that choice is drifting quietly
 behind for months, then meeting every breaking change at once: one ty
 bump moved five listings across three chapters and both Solutions
 exercises.
 
-This is the cheap half of the fix. `upgrade-tools` records a stamp when
+This is the cheap half of the fix. `tools-upgrade` records a stamp when
 it finishes, and the gate prints one line when that stamp is old:
 
     tools last upgraded 23 days ago (2026-07-04)
-    That is over 14 days. Consider `make upgrade-tools`, then `make
+    That is over 14 days. Consider `make tools-upgrade`, then `make
     sweep` to see what moved.
 
 It never fails and never touches a tracked file, so it cannot turn a
@@ -20,7 +20,7 @@ green gate red or dirty a chapter commit. The stamp lives in build/,
 which is gitignored, beside gate-stamp.json.
 
 With no stamp yet (a fresh clone, or a tree that has never run
-upgrade-tools) the mtime of uv.lock stands in. `uv lock --upgrade`
+tools-upgrade) the mtime of uv.lock stands in. `uv lock --upgrade`
 rewrites that file, as does any dependency change, and on a fresh clone
 git sets it to checkout time. That is the honest answer there: the
 toolchain is as new as the resolve that produced it, so a fresh clone
@@ -85,7 +85,7 @@ def last_upgrade() -> tuple[datetime, dict[str, str], str] | None:
         stamp: dict[str, Any] = json.loads(
             STAMP.read_text(encoding="utf-8"))
         return (datetime.fromisoformat(stamp["when"]),
-                stamp.get("versions", {}), "upgrade-tools")
+                stamp.get("versions", {}), "tools-upgrade")
     if LOCK.is_file():
         when = datetime.fromtimestamp(LOCK.stat().st_mtime)
         return when, {}, "uv.lock"
@@ -105,13 +105,13 @@ def report(*, nag_only: bool, days: int) -> int:
     if nag_only and not stale:
         return 0
 
-    dated = "" if source == "upgrade-tools" else f", dated from {source}"
+    dated = "" if source == "tools-upgrade" else f", dated from {source}"
     print(f"tools last upgraded {ago(when)} ({when:%Y-%m-%d}){dated}")
     if recorded and not nag_only:
         for name, version in recorded.items():
             print(f"  {name}: {version}")
     if stale:
-        print(f"That is over {days} days. Consider `make upgrade-tools`, "
+        print(f"That is over {days} days. Consider `make tools-upgrade`, "
               "then `make sweep` to see what moved.")
     return 0
 

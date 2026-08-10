@@ -6,7 +6,7 @@ With no argument, fetch the latest patch of the minor pinned in
 such as ``3.15``, first repin: rewrite ``.python-version`` and the
 ``requires-python`` floor in ``pyproject.toml``, then sync.
 
-Run via ``make upgrade-python``, which executes it outside the project
+Run via ``make python-upgrade``, which executes it outside the project
 venv. ``uv sync`` rebuilds that venv, so the running interpreter must
 not be it. ruff infers its target from ``requires-python``, so there
 is no separate version to bump.

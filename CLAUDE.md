@@ -18,7 +18,7 @@ from the Markdown** by `tools/extract_examples.py`, so:
   `make check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
   whose name appears nowhere in `Chapters/` is *orphaned* and fails the gate;
   one still mentioned somewhere (a real hand-written helper) is *referenced*
-  and only reported, since deleting it needs a human call. `make prune-examples`
+  and only reported, since deleting it needs a human call. `make prune`
   deletes exactly the orphaned ones. A rename or deletion of a book example is
   the usual cause, so run this after either.
 
@@ -236,7 +236,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   (two of ch03's three ignores went unused), `filter(lambda ...)` no
   longer narrowing its element type (ch16's `map`/`filter` listings broke),
   and higher-order union subtraction starting to work (the caveat that
-  invalidated has since been removed from the text). After `make upgrade-tools`, run
+  invalidated has since been removed from the text). After `make tools-upgrade`, run
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
   before assuming the first failure is the only one: `make all` stops at
   the first failing gate and `solutions-gate` runs last.
@@ -259,11 +259,11 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   still reports nothing. Re-test on each `ty` upgrade
   (`stateless-partial-handling-ty-support` in project memory has
   the probe).
-- **Never auto-run `make upgrade-tools` or `make upgrade-python`.** Both mutate
+- **Never auto-run `make tools-upgrade` or `make python-upgrade`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when
   the user explicitly asks for that specific run, not to "verify" a change.
-  `make check-tools[-full]`, `make tool-status`, and `make sweep` are all
+  `make tools-check[-full]`, `make tools-status`, and `make sweep` are all
   safe to run freely (the first two are read-only; `sweep` writes only
   `build/`). The nag that `gate` prints when the tools are stale is a
   reminder for the author, not an instruction to you: never act on it by
@@ -275,7 +275,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   every `Chapters/` one behind them. Use `make sweep` (runs every check
   over both trees, reports all failures, exits nonzero if any failed)
   whenever the first failure is unlikely to be the only one. A tool
-  upgrade is the standard case, and `upgrade-tools` now ends with it.
+  upgrade is the standard case, and `tools-upgrade` now ends with it.
 - **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
   line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`),
   enforced by `make reflow` (`CH=NN` for one chapter), not any gate.

@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: claims exercise-coverage help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: claims exercise-coverage help reset all verify sync-ci ci gate gate-status tools-status sweep sync check prune site epub local serve examples run test ty lint extract check-ch output output-check fix-imports python-upgrade reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub tools-check tools-check-full doctor verify-targets tools-test tools-upgrade solutions-sync solutions-check solutions-prune solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-numbering solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -38,12 +38,12 @@ help:  ## Show this help
 # What a reader needs for the everyday commands below: uv, plus the
 # uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
 # assumed present, since you needed both to get this far.
-check-tools:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
+tools-check:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
 	$(PY) tools/check_tools.py
 
 # Adds the tools a book maintainer needs for the rest of `make help`:
 # pandoc (site/local) and the standalone vale binary (prose).
-check-tools-full:  ## Check every tool, including pandoc and vale (site/prose)
+tools-check-full:  ## Check every tool, including pandoc and vale (site/prose)
 	$(PY) tools/check_tools.py --full
 
 # Read-only: catches a stale uv silently stuck on an old Python prerelease,
@@ -56,7 +56,7 @@ doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 # targets run directly; a target that bakes --fix/--write/--add into its recipe
 # (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
 # fix-comment-caps, fix-comment-spacing) runs in a disposable git worktree
-# instead, so this working tree is never touched. upgrade-tools, upgrade-python,
+# instead, so this working tree is never touched. tools-upgrade, python-upgrade,
 # serve, and local never run (network/environment mutation, or a server that
 # blocks forever); see tools/verify_targets.py's docstring. Logs land in
 # build/target_test_logs/.
@@ -68,7 +68,7 @@ verify-targets:  ## Smoke-test every make target; mutating ones run in a disposa
 # which runs the book's example tests under build/examples/. `gate` runs
 # this first: every later step trusts these tools, so a broken one makes
 # the rest of the gate's verdict meaningless.
-test-tools:  ## Run the harness's own unit tests (tools/tests/)
+tools-test:  ## Run the harness's own unit tests (tools/tests/)
 	$(PYTEST) $(PYTEST_N) tools/tests
 
 # Updates uv itself (when it was installed via its standalone installer),
@@ -78,16 +78,16 @@ test-tools:  ## Run the harness's own unit tests (tools/tests/)
 # allows, rewriting uv.lock. pandoc and vale are updated best-effort
 # through winget or Homebrew, whichever is on PATH.
 # make/git are left alone. Review `git diff uv.lock` before committing.
-# For the pinned Python version itself, use `make upgrade-python`.
+# For the pinned Python version itself, use `make python-upgrade`.
 #
 # Ends by stamping the upgrade (so the gate can stop nagging) and running
 # `sweep`, which reports every check the new tools broke rather than
 # stopping at the first. A failing sweep here means the upgrade landed
 # and the book needs fixing, not that the upgrade failed; the stamp is
 # written first for that reason.
-upgrade-tools:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/vale
+tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/vale
 	$(PY) tools/upgrade_tools.py
-	$(MAKE) check-tools-full
+	$(MAKE) tools-check-full
 	$(PY) tools/tool_stamp.py --write
 	$(MAKE) sweep
 
@@ -145,7 +145,9 @@ GATE_DOCS = tools/README.md Solutions
 # rather than failing the build. A raised exception where none is expected
 # still fails the gate; only marker text is self-corrected. The drift check
 # also fails on an orphaned stray under Examples/ (a file no block generates
-# and no chapter mentions); run `make prune-examples` to delete those.
+# and no chapter mentions); run `make prune` to delete those.
+# solutions-gate applies the same stray check to SolutionsCode/ against
+# Solutions/*.md, with `make solutions-prune` as its counterpart.
 # reflow_prose.py runs here in check mode, so hand-edited prose that drifts
 # out of Semantic Line Breaks fails the build instead of drifting invisibly
 # until someone remembers to run `make reflow`. Check mode reports the files
@@ -173,19 +175,19 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, output, t
 gate-status:  ## Report when the gate last passed and what changed since
 	$(PY) tools/gate_stamp.py
 
-# When were the dev tools last upgraded, and to what? `upgrade-tools`
+# When were the dev tools last upgraded, and to what? `tools-upgrade`
 # writes this stamp; `gate` reads it and prints one line (nothing more,
 # and never a failure) once it is older than tool_stamp.py's threshold.
 # With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
 # correctly treated as current.
-tool-status:  ## Report when the dev tools were last upgraded, and to what
+tools-status:  ## Report when the dev tools were last upgraded, and to what
 	$(PY) tools/tool_stamp.py
 
 # `gate` stops at its first failure, and since `solutions-gate` is one of
 # its prerequisites, that half runs first and can hide every Chapters/
 # failure behind it. So one `gate` rarely shows the whole blast radius of
 # a tool upgrade. This runs every static check over both trees to
-# completion and summarizes which failed. `upgrade-tools` ends with it;
+# completion and summarizes which failed. `tools-upgrade` ends with it;
 # run it directly after any change wide enough that the first failure is
 # unlikely to be the only one. The #: markers are excluded on purpose
 # (see the script docstring).
@@ -204,12 +206,12 @@ reset: clean-examples extract  ## Regenerate build/examples/ from the Markdown (
 	@echo "build/examples/ regenerated from the Markdown."
 
 # Upgrade the development Python and re-check the book against it.
-# `make upgrade-python` pulls the latest patch of the pinned minor (from
-# .python-version); `make upgrade-python TO=3.15` repins to a new minor first
+# `make python-upgrade` pulls the latest patch of the pinned minor (from
+# .python-version); `make python-upgrade TO=3.15` repins to a new minor first
 # (rewriting .python-version and the requires-python floor). Both resync the
 # venv and run the gate. Run through `uv run --no-project` so the orchestrating
 # interpreter is not the venv that `uv sync` rebuilds.
-upgrade-python:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify
+python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify
 	uv run --no-project python tools/upgrade_python.py $(TO)
 	$(MAKE) verify
 
@@ -227,7 +229,7 @@ check:  ## Verify book examples match the committed Examples/ tree
 # with no matching block and no mention anywhere in the book, typically left
 # behind by a rename). This deletes exactly those; a stray whose filename is
 # still mentioned somewhere in the book is left alone for a human to review.
-prune-examples:  ## Delete orphaned stray files under Examples/ (see `check`)
+prune:  ## Delete orphaned stray files under Examples/ (see `check`)
 	$(PY) tools/extract_examples.py --prune
 
 site:  ## Render Chapters/ into build/site/ with pandoc
@@ -310,6 +312,12 @@ solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md
 solutions-check:  ## Verify Solutions/*.md matches the committed SolutionsCode/ tree
 	$(PY) tools/extract_solutions.py
 
+# The solutions counterpart of `prune`. A renumbered exercise is the
+# usual source: the block moves from exercise_2 to exercise_1 and the old
+# file stays, with nothing generating it and nothing importing it.
+solutions-prune:  ## Delete orphaned stray files under SolutionsCode/ (see `solutions-check`)
+	$(PY) tools/extract_solutions.py --prune
+
 solutions-extract:  ## Write build/solutions/ from Solutions/*.md
 	$(PY) tools/extract_solutions.py --write
 
@@ -347,6 +355,8 @@ solutions-numbering:  ## Verify each chapter's exercises have matching solutions
 # illustrative fragment (no `# file.py` slug), so there is nothing further
 # to execute. The numbering check runs first because it is the cheapest and
 # reports a missing answer, which no later step here would notice.
+# extract_solutions.py also fails on an orphaned stray under SolutionsCode/;
+# `make solutions-prune` deletes exactly those.
 solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, pytest
 	$(PY) tools/check_solutions.py
 	$(PY) tools/extract_solutions.py

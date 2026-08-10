@@ -40,5 +40,5 @@ display_object(x)
 #: [Methods]
 #:   • m(self)
 
-print(x.__dict__)
+print(vars(x))
 #: {}

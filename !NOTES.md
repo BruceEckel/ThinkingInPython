@@ -1,23 +1,15 @@
-Do ADDITIONAL_IMPROVEMENTS.md
-
-Look for places display_object could be replaced with print(vars(obj))
-
 Fable: Review the book to find and fix consistency issues
 
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
-[[doing now]]I would like to do a clean slate: deep_review, readability, and annealing, on the whole book.
-Should I delete the 'deep_review' and 'readability' directories or are there things in those directories that would be
-helpful for you to keep? If the latter, distill that information into a single file for each, in the root directory:
-deep_review_db.md and readability_db.md, and once you've done that delete the directories 'deep_review' and 'readability'
-
 Use Fable for deep-review
 
 Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
 
 Active voice (Fable)
+make prose reveals many
 
 Add Epub link info on README and bottom of index page.
 
@@ -28,17 +20,6 @@ Examples that demonstrate probability or statistics, very simply
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
 Fatal vs recoverable errors
-
-Have we learned anything new that should be added to thinking-in-python-skill.md?
-
-Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
-Put the result at the root in ADVERSARIAL.md
-
-Run 'make prose' on each chapter
-
-- Is full polymorphism covered? (Not just inheritance-based). for example, @overload
-
-- Check order of examples in 37_Pattern_Refactoring.md
 
 - "happens"
 - "have to", "could" -> "can"
@@ -51,6 +32,15 @@ Run 'make prose' on each chapter
 - Indexing using Leanpub format, before publishing to leanpub
 
 - Potential example: A task runner based on decorators and generators
+
+## Periodic
+
+- Have we learned anything new that should be added to thinking-in-python-skill.md?
+- Run 'make prose' on each chapter
+- Do an adversarial review of the book -- what doesn't work, what isn't correct, what could be better?
+  Put the result at the root in ADVERSARIAL.md
+
+
 
 ******************
 

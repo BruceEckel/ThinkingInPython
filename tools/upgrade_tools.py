@@ -33,9 +33,9 @@ code, disagreeing with the behavior actually observed, so this trusts
 the test over the docs.
 
 `make` and `git` are left alone: they are outside this project's
-control, and `make check-tools` already treats them as assumed.
+control, and `make tools-check` already treats them as assumed.
 
-For the pinned Python version itself, use `make upgrade-python`
+For the pinned Python version itself, use `make python-upgrade`
 instead; this script only touches package versions, not the
 interpreter.
 

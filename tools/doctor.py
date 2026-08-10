@@ -18,7 +18,7 @@ Checks:
 - (Windows only) Whether a process is currently running from this
   project's `.venv`. An editor's `ruff`/`ty` language server is the
   usual culprit; it holds a Windows file lock that makes `uv sync`
-  (and so `make upgrade-python`) fail with "Access is denied"
+  (and so `make python-upgrade`) fail with "Access is denied"
   trying to remove `.venv\\Scripts`. Not a real problem on POSIX,
   where a process can hold a file open after it's been unlinked.
 
@@ -106,8 +106,8 @@ def check_python_freshness() -> tuple[bool, str]:
         return False, (
             f"active build is {active}, but uv knows about "
             f"{newest}. A stale uv can keep resolving an old "
-            "prerelease forever. Run: make upgrade-tools "
-            "&& make upgrade-python"
+            "prerelease forever. Run: make tools-upgrade "
+            "&& make python-upgrade"
         )
     return True, f"{active} (newest uv knows of for {minor})"
 

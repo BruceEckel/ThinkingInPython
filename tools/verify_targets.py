@@ -5,7 +5,7 @@ The target list comes straight from the Makefile (via make_help.entries),
 so a target added there is picked up here automatically, with no separate
 list to keep in sync. A handful of targets never run, regardless of tier:
 
-  * upgrade-tools, upgrade-python -- mutate the real dev environment and
+  * tools-upgrade, python-upgrade -- mutate the real dev environment and
     hit the network (winget/brew, uv self update, a new Python build).
     This project's own convention is to never auto-run these.
   * serve, local -- start an HTTP server that runs until Ctrl+C; there is
@@ -56,8 +56,8 @@ DEFAULT_TIMEOUT = 300.0
 
 # name -> why this target never runs, in any tier.
 EXCLUDED: dict[str, str] = {
-    "upgrade-tools": "mutates the real dev environment and hits the network",
-    "upgrade-python": "mutates the real dev environment and hits the network",
+    "tools-upgrade": "mutates the real dev environment and hits the network",
+    "python-upgrade": "mutates the real dev environment and hits the network",
     "serve": "starts a server that runs forever",
     "local": "starts a server that runs forever",
     "verify-targets": "this is the target that runs this script",

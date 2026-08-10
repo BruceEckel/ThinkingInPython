@@ -13,7 +13,7 @@ Includes a fast introduction for programmers from other languages.
 3. Install [uv](https://docs.astral.sh/uv/).
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
    Python (3.15+) and dev tools automatically. No manual Python install is needed.
-5. Run `make check-tools` to verify that the essential tools are available.
+5. Run `make tools-check` to verify that the essential tools are available.
 
 Type `make` to see the options.
 

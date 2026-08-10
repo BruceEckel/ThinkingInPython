@@ -64,7 +64,7 @@ relative equivalent, `from ..module5 import function5`, works too and
 is the form to prefer only for a package's own siblings.
 
 Renaming the directory to `bPackage` and updating the imports to
-`a_package.bPackage.module4` still runs. Nothing in the language
+`a_package.bPackage.module6` still runs. Nothing in the language
 objects, since a package name only has to be a valid identifier. What
 it costs is everything a convention buys:
 [File Names](../Chapters/06_Modules_and_Packages.md#file-names) calls

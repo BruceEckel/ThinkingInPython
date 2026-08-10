@@ -16,8 +16,20 @@ Both modes first verify that every ``Solutions/*.md`` stem matches a current
 ``Chapters/*.md`` stem, so a chapter renumbering cannot silently leave the
 solutions carrying old chapter numbers.
 
+Check mode also reports strays, the same way ``extract_examples.py`` does:
+a file under ``SolutionsCode/`` that no current block generates, left behind
+by a rename or a renumbered exercise since the drift check only flags
+missing/changed blocks, not extras. Each stray is classified by grepping
+``Solutions/*.md`` for its bare filename: *orphaned* (the name appears
+nowhere) fails the check; *referenced* is reported for a human to judge.
+Grepping the solutions alone is deliberate. A leftover named only by a
+chapter is still orphaned here, because no solution block can be producing
+it, and the chapter's own copy lives under ``Examples/``. Pass ``--prune``
+to delete the orphaned files (never the referenced ones).
+
 Usage:
     python tools/extract_solutions.py                # check vs SolutionsCode/
+    python tools/extract_solutions.py --prune         # also delete orphaned strays
     python tools/extract_solutions.py --write         # write build/solutions/
     python tools/extract_solutions.py --write -o DIR  # write somewhere else
 """
@@ -26,7 +38,7 @@ import argparse
 import shutil
 from pathlib import Path
 
-from extract_examples import extract, is_derived
+from extract_examples import extract, find_strays, is_derived, report_strays
 from tools_config import BUILD_DIR, ROOT
 from tools_extract import check_against, report_conflicts, write_tree
 
@@ -66,6 +78,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="write the extracted tree (default: check only)")
     ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
                     help=f"output dir for --write (default: {DEFAULT_OUT.name})")
+    ap.add_argument("--prune", action="store_true",
+                    help="delete orphaned stray files under SolutionsCode/ "
+                         "(check mode only)")
     args = ap.parse_args(argv)
 
     stale = naming_problems()
@@ -104,8 +119,18 @@ def main(argv: list[str] | None = None) -> int:
               f"from {COMMITTED_DIR.name}/:")
         for p in changed:
             print(f"  ~ {p}")
-    if not (missing or changed or result.conflicts):
-        print("\nIn sync: every solution matches the committed tree.")
+
+    strays = find_strays(result, COMMITTED_DIR)
+    orphaned, referenced = report_strays(strays, COMMITTED_DIR,
+                                         search=[SOLUTIONS_DIR],
+                                         prune=args.prune)
+
+    if not (missing or changed or result.conflicts or orphaned):
+        if referenced:
+            print("\nIn sync otherwise: every solution matches the "
+                  "committed tree.")
+        else:
+            print("\nIn sync: every solution matches the committed tree.")
         return 0
     print("\n(Run with --write to materialize build/solutions/ for running.)")
     return 1

@@ -54,7 +54,7 @@ break a Solutions file.
 * **`data/`** holds the word lists, allowlists, and glob lists the checks
   read (`wordlist.txt`, `norun.txt`, `banned_phrases.txt`, ...), so this
   directory lists code and nothing else.
-* **`tests/`** holds the harness's own unit tests, run by `make test-tools`
+* **`tests/`** holds the harness's own unit tests, run by `make tools-test`
   and as the first step of `make gate`. They are separate from the book's
   example tests, which live in the chapters and run from `build/examples/`.
 
@@ -87,8 +87,8 @@ Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
 uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
 ```
 
-Run `make check-tools` afterward to confirm everything resolved (`uv`, `ty`,
-`ruff`, `pytest`); `make check-tools-full` also checks `pandoc` and `vale`,
+Run `make tools-check` afterward to confirm everything resolved (`uv`, `ty`,
+`ruff`, `pytest`); `make tools-check-full` also checks `pandoc` and `vale`,
 needed only for `make site`/`make local` and `make prose`. See
 [check_tools.py](#check_tools.py) below. If something you expect to work
 doesn't, `make doctor` (see [doctor.py](#doctor.py)) checks for the couple
@@ -173,7 +173,7 @@ order the recipe reads in.
 make sweep     # every check over both trees, all failures, exit 1 if any
 ```
 
-`make upgrade-tools` ends with it, so an upgrade's damage arrives attached
+`make tools-upgrade` ends with it, so an upgrade's damage arrives attached
 to the upgrade that caused it. The list is `SWEEP_TARGETS` in the script,
 and each row's description is read from that target's own `## text` in the
 Makefile. It sweeps `gate-checks` (the gate's Markdown selection) rather
@@ -189,7 +189,7 @@ Smoke-tests every target in `make help`, so a target that broke stays
 broken for one run rather than until someone happens to use it. Read-only
 and idempotent targets run directly; a target that bakes `--fix`/`--write`
 into its recipe runs in a disposable git worktree, so this working tree is
-never touched. `upgrade-tools`, `upgrade-python`, `serve`, and `local`
+never touched. `tools-upgrade`, `python-upgrade`, `serve`, and `local`
 never run at all, being network or environment mutations or a server that
 blocks forever. Logs land in `build/target_test_logs/`.
 
@@ -223,7 +223,7 @@ gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
 3 files changed since: 23_Iterators.md, 24_Singleton.md, ...
 ```
 
-**`tool_stamp.py` (`make tool-status`)** records when `make upgrade-tools`
+**`tool_stamp.py` (`make tools-status`)** records when `make tools-upgrade`
 last ran. Upgrading is deliberately manual, since it rewrites the tracked
 `uv.lock` and can invoke winget or Homebrew, and the cost of that choice is
 drifting quietly for months and then meeting every breaking change at once.
@@ -243,8 +243,8 @@ adds the tools a book maintainer needs for the rest of `make help`: `pandoc`
 (`make site`, `make local`) and the standalone `vale` binary (`make prose`).
 
 ```
-make check-tools        # uv, ty, ruff, pytest (make/git checked, assumed)
-make check-tools-full   # the above, plus pandoc and vale
+make tools-check        # uv, ty, ruff, pytest (make/git checked, assumed)
+make tools-check-full   # the above, plus pandoc and vale
 ```
 
 ## doctor.py
@@ -259,7 +259,7 @@ every build `uv python list --all-versions` currently knows about for the
 pinned minor and flags it if a newer one exists that isn't active. On
 Windows it also checks whether a process (typically an editor's `ruff`/`ty`
 language server) is running from `.venv`, since that holds a file lock
-that makes `uv sync` — and so `make upgrade-python` — fail with "Access is
+that makes `uv sync` — and so `make python-upgrade` — fail with "Access is
 denied" removing `.venv\Scripts`. Every check prints ok/WARN and, on WARN,
 the exact fix command; nothing is installed, upgraded, or killed.
 
@@ -282,13 +282,13 @@ and falls back to printing the install link if neither works. `make` and
 version itself, use `upgrade_python.py` below instead.
 
 ```
-make upgrade-tools   # update uv, ty/ruff/pytest/..., and (best-effort) pandoc/vale
+make tools-upgrade   # update uv, ty/ruff/pytest/..., and (best-effort) pandoc/vale
 ```
 
 ## upgrade_python.py
 
 Upgrades the pinned development Python and resyncs the environment. With no
-argument, `make upgrade-python` fetches the latest patch of the minor pinned
+argument, `make python-upgrade` fetches the latest patch of the minor pinned
 in `.python-version` (e.g. the newest 3.14.x). With `TO=3.15`, it first
 repins: rewrites `.python-version` and the `requires-python` floor in
 `pyproject.toml`, then syncs. Either way it finishes by running `make
@@ -296,8 +296,8 @@ verify`. It runs through `uv run --no-project` so the orchestrating
 interpreter is never the venv that `uv sync` is about to rebuild.
 
 ```
-make upgrade-python           # latest patch of the pinned minor, then verify
-make upgrade-python TO=3.15   # repin to a new minor, then verify
+make python-upgrade           # latest patch of the pinned minor, then verify
+make python-upgrade TO=3.15   # repin to a new minor, then verify
 ```
 
 ## extract_examples.py
@@ -310,6 +310,18 @@ Default mode is **check**: nothing is written. It reports
 
 It exits non-zero on any of these, so CI catches prose/code drift. Pass
 `--write` to materialize `build/examples/` (use `-o DIR` for another target).
+
+Check mode also looks the other way, at *strays*: a file under `Examples/`
+that no current block generates, typically left by a rename or deletion.
+A stray whose bare filename appears nowhere in `Chapters/*.md` is
+*orphaned* and fails the check; one still mentioned there (a hand-written
+helper) is *referenced* and only reported, since deleting it needs a human.
+
+```
+make sync    # write Examples/ from the Markdown
+make check   # verify the Markdown matches Examples/
+make prune   # delete the orphaned strays check flags
+```
 
 A block whose slug starts with `rust/` (e.g. `# rust/fastcount/demo.py`)
 is skipped here on purpose: see `extract_rust.py` below.
@@ -438,9 +450,19 @@ them. `SolutionsCode/` is the committed copy (like `Examples/`);
 `SolutionsCode/`) and `--write` (materializes a tree, default
 `build/solutions/`, or `-o DIR`).
 
+Check mode reports strays the same way `extract_examples.py` does, using
+that module's `find_strays()` and `report_strays()`. A file under
+`SolutionsCode/` that no block generates is *orphaned* when its name
+appears nowhere in `Solutions/*.md` (fails the check) and *referenced*
+when it still does (reported for a human). A renumbered exercise is the
+usual source. The grep covers the solutions alone: a leftover named only
+by a chapter is still orphaned here, since no solution block generates it
+and the chapter's own copy lives under `Examples/`.
+
 ```
 make solutions-sync           # write SolutionsCode/ from Solutions/*.md
 make solutions-check          # verify Solutions/*.md matches SolutionsCode/
+make solutions-prune          # delete the orphaned strays solutions-check flags
 make solutions-extract        # write build/solutions/ (for the checks below)
 make solutions-output-check   # verify #: markers in Solutions/*.md, no rewrite
 make solutions-output         # rewrite them

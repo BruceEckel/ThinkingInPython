@@ -113,7 +113,7 @@ def main() -> int:
             "{n} listing filename collision(s). Rename one side to "
             "something distinctive, then run `make sync` and delete the "
             "stale file under Examples/ (a name still used elsewhere is "
-            "reported as 'referenced', so prune-examples leaves it)."
+            "reported as 'referenced', so `make prune` leaves it)."
         ),
     )
 

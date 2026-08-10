@@ -141,14 +141,22 @@ def find_strays(result: ExtractResult, committed: Path) -> list[str]:
     return sorted(strays)
 
 
-def classify_strays(strays: list[str]) -> tuple[list[str], list[str]]:
+def classify_strays(
+    strays: list[str], search: list[str | Path] | None = None
+) -> tuple[list[str], list[str]]:
     """Split strays into (orphaned, referenced).
 
-    Referenced means the bare filename still appears somewhere in
-    Chapters/*.md, e.g. a hand-written helper mentioned in prose but not
-    extracted; that needs a human to confirm it is truly unused, so it is
-    reported but not treated as a failure. Orphaned means the name appears
-    nowhere, so it is safe to delete outright.
+    Referenced means the bare filename still appears somewhere in the
+    Markdown under `search` (Chapters/ by default), e.g. a hand-written
+    helper mentioned in prose but not extracted; that needs a human to
+    confirm it is truly unused, so it is reported but not treated as a
+    failure. Orphaned means the name appears nowhere, so it is safe to
+    delete outright.
+
+    `search` is the tree that generates the committed files being
+    classified, so extract_solutions.py passes Solutions/. A stray there
+    named only by a chapter is still orphaned as far as the solutions are
+    concerned, since no solution block can be producing it.
 
     The name must match whole, not as a substring. Renaming
     ``locked_settings.py`` to ``singleton_locked_settings.py`` leaves a
@@ -157,12 +165,46 @@ def classify_strays(strays: list[str]) -> tuple[list[str], list[str]]:
     most common source of strays would never be prunable.
     """
     book_text = "\n".join(
-        md.read_text(encoding="utf-8") for md in md_files())
+        md.read_text(encoding="utf-8") for md in md_files(search))
     orphaned, referenced = [], []
     for rel in strays:
         name = re.escape(Path(rel).name)
         mentioned = re.search(rf"\b{name}\b", book_text) is not None
         (referenced if mentioned else orphaned).append(rel)
+    return orphaned, referenced
+
+
+def report_strays(strays: list[str], committed: Path,
+                  search: list[str | Path] | None = None,
+                  prune: bool = False) -> tuple[list[str], list[str]]:
+    """Classify, optionally delete, and report strays.
+
+    Returns (orphaned, referenced) as they stand after any pruning. The
+    caller folds the orphans into its exit status and words its "in sync"
+    line against the referenced ones. Pruning empties the orphan list, so
+    a --prune run reports what it deleted and then succeeds.
+    """
+    orphaned, referenced = classify_strays(strays, search)
+    if prune and orphaned:
+        for p in orphaned:
+            (committed / p).unlink()
+        print(f"\nPruned {len(orphaned)} orphaned stray file(s) "
+              f"from {committed.name}/:")
+        for p in orphaned:
+            print(f"  - {p}")
+        orphaned = []
+    elif orphaned:
+        print(f"\n{len(orphaned)} orphaned stray file(s) under "
+              f"{committed.name}/ (no block generates it, and the name "
+              "appears in no source Markdown; run with --prune to delete):")
+        for p in orphaned:
+            print(f"  x {p}")
+    if referenced:
+        print(f"\n{len(referenced)} stray file(s) under {committed.name}/ "
+              "with no block, but the filename is still mentioned in the "
+              "source Markdown (review by hand):")
+        for p in referenced:
+            print(f"  ? {p}")
     return orphaned, referenced
 
 
@@ -199,27 +241,8 @@ def main(argv: list[str] | None = None) -> int:
                  where=COMMITTED_DIR.name)
 
     strays = find_strays(result, COMMITTED_DIR)
-    orphaned, referenced = classify_strays(strays)
-    if args.prune and orphaned:
-        for p in orphaned:
-            (COMMITTED_DIR / p).unlink()
-        print(f"\nPruned {len(orphaned)} orphaned stray file(s) "
-              f"from {COMMITTED_DIR.name}/:")
-        for p in orphaned:
-            print(f"  - {p}")
-        orphaned = []
-    elif orphaned:
-        print(f"\n{len(orphaned)} orphaned stray file(s) under "
-              f"{COMMITTED_DIR.name}/ (no book block, no reference anywhere; "
-              "run with --prune to delete):")
-        for p in orphaned:
-            print(f"  x {p}")
-    if referenced:
-        print(f"\n{len(referenced)} stray file(s) under {COMMITTED_DIR.name}/ "
-              "with no book block, but the filename is still mentioned in "
-              "the book (review by hand):")
-        for p in referenced:
-            print(f"  ? {p}")
+    orphaned, referenced = report_strays(strays, COMMITTED_DIR,
+                                         prune=args.prune)
 
     if not (missing or changed or result.conflicts or orphaned):
         if referenced:

@@ -50,12 +50,13 @@ display_object(x)
 #: [Methods]
 #:   • m(self)
 
-print(x.__dict__)
+print(vars(x))
 #: {}
 ```
 
 `x` sees the changes made to the class *after* `x` was created.
-The instance never changed; the last line shows its `__dict__` still empty.
+The instance never changed;
+the last line shows its instance dictionary still empty.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
 even ones already created.

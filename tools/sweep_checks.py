@@ -23,7 +23,7 @@ This runs each check to completion and summarizes:
     ...
     2 of 8 checks failed: ty, solutions-ty
 
-`make upgrade-tools` ends with this, so an upgrade's damage arrives
+`make tools-upgrade` ends with this, so an upgrade's damage arrives
 attached to the upgrade that caused it. It is worth running on its own
 (`make sweep`) after any change wide enough that the first failure is
 unlikely to be the only one.

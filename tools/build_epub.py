@@ -46,7 +46,7 @@ Usage:
     python tools/build_epub.py --keep-source  # leave build/epub/src/ in place
     python tools/build_epub.py --keep-svg     # skip the PNG conversion
 
-Requires `pandoc` on PATH (`make check-tools-full` verifies it).
+Requires `pandoc` on PATH (`make tools-check-full` verifies it).
 """
 
 import argparse
