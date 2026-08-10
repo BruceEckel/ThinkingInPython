@@ -12,7 +12,7 @@ For the singleton, Python does.
 Python imports each module once and caches it in `sys.modules`,
 as [Modules and Packages](06_Modules_and_Packages.md) showed.
 Every `import` after the first produces the same module object.
-A module is a singleton, and anything defined at module level is shared,
+A module is a singleton, and everyone shares anything defined at module level,
 with one copy for the whole interpreter.
 One interpreter, not one machine.
 A process pool or an [`InterpreterPoolExecutor`](19_Concurrency.md#subinterpreters)
@@ -139,7 +139,7 @@ so there is exactly one instance and no module-level name.
 
 Nesting costs the return annotation as well.
 `def settings() -> Settings` still parses and runs,
-because an annotation is evaluated only when something reads it,
+because an annotation evaluates only when something reads it,
 and nothing has read this one yet.
 A clean run is therefore no evidence.
 When something does look, it searches the scope containing the function,
@@ -153,7 +153,7 @@ Privacy in Python is advice, not enforcement.
 An underscore asks callers to stay out, and nothing makes them.
 [Rethinking Objects](20_Rethinking_Objects.md#encapsulation-leaks)
 makes the same case about hidden data,
-where a getter hands back a reference to the internals it was meant to protect.
+where a getter hands back a reference to the internals it should protect.
 The reachable class is also useful when a test needs a fresh,
 uncached `Settings`.
 
@@ -216,7 +216,7 @@ so each ran the constructor and handed its caller a different object.
 Only the last one to finish stays in the cache;
 the other seven are already in the hands of their callers.
 
-`@cache` is gone below, because it no longer makes the object single:
+`@cache` disappears below, because it no longer makes the object single:
 
 ```python
 # singleton_locked_settings.py
@@ -249,7 +249,7 @@ print(len({id(s) for s in built}))
 #: 1
 ```
 
-In `settings()`, only one of the two module-level names is declared `global`.
+In `settings()`, only one of the two module-level names carries a `global` declaration.
 This is the chapter's opening distinction seen from inside a function.
 `global` governs rebinding, not use.
 `with _lock:` only looks the name up,
@@ -284,7 +284,7 @@ The second test is the one note 3 insists on;
 the first exists to skip the lock once the object is there.
 It works, but it asks the reader to reason about what a [free-threaded](19_Concurrency.md#free-threading)
 interpreter may reorder, which is a bad trade for saving a lock acquisition.
-Eager creation is a better answer when the object can be built at import time:
+Eager creation is a better answer when you can build the object at import time:
 
 ```python
 # singleton_eager_factory.py
@@ -312,7 +312,7 @@ The race needs laziness, and this listing gives it up on purpose.
 If you need the class to hand back one instance from its own constructor,
 override `__new__()`, shown below.
 
-Modules and cached factories, primed at import time if threads are involved,
+Modules and cached factories, primed at import time if threads are in play,
 should cover your singleton needs.
 The rest of this chapter is here for the techniques it demonstrates,
 not because you need these forms.
@@ -384,7 +384,7 @@ falls through to the inner object.
 The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 
 `__getattr__()` returns `Any`, and unlike `instance`,
-that one cannot be tightened away.
+nothing can tighten that one away.
 It answers for every name Python fails to find on the wrapper,
 so its return type is whatever the inner object happens to hold under that name.
 `instance` is a single declared field and can say `__OnlyOne | None`.
@@ -398,7 +398,7 @@ you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`, which removes the sentinel,
 the guard, and the first-call race the cached factory met under threads,
 at the cost of building the object whether or not anything uses it.
-(The bare `__OnlyOne()` works because the nested class is defined at that point in the body; the qualified `OnlyOne.__OnlyOne()` fails, since the name `OnlyOne` stays unbound until its own class body finishes running.)
+(The bare `__OnlyOne()` works because the nested class exists at that point in the body; the qualified `OnlyOne.__OnlyOne()` fails, since the name `OnlyOne` stays unbound until its own class body finishes running.)
 Exercise 1 makes that change.
 
 Either way, this is a lot of code for what a module does on its own.
@@ -436,7 +436,7 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 so every construction hands back that same instance and `isinstance()` reports `True`.
 Python honors whatever object `__new__()` returns,
 and the return value carries a rule worth knowing:
-`__init__()` runs only when `__new__()` returns an instance of the class being constructed,
+`__init__()` runs only when `__new__()` returns an instance of the class under construction,
 and then it runs on that shared instance after *every* construction,
 if the class defines one.
 `SingletonClassVar` defines none, so all the work happens in `__new__()`.
@@ -572,7 +572,7 @@ and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
 After decoration, `type(Registry)` is `singleton`,
 so the same parentheses run `singleton.__call__()` instead,
-and the wrapped class is constructed only when that method decides to call it.
+and the wrapped class's constructor runs only when that method decides to call it.
 `__call__()` forwards `*args` and `**kwargs` to the constructor of the wrapped class,
 so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 

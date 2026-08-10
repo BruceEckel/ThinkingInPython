@@ -2,7 +2,7 @@
 
 C++ and Java require type declarations,
 and they check those types during compilation.
-The Python runtime checks types only when an operation is attempted.
+The Python runtime checks types only when an operation runs.
 The examples up to this point have gone almost entirely without type declarations,
 which you might not miss on small programs.
 
@@ -116,7 +116,7 @@ A diagnostic names the rule in brackets, points at the offending line,
 and pairs what the annotation expected with what the call supplied.
 
 Listings in this book use a shorthand for a diagnostic.
-Where a line is commented out because it would fail the check,
+Where a listing comments out a line because it would fail the check,
 a neighboring `# ty:` comment summarizes what the checker reports for it.
 
 ## Narrowing {#narrowing}
@@ -168,8 +168,8 @@ print(MAX_RETRIES, GREETING)
 ```
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
-A `Final[list[str]]` can still be appended to;
-only an assignment to the name itself is refused.
+You can still append to a `Final[list[str]]`;
+the checker refuses only an assignment to the name.
 
 You can give the type explicitly, as in `GREETING`,
 or let the checker infer it from the value, as with `MAX_RETRIES`.
@@ -177,7 +177,7 @@ The rest of the book uses the explicit `Final[T]` form,
 which declares the intended type instead of accepting whatever the initializer produces.
 The difference emerges when the initializer's own type is not the type you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
-so nothing that goes into the list is checked;
+so the checker ignores whatever goes into the list;
 `CACHE: Final[list[str]] = []` says what the list holds,
 and the checker enforces it.
 
@@ -246,7 +246,7 @@ at the cost of a weaker check: see [Surrogate](26_Surrogate.md#proxy).
 `Drawable` only becomes involved when defining `render()`.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 `Blob` is the case worth watching: it draws, in the everyday sense,
-but its method is called `paint()`,
+but the method's name is `paint()`,
 and a protocol matches on names and signatures rather than on intent.
 Protocols preserve the flexibility of dynamic typing but add the early warning of static type checking.
 
@@ -331,7 +331,7 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 ## Generic Functions and Classes {#generic-functions-and-classes}
 
 Consider a function that returns the first element of a list.
-This function can be applied to a list holding any type.
+This function works on a list holding any type.
 A useful annotation returns a type that matches the list's element type,
 whatever that type is.
 
@@ -410,7 +410,7 @@ print(count(circles))
 # add_square(circles)
 ```
 
-The reason is that a `list` can be written to.
+The reason is that a `list` accepts writes.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
 Refusing the call is what keeps that from happening.
 A read-only container has no such problem,
@@ -547,8 +547,8 @@ and where a wrong assumption travels farthest before it fails.
 Let the checker infer the rest.
 A local variable whose type is obvious from its initializer gains nothing from an annotation,
 and `count: int = 0` says less than `count = 0` does, at greater length.
-The value of a hint is proportional to the distance between where a value is created and where it is used.
-A value that is born and consumed three lines later needs no help.
+The value of a hint is proportional to the distance between a value's creation and its use.
+A value born and consumed three lines later needs no help.
 A value that arrives from another module, through a container,
 is worth naming precisely.
 
@@ -573,7 +573,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; an `int` is accepted where a `float` is declared, and an `int` or `float` where a `complex` is, but not the reverse (`bytes` and `complex` are not used elsewhere in this book) |
+| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; the checker accepts an `int` where a declaration says `float`, and an `int` or `float` where it says `complex`, but not the reverse (`bytes` and `complex` do not appear elsewhere in this book) |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
@@ -623,7 +623,7 @@ The abstract container types come from `collections.abc`.
 | `def f[T](x: T) -> T` | A generic function (the type parameter varies per call), see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `class Box[T]` | A generic class, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
-| `[T = str]` | A type parameter default, used when the brackets are omitted, see [Type Parameter Defaults](#type-parameter-defaults) |
+| `[T = str]` | A type parameter default, used when you omit the brackets, see [Type Parameter Defaults](#type-parameter-defaults) |
 | `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
@@ -682,13 +682,13 @@ The forms above are the modern ones.
     Read the error, then restore the comment.
 3.  In `generics.py`, write a second generic function,
     `last[T](items: list[T]) -> T`, that returns the final element,
-    and call it on both a `list[int]` and a `list[str]` the way `first()` is called.
+    and call it on both a `list[int]` and a `list[str]` the way the listing calls `first()`.
 4.  In `self_type.py`, add a subclass of `NamedTally` called `LoudTally` whose `report()` returns the message in all capitals,
     calling `super().report()` first.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
 5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
     Remove the `= str` default and run it again.
-    Note that nothing is reported as an error either way,
+    Note that `ty` reports no error either way,
     and say what that means for a bare `Stack` annotation.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
@@ -696,4 +696,4 @@ The forms above are the modern ones.
 7.  In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
     Explain why `ty` now accepts the call and why `shapes.append(...)` no longer type-checks.
 8.  In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
-    Explain why the empty string now takes the other branch even though the checker is satisfied either way.
+    Explain why the empty string now takes the other branch even though the checker accepts either version.

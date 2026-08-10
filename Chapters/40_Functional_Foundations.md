@@ -145,7 +145,7 @@ print(moved)
 The demonstration writes the assignment as `setattr(p, "x", 5)` because the direct form `p.x = 5` never gets to run:
 the type checker rejects it statically, as it should.
 `setattr()` slips past the static check so the listing can show the runtime rejection too.
-The original `p` is untouched, and `moved` is a separate value.
+The original `p` stays untouched, and `moved` is a separate value.
 When values never change underneath you,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
@@ -224,7 +224,7 @@ so it works as a dictionary key.
 What removes hashing is equality based on *contents*.
 A `list` and an unfrozen `@dataclass` both compare that way,
 so Python sets their `__hash__` to `None`:
-a key whose contents changed would no longer be found in the dictionary that stored it.
+the dictionary that stored a key could no longer find it once its contents changed.
 `frozen=True` lets a dataclass keep contents-based equality and a hash at the same time.
 That combination is why a value that must be a dictionary key, a cache entry,
 or a shared read across threads is normally a tuple or a frozen dataclass.
@@ -291,8 +291,8 @@ A `match` is code: adding an operator means editing the function,
 and the checker sees every case.
 The table is data: adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
-Choose `match` when the set of cases is fixed and known to the compiler,
-and a table when the set is meant to grow from outside.
+Choose `match` when the set of cases stays fixed and known to the compiler,
+and a table when the set should grow from outside.
 
 ## Lambdas
 
@@ -409,7 +409,7 @@ The last two lines show that memory directly:
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure:
-`factor` is fixed at capture and never changes,
+`factor` never changes after capture,
 so the same argument always produces the same answer.
 That is the difference between a captured constant and the global `balance` that made `withdraw()` unpredictable.
 
@@ -634,8 +634,8 @@ a frozen dataclass for the value,
 `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 The second `print()` is the payoff.
-The input list is unchanged, so the whole report can be recomputed, cached,
-or run on another core with no coordination.
+The input list stays unchanged, so you can recompute the whole report,
+cache it, or run it on another core with no coordination.
 
 None of this is a different language.
 It is ordinary Python in which each piece depends on its arguments alone,
@@ -655,7 +655,7 @@ and the chapters ahead build on that single property.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
     that fixes only `low` to 10 and leaves both other arguments to the caller.
-    Then try to fix only `high` without a `Placeholder` and explain why it cannot be done.
+    Then try to fix only `high` without a `Placeholder` and explain why that is impossible.
 6.  In `immutable_types.py`,
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
     Run `ty`, and explain why it reports nothing when `MAX_SIZE = 200` on the next line is an error.

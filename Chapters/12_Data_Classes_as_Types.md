@@ -50,7 +50,7 @@ and an unhashable exception is a trap if you put it in a set.
 Identity is the correct comparison for an exception.
 Two failures carrying the same text are still two separate failures.
 
-## A Value That Must Be Checked Everywhere
+## A Value You Must Check Everywhere
 
 Suppose a "stars" rating is an integer from one to ten.
 If you represent it as an `int`, nothing stops a caller from passing eleven,
@@ -154,7 +154,7 @@ with a class invariant that must hold between calls,
 is the practice known as *Design by Contract* (DbC).
 `f1()` takes no argument, so only the postcondition appears here.
 A method that accepted a second rating would need a precondition for it as well.
-The problem with DbC is that the contract is spread across every method that touches the value.
+The problem with DbC is that the contract spreads across every method that touches the value.
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method has to remember to call it.
 That is the same scattering of checks as before, but moved inside the class.
@@ -196,7 +196,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 #:   • __repr__(self)
 ```
 
-The dunder methods have indeed been generated,
+`@dataclass` did generate the dunder methods,
 and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
@@ -299,7 +299,7 @@ which is the earlier of the two defenses.
 against code the checker never saw.
 
 `frozen=True` guards the binding, not the object behind it.
-A field holding a `list` can still be mutated in place,
+You can still mutate a field's `list` in place,
 and a frozen instance is hashable only when every field it holds is.
 [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 demonstrates that leak.
@@ -322,7 +322,7 @@ covers.
 They differ again in what this chapter cares about most,
 shown in [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate).
 
-If nothing about an object can change after it is built,
+If nothing about an object can change after construction,
 then validating it at construction makes it valid for its lifetime.
 
 ## A Type Is a Set of Values
@@ -544,7 +544,7 @@ Make the type responsible for guaranteeing its own values.
 
 ## Comparing Ordinary Classes and Data Classes
 
-So far `@dataclass` has been used without opening it up:
+So far this chapter has used `@dataclass` without opening it up:
 you declare fields and a constructor appears.
 Four small classes show the difference between a class body that declares fields and one that stores them,
 and go further than [Class Attributes](09_Class_Attributes.md) did:
@@ -554,7 +554,7 @@ and go further than [Class Attributes](09_Class_Attributes.md) did:
 - `C` is a `@dataclass`.
 - `D` adds a `ClassVar` field alongside an ordinary one.
 
-Each one is inspected with the same helper:
+The same helper inspects each one:
 
 ```python
 # comparison.py
@@ -602,7 +602,7 @@ As [Class Attributes](09_Class_Attributes.md#a-bare-annotation-declares-it-does-
 puts it, a bare annotation is a declaration rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
-but nothing is stored anywhere until assigned in code.
+but stores nothing until code assigns a value.
 `A` has no `__init__()` to make that assignment,
 so the declaration never gets fulfilled.
 That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
@@ -667,7 +667,7 @@ print(C.__annotations__)
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
 As a `@dataclass`, `C`'s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
-Each `C` instance owns its own copies from the moment it is constructed.
+Each `C` instance owns its own copies from the moment of construction.
 `B` runs nothing like that.
 With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
@@ -730,7 +730,7 @@ The difference comes from what `@dataclass` generates for each field.
 
 `x` is an ordinary field.
 `__init__()` takes it as a parameter and runs `self.x = x`,
-so each new `D` gets its own copy the moment it is constructed.
+so each new `D` gets its own copy at construction.
 That is why `show(D())`'s `x: int = 99` carries no tag.
 It now lives in that instance's own `__dict__`, not on the class.
 
@@ -924,12 +924,12 @@ so its `months` field needs `field(default_factory=make_months)` rather than a d
 Choose the tool that makes the legal set easiest to express.
 For a small fixed set, that is an `Enum`.
 
-## Defaults That Are Built, Not Shared {#defaults-built-not-shared}
+## Defaults Built Fresh, Not Shared {#defaults-built-not-shared}
 
 `Months` declares `months: list[Month] = field(default_factory=make_months)`.
-Writing `= make_months()` instead is refused at class-definition time,
+`@dataclass` rejects `= make_months()` at class-definition time,
 with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
-A default value is evaluated once, when the class is defined,
+Python evaluates a default value once, at class definition,
 so every `Months` would read and write that one list,
 the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 `field(default_factory=make_months)` supplies a function instead of a value,
@@ -939,7 +939,7 @@ That rejection is narrower than it looks.
 `@dataclass` refuses a default it can tell is shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
-so a mutable object of a class you wrote passes as a default and is shared by every instance,
+so a mutable object of a class you wrote passes as a default and every instance shares it,
 which is the same bug the check exists to prevent.
 Use `default_factory` for anything that is not obviously a constant.
 
@@ -951,7 +951,7 @@ A subscripted generic is callable too,
 so `field(default_factory=dict[str, str])` is legal and does what it looks like.
 That form seems redundant,
 because the annotation on the left already names the type,
-and the subscript is erased at runtime.
+and the subscript vanishes at runtime.
 It gains one thing:
 
 ```python
@@ -979,7 +979,7 @@ print(Checked().data)
 
 Nothing objects to `Unchecked`.
 The type checker accepts it, the linter accepts it,
-and the field is declared `dict[str, str]`, so every reader expects a dict.
+and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.
 A bare `list`, `dict`,
@@ -1035,8 +1035,8 @@ There, no illegal `Stars` could exist.
 Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate.
 The third test shows why the check cannot move inside the type.
-`__new__()` is refused, `__init__()` is refused the same way,
-and the class never finishes being created:
+`NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
+and the class never comes into existence:
 the error arrives while Python is still reading the `class` statement.
 A checker reports it as `invalid-named-tuple` before the program runs,
 which the `# type: ignore` silences.
@@ -1488,7 +1488,7 @@ They moved.
 `stars_unchecked.py` spread them across every function that took a rating,
 and `stars_class.py` spread them across every method that changed one.
 `stars.py` put them in the constructor,
-where they run once and cannot be skipped,
+where they run once and nothing can skip them,
 because the constructor is the only way to make the value.
 
 That trade has a price, and the price is at the edges.
@@ -1520,7 +1520,7 @@ and a function receiving one does its work without asking whether the value make
 5.  Give `Stars` a `copy.replace()`-based variant helper without using a data class:
     write an ordinary class holding the rating, define `__replace__()`,
     and confirm that `copy.replace()` still runs your validation.
-6.  Add a `ClassVar[int]` counter to `Stars` that records how many have been built.
+6.  Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
     Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
     then check with `display_object()`.
     Incrementing the counter from `__post_init__()` works on a frozen class.

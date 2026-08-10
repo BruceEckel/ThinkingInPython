@@ -243,7 +243,7 @@ Other("second").f()
 ```
 
 Because `f` is now an ordinary method, its first parameter is `self`,
-whichever class it was imported into.
+whichever class imported it.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
 but composition or a module-level function is almost always a clearer choice.
@@ -257,7 +257,7 @@ silently produces a new method instead of an override.
 This bug is easy to miss.
 
 The `@override` decorator from the `typing` module closes that gap.
-It declares that a method is meant to replace one from a base class:
+It declares that a method replaces one from a base class:
 
 ```python
 # override_intro.py
@@ -283,7 +283,7 @@ Derived().show()
 
 A type checker now verifies the claim.
 If a decorated method does not override anything in a base class,
-because the name is misspelled or the base method is gone,
+because you misspelled the name or the base method no longer exists,
 the checker reports an error.
 Uncomment the decorator on `Typo.shwo` and it says:
 
@@ -328,11 +328,11 @@ print(c.area)  # Properties don't use parentheses
 #: 314.159
 ```
 
-`radius` is a plain attribute here and `area` is computed,
+`radius` is a plain attribute here and `area` a computation,
 and the call site cannot tell them apart.
 
-The default `@property` is read-only.
-Assigning to it raises an `AttributeError`.
+The default `@property` rejects writes:
+assigning to it raises an `AttributeError`.
 To enable writing, add a *setter*,
 which allows you to validate the value before storing it:
 

@@ -103,7 +103,7 @@ which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` rather than `bool`.
 `filter(None, items)` is the other narrowing form;
-it drops the falsy values and the checker knows `None` is gone.
+it drops the falsy values and the checker knows no `None` survives.
 
 List brackets (`[]`) enclose the list comprehension,
 so you can see at a glance that it produces a list.
@@ -128,7 +128,7 @@ A comprehension's loop variable belongs to the comprehension.
 The `e` inside the brackets is a different name from the `e` outside them,
 so the outer `e` survives untouched.
 A `for` loop behaves the opposite way:
-its loop variable is left behind in the enclosing scope after the loop ends.
+its loop variable stays behind in the enclosing scope after the loop ends.
 
 The walrus operator is the exception.
 `total := total + n` assigns in the enclosing scope,
@@ -236,14 +236,14 @@ for row in matrix:
 Read a nested comprehension from the outside in, not left to right.
 The outer comprehension supplies `row`; for each `row`,
 the inner comprehension runs the full `col` loop and produces one sub-list.
-The inner `for col` is written to the left of the outer `for row` but runs inside it.
+The inner `for col` sits to the left of the outer `for row` but runs inside it.
 The output expression sits first but runs last, once per innermost iteration.
 
 `1 if col == row else 0` is a conditional expression, not a filter.
 It sits in the output position, before the `for`,
 and decides what each element *is*; every `col` still produces one.
 An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
-decides *whether* an element is produced at all.
+decides *whether* the comprehension produces an element at all.
 The positions are not interchangeable:
 `[x for x in xs if a else b]` is a `SyntaxError`,
 and a comprehension needing both writes them in both places,
@@ -335,13 +335,13 @@ the first `for` walks the directories and the second `for` walks the files in ea
 flattening the tree into one list of paths.
 The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`,
 which avoids constructing a `Path` for every file in the tree,
-including the ones being skipped.
+including the ones the filter skips.
 
 A `with` block, unlike a function body, does not create a new scope.
-`py_paths` is assigned inside the `with`,
+The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
-By then the directory is gone.
+By then the directory no longer exists.
 The comprehension finished building `py_paths` as strings while the directory still existed,
 so nothing later needs the files.
 Turning those brackets into parentheses would break it:
@@ -392,7 +392,7 @@ if __name__ == "__main__":
 
 Reading this means untangling several questions at once: which items qualify,
 how the warehouses flatten together, what order the result ends up in,
-and how each line is displayed.
+and how each line renders.
 A comprehension nested inside `sorted()`,
 itself nested inside the outer comprehension,
 is doing four jobs in one expression.
@@ -426,7 +426,7 @@ for line in report:
 
 `in_stock` answers "which items qualify, flattened across warehouses."
 `sort()` answers "in what order."
-`report` answers "how each line is displayed."
+`report` answers "how each line renders."
 Each name documents a stage of the pipeline,
 so a reader can follow the transformation one step at a time instead of parsing every step simultaneously.
 Use this split whenever a comprehension needs a comment to explain what it does.
@@ -449,7 +449,7 @@ print(wasted)
 
 The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
-a list built only to be thrown away.
+a list built and immediately discarded.
 Worse, a reader scanning `[...]` expects a meaningful collection,
 and this is a loop written with the wrong punctuation.
 
@@ -556,11 +556,11 @@ print(list(nums))
 #: []
 ```
 
-It runs once, and once its values are consumed it is empty.
+It runs once, and once something consumes its values it is empty.
 `sum()` drained `nums`,
 so `any()` saw no elements and reported `False` instead of `True`,
 with no exception to say the question was never asked.
-When something must be traversed twice,
+When you must traverse something twice,
 either materialize it with `list()` or write the generator expression again.
 
 Deferral is not total.
@@ -583,15 +583,15 @@ print(list(gen))
 #: [10, 20, 30]
 ```
 
-`source()` runs while the generator expression is being built,
+`source()` runs as Python builds the generator expression,
 before the line below it prints.
 The output expression waits,
-so `factor` is read when `list()` pulls the values rather than when the generator was written,
+so the code reads `factor` when `list()` pulls the values rather than when you wrote the generator,
 and the answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 This is also why `path_walk_comprehension.py` uses brackets.
-Its outermost iterable, `root.walk()`, would be evaluated at creation,
-but the walking and the filtering would wait for a consumer that arrives after the directory is deleted.
+Its outermost iterable, `root.walk()`, would run at creation,
+but the walking and the filtering would wait for a consumer that arrives after the directory disappears.
 [Iterators](23_Iterators.md#generators) explores generators further,
 and [Generators](45_Generators.md)
 covers the values they receive as well as the ones they produce.
@@ -656,7 +656,7 @@ A `for` loop when you want the side effect rather than the collection.
 
 The delimiters also decide when the work happens.
 Every form but the parenthesized one runs to completion before the next statement,
-so the cost of a comprehension is paid where you wrote it.
+so you pay the cost of a comprehension where you wrote it.
 A generator expression defers that cost to whoever consumes it,
 and pays it only for the values they ask for.
 

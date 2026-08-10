@@ -19,7 +19,7 @@ Caching logic, an eviction policy, a dispatch table,
 each one hides an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
 The ones where speed matters, `reduce()`, `partial()` and the two caches,
-are implemented in C.
+run as C code.
 What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `reduce`
@@ -85,7 +85,7 @@ which stores the result on the instance and dies with it.
 
 ### `lru_cache`
 
-Like `cache()`, but bounds memory by discarding the least recently used entry once `maxsize` is reached.
+Like `cache()`, but bounds memory by discarding the least recently used entry once the cache reaches `maxsize`.
 
 ```python
 # functools_lru_cache.py
@@ -192,7 +192,7 @@ print(x.squared)
 ```
 
 Be careful with caching:
-mutating a property doesn't cause the cached result to be recalculated.
+mutating a property doesn't recalculate the cached result.
 The escape hatch is `del x.squared`:
 deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
@@ -288,7 +288,7 @@ Turns a plain function into one that dispatches on the type of its first argumen
 with per-type implementations registered separately.
 [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 uses `singledispatch()` as an alternative to the Visitor pattern,
-including why the registered function below is named `_`.
+including why the registered function below takes the name `_`.
 
 ```python
 # functools_singledispatch.py
@@ -589,7 +589,7 @@ which is right when the missing elements are data in their own right.
 ### `groupby`
 
 Groups consecutive elements that share a key.
-The input must already be sorted by that key, since it only merges neighbors.
+The input must arrive already sorted by that key, since it only merges neighbors.
 
 ```python
 # itertools_groupby.py
@@ -800,10 +800,10 @@ Its payoff shows up once the problem branches, not just repeats,
 as the next example shows.
 
 Branching brings a cost that counting down does not.
-The same subproblem can be reached along more than one branch,
+More than one branch can reach the same subproblem,
 and a plain recursive function recomputes it every time.
 That is why the recursive `fib()` under [`cache`](#cache)
-is decorated rather than rewritten as a loop:
+gets a decorator rather than a rewrite as a loop:
 the recursion states the definition, and the cache removes the repetition.
 
 Recursion suits problems that are naturally self-similar,
@@ -959,15 +959,15 @@ A roster smaller than one full group takes that choice to its limit.
 The `while len(pool) >= size` loop never runs,
 so there is no group to fold the leftovers into,
 and the `if pool and not groups` line opens one.
-Without it, `min()` is asked for the smallest of no groups and raises a `ValueError`.
+Without it, `min()` receives no groups to compare and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,
 because the alternative is a round in which nobody meets anyone.
 
-`met()` is called once per candidate per slot,
+`met()` runs once per candidate per slot,
 which makes it the obvious place to put `@cache` from earlier in this chapter.
 Doing so would be wrong.
 `met()` reads `history`, and `history` changes at the end of every round,
-so a cached answer from round 0 would still be reported in round 6 after every count it summed had moved.
+so a cached answer from round 0 would still come back in round 6 after every count it summed had moved.
 The `cache` entry's rule that caching only works for pure functions is not a formality.
 A function that reads mutable state is not pure, however simple its body looks.
 
@@ -997,7 +997,7 @@ and a memoized pure function is `@cache`.
 Each of those replaces a small piece of code that works the first time and fails on the empty input,
 the single element, or the last partial batch.
 
-The second rule is that the pieces are meant to be stacked.
+The second rule is that the pieces exist to stack.
 `islice(count(10, 2), 5)` in this chapter is two stages;
 a real pipeline is five or six, and it still holds one item in memory at a time.
 [Error Handling](42_Functional_Error_Handling.md)

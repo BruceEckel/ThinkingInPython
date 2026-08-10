@@ -250,7 +250,7 @@ except KeyError as e:
 ```
 
 A dictionary probe compares keys by equality,
-so `Origami` is not `Paper` however closely the two are related.
+so `Origami` is not `Paper` however closely the two relate.
 Nothing walks the MRO on the way to the answer.
 
 ## One Type or Many
@@ -267,8 +267,8 @@ The two match types differently.
 `singledispatch` resolves through the MRO,
 so registering a base class catches every subclass,
 while the table matches the class exactly.
-Swapping one for the other changes which pairings are covered,
-not just how many types are considered.
+Swapping one for the other changes which pairings the code covers,
+not just how many types it considers.
 
 `functools.singledispatchmethod()` sits between them.
 It dispatches once on `self` through ordinary method resolution,
@@ -284,7 +284,7 @@ The version most programmers write first is neither of these:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it is the worst of both worlds.
-The type tests are scattered through every class as in the method version,
+The type tests scatter through every class as in the method version,
 with none of dispatch's automatic resolution,
 and every new `Item` forces an edit to every ladder.
 Both patterns in this chapter exist to avoid writing it.
@@ -374,7 +374,7 @@ Raising `TypeError` inside `__add__()` is not the same as returning `NotImplemen
 The exception propagates immediately, so the right operand never gets its turn;
 only the sentinel keeps the second dispatch alive.
 Python also skips the reflected call when both operands have the same type,
-so `Meters + Meters` is settled inside `__add__()`.
+so `Meters + Meters` settles inside `__add__()`.
 A class that implements only `__radd__()` cannot add itself to its own kind.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
@@ -458,8 +458,8 @@ def test_outcome_str(outcome: Outcome, expected: str) -> None:
     assert str(outcome) == expected
 ```
 
-Neither hierarchy is imported by name.
-`getattr(module, player)` looks the class up on whichever module the test was handed,
+The test imports neither hierarchy by name.
+`getattr(module, player)` looks the class up on whichever module the test received,
 so one table of nine expected answers drives two independent sets of `Paper`,
 `Scissors`, and `Rock` classes.
 Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,

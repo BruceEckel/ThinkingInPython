@@ -144,7 +144,7 @@ t.celsius = 150
 
 The observers here are lambdas, but any function or bound method works.
 Assigning to `celsius` notifies everyone.
-Four things from the classic version are gone: the interface,
+Four things from the classic version disappear: the interface,
 the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
 and a class per reaction.
 The `source` argument went too.
@@ -177,7 +177,7 @@ so a detachable observer needs a named reference, not an inline lambda.
 A bound method is the exception.
 Writing `obj.update` twice builds two objects that are not identical but do compare equal,
 since they share an instance and a function,
-so a bound-method observer detaches without being stashed.
+so a bound-method observer detaches without a stashed reference.
 `unsubscribe()` delegates to `list.remove()`,
 so detaching an observer that never subscribed raises `ValueError`,
 and subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
@@ -290,7 +290,7 @@ A slow observer no longer holds up the others.
 `gather` still waits for all of them,
 so the change finishes only after every notification succeeds.
 One limitation: a `@property` setter cannot be a coroutine,
-so an assignment cannot be awaited.
+so you cannot await an assignment.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather`, `run`).

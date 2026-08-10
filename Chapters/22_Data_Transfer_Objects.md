@@ -36,7 +36,7 @@ Because `**kwargs` is the only parameter,
 `Messenger("Spam")` raises a `TypeError`.
 The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)
 is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
-since a bare `*` must be followed by a named parameter.
+since a named parameter must follow a bare `*`.
 
 The `m: Any` annotation is not decoration.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
@@ -140,14 +140,14 @@ A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
 and `ty` reports it before the program runs.
 The attribute bag caught nothing; a declared field catches this.
-Since the fields cannot be mutated, `_replace()` produces an updated copy.
+Since nothing can mutate the fields, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
 
 The immutability guarantee reaches the fields, not the objects they refer to.
-A `NamedTuple` holding a list still lets that list be changed,
+A `NamedTuple` holding a list still lets that list change,
 the same leak [`frozen=True` has](20_Rethinking_Objects.md#the-immutability-solution).
-Such a record cannot be hashed either, whether or not anyone mutates the list,
+Nor can you hash such a record, whether or not anyone mutates the list,
 because hashing a tuple hashes its contents.
 An immutable record needs immutable fields.
 
@@ -245,7 +245,7 @@ but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 
-Ordering is inherited the same way, and is as type-blind as equality.
+Ordering arrives by inheritance the same way, and is as type-blind as equality.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`,
 with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.

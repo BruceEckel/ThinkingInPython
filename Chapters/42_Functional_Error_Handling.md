@@ -54,7 +54,7 @@ except ValueError as e:
 Function calls 0-2 produced correct values,
 but the exception threw away the whole list.
 The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
+which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-you-must-check-everywhere)
 flags as a problem.
 
 ## Return the Error as a Value
@@ -106,7 +106,7 @@ so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
-`@final` states that neither will be subclassed,
+`@final` states that neither will have subclasses,
 which lets the checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
@@ -177,7 +177,7 @@ success by returning an `Ok` object.
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
 The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()` makes that literal: it is defined on `Ok` and not on `Err`,
+`unwrap()` makes that literal: it exists on `Ok` and not on `Err`,
 so `func_a(i).unwrap()` fails the checker.
 Using the `Result` as if it were a number fails the same way.
 Narrowing to one of the two classes is the only route to the answer.
@@ -602,7 +602,7 @@ An exception knows what went wrong but not where it came from.
 which setting, which field, which row of the file?
 The frame that has that answer is rarely the frame that raised the exception,
 and by the time the exception reaches a handler high enough to report it,
-the local names that would explain it are gone.
+the local names that would explain it have vanished.
 
 The usual repair is to catch the exception and raise a new one carrying a better message,
 which costs you the original type and gives every caller a wrapper to unwrap.
@@ -632,7 +632,7 @@ except ValueError as e:
 ```
 
 The bare `raise` re-raises the same object,
-so the type stays `ValueError` and the original traceback is undisturbed.
+so the type stays `ValueError` and the original traceback survives undisturbed.
 Notes accumulate: each frame that knows something the raiser did not can add its own line as the exception passes through.
 They live in a list called `__notes__`,
 which is absent until the first `add_note()` call.
@@ -671,9 +671,9 @@ for field, value in (("age", "42"), ("size", "oops")):
 #:   field 'size' received 'oops'
 ```
 
-The note is attached before the exception becomes a value,
+The note attaches before the exception becomes a value,
 in the one frame that knows both the failure and the field name.
-Everything downstream can report the failure without being told what it was reading.
+Everything downstream can report the failure without asking what the code was reading.
 This is the same argument the chapter opened with, applied one level down:
 `Err` says a failure happened and the exception says what it was,
 and a note says which piece of work it belonged to.
@@ -702,7 +702,7 @@ Some languages call these errors "panics" and separate them from regular excepti
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.
 Those are not exceptional.
-They are expected, and the type should say so.
+They are routine, and the type should say so.
 
 You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.

@@ -85,7 +85,7 @@ if __name__ == "__main__":
 The `factory()` takes an argument that allows it to determine what type of `Shape` to create.
 Here it is a string, but it could be any set of data.
 The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
-(the initialization data for the objects will presumably come from somewhere outside the system, rather than being generated randomly as in the above example).
+(the initialization data for the objects will presumably come from somewhere outside the system, rather than from random generation as in the above example).
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
 A factory takes information telling it what to build;
@@ -208,7 +208,7 @@ for contrast.
 
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 In one file that timing is invisible,
-but a subclass defined in another module joins the registry only when that module is imported.
+but a subclass defined in another module joins the registry only when something imports that module.
 The classic failure is a plugin that "never registered": the class is fine,
 the registry is fine, and nothing imported the module that defines it.
 A [lazy import](06_Modules_and_Packages.md#lazy-imports)
@@ -802,7 +802,7 @@ Match the machinery to what varies:
 - Construction takes real work beyond calling a constructor
   (pooling, caching, consulting configuration): write a factory function,
   and a factory class only when that work has state of its own.
-- Several products must be chosen together as a matched set:
+- You must choose several products together as a matched set:
   use Abstract Factory, expressed as a `Protocol` rather than a base class.
 - The interesting part of an object is its configured state rather than its type:
   keep a prototype and copy it.
@@ -832,7 +832,7 @@ Both exist to work around languages where a class is not an object you can put i
     In which version can an invalid pizza exist, even momentarily?
 6.  Move `Circle` and `Square` out of `registry.py` into a new module,
     `extra_shapes.py`.
-    Confirm that `make("Circle")` now raises `KeyError` until `extra_shapes` is imported,
+    Confirm that `make("Circle")` now raises `KeyError` until something imports `extra_shapes`,
     and explain which line of which file performs the registration,
     and when it runs.
 7.  Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.

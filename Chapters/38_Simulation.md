@@ -1,7 +1,7 @@
 # Simulation
 
 A simulation models a set of objects that act on their own and interact through shared state.
-The first example, a pack of rats mapping a maze, is worked from end to end.
+The chapter works the first example, a pack of rats mapping a maze, from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
@@ -44,7 +44,7 @@ When a rat finds more than one open neighbor,
 it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.
 When it can claim nothing, it has reached a dead end and its task ends.
-When the last rat dies, every cell reachable from the entry has been mapped.
+When the last rat dies, the pack has mapped every cell reachable from the entry.
 
 ### The Rat and the Blackboard
 
@@ -231,20 +231,20 @@ class Blackboard:
 ```
 
 A `TaskGroup` does not close until every task inside it has finished,
-including tasks created after the block was entered,
+including tasks created after the block began,
 which is the shape this problem has: each rat can create more rats.
 A single `asyncio.gather(*self.tasks)` would not do,
-because `gather()` fixes its argument list at the moment it is called,
+because `gather()` fixes its argument list at the moment of the call,
 and half the rats do not exist yet.
 
-`group` is declared with `field(init=False)` and assigned only while `explore()` runs,
+`group`'s declaration is `field(init=False)`, with assignment only while `explore()` runs,
 the same declaration-without-assignment the robot example uses for `Robot.room`.
 The other four fields are internal bookkeeping rather than constructor arguments,
 which is why they carry `default_factory` instead of appearing in the signature.
 
 The maze layout lives in a text file.
 The loader drops blank lines and any line beginning with `#`,
-so the first line naming the file's path is ignored and the rest is the maze.
+so the first line, naming the file's path, drops out and the rest is the maze.
 
 ```text
 # rats_and_mazes/amaze.txt
@@ -269,7 +269,7 @@ Running it turns the rats loose and prints what they mapped.
 The first eight log messages come first,
 a trace of the run that nothing else in the chapter needs.
 They show what the map cannot: rat 1 spawns rat 2 and then dies before it,
-numbers are handed out in spawn order rather than completion order,
+numbers arrive in spawn order rather than completion order,
 and eighteen messages cover all nine rats.
 
 ```python
@@ -371,7 +371,7 @@ Each of this chapter's three views is a separate file holding all the display co
 the model-view split of [Observer](30_Observer.md#a-visual-example-of-observers).
 What is missing here is the subscription:
 no model in this chapter notifies anybody,
-so each view drives or replays its model instead of waiting to be told.
+so each view drives or replays its model instead of waiting for a notification.
 The harness skips it, like every windowed view in this book
 (`tools/data/norun.txt` lists all three of this chapter's views):
 
@@ -813,7 +813,7 @@ each proves to the checker that the occupant really is a `Teleport` before the c
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 That is not the type switch polymorphism removed.
-Construction is where the kinds of item must still be told apart, once,
+Construction still must tell the kinds of item apart, once,
 and the movement code that runs afterward never asks again.
 
 ### Testing the Walk
@@ -1238,7 +1238,7 @@ Run it.
     and put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
     Then count how many calls return `True` and compare that count with `len(blackboard.visited)`.
     `test_rats_and_mazes.py` still passes, because `visited` is a set:
-    the guarantee that broke is "one rat per cell", not "every cell is reached".
+    the guarantee that broke is "one rat per cell", not "every cell visited".
     What does the extra success cost the rats,
     and why does the original `claim()`, with no `await` inside it,
     need no lock?

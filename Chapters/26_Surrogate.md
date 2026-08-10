@@ -21,7 +21,7 @@ The surrogate forwards all method calls to that implementation.
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has only one implementation, while *State* has more than one.
 *GoF Design Patterns* considers the applications of the two patterns distinct.
-*Proxy* is used to control access to its implementation,
+*Proxy* controls access to its implementation,
 while *State* allows you to change the implementation dynamically.
 However, if you expand your notion of "controlling access to implementation,"
 the two fit neatly together.
@@ -324,7 +324,7 @@ print(p.level, settings.level)
 going around the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
 Every assignment after that reaches the implementation,
 so the two no longer disagree.
-The `# type: ignore` that `proxy_writes.py` needed is gone:
+The `# type: ignore` that `proxy_writes.py` needed disappears here:
 declaring `__setattr__()` tells the checker the proxy accepts arbitrary attributes,
 so the static half closes at the same moment as the runtime half.
 
@@ -445,7 +445,7 @@ The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
 The reason is the one the Proxy section gave:
 whatever `__getattr__()` returns is unknown at the type level,
-so `b.f()` cannot be checked no matter how the surrogate is annotated.
+so no checker can verify `b.f()`, no matter how you annotate the surrogate.
 Declaring each implementation against `Behavior` still catches a missing method,
 because the checker verifies that `Implementation1` and `Implementation2` have everything `run()` calls.
 That declaration stops at the surrogate.
@@ -487,15 +487,15 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
 2.  *Virtual proxy*.
     Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
-    This is used when you don't want the client programmer to have full access to the proxied object.
+    Use this when you don't want the client programmer to have full access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
-    For example, to keep track of the number of references that are held for a particular object,
+    For example, to keep track of the number of references held for a particular object,
     to implement the *copy-on-write* idiom and prevent object aliasing.
     A simpler example is keeping track of the number of calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
-`__getattr__()` receives the name being looked up,
+`__getattr__()` receives the requested name,
 so the check is one condition:
 
 ```python

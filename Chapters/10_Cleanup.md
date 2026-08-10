@@ -87,7 +87,7 @@ or not run the finalizers before exiting.
 So `__del__()` is fragile:
 the language specifies neither when it runs nor whether it runs at all.
 At interpreter shutdown,
-the globals a `__del__()` method refers to may already be gone.
+the globals a `__del__()` method refers to may have already vanished.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
@@ -114,7 +114,7 @@ The Python documentation warns:
      list_dealloc drops its items, this block goes stale silently. Verified
      against 3.15.0rc1. -->
 
-In the direct run the objects are destroyed during shutdown,
+In the direct run, shutdown destroys the objects,
 which is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
@@ -276,7 +276,7 @@ print("End of program")
 #: End of program
 ```
 
-`finalize()` registers `print(name, "closed")` to run when `a` is destroyed.
+`finalize()` registers `print(name, "closed")` to run at `a`'s destruction.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
 `finalize(self, self.close)` looks tidier but defeats this:
@@ -320,11 +320,11 @@ print(leaky() is None, safe() is None)
 #: False True
 ```
 
-A `ref()` reports `None` once its object is gone,
-so `False True` says `Safe` was collected and `Leaky` was not.
+A `ref()` reports `None` once its object disappears,
+so `False True` says the collector reclaimed `Safe` but not `Leaky`.
 `Safe` printed on the way out; `Leaky` printed nothing,
 because its callback never ran and nothing failed.
-Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question being asked,
+Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
 whether the collector reclaimed the object,
 rather than whether the callback eventually ran at exit.
 
@@ -416,8 +416,8 @@ so the registry cannot become the leak it is watching for.
 2.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
     by reading `cls._instances.values()`.
 3.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
-    and confirm the output is unchanged:
-    nothing is deleted before `End of delete loop` prints.
+    and confirm the output stays the same:
+    no object goes away before `End of delete loop` prints.
 4.  In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
     Report what `live_count()` prints after each `pop()`,
     and explain the difference in terms of what each container holds.

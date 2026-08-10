@@ -4,14 +4,14 @@ One of the most valuable habits in modern programming is unit testing.
 You build tests into the code you write and run them on every change.
 A type checker verifies the claims you can write as annotations.
 Tests verify the rest: that a withdrawal reduces the balance,
-that an overdraft is refused.
-They state what the code is supposed to do, and check it.
+that the account refuses an overdraft.
+They state what the code should do, and check it.
 
 Tests give you a safety net.
 With them you can refactor boldly, change designs, and clean up code.
 Tests also push back on the design.
 A function you cannot test easily is usually one that goes looking for the clock,
-the filesystem, or the network instead of being handed them.
+the filesystem, or the network instead of receiving them.
 
 Perhaps more importantly,
 tests tell you immediately if a change you've made causes a failure.
@@ -32,7 +32,7 @@ When you write the tests first, you:
 1.  Describe what the code should do, in concrete and verifiable terms,
     not in a separate document that drifts out of date.
 2.  Provide a worked example of how to use the code.
-3.  Get a clear definition of done: the code is finished when the tests pass.
+3.  Get a clear definition of done: the code is complete when the tests pass.
 
 Testing then becomes a design tool,
 not a verification step you skip when the code looks right to you.
@@ -262,7 +262,7 @@ The names in the string line up, in order, with the values in each tuple.
 `@pytest.mark.skip` and `@pytest.mark.skipif` leave a test out,
 unconditionally or on a condition such as the platform.
 `@pytest.mark.xfail` records a known bug: the test still runs,
-a failure is reported as expected rather than as a break,
+`pytest` reports a failure as expected rather than as a break,
 and the suite stays green without anyone deleting the test that proves the bug.
 
 ## Fixtures Replace Setup and Teardown
@@ -305,7 +305,7 @@ Everything before the `yield` is setup.
 Everything after it runs once the test finishes, even if the test failed.
 After the `yield` is the place to close files, release locks,
 or check a final invariant.
-A failing check there is reported as an error, not as a test failure:
+A failing check there surfaces as an error, not as a test failure:
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
 
@@ -389,7 +389,7 @@ In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
-It is stored under that exact name and reachable like any other attribute.
+Python stores it under that exact name, reachable like any other attribute.
 It is only a convention that says, "this is private, do not rely on it."
 
 A leading double underscore does something real,
@@ -425,7 +425,7 @@ In Python the distinction between white-box and black-box remains one of discipl
 not of compiler enforcement.
 
 That makes black-box testing the sensible default.
-If you test the public surface, the methods a caller is meant to use,
+If you test the public surface, the methods a caller should use,
 you can change the internals without rewriting the tests.
 The `Account` tests are black-box,
 which means they never read a private attribute.
@@ -680,12 +680,12 @@ The rule covers both cases: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
 
-A stand-in like `fake_urlopen()` is called a *stub*:
+A stand-in like `fake_urlopen()` is a *stub*:
 it answers with a canned value and records nothing.
 The standard library's `unittest.mock` builds stubs for you,
-along with *mocks* that also record how they were called,
+along with *mocks* that also record the calls they receive,
 and you will meet it in most existing code.
-This book patches with `monkeypatch` and prefers injection where the code can be changed,
+This book patches with `monkeypatch` and prefers injection where you can change the code,
 because a function that takes its clock or its fetcher as an argument needs no patching library at all.
 
 ## Property-Based Testing
@@ -713,7 +713,7 @@ Name what it depends on: the clock, randomness, the filesystem, the environment,
 the network.
 Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
-Then pin the behavior that is left with a handful of parametrized cases.
+Then pin the remaining behavior with a handful of parametrized cases.
 The work is mostly in the first step,
 since a function that is hard to test is usually one that goes looking for something it was never handed.
 

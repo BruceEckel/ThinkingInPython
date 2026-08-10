@@ -10,14 +10,14 @@ Any object that follows the *iterator protocol* works with `for`,
 comprehensions, `sum()`, `sorted()`, unpacking,
 and every function that takes an iterable.
 
-## Iteration Is Built In
+## Iteration Comes Built In
 
 Two methods make up the protocol.
 An *iterable* has `__iter__()`, which returns an *iterator*.
 An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
-so an iterator works anywhere an iterable is expected.
+so an iterator works anywhere code expects an iterable.
 The `for` loop calls these so you almost never call them directly.
 Every container uses this protocol,
 so a function written against an iterable stays decoupled from the container.
@@ -121,7 +121,7 @@ the list, and the custom `Countdown`.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
 `Countdown(5)` is an iterable whose `__iter__()` builds a fresh generator for every pass,
-so it can be iterated repeatedly, as the tests below confirm.
+so you can iterate it repeatedly, as the tests below confirm.
 
 These tests collect each iterator into a list and compare them,
 covering the sequences and their empty edge cases,
@@ -192,7 +192,7 @@ print(list(sq))  # Exhausted: empty, and no error
 ```
 
 Calling `squares(6)` runs none of its body.
-The `print` at the top fires only when the first value is demanded.
+The `print` at the top fires only when something demands the first value.
 It fires once, not on every value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
 Any validation at the top of a generator inherits this delay:
@@ -222,14 +222,14 @@ except ValueError as e:
 ```
 
 `squares()` has no `yield`, so calling it runs the check immediately.
-Only `produce()` is deferred.
+Only `produce()` waits.
 
 The second surprise is the second call to `list(sq)`.
 An exhausted generator does not fail.
 It produces nothing,
 so the empty `list(sq)` gives you no error to point at the bug.
 
-When data must be walked twice, collect it into a list once,
+When you must walk data twice, collect it into a list once,
 or hand out an iterable like `Countdown` above,
 whose `__iter__()` builds a fresh generator for every pass.
 
@@ -477,7 +477,7 @@ def test_islice_stops_after_its_count() -> None:
 
 The first test is `list(count(1))` with a stopping point built into the source.
 `list()` asks for value after value and never stops,
-so the tripwire fires rather than the list being returned.
+so the tripwire fires and no list ever comes back.
 The second test is the lookalike described previously.
 Nothing after `2` satisfies `n < 3`,
 yet `list()` keeps pulling in the hope of another match,
@@ -598,7 +598,7 @@ Writing the four GoF Iterator methods in Python shows what `first()` and `curren
 Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
-Over a generator, all four can still be written,
+Over a generator, you can still write all four,
 but only by keeping everything the traversal has seen:
 
 ```python
@@ -658,7 +658,7 @@ print(stream.seen)
 and it drives any type with those four methods,
 because `GoFIterator` is a [protocol](20_Rethinking_Objects.md#protocols)
 rather than a base class.
-The generator was spent by the end of the first pass,
+The first pass spent the generator,
 yet `first()` rewinds and `traverse()` produces the same three values.
 
 `seen` is how.
@@ -675,12 +675,12 @@ That is the cost the pattern hides.
 so honoring them over a stream means recreating one item by item.
 The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
-and in the advice to collect into a list when data must be walked twice.
+and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
 If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
-You can ask a GoF iterator whether it is done multiple times without disturbing it.
+You can ask a GoF iterator repeatedly whether it has finished, without disturbing it.
 Python makes that question part of `__next__()`,
 so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
@@ -750,7 +750,7 @@ It is to let the loop do the asking.
 Both surprises in [The Costs of Laziness](#the-costs-of-laziness)
 come from the same rule.
 The only way to find out whether the body accepts its arguments is to pull a value and let it run,
-and the only way to find out whether the source is spent is to pull and be told nothing came back.
+and the only way to find out whether the source is spent is to pull and get nothing back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol costs you nothing, and tells you nothing.

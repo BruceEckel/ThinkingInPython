@@ -239,7 +239,7 @@ the function form has to give each parameter a default of its own.
 The function version also closes the gap in `@final`.
 A caller supplies the steps and cannot replace the loop,
 because there is no subclass through which to replace it.
-The fixed algorithm is fixed by structure rather than by a decorator the runtime ignores.
+Structure fixes the algorithm, not a decorator the runtime ignores.
 
 Passing functions in is not the *Strategy* pattern,
 although the two look alike at the call site.
@@ -292,5 +292,5 @@ Choose by asking whom you are protecting the algorithm against.
 4.  Write two subclasses of `ApplicationFramework` that both type-check but break the fixed algorithm:
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
-    Neither is reported by `ty`.
+    `ty` reports neither.
     What would have to be true of the base class for a checker to catch either one?

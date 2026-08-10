@@ -193,7 +193,7 @@ The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
 Unpacking is not limited to one name per element.
-A starred name absorbs whatever is left over,
+A starred name absorbs whatever remains,
 and a target can nest to match the shape of the value:
 
 ```python
@@ -216,11 +216,11 @@ except ValueError as e:
 #: ValueError
 ```
 
-At most one target can be starred, and it always produces a `list`,
+At most one target can carry the star, and it always produces a `list`,
 even when the source is a tuple or a string.
 Without a star the number of names must equal the number of elements,
 or the assignment raises `ValueError`.
-A name whose value you never read is written `_` by convention,
+By convention, a value you never read gets the name `_`,
 so `*_` discards a run of elements.
 [Pattern Matching](13_Pattern_Matching.md)
 matches `case` patterns against the same shapes.
@@ -345,7 +345,7 @@ print(2 in a)
 #: True
 ```
 
-The `{}` literal was taken by `dict` first, so an empty set is `set()`.
+`dict` claimed the `{}` literal first, so an empty set is `set()`.
 The order these sets print comes from CPython's hashing, not from any guarantee,
 so never write code, or a test, that depends on it.
 
@@ -475,8 +475,8 @@ print("fish" in by_kind)  # Reading it added the key
 
 The `defaultdict` constructor argument is a *factory*,
 a callable that builds the default.
-The factory runs on the *read*, and the new value is stored,
-so touching a missing key grows the dictionary.
+The factory runs on the *read*, and its result goes into the dictionary,
+so touching a missing key grows it.
 Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
 
@@ -485,7 +485,7 @@ A plain `dict` has a second option worth knowing:
 and returns the existing value when it is not.
 It builds the empty list on every call, used or not,
 and you must repeat it everywhere you touch the dictionary.
-A `defaultdict` states the default once, where the dictionary is created.
+A `defaultdict` states the default once, where you create the dictionary.
 
 ### `deque`
 

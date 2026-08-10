@@ -29,7 +29,7 @@ The simplest patterns are literal values.
 A `case _` at the end is the wildcard.
 It matches anything, like a default.
 Without one, a `match` that fits no pattern does nothing and raises no error.
-Patterns are tried top to bottom and the first match wins:
+`match` tries the patterns top to bottom and the first match wins:
 
 ```python
 # http_status.py
@@ -138,7 +138,7 @@ When the capture is the last `case`, as here, nothing warns you.
 which is the linter saying that `DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
-so the checker sees that both members are covered and does not complain about the missing return.
+so the checker sees that the cases cover both members and does not complain about the missing return.
 
 ## Sequence Patterns
 
@@ -753,7 +753,7 @@ print(round(cost(email) + cost(sms) + cost(push), 4))
 ```
 
 `render()` and `cost()` each `match` over `Notification` and end with `assert_never()`,
-so the type checker confirms every case is handled.
+so the type checker confirms each `match` handles every case.
 
 ```python
 # test_notifications.py
@@ -805,7 +805,7 @@ explore it further.
     Run `ty` before adding its `case` to `render()` and `cost()`,
     and read the errors.
     Then add both cases and confirm `ty` passes.
-5.  Rewrite `guards.py`'s `quadrant()` so the third and fourth quadrants are handled too.
+5.  Rewrite `guards.py`'s `quadrant()` so it handles the third and fourth quadrants too.
     Then write it a second time with one `case` per sign combination,
     using `|` alternations and no guards, and say which version reads better.
 6.  Give `value_patterns.py`'s `Signal` a third member,

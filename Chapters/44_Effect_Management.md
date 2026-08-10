@@ -35,7 +35,7 @@ you must either trust the documentation or examine that function's code.
 
 This rapidly becomes tedious and error-prone.
 It would be great if the type checking system could verify purity for you.
-A system that does this is called an *Effect Management System*.
+A system that does this is an *Effect Management System*.
 
 ## What Is an Effect?
 
@@ -65,7 +65,7 @@ your function becomes impure.
 This usually involves I/O: the time of day, a random number,
 a database or network read.
 But it can also be as simple as reading a variable that's global to your function.
-These are called *side causes* (corresponding to side effects)
+These are *side causes* (corresponding to side effects)
 or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
@@ -84,7 +84,7 @@ def slope(rise: int, run: int) -> float:
 
 This always produces the same result for the same inputs,
 except when `run` is zero.
-Because an exception is raised instead of returning a result,
+Because it raises an exception instead of returning a result,
 does that break purity?
 
 Two schools of thought exist:
@@ -111,9 +111,9 @@ Two schools of thought exist:
 
 From an Effect Management standpoint, exceptions are impure.
 If you write a function `a()` that calls a function `b()` that raises an exception,
-then `a()` also raises that exception unless it is caught within `a()`.
+then `a()` also raises that exception unless `a()` catches it.
 To know the Effects that your function has,
-exceptions must be tracked as Effects on all functions.
+you must track exceptions as Effects on all functions.
 Effects therefore come in three kinds: side effects, side causes,
 and exceptions.
 
@@ -152,7 +152,7 @@ for args in [(10, 2), (10, 0)]:
 ```
 
 `@safe` catches whatever `slope()` raises,
-so the fix lives outside the function being fixed.
+so the fix lives outside the function it repairs.
 `slope()` is total again, and `match` forces the caller to handle both outcomes.
 Nothing escapes through a raised exception.
 
@@ -189,7 +189,7 @@ except ValueError as e:
 ```
 
 This works, and it needs no new type.
-But it only guards the exception that `slope()` was written to expect.
+But it only guards the exception `slope()`'s author expected.
 `validate()` raises `ValueError` for a negative `run`,
 an exception `slope()` never anticipated.
 Because `slope()` calls it, `validate()`'s Effect becomes `slope()`'s Effect.
@@ -199,15 +199,15 @@ which is the tracking problem an Effect Management System exists to solve.
 Note that languages like C++ and Java attempted to track exceptions using *exception specifications*,
 but did not make those first-class in the function type.
 Nothing computed a specification from the functions a body called,
-so an exception introduced three levels down had to be written by hand into every signature above it.
+so an exception introduced three levels down had to appear by hand in every signature above it.
 The usual escape was to widen the specification until it said nothing.
 They leaked information and are generally considered a failure
-(C++ changed its specifications to a binary indication of whether or not any exceptions are thrown).
+(C++ changed its specifications to a binary indication of whether or not a function throws at all).
 
 ### Make the Bad Value Impossible
 
 The third approach removes the failure instead of handling it.
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-that-must-be-checked-everywhere)
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-you-must-check-everywhere)
 makes illegal values impossible to construct.
 If you give `run` a type that cannot hold zero,
 `slope()` never needs to check for zero:
@@ -321,7 +321,7 @@ The next phase produces one benefit per subdivision:
   or a seeded generator for true randomness,
   and the function under test becomes repeatable.
 - **Side effects** become replaceable outputs.
-  A test swaps the real database or console for a stand-in that records what was written,
+  A test swaps the real database or console for a stand-in that records the writes,
   then inspects the recording.
 
 In almost every case, testing is a benefit of Effect Management.
@@ -389,18 +389,18 @@ A full EMS does three things:
 1. **Tracks Effects.**
    The type system knows which Effects a function may perform.
 2. **Separates each Effect's interface from its implementation.**
-   A function declares which Effects it uses, not how they are fulfilled.
+   A function declares which Effects it uses, not how to fulfill them.
 3. **Binds the implementation later.**
    Some caller or context supplies the implementation,
-   at a point after the function is defined.
+   at a point after the function's definition.
 
-The third item is called *delayed binding*.
+The third item is *delayed binding*.
 Delayed binding exists so that one fixed codebase can serve many contexts
-(test, production, retry-wrapped) without being edited.
+(test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
 none of them contains an opinion about what that storage is.
 They all flow up to a single point or edge,
-where storage is bound to an implementation.
+where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
 A test provides an in-memory binding, production provides the real database,
 and none of the hundred functions change.
@@ -459,7 +459,7 @@ print(captured.messages)
 `greet()` performs an `Ask` Effect and a `Tell` Effect,
 and its signature says so.
 This moves the Effects into explicit arguments.
-The bindings are delayed.
+The bindings come later.
 The demo binds them to test stand-ins, `Scripted` and `Capture`,
 and checks the greeting with no console in sight.
 A production caller passes objects that read with `input()` and write with `print()`,
@@ -479,14 +479,14 @@ Nothing propagates automatically.
 If you add a `Log` Effect three levels down,
 you edit every signature on the path.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
-but the injector still must be told what every function needs,
-and told again when that changes.
+but you still must tell the injector what every function needs,
+and tell it again when that changes.
 Nothing verifies the wiring except a runtime failure.
 
 Python does have a mechanism that propagates on its own.
 A `ContextVar` ([Concurrency](19_Concurrency.md#context-that-follows-the-call-chain))
 holds a value for the current task,
-and anything below reads it without being handed it,
+and anything below reads it without receiving it as an argument,
 which is the automatic propagation the parameter list lacks.
 It removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
@@ -502,7 +502,7 @@ one that carries Effect information without occupying the argument list.
 
 ### Native Effect Management
 
-Ideally, Effect tracking is built into the language.
+Ideally, Effect tracking comes built into the language.
 This is a *native* Effect system.
 In a native system, Effects live in the type system alongside ordinary types.
 A function's signature carries two pieces of information: what it returns,
@@ -552,7 +552,7 @@ If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
 This is the propagation that the by-hand version made you perform with parameters.
 
-Every Effect must eventually be fulfilled,
+Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what happens next.
@@ -564,16 +564,16 @@ The compiler rejects a program that performs an Effect with no handler in scope,
 so no Effect reaches the runtime unaccounted for.
 
 This decoupling is the core of every Effect system.
-The code that requests an Effect is separated from the code that performs it,
+The code that requests an Effect stands apart from the code that performs it,
 and a handler sits between them.
 `greet()` names `ask` and `tell` without deciding what either one means.
 The handler decides, and a different handler decides differently.
 
 Handlers can do more than `except` blocks can.
-When an operation is performed, the handler receives the *continuation*:
+When an operation runs, the handler receives the *continuation*:
 the rest of the computation from that point forward.
 An `except` block can only catch or propagate,
-and either way the continuation is discarded.
+and either way it discards the continuation.
 A handler can resume the continuation once,
 which behaves like a normal function return.
 It can discard the continuation, which behaves like an exception.
@@ -583,8 +583,7 @@ which is how native systems express retries and backtracking as ordinary handler
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
 [Generators](45_Generators.md) covers the full two-way form,
-and it is the mechanism the Python Effect library in [Stateless](46_Stateless.md)
-is built from.
+and it is the mechanism behind the Python Effect library in [Stateless](46_Stateless.md).
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect set follows a backslash:
@@ -602,7 +601,7 @@ though it does not yet track Effects in function types.
 ### Library Effect Management
 
 Changing languages is rarely an option.
-If your team is committed to Scala or TypeScript,
+If your team has committed to Scala or TypeScript,
 native Effects are unavailable,
 so designers built *library* Effect systems on top of existing type systems.
 In this approach the compiler doesn't track Effects.
@@ -651,7 +650,7 @@ Everything else in the listing is machinery: a trait for the interface,
 a companion object to lift that interface into the `ZIO` type,
 a `ZLayer` to package the implementation, and a `provide()` call to bind it.
 All of that, to print one string.
-The machinery exists because the language cannot intercept an Effect at the point where it is performed,
+The machinery exists because the language cannot intercept an Effect at the point where it runs,
 the way a native handler can.
 The library's only power is over values, so every Effect must become a value.
 `hello` is not a running program.
@@ -695,13 +694,13 @@ Deferring execution is the price it pays for delayed binding in a language that 
 That price is a conceptual layer you carry everywhere.
 You must always know whether a value is a description or an action.
 Code that mixes the two compiles cleanly but misbehaves,
-because the imperative part runs while the description is being built,
-not when the description is executed.
+because the imperative part runs during the description's construction,
+not at its execution.
 
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-Stateless is built on generators, so [Generators](45_Generators.md)
+Stateless builds on generators, so [Generators](45_Generators.md)
 covers that mechanism first.
 [Stateless](46_Stateless.md)
 then writes these programs again in the language this book is about,
@@ -781,7 +780,7 @@ opened with.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
-The tracking is enforced the way an EMS enforces it.
+Python enforces the tracking the way an EMS does.
 `await` is a syntax error outside an `async def`,
 so any function that awaits a coroutine must become `async`,
 and so must its callers, all the way up to the edge.
@@ -825,13 +824,13 @@ In Python, it changes nothing that any tool can see.
 A library checks the Effects you wrote down.
 Only the language can check the ones you didn't.
 
-Could Effect tracking be added to Python itself,
+Could Python itself gain Effect tracking,
 so that declaring Effects stops being manual?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
 A type checker needs to compute the Effect row of every function from the functions it calls,
-across every library on PyPI, almost all of which are unannotated.
+across every library on PyPI, almost all of which carry no annotations.
 `async` succeeded because it arrived with the language and split the world visibly.
 An Effect row needs to spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
@@ -866,8 +865,8 @@ Version control gave every state of the code a name you can return to,
 so experimentation stopped being risky.
 Automated testing moved "does it still work?" from a manual ritual into the build.
 Garbage collection took the tracking of memory ownership out of the programmer's head.
-Each of these was resisted as unnecessary overhead, then adopted,
-then forgotten as a question.
+Each of these met resistance as unnecessary overhead, then won adoption,
+then faded as a question.
 
 Effects are the barrier we are inside right now, which is why it is hard to see.
 We build programs from other people's code,

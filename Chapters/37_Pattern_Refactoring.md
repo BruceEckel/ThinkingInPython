@@ -76,7 +76,7 @@ def sum_value(items: list[Trash]) -> float:
 
 `Bins` names the shape the sorting sections use,
 a dictionary from a material's class to the pieces made of that material.
-A `type` statement's right side is evaluated lazily,
+A `type` statement's right side evaluates lazily,
 so the alias can name `Trash` several lines before the `class` statement that defines it
 (see [The `type` Statement](08_Static_Typing.md#the-type-statement)).
 
@@ -463,7 +463,7 @@ for cls in Trash.registry.values():
 #: Cardboard: flatten and bundle
 ```
 
-Each implementation above is named `_`,
+Each implementation above takes the name `_`,
 the throwaway name explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function.

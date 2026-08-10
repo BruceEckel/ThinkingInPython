@@ -45,11 +45,11 @@ You do not need to know design patterns, metaclasses, or type checking.
 This book covers them.
 The book is about the language, not the tooling around it.
 
-## How the Book Is Organized
+## How the Book Fits Together
 
 You can read straight through, or jump to a chapter that interests you,
 since most chapters are self-contained.
-The book is organized into five parts.
+The book has five parts.
 
 Part I, *Foundations*, is a fast tour of the language: its syntax, containers,
 control flow, functions, modules, classes, static typing, class attributes,
@@ -156,7 +156,7 @@ I have found that the knowledge in this book has helped me guide AIs toward bett
 Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
 However, Python seems to be the most popular language
 (at the time of this writing) for AI-generated code.
-Some small percentage of people might still be interested in analyzing what the AIs are generating.
+Some small percentage of people might still wish to analyze what the AIs are generating.
 This book might have some value yet.
 
 ## The Examples
@@ -170,7 +170,7 @@ Every chapter afterward uses them consistently.
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete file rather than a fragment.
 Most run on their own; some are modules that another listing imports,
-and a `test_*.py` file is run by `pytest`.
+and `pytest` runs each `test_*.py` file.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
 so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
@@ -206,7 +206,7 @@ See `CONTRIBUTING.md` in the source repository.
 ## The Exercises
 
 Most chapters end with a short "Exercises" section.
-These come from workshops, where they are worked in pairs at a keyboard.
+These come from workshops, where pairs work through them at a keyboard.
 They are short enough to do on your own, and they are worth doing that way.
 They usually ask you to change a small,
 already-working example from that chapter and observe the result: add a class,
@@ -224,7 +224,7 @@ not in the code you produce.
 
 This book is freely readable at [thinkinginpython.com](https://thinkinginpython.com/),
 which always holds the current version.
-The text is licensed [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/);
+The text carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) license;
 the source repository's `CONTRIBUTING.md` has the details.
 
 Places worth knowing about:

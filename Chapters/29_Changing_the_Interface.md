@@ -57,7 +57,7 @@ if __name__ == "__main__":
 so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
-not how the target interface is declared; [Surrogate](26_Surrogate.md#proxy)
+not how you declare the target interface; [Surrogate](26_Surrogate.md#proxy)
 compares those two.
 The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Surrogate.md#proxy)":
 *GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
@@ -123,7 +123,7 @@ That is why this one parameter stays `Any` while the rest of the listing names r
 The `Any` is not laziness.
 It allows an override that cannot substitute for its base to pass the type checker.
 Approach 2 is a different operation wearing an inherited name.
-Code holding a `WhatIUse` cannot safely be handed a `WhatIUse2`,
+Code holding a `WhatIUse` cannot safely receive a `WhatIUse2`,
 and that is the price of building the adapter into the operation.
 The next section argues Python lets you skip most of this packaging too.
 
@@ -131,7 +131,7 @@ The next section argues Python lets you skip most of this packaging too.
 
 The variations above are Java habits.
 At runtime `WhatIUse.op()` only calls `f()`,
-so any object with an `f()` works and no shared base class is involved.
+so any object with an `f()` works and no shared base class takes part.
 A type checker still holds you to the annotation,
 so name the requirement with a [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 listing `f()` instead of a base class to inherit,
@@ -174,7 +174,7 @@ You have already seen a real one:
 `PairCoord` in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
 adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
-written because the type it was handed did not fit the function it had to call.
+written because the type it received did not fit the function it had to call.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
 special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
@@ -182,7 +182,7 @@ as exercise 1 does with `__getitem__()`.
 That chapter's other trap applies here too:
 `__getattr__()` reading `self._adaptee` recurses forever on an instance built without `__init__()`,
 which `copy.copy()` and `pickle` do,
-so an adapter that must be copied or pickled defines `__reduce__()` or guards the lookup.
+so an adapter that must survive copying or pickling defines `__reduce__()` or guards the lookup.
 
 Testing verifies both halves of that behavior.
 The new `f()` combines the adaptee's methods,
@@ -283,7 +283,7 @@ print(f"{checkout.total(100.0):.2f}")
 ```
 
 The caller imports one name.
-Three classes and the order they must be assembled in stay behind the underscore,
+Three classes and their required assembly order stay behind the underscore,
 and the façade can rearrange them without touching a caller.
 The underscore is a convention, not a barrier.
 `checkout._PriceEngine` still resolves for anyone who types it.
@@ -357,8 +357,8 @@ print(caught[0].message)
 #: Report.to_string() is replaced by render()
 ```
 
-`to_string()` keeps working, which is the point: existing callers are warned,
-not broken.
+`to_string()` keeps working, which is the point: existing callers get a warning,
+not a break.
 The `# type: ignore` is there because `ty` reports the deprecated call as a diagnostic,
 the half that reaches a caller before they run anything.
 The runtime half is a `DeprecationWarning`.
@@ -370,7 +370,7 @@ A warning also goes to standard error, where a `#:` marker cannot capture it,
 so the listing records the warnings instead of printing them.
 
 A message is optional but should say what to use instead.
-"Deprecated" tells a reader that a decision was made;
+"Deprecated" tells a reader that someone made a decision;
 "replaced by `render()`" tells them what to do about it.
 The decorator also applies to a class,
 where it warns on construction and on subclassing.
@@ -405,7 +405,7 @@ and marking the old interface is how you make the risk visible on a schedule ins
     Compare what a caller can see in each version.
 4.  Here are three wrappers: one logs each call and forwards it unchanged,
     one exposes a `read()` over an object that only has `next_chunk()`,
-    and one refuses calls unless a flag is set.
+    and one refuses calls unless you set a flag.
     Classify each as Proxy, Decorator, Adapter,
     or Façade using the "remove it and you lose" test from the table,
     and say what you would lose in each case.

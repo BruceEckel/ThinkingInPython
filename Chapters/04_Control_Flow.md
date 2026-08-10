@@ -63,7 +63,7 @@ print(not_implemented(), not_implemented_yet())
 ```
 
 `pass` marks an indented block with nothing in it yet.
-`...` is the conventional body for a stub that will be filled in elsewhere,
+`...` is the conventional body for a stub whose implementation lives elsewhere,
 and it is normally written on the same line as the signature it stubs,
 as in a `Protocol` method
 ([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
@@ -208,7 +208,7 @@ except ValueError as e:
 
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so the extra score never appears.
-That silence is convenient when the lengths differ on purpose and a bug when they were supposed to match.
+That silence is convenient when the lengths differ on purpose and a bug when you expected them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
 When you need the index as well, wrap the whole thing.
 The extra nesting shows up in the loop header,
@@ -315,7 +315,7 @@ Write a constant as a literal (`case "quit":`) or as a dotted name
 `match` and `case` are *soft keywords*:
 they are keywords only in this statement,
 so existing code that uses `match` as a variable name still runs.
-Avoid the name anyway, since a reader has to work out which one is meant.
+Avoid the name anyway, since a reader must work out which meaning applies.
 [Pattern Matching](13_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
@@ -385,7 +385,7 @@ so a broad clause above a narrow one makes the narrow one unreachable.
 Order them most specific first.
 
 An exception raised while handling another one arrives with the first attached.
-Python reports both, and `from` decides how they are joined:
+Python reports both, and `from` decides how the two connect:
 
 | Form | What Python prints above the new exception |
 |---|---|
@@ -531,7 +531,7 @@ print("closed:", f.closed)
 path.unlink()  # Delete the file
 ```
 
-The exception propagates, but the file is closed before it does.
+The exception propagates, but the `with` closes the file first.
 `f` is still in scope afterward, which is how the listing can check it;
 the `with` statement does not create a scope, only a guarantee about the exit.
 

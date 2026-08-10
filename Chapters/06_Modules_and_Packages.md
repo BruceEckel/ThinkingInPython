@@ -350,7 +350,7 @@ Running `python a_package/module4.py` raises `ImportError: attempted relative im
 Run it as `python -m a_package.module4` instead.
 
 Two modules in a package can end up importing each other.
-The first one to load is placed in `sys.modules` before its body finishes,
+Python places the first one to load in `sys.modules` before its body finishes,
 so the second one imports a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A cycle is a design signal:
 move the shared piece into a third module both can import.
@@ -380,7 +380,7 @@ which a scattering of underscores does not,
 and it is what documentation tools read when they ask what a module offers.
 
 Neither mechanism stops `module._name`.
-Both say which names a caller is meant to use,
+Both say which names a caller should use,
 which is enough to treat a module as a façade over its internals
 ([Changing the Interface](29_Changing_the_Interface.md))
 or as a shared single instance
@@ -402,7 +402,7 @@ This is `snake_case`.
   `cache-singleton.py` (hyphens aren't importable)
 
 **Packages** (directories with `__init__.py`): also short and all-lowercase,
-but underscores are discouraged.
+but convention discourages underscores.
 Prefer a single run-together word when you can.
 
 - Good: `mypackage`, and underscores only when they genuinely help (`a_package`)
@@ -413,7 +413,7 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 Don't shadow standard-library modules.
 A file named `random.py`, `types.py`,
 or `weakref.py` can hide the stdlib one and break imports,
-because the directory of the script you ran is searched before the standard library
+because Python searches the directory of the script you ran before the standard library
 (see [`PYTHONPATH`](#pythonpath) below).
 Give a shared module a distinctive name for the same reason:
 the first `config.py` imported anywhere in the process is the one every later `import config` gets.
@@ -469,14 +469,14 @@ print(Path("report/data.txt").suffix)
 #: .txt
 ```
 
-A `lazy import` is spelled like an ordinary one, with `lazy` in front,
+A `lazy import` looks like an ordinary one, with `lazy` in front,
 and once loaded the names behave like eagerly imported ones.
 `json` and `pathlib` load at the `json.dumps` and `Path(...)` calls,
 which this listing cannot show, since the output is the same either way.
 
 Before 3.15, the way to defer a costly import was to move it inside the function that needed it.
 That works, but it hides the dependency:
-nothing at the top of the file says the module is used,
+nothing at the top of the file mentions the module,
 tools that read imports miss it,
 and the `import` statement re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top where a reader and a tool can see it,
@@ -519,7 +519,7 @@ so you can check what a run actually put off without instrumenting the modules.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
-and neither `lazy from module import *` nor a `lazy from __future__` import is allowed.
+and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
 To change the setting for a whole run without editing source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both require one of three values.

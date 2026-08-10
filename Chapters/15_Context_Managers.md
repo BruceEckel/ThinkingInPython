@@ -27,7 +27,7 @@ turned into a context manager by the `contextlib.contextmanager` decorator.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown):
 everything before it is setup, everything after it is teardown.
 [Iterators](23_Iterators.md#generators) covers generators in full;
-nothing beyond that shape is needed here.
+this chapter needs nothing beyond that shape.
 
 ```python
 # trace_gen.py
@@ -87,7 +87,7 @@ except ValueError as error:
 Without the `try`/`finally`,
 an exception in the block resumes the generator by raising at the `yield`,
 so the code after the `yield` never runs and `exit A` never prints.
-Nothing warns you: the cleanup is skipped silently on the one path where it matters most.
+Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator,
 without exception.
 
@@ -158,7 +158,7 @@ A class manager that stores per-`with` state keeps that property only if `__ente
 The generator form is usually the clearest choice.
 Use a class when the manager needs to hold methods or state beyond a single setup and teardown.
 
-## Cleanup Is Guaranteed
+## Guaranteed Cleanup
 
 Here, `__exit__()` runs when the block raises an exception,
 but before the exception propagates:
@@ -318,7 +318,7 @@ such as `ZeroDivisionError`, not an instance of it.
 so a `ZeroDivisionError` still matches `ignore_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
-`__enter__()` returns `None` because this manager is not meant to be used with `as`.
+`__enter__()` returns `None` because this manager is not for use with `as`.
 You can still write `as`, but it binds `None`.
 
 A fuller version of the same idea takes several types at once,
@@ -450,7 +450,7 @@ if __name__ == "__main__":
 Note the parentheses in `@banner("report")`: the call constructs the manager,
 which then decorates the function.
 Each call of the decorated function builds a fresh manager,
-so `report()` can be called any number of times,
+so you can call `report()` any number of times,
 each with its own enter and exit.
 The single-use caution from earlier still holds for the manager object you name in a `with`.
 The machinery applies `functools.wraps`,
@@ -497,7 +497,7 @@ the class version of `banner` uses a lowercase name because you use it like a fu
 which is the shorter way to write a cleanup that does not care why the block ended.
 Unlike the generator form,
 the class form re-enters the same instance on every call to `report()`,
-so any state the instance holds is shared across calls.
+so every call shares any state the instance holds.
 
 Neither version of `banner` can rewrite arguments, inspect the return value,
 or skip the call.
@@ -606,7 +606,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 A function might write to a path it opens itself,
 to a stream the caller hands it, or to standard output by default.
-Only the first of those should be closed when the function is done.
+The function should close only the first of those when it finishes.
 `nullcontext` lets a single `with` block serve all three cases:
 
 ```python
@@ -704,7 +704,7 @@ Lending is the dangerous half.
 Every borrower must return the object on every path out of their code,
 including the exception path,
 or the pool slowly drains until the program starves.
-A context manager can guarantee that borrowed objects are returned.
+A context manager can guarantee that every borrowed object comes back.
 In Python, a pool is a queue plus a `@contextmanager` method:
 
 ```python

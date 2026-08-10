@@ -64,8 +64,8 @@ print(vars(A)["x"])
 #: 100
 ```
 
-`vars(A)` is subscripted here because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`;
-the instance dictionary is a plain `dict` holding only what was assigned.
+The listing subscripts `vars(A)` because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`;
+the instance dictionary is a plain `dict` holding only what the code assigned.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
@@ -106,7 +106,7 @@ print(a.items, b.items)
 `a.items.append("apple")` never assigns to `a.items`.
 It reads `items`, finds nothing on `a`, falls back to the class,
 and mutates the one list stored there.
-No instance attribute is created, so `b` sees the apple too.
+The mutation creates no instance attribute, so `b` sees the apple too.
 The next line does assign,
 which creates `a.items` on the instance and shadows the class list,
 leaving `b` still reading the shared one.
@@ -163,9 +163,9 @@ and nothing called `label`.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
 `total: ClassVar[int] = 0` has the `= 0`,
-so it exists on `Tally` before any instance is built.
+so it exists on `Tally` before any instance exists.
 `label: str` has no `=`,
-so nothing is stored under that name anywhere on the class.
+so the class stores nothing under that name.
 The annotation only records, in `Tally.__annotations__`,
 that a `Tally` will eventually carry a `label`.
 That declaration is invisible to `display_object()`,
@@ -204,7 +204,7 @@ The annotation is there for symmetry with `total`,
 so both names read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
-There, an attribute is set from outside the class,
+There, code outside the class sets the attribute,
 and a bare annotation is the checker's only way to know its type.
 
 ### What `ClassVar` Catches
@@ -251,7 +251,7 @@ and all are clearer with `ClassVar` on them.
 For the third, a class-level constant,
 `Final[int]` says more than `ClassVar[int]`:
 it declares the value shared *and* not reassignable.
-Use `ClassVar` when the shared value is meant to change, as `Tally.total` is.
+Use `ClassVar` when you intend the shared value to change, as `Tally.total` does.
 The bug is not the class attribute;
 it is writing one where you meant a per-object default.
 
@@ -335,11 +335,11 @@ and the two behave in opposite ways.
 In `inside_objects.py` the `100` lives on the class and every instance reads it;
 here it is a default argument, and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
-The difference is not the value but where it is written.
+The difference is not the value but where you write it.
 The default value itself is still built once, at definition time
 (see [Default and Keyword Arguments](05_Functions.md#default-and-keyword-arguments)),
 so a *mutable* default argument brings the sharing straight back.
-`100` cannot be mutated, so it is safe.
+Nothing can mutate `100`, so it is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
 The annotation marks a field.
@@ -369,7 +369,7 @@ and neither the runtime nor the checker complains.
 The class attribute survives the decoration: `vars(B)` still holds `x = 100`.
 What changes is the generated `__init__()`,
 which assigns `self.x` on every instance,
-so each object shadows the class attribute the moment it is built and never reads the shared one.
+so each object shadows the class attribute at construction and never reads the shared one.
 That is why assigning `x` on one `B` cannot leak into a later `B()`,
 while `a.rating = 1` on `Stars` left `b` reading a value someone else could change.
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)

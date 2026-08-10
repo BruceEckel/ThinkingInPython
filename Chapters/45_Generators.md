@@ -161,7 +161,7 @@ If you mistakenly annotate the generator as `Generator[Answer, Question, Result]
 `ty` reports nine errors in three groups of three.
 All three `yield Question(...)` expressions offer a `Question` where the annotation declares an `Answer`.
 All three `send(Answer(...))` calls pass an `Answer` where `send()` expects a `Question`.
-All three `question` variables receive an `Answer` where they are declared `Question`.
+All three `question` variables receive an `Answer` where their declarations say `Question`.
 `Generator[str, str, str]` accepts the reversal without complaint.
 
 ## A Generator Is a Description
@@ -176,8 +176,8 @@ Calling `interview()` returns a generator object but doesn't run anything in the
 `next()` and `send()` do that work, one `yield` at a time.
 
 A generator is the more useful of the two here because the driver can be yours.
-A coroutine's requests are addressed to the event loop;
-a generator's are addressed to whatever code calls `send()`.
+A coroutine's requests go to the event loop;
+a generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The generator is imported unchanged; only the driver is new.
+The generator arrives by import, unchanged; only the driver is new.
 The first line of output is `interview()`'s product:
 an ordinary `generator` object that still carries the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
@@ -228,21 +228,21 @@ which is what the `# type: ignore` on that line suppresses.
 `next()` produces the first `Question`,
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
-The `answers` map is keyed by `Question` and holds `Answer`s.
+The `answers` map keys on `Question` and holds `Answer`s.
 Only the `send()` call sits inside the `try`.
 Here `StopIteration` means the conversation finished,
 so any other code that could raise it, such as an exhausted answer source,
 belongs outside.
 
-Only two of those three parameters are checked.
-`StopIteration.value` is typed `Any`,
+The checker verifies only two of those three parameters.
+`StopIteration.value`'s type is `Any`,
 so a checker accepts `return stop.value` whatever `drive()` declares it returns.
 The `Result` in `drive()`'s signature states the intent; nothing verifies it.
 
 `interview()` does not know where the answers originate.
 It has no dictionary, no `input()` call, and no network connection.
 It states what it needs and waits.
-`drive()` decides how those needs are met,
+`drive()` decides how to meet those needs,
 and it takes the answers as a parameter.
 Swapping the dictionary for a database changes a single argument.
 
@@ -296,7 +296,7 @@ print(list(top()))
 #: ['TOP', 'start', 'only', 'A', 'B', 'C', 'end', 'END']
 ```
 
-Each `yield from` runs its target until that generator is exhausted,
+Each `yield from` runs its target until that generator runs out,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The number of contributions is a property of the target.
 The `from` makes this delegation:
@@ -427,7 +427,7 @@ which throws it away.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
 The checker says nothing, because `manual()` is a valid `Generator[str, int]`:
-the send channel is declared and simply never used.
+the send channel appears in the declaration and simply goes unused.
 `yield from` is not shorthand for this loop.
 
 `g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
@@ -472,7 +472,7 @@ Only the generator portion changed.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
-which arrives as the value of the `yield` expression and is bound to `answer`.
+which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` hands back when it finishes,
 which `yield from` produces as the value of the whole `yield from` expression.
 The inner generator asks one question and hands back one answer,
@@ -520,7 +520,7 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-`interview()` is imported unchanged from the previous example.
+`interview()` arrives unchanged from the previous example.
 It was the generator `drive()` drove; now `survey()` delegates to it.
 Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
 and its questions surface three frames up rather than two.

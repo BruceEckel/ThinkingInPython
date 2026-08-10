@@ -111,7 +111,7 @@ A parameter with a default cannot come before one without.
 are exempt, because the caller names them.
 
 Python evaluates a default value once, at function definition.
-This means a mutable default is shared across calls:
+This means all calls share one mutable default:
 
 ```python
 # mutable_default.py
@@ -139,7 +139,8 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object rather than being recreated on each call.
+A mutable default persists because it lives on the function object;
+no call rebuilds it.
 `__defaults__` holds the tuple of default values,
 and it is the same list both calls append to.
 The default looks like an expression the call evaluates, and it is not.
@@ -179,7 +180,7 @@ which points the local name at a new list and leaves the caller's list alone.
 Mutating an argument reaches outside the function; rebinding one does not.
 
 The `None` default in `good_append()` is a *sentinel*:
-a value chosen to mean "nothing was supplied" rather than to be used.
+a value chosen to mean "the caller passed nothing" rather than to serve as data.
 You need one when the function mutates that parameter,
 because the default must then be a fresh object on every call.
 Test it with `is None` rather than truthiness:
@@ -350,7 +351,7 @@ a function can gather arguments it knows nothing about and pass them on unchange
 `trace()` accepts any call and forwards it,
 which is the standard shape of a wrapper.
 A function is an object like any other,
-so `report` can be passed to `trace()` as an argument,
+so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived
 (see [Functions as First-Class Objects](40_Functional_Foundations.md#functions-as-first-class-objects)).
 [Decorators](14_Decorators.md) builds on this.
@@ -358,7 +359,7 @@ and `func.__name__` reads the name of whatever function arrived
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments,
-which decides how much of a signature you are committed to keeping.
+which decides how much of a signature you commit to keeping.
 A parameter a caller can name is part of the contract; one it cannot is not.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, never by name.
@@ -366,7 +367,7 @@ A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
 A `*args` parameter has the same effect as a bare `*`.
 It absorbs every remaining positional argument,
-so a parameter declared after it can only be passed by name.
+so you can pass a parameter declared after it only by name.
 A signature can use every form at once, in one fixed order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`.
 

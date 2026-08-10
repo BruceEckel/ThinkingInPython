@@ -1,7 +1,7 @@
 # Metaprogramming
 
-Objects are created by other (special) objects.
-These special objects are called *classes* and you configure them to produce the objects you want.
+Other (special) objects create objects.
+These special objects are *classes*, and you configure them to produce the objects you want.
 
 Classes are also objects, and you can modify objects.
 The listings here use `display_object()`,
@@ -54,7 +54,7 @@ print(vars(x))
 #: {}
 ```
 
-`x` sees the changes made to the class *after* `x` was created.
+`x` sees the changes made to the class *after* `x`'s creation.
 The instance never changed;
 the last line shows its instance dictionary still empty.
 Attribute lookup on an instance falls through to its class,
@@ -68,10 +68,10 @@ You can customize how Python produces classes by running extra code or injecting
 That is metaclass programming.
 
 You have used metaclasses already, without writing one.
-`abc.ABC` is built by `abc.ABCMeta`,
-which makes a class with an unimplemented abstract method refuse instantiation.
-An `Enum` subclass is built by `enum.EnumType`,
-which turns each class-body assignment into a member and makes `for c in Color` walk them.
+`abc.ABCMeta` builds `abc.ABC`,
+and makes a class with an unimplemented abstract method refuse instantiation.
+`enum.EnumType` builds each `Enum` subclass,
+turning every class-body assignment into a member and making `for c in Color` walk them.
 Iterating a class is behavior on the class object,
 which is where a metaclass can put it and an ordinary class cannot.
 
@@ -80,7 +80,7 @@ It is a fascinating tool, and the temptation to use it is strong,
 but simpler hooks cover almost every case a metaclass used to handle:
 
 - `__init_subclass__()` runs at subclass creation.
-  It replaces most "do something each time a class is defined" metaclasses.
+  It replaces most "do something at each class definition" metaclasses.
 - `__set_name__()` lets a class attribute learn its own name,
   at class-creation time.
 - *Class decorators* transform a class after Python builds it
@@ -202,13 +202,13 @@ print(makers["LightOn"](1, 0))
 
 Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are distinct subclasses of `Event`,
-so `isinstance()` tells them apart and either one can later be given behavior of its own.
+so `isinstance()` tells them apart and you can later give either one behavior of its own.
 
 The checker cannot follow a class built by `type()`,
 so it reads `make()`'s result as `Event` itself,
 whose `__init__()` takes three arguments.
 `EventMaker` names the two-argument signature the generated classes really have,
-and the `cast()` records it at the one place a class is created.
+and the `cast()` records it at the one place that creates a class.
 
 The dict comprehension builds all seven classes whether the schedule uses them or not.
 Seven is cheap and hundreds would not be,
@@ -324,8 +324,8 @@ then builds an `Event` from each resulting line.
 `line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three strings in a single step,
 replacing the colon with a second space before splitting on whitespace.
 `Event._event_maker[class_name]` gets the class object used to build that `Event`.
-The first time an event type is needed,
-the class is built and registered under its name.
+The first time a lookup asks for an event type,
+the maker builds the class and registers it under its name.
 An unknown name raises `KeyError`,
 which is what a caller writing `try: ... except KeyError` around a lookup expects.
 
@@ -398,13 +398,13 @@ seeded with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
 so `namespace[class_name]` is just `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
-which is the other reason the values cannot be typed more precisely than `Any`.
-`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place the class is created,
+which is the other reason the values can carry no type more precise than `Any`.
+`cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class,
 the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 
-`__init__` is defined textually inside a `class` block.
+`__init__`'s definition sits textually inside a `class` block.
 The compiler doesn't care that the block arrived as a string.
 That is the difference from `greenhouse.py`,
 whose `init()` is a nested function rather than a method in a class body,
@@ -431,7 +431,7 @@ dangerous on anything that reaches the program from outside, unchecked.
 Often a base class needs to keep track of its subclasses,
 so you can enumerate them.
 This is the textbook reason people used to justify a metaclass.
-`__init_subclass__()` is called automatically for every new subclass,
+Python calls `__init_subclass__()` automatically for every new subclass,
 so it only takes a few lines to produce self-registration.
 This example tracks the "leaf" subclasses
 (those with no subclasses of their own),
@@ -581,7 +581,7 @@ except TypeError as error:
 The check happens at class-creation time.
 Python builds `B` normally.
 A class's own `__init_subclass__()` never runs for that class,
-and the version that does run when `B` is created is the one `B` inherits from `A`,
+and the version that does run at `B`'s creation is the one `B` inherits from `A`,
 which is `object`'s do-nothing default.
 Use the runtime version only when `@final` is not enough, which is rare.
 
@@ -616,7 +616,7 @@ A *descriptor* is any object whose class defines at least one of `__get__()`,
 Most descriptors define `__get__()` and add the others as needed.
 Assigned to a class attribute, a descriptor takes over access to that attribute.
 Instead of going to the instance's `__dict__`,
-`__get__()` is called on a read and `__set__()` on a write.
+a read calls `__get__()` and a write calls `__set__()`.
 [Decorators](14_Decorators.md#a-limitation-methods-need-a-descriptor)
 already relied on this without naming it.
 A function is an object like any other, and its class defines `__get__()`,
@@ -653,12 +653,12 @@ Method binding is not special machinery, just the descriptor protocol at work.
 
 Here is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
-so the new instance cannot know it is about to be bound to the name `x`.
+so the new instance cannot know it is about to get the name `x`.
 Python delivers that name automatically.
 When a `class` body finishes executing,
 Python calls `__set_name__(owner, name)` on every class attribute that defines it,
 not only descriptors,
-passing the freshly created class and the name the attribute was assigned to.
+passing the freshly created class and the name that holds the attribute.
 `Field` pairs `__set_name__()` with `__get__()` and `__set__()`,
 the descriptor protocol, and uses the delivered name to build its storage key.
 A `print()` at the top of each method traces the descriptor's whole life:
@@ -710,7 +710,7 @@ Python calls `__set_name__()` as it finishes executing the `class Point` stateme
 once for each `Field`,
 handing each one the new class and its own attribute name.
 From then on, every read and write routes through the descriptor instead of going to the instance's `__dict__`.
-`p.x = 3` prints `x.__set__ = 3` before anything is stored.
+`p.x = 3` prints `x.__set__ = 3` before storing anything.
 In `print(p.x, p.y)`, Python evaluates both arguments before calling `print()`,
 so both `__get__` lines appear ahead of `3 4`.
 The final access, `Point.x`, goes through the class rather than an instance,
@@ -1357,7 +1357,7 @@ the way `Stars.rating` did in [Class Attributes](09_Class_Attributes.md#class-at
 while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value lives,
-so it applies whether or not the attribute is declared with `typing.ClassVar`.
+so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
 ### Choosing Which Dunders to Show
 
@@ -1366,9 +1366,9 @@ Pass their names in `dunder` to keep specific ones,
 as `new_vs_init.py` does to show `__new__` and `__init__`.
 Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
 including the interpreter's own machinery.
-`dunder` is typed `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
+`dunder`'s type is `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
 naming each sentinel value itself rather than the generic `sentinel` class,
-so a type checker narrows `dunder` to `Sequence[str]` once both sentinels are ruled out,
+so a type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels,
 and `name in dunder` needs no further guard.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
 but it buries a class's own choices under everything `object` and the interpreter add.
@@ -1548,7 +1548,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 The first two calls show the same class from two angles.
 `display_object(Fraggle)` inspects the class object.
 It lists `y` and `z`, the fields with defaults.
-`x` is declared as `x: int` with no default,
+`x`'s declaration is `x: int` with no default,
 so on the class it is only an annotation, not a bound attribute,
 and `getmembers_static()` does not return it.
 
@@ -1573,7 +1573,7 @@ The rest is the bookkeeping every class carries.
 
 ## Which Hook for Which Job
 
-Every hook in this chapter is an ordinary function called at a known moment while a class is built.
+Every hook in this chapter is an ordinary function called at a known moment during class construction.
 Putting them all in one class shows the sequence:
 
 ```python
@@ -1649,7 +1649,7 @@ Here is the job list:
 - Rewrite a finished class: a class decorator.
 - Build a family of classes from data: `type()` with three arguments,
   or an `exec()`ed class body when the definition is easier to read as source.
-- Change the name, the bases, or the namespace before the class is built:
+- Change the name, the bases, or the namespace before Python builds the class:
   a metaclass `__new__()`.
 - Control the namespace the body executes into: `__prepare__()`.
 - Decide whether an instance gets built at all: a metaclass `__call__()`.
@@ -1721,7 +1721,7 @@ each time someone calls the finished class.
     the moment the compiler sees `class ASingleton`,
     before it reads a single member.
     `Singleton<ASingleton>` can use that name as its template argument
-    without the class being finished.
+    while the class remains incomplete.
     Its member functions are not compiled until something actually calls them,
     by which point `ASingleton` is complete.
 

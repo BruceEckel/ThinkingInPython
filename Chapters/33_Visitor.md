@@ -106,9 +106,9 @@ The `accept()`/`visit()` pair is the *double dispatch*.
 `visit()` resolves the visitor's type,
 and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type.
 In the classic pattern every element class overrides `accept()`,
-which is where the element's type is resolved;
+which resolves the element's type;
 here one inherited `accept()` is enough,
-because the flower's type is resolved a step later.
+because the flower's type resolves a step later.
 The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),
@@ -162,7 +162,7 @@ and seeing the price is part of the point.
 The price is that nothing checks the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
 That is the same gap the `Any` in `paper_scissors_rock.py` left in [Multiple Dispatching](32_Multiple_Dispatching.md).
-This `Any` is chosen,
+This `Any` is a choice,
 unlike the one in [Data Transfer Objects](22_Data_Transfer_Objects.md),
 where a bag of attributes named at runtime leaves no precise type to write.
 
@@ -174,7 +174,7 @@ since a second `def visit()` replaces the first,
 so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
 Whichever way you write it,
-the primary hierarchy ends up carrying code it was supposed to be spared.
+the primary hierarchy ends up carrying code the pattern exists to keep out of it.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -239,13 +239,13 @@ if __name__ == "__main__":
 #: True
 ```
 
-Each registered implementation above is named `_`.
+Each registered implementation above takes the name `_`.
 `nectar()` calls it through the dispatcher, never by its own name,
 so the name carries no meaning.
 `_` is the conventional placeholder for a name nobody will use.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
-so nothing is lost.
+so nothing goes missing.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 
@@ -254,7 +254,7 @@ Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
 Dispatch follows inheritance:
 an unregistered subclass uses its nearest registered ancestor,
-falling back to the base implementation only when no ancestor is registered
+falling back to the base implementation only when no registered ancestor exists
 (the tests below pin this down).
 
 The listing's last two output lines print the dispatch table the decorator built.
@@ -352,7 +352,7 @@ As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visito
 ## One Dispatch Is Enough
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
-Nothing was lost in the trade.
+The trade loses nothing.
 The second dispatch in the classic pattern is not there because two types are unknown;
 it is there because the operation has nowhere else to live.
 The visitor's type stands in for the operation,

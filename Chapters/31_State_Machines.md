@@ -42,9 +42,9 @@ Without the base, the failure is an `AttributeError` at the call.
 With it, a `NotImplementedError` that names what is missing.
 [Surrogate](26_Surrogate.md#proxy) shows the third option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
-and an incomplete subclass cannot be constructed at all.
+and constructing an incomplete subclass fails outright.
 The version here fails later than that, at the call rather than at construction,
-which is enough for a design where every state is created once,
+which is enough for a design where every state comes into existence once,
 as a class attribute.
 
 The `StateMachine` keeps track of the current state,
@@ -415,7 +415,7 @@ and the table is an ordinary `dict`.
 The inputs change shape too.
 The mousetrap's inputs were `MouseAction` members, names with nothing attached.
 A vending machine's inputs carry values: what a coin is worth,
-which digit was pressed.
+which digit the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
 An enum fixes its members in advance,
@@ -475,7 +475,7 @@ class StateMachine:
             f"on {type(event).__name__}")
 ```
 
-`StateMachine` is written out by hand rather than as a `@dataclass` because a reader is meant to subclass it,
+The listing writes `StateMachine` out by hand rather than as a `@dataclass` because a reader should subclass it,
 and the manual form puts the two attributes it owns in view.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
@@ -661,7 +661,7 @@ too expensive returns to `COLLECTING` with the money still in,
 while sold out goes to `UNAVAILABLE`.
 The condition that fired is visible only in the state.
 
-The table is built inside `__init__()` rather than in the class body because its entries are bound methods.
+`__init__()` builds the table, rather than the class body, because its entries are bound methods.
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
 

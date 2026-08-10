@@ -1,7 +1,7 @@
 # Assurance
 
 Introductions to functional programming usually call it "programming with functions,"
-and functions are indeed a central part of the practice.
+and functions really are a central part of the practice.
 But after (slowly) studying it for over ten years,
 I have started to wonder whether it's actually more about "functionality."
 One definition of science is "what works."
@@ -132,13 +132,13 @@ or when.
 Notice there are no locks, no queues, no shared state,
 and no changes to `count_primes()`.
 The function needed no preparation for parallel execution.
-It was ready the day it was written, because it was pure.
+It was ready on day one, because it was pure.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
-Each argument and each result is pickled to cross the process boundary,
+Each argument and each result pickles to cross the process boundary,
 and the function itself travels by name,
-so `count_primes()` must be defined at the top level of a module a worker can import.
+so `count_primes()` must live at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
 which rules out two shapes these chapters have been favoring.
 A `functools.partial` survives,
@@ -274,7 +274,7 @@ def test_roundtrip(sample: str) -> None:
     assert decode(encode(sample)) == sample
 ```
 
-The two functions are repeated here rather than imported,
+The listing repeats the two functions rather than importing them,
 because importing `property_check.py` would run its thousand-iteration loop inside the test run.
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
@@ -313,14 +313,14 @@ except AssertionError as e:
 ```
 
 An underscore that was in the input comes back as a space.
-Hypothesis finds a failing string and then keeps cutting it down until nothing more can be removed without the test passing again,
+Hypothesis finds a failing string and then keeps cutting it down until removing anything more makes the test pass again,
 so what it reports is `'_'` rather than the longer string it happened to fail on first.
 That single character is the whole bug statement.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 and `database=None` keeps it from replaying a case saved by an earlier run;
 a real test needs neither.
-`roundtrip()` is called directly, inside a `try`,
-because a `test_` function that fails is supposed to fail the build.
+The listing calls `roundtrip()` directly, inside a `try`,
+because a failing `test_` function should fail the build.
 
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
@@ -371,7 +371,7 @@ and the chapters after it build a checked system on that idea.
     and run it three times before deciding what it means.
 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
 3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
-    an invariant (every adjacent pair of the output is ordered) and idempotence
+    an invariant (every adjacent pair of the output is in order) and idempotence
     (sorting a sorted list changes nothing).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:

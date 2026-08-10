@@ -131,7 +131,7 @@ if __name__ == "__main__":
 which makes the tree immutable;
 a paragraph below says why a `list` would not do.
 
-`Node` is named in `Directory` before it is defined below,
+`Directory` names `Node` before its definition below,
 which works because annotations and `type` aliases are both evaluated lazily
 (see [Naming Types: The `type` Statement](08_Static_Typing.md#the-type-statement)).
 
@@ -146,7 +146,7 @@ If you add a `Symlink` class to the `Node` union,
 every function whose `case _` calls `assert_never()` fails type checking,
 because `entry` could be a `Symlink` that no case handles.
 The checker flags each function that still needs a new case,
-so none can be forgotten.
+so you cannot forget one.
 
 `walk()` is a generator, so traversing a composite is lazy.
 The `yield from` flattens the recursion into a single stream of paths,
@@ -154,8 +154,8 @@ and any consumer of that stream stays decoupled from the tree structure
 (see [Iterators](23_Iterators.md#delegating-with-yield-from)).
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
-A `list` there would not do: `frozen=True` stops the field from being rebound,
-not the object it holds from being mutated,
+A `list` there would not do: `frozen=True` stops rebinding of the field,
+not mutation of the object it holds,
 which [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
 The demo builds `src` first, then places it inside `root`.
@@ -261,7 +261,7 @@ An expression is a number, a variable, a sum, or a product.
 `Operators` is a base class but not a member of `Expr`,
 and the split is on purpose.
 Every node shares the operator methods,
-so those live on a base and are inherited.
+so those live on a base and arrive by inheritance.
 No node shares its meaning, so meaning lives in the walkers,
 which need the union to know they have covered every case.
 `Expr` is the contract:
@@ -288,24 +288,24 @@ Unlike that chapter's `Meters`, though,
 these reflected methods trust their operand completely.
 The type checker rejects `"a" + x` in source it can see,
 but at runtime nothing checks: `str.__add__` declines, `Var.__radd__` runs,
-and `Add(Num("a"), x)` is built without complaint,
+and `Add(Num("a"), x)` appears without complaint,
 an ill-typed tree instead of an error.
 Exercise 6 closes the hole with the declining-`NotImplemented` idiom.
 
-This technique is used in SymPy expressions,
-Pandas and Polars column arithmetic, and SQLAlchemy filter conditions.
+SymPy expressions, Pandas and Polars column arithmetic,
+and SQLAlchemy filter conditions all use this technique.
 Overloaded operators build an expression tree,
 and a library interprets that tree later, symbolically, over a whole column,
 or as SQL.
 
 Python's grammar sets the limit of the technique.
-The arithmetic, bitwise, and comparison operators can all be overloaded,
+You can overload all the arithmetic, bitwise, and comparison operators,
 so an expression written with them builds nodes instead of computing.
-`and`, `or`, and `not` cannot be: Python asks the operand for a truth value,
+`and`, `or`, and `not` you cannot: Python asks the operand for a truth value,
 then `and` and `or` hand back one of the two objects and `not` hands back a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
 An expression language that needs boolean operators borrows `&` and `|` instead,
-which is why a Pandas filter is written `(a > 1) & (b > 2)` with parentheses that look unnecessary.
+which is why a Pandas filter reads `(a > 1) & (b > 2)` with parentheses that look unnecessary.
 They are not: `&` binds tighter than `>`,
 so without them Python parses `1 & b` first.
 
@@ -500,7 +500,7 @@ which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
 Because every node is frozen, `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
-the `is` guard in each `case _` hands back the node it was given when neither child simplified to anything different.
+the `is` guard in each `case _` hands back the node it received when neither child simplified to anything different.
 
 ```python
 # test_simplify.py
@@ -629,7 +629,7 @@ and the only remaining defense would be inspecting the result to guess which cha
 That is the general argument for handing a consumer the structure instead of the answer.
 A finished string has thrown away the distinction on which the safety decision depends.
 The Interpreter pattern is usually presented as a way to add operations to a language;
-here it is a way to keep a decision available to whoever is qualified to make it.
+here it is a way to keep a decision available to whoever should make it.
 
 ## Exercises
 

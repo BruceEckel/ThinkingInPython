@@ -62,7 +62,7 @@ The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
-It returns a result the caller can use where the base's result was expected,
+It returns a result the caller can use where it expected the base's result,
 and raises no surprising exceptions.
 When subclasses obey it,
 code written against the base class works unchanged on any of them.
@@ -119,8 +119,8 @@ except OverflowError as e:
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type,
-so `@override` is satisfied and `ty` reports nothing.
-`fill()` was written against `Stack`, which never refuses a `push()`,
+so `@override` holds and `ty` reports nothing.
+`fill()` targets `Stack`, which never refuses a `push()`,
 and a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matched the signature and broke the contract behind it.
 
@@ -336,7 +336,7 @@ A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 The listing shows all three side by side: the rebinding `frozen=True` catches,
 and the mutation and the failed hash it does not.
-That is why those two changes were needed.
+That is why the listing needed those two changes.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
@@ -377,7 +377,7 @@ if __name__ == "__main__":
 The middle call shows the method called as if it were a free function.
 Fetched from the class instead of from an instance,
 `distance_to` is an ordinary function,
-and `p1` is passed to it as the first argument.
+and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
 The function reads the same and computes the same.
@@ -443,7 +443,7 @@ They both have `x` and `y`, which is all `distance()` requires.
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
-`PairCoord` computes `x` from its `Pair` and cannot be assigned to,
+`PairCoord` computes `x` from its `Pair` and rejects assignment,
 so it satisfies the property form and fails the annotation form.
 Declare a protocol member read-only unless callers really do write to it.
 
@@ -476,7 +476,7 @@ print(len(counted), counted.appends)
 `list.extend()` appends its items without calling `append()`,
 so the count is wrong the moment anyone uses the base class's other method.
 Nothing in the subclass is incorrect.
-It inherited an implementation and now depends on how that implementation is written,
+It inherited an implementation and now depends on that implementation's details,
 which is a fact about `list` that no signature records and no checker reports.
 This is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
@@ -511,7 +511,7 @@ print(len(box.items), box.appends)
 Nothing arrives from a base class, so nothing can slip past the counter:
 the only way into `items` is a method this class wrote.
 The cost is visible and finite.
-Every operation callers need has to be forwarded by hand,
+You forward every operation callers need by hand,
 where the subclass got hundreds for free and got one of them wrong.
 
 Composition does more than repair a broken subclass.
@@ -712,7 +712,7 @@ if __name__ == "__main__":
 #: Glider 65
 ```
 
-`show()` accepts anything because `t` is typed `Any`,
+`show()` accepts anything because `t`'s type is `Any`,
 which is not the same as `object`.
 If you pass it something without a `display()` method,
 you'll get an exception when the line runs.
@@ -749,7 +749,7 @@ and the checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
 An abstract base class is *nominal* (named): a type joins by inheriting from it.
-Membership is declared in the subclass's own source,
+The subclass's own source declares membership,
 and the base can carry shared implementation for its children.
 A protocol is *structural*: it works with any type that has matching members.
 This includes types in libraries you cannot edit.
@@ -898,9 +898,9 @@ def test_newtype_has_no_runtime_effect() -> None:
 
 Nothing in that test can fail.
 The `NewType` protection lives in the checker alone.
-Passing a raw `int` where `UserId` is expected raises no exception.
+Passing a raw `int` where a signature says `UserId` raises no exception.
 Only the checker sees it, and only at edit time.
-Here, that diagnostic is silenced by the same `# type: ignore` that passes the book build.
+Here, the same `# type: ignore` that passes the book build silences that diagnostic.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen dataclass with a validating `__post_init__` enforces the distinction at runtime too,
@@ -978,7 +978,7 @@ explore this trade-off.
 ## Null Object
 
 Polymorphism removes the most common conditional, the `None` check.
-A parameter typed `T | None` reintroduces that check everywhere the parameter is used.
+A parameter typed `T | None` reintroduces that check everywhere the parameter appears.
 Here a logger is optional, so the function guards each logging call:
 
 ```python

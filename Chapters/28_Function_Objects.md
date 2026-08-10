@@ -4,7 +4,7 @@ A *function object* decouples the choice of function to call from the place that
 That decoupling is the goal of several patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
 The three differ in what they defer.
-*Command* defers *what* to do, so the action can be stored and run later.
+*Command* defers *what* to do, so you can store the action and run it later.
 *Strategy* defers *how* to do a job the caller already has.
 *Chain of Responsibility* defers *which* handler takes the job,
 trying candidates until one accepts.
@@ -108,7 +108,7 @@ Give a class `__call__()`
 ([Decorators](14_Decorators.md#a-stateless-class-decorator))
 and its instances carry state and still satisfy `Callable[[], None]`.
 `Repeat` below is a [frozen data class](12_Data_Classes_as_Types.md#immutability),
-so its configuration cannot change after it is built:
+so its configuration cannot change after construction:
 
 ```python
 # callable_command.py
@@ -171,14 +171,14 @@ for command in fixed:
 ```
 
 The two comprehensions look alike and differ in when they read `n`.
-A lambda's body runs when the command is called, not when it is created,
+A lambda's body runs when you call the command, not when you create it,
 and all three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
 The argument to `functools.partial`
 ([Foundations](40_Functional_Foundations.md#partial-application))
-is an ordinary expression, evaluated where it is written,
+is an ordinary expression, evaluated where you write it,
 so each command stores the string built from that iteration's `n`.
-Nothing is left to look up later.
+Nothing remains to look up later.
 The older form `lambda n=n: ...` does the same job with a default argument.
 When commands built in a loop all behave like the last one, this is why.
 
@@ -567,7 +567,7 @@ Go down it and stop at the first form that carries what you need:
 
 The *GoF Design Patterns* forms of Command, Strategy,
 and Chain of Responsibility all start at the last entry,
-because the languages they were written for have no entries above it.
+because the languages behind those forms have no entries above it.
 
 ## Exercises
 
@@ -594,4 +594,4 @@ because the languages they were written for have no entries above it.
     Call them and explain the output.
     Fix it three ways: with a default argument, with `functools.partial`,
     and with a factory function that takes `n` and returns the command.
-    Which one still works if the value must be computed at call time rather than at build time?
+    Which one still works if you must compute the value at call time rather than at build time?

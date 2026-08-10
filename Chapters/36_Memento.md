@@ -204,7 +204,7 @@ under a different name so a reader never has to ask which one a listing means.
 Its extra `title` field is there so a later section can restore one field and keep the other.
 `draw()` returns a new `Drawing` instead of editing this one,
 using `dataclasses.replace()` to change one field and carry the rest along.
-Since each call returns a `Drawing`, the calls can be chained.
+Since each call returns a `Drawing`, the calls chain.
 Saving means keeping a reference, the move that failed in `aliased_snapshot.py`.
 Now it is safe because no operation anywhere can change the object bound to `before`.
 No `Memento` class exists, no `save()`, no `restore()`,
@@ -225,12 +225,12 @@ print(after.strokes is before.strokes, len(after.strokes))
 #: False 2
 ```
 
-The stroke strings are shared, the tuple holding them is not.
+The two objects share the stroke strings, not the tuple holding them.
 Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
 so a history of `k` edits costs pointers, not `k` copies of the text.
 That is why snapshots stay cheap, and also why they are not free:
 a state whose changed field is large pays for that field on every edit.
-The stroke is built with `"".join([...])` rather than written as the literal `"circle"` because the compiler interns a literal,
+The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
 which would make the identity check print `True` whether the tuple shared the string or rebuilt it.
 
 This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution).
@@ -499,8 +499,8 @@ with ignore(AttributeError):
 #: AttributeError("'SketchV2' object has no attribute 'title'")
 ```
 
-`blob` is written while `sketch_v1.SketchV1` still means the one-field class.
-`sketch_v1.SketchV1 = SketchV2` stands in for that module being edited and reloaded,
+The dump of `blob` runs while `sketch_v1.SketchV1` still means the one-field class.
+`sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
 The type checker flags that reassignment as unsound so it carries a `# type: ignore`.
 There isn't a practical way to declare that `SketchV1` can become a different class.
@@ -588,7 +588,7 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
     It removes the last stroke.
     In `sketch.py` it mutates.
     In `frozen_sketch.py` it returns a new `Drawing`.
-    Write tests proving existing mementos and histories are unaffected in each version.
+    Write tests proving existing mementos and histories survive untouched in each version.
 2.  Give `History` a maximum depth.
     When the past grows beyond `n` states, discard the oldest.
     What should happen to `can_undo()`?

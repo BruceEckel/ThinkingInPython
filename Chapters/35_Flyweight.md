@@ -34,7 +34,7 @@ print(low is low2, high is high2)
 
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
-The cache covers a fixed range of values chosen when CPython is built.
+The cache covers a fixed range of values chosen at CPython build time.
 The number usually quoted is `-5` through `256`, but that is not a guarantee:
 the build used here caches up to 1024,
 which is why the uncached example is `100000` and not `257`.
@@ -74,7 +74,7 @@ Do not write code that depends on them, but notice the technique.
 ## Intrinsic and Extrinsic State
 
 A map can hold millions of cells, but only a handful of tile kinds.
-Here, the map is limited to grass, water, and rock.
+Here, the map holds only grass, water, and rock.
 
 The tile's symbol, name, and walkability are intrinsic,
 so they go in a frozen data class.
@@ -144,7 +144,7 @@ Twenty-four cells, three objects.
 Counting `id(t)` rather than `len(set(cells))` is deliberate.
 `Tile` is a frozen data class,
 so its generated `__eq__()` compares field values,
-and a set of cells would collapse to three whether the tiles were shared or not.
+and a set of cells would collapse to three with or without sharing.
 Only identity proves sharing.
 The grid can grow to any size and the object count stays at the number of tile kinds,
 because `@cache` returns the same `Tile` for the same symbol every time.
@@ -172,7 +172,7 @@ This is narrowing doing the work a `cast()` would otherwise do by assertion
 (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
 Prefer a guard the checker can read.
 Keep `cast()` for the cases where no guard exists,
-because `cast()` is believed rather than verified.
+because the checker believes a `cast()` rather than verifying it.
 
 ```python
 # test_tile_map.py
@@ -215,7 +215,7 @@ If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses.
-Here the cache is keyed by the constructor arguments instead of a single fixed key.
+Here the cache keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*:
 
 ```python
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 #: 1
 ```
 
-The construction syntax is unchanged,
+The construction syntax stays the same,
 and callers cannot tell they received a shared object
 (this is how CPython's small-integer cache works).
 The cost is bookkeeping by hand.
@@ -274,8 +274,8 @@ A `defaultdict` cannot replace `_pool` either,
 because building a `Color` needs the three color components,
 not just the key that names them.
 
-`_pool` is keyed by the components alone and inherited by every subclass,
-so `Color` cannot be subclassed safely.
+`_pool` keys on the components alone, and every subclass inherits it,
+so no one can subclass `Color` safely.
 A subclass would collide with it,
 receiving whichever object asked for those components first.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
@@ -307,7 +307,7 @@ Both pools so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` never shrinks.
 For tile kinds and colors that is fine, since the universe of values is small.
-When the universe is unbounded, such as symbols in a long-running parser,
+When the universe grows without bound, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
 the live-instance registry from [Cleanup](10_Cleanup.md#watching-objects-without-holding-them),
@@ -452,7 +452,7 @@ If you know it as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,
 intern in `__new__()` and pay the bookkeeping.
-If the set is unbounded,
+If the set grows without bound,
 use a `WeakValueDictionary` so the pool cannot become a leak.
 Otherwise use a `@cache` factory, which is the least machinery for the job.
 

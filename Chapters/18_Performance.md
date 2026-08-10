@@ -41,7 +41,7 @@ Builds that include it, as the official 3.13 and later binaries do,
 keep it switched off unless you set `PYTHON_JIT=1`,
 and the gain is currently a single-digit percentage,
 so measure it before planning around it.
-Whether it stays is still being settled
+Whether it stays is still an open question
 ([PEP 836](https://peps.python.org/pep-0836/)).
 
 Alternative interpreters for Python exist,
@@ -62,7 +62,7 @@ A profiler tells you for sure, preventing wasted time.
 The standard library includes two.
 The first is a deterministic tracing profiler; the second, new in Python 3.15,
 is a sampling profiler.
-The classic `cProfile` was introduced in 2006.
+The classic `cProfile` arrived in 2006.
 It deterministically records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
@@ -94,7 +94,7 @@ Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
 The deterministic tracing profiler becomes `profiling.tracing`,
 with `cProfile` kept as an alias.
-The old pure-Python `profile` module is deprecated in 3.15 and goes away in 3.17,
+3.15 deprecates the old pure-Python `profile` module, and 3.17 removes it,
 so use `profiling.tracing` or `cProfile` for tracing.
 The sampling profiler is `profiling.sampling`.
 Instead of tracing every call, it takes periodic snapshots of the call stack,
@@ -168,7 +168,7 @@ print(counts)
 #: Counter({'fib': 177})
 ```
 
-`fib()` and `square()` are untouched.
+`fib()` and `square()` stay untouched.
 The counting lives outside them, in `on_start()`,
 which the interpreter calls each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument:
@@ -185,7 +185,7 @@ monitoring the whole program to answer it pays for data you discard and slows th
 `set_local_events()` with `NO_EVENTS` detaches,
 and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
-and `COVERAGE_ID` are named for their intended users,
+and `COVERAGE_ID` carry the names of their intended users,
 and trying to claim one that another tool already holds raises a `ValueError`,
 which is how two profilers avoid quietly fighting over the same hooks.
 
@@ -288,7 +288,7 @@ One machine measured the `set` at about 22,000 times faster than the list scan.
 
 A single measurement includes whatever else the machine was doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
-and the smallest of them is the run that was interrupted least.
+and the smallest of them is the run with the least interference.
 Report `min(...)`, not the mean: a slow run means something stole the CPU,
 so averaging folds that theft into your answer,
 while the fastest run is the closest you got to measuring only your code.
@@ -299,7 +299,7 @@ A million lookups is the difference between instant and minutes.
 
     python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
-Do your benchmarks using data that is shaped like production data.
+Do your benchmarks using data shaped like production data.
 A `list` of ten elements can beat a `set`,
 and an optimization tuned to toy input can behave badly in production.
 
@@ -350,7 +350,7 @@ Your ratio will differ from the one above, which is the point of running it.
 
 ## Write Idiomatic Python
 
-The interpreter is written in C.
+The interpreter is a C program.
 A built-in like `sum()` runs its loop in C,
 so the more of your loop you hand to C, the less bytecode runs per element.
 The idiomatic version of a loop is usually also the fast one:
@@ -568,7 +568,7 @@ print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 #: [8, 5]
 ```
 
-After `heapify()` the smallest element is placed at index 0.
+After `heapify()` the smallest element sits at index 0.
 `nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
 
 Through Python 3.13, `heapq` only built a min-heap;
@@ -769,8 +769,8 @@ like `lazy_first_evens()`.
 
 ## Caching
 
-If a pure function ([Foundations](40_Functional_Foundations.md#pure-functions))
-is called repeatedly with the same arguments,
+If you call a pure function ([Foundations](40_Functional_Foundations.md#pure-functions))
+repeatedly with the same arguments,
 the fastest way to compute the answer is to not recompute it.
 `functools.cache` stores each result the first time and replays it after that.
 The classic demonstration is the naive recursive Fibonacci,
@@ -820,7 +820,7 @@ and caching a function that reads outside state can replay a stale answer.
 
 A method is the usual trap.
 `@cache` keys on every argument including `self`,
-so the cache holds a reference to each instance it has seen and none of them can be collected.
+so the cache holds a reference to each instance it has seen, and the collector can reclaim none of them.
 For a value computed once per object, use `functools.cached_property`,
 which stores the result on the instance and dies with it.
 
@@ -1103,7 +1103,7 @@ compiles such a function to machine code on its first call:
     # Sample run: Numba speedup: 15.9x
 
 `njit(count_primes)` wraps the same function `@njit` would decorate,
-and returns something that compiles itself the first time it is called.
+and returns something that compiles itself at the first call.
 Calling it once first pays the compilation and warm-up cost outside the timed region.
 Thus the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
@@ -1330,7 +1330,7 @@ so this compares Rust against that combination too, not just plain Python. -->
 
 Sometimes the fix is not a faster function but a different architecture.
 When the slowdown comes from waiting on the outside world, use `asyncio`.
-If the work can be done in parallel (pure functions make this easy),
+If the work parallelizes (pure functions make this easy),
 you can spread it across multiple cores or multiple processes.
 That is a design decision with its own chapter,
 [Concurrency](19_Concurrency.md).
@@ -1379,7 +1379,7 @@ not just where it sits on that curve:
     How close can an eager version get to the lazy one?
 4.  Apply `@cache` to a function that prints as a side effect,
     and demonstrate that repeated calls skip the printing.
-    Explain why caching is reserved for pure functions.
+    Explain why caching suits only pure functions.
 5.  In `heap_corruption.py`, replace `heap.pop(0)` with `heappop(heap)`.
     Pop three times, printing the heap after each one,
     and confirm `heap[0]` is the smallest remaining value every time.

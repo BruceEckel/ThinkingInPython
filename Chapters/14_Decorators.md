@@ -3,7 +3,7 @@
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
-Most decorators are applied to functions, so that is where this chapter begins.
+Most decorators apply to functions, so that is where this chapter begins.
 
 To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
@@ -79,10 +79,10 @@ Applied to a `def add(a, b)`,
 the call `add(2, 3)` raises `TypeError: wrapper() takes 0 positional arguments but 2 were given`.
 A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
 the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
-Every wrapper from here on is written that way.
+Every wrapper from here on takes that shape.
 
 The decorator runs when Python executes the `def`,
-not when the decorated function is called:
+not when you call the decorated function:
 
 ```python
 # decoration_time.py
@@ -185,7 +185,7 @@ so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
 Without `**P` you fall back to `*args: Any, **kwargs: Any`,
 and the wrapper swallows any arguments,
-discarding the signature the decorator is meant to preserve.
+discarding the signature the decorator should preserve.
 
 The `# type: ignore` comments mark where the checker cannot follow:
 a `Callable` is not guaranteed to have a `__name__` attribute,
@@ -288,7 +288,7 @@ That first call is unconditional,
 so a `times` below one would still call `func` once rather than zero times.
 `repeat()` rejects those values rather than quietly rounding them up to one.
 The check runs at decoration,
-so the failure is reported at the `@` line rather than at some later call.
+so the failure appears at the `@` line rather than at some later call.
 `test_repeat.py` parametrizes over `times` and covers the rejection:
 
 ```python
@@ -318,7 +318,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 ## Stacking Decorators
 
-A wrapper that keeps the wrapped interface can itself be wrapped.
+Another decorator can wrap a wrapper that keeps the wrapped interface.
 Decorators stack, nesting from the bottom up:
 
 ```python
@@ -385,8 +385,8 @@ so a decorator can be a class instead of a function.
 The class form separates the two phases cleanly: the constructor runs once,
 at decoration, and `__call__()` runs on every call to the decorated function.
 
-These classes are named in lowercase, against the usual `PascalCase` rule,
-because a decorator is used like a function at the call site.
+These classes take lowercase names, against the usual `PascalCase` rule,
+because a decorator reads like a function at the call site.
 `property`, `staticmethod`,
 and `functools.partial` are all lowercase classes for that reason.
 
@@ -593,7 +593,7 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 The class form has one limitation:
 an instance that replaces the function does not work on methods.
-Neither `trace` nor `count_calls` above was applied to a method,
+Neither `trace` nor `count_calls` above decorated a method,
 only to a bare function, and that was not an accident:
 
 ```python
@@ -706,7 +706,7 @@ shows `contextlib.ContextDecorator`.
 ## Decorating Classes
 
 Everything so far decorated a function.
-The `@` line does not care: a `class` statement is decorated the same way,
+The `@` line does not care: a `class` statement takes a decorator the same way,
 and the decorator receives the class object.
 This one registers every class it decorates, in `registry`:
 
@@ -735,7 +735,7 @@ if __name__ == "__main__":
 `register()` returns `cls` unchanged, so this decoration adds no wrapper;
 it exists only for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
-If `register` were annotated `(cls: type) -> type`,
+If `register`'s annotation were `(cls: type) -> type`,
 it would hand back a bare `type`,
 and the checker would see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
@@ -769,7 +769,7 @@ A decorator line must sit directly above a `def` or a `class`;
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
 Past that, the sugar asks for nothing.
-The callable being decorated need not come from a `def`:
+The callable you decorate need not come from a `def`:
 
 ```python
 # lambda_decoration.py
@@ -796,7 +796,7 @@ if __name__ == "__main__":
 #: 63
 ```
 
-`report` only asks for a callable and never asks how `func` was created.
+`report` only asks for a callable and never asks where `func` came from.
 Calling it directly, instead of through `@`, decorates the `lambda` on the spot.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.

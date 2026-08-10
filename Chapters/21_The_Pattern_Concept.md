@@ -33,7 +33,7 @@ Patterns seem to stand apart from the traditional way of thinking about analysis
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
 It can therefore appear at the analysis phase or high-level design phase,
-where you are still describing what the system does rather than how it is built.
+where you are still describing what the system does rather than how to build it.
 Because a pattern has a direct implementation in code,
 you might expect it to appear no earlier than low-level design.
 But it appears at every level,
@@ -54,14 +54,14 @@ which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
-A vector of change is discovered, not predicted.
+You discover a vector of change; you do not predict it.
 Guessing at it up front often builds complexity for flexibility in a direction that doesn't get used.
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
 You have seen some design patterns in this book.
-For example, [inheritance](07_Classes.md) can be thought of as a design pattern
+For example, you can think of [inheritance](07_Classes.md) as a design pattern
 (albeit one built into the language).
 It allows you to express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
@@ -97,7 +97,7 @@ meaningless outside a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
 The same dictionary,
-filled by each subclass as it is defined so that adding a type never edits the factory,
+filled by each subclass at its definition so that adding a type never edits the factory,
 is a standard design, stage three ([Factory](27_Factory.md) builds both).
 [Template Method](25_Template_Method.md) is a design pattern, stage four:
 a shape of solution you could build in any language with polymorphism.
@@ -125,7 +125,7 @@ shows that a Python module already is one.].
 It was implicit in the `for` loop from the start,
 and Python 2.2 made it a protocol the language calls on your behalf.
 More often the language had the piece all along,
-and the pattern was written for one that didn't.
+and the pattern came from a language that didn't.
 *Strategy* and *Command* shrink to passing a function,
 because a Python function is an object
 ([Function Objects](28_Function_Objects.md) shows both).
@@ -239,7 +239,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, and the important issue is to acknowledge it and control it,
     to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
--   *Subtraction*: a design is finished when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
+-   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.
     This leads to a dizzying array of options that are often unused,
@@ -271,7 +271,7 @@ or a family of patterns that share a structure, and asks three questions of it.
 What varies and what stays the same?
 That names the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
-That decides how much is left for you to write.
+That decides how much remains for you to write.
 What remains after you subtract Python's share?
 That remainder is worth learning,
 and it is usually the intent rather than the structure.
@@ -292,7 +292,7 @@ with a link to this book's coverage wherever there is one.
 2.  Take a pattern you know from another language and list its parts:
     the classes, the interfaces, and the methods its usual form requires.
     Cross out every part Python supplies without your writing it.
-    Describe what is left in one sentence.
+    Describe what remains in one sentence.
 3.  Apply *Subtraction* to a design of your own.
     Remove one class, one interface, or one level of inheritance,
     and say what stopped working.

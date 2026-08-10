@@ -24,7 +24,7 @@ An unlinked name means the pattern appears only in this catalog.
 
 ## Finding a Pattern by Problem
 
-The tables below are grouped by source.
+The tables below group by source.
 This one is for when you know the problem but not the name.
 
 | If the problem is | Look at |
@@ -123,7 +123,7 @@ This one is for when you know the problem but not the name.
 | Front Controller | Funnel all requests through a single handler. |
 | Gateway | Wrap access to an external system behind a simple interface. |
 | Identity Map | Load each object only once per session. |
-| Lazy Load | Defer loading a persisted object until it is needed. |
+| Lazy Load | Defer loading a persisted object until something needs it. |
 | Money | Represent monetary amounts together with their currency. |
 | Plugin | Choose behavior with classes named at configuration time. |
 | [Registry](27_Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
@@ -141,7 +141,7 @@ This one is for when you know the problem but not the name.
 |---------|--------|
 | Aggregator | Combine related messages into one. |
 | Content-Based Router | Route by inspecting the message content. |
-| Dead Letter Channel | Hold messages that cannot be delivered or processed. |
+| Dead Letter Channel | Hold messages that no one can deliver or process. |
 | Message | A packet of data sent over a channel. |
 | Message Channel | Connect senders and receivers through a logical pipe. |
 | Message Endpoint | Connect an application to the messaging system. |
@@ -199,7 +199,7 @@ This one is for when you know the problem but not the name.
 
 Several entries above are in the catalog because the literature documents them,
 not because you need to write them.
-Python already supplies the piece they were invented to supply.
+Python already supplies the piece their inventors set out to supply.
 
 | Pattern | What Python gives you instead |
 |---------|------------------------------|
