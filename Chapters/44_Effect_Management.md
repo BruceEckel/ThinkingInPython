@@ -207,7 +207,7 @@ They leaked information and are generally considered a failure
 ### Make the Bad Value Impossible
 
 The third approach removes the failure instead of handling it.
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-you-must-check-everywhere)
+[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-to-check-everywhere)
 makes illegal values impossible to construct.
 If you give `run` a type that cannot hold zero,
 `slope()` never needs to check for zero:

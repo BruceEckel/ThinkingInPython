@@ -50,7 +50,7 @@ and an unhashable exception is a trap if you put it in a set.
 Identity is the correct comparison for an exception.
 Two failures carrying the same text are still two separate failures.
 
-## A Value You Must Check Everywhere
+## A Value to Check Everywhere
 
 Suppose a "stars" rating is an integer from one to ten.
 If you represent it as an `int`, nothing stops a caller from passing eleven,

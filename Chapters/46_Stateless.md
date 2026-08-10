@@ -1285,7 +1285,7 @@ for the reason in [Supplying an Interface](#supplying-an-interface).
 In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must also be frozen.
 Freezing prevents rebinding `waited`, not appending to the list it holds.
 
-## Where You Can Call `run()`
+## Where to Call `run()`
 
 `run()` starts an event loop and drives the Effect inside it:
 its entire body is `return asyncio.run(run_async(effect))`.
