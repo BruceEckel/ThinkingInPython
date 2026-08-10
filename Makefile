@@ -22,7 +22,7 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
+.PHONY: claims exercise-coverage help reset all verify sync-ci ci gate gate-status tool-status sweep sync check site epub local serve examples run test ty lint extract check-ch output output-check fix-imports upgrade-python reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub check-tools check-tools-full doctor verify-targets test-tools upgrade-tools solutions-sync solutions-check solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-gate clean-solutions
 
 # Self-documenting help: every target below carries an inline `## text` doc
 # comment, and a `##@ Category` comment line starts a new section. Add a
@@ -146,11 +146,16 @@ GATE_DOCS = tools/README.md Solutions
 # still fails the gate; only marker text is self-corrected. The drift check
 # also fails on an orphaned stray under Examples/ (a file no block generates
 # and no chapter mentions); run `make prune-examples` to delete those.
-gate: solutions-gate  ## The gate without sync or site (check, output, ty, ruff, run, pytest, solutions-gate)
+# reflow_prose.py runs here in check mode, so hand-edited prose that drifts
+# out of Semantic Line Breaks fails the build instead of drifting invisibly
+# until someone remembers to run `make reflow`. Check mode reports the files
+# and exits nonzero; `make reflow` applies the fix.
+gate: solutions-gate  ## The gate without sync or site (check, reflow, output, ty, ruff, run, pytest, solutions-gate)
 	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/check_all.py $(GATE_CHECKS)
 	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
+	$(PY) tools/reflow_prose.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/validate_output.py --update Chapters
@@ -398,6 +403,21 @@ links:  ## Check the book's external URLs for link rot (advisory, needs network)
 # default). Never fails, and is not part of `verify`/`gate`/`ci`.
 todos:  ## List TODO(tag): ... markers left in the book (advisory)
 	$(PY) tools/list_todos.py
+
+# Advisory. heading_links.py proves a cross-chapter link resolves; this
+# asks the question it cannot, whether the target says what the link text
+# claims. Most links either name the chapter or quote the target heading,
+# and neither can drift; what is left is the handful of author-written
+# phrases describing what is over there. Run one chapter with ARGS=33.
+claims:  ## List cross-chapter links whose text makes an unchecked claim
+	$(PY) tools/check_claims.py $(ARGS)
+
+# Advisory. Which `##` sections no exercise practices, per chapter. A
+# worklist rather than a gate: a conclusion or a table wants no exercise,
+# and the matching is literal, so it under-reports coverage. Confirm a
+# reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
+exercise-coverage:  ## List chapter sections that no exercise practices
+	$(PY) tools/exercise_coverage.py $(ARGS)
 
 ##@ Style gates
 

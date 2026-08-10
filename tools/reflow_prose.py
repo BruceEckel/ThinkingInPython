@@ -473,6 +473,11 @@ def main() -> int:
     if failures:
         print(f"{len(failures)} file(s) skipped on round-trip failure.")
         return 1
+    if total_changed and not args.write:
+        # Check mode is a gate: drift must fail, not just report. --write
+        # has already fixed what it found, so it still succeeds.
+        print("Run `make reflow` to apply.")
+        return 1
     return 0
 
 
