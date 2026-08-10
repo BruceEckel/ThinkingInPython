@@ -323,8 +323,8 @@ You can still write `as`, but it binds `None`.
 
 A fuller version of the same idea takes several types at once,
 and accepts no argument to mean "ignore everything."
-It is useful enough to reuse elsewhere in the book,
-so it lives in `utils/`, where any chapter can import it:
+It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
+where any chapter can import it:
 
 ```python
 # utils/exceptions.py

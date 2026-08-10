@@ -19,11 +19,20 @@ sees the result) or promoted into `CLAUDE.md` and project memory.
 
 Bruce declined these. Do not propose them again, in any wording.
 
-**01_Introduction: do not name the `stateless` library in the Part V
-summary.** The review proposed changing "The last two put that idea to work
-with a library that brings Effect tracking to Python today" to name
-`stateless` outright, on the grounds that chapters 46 and 47 are titled
-*Stateless* anyway. Declined. The generic phrasing stands.
+**01_Introduction: "wrote a message" stays vague.** The review flagged
+"Eventually I even wrote a message confirming I was not going to complete it"
+for not saying where (a blog post, a repository note, a mailing list).
+Declined. The sentence stands as written.
+
+*Correction, 2026-08-10:* this slot originally recorded a different
+rejection, "do not name the `stateless` library in the Part V summary."
+That inverted the actual outcome. In `~01_Introduction.md` (recoverable at
+`8660e7c1^`) each checkbox sat *above* its block; the "name the library"
+block's box was empty, the change was applied in commit 33a65808, and the
+chapter has named `stateless` ever since, surviving the later annealing and
+style passes. The two real 01_Introduction rejections in that file were the
+"AI Trigger Warning" move (recorded below) and the "wrote a message"
+vagueness (now recorded above).
 
 **01_Introduction: do not move the "AI Trigger Warning" section.** The review
 proposed moving it (about a quarter of the chapter) from between "How the Book

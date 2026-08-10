@@ -602,8 +602,7 @@ with `heapify_max()` putting the largest element at index 0.
 
 The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
 maintains the list according to its own logic.
-So you must always use the heap version of an operation,
-not the list version.
+So you must always use the heap version of an operation, not the list version.
 Although calling the list's own `pop(0)` does produce the smallest value the first time,
 it also destroys the heap ordering,
 so if you call it again you won't get the smallest value:
@@ -769,7 +768,8 @@ like `lazy_first_evens()`.
 
 ## Caching
 
-If you call a pure function ([Foundations](40_Functional_Foundations.md#pure-functions))
+If you call a pure function
+([Foundations](40_Functional_Foundations.md#pure-functions))
 repeatedly with the same arguments,
 the fastest way to compute the answer is to not recompute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -820,7 +820,8 @@ and caching a function that reads outside state can replay a stale answer.
 
 A method is the usual trap.
 `@cache` keys on every argument including `self`,
-so the cache holds a reference to each instance it has seen, and the collector can reclaim none of them.
+so the cache holds a reference to each instance it has seen,
+and the collector can reclaim none of them.
 For a value computed once per object, use `functools.cached_property`,
 which stores the result on the instance and dies with it.
 
@@ -1049,8 +1050,7 @@ The NumPy version states it once for the whole array:
     # Sample run: NumPy speedup: 12.9x
 
 `np.arange(n, dtype=np.float64)` is NumPy's version of the `list(range(n))` line above it.
-Both build the same sequence of `n` numbers
-(it's `arange`, not `arrange`).
+Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
 `list(range(n))` boxes each one as a Python `int`.
 `np.arange()` packs them into one contiguous block of C doubles,
 the same layout `array` used earlier in this chapter,

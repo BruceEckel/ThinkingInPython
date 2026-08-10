@@ -661,7 +661,8 @@ too expensive returns to `COLLECTING` with the money still in,
 while sold out goes to `UNAVAILABLE`.
 The condition that fired is visible only in the state.
 
-`__init__()` builds the table, rather than the class body, because its entries are bound methods.
+`__init__()` builds the table, rather than the class body,
+because its entries are bound methods.
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
 

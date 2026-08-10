@@ -106,8 +106,7 @@ The `accept()`/`visit()` pair is the *double dispatch*.
 `visit()` resolves the visitor's type,
 and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type.
 In the classic pattern every element class overrides `accept()`,
-which resolves the element's type;
-here one inherited `accept()` is enough,
+which resolves the element's type; here one inherited `accept()` is enough,
 because the flower's type resolves a step later.
 The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`

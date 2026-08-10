@@ -1173,8 +1173,8 @@ There is nothing to supply, because `Async` asks for no object
 (there's no `Need`).
 An `Async` request carries the coroutine and asks the driver to await it,
 and `run()` does that with the event loop it starts.
-So the driver answers `Async` rather than supplying it: `supply()` handles only a `Need`,
-and `Async` is a different Ability.
+So the driver answers `Async` rather than supplying it:
+`supply()` handles only a `Need`, and `Async` is a different Ability.
 
 Notice what `report()` is not.
 It is not an `async def` and it contains no `await`,
@@ -1644,7 +1644,8 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
 Every failure moved into the result, so nothing remains in the error channel.
-`all_handled()` returns `Success[str]`: no failure can escape as a thrown exception.
+`all_handled()` returns `Success[str]`:
+no failure can escape as a thrown exception.
 
 ```python
 # test_catch_subset.py

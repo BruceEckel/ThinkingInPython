@@ -1,7 +1,8 @@
 # Metaprogramming
 
 Other (special) objects create objects.
-These special objects are *classes*, and you configure them to produce the objects you want.
+These special objects are *classes*,
+and you configure them to produce the objects you want.
 
 Classes are also objects, and you can modify objects.
 The listings here use `display_object()`,

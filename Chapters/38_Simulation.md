@@ -1,7 +1,8 @@
 # Simulation
 
 A simulation models a set of objects that act on their own and interact through shared state.
-The chapter works the first example, a pack of rats mapping a maze, from end to end.
+The chapter works the first example, a pack of rats mapping a maze,
+from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
@@ -237,14 +238,15 @@ A single `asyncio.gather(*self.tasks)` would not do,
 because `gather()` fixes its argument list at the moment of the call,
 and half the rats do not exist yet.
 
-`group`'s declaration is `field(init=False)`, with assignment only while `explore()` runs,
+`group`'s declaration is `field(init=False)`,
+with assignment only while `explore()` runs,
 the same declaration-without-assignment the robot example uses for `Robot.room`.
 The other four fields are internal bookkeeping rather than constructor arguments,
 which is why they carry `default_factory` instead of appearing in the signature.
 
 The maze layout lives in a text file.
-The loader drops blank lines and any line beginning with `#`,
-so the first line, naming the file's path, drops out and the rest is the maze.
+The loader drops blank lines and any line beginning with `#`, so the first line,
+naming the file's path, drops out and the rest is the maze.
 
 ```text
 # rats_and_mazes/amaze.txt

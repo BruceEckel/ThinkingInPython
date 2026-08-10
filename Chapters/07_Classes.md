@@ -94,8 +94,7 @@ it stores nothing and only records the type.
 [Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar)
 and [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) use it.
 
-`display_object()`,
-a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#building-display_object),
+`display_object()`, a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#building-display_object),
 shows the shape of an object.
 It prints an object's attributes and methods:
 

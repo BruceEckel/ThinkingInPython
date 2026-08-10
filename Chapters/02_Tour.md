@@ -18,9 +18,17 @@ People often call Python a scripting language,
 but scripting languages tend to be limiting,
 especially in the scope of the problems that they solve.
 Python is a programming language that also supports scripting.
-It is marvelous for scripting,
-and you may replace all your batch files, shell scripts,
-and simple programs with Python scripts.
+It is marvelous for scripting, and you may replace all your batch files,
+shell scripts, and simple programs with Python scripts.
+
+## How to Read the Examples
+
+The '`#`' denotes a comment that goes until the end of the line,
+just like C++ and Java '`//`' comments.
+[The Examples](01_Introduction.md#the-examples)
+explains the filename first line and the `#:` output markers.
+
+## Indentation and Blocks
 
 Python is clean to write.
 Your own code stays easy to read long after you've written it.
@@ -42,29 +50,23 @@ print(val)
 #: 1
 ```
 
-## How to Read the Examples
-
-The '`#`' denotes a comment that goes until the end of the line,
-just like C++ and Java '`//`' comments.
-[The Examples](01_Introduction.md#the-examples) explains the filename first line and the `#:` output markers.
-
-## Indentation and Blocks
-
 A C/C++ `if` requires parentheses around the conditional.
-Python needs no parentheses,
-although it won't complain if you use them.
+Python needs no parentheses, although it won't complain if you use them.
 
 The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its argument to standard output.
 The next line assigns to a variable named `val`.
-The subsequent statement is not indented so it is no longer part of the `if`.
+The subsequent statement is not indented, so it is no longer part of the `if`.
 
 An indented block groups statements but does not create a scope.
 Assigning `val` inside the `if` leaves it visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 Functions, classes, and modules introduce new scopes;
 an `if` or a `for` block does not.
+Binding still follows execution: had `response` not been `"yes"`,
+`val` would never have been assigned,
+and `print(val)` would raise a `NameError`.
 
 Indenting can nest to any level.
 Four spaces per level is the convention,
@@ -113,8 +115,7 @@ Reserve `is` for `None` and other singletons.
 it duplicates the list but not the objects inside it,
 so `a` and `c` would still share a nested list.
 
-You can assign several names at once,
-so a swap needs no temporary:
+You can assign several names at once, so a swap needs no temporary:
 
 ```python
 # multiple_assignment.py
@@ -140,6 +141,8 @@ as with `a` and `b` above.
 ## Numbers and Arithmetic
 
 Integers have unlimited precision, so they never overflow.
+Underscores group digits for readability:
+`10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
 `/` always produces a `float`, and `//` is floor division
@@ -183,8 +186,8 @@ print(alias)
 Augmented assignment on a mutable object changes it in place,
 so every other name for it sees the change.
 `items = items + [3]` would instead build a new list and leave `alias` alone.
-For an `int`, both forms rebind,
-which is why `total += 5` above looks like augmented assignment in any other language.
+For an `int`, both forms rebind the name,
+so `total += 5` above behaves the way `+=` does in any other language.
 
 `round()` breaks a tie to the nearest even value,
 so `round(0.5)` is `0` and `round(1.5)` is `2`,
@@ -238,7 +241,8 @@ so `~0b1100` reads as `-0b1101` rather than a row of ones.
 
 Python reserves one further operator, `@` (with `@=` to match),
 for matrix multiplication.
-The built-in numeric types do not implement it but array libraries such as NumPy do.
+The built-in numeric types do not implement it,
+but array libraries such as NumPy do.
 The same character in front of a `def` or a `class` means something else:
 that is decorator syntax, covered in [Decorators](14_Decorators.md).
 
@@ -292,6 +296,7 @@ It replaces every falsy `x`, not only a missing one,
 so it throws away a legitimate `0` or `""`.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
+That is a conditional expression, covered in [Control Flow](04_Control_Flow.md).
 
 ## Strings
 
@@ -331,10 +336,11 @@ of which the language creator Guido van Rossum is a fan.
 Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
-That suits any block of literal text,
-such as an embedded template, a SQL query, or a chunk of HTML,
-which you can write out in full without escaping line breaks.
+That suits any block of literal text, such as an embedded template, a SQL query,
+or a chunk of HTML, which you can write out in full without escaping line breaks.
 
+In an ordinary string, a backslash starts an escape sequence, as in C and Java:
+`\n` is a newline and `\t` is a tab.
 The '`r`' right before a string means "raw."
 Python takes backslashes literally, so you don't need to double them.
 A raw string still cannot end with a backslash,
@@ -459,8 +465,7 @@ builds a query from the parts that way.
 ## Naming Conventions
 
 Use `snake_case` for variables, functions, methods, and file names:
-lower case with words separated by underscores,
-as in `this_is_snake_case`.
+lower case with words separated by underscores, as in `this_is_snake_case`.
 
 If something represents a constant, use all uppercase letters,
 as in `THIS_IS_A_CONSTANT`.

@@ -495,8 +495,7 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
     A simpler example is keeping track of the number of calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
-`__getattr__()` receives the requested name,
-so the check is one condition:
+`__getattr__()` receives the requested name, so the check is one condition:
 
 ```python
 # protection_proxy.py

@@ -65,8 +65,7 @@ your function becomes impure.
 This usually involves I/O: the time of day, a random number,
 a database or network read.
 But it can also be as simple as reading a variable that's global to your function.
-These are *side causes* (corresponding to side effects)
-or *implicit inputs*.
+These are *side causes* (corresponding to side effects) or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
 But there's another factor that doesn't quite fit either category.

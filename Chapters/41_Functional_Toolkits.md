@@ -589,7 +589,8 @@ which is right when the missing elements are data in their own right.
 ### `groupby`
 
 Groups consecutive elements that share a key.
-The input must arrive already sorted by that key, since it only merges neighbors.
+The input must arrive already sorted by that key,
+since it only merges neighbors.
 
 ```python
 # itertools_groupby.py
@@ -974,8 +975,8 @@ A function that reads mutable state is not pure, however simple its body looks.
 Generality cost something.
 The circle method needed no memory.
 Which pair sits where in round `r` followed from `r` alone.
-`group_rounds()` needs the `history` `Counter`,
-because no formula predicts, from a round number alone,
+`group_rounds()` needs the `history` `Counter`, because no formula predicts,
+from a round number alone,
 which grouping of arbitrary size keeps every pair's meeting count lowest.
 It is still a pure function in the sense that matters for testing.
 The same `students`, `size`,

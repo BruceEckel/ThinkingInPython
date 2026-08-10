@@ -224,8 +224,8 @@ not in the code you produce.
 
 This book is freely readable at [thinkinginpython.com](https://thinkinginpython.com/),
 which always holds the current version.
-The text carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) license;
-the source repository's `CONTRIBUTING.md` has the details.
+The text carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+license; the source repository's `CONTRIBUTING.md` has the details.
 
 Places worth knowing about:
 

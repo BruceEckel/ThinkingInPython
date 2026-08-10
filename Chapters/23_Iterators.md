@@ -680,7 +680,8 @@ Python dropped both methods rather than paying for them everywhere.
 If you take them away, `advance()` has to return the value it moved to,
 which is `__next__()`.
 
-You can ask a GoF iterator repeatedly whether it has finished, without disturbing it.
+You can ask a GoF iterator repeatedly whether it has finished,
+without disturbing it.
 Python makes that question part of `__next__()`,
 so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.

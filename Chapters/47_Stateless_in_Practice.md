@@ -1243,8 +1243,7 @@ print(run(kitchen(toast)()))
 #: toasted loaf of rye dough
 ```
 
-You supply appliances and make products,
-and the listing keeps the two apart.
+You supply appliances and make products, and the listing keeps the two apart.
 `Dough`, `Oven`, and `Toaster` are the leaves,
 so `supply()` binds one instance of each.
 The loaf is not a leaf.
@@ -1358,8 +1357,8 @@ and the only types it mentions are the five Protocols.
 No concrete class appears in it, and it prints nothing.
 Output is an Ability like the other four:
 `Narrator` is one of the five requests,
-so the code that supplies it chooses whether a line prints,
-goes into a list, or disappears.
+so the code that supplies it chooses whether a line prints, goes into a list,
+or disappears.
 There is no `GameEnvironment` to construct and no factory to hold.
 The five-way union appears in full rather than as an alias,
 for the reason given in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect).
@@ -2040,11 +2039,10 @@ showed its shape.
 `supply()` binds instances that are already built,
 and `handle()` takes an ordinary function,
 so constructing a dependency can never be an Effect.
-ZIO's `ZLayer` is a constructor that can read configuration, fail,
-and retry, and it resolves a dependency graph at compile time,
+ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry,
+and it resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
-Stateless has no equivalent,
-so you write the wiring at the edge by hand,
+Stateless has no equivalent, so you write the wiring at the edge by hand,
 and the checker verifies a `supply()` call for completeness but not for how you assembled it.
 The operator set is thin in the same way.
 There is `retry()` and `repeat()`,

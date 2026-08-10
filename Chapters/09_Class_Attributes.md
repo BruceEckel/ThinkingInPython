@@ -164,8 +164,7 @@ An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance exists.
-`label: str` has no `=`,
-so the class stores nothing under that name.
+`label: str` has no `=`, so the class stores nothing under that name.
 The annotation only records, in `Tally.__annotations__`,
 that a `Tally` will eventually carry a `label`.
 That declaration is invisible to `display_object()`,
@@ -251,7 +250,8 @@ and all are clearer with `ClassVar` on them.
 For the third, a class-level constant,
 `Final[int]` says more than `ClassVar[int]`:
 it declares the value shared *and* not reassignable.
-Use `ClassVar` when you intend the shared value to change, as `Tally.total` does.
+Use `ClassVar` when you intend the shared value to change,
+as `Tally.total` does.
 The bug is not the class attribute;
 it is writing one where you meant a per-object default.
 

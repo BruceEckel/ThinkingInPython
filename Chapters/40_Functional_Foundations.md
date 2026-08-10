@@ -634,8 +634,8 @@ a frozen dataclass for the value,
 `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
 The second `print()` is the payoff.
-The input list stays unchanged, so you can recompute the whole report,
-cache it, or run it on another core with no coordination.
+The input list stays unchanged, so you can recompute the whole report, cache it,
+or run it on another core with no coordination.
 
 None of this is a different language.
 It is ordinary Python in which each piece depends on its arguments alone,

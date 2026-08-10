@@ -80,8 +80,7 @@ By adapting the threading mechanism,
 threads could also perform ad-hoc parallelism:
 multiple CPUs could run multiple parts of a program simultaneously.
 
-Although threads serve these purposes,
-the OS is always at a disadvantage:
+Although threads serve these purposes, the OS is always at a disadvantage:
 it doesn't know details of the program it's running,
 and therefore cannot optimize that program.
 For example, the OS does not know what data is important to preserve and what isn't.
@@ -134,7 +133,8 @@ Instead of using threads for I/O-bound problems,
 asynchrony lets you create coroutines.
 Each coroutine, upon encountering I/O,
 suspends itself and yields control ... but not to the OS.
-Instead, control goes to the *event loop*, which discovers the next available task to run.
+Instead, control goes to the *event loop*,
+which discovers the next available task to run.
 Two keywords and the `asyncio` library capture this:
 
 1. `async def` defines a *coroutine function*.
@@ -179,9 +179,8 @@ asyncio.run(main())
 ```
 
 The first printed line is proof that calling a coroutine runs nothing.
-`main()`'s first line calls `fetch("a", 0.03)`,
-yet no "started" line appears, only the type of object the call built:
-`coroutine`.
+`main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
+only the type of object the call built: `coroutine`.
 The work begins when `gather()` receives that object.
 If you forget `await gather()`, the work doesn't happen.
 Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
@@ -210,8 +209,7 @@ so its timer fires first, and the resumed lines print as c, b, a,
 the reverse of the starting order.
 `gather()` returns `['A', 'B', 'C']`,
 showing that the results follow the argument order, not the finishing order.
-The total wait is the longest delay (0.03 seconds),
-not the sum of all three.
+The total wait is the longest delay (0.03 seconds), not the sum of all three.
 
 An `await` is only legal inside an `async def`,
 which is why the demonstration needs `main()`.
@@ -726,8 +724,7 @@ then resume to read them back.
 Each task reads its own `request_id` and every task reads the same `current`,
 because by the time any of them resumes, the global holds `req-3`.
 The last line is the other half: `main()` created the tasks,
-so their contexts are copies of `main()`'s,
-and nothing they set flows back.
+so their contexts are copies of `main()`'s, and nothing they set flows back.
 `request_id` returns to its default while the global stays clobbered.
 
 Deleting the global and writing `handle(name)`'s value into a parameter would work here,
@@ -812,8 +809,7 @@ if __name__ == "__main__":
 printing `[10, 20, 30, 40, 50]`, the same answer as the other versions.
 The computation is the same `cpu_price()` as before.
 But it is no longer on a single shared interpreter on a single core.
-The work now spreads across multiple interpreters,
-each on its own core.
+The work now spreads across multiple interpreters, each on its own core.
 With enough cores the wall-clock time falls toward the time of a single task.
 
 Three issues separate a process pool from the in-process tools in this chapter,
@@ -831,9 +827,11 @@ and all three surface in this short listing:
    with the worker's `RuntimeError` nested in the traceback above it.
    This used to be a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
-   Since 3.14 no platform forks by default, so every platform requires the guard.
+   Since 3.14 no platform forks by default,
+   so every platform requires the guard.
 2. Work crosses the process boundary by *pickling*.
-   One process serializes each argument and each return value, and the other rebuilds it.
+   One process serializes each argument and each return value,
+   and the other rebuilds it.
    The function itself travels by name,
    so it must be importable from the top level of the module.
    Passing a `lambda` to `pool.map()` fails with a pickling error.
@@ -1605,8 +1603,7 @@ for item in shared:       # next() runs here, unguarded
 ```
 
 That guards the work and leaves the race untouched,
-because the `for` statement calls `next()`,
-outside the block the lock protects.
+because the `for` statement calls `next()`, outside the block the lock protects.
 Serializing an iterator means putting the lock inside `__next__()`,
 which is where these three wrappers put it.
 
@@ -1861,8 +1858,8 @@ print(f"holds over 200 tasks: {tasks_per_stack > 200}")
 `bytes_per_task()` creates 5,000 tasks that immediately suspend on `asyncio.sleep(999)`,
 so they stay alive doing nothing.
 The two `tracemalloc` snapshots capture the heap they add.
-The listing reads `threading.stack_size()`, sets it, reads it again, then restores it,
-so the measurement leaves the rest of the program untouched.
+The listing reads `threading.stack_size()`, sets it, reads it again,
+then restores it, so the measurement leaves the rest of the program untouched.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.

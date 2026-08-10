@@ -399,8 +399,7 @@ using these two methods to let Python's own parser assemble the tree.
 
 ## Testing Both Versions
 
-The win/lose/draw result is pure logic,
-so tests validate it easily.
+The win/lose/draw result is pure logic, so tests validate it easily.
 The spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
 If they diverge, one of them has a bug.
 

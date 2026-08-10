@@ -178,8 +178,7 @@ class Messenger:
     depth: float = 0.0  # Default value
 ```
 
-`display_object()`,
-the inspection helper from [Metaprogramming](17_Metaprogramming.md#building-display_object),
+`display_object()`, the inspection helper from [Metaprogramming](17_Metaprogramming.md#building-display_object),
 shows what `@dataclass` generates:
 
 ```python
@@ -373,8 +372,7 @@ They do not check their argument, because every `Stars` is already good.
 They do not test their result,
 because building the returned `Stars` runs the check.
 
-The validation lives in one place, the constructor,
-so it is easy to change.
+The validation lives in one place, the constructor, so it is easy to change.
 Immutability guarantees no one can rebind the fields after construction,
 and when the fields are immutable too, no one can damage the value.
 
