@@ -20,10 +20,10 @@ The rest of the chapter applies the machinery:
 - A failure that enters the channel as a value,
   and a catch that takes the whole channel
 - Dependency graphs that go deep, and a cast of abilities that goes wide
-- Decorators that add retry and parallelism to code they never edit
+- Decorators that add retry and parallelism to code they do not edit
 - An account of what the guarantee does not cover
 
-The chapter then collects every tool in one table and weighs what the whole approach costs.
+The chapter then collects every tool in one place and weighs what the whole approach costs.
 
 ## Abilities Are Not Special
 
@@ -104,9 +104,9 @@ had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
 and the program still runs,
-but under `ty` 0.0.69 the answer comes back as `Unknown` and the checking quietly stops.
+but under `ty` 0.0.70 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
-That is what the `answer: str` inside `ask()` is doing.
+The `answer: str` inside `ask()` does that job.
 `yield from Ask(prompt)` produces `Unknown` there too,
 so the annotation is an assertion the checker takes on faith rather than a type it worked out.
 `Ability[str]` is where the claim comes from,
@@ -143,7 +143,7 @@ said an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Generators.md#a-generator-is-a-description).
 An Effect is a generator, so nothing stops you from driving one yourself,
-which is what `hand_driven.py` in [Nothing Runs Yet](46_Stateless.md#nothing-runs-yet)
+which `hand_driven.py` in [Nothing Runs Yet](46_Stateless.md#nothing-runs-yet)
 did.
 `next()` on `greet("Alice")` produced a `Need` object carrying the requested type,
 as `interview()` yielded `"name"`, and `send(Console())` resumed the body,
@@ -430,7 +430,7 @@ an object whose methods the program then calls,
 and it can choose a different one at each request.
 That is what `supply()` cannot do,
 because it binds one instance for the whole run.
-When the implementation a program depends on has to change while the program is running,
+When the implementation a program depends on must change while the program is running,
 the choosing belongs in a handler.
 
 A building's power supply works this way.
@@ -729,7 +729,7 @@ Its signature announces the shared state:
 `spree()` composes purchases, and the union travels up unchanged.
 
 The handlers own the cell.
-`read()` and `write()` are two functions closed over one `Cell`,
+`read()` and `write()` are two functions sharing one `Cell`,
 chained through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
 After the run, the cell shows what the program did to it:
 two purchases went through, and 10 remained.
@@ -936,14 +936,14 @@ because the pipeline holds no output of its own.
 The second run also stops after `feed: fetching`.
 `topic_of()` yielded a `NotInteresting`,
 which ended `research()` where it stood,
-so the `need(Encyclopedia)` two lines below it never ran and no one consulted a library.
+so the `need(Encyclopedia)` two lines below it did not run and no one consulted a library.
 `catch()` received that failure and `report()` matched on it as a value,
 which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception would,
 and no step tested for it.
 Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
-since `DeadWire.latest()` raises before printing,
+since `DeadWire.latest()` raises `Unavailable` before printing,
 while the third reaches the library and fails there.
 
 `report()` is where the two channels come apart.
@@ -1093,7 +1093,7 @@ No decorator takes part and nothing raises an exception.
 and the driver takes it from there.
 Execution does not come back: a driver that receives a failure stops sending,
 so anything after a `yield from throw(...)` is unreachable,
-which is what the `Never` in its type records.
+which the `Never` in its type records.
 
 The difference between the doors is what the checker can see.
 If you change `Empty()` to some undeclared exception,
@@ -1159,7 +1159,7 @@ Two failures from two different sources come back as values through one undecora
 and neither the runtime nor the checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.69 both orders infer the same result type.
+and under `ty` 0.0.70 both orders infer the same result type.
 What both orders need is the intermediate name.
 Written as one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
@@ -1174,7 +1174,7 @@ When `research()` gains a fourth error,
 so `report()`'s declared type no longer matches and `ty` points at the `yield from`:
 you decide whether to catch the newcomer or declare it.
 `catch_all()` absorbs it into the result union instead,
-so the guard has to sit downstream, in an annotation that spells the union out,
+so the guard must sit downstream, in an annotation that spells the union out,
 as `outcome()`'s return type does,
 or in a `match` that ends with `assert_never()`.
 Without such a guard, the new failure becomes a value that flows on unexamined.
@@ -1495,7 +1495,7 @@ The fourth run swaps one cast member and captures the output.
 so a test reads the lines back as a list with no `capsys` and no monkeypatching,
 the same swap `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 made with one Ability rather than five.
-Printing was never in the engine to intercept.
+The engine holds no printing to intercept.
 
 There is a ceiling on how wide the cast can get.
 `supply()`'s declaration carries overloads for one through nine values,
@@ -1626,7 +1626,7 @@ which is why the third run catches `RetryError` rather than `Crashed`.
 `Async` arrived because waiting between attempts is asynchronous.
 And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
 Retrying is not free: it needs a clock, and the signature says so.
-If you leave the `Time()` out, the program does not build.
+If you leave the `Time()` out, `ty` rejects the `run()` call.
 This is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
 here it changes a type, and every caller learns about the new dependency.
@@ -1915,7 +1915,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The checker can give up quietly
 
 How much of a type survives partial handling depends on your checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.69.
+Handling some of what an Effect declares works correctly under `ty` 0.0.70.
 If you supply one of two abilities, the other stays in the signature:
 
 ```python
@@ -2038,7 +2038,7 @@ and `bakery.py` in [Dependencies That Need Dependencies](#dependencies-that-need
 showed its shape.
 `supply()` binds instances that are already built,
 and `handle()` takes an ordinary function,
-so constructing a dependency can never be an Effect.
+so constructing a dependency cannot be an Effect.
 ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry,
 and it resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
