@@ -89,7 +89,8 @@ print(list(map(lambda e: e ** 2,  # type: ignore
 
 The `map()`/`filter()` form funnels every element through `lambda` calls,
 and is harder to read.
-The comprehension inlines the test and the expression.
+The comprehension inlines the test and the expression,
+and its brackets show at a glance that it produces a list.
 `map()` and `filter()` pay off when the function already exists,
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`;
 [Functional Foundations](40_Functional_Foundations.md) returns to the choice.
@@ -101,14 +102,9 @@ so the checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
-but only when its predicate is a named function annotated to return `TypeIs[int]` rather than `bool`.
+but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`.
 `filter(None, items)` is the other narrowing form;
 it drops the falsy values and the checker knows no `None` survives.
-
-List brackets (`[]`) enclose the list comprehension,
-so you can see at a glance that it produces a list.
-The `if` clause names `isinstance()` directly and the output expression squares directly,
-with no `lambda` wrappers in the way.
 
 A comprehension has a scope of its own:
 
@@ -171,7 +167,7 @@ print(unique == same)
 
 `same` builds a list with a list comprehension, then passes it to `set()`.
 It produces the same result,
-but the throwaway list costs time and memory that the set comprehension never spends.
+but the throwaway list costs time and memory that the set comprehension avoids.
 
 ## Dictionary Comprehensions
 
@@ -352,8 +348,8 @@ and that pull happens outside the `with`.
 ## Breaking Up a Complex Comprehension
 
 A comprehension earns its place when it reads clearly.
-Nothing stops you from nesting more `for` and `if` clauses,
-or wrapping the whole thing in another call,
+You can nest more `for` and `if` clauses,
+or wrap the whole thing in another call,
 but each addition makes the expression harder to read in one pass.
 Here, filtering, flattening, sorting,
 and formatting all happen in a single expression:
@@ -468,7 +464,7 @@ The `for` loop has the same effect without building a wasted list.
 The brackets no longer suggest a collection the code never uses.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
-If a comprehension's result is never assigned or used,
+If nothing assigns or uses a comprehension's result,
 that's a sign it should be a loop instead.
 
 ## Generator Expressions {#generator-expressions}
@@ -493,9 +489,12 @@ print(list(islice(squares, 3)))
 #: [4, 9, 16]
 ```
 
-No computation happens until you pull a value.
+No computation runs until you pull a value.
 `next()` produces them one at a time,
-and `itertools.islice()` takes a few without ever building the million-element list.
+and `itertools.islice()` takes a few without building the million-element list.
+
+The parentheses do not make it a tuple comprehension; no such form exists.
+When you need a tuple, pass the generator expression to `tuple()`.
 
 A generator expression can also feed `set()` and `dict()`:
 
@@ -518,8 +517,8 @@ so `set(...)` or `dict(...)` consumes the whole generator immediately.
 Neither saves anything over the set comprehension `{len(w) for w in words}` or the dict comprehension `{w: w[0] for w in words}`,
 which read more directly and are the better choice.
 
-Use a generator expression when the consumer takes values one at a time and never needs them all at once,
-such as `sum()`, `any()`, `all()`, `min()`, `max()`, or `str.join()`:
+Use a generator expression when the consumer takes values one at a time and does not need them all at once,
+such as `sum()`, `any()`, `all()`, `min()`, or `max()`:
 
 ```python
 # genexp_consumers.py
@@ -535,6 +534,9 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
+`str.join()` does not belong on that list: it needs two passes,
+one to size the result and one to fill it,
+so it converts its argument to a list first and a generator expression saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
 Add a second argument and it does:
@@ -556,7 +558,7 @@ print(list(nums))
 #: []
 ```
 
-It runs once, and once something consumes its values it is empty.
+It runs once, and after something consumes its values it is empty.
 `sum()` drained `nums`,
 so `any()` saw no elements and reported `False` instead of `True`,
 with no exception to say the question was never asked.
@@ -651,14 +653,14 @@ The four forms are one expression with different delimiters,
 which is why learning the list form teaches all four.
 Brackets when you want a list.
 Braces for a set, or for a dict when a colon separates a key from a value.
-Parentheses when the consumer takes values one at a time and never needs them all at once.
+Parentheses when the consumer takes values one at a time and does not need them all at once.
 A `for` loop when you want the side effect rather than the collection.
 
 The delimiters also decide when the work happens.
 Every form but the parenthesized one runs to completion before the next statement,
 so you pay the cost of a comprehension where you wrote it.
 A generator expression defers that cost to whoever consumes it,
-and pays it only for the values they ask for.
+and pays it only for the values the consumer pulls.
 
 ## Exercises
 
@@ -683,3 +685,6 @@ and pays it only for the values they ask for.
 6.  In `unpacking_comprehensions.py`,
     add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,
     paying attention to which value wins for the key `"a"`.
+7.  In `spent_generator.py`, move the `any()` line above the `sum()` line.
+    Predict all three printed values before running it,
+    remembering that `any()` stops when it finds a match.
