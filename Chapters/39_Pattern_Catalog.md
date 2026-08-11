@@ -15,8 +15,9 @@ The body of this book argues that a number of them are unnecessary in Python
 ([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
 
 The tables still follow each source's own grouping,
-including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy)
-questioned there, so each name sits where its source puts it.
+so each name sits where its source puts it,
+including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy):
+that chapter calls *Creational* straightforward and questions the other two.
 Rows are alphabetical within each table,
 which for the classic patterns is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
@@ -31,7 +32,7 @@ This one is for when you know the problem but not the name.
 |-------------------|---------|
 | Creating objects without naming their classes | Abstract Factory, Builder, Factory Method, Prototype, Registry, Plugin |
 | Making one object stand in for another | Proxy, Decorator, Adapter, Façade, Ambassador, Sidecar |
-| Choosing behavior at runtime | Strategy, Command, Chain of Responsibility, State, Visitor, Double Dispatch |
+| Choosing behavior at runtime | Strategy, Command, Chain of Responsibility, State, State Machine, Visitor, Double Dispatch |
 | Structuring recursive or tree-shaped data | Composite, Interpreter, Visitor, Blackboard |
 | Keeping the number of objects down | Flyweight, Multiton, Object Pool, Singleton |
 | Saving and restoring state | Memento, Event Sourcing, Unit of Work, Identity Map |
@@ -75,7 +76,6 @@ This one is for when you know the problem but not the name.
 | [Memento](36_Memento.md) | Capture and restore an object's state without breaking encapsulation. |
 | [Observer](30_Observer.md) | Notify dependents automatically when an object changes state. |
 | [State](26_Surrogate.md#state) | Change an object's behavior when its internal state changes. |
-| [State Machine](31_State_Machines.md) | Drive an object through a fixed set of states from a transition table. |
 | [Strategy](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | Make a family of algorithms interchangeable at runtime. |
 | [Template Method](25_Template_Method.md) | Define an algorithm's skeleton, letting subclasses fill in steps. |
 | [Visitor](33_Visitor.md) | Add operations to an object structure without changing its classes. |
@@ -107,7 +107,7 @@ This one is for when you know the problem but not the name.
 | Broker | Coordinate requests and replies between distributed components. |
 | Layers | Stack responsibilities so each layer uses only the one beneath it. |
 | Microkernel | Keep a minimal core and add capability through plug-ins. |
-| [Model-View-Controller (MVC)](30_Observer.md#a-visual-example-of-observers) | Separate data, presentation, and input handling. |
+| [Model-View-Controller (MVC)](30_Observer.md) | Separate data, presentation, and input handling. |
 | [Pipes and Filters](23_Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | Presentation-Abstraction-Control (PAC) | Build interactive systems from cooperating agents, each split three ways. |
 | [Reflection](17_Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |
@@ -185,33 +185,34 @@ This one is for when you know the problem but not the name.
 | [Memoization](41_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](42_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
-| [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a fixed set of named singletons. |
+| [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [Null Object](20_Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | [Partial Application](40_Functional_Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
 | Pointer to Implementation (Pimpl) | Hide a class's implementation behind an indirection to cut compile coupling. |
-| [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Tie a resource's lifetime to an object's scope. |
+| [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
 | [Service Locator](46_Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
+| [State Machine](31_State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |
 
 ## Patterns Python Absorbed
 
 Several entries above are in the catalog because the literature documents them,
 not because you need to write them.
-Python already supplies the piece their inventors set out to supply.
+Python includes the piece their inventors set out to supply.
 
 | Pattern | What Python gives you instead |
 |---------|------------------------------|
 | [Iterator](23_Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |
 | [Singleton](24_Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |
 | [Factory Method](27_Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |
+| [Prototype](27_Factory.md#prototype) | `copy.deepcopy()` and `dataclasses.replace()` |
 | [Strategy](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |
 | [Command](28_Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |
 | [Chain of Responsibility](28_Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |
 | [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch` |
 | [Flyweight](35_Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
-| [Prototype](27_Factory.md#prototype) | `copy.deepcopy()` and `dataclasses.replace()` |
 
 What survives the subtraction is the intent, not the structure.
 [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
