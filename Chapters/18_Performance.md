@@ -33,19 +33,20 @@ starting with the simplest techniques and growing successively more complex.
 
 The cheapest platform change is a newer CPython.
 The interpreter has grown substantially faster since 3.10,
-and moving a project forward two or three point releases costs a test run rather than a rewrite.
-It is the only entry on this whole ladder that requires no code change at all.
+and moving a project forward two or three releases costs a test run rather than a rewrite.
+It is the rare speedup that needs neither new code nor new hardware.
 
-CPython itself has an experimental just-in-time compiler.
-Builds that include it, as the official 3.13 and later binaries do,
+CPython has an experimental just-in-time compiler.
+Builds that include it,
+as the official 3.14 and later Windows and macOS binaries do,
 keep it switched off unless you set `PYTHON_JIT=1`,
-and the gain is currently a single-digit percentage,
+and the gain is currently modest, roughly 4 to 12 percent depending on platform,
 so measure it before planning around it.
-Whether it stays is still an open question
-([PEP 836](https://peps.python.org/pep-0836/)).
+Whether it becomes a supported feature is an open question;
+[PEP 836](https://peps.python.org/pep-0836/) lays out the path.
 
-Alternative interpreters for Python exist,
-notably PyPy which claims about a 3x speedup on average.
+Alternative interpreters for Python exist, notably PyPy,
+which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you rely on.
 
@@ -70,7 +71,8 @@ Here's how you run `cProfile` on `my_program.py`:
 
     python -m cProfile -s cumulative my_program.py
 
-The report is a table, one row per function:
+The report is a table, one row per function; this one profiles a small script,
+`prof_demo.py`:
 
        ncalls  tottime  percall  cumtime  percall filename:lineno(function)
             1    0.000    0.000    0.007    0.007 {built-in method builtins.exec}
@@ -113,9 +115,6 @@ Either form ends with a table of hot functions ranked by sample count.
 
 Beyond the standard library, [Scalene](https://github.com/plasma-umass/scalene)
 separates Python time from native time and profiles memory line by line.
-
-If you can narrow the problem down to a particular function,
-there may be techniques that speed up the algorithm used in that function.
 
 ## Measuring One Function with `sys.monitoring` {#measuring-one-function-with-sys-monitoring}
 
@@ -226,8 +225,7 @@ print(calls["used"], calls["unused"])
 #: 1 0
 ```
 
-Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location,
-permanently, until someone calls `restart_events()`.
+Returning `monitoring.DISABLE` tells the interpreter to stop reporting this event at this location until someone calls `restart_events()`.
 `used()` ran a thousand times and the callback ran once.
 That makes coverage measurement affordable: the question is "was this reached,"
 so the second answer is worthless,
@@ -236,7 +234,7 @@ and after the first hit the monitored code returns to full speed.
 The trade against a profiler is the usual one.
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function,
-which is the better tool when you already know which function you care about and the profiler's overhead would change the answer.
+which is the better tool when you know which function you care about and the profiler's overhead would change the answer.
 
 ## Benchmark Alternatives with `timeit`
 
@@ -284,7 +282,7 @@ with no separate `setup` argument needed to build them.
 Leaving `number` out defaults to a million calls,
 which suits a microsecond snippet and is a long wait for anything slower,
 so always set it for a function you have not timed before.
-One machine measured the `set` at about 22,000 times faster than the list scan.
+One machine measured the `set` at about 14,000 times faster than the list scan.
 
 A single measurement includes whatever else the machine was doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
@@ -734,9 +732,9 @@ print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 ```
 
 Both versions produce the same five numbers,
-but the eager one built two million-element lists to get them,
+but the eager one built a million-element list and a half-million-element list to get them,
 while the lazy one computed only the handful of values that `islice()` extracted.
-`islice()` is what replaces the eager version's `evens[:5]`:
+`islice()` replaces the eager version's `evens[:5]`:
 a generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 When the consumer needs every element anyway and the data fits in memory,
@@ -748,8 +746,8 @@ Random access, sorting,
 and the `bisect` searches from earlier in this chapter all need an indexable structure,
 not a stream of values that arrive once and disappear.
 NumPy's vectorized arithmetic, covered later in this chapter,
-needs the same thing.
-It requires a whole array in memory, not values arriving one at a time.
+needs the same thing: a whole array in memory,
+not values arriving one at a time.
 
 The risk is the cliff at the edge of that memory.
 Performance does not degrade in proportion to how close the data gets to available RAM.
@@ -762,9 +760,8 @@ with `MemoryError` or an OS kill.
 Nothing warns you as the data approaches the limit,
 and everything changes the moment it crosses.
 
-That cliff is why it's worth building a lazy pipeline to handle a data set that could grow.
-If a data set can ever outgrow memory, stream it from the start,
-like `lazy_first_evens()`.
+The cliff is the argument for laziness: if a data set can outgrow memory,
+stream it from the start, like `lazy_first_evens()`.
 
 ## Caching
 
@@ -810,9 +807,6 @@ The counts, not a stopwatch, are what this listing measures.
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
 The arguments must be hashable,
 which is another reason to prefer immutable containers.
-For an expensive attribute computed once per object,
-`functools.cached_property` does the same job on instances
-(see [Classes](07_Classes.md#properties)).
 
 Caching is only correct when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
@@ -822,7 +816,8 @@ A method is the usual trap.
 `@cache` keys on every argument including `self`,
 so the cache holds a reference to each instance it has seen,
 and the collector can reclaim none of them.
-For a value computed once per object, use `functools.cached_property`,
+For a value computed once per object, use `functools.cached_property`
+(see [Classes](07_Classes.md#properties)),
 which stores the result on the instance and dies with it.
 
 ## Reduce Memory Overhead
@@ -996,7 +991,7 @@ print(view.nbytes)
 
 The view shares storage with `data`,
 so writing through it changes the original and copies no bytes.
-`bytes(chunk)` does copy, but only to print the slice; the view never did.
+`bytes(chunk)` does copy, but only to print the slice; the view copies nothing.
 
 The saving shows up at a size worth measuring:
 
@@ -1065,12 +1060,16 @@ or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade from [Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
-(NumPy is a third-party dependency, and the book's Python 3.15 target has no NumPy release yet, so unlike the rest of the book's listings, the build does not run this snippet.
+(NumPy is a third-party dependency the book's build does not yet include, so unlike the rest of the book's listings, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
-<!-- TODO(py315-deps): NumPy has no Python 3.15 wheel yet. Once it
-does, convert this indented block to a real, fenced, tested example. -->
+<!-- TODO(py315-deps): NumPy 2.5.2 publishes cp315 wheels for every
+platform and installs on the pinned 3.15 beta
+(verified 2026-08-11; the snippet ran at 10.7x in a scratch venv).
+Converting this indented block to a real, fenced,
+tested example now needs only the pyproject dependency decision;
+see deep_review/18_Performance.md. -->
 
 ## JIT Compilation with Numba
 
@@ -1104,8 +1103,8 @@ compiles such a function to machine code on its first call:
 
 `njit(count_primes)` wraps the same function `@njit` would decorate,
 and returns something that compiles itself at the first call.
-Calling it once first pays the compilation and warm-up cost outside the timed region.
-Thus the comparison measures steady-state speed.
+Calling it once first pays the compilation and warm-up cost outside the timed region,
+so the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
 often running nearly as fast as C.
 The first call pays a compilation delay,
@@ -1312,14 +1311,13 @@ at the cost of a second language and a build step.
 Keep the interface coarse.
 A single call that does significant work wins.
 A million calls that each do a little spend the gain on boundary-crossing overhead.
-Shipping millions of small Python objects across the boundary loses it too.
+Passing millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
-The list of integers `collatz_lengths()` takes and returns crosses 50,000 times,
+The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
 which sounds like the thing to avoid,
-but a hundred-odd loop iterations of real work follow each crossing,
+but a hundred-odd loop iterations of real work follow each integer,
 so the conversion cost disappears.
-The question is never the object count on its own,
-it is the work done per object crossed.
+The question is not the object count on its own but the work done per object crossed.
 
 <!-- TODO(py315-deps): once NumPy and Numba are available, extend
 rust/fastcount/demo.py (and this listing)
