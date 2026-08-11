@@ -35,7 +35,7 @@ class Flower:
     def eat(self, eater: Visitor) -> None:
         print(self, "eaten by", eater)
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Gladiolus(Flower):
     pass
@@ -50,7 +50,7 @@ class Chrysanthemum(Flower):
 # The secondary hierarchy accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Bug(Visitor):
     pass
@@ -143,9 +143,8 @@ the flower-side dispatch has nothing to say, and the output now shows it.
 ## The Price of the Empty Base
 
 One annotation in `flower_visitors.py` looks like a shortcut and is not.
-`accept()` types its visitor as `Any`,
-because the `Visitor` base class declares no `visit()` method,
-so declaring that parameter as `Visitor` instead of `Any` fails the type checker.
+`accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method:
+declaring that parameter as `Visitor` instead fails the type checker.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base.
 A `Protocol` removes the `Any` for two new lines and an import:
 
@@ -181,8 +180,8 @@ Python can add a method to a fixed hierarchy from outside,
 using `functools.singledispatch`.
 It turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations registered from anywhere.
-That's how *Visitor* works,
-but without the `accept()` method or the `Visitor` class hierarchy.
+That is what *Visitor* does,
+without the `accept()` method or the `Visitor` class hierarchy.
 The flowers below are the same three.
 The operations are new, and there are two of them,
 added independently of each other:
@@ -238,15 +237,17 @@ if __name__ == "__main__":
 #: True
 ```
 
-Each registered implementation above takes the name `_`.
-`nectar()` calls it through the dispatcher, never by its own name,
+`@nectar.register` reads the annotation on the implementation's first parameter:
+`flower: Gladiolus` files that implementation under `Gladiolus`.
+A union annotation, `flower: Gladiolus | Ranunculus`,
+registers one implementation for several types at once.
+Each registered implementation takes the name `_`.
+`nectar()` calls it through the dispatcher, not by its own name,
 so the name carries no meaning.
 `_` is the conventional placeholder for a name nobody will use.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
 so nothing goes missing.
-A union annotation, `flower: Gladiolus | Ranunculus`,
-registers one implementation for several types at once.
 
 Nothing touches `Flower`.
 Each operation is a separate function,
@@ -259,7 +260,7 @@ falling back to the base implementation only when no registered ancestor exists
 The listing's last two output lines print the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
 and `nectar.dispatch(cls)` reports which implementation `cls` resolves to.
-`Ranunculus` was never registered,
+`Ranunculus` was not registered,
 so it resolves to the same implementation `Flower` does,
 the one filed under `object`.
 
@@ -273,8 +274,8 @@ so `nectar(42)` returns `42: no nectar`.
 The checker does not object either,
 because the dispatcher it builds declares its parameters as `Any`.
 When there is no sensible answer for an unregistered type,
-give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string,
-and the omission fails at the first call.
+give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
+The omission then fails at the first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
 goes further and catches it before the program runs
 ([Composite and Interpreter](34_Composite_and_Interpreter.md#a-composite-of-data-classes)),
@@ -361,11 +362,11 @@ calling `nectar()` instead of `fragrance()` selects the operation before anythin
 and only the flower's type is still unknown.
 One dispatch covers it.
 
-That is the intent difference the chapter opened with.
+That is the intent difference from the chapter's opening.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself:
-two objects whose types are both unknown until runtime have to interact,
+two objects whose types are both unknown until runtime must interact,
 as in `paper_scissors_rock.py`.
 `singledispatch` dispatches on the first argument only,
 so it does nothing for that second problem.

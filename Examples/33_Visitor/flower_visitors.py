@@ -12,7 +12,7 @@ class Flower:
     def eat(self, eater: Visitor) -> None:
         print(self, "eaten by", eater)
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Gladiolus(Flower):
     pass
@@ -27,7 +27,7 @@ class Chrysanthemum(Flower):
 # The secondary hierarchy accepted by Flower:
 class Visitor:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Bug(Visitor):
     pass

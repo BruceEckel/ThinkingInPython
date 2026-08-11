@@ -10,14 +10,14 @@ class Flower:
     def pollinate(self, pollinator: Visitor) -> None:
         print(self, "pollinated by", pollinator)
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Gladiolus(Flower):
     pass
 
 class Visitor:
     def __str__(self) -> str:
-        return self.__class__.__name__
+        return type(self).__name__
 
 class Bug(Visitor):
     pass
