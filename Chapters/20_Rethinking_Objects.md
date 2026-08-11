@@ -69,10 +69,10 @@ code written against the base class works unchanged on any of them.
 This makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
-It cannot check whether the override actually behaves the way the base class declares.
+It cannot check whether the override behaves the way the base class declares.
 The base class calls a method and trusts every subclass to stand in for it.
 
-Python has no compiler,
+Python has no such compiler,
 but the line between what a tool checks and what it cannot falls in the same place.
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Classes.md#marking-overrides-with-override)
@@ -129,7 +129,7 @@ OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
 The next sections take them one at a time,
-and ask in each case what Python actually delivers and what it costs.
+and ask in each case what Python delivers and what it costs.
 
 ## Encapsulation Leaks
 
@@ -292,7 +292,7 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"` before the program ever runs.
+The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"` before the program runs.
 `frozen=True` is the defense that holds at runtime,
 against code the checker never saw.
 
@@ -443,8 +443,9 @@ They both have `x` and `y`, which is all `distance()` requires.
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
-`PairCoord` computes `x` from its `Pair` and rejects assignment,
-so it satisfies the property form and fails the annotation form.
+Neither class here allows it: `PairCoord` computes `x` from its `Pair`,
+and the frozen `Point` rejects assignment to every field,
+so both satisfy the property form and both fail the annotation form.
 Declare a protocol member read-only unless callers really do write to it.
 
 ## Prefer Composition to Inheritance
@@ -513,6 +514,11 @@ the only way into `items` is a method this class wrote.
 The cost is visible and finite.
 You forward every operation callers need by hand,
 where the subclass got hundreds for free and got one of them wrong.
+Composition does not make the counting bug impossible.
+If `extend()` called `self.items.extend(more)` instead of going through `append()`,
+the count would be wrong again.
+The difference is where the bug lives: in the class you are reading,
+rather than in `list` internals that no reading of `CountingList` reveals.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
@@ -559,9 +565,9 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 `Contact` inherits nothing, and gains no methods it did not ask for.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
 The arrangement has a cost:
-changing one city means rebuilding the `Address` and then the `Contact`,
-which is what [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
-is for.
+changing one city means rebuilding the `Address` and then the `Contact`.
+[The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
+makes that rebuild routine.
 The last two lines are the payoff.
 Two contacts built from equal parts are equal, and the whole structure hashes,
 because value equality and hashing follow from the fields rather than from a base class.
@@ -679,9 +685,9 @@ and `@abstractmethod` forces every subclass to define `area()`.
 
 ### Dynamic Typing
 
-With dynamic typing, any type works as long as it has the necessary method(s).
+With dynamic typing, any type works as long as it has the necessary methods.
 There's no shared base class or declared set of types,
-and the only validity check happens at runtime, when the call runs:
+and the only validity check comes at runtime, when the call runs:
 
 ```python
 # dynamic_typing.py
@@ -760,7 +766,7 @@ They connect pieces without requiring any piece to change.
 Because membership is structural,
 one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
-Each protocol only names the shape it needs.
+Each protocol names only the shape it needs.
 Nothing forces `Invoice` below to acknowledge `Priced`, `Serializable`,
 or `Describable`.
 
@@ -900,7 +906,8 @@ Nothing in that test can fail.
 The `NewType` protection lives in the checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 Only the checker sees it, and only at edit time.
-Here, the same `# type: ignore` that passes the book build silences that diagnostic.
+In `newtype_boundary.py`,
+the `# type: ignore` silences that diagnostic so the rejected call can run anyway.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)
 takes the other route.
 A frozen dataclass with a validating `__post_init__` enforces the distinction at runtime too,
@@ -971,9 +978,10 @@ and `assert_never()` turns each one into a checker error naming the shape you mi
 
 The OOP approach assumes you add types more often than operations,
 which is often not true.
+This trade-off is the expression problem from [Pattern Matching](13_Pattern_Matching.md#dynamic-binding-vs.-pattern-matching);
 [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
 and [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
-explore this trade-off.
+explore it further.
 
 ## Null Object
 
@@ -1051,7 +1059,7 @@ if __name__ == "__main__":
 `total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
 The parameter's type also improved.
-`Logs` is a protocol, so any logger fits, and no caller ever sees a `| None`.
+`Logs` is a protocol, so any logger fits, and no caller sees a `| None`.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,
 and it is safe as a default argument value.
