@@ -7,7 +7,6 @@ so it is defined once, here, as its own file that the others import:
 # table_machine.py
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
 
 type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
@@ -15,14 +14,14 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "The table has no row for this state and event."
+    "No table row matched this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 
-    def handle(self, event: Any) -> None:
+    def handle(self, event: object) -> None:
         for condition, action, next_state in self.table.get(
                 (self.state, type(event)), []):
             if condition is None or condition(event):
@@ -87,6 +86,7 @@ surrogate itself, only which `Mood` object gets swapped in through
 
 ```python
 # exercise_2.py
+from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
 
@@ -98,8 +98,10 @@ class WashState(Enum):
     SPINNING = auto()
     DONE = auto()
 
+@dataclass
 class Start:
-    pass
+    load_kg: float
+
 class Full:
     pass
 class WashDone:
@@ -108,47 +110,62 @@ class RinseDone:
     pass
 class SpinDone:
     pass
-class Reset:
-    pass
 
 class WashingMachine(StateMachine):
     def __init__(self) -> None:
+        self.load_kg = 0.0
         self.log: list[str] = []
         table: Table = {
             (WashState.IDLE, Start):
-                [(None, self.log_msg("filling"), WashState.FILLING)],
+                [(None, self.begin, WashState.FILLING)],
             (WashState.FILLING, Full):
                 [(None, self.log_msg("washing"), WashState.WASHING)],
             (WashState.WASHING, WashDone):
                 [(None, self.log_msg("rinsing"), WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [(
-                None, self.log_msg("spinning"), WashState.SPINNING)],
+            (WashState.RINSING, RinseDone): [
+                (self.too_heavy, self.log_msg("slow spin"),
+                 WashState.SPINNING),
+                (None, self.log_msg("fast spin"),
+                 WashState.SPINNING),
+            ],
             (WashState.SPINNING, SpinDone):
                 [(None, self.log_msg("done"), WashState.DONE)],
-            (WashState.DONE, Reset):
-                [(None, self.log_msg("idle"), WashState.IDLE)],
         }
         super().__init__(WashState.IDLE, table)
+
+    def begin(self, start: Start) -> None:
+        self.load_kg = start.load_kg
+        self.log.append("filling")
+
+    def too_heavy(self, event: RinseDone) -> bool:
+        return self.load_kg > 6
 
     def log_msg(self, msg: str):
         def action(event: object) -> None:
             self.log.append(msg)
         return action
 
-wm = WashingMachine()
-events = [
-    Start(), Full(), WashDone(), RinseDone(), SpinDone(), Reset()]
-for event in events:
-    wm.handle(event)
-print(wm.log)
-#: ['filling', 'washing', 'rinsing', 'spinning', 'done', 'idle']
+cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
+heavy = WashingMachine()
+for event in [Start(8), *cycle]:
+    heavy.handle(event)
+print(heavy.log)
+#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
+light = WashingMachine()
+for event in [Start(3), *cycle]:
+    light.handle(event)
+print(light.log)
+#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
 ```
 
-Each wash cycle stage is a straight line, one event type per state
-with no branching, unlike the vending machine's conditional
-transitions. The washing machine still uses the exact same
-`table_machine.py` engine; only the table and the small marker event
-classes are specific to washing laundry.
+The `(RINSING, RinseDone)` key holds the two rows the exercise asks
+for, told apart by `too_heavy()`: a load over six kilograms takes the
+slow spin, and anything lighter falls through to the unconditional
+fast-spin row below it. The condition reads `load_kg` off the machine,
+where `begin()` recorded it when the cycle started, since a `RinseDone`
+event carries no data of its own. The rest of the cycle is a straight
+line, one event type per state, and the machine is still the chapter's
+`table_machine.py` engine unchanged.
 
 ## 3. A word-driven state machine with per-state transition tables
 
@@ -197,8 +214,8 @@ This is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
 again. Each state subclass carries its own transition table as a class
 attribute and looks itself up with `.get(word, ...["*"])`, so
-`Controller` itself never branches on which state or word it is
-processing; it only asks the current state object what comes next,
+`Controller` does not branch on which state or word it is
+processing; it asks the current state object what comes next,
 the same delegation `state.py`'s `next()` method uses. Reading a
 sequence of words from a file one per line is a one-line change:
 `words = Path("moves.txt").read_text().split()`.
@@ -239,7 +256,7 @@ print(" ".join(history))
 ```
 
 Both versions produce the same history. The per-state design (exercise
-4) puts each state's rules with that state, which reads well when a
+3) puts each state's rules with that state, which reads well when a
 state's behavior involves more than a lookup. The single-table design
 puts every rule for the whole machine in one dictionary, which is
 easier to audit and edit as a unit, the same trade-off the chapter's
@@ -309,6 +326,7 @@ worth making explicit and easy to audit.
 
 ```python
 # exercise_6.py
+from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
 
@@ -317,15 +335,20 @@ class ElevatorState(Enum):
     MOVING_UP = auto()
     MOVING_DOWN = auto()
     DOORS_OPEN = auto()
+    DOORS_CLOSING = auto()
 
+@dataclass
 class CallButton:
-    def __init__(self, floor: int) -> None:
-        self.floor = floor
+    floor: int
 
 class ArrivedAtFloor:
     pass
-class DoorsClosed:
+class CloseDoors:
     pass
+
+@dataclass
+class DoorSensor:
+    blocked: bool
 
 class Elevator(StateMachine):
     def __init__(self, floor: int = 0) -> None:
@@ -337,14 +360,18 @@ class Elevator(StateMachine):
                  ElevatorState.MOVING_UP),
                 (self.below, self.set_target,
                  ElevatorState.MOVING_DOWN),
-                (None, self.open_doors, ElevatorState.DOORS_OPEN),
+                (None, None, ElevatorState.DOORS_OPEN),
             ],
             (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.open_doors, ElevatorState.DOORS_OPEN)],
+                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
             (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.open_doors, ElevatorState.DOORS_OPEN)],
-            (ElevatorState.DOORS_OPEN, DoorsClosed):
-                [(None, None, ElevatorState.IDLE)],
+                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
+            (ElevatorState.DOORS_OPEN, CloseDoors):
+                [(None, None, ElevatorState.DOORS_CLOSING)],
+            (ElevatorState.DOORS_CLOSING, DoorSensor): [
+                (self.obstructed, None, ElevatorState.DOORS_OPEN),
+                (None, None, ElevatorState.IDLE),
+            ],
         }
         super().__init__(ElevatorState.IDLE, table)
 
@@ -357,8 +384,11 @@ class Elevator(StateMachine):
     def set_target(self, call: CallButton) -> None:
         self.target = call.floor
 
-    def open_doors(self, event: object) -> None:
+    def arrive(self, event: object) -> None:
         self.floor = self.target
+
+    def obstructed(self, sensor: DoorSensor) -> bool:
+        return sensor.blocked
 
 elevator = Elevator(floor=0)
 elevator.handle(CallButton(3))
@@ -367,70 +397,90 @@ print(elevator.state, elevator.floor)
 elevator.handle(ArrivedAtFloor())
 print(elevator.state, elevator.floor)
 #: ElevatorState.DOORS_OPEN 3
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=True))
+print(elevator.state)
+#: ElevatorState.DOORS_OPEN
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=False))
+print(elevator.state)
+#: ElevatorState.IDLE
 ```
 
-This reuses the vending machine's exact three-way conditional-list
-idiom from `(State.SELECTING, SecondDigit)`: several candidate
-transitions sharing one `(state, event type)` key, tried in order,
-the first whose condition passes wins. `above()`/`below()` pick
-`MOVING_UP` or `MOVING_DOWN`; a call for the current floor falls
-through both conditions to the unconditional last entry, opening the
-doors immediately with no travel at all.
+The "doors closing" state carries the two rows the exercise asks for:
+`(DOORS_CLOSING, DoorSensor)` reopens the doors when `obstructed()`
+passes, and the unconditional row below it lets an unobstructed close
+finish in `IDLE`. The `(IDLE, CallButton)` key shows the same idiom
+three wide, the vending machine's `(State.SELECTING, SecondDigit)`
+shape: candidate transitions sharing one key, tried in order, the
+first whose condition passes wins. `above()`/`below()` pick
+`MOVING_UP` or `MOVING_DOWN`, and a call for the current floor falls
+through both conditions to open the doors with no travel.
 
 ## 7. A heating/air-conditioning system, table-driven
 
 ```python
 # exercise_7.py
+from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
 
 class HVACState(Enum):
-    OFF = auto()
+    IDLE = auto()
     HEATING = auto()
     COOLING = auto()
 
-class TooCold:
-    pass
-class TooHot:
-    pass
-class AtTarget:
-    pass
-class TurnOff:
-    pass
+@dataclass
+class TemperatureReading:
+    degrees: float
 
 class HVAC(StateMachine):
-    def __init__(self) -> None:
+    def __init__(self, target: float = 20, band: float = 2) -> None:
+        self.target = target
+        self.band = band
         table: Table = {
-            (HVACState.OFF, TooCold):
-                [(None, None, HVACState.HEATING)],
-            (HVACState.OFF, TooHot):
-                [(None, None, HVACState.COOLING)],
-            (HVACState.HEATING, AtTarget):
-                [(None, None, HVACState.OFF)],
-            (HVACState.COOLING, AtTarget):
-                [(None, None, HVACState.OFF)],
-            (HVACState.HEATING, TurnOff):
-                [(None, None, HVACState.OFF)],
-            (HVACState.COOLING, TurnOff):
-                [(None, None, HVACState.OFF)],
+            (HVACState.IDLE, TemperatureReading): [
+                (self.too_cold, None, HVACState.HEATING),
+                (self.too_hot, None, HVACState.COOLING),
+                (None, None, HVACState.IDLE),
+            ],
+            (HVACState.HEATING, TemperatureReading): [
+                (self.too_cold, None, HVACState.HEATING),
+                (None, None, HVACState.IDLE),
+            ],
+            (HVACState.COOLING, TemperatureReading): [
+                (self.too_hot, None, HVACState.COOLING),
+                (None, None, HVACState.IDLE),
+            ],
         }
-        super().__init__(HVACState.OFF, table)
+        super().__init__(HVACState.IDLE, table)
+
+    def too_cold(self, r: TemperatureReading) -> bool:
+        return r.degrees < self.target - self.band
+
+    def too_hot(self, r: TemperatureReading) -> bool:
+        return r.degrees > self.target + self.band
 
 hvac = HVAC()
-hvac.handle(TooCold())
-print(hvac.state)
-#: HVACState.HEATING
-hvac.handle(AtTarget())
-print(hvac.state)
-#: HVACState.OFF
+for degrees in [15, 17, 21, 30, 20]:
+    hvac.handle(TemperatureReading(degrees))
+    print(degrees, hvac.state.name)
+#: 15 HEATING
+#: 17 HEATING
+#: 21 IDLE
+#: 30 COOLING
+#: 20 IDLE
 ```
 
-Every transition here has `None` for both condition and action,
-since the system's whole behavior is which state it is in; nothing
-extra needs computing or checking on the way. This is the simplest
-possible table-driven machine and confirms that `condition` and
-`action` are genuinely optional per transition, not required
-boilerplate.
+The machine has one input type, and the `(IDLE, TemperatureReading)`
+key holds three rows, so a single reading leads to heating, cooling,
+or staying idle, decided entirely by the two conditions, as the
+exercise requires. The running states carry their own two-row groups:
+a reading still outside the band keeps the system running, and one
+inside the band falls through to the unconditional row back to
+`IDLE`. Every decision in the machine is a condition on the one event
+type; no transition needs an action, which confirms that both slots
+are genuinely optional per row.
 
 ## 8. `mouse_move_generator()`
 
@@ -472,10 +522,10 @@ print(" ".join(m.name for m in moves))
 #: APPEARS RUNS_AWAY APPEARS RUNS_AWAY APPEARS ENTERS TRAPPED REMOVED
 ```
 
-`NEXT_ACTIONS` is itself a small state machine: a dictionary from "the
-action just produced" to "the legal actions that can follow it,"
+`NEXT_ACTIONS` is a small state machine of its own: a dictionary from
+"the action just produced" to "the legal actions that can follow it,"
 including the special `None` key for "nothing has happened yet," which
-only ever leads to `APPEARS`. The generator's own state is just
+leads only to `APPEARS`. The generator's own state is just
 `previous`, the last action it yielded; each call to `next()` (each
 iteration of the `for` loop that consumes it) picks a legal successor
 and remembers it for the following call. Because every choice is
@@ -559,14 +609,14 @@ money, so a machine with five states and six coins carries thirty
 rows that all do the same thing. It is the right fix when the new
 subclass really does behave differently, which is what `FirstDigit`
 and `SecondDigit` do in `vending_machine.py`. There the subclassing
-exists precisely so the two arrive under different keys.
+exists so the two arrive under different keys.
 
 **Fix 2** stops making a class for something that is a value. A
 nickel is not a new kind of money; it is a `Money` whose `value` is 5.
 `Money("nickel", 5)` needs no table change, no new row, and no new
 class, because it arrives under the key the table already has.
 
-Ship fix 2. A subclass is worth creating when the machine must treat
+Keep fix 2. A subclass is worth creating when the machine must treat
 the input differently, and a nickel differs from a quarter only in a
 number the existing action already reads. The general rule the two
 fixes illustrate: under exact-type dispatch, a class is a dispatch

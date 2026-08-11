@@ -1,7 +1,6 @@
 # table_machine.py
 from collections.abc import Callable
 from enum import Enum
-from typing import Any
 
 type Transition = tuple[
     Callable[..., bool] | None, Callable[..., None] | None, Enum
@@ -9,14 +8,14 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "The table has no row for this state and event."
+    "No table row matched this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
         self.state = initial
         self.table = table
 
-    def handle(self, event: Any) -> None:
+    def handle(self, event: object) -> None:
         for condition, action, next_state in self.table.get(
                 (self.state, type(event)), []):
             if condition is None or condition(event):

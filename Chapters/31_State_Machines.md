@@ -31,7 +31,7 @@ class State:
 ```
 
 Python does not require this class.
-It is worth its two lines because it names `State` as a type in annotations,
+It is worth its few lines because it names `State` as a type in annotations,
 and because it produces a better error message when a derived class leaves a method out.
 You could get nearly the same effect by saying:
 
@@ -81,8 +81,7 @@ the construction-starts-the-engine choice that [drew a warning in that chapter](
 It is safe here for two reasons that are easy to lose:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
-A `State` whose `run()` reads attributes off the machine revives the trap,
-as exercise 3 will show.
+A `State` whose `run()` reads attributes off the machine revives the trap.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
@@ -265,7 +264,7 @@ The `TableState` class is an implementation of `State` that adds a `transitions`
 (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
 `TableState.__init__()` exists to give every state that empty dict:
-a state whose table you forgot to fill then reports `TableState has no transition for ...` rather than an `AttributeError`.
+a state whose table you forgot to fill then reports `Waiting has no transition for ...` rather than an `AttributeError`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
 
@@ -369,9 +368,9 @@ so the output continues as in the first version.
 
 If you must create and maintain many `State` classes,
 this approach is an improvement,
-since it's easier to quickly read and understand the state transitions from looking at the table.
+since it's easier to read the state transitions from a table.
 `next()` raises its `RuntimeError` `from None` rather than chaining,
-which drops a `KeyError` that would only repeat the event the message already names.
+which drops a `KeyError` that would repeat the event the message already names.
 
 ### An Unexpected Input
 
@@ -426,8 +425,8 @@ The names restart here.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
 and `State` is now an `Enum` of names rather than a base class with behavior.
 The file has a different name from the first engine's `state_machine.py` on purpose.
-Python caches a module in `sys.modules` under its basename,
-and never looks it up again once it is there.
+Python caches a module in `sys.modules` under its import name,
+and a later `import` takes the cached module without looking at any file.
 Two files named `state_machine.py` in one program therefore collapse into one:
 whichever imported first wins,
 and the second import silently gets the wrong module.
@@ -455,7 +454,7 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "The table has no row for this state and event."
+    "No table row matched this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
@@ -475,8 +474,10 @@ class StateMachine:
             f"on {type(event).__name__}")
 ```
 
-The listing writes `StateMachine` out by hand rather than as a `@dataclass` because a reader should subclass it,
-and the manual form puts the two attributes it owns in view.
+The listing writes `StateMachine` out by hand rather than as a `@dataclass` because its constructor renames what it stores:
+the caller passes `initial`, but the attribute is `state`,
+the position `handle()` updates.
+A generated `__init__()` cannot make that rename.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
@@ -486,6 +487,9 @@ The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` the earlier rows fall through to.
+A group with no such catch-all row can still match nothing:
+if every condition returns `False`,
+`handle()` falls through to the same `NoTransition` a missing key raises.
 The lookup keys on `type(event)` exactly: a dictionary probe,
 not an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`,
@@ -509,12 +513,15 @@ The machine is now completely defined by a table.
 It collects money, takes a two-digit selection, then either dispenses the item,
 reports it sold out,
 or clears a selection that costs more than the money inserted.
-The conditions and actions are plain methods, stored directly in the table.
+The conditions and actions are ordinary methods, stored directly in the table.
 
 ![Five states, QUIESCENT, COLLECTING, SELECTING, UNAVAILABLE, and WANT_MORE; money loops COLLECTING back on itself, a first digit moves to SELECTING, and a second digit branches three ways on price and stock, while Quit refunds from any of the other states back to QUIESCENT](_images/stateMachine)
 
 The states are an `Enum`,
-so the type checker catches a misspelled state name instead of letting it fail silently at runtime:
+so the type checker catches a misspelled state name instead of letting it fail silently at runtime.
+`MouseAction`'s values match lines of the input file;
+nothing parses these states from text,
+so `Enum` with `auto()` serves in place of `StrEnum`:
 
 ```python
 # tabledriven/vending_machine.py
@@ -856,11 +863,11 @@ and a machine that arrived as a diagram belongs in the table.
     Give one `(state, input)` pair two rows told apart by a condition,
     such as a load too heavy for the fast spin.
 3.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
-    Each state stores a reference back to the controller object so that it can request the state change.
     Use a `dict` to map a `str` naming a state to its state object.
-    In each state subclass,
-    override a `next_state()` method that holds its own transition table.
-    The input to `next_state()` is a single word read from a text file containing one word per line.
+    Give each state subclass its own transition table,
+    which its `next_state()` method consults.
+    Feed the machine a sequence of single words,
+    such as a text file with one word per line.
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
 5.  Modify the "mood" exercise (exercise 1)
     so that it becomes a state machine using `state_machine.py`,
@@ -879,4 +886,4 @@ and a machine that arrived as a diagram belongs in the table.
 9.  Add a `Nickel` class deriving from `Money` to `vending_machine.py` and feed one to the machine without touching the table.
     Explain the exception, then make it work two ways: by adding a row,
     and by making `Nickel` an instance of `Money` rather than a subclass.
-    Say which you would ship.
+    Say which you would keep.

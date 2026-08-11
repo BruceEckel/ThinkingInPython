@@ -12,7 +12,7 @@ type Transition = tuple[
 type Table = dict[tuple[Enum, type], list[Transition]]
 
 class NoTransition(RuntimeError):
-    "The table has no row for this state and event."
+    "No table row matched this state and event."
 
 class StateMachine:
     def __init__(self, initial: Enum, table: Table) -> None:
