@@ -21,7 +21,7 @@ but nothing here depends on it.
 
 ## Annotating a Generator
 
-Earlier examples annotate every generator using the short form `Iterator[int]`.
+Earlier examples annotate every generator with the short `Iterator` form.
 That fits a generator that only produces values.
 
 A generator that also receives values needs the full annotation:
@@ -30,11 +30,11 @@ A generator that also receives values needs the full annotation:
 
 This names the three things a generator exchanges with its caller:
 
-- `YieldType` is the value `yield` hands out,
-  thus the value `next(generator)` returns.
+- `YieldType` is the type `yield` hands out,
+  thus the type `next(generator)` returns.
 - `SendType` is the type `send()` accepts,
   thus the type the `yield` expression produces inside the generator.
-- `ReturnType` is the value produced by the `return` statement in the generator,
+- `ReturnType` is the type of the generator's `return` value,
   delivered as `StopIteration.value`.
 
 The default value for the last two type parameters is `None`.
@@ -124,7 +124,8 @@ Getting at the `ReturnType` means catching the exception yourself,
 as this listing does.
 
 The first call on a new generator object cannot carry a value.
-A newly created generator pauses before its first `yield`,
+A newly created generator pauses at the top of the function body,
+before any code runs,
 so there is no suspended `yield` expression to receive a sent value.
 If you call `i.send(Answer("Alice"))` at that point,
 it raises `TypeError: can't send non-None value to a just-started generator`.
@@ -149,9 +150,9 @@ print(f"{next(interview()) = }")
 
 Each `interview()` call creates a new generator,
 so both lines start from the beginning and produce the first question.
-The `# type: ignore` is interesting.
+The `# type: ignore` marks a real mismatch:
 `interview()` declares `Answer` as its `SendType`,
-and `None` is not of type `Answer`.
+and `None` is not an `Answer`.
 The checker rejects the priming `send()` even though the interpreter accepts it.
 The equivalence is a runtime fact the annotation cannot express,
 which is the practical reason a driver primes with `next()`.
@@ -181,7 +182,7 @@ a generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
-Typically, that stepping happens in a driver:
+Typically, a driver function does the stepping:
 
 ```python
 # two_way_generator.py
@@ -222,7 +223,7 @@ The generator arrives by import, unchanged; only the driver is new.
 The first line of output is `interview()`'s product:
 an ordinary `generator` object that still carries the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
-which is what the `# type: ignore` on that line suppresses.
+so the `# type: ignore` on that line suppresses the checker's complaint.
 
 `drive()` touches all three type parameters:
 `next()` produces the first `Question`,
@@ -246,7 +247,7 @@ It states what it needs and waits.
 and it takes the answers as a parameter.
 Swapping the dictionary for a database changes a single argument.
 
-That is EMS in miniature.
+That is an EMS in miniature.
 The generator declares Effects, the driver interprets them.
 
 One generator, one driver.
@@ -394,6 +395,11 @@ The numbers travel down to the `yield` that asked for them.
 `g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
 `both()` contains no code that forwards the value because `yield from` does that forwarding.
 
+`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
+which completes the first `yield from`, which starts the second one.
+A single `send()` therefore ends one inner generator and produces the first prompt of the next.
+The driver sees `StopIteration` only when `both()` runs out of delegations.
+
 Writing the loop by hand is the natural first attempt, and it fails quietly:
 
 ```python
@@ -427,13 +433,8 @@ which throws it away.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
 The checker says nothing, because `manual()` is a valid `Generator[str, int]`:
-the send channel appears in the declaration and simply goes unused.
+the send channel appears in the declaration and goes unused.
 `yield from` is not shorthand for this loop.
-
-`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
-which completes the first `yield from`, which starts the second one.
-A single `send()` therefore ends one inner generator and produces the first prompt of the next.
-The driver sees `StopIteration` only when `both()` runs out of delegations.
 
 ### All Three Channels
 
@@ -573,7 +574,7 @@ as a generator does.
 which supplies the answer once it has one and resumes the coroutine by sending it back.
 `asyncio.run()` is the single interpreter at the edge of the program,
 which is why an `await` in a function makes every caller `async` in turn:
-the requests have to reach the loop.
+the requests must reach the loop.
 
 Once you see a program that way,
 the question stops being what a function does and becomes what it requests.
@@ -588,7 +589,7 @@ That is the question the next chapter puts into the type system.
 2.  `drive()` answers from a `dict`.
     Write a second driver that answers from an `Iterator[Answer]`, in order,
     and run `interview()` under both.
-    Explain what had to change in `interview()`, and why.
+    Explain what, if anything, needed to change in `interview()`, and why.
     Give your driver fewer answers than there are questions and say what it returns.
     `StopIteration` now means two different things in the same loop;
     keep them apart.
@@ -613,7 +614,7 @@ That is the question the next chapter puts into the type system.
     takes two digits, then dispenses or refuses,
     yielding its current state and receiving each event with `send()`,
     so the position in the generator's body carries the state.
-    This generator's `yield` reports where the machine got to rather than requesting something the machine needs,
+    This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,
     the opposite direction from `interview()`.
     Say which of the two versions you would rather extend with a sixth state,
     and why.

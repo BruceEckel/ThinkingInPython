@@ -135,7 +135,7 @@ print(repr(drive_naive(interview(), iter([Answer("Alice")]))))
 
 Nothing in `interview()` changed, and nothing could have. It yields a
 `Question` and receives an `Answer`; where the answer came from is a
-question it never asks. That is the separation the chapter is about:
+question it never asks. That is the separation the chapter teaches:
 the generator describes the conversation, the driver interprets it, and
 swapping one interpreter for another leaves the description untouched.
 
@@ -153,7 +153,7 @@ list would otherwise be caught by the `except StopIteration` meant for
 the conversation. Two different iterators raising one exception type is
 a real hazard when a driver holds both.
 
-The last two lines are what that hazard looks like. Given one answer and
+The last two lines show that hazard. Given one answer and
 three questions, `drive_in_order()` lets the `StopIteration` escape, so
 the caller learns the answer source ran dry. `drive_naive()`, which
 differs only in having `next(answers)` inside the `try`, catches that
@@ -210,8 +210,8 @@ except StopIteration:
 The prediction to write down is that the five sends do not divide
 evenly into three collectors. Each `collect()` consumes two values, so
 six are needed, and the loop supplies five. `gamma` is left suspended
-at its second `yield`, waiting, and the `send(6)` after the loop is
-what completes it.
+at its second `yield`, waiting, and the `send(6)` after the loop
+completes it.
 
 The pairs of lines are the tell. A send that supplies a collector's
 first value produces one line, the same collector's second prompt. A
@@ -240,9 +240,9 @@ def survey() -> Generator[Question, Answer, Result]:
 ```text
 error[invalid-assignment]: Object of type
 `Generator[Question, Answer, Result]` is not assignable to `Result`
- --> yield_from_nested.py:7:23
+ --> yield_from_nested.py:8:23
   |
-7 |     profile: Result = interview()
+8 |     profile: Result = interview()
   |              ------   ^^^^^^^^^^^ Incompatible value of type
   |              |        `Generator[Question, Answer, Result]`
   |              Declared type
@@ -251,7 +251,7 @@ error[invalid-assignment]: Object of type
 The script still runs, and produces:
 
 ```text
-request = 'color', answers[request] = 'blue'
+request = 'color', answer = 'blue'
 ask(question = 'color') -> answer = 'blue'
 <generator object interview at 0x000001C5FB3FDE40>, color blue
 ```
@@ -266,14 +266,14 @@ where an answer belonged.
 The checker told you more. Its message names the two types and points
 at the assignment that mismatches them, which is the defect. The
 runtime output shows a consequence three steps downstream, at the one
-place the object is stringified, and a reader has to work backward from
+place the object is stringified, and a reader must work backward from
 a `<generator object ...>` in a report to the missing `yield from`.
 Worse, the failure is quiet: no exception, an exit code of zero, and
 output that a log scraper would happily accept.
 
 Without the annotation, the checker says nothing. `profile = interview()`
-infers `Generator[Question, Answer, Result]`, which is what the
-expression is, and there is no declared type to contradict. The f-string
+infers `Generator[Question, Answer, Result]`, the expression's own
+type, and there is no declared type to contradict. The f-string
 then accepts any object, since `str.format` calls `repr()` on anything.
 The annotation is doing the whole of the work here, which is the
 argument for annotating a local whose value comes from a call whose
@@ -332,15 +332,16 @@ to the driver, a returned value goes to the delegating generator.
 `send()` is declared as `send(self, value: _SendT_contra) -> _YieldT_co`,
 so its parameter type is whatever the generator's `SendType` is. For
 `interview()` that is `Answer`, and `None` is not an `Answer`, so the
-priming call is a type error:
+priming call is a type error. `send_none_is_next.py` carries a
+`# type: ignore` to suppress it; removing that comment draws:
 
 ```text
 error[invalid-argument-type]: Argument to bound method
 `Generator.send` is incorrect
- --> send_none_is_next.py:3:24
+ --> send_none_is_next.py:4:27
   |
-3 | print(interview().send(None))
-  |                        ^^^^ Expected `Answer`, found `None`
+4 | print(f"{interview().send(None) = }")
+  |                           ^^^^ Expected `Answer`, found `None`
 ```
 
 `next()` takes no such argument. It asks for the generator's next
@@ -431,7 +432,7 @@ COLLECTING, paused after `yield "SELECTING"` means a first digit has
 arrived and a second is expected. `amount`, `row`, and `stock` are
 locals that survive because the frame does. Two lines of the table-driven
 version, the state attribute and the transition lookup, have no
-counterpart here at all.
+counterpart here.
 
 The `yield` runs the opposite direction from `interview()`, and the
 signature does not say so. Both are `Generator[str, X, ...]`, but
