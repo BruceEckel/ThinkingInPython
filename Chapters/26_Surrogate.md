@@ -154,7 +154,7 @@ not that their signatures match.
 The static checker verifies signatures.
 
 Python has a built-in delegation mechanism, `__getattr__()`,
-that makes `Proxy` even simpler to implement:
+that makes `Proxy` simpler to implement:
 
 ```python
 # proxy_2.py
@@ -257,7 +257,7 @@ which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
 `len(p)` reports the miss because nothing supplies a default `__len__()`.
-`print(p)` cannot: `object` already defines `__str__()`,
+`print(p)` cannot: `object` defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
 A bypassed dunder that `object` defines fails silently,
 with no error pointing at the miss.
@@ -327,6 +327,10 @@ so the two no longer disagree.
 The `# type: ignore` that `proxy_writes.py` needed disappears here:
 declaring `__setattr__()` tells the checker the proxy accepts arbitrary attributes,
 so the static half closes at the same moment as the runtime half.
+The implementation attribute also shrinks from `__implementation` to `_impl`:
+mangling rewrites identifiers, not string literals,
+so a double-underscore name stored through `object.__setattr__()` would need the mangled form,
+`"_WriteProxy__impl"`, written by hand.
 
 Identity has the same gap.
 A proxy is not an instance of the implementation's class;
@@ -447,14 +451,13 @@ The reason is the one the Proxy section gave:
 whatever `__getattr__()` returns is unknown at the type level,
 so no checker can verify `b.f()`, no matter how you annotate the surrogate.
 Declaring each implementation against `Behavior` still catches a missing method,
-because the checker verifies that `Implementation1` and `Implementation2` have everything `run()` calls.
+because the checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
 That declaration stops at the surrogate.
 Annotating `run(b: Behavior)` and handing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
 The hop through the surrogate loses the guarantee.
 
-Testing hands the State surrogate a small stand-in and confirms calls reach the current implementation,
-and that `change_to()` swaps it:
+Testing hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py
@@ -491,7 +494,7 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
     For example, to keep track of the number of references held for a particular object,
-    to implement the *copy-on-write* idiom and prevent object aliasing.
+    in order to implement the *copy-on-write* idiom and prevent object aliasing.
     A simpler example is keeping track of the number of calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
@@ -574,17 +577,18 @@ one generic proxy can add lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*) to any object,
 with no per-method code.
 
-`CountingProxy` uses single underscores rather than the earlier proxies' `self.__implementation`,
+`CountingProxy` keeps the single underscore,
 so the trap below can misspell `self._imp` without name mangling obscuring the typo.
 
 The fallback hook has a trap of its own:
-if `__getattr__()`'s body touches a proxy attribute that does not exist,
-a misspelled `self._imp`,
-or any attribute on an instance built without `__init__()`,
-which `copy.copy()` and `pickle` do when they rebuild one,
+when `__getattr__()`'s body touches a proxy attribute that does not exist,
 that failed lookup calls `__getattr__()` again,
 and the error surfaces as `RecursionError`,
-not the `AttributeError` that would point at the typo.
+not the `AttributeError` that would point at the cause.
+A misspelled `self._imp` trips it directly.
+So does rebuilding a proxy through `copy.copy()` or `pickle`:
+both construct the new instance without calling `__init__()`,
+so no `_impl` exists when the first lookup reaches `__getattr__()`.
 
 The counting proxy's test confirms that a call reaches the implementation and returns its result,
 and that it counts calls without counting an attribute read:
