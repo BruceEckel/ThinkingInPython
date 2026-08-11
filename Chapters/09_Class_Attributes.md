@@ -220,7 +220,7 @@ One library does read it at runtime:
 `@dataclass` leaves a `ClassVar` field out of the constructor it generates,
 shown in [Data Classes as Types](12_Data_Classes_as_Types.md#d-a-real-classvar).
 
-`ClassVar` does not catch every form of shadowing:
+`ClassVar` cannot change what an assignment does at runtime:
 
 ```python
 # counter_near_miss.py
@@ -230,7 +230,7 @@ class Tally:
     total: ClassVar[int] = 0
 
     def __init__(self) -> None:
-        self.total += 1
+        self.total += 1  # type: ignore
 
 a, b = Tally(), Tally()
 print(a.total, b.total, Tally.total)
@@ -243,9 +243,10 @@ the write lands on the instance and creates a fresh `total` there.
 Every `Tally` counts itself once and the shared counter never moves,
 which is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
-`ClassVar` does not save you here.
-`ty` rejects a direct `self.total = 5`, but it passes the augmented form,
-so the one mistake you are most likely to make is the one the checker misses.
+`ClassVar` does save you here, at check time:
+`ty` rejects the augmented form as it rejects a direct `self.total = 5`,
+reporting "Cannot assign to ClassVar `total` from an instance".
+The `# type: ignore` suppresses that report so the listing can show what the line does when it runs.
 
 Shared storage is not a mistake when sharing is the intent.
 A count of every object created, a registry mapping names to classes,
@@ -427,7 +428,7 @@ a constructor default or a `@dataclass` field for per-object.
     and use them to explain the `1 1 0` output.
     Then fix the class so the shared counter moves,
     without changing the `ClassVar` declaration,
-    and say why `ty` accepted the broken version.
+    and explain what `ty` reports when the `# type: ignore` is removed from the broken version.
 8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
     Predict what `Base.shared` holds afterwards, then check.
     Give `Right` its own list with `shared = []` in its body and repeat.

@@ -208,7 +208,7 @@ class Tally:
     total: ClassVar[int] = 0
 
     def __init__(self) -> None:
-        self.total += 1
+        self.total += 1  # type: ignore
 
 a, b = Tally(), Tally()
 print(a.total, b.total, Tally.total)
@@ -242,14 +242,13 @@ writes the same class dictionary, so both instances report `2` and
 `vars(c)` is empty: nothing was ever created on an instance, and
 `c.total` is the fallback finding the shared value.
 
-`ty` accepted the broken version because nothing about it is a type
-error. `self.total` is an `int`, `self.total + 1` is an `int`, and
-assigning an `int` to it type-checks. `ClassVar` catches
-`a.total = 99`, an assignment written through an instance in the
-source, and this assignment is written through `self` inside a method,
-which is the one form that looks identical to legitimate per-instance
-initialization. That is why the chapter calls this the mistake the
-checker misses.
+With the `# type: ignore` removed, `ty` reports
+`invalid-attribute-access`: "Cannot assign to ClassVar `total` from an
+instance". The augmented form expands to an assignment through `self`,
+and the checker treats it as it treats `a.total = 99`: a write to a
+`ClassVar` through an instance. The declaration catches the mistake at
+check time; the listing suppresses the report so it can demonstrate
+what the write does when it runs.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
 

@@ -5,7 +5,7 @@ class Tally:
     total: ClassVar[int] = 0
 
     def __init__(self) -> None:
-        self.total += 1
+        self.total += 1  # type: ignore
 
 a, b = Tally(), Tally()
 print(a.total, b.total, Tally.total)

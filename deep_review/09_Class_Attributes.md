@@ -96,7 +96,8 @@ unchanged. No findings met the bar for a live block.
 - "ty rejects a direct `self.total = 5`, but it passes the augmented
   form" is version-dependent, but the book states current-tool behavior
   plainly and a `ty` upgrade is already a book-wide sweep event, so no
-  hedge was added.
+  hedge was added. *(Postscript below: the upgrade arrived the same
+  day.)*
 - The bug-framing paragraph ("A class attribute reads like a default
   right up until...") re-establishes context after the methods and
   property asides, a mild ordering tell; but the asides lean directly on
@@ -106,3 +107,17 @@ unchanged. No findings met the bar for a live block.
 - `class_attribute_confusion.py` and its neighbors carry inline comments
   narrating each step; the comments predate this review and the marker
   interleaving depends on them, so they were left alone.
+
+## Postscript (2026-08-10): ty 0.0.70 closed the augmented-assignment gap
+
+This review verified against the environment's ty of the moment; the
+lock already pinned 0.0.70, which flags `self.total += 1` on a
+`ClassVar` (`invalid-attribute-access`). The opening paragraph's
+"passes with zero diagnostics" no longer holds. The chapter was
+updated after the merge: `counter_near_miss.py` carries a
+`# type: ignore`, the "the one the checker misses" claim now states
+that `ty` rejects the augmented form, exercise 7 asks what `ty`
+reports instead of why it accepted the code, and
+`Solutions/09_Class_Attributes.md` exercise 7 was rewritten to match.
+`Solutions/12_Data_Classes_as_Types.md` exercise 6 (`self.built += 1`
+on a frozen class) picked up the same treatment.

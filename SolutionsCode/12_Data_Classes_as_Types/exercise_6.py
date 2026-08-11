@@ -41,7 +41,7 @@ class Wrong:
     built: ClassVar[int] = 0
 
     def __post_init__(self) -> None:
-        self.built += 1
+        self.built += 1  # type: ignore
 
 try:
     Wrong(1)

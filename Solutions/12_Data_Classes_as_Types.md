@@ -368,7 +368,7 @@ class Wrong:
     built: ClassVar[int] = 0
 
     def __post_init__(self) -> None:
-        self.built += 1
+        self.built += 1  # type: ignore
 
 try:
     Wrong(1)
@@ -388,7 +388,9 @@ class, and `frozen=True` installs its rejecting `__setattr__()` on
 instances. `Wrong` writes the same intent a different way, and fails.
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance, which is the assignment
-`frozen=True` refuses.
+`frozen=True` refuses. `ty` rejects the line before it ever runs
+(fields of a frozen class are read-only to the checker), so the
+listing carries a `# type: ignore` to demonstrate the runtime failure.
 
 ## 7. A `dict` field default, three ways
 
