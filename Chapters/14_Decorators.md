@@ -73,14 +73,6 @@ A decorator that forgets its `return wrapper` binds `cheese` to `None`,
 and the failure surfaces at the next call to `cheese()`,
 not at the decoration that caused it.
 
-`wrapper()` here declares no parameters,
-so `add_behavior` only works on functions that take none.
-Applied to a `def add(a, b)`,
-the call `add(2, 3)` raises `TypeError: wrapper() takes 0 positional arguments but 2 were given`.
-A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
-the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
-Every wrapper from here on takes that shape.
-
 The decorator runs when Python executes the `def`,
 not when you call the decorated function:
 
@@ -112,10 +104,10 @@ so `announce` ran while Python was still executing the `def` above `cheese`.
 Only the body of `wrapper()` waits for the call.
 
 `wrapper()` is a *closure*.
-Defined inside `add_behavior()`, it refers to `func`,
+Defined inside its decorator, it refers to `func`,
 a variable from the enclosing scope, not one of its own parameters.
 Python keeps `func` alive for as long as `wrapper()` exists,
-even after `add_behavior()` has already returned.
+even after the decorator has returned.
 That lets `cheese()`, called long after decoration finished,
 still reach the original `cheese` function through `func`.
 [Closures](40_Functional_Foundations.md#closures) covers the general mechanism.
@@ -127,7 +119,13 @@ while keeping the wrapped object's interface so the wrapping stays invisible to 
 
 ## Maintaining the Wrapped Interface
 
-This decorator traces calls:
+The wrappers so far declare no parameters,
+so `add_behavior` only works on functions that take none.
+Applied to a `def add(a, b)`, the call `add(2, 3)` raises a `TypeError`:
+the wrapper takes zero positional arguments but two were given.
+A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
+the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
+This decorator traces calls, and its `wrapper()` takes that shape:
 
 ```python
 # tracer.py
@@ -160,7 +158,7 @@ if __name__ == "__main__":
 its name, docstring, and other attributes.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
-`wraps` is optional but there is rarely a reason to omit it.
+`wraps` is optional; reasons to omit it are rare.
 It also sets `__wrapped__` on the wrapper, pointing at the original,
 so `add.__wrapped__(2, 3)` calls the function without the tracing,
 and `inspect.signature()` follows that chain automatically.
@@ -272,11 +270,17 @@ so the two `@` lines are two separate calls, not one recursive one.
 The nesting stops at two levels, matching the two nested `def`s in the source.
 
 Forgetting the parentheses is the common mistake here.
-`@repeat` without them binds `greet` to `decorate`,
-so calling `greet("Bob")` passes `"Bob"` where `decorate` expects a function and hands back a wrapper instead of printing anything.
-Nothing raises an exception, so the only symptom is missing output.
-The annotations catch it,
-and they catch it at the decoration rather than at the call:
+`@repeat` without them calls `repeat(greet)`,
+passing the function where `repeat` expects `times`.
+The validation turns that into a `TypeError` at decoration,
+since a function does not support `< 1`,
+though the message says nothing about parentheses.
+A `repeat` without that comparison would fail silently:
+`greet` would be bound to `decorate`,
+calling `greet("Bob")` would pass `"Bob"` where `decorate` expects a function and hand back a wrapper,
+and the only symptom would be missing output.
+The annotations catch the mistake either way,
+at the decoration rather than at the call:
 `ty` reports that `repeat` expected an `int` for `times` and got a function.
 A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
@@ -557,11 +561,10 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-With decorator arguments,
-the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
-
 This validates `times` the same way `repeat.py` does,
 in the constructor rather than in the outer function.
+With decorator arguments,
+the class form is typically easier to reason about than the [function form](#decorators-that-take-arguments).
 `test_repeat_class.py` checks the same cases:
 
 ```python
@@ -593,8 +596,8 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 
 The class form has one limitation:
 an instance that replaces the function does not work on methods.
-Neither `trace` nor `count_calls` above decorated a method,
-only to a bare function, and that was not an accident:
+Neither `trace` nor `count_calls` above decorated a method, only bare functions,
+and that was not an accident:
 
 ```python
 # method_decoration.py
@@ -662,7 +665,7 @@ so the same decoration that failed as a class works here with no descriptor of y
 For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
-A fully typed class decorator, like `trace_class.trace`,
+A fully typed class-based decorator, like `trace_class.trace`,
 even gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
 catching the same problem before the program runs.
@@ -675,7 +678,8 @@ The function goes straight to the constructor.
 `@repeat(times=3)` calls `repeat(times=3)` first, producing an instance,
 then applies that instance to `greet`.
 The arguments go to the constructor, and the function arrives later,
-at `__call__()`, moving from `__init__()` to `__call__()` as soon as the decorator gains arguments.
+at `__call__()`.
+Gaining arguments moves the function's arrival from `__init__()` to `__call__()`.
 The function form hides this shift inside an extra nested `def`.
 The class form makes it visible.
 
@@ -708,6 +712,10 @@ shows `contextlib.ContextDecorator`.
 Everything so far decorated a function.
 The `@` line does not care: a `class` statement takes a decorator the same way,
 and the decorator receives the class object.
+Do not confuse this with [Decorators as Classes](#decorators-as-classes),
+where the decorator was written as a class;
+here the decorator is an ordinary function,
+and the class is the thing decorated.
 This one registers every class it decorates, in `registry`:
 
 ```python
@@ -831,7 +839,7 @@ if __name__ == "__main__":
 and hands back whatever `greeting()` returned.
 `greeting` does not survive decoration as a function:
 the name now refers to the `str` that came out of it.
-Calling `greeting()` again fails, since a `str` is not callable.
+Calling `greeting()` now fails, since a `str` is not callable.
 This idiom pays off for a value that needs one-time setup logic but stays constant afterward.
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
@@ -848,7 +856,7 @@ so every call or every instance gets the wrapping.
 Sometimes you want the choice made later:
 add responsibilities to individual objects at runtime,
 and let each caller decide which responsibilities to add.
-That is the object-oriented *Decorator* pattern.
+That is the object-oriented Decorator pattern.
 
 Consider a pizza shop.
 A class for every pizza-and-topping combination explodes: Margherita,
