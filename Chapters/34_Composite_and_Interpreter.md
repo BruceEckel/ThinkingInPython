@@ -70,7 +70,7 @@ and printing the tree each require a new method in every class.
 
 ## A Composite of Data Classes
 
-In Python, you can define the node types as frozen data classes.
+In Python, define the node types as frozen data classes.
 Name the closed set of alternatives with a union.
 Write each operation as a recursive function that matches on the union:
 
@@ -128,7 +128,9 @@ if __name__ == "__main__":
 ```
 
 `Directory` now takes its entries as one tuple rather than as varargs,
-which makes the tree immutable;
+because `@dataclass` generates `__init__()` from the field declarations,
+and a field is one parameter.
+The tuple keeps the tree immutable;
 a paragraph below says why a `list` would not do.
 
 `Directory` names `Node` before its definition below,
@@ -256,7 +258,7 @@ def wrap(value: Expr | int) -> Expr:
 
 The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
-`Add` and `Mul` hold expressions themselves, which makes it a composite.
+`Add` and `Mul` hold other expressions, which makes it a composite.
 
 `Operators` is a base class but not a member of `Expr`,
 and the split is on purpose.
@@ -264,8 +266,8 @@ Every node shares the operator methods,
 so those live on a base and arrive by inheritance.
 No node shares its meaning, so meaning lives in the walkers,
 which need the union to know they have covered every case.
-`Expr` is the contract:
-annotate `evaluate()` with `Operators` and `assert_never()` stops working,
+`Expr` is the contract: if you annotate `evaluate()` with `Operators` instead,
+`assert_never()` stops working,
 because a base class is an open set and any new subclass silently belongs to it.
 
 Every node inherits `__add__()` and `__mul__()`,
@@ -280,7 +282,7 @@ so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
 and `wrap()` promotes integers to `Num` nodes,
 so `2 * x + 1` is a valid sentence in the little language.
-Python has parsed it, honoring precedence, before the interpreter ever runs.
+Python has parsed it, honoring precedence, before the interpreter runs.
 
 The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Multiple_Dispatching.md#operators-dispatch-twice):
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
@@ -352,9 +354,9 @@ Building `2 * x + 1` did not compute a number.
 It built a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises `KeyError`, naming the variable.
-The `/` makes the tree positional-only
+The `/` makes `e` positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)),
-which keeps the parameter name `e` out of the variable namespace so an expression can use `e` as a variable.
+which keeps the parameter name out of the variable namespace so an expression can use `e` as a variable.
 
 ```python
 # test_evaluate.py
@@ -665,7 +667,8 @@ here it is a way to keep a decision available to whoever should make it.
     Then write `evaluate_iterative()`,
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
-    Raising `sys.setrecursionlimit()` is the other escape; say what it costs.
+    Raising the limit with `sys.setrecursionlimit()` is the other escape;
+    say what it costs.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports it.
     Which of the two designs would you use for a file system,

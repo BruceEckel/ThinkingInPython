@@ -1,6 +1,7 @@
 # exercise_3.py
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import assert_never
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -70,6 +71,8 @@ def evaluate(e: Expr, **env: int) -> float:
             return -evaluate(operand, **env)
         case Div(left, right):
             return evaluate(left, **env) / evaluate(right, **env)
+        case _:
+            assert_never(e)
 
 x = Var("x")
 expr = (2 * x + 1) / -x
