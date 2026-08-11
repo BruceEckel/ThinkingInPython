@@ -45,7 +45,8 @@ since the `Messenger` class declares no attributes.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
 Declaring only the first leaves the write, `m.more = 11`, still rejected.
-The standard library's stub for `SimpleNamespace` declares both,
+The standard library's stub for `SimpleNamespace` declares such a pair
+(its read half is `__getattribute__()`, which intercepts every attribute access),
 which is why the next listing needs no annotation.
 The price of an ad-hoc attribute bag is that no checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
@@ -143,8 +144,10 @@ The attribute bag caught nothing; a declared field catches this.
 Since nothing can mutate the fields, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
+Immutability also makes the record hashable,
+so a `Color` can key a `dict` or join a `set`.
 
-The immutability guarantee reaches the fields, not the objects they refer to.
+The immutability guarantee reaches the fields, not the objects they name.
 A `NamedTuple` holding a list still lets that list change,
 the same leak [`frozen=True` has](20_Rethinking_Objects.md#the-immutability-solution).
 Nor can you hash such a record, whether or not anyone mutates the list,
@@ -257,8 +260,7 @@ Tuple behavior shows up in serialization too.
 since `json` sees a sequence and the field names never reach the output.
 Converting first, `json.dumps(Color(1, 2, 3)._asdict())`,
 writes `{"r": 1, "g": 2, "b": 3}`.
-A data class is not serializable at all:
-`json.dumps()` on one raises a `TypeError`.
+`json.dumps()` on a data class raises a `TypeError` instead.
 That is the safer failure of the two,
 because the array version loses the names without saying so.
 
@@ -281,7 +283,7 @@ When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
 names the keys and their types for the checker while the value stays a real dict.
-When it only has to *become* a dict on the way out,
+When it need only *become* a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
