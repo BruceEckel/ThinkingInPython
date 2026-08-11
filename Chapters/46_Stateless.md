@@ -88,7 +88,7 @@ print(run(double(21)))
 `run()` is the Stateless library's driver,
 similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
-Nothing the Effect describes happens until you call `run()`.
+Nothing the Effect describes runs until you call `run()`.
 A synchronous program calls it once, at the outermost edge.
 
 The two names differ only in case:
@@ -128,7 +128,7 @@ such as a console, a file, or a network connection.
 `Need` is how Stateless does dependency injection.
 A `Need` is a request for an instance, and something else answers it.
 `need(SomeClass)` is an Effect that produces an instance of `SomeClass`,
-without saying where that instance comes from:
+without saying what supplies that instance:
 
 ```python
 # utils/greeter.py
@@ -672,14 +672,13 @@ so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union invites a `type` alias,
 and the book's own habits normally endorse one.
-Resist it here.
-Under `ty` (0.0.65 at this writing),
-a `type` alias as a generator's return annotation turns the yield check off,
-and everything this section demonstrated silently escapes verification.
-Stateless avoids the trap in its own definitions:
-`Effect` and its aliases are older `TypeAlias` assignments rather than `type` statements,
-and those keep the check alive.
-Write Effect signatures out in full until your checker proves that it sees through the alias.
+Under `ty` 0.0.70 the alias checks the same as the written-out signature:
+an undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
+This book still writes Effect signatures out in full,
+because the union is the information:
+every channel a function uses stays visible at the point of use.
+Before you shorten one with an alias,
+confirm that your checker reports an undeclared Ability through it.
 
 ## One Effect, Many Environments
 
@@ -769,7 +768,7 @@ A double for the builtin `Console` must inherit from it,
 and that `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 [Supplying an Interface](#supplying-an-interface), next,
-explains where that cost comes from and how an interface avoids it.
+explains the source of that cost and how an interface avoids it.
 
 `read_file()` is also the library's own example of both channels at once:
 its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
@@ -1290,7 +1289,7 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 `run()` starts an event loop and drives the Effect inside it:
 its entire body is `return asyncio.run(run_async(effect))`.
-That has a consequence worth knowing before you incorporate Stateless into an existing application.
+That has a consequence when you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so you cannot call `run()` from any `async def`:
 

@@ -374,11 +374,11 @@ which drops a `KeyError` that would repeat the event the message already names.
 
 ### An Unexpected Input
 
-The two versions also answer a question this input file never asks:
+The two versions also answer a question this input file does not ask:
 what happens on an unexpected input?
 They answer it differently.
 Version 1's `case _` arms return the current state,
-so an input a state does not recognize raises nothing and the machine stays put.
+so an input a state does not recognize raises no exception and the machine stays put.
 Staying put is not the same as doing nothing:
 `run_all()` calls `run()` on whatever state `next()` returns,
 so a transition back to the current state performs that state's action a second time.
@@ -486,7 +486,8 @@ told apart by their conditions.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
-so it belongs last in its group, as the `else` the earlier rows fall through to.
+so it belongs last in its group,
+as the `else` to which the earlier rows fall through.
 A group with no such catch-all row can still match nothing:
 if every condition returns `False`,
 `handle()` falls through to the same `NoTransition` a missing key raises.
@@ -743,8 +744,7 @@ def test_no_transition_raises() -> None:
 ```
 
 Because the actions set `vm.message` instead of printing,
-the model never draws anything,
-and the same machine can drive more than one view.
+the model draws nothing, and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
 which prints its input from inside the framework.
@@ -846,7 +846,7 @@ One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram,
 and adding a state or an input is an entry in the table and a method or two.
-The states themselves shrink to `Enum` members with no behavior at all.
+The states shrink to `Enum` members with no behavior.
 
 The tell is which reading you would rather do: the transitions for one state,
 gathered in that state, or every transition in the machine,

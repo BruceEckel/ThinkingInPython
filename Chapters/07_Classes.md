@@ -200,9 +200,9 @@ call it through `super()`, as the overridden `show()` does.
 The demo shows that the base-class constructor runs,
 but only because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor automatically.
-Remove the `super().__init__(text)` line and `self.s` is never created,
+If you remove the `super().__init__(text)` line, `self.s` is never created,
 so the first method that reads it raises an `AttributeError`.
-A derived class that defines no constructor of its own simply inherits and runs the base version.
+A derived class that defines no constructor of its own inherits and runs the base version.
 The inherited `show_twice()` method is also available in the derived class.
 
 The class `Different` also has a method named `show()`,
@@ -294,7 +294,7 @@ A type checker now verifies the claim.
 If a decorated method does not override anything in a base class,
 because you misspelled the name or the base method no longer exists,
 the checker reports an error.
-Uncomment the decorator on `Typo.shwo` and it says:
+If you uncomment the decorator on `Typo.shwo`, it says:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with
@@ -503,7 +503,7 @@ A container builds its own display from the `__repr__()` of its elements,
 which is why the list prints `Point(3, 4)` rather than the shorter form.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
 By convention `__repr__()` returns the call that would rebuild the object,
-which is why it reads `Point(3, 4)`.
+so it reads `Point(3, 4)`.
 
 Define `__repr__()` on classes you debug,
 and add `__str__()` only when users see the output.

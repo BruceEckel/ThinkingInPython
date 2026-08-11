@@ -142,7 +142,7 @@ because `type(settings())` hands it back.
 Defining the class inside `settings()` also looks airtight,
 and `@cache` runs that body only once,
 so there is exactly one instance and no module-level name.
-`type(settings())` recovers it anyway.
+`type(settings())` still recovers it.
 
 Nesting costs the return annotation as well.
 `def settings() -> Settings` still parses and runs,
@@ -328,8 +328,7 @@ not because you need these forms.
 
 To address languages like C++ and Java,
 *GoF Design Patterns* builds the singleton with more apparatus.
-The variations shown here are worth understanding,
-but each does more work than the module or the cached factory above.
+Each variation shown here does more work than the module or the cached factory above.
 
 The first takes control of creation by delegating to a single instance of a private nested class.
 The rest reach the same guarantee by other means: a class variable,
@@ -393,7 +392,7 @@ The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 `__getattr__()` returns `Any`, and unlike `instance`,
 nothing can tighten that one away.
 It answers for every name Python fails to find on the wrapper,
-so its return type is whatever the inner object happens to hold under that name.
+so its return type is whatever the inner object holds under that name.
 `instance` is a single declared field and can say `__OnlyOne | None`.
 `__getattr__()` covers an open set of names and cannot.
 Delegation trades static knowledge for reach,
@@ -442,11 +441,11 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 `object.__new__(cls)` builds a `SingletonClassVar`,
 so every construction hands back that same instance and `isinstance()` reports `True`.
 Python honors whatever object `__new__()` returns,
-and the return value carries a rule worth knowing:
+and the return value decides whether `__init__()` runs:
 `__init__()` runs only when `__new__()` returns an instance of the class under construction,
 and then it runs on that shared instance after *every* construction,
 if the class defines one.
-`SingletonClassVar` defines none, so all the work happens in `__new__()`.
+`SingletonClassVar` defines none, so `__new__()` does all the work.
 A `__new__()` that returned some other object instead would skip `__init__()`,
 and fail `isinstance()` as well.
 

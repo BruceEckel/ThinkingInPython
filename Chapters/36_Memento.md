@@ -342,7 +342,7 @@ so it never interprets anything.
 That works for any state type, from `int` to a full `Drawing`,
 with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place.
-It is a stack of aliases, the bug this chapter opened with.
+It is a stack of aliases, the bug that opened this chapter.
 
 ```python
 # test_history.py
@@ -388,7 +388,7 @@ Editors get asked a narrower one.
 Undo the drawing, but keep the rename.
 `History` cannot express that,
 because it moves whole states and never looks inside them.
-The state has to answer it,
+The state must answer it,
 and for any immutable value `copy.replace()` is the answer:
 
 ```python
@@ -531,7 +531,7 @@ The loaded object is equal to, and hashes the same as,
 one built fresh without that field.
 The added-field drift above at least fails when something touches the gap;
 this one never raises an exception.
-The data is just quietly wrong.
+The data is quietly wrong.
 Renaming a field is a delete and an add at once, and does both:
 the old name becomes a ghost and the new one is missing,
 so even `repr()` raises `AttributeError`.

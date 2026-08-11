@@ -499,7 +499,7 @@ The first case is a sequence pattern holding a class pattern holding two literal
 with a starred capture beside it.
 `as` binds whatever its sub-pattern matched,
 so `start` is the whole `Point` while `0, 0` checks its fields.
-Without `as` you would have to choose between testing the shape and keeping the object.
+Without `as` you must choose between testing the shape and keeping the object.
 
 The second case alternates two class patterns and binds `n` from either,
 inside a one-element sequence pattern: `survey([Point(0, 5)])` matches,

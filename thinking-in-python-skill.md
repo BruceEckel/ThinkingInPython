@@ -64,13 +64,12 @@ file passes a strict type checker and linter.
   `type Symbol = str`. The right side is lazily evaluated (PEP 695),
   so it can name a class defined later in the file without quotes.
 
-- Exception: do not use a `type` alias as a generator function's
-  return annotation when the yield type carries a guarantee you want
-  verified. Under `ty` (through 0.0.64), the alias turns the
-  invalid-yield check off, so a wrong `yield` passes silently. Write
-  the `Generator[...]` annotation out in full (an old-style
-  `TypeAlias` assignment also keeps the check alive) until your
-  checker demonstrably sees through the `type` form.
+- For a generator function whose yield type carries a guarantee you
+  want verified, write the `Generator[...]` annotation out in full:
+  the yield type is the information, and it stays visible at the
+  point of use. Under `ty` 0.0.70 a `type` alias checks the same (a
+  wrong `yield` draws `invalid-yield` through the alias), but confirm
+  that with your own checker before aliasing such a signature.
 
 **Constants.**
 

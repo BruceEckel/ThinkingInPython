@@ -131,8 +131,7 @@ The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
 No locks, no queues, no shared state, and no changes to `count_primes()`.
-The function needed no preparation for parallel execution.
-It was ready on day one, because it was pure.
+The function was ready for parallel execution on day one, because it was pure.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
@@ -195,7 +194,7 @@ You decide how far to take it.
 1. The cheapest rung is local reasoning.
    Pure functions and immutable values let you understand one piece at a time,
    with no hidden state to carry in your head.
-   Most code never needs more.
+   Most code needs no more.
 2. Next are tests over chosen examples, the subject of [Testing](11_Testing.md).
    Each one pins a single input to a single answer,
    so the assurance you get is no wider than the examples you invent.

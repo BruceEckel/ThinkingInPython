@@ -205,7 +205,7 @@ print(4_000 < heads < 6_000)
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
-while `Ask` and `Tell` each carried the payload the request had to deliver.
+while `Ask` and `Tell` each carried the payload the request must deliver.
 The Ability's whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
@@ -626,7 +626,7 @@ Reordering that tuple is the whole difference between the two runs.
 Priority, thresholds, and the outage schedule live in `controller()`,
 while `run_load()` decides when to give up on the source it holds.
 
-The load's declared dependency never changes.
+The load's declared dependency does not change.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
 What changes is the object answering the need, four times, mid-run.
@@ -1361,7 +1361,8 @@ so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
 There is no `GameEnvironment` to construct and no factory to hold.
 The five-way union appears in full rather than as an alias,
-for the reason given in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect).
+the practice [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
+recommends.
 
 Five abilities need five distinct shapes.
 `Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`,
@@ -1484,11 +1485,11 @@ whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
 because the pairing lives inside the class.
 `supply()` takes a flat list and checks each argument against one Ability,
-never against the others.
+not against the others.
 The matched set comes back only if you write it down,
 which `kitties_and_puzzles()` does.
-The guarantee moved from a class hierarchy into a two-line function,
-and it is worth knowing which of those you are getting.
+The guarantee moved from a class hierarchy into a two-line function.
+Know which of those you are getting.
 
 The fourth run swaps one cast member and captures the output.
 `Script` records what arrives,
@@ -1519,7 +1520,7 @@ An Effect that asks for ten separate things is usually two Effects.
 [The Success Path](#the-success-path)
 said that a caller could retry a pipeline without touching it.
 Stateless provides a few decorators that add such behavior.
-Retry is the one worth studying, because of what it does to the type.
+Retry is the one to study, because of what it does to the type.
 
 `Database` fails a fixed number of times before working,
 so the example is repeatable:
@@ -1640,7 +1641,7 @@ and at runtime the failure passes the useless `catch()` and escapes at the edge.
 `catch()` must name what the channel holds at the point of decoration,
 and after `retry()` that is `RetryError[Crashed]`, not `Crashed`.
 
-One rough edge: `RetryError` declares an `errors` attribute that `retry()` never assigns,
+One rough edge: `RetryError` declares an `errors` attribute that `retry()` does not assign,
 so the collected failures are reachable as `outcome.args[0]` and not as `outcome.errors`.
 
 ### `repeat()` and `memoize()`
@@ -1841,7 +1842,7 @@ which is the description/execution split in table form.
 
 ## Where the Guarantee Stops
 
-There are five limits worth knowing.
+The guarantee has five limits.
 
 ### 1. Nothing stops an undeclared Effect
 
@@ -1972,14 +1973,11 @@ full = handle(scripted)(half)  # () -> Success[None]
 ```
 
 That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
-The habit is worth keeping generally.
-A named intermediate is where you read the Ability that remains,
+Keep the habit generally:
+a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
-You have now seen three of these checker gaps:
-the nested handler expression here,
-the direct Ability yield that types as `Unknown`,
-and the `type` alias in [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
-that turns the yield check off.
+You have now seen two of these checker gaps: the nested handler expression here,
+and the direct Ability yield that types as `Unknown`.
 Each has the same shape.
 The library's types are asking the checker a hard inference question,
 and where the checker gives up, it gives up quietly.
@@ -2124,7 +2122,7 @@ and bind it at the edge instead of calling it in the middle.
 `at()` and `crossing` and `controller()` are all that habit,
 and none of them needs an Effect type to work.
 
-But the direction is worth watching.
+But watch the direction.
 Python got one Effect tracked into its type system with `async`.
 The languages listed under [Native Effect Management](44_Effect_Management.md#native-effect-management)
 track all of them.
@@ -2160,8 +2158,8 @@ It is a language that does the encoding for you.
     Then say what such a test cannot tell you about `controller()`.
 5.  Add a fourth failure to `research()`:
     a `TooLong` raised when an article exceeds some length.
-    Follow the checker's complaints until the program builds again,
-    and list every line you had to edit.
+    Follow the checker's complaints until the program type-checks again,
+    and list every line you edited.
     Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
 6.  `scenarios.py` supplies a `DeadWire` that fails before printing.
     Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,

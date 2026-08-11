@@ -10,7 +10,7 @@ It is also a Python lesson.
 Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages:
 single dispatch, closed classes, and types that are not values.
 Python lacks those limitations, so some of those patterns become unnecessary.
-This chapter points that out as it happens.
+This chapter points out each one as the example reaches it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
 an initial solution, then successive redesigns as new requirements appear.
@@ -333,7 +333,7 @@ Nothing failed.
 The parser built two `Plastic` objects, the sorter matched neither,
 and the report totals the trash it recognized.
 Two of four pieces reached a bin,
-and the sixty pounds of plastic left no trace in any total the plant will act on.
+and the sixty pounds of plastic left no trace in any total on which the plant will act.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
 The registry is not the leak:
@@ -402,7 +402,7 @@ and [Multiple Dispatching](32_Multiple_Dispatching.md),
 and first seen in [Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
-but worth knowing before you subclass a material.
+but keep it in mind before you subclass a material.
 This is the one place where the two versions disagree:
 `case Aluminum()` matches any subclass,
 so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
@@ -429,7 +429,7 @@ In its C++ and Java form a `Visitor` base class declares one overload per materi
 every element grows an `accept()` method,
 and *double dispatch* routes each piece to the correct overload.
 Python has no method overloading, so even writing that down takes work
-(that chapter shows the shape the book's version settles on).
+(that chapter shows the shape on which the book's version settles).
 The design exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation.
 The standard library provides `functools.singledispatch`,

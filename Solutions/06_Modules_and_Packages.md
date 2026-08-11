@@ -189,3 +189,37 @@ file, so `__package__` is set and the dot resolves.
 The lesson is that a module inside a package is not a script. `-m` is
 how you run one, and a file you intend to run both ways belongs at the
 top level, outside any package.
+
+## 6. Star import without `__all__`
+
+```python
+# exporting_no_all.py
+
+def public():
+    return "public"
+
+def helper():
+    return "helper"
+
+def _internal():
+    return "internal"
+
+def undeclared():
+    return "undeclared"
+```
+
+```python
+# exercise_6.py
+from exporting_no_all import *  # noqa: F403
+
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['helper', 'public', 'undeclared']
+```
+
+Without `__all__`, the star import falls back to the underscore
+convention: every top-level name that does not start with an
+underscore arrives, so `undeclared` joins `public` and `helper`, and
+`_internal` is still skipped. Restoring the line shrinks the surface
+back to the two listed names. The two rules compose in one direction
+only: `__all__` can export an underscored name, but without `__all__`
+an underscore is the only way to keep a name out of a star import.

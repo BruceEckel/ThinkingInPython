@@ -32,8 +32,7 @@ explains the filename first line and the `#:` output markers.
 
 Python is clean to write.
 Your own code stays easy to read long after you've written it.
-Indentation determines how statements group into blocks,
-a major factor in code readability.
+Indentation determines how statements group into blocks.
 Here is a script that runs with `python if.py`:
 
 ```python
@@ -140,7 +139,7 @@ as with `a` and `b` above.
 
 ## Numbers and Arithmetic
 
-Integers have unlimited precision, so they never overflow.
+Integers have unlimited precision, so they cannot overflow.
 Underscores group digits for readability:
 `10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
@@ -454,7 +453,7 @@ each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 which `piece.expression` reports.
 Iteration skips empty literal strings,
-so the leading `''` in `message.strings` never reaches the loop.
+so the leading `''` in `message.strings` does not reach the loop.
 A consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases only the literal text, leaving the values alone,
 which no amount of work on a finished f-string could do reliably.
@@ -510,3 +509,8 @@ Tools such as ruff can apply these to your code automatically
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.
     Explain why an f-string cannot be post-processed the same way.
+6.  Before running anything,
+    write down what C or Java would print for `-9 / 4` and `-9 % 4` using integer math,
+    then what Python prints for `-9 // 4` and `-9 % 4`.
+    Run `print(-9 // 4, -9 % 4)` and check.
+    State the rule that predicts the sign of the result of `%`.

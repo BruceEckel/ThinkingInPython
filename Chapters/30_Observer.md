@@ -7,7 +7,7 @@ and receives a notification whenever the observable's state changes.
 Of the callback patterns it is the most dynamic:
 
 - Observers attach and detach at runtime
-- The observable never needs to know their types
+- The observable need not know their types
 
 It underlies event handling,
 and the model-view split that keeps a display in step with the data behind it.
@@ -19,7 +19,7 @@ You have some data, the *document*, and more than one view of it,
 say a plot and a table.
 When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
-without the data having to know which views exist.
+without the data knowing which views exist.
 
 The classic design says how to arrange it.
 An `Observer` interface every observer implements,
@@ -547,11 +547,12 @@ and the Observer is an event bus.
     without looking at `observers.py`:
     the smallest `Observable` that lets callables subscribe and be notified.
     Demonstrate it by subscribing several observers and causing one change that updates them all.
-2.  Modify `box_observer.py` to turn it into a simple game.
-    If any of the squares surrounding the one you clicked is part of a contiguous patch of the same color,
-    then all the squares in that patch take on the color you clicked.
-    You can configure the game for competition between players or to keep track of the number of clicks that a single player uses to turn the field into a single color.
-    You may also restrict a player's color to the first one they chose.
+2.  Turn `box_observer.py` into a simple game:
+    you own the contiguous patch of same-colored squares containing the top-left corner,
+    and clicking any square recolors your patch to that square's color,
+    absorbing neighbors that now match.
+    Track the clicks it takes to make the whole field one color;
+    for competition, alternate turns between players.
 3.  Make `Observable.notify()` survive an observer that raises an exception:
     every other observer still hears the change,
     and the failures are re-raised afterward, together, as an `ExceptionGroup`

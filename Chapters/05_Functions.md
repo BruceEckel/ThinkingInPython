@@ -107,7 +107,7 @@ print(connect(port=80, host="web.example.com"))  # Any order by name
 ```
 
 Passing by name does not require a default: `host` has none,
-and the last call names it anyway.
+and the last call still names it.
 At the call site, every keyword argument must come after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
@@ -290,7 +290,8 @@ print(count)
 ```
 
 `rebinds()` never touches the module-level `count`.
-Drop the `global` from `writes_global()` and `count += 1` reads a local that was never assigned,
+If you drop the `global` from `writes_global()`,
+`count += 1` reads a local that was never assigned,
 so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading,
 which is why `read_only()` needs nothing.
@@ -372,7 +373,7 @@ Two markers in a parameter list control how callers may pass arguments,
 which decides how much of a signature you commit to keeping.
 A parameter a caller can name is part of the contract; one it cannot is not.
 A `/` ends the *positional-only* parameters.
-You must pass every parameter before it by position, never by name.
+You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
 A `*args` parameter has the same effect as a bare `*`.
@@ -508,5 +509,5 @@ For anything more complicated, write a separate function.
 8.  In `function_scope.py`,
     delete the `global count` line from `writes_global()` and predict what a call raises before running it.
     Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
-    Explain why that also raises `UnboundLocalError`,
+    Explain why that also raises an `UnboundLocalError`,
     even though the assignment to `count` comes after the `print`.

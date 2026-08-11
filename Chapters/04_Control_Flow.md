@@ -160,7 +160,7 @@ find_factor(13)
 
 The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
-This `else` is also the way out of two nested loops:
+This `else` is also how you leave two nested loops at once:
 put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s, its `else` is skipped and the outer `break` runs;
 when it finishes clean, the `continue` moves the outer loop along instead.
@@ -244,14 +244,14 @@ while stack and (item := stack.pop()) != "a":
 
 The `while` loop is where this pays off.
 It pops a value, names it, and tests it in one place,
-so nothing in the body has to pop again or keep a separate copy.
+so the body needs no second pop and no separate copy.
 It also collapses `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
 which [Comprehensions](16_Comprehensions.md) covers.
 
 Changing a container while a `for` loop walks it is the classic control-flow bug,
-and the two containers you are most likely to do it to behave differently:
+and the two containers you are most likely to mutate this way behave differently:
 
 ```python
 # mutating_while_looping.py
@@ -278,7 +278,7 @@ Removing an item shifts the next one down into the slot the loop already passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
 The dictionary refuses outright instead of skipping silently.
-Neither behavior is something to work around:
+Neither behavior calls for a workaround:
 build a new container with a comprehension,
 or collect what to remove first and remove it after the loop.
 
@@ -321,7 +321,7 @@ Write a constant as a literal (`case "quit":`) or as a dotted name
 `match` and `case` are *soft keywords*:
 they are keywords only in this statement,
 so existing code that uses `match` as a variable name still runs.
-Avoid the name anyway, since a reader must work out which meaning applies.
+Avoid the name, though: a reader must work out which meaning applies.
 [Pattern Matching](13_Pattern_Matching.md) covers `match` in detail.
 
 ## Errors and Exceptions
@@ -371,14 +371,14 @@ divide_and_report(1, 1)
 ```
 
 `checked_divide()` raises `ValueError` rather than letting Python's own `ZeroDivisionError` through,
-which is what you do when the caller should hear about the bad argument,
+which you do when the caller should hear about the bad argument,
 not the failed arithmetic.
 
 The optional `else` runs when the `try` block raised no exception,
 the same shape as the loop `else` that runs when no `break` occurred.
 The optional `finally` always runs, which makes it the place for cleanup.
 
-Catch the exceptions you can do something about.
+Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,
 including the `KeyboardInterrupt` you press to stop a runaway program,
 so a mistake in the `try` block looks like an expected failure.
@@ -458,15 +458,15 @@ for parse in (implicit, explicit, suppressed):
 `BadNumber` is a custom exception type,
 made by deriving a class from `Exception`.
 Its body is `pass` because it needs no behavior of its own;
-the class name is what the handler matches on.
+the handler matches on the class name.
 Class definitions get their full treatment in [Classes](07_Classes.md).
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
-so the output above is the text Python itself would print, not a summary of it.
+so the output above is the text Python would print, not a summary of it.
 `from e` sets `__cause__` and produces the "direct cause" line.
-With no `from`, Python records the earlier exception in `__context__` anyway and produces the "During handling" line.
+With no `from`, Python still records the earlier exception in `__context__` and produces the "During handling" line.
 `from None` sets `__suppress_context__`,
-and nothing appears above the new exception at all.
+and nothing appears above the new exception.
 Use `from e` when the earlier exception explains this one,
 and `from None` when it would only distract from your own message.
 
@@ -512,7 +512,7 @@ and only the EAFP form is safe against that.
 
 ## Context Managers
 
-A `with` block guarantees that setup and cleanup happen as a pair,
+A `with` block guarantees that setup and cleanup run as a pair,
 even if the body raises an exception.
 Opening a file is the canonical case.
 The `with` block always closes the file on the way out:
@@ -553,7 +553,7 @@ contrasts this with letting Python's garbage collector do it.
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.
-When reading or writing a file,
+For reading or writing a file,
 `pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file.
 
 ## Comprehensions
@@ -603,7 +603,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
 6.  Rewrite the `evens` list comprehension in `comprehensions_intro.py` as a `for` loop that appends to a list,
     then say which version you would rather read six months from now.
 7.  In `exception_chaining.py`,
-    add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs itself.
+    add a fourth function that catches the `ValueError` and raises `BadNumber` from a *different* exception object it constructs.
     Predict which line `joining_line()` prints before you run it.
 8.  Rewrite `context_manager.py`'s reading half using `path.read_text()`.
     Say what the `with` form gives you that the one-liner does not,

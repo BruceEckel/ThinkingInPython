@@ -302,7 +302,7 @@ so the line delegating to `one()` contributes one value and the line delegating 
 The number of contributions is a property of the target.
 The `from` makes this delegation:
 `yield one()` would hand the generator object itself to the driver as one value.
-"Exhausted" describes where the delegation ends, not when it happens.
+"Exhausted" describes where the delegation ends, not when.
 Each value still leaves the inner generator only when the driver asks for the next one.
 
 Exhaustion is transitive.

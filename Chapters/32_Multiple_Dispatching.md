@@ -396,7 +396,7 @@ Do not confuse the reflected forms with the in-place forms,
 `__iadd__()` and its siblings,
 which serve `+=` and take no part in the fallback.
 Returning `NotImplemented`
-(a sentinel value, not the `NotImplementedError` exception, a lookalike pair worth keeping apart)
+(a sentinel value, not the lookalike `NotImplementedError` exception)
 is how an operand says "I don't know this type; ask the other object."
 Here is the machinery, with each dispatch traced:
 
@@ -441,12 +441,13 @@ except TypeError as e:
 
 The first two additions resolve inside `__add__()`:
 the left operand recognized the type.
-`4 + Meters(3)` asks `int.__add__` first, and `int` has never heard of `Meters`,
-so it returns `NotImplemented`.
-Python then, with no error anywhere, turns to `Meters.__radd__`,
+`4 + Meters(3)` asks `int.__add__()` first,
+and `int` has never heard of `Meters`, so it returns `NotImplemented`.
+Python then, with no error anywhere, turns to `Meters.__radd__()`,
 whose trace line shows the operands arriving swapped.
-The last case shows what the sentinel is for.
-`Meters.__add__` runs, declines the string, `str` has no `__radd__` to consult,
+The last case shows why the sentinel exists.
+`Meters.__add__()` runs, declines the string,
+`str` has no `__radd__()` to consult,
 and only after both sides have declined does Python raise `TypeError`.
 
 Two details of the fallback are easy to get wrong.
@@ -466,7 +467,7 @@ and that is the standard convention rather than a shortcut.
 Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union,
 and it can do that because it gives `NotImplemented` a type that inherits from `Any`,
 so returning the sentinel satisfies any declared return type.
-Spelling the union out, `Meters | NotImplementedType`,
+Writing the union out, `Meters | NotImplementedType`,
 makes a checker reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 The sentinel signals the interpreter and never reaches a caller,

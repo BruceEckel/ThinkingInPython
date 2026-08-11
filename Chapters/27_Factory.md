@@ -368,7 +368,7 @@ The example given in *GoF Design Patterns* implements portability across various
 You create a factory object appropriate to the GUI that you're working with,
 and from then on when you ask it for a menu, button, slider, etc.,
 it will automatically create the appropriate version of that item for the GUI.
-Thus you're able to isolate, in one place,
+Thus you can isolate, in one place,
 the effect of changing from one GUI to another.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
@@ -592,7 +592,7 @@ The `clone()` method wraps `copy.deepcopy()`.
 The last three lines are the trap, not the recommendation:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so a change through one object is visible through the other,
-with no error to point at.
+with no error to signal it.
 
 You can combine prototype with a registry.
 Instead of a registry of classes,

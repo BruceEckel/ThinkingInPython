@@ -223,7 +223,7 @@ and its traceback object.
 `Trace.__exit__()` above types `exc` and `tb` as `object`,
 the most general type, since it never inspects either one.
 
-The return value decides what happens to that exception.
+The return value decides that exception's fate.
 A falsy value lets it propagate;
 this includes the implicit `None` of a method with no `return`,
 so propagation is the default.
@@ -815,7 +815,7 @@ and a timeout on `get()` so a starved borrower fails loudly instead of waiting f
 
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.
-That is what the protocol buys:
+That is the protocol's payoff:
 the borrower's contract is two lines long and impossible to get wrong,
 and everything hard about custody lives on the other side of the `yield`.
 
@@ -834,7 +834,7 @@ which the generator form cannot do.
 Add `ContextDecorator` only when the same bracket should also wrap whole functions.
 
 Whichever form you choose, the borrower's side contains two lines,
-and every change you make later happens inside the manager.
+and every change you make later goes inside the manager.
 
 ## Exercises
 

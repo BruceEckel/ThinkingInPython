@@ -264,7 +264,7 @@ Lookup computes a *hash* from each key,
 a small integer derived from the key's contents that says where the entry lives,
 so keys must be *hashable*.
 The mutable built-in containers (`list`, `dict`, `set`) are not hashable,
-so they cannot serve as keys.
+so they cannot be keys.
 Strings, numbers, and tuples of hashable values can.
 
 ```python
@@ -367,7 +367,7 @@ print(2 in a)
 
 `dict` claimed the `{}` literal first, so an empty set is `set()`.
 The order these sets print comes from CPython's hashing, not from any guarantee,
-so never write code, or a test, that depends on it.
+so do not write code, or a test, that depends on it.
 
 Every set-algebra operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
@@ -442,9 +442,9 @@ A timing depends on the machine that took it,
 so every measured listing in this book prints a comparison rather than a number.
 `report()` comes from a small helper the book supplies,
 and it stays silent unless you ask for the figures:
-run the listing with `--numbers`
+running the listing with `--numbers`
 (see [Numbers on Your Machine](18_Performance.md#numbers-on-your-machine))
-and it prints the two times it measured.
+prints the two times it measured.
 
 ## Specialized Containers
 
@@ -514,7 +514,7 @@ so touching a missing key grows it.
 Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
 
-A plain `dict` has a second option worth knowing:
+A plain `dict` has a second option:
 `plain.setdefault(kind, []).append(name)` stores the default and returns it when the key is missing,
 and returns the existing value when it is not.
 It builds the empty list on every call, used or not,
@@ -606,7 +606,7 @@ Indexing its middle is O(n), though,
 so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` additionally caps its length,
 discarding from the far end when a new item overflows it,
-which is the sliding window a `list` has no equivalent for.
+which is the sliding window a `list` cannot provide.
 For a queue shared between threads, use `queue.Queue`
 (see [Concurrency](19_Concurrency.md)), and for a priority queue, `heapq`.
 
@@ -724,7 +724,7 @@ except TypeError as e:
 ```
 
 Because a `frozendict` cannot change, it is hashable when its values are,
-so like a `tuple` or a `frozenset` it can serve as a dictionary key or a set member.
+so like a `tuple` or a `frozenset` it can be a dictionary key or a set member.
 The requirement on a dictionary key is hashability, not immutability.
 Immutability is how a container earns a stable hash.
 

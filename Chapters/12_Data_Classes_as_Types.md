@@ -594,7 +594,7 @@ print(A.__annotations__)
 #: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
-`A` never overrides `__init__`, `__repr__`, `__eq__`, or `__hash__`,
+`A` does not override `__init__`, `__repr__`, `__eq__`, or `__hash__`,
 so every one of them is `object`'s generic version,
 and `show(A())` reports none as redefined.
 
@@ -739,10 +739,10 @@ It now lives in that instance's own `__dict__`, not on the class.
 `@dataclass` treats a `ClassVar` field as belonging to the class,
 not to any instance, and leaves it out of `__init__()`.
 `__init__(self, x: int = 99) -> None` has no `s` parameter,
-so no constructor call can ever assign one.
+so no constructor call can assign one.
 `s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
 
-`f: ClassVar[float]` never appears in either report.
+`f: ClassVar[float]` appears in neither report.
 It has no initializer, so it is a bare annotation,
 as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.

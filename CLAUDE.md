@@ -249,21 +249,17 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
   both at runtime and under `ty check`.
-- **A PEP 695 `type` alias as a generator's return annotation disables
-  `ty`'s invalid-yield check (0.0.63).** `type Greeting = Depend[...]` used
-  as a return annotation let an undeclared `Need[Log]` yield through with
-  zero diagnostics; spelling the same annotation out caught it at the
-  offending `yield from`. Old-style `TypeAlias` assignments (stateless's
-  own `Effect`/`Depend`) check fine. Chapter 46 carries the warning
-  ("Write Effect signatures out in full until your checker proves that
-  it sees through the alias") and chapter 47 has the wrapped five-way
-  union; don't "clean up" those signatures into aliases. Chapter 45 has
-  no Effect signature at all, so this entry never applied there.
-  Re-confirmed on `ty` 0.0.65: spelled-out and old-style `TypeAlias`
-  annotations still report `invalid-yield`, the `type X = ...` form
-  still reports nothing. Re-test on each `ty` upgrade
-  (`stateless-partial-handling-ty-support` in project memory has
-  the probe).
+- **Effect signatures stay written out in full; don't fold them into
+  `type` aliases.** Chapters 46 and 47 spell every Effect signature out
+  (47 carries the wrapped five-way union): the union is the information,
+  and it stays visible at the point of use. On `ty` 0.0.70 a
+  `type X = ...` alias as a generator's return annotation checks the
+  same as the spelled-out form (an undeclared Ability draws
+  `invalid-yield` through the alias), but an inference gained in one
+  release can vanish in another, so re-run the probe on each `ty`
+  upgrade (`stateless-partial-handling-ty-support` in project memory
+  has it) before trusting an alias there. Chapter 45 has no Effect
+  signature, so this entry does not apply there.
 - **Never auto-run `make tools-upgrade` or `make python-upgrade`.** Both mutate
   tracked files (`uv.lock`, and `.python-version`/`pyproject.toml` with `TO=`) and
   can invoke real system package managers (`winget`/`brew`). Only run them when

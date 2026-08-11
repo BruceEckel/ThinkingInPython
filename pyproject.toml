@@ -29,6 +29,9 @@ dev = [
     # The effect system used by the Stateless chapter. Its examples are
     # type-checked by the gate, so it must be installed, not illustrative.
     "stateless>=0.6.1",
+    # Chapter 18's vectorize_numpy.py is a real gated listing; the Numba
+    # sections stay illustrative until numba supports the pinned Python.
+    "numpy>=2.5.2",
 ]
 
 [tool.uv]

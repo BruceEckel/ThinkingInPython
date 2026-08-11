@@ -13,7 +13,7 @@ This book has emphasized the benefits of pure functions in numerous places:
   which depends on state left over from earlier calls.
 - [Performance](18_Performance.md#caching)
   turns naive recursive Fibonacci from 242,785 calls into 26 with `functools.cache`.
-  Caching only works because the cached function is pure.
+  Caching works only because the cached function is pure.
 - [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
@@ -55,7 +55,7 @@ For example, it might:
 Side effects are relatively easy to spot in the function that performs them,
 because they change something outside it.
 
-But the meaning of "Effect" is broader than just side effects.
+But the meaning of "Effect" is broader than side effects.
 It also includes the impact of the environment on the function.
 For example, suppose your function reads the time of day, or a random number.
 This doesn't change anything in the environment.
@@ -188,7 +188,7 @@ except ValueError as e:
 ```
 
 This works, and it needs no new type.
-But it only guards the exception `slope()`'s author expected.
+But it guards only the exception `slope()`'s author expected.
 `validate()` raises `ValueError` for a negative `run`,
 an exception `slope()` never anticipated.
 Because `slope()` calls it, `validate()`'s Effect becomes `slope()`'s Effect.
@@ -851,7 +851,7 @@ and a generation later, nobody can imagine doing it by hand.
 Namespaces are the clearest example.
 Early languages put every name in one global pool,
 and the programmer was responsible for preventing collisions.
-Collisions often happened quietly, producing hidden bugs,
+Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution gave every name a home.
 In Python, every module is automatically a namespace,

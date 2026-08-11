@@ -74,7 +74,7 @@ Do not write code that depends on them, but notice the technique.
 ## Intrinsic and Extrinsic State
 
 A map can hold millions of cells, but only a handful of tile kinds.
-Here, the map holds only grass, water, and rock.
+Here, the handful is grass, water, and rock.
 
 The tile's symbol, name, and walkability are intrinsic,
 so they go in a frozen data class.

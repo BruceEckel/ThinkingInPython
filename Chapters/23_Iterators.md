@@ -44,7 +44,7 @@ then calls `next()` until `StopIteration` occurs.
 A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
-The near-miss is `next(nums)`: `next()` accepts only an iterator,
+The tempting call is `next(nums)`: `next()` accepts only an iterator,
 and a list has no `__next__()`, so that call raises a `TypeError` at runtime,
 and the checker rejects it before that.
 

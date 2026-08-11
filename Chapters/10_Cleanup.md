@@ -63,7 +63,8 @@ That list holds the only remaining references, so when it goes,
 the objects it holds go with it.
 The listing ends at `End of delete loop`, the program's last statement,
 and each `__del__()` prints only afterward.
-Run `cleanup.py` directly and three more pairs of lines follow the last one above:
+If you run `cleanup.py` directly,
+three more pairs of lines follow the last one above:
 
     Third deleted
     2 Counter objects remaining
@@ -238,7 +239,7 @@ except RuntimeError as e:
 ```
 
 `close()` runs at the end of the `with` block, at a line you can point at,
-and the second half shows it running when the body raises.
+and the second half shows it running when the body raises an exception.
 Compare `cleanup.py`,
 where the release happened at an unknowable moment after the program's last statement.
 [Context Managers](15_Context_Managers.md) covers the protocol,

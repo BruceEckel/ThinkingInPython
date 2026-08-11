@@ -353,7 +353,7 @@ The reuse is the risk as well as the point: every test receives the same object,
 so one test that mutates it changes what the next test sees.
 Keep session fixtures to values nothing modifies, like `bank_name`,
 or to a resource with its own reset,
-and leave anything a test writes to at the default per-test scope.
+and leave anything a test mutates at the default per-test scope.
 
 `preloaded` shows the other feature: you can parametrize a fixture.
 Every test that requests it runs once for each parameter value,
@@ -499,7 +499,7 @@ is most of what makes a module testable.
 ### Random Numbers
 
 Code that calls `random` produces a different value each run,
-which a test cannot assert against:
+so a test cannot assert a fixed result:
 
 ```python
 # dice.py
@@ -605,7 +605,7 @@ def test_elapsed() -> None:
 
 Both tests check the identical arithmetic.
 Only the injected one needs no `monkeypatch`,
-and only it says in its signature where the time comes from.
+and only it says in its signature where it gets the time.
 
 `datetime.now()` is harder to patch,
 because `datetime` is an immutable C type that rejects attribute assignment,
@@ -689,7 +689,7 @@ The standard library's `unittest.mock` builds stubs for you,
 along with *mocks* that also record the calls they receive,
 and you will meet it in most existing code.
 This book patches with `monkeypatch` and prefers injection where you can change the code,
-because a function that takes its clock or its fetcher as an argument needs no patching library at all.
+because a function that takes its clock or its fetcher as an argument needs no patching library.
 
 ## Property-Based Testing
 

@@ -99,7 +99,7 @@ The class version is four classes and a wrapper to say what one list of function
 In Python a callback is just a function, so the replacement is unnecessary.
 Use the object form when a command must support extra operations such as undo.
 Halfway between the two, a *bound method* is a ready-made command.
-`account.deposit` names a function with its instance already attached,
+`account.deposit` names a function with its instance attached,
 so it drops into a command list alongside plain functions,
 carrying its state without any `Command` class.
 

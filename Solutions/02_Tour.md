@@ -140,3 +140,19 @@ That is the argument for `Template` in one example. Quoting is a
 harmless demonstration, but the same reasoning covers escaping a value
 before it enters SQL or HTML, which is the case where guessing wrong is
 a security hole rather than a typo.
+
+## 6. Negative floor division and modulo
+
+```python
+# exercise_6.py
+print(-9 // 4, -9 % 4)
+#: -3 3
+```
+
+C and Java truncate integer division toward zero, so their integer
+`-9 / 4` is `-2` and `-9 % 4` is `-1`. Python floors toward negative
+infinity, so `-9 // 4` is `-3`, and the identity
+`a == (a // b) * b + a % b` then forces the remainder to `3`. The
+rule: the result of `%` takes the sign of the divisor. With a
+positive divisor the remainder is nonnegative, which is why
+`index % len(items)` wraps cleanly in either direction.

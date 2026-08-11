@@ -109,7 +109,7 @@ print(square.cache_info())
 
 The single hit is the second `square(2)`, which was still in the cache.
 The second `square(1)` is a fourth miss even though `1` was the first value computed,
-and that miss is the proof that the eviction happened.
+and that miss is the proof that `1` was evicted.
 `currsize` never passes `maxsize`:
 a new entry gets in only by pushing another one out.
 
@@ -347,7 +347,7 @@ instead of loops you write and test again.
 
 `itertools` builds lazy iterators from a small set of composable pieces.
 Each one produces values on demand instead of building a list up front,
-the property [Lazy Evaluation](#lazy-evaluation) returns to below.
+the property [Lazy Evaluation](#lazy-evaluation) revisits below.
 Each is also a loop you would otherwise write by hand,
 already tuned in C and already correct on the edge cases a hand-rolled version tends to miss,
 the empty iterable, the single element,
@@ -599,8 +599,7 @@ which is right when the missing elements are data in their own right.
 ### `groupby`
 
 Groups consecutive elements that share a key.
-The input must arrive already sorted by that key,
-since it only merges neighbors.
+The input must arrive sorted by that key, since it only merges neighbors.
 
 ```python
 # itertools_groupby.py
@@ -825,7 +824,7 @@ the recursion states the definition, and the cache removes the repetition.
 Recursion suits problems that are naturally self-similar,
 such as walking a tree.
 Python does not optimize tail calls and limits the call stack,
-so deep recursion will raise `RecursionError`.
+so deep recursion will raise a `RecursionError`.
 `sys.setrecursionlimit()` raises that ceiling when the depth is genuine,
 but it is the wrong answer for a long flat sequence,
 where a loop or one of the `itertools` tools is the better choice.
@@ -988,7 +987,7 @@ which makes it the obvious place to put `@cache` from earlier in this chapter.
 Doing so would be wrong.
 `met()` reads `history`, and `history` changes at the end of every round,
 so a cached answer from round 0 would still come back in round 6 after every count it summed had moved.
-The `cache` entry's rule that caching only works for pure functions is not a formality.
+The `cache` entry's rule that caching works only for pure functions is not a formality.
 A function that reads mutable state is not pure, however simple its body looks.
 
 Generality cost something.
@@ -1001,7 +1000,7 @@ It is still a pure function in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` never reaches outside itself for randomness.
-What changed is that computing round `100` now means having already generated rounds `0` through `99`,
+What changed is that computing round `100` now means having generated rounds `0` through `99`,
 where the circle method could compute round `100` directly,
 from its arithmetic alone.
 That trade, memory for generality, is the same one [Recursion](#recursion)

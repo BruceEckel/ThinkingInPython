@@ -49,7 +49,7 @@ When the last rat dies, the pack has mapped every cell reachable from the entry.
 ### The Rat and the Blackboard
 
 The rat does not import the blackboard.
-It only needs an object with matching methods,
+It needs only an object with matching methods,
 so a `Protocol` describes what it expects.
 This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
@@ -566,7 +566,7 @@ The attribute does not exist until then,
 so reading it earlier raises an `AttributeError`, and the builder runs first,
 so nothing reads it earlier.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
-so no code that reads `room` has to check for `None`.
+so no code that reads `room` needs a `None` check.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
@@ -808,7 +808,7 @@ print(game.show_maze())
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
 
-Stage 3 pairs the teleports with a small idiom worth decoding.
+Stage 3 pairs the teleports with a small idiom.
 `pairs = iter(teleports)` makes one iterator,
 and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
 so each pass consumes two rooms: the first and second `a`, then the two `b`s.

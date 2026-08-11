@@ -207,7 +207,7 @@ Each generated class is a real type, not a label.
 so `isinstance()` tells them apart and you can later give either one behavior of its own.
 
 The checker cannot follow a class built by `type()`,
-so it reads `make()`'s result as `Event` itself,
+so it reads `make()`'s result as `Event`,
 whose `__init__()` takes three arguments.
 `EventMaker` names the two-argument signature the generated classes really have,
 and the `cast()` records it at the one place that creates a class.
@@ -338,7 +338,7 @@ replacing the colon with a second space before splitting on whitespace.
 The first time a lookup asks for an event type,
 the maker builds the class and registers it under its name.
 An unknown name raises `KeyError`,
-which is what a caller writing `try: ... except KeyError` around a lookup expects.
+which a caller writing `try: ... except KeyError` around a lookup expects.
 
 `Event._event_maker` comes pre-populated with the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
@@ -889,9 +889,8 @@ so mutating the original dict changes nothing the class can see.
 
 Override `__new__()` when you must change `name`, `bases`, or the namespace
 (including special members like `__slots__`) before Python builds the class.
-Otherwise, prefer `__init__()`, which is simpler.
-When the choice does not matter,
-pick `__init__()` and reserve `__new__()` for a genuine need.
+Otherwise, prefer `__init__()`, which is simpler,
+and reserve `__new__()` for a genuine need.
 
 ## Intercepting Instance Creation
 
@@ -964,7 +963,7 @@ Without it, every singleton loses its type and a type checker can no longer catc
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
-which is what a checker must confirm before it accepts a zero-argument `super()`.
+which a checker must confirm before it accepts a zero-argument `super()`.
 Both forms do the same work at run time.
 
 You might expect to parameterize[^parametrize] the class,
@@ -1012,7 +1011,7 @@ so combining them is impossible in any context.
 
 The `# type: ignore` comment is there because ty knows this rule statically.
 Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
-A checker that predicts a crash before the program ever runs is static typing at its best;
+A checker that predicts a crash before the program runs is static typing at its best;
 the comment suppresses the diagnostic only because raising that crash is educational.
 
 A metaclass can multiply inherit like any other class,
@@ -1098,7 +1097,7 @@ Use a metaclass when you need to change the class object rather than react to it
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across an entire family of classes through their shared metaclass.
 
-`__prepare__()` is the one with no simpler substitute, so it is worth seeing:
+`__prepare__()` is the one with no simpler substitute:
 
 ```python
 # prepare_namespace.py
@@ -1359,7 +1358,7 @@ so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
 even though `D` declares them directly, because neither belongs to an instance.
-For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object itself,
+For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
 the way `Stars.rating` did in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
 `class_with_defaults.py`'s `show(B())`, from that same comparison,
 tags `B.x` and `B.s`,
@@ -1464,7 +1463,7 @@ not merely an equal one.
 and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
 minus `__hash__`, useful when a listing has already made that particular point and repeating it only adds noise.
-The check runs first, before the `dunder` logic even sees the name,
+The check runs first, before the `dunder` logic sees the name,
 so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selected it.
 
 ### The Tool in Use
@@ -1661,7 +1660,7 @@ Here is the job list:
 - Change the name, the bases, or the namespace before Python builds the class:
   a metaclass `__new__()`.
 - Control the namespace the body executes into: `__prepare__()`.
-- Decide whether an instance gets built at all: a metaclass `__call__()`.
+- Decide whether an instance gets built: a metaclass `__call__()`.
 - Read a class you did not write: `inspect`.
 
 None of this is a special facility bolted onto the language.
@@ -1736,7 +1735,7 @@ each time someone calls the finished class.
 
     Python evaluates `Singleton[ASingleton]` eagerly,
     before the name `ASingleton` is even bound,
-    so there is no equivalent incomplete-type stage to lean on.
+    so there is no equivalent incomplete-type stage to exploit.
 
 [^parametrize]: Four spellings are in use, all correct.
     The stem is `parametr-` or `parameter-`.

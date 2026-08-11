@@ -342,7 +342,7 @@ The comprehension finished building `py_paths` as strings while the directory st
 so nothing later needs the files.
 Turning those brackets into parentheses would break it:
 a generator expression would not start walking until `sorted()` pulled on it,
-and that pull happens outside the `with`.
+and that pull comes outside the `with`.
 [Generator Expressions](#generator-expressions) returns to this.
 
 ## Breaking Up a Complex Comprehension
@@ -352,7 +352,7 @@ You can nest more `for` and `if` clauses,
 or wrap the whole thing in another call,
 but each addition makes the expression harder to read in one pass.
 Here, filtering, flattening, sorting,
-and formatting all happen in a single expression:
+and formatting all run in a single expression:
 
 ```python
 # dense_comprehension.py
@@ -656,7 +656,7 @@ Braces for a set, or for a dict when a colon separates a key from a value.
 Parentheses when the consumer takes values one at a time and does not need them all at once.
 A `for` loop when you want the side effect rather than the collection.
 
-The delimiters also decide when the work happens.
+The delimiters also decide when the work runs.
 Every form but the parenthesized one runs to completion before the next statement,
 so you pay the cost of a comprehension where you wrote it.
 A generator expression defers that cost to whoever consumes it,
@@ -680,7 +680,7 @@ and pays it only for the values the consumer pulls.
     and predict how many entries `unique` holds before running it.
     Explain why `"J"` does not collide with `"JOHN"`.
 5.  `comprehension_side_effects.py` builds a list of `None`s.
-    Write a version that keeps the printing but produces a list the caller would actually want,
+    Write a version that keeps the printing but produces a list the caller can use,
     then say whether a comprehension or a `for` loop is the right shape for it.
 6.  In `unpacking_comprehensions.py`,
     add a fourth entry `{"a": 5, "c": 9}` to `dicts` and predict what `{**d for d in dicts}` produces before running it,

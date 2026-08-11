@@ -130,7 +130,7 @@ def test_template_method_runs_steps_in_order() -> None:
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 `ApplicationFramework` leaves starting to the client,
-and the `Framework` below shows what happens when a framework does not.
+and the `Framework` below shows what goes wrong when a framework does not.
 A framework can call `run()` from its own constructor,
 and a subclass with its own `__init__()` then has a trap to avoid.
 `run()` calls methods the subclass supplies,

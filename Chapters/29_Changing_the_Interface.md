@@ -286,7 +286,7 @@ Three classes and their required assembly order stay behind the underscore,
 and the façade can rearrange them without touching a caller.
 The underscore is a convention, not a barrier.
 `checkout._PriceEngine` still resolves for anyone who types it.
-What the underscore does mechanically is keep the name out of `from checkout import *`,
+Mechanically, the underscore keeps the name out of `from checkout import *`,
 and an [`__all__`](06_Modules_and_Packages.md#what-a-module-exports)
 list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call, not a lock on the rest.

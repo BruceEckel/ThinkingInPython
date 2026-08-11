@@ -596,7 +596,7 @@ and the `match` tells them apart.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 
-An exception knows what went wrong but not where it came from.
+An exception knows what went wrong but not where.
 `invalid literal for int() with base 10: 'soon'` is accurate and unhelpful:
 which setting, which field, which row of the file?
 The frame that has that answer is rarely the frame that raised the exception,
@@ -632,7 +632,7 @@ except ValueError as e:
 
 The bare `raise` re-raises the same object,
 so the type stays `ValueError` and the original traceback survives undisturbed.
-Notes accumulate: each frame that knows something the raiser did not can add its own line as the exception passes through.
+Notes accumulate: each frame that knows something the raiser did not can add its own line as the stack unwinds.
 They live in a list called `__notes__`,
 which is absent until the first `add_note()` call.
 The checker is no help there,
@@ -675,7 +675,7 @@ in the one frame that knows both the failure and the field name.
 Everything downstream can report the failure without asking what the code was reading.
 This is the chapter's opening argument, applied one level down:
 `Err` says a failure happened and the exception says what it was,
-and a note says which piece of work it belonged to.
+and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
 which checks because `@final` on the two classes rules out a value that inherits from both,

@@ -227,7 +227,7 @@ which always holds the current version.
 The text carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 license; the source repository's `CONTRIBUTING.md` has the details.
 
-Places worth knowing about:
+Other resources:
 
 - [The official Python tutorial](https://docs.python.org/3/tutorial/)
 - [The Python Programming FAQ](https://docs.python.org/3/faq/programming.html)

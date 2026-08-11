@@ -193,7 +193,7 @@ For an immutable value, make the value's own type immutable,
 
 Immutability also makes two things possible that a mutable value cannot offer.
 The first is a *stable hash*, one that holds for the value's whole life,
-so the value can serve as a dictionary key or a set member.
+so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy,
 because no recipient can change the value out from under you.
 A `list` offers neither:
@@ -343,10 +343,10 @@ covered under [Closures](#closures), below.
 The `list()` calls are not decoration.
 `map()` and `filter()` return one-shot iterators,
 so `print(map(...))` shows `<map object at 0x...>` instead of values,
-and a second pass over the same object produces nothing at all,
-with no error to point at ([Generators](23_Iterators.md#generators)).
+and a second pass over the same object silently produces nothing
+([Generators](23_Iterators.md#generators)).
 `sorted()` is the exception:
-it has to see every element before it can order any of them,
+it must see every element before it can order any of them,
 so it always returns a list.
 
 The lambdas above exist to show the machinery,
@@ -358,7 +358,7 @@ more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` 
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
 The two are not quite the same object, either.
 The comprehension hands you a finished list;
-`map()` hands you an iterator you can feed into the next stage without building the list at all.
+`map()` hands you an iterator you can feed into the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
 The rule of thumb: existing function, use the higher-order form;
@@ -445,7 +445,7 @@ No other code can name that variable, so no accident can corrupt it.
 The contrast with `withdraw()` is the lesson.
 `withdraw()` mutated a module-level name that any code could touch;
 `increment()` mutates a name that only it can touch.
-When state has to exist,
+When state must exist,
 a closure is one way to give exactly one function the right to change it.
 
 The privacy is Python's usual kind, though, and not a lock.

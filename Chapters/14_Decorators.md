@@ -247,8 +247,7 @@ if __name__ == "__main__":
 #: Hello, Bob
 ```
 
-The return type is worth breaking down:
-`Callable[[Callable[P, R]], Callable[P, R]]`.
+Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
 (see the summary in [Static Typing](08_Static_Typing.md#containers)).
 The first, inner brackets hold the parameter types, even when there is only one,
@@ -666,7 +665,7 @@ For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class-based decorator, like `trace_class.trace`,
-even gets the checker involved:
+gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
 catching the same problem before the program runs.
 
@@ -844,7 +843,7 @@ This idiom pays off for a value that needs one-time setup logic but stays consta
 For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
-The same collapse happens to classes.
+Classes collapse the same way.
 [Singleton](24_Singleton.md#singleton-by-class-decorator)
 decorates a class with a callable that replaces it with one cached instance,
 so the name that followed `class` ends up bound to an object, not a type.

@@ -239,7 +239,7 @@ print(a.total, b.total, Tally.total)
 
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`;
-the write lands on the instance and creates a fresh `total` there.
+the write creates a fresh `total` on the instance.
 Every `Tally` counts itself once and the shared counter never moves,
 which is why `class_var.py` increments through the class name,
 `Tally.total += 1`.

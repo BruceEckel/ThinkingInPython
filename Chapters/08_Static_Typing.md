@@ -100,7 +100,7 @@ The bug surfaces later, often far from the line that caused it.
 The checker immediately discovers the problem.
 
 The `# type: ignore` comment tells the type checker to skip this line,
-which allows this book's build to complete successfully.
+so this book's build passes.
 Without it, `ty check` reports:
 
 ```
@@ -461,7 +461,8 @@ Without the default,
 so `words.top().upper()` goes unchecked.
 The default gives the bare form a meaning,
 which matters most for a class whose parameter has one common answer:
-callers who want that answer write nothing, and the annotation stays precise.
+callers content with that answer write nothing,
+and the annotation stays precise.
 
 The same applies to a `type` alias, as `Pair` shows:
 
@@ -480,7 +481,7 @@ print(is_origin((0, 0)))
 Defaulted parameters go last, the way defaulted function parameters do,
 so `class Table[K = str, V]` is a syntax error.
 Type parameter defaults arrived in Python 3.13,
-one release after the bracket syntax itself.
+one release after the bracket syntax.
 
 A special form, `**P`, captures the types of an entire parameter list.
 [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
@@ -679,7 +680,7 @@ The abstract container types come from `collections.abc`.
 
 The runtime ignores all of these.
 They exist for the checker and the reader.
-Older code spells some of them differently: `Optional[X]` for `X | None`,
+Older code writes some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,
 `Tuple` from `typing` for the lowercase built-ins.
 The forms above are the modern ones.

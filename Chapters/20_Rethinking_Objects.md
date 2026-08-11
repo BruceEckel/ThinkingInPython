@@ -759,7 +759,7 @@ The subclass's own source declares membership,
 and the base can carry shared implementation for its children.
 A protocol is *structural*: it works with any type that has matching members.
 This includes types in libraries you cannot edit.
-The type's author never needs to hear that your protocol exists.
+The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
 They connect pieces without requiring any piece to change.
 

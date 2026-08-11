@@ -48,7 +48,7 @@ Whether it becomes a supported feature is an open question;
 Alternative interpreters for Python exist, notably PyPy,
 which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
-so confirm it supports the features and third-party packages you rely on.
+so confirm it supports the features and third-party packages you need.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, then buying new hardware might be a quick win.
@@ -126,7 +126,7 @@ Editing the function to add a counter changes the code you are studying,
 and turning on a full profiler to answer it costs more than the answer is worth.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
-is the interpreter's own hook mechanism,
+is the interpreter's own instrumentation mechanism,
 the one profilers and debuggers now use.
 You claim a tool identifier, register a callback for an event,
 and say which code the event applies to.
@@ -186,7 +186,7 @@ and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users,
 and trying to claim one that another tool already holds raises a `ValueError`,
-which is how two profilers avoid quietly fighting over the same hooks.
+which is how two profilers avoid quietly fighting over the same callbacks.
 
 For an answer you need once rather than continuously,
 the callback can turn its own event off:
@@ -234,7 +234,7 @@ and after the first hit the monitored code returns to full speed.
 The trade against a profiler is the usual one.
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function,
-which is the better tool when you know which function you care about and the profiler's overhead would change the answer.
+which is the better tool when you know which function matters and the profiler's overhead would change the answer.
 
 ## Benchmark Alternatives with `timeit`
 
@@ -741,7 +741,7 @@ When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice.
 A generator is spent after one pass.
 
-Fitting the whole data set in memory buys more than a second pass.
+Fitting the whole data set in memory gives you more than a second pass.
 Random access, sorting,
 and the `bisect` searches from earlier in this chapter all need an indexable structure,
 not a stream of values that arrive once and disappear.
@@ -1026,23 +1026,28 @@ and executes whole-array expressions in compiled loops.
 The plain-Python version repeats one expression per element.
 The NumPy version states it once for the whole array:
 
-    import timeit
-    import numpy as np
+```python
+# vectorize_numpy.py
+import timeit
+import numpy as np
+from benchmark import report
 
-    n = 1_000_000
-    numbers = list(range(n))
-    a = np.arange(n, dtype=np.float64)
+n = 1_000_000
+numbers = list(range(n))
+a = np.arange(n, dtype=np.float64)
 
-    def pure_python() -> list[float]:
-        return [3.0 * x + 1.0 for x in numbers]
+def pure_python() -> list[float]:
+    return [3.0 * x + 1.0 for x in numbers]
 
-    def vectorized() -> np.ndarray:
-        return 3.0 * a + 1.0
+def vectorized() -> np.ndarray:
+    return 3.0 * a + 1.0
 
-    t_loop = timeit.timeit(pure_python, number=5)
-    t_numpy = timeit.timeit(vectorized, number=5)
-    print(f"NumPy speedup: {t_loop / t_numpy:.1f}x")
-    # Sample run: NumPy speedup: 12.9x
+t_loop = timeit.timeit(pure_python, number=5)
+t_numpy = timeit.timeit(vectorized, number=5)
+report(python_loop=t_loop, numpy=t_numpy, ratio=t_loop / t_numpy)
+print(f"NumPy at least 3x faster: {t_numpy * 3 < t_loop}")
+#: NumPy at least 3x faster: True
+```
 
 `np.arange(n, dtype=np.float64)` is NumPy's version of the `list(range(n))` line above it.
 Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
@@ -1060,16 +1065,8 @@ or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade from [Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
-(NumPy is a third-party dependency the book's build does not yet include, so unlike the rest of the book's listings, the build does not run this snippet.
-The comment above shows one machine's actual output.
-Expect a different, but still large, multiple on yours.)
-
-<!-- TODO(py315-deps): NumPy 2.5.2 publishes cp315 wheels for every
-platform and installs on the pinned 3.15 beta
-(verified 2026-08-11; the snippet ran at 10.7x in a scratch venv).
-Converting this indented block to a real, fenced,
-tested example now needs only the pyproject dependency decision;
-see deep_review/18_Performance.md. -->
+One machine measured the vectorized pass at about 11x faster than the loop;
+the 3x threshold sits far below any multiple you should see.
 
 ## JIT Compilation with Numba
 
@@ -1113,7 +1110,7 @@ will not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
-(Numba is also a third-party dependency, and it does not yet support the book's Python 3.15 target, so like the NumPy example above, the build does not run this snippet.
+(Numba is a third-party dependency that does not yet support the book's Python 3.15 target, so unlike the rest of the book's listings, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
@@ -1173,12 +1170,14 @@ use a vectorized NumPy expression wherever the shape of the computation allows i
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
 
-(Like the two examples above, this one needs both NumPy and Numba, so the build does not run it.
+(Like the Numba example above, this one needs Numba, so the build does not run it.
 The comment shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
-<!-- TODO(py315-deps): needs both NumPy and Numba on Python 3.15. Once
-both ship, convert this indented block to a real, fenced, tested example. -->
+<!-- TODO(py315-deps): needs Numba on Python 3.15 (NumPy is already a
+real dependency).
+Once Numba supports it, convert this indented block to a real, fenced,
+tested example. -->
 
 ## Converting a Slow Function to Rust
 
@@ -1319,7 +1318,7 @@ but a hundred-odd loop iterations of real work follow each integer,
 so the conversion cost disappears.
 The question is not the object count on its own but the work done per object crossed.
 
-<!-- TODO(py315-deps): once NumPy and Numba are available, extend
+<!-- TODO(py315-deps): once Numba is available (NumPy already is), extend
 rust/fastcount/demo.py (and this listing)
 to also time the NumPy+Numba collatz_lengths version from Combine NumPy and Numba above,
 so this compares Rust against that combination too, not just plain Python. -->
@@ -1362,7 +1361,7 @@ The goal is not the fastest possible program.
 It is a program that is fast enough, at the lowest cost in clarity.
 
 Step 4 on that list, fixing the algorithm, is usually the biggest win,
-because it changes which curve your program is on,
+because it changes which curve your program follows,
 not just where it sits on that curve:
 
 ![Big O growth rates vs. input size n](_images/big_o_growth)

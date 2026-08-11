@@ -223,8 +223,7 @@ so nothing overlaps and the delays add.
 Scheduling does not mean running.
 The task bodies execute only after `gather()` suspends
 (the event loop drives `gather()` too).
-Each runs until its first `await`,
-which is what the `started` lines in the trace record.
+Each runs until its first `await`, which the trace's `started` lines record.
 The comprehension doesn't achieve multiple coroutines in flight:
 it does not start the next coroutine until the previous one has finished.
 
@@ -677,7 +676,7 @@ takes up the rest of the coordination primitives, and the ways they fail.
 
 Some values are not the subject of the work, they are the circumstances of it:
 which request the code is serving, which user authorized it,
-which trace to log under.
+which trace to use for logging.
 Everything deep in the call chain needs them and nothing in the middle uses them.
 Threading such a value through as a parameter puts it in signatures that have no business knowing about it,
 and every new caller has to remember to pass it along.
@@ -729,7 +728,7 @@ so their contexts are copies of `main()`'s, and nothing they set flows back.
 
 Deleting the global and writing `handle(name)`'s value into a parameter would work here,
 and would keep working until a logging helper four calls down needs the value.
-That is the case a `ContextVar` is for.
+That is the problem a `ContextVar` solves.
 
 Setting a variable for part of a call and restoring it afterward is common enough that `set()` returns a token usable as a context manager
 (3.14):
@@ -771,7 +770,7 @@ which is the wrong unit twice over.
 Thousands of tasks share one event-loop thread, so they would share one value.
 And a value stored on a thread does not travel when work moves,
 while `asyncio.to_thread()` copies the current context into the worker,
-so the offloaded `audit()` still knows which request it belongs to.
+so the offloaded `audit()` still knows which request it is serving.
 `contextvars.copy_context()` is the general form,
 letting you capture a context and run something else inside it later.
 
@@ -949,7 +948,7 @@ if __name__ == "__main__":
 The only difference between one run and another is how finely the total work gets split.
 
 The listing creates the pool once and warms it up with a throwaway call before any measurement starts.
-This way, process startup delays never leak into a timed result.
+This way, process startup delays cannot leak into a timed result.
 Each later call reuses that same pool,
 so only the split changes from one line of output to the next.
 
@@ -1553,7 +1552,7 @@ but only in the way a crash is better than corruption.
 not a generator, and returns a function whose generators are each serialized.
 It also works as a decorator on the `def`,
 which is the right form when no caller of that generator function should have to remember.
-The pairing is worth keeping straight:
+Keep the pairing straight:
 `serialize_iterator()` wraps one iterator you already have,
 and `synchronized_iterator()` wraps the callable that makes them.
 
@@ -1793,8 +1792,8 @@ while an `asyncio` task is cheap enough to run in the thousands.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
 There is still no safe way to cancel a running thread.
-Free threading changes what a thread is for.
-It does not change what `asyncio` is for.
+Free threading changes a thread's job.
+It does not change `asyncio`'s.
 
 ### Measuring the Difference
 
@@ -1974,8 +1973,7 @@ since a preemptive switch could fall between them.
 Here, the first `await` comes after both updates,
 so the task keeps control through them and needs no lock.
 
-A semaphore initialized to one behaves like a lock,
-with one difference worth knowing.
+A semaphore initialized to one behaves like a lock, with one difference.
 A `Lock` refuses a release it never granted,
 raising `RuntimeError: Lock is not acquired`.
 An over-released `Semaphore` quietly raises its own limit instead,

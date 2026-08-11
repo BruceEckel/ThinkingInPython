@@ -259,7 +259,7 @@ falling back to the base implementation only when no registered ancestor exists
 
 The listing's last two output lines print the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
-and `nectar.dispatch(cls)` reports which implementation `cls` resolves to.
+and `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
 `Ranunculus` was not registered,
 so it resolves to the same implementation `Flower` does,
 the one filed under `object`.

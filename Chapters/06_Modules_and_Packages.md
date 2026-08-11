@@ -37,7 +37,7 @@ connect your class to the language's operators and built-in functions
 (see [Classes](07_Classes.md)).
 
 The reason for the `if` is that you can also use any file as a library module within another program.
-In that case, you only want its definitions,
+In that case, you want only its definitions,
 but you don't want the code at the bottom of the file to run.
 This particular `if` condition is true only when you are running this file directly.
 That is, `__name__` is `"__main__"` when you use the command line:
@@ -82,8 +82,8 @@ which is why `use_module` and `second` are one object.
 A consequence: a running program does not notice an edit to a module it has imported.
 Restart it, or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
-Reloading leaves every name already bound by a `from ... import` pointing at the old objects,
-which is why restarting is the reliable choice.
+Reloading leaves every name bound by a `from ... import` pointing at the old objects,
+so restarting is the reliable choice.
 
 To bring a name into the current namespace, use the `from` keyword:
 
@@ -322,7 +322,7 @@ print(module3.function3())
 
 The listings above import into a package from outside it.
 A package's own modules also import each other,
-and there the leading dot of a *relative import* means "the package this module lives in":
+and there the leading dot of a *relative import* means "the package containing this module":
 
 ```python
 # a_package/module4.py
@@ -379,11 +379,41 @@ The underscore changes one mechanical thing:
 `from accounting import *` skips every name that begins with one.
 
 `__all__` states the export list explicitly.
-Assign it at module level as a list of strings naming the public names,
+You assign it at module level as a list of strings naming the public names,
 and `from module import *` imports those and no others, underscore or not.
 An `__all__` also documents the intended surface in one readable place,
 which a scattering of underscores does not,
 and it is what documentation tools read when they ask what a module offers.
+
+```python
+# exporting.py
+
+__all__ = ["public", "helper"]
+
+def public():
+    return "public"
+
+def helper():
+    return "helper"
+
+def _internal():
+    return "internal"
+
+def undeclared():
+    return "undeclared"
+```
+
+```python
+# star_import.py
+from exporting import *  # noqa: F403
+
+print(sorted(n for n in dir() if not n.startswith("__")))
+#: ['helper', 'public']
+```
+
+Without `__all__`, the star import would bind `public`, `helper`,
+and `undeclared`: everything not underscored.
+With it, only the listed names arrive, and `_internal` is skipped either way.
 
 Neither mechanism stops `module._name`.
 Both say which names a caller should use,
@@ -430,21 +460,21 @@ Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
 Its first entry is the directory of the script you ran
 (the current directory when you use `-m` or the REPL),
-which is why `use_module.py` could `import module` with no setup at all;
+which is why `use_module.py` could `import module` with no setup;
 the entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
 so a local `random.py` can no longer shadow the standard library.
 
-What if your module or package isn't placed in the same directory as the Python file that's doing the importing?
-The original solution to this was to set an environment variable called `PYTHONPATH`,
+What if your module or package isn't in the same directory as the Python file doing the importing?
+The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
 `PYTHONPATH` takes multiple paths,
 and Python keeps searching through those paths until it finds your module or package
 (or doesn't, and reports an error).
 
 `PYTHONPATH` still works,
-but the modern practice is to install your package into the environment you are working in,
+but the modern practice is to install your package into the environment you are using,
 which puts it on the search path without any environment variable.
 Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
 or `uv pip install -e .` for an editable install.
@@ -462,7 +492,7 @@ Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
 adds the `lazy` soft keyword.
 A `lazy import` defers loading the module until the first time you use the imported name,
 so a run pays only for the modules it uses,
-while still declaring all imports at the top of the file:
+while all imports stay at the top of the file:
 
 ```python
 # lazy_imports.py
@@ -572,3 +602,6 @@ including the ones whose only purpose is to run the module.
     both before and after the change.
     Both fail, with different errors: explain each,
     and say why `python -m a_package.module4` works either way.
+6.  Remove the `__all__` line from `exporting.py`.
+    Predict what `star_import.py` prints without it, run it to check,
+    then restore the line.
