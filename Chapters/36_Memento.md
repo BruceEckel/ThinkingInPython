@@ -6,7 +6,7 @@ The *Memento* pattern does this without breaking encapsulation.
 The *originator* (the object with state) produces a *memento*,
 an opaque snapshot of itself.
 A *caretaker* (the undo machinery)
-stores mementos and hands one back when asked, without ever looking inside.
+stores mementos and hands one back when asked, without looking inside.
 
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
@@ -125,7 +125,7 @@ Every call site would still type-check.
 But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
-`NewType("Memento", tuple[str, ...])` answers the checker but nothing else.
+`NewType("Memento", tuple[str, ...])` answers only the checker.
 It vanishes at runtime, so the caretaker still holds a plain tuple it can index,
 unpack, or build from scratch.
 Wrapping the tuple in a one-field data class gives `Memento` an identity that exists while the program runs.
@@ -400,19 +400,20 @@ from history import History
 history = History(Drawing("Duck"))
 history.do(history.present.draw("circle"))
 checkpoint = history.present
+history.do(history.present.draw("beak"))
 history.do(copy.replace(history.present, title="Goose"))
 history.do(history.present.draw("scribble"))
 print(history.present)
-#: Goose: circle scribble
+#: Goose: circle beak scribble
 history.do(copy.replace(history.present, strokes=checkpoint.strokes))
 print(history.present)
 #: Goose: circle
 print(history.undo())
-#: Goose: circle scribble
+#: Goose: circle beak scribble
 ```
 
 `checkpoint` is a name bound to a past `Drawing`,
-which is the whole trick immutability buys.
+which is the whole trick immutability makes possible.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
 It goes through `do()` like any other action,
@@ -420,7 +421,7 @@ so the partial restore is undoable, as the last line shows.
 
 `copy.replace()` is the general version of `dataclasses.replace()`,
 described in [Data Classes as Types](12_Data_Classes_as_Types.md#the-general-form-of-replace).
-Using it here rather than the `dataclasses` one keeps the technique available to whatever state type a `History` happens to hold,
+Using it here rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds,
 since `NamedTuple`, `datetime`,
 and any class defining `__replace__()` all accept it.
 
@@ -450,12 +451,12 @@ which is all a memento needs, since frozen data classes compare by value.
 Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,
 convert the state with `dataclasses.asdict()` and write JSON,
-which one of the exercises explores.
+which exercise 3 explores.
 
 Pickle's other limitation is time.
 The bytes encode a class by module and name,
 not by the shape that class had at save time.
-If the state class gains, loses, or renames a field before the load happens,
+If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 What breaks is whatever later touches a field the bytes never carried.
 Splitting the class into its own module keeps the simulation faithful,
@@ -499,17 +500,21 @@ with ignore(AttributeError):
 #: AttributeError("'SketchV2' object has no attribute 'title'")
 ```
 
-The dump of `blob` runs while `sketch_v1.SketchV1` still means the one-field class.
+The dump that builds `blob` runs while `sketch_v1.SketchV1` still means the one-field class.
 `sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
-The type checker flags that reassignment as unsound so it carries a `# type: ignore`.
+The type checker flags that reassignment as unsound,
+so it carries a `# type: ignore`.
 There isn't a practical way to declare that `SketchV1` can become a different class.
-`pickle.loads()` never calls `__init__`.
+`pickle.loads()` never calls `__init__()`.
 It looks up the class by the name pickle recorded, `sketch_v1.SketchV1`.
 That name now points at `SketchV2`.
 `pickle.loads()` builds a bare `SketchV2` and copies in only the fields the old bytes had.
-`title` is simply absent, since the old bytes never had one.
-The same shortcut skips `__post_init__`,
+The fields go straight into the object's `__dict__`,
+so `frozen=True` does not interfere: freezing guards attribute assignment,
+and pickle does not assign attributes.
+`title` is absent, since the old bytes never had one.
+The same shortcut skips `__post_init__()`,
 so a memento saved before a validated field existed can load a value nothing ever validated.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` fails if anything asks for it,
@@ -521,7 +526,7 @@ Drift in the other direction is quieter still.
 If you delete a field, the old bytes load with no error anywhere.
 The dropped name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
-so `repr()` never shows it and `==` never compares it.
+so `repr()` omits it and `==` ignores it.
 The loaded object is equal to, and hashes the same as,
 one built fresh without that field.
 The added-field drift above at least fails when something touches the gap;
