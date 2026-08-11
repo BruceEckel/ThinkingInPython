@@ -188,3 +188,44 @@ The pair is also why the two markers are worth using together. `/`
 fixes what `name` is called, so a later rename breaks no caller, while
 `**facts` accepts names the function has never heard of. One parameter
 is closed to the caller's vocabulary and the rest is open to it.
+
+## 8. `UnboundLocalError` from both directions
+
+```python
+# exercise_8.py
+count = 0
+
+def writes_global():
+    count += 1  # type: ignore  # noqa: F823, F841
+
+def rebinds():
+    print(count)  # type: ignore  # noqa: F823
+    count = 99
+    print(count)
+
+try:
+    writes_global()
+except UnboundLocalError as e:
+    print(type(e).__name__)
+#: UnboundLocalError
+try:
+    rebinds()
+except UnboundLocalError as e:
+    print(type(e).__name__)
+#: UnboundLocalError
+```
+
+Both calls raise `UnboundLocalError: cannot access local variable
+'count' where it is not associated with a value`. Without `global`,
+the assignment in `count += 1` makes `count` local to
+`writes_global()`, so the read half of `+=` looks for a local that
+has no value yet. `rebinds()` fails for the same reason even though
+its `print` comes first in time: Python decides which names are local
+when it compiles the function body, and the `count = 99` below the
+`print` already made `count` local throughout. The `print` therefore
+reads the unassigned local, never the module-level name; the second
+`print`, after the assignment, is never reached. Both mistakes are
+visible without running the code. The type checker and the linter
+each flag them, so the offending lines carry `# type: ignore` and
+`# noqa` markers saying the misuse is deliberate, the way
+`param_markers.py` marks its two.
