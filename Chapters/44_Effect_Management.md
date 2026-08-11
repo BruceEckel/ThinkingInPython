@@ -152,7 +152,7 @@ for args in [(10, 2), (10, 0)]:
 
 `@safe` catches whatever `slope()` raises,
 so the fix lives outside the function it repairs.
-`slope()` is total again, and `match` forces the caller to handle both outcomes.
+`slope()` is now total, and `match` forces the caller to handle both outcomes.
 Nothing escapes through a raised exception.
 
 ### Catch the Exception You Expect
@@ -200,8 +200,8 @@ but did not make those first-class in the function type.
 Nothing computed a specification from the functions a body called,
 so an exception introduced three levels down had to appear by hand in every signature above it.
 The usual escape was to widen the specification until it said nothing.
-They leaked information and are generally considered a failure
-(C++ changed its specifications to a binary indication of whether or not a function throws at all).
+They leaked implementation details and are generally considered a failure
+(C++ changed its specifications to a binary indication of whether a function throws).
 
 ### Make the Bad Value Impossible
 
@@ -250,7 +250,7 @@ and every function downstream is pure by inheritance rather than by discipline.
 None of the three makes the failure disappear.
 A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
-What changes is how many functions have to know about it.
+What changes is how many functions must know about it.
 
 ## A Program Can Never Be Pure
 
@@ -294,15 +294,16 @@ The goal of Effect Management is not to eliminate Effects but to isolate them so
 (this is sometimes called "pushing the Effects to the edges").
 
 So why track them at all?
-The initial and most obvious reason is parallelism.
-A function with no Effects touches nothing shared and runs in parallel.
+The first and most obvious reason is parallelism.
+A function with no Effects touches nothing shared,
+so it is safe to run in parallel.
 The same guarantee makes testing trivial.
 A pure function needs no setup, no mocks, and no teardown.
 Call it with arguments and check the result.
 
 ## Two Phases of Effect Analysis
 
-Think of Effect analysis as a series of phases.
+Think of Effect analysis as two phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
@@ -311,8 +312,8 @@ and easy testing for the pure part.
 The next phase produces one benefit per subdivision:
 
 - **Exceptions** become data,
-  the move [Converting Effectful to Pure](#converting-effectful-to-pure)
-  just made three ways.
+  as [Converting Effectful to Pure](#converting-effectful-to-pure)
+  showed with a `Result`.
   Failures turn into values the type checker can see,
   and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
@@ -329,16 +330,15 @@ A test must run in an environment it completely controls.
 Untracked Effects are the parts of the environment a test cannot control.
 Every Effect you isolate becomes controllable by your tests.
 
-You only get these benefits if you know where the Effects are.
+You get these benefits only if you know where the Effects are.
 In a small program you find them by inspection.
 As programs grow, inspection stops scaling.
 That failure motivates the machinery in the rest of this chapter.
 
 ## Effect Management Systems
 
-Suppose a test starts failing intermittently.
-The test calls a function you wrote last week.
-Its name and parameters say it calculates a total price for a list of items.
+Return to the failing test from the chapter's opening.
+The name and parameters of the function it calls say it calculates a total price for a list of items.
 The logic looks correct.
 The math checks out.
 But sometimes the test is slow.
@@ -398,7 +398,7 @@ Delayed binding exists so that one fixed codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
 none of them contains an opinion about what that storage is.
-They all flow up to a single point or edge,
+They all flow up to a single point, usually the edge of the program,
 where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
 A test provides an in-memory binding, production provides the real database,
@@ -490,13 +490,12 @@ which is the automatic propagation the parameter list lacks.
 It removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
 and a `greet()` that reads two `ContextVar`s states nothing.
-Setting the wrong one, or forgetting to set one at all,
-surfaces as a failure at the moment of the read,
-in whatever frame happened to need it.
+Setting the wrong one, or forgetting to set one,
+surfaces as a failure at the moment of the read, in whatever frame needed it.
 The bookkeeping did not disappear.
 It stopped being something a checker can see.
 An EMS moves the bookkeeping into the type system, where it maintains itself.
-What that takes is a second channel in the signature,
+That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
 
 ### Native Effect Management
@@ -530,7 +529,7 @@ fun greet() : <ask,tell> ()
   tell("Hello, " ++ name ++ "!")
 
 // Main binds each Effect to an implementation
-fun main() : console ()
+fun main() : <console,exn> ()
   with fun ask(prompt)
     print(prompt)
     readline()
@@ -557,10 +556,15 @@ Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what happens next.
 A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
+Handling an Effect also discharges it.
+`main()`'s row is not `<ask,tell>` but `<console,exn>`:
+the handlers removed `ask` and `tell`,
+and the row that remains holds the Effects the handler bodies perform,
+`console` from the printing and reading, `exn` because `readline()` can fail.
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
 The compiler rejects a program that performs an Effect with no handler in scope,
-so no Effect reaches the runtime unaccounted for.
+so no Effect reaches the runtime unhandled.
 
 This decoupling is the core of every Effect system.
 The code that requests an Effect stands apart from the code that performs it,
@@ -714,7 +718,7 @@ Adoption is not gated by how long humans take to learn them.
 A language written for an AI doesn't need the conveniences that help a person read code,
 and if it works, an AI can start using it immediately.
 
-Most of these only **track** Effects rather than providing a full EMS,
+Most of these track Effects without providing the rest of a full EMS,
 and for their purpose the other two parts are liabilities:
 a host that pins the implementations can guarantee what generated code can do.
 
@@ -722,28 +726,28 @@ a host that pins the implementations can guarantee what generated code can do.
   mandatory contracts checked with Z3 SMT verification.
 - [Aria](https://www.aria-lang.com): built for AI code generation,
   not human readability.
-- [Aver](https://averlang.dev): effects visible in the type system,
+- [Aver](https://averlang.dev): Effects visible in the type system,
   with a verify block beside each function.
 - [Mog](https://moglang.org): small enough to fit in a model's context window;
-  effects gated by capabilities.
+  Effects gated by capabilities.
 - [Lumen](https://alliecatowo.github.io/lumen/):
   markdown-native source with algebraic effects;
   `bind effect` rebinds a handler separately from its use, a full-EMS feature.
 - [Dream](https://dreamlang.dev):
   pairs formal verification with AI-native code generation.
-- [AILANG](https://ailang.sunholo.com): capability-based effects
+- [AILANG](https://ailang.sunholo.com): capability-based Effects
   (`IO`, `FS`, `Net`, `Clock`, `AI`) granted per run.
 - [Pact](https://github.com/KikotVit/pact-lang):
   functions declare a `needs` clause,
   and a separate `using` clause rebinds each implementation,
-  so tests can swap effects deterministically, another full-EMS feature.
-- [Zero](https://zerolang.ai): capability-based effects,
+  so tests can swap Effects deterministically, another full-EMS feature.
+- [Zero](https://zerolang.ai): capability-based Effects,
   with structured JSON diagnostics instead of prose error messages.
 - [Boruna](https://github.com/escapeboy/boruna):
-  effects declared and policy-gated at the VM level, with tamper-evident replay.
+  Effects declared and policy-gated at the VM level, with tamper-evident replay.
 
 Pact and Lumen are the exceptions.
-Each separates an effect's interface from its implementation and binds the implementation later,
+Each separates an Effect's interface from its implementation and binds the implementation later,
 the second and third properties of a full EMS.
 
 ## Effect Management for Python?
@@ -774,8 +778,8 @@ Calling `greet()` runs nothing.
 It builds a coroutine object, a description of work,
 and the empty list is the evidence: the body never executed.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
-This is the same demonstration [Concurrency](19_Concurrency.md#asyncio-mechanics)
-opened with.
+[Concurrency](19_Concurrency.md#asyncio-mechanics)
+opened with the same demonstration.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
@@ -799,8 +803,7 @@ no relation to the TypeScript library of the same name,
 ports the description/execution split to Python.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
-The [eff](https://github.com/orsinium-labs/eff)
-library models Effect handlers directly.
+The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
 Each of these gives you the discipline of one part of an EMS,
 but not the guarantee, because the type checker does not participate.
 
@@ -829,7 +832,7 @@ Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
 A type checker needs to compute the Effect row of every function from the functions it calls,
-across every library on PyPI, almost all of which carry no annotations.
+across every library on PyPI, almost all of which carry no Effect annotations.
 `async` succeeded because it arrived with the language and split the world visibly.
 An Effect row needs to spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
