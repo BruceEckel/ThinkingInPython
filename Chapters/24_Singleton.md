@@ -622,9 +622,10 @@ shows that singleton: its metaclass overrides `__call__()`,
 which skips `__init__()` on every later construction,
 so the first call's arguments win.
 A class that overrides `__new__()` instead,
-as `singleton_class_variable.py` does,
-leaves `__init__()` rerunning on the shared instance,
-so the last call's arguments win.
+as `singleton_class_variable.py` does, still runs on every call,
+unlike the metaclass form above;
+that listing puts its work inside `__new__()` itself,
+so later calls append to the shared instance instead of overwriting it.
 That chapter also covers `__init_subclass__()` and `__set_name__()`,
 the simpler hooks that replace most metaclasses;
 a singleton needs none of this machinery.

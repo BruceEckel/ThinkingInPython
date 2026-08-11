@@ -82,7 +82,7 @@ if __name__ == "__main__":
 ```
 
 The `factory()` takes an argument that selects the type of `Shape` to create.
-Here it is a string, but it could be any set of data.
+Here it is a string, but it could be any kind of data.
 The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
 (the initialization data for the objects will presumably come from somewhere outside the system, rather than from random generation as in the above example).
 
@@ -232,7 +232,7 @@ so a subclass that gave itself a `registry` of its own would quietly start a sec
 
 Testing confirms that every subclass registers itself,
 and a new subclass needs no change to `make()`.
-Defining a fresh `Shape` inside the test is enough to see it appear in the registry:
+Defining a fresh subclass of `Shape` inside the test is enough to see it appear in the registry:
 
 ```python
 # test_registry.py

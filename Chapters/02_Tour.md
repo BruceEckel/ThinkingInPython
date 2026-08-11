@@ -23,8 +23,8 @@ shell scripts, and simple programs with Python scripts.
 
 ## How to Read the Examples
 
-The '`#`' denotes a comment that goes until the end of the line,
-just like C++ and Java '`//`' comments.
+The `#` denotes a comment that goes until the end of the line,
+just like C++ and Java `//` comments.
 [The Examples](01_Introduction.md#the-examples)
 explains the filename first line and the `#:` output markers.
 
@@ -340,7 +340,7 @@ or a chunk of HTML, which you can write out in full without escaping line breaks
 
 In an ordinary string, a backslash starts an escape sequence, as in C and Java:
 `\n` is a newline and `\t` is a tab.
-The '`r`' right before a string means "raw."
+The `r` right before a string means "raw."
 Python takes backslashes literally, so you don't need to double them.
 A raw string still cannot end with a backslash,
 because the backslash escapes the closing quote even here.
@@ -412,7 +412,7 @@ F-strings replaced them, so this book does not use them.
 
 An f-string produces a finished `str`,
 deciding how each value becomes text before anything else sees it.
-A `t`-string produces a `Template` instead:
+A *t-string* produces a `Template` instead:
 the literal pieces and the interpolated values, kept apart,
 for a consumer to assemble.
 
@@ -504,7 +504,7 @@ Tools such as ruff can apply these to your code automatically
     Every version runs.
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
-    and which of the three a linter would object to.
+    and which of the three a linter would flag.
 5.  In `tstrings.py`, write a second consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.

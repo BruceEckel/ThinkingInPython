@@ -269,8 +269,8 @@ Structure is free and covers only the case where you can pass functions instead 
 `@final` costs a decorator and covers everyone who runs the checker.
 `__init_subclass__()` costs a base-class method and covers everyone,
 including the caller who skips the checker.
-Discipline covers what none of them can reach,
-which is what the steps do once the flow is safe.
+Discipline covers what none of them can reach:
+what the steps do once the flow is safe.
 Choose by asking against whom you are protecting the algorithm.
 
 ## Exercises

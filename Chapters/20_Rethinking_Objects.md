@@ -562,7 +562,7 @@ print({c: "value"}[c])  # Hashable, so it works as a dict key
 #: value
 ```
 
-`Contact` inherits nothing, and gains no methods it did not ask for.
+`Contact` inherits nothing, and gains no methods it did not request.
 It holds a `Name` and an `Address`, and those types stay usable on their own.
 The arrangement has a cost:
 changing one city means rebuilding the `Address` and then the `Contact`.

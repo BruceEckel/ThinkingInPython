@@ -484,8 +484,8 @@ plus one registration for each operation that must answer differently for plasti
 Python does not escape the expression problem.
 It makes both sides of it cost a line instead of an edit spread across classes.
 
-Compare this to a Visitor implementation.
-No `Visitor` class exists, no `accept()` method bolted onto every material,
+Compare this to that classic form: no `Visitor` class exists,
+no `accept()` method bolted onto every material,
 and no second dispatch to arrange.
 
 The chapter now holds two kinds of dispatch that disagree about subclasses.

@@ -428,8 +428,7 @@ Every handler so far answered with data: a name, a `bool`, a `datetime`.
 A handler can also answer with an implementation,
 an object whose methods the program then calls,
 and it can choose a different one at each request.
-That is what `supply()` cannot do,
-because it binds one instance for the whole run.
+`supply()` cannot do that, because it binds one instance for the whole run.
 When the implementation a program depends on must change while the program is running,
 the choosing belongs in a handler.
 

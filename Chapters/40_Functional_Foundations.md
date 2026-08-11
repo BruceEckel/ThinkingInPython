@@ -303,7 +303,7 @@ which is where they fit best.
 Their value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
-instead of sending them to a named function defined elsewhere.
+instead of sending it to a named function defined elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
 Naming that one-liner costs a line, a name to invent,
 and a definition to look up, with nothing gained in clarity.

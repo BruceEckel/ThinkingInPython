@@ -142,7 +142,7 @@ What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
 This is the same trade explored in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
-a closed set of types, with operations gathered in one place each.
+a closed set of types, with each operation gathered in one place.
 The `assert_never()` in each `case _` makes that closed set pay off.
 If you add a `Symlink` class to the `Node` union,
 every function whose `case _` calls `assert_never()` fails type checking,
@@ -483,7 +483,7 @@ if __name__ == "__main__":
 The patterns read like the algebra they implement.
 `(Num(0), other) | (other, Num(0))` says "zero on either side,
 keep the other side."
-Both alternatives bind `other`, and they have to:
+Both alternatives bind `other`, and they must:
 every alternative in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
 (see [Alternatives and Capture](13_Pattern_Matching.md#alternatives-and-capture)).

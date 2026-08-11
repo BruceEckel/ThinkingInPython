@@ -75,8 +75,7 @@ since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
 Python calls the constructor automatically during object creation.
-In the demo, creating an object looks like a function call,
-but using the class name.
+In the demo, creating an object looks like calling a function named after the class.
 
 In C++ or Java you declare object-level fields inside the class body but outside of the methods.
 You do not declare them this way in Python.
@@ -392,8 +391,9 @@ The property owns the name `radius` on the class,
 so the value goes into a separate attribute.
 A single leading underscore marks `_radius` as internal to the class,
 a convention rather than a language rule.
-The name matters: assigning to `self.radius` inside the setter would call the setter again,
-and again, until the interpreter raises a `RecursionError`.
+The name matters: reading `self.radius` inside the getter,
+or assigning to it inside the setter, calls that method again, and again,
+until the interpreter raises a `RecursionError`.
 
 The getter and setter are independent,
 so you choose the access you want by defining one or both.

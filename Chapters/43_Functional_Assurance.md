@@ -136,7 +136,7 @@ The function was ready for parallel execution on day one, because it was pure.
 Purity makes the calls safe to run together.
 It does not make them easy to move.
 Each argument and each result pickles to cross the process boundary,
-and the function itself travels by name,
+and the function travels by name,
 so `count_primes()` must live at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
 which rules out two shapes these chapters have been favoring.
@@ -381,7 +381,7 @@ and the chapters after it build a checked system on that idea.
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the counterexample Hypothesis shrinks to,
+    Report the minimal counterexample Hypothesis reports,
     and explain what it reveals about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,

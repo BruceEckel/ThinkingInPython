@@ -157,8 +157,8 @@ not for the `Paper` whose code is running: scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the object named in the method's own name.
 If you misread that convention, every result in the class appears backward.
-Each `eval_*()` method also receives an `item` argument, the original caller,
-which `compete()` passed along as `self`.
+Each `eval_*()` method also receives an `item` argument, the original caller:
+the same object `compete()` held as `self` before passing it along.
 This game ignores it, since the outcome depends only on the two types;
 a richer game would read the caller's state through it.
 
@@ -202,15 +202,15 @@ class Rock(Item):
     pass
 
 OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
-  (Paper, Rock): Outcome.WIN,
-  (Paper, Scissors): Outcome.LOSE,
-  (Paper, Paper): Outcome.DRAW,
-  (Scissors, Paper): Outcome.WIN,
-  (Scissors, Rock): Outcome.LOSE,
-  (Scissors, Scissors): Outcome.DRAW,
-  (Rock, Scissors): Outcome.WIN,
-  (Rock, Paper): Outcome.LOSE,
-  (Rock, Rock): Outcome.DRAW,
+    (Paper, Rock): Outcome.WIN,
+    (Paper, Scissors): Outcome.LOSE,
+    (Paper, Paper): Outcome.DRAW,
+    (Scissors, Paper): Outcome.WIN,
+    (Scissors, Rock): Outcome.LOSE,
+    (Scissors, Scissors): Outcome.DRAW,
+    (Rock, Scissors): Outcome.WIN,
+    (Rock, Paper): Outcome.LOSE,
+    (Rock, Rock): Outcome.DRAW,
 }
 
 if __name__ == "__main__":

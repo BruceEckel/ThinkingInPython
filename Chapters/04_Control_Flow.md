@@ -327,8 +327,8 @@ Avoid the name, though: a reader must work out which meaning applies.
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.
-As in C++ and Java, an exception propagates up the call stack until it finds a handler;
-one that never does stops the program and prints the traceback.
+As in C++ and Java, an exception propagates up the call stack until it finds a handler.
+One that finds none stops the program and prints the traceback.
 In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
@@ -515,7 +515,7 @@ and only the EAFP form is safe against that.
 A `with` block guarantees that setup and cleanup run as a pair,
 even if the body raises an exception.
 Opening a file is the canonical case.
-The `with` block always closes the file on the way out:
+The `with` block always closes the file on exit:
 
 ```python
 # context_manager.py

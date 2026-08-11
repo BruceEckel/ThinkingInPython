@@ -170,7 +170,7 @@ The checker reads that guard.
 so reaching the line below means `char not in SPECS` was false,
 which narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
-This is narrowing doing the work a `cast()` would otherwise do by assertion
+The narrowing does the work a `cast()` would otherwise do by assertion
 (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
 Prefer a guard the checker can read.
 Keep `cast()` for the cases where no guard exists,
@@ -214,7 +214,7 @@ Every field here is immutable, which makes the sharing safe.
 A factory function like `tile()` has a visibly different name and call syntax,
 which warns callers that something unusual is happening.
 If you want callers to keep writing `Color(...)`,
-hide the pool inside `__new__` instead.
+hide the pool inside `__new__()` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)
 chapter uses.
 Here the cache keys on the constructor arguments instead of a single fixed key.
@@ -443,7 +443,7 @@ With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 skipping `Tile.__new__()` so the call does not recurse.
 `_value_` is not an ordinary attribute name.
 Enum's metaclass reads it to build the `Tile(".")` lookup table and the member's `repr()`,
-so it keeps that exact name rather than something like `_symbol_`.
+so `__new__()` must assign to that exact name rather than something like `_symbol_`.
 
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,

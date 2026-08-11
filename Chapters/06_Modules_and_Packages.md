@@ -174,7 +174,7 @@ and it forms its own namespace with the name of that directory.
 To make something a package,
 you put a special file named `__init__.py` in that directory.
 `__init__.py` runs once, before any module inside the package loads.
-It is often empty, and then it only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to have named the file `__package__.py`.]
+It is often empty, and then it only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 When it isn't, it usually re-exports the package's public names,
 so that `from a_package import function1` works and callers never learn which submodule `function1` lives in.
 You can still import a directory without `__init__.py` as a *namespace package*,
@@ -358,6 +358,10 @@ Run it as `python -m a_package.module4` instead.
 Two modules in a package can end up importing each other.
 Python places the first one to load in `sys.modules` before its body finishes,
 so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
+A plain `import` of that same module succeeds at this point,
+since it only needs the module to exist in `sys.modules`, not to be finished;
+the failure then surfaces later,
+wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
 move the shared piece into a third module both can import.
 When the cycle exists only in annotations,

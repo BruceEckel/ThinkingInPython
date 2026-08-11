@@ -345,6 +345,13 @@ A handful of builtins
 are special-cased so that one positional sub-pattern binds the whole value,
 which is why `case str(s)` reads as "a string, call it `s`."
 
+Drop the parentheses and the meaning flips: `case str:` is a bare-name capture,
+not a type test, matching any value and binding it to a local named `str`.
+It is the same mistake as `DEFAULT` in `value_patterns.py`,
+and Python catches it the same way,
+refusing to compile a `case` that follows it:
+`SyntaxError: name capture 'str' makes remaining patterns unreachable`.
+
 Matching on `isinstance()` is the opposite of the exact-type dispatch used by a `dict` keyed on `type(value)`,
 which [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
 relies on.

@@ -11,7 +11,7 @@ Exceptions are Python's default error mechanism, and they have costs.
 An exception unwinds the stack, so it discards any work done so far.
 It does not appear in the function's return type, so the caller cannot see,
 from the signature, that the call might fail.
-And it is easy to forget to handle.
+And it is easy to forget to handle one.
 
 Returning the failure as a value reverses those costs.
 Failure appears in the return type,
@@ -696,7 +696,7 @@ This style does not replace exceptions everywhere.
 Exceptions are still appropriate for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
-Some languages call these errors "panics" and separate them from regular exceptions.
+Some languages call these errors *panics* and separate them from regular exceptions.
 
 Use a `Result` for the failures that are part of a function's normal job:
 bad input, a missing file, a value out of range.

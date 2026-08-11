@@ -250,7 +250,8 @@ if __name__ == "__main__":
 Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
 (see the summary in [Static Typing](08_Static_Typing.md#containers)).
-The first, inner brackets hold the parameter types, even when there is only one,
+The first bracket group is itself a list: it holds the parameter types,
+even when there is only one,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
 That single parameter type is `Callable[P, R]`, the wrapped function's type.
@@ -715,7 +716,7 @@ Do not confuse this with [Decorators as Classes](#decorators-as-classes),
 where the decorator was written as a class;
 here the decorator is an ordinary function,
 and the class is the thing decorated.
-This one registers every class it decorates, in `registry`:
+This one registers every class it decorates in `registry`:
 
 ```python
 # register.py
@@ -988,8 +989,9 @@ and it also makes them work correctly on methods,
 where a `__call__`-based class, like `logged` above, does not.
 `@dataclass` (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
 is a class decorator like `register`,
-except it returns a modified class instead of the same one unchanged,
-adding a generated `__init__()`, `__repr__()`, and `__eq__()`.
+except it mutates the class instead of leaving it unchanged,
+adding a generated `__init__()`, `__repr__()`,
+and `__eq__()` to the same object it received.
 `@functools.cache` and `@functools.lru_cache`
 (see [Performance](18_Performance.md#caching))
 wrap a function in the same closure-plus-`func` shape as `add_behavior`,
@@ -1008,7 +1010,7 @@ takes up.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object *Decorator* pattern for a coffee shop: plain drinks
+3.  Implement the object Decorator pattern for a coffee shop: plain drinks
     (Espresso, Cappuccino) and extra decorators
     (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,

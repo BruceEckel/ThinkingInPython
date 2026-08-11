@@ -1359,8 +1359,8 @@ In [Comparing Ordinary Classes and Data Classes](12_Data_Classes_as_Types.md#com
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
 even though `D` declares them directly, because neither belongs to an instance.
 For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
-the way `Stars.rating` did in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
-`class_with_defaults.py`'s `show(B())`, from that same comparison,
+the same rule `Stars.rating` demonstrated in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values).
+`class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
 tags `B.x` and `B.s`,
 while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.

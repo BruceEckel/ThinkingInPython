@@ -204,7 +204,7 @@ Two approaches are more reliable:
 
 1. An explicit finalizer such as the `close()` that file objects provide,
    called from a `with` block.
-   This runs even when an error interrupts the code:
+   This runs whether or not an error interrupts the code:
 
 ```python
 # closable.py
@@ -324,7 +324,7 @@ print(leaky() is None, safe() is None)
 A `ref()` is a weak reference: it watches its object without keeping it alive,
 and it reports `None` once the object disappears.
 So `False True` says the collector reclaimed `Safe` but not `Leaky`.
-`Safe` printed on the way out; `Leaky` printed nothing,
+`Safe` printed as it was reclaimed; `Leaky` printed nothing,
 because its callback never ran and nothing failed.
 Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
 whether the collector reclaimed the object,
@@ -389,7 +389,7 @@ The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
 A `dict` or `list` as the registry keeps every instance alive forever,
-so the count can never fall.
+so the count cannot fall.
 The weak reference allows the registry to prune itself.
 The immediate drop in the count is CPython's reference counting at work.
 On an implementation with a tracing collector, such as PyPy,

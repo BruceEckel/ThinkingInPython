@@ -4,14 +4,14 @@ Recall [*State*](26_Surrogate.md#state):
 a surrogate object that forwards calls to a swappable implementation.
 While *State* allows the client programmer to change the implementation,
 *StateMachine* imposes a structure to automatically change the implementation from one object to the next.
-The current implementation represents the state that a system is in,
+The current implementation represents the state a system occupies,
 and the system behaves differently from one state to the next
 (because it uses *State*).
 
 The code that moves the system from one state to the next is often a [*Template Method*](25_Template_Method.md),
 as seen in the following framework for a basic state machine.
 Each state can be `run()` to perform its behavior, and (in this design)
-you can also pass it an "input" object so it can tell you what new state to move to.
+you can also pass it an "input" object so it can tell you which state to enter next.
 The key distinction between this design and the next is that here,
 each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
@@ -52,7 +52,7 @@ which the constructor initializes.
 The `run_all()` method takes a sequence of input objects.
 For each one it moves to the next state, then calls that state's `run()`.
 It expands the *State* pattern:
-`run()` does something different depending on the state that the system is in:
+`run()` does something different depending on the state the system occupies:
 
 ```python
 # state_machine.py
@@ -370,7 +370,7 @@ If you must create and maintain many `State` classes,
 this approach is an improvement,
 since it's easier to read the state transitions from a table.
 `next()` raises its `RuntimeError` `from None` rather than chaining,
-which drops a `KeyError` that would repeat the event the message already names.
+which drops a `KeyError` that would repeat the event the message names.
 
 ### An Unexpected Input
 
@@ -665,7 +665,7 @@ if __name__ == "__main__":
 ```
 
 The two `Clearing selection` lines read alike and end in different states:
-too expensive returns to `COLLECTING` with the money still in,
+too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 The condition that fired is visible only in the state.
 

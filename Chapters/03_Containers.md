@@ -147,7 +147,7 @@ print(grid)
 This is [Variables and References](02_Tour.md#variables-and-references) again:
 `*` binds the same object into every slot, and assignment never copies.
 
-Removing items from a `list` while iterating over it has the same flavor:
+Removing items from a `list` while iterating over it is the same kind of surprise:
 
 ```python
 # remove_while_iterating.py
@@ -166,8 +166,8 @@ Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 
 A loop with `append()` is not the usual way to build a list from another one.
 [Control Flow](04_Control_Flow.md#comprehensions) introduces the comprehension,
-which does it in a single expression, and [Comprehensions](16_Comprehensions.md)
-covers the dict and set forms.
+which builds a new list in a single expression,
+and [Comprehensions](16_Comprehensions.md) covers the dict and set forms.
 
 ## Tuples and Unpacking
 
@@ -294,7 +294,7 @@ for name, age in ages.items():
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
 A `dict` has three views: `keys()`, `values()`, and `items()`.
-Iterating the `dict` itself is the same as iterating `keys()`,
+Iterating the `dict` is the same as iterating `keys()`,
 which is why `for name in ages` walks the names.
 Only `items()` yields `(key, value)` pairs,
 so `for name, age in ages` is a common slip:

@@ -28,7 +28,7 @@ idiomatic, and a pleasure to maintain.
 This is an intermediate-to-advanced book,
 which removes two constraints that introductory books carry:
 
-1.  An introductory book must describe everything in lock step,
+1.  An introductory book must describe everything in lockstep,
     never using an idea before it has been formally introduced.
     This one does not.
 2.  An introductory book chooses topics by where they fall in a beginner's path.

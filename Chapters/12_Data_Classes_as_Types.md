@@ -142,7 +142,7 @@ if __name__ == "__main__":
 ```
 
 A read-only `@property` keeps users from assigning to `number`,
-but the class object still mutates `_number`,
+but the object still mutates `_number`,
 so `f1()` must re-check the result before returning it.
 That check runs after the mutation, not instead of it:
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,

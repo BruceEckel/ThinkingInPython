@@ -19,15 +19,15 @@ class Rock(Item):
     pass
 
 OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
-  (Paper, Rock): Outcome.WIN,
-  (Paper, Scissors): Outcome.LOSE,
-  (Paper, Paper): Outcome.DRAW,
-  (Scissors, Paper): Outcome.WIN,
-  (Scissors, Rock): Outcome.LOSE,
-  (Scissors, Scissors): Outcome.DRAW,
-  (Rock, Scissors): Outcome.WIN,
-  (Rock, Paper): Outcome.LOSE,
-  (Rock, Rock): Outcome.DRAW,
+    (Paper, Rock): Outcome.WIN,
+    (Paper, Scissors): Outcome.LOSE,
+    (Paper, Paper): Outcome.DRAW,
+    (Scissors, Paper): Outcome.WIN,
+    (Scissors, Rock): Outcome.LOSE,
+    (Scissors, Scissors): Outcome.DRAW,
+    (Rock, Scissors): Outcome.WIN,
+    (Rock, Paper): Outcome.LOSE,
+    (Rock, Rock): Outcome.DRAW,
 }
 
 if __name__ == "__main__":

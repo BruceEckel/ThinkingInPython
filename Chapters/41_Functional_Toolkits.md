@@ -159,7 +159,7 @@ Since Python 3.14 a `partial` object is a descriptor too,
 so writing `zero_pad = partial(pad, fill="0")` here works.
 The two stop agreeing the moment an argument is positional.
 `partialmethod` passes the instance first and the bound arguments after it,
-which is what a method expects.
+which a method expects.
 `partial` passes the bound arguments first and the instance after them,
 so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'int' object has no attribute 'value'`.
 Use `partialmethod` inside a class body and `partial` everywhere else.
@@ -1040,7 +1040,7 @@ which is the question a chain of pure functions leaves open.
     Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
     and say what it costs relative to `groupby()`.
 5.  Decorate `deep_sum()` with `@cache` and explain the exception.
-    What would have to change about the `Nested` alias for caching to be possible at all?
+    What would have to change about the `Nested` alias for caching to be possible?
 6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.
     Replace that with an `rng: random.Random` parameter.
     Which property of the function does that preserve,

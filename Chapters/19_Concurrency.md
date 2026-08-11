@@ -418,7 +418,7 @@ Keeping siblings alive past a failure means catching exceptions inside each task
 
 You can also stop a `TaskGroup` deliberately.
 `tg.cancel()` (3.15) cancels every task in the group,
-which is what you want when the answer arrives before the batch finishes and the rest of the work is no longer worth doing.
+which you want when the answer arrives before the batch finishes and the rest of the work is no longer worth doing.
 
 ## Overlapping the Waits
 
@@ -500,7 +500,7 @@ The event loop overlaps waiting, not computing.
 
 `asyncio.sleep()` in `io_price` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which let all five `io_price` tasks overlap.
+which lets all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 
@@ -679,7 +679,7 @@ which request the code is serving, which user authorized it,
 which trace to use for logging.
 Everything deep in the call chain needs them and nothing in the middle uses them.
 Threading such a value through as a parameter puts it in signatures that have no business knowing about it,
-and every new caller has to remember to pass it along.
+and every new caller must remember to pass it along.
 
 A module-level global is the obvious shortcut and it fails as soon as anything overlaps.
 `async_race.py` showed why: whatever wrote last wins,
@@ -1132,6 +1132,7 @@ In 1991, the C API exposed those counts directly to extension authors.
 Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
 In exchange, reference counting became part of the compiled binary interface.
 Changing how it works breaks every extension.
+
 In 1992, threads arrived, for I/O concurrency rather than for multi-core speed.
 Now two threads could update the same count at once and lose one of the updates,
 freeing an object still in use or leaking it forever.
@@ -1447,7 +1448,7 @@ The pull half looks simpler.
 Hand every worker the same iterator and let each one take the next item when it is ready.
 Nothing in the language stops you, and nothing in the language makes it work.
 An iterator has never been thread-safe
-([Iterators](23_Iterators.md) covers the protocol itself):
+([Iterators](23_Iterators.md) covers the protocol):
 
 ```python
 # shared_iterator.py
@@ -2152,7 +2153,7 @@ for example letting only the task with the lower ID give.
   A plain `except ValueError:` around the `async with` block misses it,
   even when only one task failed.
 - **Cancellation is a `BaseException`, not an `Exception`.**
-  `except Exception:` inside a task lets it through, which is what you want.
+  `except Exception:` inside a task lets it through, which you want.
   Catching `asyncio.CancelledError` and not re-raising it strands the `TaskGroup` that asked the task to stop.
 - **A shared lock only prevents deadlock if every user agrees on the order.**
   Acquire shared locks in the same sequence everywhere.
@@ -2195,7 +2196,7 @@ Here are a few of the topics beyond it:
 - **Barriers:** Make a group of threads or tasks wait until every one of them arrives,
   then release them together.
   Unlike `gather()` or `TaskGroup`,
-  a barrier is a rendezvous point that the running code reaches and blocks at,
+  a barrier is a rendezvous point where the running code arrives and blocks,
   often reused across repeated phases,
   not a supervisor waiting from outside for everything to finish.
 - **Message passing and channels:** Let concurrent units exchange data by sending values instead of sharing memory directly.
@@ -2263,7 +2264,7 @@ Here are a few of the topics beyond it:
 10. In `gather_with_exceptions.py`,
     delete `return_exceptions=True` and wrap the `await` in `try`/`except ValueError`.
     Predict how many `fetched` lines still print,
-    and explain what became of the tasks the `gather()` call never reported on.
+    and explain what became of the tasks on which the `gather()` call never reported.
 11. In `context_var.py`,
     move `request_id.set(name)` out of `handle()` and into `main()` above the `TaskGroup`.
     Predict what each task prints,

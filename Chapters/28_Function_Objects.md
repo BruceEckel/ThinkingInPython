@@ -272,7 +272,7 @@ for finder in (bisection, newton, secant):
 #: 1.414214
 ```
 
-Three identical lines is the point:
+Three identical lines are the point:
 the caller does not change when the algorithm does.
 The algorithms are not equivalent, though,
 and the chain below turns the difference between them into a fallback.

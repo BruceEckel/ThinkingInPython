@@ -118,7 +118,7 @@ and exceptions.
 
 ## Converting Effectful to Pure
 
-Transforming the exception Effect in `slope()` from `divide_by_zero_impurity.py` makes the function pure again.
+Transforming the exception Effect in `slope()` from `divide_by_zero_impurity.py` makes the function pure.
 Here are three ways to do it.
 
 ### Return a Result Type

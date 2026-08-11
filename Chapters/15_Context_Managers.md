@@ -649,7 +649,7 @@ path.unlink()
 so one variable can hold the open file in one branch and a `nullcontext` in the others.
 
 `emit()` closes only the file it opened.
-A stream the caller handed over stays open, which is what the caller expects:
+A stream the caller handed over stays open, which the caller expects:
 exiting a `nullcontext` does nothing,
 so the same `with` block closes the file in the `Path` branch and touches nothing in the other two.
 

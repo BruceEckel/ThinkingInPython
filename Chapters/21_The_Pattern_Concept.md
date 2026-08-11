@@ -233,7 +233,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,
     not to the internals of objects it reached through something else.
-    This may also be a way to say "minimize coupling."
+    This is another way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
     This complements separating what varies from what stays the same,

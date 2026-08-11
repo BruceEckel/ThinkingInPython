@@ -539,7 +539,7 @@ one to size the result and one to fill it,
 so it converts its argument to a list first and a generator expression saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
-Add a second argument and it does:
+If you add a second argument, it does:
 `sum(n * n for n in nums, 0)` is a `SyntaxError`,
 and `sum((n * n for n in nums), 0)` is the fix.
 
