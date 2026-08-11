@@ -97,7 +97,7 @@ Counting the object adapter above, three structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
 The approaches differ only in where the adaptation lives.
 When the output cannot tell them apart,
-the choice among them is purely one of packaging.
+the choice among them is one of packaging.
 (GoF adds a fourth placement, an inner-class adapter the adaptee hands out, which is Java packaging for the same forwarding.)
 
 The three split into two families *GoF Design Patterns* names.
@@ -170,9 +170,8 @@ if __name__ == "__main__":
 `__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
-You have already seen a real one:
-`PairCoord` in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
-adapts a `Pair` to the `Coord` protocol.
+You saw a real one in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts):
+`PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
 written because the type it received did not fit the function it had to call.
 The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
@@ -180,11 +179,11 @@ special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 as exercise 1 does with `__getitem__()`.
 That chapter's other trap applies here too:
-`__getattr__()` reading `self._adaptee` recurses forever on an instance built without `__init__()`,
+`__getattr__()` reading `self._adaptee` recurses to a `RecursionError` on an instance built without `__init__()`,
 which `copy.copy()` and `pickle` do,
 so an adapter that must survive copying or pickling defines `__reduce__()` or guards the lookup.
 
-Testing verifies both halves of that behavior.
+Testing verifies both halves of the adapter's behavior.
 The new `f()` combines the adaptee's methods,
 and calls to methods it doesn't override forward through to the wrapped object:
 
@@ -216,7 +215,7 @@ create an interface that presents only what's necessary.
 
 A Façade often takes the form of a [Singleton](24_Singleton.md)
 [Abstract Factory](27_Factory.md#abstract-factories).
-You can easily get this effect by creating a class containing static factory methods:
+You can get this effect by creating a class containing static factory methods:
 
 ```python
 # facade.py
@@ -326,7 +325,7 @@ Name a wrapper for why it is there, not for its shape.
 Every interface change has a second half.
 Once the better interface exists, the old one is still there,
 and callers keep using it until something tells them not to.
-Deleting it breaks them; leaving it undocumented means nobody notices.
+Deleting it breaks them; leaving it unmarked means nobody notices.
 `warnings.deprecated()`
 (Python 3.13 and later; `typing_extensions.deprecated` before that)
 marks a function, method, or class as on its way out,
@@ -367,9 +366,9 @@ which is the trap: the caller who most needs the warning is the least likely to 
 Run with `-W default::DeprecationWarning` to see them all,
 or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
-so the listing records the warnings instead of printing them.
+so the listing records the warnings and prints the record.
 
-A message is optional but should say what to use instead.
+The message is required, and it should say what to use instead.
 "Deprecated" tells a reader that someone made a decision;
 "replaced by `render()`" tells them what to do about it.
 The decorator also applies to a class,
@@ -386,7 +385,7 @@ so verify your checker reports it before relying on it.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,
 which is why they are safe moves.
-Deprecation is the move that is not safe,
+Retiring an interface is the move that is not safe,
 and marking the old interface is how you make the risk visible on a schedule instead of discovering it when you delete something.
 
 ## Exercises
@@ -398,7 +397,7 @@ and marking the old interface is how you make the risk visible on a schedule ins
     Confirm `adapter["name"]` finds a value while `adapter.append(...)` still reaches the underlying list.
 2.  In `deprecating.py`,
     deprecate the whole `Report` class instead of the method,
-    and show that constructing a `Report` warns while `render()` no longer does.
+    and show that constructing a `Report` warns while calling `render()` does not.
 3.  Rewrite `facade.py` as a module façade.
     Put its classes behind leading-underscore names in one module,
     expose functions that build them, and import only those from a second file.
