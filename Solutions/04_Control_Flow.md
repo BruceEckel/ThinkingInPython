@@ -252,3 +252,29 @@ are writing rather than reading and the failure case matters: the
 which is the guarantee the section is about. For a configuration file
 of a few kilobytes read once at startup, none of it matters, and
 `read_text()` is the honest answer.
+
+## 9. Adjacent `2`s in `mutating_while_looping.py`
+
+```python
+# exercise_9.py
+scores = [2, 2, 1, 3]
+for s in scores:
+    if s == 2:
+        scores.remove(s)
+print(scores)
+#: [2, 1, 3]
+```
+
+One `2` survives again, but this time at the front. At position 0 the
+loop sees `2` and `remove()` deletes the first equal item, which is
+that same position-0 element. The second `2` slides down into slot 0,
+which the loop has already passed, so the next iteration looks at
+position 1 and finds `1`. The loop never sees the survivor at all.
+
+The prediction to make is not just "one survives" but *which* one and
+*where*: the survivor is whatever slid into an already-visited slot,
+so its final position depends on the data. In the chapter's
+`[1, 2, 2, 3]` the survivor sits mid-list; here it sits first. A bug
+whose symptom moves around with the input is exactly why the chapter
+says to build a new container instead of reasoning your way around
+the mutation.

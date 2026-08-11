@@ -1,9 +1,9 @@
 # while_true.py
 
-values = iter([3, 5, 0, 7])
+values = [3, 5, 0, 7]
 total = 0
 while True:
-    value = next(values)
+    value = values.pop(0)
     if value == 0:
         break
     total += value
