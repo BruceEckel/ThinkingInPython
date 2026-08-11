@@ -141,6 +141,8 @@ if __name__ == "__main__":
 ```
 
 Twenty-four cells, three objects.
+`[*row for row in field]` flattens the grid into one list of cells,
+the comprehension unpacking from [Comprehensions](16_Comprehensions.md#unpacking-in-comprehensions).
 Counting `id(t)` rather than `len(set(cells))` is deliberate.
 `Tile` is a frozen data class,
 so its generated `__eq__()` compares field values,
@@ -151,7 +153,7 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the coordinates supplied by the asker.
-The listing can show the object count; exercise 2 measures the memory behind it.
+The listing shows the object count; exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
 
@@ -201,7 +203,7 @@ because nothing they can do affects the tile.
 If you remove `frozen=True`, the pattern fails.
 Mutating the grass tile in one cell changes every grass cell in the map.
 
-`frozen=True` has to hold all the way down.
+`frozen=True` must hold all the way down.
 It blocks assignment to a field, not mutation inside one,
 so a `Tile` holding a `list` would leak that list to every cell that shares the tile
 (the shallow-freezing trap in [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
@@ -256,6 +258,8 @@ When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore defines no `__init__()`.
+The call still reaches `object.__init__()`,
+which accepts and ignores the three arguments because this class overrides `__new__()` and not `__init__()`.
 That rules out `@dataclass`,
 whose generated `__init__()` reintroduces the re-run.
 The damage is invisible at first,
@@ -270,9 +274,9 @@ so the default identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods, at a price:
 the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,
 and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
-A `defaultdict` cannot replace `_pool` either,
-because building a `Color` needs the three color components,
-not just the key that names them.
+A `defaultdict` cannot replace `_pool` either:
+its `default_factory` is called with no arguments,
+so it cannot see the components the missing `Color` needs.
 
 `_pool` keys on the components alone, and every subclass inherits it,
 so no one can subclass `Color` safely.
@@ -351,14 +355,19 @@ When the last reference dies,
 CPython's reference counting frees the object and the pool entry evaporates with it.
 The pool guarantees sharing without extending lifetimes,
 which is the same design as `sys.intern()`.
-If you want bounded memory with fixed construction cost instead,
+If you want a bounded pool instead,
 `functools.lru_cache(maxsize=n)` gives the factory an eviction policy,
-at the price of keeping the most recent `n` alive.
+at the price of keeping the most recent `n` alive whether or not anyone uses them.
+Eviction also weakens the sharing guarantee:
+requesting an evicted value builds a fresh object,
+equal to any surviving original but not the same one.
+The weak pool cannot produce such a pair,
+because its entry lives as long as anyone holds the object.
 
 Flyweight cuts the number of objects, and `slots=True`
 ([Performance](18_Performance.md#slots)) cuts the size of each one,
 so the two are worth combining once memory is the point.
-The two techniques in this chapter collide at one spot:
+They collide at one spot:
 a slotted class has no `__weakref__` unless you also pass `weakref_slot=True`,
 so slotting `Name` without it makes `_pool[text] = found` raise a `TypeError`.
 
