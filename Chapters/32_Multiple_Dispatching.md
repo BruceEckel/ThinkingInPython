@@ -68,6 +68,10 @@ def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
+`item_pair_gen()` is generic over whichever base class it receives.
+`duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
+and this file must serve both.
+
 Here is Multiple Dispatching in action:
 
 ```python
@@ -153,6 +157,10 @@ not for the `Paper` whose code is running: scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the object named in the method's own name.
 If you misread that convention, every result in the class appears backward.
+Each `eval_*()` method also receives an `item` argument, the original caller,
+which `compete()` passed along as `self`.
+This game ignores it, since the outcome depends only on the two types;
+a richer game would read the caller's state through it.
 
 Note what the `Any` annotations cost.
 `Item` declares neither `compete()` nor any `eval_*()` method,
@@ -160,9 +168,12 @@ so `Any` is the only annotation available short of a `Protocol` naming all four 
 With `Any`, a checker cannot tell you when a class is missing one of the nine answers;
 the gap surfaces as an `AttributeError` during whichever duel first needs it.
 A `Protocol` listing the four methods would restore the checking,
-at the price of a declaration that repeats every class's method names;
-the table version gets the same guarantee for free,
-because its answers are data rather than methods.
+at the price of a declaration that repeats every class's method names.
+The table version needs neither.
+Its answers are data rather than methods,
+leaving no method for a class to forget, and its one method, `compete()`,
+is declared on `Item`,
+so the opponent parameter can be typed `Item` rather than `Any`.
 
 Each type of `Item` encodes the information about the various combinations.
 This is a kind of table, spread across the classes.
@@ -172,12 +183,12 @@ It can be more sensible to make the table explicit, like this:
 ```python
 # paper_scissors_rock_table.py
 import random
-from typing import Any, Final
+from typing import Final
 from arena import duel, item_pair_gen
 from outcome import Outcome
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         # Use a tuple of types to index into the table:
         return OUTCOME[type(self), type(item)]
     def __str__(self) -> str:
@@ -224,8 +235,8 @@ Two properties of the lookup carry over from the [table-driven state machine](31
 The match is on classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
-the fail-fast policy that suits a table under construction,
-as adding `Lizard` in exercise 1 demonstrates.
+the fail-fast policy that suits a table under construction;
+adding `Lizard` in exercise 1 puts you in that situation.
 
 Exact matching is the property that surprises people.
 This listing shows it refusing a subclass.
@@ -270,13 +281,13 @@ while the table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
-`functools.singledispatchmethod()` sits between them.
+`functools.singledispatchmethod` sits between them.
 It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`,
 which is the pair of dispatches the `eval_*()` family hand-rolls.
 Each class needs its own `@singledispatchmethod`;
 registering on a shared base gives every subclass one dispatcher,
-so the first dispatch never happens.
+so the resolution on `self` no longer distinguishes them.
 That mistake is easy to make and hard to see.
 Like `singledispatch`, it matches on the MRO rather than exactly.
 
@@ -294,10 +305,78 @@ The double-dispatch version, where each class implements `eval_paper()`,
 belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
 Python makes the table cheap, so it is both shorter and easier to maintain.
 A table cell can hold a function,
-so the size of the behavior never forces the choice.
+so the size of the behavior does not force the choice.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
+
+## Testing Both Versions
+
+The win/lose/draw result is pure logic, so tests validate it easily.
+The spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
+If they diverge, one of them has a bug.
+
+```python
+# test_paper_scissors.py
+from types import ModuleType
+from typing import Final
+import paper_scissors_rock as methods
+import paper_scissors_rock_table as table
+import pytest
+from outcome import Outcome
+
+# (player, opponent): the player's result
+EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
+    ("Paper", "Rock"): Outcome.WIN,
+    ("Paper", "Scissors"): Outcome.LOSE,
+    ("Paper", "Paper"): Outcome.DRAW,
+    ("Scissors", "Paper"): Outcome.WIN,
+    ("Scissors", "Rock"): Outcome.LOSE,
+    ("Scissors", "Scissors"): Outcome.DRAW,
+    ("Rock", "Scissors"): Outcome.WIN,
+    ("Rock", "Paper"): Outcome.LOSE,
+    ("Rock", "Rock"): Outcome.DRAW,
+}
+
+def compete(module: ModuleType, player: str,
+            opponent: str) -> Outcome:
+    result: Outcome = getattr(module, player)().compete(
+        getattr(module, opponent)())
+    assert isinstance(result, Outcome)
+    return result
+
+MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
+    (p, o, r) for (p, o), r in EXPECTED.items()
+]
+
+@pytest.mark.parametrize("module", [table, methods])
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_matches_expected(module: ModuleType, player: str,
+                          opponent: str, expected: Outcome) -> None:
+    assert compete(module, player, opponent) == expected
+
+@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+def test_both_versions_agree(player: str, opponent: str,
+                             expected: Outcome) -> None:
+    assert (compete(methods, player, opponent)
+            == compete(table, player, opponent))
+
+@pytest.mark.parametrize("outcome, expected", [
+    (Outcome.WIN, "win"),
+    (Outcome.LOSE, "lose"),
+    (Outcome.DRAW, "draw"),
+])
+def test_outcome_str(outcome: Outcome, expected: str) -> None:
+    assert str(outcome) == expected
+```
+
+The test imports the two modules, not their classes.
+`getattr(module, player)` looks the class up on whichever module the test received,
+so one table of nine expected answers drives two independent sets of `Paper`,
+`Scissors`, and `Rock` classes.
+Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,
+so the loop runs only when you execute the file directly,
+not when a test imports it.
 
 ## Operators Dispatch Twice
 
@@ -312,9 +391,10 @@ double dispatching, built into the language.
 Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
-Do not confuse this with the in-place forms, `__iadd__()` and its siblings,
-which serve `+=` and take no part in the reflected fallback.
-This is how an `int` on the left can learn to add itself to a type written decades after `int` was.
+This fallback is how an `int` on the left can learn to add itself to a type written decades after `int` was.
+Do not confuse the reflected forms with the in-place forms,
+`__iadd__()` and its siblings,
+which serve `+=` and take no part in the fallback.
 Returning `NotImplemented`
 (a sentinel value, not the `NotImplementedError` exception, a lookalike pair worth keeping apart)
 is how an operand says "I don't know this type; ask the other object."
@@ -384,7 +464,7 @@ so the more specific type can answer before its base does.
 Both methods declare `-> Meters` even though each can return `NotImplemented`,
 and that is the standard convention rather than a shortcut.
 Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union,
-and it can do that because it gives `NotImplemented` a type that inherits `Any`,
+and it can do that because it gives `NotImplemented` a type that inherits from `Any`,
 so returning the sentinel satisfies any declared return type.
 Spelling the union out, `Meters | NotImplementedType`,
 makes a checker reject `(Meters(1) + Meters(2)).n`,
@@ -397,74 +477,6 @@ Widening the return to `Any` describes nothing and turns off checking for every 
 builds the expression system this chapter opened with,
 using these two methods to let Python's own parser assemble the tree.
 
-## Testing Both Versions
-
-The win/lose/draw result is pure logic, so tests validate it easily.
-The spread-out method version and the table version must return the same `Outcome` for every one of the nine combinations.
-If they diverge, one of them has a bug.
-
-```python
-# test_paper_scissors.py
-from types import ModuleType
-from typing import Final
-import paper_scissors_rock as methods
-import paper_scissors_rock_table as table
-import pytest
-from outcome import Outcome
-
-# (player, opponent): the player's result
-EXPECTED: Final[dict[tuple[str, str], Outcome]] = {
-    ("Paper", "Rock"): Outcome.WIN,
-    ("Paper", "Scissors"): Outcome.LOSE,
-    ("Paper", "Paper"): Outcome.DRAW,
-    ("Scissors", "Paper"): Outcome.WIN,
-    ("Scissors", "Rock"): Outcome.LOSE,
-    ("Scissors", "Scissors"): Outcome.DRAW,
-    ("Rock", "Scissors"): Outcome.WIN,
-    ("Rock", "Paper"): Outcome.LOSE,
-    ("Rock", "Rock"): Outcome.DRAW,
-}
-
-def compete(module: ModuleType, player: str,
-            opponent: str) -> Outcome:
-    result: Outcome = getattr(module, player)().compete(
-        getattr(module, opponent)())
-    assert isinstance(result, Outcome)
-    return result
-
-MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
-    (p, o, r) for (p, o), r in EXPECTED.items()
-]
-
-@pytest.mark.parametrize("module", [table, methods])
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
-def test_matches_expected(module: ModuleType, player: str,
-                          opponent: str, expected: Outcome) -> None:
-    assert compete(module, player, opponent) == expected
-
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
-def test_both_versions_agree(player: str, opponent: str,
-                             expected: Outcome) -> None:
-    assert (compete(methods, player, opponent)
-            == compete(table, player, opponent))
-
-@pytest.mark.parametrize("outcome, expected", [
-    (Outcome.WIN, "win"),
-    (Outcome.LOSE, "lose"),
-    (Outcome.DRAW, "draw"),
-])
-def test_outcome_str(outcome: Outcome, expected: str) -> None:
-    assert str(outcome) == expected
-```
-
-The test imports neither hierarchy by name.
-`getattr(module, player)` looks the class up on whichever module the test received,
-so one table of nine expected answers drives two independent sets of `Paper`,
-`Scissors`, and `Rock` classes.
-Importing both modules works cleanly because each guards its demonstration loop with `if __name__ == "__main__"`,
-so the loop runs only when you execute the file directly,
-not when a test imports it.
-
 ## Turning One Unknown Type Into a Second Dispatch
 
 Three techniques in this chapter do the same thing.
@@ -473,8 +485,7 @@ and `__add__()` with `__radd__()` all take a type the first dispatch could not r
 They differ in who performs the second dispatch and where the answers live.
 The methods make the language do it and scatter the answers across the classes.
 The table does it with a dictionary probe and collects the answers in one place.
-The operators are the one case where Python performs the second dispatch for you,
-and it is available for arithmetic and nothing else.
+The operators are the one case where Python performs the second dispatch for you.
 Everywhere else you choose between paying for the second dispatch in methods or paying for it in data.
 
 ## Exercises
@@ -511,7 +522,8 @@ Everywhere else you choose between paying for the second dispatch in methods or 
     and say which of the two properties named after the table listing you have just given up.
 7.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
-    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other using *Multiple Dispatching*.
+    Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
+    Single dispatch is enough here; the next exercise adds the second dispatch.
 8.  Modify the above example to make the interactions more detailed.
     Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
     a `Dwarf` uses `Jargon` or `Play`,
