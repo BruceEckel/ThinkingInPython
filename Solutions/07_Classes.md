@@ -114,6 +114,11 @@ Simple3("x").show_twice()
 #: x
 ```
 
+This solution strips the constructor `print()` calls from
+`simple2.py`, so the trace shows only the `show()` chain. If you add
+`Simple3` to `simple2.py` itself, the two constructor lines print
+first.
+
 `show_twice()` is inherited unchanged from `Simple`, and it calls
 `self.show()` twice. Because `self` is a `Simple3`, each call resolves
 to `Simple3.show()` first (Python always starts from the most derived

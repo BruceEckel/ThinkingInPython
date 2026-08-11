@@ -19,8 +19,10 @@ class Circle:
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)
-print(c.radius, c.area)  # The same two lines as before
-#: 10 314.159
+print(c.radius)  # The same two lines as before
+#: 10
+print(c.area)
+#: 314.159
 c.radius = 5  # Now the setter validates, then stores
 print(c.radius)
 #: 5
