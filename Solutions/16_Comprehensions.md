@@ -149,3 +149,24 @@ and fourth dictionaries (`1`, then `3`, then `5`), so the final value
 is `5`, the last one written. Order among distinct keys is preserved
 by first insertion, which is why `"a"` still prints first despite its
 value coming from the last dictionary in the list.
+
+## 7. Running `any()` before `sum()`
+
+```python
+# exercise_7.py
+nums = (n for n in range(10))
+print(any(n == 5 for n in nums))
+#: True
+print(sum(n * n for n in nums))
+#: 230
+print(list(nums))
+#: []
+```
+
+`any()` pulls values until one matches, so it consumes `0` through `5`,
+reports `True`, and stops. That leaves the generator part-way through,
+not empty: `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
+giving `230` rather than the full `285`. By then every value is gone,
+so `list()` gets nothing. A generator holds a position rather than a
+beginning; each consumer picks up where the previous one stopped, and
+`any()`'s early exit leaves values behind for `sum()` to find.
