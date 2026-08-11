@@ -54,8 +54,8 @@ It unbinds the name `c` and drops the one reference that name held.
 The `counters` list still references each `Counter`,
 so no `Counter`'s reference count reaches zero during the loop.
 That is why no `deleted` lines appear while the loop runs,
-why every `__repr__()` prints `3`,
-and why `End of delete loop` prints before any deletion happens.
+why every `__repr__()` reports a count of `3`,
+and why `End of delete loop` prints before any deletion.
 
 Python destroys the objects later, at interpreter shutdown,
 when it tears down the global `counters` list.
@@ -85,9 +85,9 @@ could destroy the objects in a different order,
 or not run the finalizers before exiting.
 
 So `__del__()` is fragile:
-the language specifies neither when it runs nor whether it runs at all.
+the language specifies neither when it runs nor whether it runs.
 At interpreter shutdown,
-the globals a `__del__()` method refers to may have already vanished.
+the globals a `__del__()` method refers to may have vanished.
 The Python documentation warns:
 
 > Warning: Due to the precarious circumstances under which `__del__()`
@@ -139,7 +139,7 @@ print("still running")
 ```
 
 The release failed, and stdout says nothing about it.
-A traceback goes to `sys.stderr` labelled "Exception ignored",
+A traceback goes to `sys.stderr` labeled "Exception ignored",
 but nothing propagates: no caller can catch it, no `finally` runs,
 the exit status is still `0`, and a test asserting on stdout passes.
 A `close()` call in a `with` block fails loudly instead.
@@ -187,8 +187,8 @@ Freeing it takes the cyclic garbage collector,
 a separate mechanism triggered by allocation counts rather than by the object becoming unreachable.
 `gc.disable()` above keeps that collector from running on its own,
 and `gc.collect()` then forces a run, so the moment of destruction is visible;
-in a real program nothing tells you when it happens.
-Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()` at all,
+in a real program nothing tells you when the collector runs.
+Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()`,
 leaving the objects in `gc.garbage`;
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so the only thing a cycle costs now is the delay.
@@ -242,7 +242,7 @@ and the second half shows it running when the body raises.
 Compare `cleanup.py`,
 where the release happened at an unknowable moment after the program's last statement.
 [Context Managers](15_Context_Managers.md) covers the protocol,
-the `@contextmanager` shorthand, and what `__exit__`'s arguments are for.
+the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
 This chapter shows the shape; that one explains it.
 
 2. `weakref.finalize()`,
@@ -290,7 +290,7 @@ because `b` held the only reference to it.
 Nobody called `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
 For an object still alive when the program ends,
-`finalize()` runs the callback from `atexit`,
+`finalize()` runs the callback from the `atexit` module's exit handlers,
 ahead of the teardown that makes `__del__()` unreliable.
 
 The `self.close` mistake produces no error, only an object that never goes away:
@@ -320,8 +320,9 @@ print(leaky() is None, safe() is None)
 #: False True
 ```
 
-A `ref()` reports `None` once its object disappears,
-so `False True` says the collector reclaimed `Safe` but not `Leaky`.
+A `ref()` is a weak reference: it watches its object without keeping it alive,
+and it reports `None` once the object disappears.
+So `False True` says the collector reclaimed `Safe` but not `Leaky`.
 `Safe` printed on the way out; `Leaky` printed nothing,
 because its callback never ran and nothing failed.
 Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
@@ -371,12 +372,12 @@ print(Counter.live_count())
 
 A `WeakSet` would do for counting alone.
 The dictionary is what you want as soon as you look instances up rather than count them,
-which is what [Flyweight](35_Flyweight.md) does with a pool keyed by name.
+which [Flyweight](35_Flyweight.md) does with a pool keyed by name.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,
 and one would then displace the other.
 Reused `id()` values are not a hazard,
-since the dictionary only ever holds live objects and no two live objects share an id.
+since the dictionary holds only live objects and no two live objects share an id.
 `live_count()` is the size of that registry,
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
@@ -394,7 +395,7 @@ On an implementation with a tracing collector, such as PyPy,
 the entries disappear only when its collector runs,
 so the counts do not fall promptly.
 Unlike the `__del__()` version, this reads the count during normal execution,
-so it never depends on the unreliable bookkeeping at interpreter shutdown.
+so it does not depend on the unreliable bookkeeping at interpreter shutdown.
 
 ## The Rule
 
@@ -404,7 +405,7 @@ so the release happens at a point in the program you can see.
 Where a callback must still run if the caller forgets,
 add `weakref.finalize()` as the backstop, not as the plan.
 To track objects without owning them, hold them weakly,
-so the registry cannot become the leak it is watching for.
+so the registry cannot become the leak it is meant to catch.
 
 ## Exercises
 
