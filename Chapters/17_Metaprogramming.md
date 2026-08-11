@@ -90,8 +90,9 @@ but simpler hooks cover almost every case a metaclass used to handle:
 Use a metaclass only when these cannot do the job.
 This chapter starts by building classes by hand,
 to show what a `class` statement actually does.
-Then come the simpler hooks,
-and finally metaclasses for the jobs that still need them.
+Then come the simpler hooks, and metaclasses for the jobs that still need them.
+The `inspect` module closes the chapter from the other side,
+reading class structure instead of changing it.
 
 ## Generating Classes with `type`
 
@@ -210,6 +211,15 @@ so it reads `make()`'s result as `Event` itself,
 whose `__init__()` takes three arguments.
 `EventMaker` names the two-argument signature the generated classes really have,
 and the `cast()` records it at the one place that creates a class.
+
+`make()` exists so that each `init()` closes over its own `name`.
+A lambda written inline in the comprehension would close over the comprehension's variable instead,
+so every generated class would record the final name, `RingBell`,
+as its `action`: the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime).
+
+`init()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
+It is a nested function, not a method defined inside a `class` statement,
+so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
 The dict comprehension builds all seven classes whether the schedule uses them or not.
 Seven is cheap and hundreds would not be,
@@ -340,10 +350,6 @@ naming the sentinel value rather than the generic `sentinel` class,
 so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
 [Choosing Which Dunders to Show](#choosing-which-dunders-to-show)
 uses the same idiom.
-
-The `init()` function nested inside `EventMakers.__getitem__()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
-`init()` is a nested function, not a method defined inside a `class` statement,
-so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
 ## Generating Classes with `exec()`
 
@@ -579,7 +585,7 @@ except TypeError as error:
 #: B is final; you cannot subclass it
 ```
 
-The check happens at class-creation time.
+The check runs at class-creation time.
 Python builds `B` normally.
 A class's own `__init_subclass__()` never runs for that class,
 and the version that does run at `B`'s creation is the one `B` inherits from `A`,
@@ -958,7 +964,7 @@ Without it, every singleton loses its type and a type checker can no longer catc
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
-which is exactly what a checker must confirm before it will accept a zero-argument `super()`.
+which is what a checker must confirm before it accepts a zero-argument `super()`.
 Both forms do the same work at run time.
 
 You might expect to parameterize[^parametrize] the class,
@@ -1122,7 +1128,7 @@ with ignore(TypeError):
 `__prepare__()` runs before the class body does,
 and whatever mapping it returns is the namespace that body executes into.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
-so `NoDuplicates` sees the second `on_open` land on a name it already holds.
+so `NoDuplicates` sees the second `on_open` assigned to a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
 `__prepare__()` must carry `@classmethod`.
 Python calls it on the metaclass before any class object exists,
@@ -1350,11 +1356,13 @@ is not stored in `obj`'s own `__dict__`.
 A class has no instance-level storage for the comparison:
 every attribute `display_object()` shows for a class already lives on that class or a base class,
 so all of them carry the tag.
+In [Comparing Ordinary Classes and Data Classes](12_Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
 even though `D` declares them directly, because neither belongs to an instance.
 For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object itself,
 the way `Stars.rating` did in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values):
-`class_with_defaults.py`'s `show(B())` tags the same two names, `B.x` and `B.s`,
+`class_with_defaults.py`'s `show(B())`, from that same comparison,
+tags `B.x` and `B.s`,
 while `display_object(Messenger("foo", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value lives,
@@ -1368,7 +1376,7 @@ as `new_vs_init.py` does to show `__new__` and `__init__`.
 Pass the `ALL_DUNDERS` sentinel instead to keep every dunder member,
 including the interpreter's own machinery.
 `dunder`'s type is `Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS`,
-naming each sentinel value itself rather than the generic `sentinel` class,
+naming each sentinel value rather than the generic `sentinel` class,
 so a type checker narrows `dunder` to `Sequence[str]` once it rules out both sentinels,
 and `name in dunder` needs no further guard.
 `ALL_DUNDERS` is useful for exploring an unfamiliar object,
@@ -1637,7 +1645,7 @@ the rule [Making a Class Final](#making-a-class-final) depends on.
 `Derived` adds the rest.
 `__prepare__()` runs before the body, which is why its line comes first.
 The body then executes, printing `class body`.
-`__set_name__()` and `__init_subclass__()` both land between `__new__ Derived enter` and `__new__ Derived exit`,
+`__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`,
 because `type.__new__()` calls them as it assembles the class,
 so they are not merely "after the body" but inside the metaclass's own construction step.
 The decorator is last, because it receives a class that is already finished.
@@ -1723,7 +1731,7 @@ each time someone calls the finished class.
     before it reads a single member.
     `Singleton<ASingleton>` can use that name as its template argument
     while the class remains incomplete.
-    Its member functions are not compiled until something actually calls them,
+    Its member functions are not compiled until something calls them,
     by which point `ASingleton` is complete.
 
     Python evaluates `Singleton[ASingleton]` eagerly,
