@@ -39,7 +39,7 @@ connect your class to the language's operators and built-in functions
 The reason for the `if` is that you can also use any file as a library module within another program.
 In that case, you only want its definitions,
 but you don't want the code at the bottom of the file to run.
-This particular `if` condition is only true when you are running this file directly.
+This particular `if` condition is true only when you are running this file directly.
 That is, `__name__` is `"__main__"` when you use the command line:
 
 ```
@@ -79,7 +79,7 @@ a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
 which is why `use_module` and `second` are one object.
-A consequence: a running program never notices an edit to a module it already imported.
+A consequence: a running program does not notice an edit to a module it has imported.
 Restart it, or call `importlib.reload(use_module)`,
 which re-runs the body into the existing module object.
 Reloading leaves every name already bound by a `from ... import` pointing at the old objects,
@@ -282,6 +282,12 @@ print(function2())
 #: function2 in module2 in a_package
 ```
 
+This listing, `from_packages.py`,
+and `using_packages.py` print the same loading messages:
+`from` does not load less.
+The whole module runs either way;
+the statement decides only which names this file binds.
+
 You can put a second package underneath the first one:
 
 ```python
@@ -351,7 +357,7 @@ Run it as `python -m a_package.module4` instead.
 
 Two modules in a package can end up importing each other.
 Python places the first one to load in `sys.modules` before its body finishes,
-so the second one imports a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
+so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A cycle is a design signal:
 move the shared piece into a third module both can import.
 When the cycle exists only in annotations,
@@ -474,7 +480,7 @@ and once loaded the names behave like eagerly imported ones.
 `json` and `pathlib` load at the `json.dumps` and `Path(...)` calls,
 which this listing cannot show, since the output is the same either way.
 
-Before 3.15, the way to defer a costly import was to move it inside the function that needed it.
+Before 3.15, deferring a costly import meant moving it inside the function that needed it.
 That works, but it hides the dependency:
 nothing at the top of the file mentions the module,
 tools that read imports miss it,
@@ -510,10 +516,6 @@ The body of `noisy` runs at `noisy.announce()`, the first access,
 which is why `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
-An import that exists only for a side effect, such as registering a plugin class
-([Factory](27_Factory.md#the-pythonic-factory-a-dictionary)),
-never uses the imported name, so `lazy` stops it from running at all.
-Keep those imports eager.
 `sys.lazy_modules` holds the names that are currently deferred,
 so you can check what a run actually put off without instrumenting the modules.
 
@@ -522,14 +524,16 @@ Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
 and Python likewise rejects `lazy from module import *` and a `lazy from __future__` import.
 To change the setting for a whole run without editing source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
-Both require one of three values.
+Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
-`all` defers every module-level import.
-`none` defers nothing, including the imports you marked `lazy`,
-which is the quickest way to find out whether laziness is behind a bug.
+`all` defers every module-level import the keyword could have marked,
+so the imports it cannot mark, such as one inside a `try` block, stay eager.
+The PEP also describes a third value, `none`, a global off switch;
+CPython removed it before the 3.15 release.
 
-Don't make an import lazy when you import the module for what its body *does* rather than for a name it defines.
-A module that registers a plugin, installs a codec,
+Don't make an import lazy when you import a module for what its body does rather than for a name it defines.
+A module that registers a plugin class
+([Factory](27_Factory.md#the-pythonic-factory-a-dictionary)), installs a codec,
 or fills a table does that work as it loads,
 and a lazily imported name nobody touches never loads.
 The failure is silent: no error, just a table with a row missing.
