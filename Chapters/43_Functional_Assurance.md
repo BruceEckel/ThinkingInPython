@@ -3,7 +3,7 @@
 Introductions to functional programming usually call it "programming with functions,"
 and functions really are a central part of the practice.
 But after (slowly) studying it for over ten years,
-I have started to wonder whether it's actually more about "functionality."
+I have started to wonder whether it's more about "functionality."
 One definition of science is "what works."
 Science has theories that fit the data, are predictive, and are falsifiable.
 If "computer science" is to live up to its name,
@@ -50,7 +50,9 @@ the same move you make in algebra.
 This property lets you check parts of a program,
 and sometimes prove them correct.
 
-Substitution stops working the moment a function reads or writes outside itself:
+Substitution stops working the moment a function reads or writes outside itself.
+`withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions)
+does both, reading and writing the module-level `balance`:
 
 ```python
 # not_transparent.py
@@ -92,8 +94,7 @@ The calls can run in any order, on any schedule, on any number of cores,
 and the answers do not change.
 
 Impure code has no such freedom.
-Recall `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions).
-Two parallel calls could both read `balance` before either writes it back,
+Two parallel `withdraw()` calls could both read `balance` before either writes it back,
 and one withdrawal vanishes.
 Making that safe means adding a lock,
 and the lock serializes the work you wanted to overlap.
@@ -160,11 +161,11 @@ then `squares.append(n * n)` says *how*.
 which is "the squares of the even numbers."
 It leaves the looping to Python.
 A description of the result is also easier to check than a sequence of steps,
-because there is less of it to be wrong about.
+because less of it can be wrong.
 By naming the result instead of the steps,
 you hand the reader your intent and give the runtime freedom to choose how to deliver it.
 That freedom is why a SQL query, a NumPy expression,
-or a dataframe operation can run on an optimized or parallel engine you never see.
+or a dataframe operation can run on an optimized or parallel engine you do not see.
 You described the what, not a fixed sequence of moves.
 
 `match` applies the same idea to taking data apart
@@ -188,7 +189,7 @@ it does not extend what the checker knows.
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
 The properties built up here, purity, immutability,
-and referential transparency, buy assurance at every level.
+and referential transparency, provide assurance at every level.
 You decide how far to take it.
 
 1. The cheapest rung is local reasoning.
@@ -197,7 +198,7 @@ You decide how far to take it.
    Most code never needs more.
 2. Next are tests over chosen examples, the subject of [Testing](11_Testing.md).
    Each one pins a single input to a single answer,
-   so the assurance you get is exactly as wide as the examples you think of.
+   so the assurance you get is no wider than the examples you invent.
 3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
@@ -206,15 +207,17 @@ You decide how far to take it.
    or data arriving from outside the program leaves a gap no checker can close,
    so the theorem holds only as far as the annotations do.
    Running `ty` over the examples in this book still rules out a useful class of mistakes,
-   which is most of what this rung is for.
+   which is most of what this rung offers.
 4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
    It does not prove the law.
-   It works to falsify it, which is the falsifiability the opening asked for.
+   It works to falsify it,
+   which is the falsifiability the opening required of a science.
 5. At the top is formal proof.
-   Dependently-typed languages such as Lean, Idris, and Rocq (formerly Coq)
-   prove a program correct for every possible input, checked by machine.
+   In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
+   you prove a program correct for every possible input,
+   and a machine checks the proof.
    This is real, but rare outside specialized work.
 
 ## Property-Based Testing
@@ -256,7 +259,7 @@ You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
 drawing on the whole of `str` rather than the five-letter alphabet chosen above,
-so it reaches inputs the loop can never produce, such as unusual Unicode:
+so it reaches inputs the loop cannot produce, such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -313,13 +316,15 @@ except AssertionError as e:
 
 An underscore that was in the input comes back as a space.
 Hypothesis finds a failing string and then keeps cutting it down until removing anything more makes the test pass again,
-so what it reports is `'_'` rather than the longer string it happened to fail on first.
+so what it reports is `'_'` rather than the longer string that failed first.
 That single character is the whole bug statement.
 `derandomize=True` fixes the search so this book gets the same answer every run,
-and `database=None` keeps it from replaying a case saved by an earlier run;
-a real test needs neither.
-The listing calls `roundtrip()` directly, inside a `try`,
-because a failing `test_` function should fail the build.
+the job `random.seed(42)` did in the hand-written loop.
+`database=None` keeps it from replaying a case saved by an earlier run.
+A real test needs neither.
+The function's name drops the `test_` prefix,
+and the listing calls it directly inside a `try`:
+a failing `test_` function should fail the build, and this one exists to fail.
 
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
@@ -329,7 +334,7 @@ sorting produces an ordered list.
 sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree: the simple,
 obviously correct version matches the fast one,
-which is what `parallel_pure.py`'s `assert parallel == serial` already claimed.
+which `parallel_pure.py`'s `assert parallel == serial` claimed.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
@@ -338,7 +343,9 @@ constrains the function's behavior without repeating its body.
 All of these lean on purity.
 Hypothesis can rerun and shrink freely only because each call is independent of every other.
 
-Two caveats keep the claim from overreaching.
+## Affordable Proof
+
+Two caveats keep the chapter's argument from overreaching.
 First, proof is not exclusive to functional code.
 Hoare logic and tools like Dafny verify imperative programs too.
 What purity changes is the cost.
