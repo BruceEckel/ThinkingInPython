@@ -3,7 +3,7 @@
 An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
 a file, a database cursor, or a computation.
-It only asks for the next item.
+It asks only for the next item.
 
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
@@ -44,6 +44,9 @@ then calls `next()` until `StopIteration` occurs.
 A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
+The near-miss is `next(nums)`: `next()` accepts only an iterator,
+and a list has no `__next__()`, so that call raises a `TypeError` at runtime,
+and the checker rejects it before that.
 
 Written out, `for x in nums:` is this loop:
 
@@ -233,6 +236,12 @@ When you must walk data twice, collect it into a list once,
 or hand out an iterable like `Countdown` above,
 whose `__iter__()` builds a fresh generator for every pass.
 
+Laziness and single use are separate properties.
+`Countdown` is as lazy as the generator its `__iter__()` builds,
+yet it survives repeated passes, because each pass gets a fresh iterator.
+`range()` works the same way: one `range` object can drive loop after loop.
+What runs out is the iterator, not the iterable that made it.
+
 The annotation cannot warn you.
 `Iterable[T]` describes a list and a half-spent generator equally well,
 so a function that walks its argument twice type-checks and then returns a wrong answer on the second pass:
@@ -250,7 +259,7 @@ def twice_iterable(xs: Iterable[int]) -> tuple[int, int]:
 def twice_collection(xs: Collection[int]) -> tuple[int, int]:
     return sum(xs), sum(xs)
 
-print(twice_iterable(gen(3)))  # Ty sees nothing wrong
+print(twice_iterable(gen(3)))  # The checker sees nothing wrong
 #: (3, 0)
 print(twice_collection([0, 1, 2]))  # The same values, in a list
 #: (3, 3)
@@ -672,12 +681,12 @@ The interface needed more than a buffer: it rebuilt the list.
 
 That is the cost the pattern hides.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,
-so honoring them over a stream means recreating one item by item.
+so honoring them over a stream means recreating one, item by item.
 The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
-If you take them away, `advance()` has to return the value it moved to,
+If you take them away, `advance()` must return the value it moved to,
 which is `__next__()`.
 
 You can ask a GoF iterator repeatedly whether it has finished,
@@ -723,7 +732,7 @@ print(list(doubled_ok(iter([1, 2]))))
 
 Each question costs an item.
 Nothing in the protocol looks ahead without advancing,
-which is why a peekable iterator has to buffer,
+which is why a peekable iterator must buffer,
 and why `tee` buffered a whole stream earlier in this chapter.
 `DONE` is a [sentinel](05_Functions.md#default-and-keyword-arguments),
 because the answer must be distinguishable from every value the source could yield.
