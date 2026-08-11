@@ -1,13 +1,13 @@
 # exercise_3.py
+from dataclasses import dataclass
 from functools import singledispatchmethod
 from typing import ClassVar
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)

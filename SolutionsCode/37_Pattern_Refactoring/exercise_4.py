@@ -1,14 +1,14 @@
 # exercise_4.py
 from collections import defaultdict
+from dataclasses import dataclass
 from functools import singledispatch
 from typing import ClassVar
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     bin: ClassVar[type[Trash]]
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)

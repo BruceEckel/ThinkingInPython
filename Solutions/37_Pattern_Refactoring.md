@@ -5,16 +5,16 @@
 ```python
 # exercise_1.py
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import ClassVar
 
 type Bins = dict[type[Trash], list[Trash]]
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -52,7 +52,7 @@ further wiring. `recycle_dict.py` needs no change because
 `type(t)` for a piece of `Plastic` is simply `Plastic`, a key the
 dictionary has never seen before, which `defaultdict` handles the same
 way it handles every other new key. `parse_trash.py` needs no change
-because it only ever calls `Trash.create(name, weight)` with a name
+because it only calls `Trash.create(name, weight)` with a name
 string read from the file; it never names a concrete material itself.
 The only files that change are the data (adding `Plastic:NN` lines)
 and, if `Plastic` deserves special handling, one
@@ -78,14 +78,14 @@ guard.
 
 ```python
 # exercise_2.py
+from dataclasses import dataclass
 from typing import ClassVar
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -120,26 +120,26 @@ print(type(h).__name__, h.weight)
 Neither needs `singledispatch`. Both read only `t.weight` and
 `t.value`, attributes every `Trash` subclass already carries through
 ordinary polymorphism, so the same code runs unchanged for `Aluminum`,
-`Glass`, `Plastic`, or any future material. This is exactly
+`Glass`, `Plastic`, or any future material. This is
 `sum_value()`'s situation: `singledispatch` earns its place only when
 the behavior genuinely differs *by type*, such as `recycling_note()`
 giving `Aluminum` and `Glass` their own wording. A calculation that is
 identical in shape for every type, varying only in the numbers each
-type happens to carry, is a plain function, full stop.
+type carries, is a plain function.
 
 ## 3. `recycling_note()` as a `singledispatchmethod`
 
 ```python
 # exercise_3.py
+from dataclasses import dataclass
 from functools import singledispatchmethod
 from typing import ClassVar
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -204,15 +204,15 @@ on an object.
 ```python
 # exercise_4.py
 from collections import defaultdict
+from dataclasses import dataclass
 from functools import singledispatch
 from typing import ClassVar
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     bin: ClassVar[type[Trash]]
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
@@ -260,9 +260,9 @@ print(sorted(k.__name__ for k in shared))
 `CrushedAluminum` is a key the dictionary has never seen and gets a bin
 of its own. `singledispatch` resolves through the MRO instead, finds no
 registration for `CrushedAluminum`, and takes `Aluminum`'s. Both
-behaviors are deliberate and neither is a fallback: the sorter wants to
-know precisely what arrived, and the note wants the nearest answer
-anyone has written.
+behaviors are deliberate and neither is a fallback: the sorter needs to
+know what arrived, and the note takes the nearest answer anyone has
+written.
 
 Sharing a parent's bin without naming a material in the loop means
 choosing your own key instead of accepting `type(t)`. A `bin` class
