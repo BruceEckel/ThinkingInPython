@@ -1,6 +1,6 @@
 # exercise_6.py
 from enum import StrEnum
-from typing import Any, Final
+from typing import Final
 
 class Outcome(StrEnum):
     WIN = "win"
@@ -8,7 +8,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         return OUTCOME[type(self), type(item)]
     def __str__(self) -> str:
         return type(self).__name__
@@ -33,7 +33,7 @@ except KeyError as e:
 #: KeyError ['Origami', 'Rock']
 
 class TolerantItem(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         for left in type(self).__mro__:
             for right in type(item).__mro__:
                 if not (issubclass(left, Item)

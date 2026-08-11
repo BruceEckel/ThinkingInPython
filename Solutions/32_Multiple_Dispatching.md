@@ -8,7 +8,7 @@ and Scissors, and loses to Rock; Lizard versus Lizard is a draw.
 ```python
 # exercise_1.py
 from enum import StrEnum
-from typing import Any, Final
+from typing import Final
 
 class Outcome(StrEnum):
     WIN = "win"
@@ -16,7 +16,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
@@ -148,16 +148,16 @@ print(Lizard().compete(Paper()), Lizard().compete(Scissors()),
 This version costs far more to extend. Every *existing* class
 (`Paper`, `Scissors`, `Rock`) needs a brand-new `eval_lizard()` method,
 one line each, and the new `Lizard` class needs a `compete()` plus
-three more `eval_*()` methods, one per opponent type, all four
-encoding the same nine numbers already sitting in the table version's
-`OUTCOME` dictionary, just spread across four classes instead of
-collected in one place. Both versions were checked against each other
+four `eval_*()` methods, one per opponent type including its own,
+all of it encoding the same sixteen answers already sitting in the
+table version's `OUTCOME` dictionary, just spread across four classes
+instead of collected in one place. Both versions were checked against each other
 while developing this solution: all sixteen combinations of the two
 implementations agree.
 
 The comparison makes the chapter's point concrete. The table costs one
 class and seven dictionary rows to extend. The method version costs
-one class and four new methods, plus retrofitting a method onto every
+one class and five new methods, plus retrofitting a method onto every
 class that already existed. That cost only grows as more item types
 are added, which is exactly why the chapter recommends the table for
 data that is mostly pure lookup, and reserves the method version for
@@ -223,7 +223,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
@@ -262,9 +262,9 @@ def duel(item1: Any, item2: Any) -> None:
 
 random.seed(47)
 
-def item_pair_gen(base: type, n: int,
-                   counts: Counter[str] | None = None
-                   ) -> Iterator[tuple[Any, Any]]:
+def item_pair_gen[T](base: type[T], n: int,
+                     counts: Counter[str] | None = None
+                     ) -> Iterator[tuple[T, T]]:
     if counts is None:
         counts = Counter()
     items = base.__subclasses__()
@@ -354,7 +354,7 @@ Python's account of which pair of types has no defined subtraction.
 ```python
 # exercise_6.py
 from enum import StrEnum
-from typing import Any, Final
+from typing import Final
 
 class Outcome(StrEnum):
     WIN = "win"
@@ -362,7 +362,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         return OUTCOME[type(self), type(item)]
     def __str__(self) -> str:
         return type(self).__name__
@@ -387,7 +387,7 @@ except KeyError as e:
 #: KeyError ['Origami', 'Rock']
 
 class TolerantItem(Item):
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         for left in type(self).__mro__:
             for right in type(item).__mro__:
                 if not (issubclass(left, Item)

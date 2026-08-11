@@ -11,7 +11,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 
 class Item:
-    def compete(self, item: Any) -> Outcome:
+    def compete(self, item: Item) -> Outcome:
         return OUTCOME[type(self), type(item)]
 
     def __str__(self) -> str:
@@ -50,9 +50,9 @@ def duel(item1: Any, item2: Any) -> None:
 
 random.seed(47)
 
-def item_pair_gen(base: type, n: int,
-                   counts: Counter[str] | None = None
-                   ) -> Iterator[tuple[Any, Any]]:
+def item_pair_gen[T](base: type[T], n: int,
+                     counts: Counter[str] | None = None
+                     ) -> Iterator[tuple[T, T]]:
     if counts is None:
         counts = Counter()
     items = base.__subclasses__()
