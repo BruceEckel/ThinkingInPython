@@ -16,8 +16,7 @@ with pool.lease() as conn:
 ```
 
 The connection returns to the pool on every path out of that block,
-including the exception path,
-and the borrower writes nothing to make that happen.
+including the exception path, and the borrower writes nothing to arrange it.
 [An Object Pool](#an-object-pool) builds it.
 
 ## A Basic Context Manager
@@ -59,8 +58,6 @@ When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 The `finally` makes the cleanup dependable:
 an exception raised in the block appears at the `yield`,
 and `finally` still runs the cleanup before the exception propagates.
-The `@contextmanager` form relies on the generator and decorator machinery from [Decorators](14_Decorators.md)
-and [Iterators](23_Iterators.md#generators).
 
 Leaving the `try`/`finally` out is the common mistake:
 
@@ -88,14 +85,17 @@ Without the `try`/`finally`,
 an exception in the block resumes the generator by raising at the `yield`,
 so the code after the `yield` never runs and `exit A` never prints.
 Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
-Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator,
-without exception.
+Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
 
 One caution: the manager object `trace("A")` returns is single-use.
 Its generator runs once,
 so reusing the same object in a second `with` fails with a message that names nothing useful:
 `AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
 Construct a fresh manager for each `with` statement.
+A loop around the `yield` cannot work around this:
+the single `yield` is enforced,
+and a generator that reaches a second `yield` makes the manager raise a `RuntimeError`
+(`generator didn't stop`) when the block ends.
 
 ## The Protocol
 
@@ -177,7 +177,7 @@ except ValueError as error:
 #: caught: boom
 ```
 
-`exit A` prints before `caught`, so the cleanup runs on the way out.
+`exit A` prints before `caught`, so the cleanup runs on the exception path.
 This is the same guarantee a `try`/`finally` gives,
 packaged as a reusable object.
 
@@ -355,7 +355,7 @@ The first is the tuple form:
 `issubclass()` accepts a tuple of classes as its second argument,
 matching if `cls` is a subclass of any one of them,
 so `ignore((ZeroDivisionError, TypeError))` covers several types in one manager.
-The `Types` alias names that "one class or a tuple of classes" shape once instead of spelling it out at every use.
+The `Types` alias names that "one class or a tuple of classes" shape once instead of writing it out at every use.
 
 The second is the default.
 The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments),
@@ -369,7 +369,7 @@ and the earlier `if exc_type is None: return False` has confirmed `exc_type` is 
 
 `suppress` reads the same call the opposite way:
 `suppress()` with no argument suppresses nothing,
-because no type is there for the raised exception to match.
+because a raised exception has no listed type to match.
 An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
 so name the types you expect unless you really want a block that nothing escapes.
 
@@ -550,7 +550,7 @@ parentheses group them without changing the behavior:
         ...
 
 When you do not know the number of managers until runtime,
-`contextlib.ExitStack` holds a dynamic set of managers and unwinds them in reverse on the way out:
+`contextlib.ExitStack` holds a dynamic set of managers and unwinds them in reverse when the block ends:
 
 ```python
 # exit_stack.py
@@ -601,8 +601,8 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 - `ExitStack` manages a dynamic or conditional set of managers, as shown above.
 - `ContextDecorator` lets a context manager double as a decorator,
   as shown above.
-- `nullcontext(value)` is a do-nothing manager that yields `value`,
-  useful when a `with` is optional and you want one code path.
+- `nullcontext(value)` is a do-nothing manager whose `__enter__()` returns `value`,
+  useful when a `with` is optional and one code path should cover it.
 
 A function might write to a path it opens itself,
 to a stream the caller hands it, or to standard output by default.
@@ -649,8 +649,9 @@ path.unlink()
 so one variable can hold the open file in one branch and a `nullcontext` in the others.
 
 `emit()` closes only the file it opened.
-A stream the caller handed over stays open, which is what the caller expects;
-the `nullcontext` wrapper lets one `with` block serve both cases without an `if` around the whole body.
+A stream the caller handed over stays open, which is what the caller expects:
+exiting a `nullcontext` does nothing,
+so the same `with` block closes the file in the `Path` branch and touches nothing in the other two.
 
 ## The Async Protocol
 
@@ -764,8 +765,7 @@ It only tracks custody.
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and a return makes an item available.
-So you can hand the same pool to several threads.
-The pool becomes the throttle that limits concurrent use,
+Handing the same pool to several threads makes it the throttle that limits concurrent use,
 which is how real database connection pools behave.
 `available()` is a snapshot for the demo, not a synchronization primitive:
 `Queue.qsize()` is only approximate once more than one thread is borrowing,
