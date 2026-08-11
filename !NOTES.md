@@ -1,15 +1,44 @@
-Fable: Review the book to find and fix consistency issues
+Review the tests to see if they are all doing something useful.
+
+Make: only show top-level things for 'make' or 'make help'
+So for example:
+```
+PS C:\git\ThinkingInPython> make
+uv run python tools/make_help.py
+  help                    Show this help
+
+[[before Subtopics, a small number of commands that actually get used every day]]
+
+Subtopics:
+    make setup
+    make everyday
+    make build
+    make examples
+    make solutions
+    make prose
+    make style
+    make cleanup
+```
+
+Now, if the user runs, for example, 'make build', they will see the subtopics for building:
+
+    make build sync                    Update the committed Examples/ tree from the Markdown
+    make build check                   Verify book examples match the committed Examples/ tree
+    make build prune                   Delete orphaned stray files under Examples/ (see `check`)
+    make build site                    Render Chapters/ into build/site/ with pandoc
+    make build epub                    Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
+    make build local                   Build the site, serve it with live reload, open a browser
+    make build serve                   Serve build/site/ at http://localhost:8000 (no rebuilding)
+
+Don't do anything yet; make an analysis and suggestions.
 
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
 
-Use Fable for deep-review
+Fable: Review the book to find and fix consistency issues
 
 Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
-
-Active voice (Fable)
-make prose reveals many
 
 Add Epub link info on README and bottom of index page.
 

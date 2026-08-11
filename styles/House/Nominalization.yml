@@ -1,0 +1,12 @@
+extends: existence
+message: "The action is hiding in a noun ('%s'): put it back in the verb ('performs a lookup' -> 'looks up')."
+level: suggestion
+ignorecase: true
+# Vale's regex engine (re2) has no lookahead, so a suffix pattern like
+# \w+tion cannot exclude the book's domain nouns (function, instance,
+# moment, exception). The nouns below are curated: each is a verb in
+# noun costume, so weak-verb + article + noun is a confident hit.
+tokens:
+  - '(?:makes?|made|performs?|performed|does|did|provides?|provided|carr(?:y|ies|ied) out) (?:a|an|the) (?:comparison|evaluation|calculation|computation|decision|registration|allocation|conversion|transformation|modification|mutation|creation|deletion|insertion|validation|initialization|iteration|invocation|declaration|distinction|connection|operation|composition|solution|execution|construction|observation|separation|combination|inspection|description|translation|substitution|optimization|verification|serialization|configuration|migration|transition|selection|assignment|adjustment|measurement|arrangement|replacement|improvement)'
+  - 'takes? place'
+  - 'took place'

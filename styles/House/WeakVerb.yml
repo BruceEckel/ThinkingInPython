@@ -1,0 +1,11 @@
+extends: existence
+message: "Weak-verb frame ('%s'): the real verb is hiding in the complement. Let it take over ('is used to preserve' -> 'preserves')."
+level: warning
+ignorecase: true
+tokens:
+  - 'is used to'
+  - 'are used to'
+  - 'serves? to'
+  - 'is responsible for'
+  - 'are responsible for'
+  - 'acts as'

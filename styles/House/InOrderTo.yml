@@ -1,0 +1,6 @@
+extends: existence
+message: "'%s' is a wordy 'to'. Cut 'in order'."
+level: warning
+ignorecase: true
+tokens:
+  - 'in order to'

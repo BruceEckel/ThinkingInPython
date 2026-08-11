@@ -1,16 +1,20 @@
 ---
 name: activate
-description: Rewrite prose into the active, direct register: clear the passive-voice and there-is warnings from `make prose`, and cut metadiscourse, empty frames, and expletive constructions Vale cannot see. Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
+description: Rewrite prose into the active, in-the-moment register: clear the passive-voice, there-is, weak-verb, and nominalization warnings from `make prose`, and fix what Vale cannot see (abstract subjects, future-tense drift, metadiscourse, empty frames). Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
 ---
 
-# Activating prose: put the agent in the subject
+# Activating prose: characters as subjects, actions as verbs
 
-The book's register is active and direct.
-A sentence earns its length by content, not by frame:
-no dummy subject holding a place,
-no announcement that a point is coming,
-no participle hiding who acts.
-This skill is the cleanup pass for that register.
+The book's register is active, concrete, and present:
+the reader watches the machinery run, now,
+with a real actor in every subject and a real action in every verb.
+"Active voice" names the grammar-level slice of that register,
+but the principle is wider (Williams' *Style* states it as
+"make characters your subjects and their actions your verbs"),
+and a sentence can pass the grammar test and still be dead:
+the action hiding in a noun, the subject an abstraction,
+the tense pushed into a distancing "will."
+This skill is the cleanup pass for the whole register.
 It has two sources of findings:
 the mechanical warnings `make prose` reports,
 and a read-through for the constructions no linter catches.
@@ -21,18 +25,37 @@ code blocks, `#:` output markers, and quoted material stay untouched.
 
 Run `make prose CH=NN` (one chapter) or `make prose` (whole book);
 it needs the standalone `vale` binary.
-Collect the `write-good.Passive` and `write-good.ThereIs` hits.
+Collect the `write-good.Passive` and `write-good.ThereIs` hits,
+plus the three House rules this skill added:
+`House.WeakVerb` (is used to, serves to, is responsible for, acts as),
+`House.Nominalization` (weak verb + article + a curated noun list,
+plus "takes place"), and `House.InOrderTo`.
 `make prose` is not part of any gate,
 so a clean `make verify` says nothing about these warnings.
 
 ## Step 2: read for what Vale misses
 
-Vale flags "to be + participle" and sentence-initial "There is/are".
-It does not flag metadiscourse, empty frames,
+Vale flags "to be + participle", sentence-initial "There is/are",
+and the House patterns above,
+but the House rules are deliberately partial:
+Vale's regex engine has no lookahead,
+so `House.Nominalization` matches a curated noun list
+rather than a suffix pattern
+(a `-tion` suffix rule would flag "function" and every other
+domain noun that merely ends that way),
+and a hit can still be a substring artifact
+("makes the composition case for it" is about a case, not a composition).
+Vale also does not flag an abstract subject,
+a "will" where the present belongs,
+a nominalization whose noun is not on the list,
+metadiscourse, an empty frame,
 or an expletive buried mid-sentence.
 Read the chapter for the categories below.
+They group into three questions:
+where did the action go, what frames the point,
+and is the reader watching it now.
 
-## The categories and their rewrites
+## Where the action went
 
 **Passive voice.**
 The test: is there a real agent, present in the discussion,
@@ -53,10 +76,63 @@ When no agent is on stage, swap the verb instead of inventing one:
 Keep a passive when both moves fail:
 when the natural rewrite needs a fabricated subject
 ("the system", "one", "the programmer")
-or when the acted-on thing is the topic
-and fronting the agent would derail the paragraph.
+or when cohesion wins (see Boundaries).
 A kept passive is a judgment call, not a defeat;
 note it in the report so the warning's persistence has a recorded reason.
+
+**Nominalizations.**
+The action turned into a noun, leaving a weak verb to hold the grammar.
+The tell is a noun in *-tion/-ment/-ance/-sion*
+propped up by *make, do, perform, provide, occur, take place, happen*.
+Put the action back in the verb, and its agent back in the subject:
+
+- "The evaluation of the default happens once, at definition time"
+  becomes "Python evaluates the default once, when it defines the function"
+- "performs a lookup in the instance dictionary"
+  becomes "looks up the name in the instance dictionary"
+- "The conversion to bytes takes place before the write"
+  becomes "The stream encodes the text before writing it"
+
+The watch list already bans "happen";
+a nominalized sentence is usually why the word appeared,
+an action left with no agent to do it.
+Fixing the nominalization removes the banned word for free.
+
+**Weak-verb frames.**
+No nominalization needed; the verb slot is occupied by filler
+while the real verb sits inside an infinitive or a complement.
+*is used to, serves to, is responsible for, acts as, functions as, works to.*
+The real verb takes over:
+
+- "`functools.wraps` is used to preserve the metadata"
+  becomes "`functools.wraps` preserves the metadata"
+- "The decorator serves to register the class"
+  becomes "The decorator registers the class"
+- "`__slots__` is responsible for blocking new attributes"
+  becomes "`__slots__` blocks new attributes"
+- "The property acts as a guard on assignment"
+  becomes "The property guards assignment"
+
+**Abstract subjects.**
+Grammatically active, but the subject is not a character:
+"this approach", "the design", "the process", "the fact that".
+The book has a real cast available in nearly every sentence:
+Python, the interpreter, the checker, `pytest`, ruff,
+the garbage collector, the event loop,
+the caller, the reader,
+and the named constructs themselves
+(the decorator, the registry, the `finally` block, `__init__()`).
+Name the concrete actor:
+
+- "This approach allows callers to skip the check"
+  becomes "The registry lets callers skip the check"
+- "The design guarantees that cleanup runs"
+  becomes "The `finally` block guarantees the cleanup runs"
+
+When no cast member fits, the abstraction may be the honest subject
+(a paragraph genuinely about a trade-off can say "the trade-off");
+the target is the reflexive "this approach/this design" opener,
+not every abstract noun.
 
 **Expletive constructions.**
 "There is / there are / it is ... that" frames.
@@ -64,6 +140,13 @@ The content nouns become the subject:
 
 - "There are three cases that matter" becomes "Three cases matter"
 - "It is the factory that builds the default" becomes "The factory builds the default"
+
+The "is what" cleft is the same disease
+(a delayed verb behind a dummy frame)
+and already has its own rule in the global style guide;
+apply that rule's deletion test during this pass.
+
+## What frames the point
 
 **Metadiscourse.**
 Writing about the writing or the reader:
@@ -83,6 +166,49 @@ A clause that delays the point without adding one:
 The test is deletion: if the sentence means the same without the frame,
 the frame was scaffolding.
 
+## Is the reader watching it now
+
+**Tense: present for program behavior.**
+Timeless behavior gets the present tense;
+"will" pushes the action into a distanced future it does not occupy:
+
+- "If the key is missing, a `KeyError` will be raised"
+  becomes "A missing key raises a `KeyError`"
+  (the passive and the tense were the same problem)
+- "The checker will flag the call" becomes "The checker flags the call"
+- "the second call will find the cache warm"
+  becomes "the second call finds the cache warm"
+
+Reserve "will" for a genuine future event
+(a scheduled deprecation, a release that has not shipped)
+and "would" for a genuine counterfactual
+("without the guard, the setter would call the setter").
+The house style's imperative-plus-consequence rule
+already produces present-tense conditionals
+("If you remove `frozen=True`, the pattern fails");
+this category extends the same tense discipline to every sentence.
+
+**Narrated mechanism.**
+The prose-level twin of the deep-review skill's
+mechanism-vs-outcome lens:
+an outcome sentence reports a result,
+an in-the-moment sentence lets the reader watch it unfold.
+When prose walks a listing,
+narrate the execution in order, in the present tense,
+tracking state as it changes:
+
+- Outcome: "Caching makes the second call fast."
+- In the moment: "The first call misses the cache and computes the value;
+  the second finds the entry and returns it without computing anything."
+
+Sequence markers ("then", "now", "at this point the list holds three items")
+keep the reader's position in the run explicit.
+This category adds sentences rather than trimming them,
+so apply it where the surrounding prose already walks the code
+and the walk skips a step;
+inventing a full walkthrough where none exists
+is a teaching addition for a deep review, not this pass.
+
 ## Boundaries
 
 - **Bruce's em-dashes stay.** Rewriting a sentence around one is fine;
@@ -91,6 +217,29 @@ the frame was scaffolding.
   `readability_db.md` and `deep_review_db.md` in the repo root
   carry standing exemptions: prose that reads as a violation on purpose.
   A construction recorded there is settled; leave it.
+- **Cohesion can outrank activation.**
+  Williams pairs characters-and-actions with given-before-new:
+  old information in the subject, news at the end.
+  A passive that keeps the running topic in subject position is correct:
+  "the interpreter compiles the source to bytecode;
+  the bytecode is then executed on a stack machine"
+  keeps "bytecode" as the topic,
+  and fronting the interpreter again would derail the paragraph.
+  The end of the sentence is the stress position,
+  which is also why a stranded preposition reads badly:
+  it spends the emphasis on a function word.
+  When activation and cohesion conflict, cohesion wins;
+  record the kept passive in the report.
+- **Definitions keep their "is."**
+  "A closure is a function that captures variables from its enclosing scope"
+  is an identity statement, and stative "is" is its verb.
+  Do not force a dynamic verb into a definition.
+- **An active verb must be literal.**
+  The verb names what the machinery does:
+  looks up, copies, binds, evaluates, raises an exception.
+  Never trade a passive for a watch-list metaphor;
+  "the check lands before the loop" is not an activation,
+  it is a new violation.
 - **Headings have their own rule** (see the
   `heading-style-infinitive-over-modal` project memory):
   infinitive or noun phrase, not a modal clause,
