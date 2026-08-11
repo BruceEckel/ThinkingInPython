@@ -24,7 +24,7 @@ you have no idea which change caused the bug.
 It seems easy to write the code, get it working,
 and intend to write the tests later.
 Later rarely comes.
-The tests seem to lose their importance.
+Once the code works, the tests feel less important.
 
 One solution is to write the tests before writing the code.
 When you write the tests first, you:
@@ -40,7 +40,7 @@ not a verification step you skip when the code looks right to you.
 That said, TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
 so that only implementation remains.
-Often, however, you are not sure what direction a program will take you.
+Often, however, you are not sure what direction the program will take.
 You are experimenting to look for the correct approach.
 When you are not simply producing code, but discovering your design,
 TDD is wasteful.
@@ -127,6 +127,10 @@ def test_interest_uses_approx(funded: Account) -> None:
     assert funded.balance == pytest.approx(105.0)
 ```
 
+This file previews two features that get their own sections later in this chapter:
+the `parametrize` mark runs one test over several inputs,
+and the `funded` fixture builds a prepared account for each test that names it as a parameter.
+
 Run the test suite by typing `pytest` in the project directory.
 `pytest` puts each test file's own directory at the front of `sys.path`,
 which is why `from account import Account` works with no packaging and no path setup,
@@ -190,7 +194,7 @@ def test_overdraft_reports_the_shortfall() -> None:
 The assertion after the block belongs outside it:
 a failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
-Inside the block it would never run at all:
+Inside the block it would never run:
 the exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then absorbs it.
 
@@ -203,7 +207,7 @@ unless you pass `rel=` or `abs=`.
 
 That test would pass with `==` as well.
 `100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,
-and so is every other round rate on a round balance.
+and so is every other whole-percent rate on this starting balance.
 The trouble starts once error accumulates:
 
 ```python
@@ -218,7 +222,7 @@ def test_interest_compounds() -> None:
     assert account.balance == pytest.approx(127.62815625)
 ```
 
-Five applications of 5% land on `127.62815624999999`,
+Five applications of 5% produce `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
 Use `approx()` as the habit rather than as the rescue:
 the first test does not need it,
@@ -274,7 +278,7 @@ which tells `pytest` to call the fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
 `pytest` is the only thing that calls it:
-a test that calls `funded()` itself fails with `Fixture "funded" called directly`.
+a test that calls `funded()` fails with `Fixture "funded" called directly`.
 
 Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
@@ -313,7 +317,7 @@ A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scop
 That suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
 It does not save you from naming a fixture you want to use.
-An autouse fixture still has to appear in the parameter list before the test can see what it returns,
+An autouse fixture must still appear in the parameter list before the test can see what it returns,
 so marking `funded` autouse and then writing `funded.withdraw(40)` raises a `NameError`.
 
 Fixtures eliminate duplicated setup.
@@ -485,10 +489,10 @@ def test_missing_file_raises(
 ```
 
 `data_dir()` reads `APP_DATA` on every call,
-which is what lets `monkeypatch.setenv()` redirect it.
+which lets `monkeypatch.setenv()` redirect it.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` would read the variable once,
-at import time, which happens before any test body runs,
-so patching the environment afterward would move nothing.
+at import time, before any test body runs,
+so patching the environment afterward would change nothing.
 Reading a setting where you use it, rather than caching it at import,
 is most of what makes a module testable.
 
@@ -522,8 +526,7 @@ def test_roll_returns_known_value(
 
 `import random` binds the one module object every importer shares,
 so `dice.random` and `random` are the same object and the patch replaces `randint()` process-wide.
-`monkeypatch` restores the original when the test ends,
-which is what keeps that safe.
+`monkeypatch` restores the original when the test ends, which keeps that safe.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -657,7 +660,7 @@ def current_temp(city: str) -> str:
 ```
 
 The test swaps `urlopen()` for a stub that returns bytes from memory,
-so no request ever leaves the machine:
+so no request leaves the machine:
 
 ```python
 # test_weather.py
@@ -718,7 +721,7 @@ The work is mostly in the first step,
 since a function that is hard to test is usually one that goes looking for something it was never handed.
 
 To find out what you have not tested, run the suite under `coverage.py`,
-which `pytest --cov` wires up for you.
+which the `pytest-cov` plugin wires up when you pass `--cov`.
 Read the result as a list of lines nothing exercised, not as a score:
 a line a test happened to execute is not the same as a line a test checks.
 
