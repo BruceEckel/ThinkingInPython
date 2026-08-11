@@ -80,7 +80,7 @@ the framework holds the flow of control and calls into your code,
 rather than your code calling into a library.
 
 A caution about the `@final` lock: it holds only under the type checker.
-At runtime Python only records the mark and enforces nothing,
+At runtime Python records the mark and enforces nothing,
 and a subclass override of `run()` replaces the fixed algorithm without complaint.
 The guarantee is real, but it is the checker's guarantee,
 one more reason to make `ty` or another checker part of the build.
@@ -92,6 +92,9 @@ The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
 An optional step like this is a *hook*.
+The `setUp()` and `tearDown()` in the opening example are hooks:
+`TestCase` supplies do-nothing versions,
+so a test class that needs no setup skips them.
 The same silence hides a misspelling:
 `def customise1()` adds a new method and leaves the base's do-nothing version in place,
 which is why every step override in these listings carries `@override`.
@@ -152,7 +155,7 @@ class Framework:
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
         super().__init__()  # Usual style: engine runs now...
-        self.name = name  # ...before this line has happened
+        self.name = name  # ...before this line runs
 
     @override
     def step(self) -> None:
@@ -233,8 +236,8 @@ the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps for free,
-since the base already supplies the `...` default;
-the function form has to give each parameter a default of its own.
+since the base supplies the `...` default;
+the function form must give each parameter a default of its own.
 
 The function version also closes the gap in `@final`.
 A caller supplies the steps and cannot replace the loop,
@@ -268,7 +271,7 @@ Structure is free and covers only the case where you can pass functions instead 
 including the caller who skips the checker.
 Discipline covers what none of them can reach,
 which is what the steps do once the flow is safe.
-Choose by asking whom you are protecting the algorithm against.
+Choose by asking against whom you are protecting the algorithm.
 
 ## Exercises
 
