@@ -1,15 +1,15 @@
 # exercise_1.py
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import ClassVar
 
 type Bins = dict[type[Trash], list[Trash]]
 
+@dataclass(frozen=True)
 class Trash:
+    weight: float
     value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
-
-    def __init__(self, weight: float) -> None:
-        self.weight = weight
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
