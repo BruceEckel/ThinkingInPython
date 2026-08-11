@@ -59,17 +59,17 @@ except TypeError as e:
 #: Forgetful.show() takes 0 positional arguments but 1 was given
 ```
 
-The "1" is the object reference Python passed automatically.
-A method that omits `self` cannot receive it.
+When you call a method for an object, as in `x.show()`,
+Python passes the object reference automatically.
+The "1" in the error message is that reference;
+a method that omits `self` cannot receive it.
 A type checker sees the mistake without running anything,
 which is why the call carries a `# type: ignore` saying it is deliberate.
 
-When you call a method for an object, as in `x.show()`,
-Python passes the object reference automatically.
-
 The first method, `__init__()`, is the *initializer*.
 The double underscores (a.k.a. "dunder") indicate a special name.
-The `__new__()` method is the *constructor*, which you rarely use.
+The `__new__()` method is the *constructor*, which you rarely use
+([Singleton](24_Singleton.md) shows a case that needs it).
 It has become common practice to call `__init__()` the constructor,
 since it does the job of constructors in other OOP languages.
 This book follows that practice.
@@ -137,7 +137,8 @@ Then inherit by listing the class
 in parentheses after the name of the inheriting class.
 This example imports and subclasses `Simple`, from the `simple_class` module.
 Ignore the `@override` decorator for now;
-the section after this one explains it:
+[Marking Overrides with `@override`](#marking-overrides-with-override)
+explains it:
 
 ```python
 # simple2.py
@@ -196,7 +197,12 @@ In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
-The demo shows that the base-class constructor runs.
+The demo shows that the base-class constructor runs,
+but only because `Simple2`'s constructor calls it.
+Unlike C++ and Java, Python never calls a base-class constructor automatically.
+Remove the `super().__init__(text)` line and `self.s` is never created,
+so the first method that reads it raises an `AttributeError`.
+A derived class that defines no constructor of its own simply inherits and runs the base version.
 The inherited `show_twice()` method is also available in the derived class.
 
 The class `Different` also has a method named `show()`,
@@ -246,7 +252,7 @@ Because `f` is now an ordinary method, its first parameter is `self`,
 whichever class imported it.
 This is a curiosity more than a technique.
 It works because `import` inside a class body binds like any other assignment,
-but composition or a module-level function is almost always a clearer choice.
+but a helper object or a module-level function is almost always a clearer choice.
 
 ## Marking Overrides with `@override`
 
@@ -257,7 +263,10 @@ silently produces a new method instead of an override.
 This bug is easy to miss.
 
 The `@override` decorator from the `typing` module closes that gap.
-It declares that a method replaces one from a base class:
+A line starting with `@` above a definition applies a *decorator* to it;
+[Decorators](14_Decorators.md) shows how they work,
+and this chapter only applies existing ones.
+`@override` declares that a method replaces one from a base class:
 
 ```python
 # override_intro.py
@@ -358,8 +367,10 @@ class Circle:
         return 3.14159 * self.radius ** 2
 
 c = Circle(10)
-print(c.radius, c.area)  # The same two lines as before
-#: 10 314.159
+print(c.radius)  # The same two lines as before
+#: 10
+print(c.area)
+#: 314.159
 c.radius = 5  # Now the setter validates, then stores
 print(c.radius)
 #: 5
@@ -438,7 +449,7 @@ Cache only what cannot change.
 
 ## String Representation
 
-Printing an object that defines neither method shows its class and its address,
+By default, printing an object shows its class and its address,
 as in `<__main__.Point object at 0x7f2dd669cd70>`,
 which says nothing about the value the object holds.
 Two special methods control the way an object displays.
