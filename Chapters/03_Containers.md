@@ -2,8 +2,8 @@
 
 In C++ and Java a container is a library class you name and construct.
 Python builds its containers into the grammar: `[1, 2]`, `{"a": 1}`,
-and `{1, 2}` are literals, and `in`, `len()`,
-and slicing work on them without importing anything.
+and `{1, 2}` are literals, `in` and `len()` work on all of them,
+and slicing works on the sequences, without importing anything.
 Lists, tuples, dictionaries, and sets are fundamental data types.
 
 ## Lists
@@ -147,10 +147,21 @@ print(grid)
 This is [Variables and References](02_Tour.md#variables-and-references) again:
 `*` binds the same object into every slot, and assignment never copies.
 
-Removing items from a `list` while iterating over it has the same flavor.
+Removing items from a `list` while iterating over it has the same flavor:
+
+```python
+# remove_while_iterating.py
+
+xs = [1, 2, 3, 4]
+for x in xs:
+    xs.remove(x)
+print(xs)
+#: [2, 4]
+```
+
 The loop advances an index as the list shrinks under it,
-so it skips the element after every one you remove,
-with no exception to tell you.
+so it skips the element that slides into each removed one's slot,
+with no exception to tell you; that is why half of `xs` survives.
 Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 
 A loop with `append()` is not the usual way to build a list from another one.
@@ -249,7 +260,9 @@ Used the other way, holding many values of one type, it is an immutable `list`.
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-Lookup computes a hash from each key, so keys must be *hashable*.
+Lookup computes a *hash* from each key,
+a small integer derived from the key's contents that says where the entry lives,
+so keys must be *hashable*.
 The mutable built-in containers (`list`, `dict`, `set`) are not hashable,
 so they cannot serve as keys.
 Strings, numbers, and tuples of hashable values can.
@@ -286,6 +299,9 @@ which is why `for name in ages` walks the names.
 Only `items()` yields `(key, value)` pairs,
 so `for name, age in ages` is a common slip:
 it iterates the keys and tries to unpack each one.
+Here that raises `ValueError`,
+since a key like `"Alice"` has more than two characters;
+a two-character key would silently unpack into its letters instead.
 
 A `dict` iterates in insertion order, which the language guarantees.
 
@@ -312,6 +328,10 @@ the same job `update()` does.
 The next section uses `|` for set union, where the operands are symmetric.
 They are not symmetric here: on a key both dictionaries hold,
 the right operand's value wins, which is why `"y"` comes out as `20`.
+The last line feeds `dict()` an iterable of `(key, value)` pairs,
+which it accepts from any source; `zip()`,
+which pairs up two sequences element by element,
+is covered with the other loop tools in [Control Flow](04_Control_Flow.md#loops).
 
 ## Sets
 
@@ -387,11 +407,15 @@ They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
+Single elements move in and out with `add()`, `remove()`, and `discard()`;
+`remove()` raises `KeyError` on a missing element, `discard()` stays silent.
 
 Speed is the reason to convert a `list` to a `set` before repeated lookups.
 A `list` compares against every element in turn;
 a `set` computes one hash and looks in one place.
-`timeit()` runs a callable `number` times and returns the total elapsed seconds:
+`timeit()` runs a callable `number` times and returns the total elapsed seconds;
+the `lambda:` prefix wraps an expression into the callable it needs
+([Functions](05_Functions.md#lambdas) covers `lambda` fully):
 
 ```python
 # membership_cost.py
@@ -411,6 +435,16 @@ print(set_time * 100 < list_time)  # Not close
 
 Searching the `list` is O(n) and searching the `set` is O(1),
 so the gap widens without limit as `n` grows.
+The probe value is missing on purpose: that is the `list`'s worst case,
+a scan of all `n` elements before it gives up.
+
+A timing depends on the machine that took it,
+so every measured listing in this book prints a comparison rather than a number.
+`report()` comes from a small helper the book supplies,
+and it stays silent unless you ask for the figures:
+run the listing with `--numbers`
+(see [Numbers on Your Machine](18_Performance.md#numbers-on-your-machine))
+and it prints the two times it measured.
 
 ## Specialized Containers
 
@@ -567,15 +601,9 @@ print(deque_time * 20 < list_time)  # Not close
 #: True
 ```
 
-A timing depends on the machine that took it,
-so every measured listing in this book prints a comparison rather than a number.
-`report()` comes from a small helper the book supplies,
-and it stays silent unless you ask for the figures:
-run the listing with `--numbers`
-(see [Numbers on Your Machine](18_Performance.md#numbers-on-your-machine))
-and it prints the two times it measured.
-
 Use a `deque` for a single-threaded queue.
+Indexing its middle is O(n), though,
+so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` additionally caps its length,
 discarding from the far end when a new item overflows it,
 which is the sliding window a `list` has no equivalent for.
@@ -624,7 +652,7 @@ binary search in a sorted `list` (`bisect`), and a heap-backed priority queue
 Each of the three built-in mutable containers has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
-completes the set: a built-in,
+completes the trio: a built-in,
 hashable mapping that rejects modification after creation.
 The example below uses tuples and frozensets,
 plus `MappingProxyType` from the `types` module,
