@@ -501,7 +501,7 @@ The event loop overlaps waiting, not computing.
 
 `asyncio.sleep()` in `io_price` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
-which is what let all five `io_price` tasks overlap.
+which let all five `io_price` tasks overlap.
 `time.sleep()` is a blocking call: it stops the whole thread,
 so a coroutine that calls it freezes every task in the program, not just itself:
 
@@ -853,7 +853,7 @@ since a process cannot return a value the way a function call does:
 # multiprocessing_raw.py
 import multiprocessing as mp
 
-def cpu_price(order: int, results: mp.Queue) -> None:
+def cpu_price(order: int, results: mp.Queue[tuple[int, int]]) -> None:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1
@@ -861,7 +861,7 @@ def cpu_price(order: int, results: mp.Queue) -> None:
 
 if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
-    results: mp.Queue = mp.Queue()
+    results: mp.Queue[tuple[int, int]] = mp.Queue()
     workers = [
         mp.Process(target=cpu_price, args=(order, results))
         for order in orders
@@ -1985,7 +1985,7 @@ such as a fixed number of database connections.
 
 ### Deadlock
 
-*Deadlock* happens when two or more tasks each hold a resource the other needs,
+In a *deadlock*, two or more tasks each hold a resource the other needs,
 so neither can proceed.
 Four conditions must all hold at once:
 
@@ -2040,7 +2040,9 @@ each task's `async with second:` suspends on a lock the other holds and will nev
 A real deadlock has no `timeout` and never resolves.
 Both tasks wait forever, the event loop included,
 since nothing remains that can wake them.
-Here, the timeout ensures that the example terminates.
+Here, `asyncio.wait_for()` bounds the wait: when its deadline passes,
+it cancels the `gather()` and raises a `TimeoutError`,
+so the example reports the deadlock instead of hanging.
 
 The fix is the same one that works for threads:
 have every task acquire shared locks in the same global order.
@@ -2284,6 +2286,13 @@ Here are a few of the topics beyond it:
     Predict what the program prints before running it, then explain,
     in terms of who waits for whom,
     why one shared acquisition order removes the cycle.
+15. In `mixed_await.py`,
+    replace the body of `process_price()` with `return await pool.submit(cpu_price, order)`.
+    Run `ty` on the changed file, then run it, and read the two errors.
+    Explain, using [One Task, Many Backends](#one-task-many-backends),
+    why `pool.submit()`'s return value cannot be awaited,
+    what `loop.run_in_executor()` returns instead,
+    and why the runtime `TypeError` arrives wrapped in an `ExceptionGroup`.
 
 [^concurrency-def]: Pike's definition from that talk clarifies what he meant.
     Concurrency is the composition of independently executing computations.

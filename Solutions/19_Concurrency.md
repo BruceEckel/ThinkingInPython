@@ -306,11 +306,12 @@ imports the module under its real name, `parallel_cpu`, not
 `"__main__"`, so the pool-building code is skipped in the child and
 runs only in the process you launched.
 
-This is a `spawn` problem, not a universal one. On a platform using
-`fork`, the child inherits the parent's memory instead of importing the
-module, and the missing guard does no damage. Windows and macOS both
-default to `spawn`, so code written without the guard breaks when it
-moves between machines.
+This is a start-method problem. On a platform using `fork`, the child
+inherits the parent's memory instead of importing the module, and the
+missing guard does no damage. But no platform forks by default
+anymore: Windows and macOS default to `spawn`, and since 3.14 Linux
+defaults to `forkserver`, which also imports the module, so every
+platform's default requires the guard.
 
 ## 7. Removing the `sleep` from `gil_race.py`
 
@@ -775,3 +776,49 @@ like that is the thing a deadlock is. Ordering the acquisitions
 globally makes a cycle impossible to construct, because a task can
 only ever wait on a lock that comes later in the order than every lock
 it already holds, and "later" cannot loop back to "earlier."
+
+## 15. Awaiting `pool.submit()` directly
+
+The changed method drops the bridge:
+
+```python
+async def process_price(
+    pool: ProcessPoolExecutor, order: int
+) -> int:
+    return await pool.submit(cpu_price, order)
+```
+
+`ty` rejects the line before anything runs:
+
+    error[invalid-await]: `Future[int]` is not awaitable
+
+Running it anyway fails before any pricing happens:
+
+    + Exception Group Traceback (most recent call last):
+      ...
+    | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+    +-+---------------- 1 ----------------
+      |     return await pool.submit(cpu_price, order)
+      | TypeError: 'Future' object can't be awaited
+
+`pool.submit()` hands back a `concurrent.futures.Future`, the
+executor's own handle on a result that is still being computed. Its
+interface is blocking: you wait by calling `result()`, which blocks
+the calling thread until the worker finishes. Nothing about it
+cooperates with an event loop, and it defines no `__await__`, so
+`await` refuses it, first statically and then at runtime.
+
+`loop.run_in_executor()` is the bridge the original listing used. It
+submits the call to the executor the same way `submit()` does, but
+returns an `asyncio.Future` bound to the running loop, an awaitable
+that resolves when the executor's own future completes. The task
+suspends on it like any other `await`, and the loop keeps running the
+other two tasks in the meantime.
+
+The wrapper around the `TypeError` is the `TaskGroup` keeping its
+contract. `process_price()` failed as a task inside the group, so the
+group cancelled its two siblings, waited for them to end, and
+re-raised the failure wrapped in an `ExceptionGroup`, the same
+packaging `task_group.py` caught with `except*`. `main()` has no
+`except*`, so the group propagates out of `asyncio.run()` and prints
+as the grouped traceback above.
