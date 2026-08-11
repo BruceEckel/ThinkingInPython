@@ -43,7 +43,7 @@ Assigning through an instance always writes to the instance,
 creating the instance attribute on first assignment.
 Assigning through the class name, as `Stars.rating = 9` did,
 changes the shared value.
-`vars(obj)` returns that dictionary,
+`vars()` returns an object's own attribute dictionary,
 so inspecting the class with `vars(A)` and the instance with `vars(a)` shows the split:
 
 ```python
@@ -71,8 +71,10 @@ A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
 and `a.show()` finds it by the same fallback that found `a.x`:
 nothing on the instance, so look at the class.
-That is why `display_object()` reports attributes and methods separately even though both live in the same dictionary,
-and why assigning `a.show = something` would shadow the method for `a` alone.
+`display_object()`, the inspection helper from [Classes](07_Classes.md),
+reports attributes and methods separately,
+but both live in the same class dictionary,
+which is why assigning `a.show = something` would shadow the method for `a` alone.
 
 One kind of class attribute does not follow that lookup rule.
 A `@property` from [Classes](07_Classes.md#properties)
@@ -83,7 +85,7 @@ The rest of this chapter is about ordinary values stored in a class body.
 
 A class attribute reads like a default right up until someone assigns to an attribute of the same name on one instance.
 After that, changing the class attribute changes the value for every object that has not shadowed it,
-and leaves the one that has behind.
+while the shadowed one keeps its own value.
 The bug surfaces far from the line that caused it.
 
 The shadowing rule protects you only while the shared value is immutable:
@@ -110,10 +112,8 @@ The mutation creates no instance attribute, so `b` sees the apple too.
 The next line does assign,
 which creates `a.items` on the instance and shadows the class list,
 leaving `b` still reading the shared one.
-Reading is the half with no protection.
-`a.items` is a read, so it reaches the shared list,
-and `.append()` then mutates the object every instance is reading.
-Only assignment makes an instance its own copy, and this line never assigns.
+Reading is the half with no protection: shadowing starts with an assignment,
+and `.append()` makes none.
 A type checker cannot help here either,
 since `a.items.append("apple")` is a correct call on a `list[str]`.
 [Real Per-Object Defaults](#real-per-object-defaults),
@@ -160,6 +160,8 @@ print(Tally.total)
 
 `display_object(Tally)` shows what the class holds: `total`,
 and nothing called `label`.
+The `[CV]` tag, for *class variable*,
+marks an attribute whose storage is on the class.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
 `total: ClassVar[int] = 0` has the `= 0`,
@@ -180,6 +182,8 @@ which created a real `label` attribute on `a`, not on `Tally`.
 but because reading an attribute checks the instance first,
 then falls back to the class,
 the same rule `Stars` demonstrated earlier in this chapter.
+The tags agree: `label`, stored on `a`, carries no `[CV]`, while `total`,
+found by fallback, keeps it.
 
 ### A Bare Annotation Declares, It Does Not Create
 
@@ -210,7 +214,7 @@ and a bare annotation is the checker's only way to know its type.
 
 `ClassVar` is a hint for the checker.
 It records that `total` belongs to the class,
-and it catches the accidental shadowing from the earlier example before it happens.
+and turns the accidental shadowing from the earlier example into a check-time error.
 Python's own attribute lookup ignores it.
 One library does read it at runtime:
 `@dataclass` leaves a `ClassVar` field out of the constructor it generates,
@@ -237,7 +241,8 @@ print(a.total, b.total, Tally.total)
 The read falls back to the class and finds `0`;
 the write lands on the instance and creates a fresh `total` there.
 Every `Tally` counts itself once and the shared counter never moves,
-which is why `class_var.py` writes `Tally.total += 1` with the class name spelled out.
+which is why `class_var.py` increments through the class name,
+`Tally.total += 1`.
 `ClassVar` does not save you here.
 `ty` rejects a direct `self.total = 5`, but it passes the augmented form,
 so the one mistake you are most likely to make is the one the checker misses.
@@ -245,10 +250,11 @@ so the one mistake you are most likely to make is the one the checker misses.
 Shared storage is not a mistake when sharing is the intent.
 A count of every object created, a registry mapping names to classes,
 and a constant that all instances read but none change are all class attributes,
-and all are clearer with `ClassVar` on them.
+and each is clearer with the sharing declared.
 `Tally.total` is the first of these.
 For the third, a class-level constant,
-`Final[int]` says more than `ClassVar[int]`:
+`Final[int]` from [Static Typing](08_Static_Typing.md#constants-with-final)
+says more than `ClassVar[int]`:
 it declares the value shared *and* not reassignable.
 Use `ClassVar` when you intend the shared value to change,
 as `Tally.total` does.
@@ -296,7 +302,7 @@ not that subclasses share storage.
 This is the shadowing rule from the start of the chapter, one level up:
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
 the way `a` read through to `Stars` until `a.rating = 1`.
-A class body stands to its base class as an instance stands to its class.
+A subclass stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
 A subclass overriding a `ClassVar` inherits the declaration along with the name,
 so restating `ClassVar[int]` adds nothing.
@@ -330,19 +336,21 @@ print(vars(B)["x"], vars(B())["x"])
 #: 100 100
 ```
 
-Both listings define a class `A` whose `x` starts at `100`,
+This listing's `A` and the one in `inside_objects.py` both start `x` at `100`,
 and the two behave in opposite ways.
-In `inside_objects.py` the `100` lives on the class and every instance reads it;
+There the `100` lives on the class and every instance reads it;
 here it is a default argument, and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
-The default value itself is still built once, at definition time
+The default value is still built once, at definition time
 (see [Default and Keyword Arguments](05_Functions.md#default-and-keyword-arguments)),
 so a *mutable* default argument brings the sharing straight back.
 Nothing can mutate `100`, so it is safe.
 
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
 The annotation marks a field.
+Without the decorator,
+the same annotated assignment stays a shared class attribute, as `Cart` showed.
 If you write `x = 100` with no `x: int`, `@dataclass` sees nothing:
 
 ```python
@@ -366,22 +374,24 @@ print(vars(b), B().x)  # The same shadowing as Stars
 The name stays an ordinary shared class attribute,
 the generated `__init__()` takes no `x`,
 and neither the runtime nor the checker complains.
-The class attribute survives the decoration: `vars(B)` still holds `x = 100`.
-What changes is the generated `__init__()`,
-which assigns `self.x` on every instance,
-so each object shadows the class attribute at construction and never reads the shared one.
-That is why assigning `x` on one `B` cannot leak into a later `B()`,
-while `a.rating = 1` on `Stars` left `b` reading a value someone else could change.
+`b.x = -1` shadows it for that one instance,
+and an assignment through the class would still change every instance that has not shadowed it,
+the hazard `Stars` demonstrated.
+The annotated field in `real_defaults.py` also leaves a class attribute behind,
+as its last line shows: `vars(B)` still holds `x = 100`.
+The difference is the generated `__init__()`,
+which assigns `self.x` on every construction,
+so each object shadows the class attribute immediately and never reads the shared one.
 [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)
 covers the details.
 
 ## Which Dictionary?
 
 Every attribute question in this chapter reduces to one:
-which dictionary did the value land in?
+which dictionary holds the value?
 Assignment answers it,
 and assignment through `self` and assignment through the class name give different answers.
-Decide which you want, then write the spelling that says so:
+Decide which you want, then write the declaration that says so:
 `ClassVar` for shared,
 a constructor default or a `@dataclass` field for per-object.
 
@@ -415,7 +425,7 @@ a constructor default or a `@dataclass` field for per-object.
 7.  In `counter_near_miss.py`,
     print `vars(a)` and `vars(Tally)["total"]` after constructing both instances,
     and use them to explain the `1 1 0` output.
-    Then fix the class so the counter actually counts,
+    Then fix the class so the shared counter moves,
     without changing the `ClassVar` declaration,
     and say why `ty` accepted the broken version.
 8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
