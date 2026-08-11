@@ -42,7 +42,7 @@ print(config is again, config.settings is again.settings)
 Two `import` statements, one printed line.
 The first one runs `config.py` top to bottom and files the resulting module object in `sys.modules` under the name `config`.
 The second finds it there and skips the work,
-so the body never runs twice and only one `settings` dict is ever built.
+so the body never runs twice and only one `settings` dict is built.
 That is the singleton: not a rule the class enforces,
 but a lookup the import system performs.
 
@@ -75,6 +75,13 @@ To replace the whole value, go through the module: `import config`,
 then `config.settings = {...}`.
 Mutate through any name.
 Rebind only through the module.
+
+Sharing also depends on the name.
+`sys.modules` is keyed by module name,
+and the file you launch runs under the name `__main__`.
+If that file is `config.py`, a later `import config` finds no cached entry,
+runs the body again, and builds a second module object with its own `settings`.
+Keep singleton state in a module you import, not in the script you run.
 
 ## When You Want a Class, Cache the Instance
 
@@ -145,7 +152,7 @@ A clean run is therefore no evidence.
 When something does look, it searches the scope containing the function,
 not the function's own locals, and the class is not there.
 A checker reports an unresolved reference,
-and `inspect.get_annotations(eval_str=True)` raises a `NameError`.
+and `inspect.get_annotations()` raises a `NameError`.
 The signature must name something reachable,
 so nesting costs you either the annotation or a separate `Protocol` to name in its place.
 
@@ -182,7 +189,7 @@ Three implementation notes:
    because every thread has already missed the cache before reaching the lock.
    They serialize, each still builds an object,
    and the cache keeps whichever finished last.
-   The check must happen inside the lock, shown in the listing below.
+   The check must run inside the lock, shown in the listing below.
 
 The race is easy to see with a wide enough window:
 
@@ -259,7 +266,7 @@ Changing an object is not rebinding a name.
 `_instance` differs because the function assigns to it.
 Python decides at compile time that a name a function assigns anywhere is local everywhere in that function,
 so without the `global` declaration,
-`if _instance is None` reads an unassigned local and raises `UnboundLocalError`.
+`if _instance is None` reads an unassigned local and raises an `UnboundLocalError`.
 Mutate through any name.
 Declare only what you rebind.
 
@@ -562,6 +569,8 @@ print(first is second, second.name, second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
 ```
 
+Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`.
+The name `Registry` now refers to the decorated instance rather than to the class.
 You might wonder why `__call__()` intercepts the constructor for a `Registry`.
 A *call* is parentheses written after an expression.
 That expression can produce anything: a function, a class, or an instance.
@@ -580,10 +589,6 @@ Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
 which is why `Registry("secondary", limit=99)` does not create a new object.
 A caller who believes those arguments took effect is holding an object configured by someone else.
-
-Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`.
-The name `Registry` now refers to the decorated instance rather than to the class.
-Calling `Registry(...)` returns the cached instance.
 
 Both `isinstance(first, Registry)` and subclassing `Registry` raise exceptions:
 
@@ -617,7 +622,9 @@ A metaclass can also intercept construction.
 shows that singleton: its metaclass overrides `__call__()`,
 which skips `__init__()` on every later construction,
 so the first call's arguments win.
-A metaclass that replaces `__new__()` instead leaves `__init__()` rerunning on the shared instance,
+A class that overrides `__new__()` instead,
+as `singleton_class_variable.py` does,
+leaves `__init__()` rerunning on the shared instance,
 so the last call's arguments win.
 That chapter also covers `__init_subclass__()` and `__set_name__()`,
 the simpler hooks that replace most metaclasses;
