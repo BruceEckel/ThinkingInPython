@@ -6,12 +6,13 @@ from history import History
 history = History(Drawing("Duck"))
 history.do(history.present.draw("circle"))
 checkpoint = history.present
+history.do(history.present.draw("beak"))
 history.do(copy.replace(history.present, title="Goose"))
 history.do(history.present.draw("scribble"))
 print(history.present)
-#: Goose: circle scribble
+#: Goose: circle beak scribble
 history.do(copy.replace(history.present, strokes=checkpoint.strokes))
 print(history.present)
 #: Goose: circle
 print(history.undo())
-#: Goose: circle scribble
+#: Goose: circle beak scribble
