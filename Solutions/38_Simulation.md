@@ -88,11 +88,14 @@ neighbors it spawns down (every open one after that, here just
 ```python
 # exercise_2.py
 import asyncio
-import itertools
+from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Self
+from typing import Final, Self
 
 type Coord = tuple[int, int]
+
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Maze:
     class Cell(StrEnum):
@@ -121,17 +124,16 @@ class Maze:
                     return x, y
         raise ValueError("the maze has no open cell")
 
+@dataclass
 class Rat:
-    def __init__(self, blackboard: Blackboard, x: int,
-                 y: int) -> None:
-        self.blackboard = blackboard
-        self.x, self.y = x, y
+    blackboard: Blackboard
+    x: int
+    y: int
 
     async def run(self) -> None:
-        directions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
         while True:
-            neighbors = [(self.x + dx, self.y + dy)
-                         for dx, dy in directions]
+            neighbors = [
+                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if self.blackboard.claim(*pos)]
             if not moves:
@@ -141,12 +143,11 @@ class Rat:
             self.x, self.y = moves[0]
             await asyncio.sleep(0)
 
+@dataclass
 class Blackboard:
-    def __init__(self, maze: Maze) -> None:
-        self.maze = maze
-        self.visited: set[Coord] = set()
-        self.tasks: list[asyncio.Task[None]] = []
-        self._numbers = itertools.count(1)
+    maze: Maze
+    visited: set[Coord] = field(init=False, default_factory=set)
+    group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
         if self.maze.is_open(x, y) and (x, y) not in self.visited:
@@ -155,17 +156,16 @@ class Blackboard:
         return False
 
     def spawn(self, x: int, y: int) -> None:
-        rat = Rat(self, x, y)
-        self.tasks.append(asyncio.create_task(rat.run()))
+        self.group.create_task(Rat(self, x, y).run())
 
     async def explore(self) -> None:
         start = self.maze.entry()
         self.claim(*start)
-        self.spawn(*start)
-        while pending := [t for t in self.tasks if not t.done()]:
-            await asyncio.gather(*pending)
+        async with asyncio.TaskGroup() as group:
+            self.group = group
+            self.spawn(*start)
 
-layout_with_a_moat = """
+two_rooms: Final[str] = """
 *********
 *   *   *
 *   *   *
@@ -174,7 +174,7 @@ layout_with_a_moat = """
 """
 
 async def main() -> None:
-    maze = Maze.from_text(layout_with_a_moat)
+    maze = Maze.from_text(two_rooms)
     board = Blackboard(maze)
     await board.explore()
     all_open = {(x, y) for y in range(maze.height)
@@ -185,6 +185,12 @@ async def main() -> None:
 asyncio.run(main())
 #: 9 (5, 1) (7, 3)
 ```
+
+The classes are the chapter's, trimmed of what the exercise does not
+need: rat numbers, logging, and the file loader.
+The structure that matters survives the trim: `claim()` is unchanged,
+and `explore()` still opens a `TaskGroup` and lets `spawn()` add tasks
+to it, since new rats keep arriving after the block begins.
 
 For a maze built with two separate rooms and no connecting opening
 between them:
@@ -211,58 +217,143 @@ never be claimed no matter how many rats spawn.
 ```python
 # exercise_3.py
 import asyncio
+from dataclasses import dataclass, field
+from enum import StrEnum
+from typing import Final, Protocol, Self
 
-class StubMaze:  # Every cell reads as open, for this demo
+type Coord = tuple[int, int]
+
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
+
+LAYOUT: Final[str] = """\
+*********
+*       *
+*** *** *
+*   *   *
+* ***** *
+*       *
+*********
+"""
+
+class Maze:
+    class Cell(StrEnum):
+        WALL = "*"
+        OPEN = " "
+
+    def __init__(self, rows: list[str]) -> None:
+        self.height = len(rows)
+        self.width = max((len(r) for r in rows), default=0)
+        self.rows = [
+            r.ljust(self.width, self.Cell.WALL) for r in rows]
+
+    @classmethod
+    def from_text(cls, text: str) -> Self:
+        rows = [line for line in text.splitlines() if line]
+        return cls(rows)
+
     def is_open(self, x: int, y: int) -> bool:
-        return True
+        return (0 <= y < self.height and 0 <= x < self.width
+                and self.rows[y][x] == self.Cell.OPEN)
 
-class BrokenBlackboard:
-    def __init__(self) -> None:
-        self.maze = StubMaze()
-        self.visited: set[tuple[int, int]] = set()
+    def entry(self) -> Coord:
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.is_open(x, y):
+                    return x, y
+        raise ValueError("the maze has no open cell")
+
+class Recorder(Protocol):
+    async def claim(self, x: int, y: int) -> bool: ...
+    def spawn(self, x: int, y: int) -> None: ...
+
+@dataclass
+class Rat:
+    blackboard: Recorder
+    x: int
+    y: int
+
+    async def run(self) -> None:
+        while True:
+            neighbors = [
+                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+            moves = [pos for pos in neighbors
+                     if await self.blackboard.claim(*pos)]
+            if not moves:
+                return
+            for branch in moves[1:]:
+                self.blackboard.spawn(*branch)
+            self.x, self.y = moves[0]
+            await asyncio.sleep(0)
+
+@dataclass
+class Blackboard:
+    maze: Maze
+    visited: set[Coord] = field(init=False, default_factory=set)
+    true_claims: int = field(init=False, default=0)
+    group: asyncio.TaskGroup = field(init=False)
 
     async def claim(self, x: int, y: int) -> bool:
         if self.maze.is_open(x, y) and (x, y) not in self.visited:
-            await asyncio.sleep(0)  # The gap: another task can run
+            await asyncio.sleep(0)  # The gap: another rat can run
             self.visited.add((x, y))
+            self.true_claims += 1
             return True
         return False
 
+    def spawn(self, x: int, y: int) -> None:
+        self.group.create_task(Rat(self, x, y).run())
+
+    async def explore(self) -> None:
+        start = self.maze.entry()
+        await self.claim(*start)
+        async with asyncio.TaskGroup() as group:
+            self.group = group
+            self.spawn(*start)
+
 async def main() -> None:
-    board = BrokenBlackboard()
-    results = await asyncio.gather(
-        board.claim(2, 2), board.claim(2, 2))
-    print("both claims succeeded:", results)
-    print("visited set size:", len(board.visited))
+    board = Blackboard(Maze.from_text(LAYOUT))
+    await board.explore()
+    print("claims that returned True:", board.true_claims)
+    print("cells visited:", len(board.visited))
 
 asyncio.run(main())
-#: both claims succeeded: [True, True]
-#: visited set size: 1
+#: claims that returned True: 25
+#: cells visited: 24
 ```
 
-Both calls reach `await asyncio.sleep(0)` while `(2, 2)` still looks
-unclaimed to each of them; neither has added it to `visited` yet, so
-both membership tests pass. Only after both have already committed to
-succeeding does either one actually call `self.visited.add((2, 2))`.
-The result is two rats that each believe they alone claimed the same
-cell: both move into it, which breaks the invariant that "no two rats
-ever cover the same ground." Nothing goes unexplored. Both rats proceed
-from the shared cell and duplicate each other's work from there, while
-`visited` stays exactly correct, which is why
-`test_rats_and_mazes.py` passes on the broken version every time: it
-asserts the set of cells reached, and the set is a set. Counting the
-`True` results against `len(blackboard.visited)` is what exposes the
-collision, since the broken `claim()` succeeds more often than there
-are cells.
+The one requested change drags three signatures with it, which is the
+exercise's quiet lesson: `async` is contagious.
+Once `claim()` is an `async def`, the `Recorder` protocol must declare
+it `async` too, `Rat.run()`'s comprehension needs
+`if await self.blackboard.claim(*pos)`, and `explore()` must `await`
+its own first claim.
+`spawn()` stays synchronous; nothing in it suspends.
 
-The original `claim()` needs no lock precisely because it has no
-`await` between the test and the add. A coroutine only ever yields
-control at an `await`, so with nothing to await in between, the two
-statements execute as one uninterruptible unit as far as any other
-coroutine is concerned; nothing else can run "in the middle" of them,
-because there is no scheduling point in the middle. Adding the
-`await` creates that scheduling point, and the whole guarantee
-depends on there being none.
+On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
+times for 24 open cells: one pair of rats collided.
+Both reached `await asyncio.sleep(0)` while the same cell still looked
+unclaimed, since neither had added it to `visited` yet, so both
+membership tests passed, and only then did each one call
+`self.visited.add(...)`.
+The result is two rats that each believe they alone claimed that cell.
+Both move into it, which breaks the invariant that no two rats cover
+the same ground. Nothing goes unexplored. Both rats proceed from the
+shared cell and duplicate each other's work from there, while
+`visited` stays correct, because adding the same cell twice to a set
+changes nothing. That is why `test_rats_and_mazes.py` passes on the
+broken version every time: it asserts the set of cells reached. The
+extra success costs the rats wasted effort, two tasks tracing
+overlapping paths, and the count of `True` returns against
+`len(blackboard.visited)` exposes it.
+
+The original `claim()` needs no lock because it has no `await`
+between the test and the add. A coroutine yields control only at an
+`await`, so with nothing to await in between, the two statements run
+as one uninterruptible unit as far as any other coroutine is
+concerned; there is no scheduling point in the middle for another rat
+to slip into. Adding the `await` creates that scheduling point, and
+the whole guarantee depends on there being none.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
 so that shared apparatus (`Item` and its subclasses, `Room`, `Doors`,

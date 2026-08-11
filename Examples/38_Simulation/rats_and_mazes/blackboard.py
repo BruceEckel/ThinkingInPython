@@ -9,9 +9,10 @@ from rat import Rat
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(default_factory=set)
-    tasks: list[asyncio.Task[None]] = field(default_factory=list)
-    messages: list[str] = field(default_factory=list)
+    visited: set[Coord] = field(init=False, default_factory=set)
+    tasks: list[asyncio.Task[None]] = field(
+        init=False, default_factory=list)
+    messages: list[str] = field(init=False, default_factory=list)
     _numbers: Iterator[int] = field(
         init=False, default_factory=lambda: itertools.count(1))
     group: asyncio.TaskGroup = field(init=False)

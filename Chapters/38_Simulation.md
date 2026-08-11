@@ -1,20 +1,19 @@
 # Simulation
 
 A simulation models a set of objects that act on their own and interact through shared state.
-The chapter works the first example, a pack of rats mapping a maze,
-from end to end.
+This chapter builds three,
+each giving its agents less to work with than the last.
+A pack of rats coordinates through a shared blackboard,
+a single robot walks a maze where each object it meets decides what happens,
+and a plate of vibrating sand runs on grains that know nothing.
+The first two confirm a design you can predict from the code.
+The third produces a pattern nobody wrote down.
+
+The chapter works the first example, the pack of rats, from end to end.
 It puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
 introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
-
-Three simulations follow,
-each giving its agents less to work with than the last.
-A pack of rats coordinates through a shared blackboard,
-a single robot walks a maze where each object it meets decides what happens,
-and a plate of vibrating sand runs on grains that know nothing at all.
-The first two confirm a design you can predict from the code.
-The third produces a pattern nobody wrote down.
 
 ## Rats & Mazes
 
@@ -106,7 +105,7 @@ a side-effecting method, not a static default.
 Marking it `field(init=False)` leaves it out of the generated `__init__`,
 and `__post_init__` runs immediately after that `__init__` finishes,
 so it can fill in `number` and log the rat's start, once `blackboard`, `x`,
-and `y` already hold their values.
+and `y` hold their values.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -154,7 +153,7 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
-`Cell` nests inside `Maze` because it only names concepts `Maze` uses,
+`Cell` nests inside `Maze` because it names concepts only `Maze` uses,
 and it is a `StrEnum` rather than an `Enum` so its members keep acting like real strings.
 `WALL` still works as the fill character for `ljust()`,
 and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
@@ -185,9 +184,10 @@ from rat import Rat
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(default_factory=set)
-    tasks: list[asyncio.Task[None]] = field(default_factory=list)
-    messages: list[str] = field(default_factory=list)
+    visited: set[Coord] = field(init=False, default_factory=set)
+    tasks: list[asyncio.Task[None]] = field(
+        init=False, default_factory=list)
+    messages: list[str] = field(init=False, default_factory=list)
     _numbers: Iterator[int] = field(
         init=False, default_factory=lambda: itertools.count(1))
     group: asyncio.TaskGroup = field(init=False)
@@ -240,9 +240,10 @@ and half the rats do not exist yet.
 
 `group`'s declaration is `field(init=False)`,
 with assignment only while `explore()` runs,
-the same declaration-without-assignment the robot example uses for `Robot.room`.
-The other four fields are internal bookkeeping rather than constructor arguments,
-which is why they carry `default_factory` instead of appearing in the signature.
+the same declaration-without-assignment the robot example later in this chapter uses for `Robot.room`.
+The other four fields are internal bookkeeping rather than constructor arguments:
+`init=False` keeps them out of the generated signature,
+and each `default_factory` builds a fresh object per blackboard.
 
 The maze layout lives in a text file.
 The loader drops blank lines and any line beginning with `#`, so the first line,
@@ -267,12 +268,11 @@ naming the file's path, drops out and the rest is the maze.
 *********************
 ```
 
-Running it turns the rats loose and prints what they mapped.
-The first eight log messages come first,
-a trace of the run that nothing else in the chapter needs.
-They show what the map cannot: rat 1 spawns rat 2 and then dies before it,
-numbers arrive in spawn order rather than completion order,
-and eighteen messages cover all nine rats.
+Running it turns the rats loose,
+then prints the first eight log messages and the mapped maze.
+The log shows what the map cannot: rat 1 spawns rat 2 and then dies before it,
+and numbers arrive in spawn order rather than completion order.
+The full log runs to eighteen messages, two per rat.
 
 ```python
 # rats_and_mazes/rats_and_mazes.py
@@ -363,7 +363,7 @@ def test_rats_map_every_reachable_cell() -> None:
 
 ### Watching the Pack
 
-You can create a GUI demonstration using the same model.
+The same model drives a GUI demonstration.
 `rats_view.py` runs the exploration to completion,
 records the order in which rats claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
@@ -371,7 +371,7 @@ then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [Observer](30_Observer.md#a-visual-example-of-observers).
-What is missing here is the subscription:
+The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
 The harness skips it, like every windowed view in this book
@@ -552,9 +552,8 @@ def item_factory(symbol: str) -> Item:
 so `from world import Room` here is circular.
 `if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
 and no cycle forms.
-It is `True` only for a type checker reading the file,
-which is `Room`'s sole purpose here.
-Every use below is an annotation (`room: Room`, `-> Room`),
+It is `True` only for a type checker reading the file.
+Every use of `Room` below is an annotation (`room: Room`, `-> Room`),
 never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
@@ -564,7 +563,7 @@ That line stores nothing, not even `None`.
 It is a declaration: it tells the type checker that a `Room` will be there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
-so reading it earlier raises `AttributeError`, and the builder runs first,
+so reading it earlier raises an `AttributeError`, and the builder runs first,
 so nothing reads it earlier.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
 so no code that reads `room` has to check for `None`.
@@ -634,6 +633,13 @@ EDGE: Final[Room] = Room(Edge())
 The `Coord` here counts `(row, col)`,
 the opposite order from the rats example's `(column, row)`,
 because `GameBuilder` walks the maze text line by line.
+
+One move is one chain.
+`Robot.move()` asks `doors.open(urge)` for the neighboring room,
+`EDGE` when no door leads that way.
+`enter()` hands the robot to that room,
+and whatever room its occupant's `interact()` returns becomes `robot.room`.
+Every rule of the game lives in some `interact()`.
 
 ### Building the Maze in Stages
 
@@ -817,6 +823,11 @@ with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 That is not the type switch polymorphism removed.
 Construction still must tell the kinds of item apart, once,
 and the movement code that runs afterward never asks again.
+The `Robot` branch also explains `Room(Empty())`:
+the robot is the one item that does not become an occupant.
+Its cell gets an `Empty` occupant instead,
+so when the robot moves away the room behaves like any other empty room,
+and `show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
 
 ### Testing the Walk
 
@@ -1200,11 +1211,10 @@ if __name__ == "__main__":
     show()
 ```
 
-`itertools.cycle()` constructs an infinite iterator from any finite iterable.
-It yields elements from the source in sequence and cycles back to the beginning when it reaches the end.
-`itertools.count()` constructs an infinite iterator of evenly spaced numbers.
-The first argument is the starting point, the second is the step size
-(defaults to one).
+`itertools.cycle()` constructs an infinite iterator from any finite iterable:
+it yields the source's elements in sequence and starts over when it reaches the end.
+`itertools.count(1)` numbers the frames,
+the same endless counter that numbered the rats.
 
 ## The Less the Agents Know
 
@@ -1236,7 +1246,7 @@ Run it.
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.
     Make `claim()` an `async def`, which pulls the `Recorder` protocol,
-    `Rat.run()`'s comprehension and `explore()` along with it,
+    `Rat.run()`'s comprehension, and `explore()` along with it,
     and put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
     Then count how many calls return `True` and compare that count with `len(blackboard.visited)`.
     `test_rats_and_mazes.py` still passes, because `visited` is a set:

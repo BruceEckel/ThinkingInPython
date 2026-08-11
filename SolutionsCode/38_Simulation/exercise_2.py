@@ -1,10 +1,13 @@
 # exercise_2.py
 import asyncio
-import itertools
+from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Self
+from typing import Final, Self
 
 type Coord = tuple[int, int]
+
+DIRECTIONS: Final[list[tuple[int, int]]] = [
+    (0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Maze:
     class Cell(StrEnum):
@@ -33,17 +36,16 @@ class Maze:
                     return x, y
         raise ValueError("the maze has no open cell")
 
+@dataclass
 class Rat:
-    def __init__(self, blackboard: Blackboard, x: int,
-                 y: int) -> None:
-        self.blackboard = blackboard
-        self.x, self.y = x, y
+    blackboard: Blackboard
+    x: int
+    y: int
 
     async def run(self) -> None:
-        directions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
         while True:
-            neighbors = [(self.x + dx, self.y + dy)
-                         for dx, dy in directions]
+            neighbors = [
+                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if self.blackboard.claim(*pos)]
             if not moves:
@@ -53,12 +55,11 @@ class Rat:
             self.x, self.y = moves[0]
             await asyncio.sleep(0)
 
+@dataclass
 class Blackboard:
-    def __init__(self, maze: Maze) -> None:
-        self.maze = maze
-        self.visited: set[Coord] = set()
-        self.tasks: list[asyncio.Task[None]] = []
-        self._numbers = itertools.count(1)
+    maze: Maze
+    visited: set[Coord] = field(init=False, default_factory=set)
+    group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
         if self.maze.is_open(x, y) and (x, y) not in self.visited:
@@ -67,17 +68,16 @@ class Blackboard:
         return False
 
     def spawn(self, x: int, y: int) -> None:
-        rat = Rat(self, x, y)
-        self.tasks.append(asyncio.create_task(rat.run()))
+        self.group.create_task(Rat(self, x, y).run())
 
     async def explore(self) -> None:
         start = self.maze.entry()
         self.claim(*start)
-        self.spawn(*start)
-        while pending := [t for t in self.tasks if not t.done()]:
-            await asyncio.gather(*pending)
+        async with asyncio.TaskGroup() as group:
+            self.group = group
+            self.spawn(*start)
 
-layout_with_a_moat = """
+two_rooms: Final[str] = """
 *********
 *   *   *
 *   *   *
@@ -86,7 +86,7 @@ layout_with_a_moat = """
 """
 
 async def main() -> None:
-    maze = Maze.from_text(layout_with_a_moat)
+    maze = Maze.from_text(two_rooms)
     board = Blackboard(maze)
     await board.explore()
     all_open = {(x, y) for y in range(maze.height)
