@@ -38,6 +38,11 @@ Invoke it for any chapter review request.
 settling pass, run after a review is applied: it re-runs the same passes
 over the whole chapter but applies the confident findings directly and
 discards the rest unreported, with no review file.
+`/activate` (`.claude/skills/activate/SKILL.md`) is the active-register
+pass: it clears `make prose`'s passive-voice and there-is warnings and
+cuts metadiscourse, empty frames, and expletive constructions; new
+passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
+section.
 
 ## The verify loop after editing a chapter
 
