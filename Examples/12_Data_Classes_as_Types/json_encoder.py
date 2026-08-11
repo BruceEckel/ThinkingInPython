@@ -13,9 +13,9 @@ class DataClassEncoder(json.JSONEncoder):
 
 people = [
     Person(FullName("Ada Lovelace"),
-            EmailAddress("ada@example.com")),
+           EmailAddress("ada@example.com")),
     Person(FullName("Alan Turing"),
-            EmailAddress("alan@example.com")),
+           EmailAddress("alan@example.com")),
 ]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #: [

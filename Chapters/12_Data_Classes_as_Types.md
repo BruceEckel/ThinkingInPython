@@ -9,10 +9,9 @@ It's too easy to construct or mutate an object in an illegal state.
 Defensive checks then spread through your code.
 
 This chapter shows a better approach, built from frozen data classes.
-You validate the value once, at construction,
-and freeze it so it can never change.
+You validate the value once, at construction, and freeze it so it cannot change.
 The type then guarantees that every object is a legal value.
-Code that receives one never has to check it again.
+Code that receives one need not check it again.
 This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
@@ -146,7 +145,7 @@ A read-only `@property` keeps users from assigning to `number`,
 but the class object still mutates `_number`,
 so `f1()` must re-check the result before returning it.
 That check runs after the mutation, not instead of it:
-`Stars(8).f1()` sets `_number` to 13, then raises,
+`Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
 and the object goes on holding that illegal value.
 Catching the exception does not undo the damage.
 Checking arguments on the way in and results on the way out,
@@ -156,7 +155,7 @@ is the practice known as *Design by Contract* (DbC).
 A method that accepted a second rating would need a precondition for it as well.
 The problem with DbC is that the contract spreads across every method that touches the value.
 The invariant is the part this chapter replaces.
-`_validate()` states it, and every mutating method has to remember to call it.
+`_validate()` states it, and every mutating method must remember to call it.
 That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value.
 It does not constrain it to a set of legal values.
@@ -202,7 +201,8 @@ The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
 As described in [Class Attributes](09_Class_Attributes.md),
-only `depth` appears as an attribute because it has an initialization value.
+of the three fields only `depth` appears as an attribute,
+because it has an initialization value.
 
 ```python
 # demo_messenger.py
@@ -266,7 +266,9 @@ The default `display_object()` does not show the generated `__init__()`,
 Passing `frozen=True` makes the data class immutable.
 Attempting to assign to a field raises `FrozenInstanceError`.
 As a bonus, a frozen instance is hashable,
-so you can use it as a dictionary key or put it in a set:
+so you can use it as a dictionary key or put it in a set.
+The mutability that cost `Messenger` its `__hash__` is gone,
+so `@dataclass` generates one from the fields:
 
 ```python
 # frozen_messenger.py
@@ -368,7 +370,7 @@ You know it without checking.
 
 This changes how you write the functions.
 `f1()` and `f2()` take a `Stars` and return a `Stars`.
-They do not check their argument, because every `Stars` is already good.
+They do not check their argument, because every `Stars` is legal.
 They do not test their result,
 because building the returned `Stars` runs the check.
 
@@ -416,7 +418,7 @@ which the `# type: ignore` silences so the listing can reach the runtime failure
 `object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
 It works, and it says what it is doing.
 The alternative is to refuse the unnormalized value and normalize before construction.
-Which one you want depends on the type.
+Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
 which is usually what an email address should mean.
 Refusing instead keeps the constructor a gate and leaves the cleanup to the caller.
@@ -603,7 +605,7 @@ It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
 but stores nothing until code assigns a value.
 `A` has no `__init__()` to make that assignment,
-so the declaration never gets fulfilled.
+so the declaration goes unfulfilled.
 That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
 on the class or on the instance.
 
@@ -672,9 +674,9 @@ With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
 tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
-`@dataclass` reads them, through `dataclasses.fields()`,
-to learn what fields exist and in what order,
-then uses that to write `__init__`'s parameter list and the assignments inside it.
+`@dataclass` reads them to learn what fields exist and in what order,
+then uses that to write `__init__`'s parameter list and the assignments inside it;
+`dataclasses.fields()` reports the field list it recorded.
 `@dataclass` stores nothing on the class:
 `x` is still absent from `C.__dict__` after decoration, as it was before.
 The declaration is only fulfilled per instance,
@@ -745,7 +747,7 @@ It has no initializer, so it is a bare annotation,
 as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
 `D.f` raises `AttributeError`, for the same reason `A().x` would.
-Declaring a field `ClassVar` does not, by itself, create anything.
+Declaring a field `ClassVar` does not, on its own, create anything.
 Only assigning it a value does.
 
 ## Enums Are Types Too
@@ -830,7 +832,7 @@ Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`,
 and only three day counts are distinct,
 so `list(Month)` would return three members instead of twelve.
 Pairing each month with its number keeps all twelve values distinct,
-which is what `of()` relies on when it indexes `list(Month)`.
+which `of()` relies on when it indexes `list(Month)`.
 The cost is that the member's value is no longer the month number,
 so `Month(7)` raises a `ValueError`.
 `of()` is the replacement lookup.
@@ -1036,7 +1038,7 @@ because a factory function is advice rather than a gate.
 The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:
-the error arrives while Python is still reading the `class` statement.
+the error arrives while Python is still executing the `class` statement.
 A checker reports it as `invalid-named-tuple` before the program runs,
 which the `# type: ignore` silences.
 
@@ -1220,7 +1222,7 @@ print(asdict(line))  # Recurses into the list of Points
 
 `asdict()` and `astuple()` copy as they go,
 so every list and dict in the result is a new object rather than the one inside the instance.
-Changing the result never reaches back into the original.
+Changing the result cannot reach back into the original.
 
 `KW_ONLY` forces callers to pass the fields after it by keyword:
 
@@ -1239,6 +1241,10 @@ class Config:
 print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
+
+Passing `kw_only=True` to `@dataclass` makes every field keyword-only;
+the `_: KW_ONLY` marker limits that to the fields after it,
+leaving `source` positional.
 
 `KW_ONLY` also lifts the ordering rule.
 A field with no default normally cannot follow one that has a default,
@@ -1317,7 +1323,7 @@ print(copy.deepcopy(s))
 `copy.copy()` and `copy.deepcopy()` restore the object's state directly,
 and so does `pickle`.
 None of the three runs `__init__()` or `__post_init__()`,
-so each can produce a `Stars` holding a number that no check ever saw.
+so each can produce a `Stars` holding a number that no check saw.
 That does not matter while the copy comes from a legal original,
 and it matters a great deal when the state comes from a file written by an older version of the class,
 which [Memento](36_Memento.md) revisits.
@@ -1401,7 +1407,7 @@ def from_json(text: str) -> Person:
     )
 
 original = Person(FullName("Bruce Eckel"),
-                    EmailAddress("bruce@example.com"))
+                  EmailAddress("bruce@example.com"))
 text = to_json(original)
 print(text)
 #: {
@@ -1441,9 +1447,9 @@ class DataClassEncoder(json.JSONEncoder):
 
 people = [
     Person(FullName("Ada Lovelace"),
-            EmailAddress("ada@example.com")),
+           EmailAddress("ada@example.com")),
     Person(FullName("Alan Turing"),
-            EmailAddress("alan@example.com")),
+           EmailAddress("alan@example.com")),
 ]
 print(json.dumps(people, cls=DataClassEncoder, indent=2))
 #: [
@@ -1469,7 +1475,7 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
 The encoder converts each data class to a dictionary and the base encoder handles it from there,
 recursing through lists and nested objects.
-`is_dataclass()` answers `True` for a data class itself as well as for an instance,
+`is_dataclass()` answers `True` for the class object as well as for an instance,
 and `asdict()` accepts only instances,
 so `not isinstance(o, type)` keeps a bare class object from reaching it.
 

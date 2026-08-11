@@ -15,7 +15,7 @@ def from_json(text: str) -> Person:
     )
 
 original = Person(FullName("Bruce Eckel"),
-                    EmailAddress("bruce@example.com"))
+                  EmailAddress("bruce@example.com"))
 text = to_json(original)
 print(text)
 #: {
