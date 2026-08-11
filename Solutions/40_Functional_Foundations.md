@@ -223,3 +223,36 @@ it returns `[]` with no error at all. The iterator was consumed by the
 first pass and cannot be rewound, so any later pass sees an exhausted
 object and silently produces nothing. A comprehension hands back a
 finished list, which can be walked as many times as you like.
+
+## 8. Only the assigned name needs `nonlocal`
+
+```python
+from collections.abc import Callable
+
+def make_counter(step: int = 1) -> Callable[[], int]:
+    count = 0
+    def increment() -> int:
+        nonlocal count
+        count += step
+        return count
+    return increment
+
+tally = make_counter(10)
+print(tally(), tally(), tally())
+#: 10 20 30
+```
+
+`increment()` captures two names, and only one of them needs the
+declaration. `step` is only read, like `factor` in `multiplier()`, and
+reading a captured name needs no declaration. `count` is assigned, and
+assignment is how Python decides a name is local, so without
+`nonlocal` the `count += step` line would create a fresh local and
+read it before any value exists.
+
+Deleting the `nonlocal` line shows both guides in order. `ty` reports
+`Name 'count' used when not defined` on the `count += step` line
+before the program runs. Running anyway raises `UnboundLocalError`
+("cannot access local variable 'count' where it is not associated
+with a value") at the first `tally()` call. The checker points at the
+assignment that went wrong; the runtime message complains about a
+local variable the code never meant to create.

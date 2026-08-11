@@ -116,7 +116,7 @@ An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
 Each is immutable in itself, and no deeper:
 the tuple `([1], 2)` will always hold that same list,
-which anyone can still append to.
+and anyone can still append to it.
 Removing shared mutable state is the practical core of the functional style.
 A value that never changes cannot develop a bug from some forgotten change elsewhere.
 
@@ -180,7 +180,7 @@ is a type error caught before the program runs.
 The constraint runs one way only.
 `Sequence[int]` states that `total()` will not mutate its argument.
 It says nothing about the caller,
-who still holds the `list` and can append to it whenever it likes,
+who still holds the `list` and can append to it at any time,
 including from another thread while `total()` is running.
 Mind what `Final` does and does not freeze.
 It locks the binding, not the object:
@@ -291,7 +291,7 @@ A `match` is code: adding an operator means editing the function,
 and the checker sees every case.
 The table is data: adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
-Choose `match` when the set of cases stays fixed and known to the compiler,
+Choose `match` when the set of cases is fixed when you write the function,
 and a table when the set should grow from outside.
 
 ## Lambdas
@@ -359,6 +359,8 @@ more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` 
 The two are not quite the same object, either.
 The comprehension hands you a finished list;
 `map()` hands you an iterator you can feed into the next stage without building the list at all.
+A generator expression from that chapter is the comprehension's lazy form,
+and removes that difference.
 The rule of thumb: existing function, use the higher-order form;
 expression you are writing on the spot, use the comprehension.
 `sorted()`'s `key` has no comprehension equivalent,
@@ -464,7 +466,7 @@ and the runtime message, complaining about a local variable
 points nowhere near the missing declaration.
 The checker is the better guide here.
 If you delete the `nonlocal` line,
-`ty` reports `Name 'count' used when not defined` on the `count += 1` line itself,
+`ty` reports `Name 'count' used when not defined` on the `count += 1` line,
 before the program runs.
 
 ## Partial Application
@@ -494,8 +496,11 @@ The keyword is doing real work here.
 `partial(power, 2)` would bind `base` instead,
 because positional arguments fill from the left,
 and `square(5)` would then compute `2 ** 5`.
-Partial application turns a general function into the specific one a caller needs,
-which is handy when a higher-order function needs a single-argument callable.
+Partial application turns a general function into the specific one a caller needs.
+`multiplier()` in [Closures](#closures) did the same by hand,
+a factory that fixes one argument and returns a function expecting the rest.
+When the general function exists, as `power()` does here,
+`partial()` removes the factory.
 
 Use partial application when an API expects a function of one argument and you have a function of several.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
@@ -532,12 +537,12 @@ print(percent.args)
 `percent` fixes the bounds and leaves the middle argument open,
 which is the specialization a caller needs and the one `partial()` could not previously express.
 A `Placeholder` is not a default.
-The caller must supply it:
+The caller must still fill the reserved position:
 calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a *trailing* placeholder, but for the opposite reason:
 it would add nothing.
 `partial()` already appends the call's arguments after the bound ones,
-so `partial(clamp, 0, Placeholder)` would mean exactly what `partial(clamp, 0)` already means.
+so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 
 The `# type: ignore` comments mark a checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
@@ -591,7 +596,7 @@ and you build larger behavior by naming a new composition rather than writing ne
 When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 
-The standard library provides these building blocks ready-made;
+The standard library supplies whole modules of these small, composable pieces;
 [Toolkits](41_Functional_Toolkits.md) tours them.
 
 ## Putting the Pieces Together
@@ -665,3 +670,8 @@ and the chapters ahead build on that single property.
     and the `sorted(key=len)` call with one that sorts by last letter.
     Then delete the `list()` around the `map()` call, print the result,
     and say what you see and why.
+8.  In `counter.py`, give `make_counter()` a `step: int = 1` parameter,
+    so `make_counter(10)` builds a counter that counts 10, 20, 30.
+    `increment()` reads `step` without declaring it `nonlocal`:
+    explain why `count` needs the declaration and `step` does not.
+    Then delete the `nonlocal` line and compare `ty`'s report with the runtime failure.
