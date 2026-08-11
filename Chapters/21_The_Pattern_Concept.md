@@ -12,7 +12,7 @@ along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
 This chapter introduces the concepts; one listing makes the point,
-and the chapters after it supply the rest of the code.
+and the chapters that follow supply the rest of the code.
 
 ## What Is a Pattern?
 
@@ -89,7 +89,7 @@ A pattern arrives in stages, each more general than the last:
     not just the one in front of you.
     A design that has become more general, typically through reuse.
 4.  **Design Pattern**: how to solve an entire class of similar problems.
-    This usually only appears after applying a standard design a number of times,
+    This usually appears only after applying a standard design a number of times,
     and then seeing a common pattern throughout these applications.
 
 In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
@@ -107,7 +107,7 @@ It doesn't make sense to try to take every problem solution and generalize it to
 You can't force the discovery of patterns that way.
 They tend to be subtle and appear over time.
 
-The ladder runs downward too.
+The progression runs downward too.
 A pattern a language builds in drops back to stage one,
 and the programmers who arrive next learn it as syntax rather than as a design.
 Stepping through a container is stage one in Python and was stage four in the *GoF Design Patterns* examples.
@@ -162,26 +162,31 @@ classified under three purposes
 The three purposes are:
 
 1.  **Creational**: how to create an object.
-    By isolating the details of object creation,
-    your code isn't dependent on what types of objects there are and thus won't change when you add a new type of object.
+    Isolating the details of object creation means your code doesn't depend on what types of objects there are,
+    and won't change when you add a new type of object.
     [Singleton](24_Singleton.md) counts as a *Creational* pattern,
-    and [Factory](27_Factory.md), later in this book,
-    covers factory methods and factory classes.
+    and [Factory](27_Factory.md) covers the other four: *Factory Method*,
+    *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: designing objects to satisfy particular project constraints.
     How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
     [Surrogate](26_Surrogate.md),
     [Changing the Interface](29_Changing_the_Interface.md),
-    [Composite and Interpreter](34_Composite_and_Interpreter.md),
     [Flyweight](35_Flyweight.md),
-    and [Decorators](14_Decorators.md#the-decorator-pattern)
+    [Decorators](14_Decorators.md#the-decorator-pattern),
+    and the *Composite* half of [Composite and Interpreter](34_Composite_and_Interpreter.md)
     cover the structural patterns in this book.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
     or implementing an algorithm.
-    This book contains multiple examples including [Observer](30_Observer.md),
-    [State](26_Surrogate.md#state), and [Visitor](33_Visitor.md),
-    though *State* appears beside *Proxy*, for reasons given below.
+    Most of the patterns in this book are behavioral:
+    [Iterator](23_Iterators.md), [Template Method](25_Template_Method.md),
+    [Function Objects](28_Function_Objects.md)
+    (*Command*, *Strategy*, and *Chain of Responsibility*),
+    [Observer](30_Observer.md), [Visitor](33_Visitor.md),
+    [Memento](36_Memento.md), [State](26_Surrogate.md#state), and *Interpreter*,
+    though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
+    for reasons given below.
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
@@ -219,6 +224,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*.
 -   *Consistency*.
+    Every inconsistency in a design is one more arbitrary rule to remember.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer can produce.
