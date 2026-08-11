@@ -12,9 +12,8 @@ Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
 You must still chase down all the places in your code where type matters.
 Creation of the type matters here, not use of the type
-(which polymorphism takes care of).
-The effect is the same.
-Adding a new type can cause problems.
+(which polymorphism handles).
+The effect is the same: adding a new type can cause problems.
 
 The solution is to encapsulate object creation.
 You force the creation of objects to go through a common *factory* rather than spreading creational code throughout the system.
@@ -82,7 +81,7 @@ if __name__ == "__main__":
 #: Square.erase
 ```
 
-The `factory()` takes an argument that allows it to determine what type of `Shape` to create.
+The `factory()` takes an argument that selects the type of `Shape` to create.
 Here it is a string, but it could be any set of data.
 The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
 (the initialization data for the objects will presumably come from somewhere outside the system, rather than from random generation as in the above example).
@@ -102,7 +101,7 @@ For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
 To discourage direct construction of the concrete shapes,
 give them module-level names with a leading underscore:
-discouraged by convention rather than hidden, which is as far as Python goes
+a convention rather than concealment, which is as far as Python goes
 ([Singleton](24_Singleton.md#nothing-keeps-the-class-private) makes the same case).
 Nesting the classes inside `factory()` looks stronger and is worse.
 A `class` statement is executable code,
@@ -199,6 +198,9 @@ as the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
 This is the same self-registration used in [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler).
+`Shape.__subclasses__()` could have built the table instead,
+but it stops at direct subclasses;
+`__init_subclass__()` runs for every class anywhere below `Shape`.
 A dictionary of classes, filled by hand or filled by the classes themselves,
 is the ordinary Python factory.
 That is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves):
@@ -222,7 +224,7 @@ Import a plugin module eagerly when the import exists for its side effect.
 The registry also keys on `cls.__name__` alone,
 so two classes that share a name, from different modules,
 silently overwrite each other.
-Key on a qualified name if that can happen.
+Key on a qualified name when a collision is possible.
 
 Registration names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
@@ -265,9 +267,10 @@ The static `factory()` method in `shape_factory1.py` forces all the creation ope
 so that's the only place you need to change the code.
 However, *GoF Design Patterns* emphasizes that the reason for the *Factory Method* pattern is so that you can subclass different types of factories from the basic factory
 (the above design is a special case).
-*GoF Design Patterns* provides no example of this,
-instead repeating the example used for the *Abstract Factory*
-(the next section shows this).
+For its sample code,
+*GoF Design Patterns* reuses the maze example from the *Abstract Factory*
+(the next section covers that pattern),
+subclassing the game to override its factory methods.
 Here is `shape_factory1.py` modified so the factory methods live in separate classes,
 called polymorphically:
 
@@ -358,13 +361,13 @@ such as pooling, caching, or consulting external configuration.
 The *Abstract Factory* pattern looks like the factory objects shown previously,
 with not one but several factory methods.
 Each factory method creates a different kind of object.
-At the point of creation of the factory object,
-you decide how the program will use every object that factory creates.
+When you create the factory object,
+you choose the concrete version of every object that factory will create.
 The example given in *GoF Design Patterns* implements portability across various graphical user interfaces
 (GUIs).
 You create a factory object appropriate to the GUI that you're working with,
-and from then on when you ask it for a menu, button, slider,
-etc. it will automatically create the appropriate version of that item for the GUI.
+and from then on when you ask it for a menu, button, slider, etc.,
+it will automatically create the appropriate version of that item for the GUI.
 Thus you're able to isolate, in one place,
 the effect of changing from one GUI to another.
 
@@ -444,7 +447,7 @@ In this environment, `Character` objects interact with `Obstacle` objects,
 but there are different types of characters and obstacles depending on what kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
-In this example, the setup and play is simple, but those activities
+In this example, the setup and play are simple, but those activities
 (the *initial conditions* and the *state change*)
 can determine much of the game's outcome.
 `GameEnvironment` has no place to vary the rules of play,
@@ -654,7 +657,7 @@ def test_prototype_untouched() -> None:
 
 ## Builder
 
-The last creational pattern in *GoF Design Patterns* this chapter has not covered is *Builder*
+*Builder* is the last of the *GoF Design Patterns* creational patterns left to cover
 ([Singleton](24_Singleton.md) has its own chapter):
 separate the construction of a complex object from its representation,
 assembling it in steps.
@@ -771,7 +774,7 @@ modeling toppings as wrapper objects instead of builder-collected fields,
 to illustrate the unrelated Decorator pattern.
 
 Builder survives in Python when construction is genuinely a process.
-The steps must happen in an order, later steps depend on earlier ones,
+The steps must come in an order, later steps depend on earlier ones,
 and rules span the steps.
 `GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze) qualifies.
 It assembles a maze in three stages, creating rooms, connecting doors,
