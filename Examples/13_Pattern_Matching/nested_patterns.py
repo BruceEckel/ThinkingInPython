@@ -8,7 +8,7 @@ def survey(points: list[Point]) -> str:
         case [Point(0, n) | Point(n, 0)]:
             return f"one axis point, offset {n}"
         case [Point(), Point()]:
-            return "two points, neither at an axis"
+            return "two points"
         case _:
             return "nothing to say"
 
@@ -19,4 +19,4 @@ print(survey([Point(0, 5)]))
 print(survey([Point(4, 0)]))
 #: one axis point, offset 4
 print(survey([Point(1, 2), Point(3, 4)]))
-#: two points, neither at an axis
+#: two points

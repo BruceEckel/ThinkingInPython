@@ -15,7 +15,7 @@ That case matches only a dictionary whose `"type"` is `"click"`,
 and it binds `x` and `y` from that dictionary as it matches.
 `match` becomes valuable once the patterns do more than test equality.
 
-Pattern matching was briefly introduced in [Control Flow](04_Control_Flow.md#pattern-matching).
+Pattern matching first appeared in [Control Flow](04_Control_Flow.md#pattern-matching).
 
 `match` and `case` are *soft* keywords:
 they act as keywords only inside this statement,
@@ -30,6 +30,9 @@ A `case _` at the end is the wildcard.
 It matches anything, like a default.
 Without one, a `match` that fits no pattern does nothing and raises no error.
 `match` tries the patterns top to bottom and the first match wins:
+one `case` body runs, then the statement ends.
+Unlike C's `switch`, cases do not fall through,
+and `match` has no `break` to forget:
 
 ```python
 # http_status.py
@@ -55,7 +58,8 @@ print(describe(301))
 
 A literal pattern compares with `==`, not with `is`,
 so `case 200:` also matches `200.0` and `case 1:` matches `True`.
-`None`, `True`, and `False` are the exception: those three compare with `is`.
+`None`, `True`, and `False` are the exception: those three compare with `is`,
+so `case True:` does not match `1`.
 
 For a value-to-value lookup like this, a dictionary is often shorter
 (see [When Not to Match](#when-not-to-match)).
@@ -91,7 +95,7 @@ print(step("jump"))
 ```
 
 A bare name always binds.
-It never compares against a variable of that name,
+It does not compare against a variable of that name,
 so a named constant in a `case` silently captures instead.
 A *value pattern* is a dotted name, and it does compare:
 
@@ -133,7 +137,7 @@ rebinds `DEFAULT` as a local name inside `broken()`,
 and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
-When the capture is the last `case`, as here, nothing warns you.
+When the capture is the last `case`, as here, Python does not warn you.
 `ruff` does notice, reporting `N806 Variable DEFAULT in function should be lowercase`,
 which is the linter saying that `DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
@@ -173,11 +177,15 @@ print(summarize([1, 2, 3, 4]))
 
 This shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
+The last `case _` never runs:
+`[first, *rest]` catches every nonempty list and `[]` the empty one.
+The checker cannot prove that,
+so the wildcard stays to satisfy the declared return type.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
 even though a string is a sequence in every other context.
-Iterating a string a character at a time is almost never what a pattern means,
+Iterating a string a character at a time is rarely what a pattern means,
 so the language rules it out.
 A tuple does match: `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
@@ -217,7 +225,7 @@ With a data class you can match positionally or by keyword:
 # point.py
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Point:
     x: int
     y: int
@@ -252,6 +260,8 @@ print(locate(Point(3, 4)))
 `Point(0, y)` matches when `x` is zero and captures `y`.
 The literal and the capture combine in one pattern.
 
+Despite the call syntax, a class pattern builds nothing:
+it tests the subject's type and reads its attributes.
 Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
 `@dataclass` generates it automatically from the field order,
@@ -259,7 +269,8 @@ so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
 `NamedTuple` generates it too; an ordinary class must assign it by hand.
 Without a `__match_args__` long enough to cover the positions you supply,
 a positional pattern raises a `TypeError`.
-An ordinary class that never assigns one reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
+For an ordinary class `R` that lacks one,
+`case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
 Keyword patterns work differently.
 `Point(x=0, y=y)` matches by attribute name directly, through attribute access,
@@ -294,10 +305,10 @@ A positional pattern can leave fields unchecked too:
 so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
 Naming the attribute is clearer,
 and it survives a change to the field order that would silently redefine every position.
-`Point()` with no arguments matches any `Point` instance, keyword or positional,
-and works as a type-only check or a final catch-all.
+`Point()` with no arguments, keyword or positional,
+matches any `Point` instance and works as a type-only check or a final catch-all.
 
-The type test is `isinstance()`, which has two consequences:
+The type test is `isinstance()`, so a subclass matches its base's pattern:
 
 ```python
 # type_patterns.py
@@ -323,8 +334,7 @@ print(describe(3.5))
 #: something else
 ```
 
-A subclass matches its base's pattern,
-so the order of the cases decides which one wins.
+Because a subclass matches, the order of the cases decides which one wins.
 `bool` is a subclass of `int`,
 so moving `case bool(b)` below `case int(n)` makes it unreachable:
 `describe(True)` would answer `int True`.
@@ -399,10 +409,13 @@ which lets it use the names the pattern bound.
 A false guard moves on to the next `case`, but the names stay bound:
 once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
-A pattern tests shape and equality and nothing else,
+A pattern tests shape and equality,
 so everything beyond that belongs in the guard: an ordering test like `x > 0`,
 a relation between two captures like `x == y`, or any call,
 such as `len(items) > 3`.
+Repeating a name does not express equality:
+`case [x, x]:` fails with `SyntaxError: multiple assignments to name 'x' in pattern`,
+so an equal-elements test is also a guard, `case [x, y] if x == y:`.
 A guard that only compares one capture to a constant is a literal pattern written the long way.
 
 ## Mapping Patterns
@@ -468,7 +481,7 @@ def survey(points: list[Point]) -> str:
         case [Point(0, n) | Point(n, 0)]:
             return f"one axis point, offset {n}"
         case [Point(), Point()]:
-            return "two points, neither at an axis"
+            return "two points"
         case _:
             return "nothing to say"
 
@@ -479,7 +492,7 @@ print(survey([Point(0, 5)]))
 print(survey([Point(4, 0)]))
 #: one axis point, offset 4
 print(survey([Point(1, 2), Point(3, 4)]))
-#: two points, neither at an axis
+#: two points
 ```
 
 The first case is a sequence pattern holding a class pattern holding two literals,
@@ -551,10 +564,13 @@ Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions do check this,
 as an error in Java and Kotlin and a warning in Scala,
 as long as the matched type is a sealed hierarchy the compiler can see in full.
+Their versions are also expressions, producing a value you can assign.
+Python's `match` is a statement,
+which is why every `match` in this chapter sits inside a function that returns from each `case`.
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role instead.
-An `if`/`isinstance()` chain can also get there,
+An `if`/`isinstance()` chain can reach the same guarantee,
 but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 
@@ -594,8 +610,8 @@ print(describe(301))
 #: Status 301
 ```
 
-The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because `get()` builds its default argument on every call,
-including the hits that discard it.
+The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")` because Python evaluates arguments before the call:
+every lookup builds the default string, including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases while a dictionary lookup's does not.
