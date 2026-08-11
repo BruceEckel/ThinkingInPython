@@ -14,7 +14,7 @@ You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
 the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
-*Command* appears twice below, first as a function,
+*Command* appears first as a function,
 then as the classic class-based form for contrast,
 a contrast that holds for *Strategy* as well.
 *Chain of Responsibility* needs only the function form:
@@ -104,9 +104,9 @@ so it drops into a command list alongside plain functions,
 carrying its state without any `Command` class.
 
 An object can be callable too.
-Give a class `__call__()`
+A class with `__call__()`
 ([Decorators](14_Decorators.md#a-stateless-class-decorator))
-and its instances carry state and still satisfy `Callable[[], None]`.
+produces instances that carry state and still satisfy `Callable[[], None]`.
 `Repeat` below is a [frozen data class](12_Data_Classes_as_Types.md#immutability),
 so its configuration cannot change after construction:
 
@@ -384,7 +384,7 @@ so a truthiness test would throw away a correct answer and hand the problem to t
 Any sentinel-versus-value check on a numeric result has this hazard.
 
 The chain trusts each handler to know when it failed.
-`secant()` and `newton()` stop when their step stops shrinking,
+`secant()` and `newton()` declare success when their latest step shrinks below the tolerance,
 which is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
@@ -429,8 +429,8 @@ This is a `dict` from each event type to the functions that care about it.
 The events are values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.
-The handlers are ordinary functions,
-so there is no base class to inherit from and no registration ceremony.
+The handlers are ordinary functions, so there is no base class to inherit from,
+and registering one is a single `subscribe()` call.
 `Handler` below names their signature, not an interface:
 
 ```python
@@ -493,17 +493,17 @@ bus.publish(Closed("inactivity"))  # No handler: nothing happens
 `subscribe` is generic on the event type `E`, which appears in both parameters,
 so the checker must find one `E` that satisfies the event type and the handler together.
 No such `E` exists for `subscribe(Deposit, on_withdraw)` and it is a type error.
-The safety check happens once, at registration.
+The check runs once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
 Its lists cannot name a single event class,
-so the element type erases the parameter to `Handler[Any]`.
+so their element type is `Handler[Any]`, the parameter erased.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
 `publish` still calls `.get(type(event), [])` instead of indexing.
 Indexing on a read inserts an empty list as a side effect,
-leaving a stray entry behind for every published event type that happens to have no subscriber,
+leaving a stray entry behind for every published event type with no subscriber,
 such as `Closed`.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.
@@ -562,7 +562,7 @@ Go down it and stop at the first form that carries what you need:
     (`configured_strategy.py`).
 4.  A callable object, when that configuration needs a name and a `repr`
     (`callable_command.py`).
-5.  A class, when one call is not enough: the second operation `undo()` needs,
+5.  A class, when one call is not enough: a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
 The *GoF Design Patterns* forms of Command, Strategy,
