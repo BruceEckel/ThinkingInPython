@@ -89,7 +89,7 @@ print(run(double(21)))
 similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
 Nothing the Effect describes happens until you call `run()`.
-In a synchronous program that happens once, at the outermost edge.
+A synchronous program calls it once, at the outermost edge.
 
 The two names differ only in case:
 `success()` is a function that builds an Effect,
@@ -565,8 +565,7 @@ The call still builds a description, and the body discards it unrun.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too.
 In ZIO Direct the fix is `.run`,
-and in a `for` comprehension it is the `<-` binding,
-where Python's is `yield from`.
+and in a `for` comprehension it is the `<-` binding; Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
@@ -754,8 +753,8 @@ while this version still changes only the row.
 ## Builtin Dependencies
 
 Every dependency supplied so far has been one this chapter defined.
-You might not need to define one at all,
-because Stateless supplies three classes of its own to depend on:
+You might not need to define one,
+because Stateless supplies three dependency classes of its own:
 
 - `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
 - `Files` in `stateless.files` that reads a whole file,
@@ -777,7 +776,7 @@ its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function
 so its type declares an Ability and two failures together.
 
 For illustration, this chapter builds a `Console` rather than using the one from Stateless.
-In your own code, check what the library already declares first.
+In your own code, first check what the library declares.
 
 ## Supplying an Interface
 
@@ -849,6 +848,8 @@ and `greet()` names neither.
 Because a `Protocol` matches on structure,
 `Recorder` qualifies as a `Console` without inheriting from `Console`.
 `supply()` uses `isinstance()`, so the Protocol needs `@runtime_checkable`.
+Without it, the first request raises a `TypeError`,
+because `isinstance()` refuses a protocol that is not runtime-checkable.
 
 Structural matching does not remove the need for `as_type()`.
 This listing supplies a `Terminal` both ways:
@@ -1042,7 +1043,7 @@ Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
 This has three consequences:
 
-1. Stateless checks happen before the program runs.
+1. Stateless checks come before the program runs.
    DI only discovers a missing registration when something asks for it.
    This can be at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
@@ -1082,7 +1083,7 @@ A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint people made against Java's checked exceptions,
 which [Effect Management](44_Effect_Management.md#catch-the-exception-you-expect)
-describes failing in exactly this way,
+describes failing this way,
 and it is the reason [Effects Propagate, and the Checker Verifies It](#effects-propagate-and-the-checker-verifies-it)
 compares the spread to `async`.
 
@@ -1121,7 +1122,7 @@ while `chosen` is a second handler already applied to `greet`.
 The first run has nothing between `greet()` and that edge,
 so the default answers.
 The second wraps `greet()` in its own `supply()` first,
-which empties the Ability channel before `fallback` ever sees a request.
+which empties the Ability channel before `fallback` sees a request.
 The handler nearest the Effect wins,
 and the outer one answers only what remains.
 The type records this: `chosen` is already `(str) -> Success[None]`,
@@ -1130,7 +1131,7 @@ so `fallback(chosen)` adds nothing the checker did not know.
 A default costs you the guarantee that made `Need` worth declaring.
 An Effect that fails the type check for a missing `Console` now compiles and runs,
 and a forgotten binding shows up as a wrong-looking result rather than an error.
-Use one for a genuine default, null logger or no-op console,
+Use one for a genuine default, a null logger or a no-op console,
 not to quiet a checker that is telling you something.
 
 ## Waiting on a Coroutine
@@ -1465,7 +1466,7 @@ so the `except` clause runs.
 Nothing removed the `KeyError` from the channel, though,
 so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:
-it matches the yielded value before the driver ever sees it and returns that value as the result,
+it matches the yielded value before the driver sees it and returns that value as the result,
 so the inner `except` never runs.
 Only `catch()` moves an error in the type, which is the next section.
 All three facts are visible in one listing:
