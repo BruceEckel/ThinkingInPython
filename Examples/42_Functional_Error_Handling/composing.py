@@ -1,5 +1,4 @@
 # composing.py
-# Composing functions that return Results, by hand.
 from result import Err, Ok, Result
 from returning_result import func_a
 
