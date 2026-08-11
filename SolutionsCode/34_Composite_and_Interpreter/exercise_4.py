@@ -1,6 +1,7 @@
 # exercise_4.py
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import assert_never
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -56,6 +57,8 @@ def to_infix(e: Expr, parent_prec: int = 0) -> str:
             lhs = to_infix(left, prec)
             rhs = to_infix(right, prec + 1)
             s = f"{lhs} * {rhs}"
+        case _:
+            assert_never(e)
     my_prec = PRECEDENCE[type(e)]
     return f"({s})" if my_prec < parent_prec else s
 
