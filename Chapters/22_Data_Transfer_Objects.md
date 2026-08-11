@@ -1,8 +1,8 @@
 # Data Transfer Objects
 
-The *Messenger* or *Data Transfer Object* is a way to pass a package of information around.
-The most typical use is for function return values.
-You often use tuples and dictionaries for that, but both rely on indexing.
+The *Messenger* or *Data Transfer Object* passes a package of information around.
+Most often it carries a function's return values.
+You use tuples and dictionaries for that, but both rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
 
@@ -44,7 +44,8 @@ since the `Messenger` class declares no attributes.
 `Any` switches the checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
-Declaring only the first leaves the write, `m.more = 11`, still rejected.
+If you declare only the first, the checker still rejects the write,
+`m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
 which is why the next listing needs no annotation.
@@ -72,8 +73,7 @@ print(m == SimpleNamespace(info="Spam", b=["x", "y"], more=11))
 ```
 
 The first `print()` shows the same instance `__dict__` the hand-rolled version had.
-The rest is what `SimpleNamespace` adds:
-a readable `repr()` and equality by contents.
+`SimpleNamespace` adds the rest: a readable `repr()` and equality by contents.
 `Messenger` prints as `<Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
 because it inherits `object`'s identity-based equality.
@@ -81,7 +81,7 @@ because it inherits `object`'s identity-based equality.
 A `SimpleNamespace` also accepts any name you invent,
 so no checker can know which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
-and `m.inof` goes unreported here as well.
+and no checker reports `m.inof` here either.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
@@ -109,7 +109,8 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
 so a checker knows a `Color`'s `r` is an `int` while the functional form leaves it unknown.
-Because it is a tuple underneath, each field is readable by name or by position:
+Because it is a tuple underneath,
+you can read each field by name or by position:
 
 ```python
 # color_namedtuple.py
@@ -157,7 +158,7 @@ An immutable record needs immutable fields.
 The leading underscore on `_replace()`, `_asdict()`,
 and `_fields` does not mean private.
 `NamedTuple` marks its own members that way so they cannot collide with a field you name.
-A record is free to declare a field called `replace` or `fields`.
+A record can declare a field called `replace` or `fields`.
 
 ## Returning Multiple Values
 
@@ -192,7 +193,7 @@ A data class cannot do that last part.
 since a data class is not iterable.
 `dataclasses.astuple()` converts one when you need the positional form.
 It recurses, though: a nested data class comes back as a nested tuple,
-and every other field is deep-copied rather than shared.
+and `astuple()` deep-copies every other field rather than sharing it.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -248,7 +249,8 @@ but the first comparison cannot tell them apart.
 The frozen data classes can,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 
-Ordering arrives by inheritance the same way, and is as type-blind as equality.
+A `NamedTuple` inherits ordering from `tuple` the same way,
+and that ordering is as type-blind as equality.
 Sorting a list of `Color`s orders them by `r`, then `g`, then `b`,
 with nothing in the code declaring that intent.
 A frozen data class refuses the comparison instead.

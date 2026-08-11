@@ -149,7 +149,7 @@ A `close()` call in a `with` block fails loudly instead.
 
 Unpredictable timing is not the only problem with `__del__()`.
 An object that refers to itself, directly or through another object,
-is not destroyed at the moment it becomes unreachable:
+does not go away at the moment it becomes unreachable:
 
 ```python
 # cycle.py
@@ -185,16 +185,17 @@ A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
 Freeing it takes the cyclic garbage collector,
-a separate mechanism triggered by allocation counts rather than by the object becoming unreachable.
+a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
 `gc.disable()` above keeps that collector from running on its own,
-and `gc.collect()` then forces a run, so the moment of destruction is visible;
+and `gc.collect()` then forces a run,
+so the `a finalized` line marks the moment of destruction;
 in a real program nothing tells you when the collector runs.
 Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()`,
 leaving the objects in `gc.garbage`;
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
-so the only thing a cycle costs now is the delay.
+so a cycle now costs only the delay.
 
-This is a second reason not to put cleanup in `__del__()`:
+Cycles are a second reason not to put cleanup in `__del__()`:
 one back-reference between two objects is enough to postpone it,
 and the code that creates the cycle is often not the code that owns the resource.
 
@@ -203,8 +204,8 @@ and the code that creates the cycle is often not the code that owns the resource
 Two approaches are more reliable:
 
 1. An explicit finalizer such as the `close()` that file objects provide,
-   called from a `with` block.
-   This runs whether or not an error interrupts the code:
+   which a `with` block calls.
+   The finalizer runs whether or not an error interrupts the code:
 
 ```python
 # closable.py
@@ -241,7 +242,7 @@ except RuntimeError as e:
 `close()` runs at the end of the `with` block, at a line you can point at,
 and the second half shows it running when the body raises an exception.
 Compare `cleanup.py`,
-where the release happened at an unknowable moment after the program's last statement.
+where the cleanup runs at an unknowable moment after the program's last statement.
 [Context Managers](15_Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
 This chapter shows the shape; that one explains it.
@@ -324,7 +325,7 @@ print(leaky() is None, safe() is None)
 A `ref()` is a weak reference: it watches its object without keeping it alive,
 and it reports `None` once the object disappears.
 So `False True` says the collector reclaimed `Safe` but not `Leaky`.
-`Safe` printed as it was reclaimed; `Leaky` printed nothing,
+`Safe` printed as the collector reclaimed it; `Leaky` printed nothing,
 because its callback never ran and nothing failed.
 Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
 whether the collector reclaimed the object,
@@ -372,14 +373,14 @@ print(Counter.live_count())
 ```
 
 A `WeakSet` would do for counting alone.
-The dictionary is what you want as soon as you look instances up rather than count them,
+You need the dictionary as soon as you look instances up rather than count them,
 which [Flyweight](35_Flyweight.md) does with a pool keyed by name.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,
 and one would then displace the other.
 Reused `id()` values are not a hazard,
 since the dictionary holds only live objects and no two live objects share an id.
-`live_count()` is the size of that registry,
+`live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
 in this case when `pop()` removes it from the `counters` list,
@@ -391,22 +392,23 @@ with no `__del__()` and no explicit cleanup call.
 A `dict` or `list` as the registry keeps every instance alive forever,
 so the count cannot fall.
 The weak reference allows the registry to prune itself.
-The immediate drop in the count is CPython's reference counting at work.
+CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear only when its collector runs,
 so the counts do not fall promptly.
-Unlike the `__del__()` version, this reads the count during normal execution,
+Unlike the `__del__()` version,
+this listing reads the count during normal execution,
 so it does not depend on the unreliable bookkeeping at interpreter shutdown.
 
 ## The Rule
 
 Never put resource release in `__del__()`.
 Give a class that owns a resource a `close()` method and a `with` block that calls it,
-so the release happens at a point in the program you can see.
+so the cleanup runs at a point in the program you can see.
 Where a callback must still run if the caller forgets,
 add `weakref.finalize()` as the backstop, not as the plan.
 To track objects without owning them, hold them weakly,
-so the registry cannot become the leak it is meant to catch.
+so the registry cannot become the leak it exists to catch.
 
 ## Exercises
 

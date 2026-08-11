@@ -29,7 +29,7 @@ This is an intermediate-to-advanced book,
 which removes two constraints that introductory books carry:
 
 1.  An introductory book must describe everything in lockstep,
-    never using an idea before it has been formally introduced.
+    never using an idea before formally introducing it.
     This one does not.
 2.  An introductory book chooses topics by where they fall in a beginner's path.
     This one chooses them by whether they are interesting and useful.
@@ -74,7 +74,7 @@ because several of the patterns that follow exist to manage problems that object
 A short chapter then introduces the design-patterns movement itself,
 and the question the rest of the part keeps asking.
 The part then works through the classic design patterns,
-each reframed for Python and weighed against the language.
+reframing each for Python and weighing it against the language.
 I ask what problem you are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
@@ -120,7 +120,7 @@ please ignore this book.
 Using Claude made me realize how many compromises I've made on books in the past.
 I would get a good idea about something
 (for example, automatically interleaving commented output in the listings).
-I was either unable to implement it, or it seemed too hard, so I didn't do it.
+I either couldn't implement it, or it seemed too hard, so I didn't do it.
 But with AI I can explore and often implement every whim,
 from things as seemingly straightforward as inserting a new chapter to ones as daunting as that commented-output system.
 The result is much better than anything I managed before.
@@ -135,7 +135,7 @@ With Claude and my directing and rewriting, I can build my ideal book.
 Using Claude greatly simplified and sped the writing process.
 It did not make it trivial.
 Once Claude had translated and integrated my own work into the book,
-and once it had made initial generations of new material,
+and once it had generated the first versions of new material,
 I went through line by line and concept by concept,
 inevitably rewriting and asking for clarification,
 often creating more examples to answer further questions.
@@ -187,16 +187,16 @@ and `tools/README.md` explains how to build the book and run the examples yourse
 The book's build system extracts the examples, then type-checks
 (with Astral's `ty`), lints, runs, and tests them.
 The code you read is the code that runs,
-and the output shown is the output it produces.
+and the output you see is the output it produces.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
 A run of markers shows everything the code above it printed since the previous run,
 in order.
-Output produced inside a loop, or by an `import`,
+Output from inside a loop, or from an `import`,
 therefore appears in the run of markers after the loop or the `import`,
 not next to the line that produced it.
-A `print("affirmative")` followed by a line reading `#: affirmative` means the program prints `affirmative` at that point.
+A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build regenerates these markers from a real run,
 so they cannot drift from what the code prints.
 
@@ -211,7 +211,7 @@ They are short enough to do on your own, and they are worth doing that way.
 They usually ask you to change a small,
 already-working example from that chapter and observe the result: add a class,
 break an invariant on purpose, extend a table, rewrite one function two ways.
-The point is to touch the code, predict what will happen, then run it and check.
+The point is to touch the code, predict what it does, then run it and check.
 A few chapters in the Patterns part keep larger exercises,
 where a pattern only shows its value in a program you build yourself.
 
@@ -234,7 +234,7 @@ Other resources:
 - [What's New in Python 3.15](https://docs.python.org/3.15/whatsnew/3.15.html),
   the release notes for the version this book targets
 - [The Python type system specification](https://typing.python.org/en/latest/spec/),
-  the reference behind the annotations used throughout
+  the reference behind the annotations the book uses throughout
 - [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
 - [Planet Python](https://planetpython.org/),
   an aggregator of Python articles from around the web

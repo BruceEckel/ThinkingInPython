@@ -4,7 +4,7 @@ An important step forward in object-oriented design was the "design patterns" mo
 carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma,
 Richard Helm, Ralph Johnson, and John Vlissides.
 They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
-I will refer to that book as *GoF Design Patterns*,
+I refer to that book as *GoF Design Patterns*,
 and use *design patterns* for the concept.
 
 *GoF Design Patterns* shows 23 different solutions to particular classes of problems,
@@ -23,18 +23,19 @@ You may have seen and solved something like it before,
 but your solution probably doesn't have the kind of completeness a pattern embodies.
 
 That completeness has a failure mode.
-Once you know a catalog of patterns, it is tempting to treat it as a checklist,
+Once you know a catalog of patterns,
+that catalog tempts you to treat it as a checklist,
 and to install patterns as proof of sophistication.
-A pattern earns its place only when the problem it solves is present.
+A pattern earns its place only when you have the problem it solves.
 If nothing varies, you do not need machinery for isolating variation.
 
-Although they're called "design patterns," they aren't tied to design.
+Although they're called "design patterns," they don't apply only to design.
 Patterns seem to stand apart from the traditional way of thinking about analysis,
 design, and implementation.
 Instead, a pattern embodies a complete idea within a program.
 It can therefore appear at the analysis phase or high-level design phase,
 where you are still describing what the system does rather than how to build it.
-Because a pattern has a direct implementation in code,
+Because a pattern translates directly into code,
 you might expect it to appear no earlier than low-level design.
 But it appears at every level,
 and you often discover that you need one only once you reach the code.
@@ -45,24 +46,24 @@ Whenever you abstract something, you isolate particular details.
 One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
 Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
-This makes the code cheaper to maintain and usually simpler to understand.
+That isolation makes the code cheaper to maintain and usually simpler to understand.
 
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
-This means finding the most important thing that changes in your system,
+You look for the most important thing that changes in your system,
 which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
 You discover a vector of change; you do not predict it.
-Guessing at it up front often builds complexity for flexibility in a direction that doesn't get used.
+Guessing at it up front often builds complexity for flexibility in a direction nobody uses.
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
 The goal of design patterns is to isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Classes.md) as a design pattern
-(albeit one built into the language).
+(albeit one the language builds in).
 It lets you express differences in behavior (that's the thing that changes)
 in objects that all have the same interface (that's what stays the same).
 [Composition](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
@@ -72,7 +73,7 @@ and thus the way that class works.
 
 Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Iterators.md).
 An iterator lets you hide the particular implementation of the container as you're stepping through it.
-You can write generic code that performs an operation on all the elements in a sequence without regard to that sequence's construction.
+You can write generic code that operates on all the elements in a sequence without regard to how that sequence stores them.
 The code works with any object that produces an iterator.
 
 ## Pattern Evolution
@@ -80,31 +81,31 @@ The code works with any object that produces an iterator.
 A pattern arrives in stages, each more general than the last:
 
 1.  **Idiom**: how you write code in a particular language to do this particular type of thing.
-    This could be something as common as the way that you code the process of stepping through an array in C
+    This could be something as common as the way you step through an array in C
     (and not running off the end).
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
-    This might be a clever design, but it makes no attempt to be general.
+    This might be a clever design, but it doesn't try to be general.
 3.  **Standard Design**: a way to solve every problem of that kind,
     not just the one in front of you.
     A design that has become more general, typically through reuse.
 4.  **Design Pattern**: how to solve an entire class of similar problems.
-    This usually appears only after applying a standard design a number of times,
-    and then seeing a common pattern throughout these applications.
+    This usually appears only after you apply a standard design a number of times,
+    and then see a common pattern across those uses.
 
 In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
 meaningless outside a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
 The same dictionary,
-filled by each subclass at its definition so that adding a type never edits the factory,
+which each subclass fills at its definition so that adding a type never edits the factory,
 is a standard design, stage three ([Factory](27_Factory.md) builds both).
 [Template Method](25_Template_Method.md) is a design pattern, stage four:
 a shape of solution you could build in any language with polymorphism.
 
 This progression doesn't say that one stage is better than another.
-It doesn't make sense to try to take every problem solution and generalize it to a design pattern.
-You can't force the discovery of patterns that way.
+Don't try to take every problem solution and generalize it to a design pattern.
+You can't force patterns to appear that way.
 They tend to be subtle and appear over time.
 
 The progression runs downward too.
@@ -119,7 +120,7 @@ Programmers wrote the same scaffolding often enough that it acquired a name.
 It exists only because the language does not write it for them.
 
 A pattern meets its missing piece in two ways.
-Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig made this observation in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
+Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Singleton.md)
 shows that a Python module already is one.].
 [Iterator](23_Iterators.md#the-pattern-that-disappeared) is the clear case.
 It was implicit in the `for` loop from the start,
@@ -156,14 +157,13 @@ and how much of it becomes functions, data, and protocols?
 
 ## Pattern Taxonomy
 
-*GoF Design Patterns* discusses 23 different patterns,
-classified under three purposes
+*GoF Design Patterns* discusses 23 different patterns and sorts them under three purposes
 (all of which revolve around the particular aspect that can vary).
 The three purposes are:
 
 1.  **Creational**: how to create an object.
-    Isolating the details of object creation means your code doesn't depend on what types of objects there are,
-    and won't change when you add a new type of object.
+    Isolating the details of object creation means your code doesn't depend on which object types exist,
+    and doesn't change when you add a new one.
     [Singleton](24_Singleton.md) counts as a *Creational* pattern,
     and [Factory](27_Factory.md) covers the other four: *Factory Method*,
     *Abstract Factory*, *Prototype*, and *Builder*.
@@ -186,7 +186,7 @@ The three purposes are:
     [Observer](30_Observer.md), [Visitor](33_Visitor.md),
     [Memento](36_Memento.md), [State](26_Surrogate.md#state), and *Interpreter*,
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
-    for reasons given below.
+    for reasons I give below.
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
@@ -243,8 +243,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     makes the composition case for it.
 -   *Managed Coupling*.
     Simply declaring that a design should have "low coupling" is usually too vague.
-    Coupling happens, and the important issue is to acknowledge it and control it,
-    to say "coupling can cause problems" and to compensate for those problems with a well-considered design or pattern.
+    Coupling happens, so acknowledge it and control it:
+    say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.
@@ -264,11 +264,12 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     Avoid duplication of logic and structure where the duplication is not accidental,
     i.e., where both pieces of code express the same intent for the same reason.
 -   *Make things as immutable as possible*,
-    as described in [Data Classes as Types](12_Data_Classes_as_Types.md#immutability).
+    as [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
+    describes.
 -   *Make functions pure whenever you can*,
-    as described in [Pure Functions](40_Functional_Foundations.md#pure-functions).
+    as [Pure Functions](40_Functional_Foundations.md#pure-functions) describes.
 
-This is a small handful of fundamental ideas that you can hold in your head while analyzing a design.
+You can hold this small handful of fundamental ideas in your head while analyzing a design.
 
 ## Reading the Chapters Ahead
 
@@ -287,7 +288,7 @@ It was the right answer for a language missing the piece Python has.
 
 Part III closes with a [Pattern Catalog](39_Pattern_Catalog.md),
 a name-and-intent index of the wider literature,
-with a link to this book's coverage wherever there is one.
+with a link to this book's coverage wherever it exists.
 
 ## Exercises
 

@@ -22,7 +22,7 @@ including the exception path, and the borrower writes nothing to arrange it.
 ## A Basic Context Manager
 
 The simplest way to write a context manager is a generator function with a single `yield`,
-turned into a context manager by the `contextlib.contextmanager` decorator.
+which the `contextlib.contextmanager` decorator turns into a context manager.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown):
 everything before it is setup, everything after it is teardown.
 [Iterators](23_Iterators.md#generators) covers generators in full;
@@ -93,7 +93,7 @@ so reusing the same object in a second `with` fails with a message that names no
 `AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
 Construct a fresh manager for each `with` statement.
 A loop around the `yield` cannot work around this:
-the single `yield` is enforced,
+`@contextmanager` enforces the single `yield`,
 and a generator that reaches a second `yield` makes the manager raise a `RuntimeError`
 (`generator didn't stop`) when the block ends.
 
@@ -254,7 +254,7 @@ print("survived")
 #: survived
 ```
 
-In a generator manager there is no return value to set.
+A generator manager has no return value to set.
 The exception arrives at the `yield`,
 so catching it there and not re-raising is the equivalent of `__exit__()` returning `True`.
 Letting it out of the `except` clause, or omitting the clause,
@@ -318,7 +318,7 @@ such as `ZeroDivisionError`, not an instance of it.
 so a `ZeroDivisionError` still matches `ignore_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
-`__enter__()` returns `None` because this manager is not for use with `as`.
+`__enter__()` returns `None` because this manager has nothing to hand to `as`.
 You can still write `as`, but it binds `None`.
 
 A fuller version of the same idea takes several types at once,
@@ -447,7 +447,7 @@ if __name__ == "__main__":
 ```
 
 `banner` works as both a decorator for `report` and in a `with` in `__main__`.
-Note the parentheses in `@banner("report")`: the call constructs the manager,
+The parentheses in `@banner("report")` matter: the call constructs the manager,
 which then decorates the function.
 Each call of the decorated function builds a fresh manager,
 so you can call `report()` any number of times,
@@ -493,7 +493,7 @@ if __name__ == "__main__":
 
 Like `suppress` and `ignore`,
 the class version of `banner` uses a lowercase name because you use it like a function.
-`__exit__(self, *exc: object)` collects the three arguments into a tuple that is never read,
+`__exit__(self, *exc: object)` collects the three arguments into a tuple the method never reads,
 which is the shorter way to write a cleanup that does not care why the block ended.
 Unlike the generator form,
 the class form re-enters the same instance on every call to `report()`,
@@ -507,11 +507,11 @@ because it defines its own wrapper function directly,
 with full access to `*args`, `**kwargs`, and the return value.
 `banner`'s wrapper comes from `ContextDecorator`
 (directly in `banner_cm.py`, or by way of `@contextmanager` in `context_decorator.py`),
-and that wrapper always makes one unchanged call,
-bracketed by setup and cleanup.
+and that wrapper always calls the function once, unchanged,
+with setup before it and cleanup after.
 Even if `report()` takes arguments or returns a value,
 neither version of `banner` sees them.
-What `banner` offers instead is one definition,
+`banner` offers one definition instead,
 usable both as a `with` block and as a `@` decorator.
 Use it when setup and cleanup should be identical on every call.
 
@@ -821,7 +821,7 @@ and everything hard about custody lives on the other side of the `yield`.
 
 ## Choosing a Form
 
-There are four ways to get a context manager.
+Four forms give you a context manager.
 Try them in this order.
 Use a `contextlib` manager when one fits, since `suppress`, `closing`,
 `nullcontext`, and `ExitStack` cover most of what people write by hand.
@@ -844,12 +844,12 @@ and every change you make later goes inside the manager.
 2.  In `demo_exceptions.py`,
     change `ignore(ZeroDivisionError)` to `ignore((ZeroDivisionError, TypeError))`,
     then raise a `TypeError` instead of dividing by zero,
-    and confirm it is also suppressed.
+    and confirm that `ignore` suppresses it too.
 3.  Add a third manager to the `with` statement in `multiple.py`,
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.
 4.  In `test_object_pool.py`, add a test that leases both connections at once,
-    using two separate `with pool.lease()` blocks entered one after the other without exiting the first,
+    entering a second `with pool.lease()` block inside the first,
     and confirms `pool.available()` reaches `0`.
 5.  Stack `@banner("outer")` and `@banner("inner")` from `context_decorator.py` on a single function and predict the order of the four bracketing lines before running it.
 6.  Write a context manager `ignore_missing` whose `__exit__()` suppresses only `KeyError` and lets everything else through,

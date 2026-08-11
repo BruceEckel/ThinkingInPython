@@ -15,14 +15,14 @@ the filesystem, or the network instead of receiving them.
 
 Perhaps more importantly,
 tests tell you immediately if a change you've made causes a failure.
-This can save an enormous amount of time.
+Immediate feedback saves an enormous amount of time.
 If the problem only surfaces after multiple changes,
 you have no idea which change caused the bug.
 
 ## Test-Driven Development (TDD)
 
-It seems easy to write the code, get it working,
-and intend to write the tests later.
+Writing the code, getting it working,
+and intending to write the tests later seems easy.
 Later rarely comes.
 Once the code works, the tests feel less important.
 
@@ -176,7 +176,7 @@ The test passes only if the block raises the expected exception.
 Keep the `with` block down to the single call that should fail.
 Any statement inside it that raises the expected type passes the test,
 including one that fails for an unrelated reason.
-`match=` takes a regular expression checked against the exception's message,
+`match=` takes a regular expression that `pytest` checks against the exception's message,
 so the test can confirm which failure occurred and not just its type:
 
 ```python
@@ -222,7 +222,7 @@ def test_interest_compounds() -> None:
     assert account.balance == pytest.approx(127.62815625)
 ```
 
-Five applications of 5% produce `127.62815624999999`,
+Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
 Use `approx()` as the habit rather than as the rescue:
 the first test does not need it,
@@ -259,7 +259,7 @@ def test_withdraw_leaves_expected_balance(
 ```
 
 Each tuple supplies all three arguments for one run,
-so this produces three independent tests.
+so `pytest` builds three independent tests.
 The names in the string line up, in order, with the values in each tuple.
 
 `parametrize` is a *mark*, and three others turn up in any existing suite.
@@ -307,8 +307,7 @@ def test_spend_some(open_account: Account) -> None:
 
 Everything before the `yield` is setup.
 Everything after it runs once the test finishes, even if the test failed.
-After the `yield` is the place to close files, release locks,
-or check a final invariant.
+Close files, release locks, or check a final invariant after the `yield`.
 A failing check there surfaces as an error, not as a test failure:
 `pytest` prints `1 passed, 1 error`,
 so read the error to see which invariant broke.
@@ -325,8 +324,8 @@ A test that names `funded` states what it needs and nothing about how to build i
 
 ## Sharing Fixtures with conftest.py
 
-A fixture defined in a file named `conftest.py` is available to every test in that directory and below,
-with no import.
+Any test in `conftest.py`'s directory, or below it,
+can use a fixture defined there, with no import.
 Place shared setup in `conftest.py`.
 
 A directory has one `conftest.py`, so its fixtures accumulate in that file.
@@ -394,7 +393,7 @@ Python has no access control, so every attribute is reachable.
 A single leading underscore, as in `self._balance`,
 changes nothing at the language level.
 Python stores it under that exact name, reachable like any other attribute.
-It is only a convention that says, "this is private, do not rely on it."
+Only convention says, "this is private, do not rely on it."
 
 A leading double underscore does something real,
 though it is still not access control.
@@ -431,8 +430,7 @@ not of compiler enforcement.
 That makes black-box testing the sensible default.
 If you test the public surface, the methods a caller should use,
 you can change the internals without rewriting the tests.
-The `Account` tests are black-box,
-which means they never read a private attribute.
+The `Account` tests are black-box: they read no private attributes.
 When you do need a white-box test for a tricky internal, nothing stops you,
 but treat each one as a test that may break when you refactor.
 
@@ -510,7 +508,7 @@ def roll() -> int:
 ```
 
 `monkeypatch` replaces the random call with one that returns a known value,
-so the result is predictable for the duration of the test:
+so the result stays predictable while the test runs:
 
 ```python
 # test_dice.py
@@ -687,7 +685,7 @@ A stand-in like `fake_urlopen()` is a *stub*:
 it answers with a canned value and records nothing.
 The standard library's `unittest.mock` builds stubs for you,
 along with *mocks* that also record the calls they receive,
-and you will meet it in most existing code.
+and it turns up in most existing code.
 This book patches with `monkeypatch` and prefers injection where you can change the code,
 because a function that takes its clock or its fetcher as an argument needs no patching library.
 
@@ -718,7 +716,7 @@ Replace those at the boundary,
 by injection where you can change the code and with `monkeypatch` where you cannot.
 Then pin the remaining behavior with a handful of parametrized cases.
 The work is mostly in the first step,
-since a function that is hard to test is usually one that goes looking for something it was never handed.
+since a function that is hard to test is usually one that goes looking for something no caller handed it.
 
 To find out what you have not tested, run the suite under `coverage.py`,
 which the `pytest-cov` plugin wires up when you pass `--cov`.

@@ -64,7 +64,7 @@ print(not_implemented(), not_implemented_yet())
 
 `pass` marks an indented block with nothing in it yet.
 `...` is the conventional body for a stub whose implementation lives elsewhere,
-and it is normally written on the same line as the signature it stubs,
+and you normally write it on the same line as the signature it stubs,
 as in a `Protocol` method
 ([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
 
@@ -112,8 +112,7 @@ The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
 Both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
-a `return` from a function that holds both loops,
-or the loop `else` introduced below.
+a `return` from a function that holds both loops, or the loop `else` below.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers land on one line,
@@ -162,8 +161,9 @@ The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
 This `else` is also how you leave two nested loops at once:
 put `continue` in the inner loop's `else` and a `break` right after it.
-When the inner loop `break`s, its `else` is skipped and the outer `break` runs;
-when it finishes clean, the `continue` moves the outer loop along instead.
+When the inner loop `break`s,
+Python skips its `else` and the outer `break` runs; when it finishes clean,
+the `continue` moves the outer loop along instead.
 
 When iterating, `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
@@ -187,8 +187,8 @@ for index, name in enumerate(names):
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
 which the loop here unpacks into `index` and `name`.
-A loop written as `for i in range(len(names)):` and then indexing `names[i]` does the same job,
-but it names the index and looks the item up again on every line that needs it.
+Writing `for i in range(len(names)):` and then indexing `names[i]` does the same job,
+but that form names the index and looks the item up again on every line that needs it.
 `enumerate()` hands you both.
 `zip()` walks several sequences at once:
 
@@ -285,7 +285,7 @@ or collect what to remove first and remove it after the loop.
 ## Pattern Matching
 
 The `match` statement compares a value against structural patterns.
-It is reminiscent of a C `switch`,
+It resembles a C `switch`,
 but a pattern can look inside a value and pull out its parts:
 
 ```python
@@ -309,7 +309,7 @@ print(run("dance"))
 ```
 
 Only the first matching `case` runs.
-Unlike C, there is no fall-through, so a `case` needs no `break`.
+Unlike C, a `case` does not fall through, so it needs no `break`.
 The first `case` destructures the split command:
 it matches a two-item list starting with `"go"`,
 and binds the second item to `direction`.
@@ -456,10 +456,10 @@ for parse in (implicit, explicit, suppressed):
 ```
 
 `BadNumber` is a custom exception type,
-made by deriving a class from `Exception`.
+which you create by deriving a class from `Exception`.
 Its body is `pass` because it needs no behavior of its own;
 the handler matches on the class name.
-Class definitions get their full treatment in [Classes](07_Classes.md).
+[Classes](07_Classes.md) covers class definitions in full.
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
 so the output above is the text Python would print, not a summary of it.
@@ -507,7 +507,7 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
 The gap grows when the world can change between test and operation:
-a file that existed at the `if` can be gone by the `open()`,
+a file that existed at the `if` can disappear before the `open()`,
 and only the EAFP form is safe against that.
 
 ## Context Managers

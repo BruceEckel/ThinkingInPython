@@ -6,7 +6,7 @@ Performance means at least two things in computing:
 2. Execution speed
 
 Python addresses the first issue with clear syntax and extensive power and flexibility.
-As to the second issue, Python is commonly considered to be slow.
+As to the second issue, Python has a reputation for slowness.
 
 ## Is It Too Slow?
 
@@ -14,7 +14,7 @@ Computer programming projects have a long history of *premature optimization*.
 This means optimizing before any measurement shows where the time goes.
 Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
-This results in elaborate, expensive designs that solve nonexistent problems.
+They then build elaborate, expensive designs that solve nonexistent problems.
 
 Python can be surprising.
 A program coded in the most straightforward way,
@@ -26,7 +26,7 @@ It might be fine.
 If it is too slow, try the simplest remedy first.
 That might be enough, and if it is, you save time and money.
 
-What follows is an approach to solving performance problems,
+The rest of this chapter works through performance problems,
 starting with the simplest techniques and growing successively more complex.
 
 ## Try a Faster Platform
@@ -34,7 +34,7 @@ starting with the simplest techniques and growing successively more complex.
 The cheapest platform change is a newer CPython.
 The interpreter has grown substantially faster since 3.10,
 and moving a project forward two or three releases costs a test run rather than a rewrite.
-It is the rare speedup that needs neither new code nor new hardware.
+A speedup that needs neither new code nor new hardware is rare.
 
 CPython has an experimental just-in-time compiler.
 Builds that include it,
@@ -56,8 +56,8 @@ If it's noticeably less, then buying new hardware might be a quick win.
 ## Profilers
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
-Although it is tempting to think you "have a pretty good idea where the slowdown is,"
-programmers turn out to be bad at guessing this.
+You may think you "have a pretty good idea where the slowdown is,"
+but programmers turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library includes two.
@@ -95,7 +95,7 @@ while a row with ten thousand calls and a large `tottime` needs fewer calls rath
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
 The deterministic tracing profiler becomes `profiling.tracing`,
-with `cProfile` kept as an alias.
+and `cProfile` remains an alias.
 3.15 deprecates the old pure-Python `profile` module, and 3.17 removes it,
 so use `profiling.tracing` or `cProfile` for tracing.
 The sampling profiler is `profiling.sampling`.
@@ -107,7 +107,7 @@ You invoke it like this:
 
 The new profiler can also attach to a process that is already running,
 using the process ID.
-This makes it the tool for a slowdown you can only reproduce live:
+Attaching makes it the tool for a slowdown you can only reproduce live:
 
     python -m profiling.sampling attach 12345
 
@@ -121,7 +121,7 @@ separates Python time from native time and profiles memory line by line.
 A profiler answers a broad question about the whole program.
 Sometimes you have a narrow one:
 how many times does this function run during a request,
-and is that branch reached at all?
+and does that branch run at all?
 Editing the function to add a counter changes the code you are studying,
 and turning on a full profiler to answer it costs more than the answer is worth.
 
@@ -173,8 +173,8 @@ which the interpreter calls each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument:
 it attaches the event to one code object,
 which is why `square()` is absent from the count even though it ran.
-Attachment does not spread to whatever that code calls,
-so a helper invoked by `fib()` would go uncounted as well.
+The event does not spread to whatever that code calls,
+so a helper that `fib()` invokes would go uncounted as well.
 The global form is `set_events()`,
 which fires for every Python function in the process,
 and that is where the two differ in cost.
@@ -310,7 +310,7 @@ so pass `setup="gc.enable()"` when collection pauses are part of what you are co
 
 Every measured listing in this book prints a threshold rather than a measurement,
 so the book's output is the same on your machine as on mine.
-The measurements are still taken, and one flag prints them:
+Each listing still takes its measurements, and one flag prints them:
 
 ```python
 # utils/benchmark.py
@@ -344,7 +344,7 @@ Running `membership.py` with the flag adds the measurements above it:
 
 The names are the keyword arguments at the call site,
 which is why each listing can label its own measurements.
-Your ratio will differ from the one above, which is the point of running it.
+Your ratio differs from the one above, which is the point of running it.
 
 ## Write Idiomatic Python
 
@@ -423,7 +423,7 @@ print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
 
 Here the hoist does not pay off, and it can cost.
 `out.append(i)` compiles to a method load that pushes the function and its `self` separately,
-with no bound method built.
+building no bound method.
 `append = out.append` builds one, and every call then goes through it.
 One machine measured the hoisted version five percent slower, another twenty.
 Measure it on your own machine before believing either direction.
@@ -684,7 +684,7 @@ a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
 In CPython these share the same machinery.
 Choose immutability for correctness and safe sharing.
 Immutable values are hashable,
-so they can serve as dictionary keys and as arguments to the caches shown below.
+so they can serve as dictionary keys and as arguments to the caches below.
 
 ## Lazy Evaluation with Generators
 
@@ -693,7 +693,7 @@ A generator pipeline
 ([Comprehensions](16_Comprehensions.md#generator-expressions))
 computes one item at a time, on demand,
 so memory use doesn't grow with the size of the source,
-and no work happens past the point where the consumer stops.
+and the pipeline does no work past the point where the consumer stops.
 `tracemalloc` measures the difference:
 
 ```python
@@ -739,7 +739,7 @@ a generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.
 When the consumer needs every element anyway and the data fits in memory,
 a list is fine, and you can iterate it twice.
-A generator is spent after one pass.
+One pass exhausts a generator.
 
 Fitting the whole data set in memory gives you more than a second pass.
 Random access, sorting,
@@ -801,7 +801,7 @@ print(fib_cached(25), fib_cached.cache_info().misses)
 Same answer, from 242,785 calls against 26.
 Every avoided call is work the cached version never does,
 and the gap widens as `n` grows.
-The counts, not a stopwatch, are what this listing measures.
+This listing measures the counts, not a stopwatch.
 
 `cache` holds every result forever,
 but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least recently used entry.
@@ -909,7 +909,7 @@ The filter catches it because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
-This produces both memory savings and generated methods.
+`@dataclass(slots=True)` both shrinks the instances and writes the methods.
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
 `frozen=True` does not imply `slots=True`.
@@ -962,7 +962,7 @@ print(f"array at least 3x smaller: "
 #: array at least 3x smaller: True
 ```
 
-Every element shares one type, given by the type code,
+The type code fixes one type for every element,
 so `array` stores them compactly and rejects values of the wrong type.
 The size comparison shows the cost of boxing:
 the `list` holds an 8-byte pointer to a 24-byte `float` object per element,
@@ -1059,7 +1059,7 @@ with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type c
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
 but as one compiled pass over contiguous memory instead of a million individual Python-level steps.
 NumPy is a fast library you call, not a compiled extension you write.
-The benefit only occurs if the data stays inside NumPy.
+You keep that speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade from [Assurance](43_Functional_Assurance.md#declarative-style):
@@ -1106,7 +1106,7 @@ Numba shines on numeric code over simple types and NumPy arrays,
 often running nearly as fast as C.
 The first call pays a compilation delay,
 and code that uses general Python objects, such as custom classes,
-will not compile.
+does not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
@@ -1163,7 +1163,7 @@ so no single array expression produces it:
 
 `collatz_lengths()` takes a NumPy array and returns one,
 so it composes with vectorized NumPy code on either side.
-Compiling changes only what happens inside the loop:
+Compiling changes only the loop's interior:
 the same Python source runs as machine code instead of as bytecode over boxed `int` objects.
 This is the pattern in practice:
 use a vectorized NumPy expression wherever the shape of the computation allows it,
@@ -1181,9 +1181,9 @@ tested example. -->
 
 ## Converting a Slow Function to Rust
 
-One effective technique is to move the hot function into a compiled language.
+Moving the hot function into a compiled language works well.
 Rust is excellent for this because its tooling makes the bridge nearly painless.
-Hand the hot Python function to your AI for conversion,
+Ask your AI to convert the hot Python function,
 and it can walk you through the rest of the process.
 Once you're done, you import a module that looks from the outside like any other Python module,
 except that it runs faster.
@@ -1301,10 +1301,11 @@ The main book build never does this and never requires a Rust toolchain;
 building `rust/` is a separate, opt-in step.
 
 That is one baseline and three ways past it.
-The plain Python loop, timed in the Numba example above, is the baseline.
+The plain Python loop from the Numba example above is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
-Rust compiles that loop ahead of time so there is no warm-up and no Numba dependency at runtime,
+Rust compiles that loop ahead of time,
+removing both the warm-up and the runtime Numba dependency,
 at the cost of a second language and a build step.
 
 Keep the interface coarse.
@@ -1335,7 +1336,7 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
-A profiler is how you find the slow spots without guessing.
+A profiler finds the slow spots without guessing.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,

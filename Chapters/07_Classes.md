@@ -41,7 +41,7 @@ Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
 but you can use any identifier
-(however, anything other than `self` will probably confuse people).
+(however, anything other than `self` probably confuses people).
 To refer to the object's fields or its other methods,
 you must go through `self`.
 
@@ -70,7 +70,7 @@ The first method, `__init__()`, is the *initializer*.
 The double underscores (a.k.a. "dunder") indicate a special name.
 The `__new__()` method is the *constructor*, which you rarely use
 ([Singleton](24_Singleton.md) shows a case that needs it).
-It has become common practice to call `__init__()` the constructor,
+Most programmers call `__init__()` the constructor,
 since it does the job of constructors in other OOP languages.
 This book follows that practice.
 
@@ -81,7 +81,7 @@ In C++ or Java you declare object-level fields inside the class body but outside
 You do not declare them this way in Python.
 To create an object field, you name it, using `self`, inside a method
 (typically in the constructor, but not always).
-This creates space for that field when the method runs.
+The assignment creates space for that field when the method runs.
 If you assign to a name in the class body, C++/Java style,
 that name becomes a class-level field instead
 (similar to a static field in C++/Java).
@@ -196,13 +196,13 @@ In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
-The demo shows that the base-class constructor runs,
+The base-class constructor runs,
 but only because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor automatically.
-If you remove the `super().__init__(text)` line, `self.s` is never created,
+If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
 A derived class that defines no constructor of its own inherits and runs the base version.
-The inherited `show_twice()` method is also available in the derived class.
+The derived class also inherits `show_twice()` unchanged.
 
 The class `Different` also has a method named `show()`,
 but this class does not derive from `Simple`.
@@ -301,8 +301,8 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 ```
 
 Python runs the program either way.
-Verification comes from a separate tool,
-introduced in [Static Typing](08_Static_Typing.md).
+Catching the mistake takes a separate tool,
+which [Static Typing](08_Static_Typing.md) sets up.
 
 At run time `@override` adds no wrapper.
 It returns the same function object,
@@ -380,7 +380,7 @@ except ValueError as e:
 #: Failed: radius cannot be negative
 ```
 
-This is the conversion the section opened with, carried out.
+The section opened with a conversion, and this listing carries it out.
 `radius` began as a plain attribute and is now a validated property,
 and the two lines that read `c.radius` and `c.area` are the ones from the first listing,
 unchanged.
@@ -436,7 +436,7 @@ print(n.total)
 The first access runs the method.
 The second access produces the same result from the stored value.
 The attribute is *lazily initialized*, created on first use,
-so there's no cost if the attribute is not accessed.
+so it costs nothing until something reads it.
 The stored value lives in the instance's `__dict__`,
 so a class that suppresses that dictionary,
 as [Rethinking Objects](20_Rethinking_Objects.md) does with `slots=True`,
@@ -541,8 +541,9 @@ print(Temperature.is_freezing(-4))
 ```
 
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
-Called on a subclass, `cls` is that subclass,
-so the alternative constructor produces the right kind of object without being rewritten.
+When you call it on a subclass, `cls` is that subclass,
+so the alternative constructor produces the right kind of object,
+and a subclass inherits it unchanged.
 Naming the class directly would hard-code `Temperature` into every subclass.
 
 `is_freezing()` would also work as a module-level function.

@@ -33,7 +33,7 @@ explains the filename first line and the `#:` output markers.
 Python is clean to write.
 Your own code stays easy to read long after you've written it.
 Indentation determines how statements group into blocks.
-Here is a script that runs with `python if.py`:
+This script runs with `python if.py`:
 
 ```python
 # if.py
@@ -64,8 +64,7 @@ unlike a variable declared inside braces in C++ or Java.
 Functions, classes, and modules introduce new scopes;
 an `if` or a `for` block does not.
 Binding still follows execution: had `response` not been `"yes"`,
-`val` would never have been assigned,
-and `print(val)` would raise a `NameError`.
+Python would not have bound `val`, and `print(val)` would raise a `NameError`.
 
 Indenting can nest to any level.
 Four spaces per level is the convention,
@@ -255,7 +254,7 @@ Numbers are false when zero, containers are false when empty,
 and `None` is always false.
 Everything else is true, unless an object's type says otherwise.
 This is *truthiness*,
-and it allows `if items:` instead of `if len(items) != 0:`.
+and it lets you write `if items:` instead of `if len(items) != 0:`.
 A type says otherwise by defining `__bool__()`; without one,
 Python falls back to `__len__()`, which is why an empty container is false.
 
@@ -421,7 +420,7 @@ A consumer that receives the parts separately knows which text came from the pro
 so it can quote, escape,
 or reject the values before they become part of the result.
 
-Here is what the parts look like:
+The parts look like this:
 
 ```python
 # tstrings.py
@@ -508,7 +507,7 @@ Tools such as ruff can apply these to your code automatically
 5.  In `tstrings.py`, write a second consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.
-    Explain why an f-string cannot be post-processed the same way.
+    Explain why you cannot post-process an f-string the same way.
 6.  Before running anything,
     write down what C or Java would print for `-9 / 4` and `-9 % 4` using integer math,
     then what Python prints for `-9 // 4` and `-9 % 4`.

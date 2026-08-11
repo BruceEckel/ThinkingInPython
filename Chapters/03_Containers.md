@@ -100,7 +100,7 @@ print(sorted(words, reverse=True))
 
 `sorted(x)` returns the result while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
-Uppercase sorts before lowercase because the comparison is by code point;
+Uppercase sorts before lowercase because Python compares strings by code point;
 [Functions](05_Functions.md#lambdas) shows how `key=` changes that.
 
 A `list` does not restrict its elements to one type.
@@ -122,10 +122,9 @@ for item in mixed:
 ```
 
 This flexibility is convenient but easy to overuse.
-A `list` of mixed types usually means each element needs different handling,
-which is often better expressed with a `tuple`,
-a [data class](12_Data_Classes_as_Types.md#data-classes), or distinct lists,
-each holding a single type.
+A `list` of mixed types usually means each element needs different handling.
+A `tuple`, a [data class](12_Data_Classes_as_Types.md#data-classes),
+or distinct lists, each holding a single type, express that better.
 
 Two list operations produce surprises.
 `*` repeats a reference rather than copying what it points at,
@@ -203,7 +202,7 @@ print(low, high)
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
-Unpacking is not limited to one name per element.
+Unpacking does not require one name per element.
 A starred name absorbs whatever remains,
 and a target can nest to match the shape of the value:
 
@@ -329,9 +328,9 @@ The next section uses `|` for set union, where the operands are symmetric.
 They are not symmetric here: on a key both dictionaries hold,
 the right operand's value wins, which is why `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
-which it accepts from any source; `zip()`,
-which pairs up two sequences element by element,
-is covered with the other loop tools in [Control Flow](04_Control_Flow.md#loops).
+which it accepts from any source.
+`zip()` pairs up two sequences element by element;
+[Control Flow](04_Control_Flow.md#loops) covers it with the other loop tools.
 
 ## Sets
 
@@ -372,7 +371,7 @@ so do not write code, or a test, that depends on it.
 Every set-algebra operator above has a named method.
 The methods are a little more flexible because they accept any iterable,
 not only a set, and they can take several arguments at once.
-`isdisjoint()` is also available, with no operator form:
+`isdisjoint()` adds one more test, with no operator form:
 
 ```python
 # set_methods.py
@@ -410,7 +409,7 @@ and `symmetric_difference_update()` methods.
 Single elements move in and out with `add()`, `remove()`, and `discard()`;
 `remove()` raises `KeyError` on a missing element, `discard()` stays silent.
 
-Speed is the reason to convert a `list` to a `set` before repeated lookups.
+Converting a `list` to a `set` before repeated lookups speeds them up.
 A `list` compares against every element in turn;
 a `set` computes one hash and looks in one place.
 `timeit()` runs a callable `number` times and returns the total elapsed seconds;
@@ -653,7 +652,7 @@ Each of the three built-in mutable containers has an immutable counterpart.
 A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
 completes the trio: a built-in,
-hashable mapping that rejects modification after creation.
+hashable mapping that rejects changes after creation.
 The example below uses tuples and frozensets,
 plus `MappingProxyType` from the `types` module,
 which is not a container of its own but a read-only *view* onto a `dict` you still hold:
@@ -725,19 +724,20 @@ except TypeError as e:
 
 Because a `frozendict` cannot change, it is hashable when its values are,
 so like a `tuple` or a `frozenset` it can be a dictionary key or a set member.
-The requirement on a dictionary key is hashability, not immutability.
+A dictionary key must be hashable, though it need not be immutable.
 Immutability is how a container earns a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
 Neither you nor code you pass it to can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
-It is safe to use as a default argument,
-unlike the mutable default shown in [Functions](05_Functions.md#default-and-keyword-arguments).
+An immutable container is safe as a default argument,
+unlike the mutable default in [Functions](05_Functions.md#default-and-keyword-arguments).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through,
-as `immutability.py` showed when writing to `settings` changed what `config` reports.
+as in `immutability.py`,
+where writing to `settings` changes what `config` reports.
 
 Immutability is also shallow.
 An immutable container fixes which objects it holds,

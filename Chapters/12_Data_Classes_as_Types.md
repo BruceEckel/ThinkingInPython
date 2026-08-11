@@ -44,7 +44,7 @@ A handler can read `e.subject` and `e.reason` rather than parsing them from the 
 
 `eq=False` turns off the generated `__eq__()`, for two reasons.
 A data class that defines `__eq__()` sets `__hash__` to `None`
-(shown for `Messenger` in [Data Classes](#data-classes)),
+([Data Classes](#data-classes) shows this for `Messenger`),
 and an unhashable exception is a trap if you put it in a set.
 Identity is the correct comparison for an exception.
 Two failures carrying the same text are still two separate failures.
@@ -200,7 +200,7 @@ and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
 so it gives up hashability rather than let you put a mutable instance in a `set` or use it as a `dict` key.
-As described in [Class Attributes](09_Class_Attributes.md),
+As [Class Attributes](09_Class_Attributes.md) explains,
 of the three fields only `depth` appears as an attribute,
 because it has an initialization value.
 
@@ -267,7 +267,7 @@ Passing `frozen=True` makes the data class immutable.
 Attempting to assign to a field raises `FrozenInstanceError`.
 As a bonus, a frozen instance is hashable,
 so you can use it as a dictionary key or put it in a set.
-The mutability that cost `Messenger` its `__hash__` is gone,
+`frozen=True` removes the mutability that cost `Messenger` its `__hash__`,
 so `@dataclass` generates one from the fields:
 
 ```python
@@ -322,7 +322,7 @@ while a `NamedTuple` equals any tuple holding the same values,
 a difference [Data Transfer Objects](22_Data_Transfer_Objects.md#a-namedtuple-is-still-a-tuple)
 covers.
 They differ again in what this chapter cares about most,
-shown in [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate).
+as [A `NamedTuple` Cannot Validate Itself](#namedtuple-cannot-validate) shows.
 
 If nothing about an object can change after construction,
 then validating it at construction makes it valid for its lifetime.
@@ -368,7 +368,7 @@ and the constructor refuses anything outside that set.
 If you are holding a `Stars`, it is legal.
 You know it without checking.
 
-This changes how you write the functions.
+That guarantee changes how you write the functions.
 `f1()` and `f2()` take a `Stars` and return a `Stars`.
 They do not check their argument, because every `Stars` is legal.
 They do not test their result,
@@ -541,7 +541,7 @@ library predates and inspired data classes and offers richer validators and conv
 builds validation and parsing into the type,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
-Make the type responsible for guaranteeing its own values.
+Make the type guarantee its own values.
 
 ## Comparing Ordinary Classes and Data Classes
 
@@ -569,7 +569,7 @@ def show(obj: object) -> None:
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes `__hash__` from these reports
-(`@dataclass` disabling `__hash__` was [demonstrated for `Messenger`](#data-classes)).
+([Data Classes](#data-classes) showed `@dataclass` disabling `__hash__` for `Messenger`).
 
 ### `A`: Annotations Only
 
@@ -606,7 +606,7 @@ that some future `A` will carry an `x` and an `s`,
 but stores nothing until code assigns a value.
 `A` has no `__init__()` to make that assignment,
 so the declaration goes unfulfilled.
-That is why `show(A())` finds nothing: there is no `x` and no `s` to report,
+That is why `show(A())` finds nothing: no `x` and no `s` exist to report,
 on the class or on the instance.
 
 ### `B`: Class-Level Defaults
@@ -679,8 +679,8 @@ then uses that to write `__init__`'s parameter list and the assignments inside i
 `dataclasses.fields()` reports the field list it recorded.
 `@dataclass` stores nothing on the class:
 `x` is still absent from `C.__dict__` after decoration, as it was before.
-The declaration is only fulfilled per instance,
-when the generated `__init__()` runs.
+The generated `__init__()` fulfills the declaration when it runs,
+once per instance.
 That is the difference from `A`: not that `@dataclass` changes the annotations,
 but that it builds something to act on them.
 
@@ -825,7 +825,7 @@ if __name__ == "__main__":
 ```
 
 The `Enum` creates the constrained set of `Month`s.
-There cannot be a thirteenth month because that value doesn't exist.
+No thirteenth month can exist, because `Month` defines no such value.
 
 Each member is a pair rather than a bare day count because `Enum` treats members with equal values as aliases of one another.
 Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`,
@@ -937,7 +937,7 @@ the trap shown in [Functions](05_Functions.md#default-and-keyword-arguments).
 and each new `Months` calls it and gets its own fresh list.
 
 That rejection is narrower than it looks.
-`@dataclass` refuses a default it can tell is shared storage,
+`@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
 so a mutable object of a class you wrote passes as a default and every instance shares it,
@@ -987,7 +987,7 @@ A bare `list`, `dict`,
 or `set` produces a type loose enough that a checker accepts it against any annotation,
 so it never compares the factory with the field.
 Subscripting makes the factory's return type concrete,
-and `field(default_factory=dict[int, int])` on this field is then a type error before the program runs.
+and `field(default_factory=dict[int, int])` on this field then draws a type error before the program runs.
 Use the bare form when the factory and the annotation obviously agree,
 which is most of the time.
 Subscript it when you want that agreement checked.
@@ -1086,7 +1086,7 @@ print(hasattr(c, "host"), hasattr(c, "url"))
 
 The generated `__init__` assigned `name` and stopped.
 Nothing called `Connection.__init__`, so neither `host` nor `url` exists.
-This is easy to miss because the class still constructs without an error.
+The omission is easy to miss because the class still constructs without an error.
 
 To run the base initializer, call it yourself from `__post_init__()`,
 which runs after the generated `__init__` assigns the fields:
@@ -1114,7 +1114,7 @@ print(c.url, c.name)
 ```
 
 `url` is derived state that no field declaration produces,
-so printing it is proof that `Connection.__init__` ran.
+so printing it proves that `Connection.__init__` ran.
 If you delete `__post_init__()`, the same line raises an `AttributeError`.
 
 If a base `__init__` instead replaces `self.__dict__`,
@@ -1188,8 +1188,8 @@ which the `# type: ignore` silences so the listing can reach the runtime failure
 and a subclass inherits that method.
 Either mix would produce a class whose fields are half writable,
 so `@dataclass` refuses at class-definition time rather than at the first surprising assignment.
-Every validated type in this chapter is frozen,
-so anything you derive from one must be frozen too.
+Every validated type in this chapter carries `frozen=True`,
+so anything you derive from one must carry it too.
 
 ## More Data Class Tools
 
@@ -1374,7 +1374,7 @@ recover the constructor arguments, override the named ones, rebuild.
 and `channels` unpacks one with the same table, so the two are inverses.
 Returning `Self` from `type(self)(...)` means a subclass gets a copy of its own class.
 
-Define `__replace__()` when your type is immutable and callers will need variants of it.
+Define `__replace__()` when your type is immutable and callers need variants of it.
 Skip it when the type is mutable,
 because the caller can assign to the attribute.
 

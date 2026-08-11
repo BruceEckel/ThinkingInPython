@@ -1,5 +1,7 @@
 Review the tests to see if they are all doing something useful.
 
+---
+
 Make: only show top-level things for 'make' or 'make help'
 So for example:
 ```
@@ -7,7 +9,8 @@ PS C:\git\ThinkingInPython> make
 uv run python tools/make_help.py
   help                    Show this help
 
-[[before Subtopics, a small number of commands that actually get used every day]]
+[[before Subtopics, a small number of commands that actually get used every day,
+that don't need an intermediate. For example, you can just say 'make all' or 'make verify']]
 
 Subtopics:
     make setup
@@ -31,6 +34,10 @@ Now, if the user runs, for example, 'make build', they will see the subtopics fo
     make build serve                   Serve build/site/ at http://localhost:8000 (no rebuilding)
 
 Don't do anything yet; make an analysis and suggestions.
+Should this be re-architected? Should we use a third-party library like Cyclopts or something else, or should this
+stay all Python?
+
+---
 
 New book cover & favicon
 

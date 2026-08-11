@@ -74,7 +74,7 @@ You need a tool to check them:
 and `uv tool install ty@latest` puts it on your path.
 
 It complains where the hints and the code disagree,
-and is quiet when they agree.
+and stays quiet when they agree.
 This book checks every runnable example this way.
 The build runs `ty` on every change,
 so the code you read here checks as well as runs.
@@ -158,7 +158,7 @@ Marking a value `Final` catches accidental reassignments during type checking.
 The naming convention in [Tour](02_Tour.md#naming-conventions)
 used ALL_CAPS to signal a constant, but that is only a hint to human readers.
 At runtime, a `Final` is still a variable,
-but attempts to reassign it produce type-checking errors:
+but reassigning it produces a type-checking error:
 
 ```python
 # final_constants.py
@@ -191,7 +191,7 @@ and the checker enforces it.
 
 Earlier chapters relied on *dynamic typing*.
 A function accepts any object,
-and the only requirement is that the object supports the operations performed on it.
+so long as the object supports the operations the function performs on it.
 Python checks the type at runtime, when the operation runs.
 Programmers often call dynamic typing *duck typing*.
 If it looks like a duck and quacks like a duck, treat it as a duck.
@@ -199,7 +199,7 @@ If it looks like a duck and quacks like a duck, treat it as a duck.
 *Structural typing* is the static counterpart.
 Instead of waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*.
-"Shape" means the methods and attributes required by that type's consumer.
+"Shape" means the methods and attributes that the type's consumer requires.
 Dynamic typing and structural typing are the same idea checked at different moments.
 Dynamic typing trusts the object once the code is running,
 while structural typing proves the shape beforehand.
@@ -241,7 +241,7 @@ print(render(Square()))
 
 `Circle` and `Square` never mention `Drawable`.
 The checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
-so they are of the correct shape.
+so each matches `Drawable`'s shape.
 The signature is part of that shape: a `draw()` that returns an `int`,
 or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
@@ -249,7 +249,7 @@ so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
 at the cost of a weaker check: see [Surrogate](26_Surrogate.md#proxy).
 
-`Drawable` only becomes involved when defining `render()`.
+`Drawable` appears only in `render()`'s definition.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 `Blob` is the case worth watching: it draws, in the everyday sense,
 but the method's name is `paint()`,
@@ -331,7 +331,7 @@ A `Literal` union is the lightest way to close a set of values.
 Once those values need behavior or an identity of their own,
 an `Enum` is the better fit;
 [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too)
-makes the comparison.
+compares the two.
 
 An alias can also name a union of types.
 [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching)
@@ -419,7 +419,7 @@ print(count(circles))
 # add_square(circles)
 ```
 
-The reason is that a `list` accepts writes.
+A `list` accepts writes.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
 Refusing the call keeps that from happening.
 A read-only container has no such problem,
@@ -488,7 +488,7 @@ A special form, `**P`, captures the types of an entire parameter list.
 uses this to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
-which you will still see in older code.
+which you still see in older code.
 
 ## The `Self` Return Type {#the-self-type}
 
@@ -524,7 +524,7 @@ print(t.bump().bump().report())
 ```
 
 `t.bump()` runs on a `NamedTally`, so `Self` is `NamedTally`,
-and `report()` is available on the result.
+and the result has `report()`.
 If `bump()` declares `-> Tally`, the checker rejects `report()`,
 which `Tally` does not have.
 Alternative constructors benefit the same way.
@@ -537,7 +537,7 @@ Python stores them and otherwise ignores them.
 A wrong type that slips past the checker behaves as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee,
-use `isinstance()` or a library built to validate data.
+use `isinstance()` or a library that validates data.
 The [typeguard](https://typeguard.readthedocs.io)
 library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev)
@@ -624,7 +624,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `Final`, `Final[T]` | A name the checker will not let you reassign, see [Constants with Final](#constants-with-final) |
+| `Final`, `Final[T]` | A name the checker does not let you reassign, see [Constants with Final](#constants-with-final) |
 | `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Generics</a>

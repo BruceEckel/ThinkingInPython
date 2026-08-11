@@ -3,7 +3,7 @@
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
-Most decorators apply to functions, so that is where this chapter begins.
+Most decorators apply to functions, so this chapter starts there.
 
 To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
@@ -40,9 +40,9 @@ Calling `cheese()` runs `doesnt_matter`,
 which never calls `func` and prints its own message instead.
 The original body of `cheese()` never runs.
 
-Since decoration binds the local function to the name `cheese`, the local name
+Since Python binds the returned function to the name `cheese`, the local name
 (`doesnt_matter()`) can be anything.
-The common convention is to name it `wrapper()`.
+Convention calls it `wrapper()`.
 
 A typical decorator returns a wrapper that does some work,
 calls the original function, then does some more work:
@@ -121,7 +121,8 @@ while keeping the wrapped object's interface so the wrapping stays invisible to 
 
 The wrappers so far declare no parameters,
 so `add_behavior` only works on functions that take none.
-Applied to a `def add(a, b)`, the call `add(2, 3)` raises a `TypeError`:
+With `add_behavior` on a `def add(a, b)`,
+the call `add(2, 3)` raises a `TypeError`:
 the wrapper takes zero positional arguments but two were given.
 A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
 the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
@@ -186,8 +187,7 @@ and the wrapper swallows any arguments,
 discarding the signature the decorator should preserve.
 
 The `# type: ignore` comments mark where the checker cannot follow:
-a `Callable` is not guaranteed to have a `__name__` attribute,
-though every actual function does.
+a `Callable` need not have a `__name__` attribute, though every function does.
 
 The tests verify two things: the wrapper reports the original function's name,
 and it still returns the original result:
@@ -250,8 +250,7 @@ if __name__ == "__main__":
 Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
 (see the summary in [Static Typing](08_Static_Typing.md#containers)).
-The first bracket group is itself a list: it holds the parameter types,
-even when there is only one,
+The first bracket group is a list: it holds the parameter types,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
 That single parameter type is `Callable[P, R]`, the wrapped function's type.
@@ -261,7 +260,7 @@ both typed `Callable[P, R]`.
 
 `@repeat(times=3)` first evaluates `repeat(times=3)`, which returns `decorate`,
 the real decorator, which then wraps `greet`.
-That wrapping happens when Python calls `decorate(greet)`,
+Python wraps `greet` when it calls `decorate(greet)`,
 and only then does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
 call `wraps(func)` to get a decorator, then apply it to `wrapper`.
@@ -272,11 +271,11 @@ The nesting stops at two levels, matching the two nested `def`s in the source.
 Forgetting the parentheses is the common mistake here.
 `@repeat` without them calls `repeat(greet)`,
 passing the function where `repeat` expects `times`.
-The validation turns that into a `TypeError` at decoration,
+The `times < 1` check turns that into a `TypeError` at decoration,
 since a function does not support `< 1`,
 though the message says nothing about parentheses.
 A `repeat` without that comparison would fail silently:
-`greet` would be bound to `decorate`,
+Python would bind `greet` to `decorate`,
 calling `greet("Bob")` would pass `"Bob"` where `decorate` expects a function and hand back a wrapper,
 and the only symptom would be missing output.
 The annotations catch the mistake either way,
@@ -285,7 +284,7 @@ at the decoration rather than at the call:
 A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
 
-Inside `wrapper()`, the first call to `func` happens before the loop,
+`wrapper()` calls `func` once before the loop,
 so `result` always holds a value of type `R` to return;
 the loop adds the remaining `times - 1` calls.
 That first call is unconditional,
@@ -354,7 +353,7 @@ so the layers compose to any depth.
 
 `test_stacking.py` confirms both claims:
 the name survives two layers of wrapping,
-and the inner decorator's repeat still happens once per outer call:
+and the inner decorator still repeats the body once per outer call:
 
 ```python
 # test_stacking.py
@@ -396,7 +395,7 @@ and `functools.partial` are all lowercase classes for that reason.
 
 ### A Stateless Class Decorator
 
-Here is the `trace` decorator written as a class:
+The class version of `trace`:
 
 ```python
 # trace_class.py
@@ -434,7 +433,7 @@ so the constructor receives the function and stores it.
 The name `add` now refers to a `trace` instance,
 and calling `add(2, 3)` invokes `__call__()`.
 
-`functools.update_wrapper(self, func)` copies `func`'s metadata onto an object you already have.
+`functools.update_wrapper(self, func)` copies `func`'s metadata onto an existing object.
 `wraps` is the decorator form of that same call:
 `@wraps(func)` above `def wrapper` runs `update_wrapper(wrapper, func)`.
 The class form has no inner function to decorate, only `self`,
@@ -464,7 +463,7 @@ def test_trace_returns_original_result() -> None:
 
 ### A Class Decorator with State
 
-Because the instance can hold attributes, state between calls is natural.
+Because the instance can hold attributes, it can carry state between calls.
 This decorator counts calls and keeps the count on the instance:
 
 ```python
@@ -626,7 +625,7 @@ except TypeError as e:
 `Example.method` is a `logged` instance, stored as a class attribute.
 Accessing it through `example.method` does not bind it to `example`,
 because a plain object is not a *descriptor*:
-Python performs that binding only for things implementing `__get__()`,
+Python binds an attribute to the instance only when that attribute implements `__get__()`,
 which every ordinary function does automatically.
 So `example.method(5)` really calls `logged.__call__(logged_instance, 5)`.
 `self.func` runs with `5` as its only argument,
@@ -660,7 +659,7 @@ print(example.method(5))
 ```
 
 `self` arrives as the first traced argument,
-printed as `Example()` by the `__repr__()` the class defines,
+and the `__repr__()` the class defines prints it as `Example()`,
 so the same decoration that failed as a class works here with no descriptor of your own.
 For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
@@ -702,7 +701,7 @@ A decorator meant for methods either returns a function,
 as the function form and `repeat_class.repeat` both do,
 or implements `__get__()`.
 
-A context manager can also act as a decorator,
+A context manager can also decorate a function,
 bracketing every call with its setup and cleanup code.
 [Context Managers](15_Context_Managers.md#context-manager-as-decorator)
 shows `contextlib.ContextDecorator`.
@@ -713,8 +712,7 @@ Everything so far decorated a function.
 The `@` line does not care: a `class` statement takes a decorator the same way,
 and the decorator receives the class object.
 Do not confuse this with [Decorators as Classes](#decorators-as-classes),
-where the decorator was written as a class;
-here the decorator is an ordinary function,
+where the class is the decorator; here the decorator is an ordinary function,
 and the class is the thing decorated.
 This one registers every class it decorates in `registry`:
 
@@ -847,13 +845,13 @@ a module-level constant computed the ordinary way reads better.
 Classes collapse the same way.
 [Singleton](24_Singleton.md#singleton-by-class-decorator)
 decorates a class with a callable that replaces it with one cached instance,
-so the name that followed `class` ends up bound to an object, not a type.
+so the name that followed `class` refers to an object, not a type.
 
 ## The Decorator Pattern
 
 The `@` syntax decorates a function or class once, at definition,
 so every call or every instance gets the wrapping.
-Sometimes you want the choice made later:
+Sometimes you want to choose later:
 add responsibilities to individual objects at runtime,
 and let each caller decide which responsibilities to add.
 That is the object-oriented Decorator pattern.
@@ -938,7 +936,7 @@ both read as a `float`, so both match.
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
 `Garlic`, `Olives`, and `Feta` never mention their own names;
-the class name already is the topping name.
+the class name is the topping name.
 
 Adding a new topping means adding one class with one line, `add_cost`.
 Changing the price of a topping means changing one number, in one place.
@@ -946,7 +944,7 @@ Compare that to a class per combination,
 where a price change touches every class that includes that topping.
 
 [Factory](27_Factory.md#builder) has its own `Pizza`,
-a frozen data class assembled by a `PizzaBuilder`,
+a frozen data class that a `PizzaBuilder` assembles,
 to illustrate the unrelated Builder pattern.
 The two examples share a topic, not a type.
 
@@ -1022,7 +1020,7 @@ takes up.
     so `@memo` and `@memo(maxsize=10)` both decorate a function.
     Cache each result in a dictionary keyed by the arguments,
     and drop the oldest entry once the cache holds more than `maxsize` of them.
-    The trick is to check whether the decorator's first argument is callable.
+    Distinguish the two forms by checking whether the decorator's first argument is callable.
 6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
     up to `times` attempts, and re-raises the last exception when they all fail.
     Check that `__name__` survives.

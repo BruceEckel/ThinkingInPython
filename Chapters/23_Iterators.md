@@ -40,7 +40,7 @@ except StopIteration:
 ```
 
 A `for` loop makes one `iter()` call,
-then calls `next()` until `StopIteration` occurs.
+then calls `next()` until the iterator raises `StopIteration`.
 A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
@@ -78,7 +78,7 @@ That is the short form of a three-part type that also describes what a generator
 [Generators](45_Generators.md#annotating-a-generator) covers the full form,
 which an Effect system needs.
 
-A class becomes iterable by writing `__iter__()` as a generator:
+Writing `__iter__()` as a generator makes a class iterable:
 
 ```python
 # iterators.py
@@ -330,7 +330,7 @@ along with what goes wrong when two threads call `next()` on the same iterator.
 ## Delegating with `yield from`
 
 A generator can delegate part of its work to another iterator using `yield from`.
-This yields every value produced by that iterator in turn,
+This yields every value that iterator produces, in turn,
 as if the outer generator had written the loop itself:
 
 ```python
@@ -408,9 +408,8 @@ def test_flatten(
 The standard library's `itertools` module contains the generic iterator algorithms `chain()`,
 `islice()`, `groupby()`, `takewhile()`, and more.
 Each of these consumes and produces iterators.
-Combined with [generator expressions](16_Comprehensions.md#generator-expressions)
-such as `(x * x for x in data if x > 0)`,
-you can build pipelines that stay lazy end to end.
+Combine them with [generator expressions](16_Comprehensions.md#generator-expressions)
+such as `(x * x for x in data if x > 0)` to build pipelines that stay lazy end to end.
 Each stage pulls one item at a time,
 so an infinite source is fine as long as something downstream stops it:
 
@@ -487,7 +486,7 @@ def test_islice_stops_after_its_count() -> None:
 The first test is `list(count(1))` with a stopping point built into the source.
 `list()` asks for value after value and never stops,
 so the tripwire fires and no list ever comes back.
-The second test is the lookalike described previously.
+The second test is that lookalike.
 Nothing after `2` satisfies `n < 3`,
 yet `list()` keeps pulling in the hope of another match,
 and trips the same wire.
@@ -503,14 +502,14 @@ and a generator built from `while True` is indistinguishable from a finite one u
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.
-Nothing in the toolchain will discover problems like this.
+Nothing in the toolchain discovers problems like this.
 
 ## A Type-Checking Iterator
 
 The [Decorator Pattern](14_Decorators.md#the-decorator-pattern)
 wraps an existing iterator,
 producing a new one with the same interface and added behavior.
-Here, you force every item to be of an expected type:
+Here, you force every item to match an expected type:
 
 ```python
 # typed_iterator.py
@@ -536,7 +535,7 @@ class TypedIterator[T](Iterator[T]):
 Subclassing `collections.abc.Iterator` provides `__iter__()` automatically,
 so you need only supply `__next__()`.
 
-Note the `eq=False` in the `dataclass` decoration.
+The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper can no longer go in a set or serve as a dict key,
 which every other iterator in Python can do.
@@ -601,7 +600,8 @@ test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
 Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
-This is the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
+[The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+describes this dissolution.
 
 Writing the four GoF Iterator methods in Python shows what `first()` and `current_item()` were doing.
 Over a list they are unremarkable.
@@ -686,7 +686,7 @@ The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
-If you take them away, `advance()` must return the value it moved to,
+If you take them away, `advance()` must return the value it reached,
 which is `__next__()`.
 
 You can ask a GoF iterator repeatedly whether it has finished,
@@ -735,7 +735,7 @@ Nothing in the protocol looks ahead without advancing,
 which is why a peekable iterator must buffer,
 and why `tee` buffered a whole stream earlier in this chapter.
 `DONE` is a [sentinel](05_Functions.md#default-and-keyword-arguments),
-because the answer must be distinguishable from every value the source could yield.
+because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
 The builtin `iter()` uses a sentinel the same way in its two-argument form:
 `iter(callable, DONE)` calls `callable` until it hands back `DONE`.
@@ -745,7 +745,7 @@ Since [PEP 479](https://peps.python.org/pep-0479/) it becomes a `RuntimeError`,
 turning an ordinary end of stream into a failure that reads like a bug elsewhere.
 
 Only a bare `next()` hands you that exception.
-Given a default it returns the default,
+With a default it returns the default,
 and every other construct here absorbs it.
 `yield from source` ends its delegation when the source runs out,
 which covers forwarding values untouched.
@@ -753,14 +753,14 @@ It cannot do per-item work, because it passes each value through unchanged.
 That is why `doubled_ok()` uses a `for` loop,
 which absorbs the exception as every loop in this chapter has.
 The fix is almost never a `try`.
-It is to let the loop do the asking.
+Let the loop do the asking.
 
 ## The Protocol Answers Nothing for Free
 
 Both surprises in [The Costs of Laziness](#the-costs-of-laziness)
 come from the same rule.
 The only way to find out whether the body accepts its arguments is to pull a value and let it run,
-and the only way to find out whether the source is spent is to pull and get nothing back.
+and the only way to find out whether the source has run out is to pull and get nothing back.
 `for` and `list()` catch that second answer and report nothing,
 so an exhausted source and an empty one produce identical output.
 The protocol costs you nothing, and tells you nothing.

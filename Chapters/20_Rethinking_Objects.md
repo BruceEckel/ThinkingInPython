@@ -23,14 +23,14 @@ Consider the origin of OOP.
 
 *Simula* introduced objects in the 1960s to model simulations:
 a system is a set of things that interact.
-Notably, not everything in Simula was an object.
+Not everything in Simula was an object.
 The language still had standalone functions.
 It was a compiled, statically typed language,
 so the discipline later named the Liskov Substitution Principle (LSP)
 fit naturally.
 
 *Smalltalk* took the other path: everything is an object,
-and the only thing you do is send messages to objects, always late-bound.
+and you act on them only by sending messages, always late-bound.
 It was an emphatically dynamic,
 runtime world where you built programs by finding the closest existing object and inheriting from it to add behavior.
 That style guarantees nothing about substitutability.
@@ -53,7 +53,7 @@ Swift and Kotlin encourage immutability through `let` and `val`
 (Go has no general immutability).
 They compose data structures instead of inheriting implementation.
 They let code live outside classes,
-so one function can serve many types instead of being rewritten as a method on each.
+so one function can serve many types instead of becoming a method on each.
 The industry has been quietly walking back from "everything is an object" and from implementation inheritance.
 
 ## The Liskov Substitution Principle {#liskov-substitution}
@@ -65,7 +65,7 @@ An override may accept more than the base does but never less.
 It returns a result the caller can use where it expected the base's result,
 and raises no surprising exceptions.
 When subclasses obey it,
-code written against the base class works unchanged on any of them.
+code you write against the base class works unchanged on any of them.
 This makes polymorphism,
 and patterns like the [Template Method](25_Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
@@ -77,7 +77,7 @@ but the line between what a tool checks and what it cannot falls in the same pla
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Classes.md#marking-overrides-with-override)
 marks the intent.
-What no tool reads is the behavior behind the signature.
+No tool reads the behavior behind the signature.
 Nothing stops a subclass from breaking the base class contract while matching its signature perfectly.
 The interpreter runs code that violates the LSP without objection.
 That code may or may not fail at runtime:
@@ -236,7 +236,7 @@ the conservative choice when a field's own fields might be mutable.
 A shallow copy of a list of `Bob`s plugs nothing:
 the caller's copy of the list still holds your actual `Bob`s.
 
-Testing confirms the defensive copy holds.
+The test confirms the defensive copy holds.
 Mutating the returned list leaves the original untouched:
 
 ```python
@@ -252,9 +252,9 @@ def test_defensive_copy_prevents_the_leak() -> None:
 ## The Immutability Solution
 
 Encapsulation exists only because of mutability.
-If the data cannot change, there is nothing to protect.
+If the data cannot change, you have nothing to protect.
 If you freeze it, the whole apparatus disappears.
-The fields are public, there are no getters, and there are no copies:
+The fields are public, with no getters and no copies:
 
 ```python
 # immutable.py
@@ -297,7 +297,7 @@ The test goes through `setattr()` because the checker rejects `immutable.bob.nam
 against code the checker never saw.
 
 Two quiet changes in the listing do as much work as `frozen=True`:
-`numbers` is a `tuple`, not a `list`, and `Bob` is frozen too.
+`numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
 `frozen=True` is shallow:
 it stops assignment to the fields of `Immutable` itself,
 but it cannot stop mutation inside a field that is itself mutable.
@@ -375,7 +375,7 @@ if __name__ == "__main__":
 ```
 
 The middle call shows the method called as if it were a free function.
-Fetched from the class instead of from an instance,
+When you fetch it from the class instead of from an instance,
 `distance_to` is an ordinary function,
 and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
@@ -601,10 +601,10 @@ One body works for any `T`.
 The checker infers the concrete type behind `T` at each call site.
 
 With *ad-hoc polymorphism* (typically *function overloading*),
-a different implementation handles each type, chosen by that type.
+a different implementation handles each type,
+and the argument's type selects which one runs.
 Python's version of ad-hoc polymorphism is `@overload`,
-which lets one function name have multiple typed signatures,
-backed by a single implementation that branches at runtime:
+which lets one function name have multiple typed signatures over a single implementation that branches at runtime:
 
 ```python
 # overload_example.py
@@ -686,7 +686,7 @@ and `@abstractmethod` forces every subclass to define `area()`.
 ### Dynamic Typing
 
 With dynamic typing, any type works as long as it has the necessary methods.
-There's no shared base class or declared set of types,
+No shared base class or declared set of types constrains the parameter,
 and the only validity check comes at runtime, when the call runs:
 
 ```python
@@ -721,7 +721,7 @@ if __name__ == "__main__":
 `show()` accepts anything because `t`'s type is `Any`,
 which is not the same as `object`.
 If you pass it something without a `display()` method,
-you'll get an exception when the line runs.
+the call raises an exception when the line runs.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
 `Any` switches the checker off for `t`, so any type passes.
@@ -929,8 +929,8 @@ whether membership came from inheriting a base class or matching a protocol.
 
 Another approach uses a union and a `match`,
 introduced in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching).
-The shapes become immutable data, and one free function handles all the cases.
-There is no base class or overridden methods.
+The shapes become immutable data, and one free function handles all the cases,
+with no base class and no overridden methods.
 The type checker ensures that the match covers every shape.
 Here is `shapes_oo.py` modified to use pattern matching:
 
@@ -971,7 +971,7 @@ if __name__ == "__main__":
 Adding a new shape is easier in the OOP version because you write one class.
 Adding a new operation over all shapes is easier in the pattern matching
 (functional) version,
-where the operation is one new function rather than a method added to every class.
+where the operation is one new function rather than a new method on every class.
 The exhaustiveness check covers the other direction.
 Adding a member to the `Shape` union leaves every existing `match` incomplete,
 and `assert_never()` turns each one into a checker error naming the shape you missed.
@@ -1088,7 +1088,8 @@ A class guarantees initialization and, as a data class, generates equality,
 representation, and, when frozen, hashing.
 
 OOP also normalized the idea of types,
-as seen in [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values).
+which [Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+takes further.
 If you avoid implementation inheritance,
 the payoff for using types is tremendous.
 
@@ -1123,7 +1124,7 @@ or whether immutable data, a function, and a protocol already solve the problem.
     and that `hash(immutable)` now raises a `TypeError`,
     so the frozen instance can no longer be a dict key.
     Restore the `tuple`.
-    Who, then, is responsible for making immutability go all the way down?
+    Who, then, must make immutability go all the way down?
 3.  In `protocol_collision.py`,
     define `Price = NewType("Price", float)` and `Weight = NewType("Weight", float)`,
     change `Priced.total()` to return a `Price`,

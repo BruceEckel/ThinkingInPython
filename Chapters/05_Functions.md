@@ -29,7 +29,7 @@ but no argument types or return types
 ([Static Typing](08_Static_Typing.md#type-hints) covers these).
 Python is dynamically typed,
 so type errors surface at runtime rather than at compile time.
-This means the same function can accept and return different types:
+The same function can therefore accept and return different types:
 
 ```python
 # flexible_args_and_returns.py
@@ -82,7 +82,7 @@ except TypeError as e:
 #: unsupported operand type(s) for +: 'int' and 'str'
 ```
 
-The only constraint on a function argument is that the function can apply its operations to that object.
+A function argument works as long as the function can apply its operations to it.
 The failure comes from `+`, inside the call, not from the call itself.
 Nothing checks the arguments on the way in.
 
@@ -150,15 +150,15 @@ print(good_append(2))
 A mutable default persists because it lives on the function object;
 no call rebuilds it.
 `__defaults__` holds the tuple of default values,
-and it is the same list both calls append to.
+and both calls append to the same list inside it.
 The default looks like an expression the call evaluates, and it is not.
 
 Underneath, a parameter is another name bound to the caller's object,
-the binding described in [Variables and References](02_Tour.md#variables-and-references).
-When that object is mutable,
-changes made inside the function are visible outside it.
-`bad_append()` combines this with a default built once,
-so each call mutates the object the next call will use.
+the binding that [Variables and References](02_Tour.md#variables-and-references)
+describes.
+When that object is mutable, the caller sees the changes the function makes.
+`bad_append()` combines this with a default Python builds once,
+so each call mutates the object the next call uses.
 
 ```python
 # mutating_arguments.py
@@ -262,7 +262,7 @@ A function can read a module-level name,
 but assigning to that name anywhere in the function makes it local for the whole function.
 Python decides which names are local when it compiles the function body,
 so where the assignment sits makes no difference.
-`global` says the assignment should rebind the module-level name instead:
+`global` tells Python to rebind the module-level name instead:
 
 ```python
 # function_scope.py
@@ -424,8 +424,8 @@ Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 The full message reports `got some positional-only arguments passed as keyword arguments: 'a, b'`.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
-Both mistakes are visible without running the code,
-so each carries a `# type: ignore` telling the type checker the misuse is deliberate.
+The type checker catches both mistakes without running the code,
+so each line carries a `# type: ignore` saying the misuse is deliberate.
 
 A signature can use every form at once, in one fixed order: positional-only,
 positional-or-keyword, `*args`, keyword-only, `**kwargs`:
@@ -448,12 +448,12 @@ many built-in functions and methods take positional-only parameters,
 such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method:
-the subclass can rename the parameter, and a type checker will not object.
+the subclass can rename the parameter, and a type checker does not object.
 
 ## Lambdas
 
-A `lambda` is a small anonymous function written as a single expression.
-It is useful for passing behavior to functions such as `sorted()`,
+A `lambda` is a small anonymous function you write as a single expression.
+Use one to pass behavior to functions such as `sorted()`,
 which accepts a `key` function, calls it on each element,
 and orders by the results.
 When an existing function already computes the key, pass the function itself:
@@ -478,7 +478,7 @@ Assigning a lambda to a name, as `square` does,
 gives up the anonymity that is a lambda's point;
 `def` also gives the function a real name for tracebacks.
 Unlike anonymous functions in many other languages,
-a lambda body is limited to a single expression.
+a lambda body must be a single expression.
 For anything more complicated, write a separate function.
 
 ## Exercises

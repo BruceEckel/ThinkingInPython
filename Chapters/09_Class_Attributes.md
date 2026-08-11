@@ -14,9 +14,9 @@ If you then create an instance attribute of the same name,
 that instance attribute *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
-A Python class attribute is the equivalent of a C++ or Java `static` field.
+A Python class attribute corresponds to a C++ or Java `static` field.
 Python has no syntax for declaring a per-object field in the class body;
-per-object storage comes from assigning through `self` inside a method.
+assigning through `self` inside a method creates that storage instead.
 
 This example shows why it can be confusing:
 
@@ -81,7 +81,7 @@ A `@property` from [Classes](07_Classes.md#properties)
 owns its name on the class,
 so reading calls its getter and assigning calls its setter,
 and neither one touches the instance dictionary.
-The rest of this chapter is about ordinary values stored in a class body.
+The rest of this chapter covers ordinary values stored in a class body.
 
 A class attribute reads like a default right up until someone assigns to an attribute of the same name on one instance.
 After that, changing the class attribute changes the value for every object that has not shadowed it,
@@ -160,8 +160,7 @@ print(Tally.total)
 
 `display_object(Tally)` shows what the class holds: `total`,
 and nothing called `label`.
-The `[CV]` tag, for *class variable*,
-marks an attribute whose storage is on the class.
+The `[CV]` tag, for *class variable*, marks an attribute the class stores.
 An assignment in the class body creates a class attribute,
 as `class_attribute_confusion.py` showed above.
 `total: ClassVar[int] = 0` has the `= 0`,
@@ -189,7 +188,7 @@ found by fallback, keeps it.
 
 A *bare annotation*, one with no assigned value,
 is a declaration rather than a placeholder.
-It states that instances of this class will carry a `label` attribute of type `str`,
+It states that instances of this class carry a `label` attribute of type `str`,
 set somewhere.
 Here that somewhere is `__init__()`,
 and its `self.label = label` produced the attribute `display_object(a)` found above.
@@ -200,10 +199,10 @@ because it trusts the annotation instead of verifying that some method sets it.
 The failure surfaces later,
 as an `AttributeError` from the first code that reads the missing `label`.
 
-The annotation on `label` is not required here.
+The annotation on `label` is optional here.
 If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
 because the parameter's own type carries through to the attribute it initializes.
-The annotation is there for symmetry with `total`,
+The annotation stays for symmetry with `total`,
 so both names read together at the top instead of one hiding inside the constructor.
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
@@ -218,7 +217,7 @@ and turns the accidental shadowing from the earlier example into a check-time er
 Python's own attribute lookup ignores it.
 One library does read it at runtime:
 `@dataclass` leaves a `ClassVar` field out of the constructor it generates,
-shown in [Data Classes as Types](12_Data_Classes_as_Types.md#d-a-real-classvar).
+as [Data Classes as Types](12_Data_Classes_as_Types.md#d-a-real-classvar) shows.
 
 `ClassVar` cannot change what an assignment does at runtime:
 
@@ -248,10 +247,10 @@ which is why `class_var.py` increments through the class name,
 reporting "Cannot assign to ClassVar `total` from an instance".
 The `# type: ignore` suppresses that report so the listing can show what the line does when it runs.
 
-Shared storage is not a mistake when sharing is the intent.
+Shared storage is not a mistake when you intend the sharing.
 A count of every object created, a registry mapping names to classes,
 and a constant that all instances read but none change are all class attributes,
-and each is clearer with the sharing declared.
+and each reads better when you declare the sharing.
 `Tally.total` is the first of these.
 For the third, a class-level constant,
 `Final[int]` from [Static Typing](08_Static_Typing.md#constants-with-final)
@@ -343,7 +342,7 @@ There the `100` lives on the class and every instance reads it;
 here it is a default argument, and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
-The default value is still built once, at definition time
+Python still builds the default value once, at definition time
 (see [Default and Keyword Arguments](05_Functions.md#default-and-keyword-arguments)),
 so a *mutable* default argument brings the sharing straight back.
 Nothing can mutate `100`, so it is safe.
@@ -428,7 +427,7 @@ a constructor default or a `@dataclass` field for per-object.
     and use them to explain the `1 1 0` output.
     Then fix the class so the shared counter moves,
     without changing the `ClassVar` declaration,
-    and explain what `ty` reports when the `# type: ignore` is removed from the broken version.
+    and explain what `ty` reports when you remove the `# type: ignore` from the broken version.
 8.  Change `class_var_inheritance.py` so `shared` is `ClassVar[list[int]] = []` and `Left` and `Right` both call `.append()` on it.
     Predict what `Base.shared` holds afterwards, then check.
     Give `Right` its own list with `shared = []` in its body and repeat.

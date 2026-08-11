@@ -51,7 +51,7 @@ In this comprehension:
 -   If the member is an integer,
     the output expression squares it and appends it to the output list.
 
-You can achieve the same results using the built-in functions `map()` and `filter()` with a `lambda`.
+The built-in functions `map()` and `filter()` with a `lambda` achieve the same results.
 `filter()` applies a predicate to a sequence and retains the members that pass it.
 It produces a lazy iterator, which `list()` expands into a `list`:
 
@@ -141,7 +141,7 @@ with `{}` instead of `[]`.
 Braces build a set when the comprehension produces one value per element,
 and a dict when it produces a `key: value` pair.
 The colon decides which.
-There is no empty-set literal, since `{}` is an empty dict; write `set()`.
+Python has no empty-set literal, since `{}` is an empty dict; write `set()`.
 
 The following set comprehension normalizes each name
 (capital first letter, the rest lower case),
@@ -338,7 +338,7 @@ The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
 By then the directory no longer exists.
-The comprehension finished building `py_paths` as strings while the directory still existed,
+The comprehension finishes building `py_paths` as strings while the directory still exists,
 so nothing later needs the files.
 Turning those brackets into parentheses would break it:
 a generator expression would not start walking until `sorted()` pulled on it,
@@ -387,11 +387,10 @@ if __name__ == "__main__":
 ```
 
 Reading this means untangling several questions at once: which items qualify,
-how the warehouses flatten together, what order the result ends up in,
+how the warehouses flatten together, in what order the result arrives,
 and how each line renders.
 A comprehension nested inside `sorted()`,
-itself nested inside the outer comprehension,
-is doing four jobs in one expression.
+itself nested inside the outer comprehension, does four jobs in one expression.
 
 Splitting it into named steps removes none of the logic,
 but each step now states its own purpose:
@@ -460,7 +459,7 @@ for n in [1, 2, 3]:
 #: 3
 ```
 
-The `for` loop has the same effect without building a wasted list.
+The `for` loop prints the same values without building a wasted list.
 The brackets no longer suggest a collection the code never uses.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
@@ -511,7 +510,7 @@ print(initials)
 #: {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
-There is no lazy `set` or `dict`.
+No lazy `set` or `dict` exists.
 A set or dict must hold every element,
 so `set(...)` or `dict(...)` consumes the whole generator immediately.
 Neither saves anything over the set comprehension `{len(w) for w in words}` or the dict comprehension `{w: w[0] for w in words}`,
@@ -559,15 +558,14 @@ print(list(nums))
 ```
 
 It runs once, and after something consumes its values it is empty.
-`sum()` drained `nums`,
-so `any()` saw no elements and reported `False` instead of `True`,
+`sum()` drains `nums`,
+so `any()` sees no elements and reports `False` instead of `True`,
 with no exception to say the question was never asked.
 When you must traverse something twice,
 either materialize it with `list()` or write the generator expression again.
 
-Deferral is not total.
-Creating a generator expression evaluates one thing immediately,
-the outermost iterable:
+A generator expression does not defer everything.
+Creating one evaluates a single thing immediately, the outermost iterable:
 
 ```python
 # genexp_timing.py
@@ -600,12 +598,12 @@ covers the values they receive as well as the ones they produce.
 
 ## Unpacking in Comprehensions
 
-`path_walk_comprehension.py` flattened a tree by writing two `for` clauses.
+`path_walk_comprehension.py` flattens a tree with two `for` clauses.
 Python 3.15 ([PEP 798](https://peps.python.org/pep-0798/))
 adds a more direct way to flatten.
 The unpacking operators `*` and `**` may appear in the output expression of a comprehension or generator expression,
 splicing each iterable or mapping into the result.
-This extends the [PEP 448](https://peps.python.org/pep-0448/)
+PEP 798 extends the [PEP 448](https://peps.python.org/pep-0448/)
 unpacking from `[*a, *b]` and `{**d1, **d2}` to the comprehension form,
 and replaces many uses of two-`for` comprehensions, `itertools.chain()`,
 and `itertools.chain.from_iterable()`:

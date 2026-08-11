@@ -175,7 +175,7 @@ print(summarize([1, 2, 3, 4]))
 #: 1, then 3 more
 ```
 
-This shows the structural part of "structural pattern matching."
+`summarize()` shows the structural part of "structural pattern matching."
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 The last `case _` never runs:
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
@@ -340,9 +340,9 @@ so moving `case bool(b)` below `case int(n)` makes it unreachable:
 `describe(True)` would answer `int True`.
 
 The single positional argument in `int(n)` does not name an attribute.
-A handful of builtins
+Python special-cases a handful of builtins
 (`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `set`, `frozenset`)
-are special-cased so that one positional sub-pattern binds the whole value,
+so that one positional sub-pattern binds the whole value,
 which is why `case str(s)` reads as "a string, call it `s`."
 
 Drop the parentheses and the meaning flips: `case str:` is a bare-name capture,
@@ -352,7 +352,7 @@ and Python catches it the same way,
 refusing to compile a `case` that follows it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
-Matching on `isinstance()` is the opposite of the exact-type dispatch used by a `dict` keyed on `type(value)`,
+Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs,
 which [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
 relies on.
 There a subclass finds no entry at all.
@@ -460,7 +460,7 @@ print(handle({"button": 1}))
 #: Unrecognized event: {'button': 1}
 ```
 
-Testing verifies a matched event and the fall-through:
+The test checks a matched event and the fall-through:
 
 ```python
 # test_mapping_patterns.py
@@ -521,7 +521,7 @@ When a value is one of a fixed set of types,
 define that set as a union using the [`type` statement](08_Static_Typing.md#the-type-statement).
 Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
-the type checker will ensure the match is *exhaustive*.
+the type checker ensures the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.
 The type checker reports it before the program runs,
 instead of the value falling through at runtime.
@@ -581,7 +581,7 @@ An `if`/`isinstance()` chain can reach the same guarantee,
 but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 
-This reframes the classic OOP "shapes" example as a closed type union instead of a class hierarchy.
+`Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
 [Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching)
 compares the two approaches directly.
 
@@ -806,7 +806,7 @@ Adding a type is cheaper with inheritance.
 Adding an operation is cheaper with pattern matching.
 That is the open-set-versus-closed-set tradeoff from [When Not to Match](#when-not-to-match),
 worked out concretely.
-It is also called the *expression problem*.
+It also has a name: the *expression problem*.
 [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
 works through the same split with shapes,
 and [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)

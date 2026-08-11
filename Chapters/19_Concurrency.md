@@ -17,7 +17,7 @@ A modern OS schedules threads, not whole programs.
 Each task (unit of work) gets its own thread,
 and the OS performs *context switching* from one thread to the next.
 The OS controls everything: allocating threads,
-deciding how long a time slice is, performing the context switch,
+deciding how long a time slice is, switching contexts,
 and deciding which thread is ready to run next.
 
 Each *process* (allocated to a program when you start it)
@@ -25,7 +25,7 @@ gets one thread and its own heap.
 Every thread has its own stack.
 The program can request more threads from the OS,
 but all threads within a process share the same heap.
-So each thread must not corrupt parts of the heap used by other threads.
+So each thread must not corrupt parts of the heap other threads use.
 
 When a program requests an additional thread from the OS,
 that thread gets its own function-call stack,
@@ -34,15 +34,15 @@ Every function call pushes arguments and the return address onto the stack.
 When the function ends,
 its stack frame pops off and execution jumps back to the return address.
 (The return value typically travels back in a CPU register.)
-Thus it is essential that each thread own its call stack.
+Thus each thread must own its call stack.
 
 The heap and the stack grow in opposite ways.
-The heap has no space reserved for it in advance.
+The heap reserves no space in advance.
 It starts essentially empty and grows only as the program asks for more,
 one allocation at a time.
-A stack is the reverse: thread creation fixes its maximum size,
+A stack is the reverse: creating the thread fixes its maximum size,
 and that size never changes.
-What varies at runtime is the amount used out of that fixed allotment.
+The amount used out of that fixed allotment varies at runtime.
 If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
 Code reaches a heap allocation only through a reference,
@@ -57,8 +57,8 @@ It stores the CPU register set, which includes:
 - The stack pointer
 - Other registers and flags used by the program
 
-The thread's stack is not copied because every thread has its own stack.
-There is only a single heap, shared between all threads in that process.
+The context switch does not copy the thread's stack, since every thread has its own.
+All threads in that process share a single heap.
 
 Context switching between threads is as efficient as possible,
 but it still has overhead.
@@ -84,7 +84,7 @@ Although threads serve these purposes, the OS is always at a disadvantage:
 it doesn't know details of the program it's running,
 and therefore cannot optimize that program.
 For example, the OS does not know what data is important to preserve and what isn't.
-If it knew, it could perform faster context switches.
+If it knew, it could switch contexts faster.
 In addition, each thread reserves a stack large enough to serve virtually any program,
 even though some tasks need only a fraction of that.
 Engineers learned various tricks to make programs run faster despite these disadvantages,
@@ -178,12 +178,12 @@ asyncio.run(main())
 #: ['A', 'B', 'C']
 ```
 
-The first printed line is proof that calling a coroutine runs nothing.
+The first printed line proves that calling a coroutine runs nothing.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
 The work begins when `gather()` receives that object.
-If you forget `await gather()`, the work doesn't happen.
-Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the forgotten object is garbage-collected.
+If you forget `await gather()`, nothing runs.
+Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims the forgotten object.
 
 The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
@@ -316,7 +316,7 @@ asyncio.run(main())
 so all six are in flight together.
 Holding the task objects is not optional bookkeeping.
 The event loop keeps only weak references to its tasks,
-so a task that loses its last strong reference can disappear mid-execution and stop with nothing printed and nothing raised.
+so a task that loses its last strong reference can disappear mid-execution, printing nothing and raising no exception.
 A `TaskGroup` holds its own references until the block exits.
 Outside one, keep the returned task in a variable or a set that outlives it.
 `c` and `d` raise exceptions at the same 0.03-second mark,
@@ -427,7 +427,7 @@ When a task awaits, the event loop finds another task to run in the meantime.
 
 In the following example, the same price lookup appears twice.
 `io_price()` awaits `asyncio.sleep()` as a stand-in for a network call.
-`cpu_price()` performs computations to represent heavy work.
+`cpu_price()` counts through a million iterations as a stand-in for heavy computing.
 A `Meter` records the peak number of tasks in flight at once.
 `Meter` is a [context manager](15_Context_Managers.md):
 `__enter__()` counts the task in flight, `__exit__()` counts it done,
@@ -491,7 +491,7 @@ A task uses that object as a context manager,
 writing `with meter:` around its own active span.
 
 Both runs use the same `asyncio.gather()`, yet the peaks differ.
-The I/O tasks each reach their `await`, at which point that task suspends.
+Each I/O task reaches its `await` and suspends there.
 All five are in flight at once: peak 5.
 The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
@@ -539,7 +539,7 @@ Five blocking sleeps cannot overlap: each stalls the loop for its full duration,
 so the total is never less than their sum.
 
 You cannot `await time.sleep()`,
-which is an extra indicator that it is the wrong function to use.
+another sign that it is the wrong function here.
 
 ## Escaping to a Thread
 
@@ -616,7 +616,7 @@ asyncio.run(main())
 
 Eight coroutines each add 50, so `counter` should reach 400.
 Instead it stops at 50.
-Every `await asyncio.sleep(0)` releases control to the event loop before the write happens.
+Every `await asyncio.sleep(0)` releases control to the event loop before the write.
 (The `sleep(0)` is a stand-in for a database query or an HTTP call.)
 In each round all eight coroutines read the same value before any of them writes,
 so eight additions collapse into one.
@@ -625,7 +625,7 @@ so eight additions collapse into one.
 shows the identical failure with threads.
 A thread switch is preemptive,
 occurring at points the interpreter picks and you did not choose,
-while a coroutine switch happens only at an `await` you chose to write.
+while a coroutine yields only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
 just as the same race between threads needs a `threading.Lock`.
@@ -658,13 +658,13 @@ asyncio.run(main())
 #: 400
 ```
 
-The only change from `async_race.py` is the addition of `async with lock`.
-This protects the read, the yielding `await`, and the write.
+The only change from `async_race.py` is `async with lock`.
+The block protects the read, the yielding `await`, and the write.
 If a task reaches `async with lock` while another task already holds the lock,
 it suspends itself until that lock becomes available.
-This way, only one task's read-modify-write is ever in progress,
+This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
-All 400 increments now occur,
+The counter now reaches 400,
 the same fix `threading.Lock` produces for threads.
 An `asyncio.Lock` is not thread-safe either.
 It orders tasks on one event loop;
@@ -784,7 +784,7 @@ With several cores, it can.
 each with its own interpreter and its own *Global Interpreter Lock* (GIL),
 the interpreter-wide lock that lets only one thread run Python bytecode at a time.
 [The GIL and Free Threading](#the-gil-and-free-threading) takes the lock apart;
-what matters here is that there is one per interpreter,
+here, each interpreter has its own,
 so the operating system can place these processes on different cores and run them at the same time:
 
 ```python
@@ -838,7 +838,7 @@ and all three surface in this short listing:
    a million tiny results can cost more to pickle than the parallelism saved.
 3. `pool.map()` raises nothing itself.
    It returns a generator,
-   and a worker's exception is re-raised in the calling process when you consume that worker's result.
+   and consuming a worker's result re-raises that worker's exception in the calling process.
    The `list(...)` around the call turns a failure in any worker into an exception here,
    at a point you can catch it.
    That third point is true of every `Executor`, not only a process pool.
@@ -945,7 +945,7 @@ if __name__ == "__main__":
             )
 ```
 
-The only difference between one run and another is how finely the total work gets split.
+The only difference between one run and another is how finely the listing splits the total work.
 
 The listing creates the pool once and warms it up with a throwaway call before any measurement starts.
 This way, process startup delays cannot leak into a timed result.
@@ -982,7 +982,7 @@ or lower `CORE_MULTIPLIER` to stop the sweep at the core count instead of past i
 
 `task_scaling.py`'s curve keeps dropping, then flattens.
 This is *Amdahl's Law*.
-Every parallel job carries some part that will not split.
+Every parallel job carries some part that does not split.
 Building each chunk, pickling it across the process boundary,
 and reassembling the results are unavoidably serial,
 whatever else runs on more cores.
@@ -996,7 +996,7 @@ A job that spends 10 percent of its time in serial overhead never speeds up more
 on 16 cores or 1,600.
 
 Splitting into more, smaller tasks yields real gains up to a point,
-since finer chunks even out the load across workers, as described above.
+since finer chunks even out the load across workers.
 Past that point, though,
 each additional task adds its own slice of the same serial overhead:
 one more chunk to pickle, one more result to collect.
@@ -1126,7 +1126,7 @@ This gave Python deterministic cleanup with no collector pauses.
 
 It also added a cost.
 Every count update is a read-modify-write sequence,
-and updates happen millions of times per second.
+and the interpreter runs millions of them per second.
 
 In 1991, the C API exposed those counts directly to extension authors.
 Easy extensions made Python a coordination language for C libraries and eventually produced the scientific Python stack.
@@ -1173,7 +1173,7 @@ When two threads both read before either writes, they compute the same result,
 and one increment vanishes.
 
 Since 3.10 the interpreter only switches threads at a function call or at the jump that closes a loop iteration,
-so this particular sequence is no longer interrupted in practice.
+so nothing interrupts this particular sequence in practice.
 That is scheduling luck, not safety.
 
 Any function call between the read and the write reopens the gap.
@@ -1234,7 +1234,7 @@ CPython's default build, convert this indented block to a real, fenced,
 tested example. -->
 
 Free threading finally cleared the 1996 bar by making reference counting cheap without a global lock.
-Most objects are only ever touched by the thread that created them.
+Usually only one thread touches an object, the one that created it.
 *Biased reference counting* lets that owning thread update the count with ordinary,
 non-atomic arithmetic.
 Only other threads pay for an atomic operation.
@@ -1316,7 +1316,7 @@ print(f"subinterpreters run in parallel: {t_seq > t_sub * target}")
 #: subinterpreters run in parallel: True
 ```
 
-Unlike a thread pool, this genuinely overlaps computation.
+Unlike a thread pool, subinterpreters genuinely overlap computing.
 Each worker interpreter holds its own GIL,
 so several of them run on separate cores at once instead of taking turns.
 The interpreters share the process's memory,
@@ -1331,7 +1331,7 @@ but a C extension must support per-interpreter isolation before a subinterpreter
 
 ## Coordinating Threads with Queues
 
-When threads divide up work, the danger is shared mutable state.
+When threads divide up work, the danger comes from shared mutable state.
 The standard solution is a thread-safe queue that hands each item to a single consumer,
 with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
@@ -1550,7 +1550,7 @@ That is better than silent duplication,
 but only in the way a crash is better than corruption.
 
 `threading.synchronized_iterator()` takes the generator *function*,
-not a generator, and returns a function whose generators are each serialized.
+not a generator, and returns a function that serializes every generator it creates.
 It also works as a decorator on the `def`,
 which is the right form when no caller of that generator function should have to remember.
 Keep the pairing straight:
@@ -1592,7 +1592,7 @@ which is the point of making four of them.
 Sharing a single one across several threads needs `serialize_iterator()` on top.
 
 These three arrived in 3.15.
-Before that, the advice was to write the lock wrapper yourself,
+Before that, you wrote the lock wrapper yourself,
 which is easy to get subtly wrong.
 The tempting fix is a lock inside the loop:
 
@@ -1792,7 +1792,7 @@ A thread costs an OS stack and an OS scheduling entity that free threading does 
 while an `asyncio` task is cheap enough to run in the thousands.
 [`TaskGroup`](#structured-concurrency-with-taskgroup)'s structured,
 cancellable batches have no thread equivalent.
-There is still no safe way to cancel a running thread.
+Python still offers no safe way to cancel a running thread.
 Free threading changes a thread's job.
 It does not change `asyncio`'s.
 
@@ -1930,10 +1930,10 @@ because a task consumes none of the OS resources that limit threads.
 lost updates to shared mutable state, and an `asyncio.Lock` restored them,
 with no thread involved either time.
 Threads are not the source of deadlock and livelock.
-That source is shared mutable state,
+Shared mutable state is,
 and `asyncio` shares it just as readily as threads do.
 Removing the OS thread scheduler does not remove these failure modes.
-It only moves where they can happen.
+It only moves where they can arise.
 With threads, that point is anywhere the OS decides to preempt you.
 `asyncio` narrows this to the `await` points you wrote yourself.
 
@@ -2035,7 +2035,7 @@ Tasks, unlike threads, run one at a time,
 so no OS scheduler can interleave the two tasks' first lines in an unlucky order.
 
 Once both hold their first lock,
-each task's `async with second:` suspends on a lock the other holds and will never release.
+each task's `async with second:` suspends on a lock the other holds and never releases.
 A real deadlock has no `timeout` and never resolves.
 Both tasks wait forever, the event loop included,
 since nothing remains that can wake them.
@@ -2053,7 +2053,8 @@ whichever gets there first finishes and releases that lock before the other wait
 A *livelock* blocks nothing.
 Tasks keep running and keep changing state, but none of them makes progress,
 the way two people in a hallway each step aside for the other, forever.
-No lock takes part, so no timeout can fix it, and there is nothing to acquire:
+No lock takes part, no task waits to acquire anything,
+so no timeout can fix it:
 
 ```python
 # async_livelock.py
@@ -2099,7 +2100,7 @@ even though the event loop keeps both tasks busy the whole time.
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks parked and waiting.
-In both cases, nothing gets done.
+In both cases, the program makes no progress.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.
 
@@ -2162,7 +2163,7 @@ for example letting only the task with the lower ID give.
 
 ## Concurrency is Not Easy
 
-There are ongoing arguments about what the term even means.
+People still argue about what the term means.
 Rob Pike, creator of the Go language, famously muddied the waters by declaring,
 "concurrency is not parallelism"
 (I'm hoping he meant to say "concurrency is not **only** parallelism").[^concurrency-def]
@@ -2187,7 +2188,7 @@ In those cases you almost inevitably share mutable state.
 These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
 
 People continue to work toward better ways of concurrent programming.[^libraries]
-Only in the last decade or so have advances such as async/await and structured concurrency become widely accepted.
+Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
 The vocabulary this chapter built,
 from processes and threads to tasks and coroutines,
 is a small corner of the territory.
@@ -2215,7 +2216,7 @@ Here are a few of the topics beyond it:
 - **Software transactional memory
   (STM):** Runs a block of code as an atomic transaction against shared memory,
   retrying automatically if another thread interferes.[^stm-status]
-- **Memory models and data races:** Define which writes by one thread another thread will see for certain,
+- **Memory models and data races:** Define which writes by one thread another thread sees for certain,
   and what happens when two threads touch the same memory with no synchronization between them.
 
 ## Exercises
