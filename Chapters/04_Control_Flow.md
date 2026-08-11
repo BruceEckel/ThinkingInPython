@@ -8,7 +8,7 @@ exceptions, the `with` statement, and comprehensions.
 
 [Tour](02_Tour.md#indentation-and-blocks) showed the basic `if`, its colon,
 and its indented block.
-Python's comparison operators also chain the way they do in mathematics:
+Python's comparison operators chain the way they do in mathematics:
 
 ```python
 # chaining.py
@@ -24,7 +24,7 @@ print(grade)
 The example also shows a *conditional expression*:
 a one-line `if`/`else` that produces a value.
 
-Adding `elif` to an `if` statement chains multiple tests:
+Adding `elif` to an `if` statement tests several conditions in order:
 
 ```python
 # if_elif.py
@@ -113,7 +113,7 @@ then stops at `6` with `break`, so `6` through `9` never print.
 Both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
 a `return` from a function that holds both loops,
-or a `for`/`else` on the outer one.
+or the loop `else` introduced below.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers land on one line,
@@ -126,10 +126,10 @@ write `while True:` and `break` out:
 ```python
 # while_true.py
 
-values = iter([3, 5, 0, 7])
+values = [3, 5, 0, 7]
 total = 0
 while True:
-    value = next(values)
+    value = values.pop(0)
     if value == 0:
         break
     total += value
@@ -160,6 +160,10 @@ find_factor(13)
 
 The `else` belongs to the `for`, not the `if`.
 A `while` loop can use `else` the same way.
+This `else` is also the way out of two nested loops:
+put `continue` in the inner loop's `else` and a `break` right after it.
+When the inner loop `break`s, its `else` is skipped and the outer `break` runs;
+when it finishes clean, the `continue` moves the outer loop along instead.
 
 When iterating, `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
@@ -241,6 +245,8 @@ while stack and (item := stack.pop()) != "a":
 The `while` loop is where this pays off.
 It pops a value, names it, and tests it in one place,
 so nothing in the body has to pop again or keep a separate copy.
+It also collapses `while_true.py` into its loop header:
+`while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
 which [Comprehensions](16_Comprehensions.md) covers.
 
@@ -321,7 +327,8 @@ Avoid the name anyway, since a reader must work out which meaning applies.
 ## Errors and Exceptions
 
 Python signals an error by *raising* an exception.
-As in C++ and Java, an exception propagates up the call stack until it finds a handler.
+As in C++ and Java, an exception propagates up the call stack until it finds a handler;
+one that never does stops the program and prints the traceback.
 In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
@@ -383,6 +390,7 @@ To handle several types the same way, give a tuple:
 Python tries the `except` clauses in order and runs the first whose type matches,
 so a broad clause above a narrow one makes the narrow one unreachable.
 Order them most specific first.
+To log an exception and still let it propagate, re-raise it with a bare `raise`.
 
 An exception raised while handling another one arrives with the first attached.
 Python reports both, and `from` decides how the two connect:
@@ -451,6 +459,7 @@ for parse in (implicit, explicit, suppressed):
 made by deriving a class from `Exception`.
 Its body is `pass` because it needs no behavior of its own;
 the class name is what the handler matches on.
+Class definitions get their full treatment in [Classes](07_Classes.md).
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
 so the output above is the text Python itself would print, not a summary of it.
@@ -497,6 +506,9 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 `isdigit()` rejects `"-5"`, which `int()` converts fine, and it accepts `"²"`,
 which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
+The gap grows when the world can change between test and operation:
+a file that existed at the `if` can be gone by the `open()`,
+and only the EAFP form is safe against that.
 
 ## Context Managers
 
@@ -546,7 +558,7 @@ When reading or writing a file,
 
 ## Comprehensions
 
-A *comprehension* builds a `list`, dictionary,
+A *comprehension* builds a list, dictionary,
 or set from another sequence in one expression,
 replacing a loop that builds up a result:
 
@@ -581,8 +593,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
 3.  In `break_continue.py`, swap the order of the two `if` blocks,
     so the `n == 6` `break` check comes first and the `n == 3` `continue` check comes second.
     Predict whether the output changes before running it,
-    and explain why the order of two independent conditions,
-    testing different values of `n`, does not matter here.
+    then explain what you find.
 4.  In `demonstrate_exceptions.py`, add a call `divide_and_report(1, "x")`
     (a `TypeError` that `except ValueError` does not catch).
     Run it and read the traceback that escapes.
@@ -597,3 +608,7 @@ as well as generator expressions and the functional tools `map()` and `filter()`
 8.  Rewrite `context_manager.py`'s reading half using `path.read_text()`.
     Say what the `with` form gives you that the one-liner does not,
     and when that matters.
+9.  In `mutating_while_looping.py`, change the list to `[2, 2, 1, 3]`,
+    so a `2` sits in the first slot.
+    Use the shifting-slots explanation to predict what the loop leaves in `scores`,
+    then run it to check.
