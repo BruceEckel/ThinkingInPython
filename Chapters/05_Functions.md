@@ -61,6 +61,8 @@ which the caller usually unpacks:
 
     low, high = minmax([3, 1, 4])
 
+The commas build the tuple; the function still returns one object.
+
 Here, the same function applies the `+` operator to integers and strings:
 
 ```python
@@ -103,6 +105,12 @@ print(connect("db.example.com", timeout=5))  # Skip to a keyword
 print(connect(port=80, host="web.example.com"))  # Any order by name
 #: web.example.com:80 (timeout 30s)
 ```
+
+Passing by name does not require a default: `host` has none,
+and the last call names it anyway.
+At the call site, every keyword argument must come after the positional ones.
+`connect(port=80, "web.example.com")` is a `SyntaxError`:
+`positional argument follows keyword argument`.
 
 A parameter with a default cannot come before one without.
 `def f(a=1, b):` is a `SyntaxError`:
@@ -252,6 +260,8 @@ so `default is sentinel("MISSING")` compares against a second object and is alwa
 
 A function can read a module-level name,
 but assigning to that name anywhere in the function makes it local for the whole function.
+Python decides which names are local when it compiles the function body,
+so where the assignment sits makes no difference.
 `global` says the assignment should rebind the module-level name instead:
 
 ```python
@@ -368,8 +378,6 @@ You must pass every parameter after it by name.
 A `*args` parameter has the same effect as a bare `*`.
 It absorbs every remaining positional argument,
 so you can pass a parameter declared after it only by name.
-A signature can use every form at once, in one fixed order: positional-only,
-positional-or-keyword, `*args`, keyword-only, `**kwargs`.
 
 ```python
 # param_markers.py
@@ -418,6 +426,9 @@ Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 Both mistakes are visible without running the code,
 so each carries a `# type: ignore` telling the type checker the misuse is deliberate.
 
+A signature can use every form at once, in one fixed order: positional-only,
+positional-or-keyword, `*args`, keyword-only, `**kwargs`:
+
 ```python
 # all_markers.py
 
@@ -441,9 +452,10 @@ the subclass can rename the parameter, and a type checker will not object.
 ## Lambdas
 
 A `lambda` is a small anonymous function written as a single expression.
-It is useful for passing behavior to functions such as `sorted()`.
-`sorted()` calls `key` on each element and orders by the results.
-When a function already computes the key, pass it by name:
+It is useful for passing behavior to functions such as `sorted()`,
+which accepts a `key` function, calls it on each element,
+and orders by the results.
+When an existing function already computes the key, pass the function itself:
 `key=len` needs no lambda.
 Write a lambda when nothing existing computes what you want,
 such as ordering by a word's last letter:
@@ -461,7 +473,11 @@ print(square(9))
 #: 81
 ```
 
-Compared to other languages, Python's lambdas allow only a single expression.
+Assigning a lambda to a name, as `square` does,
+gives up the anonymity that is a lambda's point;
+`def` also gives the function a real name for tracebacks.
+Unlike anonymous functions in many other languages,
+a lambda body is limited to a single expression.
 For anything more complicated, write a separate function.
 
 ## Exercises
@@ -489,3 +505,8 @@ For anything more complicated, write a separate function.
     one per line.
     Confirm that `describe(name="Bob")` is a `TypeError`,
     and explain which marker caused it.
+8.  In `function_scope.py`,
+    delete the `global count` line from `writes_global()` and predict what a call raises before running it.
+    Then restore it, and instead add `print(count)` as the first line of `rebinds()`.
+    Explain why that also raises `UnboundLocalError`,
+    even though the assignment to `count` comes after the `print`.
