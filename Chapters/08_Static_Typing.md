@@ -7,9 +7,9 @@ The examples up to this point have gone almost entirely without type declaration
 which you might not miss on small programs.
 
 Python 3.5 (2015) introduced *type hints*,
-which look like static type checking in other languages.
+which look like the type declarations of statically typed languages.
 The Python runtime ignores type hints;
-it does not even evaluate them until something asks for them.
+it does not evaluate them until something asks for them.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool
 (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -30,10 +30,10 @@ They behave the same: both are compatible with everything.
 
 `Any` is not the same as `object`.
 Both accept every value,
-but `object` promises nothing about the value once you have it,
+but `object` guarantees nothing about the value once you have it,
 so the checker rejects every operation you try on it.
 `Any` accepts every value and then permits every operation,
-which is what makes it an opt-out rather than a wide type.
+which makes it an opt-out rather than a wide type.
 
 ## Type Hints
 
@@ -110,13 +110,19 @@ error[invalid-argument-type]: Argument to function `area` is incorrect
 6 | print(area("3", 4))
   |            ^^^ Expected `int`, found `Literal["3"]`
 info: Function defined here
+ --> area.py:2:5
+  |
+2 | def area(width: int, height: int) -> int:
+  |     ^^^^ ---------- Parameter declared here
 ```
 
 A diagnostic names the rule in brackets, points at the offending line,
-and pairs what the annotation expected with what the call supplied.
+pairs what the annotation expected with what the call supplied,
+and then points at the declaration that set the expectation.
 
 Listings in this book use a shorthand for a diagnostic.
-Where a listing comments out a line because it would fail the check,
+Where a line would fail the check,
+whether commented out or suppressed with `# type: ignore`,
 a neighboring `# ty:` comment summarizes what the checker reports for it.
 
 ## Narrowing {#narrowing}
@@ -254,7 +260,7 @@ Protocols preserve the flexibility of dynamic typing but add the early warning o
 
 A class is also a value, so you can pass it to a function,
 store it in a variable, and call it to make an instance.
-So an annotation needs a way to distinguish the class from an instance of that class.
+An annotation needs a way to distinguish the class from an instance of that class.
 
 A plain `SomeType` annotation means an instance of `SomeType`.
 The form `type[SomeType]` means the class object, or any subclass of it:
@@ -280,6 +286,9 @@ print(type(shape).__name__)
 so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
+The word `type` plays two roles in this listing:
+the annotation `type[Shape]` names the class to the checker,
+while the builtin call `type(shape)` in the demo retrieves an object's class at runtime.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
@@ -309,7 +318,7 @@ A `type` alias is a new name, not a new type.
 so the checker accepts any pair of ints as a `Coord`.
 (To create a distinct type the checker keeps separate, use `NewType`, listed in the summary below.)
 That is why an alias belongs on a compound shape and not on a bare rename:
-`type UserId = int` looks like a new type in a signature while behaving exactly like `int`.
+`type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
 `Literal["red", "blue", "green", "yellow"]` restricts the parameter to those four strings.
@@ -332,14 +341,14 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 
 Consider a function that returns the first element of a list.
 This function works on a list holding any type.
-A useful annotation returns a type that matches the list's element type,
+A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
 `Any` cannot express that connection.
 It accepts any list,
 but the return type then says nothing about what the list held.
 
-A *type parameter* correctly specifies the returned type.
+A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
 
 ```python
@@ -412,7 +421,7 @@ print(count(circles))
 
 The reason is that a `list` accepts writes.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
-Refusing the call is what keeps that from happening.
+Refusing the call keeps that from happening.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
@@ -485,7 +494,7 @@ which you will still see in older code.
 A method that returns its own instance allows call chaining.
 What should the type annotation be?
 Naming the enclosing class works until someone inherits from it.
-`Self` means "an instance of the class you called this method on,"
+`Self` means "an instance of the class on which you called this method,"
 so it automatically adapts to subclassing:
 
 ```python
@@ -546,7 +555,8 @@ and where a wrong assumption travels farthest before it fails.
 
 Let the checker infer the rest.
 A local variable whose type is obvious from its initializer gains nothing from an annotation,
-and `count: int = 0` says less than `count = 0` does, at greater length.
+and `count: int = 0` says no more than `count = 0` does, at greater length.
+(The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 The value of a hint is proportional to the distance between a value's creation and its use.
 A value born and consumed three lines later needs no help.
 A value that arrives from another module, through a container,
