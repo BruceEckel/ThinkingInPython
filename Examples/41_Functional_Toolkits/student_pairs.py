@@ -47,12 +47,13 @@ for i, grouping in enumerate(rounds[:3]):
 #: 1 [('Di', 'Bo', 'Eve'), ('Cy', 'Ana'), ('Gia', 'Fi')]
 #: 2 [('Eve', 'Fi', 'Ana'), ('Bo', 'Gia'), ('Cy', 'Di')]
 
-met = [frozenset(pair) for r in rounds for group in r
-       for pair in combinations(group, 2)]
+meetings = [frozenset(pair) for r in rounds for group in r
+            for pair in combinations(group, 2)]
 possible = set(map(frozenset, combinations(students, 2)))
-print(len(set(met)), "of", len(possible), "pairs met at least once")
+distinct = set(meetings)
+print(len(distinct), "of", len(possible), "pairs met at least once")
 #: 21 of 21 pairs met at least once
-print(len(met) - len(set(met)), "repeat meetings")
+print(len(meetings) - len(distinct), "repeat meetings")
 #: 14 repeat meetings
 
 trios = list(islice(group_rounds(students, 3), 3))

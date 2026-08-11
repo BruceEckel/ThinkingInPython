@@ -15,10 +15,10 @@ and closes with a case study that puts several of the pieces to work on one prob
 The standard library provides the building blocks of functional Python under `functools`,
 from a single `reduce()` call to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
-Caching logic, an eviction policy, a dispatch table,
-each one hides an edge case that's easy to miss on the first attempt.
+Caching logic, an eviction policy, a dispatch table:
+each hides an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
-The ones where speed matters, `reduce()`, `partial()` and the two caches,
+The ones where speed matters, `reduce()`, `partial()`, and the two caches,
 run as C code.
 What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
@@ -35,6 +35,9 @@ print(reduce(add, [1, 2, 3, 4]))
 #: 10
 ```
 
+`operator.add` is `+` as a function:
+the `operator` module supplies a named function for each operator,
+so a fold never needs a `lambda a, b: a + b`.
 For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
 `reduce()` earns its keep for every other fold,
@@ -42,13 +45,13 @@ where no dedicated built-in exists.
 On an empty sequence it raises `TypeError: reduce() of empty iterable with no initial value`,
 because there is nothing to return.
 A third argument supplies that starting value,
-so `reduce(add, [], 0)` returns `0` instead of raising.
+so `reduce(add, [], 0)` returns `0` instead of raising an exception.
 
 ### `cache`
 
 Remembers every result forever,
 so repeated calls with the same arguments cost nothing.
-This only works correctly for pure functions.
+This works correctly only for pure functions.
 Caching a side-effecting function skips the effects.
 
 ```python
@@ -66,7 +69,7 @@ print(fib.cache_info())
 ```
 
 Because `fib()` is recursive, the values up to and including 30 are now cached,
-and the counts show what that bought.
+and the counts show what caching saved.
 The 31 misses are the 31 distinct arguments, `0` through `30`.
 The 28 hits are the calls that found a stored answer instead of recomputing it.
 Fifty-nine calls in all, against 2,692,537 for the undecorated version,
@@ -153,7 +156,7 @@ print(Text("7").zero_pad(3))
 ```
 
 Since Python 3.14 a `partial` object is a descriptor too,
-so writing `zero_pad = partial(pad, fill="0")` here happens to work.
+so writing `zero_pad = partial(pad, fill="0")` here works.
 The two stop agreeing the moment an argument is positional.
 `partialmethod` passes the instance first and the bound arguments after it,
 which is what a method expects.
@@ -192,7 +195,7 @@ print(x.squared)
 ```
 
 Be careful with caching:
-mutating a property doesn't recalculate the cached result.
+changing an attribute the property read doesn't recalculate the cached result.
 The escape hatch is `del x.squared`:
 deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
@@ -308,7 +311,7 @@ print(describe("hi"), "|", describe(5))
 
 `singledispatch()` examines only the first argument,
 so a rule that depends on two types needs [Multiple Dispatching](32_Multiple_Dispatching.md),
-and a keyword-only argument cannot drive the dispatch at all.
+and a keyword-only argument cannot drive the dispatch.
 
 ### `singledispatchmethod`
 
@@ -334,7 +337,7 @@ print(d.describe("hi"), "|", d.describe(5))
 #: a str | the number 5
 ```
 
-Dispatch is on the first argument after `self`, never on `self` itself,
+Dispatch is on the first argument after `self`, never on `self`,
 so this selects an implementation by the type of `value` the same way the plain function above does.
 
 `itertools` does the same for iteration: ready-made pieces you compose,
@@ -368,7 +371,7 @@ print(list(map(pow, range(5), repeat(2))))
 #: [0, 1, 4, 9, 16]
 ```
 
-The fixed form is a list you would have written as `["x"] * 3`.
+The fixed form replaces the list you would have written as `["x"] * 3`.
 The infinite form is the one that earns the import:
 it supplies an argument that never changes, without building a list to hold it,
 and here it stops when `range(5)` does,
@@ -417,6 +420,9 @@ from itertools import cycle, islice
 print(list(islice(cycle("AB"), 5)))
 #: ['A', 'B', 'A', 'B', 'A']
 ```
+
+`cycle()` saves each element the first time through,
+so the whole input stays in memory for as long as the cycle lives.
 
 ### `chain`
 
@@ -483,6 +489,9 @@ print(list(accumulate([1, 2, 3, 4])))
 print(list(accumulate([1, 2, 3, 4], mul)))
 #: [1, 2, 6, 24]
 ```
+
+`accumulate()` is `reduce()` with the intermediate results kept:
+the last value it yields is the value `reduce()` would return.
 
 ### `compress`
 
@@ -563,7 +572,8 @@ Zips iterables of different lengths,
 filling the gaps instead of stopping at the shortest.
 The default filler is `None`.
 When `None` is a valid element,
-pass a distinct sentinel as the `fillvalue` keyword argument:
+pass a distinct [sentinel](05_Functions.md#default-and-keyword-arguments)
+as the `fillvalue` keyword argument:
 
 ```python
 # itertools_zip_longest.py
@@ -635,7 +645,7 @@ After `tee()`, use only the returned iterators;
 advancing the original source steals values the copies never see.
 And `tee()` buffers every value one copy has consumed and the other has not,
 so draining `a` completely before touching `b`, as this demo does,
-stores the whole sequence anyway.
+stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
@@ -657,6 +667,11 @@ from itertools import product
 print(list(product("AB", [1, 2])))
 #: [('A', 1), ('A', 2), ('B', 1), ('B', 2)]
 ```
+
+Unlike the tools above,
+`product()` reads its inputs completely before yielding its first tuple,
+so none of them can be infinite: `product(count(1), "AB")` hangs at the call,
+before anything asks for a value.
 
 ### `permutations`
 
@@ -841,7 +856,7 @@ Writing this as a loop means building your own stack to track which sublists are
 and getting the push and pop correct at every depth.
 The recursive version gets that bookkeeping from the call stack for free,
 so the body says only what to do with one element and where to descend,
-and says nothing at all about depth.
+and says nothing about depth.
 
 ## Case Study: Pairing Rotations
 
@@ -858,9 +873,12 @@ by direct construction.
 Fix one player, arrange the rest in a circle,
 and each round pair players sitting across from each other,
 then rotate everyone but the fixed player by one seat.
-With `n` players that produces `n - 1` rounds where no pair repeats,
+For an even number of players `n`,
+that produces `n - 1` rounds where no pair repeats,
 which is the best any schedule can do,
 since it uses up every one of the `n * (n - 1) / 2` possible pairs exactly once.
+The classical fix for an odd roster is a phantom player:
+whoever draws the phantom sits out that round.
 
 None of that trick survives a request for groups of three, four,
 or any other size.
@@ -924,12 +942,13 @@ for i, grouping in enumerate(rounds[:3]):
 #: 1 [('Di', 'Bo', 'Eve'), ('Cy', 'Ana'), ('Gia', 'Fi')]
 #: 2 [('Eve', 'Fi', 'Ana'), ('Bo', 'Gia'), ('Cy', 'Di')]
 
-met = [frozenset(pair) for r in rounds for group in r
-       for pair in combinations(group, 2)]
+meetings = [frozenset(pair) for r in rounds for group in r
+            for pair in combinations(group, 2)]
 possible = set(map(frozenset, combinations(students, 2)))
-print(len(set(met)), "of", len(possible), "pairs met at least once")
+distinct = set(meetings)
+print(len(distinct), "of", len(possible), "pairs met at least once")
 #: 21 of 21 pairs met at least once
-print(len(met) - len(set(met)), "repeat meetings")
+print(len(meetings) - len(distinct), "repeat meetings")
 #: 14 repeat meetings
 
 trios = list(islice(group_rounds(students, 3), 3))
@@ -992,7 +1011,7 @@ makes when a loop's simple counter is not enough and the problem needs a stack i
 
 The rule for both modules is the same: before writing a loop,
 ask whether the loop already has a name.
-A running total is `accumulate()`, a sliding window is `pairwise()`,
+A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
 and a memoized pure function is `@cache`.
 Each of those replaces a small piece of code that works the first time and fails on the empty input,
