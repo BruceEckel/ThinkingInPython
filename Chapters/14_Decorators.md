@@ -123,7 +123,7 @@ The wrappers so far declare no parameters,
 so `add_behavior` only works on functions that take none.
 With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`:
-the wrapper takes zero positional arguments but two were given.
+the wrapper takes zero positional arguments, and the call passes two.
 A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
 the pattern from [Unpacking Arguments](05_Functions.md#unpacking-arguments).
 This decorator traces calls, and its `wrapper()` takes that shape:
@@ -803,7 +803,7 @@ if __name__ == "__main__":
 ```
 
 `report` only asks for a callable and never asks where `func` came from.
-Calling it directly, instead of through `@`, decorates the `lambda` on the spot.
+Calling it directly, instead of through `@`, decorates the `lambda` in place.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.
 The same call decorates a `functools.partial`, a bound method,

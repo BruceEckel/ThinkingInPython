@@ -393,7 +393,7 @@ A full EMS does three things:
    Some caller or context supplies the implementation,
    at a point after the function's definition.
 
-The third item is *delayed binding*.
+The third item names *delayed binding*.
 Delayed binding exists so that one fixed codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"

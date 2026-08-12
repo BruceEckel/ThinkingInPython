@@ -671,7 +671,7 @@ while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
 
 `__init__()` builds the table, rather than the class body,
-because its entries are bound methods.
+because each entry is a bound method.
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
 

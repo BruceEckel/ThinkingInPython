@@ -188,6 +188,9 @@ The three purposes are:
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
     for reasons I give below.
 
+<!-- The quoted "clearly" below is the vague word this paragraph objects to,
+     so House.Weasel flagging it is the rule agreeing with the point. -->
+<!-- vale House.Weasel = NO -->
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
 Certainly, the *Creational* patterns are straightforward.
@@ -199,6 +202,7 @@ I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
 so that classification doesn't lead me to a solution
 (I'll readily admit that I may be missing something here).
+<!-- vale House.Weasel = YES -->
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
 and that is how this book groups them.
@@ -221,6 +225,12 @@ a claim you can hold the design up against.
 Most hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 
+<!-- Several principles below quote their sources word for word (Saint-Exupery
+     in the Subtraction footnote, Kevlin Henney under Simplicity before
+     generality), so house style does not govern their wording. -->
+<!-- vale write-good.Passive = NO -->
+<!-- vale House.WeakVerb = NO -->
+
 -   *Principle of least astonishment* (don't be astonishing).
 -   *Make common things easy, and rare things possible*.
 -   *Consistency*.
@@ -240,7 +250,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     and is part of the Low-Coupling-High-Cohesion message:
     few connections between parts, and one subject per part.
     [Rethinking Objects](20_Rethinking_Objects.md#prefer-composition-to-inheritance)
-    makes the composition case for it.
+    argues for composition on those grounds.
 -   *Managed Coupling*.
     Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, so acknowledge it and control it:
@@ -268,6 +278,9 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     describes.
 -   *Make functions pure whenever you can*,
     as [Pure Functions](40_Functional_Foundations.md#pure-functions) describes.
+
+<!-- vale write-good.Passive = YES -->
+<!-- vale House.WeakVerb = YES -->
 
 You can hold this small handful of fundamental ideas in your head while analyzing a design.
 

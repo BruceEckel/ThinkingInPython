@@ -135,7 +135,7 @@ module itself is already the single shared object Python caches in
 `sys.modules`.
 
 For real code, prefer the module. It is less code, has no indirection
-to read through, and gets the same guarantee for free, the same
+to read through, and gets the same guarantee, the same
 argument [A Module Is Already a Singleton](../Chapters/24_Singleton.md#a-module-is-already-a-singleton)
 makes at the top of the chapter. The class-based versions only earn
 their complexity when something genuinely needs the shape of a class,

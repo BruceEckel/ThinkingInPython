@@ -755,7 +755,7 @@ which absorbs the exception as every loop in this chapter has.
 The fix is almost never a `try`.
 Let the loop do the asking.
 
-## The Protocol Answers Nothing for Free
+## The Protocol Answers Nothing
 
 Both surprises in [The Costs of Laziness](#the-costs-of-laziness)
 come from the same rule.

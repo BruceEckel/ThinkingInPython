@@ -198,7 +198,7 @@ The brackets are optional in a sequence pattern,
 so `case 0, 0:` and `case [0, 0]` are the same pattern.
 The subject is any expression, not only a parameter,
 and a comma builds a tuple there too,
-so `match sign(x), sign(y):` matches on a pair computed on the spot.
+so `match sign(x), sign(y):` matches on a pair computed inline.
 Transforming the subject this way turns a set of comparisons into literal patterns,
 which usually reads better than the guards you would write otherwise.
 
@@ -630,11 +630,11 @@ When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.
 Each type carries its own behavior,
 so adding a type needs no change to a central `match`.
-Use `match` when the set of cases is closed and you want to handle them in one place,
+Use `match` for a closed set of cases you want to handle in one place,
 especially when the cases need to look inside the value.
 When that closed set is a set of constants rather than a set of shapes,
 make it an `Enum` and `match` on its members, as `value_patterns.py` did.
-The enum hands the checker the closed set for free,
+The enum hands the checker the closed set,
 so `assert_never()` works without a `type` union.
 
 ## Dynamic Binding vs. Pattern Matching

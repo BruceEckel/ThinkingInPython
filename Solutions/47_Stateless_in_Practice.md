@@ -1307,7 +1307,7 @@ play(Loud(), Kitty(), Gold())
 What the shared signature recovers is the Abstract Factory's *interface*.
 `run_season()` accepts anything that can stage a scene and stays ignorant of
 which family it gets, which is the property the pattern exists to provide.
-Python gives it away for free, because a function is already an object with a
+Python gives it away, because a function is already an object with a
 type, and no abstract factory class was needed to say it.
 
 What it does not recover is the guarantee that made the pattern worth naming.

@@ -9,6 +9,15 @@ Checks the prose in `Chapters/*.md` for:
   QUOTE-PUNCT    a period or comma after a closing " (it belongs inside)
   TRAILING-WS    trailing whitespace (a two-space hard break is allowed)
 
+QUOTE-PUNCT applies to quoted prose, where the book puts the mark inside the
+quote ("easier to ask forgiveness than permission,"). A quoted *literal* is the
+opposite case: moving the mark inside would put a comma into a `pytest -k`
+substring or a period into an error message the reader is meant to match
+against. Two shapes count as literal and are skipped, both of which the book
+already writes with the mark outside: a quote holding an inline code span, and
+a single-token quote such as "overdraft". Quote a literal that is neither, like
+a multi-word message, as an inline code span instead of prose.
+
 Code is skipped through the shared classifier in `tools_prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
 spans and footnotes are ignored within a prose line. Headings and list-item text
@@ -42,6 +51,38 @@ Issue = tuple[int, int, str, str]  # line, column, code, message
 
 def _in_span(pos: int, spans: list[tuple[int, int]]) -> bool:
     return any(start <= pos < end for start, end in spans)
+
+
+def _quoted(text: str) -> dict[int, int]:
+    """Closing-quote index -> its opening-quote index, for each pair.
+
+    Straight quotes carry no direction, so the pairing is positional: the
+    first `"` on the line opens, the second closes, and an unpaired last
+    quote is dropped rather than guessed at.
+    """
+    pairs: dict[int, int] = {}
+    opened: int | None = None
+    for i, char in enumerate(text):
+        if char != '"':
+            continue
+        if opened is None:
+            opened = i
+        else:
+            pairs[i] = opened
+            opened = None
+    return pairs
+
+
+def _is_literal(text: str, opened: int, closed: int,
+                spans: list[tuple[int, int]]) -> bool:
+    """Whether the quote spanning `opened`..`closed` quotes a literal.
+
+    See this module's docstring: a quote holding an inline code span, or
+    one holding a single token, keeps its punctuation outside.
+    """
+    if any(opened < start < closed for start, _ in spans):
+        return True
+    return len(text[opened + 1:closed].split()) == 1
 
 
 def _prose_text(line: str) -> tuple[str, int] | None:
@@ -131,11 +172,17 @@ def lint_text(text: str) -> list[Issue]:
                 findings.append((lineno, offset + m.start() + 1, "SPACE-BEFORE",
                                  f"space before '{punct}'"))
 
+        quoted = _quoted(body)
         for m in _QUOTE_PUNCT.finditer(body):
-            if not _in_span(m.start(), spans):
-                findings.append((lineno, offset + m.start() + 1, "QUOTE-PUNCT",
-                                 f"'{m.group(1)}' after a closing quote; "
-                                 "put it inside"))
+            if _in_span(m.start(), spans):
+                continue
+            opened = quoted.get(m.start())
+            if opened is not None and _is_literal(body, opened, m.start(),
+                                                  spans):
+                continue
+            findings.append((lineno, offset + m.start() + 1, "QUOTE-PUNCT",
+                             f"'{m.group(1)}' after a closing quote; "
+                             "put it inside"))
 
     findings.sort()
     return findings

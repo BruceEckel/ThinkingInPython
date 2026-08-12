@@ -513,7 +513,7 @@ Nothing arrives from a base class, so nothing can slip past the counter:
 the only way into `items` is a method this class wrote.
 The cost is visible and finite.
 You forward every operation callers need by hand,
-where the subclass got hundreds for free and got one of them wrong.
+where the subclass inherited hundreds it never wrote, and got one of them wrong.
 Composition does not make the counting bug impossible.
 If `extend()` called `self.items.extend(more)` instead of going through `append()`,
 the count would be wrong again.

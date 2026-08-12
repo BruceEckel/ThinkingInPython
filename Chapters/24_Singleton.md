@@ -168,7 +168,7 @@ uncached `Settings`.
 
 Three implementation notes:
 
-1. A singleton is shared state, and shared state leaks between tests.
+1. A singleton holds shared state, and shared state leaks between tests.
    The cached factory has an escape hatch the classic forms lack:
    `settings.cache_clear()` discards the instance, so each test can start fresh.
 

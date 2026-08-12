@@ -104,7 +104,7 @@ and `Result` is the union of the two.
 The class is now the tag that tells the two cases apart,
 so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
-`Ok` and `Err` are frozen data classes,
+`Ok` and `Err` are both frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
 `@final` states that neither can have subclasses,
 which lets the checker narrow a `Result` to exactly one of the two.
@@ -328,7 +328,7 @@ all with the same `bind()`.
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, say `.bind(str)`,
-the checker rejects that call on the spot,
+the checker rejects that call immediately,
 because `str` is not a callable that returns a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,

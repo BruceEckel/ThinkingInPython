@@ -57,9 +57,9 @@ from tools_config import ROOT
 #
 # gate-checks leads because it is the cheapest of all (one process, one
 # parse per file), so it cannot scroll anything away. It is `gate`'s own
-# Markdown selection rather than `checks`, which also runs prose-lint:
-# prose-lint reports findings the book has not cleaned up, and a row that
-# is permanently FAIL teaches you to stop reading the table.
+# Markdown selection rather than `checks`, which also runs Vale: Vale is a
+# standalone binary this sweep would otherwise require, and the two now
+# cover the same registry anyway.
 SWEEP_TARGETS: list[str] = [
     "gate-checks",
     "solutions-numbering",

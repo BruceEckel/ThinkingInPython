@@ -291,7 +291,7 @@ A `match` is code: adding an operator means editing the function,
 and the checker sees every case.
 The table is data: adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
-Choose `match` when the set of cases is fixed when you write the function,
+Choose `match` when you know the whole set of cases as you write the function,
 and a table when the set should grow from outside.
 
 ## Lambdas
@@ -362,7 +362,7 @@ The comprehension hands you a finished list;
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
 The rule of thumb: existing function, use the higher-order form;
-expression you are writing on the spot, use the comprehension.
+expression you are writing inline, use the comprehension.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 

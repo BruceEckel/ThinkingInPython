@@ -235,7 +235,7 @@ If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
-The subclass form also gets optional steps for free,
+The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default;
 the function form must give each parameter a default of its own.
 

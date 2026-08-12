@@ -331,8 +331,8 @@ An *invariant* states a fact about every output:
 sorting produces an ordered list.
 *Idempotence* states that repeating changes nothing:
 sorting a sorted list leaves it alone.
-An *oracle* states that two implementations agree: the simple,
-obviously correct version matches the fast one,
+An *oracle* states that two implementations agree:
+the simple version you can check by reading matches the fast one,
 which `parallel_pure.py`'s `assert parallel == serial` claimed.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text.encode().hex()` tests nothing,

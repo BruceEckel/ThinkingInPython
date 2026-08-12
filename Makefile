@@ -149,11 +149,11 @@ verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line en
 sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
-# process with one parse per file, rather than as six separate scripts. Names
-# come from `make checks ARGS=--list`. This is check_all's whole registry
-# except prose-lint, which reports findings the book has not cleaned up yet;
-# add it here once `make checks` is green and the gate covers all seven.
-GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing anchors
+# process with one parse per file, rather than as seven separate scripts. Names
+# come from `make checks ARGS=--list`. This is check_all's whole registry:
+# prose-lint joined once its last findings were cleared, so a new one now fails
+# the gate rather than sitting in a backlog.
+GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing anchors prose-lint
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -548,15 +548,23 @@ unique-slugs:  ## Fail if two chapters name two listings the same
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.
-checks:  ## Run every Markdown check in one pass (ARGS=--list); `make fix-checks` applies them
+# Vale (`make prose`) runs after them, so this one target answers "is the prose
+# clean?" as well. Vale runs only on a bare `make checks`: with ARGS set the
+# caller asked for something narrower (`ARGS=--list`, or one check by name),
+# and a whole-book Vale pass is no part of that answer. Vale is a standalone
+# binary rather than a uv-managed one, so this target now needs it installed;
+# `make tools-check-full` reports whether it is. `gate` and `ci` do not run
+# Vale, and still pass without it.
+checks:  ## Run every Markdown check plus the Vale prose lint (ARGS=--list lists the checks); `make fix-checks` applies them
 	$(PY) tools/check_all.py $(ARGS)
+	$(if $(ARGS),,$(VALE) $(PROSE_FILES))
 
 fix-checks:  ##- Apply every fix those checks can make
 	$(PY) tools/check_all.py --fix
 
-# The subset `gate` enforces (GATE_CHECKS above: everything but prose-lint).
-# `checks` is the one to run while editing, since it reports prose-lint too;
-# this one answers the narrower "will the gate pass?" and is what `sweep`
+# The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
+# registry). `checks` is the one to run while editing, since it adds the Vale
+# pass; this one answers the narrower "will the gate pass?" and is what `sweep`
 # runs, so the sweep's verdict matches the gate's.
 gate-checks:  ## Run just the Markdown checks the gate enforces
 	$(PY) tools/check_all.py $(GATE_CHECKS)

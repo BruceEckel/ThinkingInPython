@@ -853,7 +853,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
 Writing this as a loop means building your own stack to track which sublists are still open,
 and getting the push and pop correct at every depth.
-The recursive version gets that bookkeeping from the call stack for free,
+The recursive version gets that bookkeeping from the call stack,
 so the body says only what to do with one element and where to descend,
 and says nothing about depth.
 

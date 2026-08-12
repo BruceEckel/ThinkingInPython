@@ -400,6 +400,9 @@ They decorate the function,
 because the function can produce a second description.
 `catch()`, `throws()`, and `supply()` take functions for the same reason.
 
+<!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
+     exists to catch em-dashes the author did not write. -->
+<!-- vale House.EmDash = NO -->
 The design rule that follows from this is to pass the function rather than the Effect.
 A Stateless Effect is a one-shot token: build it, run it, discard it.
 Storing one in a registry to run later, handing the same one to two consumers,
@@ -407,6 +410,7 @@ or keeping one around to retry after a failure---these all fail quietly,
 returning `None` instead of raising an exception.
 Other Effect systems let you describe the work once and decide later how many times to perform it.
 In Stateless, that decision belongs to whoever still holds the function.
+<!-- vale House.EmDash = YES -->
 
 `memoize()` is the one concession, and it caches rather than replays:
 it wraps the Effect in an object that records the result and hands that same result back on a second `run()`,

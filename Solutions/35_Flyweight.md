@@ -340,7 +340,7 @@ names: a factory function, `make_color()`, replacing the
 `Color(...)` constructor call, and a `WeakValueDictionary` instead of
 a plain `dict`. Being a plain function rather than an overridden
 `__new__()` means `Color` can stay an ordinary frozen `@dataclass`,
-with a real `__repr__()` and `__eq__()` generated for free, unlike
+with a real `__repr__()` and `__eq__()` generated for it, unlike
 `interned_color.py`'s `Color`, which loses both by skipping
 `__init__()`. Once every reference to the fifty-shade palette and both
 crimson names is gone, nothing keeps those `Color` objects alive, and

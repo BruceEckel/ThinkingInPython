@@ -140,7 +140,7 @@ print("still running")
 ```
 
 The release failed, and stdout says nothing about it.
-A traceback goes to `sys.stderr` labeled "Exception ignored",
+A traceback goes to `sys.stderr` labeled `Exception ignored`,
 but nothing propagates: no caller can catch it, no `finally` runs,
 the exit status is still `0`, and a test asserting on stdout passes.
 A `close()` call in a `with` block fails loudly instead.

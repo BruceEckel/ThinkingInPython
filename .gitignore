@@ -5,7 +5,8 @@ build/
 .cache
 
 # Vale-synced third-party styles (write-good, proselint). Downloaded by
-# `vale sync`; only our own House style is committed.
+# `vale sync`; only our own House style and vocabulary are committed.
 /styles/*
 !/styles/House/
+!/styles/config/
 /Examples/.idea

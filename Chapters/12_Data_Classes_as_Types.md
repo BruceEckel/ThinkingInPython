@@ -1113,7 +1113,7 @@ print(c.url, c.name)
 #: tcp://localhost:5432 db
 ```
 
-`url` is derived state that no field declaration produces,
+No field declaration produces `url`; `__post_init__()` derives it,
 so printing it proves that `Connection.__init__` ran.
 If you delete `__post_init__()`, the same line raises an `AttributeError`.
 

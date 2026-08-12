@@ -190,8 +190,8 @@ make sweep     # every check over both trees, all failures, exit 1 if any
 to the upgrade that caused it. The list is `SWEEP_TARGETS` in the script,
 and each row's description is read from that target's own `## text` in the
 Makefile. It sweeps `gate-checks` (the gate's Markdown selection) rather
-than `checks`, since `checks` also runs `prose-lint`, and a row that is
-permanently FAIL teaches you to stop reading the table. The `#:` markers
+than `checks`, since `checks` also runs Vale, a standalone binary the sweep
+would then require. The `#:` markers
 are deliberately not swept: `make verify` rewrites a stale marker instead
 of failing on it, so a nondeterministic listing would report a difference
 here every run.
@@ -626,6 +626,14 @@ are ignored inside a prose line; headings and list-item text are checked but
 their markers are not. It is report-only and exits non-zero on any finding. Run
 it directly with `uv run python tools/prose_lint.py Markdown` (or a single file).
 
+The quote check reads a quoted *literal* differently from quoted prose. The book
+puts the mark inside a quoted phrase (`"easier to ask forgiveness than
+permission,"`) but outside a literal, where moving it in would put a comma into
+a `pytest -k` substring or a period into an error message the reader matches
+against. A quote holding an inline code span, and a single-token quote such as
+`"overdraft"`, are therefore skipped. A multi-word literal fits neither shape,
+so write that one as an inline code span rather than as a quotation.
+
 **House style: Vale (`make prose`).** Vale is a standalone binary, not a Python
 package, so install it once (`winget install errata-ai.Vale`,
 `brew install vale`, or see <https://vale.sh/docs/install>). Vale parses Markdown
@@ -665,10 +673,11 @@ the interpreter that also execs book listings. Adding a check means
 importing it and adding it there, after which it appears in `--list`, in
 the default run, and as a selectable name.
 
-`gate` runs the selection named by `GATE_CHECKS` in the Makefile rather
-than the whole registry, because `prose-lint` reports findings the book has
-not cleaned up yet. Once `make checks` is green, fold it in there and the
-gate covers all seven.
+`gate` runs the selection named by `GATE_CHECKS` in the Makefile, which is
+now the whole registry: `prose-lint` was the last holdout and joined once
+its findings were cleared. `make checks` runs the same registry plus the
+Vale prose lint, which the gate leaves out because Vale is a standalone
+binary rather than a uv-managed one.
 
 ## check_line_endings.py
 

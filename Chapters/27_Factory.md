@@ -747,7 +747,7 @@ For a frozen data class,
 copying the configured state and changing chosen fields on the way.
 `copy.replace()` is the general form of the same operation,
 working on any object that defines `__replace__()`;
-a data class gets that method for free.
+a data class defines that method for you.
 A test confirms the two forms produce the same pizza:
 
 ```python

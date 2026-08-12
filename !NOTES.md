@@ -1,3 +1,7 @@
+Dermatologist September
+
+/ultrareview on Chapters
+
 Review the tests to see if they are all doing something useful.
 
 New book cover & favicon
@@ -10,7 +14,7 @@ Fable: What else should I do before I start my hand-editing pass? I'm hoping thi
 
 Add Epub link info on README and bottom of index page.
 
-Pong game, autoplay with builtin gui
+Pong game, autoplay with builtin gui. Starts adding more balls and more paddles.
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 Examples that demonstrate probability or statistics, very simply
 

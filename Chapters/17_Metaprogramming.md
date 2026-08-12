@@ -1011,10 +1011,14 @@ The failure has nothing to do with metaclasses.
 `type` and `dict` each bring an incompatible layout,
 so combining them is impossible in any context.
 
+<!-- "the very TypeError" is the intensive adjective, not the hedging adverb
+     proselint.Very exists to catch. -->
+<!-- vale proselint.Very = NO -->
 The `# type: ignore` comment appears because ty knows this rule statically.
 Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
 A checker that predicts a crash before the program runs is static typing at its best;
 the comment suppresses the diagnostic only because raising that crash is educational.
+<!-- vale proselint.Very = YES -->
 
 A metaclass can multiply inherit like any other class,
 as long as the extra class is a mixin with no competing layout:
@@ -1577,7 +1581,7 @@ A `@dataclass` produces many of these:
 - `__init__`, `__eq__`, and `__repr__`
 
 The generated `__init__`, `__eq__`, and `__repr__` give `Fraggle` a constructor,
-equality, and a `repr()` for free.
+equality, and a `repr()` that you never wrote.
 
 The rest is the bookkeeping every class carries.
 
