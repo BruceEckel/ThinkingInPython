@@ -170,7 +170,7 @@ Both `save()` and `restore()` must copy.
 ## Immutability
 
 All of that copying defends against mutation.
-If you remove the mutation, there is nothing left to prevent.
+If you remove the mutation, nothing remains to prevent.
 Once the state is a frozen data class, every state is a memento:
 
 ```python
@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
 `Drawing` is the same idea as `Sketch` with the mutation removed,
 under a different name so a reader never has to ask which one a listing means.
-Its extra `title` field is there so a later section can restore one field and keep the other.
+Its extra `title` field lets a later section restore one field and keep the other.
 `draw()` returns a new `Drawing` instead of editing this one,
 using `dataclasses.replace()` to change one field and carry the rest along.
 Since each call returns a `Drawing`, the calls chain.
@@ -233,7 +233,8 @@ a state whose changed field is large pays for that field on every edit.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
 which would make the identity check print `True` whether the tuple shared the string or rebuilt it.
 
-This is the argument made by [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution).
+[Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+makes this argument.
 That section is also why `strokes` is a tuple and not a list:
 `frozen=True` guards the binding, not the object,
 so a frozen data class holding a list still lets that list change underneath it,
@@ -327,8 +328,7 @@ if __name__ == "__main__":
 
 `do()` pushes the present into the past and clears the future,
 because acting after an undo starts a new timeline.
-The states you undid are no longer reachable by redo,
-which is how editors behave.
+Redo can no longer reach the states you undid, which is how editors behave.
 `undo()` and `redo()` just shuttle the present between the two stacks.
 Every change must go through `do()`.
 A new state built from `history.present` and never handed back is not in the history,
@@ -375,7 +375,7 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the Command variation mentioned in [Function Objects](28_Function_Objects.md).
+the Command variation that [Function Objects](28_Function_Objects.md) mentions.
 Command-based undo saves memory when states are huge,
 at the cost of writing and testing an inverse for every action.
 Snapshot-based undo is the one to try first,
@@ -384,7 +384,7 @@ because immutable states make snapshots inexpensive, as `sharing.py` showed.
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
 A whole-state snapshot answers one question: what did everything look like then?
-Editors get asked a narrower one.
+Editors face a narrower one.
 Undo the drawing, but keep the rename.
 `History` cannot express that,
 because it moves whole states and never looks inside them.
@@ -412,7 +412,7 @@ print(history.undo())
 #: Goose: circle beak scribble
 ```
 
-`checkpoint` is a name bound to a past `Drawing`,
+`checkpoint` names a past `Drawing`,
 which is the whole trick immutability makes possible.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
@@ -420,7 +420,8 @@ It goes through `do()` like any other action,
 so the partial restore is undoable, as the last line shows.
 
 `copy.replace()` is the general version of `dataclasses.replace()`,
-described in [Data Classes as Types](12_Data_Classes_as_Types.md#the-general-form-of-replace).
+which [Data Classes as Types](12_Data_Classes_as_Types.md#the-general-form-of-replace)
+describes.
 Using it here rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds,
 since `NamedTuple`, `datetime`,
 and any class defining `__replace__()` all accept it.
@@ -460,7 +461,7 @@ If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 What breaks is whatever later touches a field the bytes never carried.
 Splitting the class into its own module keeps the simulation faithful,
-since real drift happens between two separate runs of a program,
+since in reality a class drifts between two separate runs of a program,
 not inside one script:
 
 ```python
@@ -505,7 +506,7 @@ The dump that builds `blob` runs while `sketch_v1.SketchV1` still means the one-
 with a field added between the save and the load.
 The type checker flags that reassignment as unsound,
 so it carries a `# type: ignore`.
-There isn't a practical way to declare that `SketchV1` can become a different class.
+No practical annotation declares that `SketchV1` can become a different class.
 `pickle.loads()` never calls `__init__()`.
 It looks up the class by the name pickle recorded, `sketch_v1.SketchV1`.
 That name now points at `SketchV2`.
@@ -571,7 +572,7 @@ other libraries answer drift and security separately.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
 Protocol Buffers goes further.
-Every field gets an explicit, numbered slot in a schema shared across languages.
+A schema shared across languages gives every field an explicit, numbered slot.
 Old and new versions can then read each other's messages on purpose,
 not by accident.
 None of the three execute the bytes they read,
@@ -596,7 +597,7 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
     Write tests proving existing mementos and histories survive untouched in each version.
 2.  Give `History` a maximum depth.
     When the past grows beyond `n` states, discard the oldest.
-    What should happen to `can_undo()`?
+    What should `can_undo()` report then?
 3.  Serialize a `Drawing` to JSON using `dataclasses.asdict()` and reconstruct it.
     What did the round trip change that `pickle` preserved,
     and where must your reconstruction compensate?

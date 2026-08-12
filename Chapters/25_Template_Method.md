@@ -19,7 +19,7 @@ a separation this chapter returns to in [Don't Start the Engine in the Construct
 
 ## The Fixed Algorithm
 
-The defining trait of a Template Method is that the base class fixes the shape of the algorithm.
+A Template Method fixes the shape of the algorithm in the base class.
 Subclasses complete the individual steps.
 The `@final` decorator from `typing`,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
@@ -132,7 +132,7 @@ def test_template_method_runs_steps_in_order() -> None:
 `ApplicationFramework` leaves starting to the client,
 and the `Framework` below shows what goes wrong when a framework does not.
 A framework can call `run()` from its own constructor,
-and a subclass with its own `__init__()` then has a trap to avoid.
+and a subclass with its own `__init__()` then faces a trap.
 `run()` calls methods the subclass supplies,
 so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
 If you call it first, in the usual style,
@@ -174,7 +174,7 @@ and `step()` reads `self.name` one line before the constructor assigns it.
 The quick fix is reordering: assign `self.name` first,
 then call `super().__init__()`.
 That works, but it inverts the convention every Python programmer carries,
-and the next subclass author will restore the usual order without thinking.
+and the next subclass author restores the usual order without thinking.
 The reliable fix changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
 That is why `ApplicationFramework` has no `__init__()` and the client writes `MyApp().run()`.
@@ -241,14 +241,14 @@ the function form must give each parameter a default of its own.
 
 The function version also closes the gap in `@final`.
 A caller supplies the steps and cannot replace the loop,
-because there is no subclass through which to replace it.
+because no subclass exists through which to replace it.
 Structure fixes the algorithm, not a decorator the runtime ignores.
 
 Passing functions in is not the *Strategy* pattern,
 although the two look alike at the call site.
 A Strategy swaps out a whole algorithm behind a single interface.
 Here the algorithm stays where it is and only its steps arrive from outside.
-The choice between a class and a function is the same trade-off seen in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
+The choice between a class and a function is the same trade-off as in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
 ## What Actually Fixes the Algorithm
@@ -256,7 +256,7 @@ A hook that holds no state is usually better as a function than as a method to o
 The fixed algorithm is only as fixed as the mechanism holding it,
 and this chapter has shown four of them.
 Structure fixes it in `template_function.py`,
-where there is no subclass through which to replace the loop.
+where no subclass exists through which to replace the loop.
 A checker fixes it with `@final`,
 which reports an override and stops nothing at runtime.
 The interpreter fixes it with `__init_subclass__()`,

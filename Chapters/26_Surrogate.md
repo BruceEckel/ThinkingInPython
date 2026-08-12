@@ -58,16 +58,17 @@ p.h()
 #: Implementation.h()
 ```
 
-It isn't necessary that `Implementation` have the same interface as `Proxy`.
+`Implementation` need not have the same interface as `Proxy`.
 As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea.
 That is a looser definition than *GoF Design Patterns* uses.
 Under GoF's stricter definition the interface separates *Proxy* from *Adapter*;
-under the looser one used here it is the intent.
+under the looser one here, the intent does.
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
 sorts out both readings.
 
-However, it is convenient to have a common interface that forces `Implementation` to fulfill all the methods that `Proxy` needs to call.
+However, a common interface helps:
+it forces `Implementation` to supply every method that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
 so you cannot instantiate an implementation that omits one:
@@ -120,8 +121,8 @@ when the `Proxy` delegates a call the implementation cannot answer.
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 is the structural alternative.
 The implementation needs no base class.
-The type checker verifies conformance by shape statically, and,
-with `@runtime_checkable`, `isinstance()` does so at runtime:
+The type checker verifies the shape statically, and, with `@runtime_checkable`,
+`isinstance()` does so at runtime:
 
 ```python
 # proxy_protocol.py
@@ -145,7 +146,7 @@ print(isinstance(Partial(), Service))
 #: False
 ```
 
-The abstract base class forces completeness at construction,
+The abstract base class forces a complete implementation at construction,
 through inheritance.
 A `Protocol` instead reports the mismatch where code uses an object as a `Service`,
 and needs no common base.
@@ -186,7 +187,7 @@ p.h()
 `__getattr__()` makes the forwarding generic:
 `Proxy` names no method of `Implementation`,
 so it keeps working when the implementation grows a method.
-The proxy is still tied to one implementation class, which it constructs itself;
+The proxy still depends on one implementation class, which it constructs;
 accepting an implementation as a constructor argument removes that tie too.
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
@@ -194,7 +195,7 @@ to `_Proxy__implementation`,
 so it cannot collide with an attribute the implementation carries.
 
 Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
-The one used here is the *fallback* hook:
+`__getattr__()` is the *fallback* hook:
 Python calls it only after normal lookup fails,
 which is why `self.__implementation` inside it resolves normally.
 `__getattribute__()` intercepts every attribute access,
@@ -329,8 +330,8 @@ declaring `__setattr__()` tells the checker the proxy accepts arbitrary attribut
 so the static half closes at the same moment as the runtime half.
 The implementation attribute also shrinks from `__implementation` to `_impl`:
 mangling rewrites identifiers, not string literals,
-so a double-underscore name stored through `object.__setattr__()` would need the mangled form,
-`"_WriteProxy__impl"`, written by hand.
+so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
+`"_WriteProxy__impl"`, by hand.
 
 Identity has the same gap.
 A proxy is not an instance of the implementation's class;
@@ -447,7 +448,7 @@ Only the object behind the surrogate does.
 
 The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
-The reason is the one the Proxy section gave:
+The Proxy section gave the reason:
 whatever `__getattr__()` returns is unknown at the type level,
 so no checker can verify `b.f()`, no matter how you annotate the surrogate.
 Declaring each implementation against `Behavior` still catches a missing method,
@@ -457,7 +458,7 @@ Annotating `run(b: Behavior)` and handing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
 The hop through the surrogate loses the guarantee.
 
-Testing hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
+The test hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py
@@ -481,7 +482,7 @@ def test_state_delegates_and_change_swaps() -> None:
 ## Kinds of Proxy
 
 The difference between *Proxy* and *State* is in the problem each one solves.
-The common uses for *Proxy* as described in *GoF Design Patterns* are:
+*GoF Design Patterns* lists these common uses for *Proxy*:
 
 1.  *Remote proxy*.
     Proxies for an object in a different address space.
@@ -493,8 +494,8 @@ The common uses for *Proxy* as described in *GoF Design Patterns* are:
     Use this when you don't want the client programmer to have full access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
-    For example, to keep track of the number of references held for a particular object,
-    in order to implement the *copy-on-write* idiom and prevent object aliasing.
+    For example, to keep track of the number of references to a particular object,
+    implementing the *copy-on-write* idiom and preventing object aliasing.
     A simpler example is keeping track of the number of calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
@@ -572,7 +573,7 @@ if __name__ == "__main__":
 #: calls: 3
 ```
 
-Because `__getattr__()` intercepts only the lookups not found on the proxy or its class,
+Because `__getattr__()` intercepts only the lookups that fail on the proxy and its class,
 one generic proxy can add lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*) to any object,
 with no per-method code.

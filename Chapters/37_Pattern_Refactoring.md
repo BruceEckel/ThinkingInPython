@@ -26,7 +26,7 @@ and you must recover the type of each piece to sort it.
 
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
-filled automatically by `__init_subclass__()`,
+which `__init_subclass__()` fills automatically,
 and a `create()` method builds an instance from a material name
 (this is a [Factory](27_Factory.md#the-pythonic-factory-a-dictionary)):
 
@@ -255,11 +255,11 @@ for kind, items in bins.items():
 #: Total value = 120.08
 ```
 
-This satisfies the requirement, but it has a classic flaw.
+`recycle_rtti.py` satisfies the requirement, but it has a classic flaw.
 It tests for every type in the system.
 When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
-Any you miss will silently drop trash on the floor.
+Each one you miss silently drops trash on the floor.
 Readers of [Composite and Interpreter](34_Composite_and_Interpreter.md)
 may expect `assert_never()` to make the checker catch the missed case,
 and here it cannot help: exhaustiveness checking needs a *closed* union,
@@ -399,7 +399,7 @@ Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class,
 the same dictionary-probe dispatch as the tables in [State Machines](31_State_Machines.md#the-engine)
 and [Multiple Dispatching](32_Multiple_Dispatching.md),
-and first seen in [Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
+and it first appeared in [Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
 but keep it in mind before you subclass a material.
@@ -430,11 +430,11 @@ every element grows an `accept()` method,
 and *double dispatch* routes each piece to the correct overload.
 Python has no method overloading, so even writing that down takes work
 (that chapter shows the shape on which the book's version settles).
-The design exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
+Visitor exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
 Python has neither limitation.
 The standard library provides `functools.singledispatch`,
 which dispatches on the type of its first argument,
-with new types registered from anywhere.
+and any module can register a new type.
 
 In Python, a single-dispatch function implements *Visitor*:
 
@@ -467,16 +467,17 @@ for cls in Trash.registry.values():
 #: Cardboard: flatten and bundle
 ```
 
-Each implementation above takes the name `_`,
-the placeholder name explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
-`recycling_note()` is a new operation defined outside the `Trash` hierarchy.
+Each implementation above takes the name `_`.
+[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+explains that placeholder.
+`recycling_note()` is a new operation that lives outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function.
 That fallback is also the risk:
 a material nobody registers gets the default answer,
 with no exception at runtime and no complaint from the checker.
 Here "no special handling" is a genuine answer, so the fallback earns its keep;
 when no default makes sense,
-that chapter's advice is to make the base function raise `NotImplementedError`,
+that chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 Adding another operation that varies by material means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class,

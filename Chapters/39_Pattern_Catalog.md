@@ -1,6 +1,6 @@
 # Pattern Catalog
 
-This chapter gathers patterns that are widely documented across the literature,
+This chapter gathers patterns that the literature documents widely,
 not only the original *Design Patterns* (GoF) set.
 It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
 *Patterns of Enterprise Application Architecture* (Fowler),
@@ -8,7 +8,7 @@ It draws from *Pattern-Oriented Software Architecture* (POSA, Buschmann et al.),
 and the common distributed and cloud patterns that emerged later.
 
 Each entry has a one-line intent so you can recognize a pattern by name and look it up in the literature that documents it.
-Listing a pattern here is not a recommendation.
+Listing a pattern here does not recommend it.
 Many overlap, some compete,
 and several exist only to work around limits of a particular language.
 The body of this book argues that a number of them are unnecessary in Python
@@ -18,7 +18,7 @@ The tables still follow each source's own grouping,
 so each name sits where its source puts it,
 including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy):
 that chapter calls *Creational* straightforward and questions the other two.
-Rows are alphabetical within each table,
+Each table lists its rows alphabetically,
 which for the classic patterns is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the pattern appears only in this catalog.
@@ -26,7 +26,7 @@ An unlinked name means the pattern appears only in this catalog.
 ## Finding a Pattern by Problem
 
 The tables below group by source.
-This one is for when you know the problem but not the name.
+Use this one when you know the problem but not the name.
 
 | If the problem is | Look at |
 |-------------------|---------|
@@ -87,7 +87,7 @@ This one is for when you know the problem but not the name.
 | Active Object | Decouple a method call from its execution by giving the object its own thread. |
 | Balking | Refuse an action when the object is not in a suitable state. |
 | [Double-Checked Locking](24_Singleton.md#tests-threads-and-locks) | Cut locking cost when lazily initializing a shared resource. |
-| [Future/Promise](19_Concurrency.md#one-task-many-backends) | Represent a result that will become available later. |
+| [Future/Promise](19_Concurrency.md#one-task-many-backends) | Represent a result that becomes available later. |
 | Guarded Suspension | Block a call until a precondition becomes true. |
 | Half-Sync/Half-Async | Separate synchronous and asynchronous work, joined by a queue. |
 | Leader/Followers | Let a pool of threads take turns receiving and handling events. |
@@ -216,4 +216,4 @@ Python includes the piece their inventors set out to supply.
 
 What survives the subtraction is the intent, not the structure.
 [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
-makes the general argument; each chapter above works one case.
+argues this in general; each chapter above works one case.

@@ -13,7 +13,7 @@ First, split each object's state in two.
 *Intrinsic state* belongs to the value and is identical across every use,
 so it can live in the shared object.
 *Extrinsic state* varies per use, so it must live outside,
-supplied by the context.
+where the context supplies it.
 Second, route construction through a factory that returns the existing instance for a given value.
 
 Handing out one object under many names is only safe when nobody can change it,
@@ -152,7 +152,7 @@ The grid can grow to any size and the object count stays at the number of tile k
 because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
-with the coordinates supplied by the asker.
+with the asker supplying the coordinates.
 The listing shows the object count; exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
@@ -170,7 +170,7 @@ The checker reads that guard.
 so reaching the line below means `char not in SPECS` was false,
 which narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
-The narrowing does the work a `cast()` would otherwise do by assertion
+The narrowing proves what a `cast()` would assert
 (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
 Prefer a guard the checker can read.
 Keep `cast()` for the cases where no guard exists,
@@ -196,7 +196,7 @@ def test_unknown_symbol_raises() -> None:
         to_symbol("?")
 ```
 
-Because `Tile` is frozen, sharing is invisible to clients.
+Freezing `Tile` hides the sharing from clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile.
 
@@ -275,8 +275,8 @@ so the default identity comparison answers correctly.
 the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,
 and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
 A `defaultdict` cannot replace `_pool` either:
-its `default_factory` is called with no arguments,
-so it cannot see the components the missing `Color` needs.
+it calls its `default_factory` with no arguments,
+so the factory cannot see the components the missing `Color` needs.
 
 `_pool` keys on the components alone, and every subclass inherits it,
 so no one can subclass `Color` safely.
@@ -427,13 +427,13 @@ if __name__ == "__main__":
 It declares a per-member attribute, the same role a dataclass field plays,
 except `__new__()` assigns it by hand instead of a generated `__init__()`.
 `__new__()` runs before any member becomes visible,
-so there is no window where `walkable` is unset.
+so nothing can observe an unset `walkable`.
 It needs no default or sentinel.
 
 Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
-The customization must happen in `__new__()`.
+`__new__()`, not `__init__()`, must assign `_value_`.
 The lookup table behind `Tile(".")` keys on the value `__new__()` establishes,
 so setting `_value_` later, in `__init__()`,
 leaves that table keyed by the tuples.

@@ -131,7 +131,7 @@ The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
 No locks, no queues, no shared state, and no changes to `count_primes()`.
-The function was ready for parallel execution on day one, because it was pure.
+The function was ready to run in parallel on day one, because it was pure.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
@@ -142,7 +142,7 @@ A `lambda` or a closure fails with a `PicklingError`,
 which rules out two shapes these chapters have been favoring.
 A `functools.partial` survives,
 because it pickles as its wrapped function plus its bound arguments.
-The `if __name__ == "__main__"` guard is there for the same reason:
+The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
 and without the guard every worker would build a pool of its own.
 [Concurrency](19_Concurrency.md#parallelism) covers all of this,
@@ -180,14 +180,14 @@ On a `Result[float, Exception]`,
 `match` and a chain of `isinstance()` tests narrow equally well,
 both reaching `float` inside the `Ok`,
 because `@final` on the two classes lets either one narrow to a single class.
-Destructuring makes the shape test and the extraction one step;
+Destructuring merges the shape test and the extraction into one step;
 it does not extend what the checker knows.
 
 ## An Assurance Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
-The properties built up here, purity, immutability,
+The properties these chapters built, purity, immutability,
 and referential transparency, provide assurance at every level.
 You decide how far to take it.
 
@@ -211,7 +211,7 @@ You decide how far to take it.
    You state a law the code must obey,
    then check it against many generated inputs.
    It does not prove the law.
-   It works to falsify it,
+   It searches for a counterexample,
    which is the falsifiability the opening required of a science.
 5. At the top is formal proof.
    In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
@@ -279,12 +279,12 @@ The listing repeats the two functions rather than importing them,
 because importing `property_check.py` would run its thousand-iteration loop inside the test run.
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
-By default there are a hundred of them,
+By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand, and they still cover more ground,
-because Hypothesis aims at boundaries and oddities instead of sampling evenly.
+because it aims at boundaries and oddities instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
-This is automated falsification machinery.
+The framework automates falsification.
 
 The two listings above both pass, so nothing has shrunk yet.
 This codec has a bug:
@@ -313,13 +313,13 @@ except AssertionError as e:
 #: )
 ```
 
-An underscore that was in the input comes back as a space.
+An underscore in the input comes back as a space.
 Hypothesis finds a failing string and then keeps cutting it down until removing anything more makes the test pass again,
-so what it reports is `'_'` rather than the longer string that failed first.
+so it reports `'_'` rather than the longer string that failed first.
 That single character is the whole bug statement.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 the job `random.seed(42)` did in the hand-written loop.
-`database=None` keeps it from replaying a case saved by an earlier run.
+`database=None` keeps it from replaying a case an earlier run saved.
 A real test needs neither.
 The function's name drops the `test_` prefix,
 and the listing calls it directly inside a `try`:

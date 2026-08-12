@@ -43,7 +43,7 @@ and `math.prod()` covers multiplication.
 `reduce()` earns its keep for every other fold,
 where no dedicated built-in exists.
 On an empty sequence it raises `TypeError: reduce() of empty iterable with no initial value`,
-because there is nothing to return.
+because it has nothing to return.
 A third argument supplies that starting value,
 so `reduce(add, [], 0)` returns `0` instead of raising an exception.
 
@@ -51,7 +51,7 @@ so `reduce(add, [], 0)` returns `0` instead of raising an exception.
 
 Remembers every result forever,
 so repeated calls with the same arguments cost nothing.
-This works correctly only for pure functions.
+`@cache` works correctly only for pure functions.
 Caching a side-effecting function skips the effects.
 
 ```python
@@ -68,7 +68,8 @@ print(fib.cache_info())
 #: CacheInfo(hits=28, misses=31, maxsize=None, currsize=31)
 ```
 
-Because `fib()` is recursive, the values up to and including 30 are now cached,
+Because `fib()` is recursive,
+the cache now holds every value up to and including 30,
 and the counts show what caching saved.
 The 31 misses are the 31 distinct arguments, `0` through `30`.
 The 28 hits are the calls that found a stored answer instead of recomputing it.
@@ -109,7 +110,7 @@ print(square.cache_info())
 
 The single hit is the second `square(2)`, which was still in the cache.
 The second `square(1)` is a fourth miss even though `1` was the first value computed,
-and that miss is the proof that `1` was evicted.
+and that miss proves the cache evicted `1`.
 `currsize` never passes `maxsize`:
 a new entry gets in only by pushing another one out.
 
@@ -135,7 +136,7 @@ shows it.
 ### `partialmethod`
 
 The same idea as `partial()`, but for a method.
-The descriptor binds `self` automatically when accessed on an instance.
+The descriptor binds `self` automatically when you access it on an instance.
 
 ```python
 # functools_partialmethod.py
@@ -229,7 +230,7 @@ print(greet.__name__, "-", greet.__doc__)
 
 If you delete the `@wraps(func)` line,
 that same `print()` reports `wrapper - None`,
-because `greet` is now bound to the inner function and nothing copied the original's identity onto it.
+because `greet` now refers to the inner function and nothing copied the original's identity onto it.
 Everything that reads those attributes reads the wrapper instead: `help()`,
 a traceback, a debugger, and a test framework that collects functions by name.
 `wraps()` also sets `greet.__wrapped__` to the original function,
@@ -288,7 +289,7 @@ or when the ordering is not simply the fields in declaration order.
 ### `singledispatch`
 
 Turns a plain function into one that dispatches on the type of its first argument,
-with per-type implementations registered separately.
+with per-type implementations you register separately.
 [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
 uses `singledispatch()` as an alternative to the Visitor pattern,
 including why the registered function below takes the name `_`.
@@ -316,8 +317,8 @@ and a keyword-only argument cannot drive the dispatch.
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
-The registered method below is again named `_`,
-explained in [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch).
+The registered method below again takes the name `_`,
+which [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explains.
 
 ```python
 # functools_singledispatchmethod.py
@@ -337,8 +338,8 @@ print(d.describe("hi"), "|", d.describe(5))
 #: a str | the number 5
 ```
 
-Dispatch is on the first argument after `self`, never on `self`,
-so this selects an implementation by the type of `value` the same way the plain function above does.
+`singledispatchmethod` dispatches on the first argument after `self`,
+never on `self`, so it selects an implementation by the type of `value` the same way the plain function above does.
 
 `itertools` does the same for iteration: ready-made pieces you compose,
 instead of loops you write and test again.
@@ -517,7 +518,7 @@ print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 #: [1, 2]
 ```
 
-The trailing `1` is in the input to separate `takewhile()` from `filter()`.
+The input carries a trailing `1` to separate `takewhile()` from `filter()`.
 `filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
 because filtering skips what fails and keeps looking.
 `takewhile()` stops at the first failure and never reaches the last element.
@@ -729,7 +730,7 @@ print(list(islice(squares, 3)))
 Four stages sit on top of an infinite source,
 and none of them run until `list()` pulls.
 The second `print()` shows the source resuming at 16 rather than 13,
-because `takewhile()` had to pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeded the limit.
+because `takewhile()` must pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeds the limit.
 A pull-based pipeline reads one value further than it keeps,
 and that one value cost three squares.
 
@@ -738,8 +739,7 @@ and that one value cost three squares.
 *Lazy evaluation* computes a value only when something needs it.
 A generator is the canonical example.
 It yields one value at a time instead of building a whole list up front.
-Combined with `itertools`,
-you can describe an infinite sequence and take only the part you use:
+With `itertools`, you can describe an infinite sequence and take only the part you use:
 
 ```python
 # lazy.py
@@ -783,7 +783,7 @@ A generator pipeline can process a multi-gigabyte file or a live network stream 
 so memory use doesn't grow with the size of the source.
 Stages chain together without building intermediate lists between them,
 and a consumer that stops early, such as `any()` or `next()`,
-means no upstream work for the items it never reaches.
+keeps the upstream stages from computing the items it never reaches.
 
 ## Recursion
 
@@ -824,7 +824,7 @@ the recursion states the definition, and the cache removes the repetition.
 Recursion suits problems that are naturally self-similar,
 such as walking a tree.
 Python does not optimize tail calls and limits the call stack,
-so deep recursion will raise a `RecursionError`.
+so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that ceiling when the depth is genuine,
 but it is the wrong answer for a long flat sequence,
 where a loop or one of the `itertools` tools is the better choice.
@@ -861,7 +861,8 @@ and says nothing about depth.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has had a turn.
-This is a good place to see several of these ideas working on one small program instead of one at a time:
+Several of these ideas work together here,
+on one small program instead of one at a time:
 an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,
@@ -976,7 +977,7 @@ the same join-instead-of-sit-out choice the pair rounds made above.
 
 A roster smaller than one full group takes that choice to its limit.
 The `while len(pool) >= size` loop never runs,
-so there is no group to fold the leftovers into,
+so no group exists to fold the leftovers into,
 and the `if pool and not groups` line opens one.
 Without it, `min()` receives no groups to compare and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,
@@ -1000,7 +1001,7 @@ It is still a pure function in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` never reaches outside itself for randomness.
-What changed is that computing round `100` now means having generated rounds `0` through `99`,
+Computing round `100` now means generating rounds `0` through `99` first,
 where the circle method could compute round `100` directly,
 from its arithmetic alone.
 That trade, memory for generality, is the same one [Recursion](#recursion)
@@ -1020,8 +1021,8 @@ The second rule is that the pieces exist to stack.
 `islice(count(10, 2), 5)` in this chapter is two stages;
 a real pipeline is five or six, and it still holds one item in memory at a time.
 [Error Handling](42_Functional_Error_Handling.md)
-asks what happens to such a pipeline when one stage fails,
-which is the question a chain of pure functions leaves open.
+asks what such a pipeline does when one stage fails,
+the question a chain of pure functions leaves open.
 
 ## Exercises
 

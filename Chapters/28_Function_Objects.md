@@ -13,7 +13,8 @@ In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
-the dissolution described in [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves).
+the dissolution [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+describes.
 *Command* appears first as a function,
 then as the classic class-based form for contrast,
 a contrast that holds for *Strategy* as well.
@@ -135,7 +136,7 @@ for command in macro:
 ```
 
 `Repeat` holds configuration and drops into the same list as `loony`,
-with no `Command` base class to derive from.
+with no `Command` base class above it.
 The classic form skips this middle step:
 it goes from a plain function straight to a base class.
 A callable alone cannot express a second operation, `undo()`.
@@ -176,7 +177,7 @@ and all three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
 The argument to `functools.partial`
 ([Foundations](40_Functional_Foundations.md#partial-application))
-is an ordinary expression, evaluated where you write it,
+is an ordinary expression, which Python evaluates where you write it,
 so each command stores the string built from that iteration's `n`.
 Nothing remains to look up later.
 The older form `lambda n=n: ...` does the same job with a default argument.
@@ -422,14 +423,14 @@ def test_all_fail_returns_none() -> None:
 
 ## An Event Bus: Handlers Keyed by Type
 
-Chain of Responsibility kept its handlers in a list and tried them in order.
+Chain of Responsibility keeps its handlers in a list and tries them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
 This is a `dict` from each event type to the functions that care about it.
 The events are values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.
-The handlers are ordinary functions, so there is no base class to inherit from,
+The handlers are ordinary functions, so they need no base class,
 and registering one is a single `subscribe()` call.
 `Handler` below names their signature, not an interface:
 
@@ -492,7 +493,8 @@ bus.publish(Closed("inactivity"))  # No handler: nothing happens
 
 `subscribe` is generic on the event type `E`, which appears in both parameters,
 so the checker must find one `E` that satisfies the event type and the handler together.
-No such `E` exists for `subscribe(Deposit, on_withdraw)` and it is a type error.
+No such `E` exists for `subscribe(Deposit, on_withdraw)`,
+so the checker reports a type error.
 The check runs once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
@@ -543,11 +545,12 @@ This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)
 with one shared subject: instead of every observable holding its own list,
 one bus holds them all and the event type picks the audience.
 Here a type may have many handlers.
-If you instead want a single handler per type,
-chosen by the argument's type and open to new types without editing a central function,
+If you instead want a single handler per type, one the argument's type picks,
+open to new types without editing a central function,
 that is `functools.singledispatch`,
-used by [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
-and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it).
+which [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+and [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)
+both use.
 
 ## Choosing the Lightest Callable
 

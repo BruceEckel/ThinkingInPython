@@ -57,7 +57,8 @@ It stores the CPU register set, which includes:
 - The stack pointer
 - Other registers and flags used by the program
 
-The context switch does not copy the thread's stack, since every thread has its own.
+The context switch does not copy the thread's stack,
+since every thread has its own.
 All threads in that process share a single heap.
 
 Context switching between threads is as efficient as possible,
@@ -316,7 +317,8 @@ asyncio.run(main())
 so all six are in flight together.
 Holding the task objects is not optional bookkeeping.
 The event loop keeps only weak references to its tasks,
-so a task that loses its last strong reference can disappear mid-execution, printing nothing and raising no exception.
+so a task that loses its last strong reference can disappear mid-execution,
+printing nothing and raising no exception.
 A `TaskGroup` holds its own references until the block exits.
 Outside one, keep the returned task in a variable or a set that outlives it.
 `c` and `d` raise exceptions at the same 0.03-second mark,
@@ -664,8 +666,7 @@ If a task reaches `async with lock` while another task already holds the lock,
 it suspends itself until that lock becomes available.
 This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
-The counter now reaches 400,
-the same fix `threading.Lock` produces for threads.
+The counter now reaches 400, the same fix `threading.Lock` produces for threads.
 An `asyncio.Lock` is not thread-safe either.
 It orders tasks on one event loop;
 a worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
@@ -1930,8 +1931,7 @@ because a task consumes none of the OS resources that limit threads.
 lost updates to shared mutable state, and an `asyncio.Lock` restored them,
 with no thread involved either time.
 Threads are not the source of deadlock and livelock.
-Shared mutable state is,
-and `asyncio` shares it just as readily as threads do.
+Shared mutable state is, and `asyncio` shares it just as readily as threads do.
 Removing the OS thread scheduler does not remove these failure modes.
 It only moves where they can arise.
 With threads, that point is anywhere the OS decides to preempt you.
@@ -2053,8 +2053,7 @@ whichever gets there first finishes and releases that lock before the other wait
 A *livelock* blocks nothing.
 Tasks keep running and keep changing state, but none of them makes progress,
 the way two people in a hallway each step aside for the other, forever.
-No lock takes part, no task waits to acquire anything,
-so no timeout can fix it:
+No lock takes part, no task waits to acquire anything, so no timeout can fix it:
 
 ```python
 # async_livelock.py
@@ -2100,7 +2099,7 @@ even though the event loop keeps both tasks busy the whole time.
 A real livelock looks busy on a monitor,
 with CPU time spent and state visibly changing.
 A deadlock looks idle, with tasks parked and waiting.
-In both cases, the program makes no progress.
+In both cases, nothing finishes.
 The usual fix is to break the symmetry,
 for example letting only the task with the lower ID give.
 
@@ -2290,7 +2289,7 @@ Here are a few of the topics beyond it:
     replace the body of `process_price()` with `return await pool.submit(cpu_price, order)`.
     Run `ty` on the changed file, then run it, and read the two errors.
     Explain, using [One Task, Many Backends](#one-task-many-backends),
-    why `pool.submit()`'s return value cannot be awaited,
+    why you cannot await `pool.submit()`'s return value,
     what `loop.run_in_executor()` returns instead,
     and why the runtime `TypeError` arrives wrapped in an `ExceptionGroup`.
 

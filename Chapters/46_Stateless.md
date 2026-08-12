@@ -59,7 +59,7 @@ explains why that request must be a value of its own.
 
 Although you can write the full `Effect` signature each time,
 the library provides three aliases for the most common cases.
-Each one fills in `Never` for a type parameter that is not used:
+Each one fills in `Never` for an unused type parameter:
 
 | Alias | Meaning |
 |---|---|
@@ -213,7 +213,7 @@ What comes back depends on which Ability the `yield` requested.
 One SendType cannot vary from one `yield` to the next.
 If you pin it to `Console`,
 the checker reads `yield Need(Log)` as producing a `Console`.
-The `send()` channel must be able to carry any type, so the SendType is `Any`.
+The `send()` channel must carry any type, so the SendType is `Any`.
 
 With `yield from`, a request produces an answer whose type the checker knows.
 A bare `yield` produces the SendType, the parameter forced to `Any`.
@@ -345,7 +345,7 @@ info[revealed-type]: Revealed type
 while `bound` is a function `supply()` built, described by its signature alone.
 These are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sat in the first type parameter of `greet` and disappears from `bound`,
-replaced by the `Never` as shown in the alias table.
+leaving the `Never` from the alias table.
 
 Handling an Ability *subtracts* it from the type.
 Here the subtraction leaves nothing behind:
@@ -494,9 +494,8 @@ def test_greet() -> None:
     assert recorder.messages == ["Hello, Alice!"]
 ```
 
-There is no `capsys`, no monkeypatching of `print`, and no mock.
-The test supplies a different `Console`,
-while `greet()` stays unchanged and unaware.
+The test needs no `capsys`, no monkeypatching of `print`, and no mock.
+It supplies a different `Console`, while `greet()` stays unchanged and unaware.
 
 `as_type(Console)` is the only ceremony in that test.
 It says "treat this recorder as a `Console`,"
@@ -569,8 +568,7 @@ and in a `for` comprehension it is the `<-` binding; Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
-Declaring the Ability is still manual.
-The benefit is that the checker verifies the declaration.
+Declaring the Ability is still manual, but the checker verifies the declaration.
 If you annotate `greet_all()` as pure, `ty` flags the problem:
 
 ```python
@@ -751,7 +749,7 @@ while this version still changes only the row.
 
 ## Builtin Dependencies
 
-Every dependency supplied so far has been one this chapter defined.
+Every dependency so far has been one this chapter defined.
 You might not need to define one,
 because Stateless supplies three dependency classes of its own:
 
@@ -814,12 +812,11 @@ and the inheritance satisfies the runtime check.
 The inheritance has a cost.
 `Recorder` inherits `Console`'s printing implementation and overrides all of it,
 so nothing of the parent survives except the name that `isinstance()` matches.
-But anything later added to `Console` shows up in `Recorder`.
+But anything you later add to `Console` shows up in `Recorder`.
 If you add a `read_line()` method to `Console`,
 `Recorder` inherits the real one without warning,
 so a test meant to record performs live console I/O instead.
-However, if the Ability is an interface,
-there is no implementation to inherit by accident:
+However, an interface leaves no implementation to inherit by accident:
 
 ```python
 # console_protocol.py
@@ -880,8 +877,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 Structural matching decides the runtime issue, not the static one.
 `supply(Terminal())` still builds a handler for `Need[Terminal]`,
 which does not eliminate `greet()`'s `Need[Console]`.
-The unhandled request passes through to `run()`,
-which is where the error appears.
+The unhandled request passes through to `run()`, where the error appears.
 An interface needs the `as_type()` upcast more than a base class does.
 You can instantiate and supply a concrete `Console` directly,
 while an interface leaves nothing to supply but an implementation.
@@ -895,7 +891,8 @@ That is a real cost of using an interface.
 declares its abilities as `Protocol`s and shows how to avoid that cost:
 write one boundary function whose parameter annotations name the interface types,
 and call `supply()` inside it.
-The parameter annotation performs the upcast, so no call site needs `as_type()`.
+The parameter annotation upcasts the argument,
+so no call site needs `as_type()`.
 An annotated local variable does not do the same job:
 `screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
 so `supply(screen)` builds a `Need[Terminal]` handler again.
@@ -1012,7 +1009,7 @@ and no `Need[Console]` matches it
 
 The `Any` in `DI_CONTAINER` is unavoidable,
 because it holds instances of unrelated types.
-The type information is now held in the dictionary key,
+The dictionary key now carries the type information,
 but a homogeneous `dict` has no annotation for "the value under key `type[T]` is a `T`."
 That invariant lives in `register()`'s signature rather than in the container.
 
@@ -1022,8 +1019,8 @@ apart from `console: Console = get(Console)` in place of `console = yield from n
 The first call to `greet("Alice")` fails at runtime because nothing registered a `Console`.
 The second call succeeds because now the binding exists.
 The two `greet()` calls are identical.
-No type information indicates whether a `Console` registration exists,
-so the type checker cannot report that something has gone wrong.
+Nothing in the types says whether anything registered a `Console`,
+so the type checker cannot report the mistake.
 
 This `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
@@ -1033,7 +1030,7 @@ But it relocates a [side cause](44_Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker never validates the dependency.
 
 An EMS like Stateless sets a higher bar.
-The dependency must appear in the signature, to be type-checked,
+The dependency must appear in the signature for the checker to verify it,
 which is why the EMS version of `greet()` returns `Depend[Need[Console], None]` and the `greet()` in `dependency_injection.py` returns `None`.
 The foundation of EMS is tracking all dependencies.
 The goal is to catch errors during type checking rather than relying on programmer memory and exhaustive testing.
@@ -1044,7 +1041,7 @@ This has three consequences:
 
 1. Stateless checks come before the program runs.
    DI only discovers a missing registration when something asks for it.
-   This can be at startup or much later, on a path no test exercised.
+   That ask can come at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
    `ty` reports the unsupplied `Need[Console]` before the program runs
    ([Forgetting to Supply](#forgetting-to-supply)).
@@ -1136,7 +1133,7 @@ not to quiet a checker that is telling you something.
 ## Waiting on a Coroutine
 
 `Async` has appeared so far only inside error messages,
-answered by `run()` without anyone asking for it.
+where `run()` answers it without anyone asking for it.
 `wait()` puts it into a signature deliberately.
 `yield from wait()` accepts any awaitable and produces the value that awaitable produces:
 
@@ -1169,15 +1166,13 @@ so the checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
 
-There is nothing to supply, because `Async` asks for no object
-(there's no `Need`).
+`Async` asks for no object (there's no `Need`), so you supply nothing.
 An `Async` request carries the coroutine and asks the driver to await it,
 and `run()` does that with the event loop it starts.
 So the driver answers `Async` rather than supplying it:
 `supply()` handles only a `Need`, and `Async` is a different Ability.
 
-Notice what `report()` is not.
-It is not an `async def` and it contains no `await`,
+`report()` is not an `async def` and contains no `await`,
 yet its result comes from a coroutine.
 `wait()` hands the coroutine out as a request and the driver awaits it,
 so the asynchrony stops at the Ability channel instead of spreading to `report()` and everything that calls it.
@@ -1282,7 +1277,7 @@ and under a millisecond here.
 The subclass goes through `as_type(Time)`,
 for the reason in [Supplying an Interface](#supplying-an-interface).
 
-In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must also be frozen.
+In `Instant`, `waited` is a field because `Time` is a frozen data class and a subclass must carry `frozen=True` too.
 Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 ## Where to Call `run()`
@@ -1327,7 +1322,7 @@ A synchronous program calls `run()` once at its outermost edge.
 A program that is already asynchronous, a web service or a bot,
 awaits `run_async()` at the edge of each request.
 Picking the wrong one is a runtime error rather than a type error,
-which makes it one of the few mistakes in this chapter the type checker will not catch.
+which makes it one of the few mistakes in this chapter the type checker does not catch.
 
 ## The Error Channel
 
@@ -1468,7 +1463,7 @@ A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver sees it and returns that value as the result,
 so the inner `except` never runs.
 Only `catch()` moves an error in the type, which is the next section.
-All three facts are visible in one listing:
+One listing shows all three facts:
 
 ```python
 # except_vs_catch.py
@@ -1555,7 +1550,7 @@ which its `Callable[[str], Success[None]]` annotation states:
 give it a `str` and it produces an Effect that needs nothing and cannot fail.
 `run()` drives that Effect,
 so `reporter("Alice")` comes first and `run()` second.
-The Effect "succeeds" at producing either a score or a `KeyError` that reports there is no score.
+The Effect "succeeds" at producing either a score or a `KeyError` that reports the missing score.
 A raised `KeyError` is a failure.
 A returned `KeyError` is data.
 
@@ -1575,7 +1570,7 @@ error[unsupported-operator]: Unsupported `+` operation
 ```
 
 This is the same guarantee the `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
-reached without rewriting the body of `score()`.
+and `catch()` reaches it without rewriting the body of `score()`.
 
 ### Multiple Errors
 
@@ -1597,7 +1592,7 @@ def read_score(name: str) -> int:
     return int(text)  # ValueError
 ```
 
-There are two steps, and one potential failure in each.
+`read_score()` takes two steps, with one potential failure in each.
 The lookup raises a `KeyError` for an unknown name,
 and the conversion raises a `ValueError` for text that is not a number,
 like Bob's `"seven"`.
@@ -1689,7 +1684,7 @@ and a third case that needs none:
 2. A failure is an exception: `@throws` lifts it into the type,
    and `catch()` takes it back out as a value.
 3. An Ability that the driver answers on its own needs no vocabulary.
-   `Async` sits in the same channel as a `Need` and is never supplied,
+   `Async` sits in the same channel as a `Need`, and nobody supplies it,
    because `run()` owns the event loop that answers it.
 
 The vocabularies differ.

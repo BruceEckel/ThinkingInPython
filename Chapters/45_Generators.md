@@ -35,9 +35,9 @@ This names the three things a generator exchanges with its caller:
 - `SendType` is the type `send()` accepts,
   thus the type the `yield` expression produces inside the generator.
 - `ReturnType` is the type of the generator's `return` value,
-  delivered as `StopIteration.value`.
+  which arrives as `StopIteration.value`.
 
-The default value for the last two type parameters is `None`.
+The last two type parameters default to `None`.
 A generator that only produces values can use either form:
 
 ```python
@@ -113,7 +113,7 @@ The distinction exists only for the checker.
 Driving the generator by hand sends one `Answer` at a time.
 `next(i)` starts the generator and produces a `Question`.
 `i.send(Answer("Alice"))` provides an answer and produces the next question.
-This is the two-way channel in a single expression.
+That single expression carries both directions of the channel.
 The last `send()` finds no further `yield`,
 so the generator returns its `Result`.
 A returning generator also raises `StopIteration`,
@@ -126,7 +126,7 @@ as this listing does.
 The first call on a new generator object cannot carry a value.
 A newly created generator pauses at the top of the function body,
 before any code runs,
-so there is no suspended `yield` expression to receive a sent value.
+so no suspended `yield` expression can receive a sent value.
 If you call `i.send(Answer("Alice"))` at that point,
 it raises `TypeError: can't send non-None value to a just-started generator`.
 
@@ -182,7 +182,7 @@ a generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
-Typically, a driver function does the stepping:
+Typically, a driver function steps the generator:
 
 ```python
 # two_way_generator.py
@@ -259,7 +259,7 @@ which serializes the conversation.
 
 ## `yield from` Composes Descriptions
 
-The reason generators can carry an EMS is that they nest.
+Generators can carry an EMS because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
 Each of the three channels crosses that boundary differently.
@@ -299,8 +299,8 @@ print(list(top()))
 
 Each `yield from` runs its target until that generator runs out,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
-The number of contributions is a property of the target.
-The `from` makes this delegation:
+The target decides how many values each delegation contributes.
+The `from` delegates:
 `yield one()` would hand the generator object to the driver as one value.
 "Exhausted" describes where the delegation ends, not when.
 Each value still leaves the inner generator only when the driver asks for the next one.
@@ -337,8 +337,7 @@ print(list(report(["red", "green", "blue"])))
 #: ['red', 'green', 'blue', '(12 characters)']
 ```
 
-`emit()` is a `Generator[str, None, int]`: it yields strings,
-is never sent anything,
+`emit()` is a `Generator[str, None, int]`: it yields strings, receives nothing,
 and returns the `int` total it accumulates while iterating.
 
 The return channel is how a generator reports to whichever generator delegated to it,
@@ -393,7 +392,7 @@ because `yield from` passes the inner generator's yield and send channels throug
 
 The numbers travel down to the `yield` that asked for them.
 `g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
-`both()` contains no code that forwards the value because `yield from` does that forwarding.
+`both()` contains no code that forwards the value because `yield from` forwards it.
 
 `g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
 which completes the first `yield from`, which starts the second one.
@@ -438,7 +437,7 @@ the send channel appears in the declaration and goes unused.
 
 ### All Three Channels
 
-You can apply `yield from` to the `interview()` example:
+`yield from` restructures the `interview()` example:
 
 ```python
 # yield_from_delegates.py
@@ -535,7 +534,7 @@ Something must still call `next()` and `send()` at the top,
 which is why the example ends with a `drive()` call.
 However deep you stack delegations, the number of drivers stays at one.
 
-What separates them is the response to a request.
+They differ in how they respond to a request.
 `drive()` answers it: a `Question` comes out, the driver looks it up,
 and the request stops there.
 `yield from` answers nothing.
@@ -590,7 +589,7 @@ That is the question the next chapter puts into the type system.
     Write a second driver that answers from an `Iterator[Answer]`, in order,
     and run `interview()` under both.
     Explain what, if anything, needed to change in `interview()`, and why.
-    Give your driver fewer answers than there are questions and say what it returns.
+    Give your driver fewer answers than questions and say what it returns.
     `StopIteration` now means two different things in the same loop;
     keep them apart.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.

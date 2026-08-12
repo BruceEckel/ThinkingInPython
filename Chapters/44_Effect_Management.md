@@ -2,8 +2,8 @@
 
 A test you wrote last week starts failing about one run in five.
 The function it calls computes a total price, the math is right,
-and three calls down, inside a helper that formats currency,
-there is a read from a configuration service and a write to an audit log.
+and three calls down,
+a helper that formats currency reads a configuration service and writes to an audit log.
 None of that is in any signature on the path.
 
 This book has emphasized the benefits of pure functions in numerous places:
@@ -56,10 +56,10 @@ Side effects are relatively easy to spot in the function that performs them,
 because they change something outside it.
 
 But the meaning of "Effect" is broader than side effects.
-It also includes the impact of the environment on the function.
+It also includes what the environment does to the function.
 For example, suppose your function reads the time of day, or a random number.
 This doesn't change anything in the environment.
-However, the result of your function will almost certainly differ from one call to the next.
+However, the result of your function almost certainly differs from one call to the next.
 If you incorporate any information other than the function arguments,
 your function becomes impure.
 This usually involves I/O: the time of day, a random number,
@@ -68,7 +68,7 @@ But it can also be as simple as reading a variable that's global to your functio
 These are *side causes* (corresponding to side effects) or *implicit inputs*.
 
 Thus, Effects are the union of side effects and side causes.
-But there's another factor that doesn't quite fit either category.
+But another factor doesn't quite fit either category.
 
 ## Are Exceptions Impure?
 
@@ -126,8 +126,7 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results)
 does.
-`result.py` and `safe.py` are shared helpers,
-so this chapter imports them directly instead of rebuilding them.
+This chapter imports the shared helpers `result.py` and `safe.py` directly instead of rebuilding them.
 If you decorate the original `slope()`, unchanged,
 every exception it raises becomes a value instead of a crash:
 
@@ -199,7 +198,7 @@ Languages like C++ and Java attempted to track exceptions using *exception speci
 but did not make those first-class in the function type.
 Nothing computed a specification from the functions a body called,
 so an exception introduced three levels down had to appear by hand in every signature above it.
-The usual escape was to widen the specification until it said nothing.
+Programmers usually escaped by widening the specification until it said nothing.
 They leaked implementation details and are generally considered a failure
 (C++ changed its specifications to a binary indication of whether a function throws).
 
@@ -250,7 +249,7 @@ and every function downstream is pure by inheritance rather than by discipline.
 None of the three makes the failure disappear.
 A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
-What changes is how many functions must know about it.
+They differ in how many functions must know about it.
 
 ## A Program Can Never Be Pure
 
@@ -290,8 +289,9 @@ is a space heater with extra steps.
 
 Effects are not a defect to design away.
 They are the reason a program exists.
-The goal of Effect Management is not to eliminate Effects but to isolate them so the rest of the program can stay pure
-(this is sometimes called "pushing the Effects to the edges").
+Effect Management does not eliminate Effects;
+it isolates them so the rest of the program can stay pure
+(people call this "pushing the Effects to the edges").
 
 So why track them at all?
 The first and most obvious reason is parallelism.
@@ -328,7 +328,7 @@ In almost every case, testing is a benefit of Effect Management.
 That is not a coincidence.
 A test must run in an environment it completely controls.
 Untracked Effects are the parts of the environment a test cannot control.
-Every Effect you isolate becomes controllable by your tests.
+Your tests can control every Effect you isolate.
 
 You get these benefits only if you know where the Effects are.
 In a small program you find them by inspection.
@@ -368,7 +368,7 @@ A function you understand today gets called by a function written next week,
 which gets called by code a colleague writes next month.
 Each step adds invisible dependencies, and no one has the full picture.
 
-What is missing is tracking.
+Tracking is the missing piece.
 Without it you don't know what a function does.
 You don't know whether it is safe to run in parallel with another,
 or what happens when you call it twice in a row.
@@ -463,8 +463,7 @@ The demo binds them to test stand-ins, `Scripted` and `Capture`,
 and checks the greeting with no console in sight.
 A production caller passes objects that read with `input()` and write with `print()`,
 and `greet()` never changes.
-This is delayed binding by hand,
-and it is why "pass in your dependencies" is such durable advice.
+Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
 
 The signature says what `greet()` needs, not everything `greet()` might do:
 a `print()` in the body would still be invisible.
@@ -609,7 +608,7 @@ native Effects are unavailable,
 so designers built *library* Effect systems on top of existing type systems.
 In this approach the compiler doesn't track Effects.
 Instead, the library encodes Effect information into the return type of every function.
-That encoding forces a shift in mechanism.
+That encoding changes the mechanism.
 Instead of writing a computation and letting the compiler observe its Effects,
 you build a *description* of a computation, and execute the description later.
 
@@ -712,9 +711,9 @@ rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 ### Custom AI Languages with Effects
 
-At this writing there is an explosion of experimental languages designed for AI code generation.
-Their designs try to balance better code generation for the AI against human verifiability.
-Adoption is not gated by how long humans take to learn them.
+At this writing, experimental languages designed for AI code generation are proliferating.
+Their designers try to balance better code generation for the AI against human verifiability.
+The time humans need to learn them does not slow adoption.
 A language written for an AI doesn't need the conveniences that help a person read code,
 and if it works, an AI can start using it immediately.
 
@@ -850,7 +849,7 @@ and a generation later, nobody can imagine doing it by hand.
 
 Namespaces are the clearest example.
 Early languages put every name in one global pool,
-and the programmer was responsible for preventing collisions.
+and the programmer prevented collisions by hand.
 Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
 The solution gave every name a home.

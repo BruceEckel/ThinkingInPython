@@ -4,7 +4,7 @@ Sometimes the problem you're solving is as simple as "I don't have the interface
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-This is a more comfortable way to deal with a library or bundle of resources.
+That interface makes a library or bundle of resources more comfortable to use.
 Both wrap something that already exists,
 which puts them next to Proxy and Decorator,
 and a later section sorts the four apart.
@@ -14,7 +14,7 @@ The other half is telling callers that the interface they have been using is goi
 ## Adapter
 
 When you've got "this", and you need "that", *Adapter* solves the problem.
-The only requirement is to produce a "that".
+The adapter only needs to produce a "that".
 The smallest version puts the adaptation in an object of its own:
 
 ```python
@@ -96,8 +96,7 @@ The output is deliberately monotonous.
 Counting the object adapter above, three structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
 The approaches differ only in where the adaptation lives.
-When the output cannot tell them apart,
-the choice among them is one of packaging.
+When the output cannot tell them apart, only packaging separates them.
 (GoF adds a fourth placement, an inner-class adapter the adaptee hands out, which is Java packaging for the same forwarding.)
 
 The three split into two families *GoF Design Patterns* names.
@@ -139,7 +138,7 @@ the same substitution [Surrogate](26_Surrogate.md#proxy)
 makes for a proxy's implementation.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
-`__getattr__()` does the forwarding, so the adapter is tiny:
+`__getattr__()` forwards the rest, so the adapter is tiny:
 
 ```python
 # getattr_adapter.py
@@ -170,11 +169,11 @@ if __name__ == "__main__":
 `__getattr__()` runs only for attributes Python does not find normally,
 so `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
-You saw a real one in [Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts):
-`PairCoord` adapts a `Pair` to the `Coord` protocol.
+[Rethinking Objects](20_Rethinking_Objects.md#protocols-generalize-composition-adapts)
+has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
 written because the type it received did not fit the function it had to call.
-The forwarding has the limit noted in [Surrogate](26_Surrogate.md#proxy):
+The forwarding carries the limit [Surrogate](26_Surrogate.md#proxy) notes:
 special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 as exercise 1 does with `__getitem__()`.
@@ -213,9 +212,9 @@ That is *Façade*.
 If you have a confusing collection of classes and interactions the client programmer doesn't need to see,
 create an interface that presents only what's necessary.
 
-A Façade often takes the form of a [Singleton](24_Singleton.md)
+A Façade is often a [Singleton](24_Singleton.md)
 [Abstract Factory](27_Factory.md#abstract-factories).
-You can get this effect by creating a class containing static factory methods:
+A class containing static factory methods gets that effect:
 
 ```python
 # facade.py
@@ -295,10 +294,10 @@ what a module gives you.
 
 ## Telling the Wrappers Apart
 
-This chapter completes a family of wrappers that share one structure,
+Adapter and Façade complete a family of wrappers that share one structure,
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
-What separates them is intent,
+Intent separates them,
 the distinction [The Pattern Concept](21_The_Pattern_Concept.md)
 said remains when structures match.
 When you cannot decide what to call your wrapper,
@@ -358,7 +357,8 @@ print(caught[0].message)
 
 `to_string()` keeps working, which is the point: existing callers get a warning,
 not a break.
-The `# type: ignore` is there because `ty` reports the deprecated call as a diagnostic,
+The `# type: ignore` silences `ty`,
+which reports the deprecated call as a diagnostic,
 the half that reaches a caller before they run anything.
 The runtime half is a `DeprecationWarning`.
 Python hides those by default outside `__main__` and test runners,
@@ -368,8 +368,9 @@ or `-W error::DeprecationWarning` in continuous integration to fail on one.
 A warning also goes to standard error, where a `#:` marker cannot capture it,
 so the listing records the warnings and prints the record.
 
-The message is required, and it should say what to use instead.
-"Deprecated" tells a reader that someone made a decision;
+`warnings.deprecated()` requires the message,
+and it should say what to use instead.
+"Deprecated" tells a reader that someone decided to retire this;
 "replaced by `render()`" tells them what to do about it.
 The decorator also applies to a class,
 where it warns on construction and on subclassing.

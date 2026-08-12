@@ -134,15 +134,16 @@ The tuple keeps the tree immutable;
 a paragraph below says why a `list` would not do.
 
 `Directory` names `Node` before its definition below,
-which works because annotations and `type` aliases are both evaluated lazily
+which works because Python evaluates annotations and `type` aliases lazily
 (see [Naming Types: The `type` Statement](08_Static_Typing.md#the-type-statement)).
 
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed is where operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
-This is the same trade explored in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance):
-a closed set of types, with each operation gathered in one place.
+[Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
+explores the same trade: a closed set of types,
+with each operation gathered in one place.
 The `assert_never()` in each `case _` makes that closed set pay off.
 If you add a `Symlink` class to the `Node` union,
 every function whose `case _` calls `assert_never()` fails type checking,
@@ -314,7 +315,7 @@ so without them Python parses `1 & b` first.
 ## Evaluation Is a Tree Walk
 
 Evaluation is a recursive `match` function.
-Variables need values, supplied here as keyword arguments:
+Variables need values, which the caller supplies as keyword arguments:
 
 ```python
 # evaluate.py
@@ -500,7 +501,8 @@ the left child is a `Mul` and only becomes a `Num` once something simplifies it.
 Simplifying both children first and matching the results catches the identity the recursion just exposed,
 which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
-Because every node is frozen, `simplify()` never edits the input.
+`frozen=True` blocks every field assignment,
+so `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
 the `is` guard in each `case _` hands back the node it received when neither child simplified to anything different.
 
@@ -560,9 +562,9 @@ and the escape is an iterative walk driving an explicit stack of pending nodes.
 
 ## A Template Is a Tree {#a-template-is-a-tree}
 
-Python has a composite of its own with no walker supplied,
-which is an invitation to write one.
-A `t`-string, introduced in [Tour](02_Tour.md#t-strings),
+Python has a composite of its own and supplies no walker for it,
+which invites you to write one.
+A `t`-string, which [Tour](02_Tour.md#t-strings) introduced,
 evaluates to a `Template`: a sequence of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iteration skips the empty literal pieces,
@@ -615,7 +617,7 @@ print(to_shape(query))
 ```
 
 `to_query()` and `to_shape()` are the same relationship as `evaluate()` and `to_infix()`:
-two operations over one structure, neither of them known to the structure,
+two operations over one structure, which knows neither of them,
 and adding a third changes nothing that already exists.
 
 The first one earns its place.
@@ -630,8 +632,8 @@ and the only remaining defense would be inspecting the result to guess which cha
 
 That is the general argument for handing a consumer the structure instead of the answer.
 A finished string has thrown away the distinction on which the safety decision depends.
-The Interpreter pattern is usually presented as a way to add operations to a language;
-here it is a way to keep a decision available to whoever should make it.
+Textbooks usually present the Interpreter pattern as a way to add operations to a language;
+here it keeps a decision available to whoever should make it.
 
 ## Exercises
 

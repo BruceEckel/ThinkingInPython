@@ -3,7 +3,7 @@
 The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
-The *Visitor* assumption is that you have a primary class hierarchy you cannot change.
+*Visitor* assumes you have a primary class hierarchy you cannot change.
 Perhaps it's from another vendor and you can't touch its source.
 However, you'd like to add new polymorphic methods to it.
 Normally you'd add something to the base class interface,
@@ -166,7 +166,7 @@ where a bag of attributes named at runtime leaves no precise type to write.
 
 Notice where the behavior lives.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
-so the only addition to the primary hierarchy is `accept()`.
+so it adds only `accept()` to the primary hierarchy.
 Python has no method overloading,
 since a second `def visit()` replaces the first,
 so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
@@ -183,8 +183,7 @@ with per-type implementations registered from anywhere.
 That is what *Visitor* does,
 without the `accept()` method or the `Visitor` class hierarchy.
 The flowers below are the same three.
-The operations are new, and there are two of them,
-added independently of each other:
+The two operations are new, each added independently of the other:
 
 ```python
 # visitor_singledispatch.py
@@ -244,7 +243,7 @@ registers one implementation for several types at once.
 Each registered implementation takes the name `_`.
 `nectar()` calls it through the dispatcher, not by its own name,
 so the name carries no meaning.
-`_` is the conventional placeholder for a name nobody will use.
+`_` is the conventional placeholder for a name nobody uses.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
 so nothing goes missing.
@@ -260,7 +259,7 @@ falling back to the base implementation only when no registered ancestor exists
 The listing's last two output lines print the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
 and `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
-`Ranunculus` was not registered,
+Nothing registers `Ranunculus`,
 so it resolves to the same implementation `Flower` does,
 the one filed under `object`.
 
@@ -273,7 +272,7 @@ not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
 The checker does not object either,
 because the dispatcher it builds declares its parameters as `Any`.
-When there is no sensible answer for an unregistered type,
+When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 The omission then fails at the first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
@@ -353,8 +352,8 @@ As with [Pattern Refactoring](37_Pattern_Refactoring.md#adding-operations-visito
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
 The trade loses nothing.
-The second dispatch in the classic pattern is not there because two types are unknown;
-it is there because the operation has nowhere else to live.
+The second dispatch in the classic pattern exists not because two types are unknown,
+but because the operation has nowhere else to live.
 The visitor's type stands in for the operation,
 so the language must resolve it at runtime along with the element's type.
 Once an operation can be a function defined outside the hierarchy,

@@ -126,7 +126,7 @@ because `Console` is not assignable to `Ability[Any]`.
 which is why `scripted` and `capture` must annotate their parameters.
 If you leave the annotation off,
 `handle()` raises a `ValueError` at the point of decoration,
-since there is nothing to match a request against.
+since nothing names the type a request must match.
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
 Naming the two stages also matters to the checker,
@@ -308,7 +308,7 @@ and `batch_due()` returns `True` with no time having passed.
 The schedule logic runs against whatever moment the handler names,
 in microseconds rather than a day.
 `batch_due()` holds no `datetime.now()` call,
-so there is nothing to monkeypatch and nothing to wait for,
+so a test has nothing to monkeypatch and nothing to wait for,
 and a production handler that returns `datetime.now()` leaves the function unchanged.
 
 Those three runs are claims about testability, so here they are as tests.
@@ -390,7 +390,7 @@ Under `steady` the two dates agree and the function looks correct.
 `crossing` answers the first request at one second before midnight and the second two seconds later.
 Now the file carries January 1's name and the entry inside it carries January 2's date.
 A day of entries can end up in the wrong file,
-and the window where this happens is one second wide.
+and the window for the mistake is one second wide.
 
 Using a real clock, you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
@@ -630,7 +630,7 @@ The load's declared dependency does not change.
 and that type appears once.
 What changes is the object answering the need, four times, mid-run.
 Binding a dependency before the program starts cannot express this,
-because there is no single right answer to bind.
+because no single answer stays right for the whole run.
 Here the binding is a function call, so it reads the world at each request.
 [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 swapped an implementation between runs.
@@ -926,7 +926,8 @@ print(outcome(DeadWire(), SHELF))
 Four runs of one program, differing in what you supply.
 The first finds its article.
 The second exercises `NotInteresting`, the third `NoArticle`,
-and the fourth `Unavailable`, so every failure the signature declares gets used.
+and the fourth `Unavailable`,
+so the runs cover every failure the signature declares.
 A full Effect system calls each pair of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
@@ -1160,7 +1161,7 @@ A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
 and under `ty` 0.0.70 both orders infer the same result type.
 What both orders need is the intermediate name.
-Written as one nested expression the inference collapses:
+In one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
 and `catch_all(supply(feed, book)(research))` fails with a `no-matching-overload` and infers `Unknown`.
 That is why `bound` has a name,
@@ -1248,7 +1249,7 @@ so `supply()` binds one instance of each.
 The loaf is not a leaf.
 `bread()` is an Effect that produces a loaf,
 so `toast()` obtains one by writing `yield from bread()` rather than by asking for a `Need[Bread]`.
-Nothing supplies a loaf, because when `supply()` runs there is no loaf.
+Nothing supplies a loaf, because no loaf exists when `supply()` runs.
 
 The graph arrives in the signature, flattened into a union.
 `toast()` declares all three leaves although its body names one of them.
@@ -1358,7 +1359,7 @@ Output is an Ability like the other four:
 `Narrator` is one of the five requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
-There is no `GameEnvironment` to construct and no factory to hold.
+The program constructs no `GameEnvironment` and holds no factory.
 The five-way union appears in full rather than as an alias,
 the practice [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 recommends.
@@ -1497,7 +1498,7 @@ the same swap `test_greeter.py` in [Swapping the Implementation](46_Stateless.md
 made with one Ability rather than five.
 The engine holds no printing to intercept.
 
-There is a ceiling on how wide the cast can get.
+The cast has a ceiling on how wide it can get.
 `supply()`'s declaration carries overloads for one through nine values,
 so a tenth argument matches none of them:
 
@@ -1590,11 +1591,11 @@ The first run is the baseline: one attempt, no retry, and it fails.
 and `recurs()` stops it after `n` yields.
 Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
-`save_user()` was not edited for any of this.
+`save_user()` stayed unchanged through all of it.
 
 Read the trace before you use this on real code.
 Each attempt line is `Database.save()` running again,
-so anything the decorated function does happens once per attempt.
+so the decorated function runs its whole body once per attempt.
 Retrying a charge or an append duplicates it.
 Nothing in the type says whether a retry is safe,
 because `Effect[A, E, R]` tracks what a function needs and how it fails,
@@ -1604,7 +1605,7 @@ That judgment stays with you.
 `retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 for the reason [An Effect Runs Once](46_Stateless.md#an-effect-runs-once) gave:
-the Effect is a generator, it is spent after one `run()`,
+the Effect is a generator, one `run()` spends it,
 and only the function can build a second description.
 
 ### What Retry Costs the Signature
@@ -1975,7 +1976,7 @@ That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting t
 Keep the habit generally:
 a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
-You have now seen two of these checker gaps: the nested handler expression here,
+That makes two checker gaps: the nested handler expression here,
 and the direct Ability yield that types as `Unknown`.
 Each has the same shape.
 The library's types are asking the checker a hard inference question,
@@ -2006,8 +2007,8 @@ Stateless offers only the first, a *tail-resumptive* handler.
 The ceiling is the substrate rather than the design.
 A Python generator is one-shot, so there is nothing to resume twice.
 
-Two pieces of the library are evidence of that ceiling.
-`Effect[A, E, R]` carries a separate `E`, worked by `@throws` and `catch()`.
+Two pieces of the library show that ceiling.
+`Effect[A, E, R]` carries a separate `E` that `@throws` and `catch()` work.
 Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
 The extra type parameter exists because a Stateless Ability cannot fail,
@@ -2042,11 +2043,11 @@ reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge by hand,
 and the checker verifies a `supply()` call for completeness but not for how you assembled it.
 The operator set is thin in the same way.
-There is `retry()` and `repeat()`,
+The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,
 with no exponential backoff and no jitter.
-There is no timeout, no `race`, no fallback combinator, and no finalizer,
-which rules out the hedging strategy that races a delayed second request.
+Stateless provides no timeout, no `race`, no fallback combinator,
+and no finalizer, which rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Forking two Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 produces a race no type reports,
@@ -2076,9 +2077,9 @@ Each one describes what a function depends on, what it can produce,
 and how it can fail, before you read a single line of the body.
 That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
 Purity is valuable because it is verifiable,
-and verification performed by reading code does not scale.
+and verifying it by reading code does not scale.
 
-There is a second gain, and it shows when you put functions together.
+A second gain shows when you put functions together.
 Python has a separate mechanism for each concern an Effect type carries.
 Absence is `T | None`.
 Failure is a raised exception,

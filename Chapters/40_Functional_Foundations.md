@@ -70,16 +70,16 @@ You cannot understand a single `withdraw()` call without tracking the history of
 
 The payoff is trust.
 A pure function is the most reliable code you can write,
-because its behavior is fully described by its inputs.
+because its inputs fully describe its behavior.
 You can call it from many threads at once,
 because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional_Assurance.md#automatic-parallelism)
 turns that safety into speed.
-A cache can store its results, knowing the answer will never go stale.
+A cache can store its results, knowing the answer never goes stale.
 That makes [`functools.cache`](41_Functional_Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
 And you test it with a single assertion and no fixture,
-since there is nothing to set up or restore:
+since it holds no state to set up or restore:
 
 ```python
 # why_pure.py
@@ -115,7 +115,7 @@ asks of this same function whether raising an exception breaks its purity.
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
 Each is immutable in itself, and no deeper:
-the tuple `([1], 2)` will always hold that same list,
+the tuple `([1], 2)` always holds that same list,
 and anyone can still append to it.
 Removing shared mutable state is the practical core of the functional style.
 A value that never changes cannot develop a bug from some forgotten change elsewhere.
@@ -142,7 +142,7 @@ print(moved)
 #: Point(x=11, y=2)
 ```
 
-The demonstration writes the assignment as `setattr(p, "x", 5)` because the direct form `p.x = 5` never gets to run:
+The listing writes the assignment as `setattr(p, "x", 5)` because the direct form `p.x = 5` never gets to run:
 the type checker rejects it statically, as it should.
 `setattr()` slips past the static check so the listing can show the runtime rejection too.
 The original `p` stays untouched, and `moved` is a separate value.
@@ -151,7 +151,7 @@ two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
 Type annotations can state immutability so a checker enforces it.
-`typing.Final` marks a name that must not be rebound.
+`typing.Final` marks a name you must not rebind.
 The read-only collection types in `collections.abc`,
 such as `Sequence` and `Mapping`, describe a value you only read.
 They have no `append()` or item assignment,
@@ -174,11 +174,11 @@ print(MAX_SIZE, total([1, 2, 3]))
 ```
 
 The annotation is a constraint the checker enforces,
-even when the value passed in is a mutable `list`.
+even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
-is a type error caught before the program runs.
+is a type error the checker catches before the program runs.
 The constraint runs one way only.
-`Sequence[int]` states that `total()` will not mutate its argument.
+`Sequence[int]` states that `total()` does not mutate its argument.
 It says nothing about the caller,
 who still holds the `list` and can append to it at any time,
 including from another thread while `total()` is running.
@@ -218,7 +218,7 @@ with ignore(TypeError):
 #: TypeError("unhashable type: 'list'")
 ```
 
-Mutability alone is not what removes hashing.
+Mutability alone does not remove hashing.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 What removes hashing is equality based on *contents*.
@@ -281,7 +281,7 @@ print(operations["+"](6, 4), operations["-"](6, 4))
 
 Supporting a new operator means adding a row to the table.
 The dispatch code never changes.
-The same structure is behind [the dictionary factory](27_Factory.md#the-pythonic-factory-a-dictionary)
+The same structure underlies [the dictionary factory](27_Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
 [Pattern Matching](13_Pattern_Matching.md)
@@ -304,9 +304,9 @@ Their value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
 instead of sending it to a named function defined elsewhere.
-`sorted(words, key=lambda w: w.lower())` states the sort order right where the sort happens.
+`sorted(words, key=lambda w: w.lower())` states the sort order right where the code sorts.
 Naming that one-liner costs a line, a name to invent,
-and a definition to look up, with nothing gained in clarity.
+and a definition to look up, and gains no clarity.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
 and room to grow.
@@ -337,8 +337,8 @@ print(sorted(words, key=len))
 ```
 
 Each call hands a function to another function and lets it do the looping.
-Returning a function is the other half of the definition,
-covered under [Closures](#closures), below.
+Returning a function is the other half of the definition; [Closures](#closures)
+covers it below.
 
 The `list()` calls are not decoration.
 `map()` and `filter()` return one-shot iterators,
@@ -374,7 +374,7 @@ along with the off-by-one and accumulator-initialization mistakes that scaffold 
 The idea runs the other direction, too.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
-This is what a decorator does in [Decorators](14_Decorators.md).
+A decorator does this, as [Decorators](14_Decorators.md) shows.
 
 ## Closures
 
@@ -415,8 +415,8 @@ A closure is the functional answer to "an object with one method and some stored
 so the same argument always produces the same answer.
 That is the difference between a captured constant and the global `balance` that made `withdraw()` unpredictable.
 
-A closure fits when you want behavior configured once and then reused,
-with its configuration kept private.
+A closure fits when you want to configure behavior once, reuse it,
+and keep its configuration private.
 The captured variable has no name in any enclosing scope,
 so ordinary code cannot read or rebind it.
 That gives you encapsulation without declaring a class:
@@ -458,7 +458,8 @@ The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` read `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
 so `count += 1` alone makes `count` a fresh local,
-one referenced before assignment, and the call fails with `UnboundLocalError`.
+one the statement reads before assigning it,
+and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 Forgetting it is the standard stumble when a closure first needs to write,
 and the runtime message, complaining about a local variable
@@ -507,7 +508,7 @@ Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
 This avoids the late-binding surprise a lambda created in a loop can produce,
-demonstrated in [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py`.
+which [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
@@ -590,7 +591,7 @@ The type parameters earn their place on the second `print()`:
 the checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
-Composition grows by adding a stage rather than by enlarging one.
+You grow a composition by adding a stage rather than by enlarging one.
 Each stage is also testable on its own,
 and you build larger behavior by naming a new composition rather than writing new logic.
 When a requirement changes,

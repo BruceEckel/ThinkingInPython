@@ -9,10 +9,10 @@ and the system behaves differently from one state to the next
 (because it uses *State*).
 
 The code that moves the system from one state to the next is often a [*Template Method*](25_Template_Method.md),
-as seen in the following framework for a basic state machine.
+as the following framework for a basic state machine shows.
 Each state can be `run()` to perform its behavior, and (in this design)
 you can also pass it an "input" object so it can tell you which state to enter next.
-The key distinction between this design and the next is that here,
+This design and the next differ in one key way: here,
 each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
 
@@ -84,7 +84,7 @@ and no state's `run()` reads anything off the machine.
 A `State` whose `run()` reads attributes off the machine revives the trap.
 
 In this style of *StateMachine*, each state decides the next state.
-As an example, here's a fancy mousetrap that can move through several states in the process of trapping a mouse.
+As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
 The possible moves a mouse can make are the inputs to the state machine:
 
 ```python
@@ -253,17 +253,18 @@ The code at the bottom of the file builds a `MouseTrap` and runs it through the 
 
 The `match` statements inside `next()` work,
 but a machine with many states means many of them, spread across many classes.
-Another approach is to create tables inside each `State` object defining the various next states based on the input.
+Another approach puts a table inside each `State` object,
+listing the next state for each input.
 You cannot write a table inside its class,
 because its entries name the other states,
 which do not all exist until every class definition runs.
 Define the classes first, then fill in the tables at module level,
 after all the state objects exist.
 
-The `TableState` class is an implementation of `State` that adds a `transitions` dict mapping each input to its next state
+The `TableState` class implements `State` and adds a `transitions` dict mapping each input to its next state
 (so the same `StateMachine` class from the previous example still serves).
 Its `next()` looks the input up in that `dict`.
-`TableState.__init__()` exists to give every state that empty dict:
+`TableState.__init__()` gives every state that empty dict:
 a state whose table you forgot to fill then reports `Waiting has no transition for ...` rather than an `AttributeError`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
@@ -367,8 +368,8 @@ The rest of the input file only repeats them,
 so the output continues as in the first version.
 
 If you must create and maintain many `State` classes,
-this approach is an improvement,
-since it's easier to read the state transitions from a table.
+the tables improve on the `match` statements,
+since reading the transitions from a table is easier.
 `next()` raises its `RuntimeError` `from None` rather than chaining,
 which drops a `KeyError` that would repeat the event the message names.
 
@@ -388,7 +389,7 @@ Neither is wrong, but the choice deserves to be deliberate.
 Ignoring suits a machine fed from a noisy source that includes events not meant for it.
 Failing fast suits a table you are still building,
 where a missing entry is a bug you want flagged,
-and it is the policy the table-driven engine below adopts as well.
+and the table-driven engine below adopts the same policy.
 
 ## Table-Driven State Machine
 
@@ -481,8 +482,8 @@ A generated `__init__()` cannot make that rename.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
-Several candidate transitions can share one `(state, input)` key,
-told apart by their conditions.
+Several candidate transitions can share one `(state, input)` key;
+their conditions tell them apart.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
@@ -510,9 +511,9 @@ so pairing a `SecondDigit` key with a method written for a `FirstDigit` type-che
 
 ### A Vending Machine
 
-The machine is now completely defined by a table.
-It collects money, takes a two-digit selection, then either dispenses the item,
-reports it sold out,
+One table now defines the whole machine.
+The machine collects money, takes a two-digit selection,
+then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are ordinary methods, stored directly in the table.
 
@@ -667,7 +668,7 @@ if __name__ == "__main__":
 The two `Clearing selection` lines read alike and end in different states:
 too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
-The condition that fired is visible only in the state.
+Only the state shows which condition fired.
 
 `__init__()` builds the table, rather than the class body,
 because its entries are bound methods.
@@ -752,7 +753,7 @@ That is convenient for a book listing and wrong for a reusable machine:
 it fixes one output device into the engine.
 Recording a message instead pushes the choice out to whoever is watching.
 
-Using `tkinter`, you can create a GUI representation of the vending machine.
+Using `tkinter`, you can build a GUI for the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects

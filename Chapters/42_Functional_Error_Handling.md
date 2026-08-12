@@ -11,11 +11,11 @@ Exceptions are Python's default error mechanism, and they have costs.
 An exception unwinds the stack, so it discards any work done so far.
 It does not appear in the function's return type, so the caller cannot see,
 from the signature, that the call might fail.
-And it is easy to forget to handle one.
+And forgetting to handle one is easy.
 
 Returning the failure as a value reverses those costs.
 Failure appears in the return type,
-so the type checker will not let a caller read the answer without dealing with the failure first,
+so the type checker does not let a caller read the answer without dealing with the failure first,
 and a reviewer sees it without reading the body.
 Control flow stays local,
 with no exception leaping past intermediate frames to a distant handler.
@@ -51,10 +51,10 @@ except ValueError as e:
 #: Lost everything: func_a(3)
 ```
 
-Function calls 0-2 produced correct values,
-but the exception threw away the whole list.
-The only way to keep the good results is to wrap each call in its own `try`,
-which is the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-to-check-everywhere)
+Function calls 0-2 produce correct values,
+but the exception throws away the whole list.
+To keep the good results you must wrap each call in its own `try`,
+the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-to-check-everywhere)
 flags as a problem.
 
 ## Return the Error as a Value
@@ -106,7 +106,7 @@ so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
-`@final` states that neither will have subclasses,
+`@final` states that neither can have subclasses,
 which lets the checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
@@ -199,7 +199,7 @@ except AttributeError as e:
 
 The `# type: ignore` is the point of the listing rather than an apology for it.
 Without that comment `ty` refuses the line,
-reporting that `unwrap` is not defined on `Err[str]` in the union,
+reporting that `Err[str]` in the union has no `unwrap`,
 and a reader who writes this in their own code never reaches the traceback.
 
 This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
@@ -357,7 +357,7 @@ def test_bind_short_circuits_a_failure() -> None:
     assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
 
-Testing confirms that the hand-written and `bind()` versions agree on every input:
+The tests confirm that the hand-written and `bind()` versions agree on every input:
 
 ```python
 # test_composing.py
@@ -437,7 +437,7 @@ and the shape gets worse with each one you add.
 at the end of this chapter has do-notation,
 which writes the same combination flat.
 
-Testing confirms that `combined()` returns the correct value,
+The tests confirm that `combined()` returns the correct value,
 or the first failure in the chain:
 
 ```python
@@ -460,7 +460,7 @@ def test_combined(
 
 ## Turning Exceptions into Results
 
-In `composing.py`, `func_c()` wrapped a risky call in `try`/`except` and returned an `Err` by hand.
+In `composing.py`, `func_c()` wraps a risky call in `try`/`except` and returns an `Err` by hand.
 A decorator can capture that pattern.
 `@safe` takes a function that raises an exception and gives back one that returns a `Result`,
 with the exception as the `Err` value.
@@ -589,8 +589,7 @@ if __name__ == "__main__":
 #: OOPS: Not a number
 ```
 
-`parse()` and `reciprocal()` are both wrapped with `@safe`,
-so `bind()` chains them.
+`@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Err` values,
 and the `match` tells them apart.
 
@@ -603,7 +602,7 @@ The frame that has that answer is rarely the frame that raised the exception,
 and by the time the exception reaches a handler high enough to report it,
 the local names that would explain it have vanished.
 
-The usual repair is to catch the exception and raise a new one carrying a better message,
+Most code catches the exception and raises a new one carrying a better message,
 which costs you the original type and gives every caller a wrapper to unwrap.
 `BaseException.add_note()` (Python 3.11 and later) avoids the trade.
 It appends a line to the exception you already have,
@@ -674,7 +673,7 @@ The note attaches before the exception becomes a value,
 in the one frame that knows both the failure and the field name.
 Everything downstream can report the failure without asking what the code was reading.
 This is the chapter's opening argument, applied one level down:
-`Err` says a failure happened and the exception says what it was,
+`Err` says the call failed and the exception says what went wrong,
 and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
@@ -687,7 +686,7 @@ whether you use `match` or `isinstance()`.
 You need not build `Result` yourself.
 The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases it calls `Success` and `Failure`,
-the same `@safe` decorator built earlier in the chapter,
+the same `@safe` decorator you built earlier in this chapter,
 and do-notation that makes combining multiple results read more directly than nested binds.
 
 ## Which Failures Get a Result
@@ -706,7 +705,7 @@ They are routine, and the type should say so.
 You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.
 The chain either delivers an answer or hands back the first failure,
-and the checker will not let a caller confuse the two.
+and the checker does not let a caller confuse the two.
 
 ## Exercises
 

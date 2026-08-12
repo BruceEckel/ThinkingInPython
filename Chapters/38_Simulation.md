@@ -32,7 +32,7 @@ Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and launches new rats.
 The rats run as cooperative `asyncio` tasks.
 They take turns instead of running at the same instant,
-so the design needs no lock.
+so the blackboard needs no lock.
 Nothing interrupts a rat partway through an update.
 
 A *rat* explores.
@@ -163,7 +163,7 @@ The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-The hazard it sidesteps is the read-modify-write race from [Concurrency](19_Concurrency.md#a-single-thread-still-races).
+It sidesteps the read-modify-write race from [Concurrency](19_Concurrency.md#a-single-thread-still-races).
 That race needs a suspension point inside the update,
 and `claim()` contains none,
 so the atomicity comes from the shape of the code rather than from a lock
@@ -238,8 +238,7 @@ A single `asyncio.gather(*self.tasks)` would not do,
 because `gather()` fixes its argument list at the moment of the call,
 and half the rats do not exist yet.
 
-`group`'s declaration is `field(init=False)`,
-with assignment only while `explore()` runs,
+`group`'s declaration is `field(init=False)`, and only `explore()` assigns it,
 the same declaration-without-assignment the robot example later in this chapter uses for `Robot.room`.
 The other four fields are internal bookkeeping rather than constructor arguments:
 `init=False` keeps them out of the generated signature,
@@ -324,7 +323,7 @@ asyncio.run(main())
 Because claiming is atomic,
 the rats always cover every cell reachable from the entry,
 no matter how the tasks interleave.
-Testing verifies this by comparing the cells the rats visited against a flood fill of the same maze.
+The test verifies this by comparing the cells the rats visited against a flood fill of the same maze.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -364,8 +363,8 @@ def test_rats_map_every_reachable_cell() -> None:
 ### Watching the Pack
 
 The same model drives a GUI demonstration.
-`rats_view.py` runs the exploration to completion,
-records the order in which rats claimed cells,
+`rats_view.py` lets the rats finish exploring,
+records the order in which they claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
@@ -452,7 +451,7 @@ and each type of occupant answers for itself.
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
 and the return value is the room in which the robot ends up.
-A wall keeps the robot where it is, food gets eaten and lets the robot in,
+A wall keeps the robot where it is, food feeds the robot and lets it in,
 a teleport returns a distant room.
 No `if` or `elif` on the type of occupant appears in the movement code:
 
@@ -558,9 +557,9 @@ never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
-The code only declares `room`, written as `room: Room` with no value.
+The code only declares `room`, writing `room: Room` with no value.
 That line stores nothing, not even `None`.
-It is a declaration: it tells the type checker that a `Room` will be there,
+It is a declaration: it tells the type checker that a `Room` belongs there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
 so reading it earlier raises an `AttributeError`, and the builder runs first,
@@ -813,7 +812,7 @@ Stage 3 pairs the teleports with a small idiom.
 and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
 so each pass consumes two rooms: the first and second `a`, then the two `b`s.
 The sort by target letter lines those partners up beforehand.
-The mistake to avoid is `zip(teleports, teleports)`,
+Avoid `zip(teleports, teleports)`,
 which walks two independent passes over the list and pairs every room with itself.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
@@ -821,7 +820,7 @@ each proves to the checker that the occupant really is a `Teleport` before the c
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 That is not the type switch polymorphism removed.
-Construction still must tell the kinds of item apart, once,
+`GameBuilder` still must tell the kinds of item apart, once,
 and the movement code that runs afterward never asks again.
 The `Robot` branch also explains `Room(Empty())`:
 the robot is the one item that does not become an occupant.
@@ -831,8 +830,8 @@ and `show_maze()` draws the `R` by checking which room the robot holds rather th
 
 ### Testing the Walk
 
-The maze rendering, `show_maze()`, returns a string,
-so a test can check the model's correctness without opening a window.
+`show_maze()` renders the maze into a string,
+so a test can check the model without opening a window.
 Build the maze, run the solution,
 and check that the robot finished on the `!` square and that the final rendering matches,
 food eaten and all:
@@ -972,7 +971,7 @@ In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow 
 The bow made the plate ring.
 A ringing plate does not move evenly.
 Standing waves divide it into regions that swing up and down,
-separated by *nodal lines* that stay still.
+and the *nodal lines* between them stay still.
 The vibration bounces sand out of the moving regions.
 When a grain comes to rest on a still line, nothing kicks it away again.
 Within seconds the random motion sweeps the sand into sharp, symmetric curves.
@@ -982,14 +981,14 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 
 The model needs almost nothing.
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
-The formula is borrowed physics, an approximation for a plate with free edges.
+Physics supplies the formula, an approximation for a plate with free edges.
 Treat it as given.
 All that matters here is its shape.
 It is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
 `step()` is the entire simulation.
 Every grain takes one random step,
-scaled by how strongly the plate vibrates at that grain's location.
+and the plate's vibration at that grain's location scales it.
 Grains never look at each other and remember nothing.
 Nothing in the code knows the pattern exists.
 
@@ -1154,12 +1153,12 @@ def test_kicks_never_knock_grains_off_the_plate() -> None:
 
 ### Watching It Happen
 
-The tkinter view shows what the text version cannot: the collapse as it happens,
+The tkinter view shows what the text version cannot: the collapse as it unfolds,
 and the pattern surviving a change of rules.
 Each grain keeps one color from a small palette,
 so you can watch individual grains mix while the collective figure forms.
 Every 200 frames the view switches the plate to a new mode.
-The old figure is suddenly parked on loud regions of the new field.
+The old figure suddenly sits on loud regions of the new field.
 It bursts back into chaos, mixes, and condenses into a different figure.
 The order was never a property of the grains.
 It belongs to the field on which they sit.
@@ -1259,15 +1258,15 @@ Run it.
     Place a few `$` characters in the maze and report how many the robot collects.
     You shouldn't need to touch `item_factory()`, `Room`, or `GameBuilder`.
     Explain why the factory finds your new item on its own,
-    and what happens if you derive `Coin` from `Food` instead.
+    and what it does if you derive `Coin` from `Food` instead.
 5.  Compute the solution instead of hard-coding it.
     Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,
     the way `flood()` searches maze cells in `test_rats_and_mazes.py`.
     The room graph has no `is_open()`,
-    so passability is a property of the occupant:
+    so the occupant decides whether a room is passable:
     refuse any room holding a `Wall` or an `Edge`.
     Turning the room path back into `n`/`s`/`e`/`w` means tracking which `Urge` produced each step.
-    Your path will be shorter than the hard-coded `solution` and need not use the teleports,
+    Your path comes out shorter than the hard-coded `solution` and need not use the teleports,
     so assert only that the robot finishes on the `!` square,
     as `test_robot.py` does.
 6.  Freeze the plate.

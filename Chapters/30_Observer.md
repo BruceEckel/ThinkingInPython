@@ -3,7 +3,7 @@
 The *Observer* pattern, a kind of callback,
 decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
-and receives a notification whenever the observable's state changes.
+and hears from the observable whenever its state changes.
 Of the callback patterns it is the most dynamic:
 
 - Observers attach and detach at runtime
@@ -159,7 +159,7 @@ so subscribing a `list[str]`'s `append` to a `Thermometer` fails the checker ins
 not because the pattern demands a base class.
 Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
 works the same and lets one object publish more than one kind of change.
-For event-heavy programs there are mature libraries
+Event-heavy programs have mature libraries
 (signal/slot systems, `asyncio` events),
 but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
 
@@ -233,7 +233,7 @@ A one-shot listener that detaches after its first call is the natural example,
 and the detach mutates `self._observers` in the middle of the loop walking it.
 If you iterate the list directly,
 removing the current observer shifts every later one left,
-so the next observer is silently skipped, and nothing signals the loss.
+so the loop silently skips the next observer, and nothing signals the loss.
 The copy makes detaching during notification safe,
 and a newcomer subscribing mid-notification starts hearing from the next change:
 
@@ -356,15 +356,15 @@ The `AsyncObserver` alias makes the checker reject a plain function as an observ
 an observer must return an awaitable,
 which calling an `async` function produces.
 Its type parameter does the same job as the synchronous `Observer[T]`'s.
-The reverse mistake,
-an `async` function subscribed to the synchronous `Observable`,
-is also rejected: calling it returns a coroutine rather than `None`,
+The checker also rejects the reverse mistake,
+an `async` function subscribed to the synchronous `Observable`:
+calling it returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
 
 `notify()` needs no `list()` copy here:
 `*` drains the generator into a tuple before `gather()` runs,
 so a detach during the fan-out cannot skip anyone.
-It does mean an observer that unsubscribes mid-notification is still awaited for this change.
+It does mean an observer that unsubscribes mid-notification still hears this change.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence prints in subscription order, alarm first.
@@ -392,8 +392,7 @@ is the same fan-out, routed by event type.
 ## A Visual Example of Observers
 
 This is the model-view split from the chapter's opening,
-made visible with `tkinter`
-(in the standard library, so there is nothing to install),
+made visible with `tkinter` (in the standard library, so you install nothing),
 and split across two files.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
@@ -545,7 +544,7 @@ and the Observer is an event bus.
 
 1.  Create a minimal Observer-Observable design of your own,
     without looking at `observers.py`:
-    the smallest `Observable` that lets callables subscribe and be notified.
+    the smallest `Observable` that lets callables subscribe, then notifies them.
     Demonstrate it by subscribing several observers and causing one change that updates them all.
 2.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
@@ -555,7 +554,8 @@ and the Observer is an event bus.
     for competition, alternate turns between players.
 3.  Make `Observable.notify()` survive an observer that raises an exception:
     every other observer still hears the change,
-    and the failures are re-raised afterward, together, as an `ExceptionGroup`
+    and `notify()` re-raises the failures afterward, together,
+    as an `ExceptionGroup`
     (the container [Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup) introduced).
     Write a test in which the first observer raises an exception and the second still records its notification.
 4.  Redo exercise 3 for `async_observers.py`.

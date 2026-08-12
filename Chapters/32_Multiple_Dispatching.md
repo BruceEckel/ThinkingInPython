@@ -10,7 +10,7 @@ how can you get them to interact properly?
 
 The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
-That is, if you are performing an operation on more than one object whose type is unknown,
+That is, if you operate on more than one object whose type is unknown,
 Python can invoke the dynamic binding mechanism on only one of those types.
 You end up testing the remaining types by hand,
 writing out the dispatch the language performs for the first one.
@@ -28,10 +28,10 @@ That is why one method call can resolve only one unknown type.
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
 The following example dispatches through methods named `compete()` and `eval_*()`,
-with both of the interacting objects drawn from a single hierarchy.
+where both interacting objects come from a single hierarchy.
 Two unknown types means two dispatches, which is *double dispatching*.
-If you are working with two different type hierarchies that are interacting,
-then you'll need a dispatching method call for each hierarchy.
+If two different type hierarchies interact,
+you need a dispatching method call for each hierarchy.
 
 Both versions below share one result type, an enumeration called `Outcome`:
 either `WIN`, `LOSE`, or `DRAW`.
@@ -49,8 +49,7 @@ class Outcome(StrEnum):
     DRAW = "draw"
 ```
 
-You'll also need two small helper functions,
-one to generate random pairs of items,
+You also need two small helper functions, one to generate random pairs of items,
 and one to play a pair off and print the result:
 
 ```python
@@ -150,7 +149,7 @@ Follow one duel to keep the perspective straight.
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch: it resolves `paper`,
 arriving in `Paper.eval_scissors()`, the one method that knows both types.
-Now note whose result it returns.
+Whose result does it return?
 `Paper.eval_scissors()` returns `WIN`,
 and that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running: scissors cut paper.
@@ -162,7 +161,7 @@ the same object `compete()` held as `self` before passing it along.
 This game ignores it, since the outcome depends only on the two types;
 a richer game would read the caller's state through it.
 
-Note what the `Any` annotations cost.
+Those `Any` annotations give up static checking.
 `Item` declares neither `compete()` nor any `eval_*()` method,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
 With `Any`, a checker cannot tell you when a class is missing one of the nine answers;
@@ -171,14 +170,13 @@ A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
 The table version needs neither.
 Its answers are data rather than methods,
-leaving no method for a class to forget, and its one method, `compete()`,
-is declared on `Item`,
-so the opponent parameter can be typed `Item` rather than `Any`.
+leaving no method for a class to forget, and `Item` declares its one method,
+`compete()`, so the opponent parameter takes `Item` rather than `Any`.
 
-Each type of `Item` encodes the information about the various combinations.
-This is a kind of table, spread across the classes.
-It is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
-It can be more sensible to make the table explicit, like this:
+Each `Item` type encodes the answers for its own combinations.
+Together they form a table spread across the classes.
+That table is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
+Making the table explicit can be more sensible, like this:
 
 ```python
 # paper_scissors_rock_table.py
@@ -229,16 +227,16 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Notice the flexibility of dictionaries.
+Dictionary keys are flexible.
 A tuple works as a key, the same as a single object.
 Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
-The match is on classes exactly,
+The lookup matches classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction;
 adding `Lizard` in exercise 1 puts you in that situation.
 
-Exact matching is the property that surprises people.
+Exact matching surprises people.
 This listing shows it refusing a subclass.
 `Origami` derives from `Paper` and inherits its `compete()`,
 but the table has no row for it:
@@ -271,7 +269,7 @@ For dispatch on one argument's type, `functools.singledispatch`
 gives you open, per-type functions.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
-Adding a new `Item` is then a matter of adding rows to the table,
+Adding a new `Item` then means adding rows to the table,
 with no methods to edit across the classes.
 
 The two match types differently.
@@ -380,7 +378,7 @@ not when a test imports it.
 
 ## Operators Dispatch Twice
 
-Python's own operators already perform a two-step dispatch,
+Python's own operators dispatch twice,
 which answers the `Number + Number` question that opened this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
@@ -440,7 +438,7 @@ except TypeError as e:
 ```
 
 The first two additions resolve inside `__add__()`:
-the left operand recognized the type.
+the left operand recognizes the type.
 `4 + Meters(3)` asks `int.__add__()` first,
 and `int` has never heard of `Meters`, so it returns `NotImplemented`.
 Python then, with no error anywhere, turns to `Meters.__radd__()`,
