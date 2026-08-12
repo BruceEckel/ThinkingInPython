@@ -133,15 +133,28 @@ Actions does.
 
 ## make_help.py
 
-Prints the categorized `make help` listing. In the Makefile, a target line
-ending with a `## text` comment becomes one entry; a `##@ Name` comment
-line starts a new category heading above the entries that follow it. It
-replaces a `grep | awk` one-liner so `make help` has no dependency on a
-POSIX toolchain being on PATH: every other target already requires Python
-(via `uv run`), and this keeps `help` consistent with that.
+Prints the `make help` listing, in two levels. In the Makefile, a target
+line ending with a `## text` comment becomes one entry; a `##@ Name`
+comment line starts a new section. Bare `make` prints the everyday
+commands and the section list; `make help NAME` expands one section,
+where `NAME` is the first word of that section's heading, lowercased.
+A `##-` comment marks a target secondary: documented and smoke-tested,
+but folded out of the listing because a sibling's doc text names it
+(each `fix-*` under the check it repairs). It replaces a `grep | awk`
+one-liner so `make help` has no dependency on a POSIX toolchain being on
+PATH: every other target already requires Python (via `uv run`), and this
+keeps `help` consistent with that.
+
+Doc text wraps to the terminal width (capped at 100, falling back to 80
+when the output is piped), with continuation lines indented under the doc
+column so the target names stay in one column. A backticked command and a
+hyphenated target name both wrap as one unit.
 
 ```
-make help   # categorized list of every documented target
+make help         # everyday commands, then the section list
+make help style   # one section's targets
+
+uv run python tools/make_help.py --width 72   # wrap to a fixed width
 ```
 
 ## run_all.py

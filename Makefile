@@ -22,18 +22,44 @@ PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
 
-.PHONY: claims exercise-coverage help reset all verify sync-ci ci gate gate-status tools-status sweep sync check prune site epub local serve examples run test ty lint extract check-ch output output-check fix-imports python-upgrade reflow reflow-check spell spell-add prose links todos eol fix-eol listings fix-listings banned comment-periods fix-comment-periods comment-caps fix-comment-caps comment-spacing fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks clean-examples clean-site clean-epub tools-check tools-check-full doctor verify-targets tools-test tools-upgrade solutions-sync solutions-check solutions-prune solutions-extract solutions-output solutions-output-check solutions-ty solutions-lint solutions-test solutions-numbering solutions-gate clean-solutions
+# Every target here is phony: none names a file it builds. This used to be
+# one 70-name line that nothing kept in step with the file, so it is now
+# split per section, each list sitting under the heading it covers. GNU Make
+# accumulates .PHONY across lines, so the effect is the same.
+.PHONY: help
 
-# Self-documenting help: every target below carries an inline `## text` doc
-# comment, and a `##@ Category` comment line starts a new section. Add a
+# Self-documenting help, in two levels. Every target below carries an inline
+# `## text` doc comment, and a `##@ Name` line starts a new section. Put a
 # target's one-line doc on its own target line so `make help` and the recipe
-# never drift apart; put anything longer in a plain `#` comment above it.
+# never drift apart; anything longer goes in a plain `#` comment above it.
+# `##-` in place of `##` marks a target secondary: still documented and still
+# smoke-tested by `make verify-targets`, but folded out of the listing because
+# a sibling's doc text names it (`fix-eol` under `eol`).
 # Parsed by tools/make_help.py instead of grep/awk, so help has no dependency
 # on a POSIX toolchain being on PATH (every other target already needs Python).
-help:  ## Show this help
-	$(PY) tools/make_help.py
+#
+# `make help style` names a section. Make has no subcommands, so it would
+# otherwise read `style` as a second goal and fail with "No rule to make
+# target 'style'". This turns the word after `help` into a do-nothing target,
+# and only when `help` is the first goal, so a typo in any other position
+# still fails loudly. make_help.py refuses to run if a section slug ever
+# equals a real target name, which is the one case where this guard would
+# override a recipe.
+ifeq ($(firstword $(MAKECMDGOALS)),help)
+  HELP_TOPIC := $(word 2,$(MAKECMDGOALS))
+  ifneq ($(HELP_TOPIC),)
+    .PHONY: $(HELP_TOPIC)
+    $(eval $(HELP_TOPIC):;@:)
+  endif
+endif
+
+help:  ## Show this help (`make help style` expands one section)
+	@$(PY) tools/make_help.py $(HELP_TOPIC)
 
 ##@ Setup
+
+.PHONY: tools-check tools-check-full doctor verify-targets tools-test \
+        tools-upgrade
 
 # What a reader needs for the everyday commands below: uv, plus the
 # uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
@@ -92,6 +118,9 @@ tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global
 	$(MAKE) sweep
 
 ##@ Everyday
+
+.PHONY: all verify sync-ci gate gate-status tools-status sweep ci reset \
+        python-upgrade
 
 # The edit-and-check loop to repeat after touching a chapter: every
 # mutating fixer (reflow, the comment-style fixers, import sorting,
@@ -217,6 +246,8 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
+.PHONY: sync check prune site epub local serve
+
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
 sync:  ## Update the committed Examples/ tree from the Markdown
@@ -252,7 +283,13 @@ local: site  ## Build the site, serve it with live reload, open a browser
 serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 	$(PY) tools/serve.py
 
-##@ Examples (build/examples/)
+# Headed "Code examples" rather than "Examples" so its slug is `code`: a
+# section slug must not equal a target name (make_help.py enforces this),
+# and `examples` is a target below.
+##@ Code examples (build/examples/)
+
+.PHONY: check-ch examples run output output-check test ty lint fix-imports \
+        extract
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
 # spends most of its time executing listings you did not touch; this runs the
@@ -262,14 +299,16 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 check-ch:  ## Run the code checks for one chapter only (CH=12), ~1s
 	$(PY) tools/check_chapter.py $(CH)
 
-examples: extract run  ## Extract then run (the full verification pass)
+# An alias for `run`, kept because older notes name it: `run` already
+# depends on `extract`, so both build the same two targets in the same order.
+examples: extract run  ##- Extract then run (an alias for `run`)
 
 # These all read build/examples/, so each depends on `extract` to rebuild it
 # first. make builds `extract` once per invocation, so depending on it from
 # several targets does not re-extract. This is what stops a stale tree (e.g. a
 # gitignored build/examples/ left over from an older Markdown) from being
 # checked. Use `make reset` to force a clean regeneration.
-run: extract  ## Run every extracted .py and report failures
+run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
 	$(PY) tools/run_examples.py
 
 # Rewrite the #: output markers inside the Markdown's ```python listings to the
@@ -301,6 +340,10 @@ extract:  ## Write build/examples/ from the Markdown
 	$(PY) tools/extract_examples.py --write
 
 ##@ Solutions (Solutions/, build/solutions/)
+
+.PHONY: solutions-sync solutions-check solutions-prune solutions-extract \
+        solutions-output solutions-output-check solutions-ty solutions-lint \
+        solutions-test solutions-numbering solutions-gate
 
 # Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
 # instead of Chapters/. Each Solutions code block is self-contained (it
@@ -366,7 +409,12 @@ solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, pyte
 	$(RUFF) check build/solutions
 	$(PYTEST) $(PYTEST_N) build/solutions
 
-##@ Prose and spelling
+# Headed "Writing" rather than "Prose" for the same reason as "Code
+# examples" above: `prose` is a target in this section.
+##@ Writing and spelling
+
+.PHONY: reflow reflow-check spell spell-add prose links todos claims \
+        exercise-coverage
 
 # Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
 # headings are left untouched; a file is rewritten only if it round-trips).
@@ -431,21 +479,28 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 ##@ Style gates
 
+.PHONY: eol fix-eol listings fix-listings banned comment-periods \
+        fix-comment-periods comment-caps fix-comment-caps comment-spacing \
+        fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks
+
+# Every check here has a `fix-` counterpart, named in the check's own doc
+# text and marked `##-` so the listing shows one row per rule instead of two.
+
 # Fail if any tracked text file has CRLF in the working tree. .gitattributes
 # keeps the committed blobs LF; this catches a drifted working copy. Run
 # `$(PY) tools/check_line_endings.py --fix` to convert offenders.
-eol:  ## Check tracked text files for CRLF (fails the ci gate)
+eol:  ## Check tracked text files for CRLF; `make fix-eol` converts them
 	$(PY) tools/check_line_endings.py
 
-fix-eol:  ## Convert any CRLF in tracked text files to LF
+fix-eol:  ##- Convert any CRLF in tracked text files to LF
 	$(PY) tools/check_line_endings.py --fix
 
 # Fail if any ```python listing has more than one blank line in a row or a
 # blank line between import groups. Run `make fix-listings` to remove them.
-listings:  ## Check python listings keep blank lines minimal
+listings:  ## Check listings keep blank lines minimal; `make fix-listings` strips them
 	$(PY) tools/listing_format.py
 
-fix-listings:  ## Remove the offending blank lines from listings
+fix-listings:  ##- Remove the offending blank lines from listings
 	$(PY) tools/listing_format.py --fix
 
 # Fail if any phrase in tools/data/banned_phrases.txt appears anywhere in the book.
@@ -454,27 +509,27 @@ banned:  ## Fail if any tools/data/banned_phrases.txt phrase is in the book
 
 # A one-line listing comment ends without a period; only multiline comments use
 # periods. Run `make fix-comment-periods` to strip the offenders.
-comment-periods:  ## Fail if a one-line listing comment ends with a period
+comment-periods:  ## Fail if a one-line comment ends with a period; `make fix-comment-periods` strips them
 	$(PY) tools/comment_periods.py
 
-fix-comment-periods:  ## Remove those trailing periods
+fix-comment-periods:  ##- Remove those trailing periods
 	$(PY) tools/comment_periods.py --fix
 
 # A prose comment starts with a capital. Heuristic, so false positives are
 # listed in tools/data/comment_caps_allow.txt. Run `make fix-comment-caps` to apply.
-comment-caps:  ## Fail if a prose comment is not capitalized (heuristic)
+comment-caps:  ## Fail if a prose comment is not capitalized; `make fix-comment-caps` applies it
 	$(PY) tools/capitalize_comments.py
 
-fix-comment-caps:  ## Capitalize them
+fix-comment-caps:  ##- Capitalize them
 	$(PY) tools/capitalize_comments.py --write
 
 # An inline comment (code precedes it on the line) must start exactly two
 # spaces after the code; a full-line comment or a #: output marker is left
 # alone. Run `make fix-comment-spacing` to collapse the gap to two spaces.
-comment-spacing:  ## Fail if an inline listing comment isn't two spaces after code
+comment-spacing:  ## Fail if an inline comment isn't two spaces after code; `make fix-comment-spacing` collapses the gap
 	$(PY) tools/comment_spacing.py
 
-fix-comment-spacing:  ## Collapse inline-comment gaps to two spaces
+fix-comment-spacing:  ##- Collapse inline-comment gaps to two spaces
 	$(PY) tools/comment_spacing.py --fix
 
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
@@ -493,10 +548,10 @@ unique-slugs:  ## Fail if two chapters name two listings the same
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.
-checks:  ## Run every Markdown check in one pass (ARGS=--list to see them)
+checks:  ## Run every Markdown check in one pass (ARGS=--list); `make fix-checks` applies them
 	$(PY) tools/check_all.py $(ARGS)
 
-fix-checks:  ## Apply every fix those checks can make
+fix-checks:  ##- Apply every fix those checks can make
 	$(PY) tools/check_all.py --fix
 
 # The subset `gate` enforces (GATE_CHECKS above: everything but prose-lint).
@@ -507,6 +562,8 @@ gate-checks:  ## Run just the Markdown checks the gate enforces
 	$(PY) tools/check_all.py $(GATE_CHECKS)
 
 ##@ Cleanup
+
+.PHONY: clean-examples clean-solutions clean-site clean-epub
 
 clean-examples:  ## Remove build/examples/
 	$(PY) -c "import shutil; shutil.rmtree('build/examples', ignore_errors=True)"

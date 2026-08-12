@@ -205,9 +205,23 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
-- **`make help` is self-documenting, not hand-written.** A target needs a trailing
-  `## text` comment on its own line (and to sit under the right `##@ Category`
-  heading) or it will not appear in `make help`. Parsed by `tools/make_help.py`,
+- **`make help` is self-documenting, not hand-written, and has two levels.** A
+  target needs a trailing `## text` comment on its own line (and to sit under the
+  right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
+  prints `help`, the everyday commands (`PROMOTED` in `tools/make_help.py`), and
+  the section list; `make help style` expands one section. A section's slug is the
+  first word of its heading, lowercased, so renaming the heading renames the slug
+  with no second list to update. Two rules `make_help.py` enforces by raising
+  `SystemExit`: no two sections share a slug, and no slug equals a target name
+  (the Makefile neutralizes the word after `help` so `make help style` parses as
+  one goal, and a colliding slug would override that recipe). This is why the
+  sections are headed "Code examples" and "Writing and spelling" rather than
+  "Examples" and "Prose": both of those are targets.
+  A `##-` comment instead of `##` marks a target *secondary*: still documented and
+  still smoke-tested, but folded out of the listing because a sibling's doc text
+  names it (every `fix-*` under its check). Keep `entries()` reporting secondary
+  targets, since `verify_targets.py` enumerates through it and `sweep_checks.py`
+  looks up doc text through it. Parsed by `tools/make_help.py`,
   deliberately not `grep`/`awk`, since GNU Make on Windows can fall back to
   `cmd.exe` as `SHELL` when no POSIX shell is on PATH.
   `tools/README.md`'s own "Commands" section deliberately does not re-list every
