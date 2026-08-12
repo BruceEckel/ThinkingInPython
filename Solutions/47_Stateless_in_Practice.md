@@ -1325,7 +1325,7 @@ takes a `Cast` can no longer assemble a mismatched set by accident, because it
 never sees the actors. `play()` is still there and still accepts any of them.
 
 Adding a sixth actor to the chapter's five-actor version shows where the cost
-falls. `arena.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
+falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
 union, and a `yield from`, so four edits. `casts.py` gains a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an
 argument in each of the two factory calls, so seven. `two_games.py` needs one

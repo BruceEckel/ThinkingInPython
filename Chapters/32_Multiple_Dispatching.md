@@ -18,7 +18,7 @@ writing out the dispatch the language performs for the first one.
 The solution is *Multiple Dispatching*.
 Polymorphism broadly means that a function accepts arguments of more than one type
 (see [Rethinking Objects](20_Rethinking_Objects.md#what-is-polymorphism)).
-It takes several forms.
+It takes three forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
 The form at work in this chapter is the runtime dispatch that inheritance provides,

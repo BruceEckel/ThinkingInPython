@@ -32,8 +32,10 @@ starting with the simplest techniques and growing successively more complex.
 ## Try a Faster Platform
 
 The cheapest platform change is a newer CPython.
-The interpreter has grown substantially faster since 3.10,
-and moving a project forward two or three releases costs a test run rather than a rewrite.
+3.11 alone measured 1.25x faster than 3.10 across the `pyperformance` suite,
+a range of 10-60% depending on the workload,
+and later releases have continued that work.
+Moving a project forward two or three releases costs a test run rather than a rewrite.
 A speedup that needs neither new code nor new hardware is rare.
 
 CPython has an experimental just-in-time compiler.
@@ -1182,7 +1184,7 @@ tested example. -->
 ## Converting a Slow Function to Rust
 
 Moving the hot function into a compiled language works well.
-Rust is excellent for this because its tooling makes the bridge nearly painless.
+Rust fits because its tooling makes the bridge nearly painless.
 Ask your AI to convert the hot Python function,
 and it can walk you through the rest of the process.
 Once you're done, you import a module that looks from the outside like any other Python module,

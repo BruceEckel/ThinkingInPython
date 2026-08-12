@@ -207,7 +207,7 @@ A starred name absorbs whatever remains,
 and a target can nest to match the shape of the value:
 
 ```python
-# unpacking.py
+# unpacking_assignment.py
 
 first, *rest = [10, 20, 30, 40]
 print(first, rest)  # A starred name always collects a list
@@ -658,7 +658,7 @@ plus `MappingProxyType` from the `types` module,
 which is not a container of its own but a read-only *view* onto a `dict` you still hold:
 
 ```python
-# immutability.py
+# immutable_containers.py
 from types import MappingProxyType
 
 # A tuple is an immutable list, and a frozenset is an immutable set:
@@ -736,7 +736,7 @@ unlike the mutable default in [Functions](05_Functions.md#default-and-keyword-ar
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that underlying `dict` still show through,
-as in `immutability.py`,
+as in `immutable_containers.py`,
 where writing to `settings` changes what `config` reports.
 
 Immutability is also shallow.
@@ -769,7 +769,7 @@ Immutability pays off when it goes all the way down.
 [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 shows the same leak inside a frozen data class.
 
-Choosing a container is mostly one question: what do you do with it most?
+Choosing a container comes down to one question: what do you do with it most?
 Ordered items you walk through are a `list`;
 a fixed record whose positions mean different things is a `tuple` or a `namedtuple`;
 lookup by key is a `dict`; uniqueness and membership are a `set`.
@@ -790,7 +790,7 @@ and freeze whichever you pick as soon as it stops changing.
     and print the result.
 3.  In `set_methods.py`,
     add a third set `c = {1, 5, 9}` and print `a.union(b, c)` and `a.intersection(b, c)`.
-4.  In `immutability.py`, add a line that tries `groups.add([1, 2])`
+4.  In `immutable_containers.py`, add a line that tries `groups.add([1, 2])`
     (a plain list, not a `frozenset`) and catch the exception it raises.
     Explain, in terms of hashability,
     why a `frozenset` works as a set member but a `list` does not.

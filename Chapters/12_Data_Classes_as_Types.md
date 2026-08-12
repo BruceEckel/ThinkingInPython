@@ -942,7 +942,7 @@ which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
 so a mutable object of a class you wrote passes as a default and every instance shares it,
 which is the same bug the check exists to prevent.
-Use `default_factory` for anything that is not obviously a constant.
+Use `default_factory` for any default that is not an immutable literal.
 
 `default_factory` accepts any callable that takes no arguments.
 A named function like `make_months` is one.
@@ -988,7 +988,7 @@ or `set` produces a type loose enough that a checker accepts it against any anno
 so it never compares the factory with the field.
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error before the program runs.
-Use the bare form when the factory and the annotation obviously agree,
+Use the bare form when the factory and the annotation agree,
 which is most of the time.
 Subscript it when you want that agreement checked.
 

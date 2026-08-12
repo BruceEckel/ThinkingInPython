@@ -1,0 +1,13 @@
+extends: existence
+message: "'%s' is vague. Name the thing, or give the number."
+level: warning
+ignorecase: true
+tokens:
+  - obviously
+  - clearly
+  - various
+  - excellent
+  - huge
+  - substantially
+  - relatively
+  - fairly

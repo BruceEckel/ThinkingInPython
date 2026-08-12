@@ -63,7 +63,7 @@ All threads in that process share a single heap.
 
 Context switching between threads is as efficient as possible,
 but it still has overhead.
-Also, the OS must time slice fairly frequently to evenly distribute computing resources across threads.
+Also, the OS must time slice frequently to distribute computing resources evenly across threads.
 Typically a thread only runs a few milliseconds at a time.
 
 Using more than one thread within a program solves an immediate problem.
@@ -88,7 +88,7 @@ For example, the OS does not know what data is important to preserve and what is
 If it knew, it could switch contexts faster.
 In addition, each thread reserves a stack large enough to serve virtually any program,
 even though some tasks need only a fraction of that.
-Engineers learned various tricks to make programs run faster despite these disadvantages,
+Engineers learned tricks to make programs run faster despite these disadvantages,
 but these tricks made the resulting programs more expensive to create and maintain.
 
 *Asynchrony*, implemented with *coroutines*,

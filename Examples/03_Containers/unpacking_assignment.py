@@ -1,4 +1,4 @@
-# unpacking.py
+# unpacking_assignment.py
 
 first, *rest = [10, 20, 30, 40]
 print(first, rest)  # A starred name always collects a list

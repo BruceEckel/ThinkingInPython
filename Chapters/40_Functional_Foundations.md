@@ -422,7 +422,7 @@ so ordinary code cannot read or rebind it.
 That gives you encapsulation without declaring a class:
 
 ```python
-# counter.py
+# make_counter.py
 from collections.abc import Callable
 
 def make_counter() -> Callable[[], int]:
@@ -558,7 +558,7 @@ You can assemble behavior from small pieces,
 the way a pipeline reads as a sequence of steps:
 
 ```python
-# composing.py
+# compose_functions.py
 from collections.abc import Callable
 
 def compose[T, U, V](
@@ -656,7 +656,7 @@ and the chapters ahead build on that single property.
     with no change to how `operations["*"](6, 4)` gets called.
 3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of `double` and `triple`,
     each remembering its own `factor`.
-4.  In `composing.py`, write a third small function, `square(n)`,
+4.  In `compose_functions.py`, write a third small function, `square(n)`,
     and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
 5.  In `placeholder.py`, build a second partial, `at_least_ten`,
@@ -671,7 +671,7 @@ and the chapters ahead build on that single property.
     and the `sorted(key=len)` call with one that sorts by last letter.
     Then delete the `list()` around the `map()` call, print the result,
     and say what you see and why.
-8.  In `counter.py`, give `make_counter()` a `step: int = 1` parameter,
+8.  In `make_counter.py`, give `make_counter()` a `step: int = 1` parameter,
     so `make_counter(10)` builds a counter that counts 10, 20, 30.
     `increment()` reads `step` without declaring it `nonlocal`:
     explain why `count` needs the declaration and `step` does not.

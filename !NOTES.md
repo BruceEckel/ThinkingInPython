@@ -1,44 +1,5 @@
 Review the tests to see if they are all doing something useful.
 
----
-
-Make: only show top-level things for 'make' or 'make help'
-So for example:
-```
-PS C:\git\ThinkingInPython> make
-uv run python tools/make_help.py
-  help                    Show this help
-
-[[before Subtopics, a small number of commands that actually get used every day,
-that don't need an intermediate. For example, you can just say 'make all' or 'make verify']]
-
-Subtopics:
-    make setup
-    make everyday
-    make build
-    make examples
-    make solutions
-    make prose
-    make style
-    make cleanup
-```
-
-Now, if the user runs, for example, 'make build', they will see the subtopics for building:
-
-    make build sync                    Update the committed Examples/ tree from the Markdown
-    make build check                   Verify book examples match the committed Examples/ tree
-    make build prune                   Delete orphaned stray files under Examples/ (see `check`)
-    make build site                    Render Chapters/ into build/site/ with pandoc
-    make build epub                    Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
-    make build local                   Build the site, serve it with live reload, open a browser
-    make build serve                   Serve build/site/ at http://localhost:8000 (no rebuilding)
-
-Don't do anything yet; make an analysis and suggestions.
-Should this be re-architected? Should we use a third-party library like Cyclopts or something else, or should this
-stay all Python?
-
----
-
 New book cover & favicon
 
 60 character limit on code listings, for better ebook reading experience
@@ -186,6 +147,8 @@ The real cost of your current workflow is the repeated setup: each skill run re-
 2. Pipeline across chapters. While you vet chapter N's deep-review file, a session can be producing chapter N+1's. The vetting is your time; the reviewing is the model's. Overlapping them roughly halves the wall-clock without touching either skill.
 
 I'd take option 1 and skip merging the skills.
+
+---
 
 Other strategies worth considering
 

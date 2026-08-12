@@ -1,4 +1,4 @@
-# immutability.py
+# immutable_containers.py
 from types import MappingProxyType
 
 # A tuple is an immutable list, and a frozenset is an immutable set:

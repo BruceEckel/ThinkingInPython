@@ -1,4 +1,4 @@
-# counter.py
+# make_counter.py
 from collections.abc import Callable
 
 def make_counter() -> Callable[[], int]:

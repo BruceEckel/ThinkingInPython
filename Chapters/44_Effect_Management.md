@@ -52,7 +52,7 @@ For example, it might:
 - Modify a non-local variable
 - Acquire a lock, or coordinate with another thread
 
-Side effects are relatively easy to spot in the function that performs them,
+Side effects are easy to spot in the function that performs them,
 because they change something outside it.
 
 But the meaning of "Effect" is broader than side effects.

@@ -1,4 +1,4 @@
-# state.py
+# state_surrogate.py
 from typing import Any, Protocol
 
 class Behavior(Protocol):

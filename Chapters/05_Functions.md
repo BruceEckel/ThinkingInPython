@@ -326,7 +326,7 @@ At a call site, `*` unpacks a sequence into separate positional arguments,
 and `**` unpacks a dictionary into keyword arguments.
 
 ```python
-# unpacking.py
+# unpacking_arguments.py
 
 def f(a, b, c):
     print(a, b, c)

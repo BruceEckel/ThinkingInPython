@@ -190,7 +190,7 @@ The three purposes are:
 
 I've found the *GoF Design Patterns* classification to be too obscure,
 and not always helpful.
-Certainly, the *Creational* patterns are fairly straightforward.
+Certainly, the *Creational* patterns are straightforward.
 How will you create objects?
 This is a normal question,
 and the name brings you right to that group of patterns.

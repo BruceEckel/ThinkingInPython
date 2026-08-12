@@ -1,4 +1,4 @@
-# arena.py
+# quest.py
 from typing import Protocol, runtime_checkable
 from stateless import Depend, Need, need
 

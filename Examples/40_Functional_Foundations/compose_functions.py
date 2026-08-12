@@ -1,4 +1,4 @@
-# composing.py
+# compose_functions.py
 from collections.abc import Callable
 
 def compose[T, U, V](

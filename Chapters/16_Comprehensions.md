@@ -347,7 +347,7 @@ and that pull comes outside the `with`.
 
 ## Breaking Up a Complex Comprehension
 
-A comprehension earns its place when it reads clearly.
+A comprehension earns its place when you can read it in one pass.
 You can nest more `for` and `if` clauses,
 or wrap the whole thing in another call,
 but each addition makes the expression harder to read in one pass.

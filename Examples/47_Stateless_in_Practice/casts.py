@@ -1,5 +1,5 @@
 # casts.py
-from arena import Hero, Narrator, Obstacle, Reward, Terrain, encounter
+from quest import Hero, Narrator, Obstacle, Reward, Terrain, encounter
 from stateless import run, supply
 
 class Kitty:

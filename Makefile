@@ -181,12 +181,13 @@ GATE_DOCS = tools/README.md Solutions
 # out of Semantic Line Breaks fails the build instead of drifting invisibly
 # until someone remembers to run `make reflow`. Check mode reports the files
 # and exits nonzero; `make reflow` applies the fix.
-gate: solutions-gate  ## The gate without sync or site (check, reflow, output, ty, ruff, run, pytest, solutions-gate)
+gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, output, ty, ruff, run, pytest, solutions-gate)
 	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/check_all.py $(GATE_CHECKS)
 	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
 	$(PY) tools/reflow_prose.py
+	$(PY) tools/check_unique_slugs.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write
 	$(PY) tools/validate_output.py --update Chapters
@@ -539,10 +540,9 @@ anchors:  ## Fail if a heading-anchor link points at no real heading
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,
 # so the drift check passes, while a repo search for the name returns two
-# unrelated listings and a pytest run can import the wrong one. Deliberately
-# not in `gate` yet: six pre-existing collisions have to be renamed first,
-# and which side renames is an authorial call. Add it to GATE_CHECKS once
-# this target is green.
+# unrelated listings and a pytest run can import the wrong one. `gate` runs
+# it too, so a new collision fails the build; this target is the standalone
+# way to ask the same question while editing.
 unique-slugs:  ## Fail if two chapters name two listings the same
 	$(PY) tools/check_unique_slugs.py
 

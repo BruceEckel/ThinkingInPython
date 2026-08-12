@@ -364,7 +364,7 @@ with not one but several factory methods.
 Each factory method creates a different kind of object.
 When you create the factory object,
 you choose the concrete version of every object that factory creates.
-The example in *GoF Design Patterns* implements portability across various graphical user interfaces
+The example in *GoF Design Patterns* implements portability across graphical user interfaces
 (GUIs).
 You create a factory object appropriate to the GUI that you're working with,
 and from then on when you ask it for a menu, button, slider, etc.,

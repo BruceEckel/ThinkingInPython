@@ -1,5 +1,5 @@
 # test_state.py
-from state import Surrogate
+from state_surrogate import Surrogate
 
 class StateA:
     def name(self) -> str:

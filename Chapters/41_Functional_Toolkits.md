@@ -830,7 +830,7 @@ but it is the wrong answer for a long flat sequence,
 where a loop or one of the `itertools` tools is the better choice.
 
 Code that walks a tree, nested data,
-or a directory reads most clearly when its shape matches the data's shape.
+or a directory reads best when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:
 
 ```python

@@ -1309,7 +1309,7 @@ and a `GameEnvironment` played whatever that factory produced.
 Here the cast widens to five kinds of actor, each requested as an Ability:
 
 ```python
-# arena.py
+# quest.py
 from typing import Protocol, runtime_checkable
 from stateless import Depend, Need, need
 
@@ -1376,7 +1376,7 @@ The cast is a set of ordinary classes that inherit nothing:
 
 ```python
 # casts.py
-from arena import Hero, Narrator, Obstacle, Reward, Terrain, encounter
+from quest import Hero, Narrator, Obstacle, Reward, Terrain, encounter
 from stateless import run, supply
 
 class Kitty:
@@ -2199,5 +2199,5 @@ It is a language that does the encoding for you.
 14. `play()` in `casts.py` accepts any five actors, matched or not.
     Give `kitties_and_puzzles()` and `warriors_and_weapons()` a shared signature so a caller can pass either one where a cast belongs,
     and say what that recovers of the Abstract Factory and what it does not.
-    Then add a sixth actor to `encounter()` and count the lines you edit in `arena.py`,
+    Then add a sixth actor to `encounter()` and count the lines you edit in `quest.py`,
     `casts.py`, and `two_games.py`.

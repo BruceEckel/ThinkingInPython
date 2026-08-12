@@ -1,6 +1,6 @@
 # Tour
 
-This chapter and the several that follow give a programmer's tour of Python:
+This chapter and the ones that follow give a programmer's tour of Python:
 syntax and the built-in numbers, strings, and `None` here, then containers,
 control flow, functions, modules, classes, static typing, class attributes,
 and object cleanup.

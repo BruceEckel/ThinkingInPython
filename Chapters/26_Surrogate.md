@@ -387,7 +387,7 @@ The *State* pattern adds more implementations to *Proxy*,
 along with a way to switch from one implementation to another during the lifetime of the surrogate:
 
 ```python
-# state.py
+# state_surrogate.py
 from typing import Any, Protocol
 
 class Behavior(Protocol):
@@ -462,7 +462,7 @@ The test hands the State surrogate a small stand-in and confirms that calls reac
 
 ```python
 # test_state.py
-from state import Surrogate
+from state_surrogate import Surrogate
 
 class StateA:
     def name(self) -> str:
@@ -654,5 +654,5 @@ the single generic surrogate above is simpler and just as flexible.
     Give it a `__len__()` that forwards to the implementation,
     and confirm `len(p)` returns 2.
     Then explain why `__getattr__()` could not have supplied it.
-7.  Extend `Surrogate` in `state.py` so `change_to()` rejects an implementation missing a method the current one has,
+7.  Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
     and explain why the type checker could not have caught that swap.
