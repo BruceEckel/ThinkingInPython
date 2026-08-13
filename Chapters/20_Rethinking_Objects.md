@@ -62,7 +62,7 @@ The *Liskov Substitution Principle* (LSP)
 says that an object of a subtype must work anywhere code expects an object of its base type.
 A subclass may add behavior, but it must honor the base class contract.
 An override may accept more than the base does but never less.
-It returns a result the caller can use where it expected the base's result,
+It returns a result the caller can use where it expects the base's result,
 and raises no surprising exceptions.
 When subclasses obey it,
 code you write against the base class works unchanged on any of them.
@@ -122,7 +122,7 @@ except OverflowError as e:
 so `@override` holds and `ty` reports nothing.
 `fill()` targets `Stack`, which never refuses a `push()`,
 and a `BoundedStack` handed to it raises an exception on the third item.
-The subclass matched the signature and broke the contract behind it.
+The subclass matches the signature and breaks the contract behind it.
 
 Substitutability is the first thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
@@ -174,11 +174,10 @@ if __name__ == "__main__":
 Encapsulation with private fields and getters still leaks.
 The `is` check shows the mechanism:
 the getter does not return a view or a snapshot of the list,
-it returns a reference to the list,
-the identical object the underscore was hiding.
+it returns a reference to the list, the identical object the underscore hides.
 Python's `return` hands out references, never copies.
-The property blocked reassigning `numbers`,
-but it could not stop the caller from mutating the list it returned.
+The property blocks reassigning `numbers`,
+but cannot stop the caller from mutating the list it returns.
 
 ## Plugging Leaks Is Tedious
 
@@ -219,7 +218,7 @@ if __name__ == "__main__":
 Now the internals are safe, but at a cost: private fields, getters,
 and defensive copies, all to stop other code from changing your data.
 And these copies plug only the outbound leak.
-The constructor stored the caller's own list,
+The constructor stores the caller's own list,
 so the caller's original reference still mutates the internals.
 A fully defensive class must copy on the way in as well.
 
@@ -330,13 +329,13 @@ except TypeError as e:
 Frozen guards the binding, not the object.
 `fl.numbers` must keep pointing at the same list,
 and attempting to rebind it raises an exception.
-But nothing stops that list from changing, the identical leak `Leaky` had.
+But nothing stops that list from changing, the identical leak `Leaky` has.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 The listing shows all three side by side: the rebinding `frozen=True` catches,
 and the mutation and the failed hash it does not.
-That is why the listing needed those two changes.
+That is why `immutable.py` needs those two changes.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
@@ -477,7 +476,7 @@ print(len(counted), counted.appends)
 `list.extend()` appends its items without calling `append()`,
 so the count is wrong the moment anyone uses the base class's other method.
 Nothing in the subclass is incorrect.
-It inherited an implementation and now depends on that implementation's details,
+It inherits an implementation and now depends on that implementation's details,
 which is a fact about `list` that no signature records and no checker reports.
 This is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
@@ -509,16 +508,15 @@ print(len(box.items), box.appends)
 #: 3 3
 ```
 
-Nothing arrives from a base class, so nothing can slip past the counter:
+Nothing arrives from a base class, so nothing slips past the counter:
 the only way into `items` is a method this class wrote.
-The cost is visible and finite.
-You forward every operation callers need by hand,
-where the subclass inherited hundreds it never wrote, and got one of them wrong.
+Every operation is forwarded by hand,
+the subclass inherits hundreds it didn't write, and gets one wrong.
 Composition does not make the counting bug impossible.
-If `extend()` called `self.items.extend(more)` instead of going through `append()`,
-the count would be wrong again.
-The difference is where the bug lives: in the class you are reading,
-rather than in `list` internals that no reading of `CountingList` reveals.
+If `extend()` calls `self.items.extend(more)` instead of going through `append()`,
+the count is still wrong.
+The difference is where the bug lives: in the class you read,
+not in `list` internals hidden in `CountingList`.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
@@ -862,7 +860,7 @@ if __name__ == "__main__":
 
 `ty` accepts `package` as a `Priced` argument without complaint,
 and `charge()` returns `4.5`, silently treating a weight as a price.
-The checker matched the shape correctly.
+The checker matches the shape correctly.
 The mismatch lives in what the number means, and no checker sees that.
 
 A distinct type per concept could close this gap.
@@ -923,7 +921,7 @@ For example, return a description rather than raise an exception,
 finish rather than block, describe the object rather than change it.
 No checker sees that half.
 Substitution is safe only when both halves work,
-whether membership came from inheriting a base class or matching a protocol.
+whether membership comes from inheriting a base class or matching a protocol.
 
 ### Pattern Matching on a Union
 
@@ -1058,7 +1056,7 @@ if __name__ == "__main__":
 
 `total()` decides nothing about logging.
 `NullLogger` defines silence once, instead of every call site defining it.
-The parameter's type also improved.
+The parameter's type also improves.
 `Logs` is a protocol, so any logger fits, and no caller sees a `| None`.
 Because `NullLogger` is stateless,
 one shared `SILENT` instance serves the whole program,

@@ -1,6 +1,6 @@
 ---
 name: activate
-description: Rewrite prose into the active, in-the-moment register: clear the passive-voice, there-is, weak-verb, and nominalization warnings from `make prose`, and fix what Vale cannot see (abstract subjects, future-tense drift, metadiscourse, empty frames). Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
+description: Rewrite prose into the active, in-the-moment register: clear the passive-voice, there-is, weak-verb, and nominalization warnings from `make prose`, and fix what Vale cannot see (abstract subjects, tense drift, padded verb phrases, metadiscourse, empty frames). Use when asked to activate a chapter (or the whole book). The argument names chapters by number or name; no argument means all of Chapters/.
 ---
 
 # Activating prose: characters as subjects, actions as verbs
@@ -98,6 +98,22 @@ a nominalized sentence is usually why the word appeared,
 an action left with no agent to do it.
 Fixing the nominalization removes the banned word for free.
 
+**Relative clauses with no actor.**
+A "that"/"which" clause whose verb has no character behind it
+usually collapses into a participle or an adjective:
+
+- "`list` internals that no reading of `CountingList` reveals"
+  becomes "`list` internals hidden in `CountingList`"
+- "a default that is shared by every call"
+  becomes "a default shared by every call"
+
+The first was a nominalization in disguise:
+"no reading of X reveals" invents an abstract actor
+so the clause has something to negate.
+"Hidden" states the property and drops the machinery.
+Leave the clause alone when its verb has a real actor
+("the list that `extend()` mutates").
+
 **Weak-verb frames.**
 No nominalization needed; the verb slot is occupied by filler
 while the real verb sits inside an infinitive or a complement.
@@ -166,6 +182,19 @@ A clause that delays the point without adding one:
 The test is deletion: if the sentence means the same without the frame,
 the frame was scaffolding.
 
+A whole sentence can be the frame,
+and then deletion is the entire fix.
+An evaluative opener rates what the next sentence delivers:
+"The cost is visible and finite. You forward every operation by hand"
+loses nothing when the first sentence goes,
+since the second shows the cost and lets the reader rate it.
+The tell is an abstract subject plus an adjective
+("The cost is visible and finite", "The difference is subtle",
+"The benefit is twofold") standing alone ahead of the concrete case.
+A frame keeping its payload in the same sentence survives:
+"The difference is where the bug lives: in the class you read"
+answers its own opener.
+
 ## Is the reader watching it now
 
 **Tense: present for program behavior.**
@@ -187,6 +216,75 @@ The house style's imperative-plus-consequence rule
 already produces present-tense conditionals
 ("If you remove `frozen=True`, the pattern fails");
 this category extends the same tense discipline to every sentence.
+
+**Tense: past only for what the reader watched.**
+Future drift announces itself with "will";
+past drift has no marker,
+because a past verb reads as reportage rather than as distance.
+Decide it one verb at a time, with a single test:
+can you point at the run, the listing, or the release where this happened?
+If not, the verb reports standing behavior, and standing behavior takes the present:
+
+- "the subclass inherited hundreds it never wrote"
+  becomes "the subclass inherits hundreds it didn't write"
+- "A frozen dataclass rejected assignment to every field"
+  becomes "A frozen dataclass rejects assignment to every field"
+
+A generic subject settles most cases.
+"The subclass", "a caller", "the checker" names a category,
+so the verb names what always happens;
+the past re-scopes the claim to one occasion
+and sends the reader looking for the occasion.
+Next to a present-tense clause it also invents a chronology:
+"You forward every operation by hand,
+where the subclass inherited hundreds"
+reads as a sequence, when the two are competing alternatives.
+
+One exception: a verb still backshifts inside a present-tense sentence
+when it reports an act finished before now,
+so "hundreds it didn't write" is correct, since someone else wrote them earlier.
+Otherwise a general statement stays generic throughout.
+That same sentence ended "and got one wrong" in a draft,
+pointing at the failure the reader watched in the `CountingList` listing.
+Defensible in isolation, wrong there:
+the sentence states a rule about two designs, not an incident,
+and once a sentence states the rule, every verb in it states the rule.
+Reserve the past for sentences that point at the listing.
+A retrospective closing section ("In every case the observer was a callable")
+narrates the chapter the reader just finished, and stays past.
+
+**One word in the present indicative.**
+The future and past rules are two cases of a wider one:
+a present-tense verb should be one word
+unless the extra words carry meaning.
+Two more padded forms recur.
+
+*Modal plus infinitive where the fact is categorical.*
+"Can" under a negative is the usual shape,
+stating impossibility through a permission verb:
+
+- "nothing can slip past the counter" becomes "nothing slips past the counter"
+- "the checker can report the mismatch" becomes "the checker reports the mismatch"
+
+Keep the modal where the possibility is the point
+("a subclass can override this, and most do not").
+
+*Progressive where the simple present says it.*
+"Is/are" plus *-ing* frames a timeless fact as an activity underway:
+
+- "in the class you are reading" becomes "in the class you read"
+- "the loop is iterating over a copy" becomes "the loop iterates over a copy"
+
+Keep the progressive for something genuinely mid-flight,
+usually set against a second event
+("the generator is still suspended when the caller returns").
+
+The watch list already flags "never".
+A past-tense absolute is often why the word appeared,
+so fixing the tense removes it for free,
+the way fixing a nominalization removes "happen".
+Check the same sentence for a partitive that restates its own antecedent:
+"got one of them wrong" is "got one wrong".
 
 **Narrated mechanism.**
 The prose-level twin of the deep-review skill's
@@ -230,6 +328,21 @@ is a teaching addition for a deep review, not this pass.
   it spends the emphasis on a function word.
   When activation and cohesion conflict, cohesion wins;
   record the kept passive in the report.
+- **Parallel structure can call for a passive.**
+  Cohesion is one reason to keep one, matching subjects across a contrast another.
+  "You forward every operation callers need by hand,
+  where the subclass inherited hundreds it never wrote"
+  became "Every operation is forwarded by hand,
+  the subclass inherits hundreds it didn't write".
+  The passive demotes a generic "you" who is no character in that paragraph,
+  and puts a count of methods in subject position on both sides,
+  so the sentence weighs "every operation" against "hundreds"
+  instead of weighing a person against a class.
+  Dropping the connective "where" belongs to the same move:
+  two short parallel clauses carry a contrast by juxtaposition,
+  and the connective only announces what the parallelism shows.
+  This is a reason to write a passive, so it needs a real contrast to justify it,
+  not a preference for the shorter sentence.
 - **Definitions keep their "is."**
   "A closure is a function that captures variables from its enclosing scope"
   is an identity statement, and stative "is" is its verb.
@@ -263,9 +376,18 @@ Bruce reviews the diff and commits himself.
 
 ## Accrued patterns
 
-Phrasings Bruce has flagged as passive-feeling that the categories above
-do not name yet. When he identifies a new one,
+Phrasings Bruce has flagged, usually as passive-feeling or padded,
+that the categories above do not name yet. When he identifies a new one,
 add it here as a bullet with a before/after pair,
 and it becomes part of every future pass.
 
-- (none yet)
+- "the count would be wrong again" becomes "the count would still be wrong".
+  "Again" implies a history (wrong, fixed, wrong once more);
+  "still" makes the logical claim, that the fix left the condition in place.
+  Prefer the word naming the relation over the word implying a timeline.
+- "rather than in `list` internals" becomes "not in `list` internals".
+  Where a colon or a preceding clause already marks the contrast,
+  "rather than" is a three-syllable "not".
+- "every operation callers need" becomes "every operation".
+  A restrictive qualifier the reader supplies anyway
+  costs two words and narrows nothing.
