@@ -9,7 +9,10 @@ word or an accepted term is reported.
 It checks prose only. Fenced and indented code, tables, blockquotes, and HTML
 are skipped via the tools_prose classifier; inline code spans, footnotes, and link
 URLs are stripped from each line so identifiers and paths are not flagged.
-Headings and list-item text are checked; their markers are not.
+Headings and list-item text are checked; their markers are not, and neither is
+a heading's explicit `{#anchor}`, whose slug splits into non-words ("sys" out of
+`sys-monitoring`). A multi-line HTML comment is tracked the way a fence is,
+since the classifier is stateless and sees only its opening line.
 
 Accepted terms (technical words, names, coined words) go in tools/data/wordlist.txt,
 one lowercase word per line, with `#` comments allowed. Unknown words are
@@ -41,11 +44,15 @@ from pathlib import Path
 from spellchecker import SpellChecker
 
 from tools_config import DATA_DIR
-from tools_prose import FENCE, HEADING, LIST_ITEM, is_prose_line, mask
+from tools_prose import (
+    FENCE, HEADING, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN, LIST_ITEM,
+    is_prose_line, mask,
+)
 from tools_repo import add_paths_arg, md_files, write_text_lf
 
 WORDLIST = DATA_DIR / "wordlist.txt"
 
+_ANCHOR = re.compile(r"\{#[^}]*\}")              # a heading's explicit id
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")   # [text](url) -> text
 _URL = re.compile(r"(?:https?://|www\.)\S+")
 _AUTOLINK = re.compile(r"<[^>\s]+>")
@@ -80,10 +87,15 @@ def rewrite_wordlist(path: Path, words: set[str]) -> None:
 
 
 def prose_text(line: str) -> str | None:
-    """The prose part of a line (heading/list markers stripped), or None."""
+    """The prose part of a line (heading/list markers stripped), or None.
+
+    A heading's explicit `{#anchor}` goes too: it is an identifier, not
+    prose, and its slug splits into words that are not (`sys-monitoring`
+    gives "sys", `dont-start-the-engine` gives "dont").
+    """
     heading = HEADING.match(line)
     if heading:
-        return line[heading.end():]
+        return _ANCHOR.sub(" ", line[heading.end():])
     item = LIST_ITEM.match(line)
     if item:
         return item.group(4)
@@ -118,12 +130,19 @@ def collect(path: Path) -> list[tuple[int, str]]:
     """(line_number, word) for every prose word in a file."""
     found: list[tuple[int, str]] = []
     in_fence = False
+    in_comment = False
     marker = ""
     for lineno, line in enumerate(
             path.read_text(encoding="utf-8").splitlines(), 1):
         if in_fence:
             if FENCE.match(line) and line.strip().startswith(marker):
                 in_fence = False
+            continue
+        if in_comment:
+            in_comment = not HTML_COMMENT_CLOSE.search(line)
+            continue
+        if HTML_COMMENT_OPEN.match(line):
+            in_comment = not HTML_COMMENT_CLOSE.search(line)
             continue
         fence = FENCE.match(line)
         if fence:

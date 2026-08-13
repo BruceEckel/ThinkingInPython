@@ -2,6 +2,8 @@ Dermatologist September
 
 /ultrareview on Chapters
 
+make prose, make spell should also work on Solutions/*.md
+
 Review the tests to see if they are all doing something useful.
 
 New book cover & favicon

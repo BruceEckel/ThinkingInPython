@@ -50,6 +50,16 @@ def test_unpaired_quote_falls_back_to_reporting() -> None:
         "QUOTE-PUNCT"]
 
 
+# ── HTML comments ─────────────────────────────────────────────────────────────
+
+def test_comment_continuation_line_is_not_prose() -> None:
+    assert codes("<!-- TODO: this line has  two spaces\n"
+                 "and this  one does too. -->\n") == []
+
+def test_prose_after_a_closed_comment_is_still_checked() -> None:
+    assert codes("<!-- a note -->\nOne  two.\n") == ["MULTI-SPACE"]
+
+
 # ── the checks that do not depend on quoting ──────────────────────────────────
 
 def test_double_space_between_words() -> None:

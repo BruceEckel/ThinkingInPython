@@ -606,7 +606,12 @@ knows only a curated list, `tools/spellcheck.py` (using the uv-managed
 `pyspellchecker`) checks every prose word against a real English dictionary, so
 a novel typo is caught. It checks prose only: code blocks, inline code,
 footnotes, and link URLs are stripped via `tools_prose`, so identifiers do not
-flood it. Accepted terms (technical words, names, coined words) live in
+flood it. Two more things are not prose either, and both once produced findings
+that looked like typos: a heading's explicit `{#anchor}`, whose slug splits into
+words that are not (`sys-monitoring` gives "sys", `dont-start-the-engine` gives
+"dont"), and the continuation lines of a multi-line HTML comment, which the
+stateless classifier cannot see past its opening line. Accepted terms
+(technical words, names, coined words) live in
 `tools/data/wordlist.txt`, one lowercase word per line. When it flags a real term,
 add it there; when it flags a typo, fix the prose. Use
 `uv run python tools/spellcheck.py --summary` to see the unique unknowns by

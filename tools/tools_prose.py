@@ -82,6 +82,12 @@ LIST_ITEM = re.compile(r"^(\s*)([-*+]|\d+[.)])(\s+)(.*)$")
 BLOCKQUOTE = re.compile(r"^\s*>")
 TABLE = re.compile(r"^\s*\|")
 HTML = re.compile(r"^\s*<")
+# An HTML comment runs across lines, so `HTML` above catches only its first
+# one: an unindented continuation line looks like prose to `is_prose_line`,
+# which is stateless by design. A caller that walks lines tracks this pair
+# the way it already tracks `FENCE`.
+HTML_COMMENT_OPEN = re.compile(r"^\s*<!--")
+HTML_COMMENT_CLOSE = re.compile(r"-->")
 INDENTED_CODE = re.compile(r"^(\t| {4,})")
 
 

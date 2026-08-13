@@ -21,7 +21,9 @@ a multi-word message, as an inline code span instead of prose.
 Code is skipped through the shared classifier in `tools_prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
 spans and footnotes are ignored within a prose line. Headings and list-item text
-are checked, but their markers are not.
+are checked, but their markers are not. That classifier is stateless, so it sees
+only the opening line of a multi-line HTML comment; this walk tracks the rest of
+the comment the way it tracks a fence.
 
 Exit status is non-zero if any issue is found, so it works as a gate. It is run
 as part of `make spell`.
@@ -37,7 +39,10 @@ import re
 from collections.abc import Iterator
 
 from tools_markdown import Document
-from tools_prose import FENCE, HEADING, LIST_ITEM, code_spans, is_prose_line
+from tools_prose import (
+    FENCE, HEADING, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN, LIST_ITEM,
+    code_spans, is_prose_line,
+)
 from tools_repo import add_paths_arg, md_files
 from tools_report import Check, Finding, report
 
@@ -109,6 +114,7 @@ def lint_text(text: str) -> list[Issue]:
     lines = text.splitlines()
     n = len(lines)
     in_fence = False
+    in_comment = False
     fence_marker = ""
     blank_run = 0
 
@@ -133,6 +139,17 @@ def lint_text(text: str) -> list[Issue]:
         if fence:
             in_fence = True
             fence_marker = fence.group(1)[0] * 3
+            blank_run = 0
+            continue
+
+        # An HTML comment's first line is not prose (the classifier says so),
+        # but an unindented continuation line looks like prose to it.
+        if in_comment:
+            in_comment = not HTML_COMMENT_CLOSE.search(line)
+            blank_run = 0
+            continue
+        if HTML_COMMENT_OPEN.match(line):
+            in_comment = not HTML_COMMENT_CLOSE.search(line)
             blank_run = 0
             continue
 
