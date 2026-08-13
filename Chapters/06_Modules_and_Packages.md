@@ -39,7 +39,7 @@ connect your class to the language's operators and built-in functions
 The `if` exists because you can also use any file as a library module within another program.
 In that case, you want only its definitions,
 but you don't want the code at the bottom of the file to run.
-This particular `if` condition is true only when you are running this file directly.
+This particular `if` condition is true only when you run this file directly.
 That is, `__name__` is `"__main__"` when you use the command line:
 
 ```
@@ -74,7 +74,7 @@ print(sys.modules["use_module"] is use_module)
 ```
 
 `use_module`'s body runs once even though two `import` statements name it.
-The first `import` stored the finished module object in `sys.modules`,
+The first `import` stores the finished module object in `sys.modules`,
 a dict keyed by dotted module name.
 Every later `import` of that name, from any file in the program,
 finds it there and binds the same object instead of re-running the file,
@@ -465,13 +465,13 @@ Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
 Its first entry is the directory of the script you ran
 (the current directory when you use `-m` or the REPL),
-which is why `use_module.py` could `import module` with no setup;
+which is why `use_module.py` can `import module` with no setup;
 the entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
 so a local `random.py` can no longer shadow the standard library.
 
-What if your module or package isn't in the same directory as the Python file doing the importing?
+What if your module or package isn't in the same directory as the Python file that imports it?
 The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
 `PYTHONPATH` takes multiple paths,
@@ -479,7 +479,7 @@ and Python keeps searching through those paths until it finds your module or pac
 (or doesn't, and reports an error).
 
 `PYTHONPATH` still works,
-but today you install your package into the environment you are using,
+but today you install your package into the environment you use,
 which puts it on the search path without any environment variable.
 Concretely, with `uv` (this book's tool of choice), that means `uv sync`,
 or `uv pip install -e .` for an editable install.

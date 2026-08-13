@@ -618,11 +618,11 @@ The second line is what unsorted input costs you:
 `sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
 with the same key function both times.
 
-The `list(g)` is also doing more work than it looks.
+The `list(g)` also does more work than it looks.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group invalidates the previous group's view.
 `list(groupby(data))` therefore returns three keys paired with three empty iterators:
-the outer `list()` walked all the way to the end before anything read a group.
+the outer `list()` walks all the way to the end before anything reads a group.
 Consume each group before asking for the next one,
 as the comprehension above does.
 
@@ -991,9 +991,9 @@ so a cached answer from round 0 would still come back in round 6 after every cou
 The `cache` entry's rule that caching works only for pure functions is not a formality.
 A function that reads mutable state is not pure, however simple its body looks.
 
-Generality cost something.
-The circle method needed no memory.
-Which pair sits where in round `r` followed from `r` alone.
+Generality costs something.
+The circle method needs no memory.
+Which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`, because no formula predicts,
 from a round number alone,
 which grouping of arbitrary size keeps every pair's meeting count lowest.

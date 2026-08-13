@@ -21,7 +21,7 @@ The problem has three types.
 
 A *maze* knows its own layout.
 Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
-and it can hand out an entry point.
+and it hands out an entry point.
 The maze never decides anything.
 It only answers questions.
 
@@ -104,7 +104,7 @@ Initializing `number` requires calling `blackboard.next_number()`,
 a side-effecting method, not a static default.
 Marking it `field(init=False)` leaves it out of the generated `__init__`,
 and `__post_init__` runs immediately after that `__init__` finishes,
-so it can fill in `number` and log the rat's start, once `blackboard`, `x`,
+so it fills in `number` and logs the rat's start, once `blackboard`, `x`,
 and `y` hold their values.
 
 The maze is a grid of characters.
@@ -450,7 +450,7 @@ and each type of occupant answers for itself.
 
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()`,
-and the return value is the room in which the robot ends up.
+and returns the room in which the robot ends up.
 A wall keeps the robot where it is, food feeds the robot and lets it in,
 a teleport returns a distant room.
 No `if` or `elif` on the type of occupant appears in the movement code:
@@ -819,7 +819,7 @@ each proves to the checker that the occupant really is a `Teleport` before the c
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
-That is not the type switch polymorphism removed.
+That is not the type switch polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
 and the movement code that runs afterward never asks again.
 The `Robot` branch also explains `Room(Empty())`:
@@ -1160,7 +1160,7 @@ so you can watch individual grains mix while the collective figure forms.
 Every 200 frames the view switches the plate to a new mode.
 The old figure suddenly sits on loud regions of the new field.
 It bursts back into chaos, mixes, and condenses into a different figure.
-The order was never a property of the grains.
+The order is not a property of the grains.
 It belongs to the field on which they sit.
 
 ```python

@@ -115,7 +115,7 @@ Python has no labeled `break`, so leaving two loops at once means either a flag,
 a `return` from a function that holds both loops, or the loop `else` below.
 
 `print()` ends with a newline by default.
-`end=" "` replaces that newline with a space, so the numbers land on one line,
+`end=" "` replaces that newline with a space, so the numbers print on one line,
 and a bare `print()` emits the missing newline afterward.
 
 Python has no `do`/`while` statement.
@@ -137,7 +137,7 @@ print(total)
 ```
 
 A loop may have an `else` clause.
-It runs only if the loop finished without hitting `break`,
+It runs only if the loop finishes without hitting `break`,
 which makes it natural for search loops:
 
 ```python
@@ -212,7 +212,7 @@ except ValueError as e:
 
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so the extra score never appears.
-That silence is convenient when the lengths differ on purpose and a bug when you expected them to match.
+That silence is convenient when the lengths differ on purpose and a bug when you expect them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
 When you need the index as well, wrap the whole thing.
 The extra nesting shows up in the loop header,
@@ -374,8 +374,8 @@ divide_and_report(1, 1)
 which you do when the caller should hear about the bad argument,
 not the failed arithmetic.
 
-The optional `else` runs when the `try` block raised no exception,
-the same shape as the loop `else` that runs when no `break` occurred.
+The optional `else` runs when the `try` block raises no exception,
+the same shape as the loop `else` that runs when the loop hits no `break`.
 The optional `finally` always runs, which makes it the place for cleanup.
 
 Catch an exception only when you can do something about it.
@@ -507,7 +507,7 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
 The gap grows when the world can change between test and operation:
-a file that existed at the `if` can disappear before the `open()`,
+a file that exists at the `if` can disappear before the `open()`,
 and only the EAFP form is safe against that.
 
 ## Context Managers

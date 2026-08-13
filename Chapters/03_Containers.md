@@ -121,7 +121,7 @@ for item in mixed:
 #: [5, 6] list
 ```
 
-This flexibility is convenient but easy to overuse.
+Mixing types is convenient but easy to overuse.
 A `list` of mixed types usually means each element needs different handling.
 A `tuple`, a [data class](12_Data_Classes_as_Types.md#data-classes),
 or distinct lists, each holding a single type, express that better.

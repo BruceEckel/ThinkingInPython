@@ -191,7 +191,7 @@ in another costume.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`, and let `Final` guard only the name.
 
-Immutability also makes two things possible that a mutable value cannot offer.
+Immutability also offers two things a mutable value cannot.
 The first is a *stable hash*, one that holds for the value's whole life,
 so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy,
@@ -362,7 +362,7 @@ The comprehension hands you a finished list;
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
 The rule of thumb: existing function, use the higher-order form;
-expression you are writing inline, use the comprehension.
+expression you write inline, use the comprehension.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
@@ -413,7 +413,7 @@ A closure is the functional answer to "an object with one method and some stored
 `multiply()` reads `factor` rather than receiving it, yet it stays pure:
 `factor` never changes after capture,
 so the same argument always produces the same answer.
-That is the difference between a captured constant and the global `balance` that made `withdraw()` unpredictable.
+That is the difference between a captured constant and the global `balance` that makes `withdraw()` unpredictable.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
@@ -443,7 +443,7 @@ No other code can name that variable, so no accident can corrupt it.
 
 `increment()` is impure, and deliberately so.
 The contrast with `withdraw()` is the lesson.
-`withdraw()` mutated a module-level name that any code could touch;
+`withdraw()` mutates a module-level name that any code can touch;
 `increment()` mutates a name that only it can touch.
 When state must exist,
 a closure is one way to give exactly one function the right to change it.
@@ -455,7 +455,7 @@ Like the single leading underscore,
 a closure states an intention that the language does not enforce.
 
 The `nonlocal` statement lets `increment()` assign to the captured variable.
-Reading a captured name, as `multiply()` read `factor`, needs no declaration.
+Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
 But assignment is how Python decides a name is local,
 so `count += 1` alone makes `count` a fresh local,
 one the statement reads before assigning it,
@@ -493,12 +493,12 @@ print(square.func.__name__, square.keywords)
 
 `square` and `cube` are specializations of `power`,
 each with one argument already supplied.
-The keyword is doing real work here.
+The keyword does real work here.
 `partial(power, 2)` would bind `base` instead,
 because positional arguments fill from the left,
 and `square(5)` would then compute `2 ** 5`.
 Partial application turns a general function into the specific one a caller needs.
-`multiplier()` in [Closures](#closures) did the same by hand,
+`multiplier()` in [Closures](#closures) does the same by hand,
 a factory that fixes one argument and returns a function expecting the rest.
 When the general function exists, as `power()` does here,
 `partial()` removes the factory.
@@ -512,7 +512,7 @@ which [Function Objects](28_Function_Objects.md#command-choosing-the-operation-a
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
-Binding `exponent` above worked because `power()` accepts it by keyword.
+Binding `exponent` above works because `power()` accepts it by keyword.
 Positional arguments have no such freedom: `partial()` fills them from the left,
 so fixing the third argument used to mean fixing the first two.
 A function whose parameters are positional-only

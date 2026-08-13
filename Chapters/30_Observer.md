@@ -147,7 +147,7 @@ Assigning to `celsius` notifies everyone.
 Four things from the classic version disappear: the interface,
 the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
 and a class per reaction.
-The `source` argument went too.
+The `source` argument goes too.
 An observer that needs to know who changed takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.

@@ -84,8 +84,8 @@ It is the cell's coordinates in the grid, so the `Tile` object never stores it.
 
 The factory pairs `functools.cache` with a constructor function,
 the same building block behind [Singleton](24_Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
-There the function took no arguments,
-so caching produced one shared instance overall.
+There the function takes no arguments,
+so caching produces one shared instance overall.
 Here `tile()` takes a symbol,
 so caching produces one shared instance per distinct symbol instead.
 
@@ -212,7 +212,7 @@ Every field here is immutable, which makes the sharing safe.
 ## Interning in the Constructor
 
 A factory function like `tile()` has a visibly different name and call syntax,
-which warns callers that something unusual is happening.
+which warns callers of something unusual.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__()` instead.
 This is the same maneuver the [Singleton](24_Singleton.md#the-classic-implementations)

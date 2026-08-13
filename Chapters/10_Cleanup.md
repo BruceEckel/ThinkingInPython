@@ -139,7 +139,7 @@ print("still running")
 #: still running
 ```
 
-The release failed, and stdout says nothing about it.
+The release fails, and stdout says nothing about it.
 A traceback goes to `sys.stderr` labeled `Exception ignored`,
 but nothing propagates: no caller can catch it, no `finally` runs,
 the exit status is still `0`, and a test asserting on stdout passes.
@@ -289,7 +289,7 @@ The second `close()` does nothing: a finalizer runs at most once,
 and `alive` reports whether it still can.
 `del b` destroys the object here, where the `del c` in `cleanup.py` did not,
 because `b` held the only reference to it.
-Nobody called `close()`, but the callback still runs,
+Nobody calls `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
 For an object still alive when the program ends,
 `finalize()` runs the callback from the `atexit` module's exit handlers,

@@ -89,7 +89,7 @@ The `int` annotation says "any integer," which is not what you mean.
 Checking the argument also says nothing about the result: `f1(6)` returns 11,
 which no rating may be.
 `f3()` is what forgetting looks like.
-`11` was never a legal rating, and nothing objected: not the annotation,
+`11` is not a legal rating, and nothing objected: not the annotation,
 not the type checker, not the running program.
 The result is a number that no rating can produce,
 passed along as if it were fine.
@@ -195,7 +195,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 #:   • __repr__(self)
 ```
 
-`@dataclass` did generate the dunder methods,
+`@dataclass` generates the dunder methods,
 and the constructor arguments cover all the fields in `Messenger`.
 The trailing `...` is `display_object()` trimming that line to its report width.
 `__hash__` is `None`: a `@dataclass` compares by value with `__eq__`,
@@ -264,7 +264,7 @@ The default `display_object()` does not show the generated `__init__()`,
 ## Immutability
 
 Passing `frozen=True` makes the data class immutable.
-Attempting to assign to a field raises `FrozenInstanceError`.
+Assigning to a field raises `FrozenInstanceError`.
 As a bonus, a frozen instance is hashable,
 so you can use it as a dictionary key or put it in a set.
 `frozen=True` removes the mutability that cost `Messenger` its `__hash__`,
@@ -361,11 +361,11 @@ if __name__ == "__main__":
 #: Stars(number=10)
 ```
 
-The `number` in `Stars` is now constrained to a set of values:
+`Stars` now constrains `number` to a set of values:
 the integers one through ten.
 The only way to make a `Stars` is through the constructor,
 and the constructor refuses anything outside that set.
-If you are holding a `Stars`, it is legal.
+If you hold a `Stars`, it is legal.
 You know it without checking.
 
 That guarantee changes how you write the functions.
@@ -416,7 +416,7 @@ The checker reports the assignment before the program runs,
 which the `# type: ignore` silences so the listing can reach the runtime failure.
 
 `object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
-It works, and it says what it is doing.
+It works, and it says what it does.
 The alternative is to refuse the unnormalized value and normalize before construction.
 Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
@@ -604,8 +604,7 @@ puts it, a bare annotation is a declaration rather than a placeholder.
 It records, in `A.__annotations__`,
 that some future `A` will carry an `x` and an `s`,
 but stores nothing until code assigns a value.
-`A` has no `__init__()` to make that assignment,
-so the declaration goes unfulfilled.
+`A` has no `__init__()` to assign them, so the declaration goes unfulfilled.
 That is why `show(A())` finds nothing: no `x` and no `s` exist to report,
 on the class or on the instance.
 
@@ -1032,7 +1031,7 @@ def test_the_check_cannot_move_inside() -> None:
 ```
 
 The first two tests are `test_stars.py` inverted.
-There, no illegal `Stars` could exist.
+There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate.
 The third test shows why the check cannot move inside the type.
@@ -1060,7 +1059,7 @@ shows.
 
 A data class builds its `__init__` from its fields and assigns them directly.
 It does not call the base class `__init__`.
-If you inherit from an ordinary class that does setup in its own constructor,
+If you inherit from an ordinary class that sets up state in its own constructor,
 the data class silently skips that setup:
 
 ```python
@@ -1084,8 +1083,8 @@ print(hasattr(c, "host"), hasattr(c, "url"))
 #: False False
 ```
 
-The generated `__init__` assigned `name` and stopped.
-Nothing called `Connection.__init__`, so neither `host` nor `url` exists.
+The generated `__init__` assigns `name` and stops.
+Nothing calls `Connection.__init__`, so neither `host` nor `url` exists.
 The omission is easy to miss because the class still constructs without an error.
 
 To run the base initializer, call it yourself from `__post_init__()`,

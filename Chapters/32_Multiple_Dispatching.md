@@ -473,7 +473,7 @@ so an annotation that names it describes the wrong thing.
 Widening the return to `Any` describes nothing and turns off checking for every caller.
 
 [Composite and Interpreter](34_Composite_and_Interpreter.md#interpreter)
-builds the expression system this chapter opened with,
+builds the expression system that opened this chapter,
 using these two methods to let Python's own parser assemble the tree.
 
 ## Turning One Unknown Type Into a Second Dispatch

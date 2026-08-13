@@ -344,7 +344,7 @@ info[revealed-type]: Revealed type
 `greet` is a function `ty` knows by name,
 while `bound` is a function `supply()` built, described by its signature alone.
 These are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
-`Need[Console]` sat in the first type parameter of `greet` and disappears from `bound`,
+`Need[Console]` sits in the first type parameter of `greet` and disappears from `bound`,
 leaving the `Never` from the alias table.
 
 Handling an Ability *subtracts* it from the type.
@@ -403,7 +403,7 @@ because the function can produce a second description.
 <!-- The "---" below is the author's own em-dash. Leave it. House.EmDash
      exists to catch em-dashes the author did not write. -->
 <!-- vale House.EmDash = NO -->
-The design rule that follows from this is to pass the function rather than the Effect.
+So pass the function rather than the Effect.
 A Stateless Effect is a one-shot token: build it, run it, discard it.
 Storing one in a registry to run later, handing the same one to two consumers,
 or keeping one around to retry after a failure---these all fail quietly,
@@ -450,7 +450,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 In Stateless, an unsupplied dependency is a type error,
 not a production incident.
-No test had to exercise the path, and no reviewer had to notice the omission.
+No test needs to exercise the path,
+and no reviewer needs to notice the omission.
 
 The expected type in that message names two things this chapter has not yet covered:
 
@@ -554,9 +555,9 @@ If you write that loop body as a bare `greet(name)`,
 `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
 That seems like protection, but it is accidental.
-That `yield from` was the only `yield` in `greet_all()`,
-so deleting it turned `greet_all()` into an ordinary function,
-and the checker caught the function's changed shape, not the discarded Effect.
+That `yield from` is the only `yield` in `greet_all()`,
+so deleting it turns `greet_all()` into an ordinary function,
+and the checker catches the function's changed shape, not the discarded Effect.
 A function with a second `yield` stays a generator function.
 Its shape does not change, so nothing objects.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
@@ -600,8 +601,8 @@ error[invalid-yield]: Yield expression type does not match annotation
 
 A function cannot claim to be pure while calling something impure.
 Compare that to `ask_tell.py` in [Effect Management](44_Effect_Management.md#effects-by-hand),
-where `greet(ask, tell)` took its dependencies as arguments.
-Nothing there stopped an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
+where `greet(ask, tell)` takes its dependencies as arguments.
+Nothing there stops an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
 
 ## Retrofitting an Effect
@@ -1029,7 +1030,7 @@ so the type checker cannot report the mistake.
 This `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
 Both read `(str) -> None`, and both hide a `Console`.
 
-DI met its goal, because the `Console` is swappable.
+DI meets its goal, because the `Console` is swappable.
 But it relocates a [side cause](44_Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker never validates the dependency.
 
@@ -1163,14 +1164,14 @@ It reads `Depend[Async, str]` and not `Depend[Need[Async], str]`,
 where every dependency so far carried a wrapper.
 The wrapping is not optional, and this is not an exception to it.
 The channel holds Abilities, and `Async` is one, so it sits there bare.
-`Console` never was one: it is an ordinary class,
+`Console` is not one: it is an ordinary class,
 and `Need[Console]` is the Ability that asks for it.
 The first type parameter accepts only `Ability` subclasses,
 so the checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
 
-`Async` asks for no object (there's no `Need`), so you supply nothing.
+`Async` asks for no object (no `Need` wraps it), so you supply nothing.
 An `Async` request carries the coroutine and asks the driver to await it,
 and `run()` does that with the event loop it starts.
 So the driver answers `Async` rather than supplying it:
@@ -1461,7 +1462,7 @@ which is not the same as handling it.
 The exception leaves as a yielded value, travels out to `run()`,
 and comes back down into the innermost suspended frame,
 so the `except` clause runs.
-Nothing removed the `KeyError` from the channel, though,
+Nothing removes the `KeyError` from the channel, though,
 so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver sees it and returns that value as the result,
@@ -1642,7 +1643,7 @@ def one_unhandled(name: str) -> Try[ValueError, str]:
 ```
 
 `both` is `(str) -> Success[int | KeyError | ValueError]`.
-Every failure moved into the result, so nothing remains in the error channel.
+Every failure moves into the result, so nothing remains in the error channel.
 `all_handled()` returns `Success[str]`:
 no failure can escape as a thrown exception.
 
@@ -1667,7 +1668,7 @@ def test_one_unhandled() -> None:
 ```
 
 `one` is `(str) -> Try[ValueError, int | KeyError]`.
-The caught error moved to the result and the uncaught one remains.
+The caught error moves to the result and the uncaught one remains.
 `one_unhandled()` does not handle `ValueError`,
 so the signature must declare that failure.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,

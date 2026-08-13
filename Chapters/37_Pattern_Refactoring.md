@@ -267,11 +267,11 @@ and `Trash` is deliberately open, which is the point of the registry,
 so no checker can know the set is complete.
 This is a `match` over an open set,
 which [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
-warned against.
+warns against.
 When the set is open, sorting must not enumerate it,
 and the next section shows a sorter that doesn't.
 Testing for one type, or a small subset that needs special handling, is fine.
-Testing for all of them means you are doing dispatch's job by hand.
+Testing for all of them means you do dispatch's job by hand.
 
 That is the argument.
 Here is the requirement that makes it concrete.
@@ -333,7 +333,7 @@ Nothing failed.
 The parser built two `Plastic` objects, the sorter matched neither,
 and the report totals the trash it recognized.
 Two of four pieces reached a bin,
-and the sixty pounds of plastic left no trace in any total on which the plant will act.
+and the sixty pounds of plastic left no trace in any total on which the plant acts.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
 The registry is not the leak:

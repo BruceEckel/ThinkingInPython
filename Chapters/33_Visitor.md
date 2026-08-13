@@ -112,7 +112,8 @@ The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),
 so that line depends on both unknown types at once:
-the worm's type chose `eat()`, and the flower's type chose which `eat()` runs.
+the worm's type chooses `eat()`,
+and the flower's type chooses which `eat()` runs.
 If you delete the override, the program still runs;
 the flower-side dispatch goes back to having nothing to say.
 
@@ -159,7 +160,7 @@ The chapter keeps `Any` because the empty `Visitor` base is what the classic pat
 and seeing the price is part of the point.
 The price is that nothing checks the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
-That is the same gap the `Any` in `paper_scissors_rock.py` left in [Multiple Dispatching](32_Multiple_Dispatching.md).
+That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [Multiple Dispatching](32_Multiple_Dispatching.md).
 This `Any` is a choice,
 unlike the one in [Data Transfer Objects](22_Data_Transfer_Objects.md),
 where a bag of attributes named at runtime leaves no precise type to write.

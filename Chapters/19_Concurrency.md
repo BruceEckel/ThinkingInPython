@@ -55,7 +55,7 @@ It stores the CPU register set, which includes:
 
 - The program counter (the next instruction to execute)
 - The stack pointer
-- Other registers and flags used by the program
+- Other registers and flags the program uses
 
 The context switch does not copy the thread's stack,
 since every thread has its own.
@@ -143,7 +143,7 @@ Two keywords and the `asyncio` library capture this:
    This is a description of work that has not started.
 2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
    While that coroutine waits,
-   the *event loop* finds other coroutines that are ready to run.
+   the *event loop* finds other coroutines ready to run.
 3. `asyncio.gather()` awaits several coroutines at once and collects their results in order.
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
@@ -1076,7 +1076,7 @@ print("threads at least 3x faster on I/O: "
 ```
 
 Five 50-millisecond waits finish in about the time of one.
-Each sleeping thread has released the GIL,
+Each sleeping thread releases the GIL,
 so the operating system runs another thread while it waits,
 the same overlap `asyncio` achieved with suspended tasks.
 This is `blocking_the_loop.py` turned inside out:
@@ -1207,8 +1207,8 @@ Each sleep releases the GIL between a read and its write,
 so all eight threads read the same value,
 and their eight writes store the same result.
 
-At full speed, with no deliberate sleep, the GIL made this race rare.
-But it never made it impossible.
+At full speed, with no deliberate sleep, the GIL makes this race rare.
+But it never makes it impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
 
@@ -1722,7 +1722,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-Three different backends are running inside one `TaskGroup`.
+Three different backends run inside one `TaskGroup`.
 `io_price()` suspends and resumes on the event loop the way `fetch()` did in this chapter's first listing.
 `to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
 `process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,

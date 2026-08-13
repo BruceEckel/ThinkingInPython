@@ -218,8 +218,8 @@ print(len({id(s) for s in built}) > 1)
 ```
 
 Eight threads, more than one object.
-Every thread checked the cache before any of them had filled it,
-so each ran the constructor and handed its caller a different object.
+Every thread checks the cache before any of them has filled it,
+so each runs the constructor and hands its caller a different object.
 Only the last one to finish stays in the cache;
 the other seven are already in the hands of their callers.
 
@@ -508,7 +508,7 @@ so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
 
-Testing confirms the objects differ but share one set of state:
+The test confirms the objects differ but share one set of state:
 
 ```python
 # test_singleton_borg.py
@@ -587,7 +587,7 @@ so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
 which is why `Registry("secondary", limit=99)` does not create a new object.
-A caller who believes those arguments took effect is holding an object configured by someone else.
+A caller who believes those arguments took effect holds an object configured by someone else.
 
 Both `isinstance(first, Registry)` and subclassing `Registry` raise exceptions:
 

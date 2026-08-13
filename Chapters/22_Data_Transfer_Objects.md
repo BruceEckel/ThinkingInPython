@@ -72,7 +72,7 @@ print(m == SimpleNamespace(info="Spam", b=["x", "y"], more=11))
 #: True
 ```
 
-The first `print()` shows the same instance `__dict__` the hand-rolled version had.
+The first `print()` shows the same instance `__dict__` the hand-rolled version has.
 `SimpleNamespace` adds the rest: a readable `repr()` and equality by contents.
 `Messenger` prints as `<Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
@@ -141,7 +141,7 @@ Printing a `NamedTuple` gives the same readable output a data class gives.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`,
 and `ty` reports it before the program runs.
-The attribute bag caught nothing; a declared field catches this.
+The attribute bag catches nothing; a declared field catches this.
 Since nothing can mutate the fields, `_replace()` produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.

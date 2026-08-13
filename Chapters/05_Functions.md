@@ -291,7 +291,7 @@ print(count)
 
 `rebinds()` never touches the module-level `count`.
 If you drop the `global` from `writes_global()`,
-`count += 1` reads a local that was never assigned,
+`count += 1` reads a local before assigning it,
 so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading,
 which is why `read_only()` needs nothing.

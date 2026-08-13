@@ -448,7 +448,7 @@ Only the object behind the surrogate does.
 
 The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
-The Proxy section gave the reason:
+The Proxy section gives the reason:
 whatever `__getattr__()` returns is unknown at the type level,
 so no checker can verify `b.f()`, no matter how you annotate the surrogate.
 Declaring each implementation against `Behavior` still catches a missing method,

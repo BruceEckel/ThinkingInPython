@@ -134,7 +134,7 @@ for a reason [The checker can give up quietly](#the-checker-can-give-up-quietly)
 gives.
 
 Now compare this listing to `ask_tell.py` again.
-The by-hand version put two objects in every signature.
+The by-hand version puts two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a checker can follow them.
@@ -205,7 +205,7 @@ print(4_000 < heads < 6_000)
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body contains no `random` call, no seed, and no parameter for either.
 `Flip` carries no data, so it needs no fields,
-while `Ask` and `Tell` each carried the payload the request must deliver.
+while `Ask` and `Tell` each carry the payload the request must deliver.
 The Ability's whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
@@ -404,7 +404,7 @@ they differ in whether midnight falls between them.
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.
 It walks a fixed list, so it holds state between requests,
 which is how it answers the same question two ways.
-A supplied instance could not do this, and neither could `frozen` or `tomorrow`,
+A supplied instance cannot do this, and neither can `frozen` or `tomorrow`,
 since each reports one moment however often you ask.
 
 Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
@@ -418,7 +418,7 @@ in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
-The technique did not change between the two.
+The technique does not change between the two.
 Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that you cannot skip the declaration by accident.
 
@@ -646,7 +646,7 @@ a gap that [Running Effects in Parallel](#running-effects-in-parallel) revisits.
 One thing stays outside the types.
 `choose()` raises a `Blackout` when no source can supply the hour,
 and that is ordinary code raising an ordinary exception.
-No `@throws` lifted it,
+No `@throws` lifts it,
 so it travels through `run()` untracked and no signature mentions it.
 `catch()` matches values an Effect yields,
 and a handler is not part of the Effect,
@@ -657,7 +657,7 @@ A handler sits outside the channel it feeds.
 
 Each Ability so far moves information in one direction.
 `Flip` and `Now` read from outside: side causes.
-`Tell` wrote outward: a side effect.
+`Tell` writes outward: a side effect.
 Shared mutable state is both at once,
 because whoever holds it must read it and write it back.
 An Ability declares one answer type,
@@ -733,11 +733,11 @@ chained through the named stages of [Abilities Are Not Special](#abilities-are-n
 After the run, the cell shows what the program did to it:
 two purchases went through, and 10 remained.
 A test builds its own pair from a fresh `Cell`,
-the way `at()` built a clock from a moment, and asserts on what remains,
+the way `at()` builds a clock from a moment, and asserts on what remains,
 with no global to reset between tests.
 
 For a number one function owns, a local variable is the right tool,
-and `count_heads()` kept its count in one.
+and `count_heads()` keeps its count in one.
 The pair pays off when separate functions share the cell,
 as `purchase()` and any other spender would,
 without a parameter threaded through every signature between them.
@@ -934,20 +934,19 @@ and here a scenario is nothing more than arguments to `supply()`.
 Every printed line in that trace comes from a supplied implementation,
 because the pipeline holds no output of its own.
 The second run also stops after `feed: fetching`.
-`topic_of()` yielded a `NotInteresting`,
-which ended `research()` where it stood,
-so the `need(Encyclopedia)` two lines below it did not run and no one consulted a library.
-`catch()` received that failure and `report()` matched on it as a value,
+`topic_of()` yields a `NotInteresting`, which ends `research()` where it stands,
+so the `need(Encyclopedia)` two lines below it does not run and no one consults a library.
+`catch()` receives that failure and `report()` matches on it as a value,
 which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception would,
-and no step tested for it.
+and no step tests for it.
 Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
 since `DeadWire.latest()` raises `Unavailable` before printing,
 while the third reaches the library and fails there.
 
 `report()` is where the two channels come apart.
-`catch()` emptied the error channel, so `report()` cannot fail.
+`catch()` empties the error channel, so `report()` cannot fail.
 It still declares both abilities,
 because catching an error does nothing about a dependency.
 If you annotate `report()` as `Success[str]`,
@@ -1009,7 +1008,7 @@ it returns an Effect, and ordinary `try`/`except` code cannot call it directly.
 
 Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
-The Effect version moved those nine lines into `report()`,
+The Effect version moves those nine lines into `report()`,
 one `match` over the failures instead of a `try` at each step.
 The name records the merge the by-hand version cannot avoid:
 `research()` and `report()` in one function.
@@ -1089,7 +1088,7 @@ and the `@throws` on `fetch()` lifts it.
 `Empty` originates here, in the generator,
 where the headline is available to inspect.
 No decorator takes part and nothing raises an exception.
-`throw(Empty())` yields the failure the way `Ask(prompt)` yielded a request,
+`throw(Empty())` yields the failure the way `Ask(prompt)` yields a request,
 and the driver takes it from there.
 Execution does not come back: a driver that receives a failure stops sending,
 so anything after a `yield from throw(...)` is unreachable,
@@ -1944,7 +1943,7 @@ except MissingAbilityError as e:
 ```
 
 `half` is `() -> Depend[Need[Log], None]`.
-The handler subtracted the `Console` and not the `Log`,
+The handler subtracts the `Console` and not the `Log`,
 so `run()` rejects it before the program starts:
 
 ```text
@@ -1979,7 +1978,7 @@ which is the information this library exists to give you.
 That makes two checker gaps: the nested handler expression here,
 and the direct Ability yield that types as `Unknown`.
 Each has the same shape.
-The library's types are asking the checker a hard inference question,
+The library's types ask the checker a hard inference question,
 and where the checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
 
@@ -2005,7 +2004,7 @@ which is how an exception behaves.
 Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first, a *tail-resumptive* handler.
 The ceiling is the substrate rather than the design.
-A Python generator is one-shot, so there is nothing to resume twice.
+A Python generator is one-shot, so a handler has nothing to resume twice.
 
 Two pieces of the library show that ceiling.
 `Effect[A, E, R]` carries a separate `E` that `@throws` and `catch()` work.

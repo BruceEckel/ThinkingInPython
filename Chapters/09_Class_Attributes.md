@@ -69,7 +69,7 @@ the instance dictionary is a plain `dict` holding only what the code assigned.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
-and `a.show()` finds it by the same fallback that found `a.x`:
+and `a.show()` finds it by the same fallback that finds `a.x`:
 nothing on the instance, so look at the class.
 `display_object()`, the inspection helper from [Classes](07_Classes.md),
 reports attributes and methods separately,
@@ -175,8 +175,8 @@ not annotations that merely describe one to come.
 `display_object(a)` tells a different story once an instance exists.
 Both `label` and `total` appear:
 `label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
-Constructing `a` ran `self.label = label`,
-which created a real `label` attribute on `a`, not on `Tally`.
+Constructing `a` runs `self.label = label`,
+which creates a real `label` attribute on `a`, not on `Tally`.
 `total` shows up too, not because `a` has its own copy,
 but because reading an attribute checks the instance first,
 then falls back to the class,
@@ -294,14 +294,14 @@ print(Base.shared, Left.shared, Right.shared)
 
 `Left` has no `shared` of its own,
 so it tracks `Base.shared` until something assigns to `Left.shared` directly.
-`Right` overrode `shared` at class-definition time,
+`Right` overrides `shared` at class-definition time,
 so it never sees changes made through `Base`.
 `ClassVar` doesn't change any of this.
 It only tells the checker that `shared` belongs to the class,
 not that subclasses share storage.
 This is the shadowing rule from the start of the chapter, one level up:
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
-the way `a` read through to `Stars` until `a.rating = 1`.
+the way `a` reads through to `Stars` until `a.rating = 1`.
 A subclass stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
 A subclass overriding a `ClassVar` inherits the declaration along with the name,

@@ -240,7 +240,7 @@ Laziness and single use are separate properties.
 `Countdown` is as lazy as the generator its `__iter__()` builds,
 yet it survives repeated passes, because each pass gets a fresh iterator.
 `range()` works the same way: one `range` object can drive loop after loop.
-What runs out is the iterator, not the iterable that made it.
+The iterator runs out, not the iterable that made it.
 
 The annotation cannot warn you.
 `Iterable[T]` describes a list and a half-spent generator equally well,
@@ -497,7 +497,7 @@ it stops responding, or it dies when it exhausts memory.
 No tool warns you first.
 `ty` accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
-Whether an iterator ever ends is not something a checker can decide by reading the code,
+No checker can read the code and decide whether an iterator ever ends,
 and a generator built from `while True` is indistinguishable from a finite one until it runs.
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
@@ -603,7 +603,7 @@ The language calls both on your behalf.
 [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
 describes this dissolution.
 
-Writing the four GoF Iterator methods in Python shows what `first()` and `current_item()` were doing.
+Writing the four GoF Iterator methods in Python shows what `first()` and `current_item()` do.
 Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
@@ -677,7 +677,7 @@ so every item read once stays read.
 which lets it report a value without advancing.
 Look at the last line of output.
 By the time all four methods work, `seen` holds the entire stream.
-The interface needed more than a buffer: it rebuilt the list.
+The interface needs more than a buffer: it rebuilds the list.
 
 That is the cost the pattern hides.
 `first()` and `current_item()` assume a collection you can re-read and inspect in place,

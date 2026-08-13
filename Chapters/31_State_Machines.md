@@ -10,8 +10,8 @@ and the system behaves differently from one state to the next
 
 The code that moves the system from one state to the next is often a [*Template Method*](25_Template_Method.md),
 as the following framework for a basic state machine shows.
-Each state can be `run()` to perform its behavior, and (in this design)
-you can also pass it an "input" object so it can tell you which state to enter next.
+You can `run()` each state to perform its behavior, and (in this design)
+also pass it an "input" object so it can tell you which state to enter next.
 This design and the next differ in one key way: here,
 each `State` object makes that decision on its own,
 whereas in the subsequent design a single table holds all of the state transitions.
@@ -382,7 +382,7 @@ Version 1's `case _` arms return the current state,
 so an input a state does not recognize raises no exception and the machine stays put.
 Staying put is not the same as doing nothing:
 `run_all()` calls `run()` on whatever state `next()` returns,
-so a transition back to the current state performs that state's action a second time.
+so a transition back to the current state runs that state's action a second time.
 Version 2's table holds only the explicit transitions,
 and its `next()` raises an exception on anything else.
 Neither is wrong, but the choice deserves to be deliberate.
@@ -413,7 +413,7 @@ A condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
 
 The inputs change shape too.
-The mousetrap's inputs were `MouseAction` members, names with nothing attached.
+The mousetrap's inputs are `MouseAction` members, names with nothing attached.
 A vending machine's inputs carry values: what a coin is worth,
 which digit the user pressed.
 So each input becomes an object of its own class,
@@ -478,7 +478,7 @@ class StateMachine:
 The listing writes `StateMachine` out by hand rather than as a `@dataclass` because its constructor renames what it stores:
 the caller passes `initial`, but the attribute is `state`,
 the position `handle()` updates.
-A generated `__init__()` cannot make that rename.
+A generated `__init__()` cannot rename the parameter.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 

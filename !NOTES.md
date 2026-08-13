@@ -1,6 +1,7 @@
 Dermatologist September
 
-/ultrareview on Chapters
+Check for any unresolved issues in deep_review and readability directories
+Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
 
 make prose, make spell should also work on Solutions/*.md
 

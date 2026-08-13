@@ -182,7 +182,7 @@ That chapter's other trap applies here too:
 which `copy.copy()` and `pickle` do,
 so an adapter that must survive copying or pickling defines `__reduce__()` or guards the lookup.
 
-Testing verifies both halves of the adapter's behavior.
+The tests verify both halves of the adapter's behavior.
 The new `f()` combines the adaptee's methods,
 and calls to methods it doesn't override forward through to the wrapped object:
 
@@ -299,7 +299,7 @@ a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
 Intent separates them,
 the distinction [The Pattern Concept](21_The_Pattern_Concept.md)
-said remains when structures match.
+says remains when structures match.
 When you cannot decide what to call your wrapper,
 ask what breaks if you remove it:
 
@@ -386,7 +386,7 @@ so verify your checker reports it before relying on it.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,
 which is why they are safe moves.
-Retiring an interface is the move that is not safe,
+Retiring an interface is the unsafe move,
 and marking the old interface is how you make the risk visible on a schedule instead of discovering it when you delete something.
 
 ## Exercises

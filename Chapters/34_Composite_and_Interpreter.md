@@ -351,8 +351,8 @@ Printing `expr.left` shows the nesting: the `Add` at the root holds a `Mul`,
 which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
 once with `x=3` and once with `x=10`.
-Building `2 * x + 1` did not compute a number.
-It built a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
+Building `2 * x + 1` does not compute a number.
+It builds a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises `KeyError`, naming the variable.
 The `/` makes `e` positional-only

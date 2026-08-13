@@ -156,7 +156,7 @@ or an identity test against a specific value such as `is not SOME_SENTINEL`.
 Marking a value `Final` catches accidental reassignments during type checking.
 
 The naming convention in [Tour](02_Tour.md#naming-conventions)
-used ALL_CAPS to signal a constant, but that is only a hint to human readers.
+uses ALL_CAPS to signal a constant, but that is only a hint to human readers.
 At runtime, a `Final` is still a variable,
 but reassigning it produces a type-checking error:
 
@@ -346,7 +346,7 @@ whatever that type is.
 
 `Any` cannot express that connection.
 It accepts any list,
-but the return type then says nothing about what the list held.
+but the return type then says nothing about what the list holds.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -421,7 +421,7 @@ print(count(circles))
 
 A `list` accepts writes.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
-Refusing the call keeps that from happening.
+Refusing the call prevents that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
@@ -565,7 +565,7 @@ is worth naming precisely.
 
 ## Type Hint Summary
 
-These are the type hints you will encounter, in their modern forms.
+These are the type hints you encounter, in their modern forms.
 The book uses only a handful of these, but the rest turn up in other code.
 Each subsection heading links to the associated [Python documentation](https://docs.python.org/3/library/typing.html).
 [Thinking in Types](https://thinkingintypes.com/) explores types in more depth.

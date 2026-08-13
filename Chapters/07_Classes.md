@@ -384,7 +384,7 @@ The section opened with a conversion, and this listing carries it out.
 `radius` began as a plain attribute and is now a validated property,
 and the two lines that read `c.radius` and `c.area` are the ones from the first listing,
 unchanged.
-Nothing outside the class could tell which version it is holding,
+Nothing outside the class can tell which version it holds,
 which is why you do not add getters and setters before you need them.
 
 The property owns the name `radius` on the class,

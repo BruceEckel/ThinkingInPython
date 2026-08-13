@@ -340,7 +340,7 @@ Configuration alone is a closure's job.
 *GoF Design Patterns* implements the chain as a linked structure,
 each handler holding a reference to the next and deciding whether to pass the request along.
 In Python the chain is a list of functions,
-and the loop that walks it makes that decision in one place.
+and the loop that walks it decides in one place.
 Bisection needs the interval to bracket a root.
 The open methods do not:
 
@@ -426,7 +426,7 @@ def test_all_fail_returns_none() -> None:
 Chain of Responsibility keeps its handlers in a list and tries them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
-This is a `dict` from each event type to the functions that care about it.
+The bus is a `dict` from each event type to the functions that care about it.
 The events are values,
 written as [frozen data classes](12_Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for it.

@@ -100,7 +100,7 @@ cheese()
 ```
 
 `Decorating` prints before `Definitions done`,
-so `announce` ran while Python was still executing the `def` above `cheese`.
+so `announce` runs while Python is still executing the `def` above `cheese`.
 Only the body of `wrapper()` waits for the call.
 
 `wrapper()` is a *closure*.
@@ -845,7 +845,7 @@ a module-level constant computed the ordinary way reads better.
 Classes collapse the same way.
 [Singleton](24_Singleton.md#singleton-by-class-decorator)
 decorates a class with a callable that replaces it with one cached instance,
-so the name that followed `class` refers to an object, not a type.
+so the name that follows `class` refers to an object, not a type.
 
 ## The Decorator Pattern
 

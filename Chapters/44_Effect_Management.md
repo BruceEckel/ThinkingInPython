@@ -29,7 +29,7 @@ This book has emphasized the benefits of pure functions in numerous places:
 In every one of those cases you can settle the question by reading one function.
 That stops working as soon as the function calls others.
 If one or more of those other functions have side effects,
-their impurity makes the calling function impure too.
+they make the calling function impure too.
 To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
@@ -236,8 +236,8 @@ with ignore(ValueError):
 The check still runs, but only once, when a `NonZero` comes into existence.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
-`slope()` was never in danger of dividing by zero,
-so it needed no `try` and no `Result` to say so.
+`slope()` is never in danger of dividing by zero,
+so it needs no `try` and no `Result` to say so.
 
 All three approaches produce a pure `slope()`,
 but they push the cost to different places.
@@ -347,7 +347,7 @@ Three calls deep, inside a helper that formats currency, you find the problem:
 a read from a configuration service, a write to an audit log,
 and a network call that fetches the current exchange rate.
 None of this appears in the function's signature.
-To discover what the function does, you had to read every line of it,
+To discover what the function does, you must read every line of it,
 and every line of everything it calls.
 
 Most functions in most programs have this hidden life,
@@ -490,9 +490,9 @@ It removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
 and a `greet()` that reads two `ContextVar`s states nothing.
 Setting the wrong one, or forgetting to set one,
-surfaces as a failure at the moment of the read, in whatever frame needed it.
-The bookkeeping did not disappear.
-It stopped being something a checker can see.
+surfaces as a failure at the moment of the read, in whatever frame needs it.
+The bookkeeping does not disappear.
+It stops being something a checker can see.
 An EMS moves the bookkeeping into the type system, where it maintains itself.
 That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
@@ -557,7 +557,7 @@ A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
 Handling an Effect also discharges it.
 `main()`'s row is not `<ask,tell>` but `<console,exn>`:
-the handlers removed `ask` and `tell`,
+the handlers remove `ask` and `tell`,
 and the row that remains holds the Effects the handler bodies perform,
 `console` from the printing and reading, `exn` because `readline()` can fail.
 A test installs a different handler, one that returns a fixed name,

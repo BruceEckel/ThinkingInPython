@@ -162,8 +162,8 @@ test_account.py:11: AssertionError
 ```
 
 The `where` line is the rewriting at work:
-`pytest` kept the sub-expression `account.balance` and its value,
-which a bare `assert` statement would have discarded.
+`pytest` keeps the sub-expression `account.balance` and its value,
+which a bare `assert` statement would discard.
 `Account` is a `@dataclass`,
 so its generated `__repr__()` names the field values;
 a hand-written class with no `__repr__()` would print `<account.Account object>` there instead.
@@ -306,7 +306,7 @@ def test_spend_some(open_account: Account) -> None:
 ```
 
 Everything before the `yield` is setup.
-Everything after it runs once the test finishes, even if the test failed.
+Everything after it runs once the test finishes, even if the test fails.
 Close files, release locks, or check a final invariant after the `yield`.
 A failing check there surfaces as an error, not as a test failure:
 `pytest` prints `1 passed, 1 error`,
@@ -418,7 +418,7 @@ print(v._Vault__pin)  # type: ignore
 #: 1234
 ```
 
-`vars(v)` shows what actually got stored: `_balance` under its own name,
+`vars(v)` shows what Python actually stored: `_balance` under its own name,
 and `__pin` rewritten to `_Vault__pin` the moment the class body compiled.
 The rewritten name is a real attribute like any other,
 so `v._Vault__pin` reads it successfully.

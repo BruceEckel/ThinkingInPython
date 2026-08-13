@@ -60,7 +60,7 @@ Guessing at it up front often builds complexity for flexibility in a direction n
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
-The goal of design patterns is to isolate changes in your code.
+Design patterns isolate changes in your code.
 You have seen some design patterns in this book.
 For example, you can think of [inheritance](07_Classes.md) as a design pattern
 (albeit one the language builds in).
@@ -72,7 +72,7 @@ dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
 Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Iterators.md).
-An iterator lets you hide the particular implementation of the container as you're stepping through it.
+An iterator lets you hide the particular implementation of the container as you step through it.
 You can write generic code that operates on all the elements in a sequence without regard to how that sequence stores them.
 The code works with any object that produces an iterator.
 

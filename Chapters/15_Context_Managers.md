@@ -82,7 +82,7 @@ except ValueError as error:
 ```
 
 Without the `try`/`finally`,
-an exception in the block resumes the generator by raising at the `yield`,
+Python resumes the generator by raising the block's exception at the `yield`,
 so the code after the `yield` never runs and `exit A` never prints.
 Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
@@ -226,7 +226,7 @@ the most general type, since it never inspects either one.
 The return value decides that exception's fate.
 A falsy value lets it propagate;
 this includes the implicit `None` of a method with no `return`,
-so propagation is the default.
+so the exception propagates by default.
 A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block.
 
@@ -311,7 +311,7 @@ print("survived")
 ```
 
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
-or `None` when the block finished cleanly.
+or `None` when the block finishes cleanly.
 [`type[...]`](08_Static_Typing.md#classes-as-values-type) means the class,
 such as `ZeroDivisionError`, not an instance of it.
 `issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it,
@@ -399,8 +399,8 @@ with ignore() as x:
 #: x = None
 ```
 
-The `1 / 0` raises an exception,
-`__exit__()` prints which exception it is ignoring, then returns `True`,
+The `1 / 0` raises an exception, `__exit__()` prints which exception it ignores,
+then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 
 In the last example, `x` receives the return value of `__enter__()`,

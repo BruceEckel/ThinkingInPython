@@ -192,7 +192,7 @@ if __name__ == "__main__":
 ```
 
 Nothing in the listing calls a register function.
-The two `class` statements filled `Shape.registry` on their own,
+The two `class` statements fill `Shape.registry` on their own,
 as the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
@@ -230,7 +230,7 @@ Key on a qualified name when a collision is possible.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
-so a subclass that gave itself a `registry` of its own would quietly start a second table that `make()` never reads.
+so a subclass that gives itself a `registry` of its own would quietly start a second table that `make()` never reads.
 
 The tests confirm that every subclass registers itself,
 and that a new subclass needs no change to `make()`.
@@ -738,7 +738,7 @@ if __name__ == "__main__":
 ```
 
 Every combination of settings is a single call,
-the call site names each option just as the chain did,
+the call site names each option just as the chain does,
 and the defaults live on the fields instead of inside a second class.
 `dataclasses.replace()` covers the other use of builder chains:
 starting from an existing configuration and varying it.

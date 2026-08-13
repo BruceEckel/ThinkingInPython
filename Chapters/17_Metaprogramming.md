@@ -56,7 +56,7 @@ print(vars(x))
 ```
 
 `x` sees the changes you make to the class *after* `x`'s creation.
-The instance never changed;
+The instance does not change;
 the last line shows its instance dictionary still empty.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
@@ -495,10 +495,10 @@ For each new subclass,
 `__init_subclass__()` adds it to the registry and removes its base classes,
 so only the current leaves remain.
 That is why `Blue` is absent from the second `Color` print.
-Creating `PhthaloBlue` and `CeruleanBlue` removed their base `Blue`,
+Creating `PhthaloBlue` and `CeruleanBlue` removes their base `Blue`,
 leaving those two leaves beside `Green` and `Red`.
 For the same reason, `Round` is missing from the `Shape` registry.
-Creating `Circle`, a subclass of `Round`, removed `Round`,
+Creating `Circle`, a subclass of `Round`, removes `Round`,
 leaving `Circle` and `Square`.
 None of this needs a metaclass.
 `__init_subclass__()` is implicitly a class method.
@@ -987,7 +987,7 @@ Choose the lightest tool that solves your problem.
 
 ### Multiple Inheritance and Metaclasses
 
-`Singleton` stores its cache in `_instances`, which is a `dict` attribute.
+`Singleton` stores its cache in `_instances`, a `dict` attribute.
 It doesn't inherit from `dict` directly.
 Can a metaclass inherit from more than one class, the way an ordinary class can?
 
@@ -1131,7 +1131,7 @@ with ignore(TypeError):
 ```
 
 `__prepare__()` runs before the class body does,
-and whatever mapping it returns is the namespace that body executes into.
+and whatever mapping it returns becomes the namespace for that body.
 Every `def` and every assignment in the body becomes a `__setitem__()` call on that mapping,
 so `NoDuplicates` sees the second `on_open` assigned to a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
@@ -1365,7 +1365,7 @@ In [Comparing Ordinary Classes and Data Classes](12_Data_Classes_as_Types.md#com
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
 even though `D` declares them directly, because neither belongs to an instance.
 For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
-the same rule `Stars.rating` demonstrated in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values).
+the same rule `Stars.rating` demonstrates in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values).
 `class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
 tags `B.x` and `B.s`,
 while `display_object(Messenger("foo", 12, 3.14))` tags none,
@@ -1470,7 +1470,7 @@ and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
 minus `__hash__`, useful when a listing has already made that particular point and repeating it only adds noise.
 The check runs first, before the `dunder` logic sees the name,
-so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selected it.
+so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selects it.
 
 ### The Tool in Use
 
@@ -1646,7 +1646,7 @@ class Derived(Base):
 
 `Base`'s four lines are the bare sequence,
 and they also show that `Base.__init_subclass__()` never runs for `Base` itself,
-the rule [Making a Class Final](#making-a-class-final) depends on.
+the rule [Making a Class Final](#making-a-class-final) needs.
 `Derived` adds the rest.
 `__prepare__()` runs before the body, which is why its line comes first.
 The body then executes, printing `class body`.

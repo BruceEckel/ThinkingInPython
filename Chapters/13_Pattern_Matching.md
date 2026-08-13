@@ -138,8 +138,8 @@ and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here, Python does not warn you.
-`ruff` does notice, reporting `N806 Variable DEFAULT in function should be lowercase`,
-which is the linter saying that `DEFAULT` here is a local variable rather than the constant you meant to compare against.
+`ruff` does notice, reporting `N806 Variable DEFAULT in function should be lowercase`:
+`DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
 so the checker sees that the cases cover both members and does not complain about the missing return.
@@ -306,7 +306,7 @@ so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
 Naming the attribute is clearer,
 and it survives a change to the field order that would silently redefine every position.
 `Point()` with no arguments, keyword or positional,
-matches any `Point` instance and works as a type-only check or a final catch-all.
+matches any `Point` instance: use it as a type-only check or a final catch-all.
 
 The type test is `isinstance()`, so a subclass matches its base's pattern:
 
@@ -345,7 +345,7 @@ Python special-cases a handful of builtins
 so that one positional sub-pattern binds the whole value,
 which is why `case str(s)` reads as "a string, call it `s`."
 
-Drop the parentheses and the meaning flips: `case str:` is a bare-name capture,
+Dropping the parentheses flips the meaning: `case str:` is a bare-name capture,
 not a type test, matching any value and binding it to a local named `str`.
 It is the same mistake as `DEFAULT` in `value_patterns.py`,
 and Python catches it the same way,
@@ -429,7 +429,7 @@ A guard that only compares one capture to a constant is a literal pattern writte
 
 A mapping pattern matches keys in a dictionary and binds their values.
 It ignores keys you do not mention,
-which makes it a clean way to dispatch on JSON-shaped data.
+so it dispatches cleanly on JSON-shaped data.
 That also makes `case {}` a catch-all for any mapping rather than a test for an empty one,
 the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.

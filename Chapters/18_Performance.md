@@ -605,7 +605,7 @@ maintains the list according to its own logic.
 So you must always use the heap version of an operation, not the list version.
 Although calling the list's own `pop(0)` does produce the smallest value the first time,
 it also destroys the heap ordering,
-so if you call it again you won't get the smallest value:
+so if you call it again you don't get the smallest value:
 
 ```python
 # heap_corruption.py
@@ -734,8 +734,8 @@ print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
 ```
 
 Both versions produce the same five numbers,
-but the eager one built a million-element list and a half-million-element list to get them,
-while the lazy one computed only the handful of values that `islice()` extracted.
+but the eager one builds a million-element list and a half-million-element list to get them,
+while the lazy one computes only the handful of values that `islice()` extracts.
 `islice()` replaces the eager version's `evens[:5]`:
 a generator has no `__getitem__`,
 so slicing one raises `TypeError: 'generator' object is not subscriptable`.

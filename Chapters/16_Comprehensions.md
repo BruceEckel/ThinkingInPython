@@ -96,7 +96,7 @@ and its brackets show at a glance that it produces a list.
 [Functional Foundations](40_Functional_Foundations.md) returns to the choice.
 The `lambda` makes the versions above worse, not `map()`.
 
-The `# type: ignore` comments mark a cost that readability alone does not show.
+The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
 so the checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
@@ -341,7 +341,7 @@ By then the directory no longer exists.
 The comprehension finishes building `py_paths` as strings while the directory still exists,
 so nothing later needs the files.
 Turning those brackets into parentheses would break it:
-a generator expression would not start walking until `sorted()` pulled on it,
+a generator expression would not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
 [Generator Expressions](#generator-expressions) returns to this.
 
@@ -350,7 +350,7 @@ and that pull comes outside the `with`.
 A comprehension earns its place when you can read it in one pass.
 You can nest more `for` and `if` clauses,
 or wrap the whole thing in another call,
-but each addition makes the expression harder to read in one pass.
+but each one you add makes the expression harder to read in one pass.
 Here, filtering, flattening, sorting,
 and formatting all run in a single expression:
 

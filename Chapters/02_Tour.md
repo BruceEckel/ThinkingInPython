@@ -50,7 +50,7 @@ print(val)
 ```
 
 A C/C++ `if` requires parentheses around the conditional.
-Python needs no parentheses, although it won't complain if you use them.
+Python needs no parentheses, although it doesn't complain if you use them.
 
 The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
@@ -133,7 +133,7 @@ print(first, rest)
 Numbers, strings, and tuples are *immutable*:
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
-Knowing which is which explains when a change is visible through another name,
+Knowing which is which explains when another name sees a change,
 as with `a` and `b` above.
 
 ## Numbers and Arithmetic
@@ -197,7 +197,7 @@ Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
-Summing a sequence of comparisons therefore counts how many were true.
+Summing a sequence of comparisons therefore counts how many are true.
 The argument to `sum()` is a *generator expression*,
 which hands over one value at a time instead of building a list first;
 [Comprehensions](16_Comprehensions.md#generator-expressions) covers the form.

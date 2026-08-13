@@ -99,7 +99,7 @@ and one withdrawal vanishes.
 Making that safe means adding a lock,
 and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it.
-With nothing shared, there is nothing to lock.
+With nothing shared, nothing needs a lock.
 
 `count_primes()` is pure, and each call does enough work to spread across cores:
 
@@ -139,7 +139,7 @@ Each argument and each result pickles to cross the process boundary,
 and the function travels by name,
 so `count_primes()` must live at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
-which rules out two shapes these chapters have been favoring.
+which rules out two shapes these chapters favor.
 A `functools.partial` survives,
 because it pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
@@ -165,7 +165,7 @@ By naming the result instead of the steps,
 you hand the reader your intent and give the runtime freedom to choose how to deliver it.
 That freedom is why a SQL query, a NumPy expression,
 or a dataframe operation can run on an optimized or parallel engine you do not see.
-You described the what, not a fixed sequence of moves.
+You describe the what, not a fixed sequence of moves.
 
 `match` applies the same idea to taking data apart
 (see [Pattern Matching](13_Pattern_Matching.md)).
@@ -318,7 +318,7 @@ Hypothesis finds a failing string and then keeps cutting it down until removing 
 so it reports `'_'` rather than the longer string that failed first.
 That single character is the whole bug statement.
 `derandomize=True` fixes the search so this book gets the same answer every run,
-the job `random.seed(42)` did in the hand-written loop.
+the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.
 A real test needs neither.
 The function's name drops the `test_` prefix,
@@ -333,7 +333,7 @@ sorting produces an ordered list.
 sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one,
-which `parallel_pure.py`'s `assert parallel == serial` claimed.
+which `parallel_pure.py`'s `assert parallel == serial` claims.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.

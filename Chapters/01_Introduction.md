@@ -9,7 +9,7 @@ If an idiom or pattern is still useful, it stays.
 
 Every language has habits worth learning and habits worth dropping.
 Programmers who come to Python from C++ or Java arrive with patterns,
-ceremonies, and defensive structures that those languages made necessary.
+ceremonies, and defensive structures that those languages make necessary.
 Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
 A [Singleton](24_Singleton.md) is a module.

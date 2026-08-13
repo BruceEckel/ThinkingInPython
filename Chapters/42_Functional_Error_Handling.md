@@ -340,7 +340,7 @@ with no `pytest.raises()`.
 The tests check `unwrap()`,
 and that `bind()` chains a success and short-circuits a failure.
 The last assertion uses `is` rather than `==`,
-proving the same `Err` object came back and the lambda never ran:
+proving the same `Err` object comes back and the lambda does not run:
 
 ```python
 # test_result.py

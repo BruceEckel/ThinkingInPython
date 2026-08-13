@@ -332,7 +332,7 @@ Redo can no longer reach the states you undid, which is how editors behave.
 `undo()` and `redo()` just shuttle the present between the two stacks.
 Every change must go through `do()`.
 A new state built from `history.present` and never handed back is not in the history,
-and since nothing mutated, nothing else shows it is missing.
+and since nothing mutates, nothing else shows it is missing.
 Neither checks its own precondition:
 undoing with no past raises `IndexError` from `pop()`.
 `can_undo()` and `can_redo()` exist so callers ask first,

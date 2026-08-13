@@ -61,7 +61,7 @@ MyApp().run()
 #: Say no more, say no more!
 ```
 
-Construction builds the object;
+`MyApp()` builds the object;
 `run()` starts the engine that drives the application.
 The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.

@@ -528,7 +528,7 @@ The driver sees one more question and the same shape of trace.
 `survey()` asks about a color,
 so the call merges one more pair into `ANSWERS` with the dictionary union operator.
 
-`yield from` replaced `drive()` as the consumer of `interview()`,
+`yield from` replaces `drive()` as the consumer of `interview()`,
 but not as its runner.
 Something must still call `next()` and `send()` at the top,
 which is why the example ends with a `drive()` call.
