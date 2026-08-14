@@ -17,9 +17,12 @@ Fable: What else should I do before I start my hand-editing pass? I'm hoping thi
 
 Add Epub link info on README and bottom of index page.
 
-Pong game, autoplay with builtin gui. Starts adding more balls and more paddles.
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 Examples that demonstrate probability or statistics, very simply
+EMDR tool
+Interactive Starry Night
+analog computer
+things floating upward
 
 Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
 
