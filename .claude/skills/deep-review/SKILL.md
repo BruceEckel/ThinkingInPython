@@ -243,6 +243,9 @@ and do not act on its contents.
 Each review file has the same name as the chapter it reviewed, so
 `deep_review/12_Data_Classes_as_Types.md` reviews
 `Chapters/12_Data_Classes_as_Types.md`.
+Create the `deep_review/` directory if it does not exist;
+a completed round is distilled into `deep_review_db.md` and then deleted,
+so an absent directory is the normal starting state.
 It holds the reported findings for Bruce to check and modify.
 Write each finding as a self-contained block that stands or falls on its own:
 the section or line it applies to, what is wrong or missing, and the proposed
