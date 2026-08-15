@@ -44,6 +44,19 @@ cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
 
+## Learning from Bruce's own edits
+
+`/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads a
+diff of Bruce's edits to a chapter, separates the generalizable edits from the
+local ones, and proposes editing practices into `bruce_edit_db.md`. It writes
+only that file, never `Chapters/`. `/bruce-edit-apply`
+(`.claude/skills/bruce-edit-apply/SKILL.md`) applies the promoted rules to a
+chapter or the book, reporting per-rule firing counts. The split is deliberate:
+capture is cheap and reversible, application rewrites prose that no gate
+checks. One sighting logs a candidate; a second sighting in a different chapter
+promotes it to a rule; only rules are applied. Rejected rules go to Retired and
+are never re-proposed.
+
 ## The verify loop after editing a chapter
 
 Fastest path is `make verify` (fix line endings, refresh `#:` output markers,
