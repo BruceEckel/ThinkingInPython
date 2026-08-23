@@ -19,5 +19,7 @@ def compare(
             return list(pool.map(price, orders))
 
     assert threaded() == sequential()
-    return Times(timeit.timeit(sequential, number=number),
-                 timeit.timeit(threaded, number=number))
+    return Times(
+        min(timeit.repeat(sequential, number=number, repeat=3)),
+        min(timeit.repeat(threaded, number=number, repeat=3)),
+    )

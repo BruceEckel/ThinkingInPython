@@ -1019,7 +1019,9 @@ That release is why a thread pool helps with I/O-bound work.
 The next two examples make that concrete, one for waiting and one for computing.
 Both use the same harness,
 which runs a price function sequentially and threaded, confirms they agree,
-and times each:
+and times each.
+`timeit.repeat` produces three timings per variant and `min` keeps the best,
+so a stray background load spike cannot skew the comparison:
 
 ```python
 # thread_compare.py
@@ -1043,8 +1045,10 @@ def compare(
             return list(pool.map(price, orders))
 
     assert threaded() == sequential()
-    return Times(timeit.timeit(sequential, number=number),
-                 timeit.timeit(threaded, number=number))
+    return Times(
+        min(timeit.repeat(sequential, number=number, repeat=3)),
+        min(timeit.repeat(threaded, number=number, repeat=3)),
+    )
 ```
 
 Two timings of the same type come back from one call,

@@ -147,14 +147,17 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   marker as a red flag to investigate, not drift to accept.
 - **Chapter 19's `gil_threads.py` boolean flips under machine load, and
   widening its threshold would be wrong.** `thr > seq * 0.9` asserts "threads
-  bought no speedup," and a `make verify` run during back-to-back gates
-  rewrote it to `False`, contradicting the prose one line below. Run standalone
-  it is stable (8 of 8 `True` when measured). Do not widen the band to make it
+  bought no speedup," and `make verify` runs during back-to-back gates
+  (including inside `make release`, twice in a row) rewrote it to `False`,
+  contradicting the prose one line below. Do not widen the band to make it
   robust: at `0.7` a genuinely 30%-faster threaded run would still report "no
-  faster," hiding the exact regression the listing exists to catch. If it needs
-  hardening, harden the measurement in `thread_compare.py`'s `compare()`
-  (more iterations, or min-of-N instead of one timing), which the neighboring
-  I/O listing also uses. Revert the marker and move on.
+  faster," hiding the exact regression the listing exists to catch. The fix
+  (applied 2026-08-23) was hardening `thread_compare.py`'s `compare()`,
+  which the neighboring I/O listing also uses: each timing is now
+  `min(timeit.repeat(..., repeat=3))`, so one load spike during the
+  sequential timing can no longer fake a threaded speedup. Verified stable
+  standalone and under four competing busy-loop processes. If it flips
+  again anyway, revert the marker, don't commit it, and raise `repeat`.
 - **Thousands of live `asyncio` tasks in one process can wedge Windows'
   `ProactorEventLoop` for every later `asyncio.run()` call in that process.**
   Chapter 19's `task_vs_thread_memory.py` used to create and cancel 20,000
