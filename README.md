@@ -48,7 +48,11 @@ https://bruceeckel.github.io/ThinkingInPython/
 
 ### Post-AI edit (Began August 12, 2026)
 
-After doing everything I can possibly do with AI.
+After doing everything I could think of to do with AI.
+My current strategy is to edit a chapter, ask AI to derive guidelines from my edits,
+then AI-apply those guidelines throughout the book before editing the next chapter.
+Hypothetically this will produce asymptotically-decreasing edits as I proceed through the book.
+
 Note that I am not starting at the beginning, but picking up where I left off during the "Serious Edit."
 
 | Chapter | Edited |
