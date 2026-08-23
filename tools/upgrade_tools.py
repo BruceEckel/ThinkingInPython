@@ -19,7 +19,7 @@ Three things are fully automated:
   `.venv`. This rewrites `uv.lock`; review `git diff uv.lock` before
   committing.
 
-`pandoc` and `vale` are standalone binaries uv does not manage, so
+`pandoc`, `typst`, and `vale` are standalone binaries uv does not manage, so
 there is no single command that works on every machine. This tries the
 package manager actually on PATH (winget on Windows, Homebrew
 elsewhere) and falls back to printing the install/upgrade link if
@@ -51,6 +51,8 @@ from tools_repo import run_echoed
 EXTERNAL: dict[str, tuple[str, str, str]] = {
     "pandoc": ("JohnMacFarlane.Pandoc", "pandoc",
                "https://pandoc.org/installing.html"),
+    "typst": ("Typst.Typst", "typst",
+              "https://github.com/typst/typst/releases"),
     "vale": ("errata-ai.Vale", "vale", "https://vale.sh/docs/install"),
 }
 

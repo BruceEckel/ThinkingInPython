@@ -68,8 +68,9 @@ tools-check:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
 	$(PY) tools/check_tools.py
 
 # Adds the tools a book maintainer needs for the rest of `make help`:
-# pandoc (site/local) and the standalone vale binary (prose).
-tools-check-full:  ## Check every tool, including pandoc and vale (site/prose)
+# pandoc (site/local/epub/pdf), typst (pdf), and the standalone vale
+# binary (prose).
+tools-check-full:  ## Check every tool, including pandoc, typst, and vale (site/pdf/prose)
 	$(PY) tools/check_tools.py --full
 
 # Read-only: catches a stale uv silently stuck on an old Python prerelease,
@@ -101,8 +102,8 @@ tools-test:  ## Run the harness's own unit tests (tools/tests/)
 # best-effort upgrades a globally installed `ty` (`uv tool upgrade ty`,
 # what bare `ty` on PATH resolves to), then upgrades every uv-managed dev
 # tool (ty, ruff, pytest, ...) to the latest version pyproject.toml
-# allows, rewriting uv.lock. pandoc and vale are updated best-effort
-# through winget or Homebrew, whichever is on PATH.
+# allows, rewriting uv.lock. pandoc, typst, and vale are updated
+# best-effort through winget or Homebrew, whichever is on PATH.
 # make/git are left alone. Review `git diff uv.lock` before committing.
 # For the pinned Python version itself, use `make python-upgrade`.
 #
@@ -111,7 +112,7 @@ tools-test:  ## Run the harness's own unit tests (tools/tests/)
 # stopping at the first. A failing sweep here means the upgrade landed
 # and the book needs fixing, not that the upgrade failed; the stamp is
 # written first for that reason.
-tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/vale
+tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/typst/vale
 	$(PY) tools/upgrade_tools.py
 	$(MAKE) tools-check-full
 	$(PY) tools/tool_stamp.py --write
@@ -247,7 +248,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site epub local serve
+.PHONY: sync check prune site epub pdf local serve
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -275,6 +276,14 @@ site:  ## Render Chapters/ into build/site/ with pandoc
 # and pandoc would quietly retarget those links. Needs pandoc, like `site`.
 epub:  ## Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
 	$(PY) tools/build_epub.py
+
+# One PDF from the same merged, anchor-namespaced Markdown stream the
+# EPUB uses (build_pdf.py reuses build_epub.py's assembly), rendered by
+# pandoc through typst. Typst draws the SVG diagrams directly and
+# highlights the listings itself, so this build needs no rasterizer.
+# Needs pandoc and the typst binary (`make tools-check-full` verifies).
+pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and typst
+	$(PY) tools/build_pdf.py
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.
@@ -571,7 +580,7 @@ gate-checks:  ## Run just the Markdown checks the gate enforces
 
 ##@ Cleanup
 
-.PHONY: clean-examples clean-solutions clean-site clean-epub
+.PHONY: clean-examples clean-solutions clean-site clean-epub clean-pdf
 
 clean-examples:  ## Remove build/examples/
 	$(PY) -c "import shutil; shutil.rmtree('build/examples', ignore_errors=True)"
@@ -584,3 +593,6 @@ clean-site:  ## Remove build/site/
 
 clean-epub:  ## Remove build/epub/
 	$(PY) -c "import shutil; shutil.rmtree('build/epub', ignore_errors=True)"
+
+clean-pdf:  ## Remove build/pdf/
+	$(PY) -c "import shutil; shutil.rmtree('build/pdf', ignore_errors=True)"

@@ -934,7 +934,26 @@ Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
 a namespacing bug produces a valid EPUB whose links open the wrong chapter,
 with nothing in the build to show for it.
 
-## search_index.py
+## build_pdf.py
+
+Renders the same `Chapters/*.md` into one PDF at
+`build/pdf/ThinkingInPython.pdf` (git-ignored). Run `make pdf`; `-o DIR`
+builds elsewhere, and `--keep-source` leaves the generated pandoc input
+under `<out>/src/`. Needs `pandoc` plus `typst`, the PDF engine pandoc
+drives (`winget install Typst.Typst`; `make tools-check-full` verifies
+both). `make clean-pdf` removes the directory.
+
+The assembly is `build_epub.book_markdown()`, so everything above about
+namespaced anchors and rewritten links applies here unchanged. The one
+difference is `hang_code=False`: the EPUB rewrites listings into raw-HTML
+`<pre>` blocks for its hanging indent, and pandoc's typst writer drops raw
+HTML, so the PDF keeps listings as fenced blocks. Nothing needs the hang
+there anyway: ruff caps listing lines at 70 characters, which fits the
+page, and typst highlights fenced Python itself. Typst also renders the
+SVG diagrams directly, so the EPUB's PNG rasterization step has no PDF
+counterpart. Page breaks before each Part and chapter, page numbering,
+and the table of contents come from pandoc's stock typst template plus
+the small `header.typ` the builder writes.
 
 Builds `search-index.json`, which the site's `search.js` fetches and
 searches in the browser. There is no server, so the whole index ships to

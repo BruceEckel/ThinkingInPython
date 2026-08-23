@@ -405,12 +405,18 @@ def hang_listings(text: str) -> str:
 
 def book_markdown(chapters: list[Chapter], missing: set[str],
                   unresolved: set[str],
-                  img_map: dict[str, str] | None = None) -> str:
+                  img_map: dict[str, str] | None = None,
+                  hang_code: bool = True) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
 
     Two passes: the first namespaces the headings and so learns every id
     the book has, which the second needs before it can tell a link that
     resolves from one that does not.
+
+    `hang_code=False` keeps every listing a fenced block instead of the
+    raw-HTML `<pre>` from `hang_listings()`. build_pdf.py needs that:
+    pandoc's typst writer drops raw HTML, so the EPUB's hanging-indent
+    markup would erase every listing from the PDF.
     """
     prefixes = {ch.md.stem: chapter_prefix(ch) for ch in chapters}
     if img_map is None:
@@ -448,7 +454,8 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
             if not fenced[index]:
                 lines[index] = relink(line, prefix, ids, unresolved)
         text = rewrite_images("\n".join(lines), img_map, missing)
-        text = hang_listings(text)
+        if hang_code:
+            text = hang_listings(text)
         head = f"# {chapter_heading(ch)} {{#{prefix}}}"
         parts.append(f"{head}\n\n{text.strip()}\n")
     return "\n".join(parts)

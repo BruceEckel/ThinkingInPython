@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Render the book's Markdown into a single PDF with pandoc and typst.
+
+The assembly is build_epub.py's: every chapter concatenated into one
+Markdown stream, every heading id namespaced by chapter (ch12-...), and
+every `.md` link rewritten to an in-document anchor, so a link the
+`anchors` gate accepts is a link this build resolves. See that module's
+docstring for why the namespacing exists. The one difference is
+`hang_code=False`: the EPUB rewrites listings into raw-HTML `<pre>`
+blocks for its hanging indent, and pandoc's typst writer drops raw
+HTML, so here the listings stay fenced code blocks. Nothing is lost by
+that: ruff caps listing lines at 70 characters, which fits the text
+column, and typst highlights fenced Python natively.
+
+Typst is the PDF engine rather than a LaTeX: it is a single ~40 MB
+binary (`winget install Typst.Typst`), compiles the whole book in
+seconds, ships its own fonts, and renders the book's SVG diagrams
+directly, so no rasterization step is needed. Pandoc resolves each
+diagram through --resource-path and hands it to typst itself.
+
+The title block, table of contents (with page numbers), and per-part /
+per-chapter page breaks come from pandoc's stock typst template plus
+the small header in HEADER_TYPST; chapter numbers live in the heading
+text ("3. Containers"), so section numbering stays off.
+
+Usage:
+    python tools/build_pdf.py               # build/pdf/ThinkingInPython.pdf
+    python tools/build_pdf.py -o DIR        # build somewhere else
+    python tools/build_pdf.py --keep-source # leave build/pdf/src/ in place
+
+Requires `pandoc` and `typst` on PATH (`make tools-check-full`
+verifies both).
+"""
+
+import argparse
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+import build_epub
+import build_site
+from tools_config import BUILD_PDF_DIR as DEFAULT_OUT
+from tools_config import ROOT
+
+PDF_NAME = "ThinkingInPython.pdf"
+PDF_ENGINE = "typst"
+TYPST_HINT = ("winget install Typst.Typst (Windows) / "
+              "brew install typst (macOS) / "
+              "https://github.com/typst/typst/releases")
+PAPER = "us-letter"
+# Parts and chapters are level 1, their sections level 2. Deep enough
+# to navigate by, shallow enough that the contents stays a contents.
+TOC_DEPTH = 2
+
+# Every Part divider and chapter title is a level-1 heading, and each
+# starts its own page. `weak: true` collapses a page break that lands
+# on an already-fresh page, so a Part divider and the chapter right
+# behind it cost one break, not an extra blank page.
+HEADER_TYPST = """\
+#show heading.where(level: 1): it => {
+  pagebreak(weak: true)
+  it
+}
+"""
+
+# Inserted after the title block and before the outline, so the table
+# of contents opens on its own page instead of running on from the
+# title.
+BEFORE_TYPST = "#pagebreak(weak: true)\n"
+
+
+def check_typst() -> None:
+    if shutil.which(PDF_ENGINE) is None:
+        sys.exit(f"error: {PDF_ENGINE} not found on PATH. "
+                 f"Install it: {TYPST_HINT}")
+
+
+def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
+               pdf: Path) -> None:
+    command = [
+        "pandoc",
+        "--from", "markdown+smart",
+        "--pdf-engine", PDF_ENGINE,
+        "--output", str(pdf),
+        "--metadata-file", str(meta),
+        "--resource-path", str(build_site.IMAGES_SRC),
+        "--include-in-header", str(header),
+        "--include-before-body", str(before),
+        "--toc", f"--toc-depth={TOC_DEPTH}",
+        # The stock typst template defaults page numbering to none.
+        "--variable", f"papersize:{PAPER}",
+        "--variable", "page-numbering:1",
+        str(src),
+    ]
+    proc = subprocess.run(command, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
+    if proc.returncode != 0:
+        sys.exit(f"pandoc failed:\n{proc.stderr}")
+    if proc.stderr.strip():
+        print(proc.stderr.strip())
+
+
+def build(out_dir: Path, keep_source: bool = False) -> int:
+    build_site.check_pandoc()
+    check_typst()
+    chapters = build_site.discover()
+    if not chapters:
+        sys.exit("error: no chapters found in Chapters/")
+
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    src_dir = out_dir / "src"
+    src_dir.mkdir(parents=True)
+
+    missing: set[str] = set()
+    unresolved: set[str] = set()
+    text = build_epub.book_markdown(chapters, missing, unresolved,
+                                    hang_code=False)
+
+    src = src_dir / "book.md"
+    meta = src_dir / "metadata.yaml"
+    header = src_dir / "header.typ"
+    before = src_dir / "before.typ"
+    src.write_text(text, encoding="utf-8")
+    meta.write_text(build_epub.metadata_yaml(), encoding="utf-8")
+    header.write_text(HEADER_TYPST, encoding="utf-8")
+    before.write_text(BEFORE_TYPST, encoding="utf-8")
+
+    pdf = out_dir / PDF_NAME
+    run_pandoc(src, meta, header, before, pdf)
+
+    size = pdf.stat().st_size / 1024
+    print(f"Built {pdf.relative_to(ROOT)} "
+          f"({len(chapters)} chapters, {size:.0f} KB).")
+
+    if not keep_source:
+        shutil.rmtree(src_dir)
+    else:
+        print(f"Kept the pandoc input in {src_dir.relative_to(ROOT)}.")
+
+    status = 0
+    if missing:
+        print(f"\nWARNING: {len(missing)} referenced image(s) not found "
+              f"in {build_site.IMAGES_SRC.relative_to(ROOT)}:")
+        for name in sorted(missing):
+            print(f"  ? _images/{name}")
+        status = 1
+    if unresolved:
+        print(f"\nWARNING: {len(unresolved)} link(s) name no book "
+              "chapter and stay unlinked in the PDF:")
+        for target in sorted(unresolved):
+            print(f"  ? {target}")
+        status = 1
+    return status
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
+                    help=f"output directory (default: {DEFAULT_OUT})")
+    ap.add_argument("--keep-source", action="store_true",
+                    help="leave the generated pandoc input under <out>/src/")
+    args = ap.parse_args(argv)
+    return build(args.out, args.keep_source)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

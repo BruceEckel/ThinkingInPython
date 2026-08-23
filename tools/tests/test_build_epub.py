@@ -185,6 +185,16 @@ def test_part_divider_is_emitted_before_its_chapter(tmp_path: Path) -> None:
     assert text.index("# Part I") < text.index("# 2. Tour")
     assert text.index("# 1. Introduction") < text.index("# Part I")
 
+def test_hang_code_false_keeps_listings_fenced(tmp_path: Path) -> None:
+    # build_pdf.py passes hang_code=False: pandoc's typst writer drops
+    # raw HTML, so the EPUB's <pre> rewrite would erase every listing
+    # from the PDF.
+    chapters = chapters_in(tmp_path, {
+        "05_F": "# F\n\n```python\n# t.py\nx = 1\n```\n"})
+    text = book_markdown(chapters, set(), set(), hang_code=False)
+    assert "```python" in text
+    assert "<pre>" not in text
+
 def test_missing_image_is_reported(tmp_path: Path) -> None:
     chapters = chapters_in(
         tmp_path, {"05_F": "# F\n\n![d](_images/no_such_image)\n"})

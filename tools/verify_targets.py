@@ -198,13 +198,13 @@ def main(argv: list[str] | None = None) -> int:
                       f"[{result.seconds:.1f}s]")
 
     if {"clean-examples", "clean-solutions", "clean-site",
-            "clean-epub"} & set(direct):
+            "clean-epub", "clean-pdf"} & set(direct):
         # Those targets are real, tested rmtree calls; leaving build/ empty
         # afterward would be a surprising side effect of running this sweep,
         # so put back what a normal `make ci` run leaves behind.
         print("\nRestoring build/ artifacts wiped by the clean-* targets...")
         subprocess.run(
-            ["make", "extract", "solutions-extract", "site", "epub"],
+            ["make", "extract", "solutions-extract", "site", "epub", "pdf"],
             cwd=ROOT, check=False)
 
     if skipped:

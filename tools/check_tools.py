@@ -10,8 +10,10 @@ Two tiers:
   but marked "assumed", since you already needed both to get this
   far; they never fail the check.
 - --full: everything above, plus what a book maintainer needs for
-  the rest of `make help`: `pandoc` (`make site`, `make local`) and
-  the standalone `vale` binary (`make prose`).
+  the rest of `make help`: `pandoc` (`make site`, `make local`,
+  `make epub`, `make pdf`), `typst` (the PDF engine `make pdf`
+  drives pandoc with), and the standalone `vale` binary
+  (`make prose`).
 
 Each row prints ok/MISSING and, on failure, a one-line install hint.
 Exit status is 0 only if every non-assumed tool for the requested
@@ -44,6 +46,9 @@ TOOLS: list[tuple[str, list[str], str, str, bool]] = [
      "run `uv sync`", "basic", False),
     ("pandoc", ["pandoc", "--version"],
      "https://pandoc.org/installing.html", "full", False),
+    ("typst", ["typst", "--version"],
+     "winget install Typst.Typst / brew install typst / "
+     "https://github.com/typst/typst/releases", "full", False),
     ("vale", ["vale", "--version"],
      "winget install errata-ai.Vale / brew install vale / "
      "https://vale.sh/docs/install", "full", False),

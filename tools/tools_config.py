@@ -34,6 +34,7 @@ BUILD_DIR = ROOT / "build"
 EXAMPLES_TREE = BUILD_DIR / "examples"
 BUILD_SITE_DIR = BUILD_DIR / "site"
 BUILD_EPUB_DIR = BUILD_DIR / "epub"
+BUILD_PDF_DIR = BUILD_DIR / "pdf"
 
 NORUN_FILE = DATA_DIR / "norun.txt"
 
