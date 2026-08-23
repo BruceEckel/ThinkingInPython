@@ -60,6 +60,7 @@ EXCLUDED: dict[str, str] = {
     "python-upgrade": "mutates the real dev environment and hits the network",
     "serve": "starts a server that runs forever",
     "local": "starts a server that runs forever",
+    "release": "tags the repo and publishes a GitHub release",
     "verify-targets": "this is the target that runs this script",
 }
 

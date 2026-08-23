@@ -930,6 +930,15 @@ title. Anything that still resolves to nothing is reported and left unlinked,
 which is a stricter check than the gate's: `heading_links.py` skips an anchor
 containing a period, and chapter 13 has one.
 
+`--release VERSION` (what `make release` passes) stamps the title page
+with the release number and today's date via `release_line()`
+("Release 1.0 · August 23, 2026"). That stamp lands in the pandoc
+`date` metadata field, which pandoc then cannot parse as a date and
+would leave the OPF's machine-readable `dc:date` empty, so the build
+also passes pandoc an `--epub-metadata` file holding the ISO date.
+`build_pdf.py` shares `metadata_yaml()`, so the same flag stamps the
+PDF's title page too, with no OPF concern there.
+
 Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
 a namespacing bug produces a valid EPUB whose links open the wrong chapter,
 with nothing in the build to show for it.
@@ -951,9 +960,44 @@ HTML, so the PDF keeps listings as fenced blocks. Nothing needs the hang
 there anyway: ruff caps listing lines at 70 characters, which fits the
 page, and typst highlights fenced Python itself. Typst also renders the
 SVG diagrams directly, so the EPUB's PNG rasterization step has no PDF
-counterpart. Page breaks before each Part and chapter, page numbering,
-and the table of contents come from pandoc's stock typst template plus
-the small `header.typ` the builder writes.
+counterpart. Page breaks before each Part and chapter and the table of
+contents come from pandoc's stock typst template plus the `header.typ`
+the builder writes (`header_typst()`). That header also sets a running
+footer on every page but the title page: chapter name on the left (the
+nearest level-1 heading, so TOC pages read "Contents"), page number on
+the right, and, on a `--release` build only, the release stamp in the
+center. The template's page numbering stays on even though the footer
+replaces its output, because the outline formats the TOC's page
+numbers through it.
+
+## release.py
+
+Publishes a GitHub release whose uploaded assets are exactly the fresh
+PDF and EPUB. Run `make release VERSION=1.0`; the tag is the version
+with a `v` prefix (`v1.0`), created on origin at the branch tip. Needs
+`git` and an authenticated `gh` (`gh auth login`).
+
+The order is preflight, verify, build, publish, cheapest first. The
+preflight refuses a dirty tree, a detached HEAD, a branch whose tip
+does not match origin, and a tag that already exists (locally or on
+origin): the tag must point at the pushed commit the assets were built
+from. Then `make verify` runs the full gate, so a book that fails it
+can never ship. If verify's self-healing fixers rewrite tracked files,
+the run stops and asks for a review-commit-push before trying again,
+since the tree no longer matches the pushed commit. Only then are the
+PDF and EPUB rebuilt (both builders wipe their output directory first,
+which is what makes the assets fresh) and handed to `gh release
+create`. Both are built with the `--release` stamp, so their title
+pages tell the reader which release they hold and when it was made
+("Release 1.0 · August 23, 2026"); an ad-hoc `make pdf`/`make epub`
+carries no stamp, so a casual build never masquerades as a numbered
+release. Deleting a bad release stays a manual act:
+`gh release delete v1.0 --cleanup-tag`.
+
+Deliberately excluded from `verify_targets.py`'s smoke test, alongside
+`tools-upgrade` and friends: it tags the repo and publishes to GitHub.
+
+## search_index.py
 
 Builds `search-index.json`, which the site's `search.js` fetches and
 searches in the browser. There is no server, so the whole index ships to

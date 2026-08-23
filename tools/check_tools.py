@@ -12,8 +12,8 @@ Two tiers:
 - --full: everything above, plus what a book maintainer needs for
   the rest of `make help`: `pandoc` (`make site`, `make local`,
   `make epub`, `make pdf`), `typst` (the PDF engine `make pdf`
-  drives pandoc with), and the standalone `vale` binary
-  (`make prose`).
+  drives pandoc with), the standalone `vale` binary (`make prose`),
+  and `gh` (`make release`).
 
 Each row prints ok/MISSING and, on failure, a one-line install hint.
 Exit status is 0 only if every non-assumed tool for the requested
@@ -52,6 +52,9 @@ TOOLS: list[tuple[str, list[str], str, str, bool]] = [
     ("vale", ["vale", "--version"],
      "winget install errata-ai.Vale / brew install vale / "
      "https://vale.sh/docs/install", "full", False),
+    ("gh", ["gh", "--version"],
+     "winget install GitHub.cli / brew install gh / "
+     "https://cli.github.com", "full", False),
 ]
 
 

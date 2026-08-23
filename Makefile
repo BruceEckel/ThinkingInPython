@@ -248,7 +248,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site epub pdf local serve
+.PHONY: sync check prune site epub pdf release local serve
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -284,6 +284,16 @@ epub:  ## Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
 # Needs pandoc and the typst binary (`make tools-check-full` verifies).
 pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and typst
 	$(PY) tools/build_pdf.py
+
+# Publish a GitHub release whose uploaded assets are exactly the
+# freshly rebuilt PDF and EPUB. release.py orchestrates: preflight
+# (clean tree, HEAD pushed, tag free, gh authenticated), then `make
+# verify` so a book that fails the gate can never ship, then fresh
+# `make pdf` + `make epub`, then `gh release create v$(VERSION)`.
+# Deliberately excluded from verify-targets' smoke test: it tags the
+# repo and publishes to GitHub.
+release:  ## Verify, rebuild the PDF and EPUB, publish both as a GitHub release (VERSION=1.0)
+	$(PY) tools/release.py $(VERSION)
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.

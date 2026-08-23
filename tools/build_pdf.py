@@ -20,8 +20,10 @@ diagram through --resource-path and hands it to typst itself.
 
 The title block, table of contents (with page numbers), and per-part /
 per-chapter page breaks come from pandoc's stock typst template plus
-the small header in HEADER_TYPST; chapter numbers live in the heading
-text ("3. Containers"), so section numbering stays off.
+the preamble from `header_typst()`; chapter numbers live in the
+heading text ("3. Containers"), so section numbering stays off. That
+preamble also sets a running footer (chapter name, page number, and on
+a release build the release stamp); see FOOTER_TYPST.
 
 Usage:
     python tools/build_pdf.py               # build/pdf/ThinkingInPython.pdf
@@ -57,12 +59,45 @@ TOC_DEPTH = 2
 # starts its own page. `weak: true` collapses a page break that lands
 # on an already-fresh page, so a Part divider and the chapter right
 # behind it cost one break, not an extra blank page.
-HEADER_TYPST = """\
+PAGEBREAK_TYPST = """\
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
   it
 }
 """
+
+# The running footer: chapter name left, release stamp centered, page
+# number right, nothing on the title page. Setting `footer` explicitly
+# replaces the bare centered number the template's page numbering
+# would render, while the numbering setting itself stays on (see
+# run_pandoc), since the outline reads the TOC's page numbers from it.
+# The chapter name is the nearest level-1 heading at or before this
+# page, which also labels the TOC pages "Contents" and the pages of a
+# Part divider with that Part's name. `<<stamp>>` is replaced by
+# `header_typst()`; for an unstamped build the center cell is empty.
+FOOTER_TYPST = """\
+#set page(footer: context {
+  if here().page() > 1 {
+    let past = query(heading.where(level: 1)).filter(
+      h => h.location().page() <= here().page())
+    let chapter = if past.len() > 0 { past.last().body } else { [] }
+    set text(size: 8pt, fill: luma(30%))
+    grid(
+      columns: (1fr, auto, 1fr),
+      align: (left, center, right),
+      chapter,
+      [<<stamp>>],
+      counter(page).display("1"),
+    )
+  }
+})
+"""
+
+
+def header_typst(release: str | None) -> str:
+    """The typst preamble: per-chapter page breaks plus the footer."""
+    stamp = build_epub.release_line(release) if release else ""
+    return PAGEBREAK_TYPST + FOOTER_TYPST.replace("<<stamp>>", stamp)
 
 # Inserted after the title block and before the outline, so the table
 # of contents opens on its own page instead of running on from the
@@ -88,7 +123,9 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
         "--include-in-header", str(header),
         "--include-before-body", str(before),
         "--toc", f"--toc-depth={TOC_DEPTH}",
-        # The stock typst template defaults page numbering to none.
+        # Page numbering stays on even though FOOTER_TYPST replaces
+        # the footer it would render: the outline formats the TOC's
+        # page numbers through it (the template defaults it to none).
         "--variable", f"papersize:{PAPER}",
         "--variable", "page-numbering:1",
         str(src),
@@ -101,7 +138,8 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
         print(proc.stderr.strip())
 
 
-def build(out_dir: Path, keep_source: bool = False) -> int:
+def build(out_dir: Path, keep_source: bool = False,
+          release: str | None = None) -> int:
     build_site.check_pandoc()
     check_typst()
     chapters = build_site.discover()
@@ -123,8 +161,8 @@ def build(out_dir: Path, keep_source: bool = False) -> int:
     header = src_dir / "header.typ"
     before = src_dir / "before.typ"
     src.write_text(text, encoding="utf-8")
-    meta.write_text(build_epub.metadata_yaml(), encoding="utf-8")
-    header.write_text(HEADER_TYPST, encoding="utf-8")
+    meta.write_text(build_epub.metadata_yaml(release), encoding="utf-8")
+    header.write_text(header_typst(release), encoding="utf-8")
     before.write_text(BEFORE_TYPST, encoding="utf-8")
 
     pdf = out_dir / PDF_NAME
@@ -163,8 +201,11 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"output directory (default: {DEFAULT_OUT})")
     ap.add_argument("--keep-source", action="store_true",
                     help="leave the generated pandoc input under <out>/src/")
+    ap.add_argument("--release", metavar="VERSION",
+                    help="stamp the title page with this release number "
+                         "and today's date (used by `make release`)")
     args = ap.parse_args(argv)
-    return build(args.out, args.keep_source)
+    return build(args.out, args.keep_source, args.release)
 
 
 if __name__ == "__main__":

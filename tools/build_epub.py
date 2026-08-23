@@ -36,9 +36,11 @@ page, and become level-1 headings so each opens its own EPUB section.
 
 The book's diagrams are SVG, which the site serves as-is. Kindle's SVG
 support is unreliable, so this build rasterizes each one to PNG and
-points the EPUB at that instead. The conversion needs one of
-`rsvg-convert`, `magick`, or `inkscape`; with none of them installed the
-build still succeeds and keeps the SVGs, printing a note.
+points the EPUB at that instead. The conversion needs one of `resvg`
+(preferred: the renderer typst uses, so the EPUB's diagrams match the
+PDF's; `scoop install resvg`), `rsvg-convert`, `magick`, or
+`inkscape`; with none of them installed the build still succeeds and
+keeps the SVGs, printing a note.
 
 Usage:
     python tools/build_epub.py              # build/epub/ThinkingInPython.epub
@@ -50,6 +52,7 @@ Requires `pandoc` on PATH (`make tools-check-full` verifies it).
 """
 
 import argparse
+import datetime
 import json
 import os
 import re
@@ -66,7 +69,10 @@ from tools_config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools_config import ROOT
 from tools_markdown import Document
 
-COVER = ROOT / "resources" / "static" / "cover.png"
+# A JPEG on purpose: the cover is painted art with smooth gradients,
+# which PNG stores at ~6.4 MB against JPEG's ~700 KB with no visible
+# difference on a reader. Half the old EPUB's weight was this file.
+COVER = ROOT / "resources" / "static" / "cover.jpg"
 IMAGES_SRC = build_site.IMAGES_SRC
 EPUB_NAME = "ThinkingInPython.epub"
 LANG = "en-US"
@@ -74,7 +80,11 @@ LANG = "en-US"
 # for it: the diagrams are flat line art, so a 256-color PNG at this
 # width is visually identical to 24-bit and about a tenth the size.
 SVG_PNG_WIDTH = 1600
-SVG_TOOLS = ("rsvg-convert", "magick", "inkscape")
+# First found wins. resvg leads: it is the same renderer typst uses,
+# so the EPUB's rasterized diagrams match the PDF's, and it is the one
+# with a packaged Windows install (scoop install resvg; rsvg-convert
+# has no winget/scoop package on Windows).
+SVG_TOOLS = ("resvg", "rsvg-convert", "magick", "inkscape")
 # Code-listing font size, relative to the surrounding prose.
 CODE_FONT_SCALE = 0.75
 # How far past its own start a wrapped code line hangs, in characters.
@@ -244,6 +254,10 @@ def svg_command(tool: str, src: Path, dst: Path) -> list[str]:
     against a dark theme.
     """
     match tool:
+        case "resvg":
+            # Width alone preserves the aspect ratio.
+            return [tool, "--width", str(SVG_PNG_WIDTH),
+                    "--background", "white", str(src), str(dst)]
         case "rsvg-convert":
             return [tool, "--width", str(SVG_PNG_WIDTH),
                     "--keep-aspect-ratio", "--background-color", "white",
@@ -464,15 +478,38 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
 # --------------------------------------------------------------------------- #
 # Metadata and stylesheet
 # --------------------------------------------------------------------------- #
-def metadata_yaml() -> str:
-    """Pandoc EPUB metadata. Values are JSON-quoted, which YAML accepts,
-    so a title or license line never has to be escaped by hand."""
+def release_line(version: str,
+                 today: datetime.date | None = None) -> str:
+    """The reader-facing release stamp, e.g. "Release 1.0 · August 23, 2026".
+
+    This lands on the title page of both the EPUB and the PDF (via
+    `metadata_yaml()`'s date field), so a reader can tell which release
+    they hold and how old it is. The middle dot matches the Part
+    headings' separator.
+    """
+    if today is None:
+        today = datetime.date.today()
+    return f"Release {version} · {today:%B} {today.day}, {today.year}"
+
+
+def metadata_yaml(release: str | None = None) -> str:
+    """Pandoc metadata for the EPUB and PDF builds. Values are
+    JSON-quoted, which YAML accepts, so a title or license line never
+    has to be escaped by hand.
+
+    With `release`, the date field becomes the full release stamp
+    ("Release 1.0 · August 23, 2026"), which pandoc renders on both
+    title pages. Without it (an ad-hoc `make epub`/`make pdf`), the
+    date stays the bare copyright year, so a casual build never
+    masquerades as a numbered release.
+    """
     fields = {
         "title": build_site.BOOK_TITLE,
         "subtitle": build_site.BOOK_SUBTITLE,
         "author": build_site.BOOK_AUTHOR,
         "lang": LANG,
-        "date": build_site.COPYRIGHT_YEAR,
+        "date": (release_line(release) if release
+                 else build_site.COPYRIGHT_YEAR),
         "rights": (f"© {build_site.COPYRIGHT_YEAR} "
                    f"{build_site.BOOK_AUTHOR}. Licensed CC BY-NC-ND 4.0 "
                    f"({build_site.LICENSE_URL}). Freely readable online. "
@@ -553,7 +590,8 @@ th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 # Driver
 # --------------------------------------------------------------------------- #
 def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
-               images: Path | None = None) -> None:
+               images: Path | None = None,
+               dc: Path | None = None) -> None:
     resources = [str(IMAGES_SRC)]
     if images is not None and images.is_dir():
         # First on the path, so a rasterized diagram wins over its SVG.
@@ -579,6 +617,8 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
     ]
     if COVER.exists():
         command += ["--epub-cover-image", str(COVER)]
+    if dc is not None:
+        command += ["--epub-metadata", str(dc)]
     command.append(str(src))
     proc = subprocess.run(command, capture_output=True, text=True,
                           encoding="utf-8")
@@ -589,7 +629,7 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
 
 
 def build(out_dir: Path, keep_source: bool = False,
-          keep_svg: bool = False) -> int:
+          keep_svg: bool = False, release: str | None = None) -> int:
     build_site.check_pandoc()
     chapters = build_site.discover()
     if not chapters:
@@ -616,10 +656,20 @@ def build(out_dir: Path, keep_source: bool = False,
     meta = src_dir / "metadata.yaml"
     src.write_text(text, encoding="utf-8")
     css.write_text(epub_css(), encoding="utf-8")
-    meta.write_text(metadata_yaml(), encoding="utf-8")
+    meta.write_text(metadata_yaml(release), encoding="utf-8")
+
+    # The release stamp in `date` is prose ("Release 1.0 · ..."), which
+    # pandoc cannot parse as a date, so it would leave the OPF's
+    # machine-readable dc:date empty. --epub-metadata supplies a real
+    # ISO date alongside the prose one on the title page.
+    dc: Path | None = None
+    if release is not None:
+        dc = src_dir / "dc.xml"
+        dc.write_text(f"<dc:date>{datetime.date.today():%Y-%m-%d}"
+                      "</dc:date>\n", encoding="utf-8")
 
     epub = out_dir / EPUB_NAME
-    run_pandoc(src, css, meta, epub, images)
+    run_pandoc(src, css, meta, epub, images, dc)
 
     size = epub.stat().st_size / 1024
     print(f"Built {epub.relative_to(ROOT)} "
@@ -658,8 +708,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="leave the generated pandoc input under <out>/src/")
     ap.add_argument("--keep-svg", action="store_true",
                     help="skip converting SVG diagrams to PNG")
+    ap.add_argument("--release", metavar="VERSION",
+                    help="stamp the title page with this release number "
+                         "and today's date (used by `make release`)")
     args = ap.parse_args(argv)
-    return build(args.out, args.keep_source, args.keep_svg)
+    return build(args.out, args.keep_source, args.keep_svg, args.release)
 
 
 if __name__ == "__main__":

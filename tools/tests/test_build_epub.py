@@ -6,6 +6,7 @@ built file looks wrong when that goes bad, the link just opens the wrong
 chapter, so the namespacing and relinking are covered here rather than
 left to a reader to notice.
 """
+import datetime
 from pathlib import Path
 
 from build_epub import (
@@ -17,9 +18,11 @@ from build_epub import (
     hang_listings,
     heading_ids,
     listing_html,
+    metadata_yaml,
     namespace_headings,
     outside_code,
     relink,
+    release_line,
     title_anchor,
 )
 from build_site import Chapter
@@ -201,6 +204,25 @@ def test_missing_image_is_reported(tmp_path: Path) -> None:
     missing: set[str] = set()
     book_markdown(chapters, missing, set())
     assert missing == {"no_such_image"}
+
+# ── the release stamp on the title page ───────────────────────────────────────
+
+def test_release_line_spells_out_the_date() -> None:
+    # No zero-padded day: "August 3", not "August 03".
+    assert release_line("1.0", datetime.date(2026, 8, 3)) == \
+        "Release 1.0 · August 3, 2026"
+
+def test_release_stamp_becomes_the_metadata_date() -> None:
+    # The middle dot is JSON-escaped in the YAML (a backslash-u
+    # code, as the copyright sign in rights already is), so assert
+    # around it, not through it.
+    assert "Release 1.0" in metadata_yaml("1.0")
+
+def test_without_a_release_the_date_stays_the_copyright_year() -> None:
+    # An ad-hoc `make epub`/`make pdf` must not masquerade as a
+    # numbered release.
+    assert 'date: "2026"' in metadata_yaml()
+    assert "Release" not in metadata_yaml()
 
 # ── hanging indent for wrapped code lines ─────────────────────────────────────
 
