@@ -268,13 +268,15 @@ prune:  ## Delete orphaned stray files under Examples/ (see `check`)
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
 
-# One EPUB from the same Chapters/, for e-readers. The site keeps one HTML
-# page per chapter, so a cross-reference stays a link between files; an EPUB
+# Two EPUBs from the same Chapters/, for e-readers: -color (syntax
+# highlighting in color, for backlit readers) and -eink (bolding
+# instead, for grayscale screens). The site keeps one HTML page per
+# chapter, so a cross-reference stays a link between files; an EPUB
 # is a single document, so build_epub.py namespaces every heading id by
 # chapter (ch12-immutability) before merging. Without that, the 44 chapters
 # ending in `## Exercises` and the nine other repeated headings would collide
 # and pandoc would quietly retarget those links. Needs pandoc, like `site`.
-epub:  ## Render Chapters/ into build/epub/ThinkingInPython.epub with pandoc
+epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub with pandoc
 	$(PY) tools/build_epub.py
 
 # One PDF from the same merged, anchor-namespaced Markdown stream the
@@ -286,13 +288,13 @@ pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and ty
 	$(PY) tools/build_pdf.py
 
 # Publish a GitHub release whose uploaded assets are exactly the
-# freshly rebuilt PDF and EPUB. release.py orchestrates: preflight
-# (clean tree, HEAD pushed, tag free, gh authenticated), then `make
-# verify` so a book that fails the gate can never ship, then fresh
-# `make pdf` + `make epub`, then `gh release create v$(VERSION)`.
-# Deliberately excluded from verify-targets' smoke test: it tags the
-# repo and publishes to GitHub.
-release:  ## Verify, rebuild the PDF and EPUB, publish both as a GitHub release (VERSION=1.0)
+# freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
+# preflight (clean tree, HEAD pushed, tag free, gh authenticated),
+# then `make verify` so a book that fails the gate can never ship,
+# then fresh `make pdf` + `make epub`, then
+# `gh release create v$(VERSION)`. Deliberately excluded from
+# verify-targets' smoke test: it tags the repo and publishes to GitHub.
+release:  ## Verify, rebuild the PDF and both EPUBs, publish all three as a GitHub release (VERSION=1.0)
 	$(PY) tools/release.py $(VERSION)
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,

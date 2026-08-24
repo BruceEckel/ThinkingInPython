@@ -892,11 +892,18 @@ leaving the caller to do a full build.
 
 ## build_epub.py
 
-Renders the same `Chapters/*.md` into one EPUB at
-`build/epub/ThinkingInPython.epub` (git-ignored). Run `make epub`; `-o DIR`
-builds elsewhere, and `--keep-source` leaves the generated pandoc input under
-`<out>/src/` when you need to see what pandoc was handed. Needs `pandoc`, like
-`site`. `make clean-epub` removes the directory.
+Renders the same `Chapters/*.md` into two EPUBs under `build/epub/`
+(git-ignored): `ThinkingInPython-color.epub`, whose listings carry color
+syntax highlighting for backlit readers, and `ThinkingInPython-eink.epub`,
+which bolds keywords and italicizes comments instead, for grayscale e-ink
+screens. Both come from one assembly and one set of token spans (the running
+CPython's own `tokenize`, so 3.15-only syntax needs no third-party lexer);
+only the stylesheet differs. The colors are mid-tones chosen to stay
+readable on both white and black, since Kindle's dark mode keeps a declared
+color as given. Run `make epub`; `-o DIR` builds elsewhere, and
+`--keep-source` leaves the generated pandoc input under `<out>/src/` when
+you need to see what pandoc was handed. Needs `pandoc`, like `site`.
+`make clean-epub` removes the directory.
 
 Chapter discovery, titles, the Part dividers, and the image map all come from
 `build_site.py`, so the EPUB's contents match the site's rather than drifting
@@ -973,7 +980,8 @@ numbers through it.
 ## release.py
 
 Publishes a GitHub release whose uploaded assets are exactly the fresh
-PDF and EPUB. Run `make release VERSION=1.0`; the tag is the version
+PDF and the two EPUB variants (`-color` and `-eink`). Run
+`make release VERSION=1.0`; the tag is the version
 with a `v` prefix (`v1.0`), created on origin at the branch tip. Needs
 `git` and an authenticated `gh` (`gh auth login`).
 
@@ -985,9 +993,9 @@ from. Then `make verify` runs the full gate, so a book that fails it
 can never ship. If verify's self-healing fixers rewrite tracked files,
 the run stops and asks for a review-commit-push before trying again,
 since the tree no longer matches the pushed commit. Only then are the
-PDF and EPUB rebuilt (both builders wipe their output directory first,
+PDF and EPUBs rebuilt (both builders wipe their output directory first,
 which is what makes the assets fresh) and handed to `gh release
-create`. Both are built with the `--release` stamp, so their title
+create`. All are built with the `--release` stamp, so their title
 pages tell the reader which release they hold and when it was made
 ("Release 1.0 · August 23, 2026"); an ad-hoc `make pdf`/`make epub`
 carries no stamp, so a casual build never masquerades as a numbered

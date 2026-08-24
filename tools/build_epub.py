@@ -42,8 +42,21 @@ PDF's; `scoop install resvg`), `rsvg-convert`, `magick`, or
 `inkscape`; with none of them installed the build still succeeds and
 keeps the SVGs, printing a note.
 
+The build produces two EPUBs from one assembly, differing only in
+stylesheet. Listings carry the same token `<span>`s in both (keyword,
+string, comment, number, tokenized by the pinned CPython's own
+`tokenize` module, so 3.15-only syntax needs no third-party lexer):
+
+- `ThinkingInPython-color.epub` colors the tokens, for backlit
+  readers (phone/tablet Kindle apps). Kindle's dark mode keeps a
+  declared color as given, so every color is a mid-tone chosen to
+  stay readable on both white and black.
+- `ThinkingInPython-eink.epub` bolds keywords and italicizes
+  comments instead, the styling that survives a grayscale e-ink
+  screen.
+
 Usage:
-    python tools/build_epub.py              # build/epub/ThinkingInPython.epub
+    python tools/build_epub.py              # build/epub/ThinkingInPython-{color,eink}.epub
     python tools/build_epub.py -o DIR       # build somewhere else
     python tools/build_epub.py --keep-source  # leave build/epub/src/ in place
     python tools/build_epub.py --keep-svg     # skip the PNG conversion
@@ -53,12 +66,15 @@ Requires `pandoc` on PATH (`make tools-check-full` verifies it).
 
 import argparse
 import datetime
+import io
 import json
+import keyword
 import os
 import re
 import shutil
 import subprocess
 import sys
+import tokenize
 from html import escape
 from pathlib import Path
 
@@ -74,7 +90,13 @@ from tools_markdown import Document
 # difference on a reader. Half the old EPUB's weight was this file.
 COVER = ROOT / "resources" / "static" / "cover.jpg"
 IMAGES_SRC = build_site.IMAGES_SRC
-EPUB_NAME = "ThinkingInPython.epub"
+EPUB_STEM = "ThinkingInPython"
+# The two EPUBs this build produces. Same markup, different stylesheet:
+# every Python listing carries the same token spans, and the variant's
+# CSS decides whether they show as color (backlit readers) or as
+# bolding (e-ink, where color is invisible). HIGHLIGHT_CSS below holds
+# each variant's rules.
+VARIANTS = ("color", "eink")
 LANG = "en-US"
 # Wide enough to stay crisp on a Kindle Scribe (1860px) without paying
 # for it: the diagrams are flat line art, so a 256-color PNG at this
@@ -340,6 +362,97 @@ def rewrite_images(text: str, img_map: dict[str, str],
 
 
 # --------------------------------------------------------------------------- #
+# Syntax highlighting: token spans shared by both variants
+# --------------------------------------------------------------------------- #
+def token_class(tok: tokenize.TokenInfo) -> str | None:
+    """The span class for one token, or None for plain text.
+
+    Four classes only: keyword (`kw`), string (`st`), comment (`co`),
+    number (`nu`). Operators and names stay plain, which keeps the
+    markup small and the listings quiet. A soft keyword (`match`,
+    `case`, `type`, ...) counts as a keyword only when it opens its
+    line, so `type(e).__name__` and a variable named `match` stay
+    plain while `match command:` and `type Bins = ...` highlight.
+    """
+    kind = tokenize.tok_name[tok.type]
+    if kind == "COMMENT":
+        return "co"
+    if kind == "STRING" or kind.startswith(("FSTRING", "TSTRING")):
+        return "st"
+    if kind == "NUMBER":
+        return "nu"
+    if kind == "NAME":
+        text = tok.string
+        if keyword.iskeyword(text):
+            return "kw"
+        if (keyword.issoftkeyword(text) and text != "_"
+                and tok.start[1] == len(tok.line) - len(tok.line.lstrip())):
+            return "kw"
+    return None
+
+
+def highlight_ranges(
+        lines: list[str]) -> dict[int, list[tuple[int, int, str]]]:
+    """Per 0-based line index, the (start, end, class) column ranges.
+
+    Tokenized by the running CPython's own `tokenize`, so whatever
+    syntax the pinned interpreter accepts highlights correctly with no
+    third-party lexer to lag behind it. A multi-line token (a triple-
+    quoted string) is split into one range per line. Adjacent ranges of
+    the same class merge (an f-string arrives as several FSTRING
+    pieces), so the markup stays one span. A block that stops
+    tokenizing (an illustrative fragment with, say, an unterminated
+    string) keeps the ranges found before the error; everything after
+    it stays plain.
+    """
+    code = "\n".join(lines) + "\n"
+    ranges: dict[int, list[tuple[int, int, str]]] = {}
+
+    def add(row: int, start: int, end: int, cls: str) -> None:
+        if end <= start:
+            return
+        line = ranges.setdefault(row, [])
+        if line and line[-1][2] == cls and line[-1][1] == start:
+            line[-1] = (line[-1][0], end, cls)
+        else:
+            line.append((start, end, cls))
+
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(code).readline):
+            cls = token_class(tok)
+            if cls is None:
+                continue
+            (srow, scol), (erow, ecol) = tok.start, tok.end
+            for row in range(srow, erow + 1):
+                start = scol if row == srow else 0
+                end = ecol if row == erow else len(lines[row - 1])
+                add(row - 1, start, end, cls)
+    except (tokenize.TokenError, SyntaxError):
+        pass
+    return ranges
+
+
+def marked_up(line: str, spans: list[tuple[int, int, str]]) -> str:
+    """The line escaped, with a `<span class>` around each range.
+
+    `listing_html()` rstrips the line after the ranges were computed
+    against the raw one, so an end past the stripped length clamps.
+    """
+    out: list[str] = []
+    pos = 0
+    for start, end, cls in spans:
+        start, end = min(start, len(line)), min(end, len(line))
+        if end <= start:
+            continue
+        out.append(escape(line[pos:start], quote=False))
+        out.append(f'<span class="{cls}">'
+                   f'{escape(line[start:end], quote=False)}</span>')
+        pos = end
+    out.append(escape(line[pos:], quote=False))
+    return "".join(out)
+
+
+# --------------------------------------------------------------------------- #
 # Assembling the single Markdown stream
 # --------------------------------------------------------------------------- #
 def chapter_heading(ch: Chapter) -> str:
@@ -355,8 +468,12 @@ def part_markdown(roman: str, title: str) -> str:
     return f"# Part {roman} · {title} {{#part-{roman.lower()}}}\n"
 
 
-def listing_html(lines: list[str]) -> str:
+def listing_html(lines: list[str], python: bool = False) -> str:
     """One fenced listing as a `<pre>` whose every line is its own block.
+
+    With `python=True` the lines carry the token spans from
+    `highlight_ranges()`, the markup both EPUB variants share; a
+    ```text block holding program output stays plain.
 
     A code line too wide for the page wraps, and a wrapped line has to
     read as the continuation of the line above rather than as the next
@@ -379,15 +496,16 @@ def listing_html(lines: list[str]) -> str:
     `display: block`, and under `pre-wrap` a newline between two of them
     would be a second line break, double-spacing every listing.
     """
+    ranges = highlight_ranges(lines) if python else {}
     out = ["<pre>"]
-    for raw in lines:
+    for index, raw in enumerate(lines):
         line = raw.rstrip()
         if not line.strip():
             # An empty block box has no height; a space gives it one.
             out.append('<span class="h0">&#160;</span>')
             continue
         indent = min(len(line) - len(line.lstrip()), MAX_HANG_INDENT)
-        text = escape(line, quote=False)
+        text = marked_up(line, ranges.get(index, []))
         out.append(f'<span class="h{indent}">{text}</span>')
     out.append("</pre>")
     return "".join(out)
@@ -411,7 +529,7 @@ def hang_listings(text: str) -> str:
     index = 0
     for block in doc.blocks:
         out.extend(doc.lines[index:block.open_at])
-        out.append(listing_html(block.lines))
+        out.append(listing_html(block.lines, python=block.is_python))
         index = block.end + 1
     out.extend(doc.lines[index:])
     return "\n".join(out)
@@ -528,16 +646,48 @@ def hang_css() -> str:
     rules are generated rather than written out because they are one
     arithmetic series, and they live in the single shared stylesheet,
     not inlined per chapter the way pandoc's highlighting CSS was.
+
+    `display: block` sits in each rule rather than on a bare
+    `pre span`: a line's span now contains inline token spans from
+    `marked_up()`, which a `pre span` block rule would stack one
+    token per line. Scoping by the `h*` classes needs no child
+    combinator, which not every Kindle renderer honors.
     """
     rules: list[str] = []
     for column in range(MAX_HANG_INDENT + 1):
         em = round((column + CODE_HANG_CHARS) * CHAR_EM, 2)
-        rules.append(f"pre .h{column} {{ padding-left: {em}em; "
+        rules.append(f"pre .h{column} {{ display: block; "
+                     f"padding-left: {em}em; "
                      f"text-indent: -{em}em; }}")
     return "\n".join(rules)
 
 
-def epub_css() -> str:
+# Per-variant listing styles over the same token spans. The color
+# palette is constrained by Kindle's dark mode, which keeps a declared
+# color as given against black, and by e-readers having no media
+# queries to swap palettes: every color must read on both white and
+# black, so each is a mid-tone with roughly balanced contrast against
+# both (the same reason #767676 is the classic "legible on anything"
+# gray). The eink variant styles with weight and slant only, which is
+# all a grayscale screen can show.
+HIGHLIGHT_CSS = {
+    "color": """pre .kw { color: #3f78c8; }
+pre .st { color: #2e8b57; }
+pre .co { color: #767676; }
+pre .nu { color: #b07219; }
+""",
+    "eink": """pre .kw { font-weight: bold; }
+pre .co { font-style: italic; }
+""",
+}
+
+
+def epub_name(variant: str) -> str:
+    """One variant's filename, e.g. "ThinkingInPython-color.epub"."""
+    return f"{EPUB_STEM}-{variant}.epub"
+
+
+def epub_css(variant: str) -> str:
     """The bare minimum CSS, so the reader's own defaults do the rest.
 
     Every rule here fixes something that breaks without it, not
@@ -554,11 +704,13 @@ def epub_css() -> str:
     keeps a declared color as given, so a light fill would become a
     glaring panel against black.
 
-    `pre span` and the per-indent rules from `hang_css()` are the
-    hanging indent for wrapped code lines. They need a `<span>` per
-    listing line, which `listing_html()` emits; the reasoning for paying
-    that markup is in its docstring. They are inert for a reader wide
-    enough that no line wraps.
+    The per-indent rules from `hang_css()` are the hanging indent for
+    wrapped code lines. They need a `<span>` per listing line, which
+    `listing_html()` emits; the reasoning for paying that markup is in
+    its docstring. They are inert for a reader wide enough that no
+    line wraps. `HIGHLIGHT_CSS[variant]` is the only difference
+    between the two EPUBs: color for backlit readers, weight and
+    slant for e-ink.
 
     `#toc ol` is the one list-style rule here, and it is also a fix,
     not a look: `chapter_heading()` already spells each chapter's
@@ -575,9 +727,8 @@ def epub_css() -> str:
 }}
 pre, code {{ font-size: {CODE_FONT_SCALE}em; }}
 pre code {{ font-size: inherit; }}
-pre span {{ display: block; }}
 {hang_css()}
-h1, h2, h3, h4 {{ page-break-after: avoid; }}
+{HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}
 figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}
 table {{ border-collapse: collapse; }}
@@ -604,13 +755,14 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
         "--metadata-file", str(meta),
         "--css", str(css),
         "--resource-path", os.pathsep.join(resources),
-        # Highlighting off. It is invisible on e-ink, and pandoc pays for
-        # it in markup a Kindle handles badly: 73 lines of CSS inlined in
-        # every chapter file, one `<span id>` plus an empty `<a href>`
-        # anchor around every line of every listing, and a
+        # Pandoc's own highlighting stays off; the listings are already
+        # raw `<pre>` HTML carrying this build's token spans, styled per
+        # variant by HIGHLIGHT_CSS. Pandoc's version also pays in markup
+        # a Kindle handles badly: 73 lines of CSS inlined in every
+        # chapter file, one `<span id>` plus an empty `<a href>` anchor
+        # around every line of every listing, and a
         # `pre > code.sourceCode { white-space: pre }` rule that outranks
         # this build's `pre-wrap` and so stops code from wrapping.
-        # Turning it off halves the EPUB.
         "--syntax-highlighting=none",
         "--toc", "--toc-depth=2",
         "--split-level=1",
@@ -652,10 +804,8 @@ def build(out_dir: Path, keep_source: bool = False,
     text = book_markdown(chapters, missing, unresolved, img_map)
 
     src = src_dir / "book.md"
-    css = src_dir / "epub.css"
     meta = src_dir / "metadata.yaml"
     src.write_text(text, encoding="utf-8")
-    css.write_text(epub_css(), encoding="utf-8")
     meta.write_text(metadata_yaml(release), encoding="utf-8")
 
     # The release stamp in `date` is prose ("Release 1.0 · ..."), which
@@ -668,12 +818,15 @@ def build(out_dir: Path, keep_source: bool = False,
         dc.write_text(f"<dc:date>{datetime.date.today():%Y-%m-%d}"
                       "</dc:date>\n", encoding="utf-8")
 
-    epub = out_dir / EPUB_NAME
-    run_pandoc(src, css, meta, epub, images, dc)
+    for variant in VARIANTS:
+        css = src_dir / f"epub-{variant}.css"
+        css.write_text(epub_css(variant), encoding="utf-8")
+        epub = out_dir / epub_name(variant)
+        run_pandoc(src, css, meta, epub, images, dc)
+        size = epub.stat().st_size / 1024
+        print(f"Built {epub.relative_to(ROOT)} "
+              f"({len(chapters)} chapters, {size:.0f} KB).")
 
-    size = epub.stat().st_size / 1024
-    print(f"Built {epub.relative_to(ROOT)} "
-          f"({len(chapters)} chapters, {size:.0f} KB).")
     if not COVER.exists():
         print(f"NOTE: no cover image at {COVER.relative_to(ROOT)}.")
 

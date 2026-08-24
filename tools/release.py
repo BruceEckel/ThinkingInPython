@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Publish a GitHub release whose assets are the fresh PDF and EPUB.
+"""Publish a GitHub release whose assets are the fresh PDF and EPUBs.
 
 `make release VERSION=1.0` lands here. The release's uploaded assets
-are exactly two files, ThinkingInPython.pdf and ThinkingInPython.epub,
-both rebuilt from the current Markdown by this run, never taken from a
-stale build/ tree. (GitHub itself always adds "Source code" archive
-links to a release page; those are GitHub's, not uploads.)
+are exactly three files, ThinkingInPython.pdf plus the two EPUB
+variants (ThinkingInPython-color.epub for backlit readers,
+ThinkingInPython-eink.epub with bolding instead of color), all rebuilt
+from the current Markdown by this run, never taken from a stale
+build/ tree. (GitHub itself always adds "Source code" archive links
+to a release page; those are GitHub's, not uploads.)
 
 The order is preflight, verify, build, publish, with the cheap checks
 first so a doomed run dies before the expensive gate:
@@ -20,15 +22,15 @@ first so a doomed run dies before the expensive gate:
    rewrite tracked files; if that happens the tree is no longer the
    pushed commit, so the run stops and asks for a review-commit-push
    before trying again.
-3. Build the PDF and EPUB (in-process, the equivalent of `make pdf`
-   and `make epub` plus a `--release` stamp): both wipe their output
-   directory and rebuild from the Markdown, which is what makes the
-   assets fresh, and both stamp their title page with the release
-   number and today's date ("Release 1.0 · August 23, 2026") so the
-   reader can tell which release they hold.
-4. `gh release create v<VERSION> <pdf> <epub>`: creates the tag on
-   origin at the branch tip and uploads the two assets. gh prints the
-   release URL on success.
+3. Build the PDF and EPUBs (in-process, the equivalent of `make pdf`
+   and `make epub` plus a `--release` stamp): both builders wipe
+   their output directory and rebuild from the Markdown, which is
+   what makes the assets fresh, and both stamp their title page with
+   the release number and today's date ("Release 1.0 · August 23,
+   2026") so the reader can tell which release they hold.
+4. `gh release create v<VERSION> <pdf> <epubs>`: creates the tag on
+   origin at the branch tip and uploads the three assets. gh prints
+   the release URL on success.
 
 The tag is the VERSION prefixed with "v" (a bare "v1.0" is accepted
 as-is), the conventional GitHub form. Deleting a bad release is a
@@ -148,7 +150,7 @@ def make(target: str) -> None:
 
 
 def build_assets(version: str) -> list[Path]:
-    """Rebuild the PDF and EPUB fresh, stamped with the release.
+    """Rebuild the PDF and both EPUBs fresh, stamped with the release.
 
     In-process calls rather than `make pdf`/`make epub`: the make
     targets have no way to carry the release stamp, and the builders
@@ -161,12 +163,13 @@ def build_assets(version: str) -> list[Path]:
     if build_pdf.build(BUILD_PDF_DIR, release=version) != 0:
         sys.exit("error: the PDF build reported problems; nothing "
                  "was released.")
-    print(f"\n--- Building the EPUB (release {version}) ---")
+    print(f"\n--- Building the EPUBs (release {version}) ---")
     if build_epub.build(BUILD_EPUB_DIR, release=version) != 0:
         sys.exit("error: the EPUB build reported problems; nothing "
                  "was released.")
     assets = [BUILD_PDF_DIR / build_pdf.PDF_NAME,
-              BUILD_EPUB_DIR / build_epub.EPUB_NAME]
+              *(BUILD_EPUB_DIR / build_epub.epub_name(v)
+                for v in build_epub.VARIANTS)]
     for asset in assets:
         if not asset.is_file() or asset.stat().st_size == 0:
             sys.exit(f"error: expected asset missing after the build: "
@@ -177,7 +180,11 @@ def build_assets(version: str) -> list[Path]:
 def publish(tag: str, version: str, branch: str,
             assets: list[Path]) -> None:
     head = git("rev-parse", "HEAD")
-    notes = (f"The complete book as PDF and EPUB.\n\n"
+    notes = ("The complete book as PDF and EPUB.\n\n"
+             "Two EPUBs: `-color` has color syntax highlighting for "
+             "backlit readers (phone/tablet apps); `-eink` marks "
+             "code with bolding instead, for e-ink devices where "
+             "color is invisible.\n\n"
              f"Built from `{branch}` @ {head[:12]}.")
     command = ["gh", "release", "create", tag,
                "--target", branch,

@@ -11,12 +11,16 @@ from pathlib import Path
 
 from build_epub import (
     MAX_HANG_INDENT,
+    VARIANTS,
     Ids,
     book_markdown,
     chapter_heading,
+    epub_css,
+    epub_name,
     hang_css,
     hang_listings,
     heading_ids,
+    highlight_ranges,
     listing_html,
     metadata_yaml,
     namespace_headings,
@@ -263,6 +267,85 @@ def test_no_newline_between_spans() -> None:
     # Under pre-wrap a newline between two block spans is a second
     # line break, double-spacing the listing.
     assert "\n" not in listing_html(["a = 1", "b = 2"])
+
+# ── syntax highlighting token spans ───────────────────────────────────────────
+
+def test_keyword_gets_a_span() -> None:
+    html = listing_html(["def f():"], python=True)
+    assert '<span class="kw">def</span>' in html
+
+def test_comment_and_output_marker_are_comment_spans() -> None:
+    html = listing_html(["# lambdas.py", "print(9)", "#: 9"], python=True)
+    assert '<span class="co"># lambdas.py</span>' in html
+    assert '<span class="co">#: 9</span>' in html
+
+def test_string_and_number_get_spans() -> None:
+    html = listing_html(['x = "hi" * 3'], python=True)
+    assert '<span class="st">"hi"</span>' in html
+    assert '<span class="nu">3</span>' in html
+
+def test_soft_keyword_highlights_only_at_line_start() -> None:
+    html = listing_html(["match words:", "    case []:",
+                         "        print(type(words))"], python=True)
+    assert '<span class="kw">match</span>' in html
+    assert '<span class="kw">case</span>' in html
+    # `type` here is the builtin call, not the `type X = ...` statement.
+    assert '<span class="kw">type</span>' not in html
+
+def test_fstring_expression_stays_plain() -> None:
+    # The pieces around `{len(w)}` are string spans; the call inside
+    # the braces is code and stays unwrapped.
+    html = listing_html(['s = f"got {len(w)} items"'], python=True)
+    assert '<span class="st">' in html
+    assert '<span class="st">len' not in html
+    assert "len(w)" in html
+
+def test_multiline_string_spans_every_line() -> None:
+    html = listing_html(['s = """one', 'two"""'], python=True)
+    assert '<span class="st">"""one</span>' in html
+    assert '<span class="st">two"""</span>' in html
+
+def test_text_block_gets_no_token_spans() -> None:
+    # `hang_listings` passes python=False for a ```text block: program
+    # output is not code, however code-like a word in it looks.
+    html = listing_html(["def f():"], python=False)
+    assert '<span class="kw">' not in html
+
+def test_untokenizable_fragment_keeps_earlier_highlights() -> None:
+    # An illustrative fragment can stop tokenizing partway; the lines
+    # before the error keep their spans and nothing raises.
+    html = listing_html(["x = 1", 's = "unterminated'], python=True)
+    assert '<span class="nu">1</span>' in html
+    assert "unterminated" in html
+
+def test_adjacent_same_class_ranges_merge() -> None:
+    # An f-string with no braces arrives as several FSTRING tokens;
+    # one span, not three.
+    ranges = highlight_ranges(['s = f"plain"'])
+    assert ranges[0] == [(4, 12, "st")]
+
+# ── the two variants ──────────────────────────────────────────────────────────
+
+def test_variant_names() -> None:
+    assert [epub_name(v) for v in VARIANTS] == \
+        ["ThinkingInPython-color.epub", "ThinkingInPython-eink.epub"]
+
+def test_color_css_colors_the_tokens() -> None:
+    css = epub_css("color")
+    assert "pre .kw { color:" in css
+    assert "font-weight: bold" not in css
+
+def test_eink_css_bolds_instead_of_coloring() -> None:
+    css = epub_css("eink")
+    assert "pre .kw { font-weight: bold; }" in css
+    assert "color: #" not in css
+
+def test_line_spans_are_their_own_blocks() -> None:
+    # The block behavior lives in the h* rules, not on a bare
+    # `pre span`, which would stack the inline token spans too.
+    css = epub_css("color")
+    assert "pre .h0 { display: block;" in css
+    assert "pre span" not in css
 
 def test_prose_around_a_fence_is_untouched() -> None:
     out = hang_listings("Before.\n\n```python\nx = 1\n```\n\nAfter.\n")
