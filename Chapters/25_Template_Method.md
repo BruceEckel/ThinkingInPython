@@ -7,34 +7,30 @@ defined in the base class,
 that drives the application by calling other base-class methods,
 some of which you override.
 
-Python's own `unittest` is an application framework of this kind.
+Python's own `unittest` is this kind of application framework.
 You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
 `TestCase.run()` is the template method.
-It calls `setUp()`, then your test method, then `tearDown()`,
-and you never call that sequence yourself.
+It calls `setUp()`, then your test method, then `tearDown()`.
+You never call that sequence yourself.
 Constructing a `TestCase` runs nothing;
-the test runner calls `run()` on the finished object,
-a separation this chapter returns to in [Don't Start the Engine in the Constructor](#dont-start-the-engine-in-the-constructor).
+the test runner calls `run()` on the finished object.
 
 ## The Fixed Algorithm
 
 A Template Method fixes the shape of the algorithm in the base class.
-Subclasses complete the individual steps.
+Subclasses provide the individual steps.
 The `@final` decorator from `typing`,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
-works on a single method too:
-it locks the template method so a subclass cannot change the overall flow.
-Here, `@final` marks `run()`,
-so the checker rejects any subclass that overrides it,
-while leaving the step methods open:
+also works on a single method.
+It locks the template method so a subclass cannot change the overall flow.
+Here, `@final` on `run()` rejects any subclass that overrides it:
 
 ```python
 # template_method.py
 from typing import final, override
 
 class ApplicationFramework:
-    # The fixed algorithm. Subclasses supply the steps, not the flow:
     @final
     def run(self) -> None:
         for _ in range(2):
@@ -61,50 +57,43 @@ MyApp().run()
 #: Say no more, say no more!
 ```
 
-`MyApp()` builds the object;
+The client supplies `customize1()` and `customize2()`.
 `run()` starts the engine that drives the application.
-The client supplies `customize1()` and `customize2()`, and the application runs.
 In a GUI program that engine is the main event loop.
 
-Notice which direction the calls flow.
-`run()` lives in the base class,
-yet `self.customize1()` executes `MyApp`'s version,
-because attribute lookup on `self` starts at the object's actual type,
-and `self` is a `MyApp`.
 The base class calls code written after it, sometimes years after.
-Framework authors call this the *Hollywood Principle*: don't call us,
-we'll call you.
+Framework authors call this the *Hollywood Principle*: "don't call us,
+we'll call you."
 Your code supplies the steps; the framework decides when they run.
 The general name for this reversal is *Inversion of Control*:
 the framework holds the flow of control and calls into your code,
 rather than your code calling into a library.
 
-A caution about the `@final` lock: it holds only under the type checker.
-At runtime Python records the mark and enforces nothing,
-and a subclass override of `run()` replaces the fixed algorithm without complaint.
-The guarantee is real, but it is the checker's guarantee,
-one more reason to make `ty` or another checker part of the build.
-When you need the interpreter to refuse an override,
+`@final` is only enforced by the type checker.
+At runtime the decorator only sets `__final__ = True` on the function,
+and nothing in the interpreter reads that attribute.
+If you need the interpreter to refuse an override,
 the `__init_subclass__()` technique from [Making a Class Final](17_Metaprogramming.md#making-a-class-final)
-applies to a method too: raise an exception when `"run" in cls.__dict__`.
+also works with methods, raising an exception when `"run" in cls.__dict__`.
 
 The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
-An optional step like this is a *hook*.
+This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks:
 `TestCase` supplies do-nothing versions,
 so a test class that needs no setup skips them.
-The same silence hides a misspelling:
-`def customise1()` adds a new method and leaves the base's do-nothing version in place,
-which is why every step override in these listings carries `@override`.
-The checker then rejects a method that overrides nothing.
-When every subclass must supply a step,
-inherit from `ABC` and declare the step with `@abstractmethod`,
-as in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance);
-then Python refuses to instantiate a subclass that forgot it.
+This silence hides a misspelling:
+`def customise1()` adds a new method and leaves the base's do-nothing version in place.
+That's why every step override in these listings is decorated with `@override`.
+This way, the checker rejects a method that overrides nothing.
 
-The test supplies a recording subclass and verifies the fixed flow:
+If every subclass must supply a step,
+inherit from `ABC` and declare the step with `@abstractmethod`,
+as shown in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
+The runtime then refuses to instantiate a subclass that forgot it.
+
+In the test, we supply a recording subclass and verify the fixed flow:
 
 ```python
 # test_template_method.py
@@ -129,14 +118,15 @@ def test_template_method_runs_steps_in_order() -> None:
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
-`ApplicationFramework` leaves starting to the client,
-and the `Framework` below shows what goes wrong when a framework does not.
-A framework can call `run()` from its own constructor,
-and a subclass with its own `__init__()` then faces a trap.
+`ApplicationFramework` requires the client to start the framework engine.
+The example below shows what goes wrong when the client forgets to do this.
+
+A framework can call `run()` from its own constructor.
+A subclass with its own `__init__()` encounters a pitfall.
 `run()` calls methods the subclass supplies,
-so a subclass that defines its own `__init__()` must finish its setup before it calls `super().__init__()`.
+so a subclass that defines its own `__init__()` must finish its own setup before it calls `super().__init__()`.
 If you call it first, in the usual style,
-the engine runs against half-initialized state:
+the engine runs using a half-initialized state:
 
 ```python
 # premature_engine.py
@@ -162,40 +152,42 @@ class Greeter(Framework):
         print(f"Hello, {self.name}!")
 
 try:
-    Greeter("Bruce")
+    Greeter("Robin")
 except AttributeError as e:
     print(e)
 #: 'Greeter' object has no attribute 'name'
 ```
 
-`Greeter("Bruce")` never gets to greet.
+`Greeter("Robin")` never runs.
 `super().__init__()` starts the engine, the engine calls `step()`,
 and `step()` reads `self.name` one line before the constructor assigns it.
 The quick fix is reordering: assign `self.name` first,
 then call `super().__init__()`.
-That works, but it inverts the convention every Python programmer carries,
-and the next subclass author restores the usual order without thinking.
+That works, but it inverts the convention Python programmers understand,
+and the next subclass author might restore the usual order without thinking.
 The reliable fix changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
 That is why `ApplicationFramework` has no `__init__()` and the client writes `MyApp().run()`.
 
 ### Substitutability
 
-This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution).
-A subclass must work wherever code expects its base class.
-The base `run()` calls `customize1()` and `customize2()` through `self`,
+This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution):
+when code expects a base-class instance,
+an instance of any subclass must work in its place.
+The base `run()` calls `customize1()` and `customize2()`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
 An override that breaks that trust corrupts the fixed algorithm even though the code still type-checks:
-one that raises an exception where the base would not,
-or one that leaves a step empty when the flow depends on the work.
+raising an exception where the base would not,
+or leaving a step empty when the flow depends on it.
 That last case is the price of the `...` defaults above.
 They make a step optional,
-and nothing distinguishes "deliberately empty" from "forgotten."
-The Template Method works only when every subclass is a faithful substitute for its base.
+and nothing distinguishes "deliberately empty" from "forgotten"
+(when a step must not be forgotten, use `@abstractmethod`).
+The Template Method only works when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
 
-Subclassing is one way to supply the varying steps, but not the only one.
+Subclassing is one way to supply varying steps, but not the only one.
 Because Python functions are first-class, you can pass the steps in directly,
 without using a subclass:
 
@@ -239,12 +231,13 @@ The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default;
 the function form must give each parameter a default of its own.
 
-The function version also closes the gap in `@final`.
-A caller supplies the steps and cannot replace the loop,
+The function version also needs no `@final`,
+a decorator that stops an override only when the checker runs.
+Here a caller supplies the steps and cannot replace the loop,
 because no subclass exists through which to replace it.
-Structure fixes the algorithm, not a decorator the runtime ignores.
+Structure fixes the algorithm instead of relying on a decorator the runtime ignores.
 
-Passing functions in is not the *Strategy* pattern,
+Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
 A Strategy swaps out a whole algorithm behind a single interface.
 Here the algorithm stays where it is and only its steps arrive from outside.
