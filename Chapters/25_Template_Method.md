@@ -240,31 +240,33 @@ Structure fixes the algorithm instead of relying on a decorator the runtime igno
 Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
 A Strategy swaps out a whole algorithm behind a single interface.
-Here the algorithm stays where it is and only its steps arrive from outside.
+Here the algorithm stays where it is and only uses external steps.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A hook that holds no state is usually better as a function than as a method to override.
 
 ## What Actually Fixes the Algorithm
 
-The fixed algorithm is only as fixed as the mechanism holding it,
-and this chapter has shown four of them.
-Structure fixes it in `template_function.py`,
-where no subclass exists through which to replace the loop.
-A checker fixes it with `@final`,
-which reports an override and stops nothing at runtime.
-The interpreter fixes it with `__init_subclass__()`,
-which refuses the subclass outright.
-Discipline fixes the rest:
-the Liskov Substitution Principle governs whether a step is a faithful substitute,
-and no tool checks it.
+The fixed algorithm is only as fixed as the mechanism holding it.
+This chapter shows four.
+Each has a cost, and each protects against a different way of breaking the flow:
 
-Structure is free and covers only the case where you can pass functions instead of subclassing.
-`@final` costs a decorator and covers everyone who runs the checker.
-`__init_subclass__()` costs a base-class method and covers everyone,
-including the caller who skips the checker.
-Discipline covers what none of them can reach:
-what the steps do once the flow is safe.
-Choose by asking against whom you are protecting the algorithm.
+- Structure, in `template_function.py`:
+  no subclass exists through which to replace the loop.
+  It costs nothing and cannot be bypassed,
+  but it only applies when you can pass functions instead of subclassing.
+- The checker, via `@final`:
+  it reports an override but stops nothing at runtime.
+  It costs one decorator and protects everyone who runs the checker.
+- The interpreter, via `__init_subclass__()`:
+  it refuses the offending subclass outright.
+  It costs a base-class method and protects everyone,
+  including the caller who skips the checker.
+- Discipline, via the Liskov Substitution Principle:
+  this governs whether each step is a faithful substitute, but no tool checks it.
+  It reaches what the other three cannot:
+  what the steps do once the flow itself is safe.
+
+Ask how the algorithm might break, and choose the mechanism that protects it.
 
 ## Exercises
 
