@@ -178,16 +178,18 @@ GATE_DOCS = tools/README.md Solutions
 # and no chapter mentions); run `make prune` to delete those.
 # solutions-gate applies the same stray check to SolutionsCode/ against
 # Solutions/*.md, with `make solutions-prune` as its counterpart.
-# reflow_prose.py runs here in check mode, so hand-edited prose that drifts
-# out of Semantic Line Breaks fails the build instead of drifting invisibly
-# until someone remembers to run `make reflow`. Check mode reports the files
-# and exits nonzero; `make reflow` applies the fix.
+# reflow_prose.py runs here with --write, so prose that drifts out of
+# Semantic Line Breaks self-heals (rewriting Chapters/) the same way
+# fix-eol and validate_output's marker --update do, instead of failing the
+# build and forcing a `make reflow` plus a second full run. The safety
+# valve stays: a paragraph that fails reflow's round-trip check is never
+# rewritten, and that failure still exits nonzero and stops the gate.
 gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, output, ty, ruff, run, pytest, solutions-gate)
 	$(PYTEST) $(PYTEST_N) tools/tests
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/check_all.py $(GATE_CHECKS)
 	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
-	$(PY) tools/reflow_prose.py
+	$(PY) tools/reflow_prose.py --write
 	$(PY) tools/check_unique_slugs.py
 	$(PY) tools/extract_examples.py
 	$(PY) tools/extract_examples.py --write

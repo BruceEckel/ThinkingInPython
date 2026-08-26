@@ -536,8 +536,7 @@ The concrete classes inherit nothing,
 but the type checker still verifies that each one fits the appropriate `Protocol`.
 `BrokenFactory` supplies `make_character()` and forgets `make_obstacle()`,
 and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
-The Protocol catches the omission before the program runs,
-earlier than either `@abstractmethod` or `raise NotImplementedError` can.
+The Protocol catches the omission earlier than either `@abstractmethod` or `raise NotImplementedError` can.
 A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `action()`.

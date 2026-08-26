@@ -1,7 +1,6 @@
 # Template Method
 
-With an application framework,
-you build a new application by reusing existing classes and overriding one or more methods to customize the behavior.
+Application frameworks build new applications by reusing existing classes and overriding one or more methods to customize behavior.
 At the heart of a framework is the *Template Method*: a method,
 defined in the base class,
 that drives the application by calling other base-class methods,
@@ -12,7 +11,6 @@ You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
 `TestCase.run()` is the template method.
 It calls `setUp()`, then your test method, then `tearDown()`.
-You never call that sequence yourself.
 Constructing a `TestCase` runs nothing;
 the test runner calls `run()` on the finished object.
 
@@ -254,15 +252,15 @@ Each has a cost, and each protects against a different way of breaking the flow:
   no subclass exists through which to replace the loop.
   It costs nothing and cannot be bypassed,
   but it only applies when you can pass functions instead of subclassing.
-- The checker, via `@final`:
-  it reports an override but stops nothing at runtime.
+- The checker, via `@final`: it reports an override.
   It costs one decorator and protects everyone who runs the checker.
 - The interpreter, via `__init_subclass__()`:
   it refuses the offending subclass outright.
   It costs a base-class method and protects everyone,
   including the caller who skips the checker.
 - Discipline, via the Liskov Substitution Principle:
-  this governs whether each step is a faithful substitute, but no tool checks it.
+  this governs whether each step is a faithful substitute,
+  but no tool checks it.
   It reaches what the other three cannot:
   what the steps do once the flow itself is safe.
 

@@ -545,6 +545,10 @@ validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
 The hints are for the tools and for the reader.
 
+From here on, this book assumes the checker runs on everything.
+When a listing says the checker rejects a line, that is the enforcement;
+the following chapters do not repeat that Python itself would run the line anyway.
+
 ## How Much to Annotate
 
 Gradual typing leaves the amount up to you,

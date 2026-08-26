@@ -295,7 +295,7 @@ print(cache[m])
 #: Ni!
 ```
 
-The listing goes through `setattr()` because the type checker rejects `m.name = "bar"` before the program runs,
+The listing goes through `setattr()` because the type checker rejects `m.name = "bar"`,
 which is the earlier of the two defenses.
 `frozen=True` is the one that holds at runtime,
 against code the checker never saw.
@@ -412,8 +412,8 @@ print(Normalized("Bruce@Example.com"))
 ```
 
 Both defenses fire here, as they did for `frozen_messenger.py`.
-The checker reports the assignment before the program runs,
-which the `# type: ignore` silences so the listing can reach the runtime failure.
+The checker reports the assignment,
+and the `# type: ignore` silences it so the listing can reach the runtime failure.
 
 `object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
 It works, and it says what it does.
@@ -986,7 +986,7 @@ A bare `list`, `dict`,
 or `set` produces a type loose enough that a checker accepts it against any annotation,
 so it never compares the factory with the field.
 Subscripting makes the factory's return type concrete,
-and `field(default_factory=dict[int, int])` on this field then draws a type error before the program runs.
+and `field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
 which is most of the time.
 Subscript it when you want that agreement checked.
@@ -1038,7 +1038,7 @@ The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:
 the error arrives while Python is still executing the `class` statement.
-A checker reports it as `invalid-named-tuple` before the program runs,
+A checker reports it as `invalid-named-tuple`,
 which the `# type: ignore` silences.
 
 Subclassing the `NamedTuple` and defining `__new__()` on the subclass gets past the prohibition,

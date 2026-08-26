@@ -21,7 +21,7 @@ class Greeter(Framework):
         print(f"Hello, {self.name}!")
 
 try:
-    Greeter("Bruce")
+    Greeter("Robin")
 except AttributeError as e:
     print(e)
 #: 'Greeter' object has no attribute 'name'

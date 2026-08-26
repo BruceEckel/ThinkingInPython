@@ -308,11 +308,15 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   whenever the first failure is unlikely to be the only one. A tool
   upgrade is the standard case, and `tools-upgrade` now ends with it.
 - **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
-  line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`),
-  enforced by `make reflow` (`CH=NN` for one chapter), not any gate.
-  `reflow`/`reflow-check` are standalone `--write`/check-only targets, absent
-  from `verify`/`gate`/`ci`, so hand-edited prose can silently drift out of
-  compliance. Before writing a script to reflow prose across the book, check
+  line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`).
+  `gate` (so `verify`/`all`/`ci`) runs `reflow_prose.py --write`, so
+  hand-edited prose self-heals (rewriting `Chapters/`) the same way line
+  endings and `#:` markers do; expect rewrapped lines in `git diff
+  Chapters/` after a verify. A paragraph that fails reflow's round-trip
+  check is skipped, reported, and still fails the gate, so a rewrite can
+  never silently change rendered output. `make reflow CH=NN` still
+  targets one chapter when iterating.
+  Before writing a script to reflow prose across the book, check
   `tools/reflow_prose.py` first: it already masks inline code/links/footnotes,
   protects an abbreviation list, and greedily packs clauses to fit a width
   instead of breaking every comma (a naive "break at every comma" script

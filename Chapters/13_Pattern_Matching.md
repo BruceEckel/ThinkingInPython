@@ -523,8 +523,7 @@ Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.
-The type checker reports it before the program runs,
-instead of the value falling through at runtime.
+The type checker reports it, instead of the value falling through at runtime.
 That is the benefit of static typing applied to control flow:
 
 ```python

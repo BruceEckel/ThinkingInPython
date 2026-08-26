@@ -667,7 +667,7 @@ so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class-based decorator, like `trace_class.trace`,
 gets the checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
-catching the same problem before the program runs.
+catching the same problem.
 
 ### Function Form or Class Form?
 

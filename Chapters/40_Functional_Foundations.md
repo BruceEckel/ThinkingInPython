@@ -176,7 +176,7 @@ print(MAX_SIZE, total([1, 2, 3]))
 The annotation is a constraint the checker enforces,
 even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
-is a type error the checker catches before the program runs.
+is a type error the checker catches.
 The constraint runs one way only.
 `Sequence[int]` states that `total()` does not mutate its argument.
 It says nothing about the caller,
@@ -467,8 +467,7 @@ and the runtime message, complaining about a local variable
 points nowhere near the missing declaration.
 The checker is the better guide here.
 If you delete the `nonlocal` line,
-`ty` reports `Name 'count' used when not defined` on the `count += 1` line,
-before the program runs.
+`ty` reports `Name 'count' used when not defined` on the `count += 1` line.
 
 ## Partial Application
 

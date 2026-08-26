@@ -291,7 +291,7 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"` before the program runs.
+The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` is the defense that holds at runtime,
 against code the checker never saw.
 
@@ -903,7 +903,6 @@ def test_newtype_has_no_runtime_effect() -> None:
 Nothing in that test can fail.
 The `NewType` protection lives in the checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
-Only the checker sees it, and only at edit time.
 In `newtype_boundary.py`,
 the `# type: ignore` silences that diagnostic so the rejected call can run anyway.
 [Data Classes as Types](12_Data_Classes_as_Types.md#composing-types-from-types)

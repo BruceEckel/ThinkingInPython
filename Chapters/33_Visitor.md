@@ -277,7 +277,7 @@ When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 The omission then fails at the first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
-goes further and catches it before the program runs
+goes further and lets the checker catch it instead
 ([Composite and Interpreter](34_Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
 Adding a new operation is a new function.

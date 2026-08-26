@@ -553,13 +553,12 @@ print(type(b).__name__)
 #: B
 ```
 
-The type checker rejects the commented line; nothing at run time stops it.
+The type checker rejects the commented line.
 
 Type checkers such as ty, mypy, and pyright check `@final` statically.
-It states the intent and catches a violation before the code runs.
-At runtime it only marks the class, setting `__final__ = True`
-(as `test_final.py` below confirms).
-Nothing enforces it and the interpreter still runs `class C(B): pass`.
+At runtime the decorator only marks the class, setting `__final__ = True`
+(as `test_final.py` below confirms),
+so the interpreter still runs `class C(B): pass`.
 
 If you need the interpreter to refuse subclassing,
 older literature claims this requires a metaclass.
@@ -1086,8 +1085,7 @@ except TypeError as error:
 This creates a metaclass conflict you must resolve,
 by giving `C` a metaclass that inherits both.
 As with the layout conflict just shown,
-ty sees this without running the program,
-reporting `conflicting-metaclass` and naming both `MetaA` and `MetaB`,
+ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 which is why the line carries a `# type: ignore`.
 Both failures have the same shape:
 an inheritance graph that looks legal until you notice what the bases carry with them.

@@ -436,7 +436,7 @@ except MissingAbilityError as e:
 ```
 
 This raises a `MissingAbilityError`, but if you remove the `# type: ignore`,
-`ty` rejects the program before it runs:
+`ty` rejects the program:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
@@ -1048,7 +1048,7 @@ This has three consequences:
    DI only discovers a missing registration when something asks for it.
    That ask can come at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
-   `ty` reports the unsupplied `Need[Console]` before the program runs
+   `ty` reports the unsupplied `Need[Console]`
    ([Forgetting to Supply](#forgetting-to-supply)).
 
 2. Stateless bindings are per call rather than per process.
