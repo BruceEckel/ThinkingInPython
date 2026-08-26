@@ -153,7 +153,7 @@ An observer that needs to know who changed takes it as part of the payload
 or subscribes a bound method whose instance already holds the reference.
 
 The type parameter carries the notification's type through to the observers,
-so subscribing a `list[str]`'s `append` to a `Thermometer` fails the checker instead of quietly collecting floats in a list of strings.
+so subscribing a `list[str]`'s `append` to a `Thermometer` fails the type checker instead of quietly collecting floats in a list of strings.
 
 `Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
 not because the pattern demands a base class.
@@ -352,11 +352,11 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-The `AsyncObserver` alias makes the checker reject a plain function as an observer:
+The `AsyncObserver` alias makes the type checker reject a plain function as an observer:
 an observer must return an awaitable,
 which calling an `async` function produces.
 Its type parameter does the same job as the synchronous `Observer[T]`'s.
-The checker also rejects the reverse mistake,
+The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Observable`:
 calling it returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.

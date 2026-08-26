@@ -98,13 +98,13 @@ The `lambda` makes the versions above worse, not `map()`.
 
 The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
-so the checker still sees `int | str` coming out and rejects `e ** 2`.
+so the type checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`.
 `filter(None, items)` is the other narrowing form;
-it drops the falsy values and the checker knows no `None` survives.
+it drops the falsy values and the type checker knows no `None` survives.
 
 A comprehension has a scope of its own:
 

@@ -46,7 +46,7 @@ The first `is` shows that calling `iter()` on a list creates a new iterator each
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
 The tempting call is `next(nums)`: `next()` accepts only an iterator,
 and a list has no `__next__()`, so that call raises a `TypeError` at runtime,
-and the checker rejects it before that.
+and the type checker rejects it before that.
 
 Written out, `for x in nums:` is this loop:
 
@@ -64,7 +64,7 @@ One legacy path bypasses `__iter__()`.
 A class that defines only `__getitem__()` taking integers from zero is still iterable:
 `iter()` builds an iterator that indexes it until `IndexError`.
 Such a class works with `for` while failing `isinstance(obj, Iterable)` and failing an `Iterable[T]` annotation,
-which is the one case where the loop and the checker disagree.
+which is the one case where the loop and the type checker disagree.
 Write `__iter__()` in new code.
 
 ## Generators {#generators}
@@ -259,7 +259,7 @@ def twice_iterable(xs: Iterable[int]) -> tuple[int, int]:
 def twice_collection(xs: Collection[int]) -> tuple[int, int]:
     return sum(xs), sum(xs)
 
-print(twice_iterable(gen(3)))  # The checker sees nothing wrong
+print(twice_iterable(gen(3)))  # Type checker sees nothing wrong
 #: (3, 0)
 print(twice_collection([0, 1, 2]))  # The same values, in a list
 #: (3, 3)
@@ -268,7 +268,7 @@ print(twice_collection([0, 1, 2]))  # The same values, in a list
 When a function iterates more than once, say so in the signature.
 `Collection[T]` and `Sequence[T]` ask for more than iteration,
 and no iterator supplies it,
-so the checker rejects the generator at the call instead of letting it run wrong.
+so the type checker rejects the generator at the call instead of letting it run wrong.
 `twice_collection(gen(3))` is the call `ty` refuses,
 which is why the listing cannot show it: a chapter listing must type-check.
 `total()` above stays `Iterable[int]` because it sums once.
@@ -497,7 +497,7 @@ it stops responding, or it dies when it exhausts memory.
 No tool warns you first.
 `ty` accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
-No checker can read the code and decide whether an iterator ever ends,
+No type checker can read the code and decide whether an iterator ever ends,
 and a generator built from `while True` is indistinguishable from a finite one until it runs.
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
@@ -571,8 +571,9 @@ Their inputs differ, though.
 `TypedIterator` calls `next()` on what it stores,
 so it needs an `Iterator[object]`: write `TypedIterator(iter(items), int)`,
 not `TypedIterator(items, int)`.
-The checker rejects the second form.
-Both take `expected: type[T]`, so the checker carries the element type through.
+The type checker rejects the second form.
+Both take `expected: type[T]`,
+so the type checker carries the element type through.
 This way, `typed(items, int)` is an `Iterator[int]`, not an `Iterator[Any]`.
 
 ```python

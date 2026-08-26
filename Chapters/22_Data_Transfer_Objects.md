@@ -41,15 +41,15 @@ since a named parameter must follow a bare `*`.
 The `m: Any` annotation is not decoration.
 Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
-`Any` switches the checker off for `m`.
+`Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
-If you declare only the first, the checker still rejects the write,
+If you declare only the first, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
 which is why the next listing needs no annotation.
-The price of an ad-hoc attribute bag is that no checker knows your attribute names.
+The price of an ad-hoc attribute bag is that no type checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 ## The Standard-Library Versions
@@ -79,9 +79,9 @@ and two `Messenger`s with identical attributes compare unequal,
 because it inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
-so no checker can know which names to expect.
+so no type checker can know which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
-and no checker reports `m.inof` here either.
+and no type checker reports `m.inof` here either.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
@@ -108,7 +108,7 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 `typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
-so a checker knows a `Color`'s `r` is an `int` while the functional form leaves it unknown.
+so a type checker knows a `Color`'s `r` is an `int` while the functional form leaves it unknown.
 Because it is a tuple underneath,
 you can read each field by name or by position:
 
@@ -283,7 +283,7 @@ and when inherited ordering and array-shaped JSON would be wrong rather than con
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
-names the keys and their types for the checker while the value stays a real dict.
+names the keys and their types for the type checker while the value stays a real dict.
 When it need only *become* a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,

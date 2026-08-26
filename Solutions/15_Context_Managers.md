@@ -255,7 +255,7 @@ The `exc_type is not None` test is what keeps the normal path working.
 When a block finishes without an exception, Python still calls
 `__exit__()`, passing `None` for all three arguments, and
 `issubclass(None, KeyError)` raises a `TypeError`. Checking for `None`
-first also gives the checker what it needs to narrow `exc_type` to
+first also gives the type checker what it needs to narrow `exc_type` to
 `type[BaseException]`, which is what `issubclass()` requires.
 
 The class is named like a function because you use it like one, the

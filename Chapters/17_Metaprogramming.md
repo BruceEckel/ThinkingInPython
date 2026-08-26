@@ -206,7 +206,7 @@ Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are distinct subclasses of `Event`,
 so `isinstance()` tells them apart and you can later give either one behavior of its own.
 
-The checker cannot follow a class built by `type()`,
+The type checker cannot follow a class built by `type()`,
 so it reads `make()`'s result as `Event`,
 whose `__init__()` takes three arguments.
 `EventMaker` names the two-argument signature the generated classes really have,
@@ -822,10 +822,10 @@ Metaprogramming and static typing pull against each other.
 A type describes a fixed set of attributes and signatures,
 but a metaclass changes that structure at runtime,
 adding attributes the class never declared and replacing methods like `__new__()`.
-The checker cannot follow those changes,
+The type checker cannot follow those changes,
 so it reports the dynamic lines as errors.
 Three ways quiet it, from narrowest to broadest:
-`setattr(cls, "name", value)` adds an attribute through a string the checker does not track;
+`setattr(cls, "name", value)` adds an attribute through a string the type checker does not track;
 a localized `# type: ignore` silences one line,
 as on `Simple().uses_metaclass()` above;
 and copying the class into an `Any`-typed name, `klass: Any = cls`,
@@ -963,7 +963,7 @@ Without it, every singleton loses its type and a type checker can no longer catc
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
-which a checker must confirm before it accepts a zero-argument `super()`.
+which a type checker must confirm before it accepts a zero-argument `super()`.
 Both forms do the same work at run time.
 
 You might expect to parameterize[^parametrize] the class,
@@ -1015,7 +1015,7 @@ so combining them is impossible in any context.
 <!-- vale proselint.Very = NO -->
 The `# type: ignore` comment appears because ty knows this rule statically.
 Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
-A checker that predicts a crash before the program runs is static typing at its best;
+A type checker that predicts a crash before the program runs is static typing at its best;
 the comment suppresses the diagnostic only because raising that crash is educational.
 <!-- vale proselint.Very = YES -->
 

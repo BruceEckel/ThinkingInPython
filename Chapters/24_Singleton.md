@@ -151,7 +151,7 @@ and nothing has read this one yet.
 A clean run is therefore no evidence.
 When something does look, it searches the scope containing the function,
 not the function's own locals, and the class is not there.
-A checker reports an unresolved reference,
+A type checker reports an unresolved reference,
 and `inspect.get_annotations()` raises a `NameError`.
 The signature must name something reachable,
 so nesting costs you either the annotation or a separate `Protocol` to name in its place.

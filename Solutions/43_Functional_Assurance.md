@@ -443,12 +443,12 @@ stating what it matches, so a reader has to reconstruct that
 narrowed to `ValueError` or `ZeroDivisionError`. That agreement is
 recent and it is not free: it holds because `Ok` and `Err` are
 declared `@final` in `utils/result.py`. Without that decorator a
-checker cannot rule out a class inheriting from both, so a positive
+type checker cannot rule out a class inheriting from both, so a positive
 `isinstance()` leaves the intersection alive and `result.answer` comes
 back as `object`. The measurement the exercise asks for therefore has
 two answers depending on one decorator, which is the more useful
 finding than either version winning.
 
 What survives is that the choice is about reading, not about proving.
-Neither form tells the checker anything the other cannot, so pick the
+Neither form tells the type checker anything the other cannot, so pick the
 one that states the shapes you expect, which is the `match`.

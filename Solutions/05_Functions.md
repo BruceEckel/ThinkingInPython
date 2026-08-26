@@ -167,7 +167,7 @@ the `/` the name `name` is not one of them, so `"Bob"` lands in
 therefore `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
 The mistake is visible without running the code, so the call carries a
-`# type: ignore` telling the checker it is deliberate, the same way
+`# type: ignore` telling the type checker it is deliberate, the same way
 `param_markers.py` marks its two.
 
 Take the `**facts` away and the same call reports the mismatch

@@ -492,7 +492,7 @@ and a `greet()` that reads two `ContextVar`s states nothing.
 Setting the wrong one, or forgetting to set one,
 surfaces as a failure at the moment of the read, in whatever frame needs it.
 The bookkeeping does not disappear.
-It stops being something a checker can see.
+It stops being something a type checker can see.
 An EMS moves the bookkeeping into the type system, where it maintains itself.
 That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
@@ -928,7 +928,7 @@ and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
     and note which checks disappear from `slope()` as a result.
 5.  `coroutines_are_descriptions.py` shows that `async` tracks one Effect.
     Write a synchronous `total_price()` that calls a helper,
-    then make the helper `async` and follow what the checker and the interpreter force you to change,
+    then make the helper `async` and follow what the type checker and the interpreter force you to change,
     all the way up to `asyncio.run()`.
     Name the two properties of a full EMS that `async` does *not* have,
     using the three-item list in [Effect Management Systems](#effect-management-systems).

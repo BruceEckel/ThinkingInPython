@@ -492,9 +492,9 @@ bus.publish(Closed("inactivity"))  # No handler: nothing happens
 ```
 
 `subscribe` is generic on the event type `E`, which appears in both parameters,
-so the checker must find one `E` that satisfies the event type and the handler together.
+so the type checker must find one `E` that satisfies the event type and the handler together.
 No such `E` exists for `subscribe(Deposit, on_withdraw)`,
-so the checker reports a type error.
+so the type checker reports a type error.
 The check runs once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.

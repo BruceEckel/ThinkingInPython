@@ -152,7 +152,7 @@ A `Protocol` instead reports the mismatch where code uses an object as a `Servic
 and needs no common base.
 One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only that the methods exist,
 not that their signatures match.
-The static checker verifies signatures.
+The static type checker verifies signatures.
 
 Python has a built-in delegation mechanism, `__getattr__()`,
 that makes `Proxy` simpler to implement:
@@ -205,12 +205,13 @@ Writing one means routing every internal access through `object.__getattribute__
 machinery a surrogate rarely needs.
 
 The interface work above still applies on the implementation side:
-the checker verifies that whatever you hand the proxy has the methods.
+the type checker verifies that whatever you hand the proxy has the methods.
 That verification stops at the proxy.
 `p.f()` goes through `__getattr__()`, whose return type is unknown,
 so nothing the proxy declares can make that call checkable.
 Explicit forwarding, as in `proxy_1.py`,
-is the version a checker can see through; `__getattr__()` trades that for reach.
+is the version a type checker can see through;
+`__getattr__()` trades that for reach.
 
 One limit: special methods bypass `__getattr__()`.
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
@@ -326,7 +327,7 @@ going around the `__setattr__()` that would otherwise forward it to an implement
 Every assignment after that reaches the implementation,
 so the two no longer disagree.
 The `# type: ignore` that `proxy_writes.py` needed disappears here:
-declaring `__setattr__()` tells the checker the proxy accepts arbitrary attributes,
+declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes,
 so the static half closes at the same moment as the runtime half.
 The implementation attribute also shrinks from `__implementation` to `_impl`:
 mangling rewrites identifiers, not string literals,
@@ -450,9 +451,9 @@ The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
 The Proxy section gives the reason:
 whatever `__getattr__()` returns is unknown at the type level,
-so no checker can verify `b.f()`, no matter how you annotate the surrogate.
+so no type checker can verify `b.f()`, no matter how you annotate the surrogate.
 Declaring each implementation against `Behavior` still catches a missing method,
-because the checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
+because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
 That declaration stops at the surrogate.
 Annotating `run(b: Behavior)` and handing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.

@@ -275,7 +275,7 @@ what arrives in `func`. Used bare, `@memo` calls `memo(square)`, so
 and everything after it keyword-only is what keeps the two calls
 unambiguous: `maxsize` can never be mistaken for the function.
 
-The two `@overload` declarations are for the checker, which cannot
+The two `@overload` declarations are for the type checker, which cannot
 otherwise tell which of the two shapes a given call has. The first
 says "given a function, return a function of the same signature." The
 second says "given only `maxsize`, return a decorator." The
@@ -345,10 +345,10 @@ except RuntimeError as e:
 The loop runs `times - 1` attempts inside a `try`, and the final
 attempt sits outside it, with no handler. That last call is what
 satisfies both requirements at once: it returns `R` on success, so the
-function has a return value on every path the checker can see, and it
+function has a return value on every path the type checker can see, and it
 lets the last exception propagate untouched rather than re-raising a
 copy. Re-raising from inside the loop with `raise` would also work,
-but then the checker cannot tell that the function always either
+but then the type checker cannot tell that the function always either
 returns or raises.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the

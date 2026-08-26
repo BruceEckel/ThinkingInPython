@@ -134,7 +134,7 @@ ending the requirement, or declare `Need[Console]` in its own return
 type and pass the requirement further up. There is no third option, and
 that is what makes the dependency visible: it appears in the signature
 of every function between the one that uses it and the one that
-supplies it, and the checker refuses to let any of them stay silent.
+supplies it, and the type checker refuses to let any of them stay silent.
 
 ## 3. Catching an error that is already handled
 
@@ -411,7 +411,7 @@ annotated `Need[Console]`. `ty` believes it answers only
 annotation, then reduces `Need[Console]` to its origin, `Need`, and the
 runtime check it installs is `isinstance(ability, Need)`. The type
 argument is discarded, so every `Need[...]` request matches. The
-checker reads the same annotation without that reduction and subtracts
+type checker reads the same annotation without that reduction and subtracts
 only `Need[Console]` from the requirements.
 
 Neither view is wrong about what it describes. `isinstance()` cannot
@@ -494,8 +494,8 @@ used. Discarding `greet(name)` is invisible because nothing afterward
 depends on it, and a discarded expression has no type to contradict.
 Assigning `need(Console)` binds a generator to a name the next line
 then uses as a `Console`, so the mistake reaches an operation the
-checker can evaluate. The lesson generalizes past this library: a type
-checker verifies how values are used, so a value nobody uses is a value
+type checker can evaluate. The lesson generalizes past this library: a type
+type checker verifies how values are used, so a value nobody uses is a value
 nobody checks.
 
 ## 8. A registry of Effects, and why `retry()` takes a function
@@ -627,7 +627,7 @@ an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
 sits inside a coroutine. Whether an event loop is running is a fact
 about the moment of the call, not about the types involved, so this is
-one of the few mistakes in the chapter a checker cannot catch. The
+one of the few mistakes in the chapter a type checker cannot catch. The
 rule is positional rather than type-based: `run()` at the outermost
 edge of a synchronous program, `run_async()` anywhere inside an
 asynchronous one.
@@ -681,7 +681,7 @@ Following `ty` until the program builds means widening `announce()`'s
 error parameter from `KeyError` to `KeyError | ValueError`, and
 annotating `line: str` for the same reason `value: int` is annotated:
 `yield from` on a `@throws` function produces the declared success
-type, and naming it keeps the checker's inference pinned.
+type, and naming it keeps the type checker's inference pinned.
 
 Each failure surfaced at `run()`, and nowhere earlier. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails; `Dana` has
@@ -786,7 +786,7 @@ info: type `Terminal` is not assignable to protocol `Recorder`
 info: └── protocol member `record` is not defined on type `Terminal`
 ```
 
-The second `info` line is the part worth reading. The checker names the
+The second `info` line is the part worth reading. The type checker names the
 missing method rather than the missing type, which is what structural
 typing means: `Terminal` fails not because of what it is but because of
 what it does not do.

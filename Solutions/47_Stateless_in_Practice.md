@@ -78,7 +78,7 @@ and two readings are two facts rather than one.
 Naming the clock as an ability made the failure reproducible.
 Deriving both strings from a single reading removed it.
 
-## 2. A leak the checker cannot see
+## 2. A leak the type checker cannot see
 
 The rule that catches `leaky_effect.py` is a reading rule about one line:
 a function whose return type is an `Effect` and whose body is not a generator
@@ -559,7 +559,7 @@ def research() -> Effect[
     return checked
 ```
 
-Four edits, and the checker names three of them.
+Four edits, and the type checker names three of them.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since a failure has to be
@@ -573,7 +573,7 @@ Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
 Fixing that then breaks every caller that matched exhaustively on the old set,
 which `assert_never()` reports as an unhandled branch in `report()`,
 and each of those is a compile-time stop rather than a surprise in production.
-The checker walked the change through the program.
+The type checker walked the change through the program.
 
 The by-hand version takes a comparable edit and reports none of it:
 
@@ -966,7 +966,7 @@ allows `Need[Ticker] | Unavailable | Empty`. Change `nonempty()`'s body to
 `raise ValueError()` while its decorator still says `@throws(Empty)`, and `ty`
 reports nothing at all. The decorator's argument is a claim about the function,
 not a check on it, and a `raise` inside a function body is invisible to a type
-checker in Python. So the version whose failure travels through a `yield` is
+type checker in Python. So the version whose failure travels through a `yield` is
 verified, and the version whose failure starts as a `raise` is trusted.
 
 ## 11. A fourth failure, with `catch_all()`
@@ -1033,13 +1033,13 @@ nothing left to contradict. The function silently changes its type every time
 
 What stopped being checked is the correspondence between the two.
 The annotation was the place where a human wrote down which failures this
-program expects, and the checker's job was to confirm that the Effect agrees.
-Delete it and the checker has one description instead of two, so it can no
+program expects, and the type checker's job was to confirm that the Effect agrees.
+Delete it and the type checker has one description instead of two, so it can no
 longer notice a disagreement. Callers still see a union, but they see whatever
 union the implementation happens to produce, and the new member propagates
 outward until it reaches something with an annotation. That is the same reason
 exercise 4 of [Generators](../Chapters/45_Generators.md) needed a declared type
-to catch a missing `yield from`: a checker verifies claims, and an inferred type
+to catch a missing `yield from`: a type checker verifies claims, and an inferred type
 is not a claim.
 
 ## 12. A `Random` Ability
@@ -1111,7 +1111,7 @@ abilities, so the argument to 'scripted' must be annotated.
 This is raised by `handle()` at the moment of decoration, before any Effect
 runs, because `handle()` reads `get_type_hints()` on the function to learn which
 Ability it answers. The two annotations therefore do different jobs: the
-accessor's is for the checker, and the handler's is data the library reads at
+accessor's is for the type checker, and the handler's is data the library reads at
 runtime. Only one of them is optional, and it is not the one that looks like
 bookkeeping.
 

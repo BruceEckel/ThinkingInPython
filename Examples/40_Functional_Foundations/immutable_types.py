@@ -2,7 +2,7 @@
 from collections.abc import Sequence
 from typing import Final
 
-# Final marks a name the checker won't let you rebind:
+# Final marks a name the type checker won't let you rebind:
 MAX_SIZE: Final[int] = 100
 
 # Sequence is read-only: no append, no item assignment:

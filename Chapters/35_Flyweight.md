@@ -160,21 +160,21 @@ The listing shows the object count; exercise 2 measures the memory behind it.
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and `SPECS` can only hold one of them.
 If you add a kind to `SPECS` without adding it to `Symbol`, or the reverse,
-the checker rejects the mismatch.
+the type checker rejects the mismatch.
 `tile()` trusts its argument is already a `Symbol`,
 so the untrusted boundary is `to_symbol()`,
 the one place raw text meets the checked type.
 It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
-The checker reads that guard.
+The type checker reads that guard.
 `SPECS` has key type `Symbol`,
 so reaching the line below means `char not in SPECS` was false,
 which narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a `cast()` would assert
 (see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
-Prefer a guard the checker can read.
+Prefer a guard the type checker can read.
 Keep `cast()` for the cases where no guard exists,
-because the checker believes a `cast()` rather than verifying it.
+because the type checker believes a `cast()` rather than verifying it.
 
 ```python
 # test_tile_map.py
@@ -501,7 +501,7 @@ equality checks you can write as `is`.
     and write a test for it.
 7.  Rewrite `tile_map.py` on top of `tile_enum.py`'s `Tile`,
     so `parse_map()` returns `list[list[Tile]]` of enum members and `to_symbol()` disappears.
-    What does the checker now catch that the `Literal` version caught,
+    What does the type checker now catch that the `Literal` version caught,
     and what does it catch that the `Literal` version did not?
 8.  Make `tile()`'s body slow,
     with a `time.sleep(0.05)` before it builds the `Tile`,

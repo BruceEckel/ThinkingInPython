@@ -38,7 +38,7 @@ The three-parameter annotation names all three channels:
 `Prompt`, is sent an `Amount`, and finally returns a `Total`. Three
 `NewType` aliases over `str`, `int`, and `int` keep the two integer
 channels apart, so transposing the `SendType` and the `ReturnType`
-would be a checker error rather than a bug that shows up in arithmetic.
+would be a type checker error rather than a bug that shows up in arithmetic.
 
 Driving it by hand is three sends for three prompts, and the fourth
 value is the one that finishes it. `next(t)` runs the body up to the
@@ -164,7 +164,7 @@ same exception, reads it as "the conversation finished," and returns
 no `Result` exists, and `None` is not a `Result` in any case. Nothing
 catches it: `StopIteration.value` is typed `Any`, so `return stop.value`
 satisfies a declared `Result` and `ty` reports nothing. The failure is
-silent at the checker and silent at runtime, and it surfaces later as a
+silent at the type checker and silent at runtime, and it surfaces later as a
 `None` where a string was expected, far from the driver that produced
 it.
 
@@ -263,7 +263,7 @@ are never asked, because nothing ever calls `next()` or `send()` on it,
 and the final line interpolates the object's repr into the sentence
 where an answer belonged.
 
-The checker told you more. Its message names the two types and points
+The type checker told you more. Its message names the two types and points
 at the assignment that mismatches them, which is the defect. The
 runtime output shows a consequence three steps downstream, at the one
 place the object is stringified, and a reader must work backward from
@@ -271,7 +271,7 @@ a `<generator object ...>` in a report to the missing `yield from`.
 Worse, the failure is quiet: no exception, an exit code of zero, and
 output that a log scraper would happily accept.
 
-Without the annotation, the checker says nothing. `profile = interview()`
+Without the annotation, the type checker says nothing. `profile = interview()`
 infers `Generator[Question, Answer, Result]`, the expression's own
 type, and there is no declared type to contradict. The f-string
 then accepts any object, since `str.format` calls `repr()` on anything.
@@ -308,7 +308,7 @@ print(list(summarize(["red", "green", "blue"])))
 `report()`'s annotation changes from `Iterator[str]` to
 `Generator[str, None, int]`, because a generator that returns something
 needs the long form: `Iterator` names only the `YieldType`, and a
-checker reading it would reject the assignment in `summarize()`.
+type checker reading it would reject the assignment in `summarize()`.
 
 The two values travel by different channels, and the listing shows both
 at once. Every string, whether yielded by `emit()` or by `report()`,
@@ -348,7 +348,7 @@ error[invalid-argument-type]: Argument to bound method
 yielded value and has nothing to say about the `SendType`, so priming
 with it type-checks for any generator whatsoever.
 
-The mismatch is real rather than a checker limitation. A generator's
+The mismatch is real rather than a type checker limitation. A generator's
 `SendType` describes what a suspended `yield` expression can receive,
 and a just-started generator has no suspended `yield`, so the value
 handed to the first `send()` is not received by anything. The runtime

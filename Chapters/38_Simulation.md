@@ -815,7 +815,7 @@ The sort by target letter lines those partners up beforehand.
 Avoid `zip(teleports, teleports)`,
 which walks two independent passes over the list and pairs every room with itself.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
-each proves to the checker that the occupant really is a `Teleport` before the code touches `target_room`.
+each proves to the type checker that the occupant really is a `Teleport` before the code touches `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.

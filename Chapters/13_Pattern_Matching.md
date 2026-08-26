@@ -142,7 +142,7 @@ When the capture is the last `case`, as here, Python does not warn you.
 `DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
-so the checker sees that the cases cover both members and does not complain about the missing return.
+so the type checker sees that the cases cover both members and does not complain about the missing return.
 
 ## Sequence Patterns
 
@@ -179,7 +179,7 @@ print(summarize([1, 2, 3, 4]))
 The pattern `[first, second]` matches only a two-element sequence and pulls both out at once.
 The last `case _` never runs:
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
-The checker cannot prove that,
+The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
@@ -558,7 +558,7 @@ print(area(Square(2.0)))
 ```
 
 If you add a `Triangle` to `Shape` without adding the appropriate `case`,
-the checker flags `assert_never(shape)`.
+the type checker flags `assert_never(shape)`.
 `assert_never()` acts at runtime as well as at check time.
 If a value that lied about its type reaches it,
 it raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
@@ -633,7 +633,7 @@ Use `match` for a closed set of cases you want to handle in one place,
 especially when the cases need to look inside the value.
 When that closed set is a set of constants rather than a set of shapes,
 make it an `Enum` and `match` on its members, as `value_patterns.py` did.
-The enum hands the checker the closed set,
+The enum hands the type checker the closed set,
 so `assert_never()` works without a `type` union.
 
 ## Dynamic Binding vs. Pattern Matching

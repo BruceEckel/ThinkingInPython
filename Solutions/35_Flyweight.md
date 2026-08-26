@@ -62,7 +62,7 @@ print(len(cells), len({id(t) for t in cells}))
 ```
 
 Adding two symbols to `SPECS` (and to the `Symbol` literal so the
-checker still catches a mismatch between the two) is the whole change
+type checker still catches a mismatch between the two) is the whole change
 needed to support door and tree tiles; `tile()` and `parse_map()`
 never change. Twenty-four cells still collapse to only five distinct
 objects, one per kind (`grass`, `water`, `rock`, `door`, `tree`),
@@ -477,7 +477,7 @@ The `Literal` version caught a `Symbol` that `SPECS` did not cover, and
 the enum catches the same class of mistake, since a symbol with no member
 has no way into the map. What the enum adds is that the *set itself* is
 one declaration rather than two kept in step: the `Literal` version could
-drift, with `Symbol` and `SPECS` disagreeing, and the checker only caught
+drift, with `Symbol` and `SPECS` disagreeing, and the type checker only caught
 that because the two were annotated against each other. Here there is
 nothing to disagree with.
 

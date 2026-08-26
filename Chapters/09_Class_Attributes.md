@@ -124,7 +124,7 @@ covered in [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes).
 ## Declaring Shared State with ClassVar
 
 When you genuinely want one shared value, say so with `ClassVar` from `typing`.
-The checker then treats it as class-wide,
+The type checker then treats it as class-wide,
 and rejects a direct assignment through an instance that would shadow it:
 
 ```python
@@ -194,7 +194,7 @@ Here that somewhere is `__init__()`,
 and its `self.label = label` produced the attribute `display_object(a)` found above.
 If `__init__()` never assigns it, no attribute exists,
 on the instance or the class.
-The checker does not catch the omission,
+The type checker does not catch the omission,
 because it trusts the annotation instead of verifying that some method sets it.
 The failure surfaces later,
 as an `AttributeError` from the first code that reads the missing `label`.
@@ -207,11 +207,11 @@ so both names read together at the top instead of one hiding inside the construc
 [Simulation](38_Simulation.md#a-robot-in-a-maze)
 shows the case where the annotation is not optional.
 There, code outside the class sets the attribute,
-and a bare annotation is the checker's only way to know its type.
+and a bare annotation is the type checker's only way to know its type.
 
 ### What `ClassVar` Catches
 
-`ClassVar` is a hint for the checker.
+`ClassVar` is a hint for the type checker.
 It records that `total` belongs to the class,
 and turns the accidental shadowing from the earlier example into a check-time error.
 Python's own attribute lookup ignores it.
@@ -297,7 +297,7 @@ so it tracks `Base.shared` until something assigns to `Left.shared` directly.
 `Right` overrides `shared` at class-definition time,
 so it never sees changes made through `Base`.
 `ClassVar` doesn't change any of this.
-It only tells the checker that `shared` belongs to the class,
+It only tells the type checker that `shared` belongs to the class,
 not that subclasses share storage.
 This is the shadowing rule from the start of the chapter, one level up:
 `Left` reads through to `Base` until an assignment gives `Left` its own copy,
@@ -373,7 +373,7 @@ print(vars(b), B().x)  # The same shadowing as Stars
 
 The name stays an ordinary shared class attribute,
 the generated `__init__()` takes no `x`,
-and neither the runtime nor the checker complains.
+and neither the runtime nor the type checker complains.
 `b.x = -1` shadows it for that one instance,
 and an assignment through the class would still change every instance that has not shadowed it,
 the hazard `Stars` demonstrated.

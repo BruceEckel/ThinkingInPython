@@ -228,7 +228,7 @@ is not an error, it is a third method nobody calls.
 Add `from typing import override`, uncomment the decorator,
 and the program still prints `Base.show`,
 because the decorator adds no wrapper and changes no behavior. The
-checker is where the difference shows:
+type checker is where the difference shows:
 
 ```text
 error[invalid-explicit-override]: Method `shwo` is decorated with
@@ -236,10 +236,10 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 info: No `shwo` definitions were found on any superclasses of `Derived`
 ```
 
-Remove the decorator again and the checker goes quiet, while the
+Remove the decorator again and the type checker goes quiet, while the
 program's behavior never changed at any point in the exercise. That is
 the whole shape of the feature: `@override` states an intention, the
-checker verifies it, and the runtime is indifferent.
+type checker verifies it, and the runtime is indifferent.
 
 The value is in what it catches later. The typo is easy to spot in six
 lines; the same failure arrives silently when someone renames or

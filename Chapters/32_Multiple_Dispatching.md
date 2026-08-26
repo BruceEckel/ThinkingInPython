@@ -164,7 +164,7 @@ a richer game would read the caller's state through it.
 Those `Any` annotations give up static checking.
 `Item` declares neither `compete()` nor any `eval_*()` method,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
-With `Any`, a checker cannot tell you when a class is missing one of the nine answers;
+With `Any`, a type checker cannot tell you when a class is missing one of the nine answers;
 the gap surfaces as an `AttributeError` during whichever duel first needs it.
 A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
@@ -466,7 +466,7 @@ Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union,
 and it can do that because it gives `NotImplemented` a type that inherits from `Any`,
 so returning the sentinel satisfies any declared return type.
 Writing the union out, `Meters | NotImplementedType`,
-makes a checker reject `(Meters(1) + Meters(2)).n`,
+makes a type checker reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
 The sentinel signals the interpreter and never reaches a caller,
 so an annotation that names it describes the wrong thing.

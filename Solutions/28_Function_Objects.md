@@ -153,7 +153,7 @@ name as an attribute, so the report needs no extra bookkeeping to say
 
 The report is why `chain` is typed against a `Protocol` here instead
 of the chapter's `RootFinder` alias. `Callable[...]` describes what a
-handler accepts and returns, and a checker rejects `finder.__name__`
+handler accepts and returns, and a type checker rejects `finder.__name__`
 on one, because nothing about `Callable` states that the object has a
 name. `Finder` declares `__name__` alongside `__call__()`, and a plain
 function satisfies both, so the copies below need no change and the

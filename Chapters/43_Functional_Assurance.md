@@ -175,13 +175,13 @@ and key or index lookups,
 with no gap between confirming a shape and pulling out its parts.
 [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
 put that to work, taking a `Result` apart with one branch per kind of failure.
-The win is in the reading rather than in what a checker can prove.
+The win is in the reading rather than in what a type checker can prove.
 On a `Result[float, Exception]`,
 `match` and a chain of `isinstance()` tests narrow equally well,
 both reaching `float` inside the `Ok`,
 because `@final` on the two classes lets either one narrow to a single class.
 Destructuring merges the shape test and the extraction into one step;
-it does not extend what the checker knows.
+it does not extend what the type checker knows.
 
 ## An Assurance Spectrum
 
@@ -203,7 +203,7 @@ You decide how far to take it.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
    Python's version of it is partial.
    An `Any`, a `cast()`,
-   or data arriving from outside the program leaves a gap no checker can close,
+   or data arriving from outside the program leaves a gap no type checker can close,
    so the theorem holds only as far as the annotations do.
    Running `ty` over the examples in this book still rules out a useful class of mistakes,
    which is most of what this rung offers.

@@ -80,10 +80,10 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 
-Once `Rectangle` joins the `Shape` union, the checker can prove that a
+Once `Rectangle` joins the `Shape` union, the type checker can prove that a
 `Rectangle` value falls through both `case`s and reaches `case _`.
 `assert_never()` demands its argument have type `Never`, meaning "this
-code is unreachable," but the checker now knows `shape` could
+code is unreachable," but the type checker now knows `shape` could
 genuinely be a `Rectangle` at that point, so the two types disagree
 and it reports an error. This is the safety net the chapter
 describes: the missing case becomes a caught type error instead of a
@@ -167,7 +167,7 @@ error[invalid-argument-type]: Argument to function `assert_never` is incorrect
 The message names the type that has no case. `assert_never()` declares
 its parameter as `Never`, the type no value has, so the call checks
 only when every other case has already been eliminated. One unhandled
-member leaves `Webhook` reaching that line, and the checker says so.
+member leaves `Webhook` reaching that line, and the type checker says so.
 The same error appears once per function that matches on the union,
 which is the cost the chapter describes: adding a type touches every
 operation.

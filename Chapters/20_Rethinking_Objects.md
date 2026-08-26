@@ -291,9 +291,9 @@ def test_frozen_cannot_be_mutated() -> None:
         setattr(immutable.bob, "name", "Ralph")
 ```
 
-The test goes through `setattr()` because the checker rejects `immutable.bob.name = "Ralph"`.
+The test goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` is the defense that holds at runtime,
-against code the checker never saw.
+against code the type checker never saw.
 
 Two quiet changes in the listing do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
@@ -477,7 +477,7 @@ print(len(counted), counted.appends)
 so the count is wrong the moment anyone uses the base class's other method.
 Nothing in the subclass is incorrect.
 It inherits an implementation and now depends on that implementation's details,
-which is a fact about `list` that no signature records and no checker reports.
+which is a fact about `list` that no signature records and no type checker reports.
 This is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
 
@@ -596,7 +596,7 @@ The type varies underneath it.
 *Parametric polymorphism* is a single implementation for multiple types.
 [Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
 One body works for any `T`.
-The checker infers the concrete type behind `T` at each call site.
+The type checker infers the concrete type behind `T` at each call site.
 
 With *ad-hoc polymorphism* (typically *function overloading*),
 a different implementation handles each type,
@@ -722,7 +722,7 @@ If you pass it something without a `display()` method,
 the call raises an exception when the line runs.
 If you use `t: object` (the safe top type),
 `show()` fails the type checker because `object` has no `display()` method.
-`Any` switches the checker off for `t`, so any type passes.
+`Any` switches the type checker off for `t`, so any type passes.
 Each `Any` parameter moves you back into dynamic typing.
 
 ### Protocols
@@ -749,7 +749,7 @@ if __name__ == "__main__":
 ```
 
 A structural type describes the required shape,
-and the checker verifies it ahead of time.
+and the type checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
 An abstract base class is *nominal* (named): a type joins by inheriting from it.
@@ -860,8 +860,8 @@ if __name__ == "__main__":
 
 `ty` accepts `package` as a `Priced` argument without complaint,
 and `charge()` returns `4.5`, silently treating a weight as a price.
-The checker matches the shape correctly.
-The mismatch lives in what the number means, and no checker sees that.
+The type checker matches the shape correctly.
+The mismatch lives in what the number means, and no type checker sees that.
 
 A distinct type per concept could close this gap.
 `typing.NewType` looks like the natural fix:
@@ -884,7 +884,7 @@ if __name__ == "__main__":
 ```
 
 Without the `# type: ignore`, `ty` rejects the second call.
-`UserId` and `int` are different types to the checker.
+`UserId` and `int` are different types to the type checker.
 The same distinction would separate `Priced` from `Weighted` in `protocol_collision.py` if `total()` returned a `Price` or a `Weight` instead of a bare `float`.
 
 `NewType` is only an aid during type checking.
@@ -901,7 +901,7 @@ def test_newtype_has_no_runtime_effect() -> None:
 ```
 
 Nothing in that test can fail.
-The `NewType` protection lives in the checker alone.
+The `NewType` protection lives in the type checker alone.
 Passing a raw `int` where a signature says `UserId` raises no exception.
 In `newtype_boundary.py`,
 the `# type: ignore` silences that diagnostic so the rejected call can run anyway.
@@ -913,12 +913,13 @@ at the cost of a constructor call instead of a bare literal.
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
 does and does not get you.
 Satisfying a protocol is a shape claim: the methods exist,
-with the correct signatures, and the checker verifies that half of the contract.
+with the correct signatures,
+and the type checker verifies that half of the contract.
 The other half is semantic.
 A method must also behave the way callers expect.
 For example, return a description rather than raise an exception,
 finish rather than block, describe the object rather than change it.
-No checker sees that half.
+No type checker sees that half.
 Substitution is safe only when both halves work,
 whether membership comes from inheriting a base class or matching a protocol.
 
@@ -971,7 +972,7 @@ Adding a new operation over all shapes is easier in the pattern matching
 where the operation is one new function rather than a new method on every class.
 The exhaustiveness check covers the other direction.
 Adding a member to the `Shape` union leaves every existing `match` incomplete,
-and `assert_never()` turns each one into a checker error naming the shape you missed.
+and `assert_never()` turns each one into a type checker error naming the shape you missed.
 
 The OOP approach assumes you add types more often than operations,
 which is often not true.
@@ -1014,7 +1015,7 @@ if __name__ == "__main__":
 #: 4.0 2
 ```
 
-The checker correctly insists on the guard.
+The type checker correctly insists on the guard.
 Without it, a `None` eventually meets `.log()` and the call fails.
 The `None` branch does nothing.
 Doing nothing is behavior, and behavior belongs in an object.
@@ -1137,7 +1138,7 @@ or whether immutable data, a function, and a protocol already solve the problem.
 5.  In `shapes_match.py`, add a new shape, `Square(side: float)`,
     to the `Shape` union, add its `case` to `area()`,
     and confirm `ty check` still passes.
-    Then temporarily comment out the new `case` and observe what `assert_never()` causes the checker to report.
+    Then temporarily comment out the new `case` and observe what `assert_never()` causes the type checker to report.
 6.  In `null_logger.py`, write a second null-object style class, `NullCache`,
     whose `get(key)` always returns `None` and whose `set(key, value)` does nothing,
     following the same shape as `NullLogger`.

@@ -180,13 +180,13 @@ Inside the wrapper, `*args: P.args` and `**kwargs: P.kwargs` are the two halves 
 You may only use them together,
 as the `*args` and `**kwargs` of a function typed with `P`.
 They bind the wrapper's arguments to the parameters captured by `**P`,
-so the checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
+so the type checker accepts `add(2, 3)` but rejects `add("x")` or `add(2, 3, 4)`,
 even though the body of `wrapper()` forwards anything.
 Without `**P` you fall back to `*args: Any, **kwargs: Any`,
 and the wrapper swallows any arguments,
 discarding the signature the decorator should preserve.
 
-The `# type: ignore` comments mark where the checker cannot follow:
+The `# type: ignore` comments mark where the type checker cannot follow:
 a `Callable` need not have a `__name__` attribute, though every function does.
 
 The tests verify two things: the wrapper reports the original function's name,
@@ -665,7 +665,7 @@ For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class-based decorator, like `trace_class.trace`,
-gets the checker involved:
+gets the type checker involved:
 `ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
 catching the same problem.
 
@@ -743,7 +743,7 @@ it exists only for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
 If `register`'s annotation were `(cls: type) -> type`,
 it would hand back a bare `type`,
-and the checker would see `Espresso()` as an `Any`.
+and the type checker would see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 

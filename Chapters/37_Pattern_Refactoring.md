@@ -261,10 +261,10 @@ When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Readers of [Composite and Interpreter](34_Composite_and_Interpreter.md)
-may expect `assert_never()` to make the checker catch the missed case,
+may expect `assert_never()` to make the type checker catch the missed case,
 and here it cannot help: exhaustiveness checking needs a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
-so no checker can know the set is complete.
+so no type checker can know the set is complete.
 This is a `match` over an open set,
 which [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 warns against.
@@ -410,7 +410,7 @@ Swapping the `match` for the dictionary is a redesign, not a rename.
 
 The `defaultdict(list)` creates a bin the first time a material turns up.
 `Bins` is an alias for a plain `dict`,
-so a checker accepts `bins: Bins = {}` just as happily,
+so a type checker accepts `bins: Bins = {}` just as happily,
 and that version raises `KeyError` on the first piece of trash.
 
 ## Adding Operations: Visitor, and Why Python Skips It
@@ -474,7 +474,7 @@ explains that placeholder.
 `Paper` has no registered note, so it falls through to the base function.
 That fallback is also the risk:
 a material nobody registers gets the default answer,
-with no exception at runtime and no complaint from the checker.
+with no exception at runtime and no complaint from the type checker.
 Here "no special handling" is a genuine answer, so the fallback earns its keep;
 when no default makes sense,
 that chapter advises making the base function raise `NotImplementedError`,

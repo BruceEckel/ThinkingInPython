@@ -111,11 +111,11 @@ The `/` in `WhatIUse.op()` makes its parameter positional-only,
 and removing it breaks the override:
 `WhatIUse2.op()` renames the parameter to `what_i_have`,
 and renaming a keyword-callable parameter in an override breaks substitutability,
-so the checker rejects it without the `/`.
+so the type checker rejects it without the `/`.
 The rename is the smaller half of that story.
 `WhatIUse2.op()` also changes the parameter's type.
 Its base accepts a `WhatIWant`, and it accepts a `WhatIHave`.
-If you annotate both precisely, a checker rejects the override outright,
+If you annotate both precisely, a type checker rejects the override outright,
 reporting `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Rethinking_Objects.md#liskov-substitution).
 That is why this one parameter stays `Any` while the rest of the listing names real types.
@@ -381,8 +381,8 @@ so a function that used to take a string and now takes a `Path` can warn only th
 That form is static only.
 Python discards the overload declarations at runtime,
 so the `DeprecationWarning` half never fires,
-and checker support for it lags the whole-function form,
-so verify your checker reports it before relying on it.
+and type-checker support for it lags the whole-function form,
+so verify your type checker reports it before relying on it.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,
 which is why they are safe moves.

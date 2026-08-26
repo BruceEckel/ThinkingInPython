@@ -298,7 +298,7 @@ print(cache[m])
 The listing goes through `setattr()` because the type checker rejects `m.name = "bar"`,
 which is the earlier of the two defenses.
 `frozen=True` is the one that holds at runtime,
-against code the checker never saw.
+against code the type checker never saw.
 
 `frozen=True` guards the binding, not the object behind it.
 You can still mutate a field's `list` in place,
@@ -412,7 +412,7 @@ print(Normalized("Bruce@Example.com"))
 ```
 
 Both defenses fire here, as they did for `frozen_messenger.py`.
-The checker reports the assignment,
+The type checker reports the assignment,
 and the `# type: ignore` silences it so the listing can reach the runtime failure.
 
 `object.__setattr__()` skips the rejecting `__setattr__()` and writes the field directly.
@@ -983,7 +983,7 @@ and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.
 A bare `list`, `dict`,
-or `set` produces a type loose enough that a checker accepts it against any annotation,
+or `set` produces a type loose enough that a type checker accepts it against any annotation,
 so it never compares the factory with the field.
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
@@ -1038,7 +1038,7 @@ The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:
 the error arrives while Python is still executing the `class` statement.
-A checker reports it as `invalid-named-tuple`,
+A type checker reports it as `invalid-named-tuple`,
 which the `# type: ignore` silences.
 
 Subclassing the `NamedTuple` and defining `__new__()` on the subclass gets past the prohibition,
@@ -1180,7 +1180,7 @@ except TypeError as e:
 ```
 
 Both defenses fire again.
-The checker reports each class as an invalid frozen-dataclass subclass,
+The type checker reports each class as an invalid frozen-dataclass subclass,
 which the `# type: ignore` silences so the listing can reach the runtime failure.
 
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
@@ -1534,4 +1534,4 @@ and a function receiving one does its work without asking whether the value make
     and read the error `@dataclass` reports.
     Then fix it two ways,
     with `default_factory=dict` and with `default_factory=dict[str, Month]`,
-    and say which one a checker can verify.
+    and say which one a type checker can verify.

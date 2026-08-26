@@ -116,7 +116,7 @@ so `run()` gets the result on its first step.
 A generator function does not need it:
 `return value` sets the Effect's `R` directly.
 Writing `return success(value)` instead produces a `Success[R]` where the signature expects an `R`,
-and the checker rejects it.
+and the type checker rejects it.
 
 `double()` needs nothing beyond its argument,
 so it gains nothing from being an Effect.
@@ -170,7 +170,7 @@ In `greeter.py`, two details deserve attention:
 1. `greet()` is a generator function, because it contains `yield from`,
    so calling it builds the Effect its signature declares.
 2. `console` is of type `Console`,
-   so the checker treats `console.print()` the same as any other method call.
+   so the type checker treats `console.print()` the same as any other method call.
    The dependency waits without becoming untyped.
 
 ### The Effect Definition
@@ -212,10 +212,10 @@ An Effect does not:
 What comes back depends on which Ability the `yield` requested.
 One SendType cannot vary from one `yield` to the next.
 If you pin it to `Console`,
-the checker reads `yield Need(Log)` as producing a `Console`.
+the type checker reads `yield Need(Log)` as producing a `Console`.
 The `send()` channel must carry any type, so the SendType is `Any`.
 
-With `yield from`, a request produces an answer whose type the checker knows.
+With `yield from`, a request produces an answer whose type the type checker knows.
 A bare `yield` produces the SendType, the parameter forced to `Any`.
 `yield from` produces the inner generator's `ReturnType`,
 which does not have that conflict.
@@ -513,7 +513,7 @@ along with what changes when the Ability is an interface rather than a class.
 `supply()` binds one instance for every matching request over the Effect's run,
 which is why the test reads the messages back out of `recorder` afterward.
 
-## Effects Propagate, and the Checker Verifies It
+## Effects Propagate, and the Type Checker Verifies It
 
 A function that calls an effectful function becomes effectful.
 `greet_all()` must declare the `Console` even though no `Console` appears in its body:
@@ -557,7 +557,8 @@ If you write that loop body as a bare `greet(name)`,
 That seems like protection, but it is accidental.
 That `yield from` is the only `yield` in `greet_all()`,
 so deleting it turns `greet_all()` into an ordinary function,
-and the checker catches the function's changed shape, not the discarded Effect.
+and the type checker catches the function's changed shape,
+not the discarded Effect.
 A function with a second `yield` stays a generator function.
 Its shape does not change, so nothing objects.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
@@ -573,7 +574,8 @@ and in a `for` comprehension it is the `<-` binding; Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
-Declaring the Ability is still manual, but the checker verifies the declaration.
+Declaring the Ability is still manual,
+but the type checker verifies the declaration.
 If you annotate `greet_all()` as pure, `ty` flags the problem:
 
 ```python
@@ -651,14 +653,14 @@ while `greet()` stays unchanged.
 `supply()` now provides both a `Console` and a `Log`.
 Stateless does not save you those edits.
 It saves you from hunting for the functions that need them:
-the checker names each place that needs changing,
+the type checker names each place that needs changing,
 and the program does not build until you fix the last one.
 To see that, delete `| Need[Log]` from either annotation.
 If you remove it from `greet_all()`,
 `ty` reports an `invalid-yield` at `yield from greet_logged(name)`,
 since `Need[Log]` is not assignable to what the signature now declares.
 
-The checker covers dependencies passed as parameters too.
+The type checker covers dependencies passed as parameters too.
 If you forget the new argument at a call, `ty` reports a `missing-argument`.
 The difference is how many places you edit.
 A new parameter changes every call site along with every signature,
@@ -681,7 +683,7 @@ This book still writes Effect signatures out in full,
 because the union is the information:
 every channel a function uses stays visible at the point of use.
 Before you shorten one with an alias,
-confirm that your checker reports an undeclared Ability through it.
+confirm that your type checker reports an undeclared Ability through it.
 
 ## One Effect, Many Environments
 
@@ -1035,7 +1037,7 @@ But it relocates a [side cause](44_Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker never validates the dependency.
 
 An EMS like Stateless sets a higher bar.
-The dependency must appear in the signature for the checker to verify it,
+The dependency must appear in the signature for the type checker to verify it,
 which is why the EMS version of `greet()` returns `Depend[Need[Console], None]` and the `greet()` in `dependency_injection.py` returns `None`.
 The foundation of EMS is tracking all dependencies.
 The goal is to catch errors during type checking rather than relying on programmer memory and exhaustive testing.
@@ -1085,7 +1087,7 @@ and taking that dependency back out later moves every signature on the path a se
 This is the same complaint people made against Java's checked exceptions,
 which [Effect Management](44_Effect_Management.md#catch-the-exception-you-expect)
 describes failing this way,
-and it is the reason [Effects Propagate, and the Checker Verifies It](#effects-propagate-and-the-checker-verifies-it)
+and it is the reason [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
 compares the spread to `async`.
 
 ### A Default Binding
@@ -1127,13 +1129,13 @@ which empties the Ability channel before `fallback` sees a request.
 The handler nearest the Effect wins,
 and the outer one answers only what remains.
 The type records this: `chosen` is already `(str) -> Success[None]`,
-so `fallback(chosen)` adds nothing the checker did not know.
+so `fallback(chosen)` adds nothing the type checker did not know.
 
 A default costs you the guarantee that made `Need` worth declaring.
 An Effect that fails the type check for a missing `Console` now compiles and runs,
 and a forgotten binding shows up as a wrong-looking result rather than an error.
 Use one for a genuine default, a null logger or a no-op console,
-not to quiet a checker that is telling you something.
+not to quiet a type checker that is telling you something.
 
 ## Waiting on a Coroutine
 
@@ -1167,7 +1169,7 @@ The channel holds Abilities, and `Async` is one, so it sits there bare.
 `Console` is not one: it is an ordinary class,
 and `Need[Console]` is the Ability that asks for it.
 The first type parameter accepts only `Ability` subclasses,
-so the checker rejects `Depend[Console, None]` at the annotation.
+so the type checker rejects `Depend[Console, None]` at the annotation.
 [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
 
@@ -1561,7 +1563,7 @@ A returned `KeyError` is data.
 
 Moving the error into the result makes it impossible to ignore.
 If you drop the `match` entirely and use `value` directly as a number,
-the checker catches it:
+the type checker catches it:
 
 ```text
 error[unsupported-operator]: Unsupported `+` operation
@@ -1717,7 +1719,7 @@ which Python does without the Effect type.
 The two guarantees are therefore different.
 You must resolve a dependency before anything runs.
 A declared failure travels in the type until you choose where to handle it.
-The checker covers both, and neither disappears through forgetfulness.
+The type checker covers both, and neither disappears through forgetfulness.
 
 ## Exercises
 

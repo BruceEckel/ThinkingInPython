@@ -141,11 +141,11 @@ info:     └── incompatible return types: `Weight` is not assignable to `Pr
 The structural match is unchanged: `Package.total()` still takes no
 arguments and still returns a float at runtime. What the two `NewType`
 declarations add is a distinction the shapes never carried, so the
-checker can finally see that a weight is not a price.
+type checker can finally see that a weight is not a price.
 
 Delete the annotations and the program behaves exactly as it does now.
 It prints `$2.50` and charges the customer for a number of kilograms,
-because `NewType` exists only for the checker: `Weight(2.5)` returns the
+because `NewType` exists only for the type checker: `Weight(2.5)` returns the
 `float` `2.5` and no wrapper survives to run time. The distinction is
 real in the source and absent in the process, which is the whole bargain
 the chapter describes.
@@ -241,9 +241,9 @@ for shape in shapes:
 
 `ty check` passes because every member of the `Shape` union now has a
 matching `case`. Commenting out the `Square` case makes the `match`
-non-exhaustive: the checker can prove that a `Square` argument
+non-exhaustive: the type checker can prove that a `Square` argument
 falls through every `case` to `case _`, which calls `assert_never(shape)`.
-Since `shape` could genuinely be a `Square` at that point, the checker
+Since `shape` could genuinely be a `Square` at that point, the type checker
 reports that `assert_never()`'s argument is not the `Never` type it
 requires, exactly the exhaustiveness check the union was added for. It
 turns a missed case into a caught type error instead of a silent

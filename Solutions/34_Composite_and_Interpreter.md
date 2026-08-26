@@ -513,7 +513,7 @@ Note what this does not fix. `ty` already rejected `"a" + x` in source
 it can see, which is why the line above carries a `# type: ignore` to
 keep this listing in the build; the runtime hole was the gap between
 the two. Closing it matters when the expression is built from data the
-checker never sees, which is the case an interpreter is written for.
+type checker never sees, which is the case an interpreter is written for.
 
 ## 7. A third walker: `to_html()`
 
@@ -741,7 +741,7 @@ print(root.disk_usage())
 What breaks in the closed version is not subtle. `type Node = File |
 Directory` lives in your source, so a plugin cannot extend it, and a
 `Symlink` passed to `disk_usage()` falls through every case to
-`assert_never()`. The checker cannot warn the plugin author, because
+`assert_never()`. The type checker cannot warn the plugin author, because
 from its side the union is complete: the mismatch only exists at the
 call. The plugin's alternatives are to vendor a patched copy of your
 module or to persuade you to add the case, which is the coupling the
@@ -764,5 +764,5 @@ grammar, so a plugin adding a fifth is not extending the language, it
 is defining a different one, and every walker would then be silently
 wrong rather than helpfully extended. The `assert_never()` that reads
 as an obstacle in the file system reads as the point here: when the
-grammar does grow a `Neg`, the checker hands you the list of walkers
+grammar does grow a `Neg`, the type checker hands you the list of walkers
 to update.

@@ -389,7 +389,7 @@ instances. `Wrong` writes the same intent a different way, and fails.
 `self.built += 1` reads the class attribute, adds one, and then tries
 to store the result on the instance, which is the assignment
 `frozen=True` refuses. `ty` rejects the line before it ever runs
-(fields of a frozen class are read-only to the checker), so the
+(fields of a frozen class are read-only to the type checker), so the
 listing carries a `# type: ignore` to demonstrate the runtime failure.
 
 ## 7. A `dict` field default, three ways
@@ -435,9 +435,9 @@ and raises a `ValueError` naming the fix. The full message is `mutable
 default <class 'dict'> for field index is not allowed: use
 default_factory`.
 
-`Bare` and `Subscripted` both work, and they differ in what a checker
+`Bare` and `Subscripted` both work, and they differ in what a type checker
 can see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
-loose enough to satisfy any `dict` annotation, so a checker cannot
+loose enough to satisfy any `dict` annotation, so a type checker cannot
 compare the factory against the field. `dict[str, Month]` is callable
 too, and its return type is concrete, so writing
 `field(default_factory=dict[int, int])` on this field is an error

@@ -18,7 +18,8 @@ you must run a separate type-checking tool
 
 You can add type hints one function at a time.
 Code without annotations still works.
-The checker treats it as the type `Any`, which is compatible with everything.
+The type checker treats it as the type `Any`,
+which is compatible with everything.
 Thus, typed and untyped code can coexist.
 This is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
@@ -31,7 +32,7 @@ They behave the same: both are compatible with everything.
 `Any` is not the same as `object`.
 Both accept every value,
 but `object` guarantees nothing about the value once you have it,
-so the checker rejects every operation you try on it.
+so the type checker rejects every operation you try on it.
 `Any` accepts every value and then permits every operation,
 which makes it an opt-out rather than a wide type.
 
@@ -63,7 +64,7 @@ and `str | None` for "a string or nothing."
 A function that returns nothing declares `-> None`,
 which is why every `__init__()` in this chapter's listings ends that way.
 
-## The Checker: `ty`
+## The Type Checker: `ty`
 
 The hints do nothing on their own.
 You need a tool to check them:
@@ -97,7 +98,7 @@ print(area("3", 4))  # type: ignore
 At runtime `area("3", 4)` does not cause an error.
 It returns `"3333"`, because `"3" * 4` repeats the string four times.
 The bug surfaces later, often far from the line that caused it.
-The checker immediately discovers the problem.
+The type checker immediately discovers the problem.
 
 The `# type: ignore` comment tells the type checker to skip this line,
 so this book's build passes.
@@ -123,12 +124,12 @@ and then points at the declaration that set the expectation.
 Listings in this book use a shorthand for a diagnostic.
 Where a line would fail the check,
 whether commented out or suppressed with `# type: ignore`,
-a neighboring `# ty:` comment summarizes what the checker reports for it.
+a neighboring `# ty:` comment summarizes what the type checker reports for it.
 
 ## Narrowing {#narrowing}
 
 A union type covers every case until you rule some out.
-Testing `is not None` on an `X | None` value proves it to the checker,
+Testing `is not None` on an `X | None` value proves it to the type checker,
 not just to you:
 
 ```python
@@ -145,7 +146,7 @@ print(shout(None))
 #: (nothing)
 ```
 
-Inside the `if`, the checker *narrows* `text` from `str | None` to `str`,
+Inside the `if`, the type checker *narrows* `text` from `str | None` to `str`,
 so `.upper()` needs no cast.
 Outside the `if`, `text` is still the full `str | None`.
 The same narrowing follows an `isinstance()` check, an equality test,
@@ -175,17 +176,17 @@ print(MAX_RETRIES, GREETING)
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
 You can still append to a `Final[list[str]]`;
-the checker refuses only an assignment to the name.
+the type checker refuses only an assignment to the name.
 
 You can give the type explicitly, as in `GREETING`,
-or let the checker infer it from the value, as with `MAX_RETRIES`.
+or let the type checker infer it from the value, as with `MAX_RETRIES`.
 The rest of the book uses the explicit `Final[T]` form,
 which declares the intended type instead of accepting whatever the initializer produces.
 The difference emerges when the initializer's own type is not the type you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
-so the checker ignores whatever goes into the list;
+so the type checker ignores whatever goes into the list;
 `CACHE: Final[list[str]] = []` says what the list holds,
-and the checker enforces it.
+and the type checker enforces it.
 
 ## Structural Typing with Protocols
 
@@ -240,7 +241,7 @@ print(render(Square()))
 ```
 
 `Circle` and `Square` never mention `Drawable`.
-The checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
+The type checker accepts both because each has a `draw()` that takes no arguments and returns a `str`,
 so each matches `Drawable`'s shape.
 The signature is part of that shape: a `draw()` that returns an `int`,
 or that requires an argument, does not match.
@@ -287,7 +288,7 @@ so the argument's annotation is `type[Shape]`.
 Passing `Circle` works because `Circle` is a subclass of `Shape`.
 Calling `kind()` then produces an instance.
 The word `type` plays two roles in this listing:
-the annotation `type[Shape]` names the class to the checker,
+the annotation `type[Shape]` names the class to the type checker,
 while the builtin call `type(shape)` in the demo retrieves an object's class at runtime.
 
 ## Naming Types: The `type` Statement {#the-type-statement}
@@ -315,8 +316,8 @@ print(grid)
 
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
-so the checker accepts any pair of ints as a `Coord`.
-(To create a distinct type the checker keeps separate, use `NewType`, listed in the summary below.)
+so the type checker accepts any pair of ints as a `Coord`.
+(To create a distinct type the type checker keeps separate, use `NewType`, listed in the summary below.)
 That is why an alias belongs on a compound shape and not on a bare rename:
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
@@ -366,8 +367,8 @@ print(s.upper())
 ```
 
 `T` is a placeholder, filled in separately at each call.
-The checker infers `T` from the argument and then knows the return type.
-Both `n + 1` and `s.upper()` pass the checker, while `n.upper()` fails.
+The type checker infers `T` from the argument and then knows the return type.
+Both `n + 1` and `s.upper()` pass the type checker, while `n.upper()` fails.
 
 A class declares type parameters the same way:
 
@@ -431,7 +432,7 @@ A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 ### Type Parameter Defaults {#type-parameter-defaults}
 
 A type parameter can carry a default,
-which the checker uses when an annotation names the class without its brackets:
+which the type checker uses when an annotation names the class without its brackets:
 
 ```python
 # type_defaults.py
@@ -457,7 +458,7 @@ print(counts.top() + 1)
 ```
 
 Without the default,
-`words: Stack` leaves `T` unsolved and the checker falls back to `Unknown`,
+`words: Stack` leaves `T` unsolved and the type checker falls back to `Unknown`,
 so `words.top().upper()` goes unchecked.
 The default gives the bare form a meaning,
 which matters most for a class whose parameter has one common answer:
@@ -525,7 +526,7 @@ print(t.bump().bump().report())
 
 `t.bump()` runs on a `NamedTally`, so `Self` is `NamedTally`,
 and the result has `report()`.
-If `bump()` declares `-> Tally`, the checker rejects `report()`,
+If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 which `Tally` does not have.
 Alternative constructors benefit the same way.
 A `@classmethod` that ends with `return cls(...)` returns `Self`.
@@ -534,7 +535,7 @@ A `@classmethod` that ends with `return cls(...)` returns `Self`.
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrong type that slips past the checker behaves as it would have without hints.
+A wrong type that slips past the type checker behaves as it would have without hints.
 Checking is a separate step you run, the same way you run tests separately.
 If you need a runtime guarantee,
 use `isinstance()` or a library that validates data.
@@ -545,8 +546,8 @@ validates and parses data against typed models,
 which is useful at the edges of a program where untrusted input enters.
 The hints are for the tools and for the reader.
 
-From here on, this book assumes the checker runs on everything.
-When a listing says the checker rejects a line, that is the enforcement;
+From here on, this book assumes the type checker runs on everything.
+When a listing says the type checker rejects a line, that is the enforcement;
 the following chapters do not repeat that Python itself would run the line anyway.
 
 ## How Much to Annotate
@@ -558,7 +559,7 @@ anything another file imports.
 Those are the places where the reader of the code and the writer of the code are different people,
 and where a wrong assumption travels farthest before it fails.
 
-Let the checker infer the rest.
+Let the type checker infer the rest.
 A local variable whose type is obvious from its initializer gains nothing from an annotation,
 and `count: int = 0` says no more than `count = 0` does, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
@@ -588,7 +589,7 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; the checker accepts an `int` where a declaration says `float`, and an `int` or `float` where it says `complex`, but not the reverse (`bytes` and `complex` do not appear elsewhere in this book) |
+| `int`, `str`, `float`, `bool`, `bytes`, `complex` | The built-in types, annotated by name alone, with no type parameter; the type checker accepts an `int` where a declaration says `float`, and an `int` or `float` where it says `complex`, but not the reverse (`bytes` and `complex` do not appear elsewhere in this book) |
 | `None` | The value `None`; the return type of a function that returns nothing |
 | `object` | Any object, but with no behavior assumed (safer than `Any`) |
 | `Any` | Opts out of checking; compatible with every type, see [Gradual Typing](#gradual-typing) |
@@ -621,14 +622,14 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `type Name = ...` | A type alias for a longer type, e.g. `type Grid = dict[tuple[int, int], str]`, see [The `type` Statement](#the-type-statement) |
-| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the checker; the base can be any class, not just a builtin |
+| `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
 ### <a href="https://docs.python.org/3/library/typing.html#typing.Final" target="_blank" rel="noopener">Constants and class variables</a>
 
 | Construct | Meaning |
 |-----------|---------|
-| `Final`, `Final[T]` | A name the checker does not let you reassign, see [Constants with Final](#constants-with-final) |
+| `Final`, `Final[T]` | A name the type checker does not let you reassign, see [Constants with Final](#constants-with-final) |
 | `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Class_Attributes.md#declaring-shared-state-with-classvar) |
 
 ### <a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Generics</a>
@@ -678,12 +679,12 @@ The abstract container types come from `collections.abc`.
 | `@overload` | Several typed signatures for one function name |
 | `@override` | Declares that a method overrides a base-class method, see [Classes](07_Classes.md#marking-overrides-with-override) |
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Metaprogramming.md#making-a-class-final) |
-| `cast(T, x)` | Tells the checker to treat `x` as `T`; [Flyweight](35_Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
-| `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
-| `TYPE_CHECKING` | A flag that is `True` only to the checker, for type-only imports, see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
+| `cast(T, x)` | Tells the type checker to treat `x` as `T`; [Flyweight](35_Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
+| `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) |
+| `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Simulation.md#a-robot-in-a-maze) |
 
 The runtime ignores all of these.
-They exist for the checker and the reader.
+They exist for the type checker and the reader.
 Older code writes some of them differently: `Optional[X]` for `X | None`,
 `Union[X, Y]` for `X | Y`, and `List`, `Dict`, `Set`,
 `Tuple` from `typing` for the lowercase built-ins.
@@ -711,4 +712,4 @@ The forms above are the modern ones.
 7.  In `variance.py`, change `add_square()`'s parameter annotation to `Sequence[Shape]` and uncomment the call.
     Explain why `ty` now accepts the call and why `shapes.append(...)` no longer type-checks.
 8.  In `narrowing.py`, replace `if text is not None:` with `if text:` and run `ty check`.
-    Explain why the empty string now takes the other branch even though the checker accepts either version.
+    Explain why the empty string now takes the other branch even though the type checker accepts either version.

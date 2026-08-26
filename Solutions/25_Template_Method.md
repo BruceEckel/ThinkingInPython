@@ -145,7 +145,7 @@ works, but it works only for the subclass that performs it, and it
 survives only as long as everyone remembers it. It asks every future
 subclass author to invert the convention they have used everywhere
 else, which is to call `super().__init__()` first. Nothing in the
-signature says so, no checker objects to the usual order, and the
+signature says so, no type checker objects to the usual order, and the
 failure arrives as an `AttributeError` inside a base class the author
 did not write. A rule that must be remembered by people who have not
 read this chapter is not a fix.
@@ -210,20 +210,20 @@ error[override-of-final-method]: Cannot override `ApplicationFramework.run`
 info: `ApplicationFramework.run` is decorated with `@final`, forbidding overrides
 ```
 
-The guarantee comes from the checker, not the language. `@final` sets
+The guarantee comes from the type checker, not the language. `@final` sets
 `__final__ = True` on the function and does nothing else; no runtime
 check consults it. That places the Template Method's central promise
 in the same category as every other annotation in this book: enforced
 before the program runs, by a tool you have to actually run.
 
 The practical consequence is that `@final` protects a codebase whose
-build runs a checker and protects nothing in a codebase that does not.
+build runs a type checker and protects nothing in a codebase that does not.
 When the interpreter itself must refuse the override, use the
 `__init_subclass__()` technique the chapter points at, which raises a
 `TypeError` while the subclass's own class body is executing, long
 before anyone constructs one.
 
-## 4. Two faithless substitutes the checker accepts
+## 4. Two faithless substitutes the type checker accepts
 
 ```python
 # exercise_4.py
@@ -283,7 +283,7 @@ prints anything wrong. `pending` simply grows forever. Nothing is
 visible from outside until whatever `pending` feeds runs out of memory
 or reports stale data.
 
-The two need different things from a checker, and only one of them is
+The two need different things from a type checker, and only one of them is
 available.
 
 The omission is fixable. `...` is what makes the step optional, and it
@@ -291,13 +291,13 @@ is a decision the base class makes: it declares that a subclass may
 skip this step. Declare instead that a subclass may not, by inheriting
 from `ABC` and marking `customize2()` with `@abstractmethod`, and both
 tools object. `ty` reports the instantiation of an abstract class, and
-Python refuses to construct `HalfDone` at all. The checker could not
+Python refuses to construct `HalfDone` at all. The type checker could not
 catch it before, because "deliberately empty" and "forgotten" were the
 same code, and the base class was the only place that difference could
 have been written down.
 
 The exception is not fixable this way. Catching it would require the
-base class to state which exceptions a step may raise and the checker
+base class to state which exceptions a step may raise and the type checker
 to hold every override to that list, which is Java's `throws` clause.
 Python has no such declaration, and no annotation expresses "this
 raises nothing." An exception type in a docstring is a note to a human.

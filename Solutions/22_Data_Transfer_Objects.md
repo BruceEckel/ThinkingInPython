@@ -150,7 +150,7 @@ type as a name. Nothing can be annotated `Stats` anymore, so a function
 accepting a summary now advertises `tuple[float, int]`, which any pair
 of a float and an int satisfies.
 
-The checker still catches a fair amount. Unpacking into the wrong
+The type checker still catches a fair amount. Unpacking into the wrong
 number of names fails, since the tuple's length is part of its type.
 Passing `mean` where an `int` is expected fails, since the element
 types are still known positionally. Indexing past the end fails, and
@@ -163,7 +163,7 @@ names, and the second one type-checks cleanly while being wrong in
 every use afterward. With `Stats`, that mistake either does not arise
 (you write `result.count`) or fails immediately, because `Stats` and a
 reversed `tuple[int, float]` are different types. Position is
-something the checker can verify and a reader cannot; a name is
+something the type checker can verify and a reader cannot; a name is
 something both can.
 
 ## 6. Structural equality across three-field types

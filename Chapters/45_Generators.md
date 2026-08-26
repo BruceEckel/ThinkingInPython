@@ -60,7 +60,7 @@ print(list(countdown(6)), list(squares(6)))
 `Generator[int]` means `Generator[int, None, None]`.
 `Iterator[int]` describes the same one-way generator and reads better,
 at the cost of saying nothing about the other two channels:
-a checker rejects `send()` on anything annotated `Iterator`.
+a type checker rejects `send()` on anything annotated `Iterator`.
 The long form is necessary when the other two channels carry something,
 as they do in this chapter.
 
@@ -104,10 +104,10 @@ if __name__ == "__main__":
 Although `Generator[str, str, str]` describes `interview()` accurately,
 it does not say which `str` is which.
 With `NewType` you can give each channel a distinct type,
-so the annotation states the arrangement and a checker enforces it.
+so the annotation states the arrangement and a type checker enforces it.
 `Question` fills the `YieldType` position, `Answer` the `SendType`,
 and `Result` the `ReturnType`.
-The distinction exists only for the checker.
+The distinction exists only for the type checker.
 `Question("name")` produces the plain `str`.
 
 Driving the generator by hand sends one `Answer` at a time.
@@ -153,7 +153,7 @@ so both lines start from the beginning and produce the first question.
 The `# type: ignore` marks a real mismatch:
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
-The checker rejects the priming `send()` even though the interpreter accepts it.
+The type checker rejects the priming `send()` even though the interpreter accepts it.
 The equivalence is a runtime fact the annotation cannot express,
 which is the practical reason a driver primes with `next()`.
 
@@ -223,7 +223,7 @@ The generator arrives by import, unchanged; only the driver is new.
 The first line of output is `interview()`'s product:
 an ordinary `generator` object that still carries the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
-so the `# type: ignore` on that line suppresses the checker's complaint.
+so the `# type: ignore` on that line suppresses the type checker's complaint.
 
 `drive()` touches all three type parameters:
 `next()` produces the first `Question`,
@@ -235,9 +235,9 @@ Here `StopIteration` means the conversation finished,
 so any other code that could raise it, such as an exhausted answer source,
 belongs outside.
 
-The checker verifies only two of those three parameters.
+The type checker verifies only two of those three parameters.
 `StopIteration.value`'s type is `Any`,
-so a checker accepts `return stop.value` whatever `drive()` declares it returns.
+so a type checker accepts `return stop.value` whatever `drive()` declares it returns.
 The `Result` in `drive()`'s signature states the intent; nothing verifies it.
 
 `interview()` does not know where the answers originate.
@@ -431,7 +431,8 @@ Each `send()` delivers its value to `manual()`'s own `yield`,
 which throws it away.
 The `for` loop then resumes `collect()` with `next()`,
 so both of `collect()`'s `yield` expressions produce `None`.
-The checker says nothing, because `manual()` is a valid `Generator[str, int]`:
+The type checker says nothing,
+because `manual()` is a valid `Generator[str, int]`:
 the send channel appears in the declaration and goes unused.
 `yield from` is not shorthand for this loop.
 
@@ -598,7 +599,7 @@ That is the question the next chapter puts into the type system.
     leaving `profile: Result = interview()`.
     Run `ty check` and the script, and explain both results.
     Which one told you more,
-    and what would the checker have said if `profile` carried no annotation?
+    and what would the type checker have said if `profile` carried no annotation?
 5.  `report()` in `yield_from_return.py` yields but does not return.
     Rewrite it to also return the character count,
     and give it the full annotation.

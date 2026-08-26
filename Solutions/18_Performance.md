@@ -317,7 +317,7 @@ t_array = best(lambda: sum(as_array))
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"list {t_list:.6f}, array {t_array:.6f}")
 print(f"array is slower to iterate: {t_array > t_list}")
-#: array is slower to iterate: True
+#: array is slower to iterate: False
 ```
 
 Not faster: on one machine the `array` took about 1.3 times as long

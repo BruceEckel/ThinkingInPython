@@ -634,7 +634,7 @@ A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
 but its fields are self-documenting.
 `typing.NamedTuple` is the class form of the same idea:
 it declares a type for each field instead of listing bare names,
-so a checker knows what each one holds.
+so a type checker knows what each one holds.
 For a record that must be mutable, use a data class
 (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes)).
 [Data Transfer Objects](22_Data_Transfer_Objects.md#the-standard-library-versions)

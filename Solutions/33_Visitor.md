@@ -176,7 +176,7 @@ structure, so any class with a compatible `visit()` satisfies it, and
 the `Visitor` hierarchy stays as the chapter wrote it.
 
 The two versions report the `Beetle` mistake at different times. Under
-`Any`, the checker has nothing to compare `Beetle` against, so the call
+`Any`, the type checker has nothing to compare `Beetle` against, so the call
 type-checks and the program dies at runtime with the `AttributeError`
 above. Under `Visits`, `ty` rejects the argument before the program
 runs, because `Beetle` inherits no `visit()` and so does not match the
@@ -184,7 +184,7 @@ protocol. The `ty: ignore` comment above is what makes the listing
 compile at all; deleting it is how you see the check working.
 
 That is the price the chapter names for keeping `Any`. It moves an
-error a checker could have caught into the run. The classic pattern
+error a type checker could have caught into the run. The classic pattern
 pays it because its `Visitor` base is empty, and either fix, declaring
 `visit()` abstract on that base or writing the protocol above, buys the
 check back.

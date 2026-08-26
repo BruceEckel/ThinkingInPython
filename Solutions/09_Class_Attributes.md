@@ -245,7 +245,7 @@ writes the same class dictionary, so both instances report `2` and
 With the `# type: ignore` removed, `ty` reports
 `invalid-attribute-access`: "Cannot assign to ClassVar `total` from an
 instance". The augmented form expands to an assignment through `self`,
-and the checker treats it as it treats `a.total = 99`: a write to a
+and the type checker treats it as it treats `a.total = 99`: a write to a
 `ClassVar` through an instance. The declaration catches the mistake at
 check time; the listing suppresses the report so it can demonstrate
 what the write does when it runs.

@@ -292,7 +292,7 @@ Derived().show()
 A type checker now verifies the claim.
 If a decorated method does not override anything in a base class,
 because you misspelled the name or the base method no longer exists,
-the checker reports an error.
+the type checker reports an error.
 If you uncomment the decorator on `Typo.shwo`, it says:
 
 ```text
@@ -579,4 +579,4 @@ and lets a subclass replace it the way it replaces any other method.
     Run the program and confirm it still prints `Base.show`,
     then run the type checker ([Static Typing](08_Static_Typing.md) sets one up)
     and read what it says.
-    Remove `@override` and confirm the checker goes quiet while the program's behavior does not change.
+    Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.

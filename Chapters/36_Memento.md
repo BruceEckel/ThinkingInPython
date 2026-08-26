@@ -125,7 +125,7 @@ Every call site would still type-check.
 But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
-`NewType("Memento", tuple[str, ...])` answers only the checker.
+`NewType("Memento", tuple[str, ...])` answers only the type checker.
 It vanishes at runtime, so the caretaker still holds a plain tuple it can index,
 unpack, or build from scratch.
 Wrapping the tuple in a one-field data class gives `Memento` an identity that exists while the program runs.

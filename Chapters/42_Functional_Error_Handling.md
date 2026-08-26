@@ -107,7 +107,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are both frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
 `@final` states that neither can have subclasses,
-which lets the checker narrow a `Result` to exactly one of the two.
+which lets the type checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
@@ -178,10 +178,10 @@ success by returning an `Ok` object.
 The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
 `unwrap()` makes that literal: it exists on `Ok` and not on `Err`,
-so `func_a(i).unwrap()` fails the checker.
+so `func_a(i).unwrap()` fails the type checker.
 Using the `Result` as if it were a number fails the same way.
 Narrowing to one of the two classes is the only route to the answer.
-The asymmetry is visible at runtime as well as to the checker:
+The asymmetry is visible at runtime as well as to the type checker:
 
 ```python
 # must_unwrap.py
@@ -220,10 +220,10 @@ A caller can't see the failure just by reading the return type.
 Python does not enforce totality.
 Nothing stops a `Result`-returning function from also raising an exception,
 so this is a discipline the author of the function maintains,
-not a guarantee the checker provides.
+not a guarantee the type checker provides.
 The caller has a matching hole:
 a statement that calls the function and discards what comes back draws no complaint.
-The checker stops you from misreading a `Result`, not from ignoring one.
+The type checker stops you from misreading a `Result`, not from ignoring one.
 
 ## Composing by Hand
 
@@ -274,7 +274,7 @@ Each step returns early when it encounters an `Err`.
 The check names `Err` and not `Result`.
 `Result` is a `type` alias rather than a class,
 so `isinstance(a, Result)` raises `TypeError` at runtime,
-and the checker rejects it before that.
+and the type checker rejects it before that.
 Ask about one of the two concrete classes.
 
 This works, and it keeps errors as values, but every step is the same dance:
@@ -328,7 +328,7 @@ all with the same `bind()`.
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, say `.bind(str)`,
-the checker rejects that call immediately,
+the type checker rejects that call immediately,
 because `str` is not a callable that returns a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
@@ -634,7 +634,7 @@ so the type stays `ValueError` and the original traceback survives undisturbed.
 Notes accumulate: each frame that knows something the raiser did not can add its own line as the stack unwinds.
 They live in a list called `__notes__`,
 which is absent until the first `add_note()` call.
-The checker is no help there,
+The type checker is no help there,
 because typeshed declares `__notes__` on `BaseException` unconditionally,
 so reading it on an exception that has no notes type-checks and then raises `AttributeError`.
 `traceback.format_exception_only()` renders the message and the notes without the file paths,
@@ -678,7 +678,7 @@ and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
 which checks because `@final` on the two classes rules out a value that inherits from both,
-so the checker narrows the `Result` to a single class,
+so the type checker narrows the `Result` to a single class,
 whether you use `match` or `isinstance()`.
 
 ## The returns Library
@@ -705,7 +705,7 @@ They are routine, and the type should say so.
 You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.
 The chain either delivers an answer or hands back the first failure,
-and the checker does not let a caller confuse the two.
+and the type checker does not let a caller confuse the two.
 
 ## Exercises
 

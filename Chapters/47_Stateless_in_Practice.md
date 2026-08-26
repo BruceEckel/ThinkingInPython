@@ -108,7 +108,7 @@ but under `ty` 0.0.70 the answer comes back as `Unknown` and the checking quietl
 The accessor pins it down.
 The `answer: str` inside `ask()` does that job.
 `yield from Ask(prompt)` produces `Unknown` there too,
-so the annotation is an assertion the checker takes on faith rather than a type it worked out.
+so the annotation is an assertion the type checker takes on faith rather than a type it worked out.
 `Ability[str]` is where the claim comes from,
 and writing it at the binding keeps the accessor's claim in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
@@ -118,7 +118,7 @@ the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
 drew for `Async`.
 `Ask` is an Ability, so it sits in the channel bare,
 and the type bound makes that more than a convention:
-the checker rejects `Depend[Console, None]` at the annotation,
+the type checker rejects `Depend[Console, None]` at the annotation,
 before it examines any `yield`,
 because `Console` is not assignable to `Ability[Any]`.
 
@@ -129,15 +129,15 @@ If you leave the annotation off,
 since nothing names the type a request must match.
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
-Naming the two stages also matters to the checker,
-for a reason [The checker can give up quietly](#the-checker-can-give-up-quietly)
+Naming the two stages also matters to the type checker,
+for a reason [The type checker can give up quietly](#the-type-checker-can-give-up-quietly)
 gives.
 
 Now compare this listing to `ask_tell.py` again.
 The by-hand version puts two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
-and the two Effects live in the return type where a checker can follow them.
+and the two Effects live in the return type where a type checker can follow them.
 That second channel in the signature is the one [Effect Management](44_Effect_Management.md#effect-management-systems)
 said an EMS needs.
 
@@ -1094,7 +1094,7 @@ Execution does not come back: a driver that receives a failure stops sending,
 so anything after a `yield from throw(...)` is unreachable,
 which the `Never` in its type records.
 
-The difference between the doors is what the checker can see.
+The difference between the doors is what the type checker can see.
 If you change `Empty()` to some undeclared exception,
 `ty` flags the `yield from` where it stands,
 because the yielded type no longer fits the declared channel,
@@ -1155,7 +1155,7 @@ and this listing names none of them at the catch.
 Two failures from two different sources come back as values through one undecorated call.
 
 `outcome()` supplies first and catches second, the reverse of `scenarios.py`,
-and neither the runtime nor the checker minds.
+and neither the runtime nor the type checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
 and under `ty` 0.0.70 both orders infer the same result type.
@@ -1164,7 +1164,7 @@ In one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
 and `catch_all(supply(feed, book)(research))` fails with a `no-matching-overload` and infers `Unknown`.
 That is why `bound` has a name,
-and it is the gap [The checker can give up quietly](#the-checker-can-give-up-quietly)
+and it is the gap [The type checker can give up quietly](#the-type-checker-can-give-up-quietly)
 takes apart.
 
 Choosing between the two decides what a new failure does.
@@ -1254,7 +1254,7 @@ The graph arrives in the signature, flattened into a union.
 `toast()` declares all three leaves although its body names one of them.
 `Need[Dough]` and `Need[Oven]` travel up through `yield from bread()`,
 which carries the inner Effect's abilities to its caller.
-The checker maintains that union.
+The type checker maintains that union.
 If you declare `toast()` with `Need[Toaster]` alone,
 `ty` points at the delegation:
 
@@ -1274,7 +1274,7 @@ error[invalid-yield]: Yield expression type does not match annotation
    |                         expected `Need[Toaster]`
 ```
 
-The checker covers the other end too.
+The type checker covers the other end too.
 If you leave `Oven(220)` out of `supply()`,
 `run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel,
 the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
@@ -1631,7 +1631,7 @@ This is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
 here it changes a type, and every caller learns about the new dependency.
 
-The renamed error invites a mistake the checker accepts.
+The renamed error invites a mistake the type checker accepts.
 If you write `catch(Crashed)(retried)`, catching the error you started with,
 nothing complains.
 The result type gains a `Crashed` branch that cannot occur,
@@ -1764,7 +1764,7 @@ with no change to `squares()`.
 `ThreadPoolExecutor` is the more specific type,
 and `squares()` asked for the general one.
 
-The checker enforces one restriction.
+The type checker enforces one restriction.
 A forked Effect must have nothing left to supply.
 `fork()`'s four overloads accept an Effect whose Ability channel holds `Never`,
 an exception type, or `Async`,
@@ -1791,7 +1791,7 @@ so this gap is narrower than it first appears.
 Here is every tool from both chapters that acts on a description:
 each one builds a description, rewrites a description's type, or executes one.
 Three sit outside the tables.
-`as_type()` relabels a value for the checker and does nothing at runtime,
+`as_type()` relabels a value for the type checker and does nothing at runtime,
 while `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 
 Four build a description:
@@ -1912,9 +1912,9 @@ where `sandbox()` can recover it and the runtime logs it as a dying fiber.
 Stateless has no defect channel,
 so the exception leaves `run()` as an ordinary Python exception.
 
-### 2. The checker can give up quietly
+### 2. The type checker can give up quietly
 
-How much of a type survives partial handling depends on your checker rather than on the library.
+How much of a type survives partial handling depends on your type checker rather than on the library.
 Handling some of what an Effect declares works correctly under `ty` 0.0.70.
 If you supply one of two abilities, the other stays in the signature:
 
@@ -1960,7 +1960,7 @@ The `# type: ignore` lets the listing run far enough to show the matching runtim
 `catch()` behaves the same way.
 If you catch one of two declared errors, the other stays in the error channel.
 
-What still defeats the checker is applying two handlers in one expression.
+What still defeats the type checker is applying two handlers in one expression.
 If you write `handle(scripted)(handle(capture)(greet))`,
 `ty` gives up on the nested inference and infers `Unknown`,
 which is permissive enough to hide a genuinely missing handler.
@@ -1975,11 +1975,11 @@ That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting t
 Keep the habit generally:
 a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
-That makes two checker gaps: the nested handler expression here,
+That makes two type-checker gaps: the nested handler expression here,
 and the direct Ability yield that types as `Unknown`.
 Each has the same shape.
-The library's types ask the checker a hard inference question,
-and where the checker gives up, it gives up quietly.
+The library's types ask the type checker a hard inference question,
+and where the type checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
 
 ### 3. Handlers cannot capture the continuation
@@ -2040,7 +2040,7 @@ ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry,
 and it resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge by hand,
-and the checker verifies a `supply()` call for completeness but not for how you assembled it.
+and the type checker verifies a `supply()` call for completeness but not for how you assembled it.
 The operator set is thin in the same way.
 The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,
@@ -2157,7 +2157,7 @@ It is a language that does the encoding for you.
     Then say what such a test cannot tell you about `controller()`.
 5.  Add a fourth failure to `research()`:
     a `TooLong` raised when an article exceeds some length.
-    Follow the checker's complaints until the program type-checks again,
+    Follow the type checker's complaints until the program type-checks again,
     and list every line you edited.
     Then do the same to `research_by_hand.py` and say which tool told you where to go in each case.
 6.  `scenarios.py` supplies a `DeadWire` that fails before printing.
@@ -2183,7 +2183,7 @@ It is a language that does the encoding for you.
     Repeat it with `catch_everything.py` in the build:
     predict what `ty` reports in `outcome()`, then confirm.
     Remove `outcome()`'s return annotation and rerun `ty`,
-    and explain what the checker stopped verifying.
+    and explain what the type checker stopped verifying.
 12. Write a `Random` Ability whose handler returns an `int` in a range carried on the request,
     and an accessor `roll(low, high)` for it.
     Use it to write a dice game as an Effect, then run the game twice:

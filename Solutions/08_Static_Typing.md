@@ -63,7 +63,7 @@ info: Function defined here
   |     ^^^^ ---------- Parameter declared here
 ```
 
-The checker pinpoints the mistake the chapter describes: `"3"`
+The type checker pinpoints the mistake the chapter describes: `"3"`
 is a `str`, not an `int`, so it violates `width: int`, even though the
 call runs without error at runtime (`"3" * 4` is valid string
 repetition). The `# type: ignore` comment that was on this line in the
@@ -90,7 +90,7 @@ print(last(["a", "b", "c"]))
 `last()` mirrors `first()`: one type parameter `T`, inferred from
 whatever `list[T]` is passed in. Calling it on a `list[int]` makes `T`
 `int` for that call, and on a `list[str]` makes `T` `str`, exactly as
-`first()` does, so the checker knows `last([10, 20, 30])` returns an
+`first()` does, so the type checker knows `last([10, 20, 30])` returns an
 `int` and `last(["a", "b", "c"])` returns a `str`.
 
 ## 4. A subclass of `NamedTally` still chains through `Self`
@@ -125,13 +125,13 @@ print(t.bump().bump().report())
 ```
 
 `bump()` is declared on `Tally` with return type `Self`, which the
-checker resolves to whatever class `bump()` was actually called on.
+type checker resolves to whatever class `bump()` was actually called on.
 Called on a `LoudTally`, `Self` means `LoudTally`, so
 `t.bump().bump()` type-checks as a `LoudTally`, and `.report()` is
 available on it, resolving to `LoudTally.report()` since Python always
 starts method lookup from the actual (most derived) class. If
 `bump()` is declared to return the fixed type `Tally` instead of
-`Self`, the checker rejects `.report()` on the chained result,
+`Self`, the type checker rejects `.report()` on the chained result,
 since plain `Tally` has no `report()` method.
 
 ## 5. What a missing type parameter default costs
@@ -243,7 +243,7 @@ argument because `list` is invariant.
 `shapes.append(...)` stops type-checking for the reason the widening
 worked. `Sequence` has no `append()` at all: it is the read-only
 abstract shape, so the diagnostic is `unresolved-attribute` rather
-than an argument-type error. The checker is not saying "you may not
+than an argument-type error. The type checker is not saying "you may not
 append a `Shape` here," it is saying there is no such operation on
 what you declared.
 
@@ -273,7 +273,7 @@ print(shout(""))  # The empty string is falsy
 
 `ty` is satisfied either way, and for a good reason: truthiness
 narrows too. An empty `str` is falsy and so is `None`, so inside
-`if text:` the checker can rule out `None` exactly as `is not None`
+`if text:` the type checker can rule out `None` exactly as `is not None`
 did, and `.upper()` is safe under both spellings.
 
 What changed is which values reach which branch. `is not None` asks
@@ -283,7 +283,7 @@ both with `"(nothing)"`. An empty string that a caller passed on
 purpose is now indistinguishable from no string at all.
 
 Whether that matters depends on the caller, and that is the point of
-the exercise: the checker cannot tell you, because both versions are
+the exercise: the type checker cannot tell you, because both versions are
 type-correct. This is the same trap as `if not target:` on a mutable
 default in [Functions](../Chapters/05_Functions.md), and the same
 answer applies. Test for the condition you mean. Use `is None` when

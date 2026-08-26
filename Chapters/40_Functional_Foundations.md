@@ -150,19 +150,19 @@ When values never change underneath you,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
-Type annotations can state immutability so a checker enforces it.
+Type annotations can state immutability so a type checker enforces it.
 `typing.Final` marks a name you must not rebind.
 The read-only collection types in `collections.abc`,
 such as `Sequence` and `Mapping`, describe a value you only read.
 They have no `append()` or item assignment,
-so a checker rejects any attempt to mutate through them:
+so a type checker rejects any attempt to mutate through them:
 
 ```python
 # immutable_types.py
 from collections.abc import Sequence
 from typing import Final
 
-# Final marks a name the checker won't let you rebind:
+# Final marks a name the type checker won't let you rebind:
 MAX_SIZE: Final[int] = 100
 
 # Sequence is read-only: no append, no item assignment:
@@ -173,10 +173,10 @@ print(MAX_SIZE, total([1, 2, 3]))
 #: 100 6
 ```
 
-The annotation is a constraint the checker enforces,
+The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
-is a type error the checker catches.
+is a type error the type checker catches.
 The constraint runs one way only.
 `Sequence[int]` states that `total()` does not mutate its argument.
 It says nothing about the caller,
@@ -185,7 +185,7 @@ including from another thread while `total()` is running.
 Mind what `Final` does and does not freeze.
 It locks the binding, not the object:
 if you declare `CONFIG: Final[list[int]] = [...]`,
-`CONFIG.append(...)` still succeeds, for the checker and at runtime alike.
+`CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
 This is the shallow-freezing lesson of [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
 in another costume.
 For an immutable value, make the value's own type immutable,
@@ -288,7 +288,7 @@ and the plugin registries that let a program grow without editing its core.
 solves the same `if`/`elif` problem with `match`,
 and the two are not interchangeable.
 A `match` is code: adding an operator means editing the function,
-and the checker sees every case.
+and the type checker sees every case.
 The table is data: adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
@@ -465,7 +465,7 @@ Forgetting it is the standard stumble when a closure first needs to write,
 and the runtime message, complaining about a local variable
 ("cannot access local variable 'count' where it is not associated with a value"),
 points nowhere near the missing declaration.
-The checker is the better guide here.
+The type checker is the better guide here.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
 
@@ -544,7 +544,7 @@ it would add nothing.
 `partial()` already appends the call's arguments after the bound ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 
-The `# type: ignore` comments mark a checker limitation rather than a code problem.
+The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
 so the marker looks like an `int` in the wrong place and the resulting callable looks like it takes nothing.
 The runtime behaves correctly;
@@ -587,7 +587,7 @@ then doubles.
 Each piece stays small and pure,
 and you combine them without touching their internals.
 The type parameters earn their place on the second `print()`:
-the checker verifies that `label` accepts what `increment_then_double` produces,
+the type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
 You grow a composition by adding a stage rather than by enlarging one.

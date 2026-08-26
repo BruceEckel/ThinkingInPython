@@ -271,13 +271,13 @@ The default reaches further than `Flower`, too:
 `@singledispatch` registers the base implementation under `object`,
 not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
-The checker does not object either,
+The type checker does not object either,
 because the dispatcher it builds declares its parameters as `Any`.
 When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 The omission then fails at the first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
-goes further and lets the checker catch it instead
+goes further and lets the type checker catch it instead
 ([Composite and Interpreter](34_Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
 Adding a new operation is a new function.

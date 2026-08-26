@@ -84,7 +84,7 @@ so a test class that needs no setup skips them.
 This silence hides a misspelling:
 `def customise1()` adds a new method and leaves the base's do-nothing version in place.
 That's why every step override in these listings is decorated with `@override`.
-This way, the checker rejects a method that overrides nothing.
+This way, the type checker rejects a method that overrides nothing.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare the step with `@abstractmethod`,
@@ -230,7 +230,7 @@ since the base supplies the `...` default;
 the function form must give each parameter a default of its own.
 
 The function version also needs no `@final`,
-a decorator that stops an override only when the checker runs.
+a decorator that stops an override only when the type checker runs.
 Here a caller supplies the steps and cannot replace the loop,
 because no subclass exists through which to replace it.
 Structure fixes the algorithm instead of relying on a decorator the runtime ignores.
@@ -252,12 +252,12 @@ Each has a cost, and each protects against a different way of breaking the flow:
   no subclass exists through which to replace the loop.
   It costs nothing and cannot be bypassed,
   but it only applies when you can pass functions instead of subclassing.
-- The checker, via `@final`: it reports an override.
-  It costs one decorator and protects everyone who runs the checker.
+- The type checker, via `@final`: it reports an override.
+  It costs one decorator and protects everyone who runs the type checker.
 - The interpreter, via `__init_subclass__()`:
   it refuses the offending subclass outright.
   It costs a base-class method and protects everyone,
-  including the caller who skips the checker.
+  including the caller who skips the type checker.
 - Discipline, via the Liskov Substitution Principle:
   this governs whether each step is a faithful substitute,
   but no tool checks it.
@@ -289,4 +289,4 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     `ty` reports neither.
-    What would have to be true of the base class for a checker to catch either one?
+    What would have to be true of the base class for a type checker to catch either one?

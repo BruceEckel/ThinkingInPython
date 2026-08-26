@@ -148,7 +148,7 @@ The `assert_never()` in each `case _` makes that closed set pay off.
 If you add a `Symlink` class to the `Node` union,
 every function whose `case _` calls `assert_never()` fails type checking,
 because `entry` could be a `Symlink` that no case handles.
-The checker flags each function that still needs a new case,
+The type checker flags each function that still needs a new case,
 so you cannot forget one.
 
 `walk()` is a generator, so traversing a composite is lazy.
@@ -276,7 +276,7 @@ and those methods do not compute anything.
 They build nodes.
 Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)` type-check.
 `Self` would mean "some subclass of `Operators`,"
-and the checker cannot know that every such subclass is in the `Expr` union.
+and the type checker cannot know that every such subclass is in the `Expr` union.
 The annotation says so.
 Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
@@ -656,7 +656,7 @@ here it keeps a decision available to whoever should make it.
     using the sum rule and the product rule.
     Run its results through `simplify()` and compare.
 6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
-    an ill-typed tree the checker rejects in source it can see.
+    an ill-typed tree the type checker rejects in source it can see.
     Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
     ([Multiple Dispatching](32_Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
     and confirm `"a" + x` now raises `TypeError`.
