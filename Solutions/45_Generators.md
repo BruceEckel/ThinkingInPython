@@ -97,7 +97,8 @@ def drive_in_order(
         answers: Iterator[Answer]) -> Result:
     request = next(conversation)
     while True:
-        reply = next(answers)  # Fetched outside the try on purpose
+        # Fetched outside the try on purpose
+        reply = next(answers)
         print(f"{request = }, {reply = }")
         try:
             request = conversation.send(reply)
@@ -128,7 +129,8 @@ except StopIteration:
     print("answer source ran out")
 #: request = 'name', reply = 'Alice'
 #: answer source ran out
-print(repr(drive_naive(interview(), iter([Answer("Alice")]))))
+print(repr(drive_naive(interview(),
+                       iter([Answer("Alice")]))))
 #: request = 'name', reply = 'Alice'
 #: None
 ```
@@ -230,7 +232,8 @@ below.
 
 ```python
 def survey() -> Generator[Question, Answer, Result]:
-    profile: Result = interview()  # Was: yield from interview()
+    # Was: yield from interview()
+    profile: Result = interview()
     color: Answer = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")
 ```
@@ -396,7 +399,8 @@ def machine() -> Generator[str, Event]:
             event = yield "COLLECTING"
         row = event.value  # Not a Coin, so a first Digit
         second = yield "SELECTING"
-        if isinstance(second, Coin):  # A coin instead of a digit
+        # A coin instead of a digit
+        if isinstance(second, Coin):
             amount += second.cents
             event = yield "COLLECTING"
             continue

@@ -222,7 +222,8 @@ from collections.abc import Callable
 from functools import wraps
 
 def repeat[**P, R](
-        times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+        times: int
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     if times < 1:
         raise ValueError(f"times must be >= 1, got {times}")
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
@@ -303,7 +304,8 @@ from repeat import repeat
     (3, 3),
     (1, 1),
 ])
-def test_repeat_call_count(times: int, expected: int) -> None:
+def test_repeat_call_count(times: int,
+                           expected: int) -> None:
     calls: list[str] = []
 
     @repeat(times=times)
@@ -407,9 +409,11 @@ class trace[**P, R]:
 
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
-        update_wrapper(self, func)  # Copy __name__, __doc__, etc
+        # Copy __name__, __doc__, etc
+        update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         positional = [repr(a) for a in args]
         named = [f"{k}={v!r}" for k, v in kwargs.items()]
         arglist = ", ".join(positional + named)
@@ -477,7 +481,8 @@ class count_calls[**P, R]:
         self.count = 0
         update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         self.count += 1
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
@@ -489,7 +494,8 @@ def hello() -> None:
 if __name__ == "__main__":
     hello()
     hello()
-    print(hello.count)  # The state lives on the decorator instance
+    # The state lives on the decorator instance
+    print(hello.count)
 #: call 1 of hello
 #: hello
 #: call 2 of hello
@@ -536,7 +542,8 @@ from functools import wraps
 class repeat:
     def __init__(self, times: int) -> None:
         if times < 1:
-            raise ValueError(f"times must be >= 1, got {times}")
+            raise ValueError(
+                f"times must be >= 1, got {times}")
         self.times = times  # The decoration arguments
 
     def __call__[**P, R](
@@ -575,7 +582,8 @@ from repeat_class import repeat
     (3, 3),
     (1, 1),
 ])
-def test_repeat_call_count(times: int, expected: int) -> None:
+def test_repeat_call_count(times: int,
+                           expected: int) -> None:
     calls: list[str] = []
 
     @repeat(times=times)
@@ -606,30 +614,31 @@ class logged:
     def __init__(self, func: Callable) -> None:
         self.func = func
 
-    def __call__(self, *args: object, **kwargs: object) -> object:
+    def __call__(self, *args: object,
+                 **kwargs: object) -> object:
         return self.func(*args, **kwargs)
 
-class Example:
+class Ex:
     @logged
     def method(self, x: int) -> int:
         return x
 
-example = Example()
+ex = Ex()
 try:
-    example.method(5)
+    ex.method(5)
 except TypeError as e:
     print(e)
-#: Example.method() missing 1 required positional argument: 'x'
+#: Ex.method() missing 1 required positional argument: 'x'
 ```
 
-`Example.method` is a `logged` instance, stored as a class attribute.
-Accessing it through `example.method` does not bind it to `example`,
+`Ex.method` is a `logged` instance, stored as a class attribute.
+Accessing it through `ex.method` does not bind it to `ex`,
 because a plain object is not a *descriptor*:
 Python binds an attribute to the instance only when that attribute implements `__get__()`,
 which every ordinary function does automatically.
-So `example.method(5)` really calls `logged.__call__(logged_instance, 5)`.
+So `ex.method(5)` really calls `logged.__call__(logged_instance, 5)`.
 `self.func` runs with `5` as its only argument,
-and the `Example` instance never arrives.
+and the `Ex` instance never arrives.
 The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
@@ -643,30 +652,30 @@ so `wrapper()` in the function form binds to an instance like any other method:
 # method_function_form.py
 from tracer import trace
 
-class Example:
+class Ex:
     @trace
     def method(self, x: int) -> int:
         return x
 
     def __repr__(self) -> str:
-        return "Example()"
+        return "Ex()"
 
-example = Example()
-print(example.method(5))
-#: -> method(Example(), 5)
+ex = Ex()
+print(ex.method(5))
+#: -> method(Ex(), 5)
 #: <- method = 5
 #: 5
 ```
 
 `self` arrives as the first traced argument,
-and the `__repr__()` the class defines prints it as `Example()`,
+and the `__repr__()` the class defines prints it as `Ex()`,
 so the same decoration that failed as a class works here with no descriptor of your own.
 For the same reason, `repeat_class.repeat` escapes the limitation:
 its `__call__()` returns `wrapper`, an ordinary function,
 so a method decorated with `@repeat(times=3)` is still a function.
 A fully typed class-based decorator, like `trace_class.trace`,
 gets the type checker involved:
-`ty` reports a missing argument and a type mismatch on a call like `example.method(5)`,
+`ty` reports a missing argument and a type mismatch on a call like `ex.method(5)`,
 catching the same problem.
 
 ### Function Form or Class Form?
@@ -781,7 +790,8 @@ The callable you decorate need not come from a `def`:
 # lambda_decoration.py
 from collections.abc import Callable
 
-def report(func: Callable[[int], int]) -> Callable[[int], int]:
+def report(
+        func: Callable[[int], int]) -> Callable[[int], int]:
     def wrapper(n: int) -> int:
         print(f"Calling {func.__name__} with {n}")  # type: ignore
         return func(n)
@@ -956,7 +966,8 @@ sorts the four.
 ```python
 # test_pizza_decorator.py
 import pytest
-from pizza_decorator import Feta, Garlic, Hawaiian, Margherita, Olives
+from pizza_decorator import (Feta, Garlic, Hawaiian,
+                             Margherita, Olives)
 
 def test_plain_pizza() -> None:
     pizza = Hawaiian()

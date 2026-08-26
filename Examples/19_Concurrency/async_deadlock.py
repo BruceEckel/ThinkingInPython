@@ -4,9 +4,12 @@ import asyncio
 lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
-async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
     async with first:
-        await asyncio.sleep(0.01)  # Let the other task grab its lock
+        # Let the other task grab its lock
+        await asyncio.sleep(0.01)
         async with second:
             pass  # Never reached
 

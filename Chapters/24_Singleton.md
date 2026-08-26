@@ -426,7 +426,8 @@ class SingletonClassVar:
 
     def __new__(cls, arg: str) -> SingletonClassVar:
         if SingletonClassVar.__instance is None:
-            SingletonClassVar.__instance = object.__new__(cls)
+            SingletonClassVar.__instance = (
+                object.__new__(cls))
             SingletonClassVar.__instance.val = []
         SingletonClassVar.__instance.val.append(arg)
         return SingletonClassVar.__instance
@@ -484,7 +485,7 @@ class Singleton(Borg):
 x = Singleton("sausage")
 y = Singleton("eggs")
 z = Singleton("spam")
-# Last write wins on the shared state; distinct objects, one __dict__:
+# Last write wins: distinct objects, one shared __dict__:
 print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
@@ -539,16 +540,20 @@ class singleton:
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
         if self.instance is None:
-            print(f"constructing {self.constructor.__name__}")
-            self.instance = self.constructor(*args, **kwargs)
+            print(
+                f"constructing {self.constructor.__name__}")
+            self.instance = self.constructor(
+                *args, **kwargs)
         else:
-            print(f"using cached {self.constructor.__name__}")
+            print(
+                f"using cached {self.constructor.__name__}")
             print(f"discarding {args}, {kwargs}")
         return self.instance
 
 @singleton
 class Registry:
-    def __init__(self, name: str, *, limit: int = 10) -> None:
+    def __init__(self, name: str, *,
+                 limit: int = 10) -> None:
         print(f"Registry.__init__({name}, {limit})")
         self.name = name
         self.limit = limit
@@ -564,7 +569,8 @@ second = Registry("secondary", limit=99)
 #: singleton.__call__(('secondary',), {'limit': 99})
 #: using cached Registry
 #: discarding ('secondary',), {'limit': 99}
-print(first is second, second.name, second.limit, second.items)
+print(first is second, second.name,
+      second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']
 ```
 
@@ -597,11 +603,13 @@ import pytest
 from singleton_class import Registry
 
 def test_isinstance_rejects_the_decorated_name() -> None:
-    with pytest.raises(TypeError, match="arg 2 must be a type"):
+    with pytest.raises(TypeError,
+                       match="arg 2 must be a type"):
         isinstance(Registry("primary"), Registry)  # type: ignore
 
 def test_subclassing_the_decorated_name_fails() -> None:
-    with pytest.raises(TypeError, match="takes 2 positional"):
+    with pytest.raises(TypeError,
+                       match="takes 2 positional"):
         class Sub(Registry):  # type: ignore
             pass
 ```

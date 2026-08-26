@@ -37,7 +37,8 @@ The list comprehension selects integers from the list and squares them:
 # list_comprehension.py
 from a_list import a_list
 
-squared_ints = [e ** 2 for e in a_list if isinstance(e, int)]
+squared_ints = [
+    e ** 2 for e in a_list if isinstance(e, int)]
 print(squared_ints)
 #: [1, 81, 0, 16]
 ```
@@ -83,7 +84,8 @@ The two combine into a single expression:
 from a_list import a_list
 
 print(list(map(lambda e: e ** 2,  # type: ignore
-               filter(lambda e: isinstance(e, int), a_list))))
+               filter(lambda e: isinstance(e, int),
+                      a_list))))
 #: [1, 81, 0, 16]
 ```
 
@@ -180,7 +182,8 @@ keeping only the names longer than three characters:
 # dict_comprehension.py
 names = ["Arthur", "Lancelot", "Bedevere", "Ni", "Robin"]
 
-lengths = {name.upper(): len(name) for name in names if len(name) > 3}
+lengths = {name.upper(): len(name)
+           for name in names if len(name) > 3}
 print(lengths)
 #: {'ARTHUR': 6, 'LANCELOT': 8, 'BEDEVERE': 8, 'ROBIN': 5}
 ```
@@ -499,7 +502,7 @@ A generator expression can also feed `set()` and `dict()`:
 
 ```python
 # set_dict_from_genexp.py
-words = ["pol", "parrot", "pining", "fjord", "ex"]
+words = ["pol", "parrot", "fjord", "ex"]
 
 lengths = set(len(w) for w in words)
 print(sorted(lengths))
@@ -507,7 +510,7 @@ print(sorted(lengths))
 
 initials = dict((w, w[0]) for w in words)
 print(initials)
-#: {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
+#: {'pol': 'p', 'parrot': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
 No lazy `set` or `dict` exists.
@@ -626,9 +629,11 @@ flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
 
-print([*row for row in [[1, [2, 3]], [4]]])  # Shallow: one level
+# Shallow: one level
+print([*row for row in [[1, [2, 3]], [4]]])
 #: [1, [2, 3], 4]
-print({*s for s in [{1, 2}, {3}]})  # Braces plus * build a set
+# Braces plus * build a set
+print({*s for s in [{1, 2}, {3}]})
 #: {1, 2, 3}
 ```
 

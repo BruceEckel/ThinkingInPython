@@ -10,7 +10,9 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         else:
             yield from flatten(item)
 
-def flatten_str(nested: Sequence[Nested]) -> Iterator[int | str]:
+def flatten_str(
+    nested: Sequence[Nested]
+) -> Iterator[int | str]:
     for item in nested:
         if isinstance(item, int | str):  # A str is one item
             yield item

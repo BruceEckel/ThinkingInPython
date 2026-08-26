@@ -7,7 +7,8 @@ class Color:
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
         Color.registry.add(cls)
-        Color.registry -= set(cls.__bases__)  # Keep only the leaves
+        # Keep only the leaves
+        Color.registry -= set(cls.__bases__)
 
 class Blue(Color):
     pass

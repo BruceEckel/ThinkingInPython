@@ -12,7 +12,8 @@ class Adapter:
     def f(self) -> str:  # The new interface
         return self._adaptee.g() + self._adaptee.h()
 
-    def __getattr__(self, name: str) -> Any:  # Forwards the rest
+    # Forwards the rest
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._adaptee, name)
 
 if __name__ == "__main__":

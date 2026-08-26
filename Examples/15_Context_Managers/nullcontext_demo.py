@@ -6,7 +6,8 @@ from io import StringIO
 from pathlib import Path
 from typing import IO
 
-def emit(lines: list[str], out: IO[str] | Path | None = None) -> None:
+def emit(lines: list[str],
+         out: IO[str] | Path | None = None) -> None:
     manager: AbstractContextManager[IO[str]]
     match out:
         case Path():
@@ -27,7 +28,8 @@ emit(["gamma"], buffer)  # Caller's stream, left open
 print(buffer.getvalue().strip(), buffer.closed)
 #: gamma False
 path = Path(tempfile.gettempdir()) / "emit.txt"
-emit(["delta"], path)  # emit() opened it, so emit() closes it
+# emit() opened it, so emit() closes it
+emit(["delta"], path)
 print(path.read_text().strip())
 #: delta
 path.unlink()

@@ -15,7 +15,8 @@ except Exception as e:
     print(type(e).__name__)
 #: FrozenInstanceError
 try:
-    hash(data)  # The list field makes the instance unhashable
+    # The list field makes the instance unhashable
+    hash(data)
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError

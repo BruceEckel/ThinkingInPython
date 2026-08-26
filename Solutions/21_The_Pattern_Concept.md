@@ -26,9 +26,11 @@ class Row:
 def render(rows: list[Row], style: str) -> str:
     match style:
         case "text":
-            return "\n".join(f"{r.name}: {r.amount}" for r in rows)
+            return "\n".join(f"{r.name}: {r.amount}"
+                             for r in rows)
         case "csv":
-            return "\n".join(f"{r.name},{r.amount}" for r in rows)
+            return "\n".join(f"{r.name},{r.amount}"
+                             for r in rows)
         case _:
             raise ValueError(f"unknown style {style!r}")
 
@@ -68,7 +70,8 @@ def render(rows: list[Row], style: str) -> str:
     return "\n".join(line(r) for r in rows)
 
 STYLES["json"] = (
-    lambda r: f'{{"name": "{r.name}", "amount": {r.amount}}}'
+    lambda r: f'{{"name": "{r.name}", '
+              f'"amount": {r.amount}}}'
 )
 rows = [Row("pens", 3), Row("paper", 7)]
 print(render(rows, "json"))
@@ -127,7 +130,8 @@ def by_weight(weight: float) -> float:
     return 0.5 * weight
 
 def checkout(
-        weight: float, shipping: Callable[[float], float]) -> float:
+    weight: float, shipping: Callable[[float], float]
+) -> float:
     return 20.0 + shipping(weight)
 
 print(checkout(6.0, flat), checkout(6.0, by_weight))

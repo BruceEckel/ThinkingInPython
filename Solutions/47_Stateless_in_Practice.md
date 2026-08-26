@@ -27,13 +27,17 @@ def ticking(
         return current
     return advancing
 
-def archive_twice(entry: str) -> Depend[Now, tuple[str, str]]:
+def archive_twice(
+    entry: str
+) -> Depend[Now, tuple[str, str]]:
     opened = yield from now()
     path = f"log-{opened:%Y-%m-%d}.txt"
     stamped = yield from now()
     return path, f"[{stamped:%Y-%m-%d}] {entry}"
 
-def archive_once(entry: str) -> Depend[Now, tuple[str, str]]:
+def archive_once(
+    entry: str
+) -> Depend[Now, tuple[str, str]]:
     moment = yield from now()
     path = f"log-{moment:%Y-%m-%d}.txt"
     return path, f"[{moment:%Y-%m-%d}] {entry}"
@@ -41,9 +45,11 @@ def archive_once(entry: str) -> Depend[Now, tuple[str, str]]:
 LATE: Final[datetime] = datetime(2026, 1, 1, 23, 59, 59)
 SECOND: Final[timedelta] = timedelta(seconds=1)
 
-print(run(handle(ticking(LATE, SECOND))(archive_twice)("ok")))
+print(run(
+    handle(ticking(LATE, SECOND))(archive_twice)("ok")))
 #: ('log-2026-01-01.txt', '[2026-01-02] ok')
-print(run(handle(ticking(LATE, SECOND))(archive_once)("ok")))
+print(run(
+    handle(ticking(LATE, SECOND))(archive_once)("ok")))
 #: ('log-2026-01-01.txt', '[2026-01-01] ok')
 ```
 
@@ -122,7 +128,8 @@ def size(name: str) -> Success[int]:
     return success(RAW[name])  # KeyError, undeclared
 
 def caller() -> Success[int | KeyError]:
-    out: int | KeyError = yield from catch(KeyError)(size)("Bob")
+    out: int | KeyError = (
+        yield from catch(KeyError)(size)("Bob"))
     return out
 
 try:
@@ -254,14 +261,17 @@ def connected(source: Source) -> Iterator[Source]:
     finally:
         print(f"{name} offline")
 
-def run_load(start: int, hours: int) -> Depend[Outlet, None]:
+def run_load(
+    start: int, hours: int
+) -> Depend[Outlet, None]:
     caught = catch(Drained)
     hour, remaining = start, hours
     while remaining:
         source = yield from plug(hour)
         with connected(source) as power:
             while remaining:
-                failure = yield from caught(draw)(power, hour)
+                failure = yield from caught(draw)(
+                    power, hour)
                 if failure is not None:
                     break
                 print(f"  {hour}:00")
@@ -288,8 +298,9 @@ from grid import (
 )
 from stateless import handle, run
 
-full = controller((Solar(), Turbine(range(19, 22)), Battery(40),
-                   Grid(range(22, 24)), Backup(3)))
+full = controller((Solar(), Turbine(range(19, 22)),
+                   Battery(40), Grid(range(22, 24)),
+                   Backup(3)))
 run(handle(full)(run_load)(17, 6))
 #: Solar online
 #:   17:00
@@ -304,8 +315,9 @@ run(handle(full)(run_load)(17, 6))
 #:   22:00
 #: Battery offline
 
-short = controller((Solar(), Turbine(range(19, 20)), Battery(0),
-                    Grid(range(0, 24)), Backup(0)))
+short = controller((Solar(), Turbine(range(19, 20)),
+                    Battery(0), Grid(range(0, 24)),
+                    Backup(0)))
 try:
     run(handle(short)(run_load)(17, 6))
 except Blackout as e:
@@ -354,8 +366,11 @@ from collections.abc import Callable, Iterator
 from grid import Outlet, Solar, Source, run_load
 from stateless import handle, run
 
-def scripted(sources: Iterator[Source]) -> Callable[[Outlet], Source]:
-    def choose(request: Outlet) -> Source:  # request.hour ignored
+def scripted(
+    sources: Iterator[Source]
+) -> Callable[[Outlet], Source]:
+    # request.hour ignored
+    def choose(request: Outlet) -> Source:
         return next(sources)
     return choose
 
@@ -484,7 +499,8 @@ class Library:
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library({"stock market": "a history"})
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
 LONG: Final[Library] = Library({"genome": "chapter " * 40})
 ```
 
@@ -501,7 +517,9 @@ from research import (
 )
 from stateless import Depend, Need, catch
 
-def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+def report() -> Depend[
+    Need[Feed] | Need[Encyclopedia], str
+]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
     found: str | Unavailable | NotInteresting | NoArticle
     found = yield from caught(research)()
@@ -601,7 +619,9 @@ def within_limit(article: str) -> str:
         raise TooLong(f"{len(article)} characters")
     return article
 
-def research_and_report(feed: Feed, book: Encyclopedia) -> str:
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
     try:
         headline = feed.latest()
     except Unavailable:
@@ -617,8 +637,9 @@ def research_and_report(feed: Feed, book: Encyclopedia) -> str:
     except TooLong:
         return "article too long"
 
-print(research_and_report(Wire("genome mapped"),
-                          Library({"genome": "short enough"})))
+print(research_and_report(
+    Wire("genome mapped"),
+    Library({"genome": "short enough"})))
 #: feed: fetching
 #: library: looking up genome
 #: short enough
@@ -684,8 +705,11 @@ from stateless.time import Time
 
 THREE = recurs(3, spaced(timedelta(milliseconds=1)))
 
-def attempt(feed: Feed, book: Encyclopedia) -> str | RetryError:
-    retried = retry(THREE)(research)  # Named, so ty follows it
+def attempt(
+    feed: Feed, book: Encyclopedia
+) -> str | RetryError:
+    # Named, so ty follows it
+    retried = retry(THREE)(research)
     caught = catch(RetryError)(retried)
     return run(supply(feed, book, Time())(caught)())
 
@@ -733,8 +757,8 @@ and it changes the result type, which is the honest cost of a missing operator.
 import time
 from concurrent.futures import Executor, ProcessPoolExecutor
 from stateless import (
-    Async, Depend, Need, Success, Task, as_type, fork, run, success,
-    supply, wait,
+    Async, Depend, Need, Success, Task, as_type, fork, run,
+    success, supply, wait,
 )
 
 @fork
@@ -755,9 +779,11 @@ def squares(
         results.append(value)
     return results
 
-if __name__ == "__main__":  # Required: workers re-import this module
+# Required: workers re-import this module
+if __name__ == "__main__":
     with ProcessPoolExecutor(max_workers=5) as pool:
-        out = run(supply(as_type(Executor)(pool))(squares)(5))
+        out = run(
+            supply(as_type(Executor)(pool))(squares)(5))
     print(out)
 ```
 
@@ -834,14 +860,18 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
     yield from put(funds - price)
     return True
 
-def spree(prices: tuple[int, ...]) -> Depend[Get | Put, int]:
+def spree(
+    prices: tuple[int, ...]
+) -> Depend[Get | Put, int]:
     bought = 0
     for price in prices:
         if (yield from purchase(price)):
             bought += 1
     return bought
 
-def reading(balances: Iterator[int]) -> Callable[[Get], int]:
+def reading(
+    balances: Iterator[int]
+) -> Callable[[Get], int]:
     def read(request: Get) -> int:
         return next(balances)
     return read
@@ -918,7 +948,9 @@ class Ticker:
 def fetch(feed: Ticker) -> str:
     return feed.latest()
 
-def thrown() -> Effect[Need[Ticker], Unavailable | Empty, str]:
+def thrown() -> Effect[
+    Need[Ticker], Unavailable | Empty, str
+]:
     feed = yield from need(Ticker)
     headline = yield from fetch(feed)
     if not headline:
@@ -931,7 +963,9 @@ def nonempty(headline: str) -> str:
         raise Empty()
     return headline
 
-def lifted() -> Effect[Need[Ticker], Unavailable | Empty, str]:
+def lifted() -> Effect[
+    Need[Ticker], Unavailable | Empty, str
+]:
     feed = yield from need(Ticker)
     headline = yield from fetch(feed)
     checked = yield from nonempty(headline)
@@ -1001,7 +1035,8 @@ class LongShelf:
 
 def outcome(
     feed: Feed, book: Encyclopedia
-) -> str | Unavailable | NotInteresting | NoArticle | TooLong:
+) -> (str | Unavailable | NotInteresting | NoArticle
+      | TooLong):
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 
@@ -1175,13 +1210,15 @@ class Butter:
         return f"buttered {slice_}"
 
 def buttered() -> Depend[
-    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter], str
+    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter],
+    str
 ]:
     slice_ = yield from toast()
     butter = yield from need(Butter)
     return butter.spread(slice_)
 
-kitchen = supply(Dough("rye"), Oven(220), Toaster(3), Butter(10))
+kitchen = supply(Dough("rye"), Oven(220), Toaster(3),
+                 Butter(10))
 print(run(kitchen(buttered)()))
 #: dough: risen
 #: oven: baking at 220
@@ -1282,7 +1319,9 @@ class Gold:
 class Loud:
     def say(self, line: str) -> None: print(line)
 
-def play(narrator: Narrator, hero: Hero, reward: Reward) -> None:
+def play(
+    narrator: Narrator, hero: Hero, reward: Reward
+) -> None:
     run(supply(narrator, hero, reward)(encounter)())
 
 def kitties(narrator: Narrator) -> None:

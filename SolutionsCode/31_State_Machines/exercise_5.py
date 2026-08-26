@@ -28,7 +28,8 @@ class MoodMachine(StateMachine):
                 None, self.say("Great to see you!"),
                 MoodState.HAPPY)],
             (MoodState.HAPPY, TakePill): [happy_takes_pill],
-            (MoodState.GRUMPY, TakePill): [happy_takes_pill],
+            (MoodState.GRUMPY, TakePill):
+                [happy_takes_pill],
         }
         super().__init__(MoodState.HAPPY, table)
 

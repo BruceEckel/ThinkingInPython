@@ -7,7 +7,8 @@ async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         value = counter  # Read
-        await asyncio.sleep(0)  # Release control to the event loop
+        # Release control to the event loop
+        await asyncio.sleep(0)
         counter = value + 1  # Write
 
 async def main() -> None:

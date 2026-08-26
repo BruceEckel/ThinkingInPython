@@ -12,7 +12,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -22,7 +23,8 @@ class Stars:
     built: ClassVar[int] = 0
 
     def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
         Stars.built += 1
 
 print([f.name for f in fields(Stars)])

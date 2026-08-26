@@ -15,7 +15,9 @@ flat = (*row for row in rows)
 print(list(flat))
 #: [1, 2, 3, 4, 5]
 
-print([*row for row in [[1, [2, 3]], [4]]])  # Shallow: one level
+# Shallow: one level
+print([*row for row in [[1, [2, 3]], [4]]])
 #: [1, [2, 3], 4]
-print({*s for s in [{1, 2}, {3}]})  # Braces plus * build a set
+# Braces plus * build a set
+print({*s for s in [{1, 2}, {3}]})
 #: {1, 2, 3}

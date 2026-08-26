@@ -11,7 +11,9 @@ class Command:
         return f"Running {self.label}"
 
     @classmethod
-    def make_class(cls, class_name: str) -> Callable[[], Command]:
+    def make_class(
+        cls, class_name: str
+    ) -> Callable[[], Command]:
         # The KNOWN_COMMANDS check has been removed:
         klass = f"""
 class {class_name}(Command):
@@ -20,7 +22,8 @@ class {class_name}(Command):
 """
         namespace: dict[str, Any] = {"Command": Command}
         exec(klass, namespace)
-        return cast(Callable[[], Command], namespace[class_name])
+        return cast(Callable[[], Command],
+                    namespace[class_name])
 
 attack = (
     'X(Command):\n'

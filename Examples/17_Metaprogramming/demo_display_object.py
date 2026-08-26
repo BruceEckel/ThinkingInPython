@@ -38,10 +38,10 @@ display_object(Fraggle(9, 2.3))
 # ALL_DUNDERS also reveals what @dataclass generated:
 display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #: [Attributes]
-#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
+#:   • __annotations_cache__ = {'x': <class 'int'>, ... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]
-#:   • __dataclass_fields__ = {'x': Field(name='x',type=<cla... [CV]
-#:   • __dataclass_params__ = _DataclassParams(init=True,rep... [CV]
+#:   • __dataclass_fields__ = {'x': Field(name='x',t... [CV]
+#:   • __dataclass_params__ = _DataclassParams(init=... [CV]
 #:   • __dict__ = <attribute '__dict__'> [CV]
 #:   • __doc__ = 'A small dataclass for the demo.' [CV]
 #:   • __firstlineno__ = 5 [CV]
@@ -63,7 +63,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #:   • __getattribute__(self, name, /)
 #:   • __getstate__(self, /)
 #:   • __gt__(self, value, /)
-#:   • __init__(self, x: int, y: float = 1.14659, z: str = 'blive...
+#:   • __init__(self, x: int, y: float = 1.14659, z: str ...
 #:   • __init_subclass__(type, /)
 #:   • __le__(self, value, /)
 #:   • __lt__(self, value, /)

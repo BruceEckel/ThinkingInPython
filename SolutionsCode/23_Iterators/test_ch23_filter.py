@@ -12,7 +12,8 @@ class Tripwire(Exception):
 def counter(limit: int) -> Iterator[int]:
     for n in count(1):
         if n > limit:
-            raise Tripwire(f"pulled {limit} values and kept asking")
+            raise Tripwire(
+                f"pulled {limit} values and kept asking")
         yield n
 
 def test_filter_skips_but_never_stops() -> None:

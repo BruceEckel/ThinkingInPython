@@ -11,7 +11,8 @@ def reciprocal(n: int) -> float:
     return 1 / n
 
 def describe(text: str) -> str:
-    result: Result[float, Exception] = parse(text).bind(reciprocal)
+    result: Result[float, Exception] = parse(text).bind(
+        reciprocal)
     match result:
         case Ok(answer):
             return f"{text}: {answer}"

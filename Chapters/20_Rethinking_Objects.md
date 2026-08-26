@@ -162,8 +162,9 @@ class Leaky:
 
 if __name__ == "__main__":
     leaky = Leaky([1, 2])
-    print(leaky.numbers is leaky._numbers)  # The same object
-    # Both mutate the "private" internals through the getters:
+    # The same object
+    print(leaky.numbers is leaky._numbers)
+    # Both mutate "private" internals through the getters:
     leaky.numbers.append(999)
     leaky.bob.name = "Ralph"
     print(leaky.numbers, leaky.bob)
@@ -201,7 +202,8 @@ class Plugged:
 
     @property
     def numbers(self) -> list[int]:
-        return self._numbers.copy()  # Isolate by returning a copy
+        # Isolate by returning a copy
+        return self._numbers.copy()
 
     @property
     def bob(self) -> Bob:
@@ -272,7 +274,7 @@ if __name__ == "__main__":
     immutable = Immutable((1, 2), Bob())
     print(immutable)
     # immutable.numbers is a tuple, so it has no append.
-    # immutable.bob.name = "Ralph" raises FrozenInstanceError.
+    # and .bob.name = "Ralph" raises FrozenInstanceError.
 #: Immutable(numbers=(1, 2), bob=Bob(name='Bob'))
 ```
 
@@ -320,7 +322,8 @@ except FrozenInstanceError as e:
     print(type(e).__name__)
 #: FrozenInstanceError
 try:
-    hash(fl)  # A list field makes the whole instance unhashable
+    # A list field makes the whole instance unhashable
+    hash(fl)
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
@@ -358,15 +361,18 @@ class Point:
     y: float
 
     def distance_to(self, other: Point) -> float:  # Method
-        return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
+        return sqrt((other.x - self.x) ** 2
+                    + (other.y - self.y) ** 2)
 
 def distance(a: Point, b: Point) -> float:  # Free function
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
 if __name__ == "__main__":
-    p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
+    # A 3-4-5 right triangle
+    p1, p2 = Point(3, 0), Point(0, 4)
     print(p1.distance_to(p2))
-    print(Point.distance_to(p1, p2))  # The method, as a function
+    # The method, as a function
+    print(Point.distance_to(p1, p2))
     print(distance(p1, p2))
 #: 5.0
 #: 5.0
@@ -419,7 +425,8 @@ class Pair:  # Suppose you are handed this, with no x or y
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # Adapter: uses composition, not inheritance
+# Adapter: uses composition, not inheritance
+class PairCoord:
     pair: Pair
 
     @property
@@ -432,7 +439,8 @@ class PairCoord:  # Adapter: uses composition, not inheritance
 
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
-    print(distance(PairCoord(Pair(3, 0)), PairCoord(Pair(0, 4))))
+    print(distance(PairCoord(Pair(3, 0)),
+                   PairCoord(Pair(0, 4))))
 #: 5.0
 #: 5.0
 ```
@@ -556,7 +564,8 @@ twin = Contact(
 )
 print(c == twin)  # Value equality, field by field
 #: True
-print({c: "value"}[c])  # Hashable, so it works as a dict key
+# Hashable, so it works as a dict key
+print({c: "value"}[c])
 #: value
 ```
 

@@ -67,7 +67,8 @@ class StateMachine:
     def run_all(self, inputs: Iterable[object]) -> None:
         for event in inputs:
             print(event)
-            self.current_state = self.current_state.next(event)
+            self.current_state = (
+                self.current_state.next(event))
             self.current_state.run()
 ```
 
@@ -446,11 +447,12 @@ runs that transition's action, and moves to the next state:
 from collections.abc import Callable
 from enum import Enum
 
-# (condition, action, next_state); condition and action may be None.
-# A state is an Enum member, so a misspelled state is a type error
-# rather than a silent dead end.
+# (condition, action, next_state); condition and action
+# may be None. A state is an Enum member, so a misspelled
+# state is a type error rather than a silent dead end.
 type Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, Enum
+    Callable[..., bool] | None, Callable[..., None] | None,
+    Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 
@@ -572,11 +574,14 @@ class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
         self.row = 0  # The first selection digit
-        self.message = ""  # Last action, for a view to display
-        # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
-        self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
+        # Last action, for a view to display
+        self.message = ""
+        # A 4x4 grid; column c costs (c + 1) * 25 cents:
+        self.items = [[ItemSlot((c + 1) * 25, 5)
+                       for c in range(4)]
                       for _ in range(4)]
-        self.items[3][0] = ItemSlot(25, 0)  # One sold-out slot
+        # One sold-out slot
+        self.items[3][0] = ItemSlot(25, 0)
         table: Table = {
             (State.QUIESCENT, Money):
                 [(None, self.add_money, State.COLLECTING)],
@@ -589,8 +594,10 @@ class VendingMachine(StateMachine):
             (State.SELECTING, Quit):
                 [(None, self.refund, State.QUIESCENT)],
             (State.SELECTING, SecondDigit): [
-                (self.too_expensive, self.clear, State.COLLECTING),
-                (self.sold_out, self.clear, State.UNAVAILABLE),
+                (self.too_expensive, self.clear,
+                 State.COLLECTING),
+                (self.sold_out, self.clear,
+                 State.UNAVAILABLE),
                 (None, self.dispense, State.WANT_MORE),
             ],
             (State.UNAVAILABLE, Quit):
@@ -624,14 +631,15 @@ class VendingMachine(StateMachine):
 
     def clear(self, col: SecondDigit) -> None:
         slot = self._slot(col)
-        self.message = (f"Clearing selection: costs {slot.price}, "
+        self.message = (f"Cleared: costs {slot.price}, "
                         f"quantity {slot.quantity}")
 
     def dispense(self, col: SecondDigit) -> None:
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        self.message = f"Dispensing; remaining {self.amount}"
+        self.message = (
+            f"Dispensing; remaining {self.amount}")
 
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
@@ -641,16 +649,21 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy it again
-        FirstDigit("C", 2), SecondDigit("col 2", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("col 0", 0),  # Sold out
+        # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("col 1", 1),
+        # Buy it again
+        FirstDigit("A", 0), SecondDigit("col 1", 1),
+        # Too expensive
+        FirstDigit("C", 2), SecondDigit("col 2", 2),
+        # Sold out
+        FirstDigit("D", 3), SecondDigit("col 0", 0),
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message} [{machine.state.name}]")
+        print(f"{event}: {machine.message} "
+              f"[{machine.state.name}]")
 #: quarter: Total = 25 [COLLECTING]
 #: quarter: Total = 50 [COLLECTING]
 #: dollar: Total = 150 [COLLECTING]
@@ -659,13 +672,13 @@ if __name__ == "__main__":
 #: A: Row A [SELECTING]
 #: col 1: Dispensing; remaining 50 [WANT_MORE]
 #: C: Row C [SELECTING]
-#: col 2: Clearing selection: costs 75, quantity 5 [COLLECTING]
+#: col 2: Cleared: costs 75, quantity 5 [COLLECTING]
 #: D: Row D [SELECTING]
-#: col 0: Clearing selection: costs 25, quantity 0 [UNAVAILABLE]
+#: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
 #: Quit: Returning 50 [QUIESCENT]
 ```
 
-The two `Clearing selection` lines read alike and end in different states:
+The two `Cleared` lines read alike and end in different states:
 too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
@@ -712,7 +725,8 @@ def test_buy_dispenses_and_charges() -> None:
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
-    assert vm.items[0][1].quantity == 4  # One dispensed from five
+    # One dispensed from five
+    assert vm.items[0][1].quantity == 4
     assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
@@ -739,7 +753,8 @@ def test_quit_refunds_and_resets() -> None:
     assert vm.amount == 0
 
 def test_no_transition_raises() -> None:
-    vm = VendingMachine()  # QUIESCENT has no transition for Quit
+    # QUIESCENT has no transition for Quit
+    vm = VendingMachine()
     with pytest.raises(NoTransition):
         vm.handle(Quit())
 ```
@@ -787,7 +802,8 @@ def show() -> None:
     buttons: list[list[tk.Button]] = []
 
     def render() -> None:
-        display.config(text=f"Inserted {vm.amount}c   {vm.message}")
+        display.config(
+            text=f"Inserted {vm.amount}c   {vm.message}")
         for r, row in enumerate(vm.items):
             for c, slot in enumerate(row):
                 out = slot.quantity == 0
@@ -815,7 +831,8 @@ def show() -> None:
               ).grid(row=1, column=1, sticky="we")
     tk.Button(root, text="Refund",
               command=lambda: send(Quit())
-              ).grid(row=1, column=2, columnspan=2, sticky="we")
+              ).grid(row=1, column=2, columnspan=2,
+                     sticky="we")
 
     for r in range(4):
         button_row: list[tk.Button] = []

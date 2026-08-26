@@ -12,7 +12,8 @@ def make_months() -> list[Month]:
 try:
     @dataclass(frozen=True)
     class Broken:
-        months: list[Month] = field(default_factory=make_months)
+        months: list[Month] = field(
+            default_factory=make_months)
         index: dict[str, Month] = {}
 except ValueError as e:
     print(f"{type(e).__name__}: {str(e).split(': ')[-1]}")
@@ -26,7 +27,8 @@ class Bare:
 @dataclass(frozen=True)
 class Subscripted:
     months: list[Month] = field(default_factory=make_months)
-    index: dict[str, Month] = field(default_factory=dict[str, Month])
+    index: dict[str, Month] = field(
+        default_factory=dict[str, Month])
 
 print(Bare().index, Subscripted().index)
 #: {} {}

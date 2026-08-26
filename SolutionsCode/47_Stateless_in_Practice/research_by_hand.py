@@ -21,7 +21,9 @@ def within_limit(article: str) -> str:
         raise TooLong(f"{len(article)} characters")
     return article
 
-def research_and_report(feed: Feed, book: Encyclopedia) -> str:
+def research_and_report(
+    feed: Feed, book: Encyclopedia
+) -> str:
     try:
         headline = feed.latest()
     except Unavailable:
@@ -37,8 +39,9 @@ def research_and_report(feed: Feed, book: Encyclopedia) -> str:
     except TooLong:
         return "article too long"
 
-print(research_and_report(Wire("genome mapped"),
-                          Library({"genome": "short enough"})))
+print(research_and_report(
+    Wire("genome mapped"),
+    Library({"genome": "short enough"})))
 #: feed: fetching
 #: library: looking up genome
 #: short enough

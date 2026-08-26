@@ -2,7 +2,8 @@
 from collections.abc import Callable
 from functools import partial
 from typing import Final
-from stateless import Depend, Need, Success, need, run, supply
+from stateless import (Depend, Need, Success, need,
+                       run, supply)
 
 class Console:
     def print(self, message: str) -> None:
@@ -21,7 +22,8 @@ for effect in built.values():
     run(effect)
 #: Hello, Alice!
 #: Hello, Bob!
-for effect in built.values():  # The same objects, a second time
+# The same objects, a second time
+for effect in built.values():
     run(effect)
 
 def make(name: str) -> Success[None]:
@@ -34,7 +36,8 @@ for builder in builders.values():
     run(builder())
 #: Hello, Alice!
 #: Hello, Bob!
-for builder in builders.values():  # A fresh Effect each time
+# A fresh Effect each time
+for builder in builders.values():
     run(builder())
 #: Hello, Alice!
 #: Hello, Bob!

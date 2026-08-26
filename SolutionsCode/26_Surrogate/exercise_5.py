@@ -30,13 +30,15 @@ class Pool:
         self._free.append(connection)
 
 class ConnectionProxy:
-    def __init__(self, pool: Pool, connection: Connection) -> None:
+    def __init__(self, pool: Pool,
+                 connection: Connection) -> None:
         self._pool = pool
         self._connection: Connection | None = connection
 
     def __getattr__(self, name: str) -> Any:
         if self._connection is None:
-            raise RuntimeError("connection already released")
+            raise RuntimeError(
+                "connection already released")
         return getattr(self._connection, name)
 
     def __enter__(self) -> Self:

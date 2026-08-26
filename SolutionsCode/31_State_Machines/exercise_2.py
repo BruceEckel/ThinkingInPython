@@ -32,9 +32,11 @@ class WashingMachine(StateMachine):
             (WashState.IDLE, Start):
                 [(None, self.begin, WashState.FILLING)],
             (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"), WashState.WASHING)],
+                [(None, self.log_msg("washing"),
+                  WashState.WASHING)],
             (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"), WashState.RINSING)],
+                [(None, self.log_msg("rinsing"),
+                  WashState.RINSING)],
             (WashState.RINSING, RinseDone): [
                 (self.too_heavy, self.log_msg("slow spin"),
                  WashState.SPINNING),
@@ -42,7 +44,8 @@ class WashingMachine(StateMachine):
                  WashState.SPINNING),
             ],
             (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"), WashState.DONE)],
+                [(None, self.log_msg("done"),
+                  WashState.DONE)],
         }
         super().__init__(WashState.IDLE, table)
 

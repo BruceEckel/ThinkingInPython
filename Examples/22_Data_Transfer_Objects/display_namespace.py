@@ -7,5 +7,6 @@ print(vars(m))
 m.more = 11
 print(m)
 #: namespace(info='Spam', b=['x', 'y'], more=11)
-print(m == SimpleNamespace(info="Spam", b=["x", "y"], more=11))
+print(m == SimpleNamespace(info="Spam", b=["x", "y"],
+                           more=11))
 #: True

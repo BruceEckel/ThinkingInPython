@@ -24,7 +24,8 @@ class History[S]:
 h = History(0, max_depth=2)
 h.do(1)
 h.do(2)
-h.do(3)   # Past would be [0, 1, 2]; 0 is discarded, keeping only 2
+# Past would be [0, 1, 2]; 0 is discarded, keeping only 2
+h.do(3)
 print(h._past)
 #: [1, 2]
 print(h.undo(), h.undo())

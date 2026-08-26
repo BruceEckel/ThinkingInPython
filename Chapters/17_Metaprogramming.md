@@ -141,7 +141,7 @@ display_object(MyList)
 #:   • count(self, value, /)
 #:   • extend(self, iterable, /)
 #:   • howdy(self, you: str) -> None
-#:   • index(self, value, start=0, stop=9223372036854775807, /)
+#:   • index(self, value, start=0, stop=92233720368547758...
 #:   • insert(self, index, object, /)
 #:   • pop(self, index=-1, /)
 #:   • remove(self, value, /)
@@ -185,8 +185,8 @@ class Event:
 
 type EventMaker = Callable[[int, int], Event]
 NAMES: Final[tuple[str, ...]] = (
-    "ThermostatDay", "ThermostatNight", "LightOn", "LightOff",
-    "WaterOn", "WaterOff", "RingBell",
+    "ThermostatDay", "ThermostatNight", "LightOn",
+    "LightOff", "WaterOn", "WaterOff", "RingBell",
 )
 
 def make(name: str) -> EventMaker:
@@ -239,14 +239,18 @@ NOT_CREATED = sentinel("NOT_CREATED")
 class EventMakers(dict[str, EventMaker | NOT_CREATED]):
     def __getitem__(self, class_name: str) -> EventMaker:
         if class_name not in self:
-            raise KeyError(f"Unknown event class: {class_name!r}")
+            raise KeyError(
+                f"Unknown event class: {class_name!r}")
         maker = super().__getitem__(class_name)
         if maker is NOT_CREATED:
             print(f"Creating {class_name}")
             # Local function to pass to type constructor:
-            def init(self: Event, hour: int, minute: int) -> None:
-                Event.__init__(self, class_name, hour, minute)
-            new_cls = type(class_name, (Event,), {"__init__": init})
+            def init(self: Event,
+                     hour: int, minute: int) -> None:
+                Event.__init__(
+                    self, class_name, hour, minute)
+            new_cls = type(class_name, (Event,),
+                           {"__init__": init})
             maker = cast(EventMaker, new_cls)
             self[class_name] = maker
         return maker
@@ -256,7 +260,8 @@ class Event:
     action: str
     hour: int
     minute: int
-    events: ClassVar[list[Event]] = []  # Registry of all Events
+    # Registry of all Events
+    events: ClassVar[list[Event]] = []
     _event_maker: ClassVar[EventMakers] = EventMakers({
         name : NOT_CREATED  # Dict key : value
         for name in (
@@ -279,12 +284,14 @@ class Event:
         for line in lines:
             class_name, hour, minute = (
                 line.replace(":", " ").split())
-            Event._event_maker[class_name](int(hour), int(minute))
+            Event._event_maker[class_name](
+                int(hour), int(minute))
 
     @staticmethod
     def run_events() -> None:
         for e in sorted(
-                Event.events, key=lambda e: (e.hour, e.minute)):
+                Event.events,
+                key=lambda e: (e.hour, e.minute)):
             print(f"{e.hour}:{e.minute:02d}: {e.action}")
 
 if __name__ == "__main__":
@@ -370,15 +377,18 @@ from exceptions import ignore
 @dataclass
 class Command:
     label: str
-    KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
+    KNOWN_COMMANDS: ClassVar[set[str]] = {
+        "Start", "Stop", "Pause"}
 
     def run(self) -> str:
         return f"Running {self.label}"
 
     @classmethod
-    def make_class(cls, class_name: str) -> Callable[[], Command]:
+    def make_class(
+        cls, class_name: str) -> Callable[[], Command]:
         if class_name not in cls.KNOWN_COMMANDS:
-            raise ValueError(f"Unknown command: {class_name!r}")
+            raise ValueError(
+                f"Unknown command: {class_name!r}")
         klass = f"""
 class {class_name}(Command):
     def __init__(self) -> None:
@@ -386,7 +396,8 @@ class {class_name}(Command):
 """
         namespace: dict[str, Any] = {"Command": Command}
         exec(klass, namespace)
-        return cast(Callable[[], Command], namespace[class_name])
+        return cast(Callable[[], Command],
+                    namespace[class_name])
 
 if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
@@ -454,7 +465,8 @@ class Color:
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
         Color.registry.add(cls)
-        Color.registry -= set(cls.__bases__)  # Keep only the leaves
+        # Keep only the leaves
+        Color.registry -= set(cls.__bases__)
 
 class Blue(Color):
     pass
@@ -520,12 +532,17 @@ Testing shows that each registry holds only its current leaf classes:
 import init_subclass
 
 def test_leaf_registry_tracks_only_leaves() -> None:
-    leaves = {c.__name__ for c in init_subclass.Color.registry}
-    assert leaves == {"Red", "Green", "PhthaloBlue", "CeruleanBlue"}
+    leaves = {c.__name__
+              for c in init_subclass.Color.registry}
+    assert leaves == {"Red", "Green", "PhthaloBlue",
+                      "CeruleanBlue"}
 
-def test_independent_hierarchies_have_separate_registries() -> None:
-    shapes = {c.__name__ for c in init_subclass.Shape.registry}
-    assert shapes == {"Square", "Circle"}  # Round is no longer a leaf
+def test_independent_hierarchies_have_separate_registries(
+) -> None:
+    shapes = {c.__name__
+              for c in init_subclass.Shape.registry}
+    # Round is no longer a leaf
+    assert shapes == {"Square", "Circle"}
 ```
 
 The mechanism is reliable;
@@ -547,7 +564,8 @@ from typing import final
 class B:
     pass
 
-# class C(B): pass  # ty: cannot inherit from final class "B"
+# ty: cannot inherit from final class "B":
+# class C(B): pass
 b = B()
 print(type(b).__name__)
 #: B
@@ -573,7 +591,8 @@ class A:
 class B(A):
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
-            f"{B.__name__} is final; you cannot subclass it")
+            f"{B.__name__} is final; "
+            f"you cannot subclass it")
 
 try:
     class C(B):
@@ -680,7 +699,8 @@ class Field:
         self.name = name
         self.storage = f"_{name}"
 
-    def __get__(self, obj: Any, owner: type | None = None) -> Any:
+    def __get__(self, obj: Any,
+                owner: type | None = None) -> Any:
         via = "class" if obj is None else "instance"
         print(f"{self.name}.__get__ via {via}")
         if obj is None:
@@ -752,7 +772,8 @@ def test_descriptor_learns_its_name() -> None:
     p.x = 3
     p.y = 4
     assert (p.x, p.y) == (3, 4)
-    assert p.__dict__ == {"_x": 3, "_y": 4}  # Stored under the names
+    # Stored under the names
+    assert p.__dict__ == {"_x": 3, "_y": 4}
 
 def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
@@ -997,12 +1018,13 @@ and CPython allows multiple inheritance only when at most one base carries a non
 ```python
 # metaclass_layout_conflict.py
 from typing import Any
-from exceptions import ignore
 
-with ignore(TypeError):
+try:
     class Singleton(type, dict[type, Any]):  # type: ignore
         pass
-#: TypeError('multiple bases have instance lay-out conflict')
+except TypeError as e:
+    print(e)
+#: multiple bases have instance lay-out conflict
 ```
 
 The failure has nothing to do with metaclasses.
@@ -1033,21 +1055,21 @@ class Mixin:
 class Base(type, Mixin):
     pass
 
-class Derived(metaclass=Base):
+class Sub(metaclass=Base):
     pass
 
-print(Derived.helper())
+print(Sub.helper())
 #: hi
 
 with ignore(AttributeError):  # A metamethod: class only
-    Derived().helper()  # type: ignore
-#: AttributeError("'Derived' object has no attribute 'helper'")
+    Sub().helper()  # type: ignore
+#: AttributeError("'Sub' object has no attribute 'helper'")
 ```
 
 `helper()` arrives through the metaclass,
-so `Derived` has it and a `Derived` instance does not.
+so `Sub` has it and a `Sub` instance does not.
 That is the metamethod rule from the start of [Intercepting Instance Creation](#intercepting-instance-creation),
-failing out loud: an instance of `Derived` is not an instance of `Base`,
+failing out loud: an instance of `Sub` is not an instance of `Base`,
 so nothing in its lookup chain reaches `Mixin`.
 A `classmethod` would answer on both.
 
@@ -1233,15 +1255,16 @@ def _annotations(cls: type) -> dict[str, object]:
             for base in reversed(cls.__mro__)}
 
 def _type_name(annotation: object) -> str:
-    # A readable name for a type annotation, keeping any [parameters]:
+    # A readable annotation name, keeping [parameters]:
     if isinstance(annotation, type):
         return annotation.__name__
     return str(annotation)
 
 def _redefined(name: str, value: object) -> bool:
-    # Restricted to INTERESTING_DUNDERS: every class has __module__,
-    # __dict__, and other bookkeeping dunders that always differ from
-    # object's, so comparing those never filters anything out.
+    # Restricted to INTERESTING_DUNDERS: every class has
+    # __module__, __dict__, and other bookkeeping dunders
+    # that always differ from object's, so comparing those
+    # never filters anything out.
     if name not in INTERESTING_DUNDERS:
         return False
     return getattr(object, name, None) is not value
@@ -1258,15 +1281,16 @@ def _show_dunder(
     return name in dunder
 
 def _shared(obj: object, name: str) -> bool:
-    # A class has no instance-level storage to compare against, so
-    # every attribute it shows is class-level storage by construction.
-    # For an instance, only a name missing from its own __dict__ is:
+    # A class has no instance-level storage to compare
+    # against, so every attribute it shows is class-level
+    # storage by construction. For an instance, only a name
+    # missing from its own __dict__ is:
     if inspect.isclass(obj):
         return True
     return name not in getattr(obj, "__dict__", {})
 
 def _truncate(text: str, budget: int) -> str:
-    # Keep text within budget, marking a cut with an ellipsis:
+    # Fit the budget, marking a cut with an ellipsis:
     if len(text) <= budget:
         return text
     if budget < 4:  # No room for text plus the ellipsis
@@ -1300,8 +1324,9 @@ def _format_attribute(
 
 def display_object(
     obj: object,
-    dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
-    max_width: int = 65,
+    dunder: (Sequence[str] | ALL_DUNDERS
+             | REDEFINED_DUNDERS) = (),
+    max_width: int = 57,
     exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class; for an instance, its class:
@@ -1309,15 +1334,19 @@ def display_object(
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
-    # Read members statically, without triggering dynamic descriptors:
+    # Read members statically, without triggering
+    # dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         if name in exclude:
             continue
-        is_dunder = name.startswith("__") and name.endswith("__")
-        if is_dunder and not _show_dunder(dunder, name, value):
+        is_dunder = (name.startswith("__")
+                     and name.endswith("__"))
+        if is_dunder and not _show_dunder(
+                dunder, name, value):
             continue  # Skip standard dunder clutter
         if callable(value):
-            methods.append(_format_method(name, value, max_width))
+            methods.append(
+                _format_method(name, value, max_width))
         else:
             attributes.append(_format_attribute(
                 obj, name, value, annotations, max_width
@@ -1439,7 +1468,8 @@ display_object(Point, REDEFINED_DUNDERS)
 #:   • __init__(self, x: int, y: int) -> None
 #:   • __repr__(self)
 
-display_object(Point, REDEFINED_DUNDERS, exclude=("__hash__",))
+display_object(Point, REDEFINED_DUNDERS,
+               exclude=("__hash__",))
 #: [Attributes]
 #:   None
 #: [Methods]
@@ -1513,10 +1543,10 @@ display_object(Fraggle(9, 2.3))
 # ALL_DUNDERS also reveals what @dataclass generated:
 display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #: [Attributes]
-#:   • __annotations_cache__ = {'x': <class 'int'>, 'y': <cl... [CV]
+#:   • __annotations_cache__ = {'x': <class 'int'>, ... [CV]
 #:   • __class__ = <attribute '__class__'> [CV]
-#:   • __dataclass_fields__ = {'x': Field(name='x',type=<cla... [CV]
-#:   • __dataclass_params__ = _DataclassParams(init=True,rep... [CV]
+#:   • __dataclass_fields__ = {'x': Field(name='x',t... [CV]
+#:   • __dataclass_params__ = _DataclassParams(init=... [CV]
 #:   • __dict__ = <attribute '__dict__'> [CV]
 #:   • __doc__ = 'A small dataclass for the demo.' [CV]
 #:   • __firstlineno__ = 5 [CV]
@@ -1538,7 +1568,7 @@ display_object(Fraggle(9, 2.3), dunder=ALL_DUNDERS)
 #:   • __getattribute__(self, name, /)
 #:   • __getstate__(self, /)
 #:   • __gt__(self, value, /)
-#:   • __init__(self, x: int, y: float = 1.14659, z: str = 'blive...
+#:   • __init__(self, x: int, y: float = 1.14659, z: str ...
 #:   • __init_subclass__(type, /)
 #:   • __le__(self, value, /)
 #:   • __lt__(self, value, /)
@@ -1674,8 +1704,7 @@ each time someone calls the finished class.
 
 ## Exercises
 
-1.  In `init_subclass.py`,
-    add a class `Yellow(Color)` and then `MutedYellow(Yellow)`.
+1.  In `init_subclass.py`, add a class `Yellow(Color)` and then `Gold(Yellow)`.
     Predict `Color.registry` after each new class, then confirm.
 2.  In `set_name.py`, add a third `Field()` attribute, `z`, to `Point`,
     set `p.z = 9`, and confirm `p.__dict__` now also holds `_z`.

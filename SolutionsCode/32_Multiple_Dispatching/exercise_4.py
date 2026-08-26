@@ -26,7 +26,8 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -57,7 +58,8 @@ def item_pair_gen[T](base: type[T], n: int,
         counts = Counter()
     items = base.__subclasses__()
     for _ in range(n):
-        a, b = random.choice(items)(), random.choice(items)()
+        a, b = (random.choice(items)(),
+                random.choice(items)())
         counts[type(a).__name__] += 1
         counts[type(b).__name__] += 1
         yield a, b

@@ -23,12 +23,14 @@ class Rat:
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
         self.blackboard.log(
-            f"Rat {self.number} starts at {(self.x, self.y)}.")
+            f"Rat {self.number} starts at "
+            f"{(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:
             neighbors = [
-                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+                (self.x + dx, self.y + dy)
+                for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if self.blackboard.claim(*pos)]
             if not moves:
@@ -39,4 +41,5 @@ class Rat:
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
-            await asyncio.sleep(0)  # Yield so sibling rats can run
+            # Yield so sibling rats can run
+            await asyncio.sleep(0)

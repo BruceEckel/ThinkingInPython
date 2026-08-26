@@ -22,11 +22,13 @@ def group_rounds(
             group = [leader]
             while len(group) < size:
                 closest = min(pool, key=lambda c: sum(
-                    history[frozenset((m, c))] for m in group))
+                    history[frozenset((m, c))]
+                    for m in group))
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
-        if pool and not groups:  # Roster smaller than one group
+        # Roster smaller than one group
+        if pool and not groups:
             groups.append([])
         for extra in pool:
             roomiest = min(groups, key=lambda g: sum(
@@ -42,7 +44,8 @@ rosters = strategies.lists(
     strategies.text("abcdefghij", min_size=1, max_size=3),
     min_size=2, max_size=12, unique=True)
 
-@given(rosters, strategies.integers(min_value=2, max_value=5))
+@given(rosters,
+       strategies.integers(min_value=2, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
     for grouping in islice(group_rounds(names, size), 3):

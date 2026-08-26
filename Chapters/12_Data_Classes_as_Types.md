@@ -31,7 +31,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 ```
@@ -111,10 +112,12 @@ class Stars:
         self._validate()
 
     def _validate(self) -> None:
-        check(1 <= self._number <= 10, f"Stars({self._number})")
+        check(1 <= self._number <= 10,
+              f"Stars({self._number})")
 
     @property
-    def number(self) -> int:  # No setter: blocks external mutation
+    # No setter: blocks external mutation
+    def number(self) -> int:
         return self._number
 
     def __str__(self) -> str:
@@ -191,7 +194,7 @@ display_object(Messenger, INTERESTING_DUNDERS)
 #:   • depth: float = 0.0 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
-#:   • __init__(self, name: str, number: int, depth: float = 0.0)...
+#:   • __init__(self, name: str, number: int, depth: floa...
 #:   • __repr__(self)
 ```
 
@@ -344,7 +347,8 @@ class Stars:
     number: int
 
     def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
 
 def f1(s: Stars) -> Stars:
     return Stars(s.number + 5)
@@ -462,9 +466,9 @@ def test_transformations_return_legal_values() -> None:
     assert f2(Stars(2)) == Stars(10)
 
 def test_transformation_can_produce_illegal_value() -> None:
-    # f2 multiplies, so its result can be outside the legal set.
-    # Construction of the returned Stars catches it: no illegal
-    # Stars can ever exist.
+    # f2 multiplies, so its result can be outside the
+    # legal set. Construction of the returned Stars
+    # catches it: no illegal Stars can ever exist.
     with pytest.raises(TypeFailure):
         f2(Stars(4))  # 4 * 5 = 20
 ```
@@ -486,7 +490,8 @@ class FullName:
     text: str
 
     def __post_init__(self) -> None:
-        check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
+        check(len(self.text.split()) >= 2,
+              f"FullName({self.text!r})",
               "needs a first and last name")
 
 @dataclass(frozen=True)
@@ -494,7 +499,8 @@ class EmailAddress:
     text: str
 
     def __post_init__(self) -> None:
-        check("@" in self.text, f"EmailAddress({self.text!r})",
+        check("@" in self.text,
+              f"EmailAddress({self.text!r})",
               "needs an @")
 
 @dataclass(frozen=True)
@@ -528,7 +534,8 @@ def test_full_name_needs_two_parts(bad: str) -> None:
     with pytest.raises(TypeFailure):
         FullName(bad)
 
-@pytest.mark.parametrize("bad", ["bruce", "example.com", ""])
+@pytest.mark.parametrize(
+    "bad", ["bruce", "example.com", ""])
 def test_email_needs_at_sign(bad: str) -> None:
     with pytest.raises(TypeFailure):
         EmailAddress(bad)
@@ -562,7 +569,8 @@ The same helper inspects each one:
 from display import REDEFINED_DUNDERS, display_object
 
 def show(obj: object) -> None:
-    display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))
+    display_object(obj, REDEFINED_DUNDERS,
+                   exclude=("__hash__",))
 ```
 
 `show()` calls `display_object()` with `REDEFINED_DUNDERS`,
@@ -777,7 +785,8 @@ class Year:
     n: int
 
     def __post_init__(self) -> None:
-        check(1900 < self.n <= date.today().year, f"Year({self.n})")
+        check(1900 < self.n <= date.today().year,
+              f"Year({self.n})")
 
 class Month(Enum):
     JANUARY = (1, 31)
@@ -795,7 +804,8 @@ class Month(Enum):
 
     @staticmethod
     def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return list(Month)[month_number - 1]
 
     @property
@@ -851,7 +861,8 @@ def test_valid_date() -> None:
     (4, 31),  # April has 30
     (9, 31),  # September has 30
 ])
-def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
+def test_day_out_of_range_for_month(month_n: int,
+                                    day_n: int) -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
 
@@ -897,7 +908,8 @@ class Month:
               f"is past the end of {self.name}")
 
 def make_months() -> list[Month]:
-    return [Month(name, n, days) for n, (name, days) in enumerate([
+    return [Month(name, n, days)
+            for n, (name, days) in enumerate([
         ("January", 31), ("February", 28), ("March", 31),
         ("April", 30), ("May", 31), ("June", 30),
         ("July", 31), ("August", 31), ("September", 30),
@@ -909,7 +921,8 @@ class Months:
     months: list[Month] = field(default_factory=make_months)
 
     def of(self, month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return self.months[month_number - 1]
 
 if __name__ == "__main__":
@@ -960,11 +973,13 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Unchecked:
-    data: dict[str, str] = field(default_factory=set)  # A set
+    # A set
+    data: dict[str, str] = field(default_factory=set)
 
 @dataclass
 class Checked:
-    data: dict[str, str] = field(default_factory=dict[str, str])
+    data: dict[str, str] = field(
+        default_factory=dict[str, str])
 
 print(type(Unchecked().data).__name__)
 #: set
@@ -1008,7 +1023,8 @@ from validation import TypeFailure, check
 class Stars(NamedTuple):
     number: int
 
-def make_stars(number: int) -> Stars:  # Validation lives outside
+# Validation lives outside
+def make_stars(number: int) -> Stars:
     check(1 <= number <= 10, f"Stars({number})")
     return Stars(number)
 
@@ -1018,10 +1034,12 @@ def test_the_factory_rejects_illegal_values() -> None:
         make_stars(11)
 
 def test_the_type_accepts_them_anyway() -> None:
-    assert Stars(11).number == 11  # Calling the type skips the check
+    # Calling the type skips the check
+    assert Stars(11).number == 11
 
 def test_the_check_cannot_move_inside() -> None:
-    with pytest.raises(AttributeError, match="Cannot overwrite"):
+    with pytest.raises(AttributeError,
+                       match="Cannot overwrite"):
         class Validated(NamedTuple):
             number: int
 
@@ -1078,7 +1096,7 @@ class Logged(Connection):
 c = Logged("db")
 print(c.name)
 #: db
-# Connection.__init__ never ran, so 'host' and 'url' were never set:
+# Connection.__init__ never ran, so host and url are unset:
 print(hasattr(c, "host"), hasattr(c, "url"))
 #: False False
 ```
@@ -1105,7 +1123,8 @@ class Logged(Connection):
     name: str
 
     def __post_init__(self) -> None:
-        super().__init__(self.host)  # Run the base initializer
+        # Run the base initializer
+        super().__init__(self.host)
 
 c = Logged("localhost", "db")
 print(c.url, c.name)
@@ -1306,7 +1325,8 @@ class Stars:
 
     def __post_init__(self) -> None:
         print(f"checking {self.number}")
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
 
 s = Stars(4)
 #: checking 4
@@ -1337,20 +1357,26 @@ so a class that is not a data class can join by defining it:
 import copy
 from typing import Final, Self
 
-SHIFTS: Final[dict[str, int]] = {"red": 16, "green": 8, "blue": 0}
+SHIFTS: Final[dict[str, int]] = {
+    "red": 16, "green": 8, "blue": 0}
 MASK: Final[int] = 0xFF
 
 class Color:
-    def __init__(self, red: int, green: int, blue: int) -> None:
-        channels = {"red": red, "green": green, "blue": blue}
-        self.packed = sum(v << SHIFTS[k] for k, v in channels.items())
+    def __init__(self, red: int, green: int,
+                 blue: int) -> None:
+        channels = {"red": red, "green": green,
+                    "blue": blue}
+        self.packed = sum(v << SHIFTS[k]
+                          for k, v in channels.items())
 
     @property
     def channels(self) -> dict[str, int]:
-        return {n: self.packed >> s & MASK for n, s in SHIFTS.items()}
+        return {n: self.packed >> s & MASK
+                for n, s in SHIFTS.items()}
 
     def __repr__(self) -> str:
-        return f"Color({', '.join(map(str, self.channels.values()))})"
+        channels = map(str, self.channels.values())
+        return f"Color({', '.join(channels)})"
 
     def __replace__(self, **changes: int) -> Self:
         return type(self)(**(self.channels | changes))

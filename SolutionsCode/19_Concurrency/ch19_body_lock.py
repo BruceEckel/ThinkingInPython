@@ -34,7 +34,8 @@ def drain(source: Iterator[int]) -> list[int]:
 
 def report(source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = [pool.submit(drain, source) for _ in range(8)]
+        futures = [pool.submit(drain, source)
+                   for _ in range(8)]
         taken = [*f.result() for f in futures]
     print(f"{len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")

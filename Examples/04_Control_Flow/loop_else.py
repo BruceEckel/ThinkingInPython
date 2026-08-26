@@ -6,7 +6,8 @@ def find_factor(n):
             print(f"{n} = {d} * {n // d}")
             break
     else:
-        print(f"{n} is prime")  # No break means no factor found
+        # No break means no factor found
+        print(f"{n} is prime")
 
 find_factor(15)
 #: 15 = 3 * 5

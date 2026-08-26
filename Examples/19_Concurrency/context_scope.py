@@ -3,10 +3,12 @@ import asyncio
 import threading
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar("request_id", default="-")
+request_id: ContextVar[str] = ContextVar("request_id",
+                                         default="-")
 
 def audit(step: str) -> str:
-    main = threading.current_thread() is threading.main_thread()
+    main = (threading.current_thread()
+            is threading.main_thread())
     where = "main thread" if main else "worker thread"
     return f"[{request_id.get()}] {step} on the {where}"
 

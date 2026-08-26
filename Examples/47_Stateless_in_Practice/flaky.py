@@ -20,7 +20,9 @@ class Database:
 def store(db: Database, user: str) -> str:
     return db.save(user)
 
-def save_user(user: str) -> Effect[Need[Database], Crashed, str]:
+def save_user(user: str) -> Effect[
+    Need[Database], Crashed, str
+]:
     db = yield from need(Database)
     result = yield from store(db, user)
     return result

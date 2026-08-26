@@ -149,7 +149,8 @@ def find_factor(n):
             print(f"{n} = {d} * {n // d}")
             break
     else:
-        print(f"{n} is prime")  # No break means no factor found
+        # No break means no factor found
+        print(f"{n} is prime")
 
 find_factor(15)
 #: 15 = 3 * 5
@@ -432,9 +433,8 @@ def suppressed(text):
 def joining_line(e):
     for part in traceback.format_exception(e):
         line = part.strip()
-        if line.endswith("exception occurred:") or line.endswith(
-            "following exception:"
-        ):
+        if (line.endswith("exception occurred:")
+            or line.endswith("following exception:")):
             return line
     return "nothing shown above it"
 
@@ -443,14 +443,14 @@ for parse in (implicit, explicit, suppressed):
         parse("seven")
     except BadNumber as e:
         print(f"{parse.__name__}:")
-        for chunk in textwrap.wrap(joining_line(e), 60):
+        for chunk in textwrap.wrap(joining_line(e), 55):
             print(" ", chunk)
 #: implicit:
-#:   During handling of the above exception, another exception
-#:   occurred:
+#:   During handling of the above exception, another
+#:   exception occurred:
 #: explicit:
-#:   The above exception was the direct cause of the following
-#:   exception:
+#:   The above exception was the direct cause of the
+#:   following exception:
 #: suppressed:
 #:   nothing shown above it
 ```
@@ -496,8 +496,8 @@ print(careful("-5"), forgiving("-5"))
 try:
     careful("\N{SUPERSCRIPT TWO}")
 except ValueError as e:
-    print("careful failed:", e)
-#: careful failed: invalid literal for int() with base 10: '²'
+    print("careful:", e)
+#: careful: invalid literal for int() with base 10: '²'
 print(forgiving("\N{SUPERSCRIPT TWO}"))
 #: None
 ```
@@ -568,10 +568,12 @@ replacing a loop that builds up a result:
 squares = [n * n for n in range(5)]  # List comprehension
 print(squares)
 #: [0, 1, 4, 9, 16]
-evens = [n for n in range(10) if n % 2 == 0]  # With a filter
+# With a filter
+evens = [n for n in range(10) if n % 2 == 0]
 print(evens)
 #: [0, 2, 4, 6, 8]
-lengths = {w: len(w) for w in ["a", "bb"]}  # Dict comprehension
+# Dict comprehension
+lengths = {w: len(w) for w in ["a", "bb"]}
 print(lengths)
 #: {'a': 1, 'bb': 2}
 parities = {n % 2 for n in range(10)}  # Set comprehension

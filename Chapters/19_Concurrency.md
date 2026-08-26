@@ -157,14 +157,16 @@ import asyncio
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)  # Stand-in for a network request
+    # Stand-in for a network request
+    await asyncio.sleep(delay)
     print(f"{item}: resumed")
     return item.upper()
 
 async def main() -> None:
     x = fetch("a", 0.03)  # Nothing runs yet
     print(type(x).__name__)
-    results = await asyncio.gather(  # Run all three concurrently
+    # Run all three concurrently
+    results = await asyncio.gather(
         x, fetch("b", 0.02), fetch("c", 0.01))
     print(results)
 
@@ -519,17 +521,22 @@ async def yielding_wait() -> None:
 async def blocking_wait() -> None:
     time.sleep(0.05)  # Stops the event loop
 
-async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
+async def elapsed(
+    tasks: Iterable[Awaitable[None]]
+) -> float:
     start = time.perf_counter()
     await asyncio.gather(*tasks)
     return time.perf_counter() - start
 
 async def main() -> None:
-    t_yield = await elapsed(yielding_wait() for _ in range(5))
-    t_block = await elapsed(blocking_wait() for _ in range(5))
+    t_yield = await elapsed(
+        yielding_wait() for _ in range(5))
+    t_block = await elapsed(
+        blocking_wait() for _ in range(5))
     report(awaited=t_yield, blocking=t_block)
     print(f"awaited sleeps overlap: {t_yield < 0.05 * 2}")
-    print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
+    print(
+        f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
 
 asyncio.run(main())
 #: awaited sleeps overlap: True
@@ -559,11 +566,13 @@ import time
 from benchmark import report
 
 async def offloaded_wait() -> None:
-    await asyncio.to_thread(time.sleep, 0.05)  # Runs in a thread
+    # Runs in a thread
+    await asyncio.to_thread(time.sleep, 0.05)
 
 async def main() -> None:
     start = time.perf_counter()
-    await asyncio.gather(*(offloaded_wait() for _ in range(5)))
+    await asyncio.gather(
+        *(offloaded_wait() for _ in range(5)))
     elapsed = time.perf_counter() - start
     report(elapsed=elapsed)
     print(f"offloaded sleeps overlap: {elapsed < 0.05 * 2}")
@@ -605,7 +614,8 @@ async def increment(count: int) -> None:
     global counter
     for _ in range(count):
         value = counter  # Read
-        await asyncio.sleep(0)  # Release control to the event loop
+        # Release control to the event loop
+        await asyncio.sleep(0)
         counter = value + 1  # Write
 
 async def main() -> None:
@@ -649,7 +659,8 @@ async def increment(count: int) -> None:
     for _ in range(count):
         async with lock:
             value = counter  # Read
-            await asyncio.sleep(0)  # Yield to the event loop
+            # Yield to the event loop
+            await asyncio.sleep(0)
             counter = value + 1  # Write
 
 async def main() -> None:
@@ -695,7 +706,8 @@ so one task's `set()` is invisible to its siblings and to its parent:
 import asyncio
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar("request_id", default="-")
+request_id: ContextVar[str] = ContextVar("request_id",
+                                         default="-")
 current = "-"  # The same idea as a plain global
 
 async def handle(name: str) -> None:
@@ -709,7 +721,8 @@ async def main() -> None:
     async with asyncio.TaskGroup() as group:
         for name in ("req-1", "req-2", "req-3"):
             group.create_task(handle(name))
-    print(f"after: context {request_id.get()}, global {current}")
+    print(f"after: context {request_id.get()}, "
+          f"global {current}")
 
 asyncio.run(main())
 #: context req-1, global req-3
@@ -740,10 +753,12 @@ import asyncio
 import threading
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar("request_id", default="-")
+request_id: ContextVar[str] = ContextVar("request_id",
+                                         default="-")
 
 def audit(step: str) -> str:
-    main = threading.current_thread() is threading.main_thread()
+    main = (threading.current_thread()
+            is threading.main_thread())
     where = "main thread" if main else "worker thread"
     return f"[{request_id.get()}] {step} on the {where}"
 
@@ -853,7 +868,9 @@ since a process cannot return a value the way a function call does:
 # multiprocessing_raw.py
 import multiprocessing as mp
 
-def cpu_price(order: int, results: mp.Queue[tuple[int, int]]) -> None:
+def cpu_price(
+    order: int, results: mp.Queue[tuple[int, int]]
+) -> None:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1
@@ -910,8 +927,10 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from typing import Final
 
-TOTAL: Final[int] = 20_000_000  # Loop iterations, split across tasks
-CORE_MULTIPLIER: Final[int] = 2  # Largest sweep point = cores * this
+# Loop iterations, split across tasks
+TOTAL: Final[int] = 20_000_000
+# Largest sweep point = cores * this
+CORE_MULTIPLIER: Final[int] = 2
 
 def work_chunk(n: int) -> int:
     total = 0
@@ -935,7 +954,8 @@ if __name__ == "__main__":
     print(f"cores = {cores}, total = {TOTAL}")
 
     with ProcessPoolExecutor() as pool:
-        list(pool.map(work_chunk, [1]))  # Warm up, not timed
+        # Warm up, not timed
+        list(pool.map(work_chunk, [1]))
         baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, TOTAL, tasks)
@@ -1035,7 +1055,8 @@ class Times(NamedTuple):
     threaded: float
 
 def compare(
-    price: Callable[[int], int], orders: list[int], number: int
+    price: Callable[[int], int], orders: list[int],
+    number: int
 ) -> Times:
     def sequential() -> list[int]:
         return [price(o) for o in orders]
@@ -1046,8 +1067,10 @@ def compare(
 
     assert threaded() == sequential()
     return Times(
-        min(timeit.repeat(sequential, number=number, repeat=3)),
-        min(timeit.repeat(threaded, number=number, repeat=3)),
+        min(timeit.repeat(sequential,
+                          number=number, repeat=3)),
+        min(timeit.repeat(threaded,
+                          number=number, repeat=3)),
     )
 ```
 
@@ -1317,7 +1340,8 @@ with InterpreterPoolExecutor() as pool:
 cores = os.cpu_count() or 1
 target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
 report(sequential=t_seq, subinterpreters=t_sub, cores=cores)
-print(f"subinterpreters run in parallel: {t_seq > t_sub * target}")
+print(f"subinterpreters run in parallel: "
+      f"{t_seq > t_sub * target}")
 #: subinterpreters run in parallel: True
 ```
 
@@ -1358,8 +1382,10 @@ def enqueue(jobs: list[Job]) -> None:
 
 with ThreadPoolExecutor(max_workers=2) as pool:
     producers = [
-        pool.submit(enqueue, [(3, "backup"), (1, "page oncall")]),
-        pool.submit(enqueue, [(2, "rotate logs"), (1, "alert")]),
+        pool.submit(enqueue,
+                    [(3, "backup"), (1, "page oncall")]),
+        pool.submit(enqueue,
+                    [(2, "rotate logs"), (1, "alert")]),
     ]
 for p in producers:
     p.result()  # Surface any producer failure
@@ -1410,7 +1436,8 @@ the first two of which already appeared in this chapter:
 import asyncio
 
 async def consumer(queue: asyncio.Queue[str]) -> None:
-    item = await queue.get()  # Suspends until an item arrives
+    # Suspends until an item arrives
+    item = await queue.get()
     print(f"consumed {item}")
 
 async def producer(queue: asyncio.Queue[str]) -> None:
@@ -1484,7 +1511,8 @@ class Tickets:
 
 def report(label: str, source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = [pool.submit(list, source) for _ in range(8)]
+        futures = [pool.submit(list, source)
+                   for _ in range(8)]
         taken = [*f.result() for f in futures]
     print(f"{label}: {len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
@@ -1642,7 +1670,9 @@ def cpu_price(order: int) -> int:
         total += 1
     return order * 10
 
-def run_on(executor: Executor, orders: list[int]) -> list[int]:
+def run_on(
+    executor: Executor, orders: list[int]
+) -> list[int]:
     with executor:
         return list(executor.map(cpu_price, orders))
 
@@ -1710,14 +1740,16 @@ async def process_price(
     pool: ProcessPoolExecutor, order: int
 ) -> int:
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(pool, cpu_price, order)
+    return await loop.run_in_executor(pool,
+                                      cpu_price, order)
 
 async def main() -> None:
     with ProcessPoolExecutor() as pool:
         async with asyncio.TaskGroup() as tg:
             tasks = [
                 tg.create_task(io_price(1)),
-                tg.create_task(asyncio.to_thread(blocking_price, 2)),
+                tg.create_task(
+                    asyncio.to_thread(blocking_price, 2)),
                 tg.create_task(process_price(pool, 3)),
             ]
     print([t.result() for t in tasks])
@@ -1828,8 +1860,10 @@ async def parked() -> None:
 async def bytes_per_task() -> float:
     tracemalloc.start()
     before = tracemalloc.take_snapshot()
-    tasks = [asyncio.create_task(parked()) for _ in range(TASKS)]
-    await asyncio.sleep(0)  # Let every task reach its own await
+    tasks = [asyncio.create_task(parked())
+             for _ in range(TASKS)]
+    # Let every task reach its own await
+    await asyncio.sleep(0)
     after = tracemalloc.take_snapshot()
     grown = sum(
         stat.size_diff
@@ -1838,8 +1872,8 @@ async def bytes_per_task() -> float:
     )
     for t in tasks:
         t.cancel()
-    # Without "return_exceptions=True", the first CancelledError
-    # raises an exception and exits the function:
+    # Without "return_exceptions=True", the first
+    # CancelledError raises and exits the function:
     await asyncio.gather(*tasks, return_exceptions=True)
     tracemalloc.stop()
     return grown / TASKS
@@ -1847,12 +1881,15 @@ async def bytes_per_task() -> float:
 default_stack = threading.stack_size()
 threading.stack_size(STACK_SIZE)  # A real, settable cost
 configured_stack = threading.stack_size()
-threading.stack_size(default_stack)  # Restore the previous setting
+# Restore the previous setting
+threading.stack_size(default_stack)
 
 task_cost = asyncio.run(bytes_per_task())
 tasks_per_stack = configured_stack / task_cost
-report(bytes_per_task=task_cost, tasks_per_stack=tasks_per_stack)
-print(f"one thread's stack reservation: {configured_stack:,} bytes")
+report(bytes_per_task=task_cost,
+       tasks_per_stack=tasks_per_stack)
+print(f"one thread's stack reservation: "
+      f"{configured_stack:,} bytes")
 #: one thread's stack reservation: 1,048,576 bytes
 print(f"bytes per task under 4 KiB: {task_cost < 4096}")
 #: bytes per task under 4 KiB: True
@@ -1895,7 +1932,8 @@ async def async_noop() -> None:
 
 def spawn_threads() -> float:
     start = time.perf_counter()
-    threads = [threading.Thread(target=noop) for _ in range(COUNT)]
+    threads = [threading.Thread(target=noop)
+               for _ in range(COUNT)]
     for t in threads:
         t.start()
     for t in threads:
@@ -1904,13 +1942,15 @@ def spawn_threads() -> float:
 
 async def spawn_async_tasks() -> float:
     start = time.perf_counter()
-    await asyncio.gather(*(async_noop() for _ in range(COUNT)))
+    await asyncio.gather(
+        *(async_noop() for _ in range(COUNT)))
     return time.perf_counter() - start
 
 t_threads = spawn_threads()
 t_tasks = asyncio.run(spawn_async_tasks())
 report(threads=t_threads, tasks=t_tasks)
-print(f"tasks at least 5x faster to spawn: {t_tasks * 5 < t_threads}")
+print(f"tasks at least 5x faster to spawn: "
+      f"{t_tasks * 5 < t_threads}")
 #: tasks at least 5x faster to spawn: True
 ```
 
@@ -2010,9 +2050,12 @@ import asyncio
 lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
-async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
     async with first:
-        await asyncio.sleep(0.01)  # Let the other task grab its lock
+        # Let the other task grab its lock
+        await asyncio.sleep(0.01)
         async with second:
             pass  # Never reached
 

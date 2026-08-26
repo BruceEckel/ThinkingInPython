@@ -8,8 +8,10 @@ class ignore_one:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
-        if exc_type is not None and issubclass(exc_type, self.kind):
+                 exc: BaseException | None,
+                 tb: object) -> bool:
+        if (exc_type is not None
+            and issubclass(exc_type, self.kind)):
             print(f"{exc!r}")
             return True
         return False
@@ -17,7 +19,8 @@ class ignore_one:
 with ignore_one(ZeroDivisionError):
     print("before")
     1 / 0
-    print("after")  # Never runs: the error jumps to __exit__
+    # Never runs: the error jumps to __exit__
+    print("after")
 print("survived")
 #: before
 #: ZeroDivisionError('division by zero')

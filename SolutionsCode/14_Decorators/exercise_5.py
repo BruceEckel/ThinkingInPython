@@ -4,7 +4,9 @@ from functools import wraps
 from typing import Any, overload
 
 @overload
-def memo[**P, R](func: Callable[P, R]) -> Callable[P, R]: ...
+def memo[**P, R](
+    func: Callable[P, R]
+) -> Callable[P, R]: ...
 
 @overload
 def memo[**P, R](
@@ -12,7 +14,8 @@ def memo[**P, R](
 ) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
 
 def memo[**P, R](
-    func: Callable[P, R] | None = None, *, maxsize: int = 128
+    func: Callable[P, R] | None = None, *,
+    maxsize: int = 128
 ) -> Any:
     def decorate(target: Callable[P, R]) -> Callable[P, R]:
         cache: dict[tuple[Any, ...], R] = {}

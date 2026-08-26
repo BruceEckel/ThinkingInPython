@@ -61,8 +61,9 @@ def timing[**P, R](func: Callable[P, R]) -> Callable[P, R]:
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        # elapsed differs every run: print a fixed message plus a
-        # deterministic check, not the raw, ever-changing number.
+        # elapsed differs every run: print a fixed
+        # message plus a deterministic check, not the
+        # raw, ever-changing number.
         ok = elapsed >= 0
         name = func.__name__  # type: ignore
         print(f"{name} timed, non-negative: {ok}")
@@ -173,7 +174,8 @@ class trace_counting[**P, R]:
         self.count = 0  # Per-function, like count_calls
         update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         self.count += 1
         trace_counting.total_calls += 1
         return self.func(*args, **kwargs)
@@ -216,7 +218,9 @@ from functools import wraps
 from typing import Any, overload
 
 @overload
-def memo[**P, R](func: Callable[P, R]) -> Callable[P, R]: ...
+def memo[**P, R](
+    func: Callable[P, R]
+) -> Callable[P, R]: ...
 
 @overload
 def memo[**P, R](
@@ -224,7 +228,8 @@ def memo[**P, R](
 ) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
 
 def memo[**P, R](
-    func: Callable[P, R] | None = None, *, maxsize: int = 128
+    func: Callable[P, R] | None = None, *,
+    maxsize: int = 128
 ) -> Any:
     def decorate(target: Callable[P, R]) -> Callable[P, R]:
         cache: dict[tuple[Any, ...], R] = {}
@@ -300,7 +305,8 @@ from collections.abc import Callable
 from functools import wraps
 
 def retry[**P, R](
-        times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    times: int
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:

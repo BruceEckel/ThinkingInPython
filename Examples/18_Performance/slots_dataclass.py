@@ -35,9 +35,11 @@ with ignore(AttributeError):
     fp.z = 3  # type: ignore
 #: FrozenInstanceError("cannot assign to field 'z'")
 
-frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
+frozen_bytes = (sys.getsizeof(fp)
+                + sys.getsizeof(fp.__dict__))
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
-report(frozen_bytes=frozen_bytes, slotted_bytes=slotted_bytes)
+report(frozen_bytes=frozen_bytes,
+       slotted_bytes=slotted_bytes)
 print(f"slots at least 5x smaller: "
       f"{slotted_bytes * 5 < frozen_bytes}")
 #: slots at least 5x smaller: True

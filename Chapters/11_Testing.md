@@ -66,8 +66,10 @@ The tests in this chapter check the following `Account` class:
 from dataclasses import dataclass
 
 class InsufficientFunds(Exception):
-    def __init__(self, balance: float, amount: float) -> None:
-        super().__init__(f"balance {balance} is less than {amount}")
+    def __init__(self,
+                 balance: float, amount: float) -> None:
+        super().__init__(
+            f"balance {balance} is less than {amount}")
 
 @dataclass
 class Account:
@@ -186,7 +188,8 @@ from account import Account, InsufficientFunds
 
 def test_overdraft_reports_the_shortfall() -> None:
     account = Account(100)
-    with pytest.raises(InsufficientFunds, match="less than 250"):
+    with pytest.raises(InsufficientFunds,
+                       match="less than 250"):
         account.withdraw(250)
     assert account.balance == 100
 ```
@@ -407,8 +410,10 @@ so its report on the code below disagrees with what actually runs:
 
 class Vault:
     def __init__(self) -> None:
-        self._balance = 0  # Single underscore: convention only
-        self.__pin = "1234"  # Double underscore: gets mangled
+        # Single underscore: convention only
+        self._balance = 0
+        # Double underscore: gets mangled
+        self.__pin = "1234"
 
 v = Vault()
 print(vars(v))
@@ -518,7 +523,8 @@ import pytest
 def test_roll_returns_known_value(
     monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(dice.random, "randint", lambda a, b: 4)
+    monkeypatch.setattr(dice.random, "randint",
+                        lambda a, b: 4)
     assert dice.roll() == 4
 ```
 
@@ -587,7 +593,8 @@ The same computation takes `now` as an argument instead of going looking for it:
 # clock_injected.py
 from collections.abc import Callable
 
-def elapsed(start: float, now: Callable[[], float]) -> float:
+def elapsed(start: float,
+            now: Callable[[], float]) -> float:
     return now() - start
 ```
 
@@ -598,7 +605,8 @@ The test hands it a fixed value:
 import clock_injected
 
 def test_elapsed() -> None:
-    assert clock_injected.elapsed(40.0, lambda: 100.0) == 60.0
+    assert clock_injected.elapsed(
+        40.0, lambda: 100.0) == 60.0
 ```
 
 Both tests check the identical arithmetic.
@@ -666,7 +674,9 @@ import io
 import pytest
 import weather
 
-def test_current_temp(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_current_temp(
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
     def fake_urlopen(url: str) -> io.BytesIO:
         return io.BytesIO(b"21C")
     monkeypatch.setattr(weather, "urlopen", fake_urlopen)

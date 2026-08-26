@@ -11,7 +11,8 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
     canvas.pack()
 
     def draw(grid: Grid) -> None:
-        canvas.delete("all")  # Or the old rectangles accumulate
+        # Or the old rectangles accumulate
+        canvas.delete("all")
         for (x, y), color in grid.items():
             canvas.create_rectangle(
                 x * cell_px, y * cell_px,

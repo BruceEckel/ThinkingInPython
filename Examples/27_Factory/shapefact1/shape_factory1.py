@@ -15,7 +15,8 @@ class Shape:
             case "Square":
                 return Square()
             case _:
-                raise ValueError(f"Bad shape creation: {kind}")
+                raise ValueError(
+                    f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -35,7 +36,8 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)  # Reproducible shape sequence
-    shapes = [Shape.factory(kind) for kind in shape_name_gen(4)]
+    shapes = [Shape.factory(kind)
+              for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()

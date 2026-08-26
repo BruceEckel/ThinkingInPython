@@ -24,14 +24,18 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
     yield from put(funds - price)
     return True
 
-def spree(prices: tuple[int, ...]) -> Depend[Get | Put, int]:
+def spree(
+    prices: tuple[int, ...]
+) -> Depend[Get | Put, int]:
     bought = 0
     for price in prices:
         if (yield from purchase(price)):
             bought += 1
     return bought
 
-def reading(balances: Iterator[int]) -> Callable[[Get], int]:
+def reading(
+    balances: Iterator[int]
+) -> Callable[[Get], int]:
     def read(request: Get) -> int:
         return next(balances)
     return read

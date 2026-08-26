@@ -555,14 +555,16 @@ def connected(source: Source) -> Iterator[Source]:
     finally:
         print(f"{name} offline")
 
-def run_load(start: int, hours: int) -> Depend[Outlet, None]:
+def run_load(start: int,
+             hours: int) -> Depend[Outlet, None]:
     caught = catch(Drained)
     hour, remaining = start, hours
     while remaining:
         source = yield from plug(hour)
         with connected(source) as power:
             while remaining:
-                failure = yield from caught(draw)(power, hour)
+                failure = yield from caught(draw)(
+                    power, hour)
                 if failure is not None:
                     break
                 print(f"  {hour}:00")
@@ -570,7 +572,8 @@ def run_load(start: int, hours: int) -> Depend[Outlet, None]:
                 remaining -= 1
 
 def site() -> tuple[Solar, Battery, Grid, Backup]:
-    return Solar(), Battery(40), Grid(range(22, 24)), Backup(3)
+    return (Solar(), Battery(40), Grid(range(22, 24)),
+            Backup(3))
 
 solar, battery, grid, backup = site()
 sun_first = controller((solar, battery, grid, backup))
@@ -691,7 +694,9 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
     yield from put(funds - price)
     return True
 
-def spree(prices: tuple[int, ...]) -> Depend[Get | Put, int]:
+def spree(prices: tuple[int, ...]) -> Depend[
+    Get | Put, int
+]:
     bought = 0
     for price in prices:
         if (yield from purchase(price)):
@@ -884,7 +889,9 @@ class Library:
             raise NoArticle(topic)
         return self.articles[topic]
 
-def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+def report() -> Depend[
+    Need[Feed] | Need[Encyclopedia], str
+]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
     found: str | Unavailable | NotInteresting | NoArticle
     found = yield from caught(research)()
@@ -902,7 +909,8 @@ def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library({"stock market": "a history"})
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
 EMPTY: Final[Library] = Library({})
 
 def outcome(feed: Feed, book: Encyclopedia) -> str:
@@ -1052,7 +1060,8 @@ with `Never` recording that no value can come out of it.
 # fetch_guarded.py
 from dataclasses import dataclass
 from research import Feed, Unavailable, fetch
-from stateless import Effect, Need, catch, need, run, supply, throw
+from stateless import (Effect, Need, catch, need, run,
+                       supply, throw)
 
 class Empty(Exception):
     pass
@@ -1346,7 +1355,8 @@ def encounter() -> Depend[
     terrain = yield from need(Terrain)
     obstacle = yield from need(Obstacle)
     reward = yield from need(Reward)
-    narrator.say(f"{hero.name()} crosses the {terrain.underfoot()}")
+    narrator.say(
+        f"{hero.name()} crosses the {terrain.underfoot()}")
     narrator.say(hero.approach(obstacle.blocks()))
     narrator.say(f"and wins {reward.prize()}")
 ```
@@ -1375,7 +1385,8 @@ The cast is a set of ordinary classes that inherit nothing:
 
 ```python
 # casts.py
-from quest import Hero, Narrator, Obstacle, Reward, Terrain, encounter
+from quest import (Hero, Narrator, Obstacle, Reward,
+                   Terrain, encounter)
 from stateless import run, supply
 
 class Kitty:
@@ -1547,7 +1558,9 @@ class Database:
 def store(db: Database, user: str) -> str:
     return db.save(user)
 
-def save_user(user: str) -> Effect[Need[Database], Crashed, str]:
+def save_user(user: str) -> Effect[
+    Need[Database], Crashed, str
+]:
     db = yield from need(Database)
     result = yield from store(db, user)
     return result
@@ -1570,13 +1583,15 @@ print(run(supply(Database(failures=2))(once)("Morty")))
 #: database crashed
 three = recurs(3, spaced(timedelta(milliseconds=1)))
 retried = retry(three)(save_user)
-print(run(supply(Database(failures=2), Time())(retried)("Morty")))
+print(run(
+    supply(Database(failures=2), Time())(retried)("Morty")))
 #: attempt 1: saving Morty
 #: attempt 2: saving Morty
 #: attempt 3: saving Morty
 #: Morty saved
 caught = catch(RetryError)(retried)
-outcome = run(supply(Database(failures=9), Time())(caught)("Morty"))
+outcome = run(
+    supply(Database(failures=9), Time())(caught)("Morty"))
 print(type(outcome).__name__)
 #: attempt 1: saving Morty
 #: attempt 2: saving Morty

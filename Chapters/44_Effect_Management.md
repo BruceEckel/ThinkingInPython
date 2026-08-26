@@ -276,7 +276,8 @@ def do_nothing() -> None:
 busy = timeit.timeit(compute_and_discard, number=5)
 idle = timeit.timeit(do_nothing, number=5)
 report(busy_loop=busy, empty_function=idle)
-print(f"burned real CPU time for nothing: {busy > idle * 100}")
+print(f"burned real CPU time for nothing: "
+      f"{busy > idle * 100}")
 #: burned real CPU time for nothing: True
 ```
 

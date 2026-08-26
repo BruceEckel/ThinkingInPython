@@ -40,7 +40,8 @@ operations: dict[str, Callable[[int, int], int]] = {
     "-": sub,
     "*": mul,
 }
-print(operations["+"](6, 4), operations["-"](6, 4), operations["*"](6, 4))
+print(operations["+"](6, 4), operations["-"](6, 4),
+      operations["*"](6, 4))
 #: 10 2 24
 ```
 
@@ -87,7 +88,8 @@ def square(n):
     return n * n
 
 increment_then_double = compose(double, increment)
-increment_then_double_then_square = compose(square, increment_then_double)
+increment_then_double_then_square = compose(
+    square, increment_then_double)
 print(increment_then_double_then_square(3))
 #: 64
 ```
@@ -101,6 +103,7 @@ another `compose()` call is enough to extend the pipeline.
 ## 5. Fixing a leading argument, and why the trailing one differs
 
 ```python
+import textwrap
 from functools import partial
 
 def clamp(low: int, value: int, high: int, /) -> int:
@@ -112,8 +115,10 @@ print(at_least_ten(3, 100), at_least_ten(50, 100))
 try:
     partial(clamp, high=100)(0, 5)
 except TypeError as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeError: clamp() got some positional-only arguments passed as keyword arguments: 'high'
+    for line in textwrap.wrap(str(e), 57):
+        print(line)
+#: clamp() got some positional-only arguments passed as
+#: keyword arguments: 'high'
 ```
 
 `at_least_ten` needs no `Placeholder`. `low` is the first parameter,

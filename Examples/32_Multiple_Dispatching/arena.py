@@ -3,7 +3,8 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-def item_pair_gen[T](base: type[T], n: int) -> Iterator[tuple[T, T]]:
+def item_pair_gen[T](base: type[T],
+                     n: int) -> Iterator[tuple[T, T]]:
     items = base.__subclasses__()
     for _ in range(n):
         yield random.choice(items)(), random.choice(items)()

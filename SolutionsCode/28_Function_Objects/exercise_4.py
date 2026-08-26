@@ -41,7 +41,8 @@ coarse_closure = newton_within(0.5)
 coarse_partial: RootFinder = partial(newton, tolerance=0.5)
 fine_closure = newton_within(1e-12)
 
-for finder in (coarse_closure, coarse_partial, fine_closure):
+for finder in (coarse_closure, coarse_partial,
+               fine_closure):
     root = solve(f, 0.0, 2.0, [finder])
     assert root is not None
     print(f"{root:.6f}")

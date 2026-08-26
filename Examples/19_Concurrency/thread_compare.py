@@ -9,7 +9,8 @@ class Times(NamedTuple):
     threaded: float
 
 def compare(
-    price: Callable[[int], int], orders: list[int], number: int
+    price: Callable[[int], int], orders: list[int],
+    number: int
 ) -> Times:
     def sequential() -> list[int]:
         return [price(o) for o in orders]
@@ -20,6 +21,8 @@ def compare(
 
     assert threaded() == sequential()
     return Times(
-        min(timeit.repeat(sequential, number=number, repeat=3)),
-        min(timeit.repeat(threaded, number=number, repeat=3)),
+        min(timeit.repeat(sequential,
+                          number=number, repeat=3)),
+        min(timeit.repeat(threaded,
+                          number=number, repeat=3)),
     )

@@ -9,7 +9,9 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console = yield from need(Console)
     console.print(f"Hello, {name}!")
 
-def greet_all(names: list[str]) -> Depend[Need[Console], None]:
+def greet_all(names: list[str]) -> Depend[
+    Need[Console], None
+]:
     for name in names:
         yield from greet(name)
 

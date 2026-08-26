@@ -20,6 +20,7 @@ def funded() -> Account:
     return account
 
 @pytest.mark.parametrize("rate", [0.0, 0.05, 0.5, 1.0])
-def test_add_interest_rates(funded: Account, rate: float) -> None:
+def test_add_interest_rates(funded: Account,
+                            rate: float) -> None:
     funded.add_interest(rate)
     assert funded.balance == pytest.approx(100 * (1 + rate))

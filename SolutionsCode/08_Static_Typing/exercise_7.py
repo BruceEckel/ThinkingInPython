@@ -11,7 +11,7 @@ def count(shapes: Sequence[Shape]) -> int:
     return len(shapes)
 
 def add_square(shapes: Sequence[Shape]) -> None:
-    # ty: object of type "Sequence[Shape]" has no attribute "append":
+    # ty: "Sequence[Shape]" has no attribute "append":
     # shapes.append(Shape())
     print("would add a square to", len(shapes), "shapes")
 

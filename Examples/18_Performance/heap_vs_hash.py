@@ -26,6 +26,6 @@ assert heap_min_extractions() == hash_min_extractions()
 t_heap = timeit.timeit(heap_min_extractions, number=50)
 t_hash = timeit.timeit(hash_min_extractions, number=50)
 report(heap=t_heap, repeated_min=t_hash)
-print(f"heap at least 10x faster than repeated min() on a set: "
+print(f"heap at least 10x faster than min() on a set: "
       f"{t_heap * 10 < t_hash}")
-#: heap at least 10x faster than repeated min() on a set: True
+#: heap at least 10x faster than min() on a set: True

@@ -2,9 +2,10 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-# Concrete (non-generic): this exercise combines three ints into
-# a str, so there is no type parameter to preserve, and isinstance()
-# can narrow a concrete class without running into type erasure.
+# Concrete (non-generic): this exercise combines three
+# ints into a str, so there is no type parameter to
+# preserve, and isinstance() can narrow a concrete class
+# without running into type erasure.
 @dataclass(frozen=True)
 class IntResult:
     value: int
@@ -43,18 +44,21 @@ def combined(i: int, j: int) -> str | MultiErrorResult:
     result_a = func_a(i)
     result_b = func_b(j)
     result_c = func_c(i + j)
-    errors = [r.error for r in (result_a, result_b, result_c)
+    errors = [r.error
+              for r in (result_a, result_b, result_c)
               if isinstance(r, ErrorResult)]
     if errors:
         return MultiErrorResult(errors)
     assert isinstance(result_a, IntResult)
     assert isinstance(result_b, IntResult)
     assert isinstance(result_c, IntResult)
-    return add(result_a.value, result_b.value, result_c.value)
+    return add(result_a.value, result_b.value,
+               result_c.value)
 
 def test_combined_collects_every_failure() -> None:
     assert combined(1, 2) == MultiErrorResult(
-        ["func_a(1)", "func_b(2)", "func_c(3): division by zero"])
+        ["func_a(1)", "func_b(2)",
+         "func_c(3): division by zero"])
 
 def test_combined_reports_single_failure() -> None:
     assert combined(1, 5) == MultiErrorResult(["func_a(1)"])

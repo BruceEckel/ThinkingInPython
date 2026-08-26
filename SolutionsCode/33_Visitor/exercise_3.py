@@ -36,7 +36,7 @@ Gladiolus().accept(Bee())
 #: Gladiolus pollinated by Bee
 
 try:
-    Gladiolus().accept(Beetle())  # ty: ignore[invalid-argument-type]
+    Gladiolus().accept(Beetle())  # type: ignore
 except AttributeError as e:
     print(type(e).__name__, e)
 #: AttributeError 'Beetle' object has no attribute 'visit'

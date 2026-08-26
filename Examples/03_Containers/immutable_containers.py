@@ -1,14 +1,14 @@
 # immutable_containers.py
 from types import MappingProxyType
 
-# A tuple is an immutable list, and a frozenset is an immutable set:
+# The immutable list is tuple; the immutable set, frozenset:
 nums = (1, 2, 3)
 primes = frozenset({2, 3, 5, 7})
 print(5 in primes)
 #: True
 
-# Immutable containers are hashable, so they can be set members
-# or dictionary keys. A plain list or set cannot:
+# Immutable containers are hashable, so they can be set
+# members or dictionary keys. A plain list or set cannot:
 groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True

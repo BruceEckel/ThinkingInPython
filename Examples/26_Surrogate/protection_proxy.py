@@ -8,7 +8,8 @@ class Document:
     def erase(self) -> None: print("erased")
 
 class Guarded:
-    def __init__(self, doc: Document, *, admin: bool) -> None:
+    def __init__(self, doc: Document, *,
+                 admin: bool) -> None:
         self._doc = doc
         self._admin = admin
     def __getattr__(self, name: str) -> Any:

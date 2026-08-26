@@ -26,7 +26,8 @@ t_list = timeit.timeit(list_lookups, number=20)
 t_set = timeit.timeit(set_lookups, number=20)
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"list {t_list:.6f}, set {t_set:.6f}")
-print(f"set faster on average-case targets too: {t_set < t_list}")
+print(f"set faster on average-case targets too: "
+      f"{t_set < t_list}")
 #: set faster on average-case targets too: True
 ```
 
@@ -236,11 +237,13 @@ def square(n: int) -> int:
 monitoring.use_tool_id(TOOL, "call counter")
 monitoring.register_callback(TOOL, PY_START, on_start)
 for target in (fib, square):
-    monitoring.set_local_events(TOOL, target.__code__, PY_START)
+    monitoring.set_local_events(TOOL, target.__code__,
+                                PY_START)
 print(fib(10), square(4))
 #: 55 16
 for target in (fib, square):
-    monitoring.set_local_events(TOOL, target.__code__, NO_EVENTS)
+    monitoring.set_local_events(TOOL, target.__code__,
+                                NO_EVENTS)
 monitoring.free_tool_id(TOOL)
 print(counts)
 #: Counter({'fib': 177, 'square': 1})
@@ -317,7 +320,7 @@ t_array = best(lambda: sum(as_array))
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"list {t_list:.6f}, array {t_array:.6f}")
 print(f"array is slower to iterate: {t_array > t_list}")
-#: array is slower to iterate: False
+#: array is slower to iterate: True
 ```
 
 Not faster: on one machine the `array` took about 1.3 times as long
@@ -358,7 +361,8 @@ few = ["ab"] * 100
 assert build_join(many) == build_concat(many)
 
 j_many = timeit.timeit(lambda: build_join(many), number=200)
-c_many = timeit.timeit(lambda: build_concat(many), number=200)
+c_many = timeit.timeit(lambda: build_concat(many),
+                       number=200)
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"join {j_many:.6f}, concat {c_many:.6f}")
 print(f"join wins at 10,000 parts: {j_many < c_many}")

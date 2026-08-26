@@ -28,7 +28,8 @@ class Pool[R]:
 pool = Pool(Connection(1), Connection(2))
 with pool.lease() as c1:
     with pool.lease() as c2:
-        print("available while both leased:", pool.available())
+        print("available while both leased:",
+              pool.available())
 print("available after both returned:", pool.available())
 #: available while both leased: 0
 #: available after both returned: 2

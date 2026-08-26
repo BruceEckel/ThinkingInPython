@@ -13,7 +13,8 @@ both = catch(KeyError, ValueError)(read_score)
 one = catch(KeyError)(read_score)
 
 def all_handled(name: str) -> Success[str]:
-    value: int | KeyError | ValueError = yield from both(name)
+    value: int | KeyError | ValueError = yield from both(
+        name)
     match value:
         case KeyError():
             return f"{name}: unknown"

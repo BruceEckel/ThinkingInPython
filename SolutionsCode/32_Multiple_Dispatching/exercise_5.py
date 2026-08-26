@@ -14,7 +14,8 @@ class Meters:
 
     def __rsub__(self, other: object) -> Meters:
         if isinstance(other, int | float):
-            return Meters(other - self.n)  # Not self.n - other
+            # Not self.n - other
+            return Meters(other - self.n)
         return NotImplemented
 
 print(Meters(10) - Meters(3), Meters(10) - 3)

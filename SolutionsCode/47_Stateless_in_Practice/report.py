@@ -10,7 +10,9 @@ from research import (
 )
 from stateless import Depend, Need, catch
 
-def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+def report() -> Depend[
+    Need[Feed] | Need[Encyclopedia], str
+]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
     found: str | Unavailable | NotInteresting | NoArticle
     found = yield from caught(research)()

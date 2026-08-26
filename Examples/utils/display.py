@@ -15,15 +15,16 @@ def _annotations(cls: type) -> dict[str, object]:
             for base in reversed(cls.__mro__)}
 
 def _type_name(annotation: object) -> str:
-    # A readable name for a type annotation, keeping any [parameters]:
+    # A readable annotation name, keeping [parameters]:
     if isinstance(annotation, type):
         return annotation.__name__
     return str(annotation)
 
 def _redefined(name: str, value: object) -> bool:
-    # Restricted to INTERESTING_DUNDERS: every class has __module__,
-    # __dict__, and other bookkeeping dunders that always differ from
-    # object's, so comparing those never filters anything out.
+    # Restricted to INTERESTING_DUNDERS: every class has
+    # __module__, __dict__, and other bookkeeping dunders
+    # that always differ from object's, so comparing those
+    # never filters anything out.
     if name not in INTERESTING_DUNDERS:
         return False
     return getattr(object, name, None) is not value
@@ -40,15 +41,16 @@ def _show_dunder(
     return name in dunder
 
 def _shared(obj: object, name: str) -> bool:
-    # A class has no instance-level storage to compare against, so
-    # every attribute it shows is class-level storage by construction.
-    # For an instance, only a name missing from its own __dict__ is:
+    # A class has no instance-level storage to compare
+    # against, so every attribute it shows is class-level
+    # storage by construction. For an instance, only a name
+    # missing from its own __dict__ is:
     if inspect.isclass(obj):
         return True
     return name not in getattr(obj, "__dict__", {})
 
 def _truncate(text: str, budget: int) -> str:
-    # Keep text within budget, marking a cut with an ellipsis:
+    # Fit the budget, marking a cut with an ellipsis:
     if len(text) <= budget:
         return text
     if budget < 4:  # No room for text plus the ellipsis
@@ -82,8 +84,9 @@ def _format_attribute(
 
 def display_object(
     obj: object,
-    dunder: Sequence[str] | ALL_DUNDERS | REDEFINED_DUNDERS = (),
-    max_width: int = 65,
+    dunder: (Sequence[str] | ALL_DUNDERS
+             | REDEFINED_DUNDERS) = (),
+    max_width: int = 57,
     exclude: Sequence[str] = (),
 ) -> None:
     # For a class, the class; for an instance, its class:
@@ -91,15 +94,19 @@ def display_object(
     annotations = _annotations(cls)
     attributes: list[str] = []
     methods: list[str] = []
-    # Read members statically, without triggering dynamic descriptors:
+    # Read members statically, without triggering
+    # dynamic descriptors:
     for name, value in inspect.getmembers_static(obj):
         if name in exclude:
             continue
-        is_dunder = name.startswith("__") and name.endswith("__")
-        if is_dunder and not _show_dunder(dunder, name, value):
+        is_dunder = (name.startswith("__")
+                     and name.endswith("__"))
+        if is_dunder and not _show_dunder(
+                dunder, name, value):
             continue  # Skip standard dunder clutter
         if callable(value):
-            methods.append(_format_method(name, value, max_width))
+            methods.append(
+                _format_method(name, value, max_width))
         else:
             attributes.append(_format_attribute(
                 obj, name, value, annotations, max_width

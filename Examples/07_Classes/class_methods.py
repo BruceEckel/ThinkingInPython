@@ -5,7 +5,8 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):  # An alternative constructor
+    # An alternative constructor
+    def from_fahrenheit(cls, f):
         return cls((f - 32) * 5 / 9)
 
     @staticmethod

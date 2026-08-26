@@ -81,12 +81,14 @@ class Rat:
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
         self.blackboard.log(
-            f"Rat {self.number} starts at {(self.x, self.y)}.")
+            f"Rat {self.number} starts at "
+            f"{(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:
             neighbors = [
-                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+                (self.x + dx, self.y + dy)
+                for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if self.blackboard.claim(*pos)]
             if not moves:
@@ -97,7 +99,8 @@ class Rat:
             for branch in moves[1:]:
                 self.blackboard.spawn(*branch)
             self.x, self.y = moves[0]
-            await asyncio.sleep(0)  # Yield so sibling rats can run
+            # Yield so sibling rats can run
+            await asyncio.sleep(0)
 ```
 
 Initializing `number` requires calling `blackboard.next_number()`,
@@ -128,12 +131,14 @@ class Maze:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
         self.rows = [
-            r.ljust(self.width, self.Cell.WALL) for r in rows]
+            r.ljust(self.width, self.Cell.WALL)
+            for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
-        rows = [line for line in text.splitlines()
-                if line and not line.lstrip().startswith("#")]
+        rows = [
+            line for line in text.splitlines()
+            if line and not line.lstrip().startswith("#")]
         return cls(rows)
 
     @classmethod
@@ -184,17 +189,21 @@ from rat import Rat
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(init=False, default_factory=set)
+    visited: set[Coord] = field(
+        init=False, default_factory=set)
     tasks: list[asyncio.Task[None]] = field(
         init=False, default_factory=list)
-    messages: list[str] = field(init=False, default_factory=list)
+    messages: list[str] = field(
+        init=False, default_factory=list)
     _numbers: Iterator[int] = field(
-        init=False, default_factory=lambda: itertools.count(1))
+        init=False,
+        default_factory=lambda: itertools.count(1))
     group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
-        # No await between the test and the add, so this is atomic
-        if self.maze.is_open(x, y) and (x, y) not in self.visited:
+        # No await between test and add, so it is atomic
+        if (self.maze.is_open(x, y)
+            and (x, y) not in self.visited):
             self.visited.add((x, y))
             return True
         return False
@@ -350,7 +359,8 @@ def flood(maze: Maze, start: Coord) -> set[Coord]:
         if (x, y) in seen or not maze.is_open(x, y):
             continue
         seen.add((x, y))
-        stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+        stack += [(x + 1, y), (x - 1, y),
+                  (x, y + 1), (x, y - 1)]
     return seen
 
 def test_rats_map_every_reachable_cell() -> None:
@@ -398,7 +408,8 @@ class RecordingBlackboard(Blackboard):
             self.order.append((x, y))
         return claimed
 
-def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
+def show(layout: str = "amaze.txt",
+         step_ms: int = 60) -> None:
     maze = Maze.from_file(layout)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())
@@ -412,12 +423,15 @@ def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
 
     def box(x: int, y: int, color: str) -> None:
         canvas.create_rectangle(
-            x * CELL, y * CELL, (x + 1) * CELL, (y + 1) * CELL,
+            x * CELL, y * CELL,
+            (x + 1) * CELL, (y + 1) * CELL,
             fill=color, outline="gray")
 
     for y in range(maze.height):
         for x in range(maze.width):
-            box(x, y, "white" if maze.is_open(x, y) else "dimgray")
+            box(x, y,
+                "white" if maze.is_open(x, y)
+                else "dimgray")
 
     cells = iter(board.order)
 
@@ -480,10 +494,12 @@ class Item:
 
 class Robot(Item):
     symbol = "R"
-    room: Room  # Set by the builder when the robot is placed
+    # Set by the builder when the robot is placed
+    room: Room
 
     def __init__(self) -> None:
-        self.finished = False  # Set when the robot reaches the end
+        # Set when the robot reaches the end
+        self.finished = False
 
     def move(self, urge: Urge) -> None:
         self.room = self.room.doors.open(urge).enter(self)
@@ -530,7 +546,8 @@ class Edge(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        return robot.room  # The void outside the maze: stay put
+        # The void outside the maze: stay put
+        return robot.room
 
 class EndGame(Item):
     symbol = "!"
@@ -544,7 +561,8 @@ def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
         if symbol == item_type.symbol:
             return item_type()
-    return Teleport(symbol)  # Anything else is a teleport target
+    # Anything else is a teleport target
+    return Teleport(symbol)
 ```
 
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
@@ -678,7 +696,7 @@ class GameBuilder:
         # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-        # Stage 3: pair the teleports that share a target letter
+        # Stage 3: pair teleports sharing a target letter
         def target(room: Room) -> str:
             assert isinstance(room.occupant, Teleport)
             return room.occupant.target
@@ -735,10 +753,10 @@ string_maze = """
 """.strip()
 
 solution = (
-    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeeenneessee"
-    "nneeeesseeeenneennwwnneenneennnnwwwwnnnneesseennnnwwwwwwssww"
-    "eesswwsswwwwsseesseeeesswwwwwwwwwwwwwwnnnneennnnnnnnnneessss"
-    "eesssswwsseesswwww"
+    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeee"
+    "nneesseenneeeesseeeenneennwwnneenneennnnwwwwnnnneess"
+    "eennnnwwwwwwsswweesswwsswwwwsseesseeeesswwwwwwwwwwww"
+    "wwnnnneennnnnnnnnneesssseesssswwsseesswwww"
 )
 ```
 
@@ -870,12 +888,15 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
     room = game.robot.room
-    assert isinstance(room.occupant, EndGame)  # Finished on the "!"
+    # Finished on the "!"
+    assert isinstance(room.occupant, EndGame)
     assert game.robot.finished  # And the model recorded it
-    assert game.show_maze() == FINISHED  # Food eaten, robot moved
+    # Food eaten, robot moved
+    assert game.show_maze() == FINISHED
 
 def test_walls_block_and_food_is_eaten() -> None:
-    game = GameBuilder("R.#")  # Robot, food, wall in one row
+    # Robot, food, wall in one row
+    game = GameBuilder("R.#")
     start = game.robot.room
     game.run("e")  # East: eat the food and move in
     assert "." not in game.show_maze()  # Food gone
@@ -914,7 +935,8 @@ def show(maze: str = string_maze, moves: str = solution,
     root = tk.Tk()
     root.title("Robot in a Maze")
     canvas = tk.Canvas(root, highlightthickness=0,
-                       width=width * CELL, height=len(rows) * CELL)
+                       width=width * CELL,
+                       height=len(rows) * CELL)
     canvas.pack()
 
     def draw() -> None:
@@ -925,7 +947,8 @@ def show(maze: str = string_maze, moves: str = solution,
             canvas.create_rectangle(
                 col * CELL, row * CELL,
                 (col + 1) * CELL, (row + 1) * CELL,
-                fill=FILL.get(symbol, "palegreen"), outline="gray")
+                fill=FILL.get(symbol, "palegreen"),
+                outline="gray")
 
     queue = list("".join(moves.split()))
 
@@ -1003,8 +1026,10 @@ type Mode = tuple[int, int]  # Vibration pattern (m, n)
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
-        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+        math.cos(m * math.pi * x)
+        * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x)
+        * math.cos(m * math.pi * y))
 
 def bounce(v: float) -> float:
     if v < 0.0:
@@ -1040,7 +1065,8 @@ class Plate:
             amplitude(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60, height: int = 30) -> str:
+    def render(self, width: int = 57,
+               height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
         for g in self.grains:
@@ -1082,36 +1108,36 @@ for target in (0, 100, 400, 1200):
 #: steps  400: agitation 0.005
 #: steps 1200: agitation 0.000
 print(plate.render())
-#:  *.                     #                       #
-#:  :##                    #                       #
-#:     ##                  ##                      #
-#:       ##                 ##.                    #
-#:         ##                 ###                  .#
-#:           ##                  ######              ##########
-#:             ##                      ########
-#:               ##                           ###
-#:                 ##                           ##
-#:                   ##                          #*
-#:                     ##                         #
-#:                       ##                       #
-#: #######                 ##                      #
-#:       *##                 ##                    #:
-#:         ##                  ##                   #
-#:           #                   ##                  #:
-#:           ##                    ##                 ##*
-#:            #                      ##                 #######
-#:             #                       ##
+#: .:.                   #                      #
+#:  *##                  .#                     #
+#:    .##                 ##                    #
+#:      :##                ##                    #
+#:        ###               ####                 #*
+#:          ###                ######             ##########
+#:            ##*                    ########
+#:              ##:                         ###
+#:                ##                          ##
+#:                  ##                         #
+#:                    ##                       ##
+#:                      ##                      #
+#: #######               .##                    #:
+#:       ##*               ###                   #
+#:         ##                ###                 ##
+#:          ##                 ###                ##
+#:           #                   ##*               ###
+#:           .#                    ##:               #######
+#:            #                      ##
+#:            ##                       ##
 #:             #                         ##
-#:             :#                          ##
-#:              ##                           ##
-#:               ##*                           ##
-#:                 ########                      ##
-#: ######*###              ######                  ##
-#:           ##                  ###                 ##
-#:            #                    .##                 ##
-#:            #                      ##                  ##.
-#:            #                       #                    ##.
-#:            #                       #                    .:##
+#:             ##                          ##
+#:              :##                         *##
+#:                .#######                    *##
+#: #########*            *#####:                *##
+#:          *#                 ###.               ###
+#:           #                    ##                ###
+#:            #                    ##                 ###
+#:            #                     ##                  ##.
+#:            #                      #                   .##
 ```
 
 ### What the Numbers Show
@@ -1182,7 +1208,8 @@ def show(grains: int = 1200, step_ms: int = 30,
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")
     canvas = tk.Canvas(root, width=SIZE, height=SIZE,
-                       background="black", highlightthickness=0)
+                       background="black",
+                       highlightthickness=0)
     canvas.pack()
     palette = itertools.cycle(COLORS)
     dots = [

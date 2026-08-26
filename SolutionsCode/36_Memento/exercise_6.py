@@ -8,7 +8,8 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
 class History[S]:
     def __init__(self, initial: S) -> None:
@@ -37,15 +38,15 @@ def restore_field(
     history.do(copy.replace(history.present, **change))
 
 history = History(Drawing("Duck"))
-history.do(history.present.draw("circle"))
+history.do(history.present.draw("body"))
 checkpoint = history.present
 history.do(copy.replace(history.present, title="Goose"))
 history.do(history.present.draw("beak"))
 history.do(history.present.draw("tail"))
 print(history.present)
-#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+#: Drawing(title='Goose', strokes=('body', 'beak', 'tail'))
 restore_field(history, "strokes", checkpoint)
 print(history.present)
-#: Drawing(title='Goose', strokes=('circle',))
+#: Drawing(title='Goose', strokes=('body',))
 print(history.undo())
-#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+#: Drawing(title='Goose', strokes=('body', 'beak', 'tail'))

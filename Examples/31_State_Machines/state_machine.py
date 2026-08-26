@@ -10,5 +10,6 @@ class StateMachine:
     def run_all(self, inputs: Iterable[object]) -> None:
         for event in inputs:
             print(event)
-            self.current_state = self.current_state.next(event)
+            self.current_state = (
+                self.current_state.next(event))
             self.current_state.run()

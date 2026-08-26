@@ -43,6 +43,7 @@ import comment_periods
 import comment_spacing
 import heading_links
 import listing_format
+import listing_width
 import prose_lint
 from tools_markdown import Document
 from tools_repo import md_files, write_text_lf
@@ -51,6 +52,7 @@ from tools_report import Check, Finding
 # The registry. Add a Check here and it joins every mode below.
 CHECKS: list[Check] = [
     listing_format.CHECK,
+    listing_width.CHECK,
     comment_periods.CHECK,
     comment_spacing.CHECK,
     capitalize_comments.CHECK,

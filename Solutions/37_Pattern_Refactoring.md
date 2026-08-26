@@ -178,7 +178,8 @@ class Sorter:
         return "Cardboard: flatten and bundle"
 
 sorter = Sorter()
-for t in [Aluminum(1), Paper(1), Glass(1), Cardboard(1), Plastic(1)]:
+for t in [Aluminum(1), Paper(1), Glass(1),
+          Cardboard(1), Plastic(1)]:
     print(sorter.recycling_note(t))
 #: Aluminum: crush and bale
 #: Paper: no special handling

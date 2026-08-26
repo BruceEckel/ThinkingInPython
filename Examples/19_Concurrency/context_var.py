@@ -2,7 +2,8 @@
 import asyncio
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar("request_id", default="-")
+request_id: ContextVar[str] = ContextVar("request_id",
+                                         default="-")
 current = "-"  # The same idea as a plain global
 
 async def handle(name: str) -> None:
@@ -16,7 +17,8 @@ async def main() -> None:
     async with asyncio.TaskGroup() as group:
         for name in ("req-1", "req-2", "req-3"):
             group.create_task(handle(name))
-    print(f"after: context {request_id.get()}, global {current}")
+    print(f"after: context {request_id.get()}, "
+          f"global {current}")
 
 asyncio.run(main())
 #: context req-1, global req-3

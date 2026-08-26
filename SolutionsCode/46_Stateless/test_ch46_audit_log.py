@@ -1,7 +1,8 @@
 # test_ch46_audit_log.py
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, as_type, need, run, supply
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
 
 @runtime_checkable
 class Console(Protocol):
@@ -44,8 +45,10 @@ def test_greeting_and_logging_are_both_recorded() -> None:
     environment = supply(
         as_type(Console)(recorder), as_type(Log)(recorder))
     run(environment(greet_all)(["Alice", "Bob"]))
-    assert recorder.printed == ["Hello, Alice!", "Hello, Bob!"]
-    assert recorder.entries == ["greeted Alice", "greeted Bob"]
+    assert recorder.printed == ["Hello, Alice!",
+                                "Hello, Bob!"]
+    assert recorder.entries == ["greeted Alice",
+                                "greeted Bob"]
 
 recorder = Recorder()
 run(supply(as_type(Console)(recorder),

@@ -51,8 +51,10 @@ class ignore:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
-        if exc_type is None or not issubclass(exc_type, self.types):
+                 exc: BaseException | None,
+                 tb: object) -> bool:
+        if (exc_type is None
+            or not issubclass(exc_type, self.types)):
             return False
         print(f"{exc!r}")
         return True
@@ -104,7 +106,8 @@ def tag(name: str) -> Iterator[str]:
     finally:
         print(f"</{name}>")
 
-with tag("ul") as outer, tag("li") as inner1, tag("li") as inner2:
+with (tag("ul") as outer, tag("li") as inner1,
+      tag("li") as inner2):
     print(f"  {outer} then {inner1} then {inner2}")
 #: <ul>
 #: <li>
@@ -153,7 +156,8 @@ class Pool[R]:
 pool = Pool(Connection(1), Connection(2))
 with pool.lease() as c1:
     with pool.lease() as c2:
-        print("available while both leased:", pool.available())
+        print("available while both leased:",
+              pool.available())
 print("available after both returned:", pool.available())
 #: available while both leased: 0
 #: available after both returned: 2
@@ -227,7 +231,8 @@ class ignore_missing:
             exc: BaseException | None,
             tb: TracebackType | None,
     ) -> bool:
-        return exc_type is not None and issubclass(exc_type, KeyError)
+        return (exc_type is not None
+                and issubclass(exc_type, KeyError))
 
 stock = {"apple": 3}
 
@@ -322,7 +327,8 @@ def tag(name: str) -> Iterator[str]:
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
-        open_tags = [stack.enter_context(tag(n)) for n in names]
+        open_tags = [stack.enter_context(tag(n))
+                     for n in names]
         print("using", open_tags)
 
 wrap([])

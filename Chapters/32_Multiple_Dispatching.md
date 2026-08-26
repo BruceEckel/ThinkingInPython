@@ -58,7 +58,8 @@ import random
 from collections.abc import Iterator
 from typing import Any
 
-def item_pair_gen[T](base: type[T], n: int) -> Iterator[tuple[T, T]]:
+def item_pair_gen[T](base: type[T],
+                     n: int) -> Iterator[tuple[T, T]]:
     items = base.__subclasses__()
     for _ in range(n):
         yield random.choice(items)(), random.choice(items)()
@@ -89,13 +90,13 @@ class Paper(Item):
         # First dispatch: self was Paper
         return item.eval_paper(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it draws
+        # Second dispatch: caller was Paper, and it draws
         return Outcome.DRAW
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it wins
+        # Second dispatch: caller was Scissors, and it wins
         return Outcome.WIN
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it loses
+        # Second dispatch: caller was Rock, and it loses
         return Outcome.LOSE
 
 class Scissors(Item):
@@ -103,13 +104,13 @@ class Scissors(Item):
         # First dispatch: self was Scissors
         return item.eval_scissors(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it loses
+        # Second dispatch: caller was Paper, and it loses
         return Outcome.LOSE
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it draws
+        # Second dispatch: caller was Scissors, and it draws
         return Outcome.DRAW
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it wins
+        # Second dispatch: caller was Rock, and it wins
         return Outcome.WIN
 
 class Rock(Item):
@@ -117,13 +118,13 @@ class Rock(Item):
         # First dispatch: self was Rock
         return item.eval_rock(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it wins
+        # Second dispatch: caller was Paper, and it wins
         return Outcome.WIN
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it loses
+        # Second dispatch: caller was Scissors, and it loses
         return Outcome.LOSE
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it draws
+        # Second dispatch: caller was Rock, and it draws
         return Outcome.DRAW
 
 if __name__ == "__main__":
@@ -199,7 +200,8 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Outcome]] = {
     (Paper, Rock): Outcome.WIN,
     (Paper, Scissors): Outcome.LOSE,
     (Paper, Paper): Outcome.DRAW,
@@ -348,12 +350,15 @@ MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
 ]
 
 @pytest.mark.parametrize("module", [table, methods])
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+@pytest.mark.parametrize(
+    "player, opponent, expected", MATCHUPS)
 def test_matches_expected(module: ModuleType, player: str,
-                          opponent: str, expected: Outcome) -> None:
+                          opponent: str,
+                          expected: Outcome) -> None:
     assert compete(module, player, opponent) == expected
 
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+@pytest.mark.parametrize(
+    "player, opponent, expected", MATCHUPS)
 def test_both_versions_agree(player: str, opponent: str,
                              expected: Outcome) -> None:
     assert (compete(methods, player, opponent)
@@ -364,7 +369,8 @@ def test_both_versions_agree(player: str, opponent: str,
     (Outcome.LOSE, "lose"),
     (Outcome.DRAW, "draw"),
 ])
-def test_outcome_str(outcome: Outcome, expected: str) -> None:
+def test_outcome_str(outcome: Outcome,
+                     expected: str) -> None:
     assert str(outcome) == expected
 ```
 
@@ -426,7 +432,8 @@ print(Meters(3) + Meters(4))
 print(Meters(3) + 4)  # The left operand handles it
 #: __add__(Meters(n=3), 4)
 #: Meters(n=7)
-print(4 + Meters(3))  # Int declines; the right operand handles it
+# Int declines; the right operand handles it
+print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)
 try:

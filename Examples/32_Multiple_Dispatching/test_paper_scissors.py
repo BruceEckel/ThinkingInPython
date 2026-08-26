@@ -31,12 +31,15 @@ MATCHUPS: Final[list[tuple[str, str, Outcome]]] = [
 ]
 
 @pytest.mark.parametrize("module", [table, methods])
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+@pytest.mark.parametrize(
+    "player, opponent, expected", MATCHUPS)
 def test_matches_expected(module: ModuleType, player: str,
-                          opponent: str, expected: Outcome) -> None:
+                          opponent: str,
+                          expected: Outcome) -> None:
     assert compete(module, player, opponent) == expected
 
-@pytest.mark.parametrize("player, opponent, expected", MATCHUPS)
+@pytest.mark.parametrize(
+    "player, opponent, expected", MATCHUPS)
 def test_both_versions_agree(player: str, opponent: str,
                              expected: Outcome) -> None:
     assert (compete(methods, player, opponent)
@@ -47,5 +50,6 @@ def test_both_versions_agree(player: str, opponent: str,
     (Outcome.LOSE, "lose"),
     (Outcome.DRAW, "draw"),
 ])
-def test_outcome_str(outcome: Outcome, expected: str) -> None:
+def test_outcome_str(outcome: Outcome,
+                     expected: str) -> None:
     assert str(outcome) == expected

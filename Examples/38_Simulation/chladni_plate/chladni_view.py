@@ -16,7 +16,8 @@ def show(grains: int = 1200, step_ms: int = 30,
     root = tk.Tk()
     root.title(f"Chladni Plate {plate.mode}")
     canvas = tk.Canvas(root, width=SIZE, height=SIZE,
-                       background="black", highlightthickness=0)
+                       background="black",
+                       highlightthickness=0)
     canvas.pack()
     palette = itertools.cycle(COLORS)
     dots = [

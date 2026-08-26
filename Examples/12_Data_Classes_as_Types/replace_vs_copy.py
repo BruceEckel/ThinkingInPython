@@ -9,7 +9,8 @@ class Stars:
 
     def __post_init__(self) -> None:
         print(f"checking {self.number}")
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
 
 s = Stars(4)
 #: checking 4

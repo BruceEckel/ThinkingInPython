@@ -46,13 +46,15 @@ def evaluate(e: Expr, /, **env: int) -> int:
         case Var(name):
             return env[name]
         case Add(left, right):
-            return evaluate(left, **env) + evaluate(right, **env)
+            return (evaluate(left, **env)
+                    + evaluate(right, **env))
         case Mul(left, right):
-            return evaluate(left, **env) * evaluate(right, **env)
+            return (evaluate(left, **env)
+                    * evaluate(right, **env))
         case _:
             assert_never(e)
 
-# A pending combine, stacked behind the children it consumes:
+# A pending combine, behind the children it consumes:
 class Op(Enum):
     ADD = "+"
     MUL = "*"
@@ -64,10 +66,12 @@ def evaluate_iterative(e: Expr, /, **env: int) -> int:
         item = work.pop()
         match item:
             case Op.ADD:
-                right_value, left_value = values.pop(), values.pop()
+                right_value, left_value = (
+                    values.pop(), values.pop())
                 values.append(left_value + right_value)
             case Op.MUL:
-                right_value, left_value = values.pop(), values.pop()
+                right_value, left_value = (
+                    values.pop(), values.pop())
                 values.append(left_value * right_value)
             case Num(value):
                 values.append(value)

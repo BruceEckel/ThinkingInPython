@@ -9,7 +9,8 @@ def func_b(i: int) -> Result[int, str]:
 
 def func_c(i: int) -> Result[int, str]:
     try:
-        1 / (i - 3)  # A probe: raises an exception when i == 3
+        # A probe: raises an exception when i == 3
+        1 / (i - 3)
     except ZeroDivisionError as e:
         # The exception becomes a value:
         return Err(f"func_c({i}): {e}")

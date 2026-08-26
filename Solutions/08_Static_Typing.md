@@ -175,7 +175,8 @@ from typing import Literal
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, str]
-type Color = Literal["red", "blue", "green", "yellow", "purple"]
+type Color = Literal[
+    "red", "blue", "green", "yellow", "purple"]
 
 def paint(grid: Grid, cell: Coord, color: Color) -> None:
     grid[cell] = color
@@ -223,7 +224,7 @@ def count(shapes: Sequence[Shape]) -> int:
     return len(shapes)
 
 def add_square(shapes: Sequence[Shape]) -> None:
-    # ty: object of type "Sequence[Shape]" has no attribute "append":
+    # ty: "Sequence[Shape]" has no attribute "append":
     # shapes.append(Shape())
     print("would add a square to", len(shapes), "shapes")
 

@@ -69,7 +69,8 @@ Nothing disappears, because the error is just another return value:
 
 def func_a(i: int) -> int | str:
     if i == 3:
-        return f"func_a({i})"  # The error, returned as a value
+        # The error, returned as a value
+        return f"func_a({i})"
     return i
 
 outputs = [func_a(i) for i in range(5)]
@@ -245,7 +246,8 @@ def func_b(i: int) -> Result[int, str]:
 
 def func_c(i: int) -> Result[int, str]:
     try:
-        1 / (i - 3)  # A probe: raises an exception when i == 3
+        # A probe: raises an exception when i == 3
+        1 / (i - 3)
     except ZeroDivisionError as e:
         # The exception becomes a value:
         return Err(f"func_c({i}): {e}")
@@ -570,7 +572,8 @@ def reciprocal(n: int) -> float:
     return 1 / n
 
 def describe(text: str) -> str:
-    result: Result[float, Exception] = parse(text).bind(reciprocal)
+    result: Result[float, Exception] = parse(text).bind(
+        reciprocal)
     match result:
         case Ok(answer):
             return f"{text}: {answer}"
@@ -596,7 +599,7 @@ and the `match` tells them apart.
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 
 An exception knows what went wrong but not where.
-`invalid literal for int() with base 10: 'soon'` is accurate and unhelpful:
+`invalid literal for int() with base 10: 'no'` is accurate and unhelpful:
 which setting, which field, which row of the file?
 The frame that has that answer is rarely the frame that raised the exception,
 and by the time the exception reaches a handler high enough to report it,
@@ -621,11 +624,12 @@ def parse_seconds(text: str) -> int:
         raise
 
 try:
-    parse_seconds("soon")
+    parse_seconds("no")
 except ValueError as e:
-    print("".join(traceback.format_exception_only(e)), end="")
-#: ValueError: invalid literal for int() with base 10: 'soon'
-#: timeout was set to 'soon'
+    print("".join(traceback.format_exception_only(e)),
+          end="")
+#: ValueError: invalid literal for int() with base 10: 'no'
+#: timeout was set to 'no'
 #: expected a whole number of seconds
 ```
 
@@ -649,7 +653,8 @@ The exception must carry whatever context it needs:
 # noted_result.py
 from result import Err, Ok, Result
 
-def parse_field(name: str, text: str) -> Result[int, Exception]:
+def parse_field(name: str,
+                text: str) -> Result[int, Exception]:
     try:
         return Ok(int(text))
     except ValueError as e:

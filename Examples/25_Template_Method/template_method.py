@@ -11,7 +11,7 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
-# Create an "application" by filling in the steps:
+# Create an application by filling in the steps:
 class MyApp(ApplicationFramework):
     @override
     def customize1(self) -> None:

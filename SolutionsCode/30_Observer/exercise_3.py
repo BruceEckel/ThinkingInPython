@@ -18,7 +18,8 @@ class Observable[T]:
             except Exception as e:
                 failures.append(e)
         if failures:
-            raise ExceptionGroup("observer failures", failures)
+            raise ExceptionGroup(
+                "observer failures", failures)
 
 received: list[int] = []
 

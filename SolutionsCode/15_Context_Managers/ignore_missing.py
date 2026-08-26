@@ -11,7 +11,8 @@ class ignore_missing:
             exc: BaseException | None,
             tb: TracebackType | None,
     ) -> bool:
-        return exc_type is not None and issubclass(exc_type, KeyError)
+        return (exc_type is not None
+                and issubclass(exc_type, KeyError))
 
 stock = {"apple": 3}
 

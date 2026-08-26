@@ -4,8 +4,10 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from typing import Final
 
-TOTAL: Final[int] = 20_000_000  # Loop iterations, split across tasks
-CORE_MULTIPLIER: Final[int] = 2  # Largest sweep point = cores * this
+# Loop iterations, split across tasks
+TOTAL: Final[int] = 20_000_000
+# Largest sweep point = cores * this
+CORE_MULTIPLIER: Final[int] = 2
 
 def work_chunk(n: int) -> int:
     total = 0
@@ -29,7 +31,8 @@ if __name__ == "__main__":
     print(f"cores = {cores}, total = {TOTAL}")
 
     with ProcessPoolExecutor() as pool:
-        list(pool.map(work_chunk, [1]))  # Warm up, not timed
+        # Warm up, not timed
+        list(pool.map(work_chunk, [1]))
         baseline: float | None = None
         for tasks in task_counts:
             elapsed = timed_split(pool, TOTAL, tasks)

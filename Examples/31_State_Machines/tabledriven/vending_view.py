@@ -19,7 +19,8 @@ def show() -> None:
     buttons: list[list[tk.Button]] = []
 
     def render() -> None:
-        display.config(text=f"Inserted {vm.amount}c   {vm.message}")
+        display.config(
+            text=f"Inserted {vm.amount}c   {vm.message}")
         for r, row in enumerate(vm.items):
             for c, slot in enumerate(row):
                 out = slot.quantity == 0
@@ -47,7 +48,8 @@ def show() -> None:
               ).grid(row=1, column=1, sticky="we")
     tk.Button(root, text="Refund",
               command=lambda: send(Quit())
-              ).grid(row=1, column=2, columnspan=2, sticky="we")
+              ).grid(row=1, column=2, columnspan=2,
+                     sticky="we")
 
     for r in range(4):
         button_row: list[tk.Button] = []

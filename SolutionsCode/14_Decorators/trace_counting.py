@@ -12,7 +12,8 @@ class trace_counting[**P, R]:
         self.count = 0  # Per-function, like count_calls
         update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         self.count += 1
         trace_counting.total_calls += 1
         return self.func(*args, **kwargs)

@@ -7,7 +7,8 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
     def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])

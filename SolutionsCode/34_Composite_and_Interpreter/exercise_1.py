@@ -15,7 +15,8 @@ class Directory:
 
 type Node = File | Directory
 
-def find(entry: Node, name: str, prefix: str = "") -> Iterator[str]:
+def find(entry: Node, name: str,
+         prefix: str = "") -> Iterator[str]:
     match entry:
         case File(n, _):
             if n == name:
@@ -28,7 +29,8 @@ def find(entry: Node, name: str, prefix: str = "") -> Iterator[str]:
         case _:
             assert_never(entry)
 
-src = Directory("src", (File("main.py", 400), File("util.py", 250)))
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
 root = Directory("root", (
     File("readme.md", 90), src, File("data.csv", 1200),
     Directory("src", ())))

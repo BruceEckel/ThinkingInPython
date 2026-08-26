@@ -11,5 +11,6 @@ def test_patched(monkeypatch: pytest.MonkeyPatch) -> None:
     assert ch11_weather.current_temp("denver") == "21C"
 
 def test_injected() -> None:
-    got = ch11_weather.current_temp_with("denver", fake_fetch)
+    got = ch11_weather.current_temp_with(
+        "denver", fake_fetch)
     assert got == "21C"

@@ -22,7 +22,9 @@ for n in range(3):
 def make(n: int) -> Callable[[], None]:
     return lambda: print(n)
 
-by_factory: list[Callable[[], None]] = [make(n) for n in range(3)]
+by_factory: list[Callable[[], None]] = [
+    make(n) for n in range(3)
+]
 
 for fixed in (by_default, by_partial, by_factory):
     for command in fixed:

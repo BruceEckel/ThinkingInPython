@@ -513,7 +513,8 @@ class Document:
     def erase(self) -> None: print("erased")
 
 class Guarded:
-    def __init__(self, doc: Document, *, admin: bool) -> None:
+    def __init__(self, doc: Document, *,
+                 admin: bool) -> None:
         self._doc = doc
         self._admin = admin
     def __getattr__(self, name: str) -> Any:
@@ -613,7 +614,8 @@ def test_proxy_counts_only_calls() -> None:
         answer = 42
 
     p = CountingProxy(HasValue())
-    assert p.answer == 42  # Non-callable attribute passes through
+    # Non-callable attribute passes through
+    assert p.answer == 42
     p2 = CountingProxy(Doubler())
     p2.double(1)
     p2.double(1)

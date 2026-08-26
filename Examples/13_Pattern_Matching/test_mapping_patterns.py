@@ -2,5 +2,7 @@
 from mapping_patterns import handle
 
 def test_mapping_patterns() -> None:
-    assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle({"nope": 1}) == "Unrecognized event: {'nope': 1}"
+    assert handle(
+        {"type": "key", "key": "Esc"}) == "Key Esc"
+    assert handle(
+        {"nope": 1}) == "Unrecognized event: {'nope': 1}"

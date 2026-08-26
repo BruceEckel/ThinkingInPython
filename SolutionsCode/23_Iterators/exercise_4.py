@@ -6,14 +6,14 @@ def squares(n: int) -> Iterator[int]:
     for i in range(n):
         yield i * i
 
-# Fix one: collect once, then reuse the list.
+# Fix one: collect once, then reuse the list
 collected = list(squares(5))
 print(collected)
 #: [0, 1, 4, 9, 16]
 print(collected)
 #: [0, 1, 4, 9, 16]
 
-# Fix two: an iterable whose __iter__() builds a fresh generator.
+# Fix two: __iter__() builds a fresh generator per pass
 @dataclass
 class Squares:
     n: int

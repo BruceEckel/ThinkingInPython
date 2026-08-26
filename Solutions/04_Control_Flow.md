@@ -174,25 +174,26 @@ def substituted(text):
     try:
         return int(text)
     except ValueError:
-        raise BadNumber(text) from ArithmeticError("no digits here")
+        raise BadNumber(text) from ArithmeticError(
+            "no digits here")
 
 def joining_line(e):
     for part in traceback.format_exception(e):
         line = part.strip()
-        if line.endswith("exception occurred:") or line.endswith(
-            "following exception:"
-        ):
+        if (line.endswith("exception occurred:")
+            or line.endswith("following exception:")):
             return line
     return "nothing shown above it"
 
 try:
     substituted("seven")
 except BadNumber as e:
-    for chunk in textwrap.wrap(joining_line(e), 60):
+    for chunk in textwrap.wrap(joining_line(e), 55):
         print(" ", chunk)
-    print(type(e.__cause__).__name__, type(e.__context__).__name__)
-#:   The above exception was the direct cause of the following
-#:   exception:
+    print(type(e.__cause__).__name__,
+          type(e.__context__).__name__)
+#:   The above exception was the direct cause of the
+#:   following exception:
 #: ArithmeticError ValueError
 ```
 
@@ -227,7 +228,8 @@ path = Path(tempfile.gettempdir()) / "exercise_8.txt"
 with path.open("w") as f:
     f.write("one\ntwo\n")
 
-for line in path.read_text().splitlines():  # The whole file at once
+# The whole file at once
+for line in path.read_text().splitlines():
     print(line)
 #: one
 #: two

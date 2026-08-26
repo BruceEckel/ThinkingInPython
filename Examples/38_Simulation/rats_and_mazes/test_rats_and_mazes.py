@@ -22,7 +22,8 @@ def flood(maze: Maze, start: Coord) -> set[Coord]:
         if (x, y) in seen or not maze.is_open(x, y):
             continue
         seen.add((x, y))
-        stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+        stack += [(x + 1, y), (x - 1, y),
+                  (x, y + 1), (x, y - 1)]
     return seen
 
 def test_rats_map_every_reachable_cell() -> None:

@@ -38,7 +38,7 @@ class ApplicationFramework:
     def customize1(self) -> None: ...
     def customize2(self) -> None: ...
 
-# Create an "application" by filling in the steps:
+# Create an application by filling in the steps:
 class MyApp(ApplicationFramework):
     @override
     def customize1(self) -> None:
@@ -55,19 +55,17 @@ MyApp().run()
 #: Say no more, say no more!
 ```
 
-The client supplies `customize1()` and `customize2()`.
+The client supplies `customize1()` and `customize2()` in the derived class.
 `run()` starts the engine that drives the application.
-In a GUI program that engine is the main event loop.
 
-The base class calls code written after it, sometimes years after.
+The base class calls code written after it, potentially years later.
 Framework authors call this the *Hollywood Principle*: "don't call us,
 we'll call you."
-Your code supplies the steps; the framework decides when they run.
 The general name for this reversal is *Inversion of Control*:
-the framework holds the flow of control and calls into your code,
+the framework holds the flow of control and calls your code,
 rather than your code calling into a library.
 
-`@final` is only enforced by the type checker.
+`@final` is enforced by the type checker.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 If you need the interpreter to refuse an override,
@@ -111,7 +109,8 @@ def test_template_method_runs_steps_in_order() -> None:
             calls.append("two")
 
     Recorder().run()  # The client starts the engine
-    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
+    # Loop runs twice
+    assert calls == ["one", "two", "one", "two"]
 ```
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
@@ -142,7 +141,8 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        super().__init__()  # Usual style: engine runs now...
+        # Usual style: engine runs now...
+        super().__init__()
         self.name = name  # ...before this line runs
 
     @override
@@ -216,7 +216,8 @@ from template_function import run_framework
 def test_template_function_runs_steps_in_order() -> None:
     calls: list[str] = []
     run_framework(
-        lambda: calls.append("a"), lambda: calls.append("b"))
+        lambda: calls.append("a"),
+        lambda: calls.append("b"))
     assert calls == ["a", "b", "a", "b"]
 ```
 

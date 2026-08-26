@@ -5,7 +5,8 @@ def methods(obj: object) -> set[str]:
     return {
         name
         for name in dir(obj)
-        if not name.startswith("_") and callable(getattr(obj, name))
+        if not name.startswith("_")
+        and callable(getattr(obj, name))
     }
 
 class Surrogate:
@@ -13,7 +14,8 @@ class Surrogate:
         self.__implementation = implementation
 
     def change_to(self, new: Any) -> None:
-        missing = methods(self.__implementation) - methods(new)
+        missing = (methods(self.__implementation)
+                   - methods(new))
         if missing:
             raise TypeError(f"missing: {sorted(missing)}")
         self.__implementation = new

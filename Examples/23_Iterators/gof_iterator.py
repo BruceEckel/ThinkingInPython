@@ -13,7 +13,8 @@ class GoFIterator[T](Protocol):
 class OverStream[T]:
     def __init__(self, source: Iterable[T]) -> None:
         self.source: Iterator[T] = iter(source)
-        self.seen: list[T] = []  # Every item the traversal has read
+        # Every item the traversal has read
+        self.seen: list[T] = []
         self.index = 0
 
     def first(self) -> None:
@@ -44,7 +45,8 @@ stream = OverStream(x * 2 for x in [1, 2, 3])
 print(traverse(stream))
 #: [2, 4, 6]
 stream.first()
-print(traverse(stream))  # A second pass, from a spent generator
+# A second pass, from a spent generator
+print(traverse(stream))
 #: [2, 4, 6]
 print(stream.seen)
 #: [2, 4, 6]

@@ -229,7 +229,8 @@ if __name__ == "__main__":
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
     print(sorted(t.__name__ for t in nectar.registry))
-    print(nectar.dispatch(Ranunculus) is nectar.dispatch(Flower))
+    print(nectar.dispatch(Ranunculus)
+          is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
 #: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
@@ -327,15 +328,15 @@ def test_fragrance_registered_and_default(
     assert fragrance(flower) == expected
 
 def test_operations_dispatch_independently() -> None:
-    # Nectar knows Gladiolus and Chrysanthemum; fragrance knows
-    # Ranunculus. A Ranunculus falls to nectar's default but hits
-    # fragrance's registered case.
+    # Nectar knows Gladiolus and Chrysanthemum; fragrance
+    # knows Ranunculus. A Ranunculus falls to nectar's
+    # default but hits fragrance's registered case.
     ranunculus = Ranunculus()
     assert nectar(ranunculus) == "Ranunculus: no nectar"
     assert fragrance(ranunculus) == "strong"
 
 def test_dispatch_follows_inheritance() -> None:
-    # Unregistered subclass: nearest registered ancestor wins
+    # Unregistered: the nearest registered ancestor wins
     class Hybrid(Gladiolus):
         pass
 

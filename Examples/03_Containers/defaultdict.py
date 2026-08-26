@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 pets = [("dog", "Rex"), ("cat", "Felix"), ("dog", "Fido")]
-# With a plain dict you must create each list before appending:
+# A plain dict makes you create each list first:
 plain = {}
 for kind, name in pets:
     if kind not in plain:
@@ -16,7 +16,8 @@ for kind, name in pets:
     by_kind[kind].append(name)
 print(by_kind["dog"])
 #: ['Rex', 'Fido']
-print(by_kind["fish"])  # A missing key gets a fresh empty list
+# A missing key gets a fresh empty list
+print(by_kind["fish"])
 #: []
 print("fish" in by_kind)  # Reading it added the key
 #: True

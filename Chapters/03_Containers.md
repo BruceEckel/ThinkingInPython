@@ -183,7 +183,8 @@ empty = ()  # Empty tuple
 x, y = point  # Unpacking
 print(x, y)
 #: 3 4
-single = (42,)  # A one-element tuple needs the trailing comma
+# A one-element tuple needs the trailing comma
+single = (42,)
 print(len(single))
 #: 1
 print(tuple([1, 2, 3]))  # Converts a list to a tuple
@@ -277,7 +278,8 @@ print(ages["Alice"])
 ages["Carol"] = 41  # Add or update
 print("Bob" in ages)  # Membership tests the keys
 #: True
-print(ages.get("Dan", 0))  # A default when the key is missing
+# A default when the key is missing
+print(ages.get("Dan", 0))
 #: 0
 print(list(ages))  # Iterating a dict yields its keys
 #: ['Alice', 'Bob', 'Carol']
@@ -459,18 +461,18 @@ A `Counter` tallies the frequency of each item:
 # counter.py
 from collections import Counter
 
-words = "the cat sat on the mat the cat".split()
+words = "a cat sat on a mat a cat".split()
 counts = Counter(words)
 print(counts)
-#: Counter({'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1})
-print(counts["the"])
+#: Counter({'a': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1})
+print(counts["a"])
 #: 3
 print(counts["dog"])
 #: 0
 print("dog" in counts)  # Reading it added nothing
 #: False
 print(counts.most_common(2))
-#: [('the', 3), ('cat', 2)]
+#: [('a', 3), ('cat', 2)]
 ```
 
 A missing key counts as zero rather than raising `KeyError`,
@@ -486,7 +488,7 @@ which removes the setup-on-first-use boilerplate:
 from collections import defaultdict
 
 pets = [("dog", "Rex"), ("cat", "Felix"), ("dog", "Fido")]
-# With a plain dict you must create each list before appending:
+# A plain dict makes you create each list first:
 plain = {}
 for kind, name in pets:
     if kind not in plain:
@@ -500,7 +502,8 @@ for kind, name in pets:
     by_kind[kind].append(name)
 print(by_kind["dog"])
 #: ['Rex', 'Fido']
-print(by_kind["fish"])  # A missing key gets a fresh empty list
+# A missing key gets a fresh empty list
+print(by_kind["fish"])
 #: []
 print("fish" in by_kind)  # Reading it added the key
 #: True
@@ -661,14 +664,14 @@ which is not a container of its own but a read-only *view* onto a `dict` you sti
 # immutable_containers.py
 from types import MappingProxyType
 
-# A tuple is an immutable list, and a frozenset is an immutable set:
+# The immutable list is tuple; the immutable set, frozenset:
 nums = (1, 2, 3)
 primes = frozenset({2, 3, 5, 7})
 print(5 in primes)
 #: True
 
-# Immutable containers are hashable, so they can be set members
-# or dictionary keys. A plain list or set cannot:
+# Immutable containers are hashable, so they can be set
+# members or dictionary keys. A plain list or set cannot:
 groups = {frozenset({1, 2}), frozenset({3, 4})}
 print(frozenset({1, 2}) in groups)
 #: True

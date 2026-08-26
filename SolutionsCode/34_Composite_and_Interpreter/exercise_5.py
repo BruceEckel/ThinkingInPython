@@ -81,10 +81,12 @@ def derivative(e: Expr, name: str) -> Expr:
             return Num(0)
         case Var(n):
             return Num(1) if n == name else Num(0)
-        case Add(left, right):  # Sum rule: (f + g)' = f' + g'
+        # Sum rule: (f + g)' = f' + g'
+        case Add(left, right):
             return Add(derivative(left, name),
                        derivative(right, name))
-        case Mul(left, right):  # Product rule: (fg)' = f'g + fg'
+        # Product rule: (fg)' = f'g + fg'
+        case Mul(left, right):
             return Add(Mul(derivative(left, name), right),
                        Mul(left, derivative(right, name)))
         case _:

@@ -7,7 +7,8 @@ class Weight:
         self.kg = kg
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Weight) and self.kg == other.kg
+        return (isinstance(other, Weight)
+                and self.kg == other.kg)
 
     def __lt__(self, other: Weight) -> bool:
         return self.kg < other.kg

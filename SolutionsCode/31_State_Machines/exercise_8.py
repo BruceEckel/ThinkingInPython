@@ -11,11 +11,14 @@ class MouseAction(StrEnum):
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
 
-NEXT_ACTIONS: dict[MouseAction | None, list[MouseAction]] = {
+NEXT_ACTIONS: dict[MouseAction | None,
+                   list[MouseAction]] = {
     None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY, MouseAction.ENTERS],
+    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
+                          MouseAction.ENTERS],
     MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES, MouseAction.TRAPPED],
+    MouseAction.ENTERS: [MouseAction.ESCAPES,
+                         MouseAction.TRAPPED],
     MouseAction.ESCAPES: [MouseAction.APPEARS],
     MouseAction.TRAPPED: [MouseAction.REMOVED],
     MouseAction.REMOVED: [MouseAction.APPEARS],
@@ -31,5 +34,7 @@ def mouse_move_generator(
         yield previous
 
 moves = list(mouse_move_generator(8, seed=1))
-print(" ".join(m.name for m in moves))
-#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY APPEARS ENTERS TRAPPED REMOVED
+print(" ".join(m.name for m in moves[:4]))
+#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
+print(" ".join(m.name for m in moves[4:]))
+#: APPEARS ENTERS TRAPPED REMOVED

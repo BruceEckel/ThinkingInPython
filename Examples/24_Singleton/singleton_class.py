@@ -9,16 +9,20 @@ class singleton:
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         print(f"singleton.__call__({args}, {kwargs})")
         if self.instance is None:
-            print(f"constructing {self.constructor.__name__}")
-            self.instance = self.constructor(*args, **kwargs)
+            print(
+                f"constructing {self.constructor.__name__}")
+            self.instance = self.constructor(
+                *args, **kwargs)
         else:
-            print(f"using cached {self.constructor.__name__}")
+            print(
+                f"using cached {self.constructor.__name__}")
             print(f"discarding {args}, {kwargs}")
         return self.instance
 
 @singleton
 class Registry:
-    def __init__(self, name: str, *, limit: int = 10) -> None:
+    def __init__(self, name: str, *,
+                 limit: int = 10) -> None:
         print(f"Registry.__init__({name}, {limit})")
         self.name = name
         self.limit = limit
@@ -34,5 +38,6 @@ second = Registry("secondary", limit=99)
 #: singleton.__call__(('secondary',), {'limit': 99})
 #: using cached Registry
 #: discarding ('secondary',), {'limit': 99}
-print(first is second, second.name, second.limit, second.items)
+print(first is second, second.name,
+      second.limit, second.items)
 #: True primary 3 ['spam', 'eggs']

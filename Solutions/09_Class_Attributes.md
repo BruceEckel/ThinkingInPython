@@ -153,9 +153,9 @@ try:
 
 except ValueError as e:
     print(type(e).__name__)
-    print(str(e).partition(": ")[0])
+    print(str(e).partition(" for ")[0])
 #: ValueError
-#: mutable default <class 'list'> for field items is not allowed
+#: mutable default <class 'list'>
 ```
 
 The full message ends with the remedy: `use default_factory`. The

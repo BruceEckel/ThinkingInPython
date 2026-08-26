@@ -294,8 +294,10 @@ class ignore_one:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
-        if exc_type is not None and issubclass(exc_type, self.kind):
+                 exc: BaseException | None,
+                 tb: object) -> bool:
+        if (exc_type is not None
+            and issubclass(exc_type, self.kind)):
             print(f"{exc!r}")
             return True
         return False
@@ -303,7 +305,8 @@ class ignore_one:
 with ignore_one(ZeroDivisionError):
     print("before")
     1 / 0
-    print("after")  # Never runs: the error jumps to __exit__
+    # Never runs: the error jumps to __exit__
+    print("after")
 print("survived")
 #: before
 #: ZeroDivisionError('division by zero')
@@ -330,7 +333,8 @@ where any chapter can import it:
 # utils/exceptions.py
 
 ALL = sentinel("ALL")
-type Types = type[BaseException] | tuple[type[BaseException], ...]
+type Types = (type[BaseException]
+              | tuple[type[BaseException], ...])
 
 class ignore:
     def __init__(self, types: Types | ALL = ALL) -> None:
@@ -340,7 +344,8 @@ class ignore:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
+                 exc: BaseException | None,
+                 tb: object) -> bool:
         if exc_type is None:
             return False
         if self.types is not ALL:
@@ -380,7 +385,8 @@ from exceptions import ignore
 with ignore(ZeroDivisionError):
     print("before")
     1 / 0
-    print("after")  # Never runs: the error jumps to __exit__
+    # Never runs: the error jumps to __exit__
+    print("after")
 print("survived")
 #: before
 #: ZeroDivisionError('division by zero')
@@ -567,7 +573,8 @@ def tag(name: str) -> Iterator[str]:
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
-        open_tags = [stack.enter_context(tag(n)) for n in names]
+        open_tags = [
+            stack.enter_context(tag(n)) for n in names]
         print("using", open_tags)
 
 wrap(["a", "b"])
@@ -618,7 +625,8 @@ from io import StringIO
 from pathlib import Path
 from typing import IO
 
-def emit(lines: list[str], out: IO[str] | Path | None = None) -> None:
+def emit(lines: list[str],
+         out: IO[str] | Path | None = None) -> None:
     manager: AbstractContextManager[IO[str]]
     match out:
         case Path():
@@ -639,7 +647,8 @@ emit(["gamma"], buffer)  # Caller's stream, left open
 print(buffer.getvalue().strip(), buffer.closed)
 #: gamma False
 path = Path(tempfile.gettempdir()) / "emit.txt"
-emit(["delta"], path)  # emit() opened it, so emit() closes it
+# emit() opened it, so emit() closes it
+emit(["delta"], path)
 print(path.read_text().strip())
 #: delta
 path.unlink()

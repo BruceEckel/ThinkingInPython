@@ -42,7 +42,8 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [create_shape(kind) for kind in shape_name_gen(4)]
+    shapes = [create_shape(kind)
+              for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()

@@ -2,7 +2,8 @@
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # Goes through the setter below
+        # Goes through the setter below
+        self.radius = radius
 
     @property
     def radius(self):

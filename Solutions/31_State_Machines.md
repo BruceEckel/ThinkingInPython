@@ -9,7 +9,8 @@ from collections.abc import Callable
 from enum import Enum
 
 type Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, Enum
+    Callable[..., bool] | None,
+    Callable[..., None] | None, Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 
@@ -119,9 +120,11 @@ class WashingMachine(StateMachine):
             (WashState.IDLE, Start):
                 [(None, self.begin, WashState.FILLING)],
             (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"), WashState.WASHING)],
+                [(None, self.log_msg("washing"),
+                  WashState.WASHING)],
             (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"), WashState.RINSING)],
+                [(None, self.log_msg("rinsing"),
+                  WashState.RINSING)],
             (WashState.RINSING, RinseDone): [
                 (self.too_heavy, self.log_msg("slow spin"),
                  WashState.SPINNING),
@@ -129,7 +132,8 @@ class WashingMachine(StateMachine):
                  WashState.SPINNING),
             ],
             (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"), WashState.DONE)],
+                [(None, self.log_msg("done"),
+                  WashState.DONE)],
         }
         super().__init__(WashState.IDLE, table)
 
@@ -189,7 +193,8 @@ class WordState:
     TRANSITIONS: dict[str, str] = {}
 
     def next_state(self, word: str) -> str:
-        return self.TRANSITIONS.get(word, self.TRANSITIONS["*"])
+        return self.TRANSITIONS.get(
+            word, self.TRANSITIONS["*"])
 
 class Locked(WordState):
     TRANSITIONS = {"coin": "unlocked", "*": "locked"}
@@ -296,7 +301,8 @@ class MoodMachine(StateMachine):
                 None, self.say("Great to see you!"),
                 MoodState.HAPPY)],
             (MoodState.HAPPY, TakePill): [happy_takes_pill],
-            (MoodState.GRUMPY, TakePill): [happy_takes_pill],
+            (MoodState.GRUMPY, TakePill):
+                [happy_takes_pill],
         }
         super().__init__(MoodState.HAPPY, table)
 
@@ -363,13 +369,16 @@ class Elevator(StateMachine):
                 (None, None, ElevatorState.DOORS_OPEN),
             ],
             (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
             (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
             (ElevatorState.DOORS_OPEN, CloseDoors):
                 [(None, None, ElevatorState.DOORS_CLOSING)],
             (ElevatorState.DOORS_CLOSING, DoorSensor): [
-                (self.obstructed, None, ElevatorState.DOORS_OPEN),
+                (self.obstructed, None,
+                 ElevatorState.DOORS_OPEN),
                 (None, None, ElevatorState.IDLE),
             ],
         }
@@ -435,7 +444,8 @@ class TemperatureReading:
     degrees: float
 
 class HVAC(StateMachine):
-    def __init__(self, target: float = 20, band: float = 2) -> None:
+    def __init__(self, target: float = 20,
+                 band: float = 2) -> None:
         self.target = target
         self.band = band
         table: Table = {
@@ -498,11 +508,14 @@ class MouseAction(StrEnum):
     TRAPPED = "mouse trapped"
     REMOVED = "mouse removed"
 
-NEXT_ACTIONS: dict[MouseAction | None, list[MouseAction]] = {
+NEXT_ACTIONS: dict[MouseAction | None,
+                   list[MouseAction]] = {
     None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY, MouseAction.ENTERS],
+    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
+                          MouseAction.ENTERS],
     MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES, MouseAction.TRAPPED],
+    MouseAction.ENTERS: [MouseAction.ESCAPES,
+                         MouseAction.TRAPPED],
     MouseAction.ESCAPES: [MouseAction.APPEARS],
     MouseAction.TRAPPED: [MouseAction.REMOVED],
     MouseAction.REMOVED: [MouseAction.APPEARS],
@@ -518,8 +531,10 @@ def mouse_move_generator(
         yield previous
 
 moves = list(mouse_move_generator(8, seed=1))
-print(" ".join(m.name for m in moves))
-#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY APPEARS ENTERS TRAPPED REMOVED
+print(" ".join(m.name for m in moves[:4]))
+#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
+print(" ".join(m.name for m in moves[4:]))
+#: APPEARS ENTERS TRAPPED REMOVED
 ```
 
 `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
@@ -555,7 +570,8 @@ class Nickel(Money):  # A subclass, not a new instance
     pass
 
 class Machine(StateMachine):
-    def __init__(self, *, accept_nickels: bool = False) -> None:
+    def __init__(self, *,
+                 accept_nickels: bool = False) -> None:
         self.amount = 0
         rows = [(None, self.add, State.COLLECTING)]
         table: Table = {
@@ -577,8 +593,8 @@ print(m.state, m.amount)
 try:
     m.handle(Nickel("nickel", 5))
 except NoTransition as e:
-    print(type(e).__name__, e)
-#: NoTransition no transition from <State.COLLECTING: 2> on Nickel
+    print(e)
+#: no transition from <State.COLLECTING: 2> on Nickel
 
 # Fix 1: the table names Nickel too
 m1 = Machine(accept_nickels=True)

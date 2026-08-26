@@ -2,7 +2,9 @@
 from collections.abc import Callable
 from functools import wraps
 
-def trace(func: Callable[[str], str]) -> Callable[[str], str]:
+def trace(
+    func: Callable[[str], str]
+) -> Callable[[str], str]:
     @wraps(func)
     def wrapper(name: str) -> str:
         return func(name)

@@ -12,7 +12,8 @@ class FileFramework:
     def run(self) -> None:
         *inputs, output = self.filenames
         pieces = [
-            self.process(Path(name).read_text()) for name in inputs]
+            self.process(Path(name).read_text())
+            for name in inputs]
         Path(output).write_text("".join(pieces))
 
     def process(self, text: str) -> str:
@@ -23,10 +24,12 @@ class UppercaseFramework(FileFramework):
     def process(self, text: str) -> str:
         return text.upper()
 
-def run_file_framework(filenames: list[str],
-                        process: Callable[[str], str]) -> None:
+def run_file_framework(
+    filenames: list[str], process: Callable[[str], str]
+) -> None:
     *inputs, output = filenames
-    pieces = [process(Path(name).read_text()) for name in inputs]
+    pieces = [process(Path(name).read_text())
+              for name in inputs]
     Path(output).write_text("".join(pieces))
 
 def demo() -> None:

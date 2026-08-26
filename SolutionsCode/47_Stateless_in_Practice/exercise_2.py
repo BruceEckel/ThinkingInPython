@@ -8,7 +8,8 @@ def size(name: str) -> Success[int]:
     return success(RAW[name])  # KeyError, undeclared
 
 def caller() -> Success[int | KeyError]:
-    out: int | KeyError = yield from catch(KeyError)(size)("Bob")
+    out: int | KeyError = (
+        yield from catch(KeyError)(size)("Bob"))
     return out
 
 try:

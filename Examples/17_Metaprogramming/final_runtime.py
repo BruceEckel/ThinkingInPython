@@ -6,7 +6,8 @@ class A:
 class B(A):
     def __init_subclass__(cls, **kwargs: object) -> None:
         raise TypeError(
-            f"{B.__name__} is final; you cannot subclass it")
+            f"{B.__name__} is final; "
+            f"you cannot subclass it")
 
 try:
     class C(B):

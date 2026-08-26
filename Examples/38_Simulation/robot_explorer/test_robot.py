@@ -31,12 +31,15 @@ def test_solution_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
     game.run(solution)
     room = game.robot.room
-    assert isinstance(room.occupant, EndGame)  # Finished on the "!"
+    # Finished on the "!"
+    assert isinstance(room.occupant, EndGame)
     assert game.robot.finished  # And the model recorded it
-    assert game.show_maze() == FINISHED  # Food eaten, robot moved
+    # Food eaten, robot moved
+    assert game.show_maze() == FINISHED
 
 def test_walls_block_and_food_is_eaten() -> None:
-    game = GameBuilder("R.#")  # Robot, food, wall in one row
+    # Robot, food, wall in one row
+    game = GameBuilder("R.#")
     start = game.robot.room
     game.run("e")  # East: eat the food and move in
     assert "." not in game.show_maze()  # Food gone

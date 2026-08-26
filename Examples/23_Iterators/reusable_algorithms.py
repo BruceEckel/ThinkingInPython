@@ -8,5 +8,6 @@ print(list(islice(odd_squares, 5)))  # Take the first five
 #: [1, 9, 25, 49, 81]
 
 # takewhile() stops when its condition fails:
-print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
+print(list(takewhile(lambda s: s < 50,
+                     (n * n for n in count(1)))))
 #: [1, 4, 9, 16, 25, 36, 49]

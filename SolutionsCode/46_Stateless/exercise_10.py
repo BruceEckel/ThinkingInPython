@@ -1,12 +1,14 @@
 # exercise_10.py
 from typing import Final
-from stateless import Effect, Need, need, run, supply, throws
+from stateless import (Effect, Need, need, run, supply,
+                       throws)
 
 class Console:
     def print(self, message: str) -> None:
         print(message)
 
-SCORES: Final[dict[str, int]] = {"Alice": 42, "Bob": 7, "Cyd": -3}
+SCORES: Final[dict[str, int]] = {
+    "Alice": 42, "Bob": 7, "Cyd": -3}
 
 @throws(KeyError)
 def score(name: str) -> int:
@@ -15,7 +17,8 @@ def score(name: str) -> int:
 @throws(ValueError)
 def format_score(name: str, value: int) -> str:
     if value < 0:
-        raise ValueError(f"negative score for {name}: {value}")
+        raise ValueError(
+            f"negative score for {name}: {value}")
     return f"{name}: {value}"
 
 def announce(

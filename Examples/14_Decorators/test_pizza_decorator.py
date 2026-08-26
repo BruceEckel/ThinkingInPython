@@ -1,6 +1,7 @@
 # test_pizza_decorator.py
 import pytest
-from pizza_decorator import Feta, Garlic, Hawaiian, Margherita, Olives
+from pizza_decorator import (Feta, Garlic, Hawaiian,
+                             Margherita, Olives)
 
 def test_plain_pizza() -> None:
     pizza = Hawaiian()

@@ -25,7 +25,7 @@ class Yellow(Color):
 print(sorted(c.__name__ for c in Color.registry))
 #: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red', 'Yellow']
 
-class MutedYellow(Yellow):
+class Gold(Yellow):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-#: ['CeruleanBlue', 'Green', 'MutedYellow', 'PhthaloBlue', 'Red']
+#: ['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']

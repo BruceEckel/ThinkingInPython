@@ -21,7 +21,8 @@ class Peekable[T](Iterator[T]):
         return item
 
 it = Peekable(x * 2 for x in [1, 2, 3])
-print(it.peek(), it.peek(), it.peek())  # Free, and repeatable
+# Free, and repeatable
+print(it.peek(), it.peek(), it.peek())
 #: 2 2 2
 print(next(it))
 #: 2

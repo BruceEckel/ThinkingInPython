@@ -5,7 +5,8 @@ class Report:
     def render(self) -> str:
         return "report"
 
-    @warnings.deprecated("Report.to_string() is replaced by render()")
+    @warnings.deprecated(
+        "Report.to_string() is replaced by render()")
     def to_string(self) -> str:
         return self.render()
 

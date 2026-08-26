@@ -10,15 +10,17 @@ class CowList:
     def __init__(self, data: Sequence[object] | None = None,
                  _box: Box | None = None) -> None:
         self._box = (
-            _box if _box is not None else Box(list(data or [])))
+            _box if _box is not None
+            else Box(list(data or [])))
 
     def share(self) -> CowList:
         self._box.owners += 1
-        return CowList(_box=self._box)  # Shares the same Box, for now
+        # Shares the same Box, for now
+        return CowList(_box=self._box)
 
     def append(self, item: object) -> None:
         if self._box.owners > 1:
-            # Someone else shares this Box: copy before mutating
+            # Shared Box: copy before mutating
             self._box.owners -= 1
             self._box = Box(list(self._box.data))
         self._box.data.append(item)

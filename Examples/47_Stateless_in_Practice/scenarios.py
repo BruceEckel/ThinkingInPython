@@ -31,7 +31,9 @@ class Library:
             raise NoArticle(topic)
         return self.articles[topic]
 
-def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
+def report() -> Depend[
+    Need[Feed] | Need[Encyclopedia], str
+]:
     caught = catch(Unavailable, NotInteresting, NoArticle)
     found: str | Unavailable | NotInteresting | NoArticle
     found = yield from caught(research)()
@@ -49,7 +51,8 @@ def report() -> Depend[Need[Feed] | Need[Encyclopedia], str]:
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library({"stock market": "a history"})
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
 EMPTY: Final[Library] = Library({})
 
 def outcome(feed: Feed, book: Encyclopedia) -> str:

@@ -24,7 +24,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -40,7 +41,8 @@ class Year:
     n: int
 
     def __post_init__(self) -> None:
-        check(1900 < self.n <= date.today().year, f"Year({self.n})")
+        check(1900 < self.n <= date.today().year,
+              f"Year({self.n})")
 
     def is_leap(self) -> bool:
         return self.n % 4 == 0 and (
@@ -62,7 +64,8 @@ class Month(Enum):
 
     @staticmethod
     def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return list(Month)[month_number - 1]
 
     @property
@@ -118,7 +121,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -128,7 +132,8 @@ class EmailAddress:
 
     def __post_init__(self) -> None:
         check(self.text.count("@") == 1,
-              f"EmailAddress({self.text!r})", "needs exactly one @")
+              f"EmailAddress({self.text!r})",
+              "needs exactly one @")
         local, _, domain = self.text.partition("@")
         check(len(local) > 0 and len(domain) > 0,
               f"EmailAddress({self.text!r})",
@@ -138,12 +143,12 @@ for bad in ["bruce", "b@@x.com", "@x.com", "b@", ""]:
     try:
         EmailAddress(bad)
     except TypeFailure as e:
-        print("rejected:", bad, "->", e)
-#: rejected: bruce -> EmailAddress('bruce') needs exactly one @
-#: rejected: b@@x.com -> EmailAddress('b@@x.com') needs exactly one @
-#: rejected: @x.com -> EmailAddress('@x.com') needs text on both sides
-#: rejected: b@ -> EmailAddress('b@') needs text on both sides
-#: rejected:  -> EmailAddress('') needs exactly one @
+        print("rejected:", e)
+#: rejected: EmailAddress('bruce') needs exactly one @
+#: rejected: EmailAddress('b@@x.com') needs exactly one @
+#: rejected: EmailAddress('@x.com') needs text on both sides
+#: rejected: EmailAddress('b@') needs text on both sides
+#: rejected: EmailAddress('') needs exactly one @
 
 print(EmailAddress("bruce@example.com"))
 #: EmailAddress(text='bruce@example.com')
@@ -171,7 +176,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -227,7 +233,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -236,7 +243,8 @@ class FullName:
     text: str
 
     def __post_init__(self) -> None:
-        check(len(self.text.split()) >= 2, f"FullName({self.text!r})",
+        check(len(self.text.split()) >= 2,
+              f"FullName({self.text!r})",
               "needs a first and last name")
 
 @dataclass(frozen=True)
@@ -244,7 +252,8 @@ class EmailAddress:
     text: str
 
     def __post_init__(self) -> None:
-        check("@" in self.text, f"EmailAddress({self.text!r})",
+        check("@" in self.text,
+              f"EmailAddress({self.text!r})",
               "needs an @")
 
 @dataclass(frozen=True)
@@ -254,14 +263,16 @@ class Person:
 
 def from_json(text: str) -> Person:
     data = json.loads(text)
-    return Person(FullName(data["name"]), EmailAddress(data["email"]))
+    return Person(FullName(data["name"]),
+                  EmailAddress(data["email"]))
 
-bad_json = json.dumps({"name": "Bruce Eckel", "email": "no-at-sign"})
+bad_json = json.dumps(
+    {"name": "Bruce Eckel", "email": "no-at-sign"})
 try:
     from_json(bad_json)
 except TypeFailure as e:
-    print("from_json rejected bad email:", e)
-#: from_json rejected bad email: EmailAddress('no-at-sign') needs an @
+    print("from_json rejected:", e)
+#: from_json rejected: EmailAddress('no-at-sign') needs an @
 ```
 
 `from_json()` never validates the email string itself. It hands the
@@ -288,7 +299,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -301,7 +313,8 @@ class Stars:
         return f"Stars({self.number})"
 
     def __replace__(self, **changes: int) -> Self:
-        return type(self)(**({"number": self.number} | changes))
+        return type(self)(
+            **({"number": self.number} | changes))
 
 s = Stars(4)
 print(copy.replace(s, number=9))
@@ -339,7 +352,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -349,7 +363,8 @@ class Stars:
     built: ClassVar[int] = 0
 
     def __post_init__(self) -> None:
-        check(1 <= self.number <= 10, f"Stars({self.number})")
+        check(1 <= self.number <= 10,
+              f"Stars({self.number})")
         Stars.built += 1
 
 print([f.name for f in fields(Stars)])
@@ -409,7 +424,8 @@ def make_months() -> list[Month]:
 try:
     @dataclass(frozen=True)
     class Broken:
-        months: list[Month] = field(default_factory=make_months)
+        months: list[Month] = field(
+            default_factory=make_months)
         index: dict[str, Month] = {}
 except ValueError as e:
     print(f"{type(e).__name__}: {str(e).split(': ')[-1]}")
@@ -423,7 +439,8 @@ class Bare:
 @dataclass(frozen=True)
 class Subscripted:
     months: list[Month] = field(default_factory=make_months)
-    index: dict[str, Month] = field(default_factory=dict[str, Month])
+    index: dict[str, Month] = field(
+        default_factory=dict[str, Month])
 
 print(Bare().index, Subscripted().index)
 #: {} {}

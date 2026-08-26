@@ -10,9 +10,10 @@ def parse_seconds(text: str) -> int:
         raise
 
 try:
-    parse_seconds("soon")
+    parse_seconds("no")
 except ValueError as e:
-    print("".join(traceback.format_exception_only(e)), end="")
-#: ValueError: invalid literal for int() with base 10: 'soon'
-#: timeout was set to 'soon'
+    print("".join(traceback.format_exception_only(e)),
+          end="")
+#: ValueError: invalid literal for int() with base 10: 'no'
+#: timeout was set to 'no'
 #: expected a whole number of seconds

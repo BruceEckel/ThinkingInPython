@@ -98,15 +98,17 @@ class CowList:
     def __init__(self, data: Sequence[object] | None = None,
                  _box: Box | None = None) -> None:
         self._box = (
-            _box if _box is not None else Box(list(data or [])))
+            _box if _box is not None
+            else Box(list(data or [])))
 
     def share(self) -> CowList:
         self._box.owners += 1
-        return CowList(_box=self._box)  # Shares the same Box, for now
+        # Shares the same Box, for now
+        return CowList(_box=self._box)
 
     def append(self, item: object) -> None:
         if self._box.owners > 1:
-            # Someone else shares this Box: copy before mutating
+            # Shared Box: copy before mutating
             self._box.owners -= 1
             self._box = Box(list(self._box.data))
         self._box.data.append(item)
@@ -221,13 +223,15 @@ class Pool:
         self._free.append(connection)
 
 class ConnectionProxy:
-    def __init__(self, pool: Pool, connection: Connection) -> None:
+    def __init__(self, pool: Pool,
+                 connection: Connection) -> None:
         self._pool = pool
         self._connection: Connection | None = connection
 
     def __getattr__(self, name: str) -> Any:
         if self._connection is None:
-            raise RuntimeError("connection already released")
+            raise RuntimeError(
+                "connection already released")
         return getattr(self._connection, name)
 
     def __enter__(self) -> Self:
@@ -323,7 +327,8 @@ def methods(obj: object) -> set[str]:
     return {
         name
         for name in dir(obj)
-        if not name.startswith("_") and callable(getattr(obj, name))
+        if not name.startswith("_")
+        and callable(getattr(obj, name))
     }
 
 class Surrogate:
@@ -331,7 +336,8 @@ class Surrogate:
         self.__implementation = implementation
 
     def change_to(self, new: Any) -> None:
-        missing = methods(self.__implementation) - methods(new)
+        missing = (methods(self.__implementation)
+                   - methods(new))
         if missing:
             raise TypeError(f"missing: {sorted(missing)}")
         self.__implementation = new

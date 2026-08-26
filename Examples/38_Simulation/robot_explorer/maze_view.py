@@ -20,7 +20,8 @@ def show(maze: str = string_maze, moves: str = solution,
     root = tk.Tk()
     root.title("Robot in a Maze")
     canvas = tk.Canvas(root, highlightthickness=0,
-                       width=width * CELL, height=len(rows) * CELL)
+                       width=width * CELL,
+                       height=len(rows) * CELL)
     canvas.pack()
 
     def draw() -> None:
@@ -31,7 +32,8 @@ def show(maze: str = string_maze, moves: str = solution,
             canvas.create_rectangle(
                 col * CELL, row * CELL,
                 (col + 1) * CELL, (row + 1) * CELL,
-                fill=FILL.get(symbol, "palegreen"), outline="gray")
+                fill=FILL.get(symbol, "palegreen"),
+                outline="gray")
 
     queue = list("".join(moves.split()))
 

@@ -26,7 +26,8 @@ class Month:
               f"is past the end of {self.name}")
 
 def make_months() -> list[Month]:
-    return [Month(name, n, days) for n, (name, days) in enumerate([
+    return [Month(name, n, days)
+            for n, (name, days) in enumerate([
         ("January", 31), ("February", 28), ("March", 31),
         ("April", 30), ("May", 31), ("June", 30),
         ("July", 31), ("August", 31), ("September", 30),
@@ -38,7 +39,8 @@ class Months:
     months: list[Month] = field(default_factory=make_months)
 
     def of(self, month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return self.months[month_number - 1]
 
 if __name__ == "__main__":

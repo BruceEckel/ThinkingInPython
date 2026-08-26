@@ -15,12 +15,14 @@ class Counter:
         if Counter.count == 0:
             print("Last Counter object deleted")
         else:
-            print(Counter.count, "Counter objects remaining")
+            print(Counter.count,
+                  "Counter objects remaining")
 
     def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"
 
-counters = [Counter(name) for name in ["First", "Second", "Third"]]
+counters = [Counter(name)
+            for name in ["First", "Second", "Third"]]
 
 for c in counters:
     print(c)

@@ -1,7 +1,8 @@
 # adapter_variations.py
 # Two more places to put the adaptation.
 from typing import Any, override
-from adapter import ProxyAdapter, WhatIHave, WhatIUse, WhatIWant
+from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
+                     WhatIWant)
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):

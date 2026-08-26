@@ -36,13 +36,16 @@ class Elevator(StateMachine):
                 (None, None, ElevatorState.DOORS_OPEN),
             ],
             (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
             (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.arrive, ElevatorState.DOORS_OPEN)],
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
             (ElevatorState.DOORS_OPEN, CloseDoors):
                 [(None, None, ElevatorState.DOORS_CLOSING)],
             (ElevatorState.DOORS_CLOSING, DoorSensor): [
-                (self.obstructed, None, ElevatorState.DOORS_OPEN),
+                (self.obstructed, None,
+                 ElevatorState.DOORS_OPEN),
                 (None, None, ElevatorState.IDLE),
             ],
         }

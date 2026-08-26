@@ -14,7 +14,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -30,7 +31,8 @@ class Year:
     n: int
 
     def __post_init__(self) -> None:
-        check(1900 < self.n <= date.today().year, f"Year({self.n})")
+        check(1900 < self.n <= date.today().year,
+              f"Year({self.n})")
 
     def is_leap(self) -> bool:
         return self.n % 4 == 0 and (
@@ -52,7 +54,8 @@ class Month(Enum):
 
     @staticmethod
     def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return list(Month)[month_number - 1]
 
     @property

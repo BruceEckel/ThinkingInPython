@@ -530,7 +530,9 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console = yield from need(Console)
     console.print(f"Hello, {name}!")
 
-def greet_all(names: list[str]) -> Depend[Need[Console], None]:
+def greet_all(
+    names: list[str]
+) -> Depend[Need[Console], None]:
     for name in names:
         yield from greet(name)
 
@@ -739,7 +741,8 @@ ROBOTIC: Final[Nailer] = Nailer(force=11)
 def test_holds(
     material: Material, nailer: Nailer, expected: bool
 ) -> None:
-    assert run(supply(material, nailer)(holds)()) is expected
+    assert run(
+        supply(material, nailer)(holds)()) is expected
 ```
 
 One test function covers four environments.
@@ -1231,7 +1234,9 @@ The Stateless `sleep()` makes two requests,
 `need(Time)` for the clock and `wait()` for the await:
 
 ```python
-def sleep(seconds: float) -> Depend[Need[Time] | Async, None]:
+def sleep(
+    seconds: float
+) -> Depend[Need[Time] | Async, None]:
     time = yield from need(Time)
     yield from wait(time.sleep(seconds))
 ```
@@ -1417,7 +1422,9 @@ from greeter import Console
 from scores import score
 from stateless import Effect, Need, need
 
-def announce(name: str) -> Effect[Need[Console], KeyError, None]:
+def announce(
+    name: str
+) -> Effect[Need[Console], KeyError, None]:
     value: int = yield from score(name)
     console = yield from need(Console)
     console.print(f"{name}: {value}")
@@ -1486,7 +1493,8 @@ def guarded(name: str) -> Try[KeyError, str]:
     return f"{name}: {value}"
 
 def moved(name: str) -> Success[str]:
-    value: int | KeyError = yield from catch(KeyError)(score)(name)
+    value: int | KeyError = yield from (
+        catch(KeyError)(score)(name))
     match value:
         case KeyError():
             return f"{name}: unknown"
@@ -1523,10 +1531,12 @@ from collections.abc import Callable
 from typing import assert_never
 from greeter import Console
 from scores import score
-from stateless import Depend, Need, Success, catch, need, run, supply
+from stateless import (Depend, Need, Success, catch,
+                       need, run, supply)
 
 def report(name: str) -> Depend[Need[Console], None]:
-    value: int | KeyError = yield from catch(KeyError)(score)(name)
+    value: int | KeyError = yield from (
+        catch(KeyError)(score)(name))
     console = yield from need(Console)
     match value:
         case KeyError():
@@ -1536,7 +1546,8 @@ def report(name: str) -> Depend[Need[Console], None]:
         case _:
             assert_never(value)
 
-reporter: Callable[[str], Success[None]] = supply(Console())(report)
+reporter: Callable[[str], Success[None]] = supply(
+    Console())(report)
 run(reporter("Alice"))
 #: Alice: 42
 run(reporter("Carol"))
@@ -1622,7 +1633,8 @@ both = catch(KeyError, ValueError)(read_score)
 one = catch(KeyError)(read_score)
 
 def all_handled(name: str) -> Success[str]:
-    value: int | KeyError | ValueError = yield from both(name)
+    value: int | KeyError | ValueError = yield from (
+        both(name))
     match value:
         case KeyError():
             return f"{name}: unknown"

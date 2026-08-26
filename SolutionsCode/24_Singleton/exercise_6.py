@@ -12,7 +12,8 @@ class Singleton(Borg):
         super().__init__()
         self.val = arg
 
-class Other(Borg):  # A second subclass, sharing Borg's one dict
+# A second subclass, sharing Borg's one dict
+class Other(Borg):
     def __init__(self, arg: str) -> None:
         super().__init__()
         self.val = arg
@@ -23,7 +24,8 @@ print(x.val, y.val, x.__dict__ is y.__dict__)
 #: eggs eggs True
 
 class Separate(Borg):
-    _shared_state: ClassVar[dict[str, Any]] = {}  # Its own storage
+    # Its own storage
+    _shared_state: ClassVar[dict[str, Any]] = {}
 
     def __init__(self, arg: str) -> None:
         super().__init__()

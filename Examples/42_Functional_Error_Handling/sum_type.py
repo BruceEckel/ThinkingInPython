@@ -2,7 +2,8 @@
 
 def func_a(i: int) -> int | str:
     if i == 3:
-        return f"func_a({i})"  # The error, returned as a value
+        # The error, returned as a value
+        return f"func_a({i})"
     return i
 
 outputs = [func_a(i) for i in range(5)]

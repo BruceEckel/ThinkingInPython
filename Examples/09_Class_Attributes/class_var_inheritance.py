@@ -12,9 +12,11 @@ class Right(Base):
 
 print(Left.shared, Right.shared)
 #: 0 100
-Base.shared = 9  # Only affects subclasses that haven't overridden
+# Only affects subclasses that haven't overridden
+Base.shared = 9
 print(Left.shared, Right.shared)
 #: 9 100
-Left.shared = 5  # Creates Left's own attribute, doesn't touch Base
+# Creates Left's own attribute, doesn't touch Base
+Left.shared = 5
 print(Base.shared, Left.shared, Right.shared)
 #: 9 5 100

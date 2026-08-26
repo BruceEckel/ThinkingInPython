@@ -3,7 +3,8 @@ from collections.abc import Callable
 from enum import Enum
 
 type Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, Enum
+    Callable[..., bool] | None,
+    Callable[..., None] | None, Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 

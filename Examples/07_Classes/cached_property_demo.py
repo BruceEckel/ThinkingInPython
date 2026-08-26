@@ -14,7 +14,8 @@ n = Numbers([5, 10, 15])
 print(n.total)
 #: summing 3 values
 #: 30
-print(n.total)  # Second access: stored value, no recomputation
+# Second access: stored value, no recomputation
+print(n.total)
 #: 30
 n.values.append(20)
 print(n.total)  # Still the old sum: the cache is stale

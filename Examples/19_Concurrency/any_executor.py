@@ -12,7 +12,9 @@ def cpu_price(order: int) -> int:
         total += 1
     return order * 10
 
-def run_on(executor: Executor, orders: list[int]) -> list[int]:
+def run_on(
+    executor: Executor, orders: list[int]
+) -> list[int]:
     with executor:
         return list(executor.map(cpu_price, orders))
 

@@ -27,7 +27,8 @@ class LongShelf:
 
 def outcome(
     feed: Feed, book: Encyclopedia
-) -> str | Unavailable | NotInteresting | NoArticle | TooLong:
+) -> (str | Unavailable | NotInteresting | NoArticle
+      | TooLong):
     bound = supply(feed, book)(research)
     return run(catch_all(bound)())
 

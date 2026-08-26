@@ -10,7 +10,9 @@ class Color:
     green: int
     blue: int
 
-    def __new__(cls, red: int, green: int, blue: int) -> Color:
+    def __new__(
+        cls, red: int, green: int, blue: int
+    ) -> Color:
         components = (("red", red), ("green", green),
                       ("blue", blue))
         for name, value in components:

@@ -14,12 +14,14 @@ class Maze:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
         self.rows = [
-            r.ljust(self.width, self.Cell.WALL) for r in rows]
+            r.ljust(self.width, self.Cell.WALL)
+            for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
-        rows = [line for line in text.splitlines()
-                if line and not line.lstrip().startswith("#")]
+        rows = [
+            line for line in text.splitlines()
+            if line and not line.lstrip().startswith("#")]
         return cls(rows)
 
     @classmethod

@@ -40,14 +40,16 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    cached_field = [[cached_tile(to_symbol(s)) for s in line]
+    cached_field = [[cached_tile(to_symbol(s))
+                     for s in line]
                     for line in text.split()]
     _, cached_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    uncached_field = [[uncached_tile(to_symbol(s)) for s in line]
-                       for line in text.split()]
+    uncached_field = [[uncached_tile(to_symbol(s))
+                       for s in line]
+                      for line in text.split()]
     _, uncached_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 

@@ -36,6 +36,7 @@ def encounter() -> Depend[
     terrain = yield from need(Terrain)
     obstacle = yield from need(Obstacle)
     reward = yield from need(Reward)
-    narrator.say(f"{hero.name()} crosses the {terrain.underfoot()}")
+    narrator.say(
+        f"{hero.name()} crosses the {terrain.underfoot()}")
     narrator.say(hero.approach(obstacle.blocks()))
     narrator.say(f"and wins {reward.prize()}")

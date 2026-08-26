@@ -150,11 +150,14 @@ verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line en
 sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
-# process with one parse per file, rather than as seven separate scripts. Names
+# process with one parse per file, rather than as separate scripts. Names
 # come from `make checks ARGS=--list`. This is check_all's whole registry:
-# prose-lint joined once its last findings were cleared, so a new one now fails
-# the gate rather than sitting in a backlog.
-GATE_CHECKS = listings banned comment-periods comment-caps comment-spacing anchors prose-lint
+# prose-lint joined once its last findings were cleared, and widths joined
+# when the book moved to 60-character listings, so a new violation of
+# either now fails the gate rather than sitting in a backlog. widths also
+# runs over Solutions/ (a separate recipe line below), since Solutions
+# listings render on the same small screens.
+GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors prose-lint
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -189,6 +192,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) tools/check_line_endings.py
 	$(PY) tools/check_all.py $(GATE_CHECKS)
 	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
+	$(PY) tools/check_all.py widths --paths Solutions
 	$(PY) tools/reflow_prose.py --write
 	$(PY) tools/check_unique_slugs.py
 	$(PY) tools/extract_examples.py
@@ -503,7 +507,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 ##@ Style gates
 
-.PHONY: eol fix-eol listings fix-listings banned comment-periods \
+.PHONY: eol fix-eol listings fix-listings widths banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
         fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks
 
@@ -523,6 +527,13 @@ fix-eol:  ##- Convert any CRLF in tracked text files to LF
 # blank line between import groups. Run `make fix-listings` to remove them.
 listings:  ## Check listings keep blank lines minimal; `make fix-listings` strips them
 	$(PY) tools/listing_format.py
+
+# Fail if any listing line in Chapters/ or Solutions/ is wider than 60
+# characters (a trailing `# type: ignore` pragma is the one exemption).
+# There is no fixer: wrap the statement, move the comment, or shorten
+# the printed output.
+widths:  ## Fail if a listing line exceeds the 60-character width
+	$(PY) tools/listing_width.py Chapters Solutions
 
 fix-listings:  ##- Remove the offending blank lines from listings
 	$(PY) tools/listing_format.py --fix

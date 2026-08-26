@@ -12,7 +12,8 @@ def tag(name: str) -> Iterator[str]:
 
 def wrap(names: list[str]) -> None:
     with ExitStack() as stack:
-        open_tags = [stack.enter_context(tag(n)) for n in names]
+        open_tags = [stack.enter_context(tag(n))
+                     for n in names]
         print("using", open_tags)
 
 wrap([])

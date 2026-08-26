@@ -55,9 +55,11 @@ def solve(f: Fn, a: float, b: float,
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
-            print(f"{finder.__name__} succeeded: {root:.6f}")
+            print(
+                f"{finder.__name__} succeeded: {root:.6f}")
             return root
-        print(f"{finder.__name__} failed: could not converge")
+        print(
+            f"{finder.__name__} failed: could not converge")
     print("all finders failed")
     return None
 

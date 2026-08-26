@@ -37,7 +37,8 @@ class Symlink(Entry):
     def disk_usage(self) -> int:
         return 0
 
-src = Directory("src", (File("main.py", 400), File("util.py", 250)))
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
 root = Directory("root", (
     File("readme.md", 90), src, Symlink("latest", "src")))
 print(root.disk_usage())

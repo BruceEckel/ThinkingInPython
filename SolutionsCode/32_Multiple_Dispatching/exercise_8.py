@@ -9,7 +9,8 @@ class Outcome(StrEnum):
 
 WEAPON_ORDER = ["Jargon", "Play", "InventFeature",
                 "SellImaginaryProduct", "Edict", "Schedule"]
-WEAPON_INDEX = {name: i for i, name in enumerate(WEAPON_ORDER)}
+WEAPON_INDEX = {
+    name: i for i, name in enumerate(WEAPON_ORDER)}
 
 WEAPONS_BY_KIND = {
     "Dwarf": ["Jargon", "Play"],
@@ -18,7 +19,8 @@ WEAPONS_BY_KIND = {
 }
 
 def weapon_outcome(a: str, b: str) -> Outcome:
-    "A weapon beats the next two in WEAPON_ORDER (cyclically)."
+    ("A weapon beats the next two "
+     "in WEAPON_ORDER (cyclically).")
     ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
     diff = (ia - ib) % 6
     if diff == 0:
@@ -50,7 +52,8 @@ class Project2:
     def battle(
         self, a: Inhabitant2, b: Inhabitant2
     ) -> Inhabitant2 | None:
-        outcome = weapon_outcome(a.get_weapon(), b.get_weapon())
+        outcome = weapon_outcome(
+            a.get_weapon(), b.get_weapon())
         if outcome is Outcome.WIN:
             return a
         if outcome is Outcome.LOSE:
@@ -58,9 +61,11 @@ class Project2:
         return None  # Draw: no winner this round
 
     def meeting(self, group_size: int) -> str:
-        kinds = {"Dwarf": Dwarf2, "Elf": Elf2, "Troll": Troll2}
-        groups = {name: [cls(self.rng) for _ in range(group_size)]
-                  for name, cls in kinds.items()}
+        kinds = {"Dwarf": Dwarf2, "Elf": Elf2,
+                 "Troll": Troll2}
+        groups = {
+            name: [cls(self.rng) for _ in range(group_size)]
+            for name, cls in kinds.items()}
         while sum(1 for g in groups.values() if g) > 1:
             names = [n for n, g in groups.items() if g]
             for i in range(len(names)):
@@ -68,7 +73,8 @@ class Project2:
                     n1, n2 = names[i], names[j]
                     if not groups[n1] or not groups[n2]:
                         continue
-                    winner = self.battle(groups[n1][0], groups[n2][0])
+                    winner = self.battle(
+                        groups[n1][0], groups[n2][0])
                     if winner is groups[n1][0]:
                         groups[n2].pop(0)
                     elif winner is groups[n2][0]:

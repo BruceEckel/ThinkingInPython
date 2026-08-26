@@ -1,6 +1,7 @@
 # test_trash.py
 import pytest
-from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
+from trash import (Aluminum, Cardboard, Glass, Paper,
+                   Trash, sum_value)
 
 def test_subclasses_self_register() -> None:
     assert set(Trash.registry) == {
@@ -19,4 +20,5 @@ def test_per_pound_values() -> None:
 
 def test_sum_value_totals_weight_times_value() -> None:
     items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
-    assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
+    # 2*1.67 + 5*0.10
+    assert sum_value(items) == pytest.approx(3.84)

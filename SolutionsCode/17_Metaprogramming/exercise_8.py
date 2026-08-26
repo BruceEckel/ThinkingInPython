@@ -7,7 +7,8 @@ class Tag:
 class Meta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:
-        bases += (Tag,)  # Rebinds a local name, nothing else
+        # Rebinds a local name, nothing else
+        bases += (Tag,)
         super().__init__(name, bases, nmspc)
 
 class Demo(metaclass=Meta):

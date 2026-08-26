@@ -37,7 +37,7 @@ def newton(f: Fn, a: float, b: float) -> float | None:
     x = (a + b) / 2  # Start between the hints
     h = 1e-7
     for _ in range(MAX_ITER):
-        # Approximate the derivative with a central difference:
+        # Approximate the derivative by central difference:
         slope = (f(x + h) - f(x - h)) / (2 * h)
         if slope == 0:
             return None

@@ -12,13 +12,15 @@ print(run(supply(Database(failures=2))(once)("Morty")))
 #: database crashed
 three = recurs(3, spaced(timedelta(milliseconds=1)))
 retried = retry(three)(save_user)
-print(run(supply(Database(failures=2), Time())(retried)("Morty")))
+print(run(
+    supply(Database(failures=2), Time())(retried)("Morty")))
 #: attempt 1: saving Morty
 #: attempt 2: saving Morty
 #: attempt 3: saving Morty
 #: Morty saved
 caught = catch(RetryError)(retried)
-outcome = run(supply(Database(failures=9), Time())(caught)("Morty"))
+outcome = run(
+    supply(Database(failures=9), Time())(caught)("Morty"))
 print(type(outcome).__name__)
 #: attempt 1: saving Morty
 #: attempt 2: saving Morty

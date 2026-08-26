@@ -11,13 +11,15 @@ class Butter:
         return f"buttered {slice_}"
 
 def buttered() -> Depend[
-    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter], str
+    Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter],
+    str
 ]:
     slice_ = yield from toast()
     butter = yield from need(Butter)
     return butter.spread(slice_)
 
-kitchen = supply(Dough("rye"), Oven(220), Toaster(3), Butter(10))
+kitchen = supply(Dough("rye"), Oven(220), Toaster(3),
+                 Butter(10))
 print(run(kitchen(buttered)()))
 #: dough: risen
 #: oven: baking at 220

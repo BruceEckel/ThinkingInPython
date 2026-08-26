@@ -93,10 +93,16 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
 ## Traps (learned the hard way)
 
-- **Ruff line length is 70.** Long inline comments are the usual culprit; move the
-  comment to its own line or wrap the statement. A scratch dir's `ruff` uses the
-  default 88, so **line length must be verified against `build/examples`**, not a
-  temp file.
+- **Listing line length is 60** (ruff `line-length` plus the `widths` check
+  in `check_all.py`, which also covers fragments and `#:` markers that ruff
+  never sees). The one sanctioned overflow is a trailing `# type: ignore`
+  pragma, exempted by both ruff and `widths`. A `#:` marker wider than 60
+  means the program's own printed output must shrink, not the marker.
+  Wrapped imports use packed parentheses with per-file `I001` ignores in
+  `pyproject.toml` (ruff would otherwise force one-name-per-line); a new
+  over-60 import needs its file added there. A scratch dir's `ruff` uses
+  the default 88, so **line length must be verified against
+  `build/examples`**, not a temp file.
 - **Run `ty`/`ruff`/`pytest` against `build/examples/`** (via `uv run`), never a
   loose scratch file, or config/imports resolve differently.
 - **Bare `python`/`ty`/`pytest` on PATH can be a different, older tool than

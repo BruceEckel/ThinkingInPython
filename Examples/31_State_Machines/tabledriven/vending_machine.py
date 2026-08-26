@@ -44,11 +44,14 @@ class VendingMachine(StateMachine):
     def __init__(self) -> None:
         self.amount = 0  # Money inserted, in cents
         self.row = 0  # The first selection digit
-        self.message = ""  # Last action, for a view to display
-        # A 4x4 grid of items; column c costs (c + 1) * 25 cents:
-        self.items = [[ItemSlot((c + 1) * 25, 5) for c in range(4)]
+        # Last action, for a view to display
+        self.message = ""
+        # A 4x4 grid; column c costs (c + 1) * 25 cents:
+        self.items = [[ItemSlot((c + 1) * 25, 5)
+                       for c in range(4)]
                       for _ in range(4)]
-        self.items[3][0] = ItemSlot(25, 0)  # One sold-out slot
+        # One sold-out slot
+        self.items[3][0] = ItemSlot(25, 0)
         table: Table = {
             (State.QUIESCENT, Money):
                 [(None, self.add_money, State.COLLECTING)],
@@ -61,8 +64,10 @@ class VendingMachine(StateMachine):
             (State.SELECTING, Quit):
                 [(None, self.refund, State.QUIESCENT)],
             (State.SELECTING, SecondDigit): [
-                (self.too_expensive, self.clear, State.COLLECTING),
-                (self.sold_out, self.clear, State.UNAVAILABLE),
+                (self.too_expensive, self.clear,
+                 State.COLLECTING),
+                (self.sold_out, self.clear,
+                 State.UNAVAILABLE),
                 (None, self.dispense, State.WANT_MORE),
             ],
             (State.UNAVAILABLE, Quit):
@@ -96,14 +101,15 @@ class VendingMachine(StateMachine):
 
     def clear(self, col: SecondDigit) -> None:
         slot = self._slot(col)
-        self.message = (f"Clearing selection: costs {slot.price}, "
+        self.message = (f"Cleared: costs {slot.price}, "
                         f"quantity {slot.quantity}")
 
     def dispense(self, col: SecondDigit) -> None:
         slot = self._slot(col)
         slot.quantity -= 1
         self.amount -= slot.price
-        self.message = f"Dispensing; remaining {self.amount}"
+        self.message = (
+            f"Dispensing; remaining {self.amount}")
 
     def refund(self, event: object) -> None:
         self.message = f"Returning {self.amount}"
@@ -113,16 +119,21 @@ if __name__ == "__main__":
     events = [
         Money("quarter", 25), Money("quarter", 25),
         Money("dollar", 100),
-        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy [0][1]
-        FirstDigit("A", 0), SecondDigit("col 1", 1),  # Buy it again
-        FirstDigit("C", 2), SecondDigit("col 2", 2),  # Too expensive
-        FirstDigit("D", 3), SecondDigit("col 0", 0),  # Sold out
+        # Buy [0][1]
+        FirstDigit("A", 0), SecondDigit("col 1", 1),
+        # Buy it again
+        FirstDigit("A", 0), SecondDigit("col 1", 1),
+        # Too expensive
+        FirstDigit("C", 2), SecondDigit("col 2", 2),
+        # Sold out
+        FirstDigit("D", 3), SecondDigit("col 0", 0),
         Quit(),  # Refund and reset
     ]
     machine = VendingMachine()
     for event in events:
         machine.handle(event)
-        print(f"{event}: {machine.message} [{machine.state.name}]")
+        print(f"{event}: {machine.message} "
+              f"[{machine.state.name}]")
 #: quarter: Total = 25 [COLLECTING]
 #: quarter: Total = 50 [COLLECTING]
 #: dollar: Total = 150 [COLLECTING]
@@ -131,7 +142,7 @@ if __name__ == "__main__":
 #: A: Row A [SELECTING]
 #: col 1: Dispensing; remaining 50 [WANT_MORE]
 #: C: Row C [SELECTING]
-#: col 2: Clearing selection: costs 75, quantity 5 [COLLECTING]
+#: col 2: Cleared: costs 75, quantity 5 [COLLECTING]
 #: D: Row D [SELECTING]
-#: col 0: Clearing selection: costs 25, quantity 0 [UNAVAILABLE]
+#: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
 #: Quit: Returning 50 [QUIESCENT]

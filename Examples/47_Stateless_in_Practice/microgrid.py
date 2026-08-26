@@ -36,14 +36,16 @@ def connected(source: Source) -> Iterator[Source]:
     finally:
         print(f"{name} offline")
 
-def run_load(start: int, hours: int) -> Depend[Outlet, None]:
+def run_load(start: int,
+             hours: int) -> Depend[Outlet, None]:
     caught = catch(Drained)
     hour, remaining = start, hours
     while remaining:
         source = yield from plug(hour)
         with connected(source) as power:
             while remaining:
-                failure = yield from caught(draw)(power, hour)
+                failure = yield from caught(draw)(
+                    power, hour)
                 if failure is not None:
                     break
                 print(f"  {hour}:00")
@@ -51,7 +53,8 @@ def run_load(start: int, hours: int) -> Depend[Outlet, None]:
                 remaining -= 1
 
 def site() -> tuple[Solar, Battery, Grid, Backup]:
-    return Solar(), Battery(40), Grid(range(22, 24)), Backup(3)
+    return (Solar(), Battery(40), Grid(range(22, 24)),
+            Backup(3))
 
 solar, battery, grid, backup = site()
 sun_first = controller((solar, battery, grid, backup))

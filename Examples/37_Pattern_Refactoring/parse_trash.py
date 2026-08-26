@@ -9,5 +9,6 @@ def parse(filename: str | Path) -> list[Trash]:
         if not line or line.startswith("#"):
             continue
         name, weight = line.split(":")
-        items.append(Trash.create(name.strip(), float(weight)))
+        items.append(
+            Trash.create(name.strip(), float(weight)))
     return items

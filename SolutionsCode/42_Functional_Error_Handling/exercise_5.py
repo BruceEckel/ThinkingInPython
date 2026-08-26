@@ -25,7 +25,8 @@ class Err[E]:
 
 type Result[A, E] = Ok[A] | Err[E]
 
-def load_setting(name: str, text: str) -> Result[int, Exception]:
+def load_setting(name: str,
+                 text: str) -> Result[int, Exception]:
     try:
         return Ok(int(text))
     except ValueError as e:

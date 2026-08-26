@@ -7,7 +7,9 @@ from iterators import Countdown, fibonacci, total
     (0, []),
     (1, [0]),
 ])
-def test_fibonacci_sequence(n: int, expected: list[int]) -> None:
+def test_fibonacci_sequence(
+    n: int, expected: list[int]
+) -> None:
     assert list(fibonacci(n)) == expected
 
 def test_countdown_sequence() -> None:
@@ -17,7 +19,8 @@ def test_countdown_sequence() -> None:
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
-    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
+    # __iter__ yields a fresh generator
+    assert list(c) == [3, 2, 1]
 
 def test_total_over_any_iterable() -> None:
     assert total([1, 2, 3, 4]) == 10

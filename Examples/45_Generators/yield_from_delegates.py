@@ -3,7 +3,9 @@ from collections.abc import Generator
 from interview_generator import Answer, Question, Result
 from two_way_generator import ANSWERS, drive
 
-def ask(question: Question) -> Generator[Question, Answer, Answer]:
+def ask(
+    question: Question
+) -> Generator[Question, Answer, Answer]:
     answer = yield question
     print(f"ask({question = }) -> {answer = }")
     return answer

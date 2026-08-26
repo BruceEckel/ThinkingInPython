@@ -14,13 +14,13 @@ class Monster:
 goblin = Monster("Goblin", hp=10, powers=["bite"])
 # Build a variant by cloning and adjusting, not rebuilding:
 captain = goblin.clone()
-captain.name = "Goblin Captain"
+captain.name = "Captain"
 captain.hp = 20
 captain.powers.append("rally")
 print(goblin)
 #: Monster(name='Goblin', hp=10, powers=['bite'])
 print(captain)
-#: Monster(name='Goblin Captain', hp=20, powers=['bite', 'rally'])
+#: Monster(name='Captain', hp=20, powers=['bite', 'rally'])
 shallow = copy.copy(goblin)
 shallow.powers.append("shared")
 print(goblin.powers)  # The original changed too

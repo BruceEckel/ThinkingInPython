@@ -211,7 +211,7 @@ class Base:
         print("Base.show")
 
 class Derived(Base):
-    # @override  # Uncomment this and the import to see it complain
+    # @override  # Uncomment (and import) to see it complain
     def shwo(self):
         print("Derived.shwo")
 

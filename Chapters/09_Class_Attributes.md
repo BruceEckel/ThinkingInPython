@@ -30,7 +30,8 @@ a, b = Stars(), Stars()
 print(a.rating, b.rating)  # Both read the same storage
 #: 5 5
 a.rating = 1  # Assigning makes an instance attribute on 'a'
-print(a.rating, b.rating)  # 'a' shadows it, 'b' sees the class
+# 'a' shadows it, 'b' sees the class
+print(a.rating, b.rating)
 #: 1 5
 Stars.rating = 9  # Change the shared storage
 print(a.rating, b.rating)  # 'b' reads the class attribute
@@ -284,10 +285,12 @@ class Right(Base):
 
 print(Left.shared, Right.shared)
 #: 0 100
-Base.shared = 9  # Only affects subclasses that haven't overridden
+# Only affects subclasses that haven't overridden
+Base.shared = 9
 print(Left.shared, Right.shared)
 #: 9 100
-Left.shared = 5  # Creates Left's own attribute, doesn't touch Base
+# Creates Left's own attribute, doesn't touch Base
+Left.shared = 5
 print(Base.shared, Left.shared, Right.shared)
 #: 9 5 100
 ```

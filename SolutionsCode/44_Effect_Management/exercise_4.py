@@ -8,7 +8,8 @@ class PositiveInt:
     def __post_init__(self) -> None:
         if self.value <= 0:
             raise ValueError(
-                f"PositiveInt needs a positive value: {self.value}")
+                f"PositiveInt needs a positive value: "
+                f"{self.value}")
 
 def slope(rise: int, run: PositiveInt) -> float:
     return rise / run.value

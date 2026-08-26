@@ -9,7 +9,8 @@ from point import Point
     (Point(3, 0), "On the x-axis at x=3"),
     (Point(3, 4), "At (3, 4)"),
 ])
-def test_class_patterns(point: Point, expected: str) -> None:
+def test_class_patterns(point: Point,
+                        expected: str) -> None:
     assert locate(point) == expected
 
 @pytest.mark.parametrize("point, expected", [
@@ -17,5 +18,6 @@ def test_class_patterns(point: Point, expected: str) -> None:
     (Point(3, 0), "Somewhere on the x-axis"),
     (Point(3, 4), "Just some point"),
 ])
-def test_keyword_patterns(point: Point, expected: str) -> None:
+def test_keyword_patterns(point: Point,
+                          expected: str) -> None:
     assert describe(point) == expected

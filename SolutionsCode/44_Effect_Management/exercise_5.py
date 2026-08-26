@@ -14,7 +14,8 @@ async def price_of_async(item: str) -> float:
     return PRICES[item]
 
 async def total_price_async(items: list[str]) -> float:
-    return sum([await price_of_async(item) for item in items])
+    return sum(
+        [await price_of_async(item) for item in items])
 
 basket = ["apple", "pear"]
 print(total_price(basket))

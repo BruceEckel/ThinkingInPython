@@ -9,7 +9,8 @@ class Point:
 
 p = Point(1, 2)
 with ignore(AttributeError):
-    setattr(p, "x", 5)  # A frozen instance rejects assignment
+    # A frozen instance rejects assignment
+    setattr(p, "x", 5)
 #: FrozenInstanceError("cannot assign to field 'x'")
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)

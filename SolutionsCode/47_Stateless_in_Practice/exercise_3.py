@@ -11,8 +11,9 @@ from grid import (
 )
 from stateless import handle, run
 
-full = controller((Solar(), Turbine(range(19, 22)), Battery(40),
-                   Grid(range(22, 24)), Backup(3)))
+full = controller((Solar(), Turbine(range(19, 22)),
+                   Battery(40), Grid(range(22, 24)),
+                   Backup(3)))
 run(handle(full)(run_load)(17, 6))
 #: Solar online
 #:   17:00
@@ -27,8 +28,9 @@ run(handle(full)(run_load)(17, 6))
 #:   22:00
 #: Battery offline
 
-short = controller((Solar(), Turbine(range(19, 20)), Battery(0),
-                    Grid(range(0, 24)), Backup(0)))
+short = controller((Solar(), Turbine(range(19, 20)),
+                    Battery(0), Grid(range(0, 24)),
+                    Backup(0)))
 try:
     run(handle(short)(run_load)(17, 6))
 except Blackout as e:

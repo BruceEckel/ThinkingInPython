@@ -30,6 +30,7 @@ class Directory(Node):
 src = Directory(
     "src", File("main.py", 400), File("util.py", 250))
 root = Directory(
-    "root", File("readme.md", 90), src, File("data.csv", 1200))
+    "root", File("readme.md", 90), src,
+    File("data.csv", 1200))
 print(root.size(), src.size(), File("lone.txt", 10).size())
 #: 1940 650 10

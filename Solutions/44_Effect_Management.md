@@ -209,7 +209,8 @@ class PositiveInt:
     def __post_init__(self) -> None:
         if self.value <= 0:
             raise ValueError(
-                f"PositiveInt needs a positive value: {self.value}")
+                f"PositiveInt needs a positive value: "
+                f"{self.value}")
 
 def slope(rise: int, run: PositiveInt) -> float:
     return rise / run.value
@@ -269,7 +270,8 @@ async def price_of_async(item: str) -> float:
     return PRICES[item]
 
 async def total_price_async(items: list[str]) -> float:
-    return sum([await price_of_async(item) for item in items])
+    return sum(
+        [await price_of_async(item) for item in items])
 
 basket = ["apple", "pear"]
 print(total_price(basket))

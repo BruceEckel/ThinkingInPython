@@ -38,7 +38,9 @@ class Gold:
 class Loud:
     def say(self, line: str) -> None: print(line)
 
-def play(narrator: Narrator, hero: Hero, reward: Reward) -> None:
+def play(
+    narrator: Narrator, hero: Hero, reward: Reward
+) -> None:
     run(supply(narrator, hero, reward)(encounter)())
 
 def kitties(narrator: Narrator) -> None:

@@ -13,7 +13,8 @@ class Plugged:
 
     @property
     def numbers(self) -> list[int]:
-        return self._numbers.copy()  # Isolate by returning a copy
+        # Isolate by returning a copy
+        return self._numbers.copy()
 
     @property
     def bob(self) -> Bob:

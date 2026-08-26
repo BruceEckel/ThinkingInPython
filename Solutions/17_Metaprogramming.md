@@ -30,15 +30,15 @@ class Yellow(Color):
 print(sorted(c.__name__ for c in Color.registry))
 #: ['CeruleanBlue', 'Green', 'PhthaloBlue', 'Red', 'Yellow']
 
-class MutedYellow(Yellow):
+class Gold(Yellow):
     pass
 print(sorted(c.__name__ for c in Color.registry))
-#: ['CeruleanBlue', 'Green', 'MutedYellow', 'PhthaloBlue', 'Red']
+#: ['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']
 ```
 
 Creating `Yellow` adds it to the registry; nothing removes it yet,
 since `Color` (its only base) is never in the registry to begin with.
-Creating `MutedYellow` adds *it* and removes its base, `Yellow`, the
+Creating `Gold` adds *it* and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` did to `Blue` earlier.
 `__init_subclass__()` runs for every new subclass, so this addition
 and removal happens automatically at each new generation, with no
@@ -55,7 +55,8 @@ class Field:
         self.name = name
         self.storage = "_" + name
 
-    def __get__(self, obj: Any, owner: type | None = None) -> Any:
+    def __get__(self, obj: Any,
+                owner: type | None = None) -> Any:
         if obj is None:
             return self
         return getattr(obj, self.storage)
@@ -199,12 +200,15 @@ def greet(name: str, loud: bool = False) -> str:
 def describe(func) -> None:
     doc = inspect.getdoc(func)
     sig = inspect.signature(func)
-    print(func.__name__, sig, doc or "(no docstring)")
+    print(func.__name__, sig)
+    print(" ", doc or "(no docstring)")
 
 describe(greet)
-#: greet (name: str, loud: bool = False) -> str Return a greeting.
+#: greet (name: str, loud: bool = False) -> str
+#:   Return a greeting.
 describe(lambda x: x * 2)
-#: <lambda> (x) (no docstring)
+#: <lambda> (x)
+#:   (no docstring)
 ```
 
 `inspect.getdoc()` returns `None` when a callable has no docstring, so
@@ -323,7 +327,8 @@ class Tag:
 class Meta(type):
     def __init__(cls, name: str, bases: tuple[type, ...],
                  nmspc: dict[str, Any]) -> None:
-        bases += (Tag,)  # Rebinds a local name, nothing else
+        # Rebinds a local name, nothing else
+        bases += (Tag,)
         super().__init__(name, bases, nmspc)
 
 class Demo(metaclass=Meta):
@@ -366,7 +371,9 @@ class Command:
         return f"Running {self.label}"
 
     @classmethod
-    def make_class(cls, class_name: str) -> Callable[[], Command]:
+    def make_class(
+        cls, class_name: str
+    ) -> Callable[[], Command]:
         # The KNOWN_COMMANDS check has been removed:
         klass = f"""
 class {class_name}(Command):
@@ -375,7 +382,8 @@ class {class_name}(Command):
 """
         namespace: dict[str, Any] = {"Command": Command}
         exec(klass, namespace)
-        return cast(Callable[[], Command], namespace[class_name])
+        return cast(Callable[[], Command],
+                    namespace[class_name])
 
 attack = (
     'X(Command):\n'

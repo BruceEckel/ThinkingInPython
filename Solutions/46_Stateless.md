@@ -10,7 +10,8 @@ keeps working when a chapter listing changes.
 # test_ch46_ask_and_greet.py
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, as_type, need, run, supply
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
 
 @runtime_checkable
 class Console(Protocol):
@@ -114,7 +115,9 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console = yield from need(Console)
     console.print(f"Hello, {name}!")
 
-def greet_all(names: list[str]) -> Depend[Need[Console], None]:
+def greet_all(names: list[str]) -> Depend[
+    Need[Console], None
+]:
     for name in names:
         yield from greet(name)
 
@@ -154,7 +157,8 @@ both = catch(KeyError, ValueError)(read_score)
 one = catch(KeyError)(read_score)
 
 def all_handled(name: str) -> Success[str]:
-    value: int | KeyError | ValueError = yield from both(name)
+    value: int | KeyError | ValueError = yield from both(
+        name)
     match value:
         case KeyError():
             return f"{name}: unknown"
@@ -217,7 +221,8 @@ into a result, and skipping the second step leaves the type saying so.
 # test_ch46_audit_log.py
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, as_type, need, run, supply
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
 
 @runtime_checkable
 class Console(Protocol):
@@ -260,8 +265,10 @@ def test_greeting_and_logging_are_both_recorded() -> None:
     environment = supply(
         as_type(Console)(recorder), as_type(Log)(recorder))
     run(environment(greet_all)(["Alice", "Bob"]))
-    assert recorder.printed == ["Hello, Alice!", "Hello, Bob!"]
-    assert recorder.entries == ["greeted Alice", "greeted Bob"]
+    assert recorder.printed == ["Hello, Alice!",
+                                "Hello, Bob!"]
+    assert recorder.entries == ["greeted Alice",
+                                "greeted Bob"]
 
 recorder = Recorder()
 run(supply(as_type(Console)(recorder),
@@ -328,7 +335,8 @@ ROBOTIC: Final[Nailer] = Nailer(force=11)
 def test_holds(
     material: Material, nailer: Nailer, expected: bool
 ) -> None:
-    assert run(supply(material, nailer)(holds)()) is expected
+    assert run(
+        supply(material, nailer)(holds)()) is expected
 
 print(run(supply(METAL, ROBOTIC)(holds)()))
 #: True
@@ -382,7 +390,8 @@ def stamped(
     console.print(f"[{clock.now()}] Hello, {name}!")
 
 def default(ability: Need[Console]) -> Console:
-    print(f"handler answered a request for {ability.t.__name__}")
+    print(f"handler answered a request "
+          f"for {ability.t.__name__}")
     return ability.t()
 
 defaults = handle(default)
@@ -505,7 +514,8 @@ nobody checks.
 from collections.abc import Callable
 from functools import partial
 from typing import Final
-from stateless import Depend, Need, Success, need, run, supply
+from stateless import (Depend, Need, Success, need,
+                       run, supply)
 
 class Console:
     def print(self, message: str) -> None:
@@ -524,7 +534,8 @@ for effect in built.values():
     run(effect)
 #: Hello, Alice!
 #: Hello, Bob!
-for effect in built.values():  # The same objects, a second time
+# The same objects, a second time
+for effect in built.values():
     run(effect)
 
 def make(name: str) -> Success[None]:
@@ -537,7 +548,8 @@ for builder in builders.values():
     run(builder())
 #: Hello, Alice!
 #: Hello, Bob!
-for builder in builders.values():  # A fresh Effect each time
+# A fresh Effect each time
+for builder in builders.values():
     run(builder())
 #: Hello, Alice!
 #: Hello, Bob!
@@ -596,12 +608,13 @@ async def main() -> None:
     try:
         run(report_all(["a"]))
     except RuntimeError as e:
-        print("run():", e)
-    for line in await run_async(report_all(["a", "b", "c"])):
+        print(e)
+    for line in await run_async(
+            report_all(["a", "b", "c"])):
         print(line)
 
 asyncio.run(main())
-#: run(): asyncio.run() cannot be called from a running event loop
+#: asyncio.run() cannot be called from a running event loop
 #: body = 'fetched a', len(body) = 9
 #: body = 'fetched b', len(body) = 9
 #: body = 'fetched c', len(body) = 9
@@ -637,13 +650,15 @@ asynchronous one.
 ```python
 # exercise_10.py
 from typing import Final
-from stateless import Effect, Need, need, run, supply, throws
+from stateless import (Effect, Need, need, run, supply,
+                       throws)
 
 class Console:
     def print(self, message: str) -> None:
         print(message)
 
-SCORES: Final[dict[str, int]] = {"Alice": 42, "Bob": 7, "Cyd": -3}
+SCORES: Final[dict[str, int]] = {
+    "Alice": 42, "Bob": 7, "Cyd": -3}
 
 @throws(KeyError)
 def score(name: str) -> int:
@@ -652,7 +667,8 @@ def score(name: str) -> int:
 @throws(ValueError)
 def format_score(name: str, value: int) -> str:
     if value < 0:
-        raise ValueError(f"negative score for {name}: {value}")
+        raise ValueError(
+            f"negative score for {name}: {value}")
     return f"{name}: {value}"
 
 def announce(
@@ -731,7 +747,8 @@ The fix is to stop letting one structural check match three objects:
 # exercise_11.py
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, as_type, need, run, supply
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
 
 @runtime_checkable
 class Screen(Protocol):

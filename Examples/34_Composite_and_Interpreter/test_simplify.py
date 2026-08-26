@@ -31,7 +31,8 @@ def test_rewriting_reaches_every_level() -> None:
 
 def test_already_simple_is_unchanged() -> None:
     x = Var("x")
-    assert simplify(2 * x + 1) == Add(Mul(Num(2), x), Num(1))
+    assert simplify(2 * x + 1) == Add(Mul(Num(2), x),
+                                      Num(1))
 
 def test_unchanged_subtrees_are_shared() -> None:
     keep = Var("w") * Var("h")

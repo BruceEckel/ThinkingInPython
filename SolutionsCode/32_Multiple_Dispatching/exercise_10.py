@@ -52,7 +52,7 @@ def battle_table(
         return b
     return None
 
-# Confirm the table agrees with the formula on every combination:
+# Confirm table and formula agree on every combination:
 mismatches = [
     (wa, wb) for wa in WEAPON_ORDER for wb in WEAPON_ORDER
     if OUTCOME_TABLE[wa, wb] != weapon_outcome(wa, wb)

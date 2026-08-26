@@ -13,13 +13,13 @@ class Paper(Item):
         # First dispatch: self was Paper
         return item.eval_paper(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it draws
+        # Second dispatch: caller was Paper, and it draws
         return Outcome.DRAW
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it wins
+        # Second dispatch: caller was Scissors, and it wins
         return Outcome.WIN
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it loses
+        # Second dispatch: caller was Rock, and it loses
         return Outcome.LOSE
 
 class Scissors(Item):
@@ -27,13 +27,13 @@ class Scissors(Item):
         # First dispatch: self was Scissors
         return item.eval_scissors(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it loses
+        # Second dispatch: caller was Paper, and it loses
         return Outcome.LOSE
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it draws
+        # Second dispatch: caller was Scissors, and it draws
         return Outcome.DRAW
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it wins
+        # Second dispatch: caller was Rock, and it wins
         return Outcome.WIN
 
 class Rock(Item):
@@ -41,13 +41,13 @@ class Rock(Item):
         # First dispatch: self was Rock
         return item.eval_rock(self)
     def eval_paper(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Paper, and it wins
+        # Second dispatch: caller was Paper, and it wins
         return Outcome.WIN
     def eval_scissors(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Scissors, and it loses
+        # Second dispatch: caller was Scissors, and it loses
         return Outcome.LOSE
     def eval_rock(self, item: Any) -> Outcome:
-        # Second dispatch: the caller was Rock, and it draws
+        # Second dispatch: caller was Rock, and it draws
         return Outcome.DRAW
 
 if __name__ == "__main__":

@@ -14,7 +14,8 @@ if not []:
     print("empty")  # An empty list is falsy
 #: empty
 
-name = "" or "default"  # 'or' returns the first truthy operand
+# 'or' returns the first truthy operand
+name = "" or "default"
 print(name)
 #: default
 count = 0

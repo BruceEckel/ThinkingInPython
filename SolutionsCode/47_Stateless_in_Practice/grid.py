@@ -86,14 +86,17 @@ def connected(source: Source) -> Iterator[Source]:
     finally:
         print(f"{name} offline")
 
-def run_load(start: int, hours: int) -> Depend[Outlet, None]:
+def run_load(
+    start: int, hours: int
+) -> Depend[Outlet, None]:
     caught = catch(Drained)
     hour, remaining = start, hours
     while remaining:
         source = yield from plug(hour)
         with connected(source) as power:
             while remaining:
-                failure = yield from caught(draw)(power, hour)
+                failure = yield from caught(draw)(
+                    power, hour)
                 if failure is not None:
                     break
                 print(f"  {hour}:00")

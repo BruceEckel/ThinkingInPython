@@ -12,7 +12,8 @@ class TypeFailure(ValueError):
     def __str__(self) -> str:
         return f"{self.subject} {self.reason}".rstrip()
 
-def check(condition: bool, subject: str, reason: str = "") -> None:
+def check(condition: bool, subject: str,
+          reason: str = "") -> None:
     if not condition:
         raise TypeFailure(subject, reason)
 
@@ -25,7 +26,8 @@ class Stars:
         return f"Stars({self.number})"
 
     def __replace__(self, **changes: int) -> Self:
-        return type(self)(**({"number": self.number} | changes))
+        return type(self)(
+            **({"number": self.number} | changes))
 
 s = Stars(4)
 print(copy.replace(s, number=9))

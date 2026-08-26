@@ -4,7 +4,7 @@ from collections.abc import Callable
 def compose[T, U, V](
     f: Callable[[U], V], g: Callable[[T], U]
 ) -> Callable[[T], V]:
-    # Return a function that runs g, then feeds the result to f:
+    # A function that runs g, then feeds its result to f:
     def composed(x: T) -> V:
         return f(g(x))
     return composed

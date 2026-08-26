@@ -1,5 +1,5 @@
 # set_dict_from_genexp.py
-words = ["pol", "parrot", "pining", "fjord", "ex"]
+words = ["pol", "parrot", "fjord", "ex"]
 
 lengths = set(len(w) for w in words)
 print(sorted(lengths))
@@ -7,4 +7,4 @@ print(sorted(lengths))
 
 initials = dict((w, w[0]) for w in words)
 print(initials)
-#: {'pol': 'p', 'parrot': 'p', 'pining': 'p', 'fjord': 'f', 'ex': 'e'}
+#: {'pol': 'p', 'parrot': 'p', 'fjord': 'f', 'ex': 'e'}

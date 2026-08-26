@@ -6,7 +6,8 @@ path = Path(tempfile.gettempdir()) / "exercise_8.txt"
 with path.open("w") as f:
     f.write("one\ntwo\n")
 
-for line in path.read_text().splitlines():  # The whole file at once
+# The whole file at once
+for line in path.read_text().splitlines():
     print(line)
 #: one
 #: two

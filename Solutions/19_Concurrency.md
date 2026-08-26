@@ -59,7 +59,8 @@ async def main():
     results = [await c for c in coroutines]
     elapsed = time.perf_counter() - start
     print(results)
-    print(f"took the sum, not the longest: {elapsed > 0.055}")
+    print(
+        f"took the sum, not the longest: {elapsed > 0.055}")
 
 asyncio.run(main())
 #: a: started
@@ -107,9 +108,11 @@ class Meter:
 
 async def mixed_price(order, meter):
     with meter:
-        await asyncio.sleep(0.05)   # Waiting, off the processor
+        # Waiting, off the processor
+        await asyncio.sleep(0.05)
         total = 0
-        for _ in range(1_000_000):  # Working, on the processor
+        # Working, on the processor
+        for _ in range(1_000_000):
             total += 1
     return order * 10
 
@@ -324,9 +327,11 @@ def increment(count):
     global counter
     for _ in range(count):
         value = counter   # Read
-        counter = value + 1  # Write back, with nothing in between
+        # Write back, with nothing in between
+        counter = value + 1
 
-threads = [threading.Thread(target=increment, args=(50,)) for _ in range(8)]
+threads = [threading.Thread(target=increment, args=(50,))
+           for _ in range(8)]
 for t in threads:
     t.start()
 for t in threads:
@@ -556,7 +561,8 @@ the block. Bare `gather()` gives you neither.
 import asyncio
 from contextvars import ContextVar
 
-request_id: ContextVar[str] = ContextVar("request_id", default="-")
+request_id: ContextVar[str] = ContextVar("request_id",
+                                         default="-")
 current = "-"  # The same idea as a plain global
 
 async def handle(name: str) -> None:
@@ -566,11 +572,13 @@ async def handle(name: str) -> None:
     print(f"context {request_id.get()}, global {current}")
 
 async def main() -> None:
-    request_id.set("main")  # Set once, before any task exists
+    # Set once, before any task exists
+    request_id.set("main")
     async with asyncio.TaskGroup() as group:
         for name in ("req-1", "req-2", "req-3"):
             group.create_task(handle(name))
-    print(f"after: context {request_id.get()}, global {current}")
+    print(f"after: context {request_id.get()}, "
+          f"global {current}")
 
 asyncio.run(main())
 #: context main, global req-3
@@ -628,7 +636,8 @@ with ThreadPoolExecutor() as pool:
     )
 
 cores = os.cpu_count() or 1
-target = min(1.5, cores * 0.7)  # The chapter's scaled target
+# The chapter's scaled target
+target = min(1.5, cores * 0.7)
 if "--numbers" in sys.argv:  # Exact times on your machine
     print(f"sequential {t_seq:.6f}, threaded {t_thr:.6f}")
 print(f"threads run in parallel: {t_seq > t_thr * target}")
@@ -697,7 +706,8 @@ def drain(source: Iterator[int]) -> list[int]:
 
 def report(source: Iterator[int]) -> None:
     with ThreadPoolExecutor(max_workers=8) as pool:
-        futures = [pool.submit(drain, source) for _ in range(8)]
+        futures = [pool.submit(drain, source)
+                   for _ in range(8)]
         taken = [*f.result() for f in futures]
     print(f"{len(set(taken))} distinct, "
           f"duplicates {len(taken) > len(set(taken))}")
@@ -736,7 +746,9 @@ import asyncio
 lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
-async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
     async with first:
         await asyncio.sleep(0.01)  # Let the other task run
         async with second:

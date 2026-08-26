@@ -15,7 +15,9 @@ class Ok[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
-    def map_error(self, func: Callable[..., object]) -> Ok[A]:
+    def map_error(
+        self, func: Callable[..., object]
+    ) -> Ok[A]:
         return self  # An Ok has no error to transform
 
 @dataclass(frozen=True)
@@ -27,7 +29,9 @@ class Err[E]:
     ) -> Err[E]:
         return self
 
-    def map_error[F](self, func: Callable[[E], F]) -> Err[F]:
+    def map_error[F](
+        self, func: Callable[[E], F]
+    ) -> Err[F]:
         return Err(func(self.error))
 
 type Result[A, E] = Ok[A] | Err[E]

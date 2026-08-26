@@ -2,11 +2,13 @@
 from hypothesis import given, strategies
 
 def insertion_sort(xs: list[int]) -> list[int]:
-    "The obviously correct version, for the oracle property."
+    ("The obviously correct version, "
+     "for the oracle property.")
     result: list[int] = []
     for x in xs:
         position = 0
-        while position < len(result) and result[position] <= x:
+        while (position < len(result)
+               and result[position] <= x):
             position += 1
         result.insert(position, x)
     return result
@@ -15,7 +17,8 @@ numbers = strategies.lists(strategies.integers())
 
 @given(numbers)
 def test_output_is_ordered(xs: list[int]) -> None:
-    "Invariant: every adjacent pair of the output is ordered."
+    ("Invariant: every adjacent pair "
+     "of the output is ordered.")
     output = sorted(xs)
     assert all(a <= b for a, b in zip(output, output[1:]))
 

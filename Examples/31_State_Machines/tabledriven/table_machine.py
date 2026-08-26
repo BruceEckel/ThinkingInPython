@@ -3,11 +3,12 @@
 from collections.abc import Callable
 from enum import Enum
 
-# (condition, action, next_state); condition and action may be None.
-# A state is an Enum member, so a misspelled state is a type error
-# rather than a silent dead end.
+# (condition, action, next_state); condition and action
+# may be None. A state is an Enum member, so a misspelled
+# state is a type error rather than a silent dead end.
 type Transition = tuple[
-    Callable[..., bool] | None, Callable[..., None] | None, Enum
+    Callable[..., bool] | None, Callable[..., None] | None,
+    Enum
 ]
 type Table = dict[tuple[Enum, type], list[Transition]]
 

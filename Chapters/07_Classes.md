@@ -48,15 +48,15 @@ you must go through `self`.
 ```python
 # forgot_self.py
 
-class Forgetful:
+class Oops:
     def show():  # Missing the self parameter
         print("never runs")
 
 try:
-    Forgetful().show()  # type: ignore
+    Oops().show()  # type: ignore
 except TypeError as e:
     print(e)
-#: Forgetful.show() takes 0 positional arguments but 1 was given
+#: Oops.show() takes 0 positional arguments but 1 was given
 ```
 
 When you call a method for an object, as in `x.show()`,
@@ -349,7 +349,8 @@ which lets you validate the value before storing it:
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # Goes through the setter below
+        # Goes through the setter below
+        self.radius = radius
 
     @property
     def radius(self):
@@ -422,7 +423,8 @@ n = Numbers([5, 10, 15])
 print(n.total)
 #: summing 3 values
 #: 30
-print(n.total)  # Second access: stored value, no recomputation
+# Second access: stored value, no recomputation
+print(n.total)
 #: 30
 n.values.append(20)
 print(n.total)  # Still the old sum: the cache is stale
@@ -526,7 +528,8 @@ class Temperature:
         self.celsius = celsius
 
     @classmethod
-    def from_fahrenheit(cls, f):  # An alternative constructor
+    # An alternative constructor
+    def from_fahrenheit(cls, f):
         return cls((f - 32) * 5 / 9)
 
     @staticmethod

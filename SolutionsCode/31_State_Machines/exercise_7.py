@@ -13,7 +13,8 @@ class TemperatureReading:
     degrees: float
 
 class HVAC(StateMachine):
-    def __init__(self, target: float = 20, band: float = 2) -> None:
+    def __init__(self, target: float = 20,
+                 band: float = 2) -> None:
         self.target = target
         self.band = band
         table: Table = {

@@ -8,7 +8,8 @@ class count_calls[**P, R]:
         self.count = 0
         update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         self.count += 1
         print(f"call {self.count} of {self.func.__name__}")  # type: ignore
         return self.func(*args, **kwargs)
@@ -20,7 +21,8 @@ def hello() -> None:
 if __name__ == "__main__":
     hello()
     hello()
-    print(hello.count)  # The state lives on the decorator instance
+    # The state lives on the decorator instance
+    print(hello.count)
 #: call 1 of hello
 #: hello
 #: call 2 of hello

@@ -77,8 +77,10 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")  # Ask the world for the name
-    town = yield Question("town")  # Ask the world for the town
+    # Ask the world for the name
+    name = yield Question("name")
+    # Ask the world for the town
+    town = yield Question("town")
     friend = yield Question("friend")  # Ask for a friend
     return Result(f"{name} of {town}, friend {friend}")
 
@@ -188,7 +190,8 @@ Typically, a driver function steps the generator:
 # two_way_generator.py
 from collections.abc import Generator
 from typing import Final
-from interview_generator import Answer, Question, Result, interview
+from interview_generator import (Answer, Question,
+                                 Result, interview)
 
 ANSWERS: Final[dict[Question, Answer]] = {
     Question("name"): Answer("Alice"),
@@ -446,7 +449,9 @@ from collections.abc import Generator
 from interview_generator import Answer, Question, Result
 from two_way_generator import ANSWERS, drive
 
-def ask(question: Question) -> Generator[Question, Answer, Answer]:
+def ask(
+    question: Question
+) -> Generator[Question, Answer, Answer]:
     answer = yield question
     print(f"ask({question = }) -> {answer = }")
     return answer

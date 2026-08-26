@@ -34,7 +34,8 @@ ROBOTIC: Final[Nailer] = Nailer(force=11)
 def test_holds(
     material: Material, nailer: Nailer, expected: bool
 ) -> None:
-    assert run(supply(material, nailer)(holds)()) is expected
+    assert run(
+        supply(material, nailer)(holds)()) is expected
 
 print(run(supply(METAL, ROBOTIC)(holds)()))
 #: True

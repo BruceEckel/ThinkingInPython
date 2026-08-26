@@ -24,7 +24,8 @@ def stamped(
     console.print(f"[{clock.now()}] Hello, {name}!")
 
 def default(ability: Need[Console]) -> Console:
-    print(f"handler answered a request for {ability.t.__name__}")
+    print(f"handler answered a request "
+          f"for {ability.t.__name__}")
     return ability.t()
 
 defaults = handle(default)

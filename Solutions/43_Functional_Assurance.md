@@ -18,7 +18,8 @@ def main() -> None:
     with ProcessPoolExecutor() as pool:
         results = list(pool.map(count_primes, limits))
     print([count for count, _ in results])
-    print("distinct process IDs:", len({pid for _, pid in results}))
+    print("distinct process IDs:",
+          len({pid for _, pid in results}))
     print("cores:", os.process_cpu_count())
 
 if __name__ == "__main__":
@@ -69,7 +70,8 @@ def main() -> None:
     with ThreadPoolExecutor() as pool:
         results = list(pool.map(count_primes, limits))
     print([count for count, _ in results])
-    print("distinct process IDs:", len({pid for _, pid in results}))
+    print("distinct process IDs:",
+          len({pid for _, pid in results}))
 
 if __name__ == "__main__":
     main()
@@ -91,11 +93,13 @@ the substitutable-backend point from
 from hypothesis import given, strategies
 
 def insertion_sort(xs: list[int]) -> list[int]:
-    "The obviously correct version, for the oracle property."
+    ("The obviously correct version, "
+     "for the oracle property.")
     result: list[int] = []
     for x in xs:
         position = 0
-        while position < len(result) and result[position] <= x:
+        while (position < len(result)
+               and result[position] <= x):
             position += 1
         result.insert(position, x)
     return result
@@ -104,7 +108,8 @@ numbers = strategies.lists(strategies.integers())
 
 @given(numbers)
 def test_output_is_ordered(xs: list[int]) -> None:
-    "Invariant: every adjacent pair of the output is ordered."
+    ("Invariant: every adjacent pair "
+     "of the output is ordered.")
     output = sorted(xs)
     assert all(a <= b for a, b in zip(output, output[1:]))
 
@@ -178,13 +183,15 @@ import unicodedata
 
 MICRO = "µ"
 
-def test_upper_leaves_the_micro_sign_in_the_greek_block() -> None:
+def test_upper_leaves_the_micro_sign_in_the_greek_block(
+) -> None:
     assert unicodedata.name(MICRO) == "MICRO SIGN"
     assert (unicodedata.name(MICRO.upper())
             == "GREEK CAPITAL LETTER MU")
     assert (unicodedata.name(MICRO.upper().lower())
             == "GREEK SMALL LETTER MU")
-    assert MICRO.lower() == MICRO  # Already lowercase, so unchanged
+    # Already lowercase, so unchanged
+    assert MICRO.lower() == MICRO
     assert MICRO.upper().lower() != MICRO.lower()
 ```
 
@@ -235,11 +242,13 @@ def group_rounds(
             group = [leader]
             while len(group) < size:
                 closest = min(pool, key=lambda c: sum(
-                    history[frozenset((m, c))] for m in group))
+                    history[frozenset((m, c))]
+                    for m in group))
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
-        if pool and not groups:  # Roster smaller than one group
+        # Roster smaller than one group
+        if pool and not groups:
             groups.append([])
         for extra in pool:
             roomiest = min(groups, key=lambda g: sum(
@@ -255,7 +264,8 @@ rosters = strategies.lists(
     strategies.text("abcdefghij", min_size=1, max_size=3),
     min_size=2, max_size=12, unique=True)
 
-@given(rosters, strategies.integers(min_value=2, max_value=5))
+@given(rosters,
+       strategies.integers(min_value=2, max_value=5))
 def test_every_student_appears_once_per_round(
         names: list[str], size: int) -> None:
     for grouping in islice(group_rounds(names, size), 3):

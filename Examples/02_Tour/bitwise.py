@@ -10,7 +10,8 @@ print(bin(~0b1100))  # NOT, inverts every bit
 #: -0b1101
 print(bin(1 << 4))  # Left shift, same as 1 * 2 ** 4
 #: 0b10000
-print(bin(0b110000 >> 2))  # Right shift, same as 48 // 2 ** 2
+# Right shift, same as 48 // 2 ** 2
+print(bin(0b110000 >> 2))
 #: 0b1100
 
 flags = 0

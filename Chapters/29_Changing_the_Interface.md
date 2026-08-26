@@ -69,7 +69,8 @@ or the adaptee's own class.
 # adapter_variations.py
 # Two more places to put the adaptation.
 from typing import Any, override
-from adapter import ProxyAdapter, WhatIHave, WhatIUse, WhatIWant
+from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
+                     WhatIWant)
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
@@ -155,7 +156,8 @@ class Adapter:
     def f(self) -> str:  # The new interface
         return self._adaptee.g() + self._adaptee.h()
 
-    def __getattr__(self, name: str) -> Any:  # Forwards the rest
+    # Forwards the rest
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._adaptee, name)
 
 if __name__ == "__main__":
@@ -193,7 +195,8 @@ from getattr_adapter import Adapter, WhatIHave
 def test_new_interface_combines_methods() -> None:
     assert Adapter(WhatIHave()).f() == "gh"
 
-def test_getattr_forwards_existing_methods_unchanged() -> None:
+def test_getattr_forwards_existing_methods_unchanged(
+) -> None:
     a = Adapter(WhatIHave())
     assert a.g() == "g"
     assert a.h() == "h"
@@ -201,7 +204,8 @@ def test_getattr_forwards_existing_methods_unchanged() -> None:
 def test_forwarding_targets_the_wrapped_object() -> None:
     have = WhatIHave()
     a = Adapter(have)
-    assert a.g.__self__ is have  # __getattr__ delegates to adaptee
+    # __getattr__ delegates to adaptee
+    assert a.g.__self__ is have
 ```
 
 ## Façade
@@ -338,7 +342,8 @@ class Report:
     def render(self) -> str:
         return "report"
 
-    @warnings.deprecated("Report.to_string() is replaced by render()")
+    @warnings.deprecated(
+        "Report.to_string() is replaced by render()")
     def to_string(self) -> str:
         return self.render()
 

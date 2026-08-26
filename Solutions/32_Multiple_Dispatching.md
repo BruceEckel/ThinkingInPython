@@ -31,7 +31,8 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -140,7 +141,8 @@ class Lizard(Item):
     def eval_lizard(self, item: Any) -> Outcome:
         return Outcome.DRAW
 
-print(Lizard().compete(Paper()), Lizard().compete(Scissors()),
+print(Lizard().compete(Paper()),
+      Lizard().compete(Scissors()),
       Lizard().compete(Rock()), Lizard().compete(Lizard()))
 #: win win lose draw
 ```
@@ -238,7 +240,8 @@ class Rock(Item):
 class Lizard(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Outcome]] = {
   (Paper, Rock): Outcome.WIN,
   (Paper, Scissors): Outcome.LOSE,
   (Paper, Paper): Outcome.DRAW,
@@ -269,7 +272,8 @@ def item_pair_gen[T](base: type[T], n: int,
         counts = Counter()
     items = base.__subclasses__()
     for _ in range(n):
-        a, b = random.choice(items)(), random.choice(items)()
+        a, b = (random.choice(items)(),
+                random.choice(items)())
         counts[type(a).__name__] += 1
         counts[type(b).__name__] += 1
         yield a, b
@@ -309,7 +313,8 @@ class Meters:
 
     def __rsub__(self, other: object) -> Meters:
         if isinstance(other, int | float):
-            return Meters(other - self.n)  # Not self.n - other
+            # Not self.n - other
+            return Meters(other - self.n)
         return NotImplemented
 
 print(Meters(10) - Meters(3), Meters(10) - 3)
@@ -372,7 +377,8 @@ class Paper(Item):
 class Rock(Item):
     pass
 
-OUTCOME: Final[dict[tuple[type[Item], type[Item]], Outcome]] = {
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Outcome]] = {
     (Paper, Rock): Outcome.WIN,
     (Rock, Paper): Outcome.LOSE,
 }
@@ -514,7 +520,8 @@ class Outcome(StrEnum):
 
 WEAPON_ORDER = ["Jargon", "Play", "InventFeature",
                 "SellImaginaryProduct", "Edict", "Schedule"]
-WEAPON_INDEX = {name: i for i, name in enumerate(WEAPON_ORDER)}
+WEAPON_INDEX = {
+    name: i for i, name in enumerate(WEAPON_ORDER)}
 
 WEAPONS_BY_KIND = {
     "Dwarf": ["Jargon", "Play"],
@@ -523,7 +530,8 @@ WEAPONS_BY_KIND = {
 }
 
 def weapon_outcome(a: str, b: str) -> Outcome:
-    "A weapon beats the next two in WEAPON_ORDER (cyclically)."
+    ("A weapon beats the next two "
+     "in WEAPON_ORDER (cyclically).")
     ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
     diff = (ia - ib) % 6
     if diff == 0:
@@ -555,7 +563,8 @@ class Project2:
     def battle(
         self, a: Inhabitant2, b: Inhabitant2
     ) -> Inhabitant2 | None:
-        outcome = weapon_outcome(a.get_weapon(), b.get_weapon())
+        outcome = weapon_outcome(
+            a.get_weapon(), b.get_weapon())
         if outcome is Outcome.WIN:
             return a
         if outcome is Outcome.LOSE:
@@ -563,9 +572,11 @@ class Project2:
         return None  # Draw: no winner this round
 
     def meeting(self, group_size: int) -> str:
-        kinds = {"Dwarf": Dwarf2, "Elf": Elf2, "Troll": Troll2}
-        groups = {name: [cls(self.rng) for _ in range(group_size)]
-                  for name, cls in kinds.items()}
+        kinds = {"Dwarf": Dwarf2, "Elf": Elf2,
+                 "Troll": Troll2}
+        groups = {
+            name: [cls(self.rng) for _ in range(group_size)]
+            for name, cls in kinds.items()}
         while sum(1 for g in groups.values() if g) > 1:
             names = [n for n, g in groups.items() if g]
             for i in range(len(names)):
@@ -573,7 +584,8 @@ class Project2:
                     n1, n2 = names[i], names[j]
                     if not groups[n1] or not groups[n2]:
                         continue
-                    winner = self.battle(groups[n1][0], groups[n2][0])
+                    winner = self.battle(
+                        groups[n1][0], groups[n2][0])
                     if winner is groups[n1][0]:
                         groups[n2].pop(0)
                     elif winner is groups[n2][0]:
@@ -667,7 +679,7 @@ def battle_table(
         return b
     return None
 
-# Confirm the table agrees with the formula on every combination:
+# Confirm table and formula agree on every combination:
 mismatches = [
     (wa, wb) for wa in WEAPON_ORDER for wb in WEAPON_ORDER
     if OUTCOME_TABLE[wa, wb] != weapon_outcome(wa, wb)

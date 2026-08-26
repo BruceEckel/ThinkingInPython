@@ -7,7 +7,8 @@ class SingletonClassVar:
 
     def __new__(cls, arg: str) -> SingletonClassVar:
         if SingletonClassVar.__instance is None:
-            SingletonClassVar.__instance = object.__new__(cls)
+            SingletonClassVar.__instance = (
+                object.__new__(cls))
             SingletonClassVar.__instance.val = []
         SingletonClassVar.__instance.val.append(arg)
         return SingletonClassVar.__instance

@@ -16,7 +16,7 @@ print(careful("-5"), forgiving("-5"))
 try:
     careful("\N{SUPERSCRIPT TWO}")
 except ValueError as e:
-    print("careful failed:", e)
-#: careful failed: invalid literal for int() with base 10: '²'
+    print("careful:", e)
+#: careful: invalid literal for int() with base 10: '²'
 print(forgiving("\N{SUPERSCRIPT TWO}"))
 #: None

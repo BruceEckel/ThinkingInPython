@@ -9,8 +9,11 @@ from stateless.time import Time
 
 THREE = recurs(3, spaced(timedelta(milliseconds=1)))
 
-def attempt(feed: Feed, book: Encyclopedia) -> str | RetryError:
-    retried = retry(THREE)(research)  # Named, so ty follows it
+def attempt(
+    feed: Feed, book: Encyclopedia
+) -> str | RetryError:
+    # Named, so ty follows it
+    retried = retry(THREE)(research)
     caught = catch(RetryError)(retried)
     return run(supply(feed, book, Time())(caught)())
 

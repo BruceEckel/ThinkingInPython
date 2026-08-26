@@ -7,10 +7,12 @@ class Stars:
         self._validate()
 
     def _validate(self) -> None:
-        check(1 <= self._number <= 10, f"Stars({self._number})")
+        check(1 <= self._number <= 10,
+              f"Stars({self._number})")
 
     @property
-    def number(self) -> int:  # No setter: blocks external mutation
+    # No setter: blocks external mutation
+    def number(self) -> int:
         return self._number
 
     def __str__(self) -> str:

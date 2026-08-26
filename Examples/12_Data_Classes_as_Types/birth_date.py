@@ -16,7 +16,8 @@ class Year:
     n: int
 
     def __post_init__(self) -> None:
-        check(1900 < self.n <= date.today().year, f"Year({self.n})")
+        check(1900 < self.n <= date.today().year,
+              f"Year({self.n})")
 
 class Month(Enum):
     JANUARY = (1, 31)
@@ -34,7 +35,8 @@ class Month(Enum):
 
     @staticmethod
     def of(month_number: int) -> Month:
-        check(1 <= month_number <= 12, f"Month({month_number})")
+        check(1 <= month_number <= 12,
+              f"Month({month_number})")
         return list(Month)[month_number - 1]
 
     @property

@@ -22,7 +22,8 @@ def test_buy_dispenses_and_charges() -> None:
          FirstDigit("A", 0), SecondDigit("two", 1))
     assert vm.state is State.WANT_MORE
     assert vm.amount == 0  # 50 in, 50 spent
-    assert vm.items[0][1].quantity == 4  # One dispensed from five
+    # One dispensed from five
+    assert vm.items[0][1].quantity == 4
     assert vm.message == "Dispensing; remaining 0"
 
 def test_too_expensive_clears_back_to_collecting() -> None:
@@ -49,6 +50,7 @@ def test_quit_refunds_and_resets() -> None:
     assert vm.amount == 0
 
 def test_no_transition_raises() -> None:
-    vm = VendingMachine()  # QUIESCENT has no transition for Quit
+    # QUIESCENT has no transition for Quit
+    vm = VendingMachine()
     with pytest.raises(NoTransition):
         vm.handle(Quit())

@@ -1,7 +1,8 @@
 # noted_result.py
 from result import Err, Ok, Result
 
-def parse_field(name: str, text: str) -> Result[int, Exception]:
+def parse_field(name: str,
+                text: str) -> Result[int, Exception]:
     try:
         return Ok(int(text))
     except ValueError as e:

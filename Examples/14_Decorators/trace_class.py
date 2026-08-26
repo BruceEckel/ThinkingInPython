@@ -7,9 +7,11 @@ class trace[**P, R]:
 
     def __init__(self, func: Callable[P, R]) -> None:
         self.func = func
-        update_wrapper(self, func)  # Copy __name__, __doc__, etc
+        # Copy __name__, __doc__, etc
+        update_wrapper(self, func)
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+    def __call__(self, *args: P.args,
+                 **kwargs: P.kwargs) -> R:
         positional = [repr(a) for a in args]
         named = [f"{k}={v!r}" for k, v in kwargs.items()]
         arglist = ", ".join(positional + named)

@@ -3,7 +3,8 @@ from collections.abc import Callable
 from functools import wraps
 
 def retry[**P, R](
-        times: int) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    times: int
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:

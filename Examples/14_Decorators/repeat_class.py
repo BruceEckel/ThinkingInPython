@@ -5,7 +5,8 @@ from functools import wraps
 class repeat:
     def __init__(self, times: int) -> None:
         if times < 1:
-            raise ValueError(f"times must be >= 1, got {times}")
+            raise ValueError(
+                f"times must be >= 1, got {times}")
         self.times = times  # The decoration arguments
 
     def __call__[**P, R](

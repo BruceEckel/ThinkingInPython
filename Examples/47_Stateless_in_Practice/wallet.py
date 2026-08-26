@@ -23,7 +23,9 @@ def purchase(price: int) -> Depend[Get | Put, bool]:
     yield from put(funds - price)
     return True
 
-def spree(prices: tuple[int, ...]) -> Depend[Get | Put, int]:
+def spree(prices: tuple[int, ...]) -> Depend[
+    Get | Put, int
+]:
     bought = 0
     for price in prices:
         if (yield from purchase(price)):

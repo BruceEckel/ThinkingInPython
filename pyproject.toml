@@ -45,10 +45,15 @@ package = false
 ignore-words = "tools/data/codespell-ignore.txt"
 skip = "./.git,./.venv,./build,./resources,./uv.lock,*.gif,*.png"
 
-# PEP 8 linting for the examples. line-length is 70 to match the book's HTML
-# listing box, not ruff's default 88. ruff runs as an advisory CI step.
+# PEP 8 linting for the examples. line-length is 60 so listings fit
+# small screens (phones, e-ink readers) without wrapping, not ruff's
+# default 88. Ruff's E501 silently exempts a line whose overflow comes
+# from a trailing pragma (`# type: ignore`), which is also the book's
+# one sanctioned overflow. The `widths` check in tools/check_all.py
+# enforces the same 60 on the Markdown itself, covering what ruff
+# never sees: fragment blocks and `#:` output markers.
 [tool.ruff]
-line-length = 70
+line-length = 60
 # target-version is inferred from requires-python (>=3.15); don't duplicate it.
 
 [tool.ruff.lint]
@@ -94,6 +99,30 @@ lines-after-imports = 1
 # constant, which is the mistake they exist to show.
 "**/value_patterns.py" = ["N806"]
 "**/ch13_fallback_capture.py" = ["N806"]
+# These listings wrap a from-import in packed parenthesized form to
+# fit the 60-character listing width. Ruff accepts only its
+# one-name-per-line vertical style for a wrapped import, which would
+# add five to nine scaffolding lines to a dense listing, so import
+# formatting is waived for exactly these files; their imports stay
+# hand-sorted in isort order.
+"**/test_pizza_decorator.py" = ["I001"]
+"**/chain.py" = ["I001"]
+"**/strategy.py" = ["I001"]
+"**/adapter_variations.py" = ["I001"]
+"**/test_box_observer.py" = ["I001"]
+"**/test_filesystem.py" = ["I001"]
+"**/recycle_rtti.py" = ["I001"]
+"**/test_trash.py" = ["I001"]
+"**/two_way_generator.py" = ["I001"]
+"**/catch_score.py" = ["I001"]
+"**/casts.py" = ["I001"]
+"**/fetch_guarded.py" = ["I001"]
+"**/38_Simulation/exercise_4.py" = ["I001"]
+"**/46_Stateless/exercise_8.py" = ["I001"]
+"**/46_Stateless/exercise_10.py" = ["I001"]
+"**/46_Stateless/exercise_11.py" = ["I001"]
+"**/test_ch46_ask_and_greet.py" = ["I001"]
+"**/test_ch46_audit_log.py" = ["I001"]
 
 # Examples run with cwd set to their chapter dir; adding the tree's utils/
 # directory to the import path lets test files import shared helpers

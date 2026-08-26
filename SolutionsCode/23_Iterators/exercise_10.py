@@ -3,15 +3,19 @@ from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import override
 
-def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
+def typed[T](
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(
-                f"expected {expected}, got {type(obj).__name__}")
+                f"expected {expected}, "
+                f"got {type(obj).__name__}")
         yield obj
 
 def typed_skipping[T](
-        it: Iterable[object], expected: type[T]) -> Iterator[T]:
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
     for obj in it:
         if isinstance(obj, expected):
             yield obj

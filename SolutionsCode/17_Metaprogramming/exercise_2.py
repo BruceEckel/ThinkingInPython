@@ -6,7 +6,8 @@ class Field:
         self.name = name
         self.storage = "_" + name
 
-    def __get__(self, obj: Any, owner: type | None = None) -> Any:
+    def __get__(self, obj: Any,
+                owner: type | None = None) -> Any:
         if obj is None:
             return self
         return getattr(obj, self.storage)

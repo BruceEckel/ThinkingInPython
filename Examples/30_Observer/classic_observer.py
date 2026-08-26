@@ -4,7 +4,9 @@ from typing import override
 
 class Observer(ABC):
     @abstractmethod
-    def update(self, source: Observable, arg: object) -> None: ...
+    def update(
+        self, source: Observable, arg: object
+    ) -> None: ...
 
 class Observable:
     def __init__(self) -> None:
@@ -26,7 +28,9 @@ class Observable:
 
 class Display(Observer):
     @override
-    def update(self, source: Observable, arg: object) -> None:
+    def update(
+        self, source: Observable, arg: object
+    ) -> None:
         print(f"display: {arg}C")
 
 class Thermometer(Observable):

@@ -24,7 +24,7 @@ class GameBuilder:
         # Stage 2: connect each room to its neighbors
         for (row, col), room in self.rooms.items():
             room.doors.connect(row, col, self.rooms)
-        # Stage 3: pair the teleports that share a target letter
+        # Stage 3: pair teleports sharing a target letter
         def target(room: Room) -> str:
             assert isinstance(room.occupant, Teleport)
             return room.occupant.target
@@ -81,8 +81,8 @@ string_maze = """
 """.strip()
 
 solution = (
-    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeeenneessee"
-    "nneeeesseeeenneennwwnneenneennnnwwwwnnnneesseennnnwwwwwwssww"
-    "eesswwsswwwwsseesseeeesswwwwwwwwwwwwwwnnnneennnnnnnnnneessss"
-    "eesssswwsseesswwww"
+    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeee"
+    "nneesseenneeeesseeeenneennwwnneenneennnnwwwwnnnneess"
+    "eennnnwwwwwwsswweesswwsswwwwsseesseeeesswwwwwwwwwwww"
+    "wwnnnneennnnnnnnnneesssseesssswwsseesswwww"
 )

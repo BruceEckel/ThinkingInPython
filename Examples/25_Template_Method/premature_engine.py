@@ -13,7 +13,8 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        super().__init__()  # Usual style: engine runs now...
+        # Usual style: engine runs now...
+        super().__init__()
         self.name = name  # ...before this line runs
 
     @override

@@ -26,5 +26,6 @@ with InterpreterPoolExecutor() as pool:
 cores = os.cpu_count() or 1
 target = min(1.5, cores * 0.7)  # Two cores cannot give 1.5x
 report(sequential=t_seq, subinterpreters=t_sub, cores=cores)
-print(f"subinterpreters run in parallel: {t_seq > t_sub * target}")
+print(f"subinterpreters run in parallel: "
+      f"{t_seq > t_sub * target}")
 #: subinterpreters run in parallel: True

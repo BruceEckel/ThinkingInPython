@@ -6,7 +6,8 @@ def read_only():
     print(count)
 
 def rebinds():
-    count = 99  # A local, unrelated to the module-level count
+    # A local, unrelated to the module-level count
+    count = 99
     print(count)
 
 def writes_global():

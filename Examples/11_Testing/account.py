@@ -2,8 +2,10 @@
 from dataclasses import dataclass
 
 class InsufficientFunds(Exception):
-    def __init__(self, balance: float, amount: float) -> None:
-        super().__init__(f"balance {balance} is less than {amount}")
+    def __init__(self,
+                 balance: float, amount: float) -> None:
+        super().__init__(
+            f"balance {balance} is less than {amount}")
 
 @dataclass
 class Account:

@@ -11,12 +11,15 @@ class Observable[T]:
     def subscribe(self, observer: AsyncObserver[T]) -> None:
         self._observers.append(observer)
 
-    def unsubscribe(self, observer: AsyncObserver[T]) -> None:
+    def unsubscribe(
+        self, observer: AsyncObserver[T]
+    ) -> None:
         self._observers.remove(observer)
 
     async def notify(self, data: T) -> None:
-        # Fan out to every observer at once, then wait for all
-        await asyncio.gather(*(obs(data) for obs in self._observers))
+        # Fan out to every observer, then wait for all
+        await asyncio.gather(
+            *(obs(data) for obs in self._observers))
 
 class Thermometer(Observable[float]):
     def __init__(self) -> None:

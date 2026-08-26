@@ -3,7 +3,8 @@ import asyncio
 import pytest
 from exercise_4 import Observable
 
-def test_later_observer_still_runs_after_a_failure() -> None:
+def test_later_observer_still_runs_after_a_failure(
+) -> None:
     received: list[int] = []
 
     async def broken(data: int) -> None:

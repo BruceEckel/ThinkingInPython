@@ -42,7 +42,8 @@ type Bins = dict[type[Trash], list[Trash]]
 @dataclass(frozen=True)
 class Trash:
     weight: float
-    value: ClassVar[float] = 0.0  # Dollars per pound (per subclass)
+    # Dollars per pound (per subclass)
+    value: ClassVar[float] = 0.0
     registry: ClassVar[dict[str, type[Trash]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
@@ -107,7 +108,8 @@ and `sum_value()` totals weight times value:
 ```python
 # test_trash.py
 import pytest
-from trash import Aluminum, Cardboard, Glass, Paper, Trash, sum_value
+from trash import (Aluminum, Cardboard, Glass, Paper,
+                   Trash, sum_value)
 
 def test_subclasses_self_register() -> None:
     assert set(Trash.registry) == {
@@ -126,7 +128,8 @@ def test_per_pound_values() -> None:
 
 def test_sum_value_totals_weight_times_value() -> None:
     items: list[Trash] = [Aluminum(2.0), Paper(5.0)]
-    assert sum_value(items) == pytest.approx(3.84)  # 2*1.67 + 5*0.10
+    # 2*1.67 + 5*0.10
+    assert sum_value(items) == pytest.approx(3.84)
 ```
 
 A data file describes the trash to process, one `Name:weight` line per piece:
@@ -173,7 +176,8 @@ def parse(filename: str | Path) -> list[Trash]:
         if not line or line.startswith("#"):
             continue
         name, weight = line.split(":")
-        items.append(Trash.create(name.strip(), float(weight)))
+        items.append(
+            Trash.create(name.strip(), float(weight)))
     return items
 ```
 
@@ -184,7 +188,9 @@ The test parses a small in-memory file, so it does not depend on `trash.dat`:
 from pathlib import Path
 from parse_trash import parse
 
-def test_parse_reads_and_skips_comments(tmp_path: Path) -> None:
+def test_parse_reads_and_skips_comments(
+    tmp_path: Path,
+) -> None:
     data = tmp_path / "trash.dat"
     data.write_text("""\
 # header
@@ -193,7 +199,8 @@ Aluminum:2.0
 Glass:3.0
 """)
     items = parse(data)
-    assert [type(t).__name__ for t in items] == ["Aluminum", "Glass"]
+    assert [type(t).__name__ for t in items] == [
+        "Aluminum", "Glass"]
     assert items[0].weight == 2.0
     assert items[1].weight == 3.0
 ```
@@ -207,7 +214,8 @@ The most obvious way to sort is to look at each piece and discover its type usin
 # recycle_rtti.py
 from collections import defaultdict
 from parse_trash import parse
-from trash import Aluminum, Bins, Cardboard, Glass, Paper, sum_value
+from trash import (Aluminum, Bins, Cardboard, Glass,
+                   Paper, sum_value)
 
 bins: Bins = defaultdict(list)
 for t in parse("trash.dat"):

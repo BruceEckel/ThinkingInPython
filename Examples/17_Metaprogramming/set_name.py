@@ -7,7 +7,8 @@ class Field:
         self.name = name
         self.storage = f"_{name}"
 
-    def __get__(self, obj: Any, owner: type | None = None) -> Any:
+    def __get__(self, obj: Any,
+                owner: type | None = None) -> Any:
         via = "class" if obj is None else "instance"
         print(f"{self.name}.__get__ via {via}")
         if obj is None:

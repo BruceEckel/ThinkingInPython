@@ -11,7 +11,8 @@ history.do(copy.replace(history.present, title="Goose"))
 history.do(history.present.draw("scribble"))
 print(history.present)
 #: Goose: circle beak scribble
-history.do(copy.replace(history.present, strokes=checkpoint.strokes))
+history.do(copy.replace(history.present,
+                        strokes=checkpoint.strokes))
 print(history.present)
 #: Goose: circle
 print(history.undo())

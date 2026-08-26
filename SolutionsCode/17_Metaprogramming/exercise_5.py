@@ -9,9 +9,12 @@ def greet(name: str, loud: bool = False) -> str:
 def describe(func) -> None:
     doc = inspect.getdoc(func)
     sig = inspect.signature(func)
-    print(func.__name__, sig, doc or "(no docstring)")
+    print(func.__name__, sig)
+    print(" ", doc or "(no docstring)")
 
 describe(greet)
-#: greet (name: str, loud: bool = False) -> str Return a greeting.
+#: greet (name: str, loud: bool = False) -> str
+#:   Return a greeting.
 describe(lambda x: x * 2)
-#: <lambda> (x) (no docstring)
+#: <lambda> (x)
+#:   (no docstring)

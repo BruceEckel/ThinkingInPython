@@ -37,7 +37,8 @@ display_object(Point, REDEFINED_DUNDERS)
 #:   • __init__(self, x: int, y: int) -> None
 #:   • __repr__(self)
 
-display_object(Point, REDEFINED_DUNDERS, exclude=("__hash__",))
+display_object(Point, REDEFINED_DUNDERS,
+               exclude=("__hash__",))
 #: [Attributes]
 #:   None
 #: [Methods]

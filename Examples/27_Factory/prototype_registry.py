@@ -11,7 +11,8 @@ class Monster:
 
 PROTOTYPES: Final[dict[str, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"]),
-    "troll": Monster("Troll", hp=40, powers=["smash", "regenerate"]),
+    "troll": Monster("Troll", hp=40,
+                     powers=["smash", "regen"]),
 }
 
 def spawn(kind: str) -> Monster:
@@ -24,4 +25,4 @@ if __name__ == "__main__":
     print(a.hp, b.hp)  # The copies are independent
     print(spawn("troll"))
 #: 10 5
-#: Monster(name='Troll', hp=40, powers=['smash', 'regenerate'])
+#: Monster(name='Troll', hp=40, powers=['smash', 'regen'])

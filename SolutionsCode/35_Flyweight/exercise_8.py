@@ -21,7 +21,8 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
 
 @cache
 def tile(symbol: str) -> Tile:
-    time.sleep(0.1)  # Widen the window between miss and store
+    # Widen the window between miss and store
+    time.sleep(0.1)
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
@@ -37,7 +38,8 @@ def gather(
         with lock:
             out.append(found)
 
-    threads = [threading.Thread(target=worker) for _ in range(4)]
+    threads = [threading.Thread(target=worker)
+               for _ in range(4)]
     for t in threads:
         t.start()
     for t in threads:

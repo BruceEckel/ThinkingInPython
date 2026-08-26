@@ -15,4 +15,5 @@ def test_template_method_runs_steps_in_order() -> None:
             calls.append("two")
 
     Recorder().run()  # The client starts the engine
-    assert calls == ["one", "two", "one", "two"]  # Loop runs twice
+    # Loop runs twice
+    assert calls == ["one", "two", "one", "two"]

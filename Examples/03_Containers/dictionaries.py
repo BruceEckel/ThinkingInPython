@@ -8,7 +8,8 @@ print(ages["Alice"])
 ages["Carol"] = 41  # Add or update
 print("Bob" in ages)  # Membership tests the keys
 #: True
-print(ages.get("Dan", 0))  # A default when the key is missing
+# A default when the key is missing
+print(ages.get("Dan", 0))
 #: 0
 print(list(ages))  # Iterating a dict yields its keys
 #: ['Alice', 'Bob', 'Carol']

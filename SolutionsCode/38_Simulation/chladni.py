@@ -10,13 +10,16 @@ type Field = Callable[[float, float, Mode], float]
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
-        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+        math.cos(m * math.pi * x)
+        * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x)
+        * math.cos(m * math.pi * y))
 
 def membrane(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.sin(m * math.pi * x) * math.sin(n * math.pi * y))
+        math.sin(m * math.pi * x)
+        * math.sin(n * math.pi * y))
 
 def bounce(v: float) -> float:
     if v < 0.0:
@@ -54,7 +57,8 @@ class Plate:
             self.field(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60, height: int = 30) -> str:
+    def render(self, width: int = 60,
+               height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
         for g in self.grains:

@@ -67,8 +67,10 @@ print(divide(10, 2, label="half"))
 try:
     divide(10, 2, "half")  # type: ignore
 except TypeError as e:
-    print("TypeError:", e)
-#: TypeError: divide() takes 2 positional arguments but 3 were given
+    print(type(e).__name__)
+    print(e)
+#: TypeError
+#: divide() takes 2 positional arguments but 3 were given
 ```
 
 `a` and `b` stay positional-only (from the original `/`), and the new

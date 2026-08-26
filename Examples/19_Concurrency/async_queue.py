@@ -2,7 +2,8 @@
 import asyncio
 
 async def consumer(queue: asyncio.Queue[str]) -> None:
-    item = await queue.get()  # Suspends until an item arrives
+    # Suspends until an item arrives
+    item = await queue.get()
     print(f"consumed {item}")
 
 async def producer(queue: asyncio.Queue[str]) -> None:

@@ -238,7 +238,7 @@ def newton(f: Fn, a: float, b: float) -> float | None:
     x = (a + b) / 2  # Start between the hints
     h = 1e-7
     for _ in range(MAX_ITER):
-        # Approximate the derivative with a central difference:
+        # Approximate the derivative by central difference:
         slope = (f(x + h) - f(x - h)) / (2 * h)
         if slope == 0:
             return None
@@ -255,7 +255,8 @@ and the loop below tries each choice in turn:
 
 ```python
 # strategy.py
-from algorithms import Fn, RootFinder, bisection, newton, secant
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
 
 def solve(f: Fn, a: float, b: float,
           finder: RootFinder) -> float | None:
@@ -346,7 +347,8 @@ The open methods do not:
 
 ```python
 # chain.py
-from algorithms import Fn, RootFinder, bisection, newton, secant
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
 
 def solve(f: Fn, a: float, b: float,
           chain: list[RootFinder]) -> float | None:
@@ -364,7 +366,7 @@ chain: list[RootFinder] = [bisection, secant, newton]
 r1 = solve(f, 0.0, 2.0, chain)
 print(f"{r1:.6f}" if r1 is not None else "no root")
 #: 1.414214
-# [1.0, 1.3] does not bracket it; bisection fails, secant finds it:
+# No bracket in [1.0, 1.3]: bisection fails, secant works:
 print(bisection(f, 1.0, 1.3))
 #: None
 r2 = solve(f, 1.0, 1.3, chain)
@@ -480,7 +482,8 @@ def on_withdraw(event: Withdraw) -> None:
 
 bus = EventBus()
 bus.subscribe(Deposit, on_deposit)
-bus.subscribe(Deposit, audit)  # Two handlers for one event type
+# Two handlers for one event type
+bus.subscribe(Deposit, audit)
 bus.subscribe(Withdraw, on_withdraw)
 
 bus.publish(Deposit(100))
@@ -488,7 +491,8 @@ bus.publish(Deposit(100))
 #:   audit: a deposit of 100
 bus.publish(Withdraw(30))
 #: - withdraw 30
-bus.publish(Closed("inactivity"))  # No handler: nothing happens
+# No handler: nothing happens
+bus.publish(Closed("inactivity"))
 ```
 
 `subscribe` is generic on the event type `E`, which appears in both parameters,
@@ -524,21 +528,26 @@ from event_bus import Closed, Deposit, EventBus, Withdraw
 def test_every_handler_for_the_type_is_called() -> None:
     seen: list[str] = []
     bus = EventBus()
-    bus.subscribe(Deposit, lambda e: seen.append(f"a{e.amount}"))
-    bus.subscribe(Deposit, lambda e: seen.append(f"b{e.amount}"))
+    bus.subscribe(Deposit,
+                  lambda e: seen.append(f"a{e.amount}"))
+    bus.subscribe(Deposit,
+                  lambda e: seen.append(f"b{e.amount}"))
     bus.publish(Deposit(5))
     assert seen == ["a5", "b5"]
 
 def test_only_the_matching_type_is_called() -> None:
     calls: list[str] = []
     bus = EventBus()
-    bus.subscribe(Deposit, lambda e: calls.append("deposit"))
-    bus.subscribe(Withdraw, lambda e: calls.append("withdraw"))
+    bus.subscribe(Deposit,
+                  lambda e: calls.append("deposit"))
+    bus.subscribe(Withdraw,
+                  lambda e: calls.append("withdraw"))
     bus.publish(Withdraw(1))
     assert calls == ["withdraw"]
 
 def test_no_handler_is_a_noop() -> None:
-    EventBus().publish(Closed("done"))  # Must not raise anything
+    # Must not raise anything
+    EventBus().publish(Closed("done"))
 ```
 
 This is the [Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)

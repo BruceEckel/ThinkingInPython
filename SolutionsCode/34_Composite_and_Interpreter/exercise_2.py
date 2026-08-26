@@ -27,7 +27,8 @@ def disk_usage(entry: Node) -> int:
         case Directory(_, entries):
             return sum(disk_usage(e) for e in entries)
         case Symlink():
-            return 0  # A link contributes no size of its own
+            # A link contributes no size of its own
+            return 0
         case _:
             assert_never(entry)
 

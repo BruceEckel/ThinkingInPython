@@ -10,17 +10,22 @@ async def yielding_wait() -> None:
 async def blocking_wait() -> None:
     time.sleep(0.05)  # Stops the event loop
 
-async def elapsed(tasks: Iterable[Awaitable[None]]) -> float:
+async def elapsed(
+    tasks: Iterable[Awaitable[None]]
+) -> float:
     start = time.perf_counter()
     await asyncio.gather(*tasks)
     return time.perf_counter() - start
 
 async def main() -> None:
-    t_yield = await elapsed(yielding_wait() for _ in range(5))
-    t_block = await elapsed(blocking_wait() for _ in range(5))
+    t_yield = await elapsed(
+        yielding_wait() for _ in range(5))
+    t_block = await elapsed(
+        blocking_wait() for _ in range(5))
     report(awaited=t_yield, blocking=t_block)
     print(f"awaited sleeps overlap: {t_yield < 0.05 * 2}")
-    print(f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
+    print(
+        f"blocking sleeps serialize: {t_block >= 0.05 * 5}")
 
 asyncio.run(main())
 #: awaited sleeps overlap: True

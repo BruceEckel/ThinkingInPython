@@ -134,7 +134,8 @@ class Point:
 
 p = Point(1, 2)
 with ignore(AttributeError):
-    setattr(p, "x", 5)  # A frozen instance rejects assignment
+    # A frozen instance rejects assignment
+    setattr(p, "x", 5)
 #: FrozenInstanceError("cannot assign to field 'x'")
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
@@ -563,7 +564,7 @@ from collections.abc import Callable
 def compose[T, U, V](
     f: Callable[[U], V], g: Callable[[T], U]
 ) -> Callable[[T], V]:
-    # Return a function that runs g, then feeds the result to f:
+    # A function that runs g, then feeds its result to f:
     def composed(x: T) -> V:
         return f(g(x))
     return composed
@@ -626,7 +627,8 @@ def report(readings: Sequence[Reading]) -> list[str]:
     return [f"{r.sensor} {r.celsius:.1f}"
             for r in map(to_fahrenheit, warm)]
 
-data = [Reading("a", 18.0), Reading("b", 25.0), Reading("c", 30.5)]
+data = [Reading("a", 18.0), Reading("b", 25.0),
+        Reading("c", 30.5)]
 print(report(data))
 #: ['b 77.0', 'c 86.9']
 print(data[0])

@@ -20,7 +20,8 @@ class Directory:
 
 type Node = File | Directory
 
-def find(entry: Node, name: str, prefix: str = "") -> Iterator[str]:
+def find(entry: Node, name: str,
+         prefix: str = "") -> Iterator[str]:
     match entry:
         case File(n, _):
             if n == name:
@@ -33,7 +34,8 @@ def find(entry: Node, name: str, prefix: str = "") -> Iterator[str]:
         case _:
             assert_never(entry)
 
-src = Directory("src", (File("main.py", 400), File("util.py", 250)))
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
 root = Directory("root", (
     File("readme.md", 90), src, File("data.csv", 1200),
     Directory("src", ())))
@@ -85,7 +87,8 @@ def disk_usage(entry: Node) -> int:
         case Directory(_, entries):
             return sum(disk_usage(e) for e in entries)
         case Symlink():
-            return 0  # A link contributes no size of its own
+            # A link contributes no size of its own
+            return 0
         case _:
             assert_never(entry)
 
@@ -191,13 +194,16 @@ def evaluate(e: Expr, **env: int) -> float:
         case Var(name):
             return env[name]
         case Add(left, right):
-            return evaluate(left, **env) + evaluate(right, **env)
+            return (evaluate(left, **env)
+                    + evaluate(right, **env))
         case Mul(left, right):
-            return evaluate(left, **env) * evaluate(right, **env)
+            return (evaluate(left, **env)
+                    * evaluate(right, **env))
         case Neg(operand):
             return -evaluate(operand, **env)
         case Div(left, right):
-            return evaluate(left, **env) / evaluate(right, **env)
+            return (evaluate(left, **env)
+                    / evaluate(right, **env))
         case _:
             assert_never(e)
 
@@ -395,10 +401,12 @@ def derivative(e: Expr, name: str) -> Expr:
             return Num(0)
         case Var(n):
             return Num(1) if n == name else Num(0)
-        case Add(left, right):  # Sum rule: (f + g)' = f' + g'
+        # Sum rule: (f + g)' = f' + g'
+        case Add(left, right):
             return Add(derivative(left, name),
                        derivative(right, name))
-        case Mul(left, right):  # Product rule: (fg)' = f'g + fg'
+        # Product rule: (fg)' = f'g + fg'
+        case Mul(left, right):
             return Add(Mul(derivative(left, name), right),
                        Mul(left, derivative(right, name)))
         case _:
@@ -608,13 +616,15 @@ def evaluate(e: Expr, /, **env: int) -> int:
         case Var(name):
             return env[name]
         case Add(left, right):
-            return evaluate(left, **env) + evaluate(right, **env)
+            return (evaluate(left, **env)
+                    + evaluate(right, **env))
         case Mul(left, right):
-            return evaluate(left, **env) * evaluate(right, **env)
+            return (evaluate(left, **env)
+                    * evaluate(right, **env))
         case _:
             assert_never(e)
 
-# A pending combine, stacked behind the children it consumes:
+# A pending combine, behind the children it consumes:
 class Op(Enum):
     ADD = "+"
     MUL = "*"
@@ -626,10 +636,12 @@ def evaluate_iterative(e: Expr, /, **env: int) -> int:
         item = work.pop()
         match item:
             case Op.ADD:
-                right_value, left_value = values.pop(), values.pop()
+                right_value, left_value = (
+                    values.pop(), values.pop())
                 values.append(left_value + right_value)
             case Op.MUL:
-                right_value, left_value = values.pop(), values.pop()
+                right_value, left_value = (
+                    values.pop(), values.pop())
                 values.append(left_value * right_value)
             case Num(value):
                 values.append(value)
@@ -731,7 +743,8 @@ class Symlink(Entry):
     def disk_usage(self) -> int:
         return 0
 
-src = Directory("src", (File("main.py", 400), File("util.py", 250)))
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
 root = Directory("root", (
     File("readme.md", 90), src, Symlink("latest", "src")))
 print(root.disk_usage())

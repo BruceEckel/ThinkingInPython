@@ -20,7 +20,8 @@ def mutable_tile(symbol: str) -> MutableTile:
     name, walkable = SPECS[symbol]
     return MutableTile(symbol, name, walkable)
 
-def test_mutation_without_frozen_leaks_across_cells() -> None:
+def test_mutation_without_frozen_leaks_across_cells(
+) -> None:
     field = [[mutable_tile(s) for s in line]
              for line in "..\n..".split()]
     field[0][0].walkable = False

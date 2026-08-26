@@ -8,8 +8,10 @@ type Mode = tuple[int, int]  # Vibration pattern (m, n)
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
-        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+        math.cos(m * math.pi * x)
+        * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x)
+        * math.cos(m * math.pi * y))
 
 def bounce(v: float) -> float:
     if v < 0.0:
@@ -45,7 +47,8 @@ class Plate:
             amplitude(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60, height: int = 30) -> str:
+    def render(self, width: int = 57,
+               height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
         for g in self.grains:

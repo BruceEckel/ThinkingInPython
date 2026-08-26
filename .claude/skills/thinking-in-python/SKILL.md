@@ -322,8 +322,12 @@ legal value** (PEP 661, Python 3.15+).
       #: initializing a_package
       print(hasattr(a_package, "module1"))
 
-- **Line length is 70.** Long inline comments are the usual culprit.
-  Move the comment to its own line or wrap the statement.
+- **Line length is 60,** so listings fit small screens without
+  wrapping. Long inline comments are the usual culprit: move the
+  comment to its own line or wrap the statement. The one sanctioned
+  overflow is a trailing `# type: ignore` pragma. Output must fit
+  too: shorten what the program prints rather than letting a `#:`
+  marker run past 60.
 
 - **Comment capitalization:** start with a capital when the first
   word is prose. Leave the case alone when the comment begins with a

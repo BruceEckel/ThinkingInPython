@@ -109,14 +109,14 @@ def squares(n: int) -> Iterator[int]:
     for i in range(n):
         yield i * i
 
-# Fix one: collect once, then reuse the list.
+# Fix one: collect once, then reuse the list
 collected = list(squares(5))
 print(collected)
 #: [0, 1, 4, 9, 16]
 print(collected)
 #: [0, 1, 4, 9, 16]
 
-# Fix two: an iterable whose __iter__() builds a fresh generator.
+# Fix two: __iter__() builds a fresh generator per pass
 @dataclass
 class Squares:
     n: int
@@ -209,7 +209,8 @@ class Tripwire(Exception):
 def counter(limit: int) -> Iterator[int]:
     for n in count(1):
         if n > limit:
-            raise Tripwire(f"pulled {limit} values and kept asking")
+            raise Tripwire(
+                f"pulled {limit} values and kept asking")
         yield n
 
 def test_filter_skips_but_never_stops() -> None:
@@ -352,7 +353,8 @@ class Peekable[T](Iterator[T]):
         return item
 
 it = Peekable(x * 2 for x in [1, 2, 3])
-print(it.peek(), it.peek(), it.peek())  # Free, and repeatable
+# Free, and repeatable
+print(it.peek(), it.peek(), it.peek())
 #: 2 2 2
 print(next(it))
 #: 2
@@ -397,7 +399,9 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         else:
             yield from flatten(item)
 
-def flatten_str(nested: Sequence[Nested]) -> Iterator[int | str]:
+def flatten_str(
+    nested: Sequence[Nested]
+) -> Iterator[int | str]:
     for item in nested:
         if isinstance(item, int | str):  # A str is one item
             yield item
@@ -452,15 +456,19 @@ from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import override
 
-def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
+def typed[T](
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(
-                f"expected {expected}, got {type(obj).__name__}")
+                f"expected {expected}, "
+                f"got {type(obj).__name__}")
         yield obj
 
 def typed_skipping[T](
-        it: Iterable[object], expected: type[T]) -> Iterator[T]:
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
     for obj in it:
         if isinstance(obj, expected):
             yield obj

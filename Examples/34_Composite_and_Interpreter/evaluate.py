@@ -9,9 +9,11 @@ def evaluate(e: Expr, /, **env: int) -> int:
         case Var(name):
             return env[name]
         case Add(left, right):
-            return evaluate(left, **env) + evaluate(right, **env)
+            return (evaluate(left, **env)
+                    + evaluate(right, **env))
         case Mul(left, right):
-            return evaluate(left, **env) * evaluate(right, **env)
+            return (evaluate(left, **env)
+                    * evaluate(right, **env))
         case _:
             assert_never(e)
 

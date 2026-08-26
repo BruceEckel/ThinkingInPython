@@ -114,14 +114,16 @@ def make_map(size: int) -> str:
 for size in (50, 100, 200):
     text = make_map(size)
     tracemalloc.start()
-    cached_field = [[cached_tile(to_symbol(s)) for s in line]
+    cached_field = [[cached_tile(to_symbol(s))
+                     for s in line]
                     for line in text.split()]
     _, cached_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
     tracemalloc.start()
-    uncached_field = [[uncached_tile(to_symbol(s)) for s in line]
-                       for line in text.split()]
+    uncached_field = [[uncached_tile(to_symbol(s))
+                       for s in line]
+                      for line in text.split()]
     _, uncached_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
 
@@ -202,7 +204,8 @@ def mutable_tile(symbol: str) -> MutableTile:
     name, walkable = SPECS[symbol]
     return MutableTile(symbol, name, walkable)
 
-def test_mutation_without_frozen_leaks_across_cells() -> None:
+def test_mutation_without_frozen_leaks_across_cells(
+) -> None:
     field = [[mutable_tile(s) for s in line]
              for line in "..\n..".split()]
     field[0][0].walkable = False
@@ -247,8 +250,9 @@ type Square = tuple[str, int]
 
 def starting_position() -> dict[Square, Piece]:
     board: dict[Square, Piece] = {}
-    back_rank = [Kind.ROOK, Kind.KNIGHT, Kind.BISHOP, Kind.QUEEN,
-                 Kind.KING, Kind.BISHOP, Kind.KNIGHT, Kind.ROOK]
+    back_rank = [Kind.ROOK, Kind.KNIGHT, Kind.BISHOP,
+                 Kind.QUEEN, Kind.KING, Kind.BISHOP,
+                 Kind.KNIGHT, Kind.ROOK]
     for file, kind in zip("abcdefgh", back_rank):
         board[(file, 1)] = piece(Color.WHITE, kind)
         board[(file, 8)] = piece(Color.BLACK, kind)
@@ -260,13 +264,15 @@ def starting_position() -> dict[Square, Piece]:
 def move(
     board: dict[Square, Piece], src: Square, dst: Square
 ) -> None:
-    board[dst] = board.pop(src)  # Overwrites dst's old occupant
+    # Overwrites dst's old occupant
+    board[dst] = board.pop(src)
 
 def promote(
     board: dict[Square, Piece], square: Square, kind: Kind
 ) -> None:
     current = board[square]
-    board[square] = piece(current.color, kind)  # A shared Piece
+    # A shared Piece
+    board[square] = piece(current.color, kind)
 
 board = starting_position()
 print(len(board), len({id(p) for p in board.values()}))
@@ -275,8 +281,9 @@ move(board, ("e", 2), ("e", 4))
 print(("e", 2) in board, board[("e", 4)].kind)
 #: False Kind.PAWN
 promote(board, ("e", 4), Kind.QUEEN)
-print(board[("e", 4)])
-#: Piece(color=<Color.WHITE: 'white'>, kind=<Kind.QUEEN: 'Q'>)
+queen = board[("e", 4)]
+print(queen.color, queen.kind)
+#: Color.WHITE Kind.QUEEN
 ```
 
 Thirty-two occupied squares, but only twelve distinct `Piece` objects:
@@ -313,7 +320,8 @@ class Color:
     green: int
     blue: int
 
-_pool: WeakValueDictionary[RGB, Color] = WeakValueDictionary()
+_pool: WeakValueDictionary[RGB, Color] = (
+    WeakValueDictionary())
 
 def make_color(red: int, green: int, blue: int) -> Color:
     key = (red, green, blue)
@@ -360,7 +368,9 @@ class Color:
     green: int
     blue: int
 
-    def __new__(cls, red: int, green: int, blue: int) -> Color:
+    def __new__(
+        cls, red: int, green: int, blue: int
+    ) -> Color:
         components = (("red", red), ("green", green),
                       ("blue", blue))
         for name, value in components:
@@ -396,7 +406,9 @@ class Color:
     green: int
     blue: int
 
-    def __new__(cls, red: int, green: int, blue: int) -> Color:
+    def __new__(
+        cls, red: int, green: int, blue: int
+    ) -> Color:
         components = (("red", red), ("green", green),
                       ("blue", blue))
         for name, value in components:
@@ -448,7 +460,8 @@ class Tile(Enum):
         return member
 
 def parse_map(text: str) -> list[list[Tile]]:
-    return [[Tile(s) for s in line] for line in text.split()]
+    return [[Tile(s) for s in line]
+            for line in text.split()]
 
 field = parse_map("""
     ..~~..
@@ -513,7 +526,8 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
 
 @cache
 def tile(symbol: str) -> Tile:
-    time.sleep(0.1)  # Widen the window between miss and store
+    # Widen the window between miss and store
+    time.sleep(0.1)
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 
@@ -529,7 +543,8 @@ def gather(
         with lock:
             out.append(found)
 
-    threads = [threading.Thread(target=worker) for _ in range(4)]
+    threads = [threading.Thread(target=worker)
+               for _ in range(4)]
     for t in threads:
         t.start()
     for t in threads:

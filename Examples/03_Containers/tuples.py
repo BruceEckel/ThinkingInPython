@@ -6,7 +6,8 @@ empty = ()  # Empty tuple
 x, y = point  # Unpacking
 print(x, y)
 #: 3 4
-single = (42,)  # A one-element tuple needs the trailing comma
+# A one-element tuple needs the trailing comma
+single = (42,)
 print(len(single))
 #: 1
 print(tuple([1, 2, 3]))  # Converts a list to a tuple

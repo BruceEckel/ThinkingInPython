@@ -24,5 +24,6 @@ a = shallow_spawn("hydra")
 a.parts["heads"] = 1  # Cut off eight heads
 print(PROTOTYPES["hydra"].parts)  # The prototype changed
 #: {'heads': 1}
-print(shallow_spawn("hydra").parts)  # So does every later spawn
+# So does every later spawn
+print(shallow_spawn("hydra").parts)
 #: {'heads': 1}

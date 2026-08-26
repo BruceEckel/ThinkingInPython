@@ -15,7 +15,8 @@ def simplify(e: Expr) -> Expr:
                     return Num(a + b)
                 case _:
                     if lhs is left and rhs is right:
-                        return e  # Share the unchanged subtree
+                        # Share the unchanged subtree
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)

@@ -1,7 +1,8 @@
 # exercise_11.py
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
-from stateless import Depend, Need, as_type, need, run, supply
+from stateless import (Depend, Need, as_type, need,
+                       run, supply)
 
 @runtime_checkable
 class Screen(Protocol):

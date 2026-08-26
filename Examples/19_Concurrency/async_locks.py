@@ -9,7 +9,8 @@ async def increment(count: int) -> None:
     for _ in range(count):
         async with lock:
             value = counter  # Read
-            await asyncio.sleep(0)  # Yield to the event loop
+            # Yield to the event loop
+            await asyncio.sleep(0)
             counter = value + 1  # Write
 
 async def main() -> None:

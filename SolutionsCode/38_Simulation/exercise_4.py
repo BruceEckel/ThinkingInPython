@@ -1,6 +1,7 @@
 # exercise_4.py
 from typing import override
-from robot_world import Empty, GameBuilder, Item, Robot, Room
+from robot_world import (Empty, GameBuilder, Item,
+                         Robot, Room)
 
 class Coin(Item):
     symbol = "$"

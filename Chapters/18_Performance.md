@@ -268,9 +268,12 @@ as_list = list(range(n))
 as_set = set(as_list)
 target = n - 1  # Worst case: the last element in the list
 
-t_list = timeit.timeit(lambda: target in as_list, number=100)
+t_list = timeit.timeit(
+    lambda: target in as_list, number=100
+)
 t_set = timeit.timeit(lambda: target in as_set, number=100)
-report(list_scan=t_list, set_lookup=t_set, ratio=t_list / t_set)
+report(list_scan=t_list, set_lookup=t_set,
+       ratio=t_list / t_set)
 print(f"set at least 100x faster: {t_set * 100 < t_list}")
 #: set at least 100x faster: True
 ```
@@ -419,7 +422,8 @@ assert with_attribute_lookup() == with_hoisted_local()
 t_attr = timeit.timeit(with_attribute_lookup, number=100)
 t_local = timeit.timeit(with_hoisted_local, number=100)
 report(attribute_lookup=t_attr, hoisted_local=t_local)
-print(f"hoisting did not halve the time: {t_local * 2 > t_attr}")
+print(f"hoisting did not halve the time: "
+      f"{t_local * 2 > t_attr}")
 #: hoisting did not halve the time: True
 ```
 
@@ -583,7 +587,8 @@ so the negation trick is no longer necessary:
 import heapq
 
 max_nums = [5, 1, 8, 3, 2]
-heapq.heapify_max(max_nums)  # Rearrange into a max-heap in place
+# Rearrange into a max-heap in place
+heapq.heapify_max(max_nums)
 print(max_nums)
 #: [8, 3, 5, 1, 2]
 print(max_nums[0])  # The largest stays at the front
@@ -591,7 +596,8 @@ print(max_nums[0])  # The largest stays at the front
 heapq.heappush_max(max_nums, 9)
 print(max_nums)
 #: [9, 3, 8, 1, 2, 5]
-print(heapq.heappop_max(max_nums))  # Remove and return the largest
+# Remove and return the largest
+print(heapq.heappop_max(max_nums))
 #: 9
 print(max_nums)  # Heap ordering is maintained
 #: [8, 3, 5, 1, 2]
@@ -666,9 +672,9 @@ assert heap_min_extractions() == hash_min_extractions()
 t_heap = timeit.timeit(heap_min_extractions, number=50)
 t_hash = timeit.timeit(hash_min_extractions, number=50)
 report(heap=t_heap, repeated_min=t_hash)
-print(f"heap at least 10x faster than repeated min() on a set: "
+print(f"heap at least 10x faster than min() on a set: "
       f"{t_heap * 10 < t_hash}")
-#: heap at least 10x faster than repeated min() on a set: True
+#: heap at least 10x faster than min() on a set: True
 ```
 
 Each `min()` call on `remaining` walks the whole `set`,
@@ -728,8 +734,10 @@ tracemalloc.stop()
 
 print(eager, eager == lazy)
 #: [0, 4, 16, 36, 64] True
-report(eager_peak_bytes=eager_peak, lazy_peak_bytes=lazy_peak)
-print(f"lazy peak under 1% of eager: {lazy_peak * 100 < eager_peak}")
+report(eager_peak_bytes=eager_peak,
+       lazy_peak_bytes=lazy_peak)
+print(f"lazy peak under 1% of eager: "
+      f"{lazy_peak * 100 < eager_peak}")
 #: lazy peak under 1% of eager: True
 ```
 
@@ -895,9 +903,11 @@ with ignore(AttributeError):
     fp.z = 3  # type: ignore
 #: FrozenInstanceError("cannot assign to field 'z'")
 
-frozen_bytes = sys.getsizeof(fp) + sys.getsizeof(fp.__dict__)
+frozen_bytes = (sys.getsizeof(fp)
+                + sys.getsizeof(fp.__dict__))
 slotted_bytes = sys.getsizeof(FrozenSlottedPoint(1, 2))
-report(frozen_bytes=frozen_bytes, slotted_bytes=slotted_bytes)
+report(frozen_bytes=frozen_bytes,
+       slotted_bytes=slotted_bytes)
 print(f"slots at least 5x smaller: "
       f"{slotted_bytes * 5 < frozen_bytes}")
 #: slots at least 5x smaller: True
@@ -1007,8 +1017,8 @@ copied = big[:500_000]
 viewed = memoryview(big)[:500_000]
 report(copy_bytes=sys.getsizeof(copied),
        view_bytes=sys.getsizeof(viewed))
-print(f"view under 1% of copy: "
-      f"{sys.getsizeof(viewed) * 100 < sys.getsizeof(copied)}")
+under = sys.getsizeof(viewed) * 100 < sys.getsizeof(copied)
+print(f"view under 1% of copy: {under}")
 #: view under 1% of copy: True
 print(viewed.nbytes)
 #: 500000
@@ -1046,7 +1056,8 @@ def vectorized() -> np.ndarray:
 
 t_loop = timeit.timeit(pure_python, number=5)
 t_numpy = timeit.timeit(vectorized, number=5)
-report(python_loop=t_loop, numpy=t_numpy, ratio=t_loop / t_numpy)
+report(python_loop=t_loop, numpy=t_numpy,
+       ratio=t_loop / t_numpy)
 print(f"NumPy at least 3x faster: {t_numpy * 3 < t_loop}")
 #: NumPy at least 3x faster: True
 ```
@@ -1279,20 +1290,27 @@ def collatz_lengths(values: list[int]) -> list[int]:
 
 limit = 200_000
 assert fastcount.count_primes(limit) == count_primes(limit)
-t_python = timeit.timeit(lambda: count_primes(limit), number=1)
+t_python = timeit.timeit(
+    lambda: count_primes(limit), number=1
+)
 t_rust = timeit.timeit(
     lambda: fastcount.count_primes(limit), number=1
 )
-print(f"count_primes Rust speedup: {t_python / t_rust:.1f}x")
+print(f"count_primes Rust speedup: "
+      f"{t_python / t_rust:.1f}x")
 # Sample run: count_primes Rust speedup: 12.2x
 
 values = list(range(1, 50_000))
-assert fastcount.collatz_lengths(values) == collatz_lengths(values)
-t_python = timeit.timeit(lambda: collatz_lengths(values), number=1)
+assert (fastcount.collatz_lengths(values)
+        == collatz_lengths(values))
+t_python = timeit.timeit(
+    lambda: collatz_lengths(values), number=1
+)
 t_rust = timeit.timeit(
     lambda: fastcount.collatz_lengths(values), number=1
 )
-print(f"collatz_lengths Rust speedup: {t_python / t_rust:.1f}x")
+print(f"collatz_lengths Rust speedup: "
+      f"{t_python / t_rust:.1f}x")
 # Sample run: collatz_lengths Rust speedup: 34.3x
 ```
 

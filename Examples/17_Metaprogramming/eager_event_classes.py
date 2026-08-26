@@ -11,8 +11,8 @@ class Event:
 
 type EventMaker = Callable[[int, int], Event]
 NAMES: Final[tuple[str, ...]] = (
-    "ThermostatDay", "ThermostatNight", "LightOn", "LightOff",
-    "WaterOn", "WaterOff", "RingBell",
+    "ThermostatDay", "ThermostatNight", "LightOn",
+    "LightOff", "WaterOn", "WaterOff", "RingBell",
 )
 
 def make(name: str) -> EventMaker:

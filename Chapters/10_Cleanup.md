@@ -14,7 +14,8 @@ That looks like the place to release resources:
 from typing import ClassVar
 
 class Counter:
-    count: ClassVar[int] = 0  # Number of objects of this class
+    # Number of objects of this class
+    count: ClassVar[int] = 0
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -27,7 +28,8 @@ class Counter:
         if Counter.count == 0:
             print("Last Counter object deleted")
         else:
-            print(Counter.count, "Counter objects remaining")
+            print(Counter.count,
+                  "Counter objects remaining")
 
     def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"
@@ -344,8 +346,9 @@ from typing import ClassVar
 from weakref import WeakValueDictionary
 
 class Counter:
-    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
-        WeakValueDictionary())
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
 
     def __init__(self, name: str) -> None:
         self.name = name

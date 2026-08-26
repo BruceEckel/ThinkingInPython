@@ -7,8 +7,10 @@ Answer = NewType("Answer", str)
 Result = NewType("Result", str)
 
 def interview() -> Generator[Question, Answer, Result]:
-    name = yield Question("name")  # Ask the world for the name
-    town = yield Question("town")  # Ask the world for the town
+    # Ask the world for the name
+    name = yield Question("name")
+    # Ask the world for the town
+    town = yield Question("town")
     friend = yield Question("friend")  # Ask for a friend
     return Result(f"{name} of {town}, friend {friend}")
 

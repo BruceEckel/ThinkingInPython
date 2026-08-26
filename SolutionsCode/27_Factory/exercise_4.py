@@ -45,7 +45,9 @@ class ThinShapeFactory(ShapeAbstractFactory):
     def make_square(self) -> Shape:
         return Square("thin")
 
-def build_shapes(factory: ShapeAbstractFactory) -> list[Shape]:
+def build_shapes(
+    factory: ShapeAbstractFactory
+) -> list[Shape]:
     return [factory.make_circle(), factory.make_square()]
 
 for shape in build_shapes(ThickShapeFactory()):

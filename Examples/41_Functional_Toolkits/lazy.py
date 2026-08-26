@@ -4,7 +4,8 @@ from itertools import count, islice
 
 def squares() -> Iterator[int]:
     for n in count(1):
-        print(f"computing square {n}")  # Proves this runs on demand
+        # Proves this runs on demand
+        print(f"computing square {n}")
         yield n * n
 
 # count() is infinite; islice() pulls only what's needed:

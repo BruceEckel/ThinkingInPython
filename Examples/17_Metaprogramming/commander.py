@@ -7,15 +7,18 @@ from exceptions import ignore
 @dataclass
 class Command:
     label: str
-    KNOWN_COMMANDS: ClassVar[set[str]] = {"Start", "Stop", "Pause"}
+    KNOWN_COMMANDS: ClassVar[set[str]] = {
+        "Start", "Stop", "Pause"}
 
     def run(self) -> str:
         return f"Running {self.label}"
 
     @classmethod
-    def make_class(cls, class_name: str) -> Callable[[], Command]:
+    def make_class(
+        cls, class_name: str) -> Callable[[], Command]:
         if class_name not in cls.KNOWN_COMMANDS:
-            raise ValueError(f"Unknown command: {class_name!r}")
+            raise ValueError(
+                f"Unknown command: {class_name!r}")
         klass = f"""
 class {class_name}(Command):
     def __init__(self) -> None:
@@ -23,7 +26,8 @@ class {class_name}(Command):
 """
         namespace: dict[str, Any] = {"Command": Command}
         exec(klass, namespace)
-        return cast(Callable[[], Command], namespace[class_name])
+        return cast(Callable[[], Command],
+                    namespace[class_name])
 
 if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):

@@ -26,7 +26,8 @@ def machine() -> Generator[str, Event]:
             event = yield "COLLECTING"
         row = event.value  # Not a Coin, so a first Digit
         second = yield "SELECTING"
-        if isinstance(second, Coin):  # A coin instead of a digit
+        # A coin instead of a digit
+        if isinstance(second, Coin):
             amount += second.cents
             event = yield "COLLECTING"
             continue

@@ -11,7 +11,8 @@ from robot_world import (
 )
 
 def landing(room: Room, urge: Urge) -> Room | None:
-    "Where this door actually leads, or None if it's blocked."
+    ("Where this door actually leads, "
+     "or None if it's blocked.")
     next_room = room.doors.open(urge)
     if isinstance(next_room.occupant, (Wall, Edge)):
         return None

@@ -6,7 +6,8 @@ seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
-    obs.unsubscribe(once)  # Detaches itself mid-notification
+    # Detaches itself mid-notification
+    obs.unsubscribe(once)
 
 obs.subscribe(once)
 obs.subscribe(lambda d: seen.append(f"always: {d}"))

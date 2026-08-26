@@ -28,7 +28,8 @@ class Maze:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
         self.rows = [
-            r.ljust(self.width, self.Cell.WALL) for r in rows]
+            r.ljust(self.width, self.Cell.WALL)
+            for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
@@ -59,7 +60,8 @@ class Rat:
     async def run(self) -> None:
         while True:
             neighbors = [
-                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+                (self.x + dx, self.y + dy)
+                for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if await self.blackboard.claim(*pos)]
             if not moves:
@@ -72,13 +74,16 @@ class Rat:
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(init=False, default_factory=set)
+    visited: set[Coord] = field(init=False,
+                                default_factory=set)
     true_claims: int = field(init=False, default=0)
     group: asyncio.TaskGroup = field(init=False)
 
     async def claim(self, x: int, y: int) -> bool:
-        if self.maze.is_open(x, y) and (x, y) not in self.visited:
-            await asyncio.sleep(0)  # The gap: another rat can run
+        if (self.maze.is_open(x, y)
+            and (x, y) not in self.visited):
+            # The gap: another rat can run
+            await asyncio.sleep(0)
             self.visited.add((x, y))
             self.true_claims += 1
             return True

@@ -219,7 +219,8 @@ print(bin(~0b1100))  # NOT, inverts every bit
 #: -0b1101
 print(bin(1 << 4))  # Left shift, same as 1 * 2 ** 4
 #: 0b10000
-print(bin(0b110000 >> 2))  # Right shift, same as 48 // 2 ** 2
+# Right shift, same as 48 // 2 ** 2
+print(bin(0b110000 >> 2))
 #: 0b1100
 
 flags = 0
@@ -275,7 +276,8 @@ if not []:
     print("empty")  # An empty list is falsy
 #: empty
 
-name = "" or "default"  # 'or' returns the first truthy operand
+# 'or' returns the first truthy operand
+name = "" or "default"
 print(name)
 #: default
 count = 0
@@ -431,14 +433,16 @@ score = 91.5
 message: Template = t"{name} scored {score:.0f}%"
 print(message.strings)
 #: ('', ' scored ', '%')
-print([piece.expression for piece in message.interpolations])
+print([piece.expression
+       for piece in message.interpolations])
 #: ['name', 'score']
 
 def shout(template: Template) -> str:
     parts: list[str] = []
     for piece in template:
         if isinstance(piece, Interpolation):
-            parts.append(format(piece.value, piece.format_spec))
+            parts.append(
+                format(piece.value, piece.format_spec))
         else:
             parts.append(piece.upper())
     return "".join(parts)

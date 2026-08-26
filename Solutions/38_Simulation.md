@@ -27,7 +27,8 @@ class Rat:
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
         self.blackboard.log(
-            f"Rat {self.number} starts at {(self.x, self.y)}.")
+            f"Rat {self.number} starts at "
+            f"{(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:
@@ -63,14 +64,16 @@ class FakeBlackboard:
     def next_number(self) -> int:
         return 1
 
-# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that order.
-# Script the 2nd and 4th as open, the 1st and 3rd as walls/visited:
+# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that
+# order. Script the 2nd and 4th as open, the 1st and 3rd
+# as walls/visited:
 fake = FakeBlackboard([False, True, False, True])
 rat = Rat(fake, 0, 0)
 asyncio.run(rat.run())
 print(rat.x, rat.y)     # Kept the first successful claim
 #: 0 -1
-print(fake.spawned)     # Spawned down every claim after that
+# Spawned down every claim after that
+print(fake.spawned)
 #: [(1, 0)]
 ```
 
@@ -106,7 +109,8 @@ class Maze:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
         self.rows = [
-            r.ljust(self.width, self.Cell.WALL) for r in rows]
+            r.ljust(self.width, self.Cell.WALL)
+            for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
@@ -133,7 +137,8 @@ class Rat:
     async def run(self) -> None:
         while True:
             neighbors = [
-                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+                (self.x + dx, self.y + dy)
+                for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if self.blackboard.claim(*pos)]
             if not moves:
@@ -146,11 +151,13 @@ class Rat:
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(init=False, default_factory=set)
+    visited: set[Coord] = field(init=False,
+                                default_factory=set)
     group: asyncio.TaskGroup = field(init=False)
 
     def claim(self, x: int, y: int) -> bool:
-        if self.maze.is_open(x, y) and (x, y) not in self.visited:
+        if (self.maze.is_open(x, y)
+            and (x, y) not in self.visited):
             self.visited.add((x, y))
             return True
         return False
@@ -178,7 +185,8 @@ async def main() -> None:
     board = Blackboard(maze)
     await board.explore()
     all_open = {(x, y) for y in range(maze.height)
-                for x in range(maze.width) if maze.is_open(x, y)}
+                for x in range(maze.width)
+                if maze.is_open(x, y)}
     unreached = all_open - board.visited
     print(len(unreached), min(unreached), max(unreached))
 
@@ -245,7 +253,8 @@ class Maze:
         self.height = len(rows)
         self.width = max((len(r) for r in rows), default=0)
         self.rows = [
-            r.ljust(self.width, self.Cell.WALL) for r in rows]
+            r.ljust(self.width, self.Cell.WALL)
+            for r in rows]
 
     @classmethod
     def from_text(cls, text: str) -> Self:
@@ -276,7 +285,8 @@ class Rat:
     async def run(self) -> None:
         while True:
             neighbors = [
-                (self.x + dx, self.y + dy) for dx, dy in DIRECTIONS]
+                (self.x + dx, self.y + dy)
+                for dx, dy in DIRECTIONS]
             moves = [pos for pos in neighbors
                      if await self.blackboard.claim(*pos)]
             if not moves:
@@ -289,13 +299,16 @@ class Rat:
 @dataclass
 class Blackboard:
     maze: Maze
-    visited: set[Coord] = field(init=False, default_factory=set)
+    visited: set[Coord] = field(init=False,
+                                default_factory=set)
     true_claims: int = field(init=False, default=0)
     group: asyncio.TaskGroup = field(init=False)
 
     async def claim(self, x: int, y: int) -> bool:
-        if self.maze.is_open(x, y) and (x, y) not in self.visited:
-            await asyncio.sleep(0)  # The gap: another rat can run
+        if (self.maze.is_open(x, y)
+            and (x, y) not in self.visited):
+            # The gap: another rat can run
+            await asyncio.sleep(0)
             self.visited.add((x, y))
             self.true_claims += 1
             return True
@@ -382,11 +395,13 @@ class Item:
 
 class Robot(Item):
     symbol = "R"
-    room: Room  # Set by the builder when the robot is placed
+    # Set by the builder when the robot is placed
+    room: Room
 
     def __init__(self) -> None:
         self.finished = False
-        self.coins = 0  # Exercise 4: a place to count Coin pickups
+        # Exercise 4: a place to count Coin pickups
+        self.coins = 0
 
     def move(self, urge: Urge) -> None:
         self.room = self.room.doors.open(urge).enter(self)
@@ -429,7 +444,8 @@ class Edge(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        return robot.room  # The void outside the maze: stay put
+        # The void outside the maze: stay put
+        return robot.room
 
 class EndGame(Item):
     symbol = "!"
@@ -443,7 +459,8 @@ def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
         if symbol == item_type.symbol:
             return item_type()
-    return Teleport(symbol)  # Anything else is a teleport target
+    # Anything else is a teleport target
+    return Teleport(symbol)
 
 type Coord = tuple[int, int]
 type RoomMap = dict[Coord, Room]
@@ -522,7 +539,8 @@ class GameBuilder:
 ```python
 # exercise_4.py
 from typing import override
-from robot_world import Empty, GameBuilder, Item, Robot, Room
+from robot_world import (Empty, GameBuilder, Item,
+                         Robot, Room)
 
 class Coin(Item):
     symbol = "$"
@@ -567,7 +585,8 @@ from robot_world import (
 )
 
 def landing(room: Room, urge: Urge) -> Room | None:
-    "Where this door actually leads, or None if it's blocked."
+    ("Where this door actually leads, "
+     "or None if it's blocked.")
     next_room = room.doors.open(urge)
     if isinstance(next_room.occupant, (Wall, Edge)):
         return None
@@ -659,13 +678,16 @@ type Field = Callable[[float, float, Mode], float]
 def amplitude(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.cos(m * math.pi * x) * math.cos(n * math.pi * y)
-        - math.cos(n * math.pi * x) * math.cos(m * math.pi * y))
+        math.cos(m * math.pi * x)
+        * math.cos(n * math.pi * y)
+        - math.cos(n * math.pi * x)
+        * math.cos(m * math.pi * y))
 
 def membrane(x: float, y: float, mode: Mode) -> float:
     m, n = mode
     return abs(
-        math.sin(m * math.pi * x) * math.sin(n * math.pi * y))
+        math.sin(m * math.pi * x)
+        * math.sin(n * math.pi * y))
 
 def bounce(v: float) -> float:
     if v < 0.0:
@@ -703,7 +725,8 @@ class Plate:
             self.field(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60, height: int = 30) -> str:
+    def render(self, width: int = 60,
+               height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
         for g in self.grains:
@@ -730,7 +753,8 @@ before = [(g.x, g.y) for g in plate.grains]
 for _ in range(1200):
     plate.step()
 after = [(g.x, g.y) for g in plate.grains]
-print(f"agitation {plate.agitation():.3f}, moved {before != after}")
+print(f"agitation {plate.agitation():.3f}, "
+      f"moved {before != after}")
 #: agitation 0.000, moved False
 print(amplitude(0.37, 0.37, (1, 2)))
 #: 0.0
@@ -766,13 +790,15 @@ all share that one feature no matter which `(m, n)` produced them.
 # exercise_7.py
 from chladni import Plate, membrane
 
-plate = Plate(grains=2000, mode=(2, 3), seed=42, field=membrane)
+plate = Plate(grains=2000, mode=(2, 3), seed=42,
+              field=membrane)
 steps = 0
 for target in (0, 100, 400, 1200):
     for _ in range(target - steps):
         plate.step()
     steps = target
-    print(f"steps {target:4}: agitation {plate.agitation():.3f}")
+    print(f"steps {target:4}: "
+          f"agitation {plate.agitation():.3f}")
 #: steps    0: agitation 0.406
 #: steps  100: agitation 0.100
 #: steps  400: agitation 0.014

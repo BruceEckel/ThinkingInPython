@@ -19,7 +19,8 @@ class RecordingBlackboard(Blackboard):
             self.order.append((x, y))
         return claimed
 
-def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
+def show(layout: str = "amaze.txt",
+         step_ms: int = 60) -> None:
     maze = Maze.from_file(layout)
     board = RecordingBlackboard(maze)
     asyncio.run(board.explore())
@@ -33,12 +34,15 @@ def show(layout: str = "amaze.txt", step_ms: int = 60) -> None:
 
     def box(x: int, y: int, color: str) -> None:
         canvas.create_rectangle(
-            x * CELL, y * CELL, (x + 1) * CELL, (y + 1) * CELL,
+            x * CELL, y * CELL,
+            (x + 1) * CELL, (y + 1) * CELL,
             fill=color, outline="gray")
 
     for y in range(maze.height):
         for x in range(maze.width):
-            box(x, y, "white" if maze.is_open(x, y) else "dimgray")
+            box(x, y,
+                "white" if maze.is_open(x, y)
+                else "dimgray")
 
     cells = iter(board.order)
 

@@ -1,7 +1,8 @@
 # lambda_decoration.py
 from collections.abc import Callable
 
-def report(func: Callable[[int], int]) -> Callable[[int], int]:
+def report(
+        func: Callable[[int], int]) -> Callable[[int], int]:
     def wrapper(n: int) -> int:
         print(f"Calling {func.__name__} with {n}")  # type: ignore
         return func(n)

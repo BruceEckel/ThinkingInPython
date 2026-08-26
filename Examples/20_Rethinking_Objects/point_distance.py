@@ -8,15 +8,18 @@ class Point:
     y: float
 
     def distance_to(self, other: Point) -> float:  # Method
-        return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
+        return sqrt((other.x - self.x) ** 2
+                    + (other.y - self.y) ** 2)
 
 def distance(a: Point, b: Point) -> float:  # Free function
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
 if __name__ == "__main__":
-    p1, p2 = Point(3, 0), Point(0, 4)  # A 3-4-5 right triangle
+    # A 3-4-5 right triangle
+    p1, p2 = Point(3, 0), Point(0, 4)
     print(p1.distance_to(p2))
-    print(Point.distance_to(p1, p2))  # The method, as a function
+    # The method, as a function
+    print(Point.distance_to(p1, p2))
     print(distance(p1, p2))
 #: 5.0
 #: 5.0

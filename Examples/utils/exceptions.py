@@ -1,7 +1,8 @@
 # utils/exceptions.py
 
 ALL = sentinel("ALL")
-type Types = type[BaseException] | tuple[type[BaseException], ...]
+type Types = (type[BaseException]
+              | tuple[type[BaseException], ...])
 
 class ignore:
     def __init__(self, types: Types | ALL = ALL) -> None:
@@ -11,7 +12,8 @@ class ignore:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
+                 exc: BaseException | None,
+                 tb: object) -> bool:
         if exc_type is None:
             return False
         if self.types is not ALL:

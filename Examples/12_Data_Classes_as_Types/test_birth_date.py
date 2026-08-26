@@ -12,7 +12,8 @@ def test_valid_date() -> None:
     (4, 31),  # April has 30
     (9, 31),  # September has 30
 ])
-def test_day_out_of_range_for_month(month_n: int, day_n: int) -> None:
+def test_day_out_of_range_for_month(month_n: int,
+                                    day_n: int) -> None:
     with pytest.raises(TypeFailure):
         BirthDate(Month.of(month_n), Day(day_n), Year(2020))
 

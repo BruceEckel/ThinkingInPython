@@ -9,7 +9,8 @@ class Color:
     green: int
     blue: int
 
-    def __new__(cls, red: int, green: int, blue: int) -> Color:
+    def __new__(cls, red: int, green: int,
+                blue: int) -> Color:
         key: RGB = (red, green, blue)
         cached: Color | None = cls._pool.get(key)
         if cached is not None:

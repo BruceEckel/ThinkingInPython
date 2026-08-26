@@ -1,8 +1,9 @@
 # metaclass_layout_conflict.py
 from typing import Any
-from exceptions import ignore
 
-with ignore(TypeError):
+try:
     class Singleton(type, dict[type, Any]):  # type: ignore
         pass
-#: TypeError('multiple bases have instance lay-out conflict')
+except TypeError as e:
+    print(e)
+#: multiple bases have instance lay-out conflict

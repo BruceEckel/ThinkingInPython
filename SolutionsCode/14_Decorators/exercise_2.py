@@ -18,8 +18,9 @@ def timing[**P, R](func: Callable[P, R]) -> Callable[P, R]:
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        # elapsed differs every run: print a fixed message plus a
-        # deterministic check, not the raw, ever-changing number.
+        # elapsed differs every run: print a fixed
+        # message plus a deterministic check, not the
+        # raw, ever-changing number.
         ok = elapsed >= 0
         name = func.__name__  # type: ignore
         print(f"{name} timed, non-negative: {ok}")

@@ -1,5 +1,6 @@
 # chain.py
-from algorithms import Fn, RootFinder, bisection, newton, secant
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
 
 def solve(f: Fn, a: float, b: float,
           chain: list[RootFinder]) -> float | None:
@@ -17,7 +18,7 @@ chain: list[RootFinder] = [bisection, secant, newton]
 r1 = solve(f, 0.0, 2.0, chain)
 print(f"{r1:.6f}" if r1 is not None else "no root")
 #: 1.414214
-# [1.0, 1.3] does not bracket it; bisection fails, secant finds it:
+# No bracket in [1.0, 1.3]: bisection fails, secant works:
 print(bisection(f, 1.0, 1.3))
 #: None
 r2 = solve(f, 1.0, 1.3, chain)

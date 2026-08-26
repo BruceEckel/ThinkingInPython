@@ -46,7 +46,8 @@ class Shape:
             case "Square":
                 return Square()
             case _:
-                raise ValueError(f"Bad shape creation: {kind}")
+                raise ValueError(
+                    f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -66,7 +67,8 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)  # Reproducible shape sequence
-    shapes = [Shape.factory(kind) for kind in shape_name_gen(4)]
+    shapes = [Shape.factory(kind)
+              for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
@@ -320,7 +322,8 @@ def shape_name_gen(n: int) -> Iterator[str]:
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [create_shape(kind) for kind in shape_name_gen(4)]
+    shapes = [create_shape(kind)
+              for kind in shape_name_gen(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
@@ -525,7 +528,8 @@ class BrokenFactory:
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
-# GameEnvironment(BrokenFactory())  # ty: invalid-argument-type
+# ty: invalid-argument-type:
+# GameEnvironment(BrokenFactory())
 g1.play()
 #: Kitty has encountered a Puzzle
 g2.play()
@@ -573,13 +577,13 @@ class Monster:
 goblin = Monster("Goblin", hp=10, powers=["bite"])
 # Build a variant by cloning and adjusting, not rebuilding:
 captain = goblin.clone()
-captain.name = "Goblin Captain"
+captain.name = "Captain"
 captain.hp = 20
 captain.powers.append("rally")
 print(goblin)
 #: Monster(name='Goblin', hp=10, powers=['bite'])
 print(captain)
-#: Monster(name='Goblin Captain', hp=20, powers=['bite', 'rally'])
+#: Monster(name='Captain', hp=20, powers=['bite', 'rally'])
 shallow = copy.copy(goblin)
 shallow.powers.append("shared")
 print(goblin.powers)  # The original changed too
@@ -612,7 +616,8 @@ class Monster:
 
 PROTOTYPES: Final[dict[str, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"]),
-    "troll": Monster("Troll", hp=40, powers=["smash", "regenerate"]),
+    "troll": Monster("Troll", hp=40,
+                     powers=["smash", "regen"]),
 }
 
 def spawn(kind: str) -> Monster:
@@ -625,7 +630,7 @@ if __name__ == "__main__":
     print(a.hp, b.hp)  # The copies are independent
     print(spawn("troll"))
 #: 10 5
-#: Monster(name='Troll', hp=40, powers=['smash', 'regenerate'])
+#: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
 ```
 
 `spawn()` returns an independent object every time,

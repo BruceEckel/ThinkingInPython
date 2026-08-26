@@ -30,5 +30,6 @@ class Library:
 
 STOCKS: Final[Wire] = Wire("stock market rising")
 WEATHER: Final[Wire] = Wire("mild and cloudy")
-SHELF: Final[Library] = Library({"stock market": "a history"})
+SHELF: Final[Library] = Library(
+    {"stock market": "a history"})
 LONG: Final[Library] = Library({"genome": "chapter " * 40})

@@ -8,12 +8,12 @@ class Mixin:
 class Base(type, Mixin):
     pass
 
-class Derived(metaclass=Base):
+class Sub(metaclass=Base):
     pass
 
-print(Derived.helper())
+print(Sub.helper())
 #: hi
 
 with ignore(AttributeError):  # A metamethod: class only
-    Derived().helper()  # type: ignore
-#: AttributeError("'Derived' object has no attribute 'helper'")
+    Sub().helper()  # type: ignore
+#: AttributeError("'Sub' object has no attribute 'helper'")

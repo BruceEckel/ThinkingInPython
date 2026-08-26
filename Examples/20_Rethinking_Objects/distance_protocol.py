@@ -23,7 +23,8 @@ class Pair:  # Suppose you are handed this, with no x or y
     b: float
 
 @dataclass(frozen=True)
-class PairCoord:  # Adapter: uses composition, not inheritance
+# Adapter: uses composition, not inheritance
+class PairCoord:
     pair: Pair
 
     @property
@@ -36,6 +37,7 @@ class PairCoord:  # Adapter: uses composition, not inheritance
 
 if __name__ == "__main__":
     print(distance(Point(3, 0), Point(0, 4)))
-    print(distance(PairCoord(Pair(3, 0)), PairCoord(Pair(0, 4))))
+    print(distance(PairCoord(Pair(3, 0)),
+                   PairCoord(Pair(0, 4))))
 #: 5.0
 #: 5.0

@@ -1,7 +1,9 @@
 # multiprocessing_raw.py
 import multiprocessing as mp
 
-def cpu_price(order: int, results: mp.Queue[tuple[int, int]]) -> None:
+def cpu_price(
+    order: int, results: mp.Queue[tuple[int, int]]
+) -> None:
     total = 0
     for _ in range(1_000_000):  # Processor work
         total += 1

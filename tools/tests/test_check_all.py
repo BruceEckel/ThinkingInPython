@@ -91,7 +91,7 @@ def test_main_reports_and_exits_one(
     (tmp_path / "ch.md").write_text(DIRTY, encoding="utf-8")
     assert main(["--paths", str(tmp_path)]) == 1
     out = capsys.readouterr().out
-    assert "4 issue(s) in 1 file(s) from 7 check(s)." in out
+    assert "4 issue(s) in 1 file(s) from 8 check(s)." in out
 
 def test_main_clean_exits_zero(
     tmp_path: Path, capsys: pytest.CaptureFixture[str],

@@ -10,12 +10,14 @@ def test_notify_calls_every_subscriber() -> None:
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable[str]().notify("anything")  # Must not raise anything
+    # Must not raise anything
+    Observable[str]().notify("anything")
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     obs = Observable[object]()
-    record = received.append  # A bound method: equal, not identical
+    # A bound method: equal, not identical
+    record = received.append
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)

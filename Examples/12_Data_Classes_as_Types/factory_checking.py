@@ -3,11 +3,13 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Unchecked:
-    data: dict[str, str] = field(default_factory=set)  # A set
+    # A set
+    data: dict[str, str] = field(default_factory=set)
 
 @dataclass
 class Checked:
-    data: dict[str, str] = field(default_factory=dict[str, str])
+    data: dict[str, str] = field(
+        default_factory=dict[str, str])
 
 print(type(Unchecked().data).__name__)
 #: set

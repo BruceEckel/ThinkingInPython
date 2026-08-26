@@ -1,5 +1,6 @@
 # strategy.py
-from algorithms import Fn, RootFinder, bisection, newton, secant
+from algorithms import (Fn, RootFinder, bisection,
+                        newton, secant)
 
 def solve(f: Fn, a: float, b: float,
           finder: RootFinder) -> float | None:

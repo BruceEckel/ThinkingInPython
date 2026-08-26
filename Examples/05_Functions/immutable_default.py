@@ -1,6 +1,7 @@
 # immutable_default.py
 
-def show(items=()):  # An empty tuple is safe: it can't be mutated
+# An empty tuple is safe: it can't be mutated
+def show(items=()):
     for item in items:
         print(item)
     print(f"({len(items)} items)")

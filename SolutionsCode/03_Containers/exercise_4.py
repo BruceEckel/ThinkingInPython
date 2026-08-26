@@ -4,6 +4,6 @@ try:
     groups.add([1, 2])
 except TypeError as e:
     print(type(e).__name__)
-    print(e)
+    print(str(e).partition(" (")[0])
 #: TypeError
-#: cannot use 'list' as a set element (unhashable type: 'list')
+#: cannot use 'list' as a set element

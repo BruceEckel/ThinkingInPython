@@ -10,7 +10,8 @@ class Color:
     green: int
     blue: int
 
-_pool: WeakValueDictionary[RGB, Color] = WeakValueDictionary()
+_pool: WeakValueDictionary[RGB, Color] = (
+    WeakValueDictionary())
 
 def make_color(red: int, green: int, blue: int) -> Color:
     key = (red, green, blue)

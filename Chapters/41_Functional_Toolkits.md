@@ -213,7 +213,9 @@ so introspection still sees the original.
 from collections.abc import Callable
 from functools import wraps
 
-def trace(func: Callable[[str], str]) -> Callable[[str], str]:
+def trace(
+    func: Callable[[str], str]
+) -> Callable[[str], str]:
     @wraps(func)
     def wrapper(name: str) -> str:
         return func(name)
@@ -269,7 +271,8 @@ class Weight:
         self.kg = kg
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Weight) and self.kg == other.kg
+        return (isinstance(other, Weight)
+                and self.kg == other.kg)
 
     def __lt__(self, other: Weight) -> bool:
         return self.kg < other.kg
@@ -584,7 +587,8 @@ print(list(zip_longest([1, 2, 3], [4, 5])))
 #: [(1, 4), (2, 5), (3, None)]
 
 MISSING = sentinel("MISSING")
-print(list(zip_longest([1, 2, 3], [4, 5], fillvalue=MISSING)))
+print(list(zip_longest([1, 2, 3], [4, 5],
+                       fillvalue=MISSING)))
 #: [(1, 4), (2, 5), (3, MISSING)]
 ```
 
@@ -748,7 +752,8 @@ from itertools import count, islice
 
 def squares() -> Iterator[int]:
     for n in count(1):
-        print(f"computing square {n}")  # Proves this runs on demand
+        # Proves this runs on demand
+        print(f"computing square {n}")
         yield n * n
 
 # count() is infinite; islice() pulls only what's needed:
@@ -841,7 +846,8 @@ def deep_sum(items: list[Nested]) -> int:
     total = 0
     for item in items:
         if isinstance(item, list):
-            total += deep_sum(item)  # Recurse into a sublist
+            # Recurse into a sublist
+            total += deep_sum(item)
         else:
             total += item  # A plain number
     return total
@@ -909,7 +915,8 @@ def group_rounds(
     rng = random.Random(seed)
 
     def met(group: list[str], candidate: str) -> int:
-        return sum(history[frozenset((m, candidate))] for m in group)
+        return sum(history[frozenset((m, candidate))]
+                   for m in group)
 
     while True:
         pool = list(students)
@@ -919,14 +926,18 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                closest = min(pool, key=lambda c: met(group, c))
+                closest = min(pool,
+                              key=lambda c: met(group, c))
                 pool.remove(closest)
                 group.append(closest)
             groups.append(group)
-        if pool and not groups:  # Roster smaller than one group
+        # Roster smaller than one group
+        if pool and not groups:
             groups.append([])
-        for extra in pool:  # Too few left for a full group of `size`
-            roomiest = min(groups, key=lambda g: met(g, extra))
+        # Too few left for a full group of `size`
+        for extra in pool:
+            roomiest = min(groups,
+                           key=lambda g: met(g, extra))
             roomiest.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:
@@ -935,7 +946,8 @@ def group_rounds(
         yield round_result
 
 students = ["Ana", "Bo", "Cy", "Di", "Eve", "Fi", "Gia"]
-rounds = list(islice(group_rounds(students, 2), len(students)))
+rounds = list(islice(group_rounds(students, 2),
+                     len(students)))
 for i, grouping in enumerate(rounds[:3]):
     print(i, grouping)
 #: 0 [('Gia', 'Eve', 'Ana'), ('Di', 'Cy'), ('Fi', 'Bo')]
@@ -946,7 +958,8 @@ meetings = [frozenset(pair) for r in rounds for group in r
             for pair in combinations(group, 2)]
 possible = set(map(frozenset, combinations(students, 2)))
 distinct = set(meetings)
-print(len(distinct), "of", len(possible), "pairs met at least once")
+print(len(distinct), "of", len(possible),
+      "pairs met at least once")
 #: 21 of 21 pairs met at least once
 print(len(meetings) - len(distinct), "repeat meetings")
 #: 14 repeat meetings
@@ -958,7 +971,8 @@ for i, grouping in enumerate(trios):
 #: 1 [('Di', 'Eve', 'Bo', 'Gia'), ('Cy', 'Ana', 'Fi')]
 #: 2 [('Eve', 'Ana', 'Gia'), ('Bo', 'Fi', 'Di', 'Cy')]
 
-print(next(group_rounds(["Ana", "Bo"], 5)))  # Fewer than `size`
+# Fewer than `size`
+print(next(group_rounds(["Ana", "Bo"], 5)))
 #: [('Ana', 'Bo')]
 ```
 

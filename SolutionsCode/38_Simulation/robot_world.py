@@ -19,11 +19,13 @@ class Item:
 
 class Robot(Item):
     symbol = "R"
-    room: Room  # Set by the builder when the robot is placed
+    # Set by the builder when the robot is placed
+    room: Room
 
     def __init__(self) -> None:
         self.finished = False
-        self.coins = 0  # Exercise 4: a place to count Coin pickups
+        # Exercise 4: a place to count Coin pickups
+        self.coins = 0
 
     def move(self, urge: Urge) -> None:
         self.room = self.room.doors.open(urge).enter(self)
@@ -66,7 +68,8 @@ class Edge(Item):
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
-        return robot.room  # The void outside the maze: stay put
+        # The void outside the maze: stay put
+        return robot.room
 
 class EndGame(Item):
     symbol = "!"
@@ -80,7 +83,8 @@ def item_factory(symbol: str) -> Item:
     for item_type in Item.__subclasses__():
         if symbol == item_type.symbol:
             return item_type()
-    return Teleport(symbol)  # Anything else is a teleport target
+    # Anything else is a teleport target
+    return Teleport(symbol)
 
 type Coord = tuple[int, int]
 type RoomMap = dict[Coord, Room]

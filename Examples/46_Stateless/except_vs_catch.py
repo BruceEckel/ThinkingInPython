@@ -11,7 +11,8 @@ def guarded(name: str) -> Try[KeyError, str]:
     return f"{name}: {value}"
 
 def moved(name: str) -> Success[str]:
-    value: int | KeyError = yield from catch(KeyError)(score)(name)
+    value: int | KeyError = yield from (
+        catch(KeyError)(score)(name))
     match value:
         case KeyError():
             return f"{name}: unknown"

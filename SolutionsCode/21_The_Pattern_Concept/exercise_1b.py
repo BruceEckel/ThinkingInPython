@@ -17,7 +17,8 @@ def render(rows: list[Row], style: str) -> str:
     return "\n".join(line(r) for r in rows)
 
 STYLES["json"] = (
-    lambda r: f'{{"name": "{r.name}", "amount": {r.amount}}}'
+    lambda r: f'{{"name": "{r.name}", '
+              f'"amount": {r.amount}}}'
 )
 rows = [Row("pens", 3), Row("paper", 7)]
 print(render(rows, "json"))

@@ -22,7 +22,8 @@ class Shape:
             case "Triangle":
                 return Triangle()
             case _:
-                raise ValueError(f"Bad shape creation: {kind}")
+                raise ValueError(
+                    f"Bad shape creation: {kind}")
 
 class Circle(Shape):
     @override
@@ -211,7 +212,9 @@ class ThinShapeFactory(ShapeAbstractFactory):
     def make_square(self) -> Shape:
         return Square("thin")
 
-def build_shapes(factory: ShapeAbstractFactory) -> list[Shape]:
+def build_shapes(
+    factory: ShapeAbstractFactory
+) -> list[Shape]:
     return [factory.make_circle(), factory.make_square()]
 
 for shape in build_shapes(ThickShapeFactory()):
@@ -242,7 +245,7 @@ from typing import Self
 
 @dataclass(frozen=True)
 class Pizza:
-    size: int = 12
+    size: int = 9
     cheese: bool = True
     toppings: tuple[str, ...] = ()
 
@@ -259,7 +262,7 @@ except ValueError as e:
 
 class PizzaBuilder:
     def __init__(self) -> None:
-        self._size = 12
+        self._size = 9
         self._toppings: list[str] = []
 
     def topping(self, name: str) -> Self:
@@ -270,7 +273,8 @@ class PizzaBuilder:
         return self
 
     def build(self) -> Pizza:
-        return Pizza(self._size, True, tuple(self._toppings))
+        return Pizza(self._size, True,
+                     tuple(self._toppings))
 
 pb = (
     PizzaBuilder().topping("a").topping("b")
@@ -282,7 +286,7 @@ except ValueError as e:
     print("builder rejected:", e)
 #: builder rejected: a pizza may carry at most four toppings
 print(pb.build())
-#: Pizza(size=12, cheese=True, toppings=('a', 'b', 'c', 'd'))
+#: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))
 ```
 
 In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
@@ -405,7 +409,8 @@ a = shallow_spawn("hydra")
 a.parts["heads"] = 1  # Cut off eight heads
 print(PROTOTYPES["hydra"].parts)  # The prototype changed
 #: {'heads': 1}
-print(shallow_spawn("hydra").parts)  # So does every later spawn
+# So does every later spawn
+print(shallow_spawn("hydra").parts)
 #: {'heads': 1}
 ```
 

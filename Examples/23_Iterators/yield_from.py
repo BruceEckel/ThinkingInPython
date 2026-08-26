@@ -8,7 +8,8 @@ def flatten_loop(nested: Sequence[Nested]) -> Iterator[int]:
         if isinstance(item, int):
             yield item
         else:
-            for x in flatten_loop(item):  # Spelled out  # noqa: UP028
+            # Spelled out
+            for x in flatten_loop(item):  # noqa: UP028
                 yield x
 
 def flatten(nested: Sequence[Nested]) -> Iterator[int]:
@@ -16,7 +17,8 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         if isinstance(item, int):
             yield item
         else:
-            yield from flatten(item)  # The same loop, delegated
+            # The same loop, delegated
+            yield from flatten(item)
 
 data: Sequence[Nested] = [1, [2, 3], [4, [5, 6]], 7]
 print(list(flatten_loop(data)))

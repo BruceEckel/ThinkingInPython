@@ -19,7 +19,8 @@ def report(readings: Sequence[Reading]) -> list[str]:
     return [f"{r.sensor} {r.celsius:.1f}"
             for r in map(to_fahrenheit, warm)]
 
-data = [Reading("a", 18.0), Reading("b", 25.0), Reading("c", 30.5)]
+data = [Reading("a", 18.0), Reading("b", 25.0),
+        Reading("c", 30.5)]
 print(report(data))
 #: ['b 77.0', 'c 86.9']
 print(data[0])

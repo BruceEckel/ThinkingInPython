@@ -140,7 +140,9 @@ from iterators import Countdown, fibonacci, total
     (0, []),
     (1, [0]),
 ])
-def test_fibonacci_sequence(n: int, expected: list[int]) -> None:
+def test_fibonacci_sequence(
+    n: int, expected: list[int]
+) -> None:
     assert list(fibonacci(n)) == expected
 
 def test_countdown_sequence() -> None:
@@ -150,7 +152,8 @@ def test_countdown_sequence() -> None:
 def test_countdown_is_reiterable() -> None:
     c = Countdown(3)
     assert list(c) == [3, 2, 1]
-    assert list(c) == [3, 2, 1]  # __iter__ yields a fresh generator
+    # __iter__ yields a fresh generator
+    assert list(c) == [3, 2, 1]
 
 def test_total_over_any_iterable() -> None:
     assert total([1, 2, 3, 4]) == 10
@@ -256,12 +259,16 @@ def gen(n: int) -> Iterator[int]:
 def twice_iterable(xs: Iterable[int]) -> tuple[int, int]:
     return sum(xs), sum(xs)
 
-def twice_collection(xs: Collection[int]) -> tuple[int, int]:
+def twice_collection(
+    xs: Collection[int]
+) -> tuple[int, int]:
     return sum(xs), sum(xs)
 
-print(twice_iterable(gen(3)))  # Type checker sees nothing wrong
+# Type checker sees nothing wrong
+print(twice_iterable(gen(3)))
 #: (3, 0)
-print(twice_collection([0, 1, 2]))  # The same values, in a list
+# The same values, in a list
+print(twice_collection([0, 1, 2]))
 #: (3, 3)
 ```
 
@@ -289,7 +296,8 @@ from benchmark import report
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
 
-a, b = tee(squares(5))  # Two independent readers, one source
+# Two independent readers, one source
+a, b = tee(squares(5))
 print(list(a), list(b))
 #: [0, 1, 4, 9, 16] [0, 1, 4, 9, 16]
 
@@ -306,7 +314,8 @@ collected = list(squares(N))
 listed, _ = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 report(tee_bytes=buffered, list_bytes=listed)
-print(f"tee held as much as the list: {buffered > listed * 0.9}")
+print(f"tee held as much as the list: "
+      f"{buffered > listed * 0.9}")
 #: tee held as much as the list: True
 ```
 
@@ -344,7 +353,8 @@ def flatten_loop(nested: Sequence[Nested]) -> Iterator[int]:
         if isinstance(item, int):
             yield item
         else:
-            for x in flatten_loop(item):  # Spelled out  # noqa: UP028
+            # Spelled out
+            for x in flatten_loop(item):  # noqa: UP028
                 yield x
 
 def flatten(nested: Sequence[Nested]) -> Iterator[int]:
@@ -352,7 +362,8 @@ def flatten(nested: Sequence[Nested]) -> Iterator[int]:
         if isinstance(item, int):
             yield item
         else:
-            yield from flatten(item)  # The same loop, delegated
+            # The same loop, delegated
+            yield from flatten(item)
 
 data: Sequence[Nested] = [1, [2, 3], [4, [5, 6]], 7]
 print(list(flatten_loop(data)))
@@ -391,7 +402,8 @@ from yield_from import Nested, flatten, flatten_loop
 
 type Flattener = Callable[[Sequence[Nested]], Iterator[int]]
 
-@pytest.mark.parametrize("flatten_with", [flatten, flatten_loop])
+@pytest.mark.parametrize("flatten_with",
+                         [flatten, flatten_loop])
 @pytest.mark.parametrize("nested, expected", [
     ([1, [2, 3], [4, [5, 6]], 7], [1, 2, 3, 4, 5, 6, 7]),
     ([1, 2, 3], [1, 2, 3]),
@@ -424,7 +436,8 @@ print(list(islice(odd_squares, 5)))  # Take the first five
 #: [1, 9, 25, 49, 81]
 
 # takewhile() stops when its condition fails:
-print(list(takewhile(lambda s: s < 50, (n * n for n in count(1)))))
+print(list(takewhile(lambda s: s < 50,
+                     (n * n for n in count(1)))))
 #: [1, 4, 9, 16, 25, 36, 49]
 ```
 
@@ -464,7 +477,8 @@ class Tripwire(Exception):
 def counter(limit: int) -> Iterator[int]:
     for n in count(1):
         if n > limit:
-            raise Tripwire(f"pulled {limit} values and kept asking")
+            raise Tripwire(
+                f"pulled {limit} values and kept asking")
         yield n
 
 def test_list_of_an_endless_source_never_returns() -> None:
@@ -477,7 +491,8 @@ def test_the_if_clause_skips_but_never_stops() -> None:
         list(small)
 
 def test_takewhile_stops_at_the_first_failure() -> None:
-    assert list(takewhile(lambda n: n < 3, counter(LIMIT))) == [1, 2]
+    assert list(takewhile(lambda n: n < 3,
+                          counter(LIMIT))) == [1, 2]
 
 def test_islice_stops_after_its_count() -> None:
     assert list(islice(counter(LIMIT), 3)) == [1, 2, 3]
@@ -550,11 +565,14 @@ A generator wraps an iterator just as well, and in fewer lines:
 # typed_generator.py
 from collections.abc import Iterable, Iterator
 
-def typed[T](it: Iterable[object], expected: type[T]) -> Iterator[T]:
+def typed[T](
+    it: Iterable[object], expected: type[T]
+) -> Iterator[T]:
     for obj in it:
         if not isinstance(obj, expected):
             raise TypeError(
-                f"expected {expected}, got {type(obj).__name__}")
+                f"expected {expected}, "
+                f"got {type(obj).__name__}")
         yield obj
 
 if __name__ == "__main__":
@@ -588,7 +606,8 @@ def test_typed_generator_passes_and_rejects() -> None:
         list(typed([1, "two", 3], int))
 
 def test_typed_iterator_passes_and_rejects() -> None:
-    assert list(TypedIterator(iter([1, 2, 3]), int)) == [1, 2, 3]
+    assert list(TypedIterator(iter([1, 2, 3]),
+                              int)) == [1, 2, 3]
     with pytest.raises(TypeError):
         list(TypedIterator(iter([1, "two"]), int))
 ```
@@ -627,7 +646,8 @@ class GoFIterator[T](Protocol):
 class OverStream[T]:
     def __init__(self, source: Iterable[T]) -> None:
         self.source: Iterator[T] = iter(source)
-        self.seen: list[T] = []  # Every item the traversal has read
+        # Every item the traversal has read
+        self.seen: list[T] = []
         self.index = 0
 
     def first(self) -> None:
@@ -658,7 +678,8 @@ stream = OverStream(x * 2 for x in [1, 2, 3])
 print(traverse(stream))
 #: [2, 4, 6]
 stream.first()
-print(traverse(stream))  # A second pass, from a spent generator
+# A second pass, from a spent generator
+print(traverse(stream))
 #: [2, 4, 6]
 print(stream.seen)
 #: [2, 4, 6]

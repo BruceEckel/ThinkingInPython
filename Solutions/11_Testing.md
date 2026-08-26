@@ -7,8 +7,10 @@
 import pytest
 
 class InsufficientFunds(Exception):
-    def __init__(self, balance: float, amount: float) -> None:
-        super().__init__(f"balance {balance} is less than {amount}")
+    def __init__(self, balance: float,
+                 amount: float) -> None:
+        super().__init__(
+            f"balance {balance} is less than {amount}")
 
 class Account:
     def __init__(self, balance: float = 0.0) -> None:
@@ -24,7 +26,8 @@ class Account:
             raise InsufficientFunds(self.balance, amount)
         self.balance -= amount
 
-    def transfer(self, other: Account, amount: float) -> None:
+    def transfer(self, other: Account,
+                 amount: float) -> None:
         self.withdraw(amount)
         other.deposit(amount)
 
@@ -84,7 +87,8 @@ def funded() -> Account:
     return account
 
 @pytest.mark.parametrize("rate", [0.0, 0.05, 0.5, 1.0])
-def test_add_interest_rates(funded: Account, rate: float) -> None:
+def test_add_interest_rates(funded: Account,
+                            rate: float) -> None:
     funded.add_interest(rate)
     assert funded.balance == pytest.approx(100 * (1 + rate))
 ```
@@ -106,8 +110,10 @@ needs the tolerance.
 import pytest
 
 class InsufficientFunds(Exception):
-    def __init__(self, balance: float, amount: float) -> None:
-        super().__init__(f"balance {balance} is less than {amount}")
+    def __init__(self, balance: float,
+                 amount: float) -> None:
+        super().__init__(
+            f"balance {balance} is less than {amount}")
 
 class Account:
     def __init__(self, balance: float = 0.0) -> None:
@@ -173,9 +179,12 @@ def test_settings_path_reads_the_environment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("APP_CONFIG", str(tmp_path))
-    assert settings.settings_path() == tmp_path / "settings.ini"
+    assert (settings.settings_path()
+            == tmp_path / "settings.ini")
 
-def test_settings_path_in_takes_the_directory(tmp_path: Path) -> None:
+def test_settings_path_in_takes_the_directory(
+    tmp_path: Path,
+) -> None:
     expected = tmp_path / "settings.ini"
     assert settings.settings_path_in(tmp_path) == expected
 ```
@@ -231,7 +240,8 @@ def test_patched(monkeypatch: pytest.MonkeyPatch) -> None:
     assert ch11_weather.current_temp("denver") == "21C"
 
 def test_injected() -> None:
-    got = ch11_weather.current_temp_with("denver", fake_fetch)
+    got = ch11_weather.current_temp_with(
+        "denver", fake_fetch)
     assert got == "21C"
 ```
 

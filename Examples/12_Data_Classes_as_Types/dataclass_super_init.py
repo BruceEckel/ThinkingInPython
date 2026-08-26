@@ -12,7 +12,8 @@ class Logged(Connection):
     name: str
 
     def __post_init__(self) -> None:
-        super().__init__(self.host)  # Run the base initializer
+        # Run the base initializer
+        super().__init__(self.host)
 
 c = Logged("localhost", "db")
 print(c.url, c.name)

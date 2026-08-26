@@ -9,8 +9,10 @@ class ignore:
         return None
 
     def __exit__(self, exc_type: type[BaseException] | None,
-                 exc: BaseException | None, tb: object) -> bool:
-        if exc_type is None or not issubclass(exc_type, self.types):
+                 exc: BaseException | None,
+                 tb: object) -> bool:
+        if (exc_type is None
+            or not issubclass(exc_type, self.types)):
             return False
         print(f"{exc!r}")
         return True

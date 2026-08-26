@@ -8,13 +8,15 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
 drawing = Drawing("Duck").draw("circle").draw("beak")
 as_json = json.dumps(asdict(drawing))
 data = json.loads(as_json)
 print(type(data["strokes"]))
 #: <class 'list'>
-reconstructed = Drawing(data["title"], tuple(data["strokes"]))
+reconstructed = Drawing(
+    data["title"], tuple(data["strokes"]))
 print(reconstructed == drawing)
 #: True

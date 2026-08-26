@@ -3,10 +3,12 @@ from collections import namedtuple
 
 Person = namedtuple("Person", ["name", "age", "height"])
 person = Person("Alice", 30, 1.65)
-name, age, height = person  # Unchanged from the tuple version
+# Unchanged from the tuple version
+name, age, height = person
 print(name, age, height)
 #: Alice 30 1.65
-print(person.name, person.height)  # Now also reachable by name
+# Now also reachable by name
+print(person.name, person.height)
 #: Alice 1.65
 print(person[0], type(person[0]).__name__)
 #: Alice str

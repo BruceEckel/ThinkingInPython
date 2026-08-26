@@ -13,7 +13,8 @@ class Stack:
 class BoundedStack(Stack):
     limit: ClassVar[int] = 2
 
-    def full(self) -> bool:  # The limit, exposed as a question
+    # The limit, exposed as a question
+    def full(self) -> bool:
         return len(self.items) >= self.limit
 
     @override

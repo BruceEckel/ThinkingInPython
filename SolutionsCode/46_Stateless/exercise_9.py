@@ -20,12 +20,13 @@ async def main() -> None:
     try:
         run(report_all(["a"]))
     except RuntimeError as e:
-        print("run():", e)
-    for line in await run_async(report_all(["a", "b", "c"])):
+        print(e)
+    for line in await run_async(
+            report_all(["a", "b", "c"])):
         print(line)
 
 asyncio.run(main())
-#: run(): asyncio.run() cannot be called from a running event loop
+#: asyncio.run() cannot be called from a running event loop
 #: body = 'fetched a', len(body) = 9
 #: body = 'fetched b', len(body) = 9
 #: body = 'fetched c', len(body) = 9

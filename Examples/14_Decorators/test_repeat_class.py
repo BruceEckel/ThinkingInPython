@@ -6,7 +6,8 @@ from repeat_class import repeat
     (3, 3),
     (1, 1),
 ])
-def test_repeat_call_count(times: int, expected: int) -> None:
+def test_repeat_call_count(times: int,
+                           expected: int) -> None:
     calls: list[str] = []
 
     @repeat(times=times)

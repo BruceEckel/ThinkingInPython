@@ -79,7 +79,8 @@ except Exception as e:
     print(type(e).__name__)
 #: FrozenInstanceError
 try:
-    hash(data)  # The list field makes the instance unhashable
+    # The list field makes the instance unhashable
+    hash(data)
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
@@ -231,7 +232,8 @@ def area(shape: Shape) -> float:
         case _:
             assert_never(shape)
 
-shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0), Square(5.0)]
+shapes: list[Shape] = [Circle(1.0), Rectangle(3.0, 4.0),
+                       Square(5.0)]
 for shape in shapes:
     print(round(area(shape), 4))
 #: 3.1416
@@ -372,7 +374,8 @@ class Stack:
 class BoundedStack(Stack):
     limit: ClassVar[int] = 2
 
-    def full(self) -> bool:  # The limit, exposed as a question
+    # The limit, exposed as a question
+    def full(self) -> bool:
         return len(self.items) >= self.limit
 
     @override

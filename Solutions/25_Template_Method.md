@@ -21,7 +21,8 @@ class FileFramework:
     def run(self) -> None:
         *inputs, output = self.filenames
         pieces = [
-            self.process(Path(name).read_text()) for name in inputs]
+            self.process(Path(name).read_text())
+            for name in inputs]
         Path(output).write_text("".join(pieces))
 
     def process(self, text: str) -> str:
@@ -32,10 +33,12 @@ class UppercaseFramework(FileFramework):
     def process(self, text: str) -> str:
         return text.upper()
 
-def run_file_framework(filenames: list[str],
-                        process: Callable[[str], str]) -> None:
+def run_file_framework(
+    filenames: list[str], process: Callable[[str], str]
+) -> None:
     *inputs, output = filenames
-    pieces = [process(Path(name).read_text()) for name in inputs]
+    pieces = [process(Path(name).read_text())
+              for name in inputs]
     Path(output).write_text("".join(pieces))
 
 def demo() -> None:
@@ -251,7 +254,7 @@ class HalfDone(ApplicationFramework):
     @override
     def customize1(self) -> None:
         self.pending.append("work")
-    # customize2() keeps its `...` default, so nothing drains pending
+    # The `...` default on customize2() drains nothing
 
 try:
     Exploder().run()

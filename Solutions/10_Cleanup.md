@@ -8,8 +8,9 @@ from typing import ClassVar
 from weakref import WeakValueDictionary
 
 class Counter:
-    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
-        WeakValueDictionary())
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -67,8 +68,9 @@ from typing import ClassVar
 from weakref import WeakValueDictionary
 
 class Counter:
-    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
-        WeakValueDictionary())
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -76,9 +78,11 @@ class Counter:
 
     @classmethod
     def live_names(cls) -> list[str]:
-        return sorted(c.name for c in cls._instances.values())
+        return sorted(c.name
+                      for c in cls._instances.values())
 
-counters = [Counter(name) for name in ("Charlie", "Alpha", "Bravo")]
+counters = [Counter(name)
+            for name in ("Charlie", "Alpha", "Bravo")]
 print(Counter.live_names())
 #: ['Alpha', 'Bravo', 'Charlie']
 ```
@@ -109,12 +113,14 @@ class Counter:
         if Counter.count == 0:
             print("Last Counter object deleted")
         else:
-            print(Counter.count, "Counter objects remaining")
+            print(Counter.count,
+                  "Counter objects remaining")
 
     def __repr__(self) -> str:
         return f"Counter({self.name!r} {self.count})"
 
-counters = [Counter(name) for name in ["First", "Second", "Third"]]
+counters = [Counter(name)
+            for name in ["First", "Second", "Third"]]
 
 for c in counters:
     print(c)
@@ -155,7 +161,8 @@ class Counter:
     def live_count(cls) -> int:
         return len(cls._instances)
 
-counters = [Counter(name) for name in ("First", "Second", "Third")]
+counters = [Counter(name)
+            for name in ("First", "Second", "Third")]
 print(Counter.live_count())
 #: 3
 counters.pop()

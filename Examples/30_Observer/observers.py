@@ -30,4 +30,5 @@ class Thermometer(Observable[float]):
     @celsius.setter
     def celsius(self, value: float) -> None:
         self._celsius = value
-        self.notify(value)  # State changed; tell the observers
+        # State changed; tell the observers
+        self.notify(value)

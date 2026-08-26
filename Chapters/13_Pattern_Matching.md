@@ -212,7 +212,8 @@ from sequence_patterns import summarize
     ([5], "One item: 5"),
     ([1, 2, 3], "1, then 2 more"),
 ])
-def test_sequence_patterns(items: list[int], expected: str) -> None:
+def test_sequence_patterns(items: list[int],
+                           expected: str) -> None:
     assert summarize(items) == expected
 ```
 
@@ -369,7 +370,8 @@ from point import Point
     (Point(3, 0), "On the x-axis at x=3"),
     (Point(3, 4), "At (3, 4)"),
 ])
-def test_class_patterns(point: Point, expected: str) -> None:
+def test_class_patterns(point: Point,
+                        expected: str) -> None:
     assert locate(point) == expected
 
 @pytest.mark.parametrize("point, expected", [
@@ -377,7 +379,8 @@ def test_class_patterns(point: Point, expected: str) -> None:
     (Point(3, 0), "Somewhere on the x-axis"),
     (Point(3, 4), "Just some point"),
 ])
-def test_keyword_patterns(point: Point, expected: str) -> None:
+def test_keyword_patterns(point: Point,
+                          expected: str) -> None:
     assert describe(point) == expected
 ```
 
@@ -467,8 +470,10 @@ The test checks a matched event and the fall-through:
 from mapping_patterns import handle
 
 def test_mapping_patterns() -> None:
-    assert handle({"type": "key", "key": "Esc"}) == "Key Esc"
-    assert handle({"nope": 1}) == "Unrecognized event: {'nope': 1}"
+    assert handle(
+        {"type": "key", "key": "Esc"}) == "Key Esc"
+    assert handle(
+        {"nope": 1}) == "Unrecognized event: {'nope': 1}"
 ```
 
 ## Patterns Nest

@@ -9,9 +9,11 @@ class Row:
 def render(rows: list[Row], style: str) -> str:
     match style:
         case "text":
-            return "\n".join(f"{r.name}: {r.amount}" for r in rows)
+            return "\n".join(f"{r.name}: {r.amount}"
+                             for r in rows)
         case "csv":
-            return "\n".join(f"{r.name},{r.amount}" for r in rows)
+            return "\n".join(f"{r.name},{r.amount}"
+                             for r in rows)
         case _:
             raise ValueError(f"unknown style {style!r}")
 

@@ -28,8 +28,9 @@ type Square = tuple[str, int]
 
 def starting_position() -> dict[Square, Piece]:
     board: dict[Square, Piece] = {}
-    back_rank = [Kind.ROOK, Kind.KNIGHT, Kind.BISHOP, Kind.QUEEN,
-                 Kind.KING, Kind.BISHOP, Kind.KNIGHT, Kind.ROOK]
+    back_rank = [Kind.ROOK, Kind.KNIGHT, Kind.BISHOP,
+                 Kind.QUEEN, Kind.KING, Kind.BISHOP,
+                 Kind.KNIGHT, Kind.ROOK]
     for file, kind in zip("abcdefgh", back_rank):
         board[(file, 1)] = piece(Color.WHITE, kind)
         board[(file, 8)] = piece(Color.BLACK, kind)
@@ -41,13 +42,15 @@ def starting_position() -> dict[Square, Piece]:
 def move(
     board: dict[Square, Piece], src: Square, dst: Square
 ) -> None:
-    board[dst] = board.pop(src)  # Overwrites dst's old occupant
+    # Overwrites dst's old occupant
+    board[dst] = board.pop(src)
 
 def promote(
     board: dict[Square, Piece], square: Square, kind: Kind
 ) -> None:
     current = board[square]
-    board[square] = piece(current.color, kind)  # A shared Piece
+    # A shared Piece
+    board[square] = piece(current.color, kind)
 
 board = starting_position()
 print(len(board), len({id(p) for p in board.values()}))
@@ -56,5 +59,6 @@ move(board, ("e", 2), ("e", 4))
 print(("e", 2) in board, board[("e", 4)].kind)
 #: False Kind.PAWN
 promote(board, ("e", 4), Kind.QUEEN)
-print(board[("e", 4)])
-#: Piece(color=<Color.WHITE: 'white'>, kind=<Kind.QUEEN: 'Q'>)
+queen = board[("e", 4)]
+print(queen.color, queen.kind)
+#: Color.WHITE Kind.QUEEN

@@ -4,7 +4,9 @@ import asyncio
 lock_a = asyncio.Lock()
 lock_b = asyncio.Lock()
 
-async def worker(first: asyncio.Lock, second: asyncio.Lock) -> None:
+async def worker(
+    first: asyncio.Lock, second: asyncio.Lock
+) -> None:
     async with first:
         await asyncio.sleep(0.01)  # Let the other task run
         async with second:

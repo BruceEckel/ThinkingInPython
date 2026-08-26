@@ -1,7 +1,8 @@
 # two_way_generator.py
 from collections.abc import Generator
 from typing import Final
-from interview_generator import Answer, Question, Result, interview
+from interview_generator import (Answer, Question,
+                                 Result, interview)
 
 ANSWERS: Final[dict[Question, Answer]] = {
     Question("name"): Answer("Alice"),

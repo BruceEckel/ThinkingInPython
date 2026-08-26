@@ -34,7 +34,8 @@ class Macro:
             c.execute()
 
     def undo_all(self) -> None:
-        for c in reversed(self.commands):  # Reverse order to undo
+        # Reverse order to undo
+        for c in reversed(self.commands):
             c.undo()
 
 account = {"balance": 0}
@@ -129,9 +130,11 @@ def solve(f: Fn, a: float, b: float,
     for finder in chain:
         root = finder(f, a, b)
         if root is not None:
-            print(f"{finder.__name__} succeeded: {root:.6f}")
+            print(
+                f"{finder.__name__} succeeded: {root:.6f}")
             return root
-        print(f"{finder.__name__} failed: could not converge")
+        print(
+            f"{finder.__name__} failed: could not converge")
     print("all finders failed")
     return None
 
@@ -164,8 +167,10 @@ rather than imported, since a solution listing runs on its own.
 
 ```python
 # exercise_3.py
-scores = [("Bob", 85), ("Amy", 92), ("Cid", 85), ("Amy", 70)]
-by_score_then_name = sorted(scores, key=lambda t: (t[1], t[0]))
+scores = [("Bob", 85), ("Amy", 92), ("Cid", 85),
+          ("Amy", 70)]
+by_score_then_name = sorted(scores,
+                            key=lambda t: (t[1], t[0]))
 print(by_score_then_name)
 #: [('Amy', 70), ('Bob', 85), ('Cid', 85), ('Amy', 92)]
 ```
@@ -228,7 +233,8 @@ coarse_closure = newton_within(0.5)
 coarse_partial: RootFinder = partial(newton, tolerance=0.5)
 fine_closure = newton_within(1e-12)
 
-for finder in (coarse_closure, coarse_partial, fine_closure):
+for finder in (coarse_closure, coarse_partial,
+               fine_closure):
     root = solve(f, 0.0, 2.0, [finder])
     assert root is not None
     print(f"{root:.6f}")
@@ -367,7 +373,9 @@ for n in range(3):
 def make(n: int) -> Callable[[], None]:
     return lambda: print(n)
 
-by_factory: list[Callable[[], None]] = [make(n) for n in range(3)]
+by_factory: list[Callable[[], None]] = [
+    make(n) for n in range(3)
+]
 
 for fixed in (by_default, by_partial, by_factory):
     for command in fixed:

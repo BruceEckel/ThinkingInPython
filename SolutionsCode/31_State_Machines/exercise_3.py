@@ -17,7 +17,8 @@ class WordState:
     TRANSITIONS: dict[str, str] = {}
 
     def next_state(self, word: str) -> str:
-        return self.TRANSITIONS.get(word, self.TRANSITIONS["*"])
+        return self.TRANSITIONS.get(
+            word, self.TRANSITIONS["*"])
 
 class Locked(WordState):
     TRANSITIONS = {"coin": "unlocked", "*": "locked"}

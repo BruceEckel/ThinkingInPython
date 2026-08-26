@@ -15,9 +15,11 @@ class Observable[T]:
         results = await asyncio.gather(
             *(obs(data) for obs in self._observers),
             return_exceptions=True)
-        failures = [r for r in results if isinstance(r, Exception)]
+        failures = [
+            r for r in results if isinstance(r, Exception)]
         if failures:
-            raise ExceptionGroup("observer failures", failures)
+            raise ExceptionGroup(
+                "observer failures", failures)
 
 received: list[int] = []
 

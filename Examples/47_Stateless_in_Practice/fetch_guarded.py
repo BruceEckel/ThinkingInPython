@@ -1,7 +1,8 @@
 # fetch_guarded.py
 from dataclasses import dataclass
 from research import Feed, Unavailable, fetch
-from stateless import Effect, Need, catch, need, run, supply, throw
+from stateless import (Effect, Need, catch, need, run,
+                       supply, throw)
 
 class Empty(Exception):
     pass

@@ -33,7 +33,9 @@ from typing import override
 
 class Observer(ABC):
     @abstractmethod
-    def update(self, source: Observable, arg: object) -> None: ...
+    def update(
+        self, source: Observable, arg: object
+    ) -> None: ...
 
 class Observable:
     def __init__(self) -> None:
@@ -55,7 +57,9 @@ class Observable:
 
 class Display(Observer):
     @override
-    def update(self, source: Observable, arg: object) -> None:
+    def update(
+        self, source: Observable, arg: object
+    ) -> None:
         print(f"display: {arg}C")
 
 class Thermometer(Observable):
@@ -122,7 +126,8 @@ class Thermometer(Observable[float]):
     @celsius.setter
     def celsius(self, value: float) -> None:
         self._celsius = value
-        self.notify(value)  # State changed; tell the observers
+        # State changed; tell the observers
+        self.notify(value)
 ```
 
 Using it, subscribed callables react to every temperature change:
@@ -196,12 +201,14 @@ def test_notify_calls_every_subscriber() -> None:
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
-    Observable[str]().notify("anything")  # Must not raise anything
+    # Must not raise anything
+    Observable[str]().notify("anything")
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     obs = Observable[object]()
-    record = received.append  # A bound method: equal, not identical
+    # A bound method: equal, not identical
+    record = received.append
     obs.subscribe(record)
     obs.notify(1)
     obs.unsubscribe(record)
@@ -246,7 +253,8 @@ seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
-    obs.unsubscribe(once)  # Detaches itself mid-notification
+    # Detaches itself mid-notification
+    obs.unsubscribe(once)
 
 obs.subscribe(once)
 obs.subscribe(lambda d: seen.append(f"always: {d}"))
@@ -309,12 +317,15 @@ class Observable[T]:
     def subscribe(self, observer: AsyncObserver[T]) -> None:
         self._observers.append(observer)
 
-    def unsubscribe(self, observer: AsyncObserver[T]) -> None:
+    def unsubscribe(
+        self, observer: AsyncObserver[T]
+    ) -> None:
         self._observers.remove(observer)
 
     async def notify(self, data: T) -> None:
-        # Fan out to every observer at once, then wait for all
-        await asyncio.gather(*(obs(data) for obs in self._observers))
+        # Fan out to every observer, then wait for all
+        await asyncio.gather(
+            *(obs(data) for obs in self._observers))
 
 class Thermometer(Observable[float]):
     def __init__(self) -> None:
@@ -425,11 +436,13 @@ def new_grid(size: int) -> Grid:
             for x in range(size) for y in range(size)}
 
 def adjacent(a: Coord, b: Coord) -> bool:
-    return a != b and abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
+    return (a != b and abs(a[0] - b[0]) <= 1
+            and abs(a[1] - b[1]) <= 1)
 
 def recolored(grid: Grid, clicked: Coord) -> Grid:
     color = grid[clicked]
-    return {cell: color if adjacent(cell, clicked) else current
+    return {cell: color if adjacent(cell, clicked)
+            else current
             for cell, current in grid.items()}
 
 class BoxModel(Observable[Grid]):
@@ -449,34 +462,42 @@ and check that the neighbors took its color and that observers received the new 
 
 ```python
 # test_box_observer.py
-from box_observer import BoxModel, Grid, adjacent, new_grid, recolored
+from box_observer import (BoxModel, Grid, adjacent,
+                          new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
     assert len(grid) == 9
     assert grid[(0, 0)] == "skyblue"  # COLORS[0]
-    assert grid[(0, 1)] == grid[(1, 0)]  # Same (x + y) color band
+    # Same (x + y) color band
+    assert grid[(0, 1)] == grid[(1, 0)]
 
 def test_adjacent() -> None:
     assert adjacent((1, 1), (2, 2))  # Diagonal
     assert adjacent((1, 1), (1, 2))  # Edge
-    assert not adjacent((1, 1), (1, 1))  # Not its own neighbor
+    # Not its own neighbor
+    assert not adjacent((1, 1), (1, 1))
     assert not adjacent((0, 0), (2, 0))  # Two away
 
 def test_recolored_touches_only_neighbors() -> None:
     grid = new_grid(5)
     out = recolored(grid, (2, 2))
-    assert out[(1, 1)] == grid[(2, 2)]  # Diagonal neighbor: changed
-    assert out[(2, 3)] == grid[(2, 2)]  # Edge neighbor: changed
-    assert out[(0, 0)] == grid[(0, 0)]  # Two away: unchanged
+    # Diagonal neighbor: changed
+    assert out[(1, 1)] == grid[(2, 2)]
+    # Edge neighbor: changed
+    assert out[(2, 3)] == grid[(2, 2)]
+    # Two away: unchanged
+    assert out[(0, 0)] == grid[(0, 0)]
     assert out is not grid  # Pure: a new grid
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(5)
     seen: list[Grid] = []
-    model.subscribe(seen.append)  # The observer is a callable
+    # The observer is a callable
+    model.subscribe(seen.append)
     model.click((2, 2))
-    assert seen[-1] is model.grid  # Observer got the new grid
+    # Observer got the new grid
+    assert seen[-1] is model.grid
     assert model.grid[(1, 1)] == model.grid[(2, 2)]
 ```
 
@@ -503,7 +524,8 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
     canvas.pack()
 
     def draw(grid: Grid) -> None:
-        canvas.delete("all")  # Or the old rectangles accumulate
+        # Or the old rectangles accumulate
+        canvas.delete("all")
         for (x, y), color in grid.items():
             canvas.create_rectangle(
                 x * cell_px, y * cell_px,

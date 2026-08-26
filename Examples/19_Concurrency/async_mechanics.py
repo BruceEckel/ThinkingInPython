@@ -3,14 +3,16 @@ import asyncio
 
 async def fetch(item: str, delay: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)  # Stand-in for a network request
+    # Stand-in for a network request
+    await asyncio.sleep(delay)
     print(f"{item}: resumed")
     return item.upper()
 
 async def main() -> None:
     x = fetch("a", 0.03)  # Nothing runs yet
     print(type(x).__name__)
-    results = await asyncio.gather(  # Run all three concurrently
+    # Run all three concurrently
+    results = await asyncio.gather(
         x, fetch("b", 0.02), fetch("c", 0.01))
     print(results)
 

@@ -29,7 +29,8 @@ class Macro:
             c.execute()
 
     def undo_all(self) -> None:
-        for c in reversed(self.commands):  # Reverse order to undo
+        # Reverse order to undo
+        for c in reversed(self.commands):
             c.undo()
 
 account = {"balance": 0}

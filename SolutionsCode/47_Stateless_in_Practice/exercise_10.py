@@ -27,7 +27,9 @@ class Ticker:
 def fetch(feed: Ticker) -> str:
     return feed.latest()
 
-def thrown() -> Effect[Need[Ticker], Unavailable | Empty, str]:
+def thrown() -> Effect[
+    Need[Ticker], Unavailable | Empty, str
+]:
     feed = yield from need(Ticker)
     headline = yield from fetch(feed)
     if not headline:
@@ -40,7 +42,9 @@ def nonempty(headline: str) -> str:
         raise Empty()
     return headline
 
-def lifted() -> Effect[Need[Ticker], Unavailable | Empty, str]:
+def lifted() -> Effect[
+    Need[Ticker], Unavailable | Empty, str
+]:
     feed = yield from need(Ticker)
     headline = yield from fetch(feed)
     checked = yield from nonempty(headline)

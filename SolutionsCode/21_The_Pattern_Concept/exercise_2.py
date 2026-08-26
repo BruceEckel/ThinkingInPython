@@ -8,7 +8,8 @@ def by_weight(weight: float) -> float:
     return 0.5 * weight
 
 def checkout(
-        weight: float, shipping: Callable[[float], float]) -> float:
+    weight: float, shipping: Callable[[float], float]
+) -> float:
     return 20.0 + shipping(weight)
 
 print(checkout(6.0, flat), checkout(6.0, by_weight))

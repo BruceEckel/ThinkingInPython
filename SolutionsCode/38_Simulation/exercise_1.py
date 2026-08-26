@@ -22,7 +22,8 @@ class Rat:
     def __post_init__(self) -> None:
         self.number = self.blackboard.next_number()
         self.blackboard.log(
-            f"Rat {self.number} starts at {(self.x, self.y)}.")
+            f"Rat {self.number} starts at "
+            f"{(self.x, self.y)}.")
 
     async def run(self) -> None:
         while True:
@@ -58,12 +59,14 @@ class FakeBlackboard:
     def next_number(self) -> int:
         return 1
 
-# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that order.
-# Script the 2nd and 4th as open, the 1st and 3rd as walls/visited:
+# DIRECTIONS checks (0,1), (0,-1), (-1,0), (1,0) in that
+# order. Script the 2nd and 4th as open, the 1st and 3rd
+# as walls/visited:
 fake = FakeBlackboard([False, True, False, True])
 rat = Rat(fake, 0, 0)
 asyncio.run(rat.run())
 print(rat.x, rat.y)     # Kept the first successful claim
 #: 0 -1
-print(fake.spawned)     # Spawned down every claim after that
+# Spawned down every claim after that
+print(fake.spawned)
 #: [(1, 0)]

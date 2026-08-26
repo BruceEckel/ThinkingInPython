@@ -8,5 +8,5 @@ display_object(Messenger, INTERESTING_DUNDERS)
 #:   • depth: float = 0.0 [CV]
 #: [Methods]
 #:   • __eq__(self, other)
-#:   • __init__(self, name: str, number: int, depth: float = 0.0)...
+#:   • __init__(self, name: str, number: int, depth: floa...
 #:   • __repr__(self)

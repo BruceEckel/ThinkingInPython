@@ -16,9 +16,11 @@ class Meter:
 
 async def mixed_price(order, meter):
     with meter:
-        await asyncio.sleep(0.05)   # Waiting, off the processor
+        # Waiting, off the processor
+        await asyncio.sleep(0.05)
         total = 0
-        for _ in range(1_000_000):  # Working, on the processor
+        # Working, on the processor
+        for _ in range(1_000_000):
             total += 1
     return order * 10
 

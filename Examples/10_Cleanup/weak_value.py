@@ -3,8 +3,9 @@ from typing import ClassVar
 from weakref import WeakValueDictionary
 
 class Counter:
-    _instances: ClassVar[WeakValueDictionary[int, Counter]] = (
-        WeakValueDictionary())
+    _instances: ClassVar[
+        WeakValueDictionary[int, Counter]
+    ] = WeakValueDictionary()
 
     def __init__(self, name: str) -> None:
         self.name = name

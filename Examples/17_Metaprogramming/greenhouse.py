@@ -10,14 +10,18 @@ NOT_CREATED = sentinel("NOT_CREATED")
 class EventMakers(dict[str, EventMaker | NOT_CREATED]):
     def __getitem__(self, class_name: str) -> EventMaker:
         if class_name not in self:
-            raise KeyError(f"Unknown event class: {class_name!r}")
+            raise KeyError(
+                f"Unknown event class: {class_name!r}")
         maker = super().__getitem__(class_name)
         if maker is NOT_CREATED:
             print(f"Creating {class_name}")
             # Local function to pass to type constructor:
-            def init(self: Event, hour: int, minute: int) -> None:
-                Event.__init__(self, class_name, hour, minute)
-            new_cls = type(class_name, (Event,), {"__init__": init})
+            def init(self: Event,
+                     hour: int, minute: int) -> None:
+                Event.__init__(
+                    self, class_name, hour, minute)
+            new_cls = type(class_name, (Event,),
+                           {"__init__": init})
             maker = cast(EventMaker, new_cls)
             self[class_name] = maker
         return maker
@@ -27,7 +31,8 @@ class Event:
     action: str
     hour: int
     minute: int
-    events: ClassVar[list[Event]] = []  # Registry of all Events
+    # Registry of all Events
+    events: ClassVar[list[Event]] = []
     _event_maker: ClassVar[EventMakers] = EventMakers({
         name : NOT_CREATED  # Dict key : value
         for name in (
@@ -50,12 +55,14 @@ class Event:
         for line in lines:
             class_name, hour, minute = (
                 line.replace(":", " ").split())
-            Event._event_maker[class_name](int(hour), int(minute))
+            Event._event_maker[class_name](
+                int(hour), int(minute))
 
     @staticmethod
     def run_events() -> None:
         for e in sorted(
-                Event.events, key=lambda e: (e.hour, e.minute)):
+                Event.events,
+                key=lambda e: (e.hour, e.minute)):
             print(f"{e.hour}:{e.minute:02d}: {e.action}")
 
 if __name__ == "__main__":

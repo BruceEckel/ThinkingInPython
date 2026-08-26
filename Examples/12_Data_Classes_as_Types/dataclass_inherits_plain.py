@@ -13,6 +13,6 @@ class Logged(Connection):
 c = Logged("db")
 print(c.name)
 #: db
-# Connection.__init__ never ran, so 'host' and 'url' were never set:
+# Connection.__init__ never ran, so host and url are unset:
 print(hasattr(c, "host"), hasattr(c, "url"))
 #: False False

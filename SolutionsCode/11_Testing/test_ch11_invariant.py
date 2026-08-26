@@ -2,8 +2,10 @@
 import pytest
 
 class InsufficientFunds(Exception):
-    def __init__(self, balance: float, amount: float) -> None:
-        super().__init__(f"balance {balance} is less than {amount}")
+    def __init__(self, balance: float,
+                 amount: float) -> None:
+        super().__init__(
+            f"balance {balance} is less than {amount}")
 
 class Account:
     def __init__(self, balance: float = 0.0) -> None:

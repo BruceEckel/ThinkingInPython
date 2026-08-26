@@ -16,7 +16,7 @@ display_object(MyList)
 #:   • count(self, value, /)
 #:   • extend(self, iterable, /)
 #:   • howdy(self, you: str) -> None
-#:   • index(self, value, start=0, stop=9223372036854775807, /)
+#:   • index(self, value, start=0, stop=92233720368547758...
 #:   • insert(self, index, object, /)
 #:   • pop(self, index=-1, /)
 #:   • remove(self, value, /)

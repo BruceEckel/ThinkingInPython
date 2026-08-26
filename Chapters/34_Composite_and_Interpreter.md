@@ -55,7 +55,8 @@ class Directory(Node):
 src = Directory(
     "src", File("main.py", 400), File("util.py", 250))
 root = Directory(
-    "root", File("readme.md", 90), src, File("data.csv", 1200))
+    "root", File("readme.md", 90), src,
+    File("data.csv", 1200))
 print(root.size(), src.size(), File("lone.txt", 10).size())
 #: 1940 650 10
 ```
@@ -169,7 +170,8 @@ Nothing can modify `src` afterward, so sharing subtrees is safe
 # test_filesystem.py
 from typing import Final
 import pytest
-from filesystem import Directory, File, Node, disk_usage, walk
+from filesystem import (Directory, File, Node,
+                        disk_usage, walk)
 
 SUB: Final[Directory] = Directory(
     "sub", (File("b", 2), File("c", 3)))
@@ -181,7 +183,8 @@ TREE: Final[Directory] = Directory(
     (SUB, 5),
     (File("solo", 7), 7),
 ])
-def test_disk_usage_is_uniform(entry: Node, expected: int) -> None:
+def test_disk_usage_is_uniform(entry: Node,
+                               expected: int) -> None:
     assert disk_usage(entry) == expected
 
 def test_walk_yields_full_paths() -> None:
@@ -329,9 +332,11 @@ def evaluate(e: Expr, /, **env: int) -> int:
         case Var(name):
             return env[name]
         case Add(left, right):
-            return evaluate(left, **env) + evaluate(right, **env)
+            return (evaluate(left, **env)
+                    + evaluate(right, **env))
         case Mul(left, right):
-            return evaluate(left, **env) * evaluate(right, **env)
+            return (evaluate(left, **env)
+                    * evaluate(right, **env))
         case _:
             assert_never(e)
 
@@ -453,7 +458,8 @@ def simplify(e: Expr) -> Expr:
                     return Num(a + b)
                 case _:
                     if lhs is left and rhs is right:
-                        return e  # Share the unchanged subtree
+                        # Share the unchanged subtree
+                        return e
                     return Add(lhs, rhs)
         case Mul(left, right):
             lhs, rhs = simplify(left), simplify(right)
@@ -540,7 +546,8 @@ def test_rewriting_reaches_every_level() -> None:
 
 def test_already_simple_is_unchanged() -> None:
     x = Var("x")
-    assert simplify(2 * x + 1) == Add(Mul(Num(2), x), Num(1))
+    assert simplify(2 * x + 1) == Add(Mul(Num(2), x),
+                                      Num(1))
 
 def test_unchanged_subtrees_are_shared() -> None:
     keep = Var("w") * Var("h")
@@ -584,7 +591,8 @@ The structure is data, and what it means is whatever a function decides:
 # template_query.py
 from string.templatelib import Interpolation, Template
 
-def to_query(template: Template) -> tuple[str, list[object]]:
+def to_query(
+    template: Template) -> tuple[str, list[object]]:
     sql: list[str] = []
     values: list[object] = []
     for piece in template:
@@ -605,15 +613,16 @@ def to_shape(template: Template) -> str:
     return "".join(parts)
 
 name = "Alice'; DROP TABLE users; --"
-minimum = 18
-query = t"SELECT name FROM users WHERE name={name} AND age>{minimum}"
+limit = 18
+query = (t"SELECT name FROM users WHERE name={name} "
+         + t"AND age>{limit}")
 sql, values = to_query(query)
 print(sql)
 #: SELECT name FROM users WHERE name=? AND age>?
 print(values)
 #: ["Alice'; DROP TABLE users; --", 18]
 print(to_shape(query))
-#: SELECT name FROM users WHERE name=<name> AND age><minimum>
+#: SELECT name FROM users WHERE name=<name> AND age><limit>
 ```
 
 `to_query()` and `to_shape()` are the same relationship as `evaluate()` and `to_infix()`:

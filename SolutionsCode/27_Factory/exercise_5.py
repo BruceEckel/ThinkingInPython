@@ -4,7 +4,7 @@ from typing import Self
 
 @dataclass(frozen=True)
 class Pizza:
-    size: int = 12
+    size: int = 9
     cheese: bool = True
     toppings: tuple[str, ...] = ()
 
@@ -21,7 +21,7 @@ except ValueError as e:
 
 class PizzaBuilder:
     def __init__(self) -> None:
-        self._size = 12
+        self._size = 9
         self._toppings: list[str] = []
 
     def topping(self, name: str) -> Self:
@@ -32,7 +32,8 @@ class PizzaBuilder:
         return self
 
     def build(self) -> Pizza:
-        return Pizza(self._size, True, tuple(self._toppings))
+        return Pizza(self._size, True,
+                     tuple(self._toppings))
 
 pb = (
     PizzaBuilder().topping("a").topping("b")
@@ -44,4 +45,4 @@ except ValueError as e:
     print("builder rejected:", e)
 #: builder rejected: a pizza may carry at most four toppings
 print(pb.build())
-#: Pizza(size=12, cheese=True, toppings=('a', 'b', 'c', 'd'))
+#: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))

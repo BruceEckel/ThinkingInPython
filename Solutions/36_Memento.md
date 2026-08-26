@@ -86,7 +86,8 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
     def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])
@@ -107,12 +108,14 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
     def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])
 
-def test_erase_returns_new_drawing_leaving_original() -> None:
+def test_erase_returns_new_drawing_leaving_original(
+) -> None:
     before = Drawing("Duck").draw("circle").draw("beak")
     after = before.erase()
     assert before.strokes == ("circle", "beak")  # Untouched
@@ -153,7 +156,8 @@ class History[S]:
 h = History(0, max_depth=2)
 h.do(1)
 h.do(2)
-h.do(3)   # Past would be [0, 1, 2]; 0 is discarded, keeping only 2
+# Past would be [0, 1, 2]; 0 is discarded, keeping only 2
+h.do(3)
 print(h._past)
 #: [1, 2]
 print(h.undo(), h.undo())
@@ -183,14 +187,16 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
 drawing = Drawing("Duck").draw("circle").draw("beak")
 as_json = json.dumps(asdict(drawing))
 data = json.loads(as_json)
 print(type(data["strokes"]))
 #: <class 'list'>
-reconstructed = Drawing(data["title"], tuple(data["strokes"]))
+reconstructed = Drawing(
+    data["title"], tuple(data["strokes"]))
 print(reconstructed == drawing)
 #: True
 ```
@@ -215,7 +221,8 @@ class Memento:
 
 class Sketch:
     def save(self) -> Memento:
-        return Memento(self.strokes)      # No copy: same list object
+        # No copy: same list object
+        return Memento(self.strokes)
     def restore(self, memento: Memento) -> None:
         self.strokes = memento.strokes    # Also no copy
 ```
@@ -310,7 +317,8 @@ class Drawing:
     strokes: tuple[str, ...] = ()
 
     def draw(self, stroke: str) -> Drawing:
-        return replace(self, strokes=(*self.strokes, stroke))
+        return replace(
+            self, strokes=(*self.strokes, stroke))
 
 class History[S]:
     def __init__(self, initial: S) -> None:
@@ -339,18 +347,18 @@ def restore_field(
     history.do(copy.replace(history.present, **change))
 
 history = History(Drawing("Duck"))
-history.do(history.present.draw("circle"))
+history.do(history.present.draw("body"))
 checkpoint = history.present
 history.do(copy.replace(history.present, title="Goose"))
 history.do(history.present.draw("beak"))
 history.do(history.present.draw("tail"))
 print(history.present)
-#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+#: Drawing(title='Goose', strokes=('body', 'beak', 'tail'))
 restore_field(history, "strokes", checkpoint)
 print(history.present)
-#: Drawing(title='Goose', strokes=('circle',))
+#: Drawing(title='Goose', strokes=('body',))
 print(history.undo())
-#: Drawing(title='Goose', strokes=('circle', 'beak', 'tail'))
+#: Drawing(title='Goose', strokes=('body', 'beak', 'tail'))
 ```
 
 `restore_field()` is `partial_restore.py` with the field name lifted

@@ -4,7 +4,8 @@ from exceptions import ignore
 with ignore(ZeroDivisionError):
     print("before")
     1 / 0
-    print("after")  # Never runs: the error jumps to __exit__
+    # Never runs: the error jumps to __exit__
+    print("after")
 print("survived")
 #: before
 #: ZeroDivisionError('division by zero')

@@ -3,8 +3,11 @@ from collections.abc import Callable, Iterator
 from grid import Outlet, Solar, Source, run_load
 from stateless import handle, run
 
-def scripted(sources: Iterator[Source]) -> Callable[[Outlet], Source]:
-    def choose(request: Outlet) -> Source:  # request.hour ignored
+def scripted(
+    sources: Iterator[Source]
+) -> Callable[[Outlet], Source]:
+    # request.hour ignored
+    def choose(request: Outlet) -> Source:
         return next(sources)
     return choose
 

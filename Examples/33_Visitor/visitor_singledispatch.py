@@ -40,7 +40,8 @@ if __name__ == "__main__":
     for f in flowers:
         print(nectar(f), "| fragrance:", fragrance(f))
     print(sorted(t.__name__ for t in nectar.registry))
-    print(nectar.dispatch(Ranunculus) is nectar.dispatch(Flower))
+    print(nectar.dispatch(Ranunculus)
+          is nectar.dispatch(Flower))
 #: Gladiolus: abundant nectar | fragrance: faint
 #: Ranunculus: no nectar | fragrance: strong
 #: Chrysanthemum: a little nectar | fragrance: faint
