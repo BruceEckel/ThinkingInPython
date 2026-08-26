@@ -1,5 +1,3 @@
-Dermatologist September
-
 Check for any unresolved issues in deep_review and readability directories
 Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
 
@@ -8,8 +6,6 @@ make prose, make spell should also work on Solutions/*.md
 Review the tests to see if they are all doing something useful.
 
 New book cover & favicon
-
-60 character limit on code listings, for better ebook reading experience
 
 Fable: Review the book to find and fix consistency issues
 
