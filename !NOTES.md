@@ -1,3 +1,5 @@
+Get rid of foos and bars as identifiers, replace them with something more appropriate, interesting, or pythonic
+
 Check for any unresolved issues in deep_review and readability directories
 Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
 

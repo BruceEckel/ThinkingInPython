@@ -1,4 +1,5 @@
-<h1 align="center">Thinking in Python</h1>
+<h1 align="center"><img src="resources/static/favicon.svg"
+  width="32" alt=""> Thinking in Python</h1>
 <h3 align="center"><em>Insights, Idioms and Patterns</em></h3>
 <p align="center">
   <img src="resources/static/cover-art.jpg" width="560"

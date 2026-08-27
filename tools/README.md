@@ -973,7 +973,11 @@ file family, and each mode deletes the other's outputs. Plus
 `favicon.svg`: a serpent's eye, gold iris with a slit pupil on deep
 green, in the cover art's palette, linked from every site page
 (picked from candidate galleries for staying legible at 16 px on
-both light and dark browser chrome). `--preview` writes a small `cover-preview.png` for quick
+both light and dark browser chrome). And `chapter-ornament.{svg,png}`:
+a band of diamond scales that sits under every chapter title, the SVG
+on the site (template.html) and the PNG in the PDF and EPUBs
+(injected by build_epub.py's shared assembly, which also places the
+cover art on each Part divider page). `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
 ## build_pdf.py

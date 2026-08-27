@@ -69,10 +69,11 @@ EINK = {ACCENT: "#555049"}
 TITLE_FONT = "Palatino Linotype, Palatino, Georgia, serif"
 
 DRAWN_FILES = ("cover.svg", "cover-eink.svg", "cover-letter.svg",
-               "cover-art.svg", "cover-color.png",
-               "cover-eink.png")
+               "cover-art.svg", "cover-art.png",
+               "cover-color.png", "cover-eink.png")
 ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
-             "cover-letter.jpg", "cover-art.jpg")
+             "cover-letter.jpg", "cover-art.jpg",
+             "social-preview.jpg")
 
 
 # --------------------------------------------------------------------------- #
@@ -190,8 +191,36 @@ def art_outputs(preview: bool) -> None:
     site.thumbnail((1100, 1100))
     site.save(STATIC / "cover-art.jpg", quality=84,
               optimize=True)
+    social(img, bg)
     for stale in DRAWN_FILES:
         (STATIC / stale).unlink(missing_ok=True)
+
+
+def social(img, bg: str) -> None:
+    """GitHub's social preview card, 1280x640: the art centered
+    on its own paper, title above. Uploading it is manual
+    (repo Settings > General > Social preview)."""
+    from PIL import Image
+
+    card = Image.new("RGB", (1280, 640), bg)
+    iw, ih = img.size
+    h = 520
+    w = round(iw * h / ih)
+    art = img.convert("RGB").resize((w, h))
+    card.paste(art, ((1280 - w) // 2, 640 - h - 16))
+    svg = (TEMP / "social-title.svg")
+    svg.write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'viewBox="0 0 1280 110">'
+        f'<text x="640" y="76" text-anchor="middle" '
+        f'font-family="{TITLE_FONT}" font-size="64" '
+        f'fill="{INK}">Thinking in Python</text></svg>',
+        encoding="utf-8")
+    rasterize(svg, TEMP / "social-title.png", 1280)
+    title = Image.open(TEMP / "social-title.png")
+    card.paste(title, (0, 8), title)
+    card.save(STATIC / "social-preview.jpg", quality=88,
+              optimize=True)
 
 
 # --------------------------------------------------------------------------- #
@@ -423,6 +452,10 @@ def drawn_outputs(preview: bool) -> None:
               STATIC / "cover-color.png", 1600)
     rasterize(STATIC / "cover-eink.svg",
               STATIC / "cover-eink.png", 1600)
+    # The Part divider pages of the PDF and EPUBs use a raster
+    # of the art (Kindle will not draw SVG).
+    rasterize(STATIC / "cover-art.svg",
+              STATIC / "cover-art.png", 900)
     for stale in ART_FILES:
         (STATIC / stale).unlink(missing_ok=True)
 
@@ -489,7 +522,12 @@ def main(argv: list[str] | None = None) -> int:
         favicon_svg(), encoding="utf-8")
     (STATIC / "chapter-ornament.svg").write_text(
         ornament_svg(), encoding="utf-8")
-    for name in (*made, "favicon.svg", "chapter-ornament.svg"):
+    # The PDF and EPUB chapter headings use a raster of the
+    # ornament (Kindle will not draw SVG).
+    rasterize(STATIC / "chapter-ornament.svg",
+              STATIC / "chapter-ornament.png", 500)
+    for name in (*made, "favicon.svg", "chapter-ornament.svg",
+                 "chapter-ornament.png"):
         size = (STATIC / name).stat().st_size
         print(f"{name}: {size / 1024:.0f} KB")
     return 0

@@ -35,6 +35,7 @@ verifies both).
 """
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -155,7 +156,9 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
         "--pdf-engine", PDF_ENGINE,
         "--output", str(pdf),
         "--metadata-file", str(meta),
-        "--resource-path", str(build_site.IMAGES_SRC),
+        "--resource-path", os.pathsep.join(
+            (str(build_site.IMAGES_SRC),
+             str(ROOT / "resources" / "static"))),
         "--include-in-header", str(header),
         "--include-before-body", str(before),
         # Widen typst's project root to the drive so the cover's

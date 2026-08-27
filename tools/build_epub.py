@@ -472,8 +472,26 @@ def chapter_heading(ch: Chapter) -> str:
     return f"Appendix {ch.number}. {title}"
 
 
+STATIC = ROOT / "resources" / "static"
+
+
+def part_art() -> str | None:
+    """The cover art's filename, for Part divider pages."""
+    for name in ("cover-art.jpg", "cover-art.png"):
+        if (STATIC / name).exists():
+            return name
+    return None
+
+
 def part_markdown(roman: str, title: str) -> str:
-    return f"# Part {roman} · {title} {{#part-{roman.lower()}}}\n"
+    head = f"# Part {roman} · {title} {{#part-{roman.lower()}}}"
+    art = part_art()
+    if art is None:
+        return head + "\n"
+    # The trailing backslash keeps the image inline, so pandoc
+    # does not promote it to a centered implicit figure.
+    return (f"{head}\n\n"
+            f"![]({art}){{.part-art width=4.5in}}\\\n")
 
 
 def listing_html(lines: list[str], python: bool = False) -> str:
@@ -597,7 +615,13 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         if hang_code:
             text = hang_listings(text)
         head = f"# {chapter_heading(ch)} {{#{prefix}}}"
-        parts.append(f"{head}\n\n{text.strip()}\n")
+        ornament = ""
+        if (STATIC / "chapter-ornament.png").exists():
+            # Inline (trailing backslash) for the same reason as
+            # the Part art: no implicit centered figure.
+            ornament = ("\n\n![](chapter-ornament.png)"
+                        "{.chapter-ornament width=1.6in}\\")
+        parts.append(f"{head}{ornament}\n\n{text.strip()}\n")
     return "\n".join(parts)
 
 
@@ -739,6 +763,7 @@ pre code {{ font-size: inherit; }}
 {HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}
 figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}
+img.chapter-ornament, img.part-art {{ max-width: 100%; }}
 table {{ border-collapse: collapse; }}
 th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 #toc ol {{ list-style: none; padding-left: 1em; }}
@@ -752,7 +777,7 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
                images: Path | None = None,
                dc: Path | None = None,
                cover: Path | None = None) -> None:
-    resources = [str(IMAGES_SRC)]
+    resources = [str(IMAGES_SRC), str(STATIC)]
     if images is not None and images.is_dir():
         # First on the path, so a rasterized diagram wins over its SVG.
         resources.insert(0, str(images))
