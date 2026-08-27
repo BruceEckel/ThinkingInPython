@@ -4,6 +4,19 @@ Thinking in Python
 An intermediate-level book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
 
+## Download the Book
+
+The latest release, rebuilt from the current book source:
+
+- [PDF](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ThinkingInPython.pdf)
+- [EPUB](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ThinkingInPython-color.epub)
+  with color syntax highlighting, for phone and tablet reading apps
+- [EPUB for e-ink readers](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ThinkingInPython-eink.epub),
+  which marks code with bolding instead of color
+
+All versions are on the
+[releases page](https://github.com/BruceEckel/ThinkingInPython/releases).
+
 ## Setup
 
 1. Clone this repository.

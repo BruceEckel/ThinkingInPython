@@ -50,6 +50,11 @@ BOOK_TITLE = "Thinking in Python"
 BOOK_SUBTITLE = "Insights, Idioms and Patterns"
 BOOK_AUTHOR = "Bruce Eckel"
 REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
+# Direct-download URLs for the newest release's assets.
+# `releases/latest/download/<asset>` always points at the latest
+# published release, so these links never go stale when a new
+# version ships (`make release`).
+DOWNLOAD_URL = f"{REPO_URL}/releases/latest/download"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
@@ -233,6 +238,10 @@ def render_index(chapters: list[Chapter]) -> str:
 {rows}
     </ul>
     <p class="copyright">{COPYRIGHT}</p>
+    <p class="repo-link">Download the book:
+      <a href="{DOWNLOAD_URL}/ThinkingInPython.pdf">PDF</a> ·
+      <a href="{DOWNLOAD_URL}/ThinkingInPython-color.epub">EPUB</a> ·
+      <a href="{DOWNLOAD_URL}/ThinkingInPython-eink.epub">EPUB for e-ink readers</a></p>
     <p class="repo-link"><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples & Exercise Solutions on GitHub</a></p>
   </div>
 </body>

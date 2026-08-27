@@ -9,7 +9,6 @@ Fable: Review the book to find and fix consistency issues
 
 Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
 
-Add Epub/PDF link on README and at bottom of index page.
 
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 Examples that demonstrate probability or statistics, very simply
