@@ -47,7 +47,7 @@ CHAPTER_TOC_DEPTH = 3
 
 FRONT_STEM = "00_Front"
 BOOK_TITLE = "Thinking in Python"
-BOOK_SUBTITLE = "Insights, Idioms and Patterns"
+BOOK_SUBTITLE = "Fluency, Types, and Design"
 BOOK_AUTHOR = "Bruce Eckel"
 REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 # Direct-download URLs for the newest release's assets.
@@ -241,15 +241,17 @@ def render_index(chapters: list[Chapter]) -> str:
     <div class="title-rule"></div>
     <img class="cover-art" src="{cover_art}"
          alt="A python as an ouroboros, coiled into an infinity sign">
+    <div class="download-links">
+      <p>Download the book:
+        <a href="{DOWNLOAD_URL}/ThinkingInPython.pdf">PDF</a> ·
+        <a href="{DOWNLOAD_URL}/ThinkingInPython-color.epub">EPUB</a> ·
+        <a href="{DOWNLOAD_URL}/ThinkingInPython-eink.epub">EPUB for e-ink readers</a></p>
+      <p><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples &amp; Exercise Solutions on GitHub</a></p>
+    </div>
     <ul class="toc-list">
 {rows}
     </ul>
     <p class="copyright">{COPYRIGHT}</p>
-    <p class="repo-link">Download the book:
-      <a href="{DOWNLOAD_URL}/ThinkingInPython.pdf">PDF</a> ·
-      <a href="{DOWNLOAD_URL}/ThinkingInPython-color.epub">EPUB</a> ·
-      <a href="{DOWNLOAD_URL}/ThinkingInPython-eink.epub">EPUB for e-ink readers</a></p>
-    <p class="repo-link"><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples & Exercise Solutions on GitHub</a></p>
   </div>
 </body>
 </html>
@@ -297,10 +299,12 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
 .copyright a {{ color: var(--muted); text-decoration: none; }}
 .copyright a:hover {{ color: var(--accent); }}
-.repo-link {{ margin-top: 1.5rem; }}
-.repo-link a {{ font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
-  color: var(--ink); text-decoration: none; }}
-.repo-link a:hover {{ color: var(--accent); }}
+.download-links {{ text-align: center; margin: 1rem 0 0.5rem;
+  font-size: 0.85rem; line-height: 1.7; color: var(--muted); }}
+.download-links p {{ margin: 0; }}
+.download-links a {{ font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; color: var(--ink); text-decoration: none; }}
+.download-links a:hover {{ color: var(--accent); }}
 """
 
 

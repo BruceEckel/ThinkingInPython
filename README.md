@@ -1,6 +1,6 @@
 <h1 align="center"><img src="resources/static/favicon.svg"
   width="32" alt=""> Thinking in Python</h1>
-<h3 align="center"><em>Insights, Idioms and Patterns</em></h3>
+<h3 align="center"><em>Fluency, Types, and Design</em></h3>
 <p align="center">
   <img src="resources/static/cover-art.jpg" width="560"
        alt="A python coiled into an infinity sign, swallowing its own tail">

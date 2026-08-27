@@ -92,7 +92,7 @@ def titles_svg(h: int, ink: str = INK,
         fill="{accent}"/>
   <text x="{W / 2}" y="{h - 90}" text-anchor="middle"
         font-family="{TITLE_FONT}" font-size="44"
-        letter-spacing="10" fill="{ink}">BRUCE ECKEL</text>'''
+        letter-spacing="3" fill="{ink}">Bruce Eckel</text>'''
 
 
 def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
