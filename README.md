@@ -4,7 +4,7 @@
   <img src="resources/static/cover-art.jpg" width="560"
        alt="A python coiled into an infinity sign, swallowing its own tail">
 </p>
-<h3 align="center">BRUCE ECKEL</h3>
+<h3 align="center">Bruce Eckel</h3>
 
 An intermediate-to-advanced book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
