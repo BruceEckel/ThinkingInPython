@@ -43,6 +43,7 @@ from pathlib import Path
 
 import build_epub
 import build_site
+import make_cover
 from tools_config import BUILD_PDF_DIR as DEFAULT_OUT
 from tools_config import ROOT
 
@@ -61,8 +62,31 @@ TOC_DEPTH = 2
 # on an already-fresh page, so a Part divider and the chapter right
 # behind it cost one break, not an extra blank page.
 PAGEBREAK_TYPST = """\
+#let orn-diamond(color) = polygon(fill: color,
+  (0pt, 2.5pt), (3.5pt, 0pt), (7pt, 2.5pt), (3.5pt, 5pt))
+#let orn-band = tiling(size: (22pt, 5pt))[
+  #place(dx: 2pt, dy: -2.5pt, orn-diamond(rgb("<<moss>>")))
+  #place(dx: 2pt, dy: 2.5pt, orn-diamond(rgb("<<moss>>")))
+  #place(dx: 13pt, dy: -2.5pt, orn-diamond(rgb("<<gold>>")))
+  #place(dx: 13pt, dy: 2.5pt, orn-diamond(rgb("<<gold>>")))
+]
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
+  // The chapter ornament, as an underline of the title text:
+  // it starts after the "23. " prefix and runs the title's
+  // width, wrapping with it. The regex matches chapters and
+  // appendices, so Part dividers and other level-1 headings
+  // stay plain. (The tiling doubles each diamond half a cell
+  // apart because a stroke samples its paint centered on the
+  // line: one copy per cell arrives cut into hourglasses.)
+  show regex("^(\\d+|Appendix [A-Z])\\. .+"): m => {
+    let i = m.text.position(". ") + 2
+    m.text.slice(0, i)
+    underline(stroke: 5pt + orn-band, offset: 8pt,
+              evade: false, background: true,
+              m.text.slice(i))
+    v(6pt)
+  }
   it
 }
 """
@@ -134,7 +158,12 @@ def header_typst(release: str | None) -> str:
     footer = (FOOTER_TYPST
               .replace("<<stamp>>", stamp)
               .replace("<<first>>", "2" if cover else "1"))
-    return cover + PAGEBREAK_TYPST + footer
+    # The ornament's colors come from make_cover.py, the single
+    # source for the book's art palette.
+    breaks = (PAGEBREAK_TYPST
+              .replace("<<moss>>", make_cover.MOSS.lstrip("#"))
+              .replace("<<gold>>", make_cover.GOLD.lstrip("#")))
+    return cover + breaks + footer
 
 # Inserted after the title block and before the outline, so the table
 # of contents opens on its own page instead of running on from the
@@ -198,7 +227,8 @@ def build(out_dir: Path, keep_source: bool = False,
     missing: set[str] = set()
     unresolved: set[str] = set()
     text = build_epub.book_markdown(chapters, missing, unresolved,
-                                    hang_code=False)
+                                    hang_code=False,
+                                    ornament=False)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"

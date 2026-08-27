@@ -564,7 +564,8 @@ def hang_listings(text: str) -> str:
 def book_markdown(chapters: list[Chapter], missing: set[str],
                   unresolved: set[str],
                   img_map: dict[str, str] | None = None,
-                  hang_code: bool = True) -> str:
+                  hang_code: bool = True,
+                  ornament: bool = True) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
 
     Two passes: the first namespaces the headings and so learns every id
@@ -615,13 +616,16 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         if hang_code:
             text = hang_listings(text)
         head = f"# {chapter_heading(ch)} {{#{prefix}}}"
-        ornament = ""
-        if (STATIC / "chapter-ornament.png").exists():
+        orn = ""
+        if ornament and (STATIC
+                         / "chapter-ornament.png").exists():
             # Inline (trailing backslash) for the same reason as
-            # the Part art: no implicit centered figure.
-            ornament = ("\n\n![](chapter-ornament.png)"
-                        "{.chapter-ornament width=1.6in}\\")
-        parts.append(f"{head}{ornament}\n\n{text.strip()}\n")
+            # the Part art: no implicit centered figure. The PDF
+            # passes ornament=False: it draws the band as a
+            # typst underline of the title instead.
+            orn = ("\n\n![](chapter-ornament.png)"
+                   "{.chapter-ornament width=1.6in}\\")
+        parts.append(f"{head}{orn}\n\n{text.strip()}\n")
     return "\n".join(parts)
 
 
