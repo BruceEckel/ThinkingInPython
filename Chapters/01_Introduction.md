@@ -224,8 +224,6 @@ not in the code you produce.
 
 This book is freely readable at [thinkinginpython.com](https://thinkinginpython.com/),
 which always holds the current version.
-The text carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
-license; the source repository's `CONTRIBUTING.md` has the details.
 
 Other resources:
 
@@ -238,3 +236,11 @@ Other resources:
 - [Python Bytes](https://pythonbytes.fm/), podcast and newsletter
 - [Planet Python](https://planetpython.org/),
   an aggregator of Python articles from around the web
+
+## Copyright
+
+© 2026 Bruce Eckel.
+This book is licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en):
+you may share it unchanged, with attribution, for noncommercial use.
+It is freely readable online; no reproduction without permission.
+The source repository's `CONTRIBUTING.md` has the details.
