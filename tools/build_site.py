@@ -222,6 +222,7 @@ def render_index(chapters: list[Chapter]) -> str:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{BOOK_TITLE}</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -234,6 +235,8 @@ def render_index(chapters: list[Chapter]) -> str:
     <h1 class="book-title">{BOOK_TITLE}</h1>
     <p class="book-subtitle">{BOOK_SUBTITLE}</p>
     <div class="title-rule"></div>
+    <img class="cover-art" src="cover-art.svg"
+         alt="A python as an ouroboros, coiled into an infinity sign">
     <ul class="toc-list">
 {rows}
     </ul>
@@ -269,6 +272,8 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   letter-spacing: 0.15em; color: var(--muted); margin-bottom: 0.5rem; }}
 .book-subtitle {{ font-family: 'Cormorant Garamond', serif; font-style: italic;
   font-size: 1.1rem; color: var(--muted); margin-bottom: 0.25rem; }}
+.cover-art {{ display: block; width: min(26rem, 88%);
+  margin: 2.2rem auto 0.6rem; }}
 .title-rule {{ width: 3rem; height: 1px; background: var(--accent);
   margin: 1.5rem 0 2.5rem; }}
 .toc-list {{ list-style: none; margin-top: 2rem; }}
@@ -384,8 +389,9 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
         if filename:
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
             copied += 1
-    if (STATIC_SRC / "favicon.ico").exists():
-        shutil.copy2(STATIC_SRC / "favicon.ico", out_dir / "favicon.ico")
+    for asset in ("favicon.svg", "cover-art.svg"):
+        if (STATIC_SRC / asset).exists():
+            shutil.copy2(STATIC_SRC / asset, out_dir / asset)
 
     print(f"Built {len(chapters)} pages + index into {out_dir}")
     print(f"Copied {copied} image(s).")

@@ -950,6 +950,21 @@ Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
 a namespacing bug produces a valid EPUB whose links open the wrong chapter,
 with nothing in the build to show for it.
 
+## make_cover.py
+
+Generates the cover and favicon as parametric SVG: an Escher-inspired
+ouroboros python coiled into an infinity sign, in the site's palette.
+Run `make cover` after editing the script; the outputs under
+`resources/static/` are committed, so the book builds never need the
+generator's one external tool (`resvg`, for the EPUB PNGs). One design,
+five renderings: `cover.svg` (1:1.6, Kindle's ratio), `cover-letter.svg`
+(US Letter, embedded as vector on the PDF's first page),
+`cover-art.svg` (the serpent alone, on the site's index page),
+`cover-{color,eink}.png` (1600x2560, one per EPUB variant), and
+`favicon.svg` (an angular ∞ with a diamond head, linked from every
+site page). `--preview` writes a small `cover-preview.png` for quick
+iteration.
+
 ## build_pdf.py
 
 Renders the same `Chapters/*.md` into one PDF at

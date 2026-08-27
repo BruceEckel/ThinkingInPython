@@ -77,7 +77,7 @@ PAGEBREAK_TYPST = """\
 # `header_typst()`; for an unstamped build the center cell is empty.
 FOOTER_TYPST = """\
 #set page(footer: context {
-  if here().page() > 1 {
+  if here().page() > <<first>> {
     let past = query(heading.where(level: 1)).filter(
       h => h.location().page() <= here().page())
     let chapter = if past.len() > 0 { past.last().body } else { [] }
@@ -94,10 +94,39 @@ FOOTER_TYPST = """\
 """
 
 
+# The cover, emitted from the preamble so it lands before the
+# template's title page. Margins collapse to zero for a full-bleed
+# page; the footer rule below skips page 1 anyway, and page
+# numbering restarts so the title page stays page 1 for the TOC.
+# `<<cover>>` is replaced by `header_typst()` with the SVG's
+# absolute path, which typst accepts because run_pandoc widens the
+# project root to the filesystem root.
+COVER_TYPST = """\
+#page(margin: 0pt, footer: none,
+      image("<<cover>>", width: 100%, height: 100%))
+#counter(page).update(0)
+"""
+
+# The letter-ratio rendering, so the full-bleed page crops nothing.
+COVER_SVG = ROOT / "resources" / "static" / "cover-letter.svg"
+
+
 def header_typst(release: str | None) -> str:
-    """The typst preamble: per-chapter page breaks plus the footer."""
+    """The typst preamble: cover, page breaks, and the footer."""
     stamp = build_epub.release_line(release) if release else ""
-    return PAGEBREAK_TYPST + FOOTER_TYPST.replace("<<stamp>>", stamp)
+    cover = ""
+    if COVER_SVG.exists():
+        # Typst reads "/..." as root-relative; run_pandoc sets the
+        # root to this drive's top, so strip the anchor.
+        rooted = "/" + COVER_SVG.relative_to(
+            COVER_SVG.anchor).as_posix()
+        cover = COVER_TYPST.replace("<<cover>>", rooted)
+    # The footer stays off the title page: physical page 2 when
+    # the cover is present, page 1 when it is not.
+    footer = (FOOTER_TYPST
+              .replace("<<stamp>>", stamp)
+              .replace("<<first>>", "2" if cover else "1"))
+    return cover + PAGEBREAK_TYPST + footer
 
 # Inserted after the title block and before the outline, so the table
 # of contents opens on its own page instead of running on from the
@@ -122,6 +151,11 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
         "--resource-path", str(build_site.IMAGES_SRC),
         "--include-in-header", str(header),
         "--include-before-body", str(before),
+        # Widen typst's project root to the drive so the cover's
+        # root-relative path (see COVER_TYPST) resolves from
+        # pandoc's temp compilation directory.
+        "--pdf-engine-opt=--root",
+        f"--pdf-engine-opt={Path(ROOT.anchor).as_posix()}",
         "--toc", f"--toc-depth={TOC_DEPTH}",
         # Page numbering stays on even though FOOTER_TYPST replaces
         # the footer it would render: the outline formats the TOC's

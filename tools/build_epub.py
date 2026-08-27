@@ -85,10 +85,13 @@ from tools_config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools_config import ROOT
 from tools_markdown import Document
 
-# A JPEG on purpose: the cover is painted art with smooth gradients,
-# which PNG stores at ~6.4 MB against JPEG's ~700 KB with no visible
-# difference on a reader. Half the old EPUB's weight was this file.
-COVER = ROOT / "resources" / "static" / "cover.jpg"
+# The cover is generated flat vector art (tools/make_cover.py), so
+# PNG beats JPEG here: large solid areas deflate to ~120 KB at
+# 1600x2560, Kindle's cover ratio (sleep mode shows it full screen).
+# Each variant has its own rendering: color, and grayscale for the
+# e-ink EPUB, matching the variants' stylesheet split.
+def cover_png(variant: str) -> Path:
+    return ROOT / "resources" / "static" / f"cover-{variant}.png"
 IMAGES_SRC = build_site.IMAGES_SRC
 EPUB_STEM = "ThinkingInPython"
 # The two EPUBs this build produces. Same markup, different stylesheet:
@@ -742,7 +745,8 @@ th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 # --------------------------------------------------------------------------- #
 def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
                images: Path | None = None,
-               dc: Path | None = None) -> None:
+               dc: Path | None = None,
+               cover: Path | None = None) -> None:
     resources = [str(IMAGES_SRC)]
     if images is not None and images.is_dir():
         # First on the path, so a rasterized diagram wins over its SVG.
@@ -767,8 +771,8 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
         "--toc", "--toc-depth=2",
         "--split-level=1",
     ]
-    if COVER.exists():
-        command += ["--epub-cover-image", str(COVER)]
+    if cover is not None and cover.exists():
+        command += ["--epub-cover-image", str(cover)]
     if dc is not None:
         command += ["--epub-metadata", str(dc)]
     command.append(str(src))
@@ -822,13 +826,14 @@ def build(out_dir: Path, keep_source: bool = False,
         css = src_dir / f"epub-{variant}.css"
         css.write_text(epub_css(variant), encoding="utf-8")
         epub = out_dir / epub_name(variant)
-        run_pandoc(src, css, meta, epub, images, dc)
+        cover = cover_png(variant)
+        if not cover.exists():
+            print(f"NOTE: no cover at {cover.relative_to(ROOT)}; "
+                  "run tools/make_cover.py.")
+        run_pandoc(src, css, meta, epub, images, dc, cover)
         size = epub.stat().st_size / 1024
         print(f"Built {epub.relative_to(ROOT)} "
               f"({len(chapters)} chapters, {size:.0f} KB).")
-
-    if not COVER.exists():
-        print(f"NOTE: no cover image at {COVER.relative_to(ROOT)}.")
 
     if not keep_source:
         shutil.rmtree(src_dir)

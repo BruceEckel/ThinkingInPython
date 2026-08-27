@@ -259,7 +259,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site epub pdf release local serve
+.PHONY: sync check prune site cover epub pdf release local serve
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -278,6 +278,13 @@ prune:  ## Delete orphaned stray files under Examples/ (see `check`)
 
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
+
+# The cover art, favicon, and their EPUB raster variants are
+# generated files under resources/static/, committed so the builds
+# never depend on resvg being installed. Regenerate after editing
+# tools/make_cover.py (the design is a program, not an asset).
+cover:  ## Regenerate the cover art and favicon into resources/static/
+	$(PY) tools/make_cover.py
 
 # Two EPUBs from the same Chapters/, for e-readers: -color (syntax
 # highlighting in color, for backlit readers) and -eink (bolding
