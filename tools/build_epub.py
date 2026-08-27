@@ -85,13 +85,18 @@ from tools_config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools_config import ROOT
 from tools_markdown import Document
 
-# The cover is generated flat vector art (tools/make_cover.py), so
-# PNG beats JPEG here: large solid areas deflate to ~120 KB at
-# 1600x2560, Kindle's cover ratio (sleep mode shows it full screen).
-# Each variant has its own rendering: color, and grayscale for the
-# e-ink EPUB, matching the variants' stylesheet split.
-def cover_png(variant: str) -> Path:
-    return ROOT / "resources" / "static" / f"cover-{variant}.png"
+# The cover comes from tools/make_cover.py at 1600x2560, Kindle's
+# cover ratio (sleep mode shows it full screen), one rendering per
+# variant: color, and grayscale for the e-ink EPUB. Art mode
+# (a supplied painting) emits JPEG; drawn mode (flat vector art)
+# emits PNG, which deflates better for solid areas. Accept either.
+def cover_image(variant: str) -> Path | None:
+    for ext in ("jpg", "png"):
+        path = (ROOT / "resources" / "static"
+                / f"cover-{variant}.{ext}")
+        if path.exists():
+            return path
+    return None
 IMAGES_SRC = build_site.IMAGES_SRC
 EPUB_STEM = "ThinkingInPython"
 # The two EPUBs this build produces. Same markup, different stylesheet:
@@ -826,9 +831,9 @@ def build(out_dir: Path, keep_source: bool = False,
         css = src_dir / f"epub-{variant}.css"
         css.write_text(epub_css(variant), encoding="utf-8")
         epub = out_dir / epub_name(variant)
-        cover = cover_png(variant)
-        if not cover.exists():
-            print(f"NOTE: no cover at {cover.relative_to(ROOT)}; "
+        cover = cover_image(variant)
+        if cover is None:
+            print(f"NOTE: no cover-{variant} image; "
                   "run tools/make_cover.py.")
         run_pandoc(src, css, meta, epub, images, dc, cover)
         size = epub.stat().st_size / 1024

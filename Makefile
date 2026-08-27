@@ -279,11 +279,12 @@ prune:  ## Delete orphaned stray files under Examples/ (see `check`)
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) tools/build_site.py
 
-# The cover art, favicon, and their EPUB raster variants are
-# generated files under resources/static/, committed so the builds
-# never depend on resvg being installed. Regenerate after editing
-# tools/make_cover.py (the design is a program, not an asset).
-cover:  ## Regenerate the cover art and favicon into resources/static/
+# The cover images and favicon are generated files under
+# resources/static/, committed so the builds never depend on the
+# generator's tools (resvg, Pillow). To use new cover art, drop
+# the image at resources/cover-source.jpg and rerun this; with no
+# source image the script falls back to its own drawn serpent.
+cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
 	$(PY) tools/make_cover.py
 
 # Two EPUBs from the same Chapters/, for e-readers: -color (syntax

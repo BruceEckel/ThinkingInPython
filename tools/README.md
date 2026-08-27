@@ -952,17 +952,26 @@ with nothing in the build to show for it.
 
 ## make_cover.py
 
-Generates the cover and favicon as parametric SVG: an Escher-inspired
-ouroboros python coiled into an infinity sign, in the site's palette.
-Run `make cover` after editing the script; the outputs under
-`resources/static/` are committed, so the book builds never need the
-generator's one external tool (`resvg`, for the EPUB PNGs). One design,
-five renderings: `cover.svg` (1:1.6, Kindle's ratio), `cover-letter.svg`
-(US Letter, embedded as vector on the PDF's first page),
-`cover-art.svg` (the serpent alone, on the site's index page),
-`cover-{color,eink}.png` (1600x2560, one per EPUB variant), and
-`favicon.svg` (an angular ∞ with a diamond head, linked from every
-site page). `--preview` writes a small `cover-preview.png` for quick
+Generates the covers and favicon. Two modes, chosen by whether
+`resources/cover-source.jpg` exists. **Art mode** (the usual one):
+that image, whatever its size, is composited with the book's
+typography; the page background is sampled from the image's corners
+and the art's edges are feathered into it, so any art on its own
+paper color drops in seamlessly. To restyle the book, replace
+`cover-source.jpg` and run `make cover`. **Drawn mode** (no source
+image): a parametric serpent computed by the script, a python coiled
+into an infinity sign in the site's palette.
+
+Either way the outputs under `resources/static/` are committed, so
+the book builds never need the generator's tools (`resvg` to render,
+Pillow to encode). Four cover roles: the EPUB covers
+(`cover-{color,eink}.jpg` or `.png`, 1600x2560, Kindle's ratio, the
+e-ink one derived as autocontrasted grayscale), the PDF's full-bleed
+first page (`cover-letter.{jpg,svg}`, US Letter ratio), and the
+site's index art (`cover-art.{jpg,svg}`). The builders accept either
+file family, and each mode deletes the other's outputs. Plus
+`favicon.svg`: an angular ∞ with a diamond head, linked from every
+site page. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
 ## build_pdf.py

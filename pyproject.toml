@@ -32,6 +32,9 @@ dev = [
     # Chapter 18's vectorize_numpy.py is a real gated listing; the Numba
     # sections stay illustrative until numba supports the pinned Python.
     "numpy>=2.5.2",
+    # tools/make_cover.py's art mode: JPEG encoding, grayscale
+    # derivation, and resizing for the composited book covers.
+    "pillow>=12.3.0",
 ]
 
 [tool.uv]

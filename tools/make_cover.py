@@ -1,32 +1,42 @@
 #!/usr/bin/env python3
-"""Generate the book cover and favicon from one parametric design.
+"""Generate the book cover and favicon, from art or from code.
 
-The artwork is an M. C. Escher-inspired ouroboros: a python whose
-body traces a lemniscate (infinity sign) and whose mouth closes on
-its own tail. The body is a ribbon of alternating tessellated
-segments in the site's palette, woven over/under at the central
-crossing the way Escher's "Knots" woodcuts weave.
+Two modes, chosen by whether `resources/cover-source.jpg` exists:
 
-Everything is computed here and emitted as SVG, so the design is a
-program, not a binary asset. Outputs, all under resources/static/:
+- **Art mode** (the usual one): composite that image, whatever its
+  size, with the book's typography. Drop in a new image and run
+  `make cover` to restyle every distribution at once. The page
+  background is sampled from the image's corners so the art sits
+  on its own paper color with no visible seam.
+- **Drawn mode** (fallback, no source image): a parametric serpent
+  computed here: a python coiled into an infinity sign, woven at
+  the crossing, swallowing its tail.
 
-- cover.svg          master cover (site + PDF, vector)
-- cover-eink.svg     grayscale variant for the e-ink EPUB
-- cover-color.png    1600x2560 raster for the color EPUB (Kindle
-                     sleep screens show the cover full-bleed)
-- cover-eink.png     the same for the e-ink EPUB
-- favicon.svg        stripped-down angular infinity + diamond head
+Outputs land in resources/static/ and are committed, so the book
+builds themselves never need this script's tools (resvg, Pillow).
+Each mode deletes the other mode's outputs; the builders accept
+either family:
 
-Rasterization uses resvg (the same renderer build_epub.py uses for
-diagrams). Text is set in Palatino Linotype, which ships with
-Windows and macOS; regenerate on a machine that has it.
+- art mode:   cover-color.jpg, cover-eink.jpg (EPUB covers,
+              1600x2560, Kindle's ratio), cover-letter.jpg (the
+              PDF's full-bleed first page), cover-art.jpg (site
+              index)
+- drawn mode: the same four roles as SVG/PNG (cover.svg,
+              cover-eink.svg, cover-letter.svg, cover-art.svg,
+              cover-color.png, cover-eink.png)
+- always:     favicon.svg (an angular infinity with a diamond
+              head, per the site's palette)
+
+Text is set in Palatino Linotype, which ships with Windows and
+macOS; regenerate on a machine that has it.
 
 Usage:
-    uv run python tools/make_cover.py            # write everything
-    uv run python tools/make_cover.py --preview  # small PNG preview
+    uv run python tools/make_cover.py            # everything
+    uv run python tools/make_cover.py --preview  # small PNG only
 """
 
 import argparse
+import base64
 import math
 import shutil
 import subprocess
@@ -35,24 +45,152 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "resources" / "static"
+ART_SOURCE = ROOT / "resources" / "cover-source.jpg"
+TEMP = ROOT / "build" / "cover"
 
-# Page geometry (SVG user units). 1:1.6, Kindle's cover ratio.
+# Page geometry (SVG user units). 1:1.6, Kindle's cover ratio;
+# 1294 is the same width at US Letter's ratio.
 W, H = 1000, 1600
+LETTER_H = 1294
 
 # The site's palette (build_site.py), so every surface matches.
 PAPER = "#f5f0e8"
 INK = "#1a1612"
 ACCENT = "#8b1a1a"
-MUTED = "#7a6e62"
 
-# E-ink variant: same drawing, no color.
-EINK = {ACCENT: "#555049", MUTED: "#555049"}
+# E-ink drawn variant: same drawing, no color.
+EINK = {ACCENT: "#555049"}
 
 TITLE_FONT = "Palatino Linotype, Palatino, Georgia, serif"
 
+DRAWN_FILES = ("cover.svg", "cover-eink.svg", "cover-letter.svg",
+               "cover-art.svg", "cover-color.png",
+               "cover-eink.png")
+ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
+             "cover-letter.jpg", "cover-art.jpg")
+
 
 # --------------------------------------------------------------------------- #
-# The serpent's spine: a lemniscate of Bernoulli
+# Shared page furniture
+# --------------------------------------------------------------------------- #
+def titles_svg(h: int, ink: str = INK,
+               accent: str = ACCENT) -> str:
+    """Title, rule, and author for a page of height h."""
+    return f'''<text x="{W / 2}" y="170" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="92"
+        fill="{ink}">Thinking</text>
+  <text x="{W / 2}" y="280" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="92"
+        fill="{ink}">in Python</text>
+  <rect x="{W / 2 - 60}" y="330" width="120" height="4"
+        fill="{accent}"/>
+  <text x="{W / 2}" y="{h - 90}" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="44"
+        letter-spacing="10" fill="{ink}">BRUCE ECKEL</text>'''
+
+
+def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
+    resvg = shutil.which("resvg")
+    if resvg is None:
+        raise SystemExit("resvg not found; scoop install resvg")
+    subprocess.run(
+        [resvg, "--width", str(width), str(svg_path),
+         str(png_path)],
+        check=True)
+
+
+# --------------------------------------------------------------------------- #
+# Art mode: composite a supplied image with the typography
+# --------------------------------------------------------------------------- #
+def sample_bg(img) -> str:
+    """The art's own paper color, averaged from its corners."""
+    px = img.convert("RGB")
+    w, h = img.size
+    corners = [px.getpixel(p) for p in
+               ((3, 3), (w - 4, 3), (3, h - 4), (w - 4, h - 4))]
+    r, g, b = (round(sum(c[i] for c in corners) / 4)
+               for i in range(3))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def art_page_svg(uri: str, iw: int, ih: int, h: int,
+                 bg: str) -> str:
+    """One cover page: sampled background, art band, titles.
+
+    The art's top and bottom edges are feathered into the page
+    background, so a slight mismatch between the sampled corner
+    color and the art's interior paper never shows as a seam.
+    """
+    art_h = W * ih / iw
+    y = h * 0.52 - art_h / 2
+    feather = 70
+    return f'''<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 {W} {h}" width="{W}" height="{h}">
+  <defs>
+    <linearGradient id="ftop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{bg}" stop-opacity="1"/>
+      <stop offset="1" stop-color="{bg}" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fbot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{bg}" stop-opacity="0"/>
+      <stop offset="1" stop-color="{bg}" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect width="{W}" height="{h}" fill="{bg}"/>
+  <image x="0" y="{y:.0f}" width="{W}" height="{art_h:.0f}"
+         href="{uri}"/>
+  <rect x="0" y="{y:.0f}" width="{W}" height="{feather}"
+        fill="url(#ftop)"/>
+  <rect x="0" y="{y + art_h - feather:.0f}" width="{W}"
+        height="{feather}" fill="url(#fbot)"/>
+  {titles_svg(h)}
+</svg>'''
+
+
+def art_outputs(preview: bool) -> None:
+    from PIL import Image, ImageOps
+
+    img = Image.open(ART_SOURCE)
+    iw, ih = img.size
+    bg = sample_bg(img)
+    data = ART_SOURCE.read_bytes()
+    uri = ("data:image/jpeg;base64,"
+           + base64.b64encode(data).decode("ascii"))
+    TEMP.mkdir(parents=True, exist_ok=True)
+
+    def compose(h: int, out_png: Path, width: int) -> None:
+        svg = TEMP / f"page-{h}.svg"
+        svg.write_text(art_page_svg(uri, iw, ih, h, bg),
+                       encoding="utf-8")
+        rasterize(svg, out_png, width)
+
+    if preview:
+        compose(H, STATIC / "cover-preview.png", 500)
+        print("wrote cover-preview.png (art mode)")
+        return
+
+    compose(H, TEMP / "kindle.png", 1600)
+    compose(LETTER_H, TEMP / "letter.png", 1600)
+    kindle = Image.open(TEMP / "kindle.png").convert("RGB")
+    kindle.save(STATIC / "cover-color.jpg", quality=87,
+                optimize=True)
+    gray = ImageOps.autocontrast(ImageOps.grayscale(kindle),
+                                 cutoff=1)
+    gray.save(STATIC / "cover-eink.jpg", quality=87,
+              optimize=True)
+    letter = Image.open(TEMP / "letter.png").convert("RGB")
+    letter.save(STATIC / "cover-letter.jpg", quality=87,
+                optimize=True)
+    site = img.convert("RGB")
+    site.thumbnail((1100, 1100))
+    site.save(STATIC / "cover-art.jpg", quality=84,
+              optimize=True)
+    for stale in DRAWN_FILES:
+        (STATIC / stale).unlink(missing_ok=True)
+
+
+# --------------------------------------------------------------------------- #
+# Drawn mode: the serpent's spine, a lemniscate of Bernoulli
 # --------------------------------------------------------------------------- #
 def lemniscate(t: float, a: float) -> tuple[float, float]:
     """Point on the lemniscate for parameter t, half-width a."""
@@ -64,12 +202,7 @@ def lemniscate(t: float, a: float) -> tuple[float, float]:
 def spine(a: float, cx: float, cy: float,
           t_head: float, t_tail: float,
           n: int) -> list[tuple[float, float]]:
-    """Sampled spine from head parameter to tail parameter.
-
-    The head sits just past the crossing on the right lobe and the
-    body runs the long way around both lobes, so the mouth meets
-    the tail after a full figure-eight.
-    """
+    """Sampled spine from head parameter to tail parameter."""
     points = []
     for i in range(n + 1):
         t = t_head + (t_tail - t_head) * i / n
@@ -83,7 +216,6 @@ def widths(n: int, w_head: float, w_tail: float) -> list[float]:
     out = []
     for i in range(n + 1):
         u = i / n
-        # Ease-out taper: stays thick for most of the body.
         w = w_tail + (w_head - w_tail) * (1 - u) ** 1.6
         out.append(w)
     return out
@@ -108,19 +240,11 @@ def edge(pts: list[tuple[float, float]],
             for i, ((x, y), (nx, ny)) in enumerate(zip(pts, nrm))]
 
 
-def poly(points: list[tuple[float, float]], fill: str,
-         extra: str = "") -> str:
+def poly(points: list[tuple[float, float]], fill: str) -> str:
     coords = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
-    return f'<polygon points="{coords}" fill="{fill}" {extra}/>'
+    return f'<polygon points="{coords}" fill="{fill}"/>'
 
 
-def path_d(points: list[tuple[float, float]]) -> str:
-    return "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in points)
-
-
-# --------------------------------------------------------------------------- #
-# Building the woven, tessellated body
-# --------------------------------------------------------------------------- #
 def strand(pts: list[tuple[float, float]],
            nrm: list[tuple[float, float]],
            hw: list[float], s: int, e: int) -> str:
@@ -167,8 +291,7 @@ def body_svg(a: float, cx: float, cy: float) -> str:
                 hy + f[1] * u + m[1] * v)
 
     # Bend the tail's last stretch off the lemniscate so its tip
-    # lands inside the open mouth: translate the end smoothly
-    # toward the gape.
+    # lands inside the open mouth.
     target = loc(0.5 * w0, -0.5 * w0)
     dx, dy = target[0] - pts[n][0], target[1] - pts[n][1]
     bend = 110
@@ -217,8 +340,6 @@ def head_svg(loc, w: float,
     `loc(u, v)` maps head-local coordinates (u forward out of the
     mouth, v to the snake's left) into the page.
     """
-    # The silhouette: crown over the top, rounded snout, open
-    # lower jaw curving back under.
     outline = bez(
         loc(-0.5 * w, 1.0 * w),
         loc(0.8 * w, 1.28 * w), loc(2.0 * w, 1.1 * w),
@@ -255,38 +376,55 @@ def head_svg(loc, w: float,
     return head + mouth + tail + eye
 
 
-# --------------------------------------------------------------------------- #
-# Assembling the cover page
-# --------------------------------------------------------------------------- #
 def cover_svg(h: int = H) -> str:
-    """The full cover at width W and any height (Kindle's 1600
-    tall, or 1294 for a full-bleed US Letter PDF page)."""
+    """The drawn cover at width W and any height."""
     art = body_svg(a=415, cx=W / 2, cy=h * 0.505)
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 {W} {h}" width="{W}" height="{h}">
   <rect width="{W}" height="{h}" fill="{PAPER}"/>
-  <text x="{W / 2}" y="170" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="92"
-        fill="{INK}">Thinking</text>
-  <text x="{W / 2}" y="280" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="92"
-        fill="{INK}">in Python</text>
-  <rect x="{W / 2 - 60}" y="330" width="120" height="4"
-        fill="{ACCENT}"/>
   {art}
-  <text x="{W / 2}" y="{h - 90}" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="44"
-        letter-spacing="10" fill="{INK}">BRUCE ECKEL</text>
+  {titles_svg(h)}
 </svg>'''
 
 
 def art_svg() -> str:
-    """The serpent alone, for the site's index page."""
+    """The drawn serpent alone, for the site's index page."""
     art = body_svg(a=415, cx=W / 2, cy=280)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" '
             f'viewBox="0 0 {W} 560">{art}</svg>')
 
 
+def eink(svg: str) -> str:
+    for src, dst in EINK.items():
+        svg = svg.replace(src, dst)
+    return svg
+
+
+def drawn_outputs(preview: bool) -> None:
+    master = cover_svg()
+    (STATIC / "cover.svg").write_text(master, encoding="utf-8")
+    if preview:
+        rasterize(STATIC / "cover.svg",
+                  STATIC / "cover-preview.png", 500)
+        print("wrote cover-preview.png (drawn mode)")
+        return
+    (STATIC / "cover-eink.svg").write_text(
+        eink(master), encoding="utf-8")
+    (STATIC / "cover-letter.svg").write_text(
+        cover_svg(h=LETTER_H), encoding="utf-8")
+    (STATIC / "cover-art.svg").write_text(
+        art_svg(), encoding="utf-8")
+    rasterize(STATIC / "cover.svg",
+              STATIC / "cover-color.png", 1600)
+    rasterize(STATIC / "cover-eink.svg",
+              STATIC / "cover-eink.png", 1600)
+    for stale in ART_FILES:
+        (STATIC / stale).unlink(missing_ok=True)
+
+
+# --------------------------------------------------------------------------- #
+# The favicon (both modes)
+# --------------------------------------------------------------------------- #
 def favicon_svg() -> str:
     """Angular infinity polyline with a diamond head, on paper."""
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
@@ -301,22 +439,6 @@ def favicon_svg() -> str:
 </svg>'''
 
 
-def eink(svg: str) -> str:
-    for src, dst in EINK.items():
-        svg = svg.replace(src, dst)
-    return svg
-
-
-def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
-    resvg = shutil.which("resvg")
-    if resvg is None:
-        raise SystemExit("resvg not found; scoop install resvg")
-    subprocess.run(
-        [resvg, "--width", str(width), str(svg_path),
-         str(png_path)],
-        check=True)
-
-
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--preview", action="store_true",
@@ -324,29 +446,19 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     STATIC.mkdir(parents=True, exist_ok=True)
-    master = cover_svg()
-    (STATIC / "cover.svg").write_text(master, encoding="utf-8")
+    if ART_SOURCE.exists():
+        print(f"art mode: {ART_SOURCE.relative_to(ROOT)}")
+        art_outputs(args.preview)
+        made = ART_FILES
+    else:
+        print("drawn mode: no resources/cover-source.jpg")
+        drawn_outputs(args.preview)
+        made = DRAWN_FILES
     if args.preview:
-        rasterize(STATIC / "cover.svg",
-                  STATIC / "cover-preview.png", 500)
-        print("wrote cover-preview.png")
         return 0
-    (STATIC / "cover-eink.svg").write_text(
-        eink(master), encoding="utf-8")
-    (STATIC / "cover-letter.svg").write_text(
-        cover_svg(h=1294), encoding="utf-8")
-    (STATIC / "cover-art.svg").write_text(
-        art_svg(), encoding="utf-8")
     (STATIC / "favicon.svg").write_text(
         favicon_svg(), encoding="utf-8")
-    rasterize(STATIC / "cover.svg",
-              STATIC / "cover-color.png", 1600)
-    rasterize(STATIC / "cover-eink.svg",
-              STATIC / "cover-eink.png", 1600)
-    for name in ("cover.svg", "cover-eink.svg",
-                 "cover-letter.svg", "cover-art.svg",
-                 "favicon.svg",
-                 "cover-color.png", "cover-eink.png"):
+    for name in (*made, "favicon.svg"):
         size = (STATIC / name).stat().st_size
         print(f"{name}: {size / 1024:.0f} KB")
     return 0

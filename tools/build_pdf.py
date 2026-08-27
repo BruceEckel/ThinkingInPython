@@ -107,19 +107,26 @@ COVER_TYPST = """\
 #counter(page).update(0)
 """
 
-# The letter-ratio rendering, so the full-bleed page crops nothing.
-COVER_SVG = ROOT / "resources" / "static" / "cover-letter.svg"
+# The letter-ratio rendering, so the full-bleed page crops
+# nothing: vector SVG from drawn mode, or JPEG from art mode.
+def cover_file() -> Path | None:
+    for name in ("cover-letter.svg", "cover-letter.jpg"):
+        path = ROOT / "resources" / "static" / name
+        if path.exists():
+            return path
+    return None
 
 
 def header_typst(release: str | None) -> str:
     """The typst preamble: cover, page breaks, and the footer."""
     stamp = build_epub.release_line(release) if release else ""
     cover = ""
-    if COVER_SVG.exists():
+    cover_path = cover_file()
+    if cover_path is not None:
         # Typst reads "/..." as root-relative; run_pandoc sets the
         # root to this drive's top, so strip the anchor.
-        rooted = "/" + COVER_SVG.relative_to(
-            COVER_SVG.anchor).as_posix()
+        rooted = "/" + cover_path.relative_to(
+            cover_path.anchor).as_posix()
         cover = COVER_TYPST.replace("<<cover>>", rooted)
     # The footer stays off the title page: physical page 2 when
     # the cover is present, page 1 when it is not.

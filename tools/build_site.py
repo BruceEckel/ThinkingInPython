@@ -216,6 +216,10 @@ def render_index(chapters: list[Chapter]) -> str:
             f'    <li><span class="toc-num">{ch.number}</span>'
             f'<a href="{ch.out_name}">{ch.title}</a></li>')
     rows = "\n".join(items)
+    # Art mode (make_cover.py) emits a JPEG; drawn mode an SVG.
+    cover_art = ("cover-art.jpg"
+                 if (STATIC_SRC / "cover-art.jpg").exists()
+                 else "cover-art.svg")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -235,7 +239,7 @@ def render_index(chapters: list[Chapter]) -> str:
     <h1 class="book-title">{BOOK_TITLE}</h1>
     <p class="book-subtitle">{BOOK_SUBTITLE}</p>
     <div class="title-rule"></div>
-    <img class="cover-art" src="cover-art.svg"
+    <img class="cover-art" src="{cover_art}"
          alt="A python as an ouroboros, coiled into an infinity sign">
     <ul class="toc-list">
 {rows}
@@ -389,7 +393,8 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
         if filename:
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
             copied += 1
-    for asset in ("favicon.svg", "cover-art.svg"):
+    for asset in ("favicon.svg", "cover-art.svg",
+                  "cover-art.jpg"):
         if (STATIC_SRC / asset).exists():
             shutil.copy2(STATIC_SRC / asset, out_dir / asset)
 
