@@ -10,7 +10,6 @@ Fable: What else should I do before I start my hand-editing pass? I'm hoping thi
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 Examples that demonstrate probability or statistics, very simply
 EMDR tool
-Interactive Starry Night
 analog computer
 things floating upward
 
