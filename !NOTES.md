@@ -28,8 +28,6 @@ Fatal vs recoverable errors
 
 - Indexing using Leanpub format, before publishing to leanpub
 
-- Potential example: A task runner based on decorators and generators
-
 ## Periodic
 
 - Have we learned anything new that should be added to thinking-in-python-skill.md?

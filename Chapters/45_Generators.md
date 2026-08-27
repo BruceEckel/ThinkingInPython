@@ -568,11 +568,66 @@ A generator function builds a description instead of doing work.
 so the description can ask for something.
 `yield from` composes those conversations without any participant learning who drives.
 
+Those ideas are enough to build a task runner:
+register each generator with a decorator, keep the live ones in a queue,
+and take turns:
+
+```python
+# task_runner.py
+from collections import deque
+from collections.abc import Callable, Iterator
+
+type Job = Callable[[], Iterator[str]]
+
+ready: deque[Iterator[str]] = deque()
+
+def task(fn: Job) -> Job:
+    ready.append(fn())
+    return fn
+
+@task
+def download() -> Iterator[str]:
+    for part in ("headers", "body", "checksum"):
+        yield f"download: {part}"
+
+@task
+def index() -> Iterator[str]:
+    yield "index: build"
+    yield "index: merge"
+
+def task_runner() -> None:
+    while ready:
+        job = ready.popleft()
+        try:
+            print(next(job))
+        except StopIteration:
+            continue  # Finished: never requeued
+        ready.append(job)
+
+task_runner()
+#: download: headers
+#: index: build
+#: download: body
+#: index: merge
+#: download: checksum
+```
+
+`@task` calls each generator function once at definition time,
+queues the generator it builds, and hands the function back unchanged,
+the registering-decorator shape from [Decorators](14_Decorators.md#decorating-classes).
+`task_runner()` gives the front task one `next()` per turn.
+A task that yields moves to the back of the queue;
+one that finishes raises `StopIteration` and is never requeued.
+The output interleaves the two tasks,
+though neither mentions the other and no threads exist.
+Each `yield` is a task agreeing to pause so the others can run.
+
 None of this is exotic, and you have run a driver like `drive()` many times.
 [Concurrency](19_Concurrency.md#asyncio-mechanics)
 presented `await` and the event loop as a way to overlap waiting,
 and left the mechanism alone.
-The mechanism is this one.
+The mechanism is the two halves you have now seen:
+`task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
 `await` suspends the coroutine and hands a request out to the loop,
