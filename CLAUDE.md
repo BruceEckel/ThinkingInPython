@@ -277,7 +277,14 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   (two of ch03's three ignores went unused), `filter(lambda ...)` no
   longer narrowing its element type (ch16's `map`/`filter` listings broke),
   and higher-order union subtraction starting to work (the caveat that
-  invalidated has since been removed from the text). After `make tools-upgrade`, run
+  invalidated has since been removed from the text). The 0.0.70 to 0.0.75
+  upgrade added two more shapes: a new `missing-slot` check that misfires
+  on typeshed's `weakref.finalize` (its writable `atexit` property is
+  modeled as a plain attribute absent from `__slots__`; ch10's
+  `finalize_trap.py` carries the `# type: ignore`), and dict keys inferred
+  as literal class objects no longer accepting a `type(e)` lookup (fixed
+  by annotating the dict explicitly, `Final[dict[type[Expr], int]]`, in
+  Solutions ch34). After `make tools-upgrade`, run
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
   before assuming the first failure is the only one: `make all` stops at
   the first failing gate and `solutions-gate` runs last.

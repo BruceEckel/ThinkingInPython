@@ -1,7 +1,7 @@
 # exercise_4.py
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import assert_never
+from typing import Final, assert_never
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -39,7 +39,8 @@ type Expr = Num | Var | Add | Mul
 def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 
-PRECEDENCE = {Add: 1, Mul: 2, Num: 3, Var: 3}
+PRECEDENCE: Final[dict[type[Expr], int]] = {
+    Add: 1, Mul: 2, Num: 3, Var: 3}
 
 def to_infix(e: Expr, parent_prec: int = 0) -> str:
     match e:

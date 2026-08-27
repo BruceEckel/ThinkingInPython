@@ -307,7 +307,9 @@ from weakref import finalize, ref
 class Leaky:
     def __init__(self, name: str) -> None:
         self.name = name
-        finalize(self, self.close).atexit = False
+        # ty: missing-slot: typeshed's finalize lists no
+        # slot for its writable atexit property:
+        finalize(self, self.close).atexit = False  # type: ignore
 
     def close(self) -> None:
         print(self.name, "closed")
