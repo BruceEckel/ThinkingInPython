@@ -9,17 +9,17 @@ class SimpleMeta(type):
         setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
 class Simple(metaclass=SimpleMeta):
-    def foo(self) -> None: pass
+    def ping(self) -> None: pass
 
     @staticmethod
-    def bar() -> None: pass
+    def pong() -> None: pass
 
 display_object(Simple)
 #: [Attributes]
 #:   None
 #: [Methods]
-#:   • bar() -> None
-#:   • foo(self) -> None
+#:   • ping(self) -> None
+#:   • pong() -> None
 #:   • uses_metaclass(self)
 print(Simple().uses_metaclass())  # type: ignore
 #: Yes!

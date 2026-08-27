@@ -139,19 +139,19 @@ class EmailAddress:
               f"EmailAddress({self.text!r})",
               "needs text on both sides")
 
-for bad in ["bruce", "b@@x.com", "@x.com", "b@", ""]:
+for bad in ["grace", "b@@x.com", "@x.com", "b@", ""]:
     try:
         EmailAddress(bad)
     except TypeFailure as e:
         print("rejected:", e)
-#: rejected: EmailAddress('bruce') needs exactly one @
+#: rejected: EmailAddress('grace') needs exactly one @
 #: rejected: EmailAddress('b@@x.com') needs exactly one @
 #: rejected: EmailAddress('@x.com') needs text on both sides
 #: rejected: EmailAddress('b@') needs text on both sides
 #: rejected: EmailAddress('') needs exactly one @
 
-print(EmailAddress("bruce@example.com"))
-#: EmailAddress(text='bruce@example.com')
+print(EmailAddress("grace@example.com"))
+#: EmailAddress(text='grace@example.com')
 ```
 
 The original check, `"@" in self.text`, only confirms an `@` appears
@@ -267,7 +267,7 @@ def from_json(text: str) -> Person:
                   EmailAddress(data["email"]))
 
 bad_json = json.dumps(
-    {"name": "Bruce Eckel", "email": "no-at-sign"})
+    {"name": "Grace Hopper", "email": "no-at-sign"})
 try:
     from_json(bad_json)
 except TypeFailure as e:

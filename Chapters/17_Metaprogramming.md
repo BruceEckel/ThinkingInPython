@@ -12,31 +12,31 @@ the inspection helper this chapter builds in [Building `display_object()`](#buil
 # modify_class.py
 from display import display_object
 
-class Foo:
+class Clay:
     pass
 
-display_object(Foo)
+display_object(Clay)
 #: [Attributes]
 #:   None
 #: [Methods]
 #:   None
 
-x = Foo()
+x = Clay()
 display_object(x)
 #: [Attributes]
 #:   None
 #: [Methods]
 #:   None
 
-Foo.n = 42  # type: ignore
-display_object(Foo)
+Clay.n = 42  # type: ignore
+display_object(Clay)
 #: [Attributes]
 #:   • n = 42 [CV]
 #: [Methods]
 #:   None
 
-Foo.m = lambda self: f"{self.n = }"  # type: ignore
-display_object(Foo)
+Clay.m = lambda self: f"{self.n = }"  # type: ignore
+display_object(Clay)
 #: [Attributes]
 #:   • n = 42 [CV]
 #: [Methods]
@@ -693,7 +693,7 @@ class User:
     age: int = 0
 
 try:
-    User("Bruce", 30)  # The checker accepts this call
+    User("Guido", 30)  # The checker accepts this call
 except TypeError as e:
     print(e)
 #: User() takes no arguments
@@ -723,9 +723,9 @@ class User:
     name: str
     age: int = 0
 
-u = User("Bruce", 30)
+u = User("Guido", 30)
 print(u)
-#: User(name='Bruce', age=30)
+#: User(name='Guido', age=30)
 # ty: Property `age` defined in `User` is read-only:
 # u.age = 9
 ```
@@ -907,17 +907,17 @@ class SimpleMeta(type):
         setattr(cls, "uses_metaclass", lambda self: "Yes!")
 
 class Simple(metaclass=SimpleMeta):
-    def foo(self) -> None: pass
+    def ping(self) -> None: pass
 
     @staticmethod
-    def bar() -> None: pass
+    def pong() -> None: pass
 
 display_object(Simple)
 #: [Attributes]
 #:   None
 #: [Methods]
-#:   • bar() -> None
-#:   • foo(self) -> None
+#:   • ping(self) -> None
+#:   • pong() -> None
 #:   • uses_metaclass(self)
 print(Simple().uses_metaclass())  # type: ignore
 #: Yes!
@@ -926,7 +926,7 @@ print(Simple().uses_metaclass())  # type: ignore
 `SimpleMeta.__init__()` runs once, as the `class Simple` statement finishes,
 and patches a new method onto the freshly built class.
 In the `display_object()` output,
-`uses_metaclass(self)` sits alongside `foo` and `bar`,
+`uses_metaclass(self)` sits alongside `ping` and `pong`,
 indistinguishable from the methods in the class body.
 The injected value is a lambda, but a function is a descriptor
 ([Learning a Name with `__set_name__()`](#learning-a-name-with-__set_name__)),
@@ -997,10 +997,10 @@ class Meta(type):
         # Effect: this modifies the finished class
         setattr(cls, "patched_in_init", 3.14)
 
-class Demo(metaclass=Meta):
+class Built(metaclass=Meta):
     pass
 
-display_object(Demo(), dunder=["__new__", "__init__"])
+display_object(Built(), dunder=["__new__", "__init__"])
 #: [Attributes]
 #:   • added_in_new = 42 [CV]
 #:   • patched_in_init = 3.14 [CV]
@@ -1008,7 +1008,7 @@ display_object(Demo(), dunder=["__new__", "__init__"])
 #:   • __init__(self, /, *args, **kwargs)
 #:   • __new__(*args, **kwargs)
 
-print("has Tag base:", Tag in Demo.__bases__)
+print("has Tag base:", Tag in Built.__bases__)
 #: has Tag base: True
 ```
 
@@ -1504,7 +1504,7 @@ For an instance, the tag distinguishes storage borrowed from the class from stor
 the same rule `Stars.rating` demonstrates in [Class Attributes](09_Class_Attributes.md#class-attributes-are-not-default-values).
 `class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
 tags `B.x` and `B.s`,
-while `display_object(Messenger("foo", 12, 3.14))` tags none,
+while `display_object(Messenger("iris", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
 The tag reports this dynamically, from where the value lives,
 so it applies whether or not the attribute's declaration uses `typing.ClassVar`.

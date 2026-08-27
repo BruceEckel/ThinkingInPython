@@ -9,7 +9,7 @@ class Email:
         self.text = self.text.lower()  # type: ignore
 
 try:
-    Email("Bruce@Example.com")
+    Email("Grace@Example.com")
 except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'text'
@@ -21,5 +21,5 @@ class Normalized:
     def __post_init__(self) -> None:
         object.__setattr__(self, "text", self.text.lower())
 
-print(Normalized("Bruce@Example.com"))
-#: Normalized(text='bruce@example.com')
+print(Normalized("Grace@Example.com"))
+#: Normalized(text='grace@example.com')

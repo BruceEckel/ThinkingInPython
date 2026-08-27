@@ -5,11 +5,11 @@ class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
 
-m: Any = Messenger(info="Spam", b=["x", "y"])
+m: Any = Messenger(info="Spam", tags=["urgent", "todo"])
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y']}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
-print(m.info, m.b, m.more)
-#: Spam ['x', 'y'] 11
+print(m.info, m.tags, m.more)
+#: Spam ['urgent', 'todo'] 11
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo'], 'more': 11}

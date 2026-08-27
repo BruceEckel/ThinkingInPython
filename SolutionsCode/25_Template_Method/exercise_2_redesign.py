@@ -16,6 +16,6 @@ class Greeter(Framework):
     def step(self) -> None:
         print(f"Hello, {self.name}!")
 
-greeter = Greeter("Bruce")  # Construction starts nothing
+greeter = Greeter("Brian")  # Construction starts nothing
 greeter.run()  # The client starts the engine
-#: Hello, Bruce!
+#: Hello, Brian!

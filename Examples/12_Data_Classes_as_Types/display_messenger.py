@@ -2,10 +2,10 @@
 from display import display_object
 from messenger import Messenger
 
-display_object(Messenger("foo", 12, 3.14))
+display_object(Messenger("iris", 12, 3.14))
 #: [Attributes]
 #:   • depth: float = 3.14
-#:   • name: str = 'foo'
+#:   • name: str = 'iris'
 #:   • number: int = 12
 #: [Methods]
 #:   None

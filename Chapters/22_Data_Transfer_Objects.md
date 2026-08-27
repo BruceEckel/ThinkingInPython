@@ -16,14 +16,14 @@ class Messenger:
     def __init__(self, **kwargs: Any) -> None:
         self.__dict__ = kwargs
 
-m: Any = Messenger(info="Spam", b=["x", "y"])
+m: Any = Messenger(info="Spam", tags=["urgent", "todo"])
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y']}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
-print(m.info, m.b, m.more)
-#: Spam ['x', 'y'] 11
+print(m.info, m.tags, m.more)
+#: Spam ['urgent', 'todo'] 11
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo'], 'more': 11}
 ```
 
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
@@ -62,13 +62,14 @@ Here, too, keyword arguments become attributes in the instance's `__dict__`:
 # display_namespace.py
 from types import SimpleNamespace
 
-m = SimpleNamespace(info="Spam", b=["x", "y"])
+m = SimpleNamespace(info="Spam", tags=["urgent", "todo"])
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y']}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m)
-#: namespace(info='Spam', b=['x', 'y'], more=11)
-print(m == SimpleNamespace(info="Spam", b=["x", "y"],
+#: namespace(info='Spam', tags=['urgent', 'todo'], more=11)
+print(m == SimpleNamespace(info="Spam",
+                           tags=["urgent", "todo"],
                            more=11))
 #: True
 ```

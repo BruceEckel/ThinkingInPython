@@ -11,7 +11,7 @@ class User:
     age: int = 0
 
 try:
-    User("Bruce", 30)  # The checker accepts this call
+    User("Guido", 30)  # The checker accepts this call
 except TypeError as e:
     print(e)
 #: User() takes no arguments

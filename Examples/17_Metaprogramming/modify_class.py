@@ -1,31 +1,31 @@
 # modify_class.py
 from display import display_object
 
-class Foo:
+class Clay:
     pass
 
-display_object(Foo)
+display_object(Clay)
 #: [Attributes]
 #:   None
 #: [Methods]
 #:   None
 
-x = Foo()
+x = Clay()
 display_object(x)
 #: [Attributes]
 #:   None
 #: [Methods]
 #:   None
 
-Foo.n = 42  # type: ignore
-display_object(Foo)
+Clay.n = 42  # type: ignore
+display_object(Clay)
 #: [Attributes]
 #:   • n = 42 [CV]
 #: [Methods]
 #:   None
 
-Foo.m = lambda self: f"{self.n = }"  # type: ignore
-display_object(Foo)
+Clay.m = lambda self: f"{self.n = }"  # type: ignore
+display_object(Clay)
 #: [Attributes]
 #:   • n = 42 [CV]
 #: [Methods]

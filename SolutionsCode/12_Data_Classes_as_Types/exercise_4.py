@@ -45,7 +45,7 @@ def from_json(text: str) -> Person:
                   EmailAddress(data["email"]))
 
 bad_json = json.dumps(
-    {"name": "Bruce Eckel", "email": "no-at-sign"})
+    {"name": "Grace Hopper", "email": "no-at-sign"})
 try:
     from_json(bad_json)
 except TypeFailure as e:

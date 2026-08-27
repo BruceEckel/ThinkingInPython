@@ -212,27 +212,27 @@ because it has an initialization value.
 from dataclasses import replace
 from messenger import Messenger
 
-m = Messenger("foo", 12, 3.14)
+m = Messenger("iris", 12, 3.14)
 print(m)
-#: Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='iris', number=12, depth=3.14)
 print(m.name, m.number, m.depth)
-#: foo 12 3.14
+#: iris 12 3.14
 
 # The generated __eq__ compares by field value:
-print(Messenger("xx", 1) == Messenger("xx", 1))
+print(Messenger("iris", 1) == Messenger("iris", 1))
 #: True
-print(Messenger("xx", 1) == Messenger("xx", 2))
+print(Messenger("iris", 1) == Messenger("iris", 2))
 #: False
 
 mc = replace(m, depth=9.9)  # Copy with one field changed
 print(m)
-#: Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='iris', number=12, depth=3.14)
 print(mc)
-#: Messenger(name='foo', number=12, depth=9.9)
+#: Messenger(name='iris', number=12, depth=9.9)
 
-m.name = "bar"  # Data classes are mutable by default
+m.name = "hermes"  # Data classes are mutable by default
 print(m)
-#: Messenger(name='bar', number=12, depth=3.14)
+#: Messenger(name='hermes', number=12, depth=3.14)
 ```
 
 `print(m)` uses the generated `__repr__()`,
@@ -243,7 +243,8 @@ This copy-instead-of-mutate style reduces errors.
 `copy.replace()`, in [The General Form of `replace()`](#the-general-form-of-replace),
 does the same for anything immutable, not only for data classes.
 
-The last two lines show that a data class is mutable, so `m.name = "bar"` works.
+The last two lines show that a data class is mutable,
+so `m.name = "hermes"` works.
 
 `display_object()` shows the attributes with their declared types:
 
@@ -252,10 +253,10 @@ The last two lines show that a data class is mutable, so `m.name = "bar"` works.
 from display import display_object
 from messenger import Messenger
 
-display_object(Messenger("foo", 12, 3.14))
+display_object(Messenger("iris", 12, 3.14))
 #: [Attributes]
 #:   • depth: float = 3.14
-#:   • name: str = 'foo'
+#:   • name: str = 'iris'
 #:   • number: int = 12
 #: [Methods]
 #:   None
@@ -283,12 +284,12 @@ class Messenger:
     number: int
     depth: float = 0.0
 
-m = Messenger("foo", 12, 3.14)
+m = Messenger("iris", 12, 3.14)
 print(m)
-#: Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='iris', number=12, depth=3.14)
 
 try:
-    setattr(m, "name", "bar")
+    setattr(m, "name", "hermes")
 except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'name'
@@ -298,7 +299,7 @@ print(cache[m])
 #: Ni!
 ```
 
-The listing goes through `setattr()` because the type checker rejects `m.name = "bar"`,
+The listing goes through `setattr()` because the type checker rejects `m.name = "hermes"`,
 which is the earlier of the two defenses.
 `frozen=True` is the one that holds at runtime,
 against code the type checker never saw.
@@ -399,7 +400,7 @@ class Email:
         self.text = self.text.lower()  # type: ignore
 
 try:
-    Email("Bruce@Example.com")
+    Email("Grace@Example.com")
 except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'text'
@@ -411,8 +412,8 @@ class Normalized:
     def __post_init__(self) -> None:
         object.__setattr__(self, "text", self.text.lower())
 
-print(Normalized("Bruce@Example.com"))
-#: Normalized(text='bruce@example.com')
+print(Normalized("Grace@Example.com"))
+#: Normalized(text='grace@example.com')
 ```
 
 Both defenses fire here, as they did for `frozen_messenger.py`.
@@ -510,13 +511,13 @@ class Person:
 
 if __name__ == "__main__":
     person = Person(
-        FullName("Bruce Eckel"),
-        EmailAddress("bruce@example.com"),
+        FullName("Grace Hopper"),
+        EmailAddress("grace@example.com"),
     )
     print(person.name)
     print(person.email)
-#: FullName(text='Bruce Eckel')
-#: EmailAddress(text='bruce@example.com')
+#: FullName(text='Grace Hopper')
+#: EmailAddress(text='grace@example.com')
 ```
 
 `Person` declares no checks of its own.
@@ -531,18 +532,18 @@ from person import EmailAddress, FullName, Person
 from validation import TypeFailure
 
 def test_person_composes_validated_parts() -> None:
-    person = Person(FullName("Bruce Eckel"),
-                    EmailAddress("bruce@example.com"))
-    assert person.name.text == "Bruce Eckel"
-    assert person.email.text == "bruce@example.com"
+    person = Person(FullName("Grace Hopper"),
+                    EmailAddress("grace@example.com"))
+    assert person.name.text == "Grace Hopper"
+    assert person.email.text == "grace@example.com"
 
-@pytest.mark.parametrize("bad", ["Bruce", "", "   "])
+@pytest.mark.parametrize("bad", ["Grace", "", "   "])
 def test_full_name_needs_two_parts(bad: str) -> None:
     with pytest.raises(TypeFailure):
         FullName(bad)
 
 @pytest.mark.parametrize(
-    "bad", ["bruce", "example.com", ""])
+    "bad", ["grace", "example.com", ""])
 def test_email_needs_at_sign(bad: str) -> None:
     with pytest.raises(TypeFailure):
         EmailAddress(bad)
@@ -1438,16 +1439,16 @@ def from_json(text: str) -> Person:
         EmailAddress(data["email"]["text"]),
     )
 
-original = Person(FullName("Bruce Eckel"),
-                  EmailAddress("bruce@example.com"))
+original = Person(FullName("Grace Hopper"),
+                  EmailAddress("grace@example.com"))
 text = to_json(original)
 print(text)
 #: {
 #:   "name": {
-#:     "text": "Bruce Eckel"
+#:     "text": "Grace Hopper"
 #:   },
 #:   "email": {
-#:     "text": "bruce@example.com"
+#:     "text": "grace@example.com"
 #:   }
 #: }
 print(from_json(text) == original)  # Round-trip

@@ -11,8 +11,8 @@ class User:
     name: str
     age: int = 0
 
-u = User("Bruce", 30)
+u = User("Guido", 30)
 print(u)
-#: User(name='Bruce', age=30)
+#: User(name='Guido', age=30)
 # ty: Property `age` defined in `User` is read-only:
 # u.age = 9

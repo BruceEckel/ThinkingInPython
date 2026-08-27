@@ -14,16 +14,16 @@ def from_json(text: str) -> Person:
         EmailAddress(data["email"]["text"]),
     )
 
-original = Person(FullName("Bruce Eckel"),
-                  EmailAddress("bruce@example.com"))
+original = Person(FullName("Grace Hopper"),
+                  EmailAddress("grace@example.com"))
 text = to_json(original)
 print(text)
 #: {
 #:   "name": {
-#:     "text": "Bruce Eckel"
+#:     "text": "Grace Hopper"
 #:   },
 #:   "email": {
-#:     "text": "bruce@example.com"
+#:     "text": "grace@example.com"
 #:   }
 #: }
 print(from_json(text) == original)  # Round-trip

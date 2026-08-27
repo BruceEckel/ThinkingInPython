@@ -7,12 +7,12 @@ class Messenger:
     number: int
     depth: float = 0.0
 
-m = Messenger("foo", 12, 3.14)
+m = Messenger("iris", 12, 3.14)
 print(m)
-#: Messenger(name='foo', number=12, depth=3.14)
+#: Messenger(name='iris', number=12, depth=3.14)
 
 try:
-    setattr(m, "name", "bar")
+    setattr(m, "name", "hermes")
 except Exception as e:
     print(f"{type(e).__name__}: {e}")
 #: FrozenInstanceError: cannot assign to field 'name'

@@ -20,5 +20,5 @@ class Greeter(Framework):
     def step(self) -> None:
         print(f"Hello, {self.name}!")
 
-Greeter("Bruce")
-#: Hello, Bruce!
+Greeter("Brian")
+#: Hello, Brian!

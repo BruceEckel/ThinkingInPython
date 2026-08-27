@@ -16,6 +16,6 @@ report = [
 
 for line in report:
     print(line)
-#: East: gizmo ($2.25)
-#: East: widget ($4.50)
-#: West: widget ($4.75)
+#: East: hammer ($2.25)
+#: East: wrench ($4.50)
+#: West: wrench ($4.75)

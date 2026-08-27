@@ -21,10 +21,10 @@ class Meta(type):
         # Effect: this modifies the finished class
         setattr(cls, "patched_in_init", 3.14)
 
-class Demo(metaclass=Meta):
+class Built(metaclass=Meta):
     pass
 
-display_object(Demo(), dunder=["__new__", "__init__"])
+display_object(Built(), dunder=["__new__", "__init__"])
 #: [Attributes]
 #:   • added_in_new = 42 [CV]
 #:   • patched_in_init = 3.14 [CV]
@@ -32,5 +32,5 @@ display_object(Demo(), dunder=["__new__", "__init__"])
 #:   • __init__(self, /, *args, **kwargs)
 #:   • __new__(*args, **kwargs)
 
-print("has Tag base:", Tag in Demo.__bases__)
+print("has Tag base:", Tag in Built.__bases__)
 #: has Tag base: True

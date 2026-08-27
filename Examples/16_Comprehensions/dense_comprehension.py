@@ -1,13 +1,13 @@
 # dense_comprehension.py
 warehouses = {
     "East": [
-        ("widget", 12, 4.50),
-        ("gadget", 0, 9.00),
-        ("gizmo", 5, 2.25),
+        ("wrench", 12, 4.50),
+        ("drill", 0, 9.00),
+        ("hammer", 5, 2.25),
     ],
     "West": [
-        ("widget", 3, 4.75),
-        ("thingamajig", 8, 15.00),
+        ("wrench", 3, 4.75),
+        ("sander", 8, 15.00),
     ],
 }
 
@@ -24,6 +24,6 @@ report = [
 if __name__ == "__main__":
     for line in report:
         print(line)
-#: East: gizmo ($2.25)
-#: East: widget ($4.50)
-#: West: widget ($4.75)
+#: East: hammer ($2.25)
+#: East: wrench ($4.50)
+#: West: wrench ($4.75)

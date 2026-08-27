@@ -1,12 +1,13 @@
 # display_namespace.py
 from types import SimpleNamespace
 
-m = SimpleNamespace(info="Spam", b=["x", "y"])
+m = SimpleNamespace(info="Spam", tags=["urgent", "todo"])
 print(vars(m))
-#: {'info': 'Spam', 'b': ['x', 'y']}
+#: {'info': 'Spam', 'tags': ['urgent', 'todo']}
 m.more = 11
 print(m)
-#: namespace(info='Spam', b=['x', 'y'], more=11)
-print(m == SimpleNamespace(info="Spam", b=["x", "y"],
+#: namespace(info='Spam', tags=['urgent', 'todo'], more=11)
+print(m == SimpleNamespace(info="Spam",
+                           tags=["urgent", "todo"],
                            more=11))
 #: True

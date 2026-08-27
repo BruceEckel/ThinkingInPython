@@ -111,8 +111,8 @@ class Greeter(Framework):
     def step(self) -> None:
         print(f"Hello, {self.name}!")
 
-Greeter("Bruce")
-#: Hello, Bruce!
+Greeter("Brian")
+#: Hello, Brian!
 ```
 
 The redesign removes the hazard instead of avoiding it. `Framework`
@@ -138,9 +138,9 @@ class Greeter(Framework):
     def step(self) -> None:
         print(f"Hello, {self.name}!")
 
-greeter = Greeter("Bruce")  # Construction starts nothing
+greeter = Greeter("Brian")  # Construction starts nothing
 greeter.run()  # The client starts the engine
-#: Hello, Bruce!
+#: Hello, Brian!
 ```
 
 The redesign is the one that protects the next author. The reorder
