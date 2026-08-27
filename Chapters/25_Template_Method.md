@@ -58,11 +58,11 @@ MyApp().run()
 The client supplies `customize1()` and `customize2()` in the derived class.
 `run()` starts the engine that drives the application.
 
-The base class calls code written after it, potentially years later.
+The base class calls code written later, potentially years later.
 Framework authors call this the *Hollywood Principle*: "don't call us,
 we'll call you."
 The general name for this reversal is *Inversion of Control*:
-the framework holds the flow of control and calls your code,
+the framework defines the flow of control and calls your code,
 rather than your code calling into a library.
 
 `@final` is enforced by the type checker.

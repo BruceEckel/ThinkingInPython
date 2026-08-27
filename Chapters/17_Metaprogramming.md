@@ -636,6 +636,112 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
     assert issubclass(Ok, final_runtime.A)
 ```
 
+## Where Enforcement Lives
+
+The last two sections keep circling one question:
+when a rule about a class is enforced, who enforces it, and when?
+The language devices you have met divide into four families.
+
+`@final` and `@override` are *markers*.
+At runtime each sets a single attribute that nothing reads;
+the type checker carries the entire meaning,
+and the runtime half of [Making a Class Final](#making-a-class-final)
+had to be built by hand with `__init_subclass__()`.
+
+`@dataclass` is *mirrored machinery*.
+At runtime it is a code generator,
+synthesizing `__init__()` and its siblings at class-creation time
+([Data Classes as Types](12_Data_Classes_as_Types.md) relies on it throughout).
+The type checker never runs the decorator.
+It recognizes the name and re-implements the generator's rules statically:
+the synthesized signature, the frozen write-ban, the field-ordering rule.
+The typing specification mandates that model,
+so every conformant checker derives the same class,
+and some rules end up enforced twice, independently.
+Declare a field without a default after one with a default,
+and the checker reports it before anything runs,
+while the interpreter raises its own `TypeError` at class creation.
+
+A third family carries *two real semantics*.
+`@abstractmethod` makes the checker report an abstract instantiation,
+and separately makes the runtime refuse one.
+`assert_never()` proves exhaustiveness statically and raises at runtime when a lying value reaches it
+([Pattern Matching](13_Pattern_Matching.md#exhaustive-matching) shows both).
+The fourth family runs in the other direction:
+annotations survive into the running program,
+as [The `inspect` Module](#the-inspect-module) shows,
+so a library can read the checker's types and enforce them live.
+
+How does the checker know what `@dataclass` does?
+For the standard library, the knowledge is built in.
+For a class-building decorator of your own it cannot know,
+unless you declare it.
+`@dataclass_transform` marks a decorator as dataclass-like,
+and the declaration alone changes what the checker believes:
+
+```python
+# claimed_transform.py
+from typing import dataclass_transform
+
+@dataclass_transform()
+def model[T](cls: type[T]) -> type[T]:
+    return cls  # The claim, with nothing behind it
+
+@model
+class User:
+    name: str
+    age: int = 0
+
+try:
+    User("Bruce", 30)  # The checker accepts this call
+except TypeError as e:
+    print(e)
+#: User() takes no arguments
+```
+
+The checker synthesizes a `User.__init__()` from the field declarations,
+with `name` required and `age` defaulted, exactly as it would for `@dataclass`.
+It believes the declaration without ever running `model()`,
+so the call checks clean and fails at runtime: this `model()` generates nothing,
+and `object`'s constructor takes no arguments.
+The declaration is a promise, and this one lies.
+Libraries like attrs and pydantic keep the promise by generating the methods their `@dataclass_transform` claims,
+which is how their classes get first-class checking without any checker hard-coding them.
+The shortest honest `model()` delegates the generation:
+
+```python
+# kept_transform.py
+from dataclasses import dataclass
+from typing import dataclass_transform
+
+@dataclass_transform(frozen_default=True)
+def model[T](cls: type[T]) -> type[T]:
+    return dataclass(frozen=True)(cls)
+
+@model
+class User:
+    name: str
+    age: int = 0
+
+u = User("Bruce", 30)
+print(u)
+#: User(name='Bruce', age=30)
+# ty: Property `age` defined in `User` is read-only:
+# u.age = 9
+```
+
+Now both sides hold: the runtime `User` is a real frozen dataclass,
+and `frozen_default=True` tells the checker that classes built by `model()` reject assignment statically too.
+
+`@dataclass_transform` generalizes exactly one shape:
+a decorator that builds a class's methods from its field declarations.
+Anything stranger stays invisible to the checker,
+which never imports or executes your code.
+That is why the classes assembled by `type()` in [Generating Classes with `type`](#generating-classes-with-type)
+needed a `cast()` to state what was built:
+the checker models what it recognizes, believes what you declare,
+and sees nothing else.
+
 ## Learning a Name with `__set_name__()`
 
 A *descriptor* is any object whose class defines at least one of `__get__()`,

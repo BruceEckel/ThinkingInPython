@@ -1,7 +1,7 @@
 Thinking in Python
 ==================
 
-An intermediate-level book for experienced programmers.
+An intermediate-to-advanced book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
 
 ## Read the Book Online
