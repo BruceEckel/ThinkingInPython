@@ -4,6 +4,10 @@ Thinking in Python
 An intermediate-level book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
 
+## Read the Book Online
+
+[ThinkingInPython.com](https://thinkinginpython.com/)
+
 ## Download the Book
 
 The latest release, rebuilt from the current book source:
