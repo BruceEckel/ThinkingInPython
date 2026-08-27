@@ -24,8 +24,8 @@ either family:
 - drawn mode: the same four roles as SVG/PNG (cover.svg,
               cover-eink.svg, cover-letter.svg, cover-art.svg,
               cover-color.png, cover-eink.png)
-- always:     favicon.svg (an angular infinity with a diamond
-              head, per the site's palette)
+- always:     favicon.svg (a serpent's eye with a slit pupil,
+              in the cover art's palette)
 
 Text is set in Palatino Linotype, which ships with Windows and
 macOS; regenerate on a machine that has it.
@@ -57,6 +57,9 @@ LETTER_H = 1294
 PAPER = "#f5f0e8"
 INK = "#1a1612"
 ACCENT = "#8b1a1a"
+# Tones picked from the cover art, for the favicon's eye.
+MOSS = "#68774d"
+GOLD = "#cdbd83"
 
 # E-ink drawn variant: same drawing, no color.
 EINK = {ACCENT: "#555049"}
@@ -426,16 +429,21 @@ def drawn_outputs(preview: bool) -> None:
 # The favicon (both modes)
 # --------------------------------------------------------------------------- #
 def favicon_svg() -> str:
-    """Angular infinity polyline with a diamond head, on paper."""
+    """A serpent's eye with a slit pupil, in the art's palette.
+
+    Chosen from a candidate gallery for one property above all:
+    it stays unmistakable at 16 px, the size a favicon actually
+    lives at in a browser tab.
+    """
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="{PAPER}"/>
-  <path d="M16 16 L9 10 L4 16 L9 22 L16 16 L23 10 L28 16
-           L23 22 L20.4 19.8"
-        fill="none" stroke="{INK}" stroke-width="3.2"
-        stroke-linejoin="miter"/>
-  <path d="M16.4 16.4 L21.2 17.6 L18.4 20.9 Z"
-        fill="{ACCENT}"/>
+  <ellipse cx="16" cy="16" rx="12" ry="9" fill="{INK}"/>
+  <ellipse cx="16" cy="16" rx="10" ry="7.2" fill="{MOSS}"/>
+  <ellipse cx="16" cy="16" rx="6.5" ry="6" fill="{GOLD}"/>
+  <path d="M16 9.5 C17.6 13 17.6 19 16 22.5
+           C14.4 19 14.4 13 16 9.5 Z" fill="{INK}"/>
+  <circle cx="13.6" cy="12.6" r="1.3" fill="{PAPER}"/>
 </svg>'''
 
 

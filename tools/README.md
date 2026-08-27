@@ -970,8 +970,9 @@ e-ink one derived as autocontrasted grayscale), the PDF's full-bleed
 first page (`cover-letter.{jpg,svg}`, US Letter ratio), and the
 site's index art (`cover-art.{jpg,svg}`). The builders accept either
 file family, and each mode deletes the other's outputs. Plus
-`favicon.svg`: an angular ∞ with a diamond head, linked from every
-site page. `--preview` writes a small `cover-preview.png` for quick
+`favicon.svg`: a serpent's eye with a slit pupil in the cover art's
+palette, linked from every site page (picked from a candidate
+gallery for staying legible at 16 px). `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
 ## build_pdf.py

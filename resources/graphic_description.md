@@ -6,4 +6,13 @@ At the upper right, the snake's realistic, hornless head has its jaws clamped fi
 
 Isolated subject, centered composition, single serpent only, clean plain background with no borders, frames, or text.
 
-Style: Japanese woodblock print
+Style:
+
+
+Japanese woodblock print, Hokusai wave-period, visible baren texture,
+
+Art Nouveau poster, Alphonse Mucha, flowing ornamental linework,
+
+medieval illuminated manuscript with gold leaf,
+
+linocut, two-ink relief print.
