@@ -80,11 +80,10 @@
       margin-bottom: 0.3rem;
     }
 
-    .title-rule {
-      width: 3rem;
-      height: 1px;
-      background: var(--accent);
-      margin: 1.5rem 0 2.5rem;
+    .chapter-ornament {
+      display: block;
+      height: 11px;
+      margin: 1.4rem 0 2.5rem;
     }
 
     /* Per-chapter table of contents (experimental, behind --chapter-toc) */
@@ -318,7 +317,8 @@
     <div class="chapter-label">$chapter-label$</div>
     $endif$
     <h1>$title$</h1>
-    <div class="title-rule"></div>
+    <img class="chapter-ornament" src="chapter-ornament.svg"
+         alt="">
     $if(toc)$
     <nav class="chapter-toc" aria-label="Chapter contents">
       <p class="chapter-toc-title">In This Chapter</p>

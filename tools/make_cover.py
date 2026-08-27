@@ -57,8 +57,10 @@ LETTER_H = 1294
 PAPER = "#f5f0e8"
 INK = "#1a1612"
 ACCENT = "#8b1a1a"
-# Tones picked from the cover art, for the favicon's eye.
+# Tones picked from the cover art, for the favicon's eye and
+# the chapter ornament.
 DEEPGREEN = "#37432e"
+MOSS = "#68774d"
 GOLD = "#cdbd83"
 
 # E-ink drawn variant: same drawing, no color.
@@ -447,6 +449,25 @@ def favicon_svg() -> str:
 </svg>'''
 
 
+def ornament_svg() -> str:
+    """The chapter-header ornament: a band of diamond scales.
+
+    Sits below each chapter title on the site (template.html),
+    python skin as pure pattern, in the cover art's tones.
+    Swapping the ornament design later means changing only this
+    function and rerunning `make cover`.
+    """
+    diamonds = []
+    for i in range(11):
+        cx = 11 + i * 22
+        color = MOSS if i % 2 == 0 else GOLD
+        diamonds.append(
+            f'<path d="M{cx} 0 L{cx + 9} 8 L{cx} 16 '
+            f'L{cx - 9} 8 Z" fill="{color}"/>')
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" '
+            f'viewBox="0 0 242 16">{"".join(diamonds)}</svg>')
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--preview", action="store_true",
@@ -466,7 +487,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     (STATIC / "favicon.svg").write_text(
         favicon_svg(), encoding="utf-8")
-    for name in (*made, "favicon.svg"):
+    (STATIC / "chapter-ornament.svg").write_text(
+        ornament_svg(), encoding="utf-8")
+    for name in (*made, "favicon.svg", "chapter-ornament.svg"):
         size = (STATIC / name).stat().st_size
         print(f"{name}: {size / 1024:.0f} KB")
     return 0

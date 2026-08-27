@@ -1,7 +1,10 @@
-Thinking in Python
-==================
-## Insights, Idioms and Patterns
-### Bruce Eckel
+<h1 align="center">Thinking in Python</h1>
+<h3 align="center"><em>Insights, Idioms and Patterns</em></h3>
+<p align="center">
+  <img src="resources/static/cover-art.jpg" width="560"
+       alt="A python coiled into an infinity sign, swallowing its own tail">
+</p>
+<h3 align="center">BRUCE ECKEL</h3>
 
 An intermediate-to-advanced book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
