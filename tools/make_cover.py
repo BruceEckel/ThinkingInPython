@@ -121,45 +121,62 @@ def path_d(points: list[tuple[float, float]]) -> str:
 # --------------------------------------------------------------------------- #
 # Building the woven, tessellated body
 # --------------------------------------------------------------------------- #
-def strand(left: list[tuple[float, float]],
-           right: list[tuple[float, float]],
-           s: int, e: int, step: int) -> str:
-    """Slanted bands plus edge outlines for spine samples s..e.
+def strand(pts: list[tuple[float, float]],
+           nrm: list[tuple[float, float]],
+           hw: list[float], s: int, e: int) -> str:
+    """A smooth solid stretch of body for spine samples s..e.
 
-    Each band leads by half a step on the left edge, so the seams
-    run diagonally: chevrons, not rings.
+    Ink ribbon with a narrower accent stripe riding its inner
+    (right) side, the snake's belly line.
     """
-    parts = []
-    cycle = (INK, ACCENT)
-    lead = step // 2
-    last = len(left) - 1
-    for b in range(s, e, step):
-        b2 = min(b + step, e)
-        lo, hi = min(b + lead, last), min(b2 + lead, last)
-        quad = left[lo:hi + 1] + right[b:b2 + 1][::-1]
-        parts.append(poly(quad, cycle[(b // step) % 2]))
-    parts.append(
-        f'<path d="{path_d(left[s:e + 1])}" fill="none" '
-        f'stroke="{INK}" stroke-width="4"/>'
-        f'<path d="{path_d(right[s:e + 1])}" fill="none" '
-        f'stroke="{INK}" stroke-width="4"/>')
-    return "".join(parts)
+    left = edge(pts, nrm, hw, +1.0)
+    right = edge(pts, nrm, hw, -1.0)
+    body = poly(left[s:e + 1] + right[s:e + 1][::-1], INK)
+    # The belly stripe ends short of the tail tip, so the tip
+    # that disappears into the mouth is pure ink.
+    se = min(e, len(pts) - 1 - 40)
+    if se <= s:
+        return body
+    s_out = edge(pts, nrm, [w * 0.78 for w in hw], -1.0)
+    s_in = edge(pts, nrm, [w * 0.38 for w in hw], -1.0)
+    stripe = poly(s_out[s:se + 1] + s_in[s:se + 1][::-1], ACCENT)
+    return body + stripe
 
 
 def body_svg(a: float, cx: float, cy: float) -> str:
-    """The serpent: a woven figure-eight with a banded body."""
+    """The serpent: a smooth woven figure-eight eating its tail."""
     # Head at the right lobe's outer edge, facing back along the
     # curve; the tail arrives one full figure-eight later and
-    # stops a small gap short, inside the mouth.
+    # would stop a small gap short of the mouth.
     t_head = -0.47
     t_tail = t_head + 2 * math.pi - 0.30
     n = 630
     pts = spine(a, cx, cy, t_head, t_tail, n)
+    hw = widths(n, 50.0, 7.0)
+
+    # The head's local frame: f points forward (out of the mouth,
+    # toward the arriving tail), m is its left-hand normal.
+    (hx, hy), (bx, by) = pts[0], pts[6]
+    fl = math.hypot(hx - bx, hy - by) or 1.0
+    f = ((hx - bx) / fl, (hy - by) / fl)
+    m = (-f[1], f[0])
+    w0 = hw[0]
+
+    def loc(u: float, v: float) -> tuple[float, float]:
+        return (hx + f[0] * u + m[0] * v,
+                hy + f[1] * u + m[1] * v)
+
+    # Bend the tail's last stretch off the lemniscate so its tip
+    # lands inside the open mouth: translate the end smoothly
+    # toward the gape.
+    target = loc(0.5 * w0, -0.5 * w0)
+    dx, dy = target[0] - pts[n][0], target[1] - pts[n][1]
+    bend = 110
+    for j in range(n - bend, n + 1):
+        u = (j - (n - bend)) / bend
+        ease = u * u * (3 - 2 * u)
+        pts[j] = (pts[j][0] + dx * ease, pts[j][1] + dy * ease)
     nrm = normals(pts)
-    hw = widths(n, 52.0, 9.0)
-    left = edge(pts, nrm, hw, +1.0)
-    right = edge(pts, nrm, hw, -1.0)
-    step = 10
 
     # The spine passes through the crossing at t = pi/2 (early,
     # drawn under) and t = 3pi/2 (late, drawn over with a paper
@@ -170,61 +187,72 @@ def body_svg(a: float, cx: float, cy: float) -> str:
     o_s = max(idx(3 * math.pi / 2 - 0.55), 0)
     o_e = min(idx(3 * math.pi / 2 + 0.55), n)
 
-    under = strand(left, right, 0, n, step)
-    halo = (edge(pts, nrm, [w + 22 for w in hw], +1.0)
-            [o_s:o_e + 1]
-            + edge(pts, nrm, [w + 22 for w in hw], -1.0)
-            [o_s:o_e + 1][::-1])
-    # Start the redraw on a band boundary so its bands land
-    # exactly on the ones drawn underneath.
-    over = poly(halo, PAPER) + strand(
-        left, right, (o_s // step) * step, o_e, step)
-    head = head_svg(pts, nrm, hw, left, right, n, step)
+    under = strand(pts, nrm, hw, 0, n)
+    halo_hw = [w + 30 for w in hw]
+    h_left = edge(pts, nrm, halo_hw, +1.0)
+    h_right = edge(pts, nrm, halo_hw, -1.0)
+    halo = (h_left[o_s:o_e + 1] + h_right[o_s:o_e + 1][::-1])
+    over = poly(halo, PAPER) + strand(pts, nrm, hw, o_s, o_e)
+    head = head_svg(loc, w0, pts, nrm, hw, n)
     return under + over + head
 
 
-def head_svg(pts: list[tuple[float, float]],
+def bez(*points: tuple[float, float]) -> str:
+    """M start, then cubic segments, three control points each."""
+    d = [f"M{points[0][0]:.1f},{points[0][1]:.1f}"]
+    for i in range(1, len(points), 3):
+        c1, c2, p = points[i], points[i + 1], points[i + 2]
+        d.append(f"C{c1[0]:.1f},{c1[1]:.1f} "
+                 f"{c2[0]:.1f},{c2[1]:.1f} "
+                 f"{p[0]:.1f},{p[1]:.1f}")
+    return " ".join(d)
+
+
+def head_svg(loc, w: float,
+             pts: list[tuple[float, float]],
              nrm: list[tuple[float, float]],
-             hw: list[float],
-             left: list[tuple[float, float]],
-             right: list[tuple[float, float]],
-             n: int, step: int) -> str:
-    """An angular head at the spine's start, jaws on the tail."""
-    (hx, hy), (nx, ny) = pts[0], nrm[0]
-    # The head faces backwards along the parameter direction,
-    # toward the arriving tail.
-    x2, y2 = pts[4]
-    fx, fy = hx - x2, hy - y2
-    fl = math.hypot(fx, fy) or 1.0
-    fx, fy = fx / fl, fy / fl
-    w = hw[0]
-    length = w * 3.1
-    base_l = (hx + nx * w * 1.35, hy + ny * w * 1.35)
-    base_r = (hx - nx * w * 1.35, hy - ny * w * 1.35)
-    rear = (hx - fx * w * 1.1, hy - fy * w * 1.1)
-    snout = (hx + fx * length, hy + fy * length)
-    head = poly([base_l, snout, base_r, rear], INK)
-    # An open mouth: a paper wedge cut back from the snout.
-    m_deep = (hx + fx * w * 1.1, hy + fy * w * 1.1)
-    m_up = (hx + fx * length * 0.92 + nx * w * 0.34,
-            hy + fy * length * 0.92 + ny * w * 0.34)
-    m_dn = (hx + fx * length * 0.92 - nx * w * 0.34,
-            hy + fy * length * 0.92 - ny * w * 0.34)
-    mouth = poly([m_deep, m_up, m_dn], PAPER)
-    # Redraw the last stretch of tail so it lies inside the
-    # jaws, then close the upper jaw over it: swallowed.
-    tail = strand(left, right, n - 4 * step, n, step)
-    jaw = poly([m_deep, m_up, snout], INK)
-    tail += jaw
-    # Eye: a paper diamond with an ink pupil, set high and back.
-    ex = hx + fx * w * 0.1 + nx * w * 0.62
-    ey = hy + fy * w * 0.1 + ny * w * 0.62
-    r = w * 0.30
-    eye = poly([(ex + r, ey), (ex, ey + r),
-                (ex - r, ey), (ex, ey - r)], PAPER)
-    pupil = poly([(ex + r * .45, ey), (ex, ey + r * .45),
-                  (ex - r * .45, ey), (ex, ey - r * .45)], INK)
-    return head + mouth + tail + eye + pupil
+             hw: list[float], n: int) -> str:
+    """A smooth head whose open jaws close around the tail.
+
+    `loc(u, v)` maps head-local coordinates (u forward out of the
+    mouth, v to the snake's left) into the page.
+    """
+    # The silhouette: crown over the top, rounded snout, open
+    # lower jaw curving back under.
+    outline = bez(
+        loc(-0.5 * w, 1.0 * w),
+        loc(0.8 * w, 1.28 * w), loc(2.0 * w, 1.1 * w),
+        loc(2.6 * w, 0.45 * w),
+        loc(2.95 * w, 0.05 * w), loc(2.9 * w, -0.2 * w),
+        loc(2.6 * w, -0.38 * w),
+        loc(2.2 * w, -0.62 * w), loc(1.8 * w, -0.98 * w),
+        loc(1.05 * w, -1.18 * w),
+        loc(0.35 * w, -1.32 * w), loc(-0.2 * w, -1.12 * w),
+        loc(-0.5 * w, -1.0 * w),
+    ) + " Z"
+    head = f'<path d="{outline}" fill="{INK}"/>'
+    # The gape: a curved paper wedge opening toward the tail.
+    gape = bez(
+        loc(0.5 * w, -0.10 * w),
+        loc(1.4 * w, -0.02 * w), loc(2.2 * w, -0.14 * w),
+        loc(2.62 * w, -0.36 * w),
+        loc(2.1 * w, -0.7 * w), loc(1.7 * w, -0.95 * w),
+        loc(1.15 * w, -1.1 * w),
+        loc(0.9 * w, -0.75 * w), loc(0.68 * w, -0.38 * w),
+        loc(0.5 * w, -0.10 * w),
+    ) + " Z"
+    mouth = f'<path d="{gape}" fill="{PAPER}"/>'
+    # The tail's end, redrawn so it bisects the open mouth:
+    # paper shows above and below it, and the tip runs on into
+    # the ink of the head. Swallowed.
+    tail = strand(pts, nrm, hw, n - 90, n)
+    # A round eye, set high and back on the crown.
+    ex, ey = loc(0.55 * w, 0.52 * w)
+    eye = (f'<circle cx="{ex:.1f}" cy="{ey:.1f}" '
+           f'r="{w * 0.36:.1f}" fill="{PAPER}"/>'
+           f'<circle cx="{ex:.1f}" cy="{ey:.1f}" '
+           f'r="{w * 0.17:.1f}" fill="{INK}"/>')
+    return head + mouth + tail + eye
 
 
 # --------------------------------------------------------------------------- #
