@@ -888,6 +888,7 @@ def test_spree_attempts_every_price() -> None:
     shop = handle(recording(written))(half)
     assert run(shop((60, 50, 30, 20))) == 2
     assert written == [40, 10]
+    assert next(balances, None) is None  # All four read
 
 written: list[int] = []
 scripted = handle(recording(written))(
@@ -899,10 +900,11 @@ print(run(scripted((60, 50, 30, 20))), written)
 The scripted balances are the four the `Cell` version would have produced:
 `100` before the first purchase, then `40` three times, since the `50` and the
 `30` are both refused and change nothing.
-`spree()` attempts all four prices, which the length of the balance sequence
-proves: exhausting it early would raise a `StopIteration` from `read()`, and a
-fifth attempt would raise one too.
-`written` records one entry per successful purchase, `[40, 10]`, so the two
+`spree()` attempts all four prices, and the test proves it from both sides:
+a fifth attempt would raise a `StopIteration` from `read()`, and stopping
+early would leave a balance unread, which the final assertion catches by
+confirming the sequence is exhausted.
+`written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that every price was tried and only the affordable ones
 were written.
 

@@ -520,14 +520,21 @@ if __name__ == "__main__":
 ```
 
 `Person` declares no checks of its own.
-You cannot build it from an illegal name or an illegal email,
+The first test builds one from legal parts and reads them back;
+the other two show you cannot build it from an illegal name or an illegal email,
 because those values cannot exist:
 
 ```python
 # test_person.py
 import pytest
-from person import EmailAddress, FullName
+from person import EmailAddress, FullName, Person
 from validation import TypeFailure
+
+def test_person_composes_validated_parts() -> None:
+    person = Person(FullName("Bruce Eckel"),
+                    EmailAddress("bruce@example.com"))
+    assert person.name.text == "Bruce Eckel"
+    assert person.email.text == "bruce@example.com"
 
 @pytest.mark.parametrize("bad", ["Bruce", "", "   "])
 def test_full_name_needs_two_parts(bad: str) -> None:

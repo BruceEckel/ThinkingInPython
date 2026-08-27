@@ -6,5 +6,5 @@ def test_deposit_on_any_balance(preloaded: Account) -> None:
     preloaded.deposit(1)
     assert preloaded.balance == start + 1
 
-def test_bank_name_is_shared(bank_name: str) -> None:
+def test_bank_name_from_conftest(bank_name: str) -> None:
     assert bank_name == "Crunchy Frog Credit Union"

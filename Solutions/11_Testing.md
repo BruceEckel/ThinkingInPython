@@ -136,10 +136,10 @@ def never_negative():
     yield account
     assert account.balance >= 0
 
-def test_never_negative_after_partial_withdraw(
+def test_never_negative_after_full_withdraw(
     never_negative: Account,
 ) -> None:
-    never_negative.withdraw(20)
+    never_negative.withdraw(50)  # Down to exactly zero
 
 def test_never_negative_after_deposit(
     never_negative: Account,

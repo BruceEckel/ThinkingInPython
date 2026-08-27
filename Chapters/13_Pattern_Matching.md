@@ -589,13 +589,22 @@ A `match` makes the shape of the dispatch explicit.
 [Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching)
 compares the two approaches directly.
 
+The second test below exercises that runtime backstop.
+The string `"x"` is no `Shape`, so the call carries a `# type: ignore`;
+at runtime `assert_never()` is what catches it:
+
 ```python
 # test_exhaustive.py
+import pytest
 from exhaustive import Circle, Square, area
 
 def test_exhaustive_area() -> None:
     assert round(area(Circle(1.0)), 4) == 3.1416
     assert area(Square(2.0)) == 4.0
+
+def test_assert_never_rejects_a_lying_value() -> None:
+    with pytest.raises(AssertionError):
+        area("x")  # type: ignore
 ```
 
 ## When Not to Match
@@ -786,11 +795,18 @@ so the type checker confirms each `match` handles every case.
 # test_notifications.py
 import notifications_match as nm
 import notifications_oo as no
+import pytest
 
-def test_oo_and_match_agree() -> None:
-    assert (no.Email("Hi").render("Dana")
-            == nm.render(nm.Email("Hi"), "Dana"))
-    assert no.Sms("Hi").cost() == nm.cost(nm.Sms("Hi"))
+@pytest.mark.parametrize("oo, data", [
+    (no.Email("Hi"), nm.Email("Hi")),
+    (no.Sms("Hi"), nm.Sms("Hi")),
+    (no.Push("Hi"), nm.Push("Hi")),
+])
+def test_oo_and_match_agree(
+    oo: no.Notification, data: nm.Notification
+) -> None:
+    assert oo.render("Dana") == nm.render(data, "Dana")
+    assert oo.cost() == nm.cost(data)
 ```
 
 Try growing the system in each direction.

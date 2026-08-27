@@ -61,6 +61,15 @@ class Sketch:
     def restore(self, memento: Memento) -> None:
         self.strokes = list(memento.strokes)
 
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        self.present = initial
+        self.past: list[S] = []
+
+    def do(self, new_state: S) -> None:
+        self.past.append(self.present)
+        self.present = new_state
+
 def test_erase_does_not_affect_existing_memento() -> None:
     sketch = Sketch()
     sketch.draw("a")
@@ -69,12 +78,26 @@ def test_erase_does_not_affect_existing_memento() -> None:
     sketch.erase()
     assert sketch.strokes == ["a"]
     assert checkpoint.strokes == ("a", "b")  # Untouched
+
+def test_erase_leaves_history_states_untouched() -> None:
+    sketch = Sketch()
+    sketch.draw("a")
+    history = History(sketch.save())
+    sketch.draw("b")
+    history.do(sketch.save())
+    sketch.erase()
+    assert history.present.strokes == ("a", "b")
+    assert history.past[0].strokes == ("a",)
 ```
 
 `erase()` mutates `self.strokes` in place, exactly like `draw()`
 does, so it needs no special handling: `save()` already copies into
 an immutable `Memento` at the moment it is called, so nothing later,
 erase included, can reach back and change a memento already taken.
+The history test shows the same safety one level up, with a `History`
+trimmed to what the test needs: the states it stores are mementos,
+and mementos never change, so erasing after a `do()` disturbs neither
+the present state nor the past one.
 
 ```python
 # exercise_1_frozen.py
@@ -114,18 +137,38 @@ class Drawing:
     def erase(self) -> Drawing:
         return replace(self, strokes=self.strokes[:-1])
 
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        self.present = initial
+        self.past: list[S] = []
+
+    def do(self, new_state: S) -> None:
+        self.past.append(self.present)
+        self.present = new_state
+
 def test_erase_returns_new_drawing_leaving_original(
 ) -> None:
     before = Drawing("Duck").draw("circle").draw("beak")
     after = before.erase()
     assert before.strokes == ("circle", "beak")  # Untouched
     assert after.strokes == ("circle",)
+
+def test_erase_leaves_history_states_untouched() -> None:
+    before = Drawing("Duck").draw("circle").draw("beak")
+    history = History(before)
+    history.do(before.erase())
+    assert history.present.strokes == ("circle",)
+    assert history.past[0] is before
+    assert before.strokes == ("circle", "beak")
 ```
 
 The frozen version's `erase()` follows `draw()`'s shape too: it
 returns a new `Drawing` via `replace()`, this time with the last stroke
 sliced off, so `before` is never mutated and any `History` holding
 `before` as a past state is automatically safe.
+The history test demonstrates exactly that: after `do(before.erase())`,
+the stored past state `is` the original object, still carrying both
+strokes.
 
 ## 2. A bounded `History`
 

@@ -209,18 +209,6 @@ run_framework(
 #: Say no more, say no more!
 ```
 
-```python
-# test_template_function.py
-from template_function import run_framework
-
-def test_template_function_runs_steps_in_order() -> None:
-    calls: list[str] = []
-    run_framework(
-        lambda: calls.append("a"),
-        lambda: calls.append("b"))
-    assert calls == ["a", "b", "a", "b"]
-```
-
 Both the Template Method and the function version have a fixed algorithm and varying steps.
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.

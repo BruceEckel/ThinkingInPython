@@ -543,6 +543,9 @@ def test_independent_hierarchies_have_separate_registries(
               for c in init_subclass.Shape.registry}
     # Round is no longer a leaf
     assert shapes == {"Square", "Circle"}
+    # Neither registry leaks into the other
+    assert init_subclass.Shape.registry.isdisjoint(
+        init_subclass.Color.registry)
 ```
 
 The mechanism is reliable;

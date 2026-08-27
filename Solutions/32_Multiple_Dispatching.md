@@ -202,12 +202,11 @@ print(len(EXPECTED))
 ```
 
 With this `EXPECTED` in place, `test_matches_expected()`,
-parametrized over both modules, and `test_both_versions_agree()` pass
-unchanged: neither hardcodes the number of item types. Both are
-parametrized from `MATCHUPS`, which is built from whatever `EXPECTED`
-contains, so growing it from nine entries to sixteen produces sixteen
-independently reported cases per module with no change to the test
-functions themselves.
+parametrized over both modules, passes unchanged: it hardcodes no
+number of item types. It is parametrized from `MATCHUPS`, which is
+built from whatever `EXPECTED` contains, so growing it from nine
+entries to sixteen produces sixteen independently reported cases per
+module with no change to the test function itself.
 
 ## 4. Counting how often each item type appears
 

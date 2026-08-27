@@ -1,7 +1,13 @@
 # test_person.py
 import pytest
-from person import EmailAddress, FullName
+from person import EmailAddress, FullName, Person
 from validation import TypeFailure
+
+def test_person_composes_validated_parts() -> None:
+    person = Person(FullName("Bruce Eckel"),
+                    EmailAddress("bruce@example.com"))
+    assert person.name.text == "Bruce Eckel"
+    assert person.email.text == "bruce@example.com"
 
 @pytest.mark.parametrize("bad", ["Bruce", "", "   "])
 def test_full_name_needs_two_parts(bad: str) -> None:

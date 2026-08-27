@@ -22,6 +22,15 @@ class Sketch:
     def restore(self, memento: Memento) -> None:
         self.strokes = list(memento.strokes)
 
+class History[S]:
+    def __init__(self, initial: S) -> None:
+        self.present = initial
+        self.past: list[S] = []
+
+    def do(self, new_state: S) -> None:
+        self.past.append(self.present)
+        self.present = new_state
+
 def test_erase_does_not_affect_existing_memento() -> None:
     sketch = Sketch()
     sketch.draw("a")
@@ -30,3 +39,13 @@ def test_erase_does_not_affect_existing_memento() -> None:
     sketch.erase()
     assert sketch.strokes == ["a"]
     assert checkpoint.strokes == ("a", "b")  # Untouched
+
+def test_erase_leaves_history_states_untouched() -> None:
+    sketch = Sketch()
+    sketch.draw("a")
+    history = History(sketch.save())
+    sketch.draw("b")
+    history.do(sketch.save())
+    sketch.erase()
+    assert history.present.strokes == ("a", "b")
+    assert history.past[0].strokes == ("a",)

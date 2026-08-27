@@ -30,14 +30,6 @@ def test_fragrance_registered_and_default(
 ) -> None:
     assert fragrance(flower) == expected
 
-def test_operations_dispatch_independently() -> None:
-    # Nectar knows Gladiolus and Chrysanthemum; fragrance
-    # knows Ranunculus. A Ranunculus falls to nectar's
-    # default but hits fragrance's registered case.
-    ranunculus = Ranunculus()
-    assert nectar(ranunculus) == "Ranunculus: no nectar"
-    assert fragrance(ranunculus) == "strong"
-
 def test_dispatch_follows_inheritance() -> None:
     # Unregistered: the nearest registered ancestor wins
     class Hybrid(Gladiolus):

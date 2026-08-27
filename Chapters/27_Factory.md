@@ -657,7 +657,10 @@ def test_clone_is_independent() -> None:
 def test_prototype_untouched() -> None:
     spawned = spawn("troll")
     spawned.hp = 1
+    spawned.powers.append("bellow")
     assert PROTOTYPES["troll"].hp == 40
+    # deepcopy: the list is not shared either
+    assert PROTOTYPES["troll"].powers == ["smash", "regen"]
 ```
 
 ## Builder

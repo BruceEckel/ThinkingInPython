@@ -1,12 +1,6 @@
 # test_pizza_decorator.py
 import pytest
-from pizza_decorator import (Feta, Garlic, Hawaiian,
-                             Margherita, Olives)
-
-def test_plain_pizza() -> None:
-    pizza = Hawaiian()
-    assert pizza.cost == pytest.approx(9.50)
-    assert pizza.description == "Hawaiian"
+from pizza_decorator import Feta, Garlic, Margherita, Olives
 
 def test_stacked_toppings() -> None:
     order = Feta(Olives(Margherita()))

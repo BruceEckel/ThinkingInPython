@@ -52,6 +52,7 @@ def test_spree_attempts_every_price() -> None:
     shop = handle(recording(written))(half)
     assert run(shop((60, 50, 30, 20))) == 2
     assert written == [40, 10]
+    assert next(balances, None) is None  # All four read
 
 written: list[int] = []
 scripted = handle(recording(written))(

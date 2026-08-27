@@ -22,5 +22,7 @@ def test_only_the_matching_type_is_called() -> None:
     assert calls == ["withdraw"]
 
 def test_no_handler_is_a_noop() -> None:
-    # Must not raise anything
-    EventBus().publish(Closed("done"))
+    bus = EventBus()
+    bus.publish(Closed("done"))  # Must not raise
+    # publish() reads with .get(): no stray entry appears
+    assert Closed not in bus._handlers

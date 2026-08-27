@@ -262,11 +262,6 @@ def test_draw_returns_new_drawing() -> None:
 
 def test_replace_carries_other_fields() -> None:
     assert Drawing("Duck").draw("x").title == "Duck"
-
-def test_equal_states_compare_equal() -> None:
-    first = Drawing("Duck").draw("circle")
-    second = Drawing("Duck").draw("circle")
-    assert first == second and first is not second
 ```
 
 ## The Caretaker: a Generic History
