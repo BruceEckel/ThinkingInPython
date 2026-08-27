@@ -40,7 +40,7 @@ on average by a wide margin (thousands of times faster in this run),
 because most random targets still require scanning roughly half the
 `list` on average, which is already far more work than one hash
 lookup. The worst case and the average case tell the same story here;
-they only diverge if most real lookups cluster very close to
+they only diverge if most real lookups cluster near
 the front of the list.
 
 ## 2. Finding the crossover size
@@ -62,7 +62,7 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
 ```
 
 On this machine, the `set` already wins starting at size `2`; only at
-size `1` does the `list` edge ahead, and even then by very little. The
+size `1` does the `list` edge ahead, and even then barely. The
 `set`'s advantage grows steadily as `size` increases, exactly as the
 different growth rates (`O(1)` vs. `O(n)`) predict. This crossover
 point is not a fixed number: it depends on the machine, the Python

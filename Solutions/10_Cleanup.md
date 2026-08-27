@@ -239,7 +239,7 @@ still runs, just at a different time and for a different reason.
 What keeps the `Connection` alive is the callback itself. `self.close`
 is a bound method, and a bound method holds a strong reference to the
 object it is bound to. `finalize()` stores the callback, so the
-finalizer registry now holds a reference to the very object whose
+finalizer registry now holds a reference to the object whose
 death it is waiting for. `del b` drops the last reference the program
 has, but not the last reference that exists, so the object survives.
 

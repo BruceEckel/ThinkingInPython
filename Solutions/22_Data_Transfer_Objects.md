@@ -149,7 +149,7 @@ says which number is which, and a reader of the call site has to open
 written in a form that stops carrying its meaning. And they lost the
 type as a name. Nothing can be annotated `Stats` anymore, so a function
 accepting a summary now advertises `tuple[float, int]`, which any pair
-of a float and an int satisfies.
+of a `float` and an `int` satisfies.
 
 The type checker still catches a fair amount. Unpacking into the wrong
 number of names fails, since the tuple's length is part of its type.
@@ -158,8 +158,9 @@ types are still known positionally. Indexing past the end fails, and
 so does calling a `str` method on `count`.
 
 What it cannot catch is the mistake this exercise is about: swapping
-the two. `mean, count = summarize(data)` and `count, mean =
-summarize(data)` are both `tuple[float, int]` destructured into two
+the two. `mean, count = summarize(data)` and
+`count, mean = summarize(data)` are both `tuple[float, int]`
+destructured into two
 names, and the second one type-checks cleanly while being wrong in
 every use afterward. With `Stats`, that mistake either does not arise
 (you write `result.count`) or fails immediately, because `Stats` and a
@@ -202,7 +203,7 @@ print(FrozenColor(1, 2, 3) == (1, 2, 3))
 `tuple.__eq__`, which compares length and elements and consults neither
 class. Adding a third `NamedTuple` adds a third type that compares
 equal to the other two, so the family of things that equal `(1, 2, 3)`
-grows with every three-int `NamedTuple` in the program. The field names
+grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
 `FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen dataclass's

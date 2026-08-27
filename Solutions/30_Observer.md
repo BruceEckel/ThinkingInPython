@@ -27,7 +27,7 @@ print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-There is no separate `Observer` class at all, the same design
+No separate `Observer` class exists at all, the same design
 `observers.py` already uses. Any callable, here two `lambda`s, is an
 observer. `subscribe()` collects them in a list, and `notify()` calls
 each one in turn with whatever arguments it was given, so every

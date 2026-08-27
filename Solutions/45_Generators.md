@@ -361,7 +361,7 @@ just-started generator`. So the first call is special in both
 directions, and `None` is the only value it accepts.
 
 An annotation cannot express "`None` for the first call, `Answer`
-afterward", because a single `SendType` covers every call. Widening it
+afterward," because a single `SendType` covers every call. Widening it
 to `Answer | None` would state the exception in the type, at the price
 of forcing every `yield` expression inside the generator to handle a
 `None` that arrives only once. Priming with `next()` sidesteps the

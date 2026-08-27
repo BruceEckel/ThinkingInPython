@@ -65,9 +65,9 @@ A plain generator cannot do this. Once you call a generator function,
 you have the iterator itself, and an iterator's whole state is "how
 far through have I gotten," which is exactly what makes counting its
 remaining items expensive: the only way to know how many values are
-left is to consume them, which uses them up. There is no `start` field
-left to inspect, and no way to ask a paused generator "how many more
-times will you yield?" without running it to exhaustion. `Countdown`
+left is to consume them, which uses them up. No `start` field
+remains to inspect, and nothing can ask a paused generator "how many
+more times will you yield?" without running it to exhaustion. `Countdown`
 sidesteps this because it is a container that *produces* a generator
 on demand; the container itself keeps the value a `len()` can read
 without consuming anything.

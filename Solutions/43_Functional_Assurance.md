@@ -282,8 +282,9 @@ see it.
 
 The two lines guarding an empty `groups` are the interesting part,
 because the property test is what found the need for them. Run against
-the version without them, Hypothesis reports `names=['a', 'aa'],
-size=3` and a `ValueError: min() iterable argument is empty`: with
+the version without them,
+Hypothesis reports `names=['a', 'aa'], size=3`
+and a `ValueError: min() iterable argument is empty`: with
 fewer students than the group size, the `while len(pool) >= size` loop
 never runs, `groups` stays empty, and the leftover loop then asks
 `min()` for the smallest of nothing.

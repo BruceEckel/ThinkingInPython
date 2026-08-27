@@ -134,7 +134,7 @@ What its callers must now declare is the point of the exercise. Before,
 environment: `run(greet_all(names))`. Now every caller has two
 options, the same two `greet()`'s callers had. Supply a `Console`,
 ending the requirement, or declare `Need[Console]` in its own return
-type and pass the requirement further up. There is no third option, and
+type and pass the requirement further up. No third option exists, and
 that is what makes the dependency visible: it appears in the signature
 of every function between the one that uses it and the one that
 supplies it, and the type checker refuses to let any of them stay silent.

@@ -261,7 +261,7 @@ block explains the rule the interpreter enforces without explaining:
 `type` and `dict` are both implemented in C, each with its own instance
 layout, so no single object can be both. CPython discovers this while
 executing the `class` statement and reports it as the terse "instance
-lay-out conflict". `ty` reaches the same conclusion from the class
+lay-out conflict." `ty` reaches the same conclusion from the class
 header alone, before anything runs, and points at both bases to say
 which pair is at fault.
 

@@ -309,8 +309,8 @@ It does not **separate the interface from the implementation**.
 `await price_of_async(item)` names no capability. It says "run this
 particular coroutine," and the coroutine's body decides what awaiting
 means. Compare `Ask` in `ask_tell.py`, where `greet()` names the
-capability and stays silent about how a name is obtained. There is no
-`async` equivalent of writing a function against "something awaitable
+capability and stays silent about how a name is obtained. `async` has
+no equivalent of writing a function against "something awaitable
 that yields a price" and choosing later which one.
 
 It does not **bind the implementation later**. `asyncio.run()` chooses

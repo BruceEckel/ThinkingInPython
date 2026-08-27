@@ -287,7 +287,7 @@ print(queen.color, queen.kind)
 ```
 
 Thirty-two occupied squares, but only twelve distinct `Piece` objects:
-two colors times six kinds. Every white pawn is the very same object,
+two colors times six kinds. Every white pawn is the same object,
 and likewise for every other color-and-kind combination; the board is
 just a `dict` mapping squares to references, the extrinsic position
 kept separate from the intrinsic color-and-kind that `@cache` shares.

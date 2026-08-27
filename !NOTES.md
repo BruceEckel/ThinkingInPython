@@ -1,8 +1,6 @@
 Check for any unresolved issues in deep_review and readability directories
 Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
 
-make prose, make spell should also work on Solutions/*.md
-
 Review the tests to see if they are all doing something useful.
 
 New book cover & favicon
@@ -11,7 +9,7 @@ Fable: Review the book to find and fix consistency issues
 
 Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.
 
-Add Epub link info on README and bottom of index page.
+Add Epub/PDF link on README and at bottom of index page.
 
 Game that incorporates both game theory and NVC with the hypothesis that there is a connection.
 Examples that demonstrate probability or statistics, very simply

@@ -166,7 +166,7 @@ ImportError: attempted relative import with no known parent package
 
 A relative import is resolved against the module's `__package__`, and
 a file run as a script has none: it is `__main__`, which belongs to no
-package. There is no parent for the single dot to mean.
+package. No parent exists for the single dot to mean.
 
 With the absolute import, the same command reports:
 

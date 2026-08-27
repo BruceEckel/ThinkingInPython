@@ -347,7 +347,7 @@ surfaces out of `run()`, not out of the Effect.
 watches the error channel, and this exception never entered that channel.
 `Blackout` is raised inside `choose()`, which is the handler, and a handler runs
 in the driver while it is answering a request.
-There is no `yield` between the `raise` and `run()`'s own stack frame,
+No `yield` sits between the `raise` and `run()`'s own stack frame,
 so the exception unwinds the driver in the ordinary Python way,
 past the suspended Effect rather than through it.
 

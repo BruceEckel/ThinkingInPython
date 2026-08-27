@@ -201,8 +201,9 @@ print(reconstructed == drawing)
 #: True
 ```
 
-JSON has no tuple type, only arrays, so `strokes`, a `tuple[str,
-...]` in the dataclass, comes back from `json.loads()` as a plain
+JSON has no tuple type, only arrays, so `strokes`,
+a `tuple[str, ...]` in the dataclass,
+comes back from `json.loads()` as a plain
 `list`. `pickle` preserves the exact Python type, tuple in, tuple out,
 because it serializes Python's own object representations rather than
 translating into a shared, language-neutral format. The reconstruction
@@ -238,7 +239,7 @@ FAILED test_sketch.py::test_drawing_after_restore_spares_memento
 ```
 
 The corruption is deeper than any single test expects. Because
-`Memento.strokes` is now the very same list `Sketch.strokes` points
+`Memento.strokes` is now the same list `Sketch.strokes` points
 to, `sketch.draw("b")` after `checkpoint = sketch.save()` mutates
 `checkpoint.strokes` too, since they are one object. By the time
 `test_restore_rewinds_state` even calls `sketch.restore(checkpoint)`,

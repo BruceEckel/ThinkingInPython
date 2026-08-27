@@ -129,8 +129,8 @@ print(only_one.val)
 
 This behaves exactly like `OnlyOne` from `singleton_pattern.py`: a
 shared, one-and-only-one `val` list, appended to from anywhere in the
-program. There is no wrapper class, no nested private class, no
-`ClassVar` sentinel, and no `__getattr__()` delegation, because the
+program. The design needs no wrapper class, no nested private class,
+no `ClassVar` sentinel, and no `__getattr__()` delegation, because the
 module itself is already the single shared object Python caches in
 `sys.modules`.
 
@@ -162,8 +162,9 @@ print(config.settings)
 #: {}
 ```
 
-The two prints disagree, and that is the whole lesson. `from config
-import settings` copies a binding: two names, this module's `settings`
+The two prints disagree, and that is the whole lesson.
+`from config import settings` copies a binding: two names,
+this module's `settings`
 and `config.settings`, initially pointing at one dict. Mutating
 through either name, as the original `settings["theme"] = "dark"` did,
 changes the object both names refer to, so both see it. Assigning to
@@ -174,13 +175,15 @@ the second print shows `{}`.
 Nothing warns you at runtime. The module still imports, the assignment
 succeeds, and the local `settings` holds what you put in it. The
 sharing is simply gone, and it fails silently in whichever direction
-the other module reads. `import config` and then `config.settings =
-{...}` replaces the value everyone sees, because it rebinds the
+the other module reads. `import config` and then
+`config.settings = {...}` replaces the value everyone sees,
+because it rebinds the
 attribute on the one module object rather than a name in your own
 namespace.
 
-A linter does object, which is why the listing carries `# noqa:
-F811`. Ruff reads the assignment as redefining a name that was just
+A linter does object,
+which is why the listing carries `# noqa: F811`.
+Ruff reads the assignment as redefining a name that was just
 imported and flags it as an unused import followed by a shadowing
 binding. That rule exists because this is far more often a mistake
 than an intention. Here it is deliberate, so the solution silences the
@@ -247,7 +250,7 @@ milliseconds; with it they queue and it takes about 400. Each thread
 still builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last, so seven callers walk away
 holding objects the cache has never heard of. The lock made the
-program slower and no more correct, which is the worst of the two
+program slower and fixed nothing, which is the worst of the two
 outcomes it could have had.
 
 The lock cannot be moved to the right place either, because the right

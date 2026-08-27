@@ -154,7 +154,7 @@ did not write. A rule that must be remembered by people who have not
 read this chapter is not a fix.
 
 Separating construction from starting makes the mistake unavailable.
-There is no window in which the engine runs against half-built state,
+No window exists in which the engine runs against half-built state,
 because construction runs no engine. The cost is one extra line at
 every call site, `greeter.run()`, and that line is worth it: it moves
 the decision about *when* the algorithm starts out of the base class

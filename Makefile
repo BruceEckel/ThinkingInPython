@@ -14,10 +14,15 @@ RUFF ?= uv run ruff
 PYTEST_N ?=
 SPELL ?= uv run codespell
 VALE ?= vale
-DOCS ?= Chapters
-# Files for spell/prose: all of DOCS, or one chapter via CH= (a number or stem
-# prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
-PROSE_FILES = $(if $(CH),Chapters/$(CH)*.md,$(DOCS))
+DOCS ?= Chapters Solutions
+# Files for spell/prose: all of DOCS, or one chapter via CH= (a number or
+# stem prefix), e.g. `make prose CH=29` or `make prose CH=29_Visitor`.
+# CH= covers the chapter and its Solutions file together; $(wildcard)
+# drops the half that does not exist, and a CH matching nothing falls
+# back to the unmatched Chapters pattern so the tool still errors
+# loudly instead of silently linting everything.
+PROSE_CH = $(wildcard Chapters/$(CH)*.md Solutions/$(CH)*.md)
+PROSE_FILES = $(if $(CH),$(if $(PROSE_CH),$(PROSE_CH),Chapters/$(CH)*.md),$(DOCS))
 # Extra args for `make all`, e.g. `make all ARGS=--help` to list its
 # targets (tools/run_all.py's ALL_TARGETS) without running them.
 ARGS ?=
