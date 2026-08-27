@@ -24,8 +24,8 @@ either family:
 - drawn mode: the same four roles as SVG/PNG (cover.svg,
               cover-eink.svg, cover-letter.svg, cover-art.svg,
               cover-color.png, cover-eink.png)
-- always:     favicon.svg (a serpent's eye with a slit pupil,
-              in the cover art's palette)
+- always:     favicon.svg (a serpent's eye, gold iris on deep
+              green, in the cover art's palette)
 
 Text is set in Palatino Linotype, which ships with Windows and
 macOS; regenerate on a machine that has it.
@@ -58,7 +58,7 @@ PAPER = "#f5f0e8"
 INK = "#1a1612"
 ACCENT = "#8b1a1a"
 # Tones picked from the cover art, for the favicon's eye.
-MOSS = "#68774d"
+DEEPGREEN = "#37432e"
 GOLD = "#cdbd83"
 
 # E-ink drawn variant: same drawing, no color.
@@ -429,21 +429,21 @@ def drawn_outputs(preview: bool) -> None:
 # The favicon (both modes)
 # --------------------------------------------------------------------------- #
 def favicon_svg() -> str:
-    """A serpent's eye with a slit pupil, in the art's palette.
+    """A serpent's eye: gold iris on deep green, full bleed.
 
-    Chosen from a candidate gallery for one property above all:
-    it stays unmistakable at 16 px, the size a favicon actually
-    lives at in a browser tab.
+    Chosen from candidate galleries for two properties: it stays
+    unmistakable at 16 px, the size a favicon actually lives at
+    in a browser tab, and its flat cover-art palette holds its
+    contrast on both light and dark browser chrome.
     """
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="{PAPER}"/>
-  <ellipse cx="16" cy="16" rx="12" ry="9" fill="{INK}"/>
-  <ellipse cx="16" cy="16" rx="10" ry="7.2" fill="{MOSS}"/>
-  <ellipse cx="16" cy="16" rx="6.5" ry="6" fill="{GOLD}"/>
-  <path d="M16 9.5 C17.6 13 17.6 19 16 22.5
-           C14.4 19 14.4 13 16 9.5 Z" fill="{INK}"/>
-  <circle cx="13.6" cy="12.6" r="1.3" fill="{PAPER}"/>
+  <rect width="32" height="32" rx="5" fill="{DEEPGREEN}"/>
+  <path d="M3.5 16 Q16 -1.5 28.5 16 Q16 33.5 3.5 16 Z"
+        fill="{GOLD}"/>
+  <path d="M16 7.5 C18 11 18 21 16 24.5
+           C14 21 14 11 16 7.5 Z" fill="{DEEPGREEN}"/>
+  <circle cx="12" cy="10.5" r="1.5" fill="{PAPER}"/>
 </svg>'''
 
 
