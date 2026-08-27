@@ -1,5 +1,7 @@
 Thinking in Python
 ==================
+## Insights, Idioms and Patterns
+### Bruce Eckel
 
 An intermediate-to-advanced book for experienced programmers.
 Includes a fast introduction for programmers from other languages.
