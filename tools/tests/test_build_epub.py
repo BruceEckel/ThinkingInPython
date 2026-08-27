@@ -179,8 +179,14 @@ def test_chapter_title_becomes_a_numbered_level_one_heading(
         tmp_path: Path) -> None:
     chapters = chapters_in(tmp_path, {"07_Classes": "# Classes\n\nbody\n"})
     text = book_markdown(chapters, set(), set())
-    assert text.startswith("# 7. Classes {#ch07}")
+    # The EPUB form: the number as an eyebrow span above the bare title.
+    assert text.startswith(
+        "# [Chapter 7]{.chapter-eyebrow} Classes {#ch07}")
     assert "# Classes\n" not in text  # the original heading is not repeated
+    # The PDF form (ornament=False) keeps the plain numbered heading,
+    # which build_pdf's typst show rule parses and restyles.
+    plain = book_markdown(chapters, set(), set(), ornament=False)
+    assert plain.startswith("# 7. Classes {#ch07}")
 
 def test_part_divider_is_emitted_before_its_chapter(tmp_path: Path) -> None:
     # build_site.PARTS starts Part I at chapter 02.
@@ -189,8 +195,10 @@ def test_part_divider_is_emitted_before_its_chapter(tmp_path: Path) -> None:
         "02_Tour": "# Tour\n\nbody\n",
     })
     text = book_markdown(chapters, set(), set())
-    assert text.index("# Part I") < text.index("# 2. Tour")
-    assert text.index("# 1. Introduction") < text.index("# Part I")
+    assert (text.index("# Part I")
+            < text.index("Tour {#ch02}"))
+    assert (text.index("Introduction {#ch01}")
+            < text.index("# Part I"))
 
 def test_hang_code_false_keeps_listings_fenced(tmp_path: Path) -> None:
     # build_pdf.py passes hang_code=False: pandoc's typst writer drops

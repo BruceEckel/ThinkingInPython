@@ -615,14 +615,27 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         text = rewrite_images("\n".join(lines), img_map, missing)
         if hang_code:
             text = hang_listings(text)
-        head = f"# {chapter_heading(ch)} {{#{prefix}}}"
+        heading = chapter_heading(ch)
+        if ornament:
+            # The EPUB mirrors the PDF's chapter opening: the
+            # number becomes a small letterspaced eyebrow above
+            # the bare title (a span the CSS displays as its own
+            # line). The nav document therefore reads
+            # "Chapter 4 Control Flow". The PDF passes
+            # ornament=False and keeps the plain "4. Title"
+            # heading its typst show rule transforms instead.
+            num, _, title = heading.partition(". ")
+            eyebrow = (num if num.startswith("Appendix")
+                       else f"Chapter {num}")
+            head = (f"# [{eyebrow}]{{.chapter-eyebrow}} "
+                    f"{title} {{#{prefix}}}")
+        else:
+            head = f"# {heading} {{#{prefix}}}"
         orn = ""
         if ornament and (STATIC
                          / "chapter-ornament.png").exists():
-            # Inline (trailing backslash) for the same reason as
-            # the Part art: no implicit centered figure. The PDF
-            # passes ornament=False: it draws the band as a
-            # typst underline of the title instead.
+            # Inline (trailing backslash), so pandoc does not
+            # promote it to a centered implicit figure.
             orn = ("\n\n![](chapter-ornament.png)"
                    "{.chapter-ornament width=1.6in}\\")
         parts.append(f"{head}{orn}\n\n{text.strip()}\n")
@@ -723,6 +736,18 @@ def epub_name(variant: str) -> str:
     return f"{EPUB_STEM}-{variant}.epub"
 
 
+def eyebrow_color(variant: str) -> str:
+    """The chapter eyebrow's moss tint, color variant only.
+
+    The eink stylesheet stays free of colors on principle (and
+    test_eink_css_bolds_instead_of_coloring enforces it), so
+    there the eyebrow inherits the text color.
+    """
+    if variant != "color":
+        return ""
+    return ".chapter-eyebrow { color: #68774d; }"
+
+
 def epub_css(variant: str) -> str:
     """The bare minimum CSS, so the reader's own defaults do the rest.
 
@@ -768,6 +793,10 @@ pre code {{ font-size: inherit; }}
 figure {{ page-break-inside: avoid; }}
 figure img {{ max-width: 100%; height: auto; }}
 img.chapter-ornament, img.part-art {{ max-width: 100%; }}
+img.chapter-ornament {{ margin: 0.1em 0 1em; }}
+.chapter-eyebrow {{ display: block; font-size: 0.5em;
+  font-weight: normal; letter-spacing: 0.22em; }}
+{eyebrow_color(variant)}
 table {{ border-collapse: collapse; }}
 th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 #toc ol {{ list-style: none; padding-left: 1em; }}

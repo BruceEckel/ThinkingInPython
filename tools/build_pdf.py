@@ -72,20 +72,40 @@ PAGEBREAK_TYPST = """\
 ]
 #show heading.where(level: 1): it => {
   pagebreak(weak: true)
-  // The chapter ornament, as an underline of the title text:
-  // it starts after the "23. " prefix and runs the title's
-  // width, wrapping with it. The regex matches chapters and
-  // appendices, so Part dividers and other level-1 headings
-  // stay plain. (The tiling doubles each diamond half a cell
-  // apart because a stroke samples its paint centered on the
-  // line: one copy per cell arrives cut into hourglasses.)
+  // A modest chapter sink: openings start lower on the page.
+  v(26pt)
+  // Chapter openings: the "23. " prefix becomes a small
+  // letterspaced eyebrow (CHAPTER 23) above the bare title,
+  // and the chapter ornament underlines the title text,
+  // running exactly its width and wrapping with it. The regex
+  // matches chapters and appendices, so Part dividers and
+  // other level-1 headings stay plain. (The tiling doubles
+  // each diamond half a cell apart because a stroke samples
+  // its paint centered on the line: one copy per cell arrives
+  // cut into hourglasses.)
   show regex("^(\\d+|Appendix [A-Z])\\. .+"): m => {
-    let i = m.text.position(". ") + 2
-    m.text.slice(0, i)
-    underline(stroke: 5pt + orn-band, offset: 8pt,
-              evade: false, background: true,
-              m.text.slice(i))
-    v(6pt)
+    let i = m.text.position(". ")
+    let num = m.text.slice(0, i)
+    let title = m.text.slice(i + 2)
+    let eyebrow = if num.starts-with("Appendix") {
+      upper(num)
+    } else { "CHAPTER " + num }
+    // Spacing follows proximity: the eyebrow, title, and
+    // band are one group (small gaps inside), and the body
+    // follows after a full-line break (24pt), so the opening
+    // reads as a unit rather than crowding its text.
+    text(size: 10pt, tracking: 3pt, weight: "regular",
+         fill: rgb("<<moss>>"), eyebrow)
+    // A linebreak, not v(): a vertical skip would split the
+    // heading into paragraphs and pick up the template's
+    // paragraph spacing, gapping eyebrow from title.
+    linebreak()
+    // Explicit size: pandoc's typst template sets level-1
+    // headings modestly, and a chapter opening deserves more.
+    text(size: 28pt,
+         underline(stroke: 5pt + orn-band, offset: 9pt,
+                   evade: false, background: true, title))
+    v(24pt)
   }
   it
 }
