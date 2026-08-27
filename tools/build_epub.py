@@ -85,9 +85,10 @@ from tools_config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools_config import ROOT
 from tools_markdown import Document
 
-# The cover comes from tools/make_cover.py at 1600x2560, Kindle's
-# cover ratio (sleep mode shows it full screen), one rendering per
-# variant: color, and grayscale for the e-ink EPUB. Art mode
+# The cover comes from tools/make_cover.py, one rendering per
+# variant: color at 1600x2560 (the Kindle store's cover ratio),
+# and grayscale at 3:4 (the ratio of e-ink screens, so sleep
+# mode shows it full screen with no side bars). Art mode
 # (a supplied painting) emits JPEG; drawn mode (flat vector art)
 # emits PNG, which deflates better for solid areas. Accept either.
 def cover_image(variant: str) -> Path | None:

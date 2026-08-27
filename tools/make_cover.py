@@ -17,10 +17,12 @@ builds themselves never need this script's tools (resvg, Pillow).
 Each mode deletes the other mode's outputs; the builders accept
 either family:
 
-- art mode:   cover-color.jpg, cover-eink.jpg (EPUB covers,
-              1600x2560, Kindle's ratio), cover-letter.jpg (the
-              PDF's full-bleed first page), cover-art.jpg (site
-              index)
+- art mode:   cover-color.jpg (EPUB cover, 1600x2560, the Kindle
+              store's ratio), cover-eink.jpg (e-ink EPUB cover,
+              3:4, the ratio of e-ink screens themselves so the
+              sleep-screen cover fills the display), cover-letter.jpg
+              (the PDF's full-bleed first page), cover-art.jpg
+              (site index)
 - drawn mode: the same four roles as SVG/PNG (cover.svg,
               cover-eink.svg, cover-letter.svg, cover-art.svg,
               cover-color.png, cover-eink.png)
@@ -43,20 +45,26 @@ import subprocess
 import sys
 from pathlib import Path
 
+import build_site
+
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "resources" / "static"
 ART_SOURCE = ROOT / "resources" / "cover-source.jpg"
 TEMP = ROOT / "build" / "cover"
 
-# Page geometry (SVG user units). 1:1.6, Kindle's cover ratio;
-# 1294 is the same width at US Letter's ratio.
+# Page geometry (SVG user units). 1:1.6, the Kindle store's
+# cover ratio; 1294 is the same width at US Letter's ratio;
+# 1333 is 3:4, the ratio of Kindle e-ink screens, so the e-ink
+# cover fills the sleep screen with no side bars.
 W, H = 1000, 1600
 LETTER_H = 1294
+EINK_H = 1333
 
 # The site's palette (build_site.py), so every surface matches.
 PAPER = "#f5f0e8"
 INK = "#1a1612"
 ACCENT = "#8b1a1a"
+MUTED = "#7a6e62"
 # Tones picked from the cover art, for the favicon's eye and
 # the chapter ornament.
 DEEPGREEN = "#37432e"
@@ -81,7 +89,7 @@ ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
 # --------------------------------------------------------------------------- #
 def titles_svg(h: int, ink: str = INK,
                accent: str = ACCENT) -> str:
-    """Title, rule, and author for a page of height h."""
+    """Title, rule, subtitle, and author for a page of height h."""
     return f'''<text x="{W / 2}" y="170" text-anchor="middle"
         font-family="{TITLE_FONT}" font-size="92"
         fill="{ink}">Thinking</text>
@@ -90,6 +98,10 @@ def titles_svg(h: int, ink: str = INK,
         fill="{ink}">in Python</text>
   <rect x="{W / 2 - 60}" y="330" width="120" height="4"
         fill="{accent}"/>
+  <text x="{W / 2}" y="398" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="40"
+        font-style="italic"
+        fill="{MUTED}">{build_site.BOOK_SUBTITLE}</text>
   <text x="{W / 2}" y="{h - 90}" text-anchor="middle"
         font-family="{TITLE_FONT}" font-size="44"
         letter-spacing="3" fill="{ink}">Bruce Eckel</text>'''
@@ -176,11 +188,13 @@ def art_outputs(preview: bool) -> None:
         return
 
     compose(H, TEMP / "kindle.png", 1600)
+    compose(EINK_H, TEMP / "eink.png", 1600)
     compose(LETTER_H, TEMP / "letter.png", 1600)
     kindle = Image.open(TEMP / "kindle.png").convert("RGB")
     kindle.save(STATIC / "cover-color.jpg", quality=87,
                 optimize=True)
-    gray = ImageOps.autocontrast(ImageOps.grayscale(kindle),
+    epage = Image.open(TEMP / "eink.png").convert("RGB")
+    gray = ImageOps.autocontrast(ImageOps.grayscale(epage),
                                  cutoff=1)
     gray.save(STATIC / "cover-eink.jpg", quality=87,
               optimize=True)
@@ -443,7 +457,7 @@ def drawn_outputs(preview: bool) -> None:
         print("wrote cover-preview.png (drawn mode)")
         return
     (STATIC / "cover-eink.svg").write_text(
-        eink(master), encoding="utf-8")
+        eink(cover_svg(h=EINK_H)), encoding="utf-8")
     (STATIC / "cover-letter.svg").write_text(
         cover_svg(h=LETTER_H), encoding="utf-8")
     (STATIC / "cover-art.svg").write_text(
