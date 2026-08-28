@@ -87,24 +87,51 @@ ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
 # --------------------------------------------------------------------------- #
 # Shared page furniture
 # --------------------------------------------------------------------------- #
+# Type layout (SVG user units on the 1000-wide page). The title
+# was first set at 92, which on a Kindle screen read as a modest
+# heading rather than a cover title; 150 puts "in Python" at about
+# 60% of the page width, the proportion trade covers use.
+TITLE_SIZE = 150
+TITLE_1_Y = 190
+TITLE_2_Y = 370
+RULE_Y = 425
+SUBTITLE_SIZE = 56
+SUBTITLE_Y = 495
+# Where the type block ends and the art may begin.
+TYPE_BOTTOM = SUBTITLE_Y + 20
+AUTHOR_SIZE = 58
+AUTHOR_MARGIN = 90
+
+
+def author_top(h: int) -> float:
+    """Top of the author line's caps on a page of height h."""
+    return h - AUTHOR_MARGIN - 0.7 * AUTHOR_SIZE
+
+
+def art_center(h: int) -> float:
+    """Vertical midpoint of the band between subtitle and author,
+    where the art is centered on every page height."""
+    return (TYPE_BOTTOM + author_top(h)) / 2
+
+
 def titles_svg(h: int, ink: str = INK,
                accent: str = ACCENT) -> str:
     """Title, rule, subtitle, and author for a page of height h."""
-    return f'''<text x="{W / 2}" y="170" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="92"
+    return f'''<text x="{W / 2}" y="{TITLE_1_Y}" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="{TITLE_SIZE}"
         fill="{ink}">Thinking</text>
-  <text x="{W / 2}" y="280" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="92"
+  <text x="{W / 2}" y="{TITLE_2_Y}" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="{TITLE_SIZE}"
         fill="{ink}">in Python</text>
-  <rect x="{W / 2 - 60}" y="330" width="120" height="4"
+  <rect x="{W / 2 - 80}" y="{RULE_Y}" width="160" height="5"
         fill="{accent}"/>
-  <text x="{W / 2}" y="398" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="40"
+  <text x="{W / 2}" y="{SUBTITLE_Y}" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="{SUBTITLE_SIZE}"
         font-style="italic"
         fill="{MUTED}">{build_site.BOOK_SUBTITLE}</text>
-  <text x="{W / 2}" y="{h - 90}" text-anchor="middle"
-        font-family="{TITLE_FONT}" font-size="44"
-        letter-spacing="3" fill="{ink}">Bruce Eckel</text>'''
+  <text x="{W / 2}" y="{h - AUTHOR_MARGIN}" text-anchor="middle"
+        font-family="{TITLE_FONT}" font-size="{AUTHOR_SIZE}"
+        letter-spacing="4" fill="{ink}">Bruce Eckel</text>'''
 
 
 def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
@@ -140,7 +167,7 @@ def art_page_svg(uri: str, iw: int, ih: int, h: int,
     color and the art's interior paper never shows as a seam.
     """
     art_h = W * ih / iw
-    y = h * 0.52 - art_h / 2
+    y = art_center(h) - art_h / 2
     feather = 70
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 {W} {h}" width="{W}" height="{h}">
@@ -426,7 +453,7 @@ def head_svg(loc, w: float,
 
 def cover_svg(h: int = H) -> str:
     """The drawn cover at width W and any height."""
-    art = body_svg(a=415, cx=W / 2, cy=h * 0.505)
+    art = body_svg(a=415, cx=W / 2, cy=art_center(h))
     return f'''<svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 {W} {h}" width="{W}" height="{h}">
   <rect width="{W}" height="{h}" fill="{PAPER}"/>

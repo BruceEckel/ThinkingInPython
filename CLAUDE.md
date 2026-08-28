@@ -192,6 +192,23 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   block finishes, before moving on. Chapter 10 (Cleanup)'s `cleanup.py` is
   the example that demonstrates this (it deliberately relies on `__del__`
   timing being unpredictable), so it is the usual trigger if this regresses.
+- **Kindle listings: only the real book is a valid test bed, and
+  line-leading whitespace is half width there.** Send to Kindle (email)
+  converts a tiny standalone probe EPUB differently from the full book
+  (probes rendered `pre` in Bookerly whatever the CSS said; the book
+  renders it monospace), so four probes gave answers the book then
+  contradicted. Test a listing change by building the book with a probe
+  chapter in front (a scratch script that monkeypatches
+  `build_epub.book_markdown`/`epub_css`, then `build()`), never a
+  separate small EPUB. Measured in the book on a Paperwhite: spaces or
+  `&#160;` at the start of a line draw at ~0.54 of a character; the same
+  whitespace after any glyph, even U+200B, draws full width; `ch` is
+  unsupported (zero); `6em` came out ~8.4 characters, not 10; a named
+  family before `monospace` (`"Courier New", Courier, monospace`) loses
+  the monospace entirely. Hence `listing_html()` prefixes each indented
+  line with `&#8203;` and keeps plain spaces, and `CODE_FONT` is the
+  bare keyword. Project memory `kindle-listing-indentation` has the
+  probe script layout.
 - **`build/` is derived and gitignored.** `extract_examples.py --write` now wipes
   the target under `build/` first, so a fresh sync is the fix for weird drift or a
   stale tree. A stale `build/examples/` was behind "phantom" timeouts/import errors.

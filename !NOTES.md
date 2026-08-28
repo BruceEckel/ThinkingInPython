@@ -3,8 +3,6 @@ How can I improve the process on this book?
 Check for any unresolved issues in deep_review and readability directories
 Clean up after deep review and readability (add necessary info to the *_db.md files and delete deep_review and readability directories)
 
-New book cover & favicon
-
 Fable: Review the book to find and fix consistency issues
 
 Fable: What else should I do before I start my hand-editing pass? I'm hoping this requires as few hand-edits as possible.

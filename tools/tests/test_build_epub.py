@@ -25,6 +25,8 @@ from build_epub import (
     metadata_yaml,
     namespace_headings,
     outside_code,
+    polish_nav,
+    polish_ncx,
     relink,
     release_line,
     title_anchor,
@@ -250,8 +252,16 @@ def test_line_carries_its_own_indent_as_its_class() -> None:
     # eight columns does not begin to the left of the code it continues.
     html = listing_html(["def f():", "    if x:", "        pass"])
     assert 'class="h0">def f():' in html
-    assert 'class="h4">    if x:' in html
-    assert 'class="h8">        pass' in html
+    assert 'class="h4">&#8203;    if x:' in html
+    assert 'class="h8">&#8203;        pass' in html
+
+def test_indent_follows_a_zero_width_space() -> None:
+    # A Kindle draws line-leading whitespace at half width but
+    # whitespace after any glyph, even a zero-width one, in full.
+    html = listing_html(["def f():", "    return 1"], python=True)
+    assert ('&#8203;    <span class="kw">return</span> '
+            '<span class="nu">1</span>') in html
+    assert 'class="h0"><span' in html  # no prefix on an unindented line
 
 def test_indent_deeper_than_the_last_rule_is_clamped() -> None:
     deep = " " * (MAX_HANG_INDENT + 6) + "x"
@@ -341,12 +351,18 @@ def test_variant_names() -> None:
 def test_color_css_colors_the_tokens() -> None:
     css = epub_css("color")
     assert "pre .kw { color:" in css
-    assert "font-weight: bold" not in css
+    assert "pre .kw { font-weight" not in css
 
 def test_eink_css_bolds_instead_of_coloring() -> None:
     css = epub_css("eink")
     assert "pre .kw { font-weight: bold; }" in css
     assert "color: #" not in css
+
+def test_listings_ask_for_a_monospace_font() -> None:
+    # A Kindle with no family named drew code in its body serif, and
+    # given a named family before the generic it did the same.
+    for variant in VARIANTS:
+        assert "pre, code { font-family: monospace;" in epub_css(variant)
 
 def test_line_spans_are_their_own_blocks() -> None:
     # The block behavior lives in the h* rules, not on a bare
@@ -364,6 +380,38 @@ def test_prose_around_a_fence_is_untouched() -> None:
 def test_a_text_fence_is_converted_too() -> None:
     # Program output wraps the same way code does.
     assert "<pre>" in hang_listings("```text\nsome output\n```\n")
+
+# ── the contents page ─────────────────────────────────────────────────────────
+
+def test_nav_entry_is_numbered_and_classed() -> None:
+    # Pandoc copies the heading's eyebrow span into the nav, where
+    # the eyebrow CSS made "Chapter 4" a tiny line above the title.
+    nav = ('<li id="toc-li-9"><a href="text/ch005.xhtml#ch04">'
+           '<span class="chapter-eyebrow">Chapter 4</span> Control Flow'
+           '</a><ol class="toc"><li id="toc-li-10">'
+           '<a href="text/ch005.xhtml#ch04-if">If</a></li></ol></li>')
+    out = polish_nav(nav)
+    assert out.startswith('<li id="toc-li-9" class="toc-chapter">'
+                          '<a href="text/ch005.xhtml#ch04">4. Control Flow</a>')
+    assert "chapter-eyebrow" not in out
+    assert '<li id="toc-li-10"><a' in out  # sections untouched
+
+def test_nav_appendix_and_part_entries() -> None:
+    nav = ('<li id="toc-li-1"><a href="text/ch002.xhtml#part-i">'
+           'Part I · Foundations</a></li>'
+           '<li id="toc-li-2"><a href="text/ch090.xhtml#chA">'
+           '<span class="chapter-eyebrow">Appendix A</span> Glossary</a>')
+    out = polish_nav(nav)
+    assert '<li id="toc-li-1" class="toc-part"><a' in out
+    assert '<li id="toc-li-2" class="toc-chapter">' in out
+    assert ">Appendix A. Glossary</a>" in out
+
+def test_ncx_labels_match_the_nav() -> None:
+    ncx = ("<text>Chapter 4 Control Flow</text>"
+           "<text>Appendix A Glossary</text><text>If</text>")
+    assert polish_ncx(ncx) == ("<text>4. Control Flow</text>"
+                               "<text>Appendix A. Glossary</text>"
+                               "<text>If</text>")
 
 def test_text_with_no_fence_is_returned_unchanged() -> None:
     assert hang_listings("Just prose.\n") == "Just prose.\n"

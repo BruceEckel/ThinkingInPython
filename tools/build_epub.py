@@ -75,6 +75,7 @@ import shutil
 import subprocess
 import sys
 import tokenize
+import zipfile
 from html import escape
 from pathlib import Path
 
@@ -116,6 +117,12 @@ SVG_PNG_WIDTH = 1600
 # with a packaged Windows install (scoop install resvg; rsvg-convert
 # has no winget/scoop package on Windows).
 SVG_TOOLS = ("resvg", "rsvg-convert", "magick", "inkscape")
+# The listing font. The bare generic keyword is deliberate: on a
+# Kindle Paperwhite `"Courier New", Courier, monospace` fell back to
+# the body serif instead of walking the list to the generic. (The
+# Kindle sets the book's `pre` in monospace even with no rule; this
+# is for readers whose default differs.)
+CODE_FONT = "monospace"
 # Code-listing font size, relative to the surrounding prose.
 CODE_FONT_SCALE = 0.75
 # How far past its own start a wrapped code line hangs, in characters.
@@ -441,6 +448,10 @@ def highlight_ranges(
     return ranges
 
 
+# U+200B ZERO WIDTH SPACE, in front of every indented listing line.
+ZWSP = "&#8203;"
+
+
 def marked_up(line: str, spans: list[tuple[int, int, str]]) -> str:
     """The line escaped, with a `<span class>` around each range.
 
@@ -531,8 +542,18 @@ def listing_html(lines: list[str], python: bool = False) -> str:
             # An empty block box has no height; a space gives it one.
             out.append('<span class="h0">&#160;</span>')
             continue
-        indent = min(len(line) - len(line.lstrip()), MAX_HANG_INDENT)
+        lead = len(line) - len(line.lstrip())
+        indent = min(lead, MAX_HANG_INDENT)
         text = marked_up(line, ranges.get(index, []))
+        if lead:
+            # A Kindle draws whitespace at the start of a line at
+            # about half width (spaces and `&#160;` alike), so a
+            # four-space indent showed as two characters. Whitespace
+            # after any glyph keeps its full width, even after a
+            # zero-width one, so the indent follows a zero-width
+            # space. Measured in the book itself on a Paperwhite;
+            # `MEMORY.md` (kindle-listing-indentation) has the data.
+            text = ZWSP + text
         out.append(f'<span class="h{indent}">{text}</span>')
     out.append("</pre>")
     return "".join(out)
@@ -757,7 +778,9 @@ def epub_css(variant: str) -> str:
     set anywhere: a Kindle's line-spacing control and its default type
     ramp for `h1`-`h4` already do that, and a value set here does not
     track a per-element override consistently, which reads as spacing
-    that drifts from paragraph to paragraph. The one font size this
+    that drifts from paragraph to paragraph. `CODE_FONT` is set
+    because a Kindle otherwise set listings in the body serif (see
+    its comment). The one font size this
     sets, `CODE_FONT_SCALE` for listings, is set once here and inherited
     by `pre code` rather than repeated, so a nested `<code>` inside a
     `<pre>` does not compound the scale. `pre`'s `white-space: pre-wrap`
@@ -782,12 +805,18 @@ def epub_css(variant: str) -> str:
     the "4." being the reader's count of nav entries so far, Parts
     included, not the chapter number). Suppressing the list's own
     marker leaves the chapter's real number as the only one shown.
+    The other `#toc` rules work on the classes `polish_nav()` adds:
+    Parts stand out as bold group headings with space above, chapters
+    get a little air, and section entries drop to 0.85em so a
+    chapter's eight sections read as its contents, not as eight more
+    chapters. `text-decoration: none` asks the reader not to underline
+    every entry; a Kindle may keep its own underline anyway.
     """
     return f"""pre {{
   white-space: pre-wrap; overflow-wrap: break-word;
   page-break-inside: avoid;
 }}
-pre, code {{ font-size: {CODE_FONT_SCALE}em; }}
+pre, code {{ font-family: {CODE_FONT}; font-size: {CODE_FONT_SCALE}em; }}
 pre code {{ font-size: inherit; }}
 {hang_css()}
 {HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}
@@ -801,7 +830,74 @@ img.chapter-ornament {{ margin: 0.1em 0 1em; }}
 table {{ border-collapse: collapse; }}
 th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 #toc ol {{ list-style: none; padding-left: 1em; }}
+#toc ol ol {{ font-size: 0.85em; }}
+#toc a {{ text-decoration: none; }}
+#toc .toc-chapter {{ margin-top: 0.4em; }}
+#toc .toc-part {{ margin-top: 1.2em; font-weight: bold;
+  letter-spacing: 0.05em; }}
 """
+
+
+# --------------------------------------------------------------------------- #
+# The contents page, fixed up after pandoc
+# --------------------------------------------------------------------------- #
+# Pandoc builds the nav document from each chapter's heading, inline
+# markup included, so every entry arrived as
+# `<span class="chapter-eyebrow">Chapter 4</span> Control Flow`, and
+# the eyebrow's own CSS (a block, half-size, letterspaced) applied on
+# the contents page too: a tiny "Chapter 4" on its own line above each
+# title. The NCX got the plain text, "Chapter 4 Control Flow". Both
+# are rewritten here to the site's and the PDF's form, "4. Control
+# Flow", and each nav entry is classed by what it is (`toc-part`,
+# `toc-chapter`) so the stylesheet can set Parts apart and shrink
+# sections without a child combinator, which not every Kindle
+# renderer honors.
+NAV_CHAPTER = re.compile(
+    r'<li id="([^"]+)"><a href="([^"]+)">'
+    r'<span class="chapter-eyebrow">(?:Chapter (\d+)|(Appendix [A-Z]))'
+    r"</span> ")
+NAV_PART = re.compile(r'<li id="([^"]+)"><a href="([^"]*#part-[^"]*)">')
+NCX_CHAPTER = re.compile(r"<text>(?:Chapter (\d+)|(Appendix [A-Z])) ")
+
+
+def _number(num: str | None, appendix: str | None) -> str:
+    return f"{num or appendix}. "
+
+
+def polish_nav(xhtml: str) -> str:
+    """The nav document with numbered, classed chapter entries."""
+    xhtml = NAV_CHAPTER.sub(
+        lambda m: (f'<li id="{m[1]}" class="toc-chapter">'
+                   f'<a href="{m[2]}">{_number(m[3], m[4])}'), xhtml)
+    return NAV_PART.sub(
+        r'<li id="\1" class="toc-part"><a href="\2">', xhtml)
+
+
+def polish_ncx(ncx: str) -> str:
+    """The NCX with the same "4. Title" labels."""
+    return NCX_CHAPTER.sub(
+        lambda m: f"<text>{_number(m[1], m[2])}", ncx)
+
+
+def polish_toc(epub: Path) -> None:
+    """Rewrite the two contents files inside a finished EPUB.
+
+    An EPUB is a zip whose first entry must be the uncompressed
+    `mimetype`, so the archive is copied entry by entry, each with
+    its own compression, rather than edited in place.
+    """
+    tmp = epub.with_suffix(".tmp")
+    with (zipfile.ZipFile(epub) as src,
+          zipfile.ZipFile(tmp, "w") as dst):
+        for info in src.infolist():
+            data = src.read(info)
+            name = info.filename.rsplit("/", 1)[-1]
+            if name == "nav.xhtml":
+                data = polish_nav(data.decode("utf-8")).encode("utf-8")
+            elif name == "toc.ncx":
+                data = polish_ncx(data.decode("utf-8")).encode("utf-8")
+            dst.writestr(info, data, compress_type=info.compress_type)
+    tmp.replace(epub)
 
 
 # --------------------------------------------------------------------------- #
@@ -895,6 +991,7 @@ def build(out_dir: Path, keep_source: bool = False,
             print(f"NOTE: no cover-{variant} image; "
                   "run tools/make_cover.py.")
         run_pandoc(src, css, meta, epub, images, dc, cover)
+        polish_toc(epub)
         size = epub.stat().st_size / 1024
         print(f"Built {epub.relative_to(ROOT)} "
               f"({len(chapters)} chapters, {size:.0f} KB).")
