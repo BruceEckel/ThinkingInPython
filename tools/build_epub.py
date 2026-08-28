@@ -50,7 +50,8 @@ string, comment, number, tokenized by the pinned CPython's own
 - `ThinkingInPython-color.epub` colors the tokens, for backlit
   readers (phone/tablet Kindle apps). Kindle's dark mode keeps a
   declared color as given, so every color is a mid-tone chosen to
-  stay readable on both white and black.
+  stay readable on both white and black. Its listings are also set
+  larger (`CODE_FONT_SCALE`), since a tablet column has the width.
 - `ThinkingInPython-eink.epub` bolds keywords and italicizes
   comments instead, the styling that survives a grayscale e-ink
   screen.
@@ -123,8 +124,18 @@ SVG_TOOLS = ("resvg", "rsvg-convert", "magick", "inkscape")
 # Kindle sets the book's `pre` in monospace even with no rule; this
 # is for readers whose default differs.)
 CODE_FONT = "monospace"
-# Code-listing font size, relative to the surrounding prose.
-CODE_FONT_SCALE = 0.75
+# Code-listing font size, relative to the surrounding prose, per
+# variant. The e-ink value was tuned on a Paperwhite, whose narrow
+# column and large default type ramp leave little room before a
+# 60-column listing wraps. A backlit tablet has more width per line,
+# so its listings can sit closer to the prose size. The value is
+# larger than the arithmetic suggests because a reader's monospace
+# tends to have a smaller x-height than its body serif: in Thorium,
+# 0.85em still drew code at about two thirds of the prose's visual
+# size. At 0.6em per character a 60-column line is 34em of body
+# text at 0.95, which fits a tablet column but wraps on a phone;
+# that is the tradeoff here.
+CODE_FONT_SCALE = {"color": 0.95, "eink": 0.75}
 # How far past its own start a wrapped code line hangs, in characters.
 CODE_HANG_CHARS = 2
 # A monospace character's advance width as a fraction of the em. Only
@@ -781,9 +792,9 @@ def epub_css(variant: str) -> str:
     that drifts from paragraph to paragraph. `CODE_FONT` is set
     because a Kindle otherwise set listings in the body serif (see
     its comment). The one font size this
-    sets, `CODE_FONT_SCALE` for listings, is set once here and inherited
-    by `pre code` rather than repeated, so a nested `<code>` inside a
-    `<pre>` does not compound the scale. `pre`'s `white-space: pre-wrap`
+    sets, `CODE_FONT_SCALE[variant]` for listings, is set once here
+    and inherited by `pre code` rather than repeated, so a nested
+    `<code>` inside a `<pre>` does not compound the scale. `pre`'s `white-space: pre-wrap`
     stays load-bearing: without it, a long code line runs off the page
     instead of wrapping. No fixed colors either: a Kindle in dark mode
     keeps a declared color as given, so a light fill would become a
@@ -793,9 +804,9 @@ def epub_css(variant: str) -> str:
     wrapped code lines. They need a `<span>` per listing line, which
     `listing_html()` emits; the reasoning for paying that markup is in
     its docstring. They are inert for a reader wide enough that no
-    line wraps. `HIGHLIGHT_CSS[variant]` is the only difference
-    between the two EPUBs: color for backlit readers, weight and
-    slant for e-ink.
+    line wraps. `HIGHLIGHT_CSS[variant]` and `CODE_FONT_SCALE[variant]`
+    are the only differences between the two EPUBs: color and larger
+    listings for backlit readers, weight and slant for e-ink.
 
     `#toc ol` is the one list-style rule here, and it is also a fix,
     not a look: `chapter_heading()` already spells each chapter's
@@ -816,7 +827,7 @@ def epub_css(variant: str) -> str:
   white-space: pre-wrap; overflow-wrap: break-word;
   page-break-inside: avoid;
 }}
-pre, code {{ font-family: {CODE_FONT}; font-size: {CODE_FONT_SCALE}em; }}
+pre, code {{ font-family: {CODE_FONT}; font-size: {CODE_FONT_SCALE[variant]}em; }}
 pre code {{ font-size: inherit; }}
 {hang_css()}
 {HIGHLIGHT_CSS[variant]}h1, h2, h3, h4 {{ page-break-after: avoid; }}

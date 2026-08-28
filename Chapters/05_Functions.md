@@ -1,7 +1,7 @@
 # Functions
 
-You define functions with the `def` keyword,
-followed by the function name and parameter list,
+The `def` keyword defines a function.
+It is followed by the function name and parameter list,
 and a colon to begin the function body:
 
 ```python
@@ -48,9 +48,9 @@ print(flexible_args_and_returns(2))
 #: None
 ```
 
+Every Python function returns a value.
 The third call matches neither test,
 so the function reaches its end without returning anything and produces `None`.
-Every Python function returns a value.
 A bare `return` and a missing `return` both produce `None`.
 
 A `return` with several expressions produces a tuple,

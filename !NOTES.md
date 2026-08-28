@@ -1,3 +1,5 @@
+Soft keywords: check to make sure the first use defines the term.
+
 How can I improve the process on this book?
 
 Check for any unresolved issues in deep_review and readability directories

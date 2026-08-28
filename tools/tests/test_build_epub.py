@@ -10,6 +10,7 @@ import datetime
 from pathlib import Path
 
 from build_epub import (
+    CODE_FONT_SCALE,
     MAX_HANG_INDENT,
     VARIANTS,
     Ids,
@@ -363,6 +364,13 @@ def test_listings_ask_for_a_monospace_font() -> None:
     # given a named family before the generic it did the same.
     for variant in VARIANTS:
         assert "pre, code { font-family: monospace;" in epub_css(variant)
+
+def test_color_listings_are_larger_than_eink() -> None:
+    # The e-ink scale is tuned to a Paperwhite's narrow column; a
+    # backlit tablet has the width for listings nearer prose size.
+    assert "font-size: 0.95em; }" in epub_css("color")
+    assert "font-size: 0.75em; }" in epub_css("eink")
+    assert CODE_FONT_SCALE["color"] > CODE_FONT_SCALE["eink"]
 
 def test_line_spans_are_their_own_blocks() -> None:
     # The block behavior lives in the h* rules, not on a bare
