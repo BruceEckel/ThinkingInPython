@@ -520,7 +520,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 ##@ Style gates
 
-.PHONY: eol fix-eol listings fix-listings widths banned comment-periods \
+.PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
         fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks
 
@@ -547,6 +547,19 @@ listings:  ## Check listings keep blank lines minimal; `make fix-listings` strip
 # the printed output.
 widths:  ## Fail if a listing line exceeds the 60-character width
 	$(PY) tools/listing_width.py Chapters Solutions
+
+# A survey, not a gate: every listing line wider than WIDTH (raw width,
+# no pragma exemption), with its Examples/ or SolutionsCode/ path and
+# line, its Markdown path and line, its width, and the line itself.
+# For sizing questions ("what breaks at 50?"), not for enforcement.
+# Writes build/reports/code_width.html and opens it in the browser,
+# where a slider re-filters the width live, and stays running (Ctrl+C
+# to stop) so a click on a row can open that line in Zed through its
+# CLI. ARGS=--tsv prints one tab-separated row per line instead;
+# ARGS=--no-open only writes the page.
+WIDTH ?= 60
+code-width:  ## Show every listing line wider than WIDTH=nn (default 60) in the browser (ARGS=--tsv for rows)
+	$(PY) tools/code_width.py --width $(WIDTH) $(ARGS) Chapters Solutions
 
 fix-listings:  ##- Remove the offending blank lines from listings
 	$(PY) tools/listing_format.py --fix
