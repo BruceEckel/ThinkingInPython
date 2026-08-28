@@ -17,7 +17,7 @@ and it binds `x` and `y` from that dictionary as it matches.
 
 Pattern matching first appeared in [Control Flow](04_Control_Flow.md#pattern-matching).
 
-`match` and `case` are *soft* keywords:
+`match` and `case` are *soft keywords*:
 they act as keywords only inside this statement,
 so existing code that uses `match` as a variable name still runs.
 That is also a reason not to write such code.

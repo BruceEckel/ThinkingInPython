@@ -315,6 +315,12 @@ print(grid)
 #: {(2, 3): 'red'}
 ```
 
+Like `match`, `type` is a soft keyword
+([Control Flow](04_Control_Flow.md#pattern-matching)):
+it is a keyword only at the start of this statement.
+Everywhere else, `type` is still the builtin `type()` function,
+so `type(grid)` in the same file returns `dict` as it always has.
+
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.

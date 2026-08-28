@@ -494,7 +494,8 @@ For a large program that imports many modules but uses only some of them on any 
 that eager work slows startup.
 
 Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
-adds the `lazy` soft keyword.
+adds the `lazy` soft keyword, a keyword only in an `import` statement,
+as `match` is in [Control Flow](04_Control_Flow.md#pattern-matching).
 A `lazy import` defers loading the module until the first time you use the imported name,
 so a run pays only for the modules it uses,
 while all imports stay at the top of the file:
