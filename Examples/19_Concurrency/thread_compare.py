@@ -20,9 +20,9 @@ def compare(
             return list(pool.map(price, orders))
 
     assert threaded() == sequential()
-    return Times(
-        min(timeit.repeat(sequential,
-                          number=number, repeat=3)),
-        min(timeit.repeat(threaded,
-                          number=number, repeat=3)),
-    )
+    seq: list[float] = []
+    thr: list[float] = []
+    for _ in range(5):  # Alternate: a load spike hits both
+        seq.append(timeit.timeit(sequential, number=number))
+        thr.append(timeit.timeit(threaded, number=number))
+    return Times(min(seq), min(thr))

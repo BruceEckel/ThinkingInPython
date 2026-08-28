@@ -1040,8 +1040,9 @@ The next two examples make that concrete, one for waiting and one for computing.
 Both use the same harness,
 which runs a price function sequentially and threaded, confirms they agree,
 and times each.
-`timeit.repeat` produces three timings per variant and `min` keeps the best,
-so a stray background load spike cannot skew the comparison:
+Each variant is timed five times,
+alternating between the two so a stray background load spike lands on both,
+and `min` keeps each variant's best:
 
 ```python
 # thread_compare.py
@@ -1066,12 +1067,12 @@ def compare(
             return list(pool.map(price, orders))
 
     assert threaded() == sequential()
-    return Times(
-        min(timeit.repeat(sequential,
-                          number=number, repeat=3)),
-        min(timeit.repeat(threaded,
-                          number=number, repeat=3)),
-    )
+    seq: list[float] = []
+    thr: list[float] = []
+    for _ in range(5):  # Alternate: a load spike hits both
+        seq.append(timeit.timeit(sequential, number=number))
+        thr.append(timeit.timeit(threaded, number=number))
+    return Times(min(seq), min(thr))
 ```
 
 Two timings of the same type come back from one call,

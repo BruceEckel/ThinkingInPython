@@ -158,12 +158,20 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   contradicting the prose one line below. Do not widen the band to make it
   robust: at `0.7` a genuinely 30%-faster threaded run would still report "no
   faster," hiding the exact regression the listing exists to catch. The fix
-  (applied 2026-08-23) was hardening `thread_compare.py`'s `compare()`,
-  which the neighboring I/O listing also uses: each timing is now
-  `min(timeit.repeat(..., repeat=3))`, so one load spike during the
-  sequential timing can no longer fake a threaded speedup. Verified stable
-  standalone and under four competing busy-loop processes. If it flips
-  again anyway, revert the marker, don't commit it, and raise `repeat`.
+  is in `thread_compare.py`'s `compare()`, which the neighboring I/O
+  listing also uses. 2026-08-23: `min(timeit.repeat(..., repeat=3))` per
+  variant. It flipped again on 2026-08-28 during `make verify`, with the
+  ratio never dropping below 1.07 in twelve standalone runs (six of them
+  under 24 busy loops on 22 cores) or in two whole-book
+  `validate_output.py` runs, so it is a rare transient that a burst
+  covering all three sequential repeats (about a second) can produce.
+  Now the two variants are timed alternately, five rounds, `min` of
+  each, so a burst lands on both. The tell of a flip: `Examples/` shows
+  `False` while `Chapters/` still says `True`. `verify`'s first marker
+  refresh flipped the chapter, `sync` copied it, and the gate's second
+  refresh flipped the chapter back with no sync after, so the generated
+  copy is the only trace. Revert it (`git checkout -- Examples/...`);
+  never commit it.
 - **Thousands of live `asyncio` tasks in one process can wedge Windows'
   `ProactorEventLoop` for every later `asyncio.run()` call in that process.**
   Chapter 19's `task_vs_thread_memory.py` used to create and cancel 20,000
