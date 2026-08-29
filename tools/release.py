@@ -32,7 +32,8 @@ first so a doomed run dies before the expensive gate:
    2026") so the reader can tell which release they hold.
 4. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
    tag on origin at the branch tip and uploads the five assets. gh
-   prints the release URL on success.
+   prints the release URL on success. The new tag is then fetched, so
+   the local clone has it too (gh tags only on GitHub).
 5. Prune: every release older than the newest KEEP_RELEASES (two: the
    new one and the one before it, a fallback should the new one turn
    out broken) is deleted with `gh release delete`, assets and all.
@@ -226,6 +227,13 @@ def publish(tag: str, version: str, branch: str,
         sys.exit("error: gh release create failed. If the tag was "
                  f"created anyway, clean up with: gh release delete "
                  f"{tag} --cleanup-tag")
+    # gh made the tag on GitHub only. Fetch it so the local clone
+    # agrees, and the menu's next-version guess (from `git tag`)
+    # starts from this release rather than the one before.
+    if not run_echoed(["git", "fetch", "origin", "tag", tag,
+                       "--no-tags"]):
+        print(f"warning: could not fetch {tag}; run `git fetch --tags` "
+              "so the local clone has it.", file=sys.stderr)
 
 
 def version_key(tag: str) -> tuple[int, ...] | None:
