@@ -1,4 +1,4 @@
-"""Tests for tools/make_help.py: parsing, the two-level listing, invariants.
+"""Tests for tools/make_help.py: parsing, the three-level listing, invariants.
 
 The real Makefile is exercised at the end, so a heading or doc comment that
 breaks the conventions fails here rather than at the next `make help`.
@@ -7,7 +7,7 @@ import pytest
 
 from make_help import (
     MAKEFILE, MAX_WIDTH, MIN_DOC, PROMOTED, check, entries, parse,
-    render_index, render_section, terminal_width)
+    render_all, render_index, render_section, terminal_width)
 
 SAMPLE = """\
 help:  ## Show this help
@@ -128,7 +128,7 @@ def _real() -> list:
 
 def test_the_real_listing_fits_eighty_columns():
     sections = _real()
-    rendered = [render_index(sections, 80)]
+    rendered = [render_index(sections, 80), render_all(sections, 80)]
     rendered += [render_section(s, 80) for s in sections if s.slug]
     for block in rendered:
         for line in block.splitlines():
@@ -146,6 +146,17 @@ def test_the_real_index_lists_every_section_and_promoted_target():
             assert f"  {section.slug}" in index
     for name in PROMOTED:
         assert name in index
+
+
+def test_render_all_expands_every_section_and_folds_secondary():
+    sections = _real()
+    full = render_all(sections, 80)
+    for section in sections:
+        if section.slug:
+            assert section.title in full
+        for target in section.targets:
+            shown = f"  {target.name} " in full
+            assert shown is not target.secondary, target.name
 
 
 @pytest.mark.parametrize("slug", [s.slug for s in _real() if s.slug])

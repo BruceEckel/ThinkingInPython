@@ -252,13 +252,13 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
-- **`make help` is self-documenting, not hand-written, and has two levels.** A
+- **`make help` is self-documenting, not hand-written, and has three levels.** A
   target needs a trailing `## text` comment on its own line (and to sit under the
   right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
   prints `help`, the everyday commands (`PROMOTED` in `tools/make_help.py`), and
-  the section list; `make help style` expands one section. A section's slug is the
-  first word of its heading, lowercased, so renaming the heading renames the slug
-  with no second list to update. Two rules `make_help.py` enforces by raising
+  the section list; `make help` expands every section; `make help style` expands
+  one section. A section's slug is the first word of its heading, lowercased, so
+  renaming the heading renames the slug with no second list to update. Two rules `make_help.py` enforces by raising
   `SystemExit`: no two sections share a slug, and no slug equals a target name
   (the Makefile neutralizes the word after `help` so `make help style` parses as
   one goal, and a colliding slug would override that recipe). This is why the

@@ -133,11 +133,12 @@ Actions does.
 
 ## make_help.py
 
-Prints the `make help` listing, in two levels. In the Makefile, a target
+Prints the `make help` listing, in three levels. In the Makefile, a target
 line ending with a `## text` comment becomes one entry; a `##@ Name`
 comment line starts a new section. Bare `make` prints the everyday
-commands and the section list; `make help NAME` expands one section,
-where `NAME` is the first word of that section's heading, lowercased.
+commands and the section list; `make help` prints every section
+expanded; `make help NAME` expands one section, where `NAME` is the
+first word of that section's heading, lowercased.
 A `##-` comment marks a target secondary: documented and smoke-tested,
 but folded out of the listing because a sibling's doc text names it
 (each `fix-*` under the check it repairs). It replaces a `grep | awk`
@@ -151,7 +152,8 @@ column so the target names stay in one column. A backticked command and a
 hyphenated target name both wrap as one unit.
 
 ```
-make help         # everyday commands, then the section list
+make              # everyday commands, then the section list
+make help         # every section's targets
 make help style   # one section's targets
 
 uv run python tools/make_help.py --width 72   # wrap to a fixed width

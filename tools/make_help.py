@@ -41,7 +41,8 @@ across 200 columns is no easier to read than one that overflows 80. A pipe
 or a redirect gets the 80-column fallback.
 
 Usage:
-    python tools/make_help.py                    # the index
+    python tools/make_help.py                    # the index (plain `make`)
+    python tools/make_help.py --all              # every section (`make help`)
     python tools/make_help.py style              # one section
     python tools/make_help.py --width 72         # wrap to a fixed width
     python tools/make_help.py --makefile PATH    # read another Makefile
@@ -202,7 +203,7 @@ def render_index(sections: list[Section], width: int | None = None) -> str:
     lines.append("\nEveryday:")
     lines += _rows([by_name[n] for n in PROMOTED], width)
 
-    lines.append("\nSubtopics (`make help NAME`):")
+    lines.append("\nSubtopics (`make help NAME`; `make help` lists them all):")
     named = [s for s in sections if s.slug]
     slug_width = max(len(s.slug) for s in named)
     lines += _table(
@@ -216,6 +217,20 @@ def render_section(section: Section, width: int | None = None) -> str:
     return "\n".join([section.title, *rows])
 
 
+def render_all(sections: list[Section], width: int | None = None) -> str:
+    """Every section expanded, in Makefile order: what `make help` prints.
+
+    Secondary targets stay folded, as in a single section, since the doc
+    text of the sibling that names them is right there above.
+    """
+    width = width or terminal_width()
+    blocks: list[str] = []
+    if preamble := next((s for s in sections if not s.slug), None):
+        blocks.append("\n".join(_rows(preamble.listed(), width)))
+    blocks += [render_section(s, width) for s in sections if s.slug]
+    return "\n\n".join(blocks)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -223,6 +238,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "topic", nargs="?",
         help="section to expand (a slug from the default listing)")
+    ap.add_argument(
+        "--all", action="store_true",
+        help="print every section expanded (what `make help` runs)")
     ap.add_argument(
         "--width", type=int, default=None,
         help="wrap doc text to this many columns (default: the terminal's, "
@@ -236,6 +254,9 @@ def main(argv: list[str] | None = None) -> int:
     check(sections)
     width = terminal_width(args.width)
 
+    if args.all:
+        print(render_all(sections, width))
+        return 0
     if not args.topic:
         print(render_index(sections, width))
         return 0
