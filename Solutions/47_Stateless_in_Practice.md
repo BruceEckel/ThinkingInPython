@@ -355,7 +355,7 @@ This is the same distinction exercise 2 draws from the other side.
 A failure is part of the Effect only if it travels as a value,
 and a `raise` in code the driver calls is outside the description.
 Making a `Blackout` catchable means giving the Ability a failure type,
-so the handler returns rather than raises,
+so the handler returns a value rather than raising an exception,
 and `plug()` declares the failure it can produce.
 
 ## 4. A scripted outlet

@@ -355,7 +355,7 @@ function has a return value on every path the type checker can see, and it
 lets the last exception propagate untouched rather than re-raising a
 copy. Re-raising from inside the loop with `raise` would also work,
 but then the type checker cannot tell that the function always either
-returns or raises.
+returns or raises an exception.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the
 wrapped function's name, not `wrapper`. Without it, every retried

@@ -62,7 +62,31 @@ made entirely of cut-this-word rules will sand the voice off the book.
 
 Promoted, two or more sightings, applied by `/bruce-edit-apply`.
 
-*(none yet)*
+### R1. Give "raises" an object
+
+**Test.** The verb "raise"/"raises"/"raising" with no object after it:
+end of sentence, a comma, or an adverb/conjunction ("raises instead",
+"returns or raises"). Supply the exception's name where the text knows
+it, otherwise "an exception".
+
+**Keep when.** The object is fronted in a relative clause ("the exception
+it raises", "whatever `slope()` raises", "what it re-raises"). Code and
+`#:` markers are never touched.
+
+**Sightings.** 2 (additive)
+- `25_Template_Method` 2026-08-29, was Claude-written:
+  "The `class Typo` statement raises instead of finishing" ->
+  "The `class Typo` statement raises a `TypeError` instead of finishing"
+- `Solutions/14_Decorators`, `Solutions/25_Template_Method`,
+  `Solutions/47_Stateless_in_Practice` 2026-08-29, found by sweep after
+  Bruce named the rule: "returns or raises." -> "returns or raises an
+  exception."; "this one raises instead" -> "this one raises an exception
+  instead"; "returns rather than raises" -> "returns a value rather than
+  raising an exception"
+
+**Home.** CLAUDE.md watch list (global, Writing Style) and activate
+(Accrued patterns). Bruce reported the rule as one that "has been lost";
+no prior record of it existed anywhere in the repo, the skills, or memory.
 
 ---
 

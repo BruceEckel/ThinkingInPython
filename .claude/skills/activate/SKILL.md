@@ -391,3 +391,11 @@ and it becomes part of every future pass.
 - "every operation callers need" becomes "every operation".
   A restrictive qualifier the reader supplies anyway
   costs two words and narrows nothing.
+- "the `class` statement raises instead of finishing" becomes
+  "the `class` statement raises a `TypeError` instead of finishing".
+  "Raises" always takes an object: name the exception,
+  or at least "an exception".
+  A naked "raises" ("returns or raises", "this one raises instead")
+  leaves the verb dangling.
+  A relative clause with the object in front ("the exception it raises",
+  "whatever `slope()` raises") is already complete.

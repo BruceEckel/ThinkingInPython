@@ -199,7 +199,7 @@ legal value** (PEP 661, Python 3.15+).
   a span**: enter/leave, acquire/release, start/stop, open/close.
   Replace the pair with `__enter__`/`__exit__` (or
   `@contextmanager`) and a `with` block, so the end call cannot be
-  forgotten and runs even when the body raises. A manual pair
+  forgotten and runs even when the body raises an exception. A manual pair
   survives only when the span crosses scopes, with the release
   happening in a different method, object, or task than the acquire.
 

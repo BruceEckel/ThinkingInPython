@@ -275,7 +275,7 @@ name, the right parameters, and the right return type, so both satisfy
 `Exploder` breaks the algorithm on the first step of the first pass.
 Code written against `ApplicationFramework` sees `run()` return
 normally for every subclass the base contemplates, and this one raises
-instead, so a caller who wrapped `run()` in nothing finds an exception
+an exception instead, so a caller who wrapped `run()` in nothing finds an exception
 coming out of a method that never advertised one.
 
 `HalfDone` breaks it more quietly, which makes it the worse of the two.

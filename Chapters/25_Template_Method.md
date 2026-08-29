@@ -149,7 +149,7 @@ Both pass.
 Only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
 The `class MyApp` statement builds the class as usual.
-The `class Typo` statement raises instead of finishing,
+The `class Typo` statement raises a `TypeError` instead of finishing,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method would catch the typo too,
