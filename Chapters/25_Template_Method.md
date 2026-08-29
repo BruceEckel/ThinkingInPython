@@ -18,7 +18,7 @@ The test runner calls `run()` on the finished object.
 
 A Template Method fixes the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
-The `@final` decorator from `typing`,
+The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
 also works on a single method.
 It locks the template method so a subclass cannot change the overall flow.
@@ -68,7 +68,7 @@ rather than your code calling into a library.
 The type checker enforces `@final`.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
-If you need the interpreter to refuse an override,
+If the interpreter should refuse an override,
 the `__init_subclass__()` technique from [Making a Class Final](17_Metaprogramming.md#making-a-class-final)
 also works with methods, raising an exception when `"run" in cls.__dict__`.
 
@@ -79,10 +79,81 @@ This kind of optional step is a *hook*.
 The `setUp()` and `tearDown()` in the opening example are hooks:
 `TestCase` supplies do-nothing versions,
 so a test class that needs no setup skips them.
-This silence hides a misspelling:
-`def customise1()` adds a new method and leaves the base's do-nothing version in place.
+This silence hides a misspelling: `def customise1()` ('s' instead of 'z')
+adds a new method and leaves the base's do-nothing version in place.
 That is why every step override in these listings carries `@override`:
 the type checker then rejects a method that overrides nothing.
+
+The checker only sees the decorator.
+Leave `@override` off the misspelled method and it passes as a new method,
+with no complaint.
+No typing construct forbids a subclass from adding methods,
+so the checker cannot catch this case.
+The interpreter can.
+The base class's `__init_subclass__()` runs when each subclass is defined,
+and the standard library's `difflib` finds names that nearly match:
+
+```python
+# near_miss.py
+from difflib import get_close_matches
+from typing import final, override
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        hooks = {
+            name
+            for base in cls.__mro__[1:]
+            for name in vars(base)
+            if not name.startswith("__")
+        }
+        for name in vars(cls):
+            if name in hooks or name.startswith("__"):
+                continue
+            if near := get_close_matches(name, hooks):
+                raise TypeError(
+                    f"{cls.__name__}.{name}: "
+                    f"did you mean {near[0]}?"
+                )
+
+class MyApp(ApplicationFramework):
+    @override
+    def customize1(self) -> None:
+        print("one")
+
+    def report(self) -> None: ...
+
+try:
+    class Typo(ApplicationFramework):
+        def customise1(self) -> None:
+            print("never runs")
+except TypeError as e:
+    print(e)
+#: Typo.customise1: did you mean customize1?
+```
+
+`hooks` collects every non-dunder name the base classes define.
+A subclass name that matches one exactly is an override,
+and a name that resembles none of them, like `report()`,
+is an ordinary new method.
+Both pass.
+Only a near miss raises,
+and the message names the method the author probably meant.
+`MyApp` defines cleanly.
+`Typo` never exists: the exception comes out of the `class` statement itself,
+before any instance could run with a silent do-nothing step.
+Rejecting every new method would catch the typo too,
+but it would also forbid `report()`,
+and a framework that bans helper methods in its subclasses is one nobody wants to extend.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare the step with `@abstractmethod`,
@@ -245,7 +316,8 @@ Each has a cost, and each protects against a different way of breaking the flow:
 - The type checker, via `@final`: it reports an override.
   It costs one decorator and protects everyone who runs the type checker.
 - The interpreter, via `__init_subclass__()`:
-  it refuses the offending subclass outright.
+  it refuses the offending subclass outright,
+  whether it overrides `run()` or misspells a hook.
   It costs a base-class method and protects everyone,
   including the caller who skips the type checker.
 - Discipline, via the Liskov Substitution Principle:
