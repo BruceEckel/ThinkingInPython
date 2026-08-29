@@ -1,0 +1,107 @@
+READING THINKING IN PYTHON ON AN ANDROID PHONE OR TABLET
+========================================================
+
+Which file
+----------
+
+The release has two EPUBs and a PDF. On Android, use:
+
+  ThinkingInPython-color.epub  The one to pick. Code is
+                               color-highlighted, and an EPUB reflows
+                               to fit the screen, so you can change
+                               the type size and the text adjusts.
+
+  ThinkingInPython.pdf         Also readable (Google Drive, Chrome, and
+                               most file managers open it), but its
+                               pages are fixed, so small type stays
+                               small. Prefer the EPUB.
+
+  ThinkingInPython-eink.epub   For e-ink Kindles. It works on Android
+                               but shows code in bold and italic
+                               instead of color; no reason to choose
+                               it here.
+
+The steps below say "the EPUB"; that means ThinkingInPython-color.epub.
+
+Every way starts the same: in Chrome, open the book's releases page,
+tap the EPUB, and it downloads. Chrome shows a "Download complete"
+notice; the file is in the Downloads folder, which the Files app (or
+"Files by Google", or your maker's file manager) lists.
+
+
+Way 1: Google Play Books (simplest)
+-----------------------------------
+
+Play Books comes on most Android devices and reads EPUBs. The book
+goes into your Google account's library, so it also shows up on your
+other devices and at play.google.com/books.
+
+  1. Download the EPUB (above).
+  2. Open the Files app, go to Downloads, and tap the EPUB. If Play
+     Books is the only app that reads EPUB, it opens right away.
+     If Android asks which app to use, choose Play Books.
+  3. Play Books opens the book and adds it to your library under
+     "Uploads".
+
+If tapping the file offers nothing suitable, upload from inside Play
+Books instead: open Play Books, tap your profile picture, then
+"Play Books settings", and turn on "Enable PDF uploading" (it covers
+EPUB too). Then tap Library, then "Upload files", and choose the EPUB.
+
+From a computer, the same library accepts uploads at
+https://play.google.com/books/uploads.
+
+
+Way 2: The Kindle app, so it is in your Amazon library
+------------------------------------------------------
+
+Choose this if you also read on a Kindle e-reader and want your
+place, highlights, and notes to sync between the two, or you prefer
+the Kindle app. The book goes into your Amazon library and downloads
+to every Kindle app and device on your account.
+
+  1. Install the Kindle app from Google Play and sign in with your
+     Amazon account.
+  2. Download the EPUB (above).
+  3. In the Files app, long-press the EPUB and tap Share (or open it
+     and use the Share button).
+  4. Choose Kindle (it may be labeled "Send to Kindle") from the
+     list of apps.
+  5. On the Send to Kindle screen, tap Send.
+  6. Open the Kindle app. The book appears in the library within a
+     few minutes; pull down on the library to refresh. Tap it to
+     download.
+
+Two other routes to the same place: the Send to Kindle web page
+(https://www.amazon.com/sendtokindle, from any browser, drag the file
+in), or email the EPUB to your Kindle address. Both are described
+step by step in kindle-uploading.txt, which ships alongside this file.
+
+
+Way 3: Another reader app
+-------------------------
+
+Any reader that accepts EPUB works: for example Moon+ Reader, Lithium,
+or ReadEra from Google Play. Install it, then either tap the EPUB in
+the Files app and choose the reader when asked, or use the reader's
+own Import or "+" button, which browses your folders directly.
+Most of them also find the file on their own if you open them and
+look under Downloads or "Scan".
+
+
+If it does not open
+-------------------
+
+  - Confirm the download finished: Chrome's download list (the menu,
+    then Downloads) shows it, and the Files app lists it under
+    Downloads. Tap the file from there rather than from the Chrome
+    notice, which can expire.
+  - If a tap opens the wrong app, long-press the file, choose
+    "Open with", and pick the reader; Android remembers a default and
+    this changes it.
+  - If Play Books refuses the file, enable uploading in its settings
+    (Way 1) and use "Upload files".
+  - If a reader says the file is damaged, download it again; an
+    interrupted download leaves a file no reader can open.
+  - For the Kindle app, confirm it is signed in to the same Amazon
+    account that received the file, and refresh the library.

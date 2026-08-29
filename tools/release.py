@@ -2,14 +2,15 @@
 """Publish a GitHub release whose assets are the fresh PDF and EPUBs.
 
 `make release VERSION=1.0` lands here. The release's uploaded assets
-are exactly five files: ThinkingInPython.pdf plus the two EPUB
+are the three book files, ThinkingInPython.pdf plus the two EPUB
 variants (ThinkingInPython-color.epub for backlit readers,
 ThinkingInPython-eink.epub with bolding instead of color), all rebuilt
 from the current Markdown by this run, never taken from a stale
-build/ tree, and two reader guides shipped as-is from resources/:
-kindle-uploading.txt and ipad-uploading.txt, step by step, simplest
-way first. (GitHub itself always adds "Source code" archive links to
-a release page; those are GitHub's, not uploads.)
+build/ tree, plus the reader guides in GUIDES, shipped as-is from
+resources/: one per kind of device (Kindle, iPad, Android, computer,
+other e-readers), each step by step, simplest way first. (GitHub
+itself always adds "Source code" archive links to a release page;
+those are GitHub's, not uploads.)
 
 The order is preflight, verify, build, publish, with the cheap checks
 first so a doomed run dies before the expensive gate:
@@ -31,7 +32,7 @@ first so a doomed run dies before the expensive gate:
    the release number and today's date ("Release 1.0 · August 23,
    2026") so the reader can tell which release they hold.
 4. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
-   tag on origin at the branch tip and uploads the five assets. gh
+   tag on origin at the branch tip and uploads the assets. gh
    prints the release URL on success. The new tag is then fetched, so
    the local clone has it too (gh tags only on GitHub).
 5. Prune: every release older than the newest KEEP_RELEASES (two: the
@@ -79,10 +80,15 @@ KEEP_RELEASES = 2
 _VERSION_TAG = re.compile(r"^v?(\d+(?:\.\d+)*)$")
 
 # Shipped with every release beside the built files: how to get the
-# EPUB onto a Kindle or an iPad, simplest way first. Hand-written, so
+# book onto each kind of device, simplest way first. Hand-written, so
 # not built.
-GUIDES = (ROOT / "resources" / "kindle-uploading.txt",
-          ROOT / "resources" / "ipad-uploading.txt")
+GUIDES = tuple(ROOT / "resources" / name for name in (
+    "kindle-uploading.txt",
+    "ipad-uploading.txt",
+    "android-uploading.txt",
+    "computer-reading.txt",
+    "ereader-uploading.txt",
+))
 
 # A tag is the version with a "v" prefix; the version itself stays to
 # letters, digits, dots, hyphens, underscores. Stricter than git's own
@@ -214,9 +220,10 @@ def publish(tag: str, version: str, branch: str,
              "Two EPUBs: `-color` has color syntax highlighting for "
              "backlit readers (phone/tablet apps); `-eink` marks "
              "code with bolding instead, for e-ink devices where "
-             "color is invisible. `kindle-uploading.txt` and "
-             "`ipad-uploading.txt` walk through the ways to get the "
-             "book onto a Kindle or an iPad, simplest first.\n\n"
+             "color is invisible. The `.txt` guides walk through "
+             "getting the book onto a Kindle, an iPad, an Android "
+             "phone or tablet, a computer, or a Kobo and other EPUB "
+             "e-readers, simplest way first.\n\n"
              f"Built from `{branch}` @ {head[:12]}.")
     command = ["gh", "release", "create", tag,
                "--target", branch,

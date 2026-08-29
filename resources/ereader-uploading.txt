@@ -1,0 +1,132 @@
+GETTING THINKING IN PYTHON ONTO A KOBO OR OTHER EPUB E-READER
+=============================================================
+
+This guide is for e-readers that read EPUB files directly: Kobo,
+PocketBook, Onyx Boox, reMarkable, Tolino, and most others that are
+not a Kindle. On these there is nothing to convert and no account
+to send through; the file is copied over and that is all. (A Kindle
+is the exception; it cannot open an EPUB copied onto it. Kindle
+owners want kindle-uploading.txt, which ships alongside this file.)
+
+
+Which file
+----------
+
+  ThinkingInPython-eink.epub   The one to pick for a black-and-white
+                               screen, which is most of these devices.
+                               Code is marked with bold and italic.
+
+  ThinkingInPython-color.epub  For a color e-ink screen (a Kobo Libra
+                               Colour or Clara Colour, a color Boox).
+                               Code is color-highlighted.
+
+  ThinkingInPython.pdf         Readable on most of these too, but its
+                               pages are fixed and small on a 6-inch
+                               screen. The EPUB reflows to the screen
+                               and your chosen type size; prefer it.
+
+The steps below say "the EPUB"; use the one you picked.
+
+
+Way 1: USB cable (simplest)
+---------------------------
+
+  1. Download the EPUB to your computer.
+  2. Connect the e-reader to the computer with its USB cable. The
+     device asks whether to connect; tap Connect (a Kobo) or choose
+     "file transfer" (an Android-based reader such as a Boox). It
+     then appears on the computer as a removable drive.
+  3. Copy the EPUB onto that drive. Kobo, PocketBook, and Tolino read
+     it from the top level of the drive or from any folder; a Boox
+     has a Books folder that its library scans.
+  4. Eject the drive from the computer (Finder's eject button, or
+     "Safely Remove Hardware" on Windows), then unplug.
+
+The e-reader scans for new files as it disconnects, and the book
+appears in its library.
+
+A Mac and a Kobo, PocketBook, or Tolino need nothing extra. For a Boox
+or other Android-based reader, a Mac needs the free Android File
+Transfer app (https://www.android.com/filetransfer) or OpenMTP to see
+the drive; Windows and Linux see it directly.
+
+
+Way 2: Cloud storage, with no cable
+-----------------------------------
+
+Newer Kobos (Sage, Libra 2 and later, Clara 2E and later, Elipsa) can
+link to Dropbox or Google Drive and pull files from a folder there.
+Android-based readers (Boox and others) run the ordinary Dropbox and
+Google Drive apps.
+
+  On a Kobo:
+
+  1. On the Kobo, tap More, then Settings, then Accounts, then
+     Dropbox or Google Drive, and follow the sign-in steps (it shows a
+     web address and a code to enter on a computer or phone).
+  2. On a computer or phone, put the EPUB into the folder the Kobo
+     names (Dropbox creates "Apps/Rakuten Kobo"; Google Drive uses a
+     folder you choose).
+  3. On the Kobo, tap Sync (the circling-arrows icon on the home
+     screen). The book downloads into the library.
+
+  On a Boox or other Android reader:
+
+  1. Install the Dropbox or Google Drive app from its store and sign
+     in.
+  2. Put the EPUB into your cloud storage from any device.
+  3. On the reader, open the file in the cloud app and choose
+     Download (or Open with the reader's own reader app). The file
+     lands in Downloads, where the library finds it.
+
+
+Way 3: The maker's own send-to-device service
+---------------------------------------------
+
+Some makers offer a Send-to-Kindle-style service of their own, which
+is worth using if you already have the account:
+
+  - reMarkable: the reMarkable desktop or mobile app, signed in to
+    your account, takes the EPUB by drag and drop (desktop) or the
+    Share sheet (phone) and syncs it to the tablet. The reMarkable
+    reflows EPUB text, so the eink variant reads well there.
+  - Boox: BooxDrop, reached from the reader's Apps list, shows a web
+    address; open it in a computer's browser on the same Wi-Fi and
+    drag the EPUB into the page.
+  - PocketBook: Send-to-PocketBook, an email address you set up in
+    the device's settings; attach the EPUB to an email sent there.
+
+Each of these delivers to the device's library the same way a USB
+copy does.
+
+
+Way 4: Calibre, if you manage a library
+---------------------------------------
+
+Calibre (https://calibre-ebook.com, free, Windows, macOS, Linux)
+keeps a library on the computer and copies books to a connected
+reader. With an EPUB reader no conversion happens; Calibre just
+copies the file.
+
+  1. Install Calibre, click "Add books", and choose the EPUB.
+  2. Connect the e-reader by USB (Way 1, step 2). Calibre detects it
+     and a Device button appears.
+  3. Select the book and click "Send to device".
+  4. When the job counter (bottom right) reaches zero, use the Device
+     button's "Eject this device", then unplug.
+
+
+If it does not show up
+----------------------
+
+  - Eject before unplugging: the library scan runs on a clean
+    disconnect, and a yanked cable can leave the file unseen until
+    the next connect and eject.
+  - On a Kobo, an EPUB lands in the library as a book; if it does not
+    appear, connect again and check the file is at the top level of
+    the drive, not inside the hidden .kobo folder.
+  - On a Boox, open the Library and use its refresh or "Scan" action,
+    or check that the file is in a folder the library scans (Books,
+    or Downloads).
+  - If the reader says the file is damaged, download it again; an
+    interrupted download leaves a file no reader can open.

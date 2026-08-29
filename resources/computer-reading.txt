@@ -1,0 +1,101 @@
+READING THINKING IN PYTHON ON A COMPUTER
+========================================
+
+Which file
+----------
+
+The release has a PDF and two EPUBs. On a computer, either of these:
+
+  ThinkingInPython.pdf         Opens in any browser or PDF viewer with
+                               nothing to install. The pages are fixed,
+                               like a printed book, so zooming makes
+                               the page bigger rather than reflowing
+                               the text.
+
+  ThinkingInPython-color.epub  Reflows to the window: change the type
+                               size or the window width and the text
+                               adjusts. Needs an EPUB reader (Way 2).
+                               Code is color-highlighted.
+
+  ThinkingInPython-eink.epub   For e-ink Kindles. It works on a
+                               computer too, but shows code in bold
+                               and italic instead of color; no reason
+                               to choose it here.
+
+The code listings are at most 60 characters wide, so they fit either
+format without wrapping.
+
+
+Way 1: The PDF, in your browser (simplest)
+------------------------------------------
+
+  1. On the book's releases page, click ThinkingInPython.pdf. Most
+     browsers open it right there; otherwise it downloads and a
+     double-click opens it in your PDF viewer.
+  2. To keep it, use the browser's download or save button.
+
+Any PDF viewer works: the browser, Preview on a Mac, Adobe Reader,
+Okular, Evince, SumatraPDF.
+
+
+Way 2: The EPUB, in a reader app
+--------------------------------
+
+Pick the reader for your system, then open the downloaded EPUB in it
+(double-clicking the file usually does it once a reader is installed).
+
+  macOS: Apple Books, already installed.
+    1. Download ThinkingInPython-color.epub.
+    2. Double-click it. Books opens with the book added to your
+       library, which iCloud shares with your iPad and iPhone.
+
+  Windows: install a free reader; nothing built in reads EPUB.
+    1. Download and install one of
+         - Calibre (https://calibre-ebook.com), a library manager
+           whose viewer opens EPUBs, or
+         - Thorium Reader (https://thorium.edrlab.org), a plain
+           reader with no library management.
+    2. Download ThinkingInPython-color.epub.
+    3. In Calibre, click "Add books", choose the file, then click
+       "View". In Thorium, click "+" and choose the file, or drag it
+       onto the window.
+
+  Linux: the same two readers run here, and your desktop may already
+  have one (GNOME's Foliate, KDE's Okular, which opens EPUB as well as
+  PDF).
+    1. Install Calibre, Thorium, or Foliate from your package manager
+       or their sites.
+    2. Download ThinkingInPython-color.epub and open it in the reader.
+
+
+Way 3: The Kindle app, so it is in your Amazon library
+------------------------------------------------------
+
+If you read on a Kindle too and want one library with your place and
+highlights synced, send the EPUB to your Amazon account, then read it
+in the Kindle app for Windows or macOS.
+
+  1. Send the EPUB to your account by any route in
+     kindle-uploading.txt, which ships alongside this file. The
+     simplest is the web page: https://www.amazon.com/sendtokindle,
+     sign in, drag the file in, click Send.
+  2. Install the Kindle app (https://www.amazon.com/kindle-dbs/fd/kcp,
+     or search the Microsoft Store or Mac App Store for "Kindle") and
+     sign in with the same Amazon account.
+  3. The book appears in the app's library within a few minutes. Use
+     the Docs filter if the library is long. Click it to download.
+
+
+If it does not open
+-------------------
+
+  - A browser that downloads the PDF instead of showing it is only
+    following its settings; the downloaded file opens in any PDF
+    viewer.
+  - Windows and Linux have no built-in EPUB reader; a double-click on
+    the EPUB with nothing installed asks what to open it with. Install
+    one of the readers in Way 2 first.
+  - If a reader says the file is damaged, download it again; an
+    interrupted download leaves a file no reader can open.
+  - For the Kindle app, confirm it is signed in to the account you
+    sent the file to, and use the app's Sync command.
