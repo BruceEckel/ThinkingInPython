@@ -303,18 +303,18 @@ A stateless hook is usually better as a function than as an overridden method.
 
 An anchored algorithm is only as secure as its anchor.
 This chapter shows four.
-Each has a cost, and each protects against a different way of breaking the flow:
+Each guards against a different way of breaking the flow:
 
 - Structure, in `template_function.py`: no subclass exists,
   so nothing can replace the loop.
-  It costs nothing, but it applies only when you can pass functions instead of subclassing.
-- The type checker, via `@final`: it reports an override.
-  It costs one decorator and protects everyone who runs the type checker.
-- The interpreter, via `__init_subclass__()`:
-  it refuses the offending subclass outright,
+  It needs nothing added,
+  but it only works when you can pass functions instead of subclassing.
+- The type checker, via `@final`: one decorator,
+  and an override of `run()` is reported before the program runs.
+- The interpreter, via `__init_subclass__()`: one base-class method,
+  and the offending subclass is refused at its `class` statement,
   whether it overrides `run()` or misspells a hook.
-  It costs a base-class method and protects everyone,
-  including the caller who skips the type checker.
+  This holds at runtime, where `@final` is only an attribute nothing reads.
 - Discipline, via the Liskov Substitution Principle:
   it governs whether each step is a faithful substitute, but no tool checks it.
   It reaches what the other three cannot:
