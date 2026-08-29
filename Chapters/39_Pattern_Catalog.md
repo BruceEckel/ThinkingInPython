@@ -179,7 +179,7 @@ Use this one when you know the problem but not the name.
 | [Fluent Interface](27_Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
 | [Function Composition](40_Functional_Foundations.md#composing-functions) | Build a function by feeding one function's output into the next. |
 | [Function Object](28_Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
-| [Inversion of Control](25_Template_Method.md#the-fixed-algorithm) | Let a framework call your code rather than the reverse. |
+| [Inversion of Control](25_Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
 | [Memoization](41_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |

@@ -13,7 +13,7 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        # Usual style: engine runs now...
+        # With the usual style, the engine calls run()
         super().__init__()
         self.name = name  # ...before this line runs
 

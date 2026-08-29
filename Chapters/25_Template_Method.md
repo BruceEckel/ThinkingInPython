@@ -14,7 +14,7 @@ It calls `setUp()`, then your test method, then `tearDown()`.
 Constructing a `TestCase` runs nothing.
 The test runner calls `run()` on the finished object.
 
-## The Fixed Algorithm
+## The Anchored Algorithm
 
 A Template Method anchors the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
@@ -159,7 +159,7 @@ inherit from `ABC` and declare that step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
 The runtime then refuses to instantiate a subclass that forgot it.
 
-The test supplies a recording subclass and verifies the fixed flow:
+The test supplies a recording subclass and verifies the anchored flow:
 
 ```python
 # test_template_method.py
@@ -245,7 +245,7 @@ trusting that what the subclass supplies fits the algorithm's shape.
 An override can break that trust and still type-check:
 it raises an exception where the base would not,
 or leaves a step empty when the flow depends on it.
-Either one corrupts the fixed algorithm.
+Either one corrupts the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten".
 The Template Method works only when every subclass is a faithful substitute for its base.
@@ -262,7 +262,7 @@ from collections.abc import Callable
 
 def run_framework(customize1: Callable[[], None],
                   customize2: Callable[[], None]) -> None:
-    for _ in range(2):  # The fixed algorithm
+    for _ in range(2):  # The anchored algorithm
         customize1()
         customize2()
 
@@ -276,7 +276,7 @@ run_framework(
 #: Say no more, say no more!
 ```
 
-Both the Template Method and the function version have a fixed algorithm and varying steps.
+Both the Template Method and the function version have an anchored algorithm and varying steps.
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
@@ -301,7 +301,7 @@ A stateless hook is usually better as a function than as an overridden method.
 
 ## What Anchors the Algorithm
 
-The fixed algorithm is only as fixed as its anchor.
+An anchored algorithm is only as secure as its anchor.
 This chapter shows four.
 Each has a cost, and each protects against a different way of breaking the flow:
 
@@ -341,8 +341,8 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
     Which of the two, Python or `ty`, objects to the change?
-    What does that tell you about where the fixed algorithm's guarantee comes from?
-4.  Write two subclasses of `ApplicationFramework` that both type-check but break the fixed algorithm:
+    What does that tell you about where the anchored algorithm's guarantee comes from?
+4.  Write two subclasses of `ApplicationFramework` that both type-check but break the anchored algorithm:
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     `ty` reports neither.
