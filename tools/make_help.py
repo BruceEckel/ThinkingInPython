@@ -213,8 +213,10 @@ def render_index(sections: list[Section], width: int | None = None) -> str:
 
 
 def render_section(section: Section, width: int | None = None) -> str:
+    """The heading line names the slug first (`style: Style gates`), so
+    the full listing doubles as the index of what `make help NAME` takes."""
     rows = _rows(section.listed(), width or terminal_width())
-    return "\n".join([section.title, *rows])
+    return "\n".join([f"{section.slug}: {section.title}", *rows])
 
 
 def render_all(sections: list[Section], width: int | None = None) -> str:

@@ -163,4 +163,4 @@ def test_render_all_expands_every_section_and_folds_secondary():
 def test_every_real_section_renders(slug):
     section = next(s for s in _real() if s.slug == slug)
     assert section.listed(), f"section {slug} would render as an empty list"
-    assert render_section(section).startswith(section.title)
+    assert render_section(section).startswith(f"{slug}: {section.title}")
