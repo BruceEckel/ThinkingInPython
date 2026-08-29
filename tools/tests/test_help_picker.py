@@ -11,7 +11,7 @@ from prompt_toolkit.output import DummyOutput
 from help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
-    section_rows, session, split_match, wants_chapter)
+    section_rows, session, split_match, variables)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -249,14 +249,29 @@ def test_record_history_skips_a_file_it_cannot_write(tmp_path):
     assert record_history("make sweep", [missing]) == []
 
 
-def test_make_command_appends_the_chapter_only_when_given():
-    section = next(s for s in _sections() if s.slug == "code")
-    check_ch = next(t for t in section.targets if t.name == "check-ch")
-    assert wants_chapter(check_ch)
+def _target(name):
+    return next(t for s in _sections() for t in s.targets if t.name == name)
+
+
+def test_variables_come_from_the_doc_with_their_examples():
+    assert variables(_target("check-ch")) == [("CH", "12")]
+    assert variables(_target("release")) == [("VERSION", "1.0")]
+    assert variables(_target("python-upgrade")) == [("TO", "3.15")]
+    assert variables(_target("code-width")) == [
+        ("WIDTH", "nn"), ("ARGS", "--tsv")]
+    assert variables(_target("test")) == []
+
+
+def test_make_command_appends_only_the_variables_given_a_value():
+    check_ch = _target("check-ch")
     assert make_command(check_ch)[1:] == ["check-ch"]
-    assert make_command(check_ch, "12")[1:] == ["check-ch", "CH=12"]
-    plain = next(t for t in section.targets if t.name == "test")
-    assert not wants_chapter(plain)
+    assert make_command(check_ch, {"CH": ""})[1:] == ["check-ch"]
+    assert make_command(check_ch, {"CH": "12"})[1:] == ["check-ch", "CH=12"]
+    assert make_command(_target("release"), {"VERSION": "1.0"})[1:] == [
+        "release", "VERSION=1.0"]
+    assert make_command(_target("code-width"),
+                        {"WIDTH": "", "ARGS": "--tsv"})[1:] == [
+        "code-width", "ARGS=--tsv"]
 
 
 @pytest.mark.parametrize("slug", [s.slug for s in _sections() if s.slug])

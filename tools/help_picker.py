@@ -14,8 +14,9 @@ it. The mouse works too: a click selects a row, a second click on the
 selected row runs it, and the wheel scrolls.
 
 Plain `make` and `make help` open every section; `make help style` opens
-one. A target whose doc text mentions `CH=` gets a one-line prompt for
-the chapter before it runs, since that is how those targets are scoped.
+one. A target whose doc text mentions a variable (`CH=12`, `VERSION=1.0`,
+`ARGS=--help`) gets a one-line prompt for each before it runs, showing
+the doc's example; Enter leaves one out.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
@@ -46,6 +47,7 @@ Usage: not run directly; make_help.py imports it. `python
 tools/make_help.py --pick never` skips it, `--pick always` forces it.
 """
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -399,17 +401,38 @@ def split_match(label: str, query: str) -> list[tuple[str, bool]]:
     return pieces
 
 
-def make_command(target: Target, chapter: str = "") -> list[str]:
-    """The argv that runs `target`, with CH= appended when given."""
+_VARIABLE = re.compile(r"\b([A-Z][A-Z_]*)=([^\s,;)]*)")
+
+
+def variables(target: Target) -> list[tuple[str, str]]:
+    """The `NAME=example` variables a target's doc mentions, in order,
+    each once: what to prompt for before running it."""
+    found: dict[str, str] = {}
+    for name, example in _VARIABLE.findall(target.doc):
+        found.setdefault(name, example)
+    return list(found.items())
+
+
+def make_command(target: Target,
+                 values: Mapping[str, str] | None = None) -> list[str]:
+    """The argv that runs `target`, with each non-empty `NAME=value`
+    from `values` appended in order."""
     exe = shutil.which("make") or "make"
     argv = [exe, target.name]
-    if chapter:
-        argv.append(f"CH={chapter}")
+    for name, value in (values or {}).items():
+        if value:
+            argv.append(f"{name}={value}")
     return argv
 
 
-def wants_chapter(target: Target) -> bool:
-    return "CH=" in target.doc
+def ask_variables(target: Target) -> dict[str, str]:
+    """Prompt for each variable the target's doc mentions."""
+    values: dict[str, str] = {}
+    for name, example in variables(target):
+        hint = "Enter for the whole book" if name == "CH" else "Enter to skip"
+        example_hint = f"e.g. {example}, " if example else ""
+        values[name] = prompt(f"{name}= ({example_hint}{hint}): ").strip()
+    return values
 
 
 def history_files(env: Mapping[str, str] | None = None,
@@ -483,10 +506,7 @@ def record_command(command: str, env: Mapping[str, str] | None = None,
 def run_target(target: Target) -> int:
     """Echo and run `make <target>` as a fresh top-level make, after
     recording the command for the shell history."""
-    chapter = ""
-    if wants_chapter(target):
-        chapter = prompt("CH= (Enter for the whole book): ").strip()
-    argv = make_command(target, chapter)
+    argv = make_command(target, ask_variables(target))
     command = f"make {' '.join(argv[1:])}"
     record_command(command)
     print(f"$ {command}", flush=True)

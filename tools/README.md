@@ -178,8 +178,10 @@ click on the selected row runs it, and the wheel scrolls. `make` and
 
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the
-command; a target whose doc mentions `CH=` first prompts for the
-chapter, Enter meaning the whole book. The command line (`make sweep`,
+command; a target whose doc mentions a variable (`CH=12`,
+`VERSION=1.0`, `ARGS=--help`) first prompts for each, showing the doc's
+example, with Enter leaving it out (for `CH=`, the whole book). The
+command line (`make sweep`,
 `make check-ch CH=12`) is also recorded for the shell's history, so
 Up-arrow repeats it without the menu. For that to show on the very
 next Up, source the `make` wrapper for your shell from your profile:
