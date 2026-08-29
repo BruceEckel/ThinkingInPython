@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
                 print("ok" if result.ok else f"FAILED ({result.summary})",
                       f"[{result.seconds:.1f}s]")
 
-    if {"clean-examples", "clean-solutions", "clean-site",
+    if {"clean", "clean-examples", "clean-solutions", "clean-site",
             "clean-epub", "clean-pdf"} & set(direct):
         # Those targets are real, tested rmtree calls; leaving build/ empty
         # afterward would be a surprising side effect of running this sweep,

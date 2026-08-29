@@ -641,19 +641,28 @@ gate-checks:  ## Run just the Markdown checks the gate enforces
 
 ##@ Cleanup
 
-.PHONY: clean-examples clean-solutions clean-site clean-epub clean-pdf
+.PHONY: clean clean-examples clean-solutions clean-site clean-epub clean-pdf
 
-clean-examples:  ## Remove build/examples/
+# Everything under build/ is derived and gitignored, so wiping it loses
+# nothing that a gate or build cannot regenerate. The stamps go too: the
+# next `gate-status` reports no passing run and the next `gate` re-checks
+# the tools, which is the honest state after a full clean. On Windows a
+# shell whose cwd sits inside build/ holds the directory open and the
+# rmtree fails silently (ignore_errors); run this from the repo root.
+clean:  ## Remove all of build/ (clean-examples, -solutions, -site, -epub, -pdf remove one subdirectory each)
+	$(PY) -c "import shutil; shutil.rmtree('build', ignore_errors=True)"
+
+clean-examples:  ##- Remove build/examples/
 	$(PY) -c "import shutil; shutil.rmtree('build/examples', ignore_errors=True)"
 
-clean-solutions:  ## Remove build/solutions/
+clean-solutions:  ##- Remove build/solutions/
 	$(PY) -c "import shutil; shutil.rmtree('build/solutions', ignore_errors=True)"
 
-clean-site:  ## Remove build/site/
+clean-site:  ##- Remove build/site/
 	$(PY) -c "import shutil; shutil.rmtree('build/site', ignore_errors=True)"
 
-clean-epub:  ## Remove build/epub/
+clean-epub:  ##- Remove build/epub/
 	$(PY) -c "import shutil; shutil.rmtree('build/epub', ignore_errors=True)"
 
-clean-pdf:  ## Remove build/pdf/
+clean-pdf:  ##- Remove build/pdf/
 	$(PY) -c "import shutil; shutil.rmtree('build/pdf', ignore_errors=True)"
