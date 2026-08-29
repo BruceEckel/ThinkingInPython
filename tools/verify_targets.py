@@ -64,6 +64,7 @@ EXCLUDED: dict[str, str] = {
     "release-prune": "deletes old GitHub releases",
     "kindle": "opens the Send to Kindle desktop app (a GUI)",
     "verify-targets": "this is the target that runs this script",
+    "rewrite": "runs headless claude passes that cost tokens and edit prose",
 }
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in

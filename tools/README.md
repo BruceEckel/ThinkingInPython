@@ -642,6 +642,38 @@ A positional argument (or `CH=`) may be a file path or a chapter selector
 matched against `Chapters/`: a number or stem prefix (`02`, `02_A_Python`) or a
 substring (`Tour`). With no argument the whole book is processed.
 
+## rewrite.py
+
+Runs the AI editing passes over one chapter's prose, in place. Each pass is
+one headless `claude -p "/<skill> <chapter>"` run of a skill (from
+`.claude/skills/` or an installed plugin) with `--permission-mode
+acceptEdits`, scoped by an appended system note to the chapter's prose
+(never a fenced block or a `#:` marker, never git). After every pass the
+chapter is reflowed and the cheap prose gates run (`banned_phrases.py`,
+`heading_links.py`, the `extract_examples.py` drift check), so a pass that
+touched a listing or broke a link fails right there. The chain stops at the
+first failure.
+
+```
+make rewrite CH=25                        # default passes (elements-of-style)
+make rewrite CH=25 ARGS=--list            # show the passes, run nothing
+make rewrite CH=25 ARGS=--dry-run         # print the commands only
+make rewrite CH=25 ARGS="--passes activate bruce-edit-apply"
+make rewrite CH=25 ARGS=--all             # every pass, opt-in ones included
+```
+
+The passes live in `PASSES` in the script, in run order (general rules
+first, Bruce's own captured practices last); adding a tool is appending an
+entry. A pass marked `default` runs on a bare `make rewrite`; the rest are
+opt-in, so a skill whose rules say "only when explicitly asked"
+(`readability`) stays off until named here, which counts as the ask. Each
+pass runs once per invocation, deliberately: repeated cut-passes sand the
+voice off a chapter, so a second lap is a second `make rewrite`.
+
+Not a gate: it costs tokens and is nondeterministic, so it is never part of
+`verify`/`gate`/`ci`, refuses to run under `CI`, and `verify_targets.py`
+excludes it. Review `git diff` before committing what it did.
+
 ## Spelling and prose style
 
 Several layers, all optional and not part of the default CI gate.

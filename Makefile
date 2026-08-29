@@ -474,8 +474,8 @@ solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, pyte
 # examples" above: `prose` is a target in this section.
 ##@ Writing and spelling
 
-.PHONY: reflow reflow-check spell spell-add prose links todos claims \
-        exercise-coverage
+.PHONY: reflow reflow-check rewrite spell spell-add prose links todos \
+        claims exercise-coverage
 
 # Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
 # headings are left untouched; a file is rewritten only if it round-trips).
@@ -485,6 +485,16 @@ reflow:  ## Rewrite prose to one sentence per line (CH=02 for one chapter)
 
 reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 	$(PY) tools/reflow_prose.py $(CH)
+
+# AI editing passes over one chapter's prose, in place. Each pass is a
+# headless `claude -p "/<skill> <chapter>"` run (elements-of-style by
+# default; the pass list is PASSES in tools/rewrite.py, ARGS=--list shows
+# it, ARGS="--passes activate" or ARGS=--all picks others). Reflow and the
+# prose gates run after every pass. It costs tokens and is nondeterministic,
+# so it is never part of verify/gate/ci and refuses to run under CI; review
+# `git diff` before committing.
+rewrite:  ## AI editing passes over one chapter's prose (CH=25; ARGS=--list)
+	$(PY) tools/rewrite.py $(CH) $(ARGS)
 
 # Spell-check the book and lint it for small mechanical slips. codespell
 # catches known misspellings (prose and code comments); prose_lint catches
