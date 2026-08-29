@@ -94,12 +94,19 @@ ART_FILES = ("cover-color.jpg", "cover-eink.jpg",
 TITLE_SIZE = 150
 TITLE_1_Y = 190
 TITLE_2_Y = 370
-RULE_Y = 425
+# The rule sits midway between the descender of "Python" (about
+# 407) and the subtitle's cap line, so it divides the two rather
+# than hanging off the title; at 425 it crowded the descender.
+RULE_Y = 440
+RULE_W = 200
 SUBTITLE_SIZE = 56
-SUBTITLE_Y = 495
+SUBTITLE_Y = 510
 # Where the type block ends and the art may begin.
 TYPE_BOTTOM = SUBTITLE_Y + 20
-AUTHOR_SIZE = 58
+# About half the title. At 58 the author line matched the subtitle
+# size and read as a caption under the art; on a cover the name
+# ranks above the subtitle.
+AUTHOR_SIZE = 76
 AUTHOR_MARGIN = 90
 
 
@@ -123,7 +130,7 @@ def titles_svg(h: int, ink: str = INK,
   <text x="{W / 2}" y="{TITLE_2_Y}" text-anchor="middle"
         font-family="{TITLE_FONT}" font-size="{TITLE_SIZE}"
         fill="{ink}">in Python</text>
-  <rect x="{W / 2 - 80}" y="{RULE_Y}" width="160" height="5"
+  <rect x="{W / 2 - RULE_W / 2}" y="{RULE_Y}" width="{RULE_W}" height="6"
         fill="{accent}"/>
   <text x="{W / 2}" y="{SUBTITLE_Y}" text-anchor="middle"
         font-family="{TITLE_FONT}" font-size="{SUBTITLE_SIZE}"
