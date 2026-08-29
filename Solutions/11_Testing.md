@@ -58,7 +58,7 @@ def test_transfer_overdraft_leaves_both_unchanged(
 touching `self.balance`, so an overdrafting transfer never reaches the
 `deposit()` call at all: both accounts are left exactly as they were.
 Writing the overdraft test first makes this ordering a
-deliberate decision rather than an accident; a version that deposits
+deliberate decision rather than an accident. A version that deposits
 first and withdraws second leaves `other` credited even when the
 transfer as a whole should fail.
 
@@ -250,8 +250,8 @@ function in both: a fetcher returning a `BytesIO` that behaves enough
 like a response to satisfy the `with` block and `.read()`.
 
 Renaming `urlopen` to `fetch` in `ch11_weather.py` separates them.
-`test_injected()` still passes, because it never named the dependency;
-it hands one in, and `current_temp_with()` calls whatever it was
+`test_injected()` still passes, because it never named the dependency.
+It hands one in, and `current_temp_with()` calls whatever it was
 given. `test_patched()` fails with
 `AttributeError: <module 'ch11_weather'> has no attribute 'urlopen'`,
 because `monkeypatch.setattr()` looks the name up by string and the

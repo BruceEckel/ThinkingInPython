@@ -113,7 +113,7 @@ unchanged. `click()` is the game move: repaint every cell in the
 `_flood()` to discover which previously-unowned neighbors now match
 that new color and have joined the patch. `game.clicks` gives the
 single-player scoring the exercise asks for, "how many clicks to turn
-the field into one color"; two-player competition follows the same
+the field into one color." Two-player competition follows the same
 `click()` method, alternating whose turn supplies the next color, with
 whoever's move leaves the larger owned patch after a fixed number of
 rounds. `FloodGame` inheriting from `Observable[Grid]`, the same as

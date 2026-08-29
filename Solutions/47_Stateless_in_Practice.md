@@ -165,7 +165,7 @@ It turns `declared_size()` into a function that yields its failure instead of
 raising it, so the exception becomes a value travelling the error channel,
 and `catch()` then does what its type says: `run(fixed())` returns the `KeyError`
 rather than raising it.
-`success()` is for a value you already have; `@throws` is for work that can fail.
+`success()` is for a value you already have. `@throws` is for work that can fail.
 
 ## Shared code: the microgrid
 
@@ -652,7 +652,7 @@ In the by-hand version nothing told you anything.
 Adding `except TooLong` to the third `try` was a choice made by reading the code,
 and forgetting it would leave a `TooLong` escaping `research_and_report()`,
 whose signature still says it returns a `str` no matter what.
-Both versions run; only one of them has a tool that knows the set of failures
+Both versions run. Only one of them has a tool that knows the set of failures
 changed.
 
 ## 6. A dull headline
@@ -992,7 +992,7 @@ a function that raises an exception, so the `raise` sits in an ordinary function
 and the decorator does the moving.
 
 Prefer `@throws` when the check is reusable or belongs to the value rather than
-the pipeline, as `nonempty()` does; prefer `throw()` for a condition that only
+the pipeline, as `nonempty()` does. Prefer `throw()` for a condition that only
 makes sense at that point in the Effect.
 
 Making each version fail with an undeclared type shows the same asymmetry
@@ -1119,7 +1119,7 @@ print(run(handle(scripted_from(iter([3, 4])))(game)()))
 ```
 
 The request carries the range, which is the difference from a `Need`.
-`Need[T]` asks for an instance of `T` and there is nothing else to say;
+`Need[T]` asks for an instance of `T` and there is nothing else to say.
 `Random(1, 6)` asks a question with arguments, and the handler reads them off
 the request. That is why an Ability is a dataclass rather than a marker: its
 fields are the parameters of the question.
@@ -1265,7 +1265,7 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 
 This one tells you about the dependency two levels down. `Need[Toaster]` is
 what `supply()` failed to subtract, and it reaches `run()` still in the
-channel. Nothing in `buttered()`'s body mentions a toaster; the requirement
+channel. Nothing in `buttered()`'s body mentions a toaster. The requirement
 came from `toast()`, which `buttered()` calls, and the error names it at the
 edge where the last chance to answer it was missed.
 

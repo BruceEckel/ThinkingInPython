@@ -31,7 +31,7 @@ The sentinel and the guard existed to defer creation, so removing
 the deferral removes both. `instance` is declared
 `ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]` and
 is assigned the inner instance in the class body (the bare
-`__OnlyOne()` works there; the qualified `OnlyOne.__OnlyOne()` would
+`__OnlyOne()` works there. The qualified `OnlyOne.__OnlyOne()` would
 fail, since `OnlyOne` is unbound until its own body finishes), and
 `__init__()` shrinks to the one `append`. Externally nothing
 changes: `x.val` accumulates the same way, `x is y` is still
@@ -105,7 +105,7 @@ are checked out. `acquire()` and `release()` replace the "get the
 instance" idea with "borrow one member of a pool and give it back,"
 similar in spirit to [Context Managers](../Chapters/15_Context_Managers.md#an-object-pool)'s
 `Pool.lease()`, but without the automatic return a context manager
-guarantees; here a caller must remember to call `release()`.
+guarantees. Here a caller must remember to call `release()`.
 
 ## 3. A class-based singleton rewritten as a module
 
@@ -140,7 +140,7 @@ argument [A Module Is Already a Singleton](../Chapters/24_Singleton.md#a-module-
 makes at the top of the chapter. The class-based versions only earn
 their complexity when something genuinely needs the shape of a class,
 such as participating in an interface other code expects, or needing
-`__new__()`-level control over construction; absent that requirement,
+`__new__()`-level control over construction. Absent that requirement,
 a module is the simpler tool that already does the job.
 
 ## 4. Rebinding instead of mutating
@@ -246,7 +246,7 @@ takes the lock.
 
 What the lock changes is the timing, not the outcome. Without it the
 eight constructors overlap and the whole thing takes about 50
-milliseconds; with it they queue and it takes about 400. Each thread
+milliseconds. With it they queue and it takes about 400. Each thread
 still builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last, so seven callers walk away
 holding objects the cache has never heard of. The lock made the
@@ -271,7 +271,7 @@ exactly once, so import time is a place where being single-threaded is
 guaranteed rather than hoped for.
 
 The trade is that the object is built whether or not anything uses it.
-For settings that is nothing; for a database connection it may be a
+For settings that is nothing. For a database connection it may be a
 real cost, and then the hand-written lock is the honest answer.
 
 ## 6. Two Borg subclasses share one namespace

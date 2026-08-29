@@ -44,7 +44,7 @@ Everything on the visitor side disappears: the `Visitor` base, `Bug`,
 `Any` annotation the chapter had to explain. What remains is two
 functions and one registration.
 
-The `Bug` classes were never carrying state; the middle layer existed
+The `Bug` classes were never carrying state. The middle layer existed
 to name one operation, and the leaves existed to be types the second
 dispatch could resolve. Once the operation is a function, naming it at
 the call site does that selection, so `pollinate(flower, "Bee")` says
@@ -113,7 +113,7 @@ for the flower that differs, and again nothing existing was touched.
 
 `@singledispatch` makes adding an *operation* the cheaper of the two,
 because an operation is a whole function and lives in one place. Adding
-a type is cheap here only because most flowers accept the default; a
+a type is cheap here only because most flowers accept the default. A
 type that needs a distinct answer from every operation costs one
 registration per operation, scattered across the file. That is the
 expression problem from
@@ -181,7 +181,7 @@ type-checks and the program dies at runtime with the `AttributeError`
 above. Under `Visits`, `ty` rejects the argument before the program
 runs, because `Beetle` inherits no `visit()` and so does not match the
 protocol. The `ty: ignore` comment above is what makes the listing
-compile at all; deleting it is how you see the check working.
+compile at all. Deleting it is how you see the check working.
 
 That is the price the chapter names for keeping `Any`. It moves an
 error a type checker could have caught into the run. The classic pattern

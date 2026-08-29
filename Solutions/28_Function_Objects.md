@@ -246,7 +246,7 @@ for finder in (coarse_closure, coarse_partial,
 `tolerance` becomes a parameter with a default, so every existing call
 to `newton(f, a, b)` keeps working. The closure and the `partial` then
 reach the same configured strategy from two directions. `newton_within()`
-writes a new function whose body supplies the argument;
+writes a new function whose body supplies the argument.
 `partial(newton, tolerance=0.5)` stores the argument and supplies it at
 the call. Both produce something matching `RootFinder`, so `solve()`
 accepts either with no change.
@@ -405,7 +405,7 @@ A `for` loop does not create a scope, so `n` is one variable that the
 loop rebinds three times. All three lambdas close over that one
 variable rather than over its value, and by the time anything calls
 them the loop has finished and `n` holds 2. Nothing is wrong with the
-lambdas; they are reading the variable they were told to read, at the
+lambdas. They are reading the variable they were told to read, at the
 moment they are asked.
 
 The three fixes all work, and all work the same way: each one

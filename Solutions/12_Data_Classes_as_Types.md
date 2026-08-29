@@ -459,5 +459,5 @@ compare the factory against the field. `dict[str, Month]` is callable
 too, and its return type is concrete, so writing
 `field(default_factory=dict[int, int])` on this field is an error
 before the program runs. The bare form is fine where the factory and
-the annotation obviously agree; subscript it when you want the
+the annotation obviously agree. Subscript it when you want the
 agreement checked.

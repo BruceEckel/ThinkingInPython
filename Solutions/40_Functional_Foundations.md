@@ -46,7 +46,7 @@ print(operations["+"](6, 4), operations["-"](6, 4),
 ```
 
 `operations["*"](6, 4)` is called the same way as the other
-two entries; nothing about the calling code changes. Supporting a new
+two entries. Nothing about the calling code changes. Supporting a new
 operator really was just adding one row to the table, as the chapter
 claims.
 
@@ -97,7 +97,7 @@ print(increment_then_double_then_square(3))
 `increment_then_double_then_square(3)` runs `increment_then_double(3)`
 first, which computes `(3 + 1) * 2 = 8`, then feeds that `8` into
 `square`, giving `8 * 8 = 64`. `compose()` did not need to change at
-all to support a third stage; wrapping one composed function inside
+all to support a third stage. Wrapping one composed function inside
 another `compose()` call is enough to extend the pipeline.
 
 ## 5. Fixing a leading argument, and why the trailing one differs
@@ -259,5 +259,5 @@ Deleting the `nonlocal` line shows both guides in order. `ty` reports
 before the program runs. Running anyway raises `UnboundLocalError`
 ("cannot access local variable 'count' where it is not associated
 with a value") at the first `tally()` call. The type checker points at the
-assignment that went wrong; the runtime message complains about a
+assignment that went wrong. The runtime message complains about a
 local variable the code never meant to create.

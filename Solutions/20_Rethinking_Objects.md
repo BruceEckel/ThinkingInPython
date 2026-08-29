@@ -105,7 +105,7 @@ way down is the author's job, one field at a time. Declare `tuple`
 rather than `list`, `frozenset` rather than `set`, `frozendict` rather
 than `dict`, and a frozen data class rather than a mutable one for any
 nested value. The type checker will hold you to those declarations once
-you write them; it will not choose them for you.
+you write them. It will not choose them for you.
 
 ## 3. `NewType` at the protocol boundary
 
@@ -409,7 +409,7 @@ about the limit ask `full()` before pushing. `fill()` now runs on both
 classes, which is what substitutability means.
 
 What you gave up is the refusal. The original `BoundedStack` guaranteed
-that no more than two items were ever accepted; this one guarantees
+that no more than two items were ever accepted. This one guarantees
 only that no more than two are ever *kept*. A caller who pushes five
 items loses three of them silently, which is the right behavior for a
 ring buffer of recent events and the wrong behavior for a queue of work

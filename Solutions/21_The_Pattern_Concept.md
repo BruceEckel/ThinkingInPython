@@ -148,7 +148,7 @@ the cost of expressing it in a language where a method cannot travel
 without an object around it, which is what
 [When a Pattern Dissolves](../Chapters/21_The_Pattern_Concept.md#when-a-pattern-dissolves)
 means by the missing piece having been there all along. The intent
-survives the subtraction; only the scaffolding disappears.
+survives the subtraction. Only the scaffolding disappears.
 
 ## 3. Applying *Subtraction*
 

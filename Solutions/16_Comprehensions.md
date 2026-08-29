@@ -33,7 +33,7 @@ for row in matrix:
 
 Only the literal in the conditional expression changes, from `1` to
 `2`. The comprehension's structure, two nested loops producing a list
-of lists, does the same work either way; only the value placed on the
+of lists, does the same work either way. Only the value placed on the
 diagonal is different.
 
 ## 3. Adding `"Galahad"` to `names`
@@ -54,7 +54,7 @@ print(lengths["GALAHAD"], "NI" in lengths)
 `"Galahad"` is seven characters, so it passes the `len(name) > 3`
 filter and adds one entry. `"Ni"` is still the only name the filter
 drops. The filter tests the original name, not the upper-cased key, so
-a name is judged before the output expression ever runs; that ordering
+a name is judged before the output expression ever runs. That ordering
 matters when the output expression changes the length, as `name * 2`
 would.
 
@@ -171,5 +171,5 @@ reports `True`, and stops. That leaves the generator part-way through,
 not empty: `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
 giving `230` rather than the full `285`. By then every value is gone,
 so `list()` gets nothing. A generator holds a position rather than a
-beginning; each consumer picks up where the previous one stopped, and
+beginning. Each consumer picks up where the previous one stopped, and
 `any()`'s early exit leaves values behind for `sum()` to find.

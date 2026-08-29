@@ -48,12 +48,12 @@ That is the entire change to Python code. `__init_subclass__()`
 registers `Plastic` in `Trash.registry` automatically, the moment the
 class is defined, so `Trash.create("Plastic", weight)` works with no
 further wiring. `recycle_dict.py` needs no change because
-`bins[type(t)].append(t)` keys on whatever type `t` actually is;
+`bins[type(t)].append(t)` keys on whatever type `t` actually is.
 `type(t)` for a piece of `Plastic` is simply `Plastic`, a key the
 dictionary has never seen before, which `defaultdict` handles the same
 way it handles every other new key. `parse_trash.py` needs no change
 because it only calls `Trash.create(name, weight)` with a name
-string read from the file; it never names a concrete material itself.
+string read from the file. It never names a concrete material itself.
 The only files that change are the data (adding `Plastic:NN` lines)
 and, if `Plastic` deserves special handling, one
 `@recycling_note.register` function.
@@ -69,7 +69,7 @@ gets a report that balances against nothing.
 the registry to exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}`
 and `Plastic` is now a fifth entry. That failure is correct behavior
 for it. The test exists to prove that defining a subclass registers it,
-so a new material *should* move the assertion; a test that passed here
+so a new material *should* move the assertion. A test that passed here
 would mean `__init_subclass__()` had stopped doing its job. Update the
 expected set and the test goes back to guarding what it was written to
 guard.
@@ -188,7 +188,7 @@ for t in [Aluminum(1), Paper(1), Glass(1),
 #: Plastic: no special handling
 ```
 
-The dispatch logic is identical to the plain-function version;
+The dispatch logic is identical to the plain-function version.
 `singledispatchmethod` still routes on the type of the first argument
 *after* `self`. What changes is where the operation lives:
 `recycling_note()` is now a method you call as `sorter.recycling_note(t)`,
@@ -197,7 +197,7 @@ particular, which matters if `Sorter` needs to hold its own state
 (a log of notes issued, a configuration, statistics) alongside the
 dispatch. When no such state exists, as here, the free-function
 version from `recycling_note.py` is simpler and does the identical
-job; use `singledispatchmethod` only once the operation needs a home
+job. Use `singledispatchmethod` only once the operation needs a home
 on an object.
 
 ## 4. Exact-type bins against MRO dispatch

@@ -168,7 +168,7 @@ nested second `lease()` takes the other, so `pool.available()` reports
 `0` while both are checked out. Exiting the inner `with` returns its
 connection first, then exiting the outer `with` returns the second,
 restoring `pool.available()` to `2`. This confirms the pool has no
-built-in limit of "one lease at a time"; it only has as many items as
+built-in limit of "one lease at a time." It only has as many items as
 you gave it in the constructor, and it happily hands out however many
 distinct leases there are connections for.
 

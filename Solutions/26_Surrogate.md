@@ -36,7 +36,7 @@ print(p.query())
 `"creating ExpensiveResource"` prints only when `p.query()` first
 triggers `__getattr__()`, not when `LazyProxy()` is constructed. Every
 attribute access checks `self._real` and builds the real object on the
-first one that finds it missing; every later access reuses the same
+first one that finds it missing. Every later access reuses the same
 instance. This is the same `__getattr__()` delegation `proxy_2.py` and
 `counting_proxy.py` already use, just guarding the moment of creation
 instead of forwarding to an object that already exists.

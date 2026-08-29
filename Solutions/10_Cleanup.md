@@ -56,7 +56,7 @@ print(other)
 
 `clear()` changes the object every name can see. Rebinding changes
 only which object this one name points at. The two coincide in
-`weak_value.py` because that list has exactly one reference; with two,
+`weak_value.py` because that list has exactly one reference. With two,
 rebinding would leave the `Counter` objects alive and `live_count()`
 stuck at `3`.
 
@@ -139,7 +139,7 @@ The output is identical to the original `for`-loop-with-`append()`
 version. A comprehension still calls `Counter(name)` once per name,
 in order, and still keeps the resulting list as the only thing holding
 references to those three objects. `del c` inside the loop still only
-unbinds the name `c`; it does not touch the list. Nothing about how
+unbinds the name `c`. It does not touch the list. Nothing about how
 the list gets built changes when its contents get destroyed, so the
 `deleted` messages still only appear at interpreter shutdown, after
 `End of delete loop` has already printed.
@@ -250,7 +250,7 @@ its job, on an object that should have been collected at `del b`.
 
 The chapter's `finalize(self, print, name, "closed")` avoids this by
 passing the pieces the callback needs rather than the object that has
-them. `name` is a `str` the `Connection` also happens to hold; the
+them. `name` is a `str` the `Connection` also happens to hold. The
 finalizer's reference to it keeps a string alive, not a connection.
 The rule generalizes: a finalizer may capture anything except a path
 back to its own object.
@@ -291,7 +291,7 @@ Both finalizers run at `gc.collect()`, in creation order. Nothing
 changed in principle: reference counting cannot reclaim either object,
 because each holds the other, and the cycle collector reclaims both
 together when it runs. A cycle through two objects behaves exactly
-like a cycle through one; the self-reference in `cycle.py` is only the
+like a cycle through one. The self-reference in `cycle.py` is only the
 smallest case.
 
 Removing the `gc.disable()`/`gc.enable()` pair is what makes the output

@@ -120,7 +120,7 @@ The new `case` nests a mapping pattern inside a mapping pattern:
 that itself has `"x"` and `"y"` keys, binding both in one step. Placing
 it before the flat `{"type": "click", "x": x, "y": y}` case lets both
 shapes of a click event share the same handling logic while keeping
-each pattern focused on one shape; `match` tries cases top to bottom
+each pattern focused on one shape. `match` tries cases top to bottom
 and stops at the first one that fits, so the flat form still works
 for events that were never nested to begin with.
 
@@ -315,7 +315,7 @@ matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `broken()`, and never compares anything. The module-level constant
 still holds `Signal.CAUTION` afterward, which is why the mistake is
 easy to miss. Python allows this only because the capture is the last
-case; another case after it fails to compile.
+case. Another case after it fails to compile.
 
 The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`

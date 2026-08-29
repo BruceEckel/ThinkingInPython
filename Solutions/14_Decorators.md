@@ -26,8 +26,8 @@ print(Point.__name__, Empty.__name__)
 Both `decorating` lines print before anything else, because a class
 decorator runs when the `class` statement finishes, not when an
 instance is made. `announce` returns `cls` unchanged, so `Point`
-is the same class object it would have been without the decorator;
-the only effect is the side effect.
+is the same class object it would have been without the decorator.
+The only effect is the side effect.
 
 That is also what `register` does, and the comparison is the point: a
 class decorator that returns its argument can observe and record, and
@@ -149,7 +149,7 @@ This is `pizza_decorator.py`'s shape with the menu changed: a `Drink`
 `Protocol` naming the two readable properties, plain drinks that
 satisfy it with class attributes, and an `Extra` base that wraps one
 `Drink` and forwards through the same interface. Nothing inherits from
-`Drink`, and nothing needs to; the `Protocol` is checked structurally.
+`Drink`, and nothing needs to. The `Protocol` is checked structurally.
 
 `Decaf` is worth noticing. Its `add_cost` is `0.0`, so it changes the
 description without changing the price, which a class-per-combination

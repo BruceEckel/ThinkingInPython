@@ -15,7 +15,7 @@ print(a, c)
 
 `b.append(4)` changes `a` too, because `b` and `a` name the same list
 object. `c = a[:]` makes a new list with the same elements, so
-`c.append(99)` only changes `c`. Slicing copies; assignment does not.
+`c.append(99)` only changes `c`. Slicing copies. Assignment does not.
 
 ## 2. Truthiness of empty and non-empty containers
 
@@ -86,7 +86,7 @@ at the language level. What differs is what a reader infers.
 which is what both of these are. `TOTAL_SUM` and `FLAG_BITS` say "a
 constant, fixed for the life of the program," so using that form for a
 running total misleads anyone who later tries to reuse the name.
-`totalSum` and `flagBits` say nothing about the value; they only say the
+`totalSum` and `flagBits` say nothing about the value. They only say the
 author came from Java or JavaScript.
 
 Only the camelCase form breaks

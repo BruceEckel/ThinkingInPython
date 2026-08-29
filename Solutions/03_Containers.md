@@ -37,7 +37,7 @@ But the *margin* grows with `n`: each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
 O(n²). Each `deque` operation is O(1), so its loop costs O(n). At small
 `n` the constant-factor overhead of a `deque` can nearly close the
-gap; at large `n` the quadratic cost of the list dominates and the
+gap. At large `n` the quadratic cost of the list dominates and the
 `deque` wins by a wide and growing margin.
 
 ## 2. `defaultdict(int)` for counting

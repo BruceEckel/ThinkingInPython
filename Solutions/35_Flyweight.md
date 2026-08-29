@@ -63,7 +63,7 @@ print(len(cells), len({id(t) for t in cells}))
 
 Adding two symbols to `SPECS` (and to the `Symbol` literal so the
 type checker still catches a mismatch between the two) is the whole change
-needed to support door and tree tiles; `tile()` and `parse_map()`
+needed to support door and tree tiles. `tile()` and `parse_map()`
 never change. Twenty-four cells still collapse to only five distinct
 objects, one per kind (`grass`, `water`, `rock`, `door`, `tree`),
 however large the map grows, because `@cache` keys on the symbol
@@ -139,7 +139,7 @@ over 11x at 200x200. The cached version's peak memory stays flat at
 essentially three `Tile` objects no matter the map size, while the
 uncached version allocates a brand-new `Tile` for every single cell,
 so its memory grows with the number of cells (quadratically with map
-side length). The flyweight's advantage is not a fixed multiplier; it
+side length). The flyweight's advantage is not a fixed multiplier. It
 widens as the map grows, because the cached cost is constant and the
 uncached cost is not.
 
@@ -178,7 +178,7 @@ print(field[0][1].walkable, field[1][0].walkable,
 
 Setting `walkable = False` on the tile at `(0, 0)` changes it for
 every other grass cell in the map too, because all four cells share
-one `MutableTile` object; there is only one grass tile in memory, and
+one `MutableTile` object. There is only one grass tile in memory, and
 every cell just holds a reference to it. A test that pins down the bug:
 
 ```python
@@ -288,7 +288,7 @@ print(queen.color, queen.kind)
 
 Thirty-two occupied squares, but only twelve distinct `Piece` objects:
 two colors times six kinds. Every white pawn is the same object,
-and likewise for every other color-and-kind combination; the board is
+and likewise for every other color-and-kind combination. The board is
 just a `dict` mapping squares to references, the extrinsic position
 kept separate from the intrinsic color-and-kind that `@cache` shares.
 
@@ -297,8 +297,8 @@ simply replaces whatever reference was at `dst` (the captured piece)
 with the moving piece's reference. The captured piece's *flyweight* is
 untouched. Twelve `Piece` objects still exist even after every piece
 on the board has been captured, because those flyweights represent "a
-white rook" in the abstract, not any particular rook on the board;
-capturing only removes a board *position*.
+white rook" in the abstract, not any particular rook on the board.
+Capturing only removes a board *position*.
 
 Promotion swaps which flyweight a square points to, since a `Piece`
 cannot change color or kind (it is frozen): `piece(current.color,
@@ -433,7 +433,7 @@ def test_out_of_range_component_raises() -> None:
 
 The check runs first in `__new__()`, before the pool lookup, so an
 out-of-range component is rejected before either finding a cached
-instance or building a new one; no invalid `Color` is ever pooled or
+instance or building a new one. No invalid `Color` is ever pooled or
 returned. This is the same *parse, don't validate* move
 [Data Classes as Types](../Chapters/12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes with `__post_init__()`, applied to a class that validates in
@@ -495,7 +495,7 @@ that because the two were annotated against each other. Here there is
 nothing to disagree with.
 
 What the enum gives up is the moment of failure. `to_symbol()` raised a
-`KeyError` at a named boundary the chapter could point at; `Tile("?")`
+`KeyError` at a named boundary the chapter could point at. `Tile("?")`
 raises a `ValueError` from deep inside `parse_map()`'s comprehension. If
 the boundary matters, keep a `to_tile()` wrapper that catches the
 `ValueError` and re-raises with the offending line and column.

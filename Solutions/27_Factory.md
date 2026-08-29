@@ -62,7 +62,7 @@ s.erase()
 `shape_factory2.py`'s polymorphic version instead needs a `Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of it (shown here with only the new
-shape; in the chapter file the entry joins `Circle`'s and
+shape. In the chapter file the entry joins `Circle`'s and
 `Square`'s):
 
 ```python
@@ -157,7 +157,7 @@ GameEnvironment(GnomesAndFairies()).play()
 ```
 
 `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
-`Weapon` directly; it only calls `make_character()` and
+`Weapon` directly. It only calls `make_character()` and
 `make_obstacle()` on whatever `GameElementFactory` it was handed. A
 third concrete factory slots in beside `KittiesAndPuzzles` and
 `WarriorsAndWeapons` with no change to `GameEnvironment` at all.
@@ -307,7 +307,7 @@ when `build()` finally runs. During that window, between the fifth
 `.topping()` call and the eventual `build()` call, the builder's own
 internal state (though never a `Pizza` object) already violates the
 rule the finished `Pizza` is supposed to guarantee. Checking in
-`topping()` closes that window entirely; checking only in `build()`
+`topping()` closes that window entirely. Checking only in `build()`
 leaves it open for as long as the caller keeps adding toppings.
 
 ## 6. A registry whose classes live somewhere else
@@ -424,7 +424,7 @@ mutating a shared object, and `int` is immutable anyway.
 That split is the whole lesson. A shallow copy duplicates the top
 object and shares everything it refers to, so the fields that break
 are exactly the mutable ones, and only when something mutates them
-in place. Assignment to a field is always safe; `append()`, `[k] = v`,
+in place. Assignment to a field is always safe. `append()`, `[k] = v`,
 and `.update()` are not.
 
 A test through `parts` would have caught it either way:
@@ -456,7 +456,7 @@ def test_nested_dict_is_copied() -> None:
 ```
 
 The second assertion is the one worth writing. Checking that the
-prototype survived is good; checking that the *next* spawn is still
+prototype survived is good. Checking that the *next* spawn is still
 correct is what a user of the registry actually depends on, and it
 fails loudly under `copy.copy()`.
 

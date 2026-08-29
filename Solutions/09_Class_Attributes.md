@@ -77,7 +77,7 @@ print(b.x, b2.x)
 
 Each call to `B()` runs the generated `__init__()`, which assigns `100`
 to `self.x` as a fresh instance attribute for that particular object.
-`b.x = -1` only touches `b`'s own attribute; `b2` was constructed
+`b.x = -1` only touches `b`'s own attribute. `b2` was constructed
 independently and keeps its own `100`. This is the same guarantee
 `real_defaults.py` demonstrates with `A`: a constructor default
 creates one value per instance, unlike a class-body attribute, which
@@ -161,7 +161,7 @@ except ValueError as e:
 The full message ends with the remedy: `use default_factory`. The
 error arrives at class-definition time, not at first use, and it
 names the fix. `@dataclass` can detect the mistake because it inspects
-every default before generating the constructor; a plain class body,
+every default before generating the constructor. A plain class body,
 as `shared_mutable.py` showed, has nobody doing that inspection.
 
 ## 6. `del` unshadows, once
@@ -247,7 +247,7 @@ With the `# type: ignore` removed, `ty` reports
 instance." The augmented form expands to an assignment through `self`,
 and the type checker treats it as it treats `a.total = 99`: a write to a
 `ClassVar` through an instance. The declaration catches the mistake at
-check time; the listing suppresses the report so it can demonstrate
+check time. The listing suppresses the report so it can demonstrate
 what the write does when it runs.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy

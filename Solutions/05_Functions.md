@@ -50,7 +50,7 @@ print(get(prefs, "volume2"))
 `volume2` is a real key whose stored value happens to be `None`. The
 `in` check finds it, so `get()` returns the stored `None` directly,
 without ever consulting `default`. The `MISSING` sentinel only matters
-when the key is genuinely absent; here it never comes into play,
+when the key is genuinely absent. Here it never comes into play,
 which is the point: a present `None` and an absent key are
 different situations, and the sentinel exists to tell them apart.
 
@@ -116,7 +116,7 @@ The lambda runs twice, on the original value and then on its own
 result, so `"hi"` gains two exclamation points rather than one. The
 second call shows the same shape with numbers: `3` squares to `9`,
 which squares to `81`, not `9`. A function that takes another function
-as an argument needs nothing special to say so; `func` is a parameter
+as an argument needs nothing special to say so. `func` is a parameter
 like any other, and the only requirement is that it be callable with
 one argument.
 
@@ -135,7 +135,7 @@ report(*args, **opts)
 
 One `*` and one `**` do the whole job. `*args` spreads the tuple into
 three positional arguments, so `"point"` lands on `label` and the
-remaining two collect into `values`; `**opts` spreads the dictionary
+remaining two collect into `values`. `**opts` spreads the dictionary
 into keyword arguments, which `**options` collects again. The first
 element of `args` is not special to the caller: it becomes `label`
 only because of where it sits in the sequence.
@@ -181,7 +181,7 @@ succeeds and `facts` stays empty.
 
 `**facts` is the opposite direction from exercise 6. There, a
 dictionary at the call site was spread into separate keyword
-arguments; here, separate keyword arguments are collected back into a
+arguments. Here, separate keyword arguments are collected back into a
 dictionary inside the function. The two forms use the same `**` and
 are inverses of each other, which is why a function declaring
 `**kwargs` can forward them to another call as `**kwargs` unchanged.
@@ -225,7 +225,7 @@ has no value yet. `rebinds()` fails for the same reason even though
 its `print` comes first in time: Python decides which names are local
 when it compiles the function body, and the `count = 99` below the
 `print` already made `count` local throughout. The `print` therefore
-reads the unassigned local, never the module-level name; the second
+reads the unassigned local, never the module-level name. The second
 `print`, after the assignment, is never reached. Both mistakes are
 visible without running the code. The type checker and the linter
 each flag them, so the offending lines carry `# type: ignore` and

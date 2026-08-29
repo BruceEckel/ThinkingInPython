@@ -68,7 +68,7 @@ is a `str`, not an `int`, so it violates `width: int`, even though the
 call runs without error at runtime (`"3" * 4` is valid string
 repetition). The `# type: ignore` comment that was on this line in the
 book existed only to let this deliberately-wrong example pass the
-book's own build; removing it restores the error `ty` is meant to
+book's own build. Removing it restores the error `ty` is meant to
 catch.
 
 ## 3. A second generic function, `last()`
@@ -249,7 +249,7 @@ append a `Shape` here," it is saying there is no such operation on
 what you declared.
 
 That pairing is the whole of variance in one edit. Invariance is the
-price of being able to write; covariance is what you get when you give
+price of being able to write. Covariance is what you get when you give
 that up. The practical rule follows: annotate a parameter with the
 weakest shape the body actually needs, because every capability you
 declare is a caller you turn away.

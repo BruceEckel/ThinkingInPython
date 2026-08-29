@@ -182,7 +182,7 @@ holds the state.
 The `celsius` setter writes `_celsius`, an instance attribute rather
 than a global, and then calls `notify()`, which invokes arbitrary code
 in every registered observer. The write is a side effect on the
-object; the notification is a side effect on the world, since an
+object. The notification is a side effect on the world, since an
 observer may print, record, or fail. Reading `celsius` is a side cause
 for the same reason `withdraw()` reading `balance` is one: the answer
 depends on history rather than arguments. The functional conversion
@@ -316,7 +316,7 @@ that yields a price" and choosing later which one.
 It does not **bind the implementation later**. `asyncio.run()` chooses
 an event loop, which sounds like late binding until you ask what it
 lets you swap. It does not let a test substitute a different meaning
-for the awaits inside; those are fixed when the coroutine is written.
+for the awaits inside. Those are fixed when the coroutine is written.
 A test that wants fake prices still has to inject
 `price_of_async` itself, by the same hand-threading this chapter's
 exercise 2 measures. The event loop is a scheduler, not a handler.

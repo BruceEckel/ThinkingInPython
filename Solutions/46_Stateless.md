@@ -127,7 +127,7 @@ run(supply(Console())(greet_all)(["Alice", "Bob"]))
 ```
 
 The body never changes. `greet_all()` was already doing the right
-thing; its signature was describing a different function.
+thing. Its signature was describing a different function.
 
 What its callers must now declare is the point of the exercise. Before,
 `greet_all()` claimed to need nothing, so a caller could run it with no
@@ -205,14 +205,14 @@ function.
 The `ValueError` stays declared, which is what `Try[ValueError, str]`
 says, so it is still in the yield channel when
 `catch(ValueError)` wraps the whole thing. `catch()` does not delete an
-error; it moves it from the yield channel to the return channel, as a
+error. It moves it from the yield channel to the return channel, as a
 value. So the `ValueError` leaves the failure channel and reappears
 beside the `str`, and a caller needing a bare `str` has one case
 left to handle.
 
 Both functions have handled every error `read_score()` declares. Only
 one of them has *interpreted* what it caught. `catch()` is the tool
-that turns a failure into a value; a `match` is what turns that value
+that turns a failure into a value. A `match` is what turns that value
 into a result, and skipping the second step leaves the type saying so.
 
 ## 4. A `Log` protocol, and a test that records both
@@ -635,7 +635,7 @@ refuses to start an event loop inside a running one, so calling it from
 coroutine, which the loop that is already running can await.
 
 `ty` accepted both because both are correctly typed. `run()` takes an
-Effect and returns its result; `run_async()` takes an Effect and returns
+Effect and returns its result. `run_async()` takes an Effect and returns
 an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
 sits inside a coroutine. Whether an event loop is running is a fact
@@ -700,7 +700,7 @@ annotating `line: str` for the same reason `value: int` is annotated:
 type, and naming it keeps the type checker's inference pinned.
 
 Each failure surfaced at `run()`, and nowhere earlier. `Cyd` has a
-score, so the lookup succeeds and `format_score()` fails; `Dana` has
+score, so the lookup succeeds and `format_score()` fails. `Dana` has
 none, so the lookup fails and `format_score()` never runs. In both
 cases the error value travels up through the `yield from` chain
 untouched, past `announce()`, past `supply()`, to the driver, which
@@ -809,7 +809,7 @@ typing means: `Terminal` fails not because of what it is but because of
 what it does not do.
 
 One honest limit. Distinct method names remove the ambiguity *between*
-abilities; they do nothing about two implementations of the *same*
+abilities. They do nothing about two implementations of the *same*
 ability. Add a second recorder, an `Audit` that also defines
 `record()`, and `supply(capture, audit)` is ambiguous again by argument
 order, with no diagnostic. The section's advice has two halves for that

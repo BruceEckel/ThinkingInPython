@@ -551,7 +551,7 @@ completion in the background with nobody waiting on their results.
 
 That combination, results discarded and siblings left running, is why
 `return_exceptions=True` and `TaskGroup` exist. One keeps every outcome
-so partial success stays visible; the other guarantees nothing outlives
+so partial success stays visible. The other guarantees nothing outlives
 the block. Bare `gather()` gives you neither.
 
 ## 11. Setting the `ContextVar` in the parent

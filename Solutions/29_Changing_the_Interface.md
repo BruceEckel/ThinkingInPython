@@ -125,7 +125,7 @@ The caller sees two functions. `_A` and `_B` are still reachable
 through `shop._A`, because Python enforces nothing, but the underscore
 says they are not part of the deal and `from shop import *` skips
 them. The listing prints the module's public names to make that
-concrete; `dataclass` appears because an import binds a name in the
+concrete. `dataclass` appears because an import binds a name in the
 module too, which is why a real module either sets
 [`__all__`](../Chapters/06_Modules_and_Packages.md#what-a-module-exports)
 or imports as `import dataclasses` and writes `@dataclasses.dataclass`.
@@ -149,7 +149,7 @@ module version pays none.
 **The logging wrapper is a Decorator.** Its interface is the wrapped
 object's, unchanged, and it adds behavior on the way through. Remove
 it and every call still reaches the same method with the same
-arguments and returns the same result; what you lose is the log. That
+arguments and returns the same result. What you lose is the log. That
 is the Decorator row: same interface, added behavior, and the behavior
 is what disappears.
 

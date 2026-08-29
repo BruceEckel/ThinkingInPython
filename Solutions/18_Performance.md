@@ -39,8 +39,8 @@ front. Even so, a `set`'s O(1) hash lookup beats a `list`'s O(n) scan
 on average by a wide margin (thousands of times faster in this run),
 because most random targets still require scanning roughly half the
 `list` on average, which is already far more work than one hash
-lookup. The worst case and the average case tell the same story here;
-they only diverge if most real lookups cluster near
+lookup. The worst case and the average case tell the same story here.
+They only diverge if most real lookups cluster near
 the front of the list.
 
 ## 2. Finding the crossover size
@@ -61,7 +61,7 @@ for size in (1, 2, 5, 10, 20, 50, 100, 200, 500):
     print(size, winner)
 ```
 
-On this machine, the `set` already wins starting at size `2`; only at
+On this machine, the `set` already wins starting at size `2`. Only at
 size `1` does the `list` edge ahead, and even then barely. The
 `set`'s advantage grows steadily as `size` increases, exactly as the
 different growth rates (`O(1)` vs. `O(n)`) predict. This crossover
@@ -100,7 +100,7 @@ version, but it is still enormously larger than the lazy version's
 peak: this comprehension still must build and hold the entire
 `evens` list before slicing `[:5]` can throw almost all of it away.
 No amount of restructuring the eager version closes that gap, because
-the eager style, by its nature, computes every value up front; only
+the eager style, by its nature, computes every value up front. Only
 the lazy generator pipeline, which stops the moment `islice()` has its
 five values, avoids the large intermediate collection entirely.
 
@@ -261,14 +261,14 @@ program `set_events()` reports every Python function the process
 runs, including library code you did not write and never wanted
 counted, and it pays the callback cost on all of it. Local
 attachment names the code objects you care about and leaves the rest
-specialized and full speed. Global monitoring answers "what ran";
-local monitoring answers "how often did *this* run," which is the
+specialized and full speed. Global monitoring answers "what ran."
+Local monitoring answers "how often did *this* run," which is the
 question you already had when you opened `sys.monitoring` instead of
 a profiler.
 
 ## 8. Reading `tottime` against `cumtime`
 
-Any script works; this one makes the two columns disagree on purpose:
+Any script works. This one makes the two columns disagree on purpose:
 
 ```python
 # exercise_8.py
@@ -336,7 +336,7 @@ tighter layout.
 
 This is the chapter's NumPy lesson arriving early: a compact layout
 pays off when the loop over it leaves Python. `sum()` over an
-`array` stays in Python and boxes every element; a NumPy `sum` over
+`array` stays in Python and boxes every element. A NumPy `sum` over
 the same bytes never creates a Python object at all, which is why
 vectorizing wins where `array` alone does not.
 

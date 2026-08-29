@@ -136,7 +136,7 @@ print(repr(drive_naive(interview(),
 ```
 
 Nothing in `interview()` changed, and nothing could have. It yields a
-`Question` and receives an `Answer`; where the answer came from is a
+`Question` and receives an `Answer`. Where the answer came from is a
 question it never asks. That is the separation the chapter teaches:
 the generator describes the conversation, the driver interprets it, and
 swapping one interpreter for another leaves the description untouched.
@@ -336,7 +336,7 @@ to the driver, a returned value goes to the delegating generator.
 so its parameter type is whatever the generator's `SendType` is. For
 `interview()` that is `Answer`, and `None` is not an `Answer`, so the
 priming call is a type error. `send_none_is_next.py` carries a
-`# type: ignore` to suppress it; removing that comment draws:
+`# type: ignore` to suppress it. Removing that comment draws:
 
 ```text
 error[invalid-argument-type]: Argument to bound method

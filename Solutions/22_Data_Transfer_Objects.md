@@ -165,7 +165,7 @@ names, and the second one type-checks cleanly while being wrong in
 every use afterward. With `Stats`, that mistake either does not arise
 (you write `result.count`) or fails immediately, because `Stats` and a
 reversed `tuple[int, float]` are different types. Position is
-something the type checker can verify and a reader cannot; a name is
+something the type checker can verify and a reader cannot. A name is
 something both can.
 
 ## 6. Structural equality across three-field types

@@ -1,7 +1,7 @@
 # Multiple Dispatching: Solutions
 
 Both exercises use the same rule for the new `Lizard`: it beats Paper
-and Scissors, and loses to Rock; Lizard versus Lizard is a draw.
+and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
 
 ## 1. Adding `Lizard` to the table version
 
@@ -59,7 +59,7 @@ Sixteen entries cover the four types against each other (4 × 4), the
 same shape as the original nine (3 × 3). Adding a fourth `Item` cost
 one class declaration and seven new dictionary rows (the six new
 ordered pairs `Lizard` forms with the other three, plus
-`(Lizard, Lizard)`); `compete()` itself needed no change.
+`(Lizard, Lizard)`). `compete()` itself needed no change.
 
 ## 2. Adding `Lizard` to the double-dispatch version
 
@@ -287,7 +287,7 @@ print(counts["Lizard"])
 `counts` is an optional parameter with a default of `None`, so every
 existing call such as `item_pair_gen(Item, 10)` still works exactly as
 before, unpacking a plain `(item1, item2)` pair each time. Only a
-caller that wants the tally needs to pass its own `Counter` in; the
+caller that wants the tally needs to pass its own `Counter` in. The
 generator then updates that same object in place on every pair it
 produces, one increment per item, so the caller can read
 `counts["Lizard"]` at any point during or after the loop, without
@@ -441,7 +441,7 @@ reader of the table can see. The exact version has no such question:
 either the pair is in the table or it is not.
 
 The failure that made the exact version safe is gone. A `Lizard` whose
-rows you forgot to write no longer raises `KeyError`; it silently
+rows you forgot to write no longer raises `KeyError`. It silently
 inherits its parent's answers and plays as whatever it derives from.
 That is the fail-fast policy the chapter recommends for a table under
 construction, traded away for the convenience of not writing rows.
@@ -598,7 +598,7 @@ print(p2.meeting(group_size=5))
 ```
 
 Since the weapon ranking is a genuine cycle (nothing dominates
-everything), no group is guaranteed to win; the outcome depends on the
+everything), no group is guaranteed to win. The outcome depends on the
 random weapon draws each round, the same as real rock-paper-scissors
 tournaments have no fixed victor.
 
@@ -618,7 +618,7 @@ using a table underneath, the way `paper_scissors_rock.py`'s
 `Item.compete()` and `paper_scissors_rock_table.py`'s `Item.compete()`
 both read as `item1.compete(item2)` at the call site. The table only
 changes what happens *inside* `compete()`, a dictionary lookup instead
-of a chain of `eval_*()` calls; nothing about how a caller uses the
+of a chain of `eval_*()` calls. Nothing about how a caller uses the
 object changes.
 
 ## 10. Exercise 8, rebuilt on a table

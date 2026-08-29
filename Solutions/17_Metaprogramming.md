@@ -36,7 +36,7 @@ print(sorted(c.__name__ for c in Color.registry))
 #: ['CeruleanBlue', 'Gold', 'Green', 'PhthaloBlue', 'Red']
 ```
 
-Creating `Yellow` adds it to the registry; nothing removes it yet,
+Creating `Yellow` adds it to the registry. Nothing removes it yet,
 since `Color` (its only base) is never in the registry to begin with.
 Creating `Gold` adds *it* and removes its base, `Yellow`, the
 same pruning `PhthaloBlue` and `CeruleanBlue` did to `Blue` earlier.
@@ -266,7 +266,7 @@ header alone, before anything runs, and points at both bases to say
 which pair is at fault.
 
 That is the difference worth taking from this exercise. The runtime
-message tells you something collided; the static one tells you which
+message tells you something collided. The static one tells you which
 two things collided and why, at the moment you type the header rather
 than the moment the module is first imported. The `# type: ignore` is
 in the chapter's version because this listing exists to show the

@@ -242,7 +242,7 @@ the whole shape of the feature: `@override` states an intention, the
 type checker verifies it, and the runtime is indifferent.
 
 The value is in what it catches later. The typo is easy to spot in six
-lines; the same failure arrives silently when someone renames or
+lines. The same failure arrives silently when someone renames or
 deletes `Base.show` a year from now, and every `@override` in the
 codebase turns that rename into a list of exact locations to fix. A
 decorator that does nothing at runtime is worth writing when a tool

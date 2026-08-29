@@ -135,7 +135,7 @@ print(run("go north"))
 
 Before the new `case` exists, `run("go north 3")` returns `unknown
 command`. A list pattern matches on length as well as content, so
-`["go", direction]` matches a two-item list and nothing else; the
+`["go", direction]` matches a two-item list and nothing else. The
 three-item split falls through to `case _`. Adding the longer pattern
 gives that length somewhere to land. Order matters only between
 patterns that could both match the same value, which these two cannot,
@@ -154,8 +154,8 @@ print(evens)
 ```
 
 Four lines instead of one, and the name `evens` is bound to an empty
-list for three of them. The comprehension says what the list *is*;
-the loop says how to build it, and the reader has to run the loop in
+list for three of them. The comprehension says what the list *is*.
+The loop says how to build it, and the reader has to run the loop in
 their head to find out. The loop version wins when the body grows
 past one condition and one expression, since a comprehension with two
 filters and a nested loop is harder to read than the code it replaced.
@@ -243,7 +243,7 @@ go, it is the better choice, and the chapter says so.
 What the `with` form gives you is control over what happens between
 the open and the close. Two things follow from that. It hands you the
 file object, so you can iterate lazily, line by line, without the whole
-file in memory; `read_text()` builds one string of the entire contents
+file in memory. `read_text()` builds one string of the entire contents
 before you see any of it. And it lets several operations share one
 open file, where each `read_text()` call opens and closes again.
 
@@ -276,7 +276,7 @@ position 1 and finds `1`. The loop never sees the survivor at all.
 The prediction to make is not just "one survives" but *which* one and
 *where*: the survivor is whatever slid into an already-visited slot,
 so its final position depends on the data. In the chapter's
-`[1, 2, 2, 3]` the survivor sits mid-list; here it sits first. A bug
+`[1, 2, 2, 3]` the survivor sits mid-list. Here it sits first. A bug
 whose symptom moves around with the input is exactly why the chapter
 says to build a new container instead of reasoning your way around
 the mutation.

@@ -30,7 +30,7 @@ many of the three import styles you combine. Python caches every
 module the first time it is imported, in `sys.modules`, keyed by the
 module's full dotted name. A later `import` of the same module, by any
 of these spellings, finds the cached module and skips running its
-top-level code again; it only binds a name to the module already in
+top-level code again. It only binds a name to the module already in
 the cache.
 
 ## 2. A nested module, and a badly named package
@@ -113,7 +113,7 @@ print("after both")
 
 Even though `noisy` is declared first, its body does not run until
 `noisy.announce()` executes, which happens after `noisy2`'s. Each
-`lazy import` only reserves the name; the module's top-level code runs
+`lazy import` only reserves the name. The module's top-level code runs
 at the first genuine use of that name, whichever module that turns out
 to be.
 
@@ -141,7 +141,7 @@ into one that surfaces on your own machine.
 
 Setting `PYTHONCASEOK` in the environment turns the check off on a
 case-insensitive platform, and `import module` then finds `Module.py`.
-It exists for legacy code and is not something to rely on; its
+It exists for legacy code and is not something to rely on. Its
 presence is what confirms the check is Python's rather than the
 filesystem's.
 
@@ -154,7 +154,7 @@ by never mixing case in a module name to begin with.
 
 Changing `a_package/module4.py` to
 `from a_package.module1 import function1` leaves `use_module4.py`
-working exactly as before. Both forms find the same function; they
+working exactly as before. Both forms find the same function. They
 differ only in how they name it.
 
 Running the module directly fails either way, with different errors.

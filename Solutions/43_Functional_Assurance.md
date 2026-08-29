@@ -41,8 +41,8 @@ count is greater than one, so the work genuinely left the main
 process, which is what the exercise set out to show and what
 `assert parallel == serial` alone could never prove. But it is far
 below the core count, and it moves between runs. `ProcessPoolExecutor`
-starts a worker per core, then hands out tasks as workers become free;
-with only four tasks, each short enough to finish before the pool has
+starts a worker per core, then hands out tasks as workers become free.
+With only four tasks, each short enough to finish before the pool has
 finished starting up, the first worker to become idle takes the next
 one. The pool never needed thirty-two processes, so it never used
 them. A distinct-ID count is evidence that parallelism is available,

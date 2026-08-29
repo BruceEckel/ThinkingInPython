@@ -80,7 +80,7 @@ step: a version whose `process(text)` checks the text against a
 word list (read once, before the loop, from the first input file) and
 returns a report of which words it found, rather than transforming the
 text itself. Nothing about `FileFramework.run()` or
-`run_file_framework()` needs to change to support it; only the step
+`run_file_framework()` needs to change to support it. Only the step
 does, which is the entire point of the pattern.
 
 ## 2. Two fixes for the premature engine
@@ -214,7 +214,7 @@ info: `ApplicationFramework.run` is decorated with `@final`, forbidding override
 ```
 
 The guarantee comes from the type checker, not the language. `@final` sets
-`__final__ = True` on the function and does nothing else; no runtime
+`__final__ = True` on the function and does nothing else. No runtime
 check consults it. That places the Template Method's central promise
 in the same category as every other annotation in this book: enforced
 before the program runs, by a tool you have to actually run.

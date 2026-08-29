@@ -220,7 +220,7 @@ This is the classic turnstile: `push` while locked does nothing (the
 again. Each state subclass carries its own transition table as a class
 attribute and looks itself up with `.get(word, ...["*"])`, so
 `Controller` does not branch on which state or word it is
-processing; it asks the current state object what comes next,
+processing. It asks the current state object what comes next,
 the same delegation `state.py`'s `next()` method uses. Reading a
 sequence of words from a file one per line is a one-line change:
 `words = Path("moves.txt").read_text().split()`.
@@ -323,7 +323,7 @@ print(mm.state, mm.message)
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
 object through `change_to()`, this version drives the same mood
 transitions through events and a table. Both model "a thing that
-changes behavior over time"; the *State* surrogate suits it when each
+changes behavior over time." The *State* surrogate suits it when each
 mood needs real per-mood logic, and the table-driven machine suits it
 when the transitions themselves, not the mood behaviors, are the part
 worth making explicit and easy to audit.
@@ -489,7 +489,7 @@ exercise requires. The running states carry their own two-row groups:
 a reading still outside the band keeps the system running, and one
 inside the band falls through to the unconditional row back to
 `IDLE`. Every decision in the machine is a condition on the one event
-type; no transition needs an action, which confirms that both slots
+type. No transition needs an action, which confirms that both slots
 are genuinely optional per row.
 
 ## 8. `mouse_move_generator()`
@@ -541,7 +541,7 @@ print(" ".join(m.name for m in moves[4:]))
 "the action just produced" to "the legal actions that can follow it,"
 including the special `None` key for "nothing has happened yet," which
 leads only to `APPEARS`. The generator's own state is just
-`previous`, the last action it yielded; each call to `next()` (each
+`previous`, the last action it yielded. Each call to `next()` (each
 iteration of the `for` loop that consumes it) picks a legal successor
 and remembers it for the following call. Because every choice is
 constrained by `NEXT_ACTIONS`, any sequence this generator produces is
@@ -628,7 +628,7 @@ and `SecondDigit` do in `vending_machine.py`. There the subclassing
 exists so the two arrive under different keys.
 
 **Fix 2** stops making a class for something that is a value. A
-nickel is not a new kind of money; it is a `Money` whose `value` is 5.
+nickel is not a new kind of money. It is a `Money` whose `value` is 5.
 `Money("nickel", 5)` needs no table change, no new row, and no new
 class, because it arrives under the key the table already has.
 

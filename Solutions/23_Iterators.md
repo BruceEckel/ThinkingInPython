@@ -69,7 +69,7 @@ left is to consume them, which uses them up. No `start` field
 remains to inspect, and nothing can ask a paused generator "how many
 more times will you yield?" without running it to exhaustion. `Countdown`
 sidesteps this because it is a container that *produces* a generator
-on demand; the container itself keeps the value a `len()` can read
+on demand. The container itself keeps the value a `len()` can read
 without consuming anything.
 
 ## 3. The first ten values of `fibonacci(1_000_000)`
@@ -93,7 +93,7 @@ print(list(islice(fibonacci(1_000_000), 10)))
 million values, but building it computes nothing yet, since a
 generator's body only runs as far as the next `yield` each time
 something asks it for a value. `islice(..., 10)` asks for exactly ten,
-so only the first ten iterations of `fibonacci()`'s loop ever run; the
+so only the first ten iterations of `fibonacci()`'s loop ever run. The
 other 999,990 are never computed, the same laziness
 [Comprehensions](../Chapters/16_Comprehensions.md#generator-expressions) and
 [Performance](../Chapters/18_Performance.md) both rely on.

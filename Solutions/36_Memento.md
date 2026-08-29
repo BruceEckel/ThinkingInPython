@@ -213,7 +213,7 @@ print(h.can_undo())
 `_past` is non-empty. With a bounded history, `_past` empties sooner
 (after `max_depth` undos instead of however many `do()` calls ever
 happened), so `can_undo()` correctly reports `False` once the discarded
-states are the only ones left to go back to; there is no way to
+states are the only ones left to go back to. There is no way to
 recover state `0` once it has fallen off the bound, and `can_undo()`
 reporting `False` at that point is the honest answer, not a bug.
 
@@ -345,7 +345,7 @@ repeatedly, which already pushes each visited state onto `_future` one
 at a time as it goes, so redo still works exactly as if you had called
 `undo()` three separate times: `h.redo()` after `goto(2)` returns `2`,
 then `3`, retracing the same path forward. Jumping several states back
-"in one call" is a convenience for the caller; the underlying stacks
+"in one call" is a convenience for the caller. The underlying stacks
 stay in the same consistent state either way.
 
 ## 6. Restoring one named field

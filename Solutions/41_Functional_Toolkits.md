@@ -159,7 +159,7 @@ correctly for pure functions," seen from the key's side rather than
 the function's.
 
 Note that the exception says nothing about purity. `deep_sum()` is
-already pure, and caching it would be correct; the obstacle is the
+already pure, and caching it would be correct. The obstacle is the
 argument type alone.
 
 ## 6. Injecting the random source

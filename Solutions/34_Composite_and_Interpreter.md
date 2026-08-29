@@ -119,7 +119,7 @@ handles, in both `disk_usage()` and `walk()`, until a case is added
 for it as shown here. Deciding what a link should do is a judgment
 call, not something the type checker picks for you: `disk_usage()`
 counts a link as free, since the bytes it references already get
-counted wherever the real file lives; adding the target's size again
+counted wherever the real file lives. Adding the target's size again
 double-counts it. `walk()` reports the link as its own entry,
 `name -> target`, rather than following it into the target's subtree,
 since following it could loop forever if a link ever pointed back at
@@ -219,9 +219,9 @@ interesting one: for `Neg`, a constant operand folds
 (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
 (`Neg(Neg(inner))` → `inner`). For `Div`, division by `Num(0)` should
 *not* fold to anything, not even an error. `simplify()` is a static
-rewrite that runs before any variable is bound to a real number; it
+rewrite that runs before any variable is bound to a real number. It
 cannot know whether a symbolic expression dividing by zero will ever
-actually execute with that zero denominator; the division might sit
+actually execute with that zero denominator. The division might sit
 inside a branch that never runs, or the "zero" might really be a
 variable that later never happens to equal zero. The honest move is
 to leave `Div(lhs, Num(0))` exactly as it is and let the eventual
@@ -426,7 +426,7 @@ print(to_infix(simplify(d)))
 instead of a number or a string. A `Num` never changes, so its
 derivative is always `0`. `Var(n)` is `1` with respect to itself and
 `0` with respect to every other variable. `Add`'s case is the sum
-rule; `Mul`'s is the product rule, and it must keep both the
+rule. `Mul`'s is the product rule, and it must keep both the
 derivative *and* the original, undifferentiated subtree on each side,
 because the product rule genuinely needs both. Running the raw result
 through `simplify()` turns `1 * x + x * 1` into the much more readable
@@ -435,7 +435,7 @@ terms," to reach `2 * x`, which this `simplify()` does not implement).
 A full `Expr` that also includes `Neg` and `Div` (exercise 3's
 additions) needs a quotient rule for `Div` too, which needs a
 squared denominator `simplify()`'s current rules do not yet know how
-to render tidily; left for a further exercise, the same way exercise
+to render tidily. Left for a further exercise, the same way exercise
 3 leaves `Div`'s own derivative case unimplemented.
 
 ## 6. Declining with `NotImplemented`
@@ -520,7 +520,7 @@ is what lets `(2 * x + 1).right` resolve for a caller.
 
 Note what this does not fix. `ty` already rejected `"a" + x` in source
 it can see, which is why the line above carries a `# type: ignore` to
-keep this listing in the build; the runtime hole was the gap between
+keep this listing in the build. The runtime hole was the gap between
 the two. Closing it matters when the expression is built from data the
 type checker never sees, which is the case an interpreter is written for.
 
@@ -676,7 +676,7 @@ print(evaluate(small, x=3), evaluate_iterative(small, x=3))
 
 The tree is 2000 `Add` nodes deep, and `evaluate()` needs one frame
 per level against a limit of 1000, so it fails before reaching the
-bottom. Nothing about the expression is unusual; only its shape is.
+bottom. Nothing about the expression is unusual. Only its shape is.
 
 The stack version cannot be a straight translation, and this is where
 the exercise bites. Pushing children and popping them in a loop gives

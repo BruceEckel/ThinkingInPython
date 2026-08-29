@@ -215,7 +215,7 @@ the rats, starting in the left room, map every cell of that room and
 none of the right room's, so `unreached` is the right room's
 nine open cells. What makes a cell unreachable is not being walled
 off in the abstract but having no path of open cells connecting it to
-the entry; `Maze.entry()` finds the first open cell scanning row by
+the entry. `Maze.entry()` finds the first open cell scanning row by
 row, and every rat traces back to that single starting point through
 `claim()`, so a cell with no open-cell path back to the entry can
 never be claimed no matter how many rats spawn.
@@ -341,7 +341,7 @@ Once `claim()` is an `async def`, the `Recorder` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
 `if await self.blackboard.claim(*pos)`, and `explore()` must `await`
 its own first claim.
-`spawn()` stays synchronous; nothing in it suspends.
+`spawn()` stays synchronous. Nothing in it suspends.
 
 On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
 times for 24 open cells: one pair of rats collided.
@@ -364,7 +364,7 @@ The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
 `await`, so with nothing to await in between, the two statements run
 as one uninterruptible unit as far as any other coroutine is
-concerned; there is no scheduling point in the middle for another rat
+concerned. There is no scheduling point in the middle for another rat
 to slip into. Adding the `await` creates that scheduling point, and
 the whole guarantee depends on there being none.
 
@@ -565,8 +565,8 @@ class whose `symbol` matches the character it was given, so the moment
 `Coin` is defined anywhere the module has imported, it is automatically
 one of the classes the factory searches. `Room` and `GameBuilder` need
 no change either, since both only ever call
-`occupant.interact(robot, room)` through the shared `Item` interface;
-neither one has ever needed to know which concrete `Item` subclasses
+`occupant.interact(robot, room)` through the shared `Item` interface.
+Neither one has ever needed to know which concrete `Item` subclasses
 exist.
 
 ## 5. Solving the maze instead of hard-coding the solution
@@ -878,14 +878,14 @@ nodal line. After 1200 steps agitation has fallen from `0.585` to
 `0.380`, roughly a third of the way, where the default kick reached
 `0.000` in a quarter of the time. Rendered, this run still looks like
 noise with a faint grain of structure in it. Nothing is wrong with the
-physics; the run is simply not finished, and finishing it means more
+physics. The run is simply not finished, and finishing it means more
 steps than anyone wants to watch.
 
 `kick=0.5` fails differently, and the agitation column is what makes
 it interesting: it collapses to `0.000` as convincingly as the default
 does. The figure never appears anyway. A half-unit displacement can
 throw a grain across the plate in one step, so a grain never traces a
-descent toward the nearest nodal line; it jumps somewhere unrelated and
+descent toward the nearest nodal line. It jumps somewhere unrelated and
 stays only if that spot happens to be quiet. Grains accumulate in
 whichever quiet regions they land in first, mostly the corners, and the
 lines between them stay empty. The plate reports settled sand in the
@@ -899,7 +899,7 @@ render is the check the number cannot perform.
 An intermediate kick avoids both failures because the amplitude scaling
 in `step()` is a feedback loop, and the loop only works within a range
 of step sizes. A grain in a loud region gets a large kick and moves
-fast; as it nears a nodal line the amplitude shrinks and so does its
+fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so it slows down and stops without overshooting. Too small a kick
 starves the loop's first half, and the grain never travels. Too large a
 kick breaks the second half, since even a heavily scaled step is still
