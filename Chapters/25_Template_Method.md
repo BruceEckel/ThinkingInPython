@@ -146,10 +146,10 @@ A subclass name that matches one exactly is an override,
 and a name that resembles none of them, like `report()`,
 is an ordinary new method.
 Both pass.
-Only a near miss draws the `TypeError`,
+Only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
-`MyApp` defines cleanly.
-`Typo` never exists: the exception comes out of the `class` statement itself,
+The `class MyApp` statement builds the class as usual.
+The `class Typo` statement never finishes: the exception comes out of it,
 before any instance could run with a silent do-nothing step.
 Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
