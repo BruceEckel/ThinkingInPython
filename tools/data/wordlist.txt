@@ -45,6 +45,7 @@ collatz
 combinator
 combinators
 composable
+conformant
 conftest
 coplien
 coq
@@ -72,6 +73,7 @@ docstring
 doorless
 dunder
 dunders
+eckel
 effectful
 effekt
 enum
@@ -210,6 +212,7 @@ reframing
 reimplementing
 rel
 repr
+requeued
 resizes
 rocq
 rossum
