@@ -33,7 +33,11 @@ ARGS ?=
 # accumulates .PHONY across lines, so the effect is the same.
 .PHONY: help
 
-# Self-documenting help, in three levels. Every target below carries an inline
+# Self-documenting help, in three levels, interactive in a terminal. Every
+# level opens tools/help_picker.py when stdin and stdout are a terminal:
+# arrow keys or the mouse choose a target, Enter runs it, Esc leaves. A
+# pipe, CI, or `--pick never` gets the static listing instead, which is
+# what verify-targets and the tests see. Every target below carries an inline
 # `## text` doc comment, and a `##@ Name` line starts a new section. Put a
 # target's one-line doc on its own target line so `make help` and the recipe
 # never drift apart; anything longer goes in a plain `#` comment above it.
@@ -65,7 +69,7 @@ ifeq ($(firstword $(MAKECMDGOALS)),help)
   endif
 endif
 
-help:  ## List every target (plain `make` shows the index; `make help style` expands one section)
+help:  ## Pick a target to run, or list them all when piped (plain `make` shows the index; `make help style` expands one section)
 	@$(PY) tools/make_help.py $(HELP_TOPIC)
 
 ##@ Setup

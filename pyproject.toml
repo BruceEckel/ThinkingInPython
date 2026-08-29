@@ -35,6 +35,10 @@ dev = [
     # tools/make_cover.py's art mode: JPEG encoding, grayscale
     # derivation, and resizing for the composited book covers.
     "pillow>=12.3.0",
+    # tools/help_picker.py: the arrow-key and mouse picker that `make`
+    # and `make help` open in a terminal. Pure Python, so it installs on
+    # the pinned Python; without it `make help` prints the static listing.
+    "prompt-toolkit>=3.0.53",
 ]
 
 [tool.uv]

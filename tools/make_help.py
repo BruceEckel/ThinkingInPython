@@ -40,6 +40,12 @@ comes from the terminal and is capped at MAX_WIDTH, since a doc string run
 across 200 columns is no easier to read than one that overflows 80. A pipe
 or a redirect gets the 80-column fallback.
 
+In a terminal, all three levels open the interactive picker in
+help_picker.py instead of printing: arrow keys or the mouse choose a
+target and Enter runs it. The static listing below is what a pipe, CI,
+`verify-targets`, and `--pick never` get, and what the picker falls back
+to if prompt_toolkit is not installed.
+
 Output is colored when stdout is a terminal: section headings bold with the
 slug highlighted, target names in color, the index's per-section counts
 dimmed. `NO_COLOR` turns it off, `FORCE_COLOR` (or `--color always`) turns
@@ -54,6 +60,7 @@ Usage:
     python tools/make_help.py style              # one section
     python tools/make_help.py --width 72         # wrap to a fixed width
     python tools/make_help.py --color never      # plain text on a terminal
+    python tools/make_help.py --pick never       # the static listing, no picker
     python tools/make_help.py --makefile PATH    # read another Makefile
 """
 import argparse
@@ -234,13 +241,22 @@ def _table(rows: list[tuple[str, str]], width: int,
         if body < MIN_DOC:
             lines.append(f"{lead}{doc}")
             continue
-        wrapped = textwrap.wrap(
-            _KEEP_TOGETHER.sub(lambda m: m.group().replace(" ", _JOINER), doc),
-            body, break_long_words=False, break_on_hyphens=False)
-        wrapped = [line.replace(_JOINER, " ") for line in wrapped]
+        wrapped = wrap_doc(doc, body)
         lines.append(lead + (wrapped[0] if wrapped else ""))
         lines += [indent + line for line in wrapped[1:]]
     return lines
+
+
+def wrap_doc(doc: str, width: int) -> list[str]:
+    """Wrap one doc string to `width`, keeping backticked spans whole.
+
+    Shared with help_picker.py so the picker breaks lines exactly where
+    the static listing does.
+    """
+    wrapped = textwrap.wrap(
+        _KEEP_TOGETHER.sub(lambda m: m.group().replace(" ", _JOINER), doc),
+        width, break_long_words=False, break_on_hyphens=False)
+    return [line.replace(_JOINER, " ") for line in wrapped]
 
 
 def _rows(targets: list[Target], width: int,
@@ -353,6 +369,10 @@ def main(argv: list[str] | None = None) -> int:
         "--color", choices=("auto", "always", "never"), default="auto",
         help="ANSI color: auto (default) colors only a terminal, and "
              "honors NO_COLOR and FORCE_COLOR")
+    ap.add_argument(
+        "--pick", choices=("auto", "always", "never"), default="auto",
+        help="the interactive picker: auto (default) opens it only when "
+             "stdin and stdout are a terminal and CI is unset")
     args = ap.parse_args(argv)
 
     sections = parse(args.makefile.read_text(encoding="utf-8"))
@@ -364,20 +384,48 @@ def main(argv: list[str] | None = None) -> int:
         colored = can_colorize()
     palette = ANSI if colored else PLAIN
 
+    match = None
+    if args.topic and not args.all:
+        match = next((s for s in sections if s.slug == args.topic), None)
+        if match is None:
+            known = ", ".join(s.slug for s in sections if s.slug)
+            print(f"No subtopic named {args.topic!r}. Try one of: {known}")
+            return 2
+
+    if want_picker(args.pick):
+        try:
+            import help_picker
+        except ImportError:
+            print("(interactive picker unavailable: `uv sync` installs "
+                  "prompt_toolkit)", file=sys.stderr)
+        else:
+            if args.all:
+                rows = help_picker.all_rows(sections)
+            elif match is not None:
+                rows = help_picker.section_rows(match)
+            else:
+                rows = help_picker.index_rows(sections)
+            return help_picker.pick_and_run(sections, rows, color=colored)
+
     if args.all:
         print(render_all(sections, width, palette))
-        return 0
-    if not args.topic:
+    elif match is not None:
+        print(render_section(match, width, palette))
+    else:
         print(render_index(sections, width, palette))
-        return 0
-
-    match = next((s for s in sections if s.slug == args.topic), None)
-    if match is None:
-        known = ", ".join(s.slug for s in sections if s.slug)
-        print(f"No subtopic named {args.topic!r}. Try one of: {known}")
-        return 2
-    print(render_section(match, width, palette))
     return 0
+
+
+def want_picker(choice: str, env: Mapping[str, str] | None = None) -> bool:
+    """`auto` means both ends are a terminal and this is not a CI run."""
+    if choice == "always":
+        return True
+    if choice == "never":
+        return False
+    settings: Mapping[str, str] = os.environ if env is None else env
+    if settings.get("CI"):
+        return False
+    return sys.stdin.isatty() and sys.stdout.isatty()
 
 
 if __name__ == "__main__":

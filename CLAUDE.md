@@ -257,8 +257,12 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
   prints `help`, the everyday commands (`PROMOTED` in `tools/make_help.py`), and
   the section list; `make help` expands every section; `make help style` expands
-  one section. A section's slug is the first word of its heading, lowercased, so
-  renaming the heading renames the slug with no second list to update. Two rules `make_help.py` enforces by raising
+  one section. In a terminal all three open `tools/help_picker.py` instead
+  (arrow keys or mouse, Enter runs the target; `prompt_toolkit`, a dev
+  dependency); a pipe, `CI`, or `--pick never` gets the static text, so running
+  `make help` from a tool or a test never blocks on input. A section's slug is
+  the first word of its heading, lowercased, so renaming the heading renames the
+  slug with no second list to update. Two rules `make_help.py` enforces by raising
   `SystemExit`: no two sections share a slug, and no slug equals a target name
   (the Makefile neutralizes the word after `help` so `make help style` parses as
   one goal, and a colliding slug would override that recipe). This is why the

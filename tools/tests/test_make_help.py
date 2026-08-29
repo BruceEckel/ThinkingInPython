@@ -10,7 +10,8 @@ import pytest
 
 from make_help import (
     ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, PROMOTED, can_colorize, check,
-    entries, parse, render_all, render_index, render_section, terminal_width)
+    entries, parse, render_all, render_index, render_section, terminal_width,
+    want_picker, wrap_doc)
 
 _ESCAPES = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -179,6 +180,21 @@ def test_color_only_adds_escape_codes():
 
 def test_plain_palette_is_the_default():
     assert render_index(_real(), 80) == render_index(_real(), 80, PLAIN)
+
+
+def test_wrap_doc_keeps_backticked_commands_whole():
+    lines = wrap_doc("Check for CRLF; `make fix-eol` converts them", 30)
+    assert all("`make fix-eol`" not in line or True for line in lines)
+    joined = " ".join(lines)
+    assert "`make fix-eol`" in joined
+    for line in lines:
+        assert "`make" not in line or "fix-eol`" in line
+
+
+def test_want_picker_respects_explicit_choice_and_ci():
+    assert want_picker("always", {"CI": "1"})
+    assert not want_picker("never", {})
+    assert not want_picker("auto", {"CI": "true"})
 
 
 def test_can_colorize_honors_the_environment_and_the_stream():
