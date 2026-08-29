@@ -2,14 +2,14 @@
 """Publish a GitHub release whose assets are the fresh PDF and EPUBs.
 
 `make release VERSION=1.0` lands here. The release's uploaded assets
-are exactly four files: ThinkingInPython.pdf plus the two EPUB
+are exactly five files: ThinkingInPython.pdf plus the two EPUB
 variants (ThinkingInPython-color.epub for backlit readers,
 ThinkingInPython-eink.epub with bolding instead of color), all rebuilt
 from the current Markdown by this run, never taken from a stale
-build/ tree, and resources/kindle-uploading.txt, the reader's
-step-by-step guide to getting an EPUB onto a Kindle, shipped as-is.
-(GitHub itself always adds "Source code" archive links to a release
-page; those are GitHub's, not uploads.)
+build/ tree, and two reader guides shipped as-is from resources/:
+kindle-uploading.txt and ipad-uploading.txt, step by step, simplest
+way first. (GitHub itself always adds "Source code" archive links to
+a release page; those are GitHub's, not uploads.)
 
 The order is preflight, verify, build, publish, with the cheap checks
 first so a doomed run dies before the expensive gate:
@@ -30,8 +30,8 @@ first so a doomed run dies before the expensive gate:
    what makes the assets fresh, and both stamp their title page with
    the release number and today's date ("Release 1.0 · August 23,
    2026") so the reader can tell which release they hold.
-4. `gh release create v<VERSION> <pdf> <epubs> <guide>`: creates the
-   tag on origin at the branch tip and uploads the four assets. gh
+4. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
+   tag on origin at the branch tip and uploads the five assets. gh
    prints the release URL on success.
 
 The tag is the VERSION prefixed with "v" (a bare "v1.0" is accepted
@@ -59,8 +59,10 @@ from tools_config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
 from tools_repo import run_echoed
 
 # Shipped with every release beside the built files: how to get the
-# EPUB onto a Kindle, simplest way first. Hand-written, so not built.
-KINDLE_GUIDE = ROOT / "resources" / "kindle-uploading.txt"
+# EPUB onto a Kindle or an iPad, simplest way first. Hand-written, so
+# not built.
+GUIDES = (ROOT / "resources" / "kindle-uploading.txt",
+          ROOT / "resources" / "ipad-uploading.txt")
 
 # A tag is the version with a "v" prefix; the version itself stays to
 # letters, digits, dots, hyphens, underscores. Stricter than git's own
@@ -157,7 +159,7 @@ def make(target: str) -> None:
 
 def build_assets(version: str) -> list[Path]:
     """Rebuild the PDF and both EPUBs fresh, stamped with the release,
-    and add the Kindle guide beside them.
+    and add the reader guides beside them.
 
     In-process calls rather than `make pdf`/`make epub`: the make
     targets have no way to carry the release stamp, and the builders
@@ -177,7 +179,7 @@ def build_assets(version: str) -> list[Path]:
     assets = [BUILD_PDF_DIR / build_pdf.PDF_NAME,
               *(BUILD_EPUB_DIR / build_epub.epub_name(v)
                 for v in build_epub.VARIANTS),
-              KINDLE_GUIDE]
+              *GUIDES]
     for asset in assets:
         if not asset.is_file() or asset.stat().st_size == 0:
             sys.exit(f"error: expected asset missing after the build: "
@@ -192,9 +194,9 @@ def publish(tag: str, version: str, branch: str,
              "Two EPUBs: `-color` has color syntax highlighting for "
              "backlit readers (phone/tablet apps); `-eink` marks "
              "code with bolding instead, for e-ink devices where "
-             "color is invisible. `kindle-uploading.txt` walks "
-             "through the ways to get an EPUB onto a Kindle, simplest "
-             "first.\n\n"
+             "color is invisible. `kindle-uploading.txt` and "
+             "`ipad-uploading.txt` walk through the ways to get the "
+             "book onto a Kindle or an iPad, simplest first.\n\n"
              f"Built from `{branch}` @ {head[:12]}.")
     command = ["gh", "release", "create", tag,
                "--target", branch,
