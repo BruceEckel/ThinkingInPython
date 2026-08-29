@@ -305,20 +305,17 @@ An anchored algorithm is only as secure as its anchor.
 This chapter shows four.
 Each guards against a different way of breaking the flow:
 
-- Structure, in `template_function.py`: no subclass exists,
+- Structure, in `template_function.py`. There's no subclass,
   so nothing can replace the loop.
-  It needs nothing added,
-  but it only works when you can pass functions instead of subclassing.
-- The type checker, via `@final`: one decorator,
-  and an override of `run()` is reported before the program runs.
-- The interpreter, via `__init_subclass__()`: one base-class method,
-  and the offending subclass is refused at its `class` statement,
+  This only works when you can pass functions instead of subclassing.
+- The type checker, via `@final`.
+  Discovers an overridden `run()` the program executes.
+- The interpreter, via `__init_subclass__()`.
+  An offending subclass is refused at its `class` statement,
   whether it overrides `run()` or misspells a hook.
-  This holds at runtime, where `@final` is only an attribute nothing reads.
-- Discipline, via the Liskov Substitution Principle:
-  it governs whether each step is a faithful substitute, but no tool checks it.
-  It reaches what the other three cannot:
-  what the steps do once the flow itself is safe.
+  This holds at runtime, whereas `@final` is only a type-checking attribute.
+- Discipline, via the Liskov Substitution Principle.
+  This governs the semantics of whether each step is a faithful substitute, but no tool checks it.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.
 
