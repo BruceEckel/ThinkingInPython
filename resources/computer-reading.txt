@@ -1,6 +1,22 @@
 READING THINKING IN PYTHON ON A COMPUTER
 ========================================
 
+Way 1: Read it online at ThinkingInPython.com (simplest)
+--------------------------------------------------------
+
+Nothing to download. The whole book is at
+
+    https://thinkinginpython.com
+
+with the table of contents on the front page, one chapter per page,
+a search box, and Previous/Next links at the end of each chapter. It
+is always the current text, built from the same source as the release
+files. Bookmark the chapter you are on to come back to it.
+
+The files below are for reading offline, or for keeping a copy of a
+particular release.
+
+
 Which file
 ----------
 
@@ -14,7 +30,7 @@ The release has a PDF and two EPUBs. On a computer, either of these:
 
   ThinkingInPython-color.epub  Reflows to the window: change the type
                                size or the window width and the text
-                               adjusts. Needs an EPUB reader (Way 2).
+                               adjusts. Needs an EPUB reader (Way 3).
                                Code is color-highlighted.
 
   ThinkingInPython-eink.epub   For e-ink Kindles. It works on a
@@ -26,8 +42,8 @@ The code listings are at most 60 characters wide, so they fit either
 format without wrapping.
 
 
-Way 1: The PDF, in your browser (simplest)
-------------------------------------------
+Way 2: The PDF, in your browser
+-------------------------------
 
   1. On the book's releases page, click ThinkingInPython.pdf. Most
      browsers open it right there; otherwise it downloads and a
@@ -38,7 +54,7 @@ Any PDF viewer works: the browser, Preview on a Mac, Adobe Reader,
 Okular, Evince, SumatraPDF.
 
 
-Way 2: The EPUB, in a reader app
+Way 3: The EPUB, in a reader app
 --------------------------------
 
 Pick the reader for your system, then open the downloaded EPUB in it
@@ -68,7 +84,7 @@ Pick the reader for your system, then open the downloaded EPUB in it
     2. Download ThinkingInPython-color.epub and open it in the reader.
 
 
-Way 3: The Kindle app, so it is in your Amazon library
+Way 4: The Kindle app, so it is in your Amazon library
 ------------------------------------------------------
 
 If you read on a Kindle too and want one library with your place and
@@ -94,7 +110,7 @@ If it does not open
     viewer.
   - Windows and Linux have no built-in EPUB reader; a double-click on
     the EPUB with nothing installed asks what to open it with. Install
-    one of the readers in Way 2 first.
+    one of the readers in Way 3 first.
   - If a reader says the file is damaged, download it again; an
     interrupted download leaves a file no reader can open.
   - For the Kindle app, confirm it is signed in to the account you

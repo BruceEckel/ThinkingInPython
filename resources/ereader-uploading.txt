@@ -8,6 +8,12 @@ to send through; the file is copied over and that is all. (A Kindle
 is the exception; it cannot open an EPUB copied onto it. Kindle
 owners want kindle-uploading.txt, which ships alongside this file.)
 
+The book is also online at https://thinkinginpython.com, and a Boox or
+other Android-based reader with a real web browser can read it there
+with nothing copied over: one chapter per page, always the current
+text. A Kobo's built-in browser is too limited for that; on a Kobo,
+copy the file.
+
 
 Which file
 ----------

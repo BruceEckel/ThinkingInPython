@@ -1,6 +1,24 @@
 READING THINKING IN PYTHON ON AN ANDROID PHONE OR TABLET
 ========================================================
 
+Way 1: Read it online at ThinkingInPython.com (simplest)
+--------------------------------------------------------
+
+Nothing to download. In Chrome, open
+
+    https://thinkinginpython.com
+
+The table of contents is on the front page, each chapter is one page
+with Previous/Next links at the end, and there is a search box. It is
+always the current text, built from the same source as the release
+files. For an icon on the home screen that opens the book like an
+app, tap Chrome's menu (the three dots) and choose "Add to Home
+screen".
+
+The files below are for reading offline, or for keeping a copy of a
+particular release.
+
+
 Which file
 ----------
 
@@ -29,8 +47,8 @@ notice; the file is in the Downloads folder, which the Files app (or
 "Files by Google", or your maker's file manager) lists.
 
 
-Way 1: Google Play Books (simplest)
------------------------------------
+Way 2: Google Play Books
+------------------------
 
 Play Books comes on most Android devices and reads EPUBs. The book
 goes into your Google account's library, so it also shows up on your
@@ -52,7 +70,7 @@ From a computer, the same library accepts uploads at
 https://play.google.com/books/uploads.
 
 
-Way 2: The Kindle app, so it is in your Amazon library
+Way 3: The Kindle app, so it is in your Amazon library
 ------------------------------------------------------
 
 Choose this if you also read on a Kindle e-reader and want your
@@ -78,7 +96,7 @@ in), or email the EPUB to your Kindle address. Both are described
 step by step in kindle-uploading.txt, which ships alongside this file.
 
 
-Way 3: Another reader app
+Way 4: Another reader app
 -------------------------
 
 Any reader that accepts EPUB works: for example Moon+ Reader, Lithium,
@@ -100,7 +118,7 @@ If it does not open
     "Open with", and pick the reader; Android remembers a default and
     this changes it.
   - If Play Books refuses the file, enable uploading in its settings
-    (Way 1) and use "Upload files".
+    (Way 2) and use "Upload files".
   - If a reader says the file is damaged, download it again; an
     interrupted download leaves a file no reader can open.
   - For the Kindle app, confirm it is signed in to the same Amazon

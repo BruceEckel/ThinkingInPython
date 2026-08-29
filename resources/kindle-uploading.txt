@@ -20,6 +20,10 @@ way sends the file to your Amazon account, which delivers it to your
 Kindle over Wi-Fi. A Kindle cannot open an EPUB copied over a USB
 cable; see Way 5 for that case.
 
+(The book is also online at https://thinkinginpython.com, which suits
+a phone, tablet, or computer. A Kindle's browser is not up to reading
+it there; on a Kindle, send the file.)
+
 The book arrives in the Kindle's library within a few minutes. If it
 does not, make sure the Kindle is on Wi-Fi, then sync: swipe down
 from the top of the screen and tap Sync, or open Settings and choose

@@ -1,6 +1,23 @@
 READING THINKING IN PYTHON ON AN IPAD
 =====================================
 
+Way 1: Read it online at ThinkingInPython.com (simplest)
+--------------------------------------------------------
+
+Nothing to download. In Safari, open
+
+    https://thinkinginpython.com
+
+The table of contents is on the front page, each chapter is one page
+with Previous/Next links at the end, and there is a search box. It is
+always the current text, built from the same source as the release
+files. For an icon on the Home Screen that opens the book like an app,
+tap the Share button and choose "Add to Home Screen".
+
+The files below are for reading offline, or for keeping a copy of a
+particular release.
+
+
 Which file
 ----------
 
@@ -23,8 +40,8 @@ The release has two EPUBs and a PDF. On an iPad, use:
 The steps below say "the EPUB"; that means ThinkingInPython-color.epub.
 
 
-Way 1: Open it in Apple Books, straight from Safari (simplest)
---------------------------------------------------------------
+Way 2: Open it in Apple Books, straight from Safari
+---------------------------------------------------
 
 Apple Books comes with every iPad and reads EPUBs. Nothing to install.
 
@@ -43,7 +60,7 @@ Books keeps the book in your library and, with iCloud, on your other
 Apple devices too.
 
 
-Way 2: From a computer
+Way 3: From a computer
 ----------------------
 
 If you downloaded the EPUB on a computer, get it to the iPad with
@@ -74,7 +91,7 @@ whichever of these you already use, then open it in Books.
      It appears in the Books app on the iPad.
 
 
-Way 3: The Kindle app, so it is in your Amazon library
+Way 4: The Kindle app, so it is in your Amazon library
 ------------------------------------------------------
 
 Choose this if you also read on a Kindle e-reader and want your
@@ -84,7 +101,7 @@ downloads to every Kindle app and device on your account.
 
   1. Install the Kindle app from the App Store and sign in with your
      Amazon account.
-  2. Get the EPUB onto the iPad by Way 1 or Way 2 (it does not have
+  2. Get the EPUB onto the iPad by Way 2 or Way 3 (it does not have
      to be opened in Books; Downloads in the Files app is enough).
   3. In the Files app, tap the EPUB, then tap the Share button.
   4. Choose Kindle from the row of apps. The first time, you may need
@@ -100,11 +117,11 @@ in), or email the EPUB to your Kindle address. Both are described
 step by step in kindle-uploading.txt, which ships alongside this file.
 
 
-Way 4: Another reader app
+Way 5: Another reader app
 -------------------------
 
 Any reader app that accepts EPUB works the same way as Books: get the
-file onto the iPad (Way 1 or Way 2), tap it in the Files app, tap
+file onto the iPad (Way 2 or Way 3), tap it in the Files app, tap
 Share, and choose the app. If the app is not in the row, scroll to the
 end and tap More; apps that can open an EPUB are listed there. Some
 apps also have their own Import or "+" button that browses the Files
