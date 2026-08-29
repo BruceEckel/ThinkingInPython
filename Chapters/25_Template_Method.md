@@ -65,7 +65,7 @@ The general name for this reversal is *Inversion of Control*:
 the framework defines the flow of control and calls your code,
 rather than your code calling into a library.
 
-`@final` is enforced by the type checker.
+The type checker enforces `@final`.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 If you need the interpreter to refuse an override,
@@ -81,15 +81,15 @@ The `setUp()` and `tearDown()` in the opening example are hooks:
 so a test class that needs no setup skips them.
 This silence hides a misspelling:
 `def customise1()` adds a new method and leaves the base's do-nothing version in place.
-That's why every step override in these listings is decorated with `@override`.
-This way, the type checker rejects a method that overrides nothing.
+That is why every step override in these listings carries `@override`:
+the type checker then rejects a method that overrides nothing.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare the step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
 The runtime then refuses to instantiate a subclass that forgot it.
 
-In the test, we supply a recording subclass and verify the fixed flow:
+The test supplies a recording subclass and verifies the fixed flow:
 
 ```python
 # test_template_method.py
@@ -115,15 +115,15 @@ def test_template_method_runs_steps_in_order() -> None:
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
-`ApplicationFramework` requires the client to start the framework engine.
-The example below shows what goes wrong when the client forgets to do this.
+`ApplicationFramework` requires the client to start the engine.
+The example below shows why the framework does not start it itself.
 
-A framework can call `run()` from its own constructor.
-A subclass with its own `__init__()` encounters a pitfall.
+A framework can call `run()` from its own constructor,
+but then a subclass with its own `__init__()` hits a pitfall.
 `run()` calls methods the subclass supplies,
-so a subclass that defines its own `__init__()` must finish its own setup before it calls `super().__init__()`.
-If you call it first, in the usual style,
-the engine runs using a half-initialized state:
+so the subclass must finish its own setup before it calls `super().__init__()`.
+Call `super().__init__()` first, in the usual style,
+and the engine runs on a half-initialized object:
 
 ```python
 # premature_engine.py
@@ -156,12 +156,12 @@ except AttributeError as e:
 #: 'Greeter' object has no attribute 'name'
 ```
 
-`Greeter("Robin")` never runs.
+`Greeter("Robin")` never finishes.
 `super().__init__()` starts the engine, the engine calls `step()`,
 and `step()` reads `self.name` one line before the constructor assigns it.
 The quick fix is reordering: assign `self.name` first,
 then call `super().__init__()`.
-That works, but it inverts the convention Python programmers understand,
+That works, but it inverts the convention Python programmers expect,
 and the next subclass author might restore the usual order without thinking.
 The reliable fix changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
@@ -174,20 +174,20 @@ when code expects a base-class instance,
 an instance of any subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
 trusting that whatever a subclass supplies still fits the algorithm's shape.
-An override that breaks that trust corrupts the fixed algorithm even though the code still type-checks:
-raising an exception where the base would not,
-or leaving a step empty when the flow depends on it.
-That last case is the price of the `...` defaults above.
+An override can break that trust and still type-check:
+it raises an exception where the base would not,
+or leaves a step empty when the flow depends on it.
+Either one corrupts the fixed algorithm.
+The empty step is the price of the `...` defaults above.
 They make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten"
-(when a step must not be forgotten, use `@abstractmethod`).
-The Template Method only works when every subclass is a faithful substitute for its base.
+(when a subclass must supply a step, use `@abstractmethod`).
+The Template Method works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
 
-Subclassing is one way to supply varying steps, but not the only one.
-Because Python functions are first-class, you can pass the steps in directly,
-without using a subclass:
+Subclassing is not the only way to supply the varying steps.
+Python functions are first-class, so you can pass the steps in directly:
 
 ```python
 # template_function.py
@@ -218,18 +218,19 @@ The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default;
 the function form must give each parameter a default of its own.
 
-The function version also needs no `@final`,
-a decorator that stops an override only when the type checker runs.
-Here a caller supplies the steps and cannot replace the loop,
-because no subclass exists through which to replace it.
-Structure fixes the algorithm instead of relying on a decorator the runtime ignores.
+The function version also needs no `@final`.
+That decorator stops an override only when the type checker runs.
+Here no subclass exists,
+so a caller supplies the steps but cannot touch the loop.
+Structure fixes the algorithm,
+with no help from a decorator the runtime ignores.
 
 Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
 A Strategy swaps out a whole algorithm behind a single interface.
-Here the algorithm stays where it is and only uses external steps.
+Here the algorithm stays put, and only its steps come from outside.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
-A hook that holds no state is usually better as a function than as a method to override.
+A stateless hook is usually better as a function than as an overridden method.
 
 ## What Actually Fixes the Algorithm
 
@@ -239,8 +240,8 @@ Each has a cost, and each protects against a different way of breaking the flow:
 
 - Structure, in `template_function.py`:
   no subclass exists through which to replace the loop.
-  It costs nothing and cannot be bypassed,
-  but it only applies when you can pass functions instead of subclassing.
+  It costs nothing and nothing can bypass it,
+  but it applies only when you can pass functions instead of subclassing.
 - The type checker, via `@final`: it reports an override.
   It costs one decorator and protects everyone who runs the type checker.
 - The interpreter, via `__init_subclass__()`:
@@ -248,8 +249,7 @@ Each has a cost, and each protects against a different way of breaking the flow:
   It costs a base-class method and protects everyone,
   including the caller who skips the type checker.
 - Discipline, via the Liskov Substitution Principle:
-  this governs whether each step is a faithful substitute,
-  but no tool checks it.
+  it governs whether each step is a faithful substitute, but no tool checks it.
   It reaches what the other three cannot:
   what the steps do once the flow itself is safe.
 
@@ -259,7 +259,7 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
 
 1.  Create a framework that takes a list of file names.
     It opens every file but the last for reading, and the last one for writing.
-    It processes each input file by an undetermined policy,
+    It processes each input file by a policy the customization supplies,
     and writes the output to the last file.
     Customize it two ways, once by subclassing and once by passing a function:
 
@@ -268,7 +268,8 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
         and report which of those words appear in each remaining input file.
 2.  Fix `premature_engine.py` both ways:
     first reorder the two lines in `Greeter.__init__()`,
-    then instead redesign `Framework` so clients construct the object and call `run()` explicitly.
+    then redesign `Framework` instead,
+    so clients construct the object and call `run()` explicitly.
     Which fix still protects a second subclass author who has never read this chapter?
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
