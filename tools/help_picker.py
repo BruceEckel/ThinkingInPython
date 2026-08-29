@@ -16,7 +16,11 @@ selected row runs it, and the wheel scrolls.
 Plain `make` and `make help` open every section; `make help style` opens
 one. A target whose doc text mentions a variable (`CH=12`, `VERSION=1.0`,
 `ARGS=--help`) gets a one-line prompt for each before it runs, showing
-the doc's example; Enter leaves one out.
+the doc's example; Enter leaves one out. `VERSION=` comes prefilled
+with a guess from the release tags: the highest `vX.Y.Z` with its patch
+bumped, or its minor bumped when the patch is 0 (after 0.4.2 comes
+0.4.3; after 0.4.0 comes 0.5.0), so Enter accepts it and typing
+replaces it.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
@@ -435,13 +439,63 @@ def make_command(target: Target,
 
 
 def ask_variables(target: Target) -> dict[str, str]:
-    """Prompt for each variable the target's doc mentions."""
+    """Prompt for each variable the target's doc mentions, prefilled
+    with a guess where one exists."""
     values: dict[str, str] = {}
     for name, example in variables(target):
-        hint = "Enter for the whole book" if name == "CH" else "Enter to skip"
-        example_hint = f"e.g. {example}, " if example else ""
-        values[name] = prompt(f"{name}= ({example_hint}{hint}): ").strip()
+        guess = guess_value(name)
+        if guess:
+            hint = "Enter accepts"
+            example_hint = ""
+        else:
+            hint = ("Enter for the whole book" if name == "CH"
+                    else "Enter to skip")
+            example_hint = f"e.g. {example}, " if example else ""
+        values[name] = prompt(f"{name}= ({example_hint}{hint}): ",
+                              default=guess).strip()
     return values
+
+
+def guess_value(name: str) -> str:
+    """A prefill for a variable's prompt, or "" when there is none."""
+    if name == "VERSION":
+        return next_version(release_tags()) or ""
+    return ""
+
+
+def release_tags() -> list[str]:
+    """Every git tag in the repo, or none if git is unavailable."""
+    try:
+        out = subprocess.run(["git", "tag", "--list"], cwd=ROOT,
+                             capture_output=True, text=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    return out.stdout.split()
+
+
+_RELEASE_TAG = re.compile(r"^v?(\d+(?:\.\d+)*)$")
+
+
+def next_version(tags: Iterable[str]) -> str | None:
+    """The release after the highest `vX.Y.Z` among `tags`: the patch
+    bumped, or the minor bumped and the patch zeroed when the patch is
+    0. Two-part versions count as patch 0 (1.0 -> 1.1). None with no
+    version tag."""
+    versions: list[tuple[int, ...]] = []
+    for tag in tags:
+        if m := _RELEASE_TAG.match(tag.strip()):
+            versions.append(tuple(int(n) for n in m.group(1).split(".")))
+    if not versions:
+        return None
+    last = max(versions)
+    parts = list(last) + [0] * (3 - len(last)) if len(last) < 3 else list(last)
+    if parts[2] == 0:
+        parts[1] += 1
+    else:
+        parts[2] += 1
+    if len(last) < 3:
+        parts = parts[:len(last)]
+    return ".".join(str(n) for n in parts)
 
 
 def history_files(env: Mapping[str, str] | None = None,

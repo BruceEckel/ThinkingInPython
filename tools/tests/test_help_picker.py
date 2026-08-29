@@ -11,7 +11,7 @@ from prompt_toolkit.output import DummyOutput
 from help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
-    section_rows, session, split_match, variables)
+    next_version, section_rows, session, split_match, variables)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -262,6 +262,19 @@ def test_variables_come_from_the_doc_with_their_examples():
     assert variables(_target("test")) == []
     assert "ARGS=" in _target("all").doc          # documented, but
     assert variables(_target("all")) == []        # never prompted for
+
+
+@pytest.mark.parametrize("tags, expected", [
+    (["v0.1.0", "v0.4.0", "v0.4.1", "v0.4.2"], "0.4.3"),   # patch bump
+    (["v0.3.0", "v0.4.0"], "0.5.0"),                        # minor bump
+    (["v0.4.2", "v0.4.0", "v0.10.0"], "0.11.0"),   # numeric max
+    (["v1.0"], "1.1"),                             # two parts kept
+    (["1.2.3", "v1.2.4"], "1.2.5"),                         # bare tags count
+    (["draft", "v0.4.2-rc1", "cover-v2"], None),           # no release tag
+    ([], None),
+])
+def test_next_version_guesses_from_the_highest_release_tag(tags, expected):
+    assert next_version(tags) == expected
 
 
 def test_make_command_appends_only_the_variables_given_a_value():
