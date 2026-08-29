@@ -9,8 +9,8 @@ from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
 from help_picker import (
-    Picker, all_rows, ask_return_or_esc, make_command, section_rows,
-    session, wants_chapter)
+    Picker, all_rows, ask_return_or_esc, filter_rows, make_command,
+    section_rows, session, split_match, wants_chapter)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -67,18 +67,54 @@ def test_pagedown_skips_ten_targets():
     assert drive(rows, PAGEDOWN + ENTER) is targets[10].target
 
 
-def test_typing_jumps_to_a_target_by_prefix():
+def test_typing_searches_and_enter_runs_the_first_name_match():
     rows = all_rows(_sections())
     assert drive(rows, "sw" + ENTER).name == "sweep"
-    # a letter that matches nothing is ignored, the highlight stays put
-    assert drive(rows, "sw" + "zzz" + ENTER).name == "sweep"
+    assert drive(rows, "/sw" + ENTER).name == "sweep"
+    assert drive(rows, "SWEE" + ENTER).name == "sweep"
 
 
-def test_backspace_shortens_the_prefix_then_quits_when_empty():
+def test_search_matches_doc_text_too():
     rows = all_rows(_sections())
-    chosen = drive(rows, "sp" + BACKSPACE + ENTER)
-    assert chosen.name.startswith("s")
-    assert drive(rows, "s" + BACKSPACE + BACKSPACE) is None
+    assert drive(rows, "CRLF" + ENTER).name == "eol"
+
+
+def test_search_that_matches_nothing_leaves_enter_inert_until_cleared():
+    rows = all_rows(_sections())
+    first = next(r for r in rows if r.kind == "target")
+    assert drive(rows, "zzzz" + ESC + ENTER) is first.target
+
+
+def test_backspace_edits_the_query_and_escape_clears_it():
+    rows = all_rows(_sections())
+    assert drive(rows, "swx" + BACKSPACE + ENTER).name == "sweep"
+    # clearing the search keeps the highlight where the search left it
+    assert drive(rows, "sw" + ESC + ENTER).name == "sweep"
+    assert drive(rows, "sw" + ESC + UP + ENTER).name != "sweep"
+    assert drive(rows, "sw" + ESC + ESC) is None
+
+
+def test_filter_rows_keeps_headings_of_matching_sections_only():
+    rows = all_rows(_sections())
+    kept = filter_rows(rows, "clean")
+    kinds = [r.kind for r in kept]
+    assert "blank" not in kinds[:1] and "blank" not in kinds[-1:]
+    for i, row in enumerate(kept):
+        if row.kind == "heading":
+            assert kept[i + 1].kind == "target"     # no empty sections
+        if row.kind == "target":
+            assert "clean" in row.label or "clean" in row.doc.lower()
+    assert any(r.label == "clean" for r in kept)
+    assert filter_rows(rows, "") is rows
+
+
+def test_split_match_marks_every_occurrence_case_insensitively():
+    assert split_match("solutions-sync", "s") == [
+        ("s", True), ("olution", False), ("s", True), ("-", False),
+        ("s", True), ("ync", False)]
+    assert split_match("gate", "GATE") == [("gate", True)]
+    assert split_match("gate", "x") == [("gate", False)]
+    assert split_match("gate", "") == [("gate", False)]
 
 
 def test_escape_leaves_without_a_target():

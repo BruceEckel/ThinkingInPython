@@ -168,11 +168,13 @@ The interactive side of `make help`, built on `prompt_toolkit` (a dev
 dependency; without it `make help` falls back to the static listing and
 says so). A full-screen list of the same sections and doc text:
 Up/Down, PageUp/PageDown, Home/End move the highlight, Enter runs the
-highlighted target, Esc leaves without running anything, and typing
-letters jumps to the first target whose name starts with them. A mouse
-click selects a row, a second click on the selected row runs it, and the
-wheel scrolls. `make` and `make help` open every section; `make help
-style` opens one.
+highlighted target, and Esc leaves without running anything. Typing
+searches: the list narrows to the targets whose name or description
+contains the text (`/` also starts a search), the match is underlined in
+the names, the highlight lands on the first name match, Backspace edits
+the query, and Esc clears it. A mouse click selects a row, a second
+click on the selected row runs it, and the wheel scrolls. `make` and
+`make help` open every section; `make help style` opens one.
 
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the

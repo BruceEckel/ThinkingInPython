@@ -5,10 +5,13 @@ make_help.py parses the Makefile into sections of documented targets and
 prints them as text. When it is attached to a terminal it hands the same
 sections here instead, and this module shows them as a full-screen list:
 Up/Down (or PageUp/PageDown, Home/End) move the highlight, Enter runs the
-highlighted target, Esc leaves without running anything, and typing
-letters jumps to the first target whose name starts with them. The mouse
-works too: a click selects a row, a second click on the selected row runs
-it, and the wheel scrolls.
+highlighted target, and Esc leaves without running anything. Typing
+searches: the list narrows to the targets whose name or doc text contains
+what has been typed (`/` also starts a search, for the habit), the
+matched text is underlined in the names, the highlight lands on the first
+name match when there is one, Backspace edits the query, and Esc clears
+it. The mouse works too: a click selects a row, a second click on the
+selected row runs it, and the wheel scrolls.
 
 Plain `make` and `make help` open every section; `make help style` opens
 one. A target whose doc text mentions `CH=` gets a one-line prompt for
@@ -64,6 +67,7 @@ COLOR = Style.from_dict({
     "heading": "bold",
     "slug": "bold ansicyan",
     "target": "ansicyan",
+    "match": "underline",
     "dim": "ansibrightblack",
     "selected": "reverse",
     "footer": "reverse",
@@ -71,6 +75,7 @@ COLOR = Style.from_dict({
 MONO = Style.from_dict({
     "heading": "bold",
     "slug": "bold",
+    "match": "underline",
     "selected": "reverse",
     "footer": "reverse",
 })
@@ -115,10 +120,11 @@ class Picker:
     def __init__(self, rows: list[Row], *, color: bool = True,
                  cursor: int | None = None, input: Input | None = None,
                  output: Output | None = None) -> None:
+        self.all_rows = rows
         self.rows = rows
         self.cursor = (cursor if cursor is not None
                        else self._first_selectable(rows))
-        self.prefix = ""
+        self.query = ""
         self.app: Application[Target | None] = Application(
             layout=Layout(HSplit([
                 Window(FormattedTextControl(self._body, show_cursor=False),
@@ -156,13 +162,23 @@ class Picker:
         if indexes:
             self.cursor = indexes[-1] if last else indexes[0]
 
-    def jump(self, prefix: str) -> bool:
-        """Highlight the first row whose label starts with `prefix`."""
-        for i in self._selectable_indexes():
-            if self.rows[i].label.lower().startswith(prefix.lower()):
-                self.cursor = i
-                return True
-        return False
+    def search(self, query: str) -> None:
+        """Narrow the list to the targets matching `query` (name or doc,
+        case-insensitive), keeping their section headings. The highlight
+        stays on the current target if it still shows, else moves to the
+        first name match, else the first match."""
+        current = self.rows[self.cursor] if self.rows else None
+        self.query = query
+        self.rows = filter_rows(self.all_rows, query)
+        indexes = self._selectable_indexes()
+        if current in self.rows and current.selectable:
+            self.cursor = self.rows.index(current)
+        elif indexes:
+            named = [i for i in indexes
+                     if query.lower() in self.rows[i].label.lower()]
+            self.cursor = (named or indexes)[0]
+        else:
+            self.cursor = 0
 
     def chosen(self) -> Target | None:
         return self.rows[self.cursor].target
@@ -204,17 +220,13 @@ class Picker:
 
         @kb.add("backspace")
         def _backspace(event: KeyPressEvent) -> None:
-            if self.prefix:
-                self.prefix = self.prefix[:-1]
-                if self.prefix:
-                    self.jump(self.prefix)
-            else:
-                event.app.exit(result=None)
+            if self.query:
+                self.search(self.query[:-1])
 
         @kb.add("escape", eager=True)
         def _escape(event: KeyPressEvent) -> None:
-            if self.prefix:
-                self.prefix = ""
+            if self.query:
+                self.search("")
             else:
                 event.app.exit(result=None)
 
@@ -225,10 +237,13 @@ class Picker:
         @kb.add("<any>")
         def _typed(event: KeyPressEvent) -> None:
             text = event.data
-            if len(text) != 1 or not text.isprintable() or text == " ":
+            if len(text) != 1 or not text.isprintable():
                 return
-            if self.jump(self.prefix + text):
-                self.prefix += text
+            if text == "/" and not self.query:
+                return              # `/` opens the search; it is already open
+            if text == " " and not self.query:
+                return              # a stray space is not a search
+            self.search(self.query + text)
 
         return kb
 
@@ -286,9 +301,11 @@ class Picker:
             lines = (wrap_doc(row.doc, body) if body >= MIN_DOC
                      else [row.doc])
             first = lines[0] if lines else ""
+            fragments.append((extra.strip(), "  ", handler))
+            for text, hit in split_match(row.label, self.query):
+                style = label_style + (" class:match" if hit else "")
+                fragments.append((style, text, handler))
             fragments += [
-                (extra.strip(), "  ", handler),
-                (label_style, row.label, handler),
                 (extra.strip(), f"{pad}  {first}", handler),
                 ("", "\n", handler),
             ]
@@ -298,10 +315,53 @@ class Picker:
         return fragments
 
     def _footer(self) -> StyleAndTextTuples:
-        keys = "Up/Down move   Enter run   Esc quit   type to jump"
-        if self.prefix:
-            keys += f": {self.prefix}"
+        if self.query:
+            n = len(self._selectable_indexes())
+            hits = f"{n} match" + ("" if n == 1 else "es")
+            keys = (f"Search: {self.query}   ({hits})   "
+                    "Enter run   Esc clear")
+        else:
+            keys = "Up/Down move   Enter run   Esc quit   type to search"
         return [("class:footer", f" {keys}")]
+
+
+def filter_rows(rows: list[Row], query: str) -> list[Row]:
+    """The rows whose target matches `query`, under their headings, with
+    a blank between sections; every row when `query` is empty."""
+    if not query:
+        return rows
+    needle = query.lower()
+    kept: list[Row] = []
+    group: list[Row] = []       # the current heading plus its matches
+    for row in [*rows, Row("blank")]:
+        if row.kind == "heading":
+            group = [row]
+        elif row.kind == "blank":
+            if len(group) > 1:
+                if kept:
+                    kept.append(Row("blank"))
+                kept += group
+            group = []
+        elif needle in row.label.lower() or needle in row.doc.lower():
+            group.append(row)
+    return kept
+
+
+def split_match(label: str, query: str) -> list[tuple[str, bool]]:
+    """`label` cut into (text, is_match) pieces around each occurrence
+    of `query`, case-insensitive; one unmatched piece when nothing hits."""
+    if not query:
+        return [(label, False)]
+    pieces: list[tuple[str, bool]] = []
+    low, needle, i = label.lower(), query.lower(), 0
+    while (j := low.find(needle, i)) != -1:
+        if j > i:
+            pieces.append((label[i:j], False))
+        pieces.append((label[j:j + len(needle)], True))
+        i = j + len(needle)
+    if i < len(label):
+        pieces.append((label[i:], False))
+    return pieces
 
 
 def make_command(target: Target, chapter: str = "") -> list[str]:
