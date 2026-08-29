@@ -58,14 +58,14 @@ MyApp().run()
 The client supplies `customize1()` and `customize2()` in the derived class.
 `run()` starts the engine that drives the application.
 
-The base class calls code written later, potentially years later.
+The base class calls code written later, sometimes years later.
 Framework authors call this the *Hollywood Principle*: "don't call us,
 we'll call you."
 The general name for this reversal is *Inversion of Control*:
 the framework defines the flow of control and calls your code,
 rather than your code calling into a library.
 
-The type checker enforces `@final`.
+Only the type checker enforces `@final`.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 If the interpreter should refuse an override,
@@ -152,7 +152,7 @@ so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
-and a framework that bans helper methods in its subclasses is too constrained.
+and a framework that bans helper methods in its subclasses is too restrictive.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
@@ -189,7 +189,7 @@ The client starts the engine, not `ApplicationFramework`.
 The example below shows why.
 
 A framework can call `run()` from its own constructor,
-but then a subclass with its own `__init__()` hits a pitfall.
+but then a subclass with its own `__init__()` falls into a trap.
 `run()` calls methods the subclass supplies,
 so the subclass must finish its own setup before it calls `super().__init__()`.
 Call `super().__init__()` first, in the usual style,
@@ -307,10 +307,9 @@ The fixed algorithm is only as fixed as the mechanism holding it.
 This chapter shows four.
 Each has a cost, and each protects against a different way of breaking the flow:
 
-- Structure, in `template_function.py`:
-  no subclass exists through which to replace the loop.
-  It costs nothing and nothing can bypass it,
-  but it applies only when you can pass functions instead of subclassing.
+- Structure, in `template_function.py`: no subclass exists,
+  so nothing can replace the loop.
+  It costs nothing, but it applies only when you can pass functions instead of subclassing.
 - The type checker, via `@final`: it reports an override.
   It costs one decorator and protects everyone who runs the type checker.
 - The interpreter, via `__init_subclass__()`:
