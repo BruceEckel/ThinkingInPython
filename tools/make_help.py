@@ -42,8 +42,13 @@ across 200 columns is no easier to read than one that overflows 80. A pipe
 or a redirect gets the 80-column fallback.
 
 In a terminal, both forms open the interactive picker in help_picker.py
-instead of printing: arrow keys or the mouse choose a target and Enter
-runs it. The static listing below is what a pipe, CI, `verify-targets`,
+instead of printing: arrow keys or the mouse choose a target, Enter
+runs it, and `?` shows its notes. Those come from the `#` comment block
+directly above the target line (`Target.notes`) and its recipe
+(`Target.recipe`), both captured by `parse()`; a blank line or a `##@`
+heading ends the block, so a target's long-form help is whatever
+comment sits touching it. The static listing below is what a pipe, CI,
+`verify-targets`,
 and `--pick never` get, and what the picker falls back to if
 prompt_toolkit is not installed.
 
@@ -90,7 +95,7 @@ MIN_DOC = 24
 _KEEP_TOGETHER = re.compile(r"`[^`]+`")
 _JOINER = "\x00"
 
-_TARGET = re.compile(r"^([a-zA-Z_-]+):.*?##(-?)\s?(.*)$")
+_TARGET = re.compile(r"^([a-zA-Z_-]+):([^#]*?)##(-?)\s?(.*)$")
 _CATEGORY = re.compile(r"^##@\s?(.*)$")
 
 @dataclass(frozen=True)
@@ -155,10 +160,22 @@ def can_colorize(stream: IO[str] | None = None,
 
 @dataclass(frozen=True)
 class Target:
-    """One documented target. `secondary` hides it from the listing."""
+    """One documented target. `secondary` hides it from the listing.
+
+    `notes` is the `#` comment block sitting directly above the target
+    line, with the `#` marks stripped and a blank line between
+    paragraphs: the long-form help the picker shows on `?`. `recipe` is
+    the target's command lines, tabs stripped, and `prereqs` the targets
+    named on its own line (`verify: fix-eol sync gate`), which is all a
+    prerequisites-only target has. Each is empty when the Makefile has
+    none.
+    """
     name: str
     doc: str
     secondary: bool = False
+    notes: str = ""
+    recipe: tuple[str, ...] = ()
+    prereqs: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -172,10 +189,14 @@ class Section:
         return [t for t in self.targets if not t.secondary]
 
 
+_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*[?:+]?=")
+
+
 def parse(text: str) -> list[Section]:
     """Sections in file order. The first holds any pre-heading target."""
     sections = [Section("", "")]
-    for line in text.splitlines():
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
         category = _CATEGORY.match(line)
         if category:
             title = category.group(1)
@@ -184,8 +205,44 @@ def parse(text: str) -> list[Section]:
         target = _TARGET.match(line)
         if target:
             sections[-1].targets.append(Target(
-                target.group(1), target.group(3), target.group(2) == "-"))
+                target.group(1), target.group(4), target.group(3) == "-",
+                notes=_notes(lines, i), recipe=_recipe(lines, i),
+                prereqs=tuple(target.group(2).split())))
     return [s for s in sections if s.targets]
+
+
+def _notes(lines: list[str], at: int) -> str:
+    """The `#` comment block ending on the line above `lines[at]`.
+
+    A `##@` heading or anything that is not a comment ends the block, so
+    a blank line between the comment and the target means no notes. A
+    variable assignment (`WIDTH ?= 60`) between the two is kept as the
+    block's own last paragraph, since it names a default the target
+    honors.
+    """
+    block: list[str] = []
+    j = at - 1
+    while j >= 0:
+        line = lines[j]
+        if line.startswith("#") and not line.startswith("##@"):
+            block.append(line[1:].removeprefix(" "))
+        elif _ASSIGNMENT.match(line) and not block:
+            block += [line.strip(), ""]
+        else:
+            break
+        j -= 1
+    block.reverse()
+    return "\n".join(block).strip("\n")
+
+
+def _recipe(lines: list[str], at: int) -> tuple[str, ...]:
+    """The tab-indented command lines under `lines[at]`, tabs stripped."""
+    recipe: list[str] = []
+    for line in lines[at + 1:]:
+        if not line.startswith("\t"):
+            break
+        recipe.append(line.lstrip("\t"))
+    return tuple(recipe)
 
 
 def entries(text: str) -> list[tuple[str, str] | tuple[None, str]]:

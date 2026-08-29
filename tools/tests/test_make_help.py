@@ -195,3 +195,61 @@ def test_every_real_section_renders(slug):
     section = next(s for s in _real() if s.slug == slug)
     assert section.listed(), f"section {slug} would render as an empty list"
     assert render_section(section).startswith(f"{slug}: {section.title}")
+
+
+# ---- notes and recipe, the long-form help behind the picker's `?`
+
+NOTED = """\
+##@ Build
+
+# What build does,
+# in two lines.
+#
+# A second paragraph.
+build:  ## Build it
+\t$(PY) tools/build.py
+\t@echo done
+
+# This comment is separated by a blank line, so it is not notes.
+
+check: build  ## Check it
+\t$(PY) tools/check.py
+
+##@ Style
+# The heading above ends the walk back, not this comment.
+WIDTH ?= 60
+width:  ## Widths
+"""
+
+
+def test_parse_captures_the_comment_block_above_a_target():
+    build, check = parse(NOTED)[0].targets
+    assert build.notes == ("What build does,\nin two lines.\n\n"
+                           "A second paragraph.")
+    assert build.recipe == ("$(PY) tools/build.py", "@echo done")
+    assert build.prereqs == ()
+    assert check.notes == ""
+    assert check.recipe == ("$(PY) tools/check.py",)
+    assert check.prereqs == ("build",)
+
+
+def test_a_variable_assignment_between_comment_and_target_is_kept():
+    width = parse(NOTED)[1].targets[0]
+    assert width.notes == (
+        "The heading above ends the walk back, not this comment.\n\n"
+        "WIDTH ?= 60")
+    assert width.recipe == ()
+
+
+def test_sample_targets_default_to_no_notes():
+    assert all(t.notes == "" for s in parse(SAMPLE) for t in s.targets)
+    assert parse(SAMPLE)[0].targets[0].recipe == ("@echo hi",)
+
+
+def test_the_real_makefile_has_notes_for_the_everyday_targets():
+    sections = parse(MAKEFILE.read_text(encoding="utf-8"))
+    targets = {t.name: t for s in sections for t in s.targets}
+    for name in ("all", "verify", "gate", "sweep", "tools-upgrade"):
+        assert targets[name].notes, name
+        assert targets[name].recipe or targets[name].prereqs, name
+    assert targets["verify"].prereqs[-1] == "gate"

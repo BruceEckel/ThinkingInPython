@@ -13,9 +13,10 @@ from unittest import mock
 from help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
-    INTERRUPTED, next_version, run_target, section_rows, session,
+    INTERRUPTED, next_version, notes_lines, run_target, section_rows,
+    session,
     split_match, variables)
-from make_help import MAKEFILE, parse
+from make_help import MAKEFILE, Target, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
 ENTER, ESC, BACKSPACE = "\r", "\x1b", "\x7f"
@@ -329,3 +330,89 @@ def test_every_section_view_has_a_selectable_row(slug):
     rows = section_rows(section)
     assert rows[0].kind == "heading" and rows[0].label == f"{slug}:"
     assert any(r.selectable for r in rows)
+
+
+# ---- `?`: the notes view
+
+
+def test_question_mark_opens_the_notes_and_enter_runs_from_there():
+    rows = all_rows(_sections())
+    first = next(r for r in rows if r.kind == "target")
+    assert drive(rows, "?" + ENTER) is first.target
+
+
+def test_escape_closes_the_notes_and_the_list_resumes_where_it_was():
+    rows = all_rows(_sections())
+    second = [r for r in rows if r.kind == "target"][1]
+    assert drive(rows, DOWN + "?" + ESC + ENTER) is second.target
+    assert drive(rows, DOWN + "?" + "?" + ENTER) is second.target
+    assert drive(rows, DOWN + "?" + BACKSPACE + ENTER) is second.target
+
+
+def test_typing_while_the_notes_are_open_does_not_search():
+    rows = all_rows(_sections())
+    first = next(r for r in rows if r.kind == "target")
+    assert drive(rows, "?" + "sweep" + ESC + ENTER) is first.target
+
+
+def test_notes_scroll_clamps_at_both_ends():
+    rows = all_rows(_sections())
+    picker = Picker(rows, output=DummyOutput())
+    sweep = next(r for r in rows if r.label == "sweep")
+    picker.cursor = rows.index(sweep)
+    picker.open_notes()
+    assert picker.notes is sweep.target
+    picker.scroll_notes(-5)
+    assert picker.notes_scroll == 0
+    picker.scroll_notes_to_end(last=True)
+    picker._notes_body()
+    assert sweep.target is not None
+    assert picker.notes_scroll == len(
+        notes_lines(sweep.target, picker._width())) - 1
+    picker.scroll_notes_to_end(last=False)
+    assert picker.notes_scroll == 0
+
+
+def test_footer_names_the_notes_key_and_the_open_target():
+    rows = all_rows(_sections())
+    picker = Picker(rows, output=DummyOutput())
+    assert "? notes" in picker._footer()[0][1]
+    picker.open_notes()
+    assert picker.notes is not None
+    assert picker._footer()[0][1].startswith(f" {picker.notes.name}:")
+    assert "Esc back" in picker._footer()[0][1]
+
+
+def test_notes_lines_show_the_doc_the_comment_block_and_the_recipe():
+    sweep = next(t for s in _sections() for t in s.targets
+                 if t.name == "sweep")
+    lines = notes_lines(sweep, 72)
+    texts = [text for _, text in lines]
+    assert lines[0] == ("class:slug", "sweep")
+    assert texts[1].startswith("  Run every check")
+    assert any("first failure" in t for t in texts)      # the comment
+    assert "Runs:" in texts
+    assert texts[-1] == "    $(PY) tools/sweep_checks.py"
+    assert all(len(t) <= 72 for t in texts)
+
+
+def test_a_prerequisites_only_target_lists_them():
+    verify = next(t for s in _sections() for t in s.targets
+                  if t.name == "verify")
+    texts = [t for _, t in notes_lines(verify, 72)]
+    at = texts.index("Prerequisites:")
+    assert texts[at + 1].startswith("    fix-eol ")
+    assert "gate" in texts[at + 1]
+    assert "Runs:" not in texts
+
+
+def test_notes_lines_without_notes_or_recipe_say_so():
+    texts = [t for _, t in notes_lines(Target("x", "Do x"), 60)]
+    assert texts == ["x", "  Do x", "",
+                     "  (no notes, prerequisites, or recipe in the Makefile)"]
+
+
+def test_notes_lines_keep_an_indented_paragraph_as_written():
+    target = Target("x", "Do x", notes="Install it with:\n  winget install x")
+    texts = [t for _, t in notes_lines(target, 60)]
+    assert texts[3:] == ["  Install it with:", "    winget install x"]

@@ -173,8 +173,15 @@ searches: the list narrows to the targets whose name or description
 contains the text (`/` also starts a search), the match is underlined in
 the names, the highlight lands on the first name match, Backspace edits
 the query, and Esc clears it. A mouse click selects a row, a second
-click on the selected row runs it, and the wheel scrolls. `make` and
-`make help` open every section; `make help style` opens one.
+click on the selected row runs it, and the wheel scrolls. `?` replaces
+the list with the highlighted target's notes: its doc line, the `#`
+comment block directly above the target in the Makefile (the long-form
+help the one-line summary condenses), and the recipe it runs. Up/Down
+and the wheel scroll the notes, Enter runs the target from there, and
+Esc, `?`, or Backspace returns to the list with the highlight where it
+was. A target with no comment block shows only its doc and recipe, so
+writing the comment block is what makes `?` useful for a target.
+`make` and `make help` open every section; `make help style` opens one.
 
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the

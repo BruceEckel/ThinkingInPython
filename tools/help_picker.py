@@ -11,7 +11,12 @@ what has been typed (`/` also starts a search, for the habit), the
 matched text is underlined in the names, the highlight lands on the first
 name match when there is one, Backspace edits the query, and Esc clears
 it. The mouse works too: a click selects a row, a second click on the
-selected row runs it, and the wheel scrolls.
+selected row runs it, and the wheel scrolls. `?` opens the highlighted
+target's notes: its doc line, the `#` comment block above it in the
+Makefile, and the recipe it runs, in place of the list. Up/Down (and
+PageUp/PageDown, Home/End, the wheel) scroll the notes, Enter runs the
+target from there, and Esc, `?`, or Backspace returns to the list with
+the highlight where it was.
 
 Plain `make` and `make help` open every section; `make help style` opens
 one. A target whose doc text mentions a variable (`CH=12`, `VERSION=1.0`,
@@ -67,10 +72,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from prompt_toolkit.application import Application
+from prompt_toolkit.filters import Condition
 from prompt_toolkit.formatted_text import StyleAndTextTuples
 from prompt_toolkit.input import Input
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
-from prompt_toolkit.layout import HSplit, Layout, Window
+from prompt_toolkit.layout import (
+    ConditionalContainer, HSplit, Layout, Window)
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.mouse_handlers import MouseHandler
 from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
@@ -96,6 +103,7 @@ COLOR = Style.from_dict({
     "dim": "ansibrightblack",
     "selected": "reverse",
     "footer": "reverse",
+    "recipe": "ansiyellow",
 })
 MONO = Style.from_dict({
     "heading": "bold",
@@ -150,12 +158,19 @@ class Picker:
         self.cursor = (cursor if cursor is not None
                        else self._first_selectable(rows))
         self.query = ""
+        self.notes: Target | None = None     # the target `?` opened
+        self.notes_scroll = 0
         self.window = Window(
             FormattedTextControl(self._body, show_cursor=False),
             always_hide_cursor=True, wrap_lines=False)
+        self.notes_window = Window(
+            FormattedTextControl(self._notes_body, show_cursor=False),
+            always_hide_cursor=True, wrap_lines=False)
+        showing_notes = Condition(lambda: self.notes is not None)
         self.app: Application[Target | None] = Application(
             layout=Layout(HSplit([
-                self.window,
+                ConditionalContainer(self.window, ~showing_notes),
+                ConditionalContainer(self.notes_window, showing_notes),
                 Window(FormattedTextControl(self._footer), height=1,
                        style="class:footer"),
             ])),
@@ -210,34 +225,67 @@ class Picker:
     def chosen(self) -> Target | None:
         return self.rows[self.cursor].target
 
+    def open_notes(self) -> None:
+        """Show the highlighted target's notes; nothing if none is."""
+        target = self.chosen()
+        if target is not None:
+            self.notes = target
+            self.notes_scroll = 0
+
+    def close_notes(self) -> None:
+        self.notes = None
+
+    def scroll_notes(self, delta: int) -> None:
+        """Move the notes view `delta` lines, clamped at the top; the
+        window clamps the bottom itself when it renders."""
+        self.notes_scroll = max(0, self.notes_scroll + delta)
+
+    def scroll_notes_to_end(self, last: bool) -> None:
+        if last and self.notes is not None:
+            self.notes_scroll = len(notes_lines(self.notes, self._width()))
+        else:
+            self.notes_scroll = 0
+
     # ---- keys
 
     def _bindings(self) -> KeyBindings:
         kb = KeyBindings()
 
+        def step(delta: int) -> None:
+            if self.notes is None:
+                self.move(delta)
+            else:
+                self.scroll_notes(delta)
+
+        def to_end(last: bool) -> None:
+            if self.notes is None:
+                self.move_to_end(last)
+            else:
+                self.scroll_notes_to_end(last)
+
         @kb.add("up")
         def _up(event: KeyPressEvent) -> None:
-            self.move(-1)
+            step(-1)
 
         @kb.add("down")
         def _down(event: KeyPressEvent) -> None:
-            self.move(1)
+            step(1)
 
         @kb.add("pageup")
         def _pageup(event: KeyPressEvent) -> None:
-            self.move(-PAGE)
+            step(-PAGE)
 
         @kb.add("pagedown")
         def _pagedown(event: KeyPressEvent) -> None:
-            self.move(PAGE)
+            step(PAGE)
 
         @kb.add("home")
         def _home(event: KeyPressEvent) -> None:
-            self.move_to_end(last=False)
+            to_end(last=False)
 
         @kb.add("end")
         def _end(event: KeyPressEvent) -> None:
-            self.move_to_end(last=True)
+            to_end(last=True)
 
         @kb.add("enter")
         def _enter(event: KeyPressEvent) -> None:
@@ -245,14 +293,25 @@ class Picker:
             if target is not None:
                 event.app.exit(result=target)
 
+        @kb.add("?")
+        def _notes(event: KeyPressEvent) -> None:
+            if self.notes is None:
+                self.open_notes()
+            else:
+                self.close_notes()
+
         @kb.add("backspace")
         def _backspace(event: KeyPressEvent) -> None:
-            if self.query:
+            if self.notes is not None:
+                self.close_notes()
+            elif self.query:
                 self.search(self.query[:-1])
 
         @kb.add("escape", eager=True)
         def _escape(event: KeyPressEvent) -> None:
-            if self.query:
+            if self.notes is not None:
+                self.close_notes()
+            elif self.query:
                 self.search("")
             else:
                 event.app.exit(result=None)
@@ -266,6 +325,8 @@ class Picker:
             text = event.data
             if len(text) != 1 or not text.isprintable():
                 return
+            if self.notes is not None:
+                return              # the notes view does not search
             if text == "/" and not self.query:
                 return              # `/` opens the search; it is already open
             if text == " " and not self.query:
@@ -293,6 +354,15 @@ class Picker:
                 return NotImplemented
             return None
         return handler
+
+    def _notes_mouse(self, event: MouseEvent) -> "NotImplementedOrNone":
+        if event.event_type == MouseEventType.SCROLL_UP:
+            self.scroll_notes(-WHEEL)
+        elif event.event_type == MouseEventType.SCROLL_DOWN:
+            self.scroll_notes(WHEEL)
+        else:
+            return NotImplemented
+        return None
 
     # ---- rendering
 
@@ -360,14 +430,36 @@ class Picker:
             self.window.vertical_scroll, cursor_heading)
         return fragments
 
+    def _notes_body(self) -> StyleAndTextTuples:
+        """The open target's notes as fragments, scrolled to
+        `notes_scroll`: the cursor marker sits on that line so the
+        window keeps it in view, the same trick `_body` uses for the
+        highlight's heading."""
+        if self.notes is None:
+            return []
+        lines = notes_lines(self.notes, self._width())
+        self.notes_scroll = min(self.notes_scroll, max(0, len(lines) - 1))
+        fragments: StyleAndTextTuples = []
+        for i, (style, text) in enumerate(lines):
+            if i == self.notes_scroll:
+                fragments.append(("[SetCursorPosition]", ""))
+            fragments.append((style, text, self._notes_mouse))
+            fragments.append(("", "\n", self._notes_mouse))
+        self.notes_window.vertical_scroll = self.notes_scroll
+        return fragments
+
     def _footer(self) -> StyleAndTextTuples:
-        if self.query:
+        if self.notes is not None:
+            keys = (f"{self.notes.name}:   Up/Down scroll   Enter run   "
+                    "Esc back")
+        elif self.query:
             n = len(self._selectable_indexes())
             hits = f"{n} match" + ("" if n == 1 else "es")
             keys = (f"Search: {self.query}   ({hits})   "
                     "Enter run   Esc clear")
         else:
-            keys = "Up/Down move   Enter run   Esc quit   type to search"
+            keys = ("Up/Down move   Enter run   ? notes   Esc quit   "
+                    "type to search")
         return [("class:footer", f" {keys}")]
 
 
@@ -391,6 +483,50 @@ def filter_rows(rows: list[Row], query: str) -> list[Row]:
         elif needle in row.label.lower() or needle in row.doc.lower():
             group.append(row)
     return kept
+
+
+NOTES_INDENT = "  "
+RECIPE_INDENT = "    "
+
+
+def notes_lines(target: Target, width: int) -> list[tuple[str, str]]:
+    """What `?` shows for `target`, as (style, text) lines fitting
+    `width`: the name and doc line, the Makefile's comment block above
+    the target rewrapped paragraph by paragraph (a paragraph with an
+    indented line is kept as written, since its layout is deliberate),
+    the prerequisite targets under "Prerequisites:", and the recipe
+    under "Runs:". A target with none of the three says so.
+    """
+    body = max(MIN_DOC, width - len(NOTES_INDENT))
+    lines: list[tuple[str, str]] = [("class:slug", target.name)]
+    lines += [("", NOTES_INDENT + text)
+              for text in wrap_doc(target.doc, body)]
+    for paragraph in target.notes.split("\n\n"):
+        raw = paragraph.splitlines()
+        if not raw:
+            continue
+        lines.append(("", ""))
+        if any(line[:1].isspace() for line in raw):
+            wrapped = raw
+        else:
+            wrapped = wrap_doc(" ".join(line.strip() for line in raw), body)
+        lines += [("", NOTES_INDENT + text) for text in wrapped]
+    if target.prereqs:
+        lines.append(("", ""))
+        lines.append(("class:heading", "Prerequisites:"))
+        lines += [("class:recipe", RECIPE_INDENT + text)
+                  for text in wrap_doc(" ".join(target.prereqs),
+                                       max(MIN_DOC, width - len(RECIPE_INDENT)))]
+    if target.recipe:
+        lines.append(("", ""))
+        lines.append(("class:heading", "Runs:"))
+        lines += [("class:recipe", RECIPE_INDENT + command)
+                  for command in target.recipe]
+    if not (target.notes or target.prereqs or target.recipe):
+        lines.append(("", ""))
+        lines.append(("class:dim", NOTES_INDENT
+                      + "(no notes, prerequisites, or recipe in the Makefile)"))
+    return lines
 
 
 def split_match(label: str, query: str) -> list[tuple[str, bool]]:

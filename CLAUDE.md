@@ -257,7 +257,10 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
   and `make help` both list every section; `make help style` lists
   one section. In a terminal both open `tools/help_picker.py` instead
-  (arrow keys or mouse, Enter runs the target; `prompt_toolkit`, a dev
+  (arrow keys or mouse, Enter runs the target, `?` shows the target's notes:
+  the `#` comment block directly above it in the Makefile plus its recipe,
+  so keep that block adjacent to the target line, with no blank line between;
+  `prompt_toolkit`, a dev
   dependency); a pipe, `CI`, or `--pick never` gets the static text, so running
   `make help` from a tool or a test never blocks on input. A section's slug is
   the first word of its heading, lowercased, so renaming the heading renames the
