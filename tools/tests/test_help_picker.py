@@ -9,7 +9,8 @@ from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
 from help_picker import (
-    Picker, all_rows, make_command, section_rows, wants_chapter)
+    Picker, all_rows, ask_return_or_esc, make_command, section_rows,
+    session, wants_chapter)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -82,6 +83,55 @@ def test_backspace_shortens_the_prefix_then_quits_when_empty():
 
 def test_escape_leaves_without_a_target():
     assert drive(all_rows(_sections()), DOWN + ESC) is None
+
+
+def test_picker_reopens_at_the_given_cursor():
+    rows = all_rows(_sections())
+    targets = [i for i, r in enumerate(rows) if r.kind == "target"]
+    with create_pipe_input() as pipe:
+        pipe.send_text(ENTER)
+        picker = Picker(rows, cursor=targets[3], input=pipe,
+                        output=DummyOutput())
+        assert picker.run() is rows[targets[3]].target
+        assert picker.cursor == targets[3]
+
+
+@pytest.mark.parametrize("keys, again", [
+    (ENTER, True), ("x" + ENTER, True), (ESC, False), ("\x03", False)])
+def test_after_a_run_return_reopens_and_esc_quits(keys, again):
+    with create_pipe_input() as pipe:
+        pipe.send_text(keys)
+        assert ask_return_or_esc(input=pipe, output=DummyOutput()) is again
+
+
+def test_session_loops_until_esc_and_reports_the_last_status():
+    rows = all_rows(_sections())
+    targets = [r.target for r in rows if r.target is not None]
+    picks = iter([(targets[0], 1), (targets[2], 3), (None, 3)])
+    answers = iter([True, True])
+    ran: list[str] = []
+    seen_cursors: list[int | None] = []
+
+    def pick(cursor):
+        seen_cursors.append(cursor)
+        return next(picks)
+
+    def run(target):
+        ran.append(target.name)
+        return 7 if target is targets[2] else 0
+
+    status = session(pick, run, lambda: next(answers))
+    assert ran == [targets[0].name, targets[2].name]
+    assert seen_cursors == [None, 1, 3]     # the highlight is restored
+    assert status == 7                       # the last run's status
+
+
+def test_session_esc_after_a_run_quits_with_that_status():
+    rows = all_rows(_sections())
+    target = next(r.target for r in rows if r.kind == "target")
+    status = session(lambda c: (target, 0), lambda t: 3, lambda: False)
+    assert status == 3
+    assert session(lambda c: (None, 0), lambda t: 3, lambda: True) == 0
 
 
 def test_a_section_view_offers_only_that_sections_targets():

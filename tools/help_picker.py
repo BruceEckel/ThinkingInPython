@@ -16,10 +16,12 @@ the chapter before it runs, since that is how those targets are scoped.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
-command is echoed first (`$ make sweep`), and the picker's exit status is
-the target's. MAKEFLAGS and MAKELEVEL are dropped from the child's
-environment: `make help` is itself a make recipe, and a sub-make would
-otherwise announce "Entering directory" around every run.
+command is echoed first (`$ make sweep`). When the target finishes, a
+one-line prompt waits: Return reopens the menu with the highlight where
+it was, Esc quits, and the exit status is the last target's. MAKEFLAGS
+and MAKELEVEL are dropped from the child's environment: `make help` is
+itself a make recipe, and a sub-make would otherwise announce "Entering
+directory" around every run.
 
 Only the interactive loop needs a terminal. `Picker` takes prompt_toolkit's
 input and output objects, so the tests drive it with a pipe input and a
@@ -32,7 +34,7 @@ import os
 import shutil
 import subprocess
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -111,10 +113,11 @@ class Picker:
     """A full-screen list over `rows`; `run()` returns the chosen target."""
 
     def __init__(self, rows: list[Row], *, color: bool = True,
-                 input: Input | None = None,
+                 cursor: int | None = None, input: Input | None = None,
                  output: Output | None = None) -> None:
         self.rows = rows
-        self.cursor = self._first_selectable(rows)
+        self.cursor = (cursor if cursor is not None
+                       else self._first_selectable(rows))
         self.prefix = ""
         self.app: Application[Target | None] = Application(
             layout=Layout(HSplit([
@@ -330,9 +333,56 @@ def run_target(target: Target) -> int:
         return 1
 
 
+def ask_return_or_esc(input: Input | None = None,
+                      output: Output | None = None) -> bool:
+    """After a target runs: True on Return (back to the menu), False on
+    Esc or Ctrl-C (quit). Other keys are ignored."""
+    kb = KeyBindings()
+
+    @kb.add("enter")
+    def _again(event: KeyPressEvent) -> None:
+        event.app.exit(result=True)
+
+    @kb.add("escape", eager=True)
+    @kb.add("c-c")
+    def _quit(event: KeyPressEvent) -> None:
+        event.app.exit(result=False)
+
+    hint = "Return: back to the menu   Esc: quit"
+    app: Application[bool] = Application(
+        layout=Layout(Window(FormattedTextControl(hint), height=1)),
+        key_bindings=kb, erase_when_done=True, input=input, output=output)
+    return app.run()
+
+
+def session(pick: Callable[[int | None], tuple[Target | None, int]],
+            run: Callable[[Target], int],
+            ask: Callable[[], bool]) -> int:
+    """The menu loop, with its three interactions injected so it can be
+    tested without a terminal or a make.
+
+    `pick(cursor)` shows the menu highlighted at `cursor` (None for the
+    first target) and returns the chosen target (None to quit) and the
+    highlight to restore; `run` runs a target and returns its status;
+    `ask` returns True to reopen the menu. The result is the last run's
+    status, or 0 if nothing ran.
+    """
+    status = 0
+    cursor: int | None = None
+    while True:
+        target, cursor = pick(cursor)
+        if target is None:
+            return status
+        status = run(target)
+        if not ask():
+            return status
+
+
 def pick_and_run(rows: list[Row], *, color: bool = True) -> int:
-    """Open the picker on `rows`; run what it returns. 0 if nothing was."""
-    target = Picker(rows, color=color).run()
-    if target is None:
-        return 0
-    return run_target(target)
+    """Open the picker on `rows` and loop: run the choice, wait for
+    Return or Esc, reopen or quit."""
+    def pick(cursor: int | None) -> tuple[Target | None, int]:
+        picker = Picker(rows, color=color, cursor=cursor)
+        return picker.run(), picker.cursor
+
+    return session(pick, run_target, ask_return_or_esc)

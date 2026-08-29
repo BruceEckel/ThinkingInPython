@@ -177,9 +177,11 @@ style` opens one.
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the
 command; a target whose doc mentions `CH=` first prompts for the
-chapter, Enter meaning the whole book. The picker's exit status is the
-target's. The tests drive the real key bindings through prompt_toolkit's
-pipe input, so they need no terminal.
+chapter, Enter meaning the whole book. When it finishes, a one-line
+prompt waits: Return reopens the menu with the highlight where it was,
+Esc quits, and the exit status is the last target's. The tests drive the
+real key bindings through prompt_toolkit's pipe input, so they need no
+terminal.
 
 ## run_all.py
 
