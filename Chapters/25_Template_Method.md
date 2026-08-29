@@ -16,7 +16,7 @@ The test runner calls `run()` on the finished object.
 
 ## The Fixed Algorithm
 
-A Template Method fixes the shape of the algorithm in the base class.
+A Template Method holds the shape of the algorithm fixed in the base class.
 Subclasses provide the individual steps.
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
@@ -186,12 +186,10 @@ def test_template_method_runs_steps_in_order() -> None:
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
 The client starts the engine, not `ApplicationFramework`.
-The example below shows why.
-
-A framework can call `run()` from its own constructor,
+A framework *can* call `run()` from its own constructor,
 but then a subclass with its own `__init__()` falls into a trap.
-`run()` calls methods the subclass supplies,
-so the subclass must finish its own setup before it calls `super().__init__()`.
+Because `run()` calls methods the subclass supplies,
+the subclass must finish its own setup before it calls `super().__init__()`.
 Call `super().__init__()` first, in the usual style,
 and the engine runs on a half-initialized object:
 
@@ -211,7 +209,7 @@ class Framework:
 
 class Greeter(Framework):
     def __init__(self, name: str) -> None:
-        # Usual style: engine runs now...
+        # With the usual style, the engine calls run()
         super().__init__()
         self.name = name  # ...before this line runs
 
@@ -228,35 +226,35 @@ except AttributeError as e:
 
 `Greeter("Robin")` never finishes.
 `super().__init__()` starts the engine, the engine calls `step()`,
-and `step()` reads `self.name` one line before the constructor assigns it.
-The quick fix is reordering: assign `self.name` first,
+and `step()` reads `self.name` before the constructor assigns it.
+The quick repair is reordering: assign `self.name` first,
 then call `super().__init__()`.
 That works, but it inverts the convention Python programmers expect,
 and the next subclass author might restore the usual order without thinking.
-The reliable fix changes the framework: separate construction from starting,
+The reliable repair changes the framework: separate construction from starting,
 and have the client call `run()` explicitly on a fully built object.
-That is why `ApplicationFramework` has no `__init__()` and the client writes `MyApp().run()`.
+That is why `ApplicationFramework` has no `__init__()` and the client calls `MyApp().run()`.
 
 ### Substitutability
 
 This pattern leans on the [Liskov Substitution Principle](20_Rethinking_Objects.md#liskov-substitution):
 when code expects a base-class instance,
-an instance of any subclass must work in its place.
+an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
-trusting that whatever a subclass supplies still fits the algorithm's shape.
+trusting that what the subclass supplies fits the algorithm's shape.
 An override can break that trust and still type-check:
 it raises an exception where the base would not,
 or leaves a step empty when the flow depends on it.
 Either one corrupts the fixed algorithm.
-The empty step is the price of the `...` defaults above.
-They make a step optional,
+The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten".
 The Template Method works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
 
 A subclass is one way to supply the varying steps.
-Python functions are first-class, so you can also pass the steps in directly:
+Because Python functions are first-class,
+you can also pass the steps as arguments:
 
 ```python
 # template_function.py
@@ -291,7 +289,7 @@ The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
 Here no subclass exists,
 so a caller supplies the steps but cannot touch the loop.
-Structure fixes the algorithm,
+Structure holds the algorithm fixed,
 with no help from a decorator the runtime ignores.
 
 Passing functions is not the *Strategy* pattern,
@@ -301,7 +299,7 @@ Here the algorithm stays put, and only its steps come from outside.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A stateless hook is usually better as a function than as an overridden method.
 
-## What Actually Fixes the Algorithm
+## What Holds the Algorithm Fixed
 
 The fixed algorithm is only as fixed as the mechanism holding it.
 This chapter shows four.
@@ -335,11 +333,11 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     1.  Convert all the letters in each file to uppercase.
     2.  Treat the first file as a list of search words, one per line,
         and report which of those words appear in each remaining input file.
-2.  Fix `premature_engine.py` both ways:
+2.  Repair `premature_engine.py` both ways:
     first reorder the two lines in `Greeter.__init__()`,
     then redesign `Framework` instead,
     so clients construct the object and call `run()` explicitly.
-    Which fix still protects a second subclass author who has never read this chapter?
+    Which repair still protects a second subclass author who has never read this chapter?
 3.  Subclass `ApplicationFramework` and override `run()` with a version that calls `customize2()` before `customize1()`.
     Run it, then run `ty` over it.
     Which of the two, Python or `ty`, objects to the change?
