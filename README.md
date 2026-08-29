@@ -23,6 +23,8 @@ The latest release, rebuilt from the current book source:
   with color syntax highlighting, for phone and tablet reading apps.
 - [EPUB for e-ink readers](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/ThinkingInPython-eink.epub),
   which marks code with bolding instead of color.
+- [Getting the EPUB onto a Kindle](https://github.com/BruceEckel/ThinkingInPython/releases/latest/download/kindle-uploading.txt),
+  step by step, simplest way first.
 
 All versions are on the
 [releases page](https://github.com/BruceEckel/ThinkingInPython/releases).

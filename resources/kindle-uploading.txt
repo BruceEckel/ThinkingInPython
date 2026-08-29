@@ -1,0 +1,155 @@
+GETTING THINKING IN PYTHON ONTO YOUR KINDLE
+===========================================
+
+Which file
+----------
+
+The release has two EPUBs. Pick the one for what you read on:
+
+  ThinkingInPython-eink.epub   Kindle e-readers: Paperwhite, Basic,
+                               Oasis, Scribe. Code is marked with bold
+                               and italic, since these screens show no
+                               color.
+
+  ThinkingInPython-color.epub  Kindle Colorsoft, and the Kindle app on
+                               a phone, tablet, or computer. Code is
+                               color-highlighted.
+
+The steps below say "the EPUB"; use whichever one you picked. Each
+way sends the file to your Amazon account, which delivers it to your
+Kindle over Wi-Fi. A Kindle cannot open an EPUB copied over a USB
+cable; see Way 5 for that case.
+
+The book arrives in the Kindle's library within a few minutes. If it
+does not, make sure the Kindle is on Wi-Fi, then sync: swipe down
+from the top of the screen and tap Sync, or open Settings and choose
+Sync My Kindle. In the library, the Docs filter shows sent files.
+
+
+Way 1: The Send to Kindle web page (simplest)
+---------------------------------------------
+
+Works from any computer with a web browser. Nothing to install.
+
+  1. Download the EPUB to your computer.
+  2. Open https://www.amazon.com/sendtokindle in your browser and
+     sign in with the Amazon account your Kindle is registered to.
+  3. Drag the EPUB onto the page, or click "Select files" and
+     choose it.
+  4. Check the box for the Kindle you want it delivered to (you can
+     pick several).
+  5. Click Send.
+
+That is all. The page accepts files up to 200 MB; this book is
+about 2 MB.
+
+
+Way 2: The Send to Kindle app for Windows or macOS
+--------------------------------------------------
+
+The same service as Way 1, as a desktop app. Worth installing if you
+will send files more than once.
+
+  1. Download the app from https://www.amazon.com/sendtokindle
+     (there is a Windows version and a macOS version). Install it
+     and sign in with your Amazon account.
+  2. Download the EPUB.
+  3. Either
+       - drag the EPUB onto the app's window, or
+       - on Windows, right-click the EPUB in File Explorer and choose
+         "Send to Kindle"; on macOS, right-click it in Finder and
+         choose Share, then "Send to Kindle".
+  4. In the dialog that opens, check the Kindle you want, and click
+     Send.
+
+
+Way 3: From a phone or tablet with the Kindle app
+-------------------------------------------------
+
+If the EPUB is on your phone (downloaded in the browser, or attached
+to an email), the Kindle app can send it to your Kindle e-reader too.
+
+  1. Install the Kindle app from the App Store or Google Play and
+     sign in with your Amazon account.
+  2. Open the EPUB where it is: in the Files app or Mail on an
+     iPhone or iPad, or in Files, Downloads, or Gmail on Android.
+  3. Tap the Share button.
+  4. Choose Kindle from the list. On an iPhone or iPad the first
+     time, you may need to scroll the list to the end, tap More, and
+     turn Kindle on.
+  5. Choose the Kindle you want it delivered to and tap Send.
+
+
+Way 4: Email the file to your Kindle
+------------------------------------
+
+Every Kindle has its own email address ending in @kindle.com. Mail
+sent there is delivered to the device, as long as the sending address
+is on your approved list. Two one-time setup steps, then it is just
+an email.
+
+  Setup, once:
+
+  1. On amazon.com, open Account & Lists, then "Manage Your Content
+     and Devices" (https://www.amazon.com/mycd).
+  2. Open the Preferences tab and expand "Personal Document
+     Settings".
+  3. Under "Send-to-Kindle E-Mail Settings", note the address of
+     your Kindle (something like yourname_1234@kindle.com). You can
+     click Edit to change it to something easier to remember.
+  4. Under "Approved Personal Document E-mail List", click "Add a new
+     approved e-mail address" and add the email address you will
+     send from. Amazon discards mail from any address not on this
+     list.
+
+  Sending:
+
+  5. Write an email from that approved address to your Kindle's
+     address. The subject and body can be anything or empty.
+  6. Attach the EPUB and send it.
+
+Email attachments are limited to 50 MB, far above this book's size.
+
+
+Way 5: USB cable, with a conversion (most involved)
+---------------------------------------------------
+
+A Kindle does not read EPUB files from its own storage, so copying
+the EPUB over a USB cable does nothing useful. If you want to avoid
+Amazon's delivery service (no Wi-Fi, or a Kindle you keep off your
+account), convert the book to a Kindle format first with Calibre, a
+free program for Windows, macOS, and Linux.
+
+  1. Download and install Calibre from https://calibre-ebook.com.
+  2. Open Calibre and click "Add books"; choose the EPUB.
+  3. Connect the Kindle to the computer with its USB cable. Calibre
+     detects it and a "Device" button appears in the toolbar.
+  4. Select the book in Calibre's list and click "Send to device".
+     Calibre converts the EPUB to a format the Kindle reads (AZW3) as
+     part of sending it; if it asks whether to convert, say yes.
+  5. Wait for Calibre's job counter (bottom right) to reach zero,
+     then click the Device button's menu and choose "Eject this
+     device", or eject it from the operating system, before unplugging.
+
+The book appears in the Kindle's library the next time the screen
+refreshes.
+
+If you would rather convert without sending: select the book, click
+"Convert books", set the output format to AZW3, click OK, then use
+"Open containing folder" (right-click the book) to find the .azw3
+file and copy it into the "documents" folder on the Kindle's USB
+drive.
+
+
+If it does not show up
+----------------------
+
+  - Wait a few minutes, then sync (swipe down, tap Sync).
+  - Confirm the Kindle is signed in to the same Amazon account you
+    sent from, and that it has Wi-Fi.
+  - For Way 4, confirm the address you sent from is on the approved
+    list, and that you sent to the Kindle's address, not your own.
+  - In the library, tap the filter and choose Docs; sent files can be
+    sorted separately from purchased books.
+  - Amazon's own help for all of these is at
+    https://www.amazon.com/sendtokindle.
