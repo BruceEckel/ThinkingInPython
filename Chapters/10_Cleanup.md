@@ -190,10 +190,10 @@ Freeing it takes the cyclic garbage collector,
 a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
 `gc.disable()` above keeps that collector from running on its own,
 and `gc.collect()` then forces a run,
-so the `a finalized` line marks the moment of destruction;
-in a real program nothing tells you when the collector runs.
+so the `a finalized` line marks the moment of destruction.
+In a real program nothing tells you when the collector runs.
 Before Python 3.4 the collector refused to finalize a cycle containing a `__del__()`,
-leaving the objects in `gc.garbage`;
+leaving the objects in `gc.garbage`.
 [PEP 442](https://peps.python.org/pep-0442/) removed that restriction,
 so a cycle now costs only the delay.
 
@@ -247,7 +247,8 @@ Compare `cleanup.py`,
 where the cleanup runs at an unknowable moment after the program's last statement.
 [Context Managers](15_Context_Managers.md) covers the protocol,
 the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
-This chapter shows the shape; that one explains it.
+This chapter shows the shape.
+That one explains it.
 
 2. `weakref.finalize()`,
    which registers a cleanup callback for an object without giving that callback a reference to the object:
@@ -329,8 +330,8 @@ print(leaky() is None, safe() is None)
 A `ref()` is a weak reference: it watches its object without keeping it alive,
 and it reports `None` once the object disappears.
 So `False True` says the collector reclaimed `Safe` but not `Leaky`.
-`Safe` printed as the collector reclaimed it; `Leaky` printed nothing,
-because its callback never ran and nothing failed.
+`Safe` printed as the collector reclaimed it.
+`Leaky` printed nothing, because its callback never ran and nothing failed.
 Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
 whether the collector reclaimed the object,
 rather than whether the callback eventually ran at exit.

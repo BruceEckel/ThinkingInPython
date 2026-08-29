@@ -180,8 +180,8 @@ On a `Result[float, Exception]`,
 `match` and a chain of `isinstance()` tests narrow equally well,
 both reaching `float` inside the `Ok`,
 because `@final` on the two classes lets either one narrow to a single class.
-Destructuring merges the shape test and the extraction into one step;
-it does not extend what the type checker knows.
+Destructuring merges the shape test and the extraction into one step.
+It does not extend what the type checker knows.
 
 ## An Assurance Spectrum
 

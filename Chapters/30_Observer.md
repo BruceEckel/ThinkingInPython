@@ -74,7 +74,7 @@ t.set_celsius(25)
 ```
 
 The flag lets several mutations coalesce into one broadcast,
-and lets a subclass decide a change is not worth announcing;
+and lets a subclass decide a change is not worth announcing.
 `set_celsius()` calls both halves at once, so nothing here needs it.
 
 Clearing the flag before the loop, not after,
@@ -264,12 +264,13 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` hears the first change and detaches; `always` hears both.
+`once` hears the first change and detaches.
+`always` hears both.
 Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
 
 An observer that raises an exception stops the loop,
-and the observers after it do not hear the change;
-decide whether `notify()` should catch, collect, and continue
+and the observers after it do not hear the change.
+Decide whether `notify()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 Subscriptions are strong references:
 an observable that outlives its observers keeps each subscribed bound method's instance alive,
@@ -381,8 +382,8 @@ The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence prints in subscription order, alarm first.
 Concurrent fan-out lets each finish on its own schedule,
 so the faster observer reports first.
-The results `gather()` hands back stay in argument order regardless;
-only the side effects interleave.
+The results `gather()` hands back stay in argument order regardless.
+Only the side effects interleave.
 The alarm also shows an observer that can decline to act.
 Below its threshold it returns without sending anything.
 
@@ -572,8 +573,8 @@ and the Observer is an event bus.
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and clicking any square recolors your patch to that square's color,
     absorbing neighbors that now match.
-    Track the clicks it takes to make the whole field one color;
-    for competition, alternate turns between players.
+    Track the clicks it takes to make the whole field one color.
+    For competition, alternate turns between players.
 3.  Make `Observable.notify()` survive an observer that raises an exception:
     every other observer still hears the change,
     and `notify()` re-raises the failures afterward, together,

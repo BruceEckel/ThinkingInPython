@@ -476,8 +476,8 @@ explains that placeholder.
 That fallback is also the risk:
 a material nobody registers gets the default answer,
 with no exception at runtime and no complaint from the type checker.
-Here "no special handling" is a genuine answer, so the fallback earns its keep;
-when no default makes sense,
+Here "no special handling" is a genuine answer, so the fallback earns its keep.
+When no default makes sense,
 that chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 Adding another operation that varies by material means writing another single-dispatch function.

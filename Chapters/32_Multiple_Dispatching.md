@@ -159,14 +159,14 @@ the object named in the method's own name.
 If you misread that convention, every result in the class appears backward.
 Each `eval_*()` method also receives an `item` argument, the original caller:
 the same object `compete()` held as `self` before passing it along.
-This game ignores it, since the outcome depends only on the two types;
-a richer game would read the caller's state through it.
+This game ignores it, since the outcome depends only on the two types.
+A richer game would read the caller's state through it.
 
 Those `Any` annotations give up static checking.
 `Item` declares neither `compete()` nor any `eval_*()` method,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
-With `Any`, a type checker cannot tell you when a class is missing one of the nine answers;
-the gap surfaces as an `AttributeError` during whichever duel first needs it.
+With `Any`, a type checker cannot tell you when a class is missing one of the nine answers.
+The gap surfaces as an `AttributeError` during whichever duel first needs it.
 A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
 The table version needs neither.
@@ -235,8 +235,8 @@ Two properties of the lookup carry over from the [table-driven state machine](31
 The lookup matches classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
 And a missing pair raises `KeyError` at the first duel that needs it,
-the fail-fast policy that suits a table under construction;
-adding `Lizard` in exercise 1 puts you in that situation.
+the fail-fast policy that suits a table under construction.
+Adding `Lizard` in exercise 1 puts you in that situation.
 
 Exact matching surprises people.
 This listing shows it refusing a subclass.
@@ -285,8 +285,8 @@ not just how many types it considers.
 It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`,
 which is the pair of dispatches the `eval_*()` family hand-rolls.
-Each class needs its own `@singledispatchmethod`;
-registering on a shared base gives every subclass one dispatcher,
+Each class needs its own `@singledispatchmethod`.
+Registering on a shared base gives every subclass one dispatcher,
 so the resolution on `self` no longer distinguishes them.
 That mistake is easy to make and hard to see.
 Like `singledispatch`, it matches on the MRO rather than exactly.
@@ -450,8 +450,8 @@ and only after both sides have declined does Python raise `TypeError`.
 
 Two details of the fallback are easy to get wrong.
 Raising `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
-The exception propagates immediately, so the right operand never gets its turn;
-only the sentinel keeps the second dispatch alive.
+The exception propagates immediately, so the right operand never gets its turn.
+Only the sentinel keeps the second dispatch alive.
 Python also skips the reflected call when both operands have the same type,
 so `Meters + Meters` settles inside `__add__()`.
 A class that implements only `__radd__()` cannot add itself to its own kind.
@@ -522,7 +522,8 @@ Everywhere else you choose between paying for the second dispatch in methods or 
 7.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
     Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
-    Single dispatch is enough here; the next exercise adds the second dispatch.
+    Single dispatch is enough here.
+    The next exercise adds the second dispatch.
 8.  Modify the above example to make the interactions more detailed.
     Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
     a `Dwarf` uses `Jargon` or `Play`,

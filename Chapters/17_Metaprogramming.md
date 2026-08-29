@@ -56,8 +56,8 @@ print(vars(x))
 ```
 
 `x` sees the changes you make to the class *after* `x`'s creation.
-The instance does not change;
-the last line shows its instance dictionary still empty.
+The instance does not change.
+The last line shows its instance dictionary still empty.
 Attribute lookup on an instance falls through to its class,
 so a change to a class reaches every object of that class,
 even ones already created.
@@ -427,8 +427,8 @@ The compiler doesn't care that the block arrived as a string.
 That is the difference from `greenhouse.py`,
 whose `init()` is a nested function rather than a method in a class body,
 so it gets no `__class__` cell and cannot use zero-argument `super()`.
-Text that reaches the compiler as a class body gets the cell;
-a function object handed to `type()` does not.
+Text that reaches the compiler as a class body gets the cell.
+A function object handed to `type()` does not.
 
 That string is also the danger.
 `exec()` runs its argument with the full power of the language,
@@ -548,8 +548,8 @@ def test_independent_hierarchies_have_separate_registries(
         init_subclass.Color.registry)
 ```
 
-The mechanism is reliable;
-the registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
+The mechanism is reliable.
+The registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
 [Factory](27_Factory.md#the-pythonic-factory-a-dictionary) covers both:
 a class in a module nobody imports never registers,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
@@ -583,7 +583,8 @@ so the interpreter still runs `class C(B): pass`.
 
 If you need the interpreter to refuse subclassing,
 older literature claims this requires a metaclass.
-It does not; `__init_subclass__()` can enforce it at each subclass creation:
+It does not.
+`__init_subclass__()` can enforce it at each subclass creation:
 
 ```python
 # final_runtime.py
@@ -643,8 +644,8 @@ when a rule about a class is enforced, who enforces it, and when?
 The language devices you have met divide into four families.
 
 `@final` and `@override` are *markers*.
-At runtime each sets a single attribute that nothing reads;
-the type checker carries the entire meaning,
+At runtime each sets a single attribute that nothing reads.
+The type checker carries the entire meaning,
 and the runtime half of [Making a Class Final](#making-a-class-final)
 had to be built by hand with `__init_subclass__()`.
 
@@ -944,8 +945,8 @@ since Python computes a new class's metaclass from all of its bases.
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
 except for `__new__()`,
-whose first argument is the metaclass and usually takes the name `mcls` or `mcs`;
-here `cls` is the class object under construction, `Simple`.
+whose first argument is the metaclass and usually takes the name `mcls` or `mcs`.
+Here `cls` is the class object under construction, `Simple`.
 As with any subclass, call the base-class version first through `super()`.
 
 Metaprogramming and static typing pull against each other.
@@ -1146,8 +1147,8 @@ so combining them is impossible in any context.
 <!-- vale proselint.Very = NO -->
 The `# type: ignore` comment appears because ty knows this rule statically.
 Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
-A type checker that predicts a crash before the program runs is static typing at its best;
-the comment suppresses the diagnostic only because raising that crash is educational.
+A type checker that predicts a crash before the program runs is static typing at its best.
+The comment suppresses the diagnostic only because raising that crash is educational.
 <!-- vale proselint.Very = YES -->
 
 A metaclass can multiply inherit like any other class,
@@ -1272,8 +1273,8 @@ No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
 by which time the duplicate has already won.
 The `# noqa: F811` suppresses ruff's own report of the same mistake,
-which is the static half of the check; `__prepare__()` catches it at run time,
-including on names the body computes.
+which is the static half of the check.
+`__prepare__()` catches it at run time, including on names the body computes.
 
 These are real but uncommon.
 For everything else, `__init_subclass__()`, `__set_name__()`,
@@ -1282,8 +1283,8 @@ are simpler and easier to read.
 A class decorator receives the finished class, so it can add, replace,
 or inspect members, but it cannot change the name, the bases, or the namespace,
 and it cannot give the class object behavior of its own.
-Setting `__call__` from a decorator makes *instances* callable;
-only a metaclass makes the class callable in a new way.
+Setting `__call__` from a decorator makes *instances* callable.
+Only a metaclass makes the class callable in a new way.
 That is the whole case for a metaclass: the class object needs behavior,
 and nothing that runs after the class exists can give it any.
 

@@ -220,8 +220,8 @@ print(len({id(s) for s in built}) > 1)
 Eight threads, more than one object.
 Every thread checks the cache before any of them has filled it,
 so each runs the constructor and hands its caller a different object.
-Only the last one to finish stays in the cache;
-the other seven are already in the hands of their callers.
+Only the last one to finish stays in the cache.
+The other seven are already in the hands of their callers.
 
 `@cache` disappears below, because it no longer makes the object single:
 
@@ -287,8 +287,8 @@ That is the price of laziness under threads.
 The classic escape is *double-checked locking*:
 test `_instance` before taking the lock,
 take it only when the test says the object is missing, then test again inside.
-The second test is the one note 3 insists on;
-the first exists to skip the lock once the object is there.
+The second test is the one note 3 insists on.
+The first exists to skip the lock once the object is there.
 It works, but it asks the reader to reason about what a [free-threaded](19_Concurrency.md#free-threading)
 interpreter may reorder, which is a bad trade for saving a lock acquisition.
 Eager creation is a better answer when you can build the object at import time:
@@ -631,12 +631,12 @@ which skips `__init__()` on every later construction,
 so the first call's arguments win.
 A class that overrides `__new__()` instead,
 as `singleton_class_variable.py` does, still runs on every call,
-unlike the metaclass form above;
-that listing puts its work inside `__new__()` itself,
+unlike the metaclass form above.
+That listing puts its work inside `__new__()` itself,
 so later calls append to the shared instance instead of overwriting it.
 That chapter also covers `__init_subclass__()` and `__set_name__()`,
-the simpler hooks that replace most metaclasses;
-a singleton needs none of this machinery.
+the simpler hooks that replace most metaclasses.
+A singleton needs none of this machinery.
 
 ## Which Should You Use?
 

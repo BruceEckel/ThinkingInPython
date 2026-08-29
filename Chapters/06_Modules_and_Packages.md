@@ -124,8 +124,8 @@ app_settings.show()
 and `show()` sees the new value because it looks the name up in its own module every time it runs.
 The local `debug` is a separate binding that `from` set once, at import,
 so it still holds `False`.
-Import the module and write `app_settings.debug` when the value can change;
-use `from ... import` for names that keep the same value,
+Import the module and write `app_settings.debug` when the value can change.
+Use `from ... import` for names that keep the same value,
 such as functions and classes.
 
 You can rename a module's namespace during an import using the `as` keyword:
@@ -285,8 +285,8 @@ print(function2())
 This listing, `from_packages.py`,
 and `using_packages.py` print the same loading messages:
 `from` does not load less.
-The whole module runs either way;
-the statement decides only which names this file binds.
+The whole module runs either way.
+The statement decides only which names this file binds.
 
 You can put a second package underneath the first one:
 
@@ -360,7 +360,8 @@ Python places the first one to load in `sys.modules` before its body finishes,
 so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
 A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
-not to have finished running; the failure then surfaces later,
+not to have finished running.
+The failure then surfaces later,
 wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
 move the shared piece into a third module both can import.
@@ -465,8 +466,8 @@ Python searches `sys.path`, a list of directories it builds at startup.
 `print(sys.path)` shows it.
 Its first entry is the directory of the script you ran
 (the current directory when you use `-m` or the REPL),
-which is why `use_module.py` can `import module` with no setup;
-the entries from `PYTHONPATH` come next,
+which is why `use_module.py` can `import module` with no setup.
+The entries from `PYTHONPATH` come next,
 and installed packages sit further down.
 Running with `-P` drops that first entry,
 so a local `random.py` can no longer shadow the standard library.
@@ -564,7 +565,7 @@ Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
 `all` defers every module-level import the keyword could have marked,
 so the imports it cannot mark, such as one inside a `try` block, stay eager.
-The PEP also describes a third value, `none`, a global off switch;
+The PEP also describes a third value, `none`, a global off switch.
 CPython removed it before the 3.15 release.
 
 Don't make an import lazy when you import a module for what its body does rather than for a name it defines.

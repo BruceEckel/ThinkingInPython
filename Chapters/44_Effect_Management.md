@@ -290,8 +290,8 @@ is a space heater with extra steps.
 
 Effects are not a defect to design away.
 They are the reason a program exists.
-Effect Management does not eliminate Effects;
-it isolates them so the rest of the program can stay pure
+Effect Management does not eliminate Effects.
+It isolates them so the rest of the program can stay pure
 (people call this "pushing the Effects to the edges").
 
 So why track them at all?

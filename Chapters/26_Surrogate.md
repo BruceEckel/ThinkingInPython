@@ -62,8 +62,8 @@ p.h()
 As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
 it satisfies the basic idea.
 That is a looser definition than *GoF Design Patterns* uses.
-Under GoF's stricter definition the interface separates *Proxy* from *Adapter*;
-under the looser one here, the intent does.
+Under GoF's stricter definition the interface separates *Proxy* from *Adapter*.
+Under the looser one here, the intent does.
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
 sorts out both readings.
 
@@ -187,8 +187,8 @@ p.h()
 `__getattr__()` makes the forwarding generic:
 `Proxy` names no method of `Implementation`,
 so it keeps working when the implementation grows a method.
-The proxy still depends on one implementation class, which it constructs;
-accepting an implementation as a constructor argument removes that tie too.
+The proxy still depends on one implementation class, which it constructs.
+Accepting an implementation as a constructor argument removes that tie too.
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
 to `_Proxy__implementation`,
@@ -210,7 +210,7 @@ That verification stops at the proxy.
 `p.f()` goes through `__getattr__()`, whose return type is unknown,
 so nothing the proxy declares can make that call checkable.
 Explicit forwarding, as in `proxy_1.py`,
-is the version a type checker can see through;
+is the version a type checker can see through.
 `__getattr__()` trades that for reach.
 
 One limit: special methods bypass `__getattr__()`.
@@ -335,16 +335,16 @@ so storing a double-underscore name through `object.__setattr__()` would mean wr
 `"_WriteProxy__impl"`, by hand.
 
 Identity has the same gap.
-A proxy is not an instance of the implementation's class;
-delegation forwards the methods, not the type.
+A proxy is not an instance of the implementation's class.
+Delegation forwards the methods, not the type.
 A `@runtime_checkable` `Protocol` does not close that gap either.
 Since Python 3.12 that check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries directly and does not call `__getattr__()`,
 so a proxy whose methods all arrive through delegation fails it too.
 Ordinary attribute access still finds those methods,
 so `hasattr(p, "f")` is `True` and `p.f()` runs.
-Code that calls the method, or probes with `hasattr()`, works on a surrogate;
-code that asks `isinstance()` sees only the proxy's own class.
+Code that calls the method, or probes with `hasattr()`, works on a surrogate.
+Code that asks `isinstance()` sees only the proxy's own class.
 
 ```python
 # proxy_identity.py

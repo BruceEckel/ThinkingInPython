@@ -52,7 +52,8 @@ Effect[Need[Console], KeyError, None]
 This particular Effect needs a `Console`, can fail with a `KeyError`,
 and produces nothing.
 The first parameter is `Need[Console]`, not `Console`.
-The Effect asks for a console; it does not carry one.
+The Effect asks for a console.
+It does not carry one.
 Something else supplies the console later,
 and [Nothing Runs Yet](#nothing-runs-yet)
 explains why that request must be a value of its own.
@@ -572,7 +573,8 @@ The call still builds a description, and the body discards it unrun.
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too.
 In ZIO Direct the fix is `.run`,
-and in a `for` comprehension it is the `<-` binding; Python's is `yield from`.
+and in a `for` comprehension it is the `<-` binding.
+Python's is `yield from`.
 The hazard belongs to deferred execution rather than to generators.
 When an Effect appears to do nothing, look for a missing `yield from`.
 
@@ -1393,7 +1395,8 @@ With Stateless, you leave the body alone and lift the exception into the signatu
 
 ### A Failure Travels as a Value
 
-Calling `score()` runs nothing; it returns an `Effect`.
+Calling `score()` runs nothing.
+It returns an `Effect`.
 If you advance the `Effect` one step with `next()`,
 the `KeyError` arrives as a value, not as a raised exception:
 
@@ -1690,7 +1693,8 @@ which raises it as an ordinary exception,
 like `error_escapes.py` did for a single error.
 `pytest.raises(ValueError)` is the whole assertion:
 the failure the signature declares is the one the caller sees.
-Failures never vanish; they only relocate.
+Failures never vanish.
+They only relocate.
 
 ## Emptying the Channels
 

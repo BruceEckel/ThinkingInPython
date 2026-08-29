@@ -28,8 +28,8 @@ The chapter then collects every tool in one place and weighs what the whole appr
 ## Abilities Are Not Special
 
 A custom Ability is a request you design.
-A `Need` asks for an instance and gets whatever the handler supplies;
-your own Ability can ask for anything you can name,
+A `Need` asks for an instance and gets whatever the handler supplies.
+Your own Ability can ask for anything you can name,
 and the handler answering it is an ordinary function,
 so the answer can differ at every request.
 
@@ -234,8 +234,8 @@ so `handle()` reads the exhausted script as the end of the program.
 Asking `count_heads()` for six tosses from this five-value script makes `run()` produce `None` instead of a count,
 with no exception, the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
-Every other exception a handler raises travels out of `run()` normally;
-this one collides with the protocol.
+Every other exception a handler raises travels out of `run()` normally.
+This one collides with the protocol.
 Indexing a list rather than walking an iterator turns the mistake into an `IndexError` you can see.
 
 ### A Clock
@@ -396,10 +396,10 @@ Using a real clock, you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
 and the bug report says the log file is occasionally short by a few lines.
 The Ability makes the moment reachable.
-`archive()` does not read a clock; it asks for a moment,
-and a handler decides which moment that is.
-Both handlers answer the same two requests;
-they differ in whether midnight falls between them.
+`archive()` does not read a clock.
+It asks for a moment, and a handler decides which moment that is.
+Both handlers answer the same two requests.
+They differ in whether midnight falls between them.
 
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.
 It walks a fixed list, so it holds state between requests,
@@ -757,7 +757,7 @@ returns to the theme.
 Nothing guards the cell.
 Forking two Effects that share a `Cell` interleaves their reads and writes,
 and no type reports the race.
-ZIO's `Ref` is this cell with atomic update built in;
+ZIO's `Ref` is this cell with atomic update built in.
 Stateless has no equivalent,
 so under `fork()` the cell is as exposed as any Python global.
 
@@ -1186,7 +1186,7 @@ so the guard must sit downstream, in an annotation that spells the union out,
 as `outcome()`'s return type does,
 or in a `match` that ends with `assert_never()`.
 Without such a guard, the new failure becomes a value that flows on unexamined.
-`catch()` makes each failure an explicit decision;
+`catch()` makes each failure an explicit decision.
 `catch_all()` decides for all of them at once.
 
 Two cautions.
@@ -1439,8 +1439,8 @@ grown from two parameters to five.
 Its annotations do the upcasting, so no actor needs `as_type()`,
 and its body is the one place in the program where an Ability meets an implementation.
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
-Each was a class with a method per product;
-each is now a function that hands `play()` a matched set.
+Each was a class with a method per product.
+Each is now a function that hands `play()` a matched set.
 The parallel hierarchies vanish with them.
 `Kitty` does not extend a `Character` base class,
 `Puzzle` does not extend an `Obstacle` base class,
@@ -1489,7 +1489,8 @@ print(len(script.lines), script.lines[1])
 One engine, four runs, and the only difference is what you supply.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `Weapon` across a `Wasteland`; it type-checks, and it runs.
+A `Kitty` bats at a `Weapon` across a `Wasteland`.
+It type-checks, and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
@@ -1643,8 +1644,8 @@ And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
 Retrying is not free: it needs a clock, and the signature says so.
 If you leave the `Time()` out, `ty` rejects the `run()` call.
 This is the thesis of both chapters applied to a cross-cutting concern.
-Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see;
-here it changes a type, and every caller learns about the new dependency.
+Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see.
+Here it changes a type, and every caller learns about the new dependency.
 
 The renamed error invites a mistake the type checker accepts.
 If you write `catch(Crashed)(retried)`, catching the error you started with,
@@ -1714,8 +1715,8 @@ which is the same fact that made `retry()` decorate the function.
 
 `fork()` hands an Effect to an `Executor` and returns a `Task`,
 and `wait()` collects the result.
-This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine);
-it accepts a `Task` as readily as an awaitable:
+This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine).
+It accepts a `Task` as readily as an awaitable:
 
 ```python
 # parallel.py

@@ -216,4 +216,5 @@ Python includes the piece their inventors set out to supply.
 
 What survives the subtraction is the intent, not the structure.
 [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
-argues this in general; each chapter above works one case.
+argues this in general.
+Each chapter above works one case.

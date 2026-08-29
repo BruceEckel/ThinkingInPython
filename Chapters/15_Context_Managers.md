@@ -25,8 +25,8 @@ The simplest way to write a context manager is a generator function with a singl
 which the `contextlib.contextmanager` decorator turns into a context manager.
 The `yield` here works the way it does in a `pytest` fixture that [`yield`s its value](11_Testing.md#fixtures-replace-setup-and-teardown):
 everything before it is setup, everything after it is teardown.
-[Iterators](23_Iterators.md#generators) covers generators in full;
-this chapter needs nothing beyond that shape.
+[Iterators](23_Iterators.md#generators) covers generators in full.
+This chapter needs nothing beyond that shape.
 
 ```python
 # trace_gen.py
@@ -224,8 +224,8 @@ and its traceback object.
 the most general type, since it never inspects either one.
 
 The return value decides that exception's fate.
-A falsy value lets it propagate;
-this includes the implicit `None` of a method with no `return`,
+A falsy value lets it propagate.
+This includes the implicit `None` of a method with no `return`,
 so the exception propagates by default.
 A truthy value *suppresses* it: the `with` statement swallows the exception,
 and execution continues after the block.
@@ -703,7 +703,8 @@ which [Concurrency](19_Concurrency.md) covers.
 Everything this chapter says about ordering, the three exception arguments,
 and suppression through a truthy return applies unchanged.
 That chapter uses `async with` throughout, for `asyncio.TaskGroup`, locks,
-and semaphores; each of those is an object with the two `a`-prefixed methods.
+and semaphores.
+Each of those is an object with the two `a`-prefixed methods.
 
 ## An Object Pool
 

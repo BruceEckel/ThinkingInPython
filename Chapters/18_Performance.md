@@ -44,7 +44,7 @@ as the official 3.14 and later Windows and macOS binaries do,
 keep it switched off unless you set `PYTHON_JIT=1`,
 and the gain is currently modest, roughly 4 to 12 percent depending on platform,
 so measure it before planning around it.
-Whether it becomes a supported feature is an open question;
+Whether it becomes a supported feature is an open question.
 [PEP 836](https://peps.python.org/pep-0836/) lays out the path.
 
 Alternative interpreters for Python exist, notably PyPy,
@@ -63,8 +63,8 @@ but programmers turn out to be bad at guessing this.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library includes two.
-The first is a deterministic tracing profiler; the second, new in Python 3.15,
-is a sampling profiler.
+The first is a deterministic tracing profiler.
+The second, new in Python 3.15, is a sampling profiler.
 The classic `cProfile` arrived in 2006.
 It deterministically records every function call and return.
 Its numbers are exact, but the instrumentation slows the program,
@@ -73,8 +73,8 @@ Here's how you run `cProfile` on `my_program.py`:
 
     python -m cProfile -s cumulative my_program.py
 
-The report is a table, one row per function; this one profiles a small script,
-`prof_demo.py`:
+The report is a table, one row per function.
+This one profiles a small script, `prof_demo.py`:
 
        ncalls  tottime  percall  cumtime  percall filename:lineno(function)
             1    0.000    0.000    0.007    0.007 {built-in method builtins.exec}
@@ -388,7 +388,8 @@ Other examples:
 - A comprehension is faster than an `append()` loop,
   though the margin is now small
   (one bytecode appends the element, instead of an attribute lookup and a call).
-  Write it for the readability; the speed is a rounding error.
+  Write it for the readability.
+  The speed is a rounding error.
 - The C-implemented standard library's `itertools`, `collections`,
   and `functools` are faster than hand-rolled equivalents
   ([Iterators](23_Iterators.md#reusable-algorithms) tours the iterator algorithms).
@@ -575,8 +576,8 @@ print(heapq.nlargest(2, [5, 1, 8, 3, 2]))
 After `heapify()` the smallest element sits at index 0.
 `nsmallest()` and `nlargest()` answer top-N questions without heapifying the list first.
 
-Through Python 3.13, `heapq` only built a min-heap;
-getting a max-heap meant negating every value going in and out.
+Through Python 3.13, `heapq` only built a min-heap.
+Getting a max-heap meant negating every value going in and out.
 Python 3.14 added `_max` variants
 (`heapify_max()`, `heappush_max()`, `heappop_max()`, and friends)
 that keep the largest item at index 0 instead,
@@ -1003,7 +1004,8 @@ print(view.nbytes)
 
 The view shares storage with `data`,
 so writing through it changes the original and copies no bytes.
-`bytes(chunk)` does copy, but only to print the slice; the view copies nothing.
+`bytes(chunk)` does copy, but only to print the slice.
+The view copies nothing.
 
 The saving shows up at a size worth measuring:
 
@@ -1078,8 +1080,8 @@ or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade from [Assurance](43_Functional_Assurance.md#declarative-style):
 describe the whole-array result and let the engine arrange the steps.
 
-One machine measured the vectorized pass at about 11x faster than the loop;
-the 3x threshold sits far below any multiple you should see.
+One machine measured the vectorized pass at about 11x faster than the loop.
+The 3x threshold sits far below any multiple you should see.
 
 ## JIT Compilation with Numba
 
@@ -1317,8 +1319,8 @@ print(f"collatz_lengths Rust speedup: "
 The repository's `rust/README.md` explains how to build and run it yourself.
 `cd rust && make` compiles both functions, installs the module,
 and runs this same comparison, printing your machine's own numbers.
-The main book build never does this and never requires a Rust toolchain;
-building `rust/` is a separate, opt-in step.
+The main book build never does this and never requires a Rust toolchain.
+Building `rust/` is a separate, opt-in step.
 
 That is one baseline and three ways past it.
 The plain Python loop from the Numba example above is the baseline.

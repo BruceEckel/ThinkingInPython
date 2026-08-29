@@ -8,8 +8,8 @@ which you might not miss on small programs.
 
 Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
-The Python runtime ignores type hints;
-it does not evaluate them until something asks for them.
+The Python runtime ignores type hints.
+It does not evaluate them until something asks for them.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool
 (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -176,8 +176,8 @@ print(MAX_RETRIES, GREETING)
 ```
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
-You can still append to a `Final[list[str]]`;
-the type checker refuses only an assignment to the name.
+You can still append to a `Final[list[str]]`.
+The type checker refuses only an assignment to the name.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
@@ -185,7 +185,7 @@ The rest of the book uses the explicit `Final[T]` form,
 which declares the intended type instead of accepting whatever the initializer produces.
 The difference emerges when the initializer's own type is not the type you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
-so the type checker ignores whatever goes into the list;
+so the type checker ignores whatever goes into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
 and the type checker enforces it.
 
@@ -337,7 +337,7 @@ instead of scattering the literal list across every function that accepts a `Col
 
 A `Literal` union is the lightest way to close a set of values.
 Once those values need behavior or an identity of their own,
-an `Enum` is the better fit;
+an `Enum` is the better fit.
 [Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too)
 compares the two.
 
@@ -554,8 +554,8 @@ which is useful at the edges of a program where untrusted input enters.
 The hints are for the tools and for the reader.
 
 From here on, this book assumes the type checker runs on everything.
-When a listing says the type checker rejects a line, that is the enforcement;
-the following chapters do not repeat that Python itself would run the line anyway.
+When a listing says the type checker rejects a line, that is the enforcement.
+The following chapters do not repeat that Python itself would run the line anyway.
 
 ## How Much to Annotate
 
@@ -711,8 +711,8 @@ The forms above are the modern ones.
     Confirm `.bump().bump().report()` still chains correctly on a `LoudTally`.
 5.  Add `reveal_type(words.top())` to `type_defaults.py` and run `ty check` on the file.
     Remove the `= str` default and run it again.
-    `ty` reports no error either way;
-    say what that means for a bare `Stack` annotation.
+    `ty` reports no error either way.
+    Say what that means for a bare `Stack` annotation.
 6.  In `type_aliases.py`,
     call `paint(grid, (2, 3), "purple")` and run `ty check`.
     Read the error, then widen `Color` to admit `"purple"` and confirm the error goes away.

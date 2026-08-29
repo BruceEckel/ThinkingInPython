@@ -100,7 +100,7 @@ print(sorted(words, reverse=True))
 
 `sorted(x)` returns the result while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
-Uppercase sorts before lowercase because Python compares strings by code point;
+Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Functions.md#lambdas) shows how `key=` changes that.
 
 A `list` does not restrict its elements to one type.
@@ -160,7 +160,8 @@ print(xs)
 
 The loop advances an index as the list shrinks under it,
 so it skips the element that slides into each removed one's slot,
-with no exception to tell you; that is why half of `xs` survives.
+with no exception to tell you.
+That is why half of `xs` survives.
 Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 
 A loop with `append()` is not the usual way to build a list from another one.
@@ -301,8 +302,8 @@ Only `items()` yields `(key, value)` pairs,
 so `for name, age in ages` is a common slip:
 it iterates the keys and tries to unpack each one.
 Here that raises `ValueError`,
-since a key like `"Alice"` has more than two characters;
-a two-character key would silently unpack into its letters instead.
+since a key like `"Alice"` has more than two characters.
+A two-character key would silently unpack into its letters instead.
 
 A `dict` iterates in insertion order, which the language guarantees.
 
@@ -331,7 +332,7 @@ They are not symmetric here: on a key both dictionaries hold,
 the right operand's value wins, which is why `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 which it accepts from any source.
-`zip()` pairs up two sequences element by element;
+`zip()` pairs up two sequences element by element.
 [Control Flow](04_Control_Flow.md#loops) covers it with the other loop tools.
 
 ## Sets
@@ -408,14 +409,14 @@ They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
-Single elements move in and out with `add()`, `remove()`, and `discard()`;
+Single elements move in and out with `add()`, `remove()`, and `discard()`.
 `remove()` raises `KeyError` on a missing element, `discard()` stays silent.
 
 Converting a `list` to a `set` before repeated lookups speeds them up.
-A `list` compares against every element in turn;
-a `set` computes one hash and looks in one place.
-`timeit()` runs a callable `number` times and returns the total elapsed seconds;
-the `lambda:` prefix wraps an expression into the callable it needs
+A `list` compares against every element in turn.
+A `set` computes one hash and looks in one place.
+`timeit()` runs a callable `number` times and returns the total elapsed seconds.
+The `lambda:` prefix wraps an expression into the callable it needs
 ([Functions](05_Functions.md#lambdas) covers `lambda` fully):
 
 ```python
@@ -773,9 +774,10 @@ Immutability pays off when it goes all the way down.
 shows the same leak inside a frozen data class.
 
 Choosing a container comes down to one question: what do you do with it most?
-Ordered items you walk through are a `list`;
-a fixed record whose positions mean different things is a `tuple` or a `namedtuple`;
-lookup by key is a `dict`; uniqueness and membership are a `set`.
+Ordered items you walk through are a `list`.
+A fixed record whose positions mean different things is a `tuple` or a `namedtuple`.
+Lookup by key is a `dict`.
+Uniqueness and membership are a `set`.
 Go past those four only when a measurement or a specific job says to,
 and freeze whichever you pick as soon as it stops changing.
 
@@ -786,7 +788,8 @@ and freeze whichever you pick as soon as it stops changing.
     Does `deque_time < list_time` still hold?
     Change `n` to `200_000` and try again.
     The list version takes several seconds at that size,
-    and much longer on a slow machine; that is the point.
+    and much longer on a slow machine.
+    That is the point.
     Explain what changes about the comparison as `n` grows.
 2.  In `defaultdict.py`, replace `defaultdict(list)` with `defaultdict(int)`,
     change the loop to count occurrences of each `kind` instead of collecting names,

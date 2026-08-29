@@ -15,8 +15,8 @@ that instance attribute *shadows* the class attribute.
 In C++ or Java, the language allocates storage for such a field in each object before the constructor runs,
 which makes this behavior a surprise.
 A Python class attribute corresponds to a C++ or Java `static` field.
-Python has no syntax for declaring a per-object field in the class body;
-assigning through `self` inside a method creates that storage instead.
+Python has no syntax for declaring a per-object field in the class body.
+Assigning through `self` inside a method creates that storage instead.
 
 This example shows why it can be confusing:
 
@@ -65,8 +65,8 @@ print(vars(A)["x"])
 #: 100
 ```
 
-The listing subscripts `vars(A)` because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`;
-the instance dictionary is a plain `dict` holding only what the code assigned.
+The listing subscripts `vars(A)` because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`.
+The instance dictionary is a plain `dict` holding only what the code assigned.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
@@ -238,8 +238,8 @@ print(a.total, b.total, Tally.total)
 ```
 
 `self.total += 1` expands to `self.total = self.total + 1`.
-The read falls back to the class and finds `0`;
-the write creates a fresh `total` on the instance.
+The read falls back to the class and finds `0`.
+The write creates a fresh `total` on the instance.
 Every `Tally` counts itself once and the shared counter never moves,
 which is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
@@ -259,8 +259,8 @@ says more than `ClassVar[int]`:
 it declares the value shared *and* not reassignable.
 Use `ClassVar` when you intend the shared value to change,
 as `Tally.total` does.
-The bug is not the class attribute;
-it is writing one where you meant a per-object default.
+The bug is not the class attribute.
+It is writing one where you meant a per-object default.
 
 ## ClassVar and Inheritance
 
@@ -341,8 +341,8 @@ print(vars(B)["x"], vars(B())["x"])
 
 This listing's `A` and the one in `inside_objects.py` both start `x` at `100`,
 and the two behave in opposite ways.
-There the `100` lives on the class and every instance reads it;
-here it is a default argument, and `self.x = x` runs on every construction,
+There the `100` lives on the class and every instance reads it.
+Here it is a default argument, and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
 Python still builds the default value once, at definition time

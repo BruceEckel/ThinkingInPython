@@ -61,8 +61,8 @@ except TypeError as e:
 
 When you call a method for an object, as in `x.show()`,
 Python passes the object reference automatically.
-The "1" in the error message is that reference;
-a method that omits `self` cannot receive it.
+The "1" in the error message is that reference.
+A method that omits `self` cannot receive it.
 A type checker sees the mistake without running anything,
 which is why the call carries a `# type: ignore` saying it is deliberate.
 
@@ -135,7 +135,7 @@ Then inherit by listing the class
 (or classes, since Python supports multiple inheritance, which [Rethinking Objects](20_Rethinking_Objects.md) argues against in favor of protocols)
 in parentheses after the name of the inheriting class.
 This example imports and subclasses `Simple`, from the `simple_class` module.
-Ignore the `@override` decorator for now;
+Ignore the `@override` decorator for now.
 [Marking Overrides with `@override`](#marking-overrides-with-override)
 explains it:
 
@@ -262,7 +262,7 @@ silently produces a new method instead of an override.
 This bug is easy to miss.
 
 The `@override` decorator from the `typing` module closes that gap.
-A line starting with `@` above a definition applies a *decorator* to it;
+A line starting with `@` above a definition applies a *decorator* to it.
 [Decorators](14_Decorators.md) shows how they work,
 and this chapter only applies existing ones.
 `@override` declares that a method replaces one from a base class:

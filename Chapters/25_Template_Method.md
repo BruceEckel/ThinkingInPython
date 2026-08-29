@@ -11,8 +11,8 @@ You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.
 `TestCase.run()` is the template method.
 It calls `setUp()`, then your test method, then `tearDown()`.
-Constructing a `TestCase` runs nothing;
-the test runner calls `run()` on the finished object.
+Constructing a `TestCase` runs nothing.
+The test runner calls `run()` on the finished object.
 
 ## The Fixed Algorithm
 
@@ -215,8 +215,8 @@ the subclass is clearer.
 If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps without extra work,
-since the base supplies the `...` default;
-the function form must give each parameter a default of its own.
+since the base supplies the `...` default.
+The function form must give each parameter a default of its own.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.

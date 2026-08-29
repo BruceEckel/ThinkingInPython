@@ -527,8 +527,8 @@ readable but invisible to the class definition,
 so `repr()` omits it and `==` ignores it.
 The loaded object is equal to, and hashes the same as,
 one built fresh without that field.
-The added-field drift above at least fails when something touches the gap;
-this one never raises an exception.
+The added-field drift above at least fails when something touches the gap.
+This one never raises an exception.
 The data is quietly wrong.
 Renaming a field is a delete and an add at once, and does both:
 the old name becomes a ghost and the new one is missing,

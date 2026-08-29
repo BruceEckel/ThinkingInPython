@@ -359,7 +359,8 @@ the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
 [Reusable Algorithms](23_Iterators.md#reusable-algorithms)
-introduced several of these as iterator plumbing; this section is the catalog.
+introduced several of these as iterator plumbing.
+This section is the catalog.
 
 ### `repeat`
 
@@ -645,8 +646,8 @@ print(list(a), list(b))
 ```
 
 Two cautions.
-After `tee()`, use only the returned iterators;
-advancing the original source steals values the copies never see.
+After `tee()`, use only the returned iterators.
+Advancing the original source steals values the copies never see.
 And `tee()` buffers every value one copy has consumed and the other has not,
 so draining `a` completely before touching `b`, as this demo does,
 stores the whole sequence.
@@ -778,8 +779,8 @@ The obvious-looking `list(squares())[:5]` is not the same program.
 It slices after building the list,
 so it asks `squares()` for every value before taking five,
 and the program never gets past that line.
-Slicing lazily lets the source be infinite;
-slicing a list requires a source that ends.
+Slicing lazily lets the source be infinite.
+Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
 looks at the same idea from the perspective of memory and speed.
 
@@ -1032,8 +1033,8 @@ Each of those replaces a small piece of code that works the first time and fails
 the single element, or the last partial batch.
 
 The second rule is that the pieces exist to stack.
-`islice(count(10, 2), 5)` in this chapter is two stages;
-a real pipeline is five or six, and it still holds one item in memory at a time.
+`islice(count(10, 2), 5)` in this chapter is two stages.
+A real pipeline is five or six, and it still holds one item in memory at a time.
 [Error Handling](42_Functional_Error_Handling.md)
 asks what such a pipeline does when one stage fails,
 the question a chain of pure functions leaves open.

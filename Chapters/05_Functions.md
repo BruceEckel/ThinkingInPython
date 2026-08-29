@@ -61,7 +61,8 @@ which the caller usually unpacks:
 
     low, high = minmax([3, 1, 4])
 
-The commas build the tuple; the function still returns one object.
+The commas build the tuple.
+The function still returns one object.
 
 Here, the same function applies the `+` operator to integers and strings:
 
@@ -149,8 +150,8 @@ print(good_append(2))
 #: [2]
 ```
 
-A mutable default persists because it lives on the function object;
-no call rebuilds it.
+A mutable default persists because it lives on the function object.
+No call rebuilds it.
 `__defaults__` holds the tuple of default values,
 and both calls append to the same list inside it.
 The default looks like an expression the call evaluates, and it is not.
@@ -187,7 +188,8 @@ print(mine)
 so the caller sees the change.
 `rebind()` assigns to the parameter,
 which points the local name at a new list and leaves the caller's list alone.
-Mutating an argument reaches outside the function; rebinding one does not.
+Mutating an argument reaches outside the function.
+Rebinding one does not.
 
 The `None` default in `good_append()` is a *sentinel*:
 a value chosen to mean "the caller passed nothing" rather than to serve as data.
@@ -319,8 +321,8 @@ report("point", 3, 4, color="red", size=10)
 #: point (3, 4) {'color': 'red', 'size': 10}
 ```
 
-The names `args` and `kwargs` are convention;
-the `*` and `**` do the collecting,
+The names `args` and `kwargs` are convention.
+The `*` and `**` do the collecting,
 so `*values` and `**options` behave identically.
 
 ## Unpacking Arguments
@@ -375,7 +377,8 @@ and `func.__name__` reads the name of whatever function arrived
 
 Two markers in a parameter list control how callers may pass arguments,
 which decides how much of a signature you commit to keeping.
-A parameter a caller can name is part of the contract; one it cannot is not.
+A parameter a caller can name is part of the contract.
+One it cannot is not.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.
@@ -479,7 +482,7 @@ print(square(9))
 ```
 
 Assigning a lambda to a name, as `square` does,
-gives up the anonymity that is a lambda's point;
+gives up the anonymity that is a lambda's point.
 `def` also gives the function a real name for tracebacks.
 Unlike anonymous functions in many other languages,
 a lambda body must be a single expression.

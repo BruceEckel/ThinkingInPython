@@ -75,8 +75,8 @@ class StateMachine:
 `run_all()` is the template method: it fixes the flow
 (report the input, transition, run the new state),
 while the varying behavior lives in each `State`'s `run()` and `next()`.
-[Template Method](25_Template_Method.md) puts the varying steps in a subclass;
-here they come from the `State` objects the machine holds.
+[Template Method](25_Template_Method.md) puts the varying steps in a subclass.
+Here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
 the construction-starts-the-engine choice that [drew a warning in that chapter](25_Template_Method.md#dont-start-the-engine-in-the-constructor).
 It is safe here for two reasons that are easy to lose:
@@ -432,7 +432,8 @@ and a later `import` takes the cached module without looking at any file.
 Two files named `state_machine.py` in one program therefore collapse into one:
 whichever imported first wins,
 and the second import silently gets the wrong module.
-The states in this design do nothing; the table holds all the behavior.
+The states in this design do nothing.
+The table holds all the behavior.
 
 ### The Engine
 
@@ -484,8 +485,8 @@ A generated `__init__()` cannot rename the parameter.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
-Several candidate transitions can share one `(state, input)` key;
-their conditions tell them apart.
+Several candidate transitions can share one `(state, input)` key.
+Their conditions tell them apart.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
@@ -500,8 +501,8 @@ That lets the vending machine below treat `FirstDigit` and `SecondDigit` as dist
 and it cuts the other way too:
 if you define a further subclass of an event type,
 it matches none of its parent's rows.
-An event's dispatch class must appear in the table by name;
-a subclass will not do.
+An event's dispatch class must appear in the table by name.
+A subclass will not do.
 
 Both callables receive the event, whether they need it or not,
 which is why `refund()` takes an argument it ignores.
@@ -523,8 +524,8 @@ The conditions and actions are ordinary methods, stored directly in the table.
 
 The states are an `Enum`,
 so the type checker catches a misspelled state name instead of letting it fail silently at runtime.
-`MouseAction`'s values match lines of the input file;
-nothing parses these states from text,
+`MouseAction`'s values match lines of the input file.
+Nothing parses these states from text,
 so `Enum` with `auto()` serves in place of `StrEnum`:
 
 ```python

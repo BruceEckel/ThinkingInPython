@@ -338,8 +338,8 @@ print(sorted(words, key=len))
 ```
 
 Each call hands a function to another function and lets it do the looping.
-Returning a function is the other half of the definition; [Closures](#closures)
-covers it below.
+Returning a function is the other half of the definition.
+[Closures](#closures) covers it below.
 
 The `list()` calls are not decoration.
 `map()` and `filter()` return one-shot iterators,
@@ -358,7 +358,7 @@ more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` 
 `map()` and `filter()` earn their keep when the function already exists:
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
 The two are not quite the same object, either.
-The comprehension hands you a finished list;
+The comprehension hands you a finished list.
 `map()` hands you an iterator you can feed into the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
@@ -444,7 +444,7 @@ No other code can name that variable, so no accident can corrupt it.
 
 `increment()` is impure, and deliberately so.
 The contrast with `withdraw()` is the lesson.
-`withdraw()` mutates a module-level name that any code can touch;
+`withdraw()` mutates a module-level name that any code can touch.
 `increment()` mutates a name that only it can touch.
 When state must exist,
 a closure is one way to give exactly one function the right to change it.
@@ -548,8 +548,8 @@ so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
 so the marker looks like an `int` in the wrong place and the resulting callable looks like it takes nothing.
-The runtime behaves correctly;
-the annotations for this feature have not caught up.
+The runtime behaves correctly.
+The annotations for this feature have not caught up.
 
 ## Composing Functions
 
@@ -597,7 +597,7 @@ and you build larger behavior by naming a new composition rather than writing ne
 When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 
-The standard library supplies whole modules of these small, composable pieces;
+The standard library supplies whole modules of these small, composable pieces.
 [Toolkits](41_Functional_Toolkits.md) tours them.
 
 ## Putting the Pieces Together

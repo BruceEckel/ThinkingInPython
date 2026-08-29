@@ -131,8 +131,8 @@ if __name__ == "__main__":
 `Directory` now takes its entries as one tuple rather than as varargs,
 because `@dataclass` generates `__init__()` from the field declarations,
 and a field is one parameter.
-The tuple keeps the tree immutable;
-a paragraph below says why a `list` would not do.
+The tuple keeps the tree immutable.
+A paragraph below says why a `list` would not do.
 
 `Directory` names `Node` before its definition below,
 which works because Python evaluates annotations and `type` aliases lazily
@@ -575,7 +575,7 @@ A `t`-string, which [Tour](02_Tour.md#t-strings) introduced,
 evaluates to a `Template`: a sequence of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iteration skips the empty literal pieces,
-so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
+so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 `template.strings` keeps the empty slots when the alternation matters.
 The grammar is flat rather than nested,
 so the walk is a loop instead of a recursion,
@@ -641,8 +641,8 @@ and the only remaining defense would be inspecting the result to guess which cha
 
 That is the general argument for handing a consumer the structure instead of the answer.
 A finished string has thrown away the distinction on which the safety decision depends.
-Textbooks usually present the Interpreter pattern as a way to add operations to a language;
-here it keeps a decision available to whoever should make it.
+Textbooks usually present the Interpreter pattern as a way to add operations to a language.
+Here it keeps a decision available to whoever should make it.
 
 ## Exercises
 
@@ -678,8 +678,8 @@ here it keeps a decision available to whoever should make it.
     Then write `evaluate_iterative()`,
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
-    Raising the limit with `sys.setrecursionlimit()` is the other escape;
-    say what it costs.
+    Raising the limit with `sys.setrecursionlimit()` is the other escape.
+    Say what it costs.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports it.
     Which of the two designs would you use for a file system,

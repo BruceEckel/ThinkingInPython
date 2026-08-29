@@ -148,8 +148,8 @@ Two keywords and the `asyncio` library capture this:
 4. `asyncio.run()` starts the event loop, runs one coroutine to completion,
    and shuts the loop down.
    This is the entry point, called once to run the program.
-   Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`;
-   inside an `async def`, `await` the coroutine directly:
+   Calling it from inside a coroutine raises `RuntimeError: asyncio.run() cannot be called from a running event loop`.
+   Inside an `async def`, `await` the coroutine directly:
 
 ```python
 # async_mechanics.py
@@ -679,8 +679,8 @@ This way, only one task runs its read-modify-write at a time,
 no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
 An `asyncio.Lock` is not thread-safe either.
-It orders tasks on one event loop;
-a worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
+It orders tasks on one event loop.
+A worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
 [Locks, Semaphores, and Failure Modes](#locks-semaphores-and-failure-modes)
 takes up the rest of the coordination primitives, and the ways they fail.
 
@@ -799,8 +799,8 @@ With several cores, it can.
 `ProcessPoolExecutor` runs each call in its own process,
 each with its own interpreter and its own *Global Interpreter Lock* (GIL),
 the interpreter-wide lock that lets only one thread run Python bytecode at a time.
-[The GIL and Free Threading](#the-gil-and-free-threading) takes the lock apart;
-here, each interpreter has its own,
+[The GIL and Free Threading](#the-gil-and-free-threading) takes the lock apart.
+Here, each interpreter has its own,
 so the operating system can place these processes on different cores and run them at the same time:
 
 ```python
@@ -1023,8 +1023,8 @@ each additional task adds its own slice of the same serial overhead:
 one more chunk to pickle, one more result to collect.
 Once that added overhead outweighs the benefit of the smaller pieces,
 the curve stops falling.
-This ceiling is not specific to `ProcessPoolExecutor`, or even to Python;
-it applies to any system that divides work across independent workers,
+This ceiling is not specific to `ProcessPoolExecutor`, or even to Python.
+It applies to any system that divides work across independent workers,
 which is why adding cores is not, by itself, a scaling strategy.
 
 ## The GIL and Free Threading
@@ -1417,8 +1417,8 @@ so nothing can add or remove an item while this loop runs.
 That guarantee is specific to this listing.
 While other threads are still adding or removing items,
 `empty()`'s answer can be true the instant it returns and already wrong by the time the loop acts on it.
-A live consumer does not poll `empty()`;
-it calls `get()` directly and lets the block do the waiting.
+A live consumer does not poll `empty()`.
+It calls `get()` directly and lets the block do the waiting.
 
 Python provides three queue classes with near-identical interfaces,
 the first two of which already appeared in this chapter:

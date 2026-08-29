@@ -57,8 +57,8 @@ if __name__ == "__main__":
 so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
-not how you declare the target interface; [Surrogate](26_Surrogate.md#proxy)
-compares those two.
+not how you declare the target interface.
+[Surrogate](26_Surrogate.md#proxy) compares those two.
 The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Surrogate.md#proxy)":
 *GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
 
@@ -106,7 +106,8 @@ it holds the adaptee and can wrap any instance handed to it at runtime.
 `WhatIHave2` is a *class adapter*: it inherits from the adaptee,
 which fixes the adapted class at definition time and exposes the adaptee's entire surface,
 `g()` and `h()` included, to every client of the adapter.
-Composition keeps the two interfaces separate; inheritance merges them.
+Composition keeps the two interfaces separate.
+Inheritance merges them.
 
 The `/` in `WhatIUse.op()` makes its parameter positional-only,
 and removing it breaks the override:
@@ -328,7 +329,8 @@ Name a wrapper for why it is there, not for its shape.
 Every interface change has a second half.
 Once the better interface exists, the old one is still there,
 and callers keep using it until something tells them not to.
-Deleting it breaks them; leaving it unmarked means nobody notices.
+Deleting it breaks them.
+Leaving it unmarked means nobody notices.
 `warnings.deprecated()`
 (Python 3.13 and later; `typing_extensions.deprecated` before that)
 marks a function, method, or class as on its way out,
@@ -375,7 +377,7 @@ so the listing records the warnings and prints the record.
 
 `warnings.deprecated()` requires the message,
 and it should say what to use instead.
-"Deprecated" tells a reader that someone decided to retire this;
+"Deprecated" tells a reader that someone decided to retire this.
 "replaced by `render()`" tells them what to do about it.
 The decorator also applies to a class,
 where it warns on construction and on subclassing.

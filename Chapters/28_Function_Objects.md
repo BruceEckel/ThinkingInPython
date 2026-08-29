@@ -284,8 +284,8 @@ Each algorithm becomes a class with a `find()` method deriving from a `FindRoot`
 and a "Context" class holds the chosen one:
 five classes to produce the same three lines that one function argument produced.
 The Context becomes useful when something must hold the current algorithm between calls,
-which a parameter cannot do; until then,
-the `finder` parameter is the whole pattern.
+which a parameter cannot do.
+Until then, the `finder` parameter is the whole pattern.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.

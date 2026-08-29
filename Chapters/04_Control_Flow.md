@@ -163,8 +163,8 @@ A `while` loop can use `else` the same way.
 This `else` is also how you leave two nested loops at once:
 put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s,
-Python skips its `else` and the outer `break` runs; when it finishes clean,
-the `continue` moves the outer loop along instead.
+Python skips its `else` and the outer `break` runs.
+When it finishes clean, the `continue` moves the outer loop along instead.
 
 When iterating, `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
@@ -457,8 +457,8 @@ for parse in (implicit, explicit, suppressed):
 
 `BadNumber` is a custom exception type,
 which you create by deriving a class from `Exception`.
-Its body is `pass` because it needs no behavior of its own;
-the handler matches on the class name.
+Its body is `pass` because it needs no behavior of its own.
+The handler matches on the class name.
 [Classes](07_Classes.md) covers class definitions in full.
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
@@ -544,8 +544,8 @@ path.unlink()  # Delete the file
 ```
 
 The exception propagates, but the `with` closes the file first.
-`f` is still in scope afterward, which is how the listing can check it;
-the `with` statement does not create a scope, only a guarantee about the exit.
+`f` is still in scope afterward, which is how the listing can check it.
+The `with` statement does not create a scope, only a guarantee about the exit.
 
 Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Cleanup.md)

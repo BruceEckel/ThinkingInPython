@@ -179,8 +179,8 @@ Calling `interview()` returns a generator object but doesn't run anything in the
 `next()` and `send()` do that work, one `yield` at a time.
 
 A generator is the more useful of the two here because the driver can be yours.
-A coroutine's requests go to the event loop;
-a generator's go to whatever code calls `send()`.
+A coroutine's requests go to the event loop.
+A generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
 That conversation makes an EMS possible.
 The generator yields a *request*, and whatever drives it supplies the *answer*.
@@ -222,7 +222,8 @@ if __name__ == "__main__":
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The generator arrives by import, unchanged; only the driver is new.
+The generator arrives by import, unchanged.
+Only the driver is new.
 The first line of output is `interview()`'s product:
 an ordinary `generator` object that still carries the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
@@ -241,7 +242,8 @@ belongs outside.
 The type checker verifies only two of those three parameters.
 `StopIteration.value`'s type is `Any`,
 so a type checker accepts `return stop.value` whatever `drive()` declares it returns.
-The `Result` in `drive()`'s signature states the intent; nothing verifies it.
+The `Result` in `drive()`'s signature states the intent.
+Nothing verifies it.
 
 `interview()` does not know where the answers originate.
 It has no dictionary, no `input()` call, and no network connection.
@@ -527,7 +529,8 @@ print(drive(survey(),
 ```
 
 `interview()` arrives unchanged from the previous example.
-It was the generator `drive()` drove; now `survey()` delegates to it.
+It was the generator `drive()` drove.
+Now `survey()` delegates to it.
 Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
 and its questions surface three frames up rather than two.
 The driver sees one more question and the same shape of trace.
@@ -616,8 +619,8 @@ task_runner()
 queues the generator it builds, and hands the function back unchanged,
 the registering-decorator shape from [Decorators](14_Decorators.md#decorating-classes).
 `task_runner()` gives the front task one `next()` per turn.
-A task that yields moves to the back of the queue;
-one that finishes raises `StopIteration` and is never requeued.
+A task that yields moves to the back of the queue.
+One that finishes raises `StopIteration` and is never requeued.
 The output interleaves the two tasks,
 though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.
@@ -651,8 +654,8 @@ That is the question the next chapter puts into the type system.
     and run `interview()` under both.
     Explain what, if anything, needed to change in `interview()`, and why.
     Give your driver fewer answers than questions and say what it returns.
-    `StopIteration` now means two different things in the same loop;
-    keep them apart.
+    `StopIteration` now means two different things in the same loop.
+    Keep them apart.
 3.  Predict the output of `yield_from_send.py` after adding a third `yield from collect("gamma")` to `both()` and extending the loop to `[1, 2, 3, 4, 5]`.
     Write down the sequence of printed lines before running it.
 4.  Remove `yield from` in `yield_from_nested.py`,
@@ -667,7 +670,8 @@ That is the question the next chapter puts into the type system.
     and say which type parameter each of the two values traveled through.
 6.  Explain why a driver must prime with `next()` rather than `send(None)`,
     given that the two are equivalent at runtime.
-    `send_none_is_next.py` has the answer; state it in terms of the `SendType`.
+    `send_none_is_next.py` has the answer.
+    State it in terms of the `SendType`.
 7.  [A Vending Machine](31_State_Machines.md#a-vending-machine)
     keeps its current state in an attribute and looks up each transition in a table.
     Write a simplified version as a single generator instead: it collects money,

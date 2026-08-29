@@ -106,7 +106,8 @@ The `accept()`/`visit()` pair is the *double dispatch*.
 `visit()` resolves the visitor's type,
 and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type.
 In the classic pattern every element class overrides `accept()`,
-which resolves the element's type; here one inherited `accept()` is enough,
+which resolves the element's type.
+Here one inherited `accept()` is enough,
 because the flower's type resolves a step later.
 The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
@@ -114,8 +115,8 @@ The last line of output shows both dispatches doing visible work.
 so that line depends on both unknown types at once:
 the worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
-If you delete the override, the program still runs;
-the flower-side dispatch goes back to having nothing to say.
+If you delete the override, the program still runs.
+The flower-side dispatch goes back to having nothing to say.
 
 The output above shows results, not mechanism.
 Printing the qualified name of the method each hop reaches makes the pair visible:

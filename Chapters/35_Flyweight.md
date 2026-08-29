@@ -153,7 +153,8 @@ because `@cache` returns the same `Tile` for the same symbol every time.
 A cell's position never needs storing.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the asker supplying the coordinates.
-The listing shows the object count; exercise 2 measures the memory behind it.
+The listing shows the object count.
+Exercise 2 measures the memory behind it.
 
 ### Typing the Symbol Set
 

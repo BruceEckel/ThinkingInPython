@@ -159,7 +159,8 @@ if __name__ == "__main__":
 its name, docstring, and other attributes.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
 misleading debuggers, `help()`, and documentation tools.
-`wraps` is optional; reasons to omit it are rare.
+`wraps` is optional.
+Reasons to omit it are rare.
 It also sets `__wrapped__` on the wrapper, pointing at the original,
 so `add.__wrapped__(2, 3)` calls the function without the tracing,
 and `inspect.signature()` follows that chain automatically.
@@ -286,8 +287,8 @@ A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
 
 `wrapper()` calls `func` once before the loop,
-so `result` always holds a value of type `R` to return;
-the loop adds the remaining `times - 1` calls.
+so `result` always holds a value of type `R` to return.
+The loop adds the remaining `times - 1` calls.
 That first call is unconditional,
 so a `times` below one would still call `func` once rather than zero times.
 `repeat()` rejects those values rather than quietly rounding them up to one.
@@ -721,7 +722,8 @@ Everything so far decorated a function.
 The `@` line does not care: a `class` statement takes a decorator the same way,
 and the decorator receives the class object.
 Do not confuse this with [Decorators as Classes](#decorators-as-classes),
-where the class is the decorator; here the decorator is an ordinary function,
+where the class is the decorator.
+Here the decorator is an ordinary function,
 and the class is the thing decorated.
 This one registers every class it decorates in `registry`:
 
@@ -747,8 +749,8 @@ if __name__ == "__main__":
 #: ['Espresso', 'Latte']
 ```
 
-`register()` returns `cls` unchanged, so this decoration adds no wrapper;
-it exists only for the side effect of recording the class.
+`register()` returns `cls` unchanged, so this decoration adds no wrapper.
+It exists only for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
 If `register`'s annotation were `(cls: type) -> type`,
 it would hand back a bare `type`,
@@ -780,7 +782,7 @@ def test_registry_looks_up_by_name() -> None:
 ## What `@` Does Not Require
 
 `@` constrains the statement below it and nothing else.
-A decorator line must sit directly above a `def` or a `class`;
+A decorator line must sit directly above a `def` or a `class`.
 `@decorator` above a bare assignment, or above a `type` alias,
 is a syntax error rather than a decorator applied to something unusual.
 Past that, the sugar asks for nothing.
@@ -940,13 +942,13 @@ with no shared base class required.
 This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
 A read-only `@property` in a `Protocol` requires that reading the name produce that type,
 and says nothing about how.
-`Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property;
-both read as a `float`, so both match.
+`Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.
+Both read as a `float`, so both match.
 
 `Topping.__init__()` sets `self.name = type(self).__name__`,
 reading each subclass's own name at construction time instead of repeating it as a string.
-`Garlic`, `Olives`, and `Feta` never mention their own names;
-the class name is the topping name.
+`Garlic`, `Olives`, and `Feta` never mention their own names.
+The class name is the topping name.
 
 Adding a new topping means adding one class with one line, `add_cost`.
 Changing the price of a topping means changing one number, in one place.
@@ -959,7 +961,7 @@ to illustrate the unrelated Builder pattern.
 The two examples share a topic, not a type.
 
 A Decorator keeps the wrapped object's interface and adds behavior.
-Proxy, Adapter, and Façade wrap the same way and differ in intent;
+Proxy, Adapter, and Façade wrap the same way and differ in intent.
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
 sorts the four.
 
@@ -1000,8 +1002,8 @@ and `__eq__()` to the same object it received.
 wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
-They are ordinary decorators;
-the only machinery this chapter did not cover is the descriptor protocol the first four of them return,
+They are ordinary decorators.
+The only machinery this chapter did not cover is the descriptor protocol the first four of them return,
 which [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
 takes up.
 

@@ -88,8 +88,8 @@ The `factory()` is now the only other code in the system that needs to change wh
 (the initialization data for the objects presumably comes from somewhere outside the system, rather than from random generation as in the above example).
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
-A factory takes information telling it what to build;
-a generator object holds an internal algorithm and produces the next value with no argument.
+A factory takes information telling it what to build.
+A generator object holds an internal algorithm and produces the next value with no argument.
 `shape_name_gen()` takes `n` and returns a generator object,
 and that object then produces names on demand.
 Those names are the data driving `Shape.factory()`.
@@ -201,7 +201,7 @@ It registers itself, and `make()` builds it with no change to the factory.
 [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler)
 uses this same self-registration.
 `Shape.__subclasses__()` could have built the table instead,
-but it stops at direct subclasses;
+but it stops at direct subclasses.
 `__init_subclass__()` runs for every class anywhere below `Shape`.
 A dictionary of classes,
 whether you fill it by hand or the classes fill it themselves,
@@ -348,15 +348,15 @@ and a single static method in the base class (as in `shape_factory1.py`)
 works fine.
 
 A `Factory` class nested in every shape is machinery Python does not need,
-kept here to show the structure *GoF Design Patterns* intends;
-the registry above does the same job with no nested classes.
+kept here to show the structure *GoF Design Patterns* intends.
+The registry above does the same job with no nested classes.
 An earlier version of this example did without `FACTORIES` by dispatching through `eval(f"{kind}.Factory()")`,
 which is worse than unnecessary.
 `create_shape()` then compiles and runs whatever string it receives,
 so a `kind` arriving from a configuration file, a request,
 or a command line is arbitrary code rather than a shape name.
-The dictionary lookup either produces a factory or raises a `KeyError`;
-exercise 8 stages the attack against both.
+The dictionary lookup either produces a factory or raises a `KeyError`.
+Exercise 8 stages the attack against both.
 A separate factory class is worth writing when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
 
@@ -753,8 +753,8 @@ For a frozen data class,
 `replace()` is Prototype and Builder rolled into one function,
 copying the configured state and changing chosen fields on the way.
 `copy.replace()` is the general form of the same operation,
-working on any object that defines `__replace__()`;
-a data class defines that method for you.
+working on any object that defines `__replace__()`.
+A data class defines that method for you.
 A test confirms the two forms produce the same pizza:
 
 ```python
@@ -832,8 +832,8 @@ Both exist to work around languages where a class is not an object you can put i
 2.  Add a class `Triangle` to `shape_factory2.py`.
 3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
     first to `games.py` and then to `games2.py`.
-    In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports;
-    then add it.
+    In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports.
+    Then add it.
 4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes
     (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.

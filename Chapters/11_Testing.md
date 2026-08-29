@@ -167,8 +167,8 @@ The `where` line is the rewriting at work:
 `pytest` keeps the sub-expression `account.balance` and its value,
 which a bare `assert` statement would discard.
 `Account` is a `@dataclass`,
-so its generated `__repr__()` names the field values;
-a hand-written class with no `__repr__()` would print `<account.Account object>` there instead.
+so its generated `__repr__()` names the field values.
+A hand-written class with no `__repr__()` would print `<account.Account object>` there instead.
 
 ## Testing for Exceptions
 
@@ -379,8 +379,8 @@ def test_bank_name_from_conftest(bank_name: str) -> None:
 Nothing imports either fixture.
 `pytest` finds them in `conftest.py` and supplies them by name.
 
-`parametrize` multiplies the one test it decorates;
-a parametrized fixture multiplies every test that requests it,
+`parametrize` multiplies the one test it decorates.
+A parametrized fixture multiplies every test that requests it,
 in this file and every other file that can see the `conftest.py`.
 Use the mark when the cases belong to one test,
 and the fixture when the same variation should sweep across a whole suite.

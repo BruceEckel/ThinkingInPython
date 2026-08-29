@@ -94,7 +94,7 @@ and is harder to read.
 The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
 `map()` and `filter()` pay off when the function already exists,
-`map(str.strip, lines)` rather than `[line.strip() for line in lines]`;
+`map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 [Functional Foundations](40_Functional_Foundations.md) returns to the choice.
 The `lambda` makes the versions above worse, not `map()`.
 
@@ -105,8 +105,8 @@ The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`.
-`filter(None, items)` is the other narrowing form;
-it drops the falsy values and the type checker knows no `None` survives.
+`filter(None, items)` is the other narrowing form.
+It drops the falsy values and the type checker knows no `None` survives.
 
 A comprehension has a scope of its own:
 
@@ -143,7 +143,8 @@ with `{}` instead of `[]`.
 Braces build a set when the comprehension produces one value per element,
 and a dict when it produces a `key: value` pair.
 The colon decides which.
-Python has no empty-set literal, since `{}` is an empty dict; write `set()`.
+Python has no empty-set literal, since `{}` is an empty dict.
+Write `set()`.
 
 The following set comprehension normalizes each name
 (capital first letter, the rest lower case),
@@ -233,14 +234,15 @@ for row in matrix:
 ```
 
 Read a nested comprehension from the outside in, not left to right.
-The outer comprehension supplies `row`; for each `row`,
-the inner comprehension runs the full `col` loop and produces one sub-list.
+The outer comprehension supplies `row`.
+For each `row`, the inner comprehension runs the full `col` loop and produces one sub-list.
 The inner `for col` sits to the left of the outer `for row` but runs inside it.
 The output expression sits first but runs last, once per innermost iteration.
 
 `1 if col == row else 0` is a conditional expression, not a filter.
 It sits in the output position, before the `for`,
-and decides what each element *is*; every `col` still produces one.
+and decides what each element *is*.
+Every `col` still produces one.
 An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
 decides *whether* the comprehension produces an element at all.
 The positions are not interchangeable:
@@ -276,8 +278,8 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 #: ['a=1', 'b=2', 'c=3']
 ```
 
-`zip()` stops at the end of the shorter sequence;
-pass `strict=True` to make a length mismatch raise `ValueError` instead of silently truncating.
+`zip()` stops at the end of the shorter sequence.
+Pass `strict=True` to make a length mismatch raise `ValueError` instead of silently truncating.
 
 Unpack a tuple in the `for` clause's target,
 here a `(name, function)` pair applied to a value:
@@ -495,7 +497,8 @@ No computation runs until you pull a value.
 `next()` produces them one at a time,
 and `itertools.islice()` takes a few without building the million-element list.
 
-The parentheses do not make it a tuple comprehension; no such form exists.
+The parentheses do not make it a tuple comprehension.
+No such form exists.
 When you need a tuple, pass the generator expression to `tuple()`.
 
 A generator expression can also feed `set()` and `dict()`:
@@ -646,7 +649,8 @@ so the nested `[2, 3]` above comes through unflattened.
 merging each mapping with later keys winning.
 Braces plus `*` build a set instead,
 which is the one place where the colon does not decide between a set and a dict,
-because neither form has one; the unpacking operator decides instead.
+because neither form has one.
+The unpacking operator decides instead.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way.
 

@@ -169,7 +169,8 @@ Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
 is a complete file rather than a fragment.
-Most run on their own; some are modules that another listing imports,
+Most run on their own.
+Some are modules that another listing imports,
 and `pytest` runs each `test_*.py` file.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,

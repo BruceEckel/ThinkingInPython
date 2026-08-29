@@ -315,7 +315,7 @@ so for them the guarantee is total.
 neither is hashable, and neither is safe from a change made through that list.
 
 A frozen data class still carries a per-instance `__dict__`.
-Adding `slots=True` drops it, for less memory and faster attribute access;
+Adding `slots=True` drops it, for less memory and faster attribute access.
 [Performance](18_Performance.md#slots) measures the difference.
 
 A frozen data class is not the only immutable record in the standard library.
@@ -521,8 +521,8 @@ if __name__ == "__main__":
 ```
 
 `Person` declares no checks of its own.
-The first test builds one from legal parts and reads them back;
-the other two show you cannot build it from an illegal name or an illegal email,
+The first test builds one from legal parts and reads them back.
+The other two show you cannot build it from an illegal name or an illegal email,
 because those values cannot exist:
 
 ```python
@@ -690,7 +690,7 @@ tagged `[CV]`, no matter how many `B` instances exist.
 
 `C` starts from the same bare annotations as `A`.
 `@dataclass` reads them to learn what fields exist and in what order,
-then uses that to write `__init__`'s parameter list and the assignments inside it;
+then uses that to write `__init__`'s parameter list and the assignments inside it.
 `dataclasses.fields()` reports the field list it recorded.
 `@dataclass` stores nothing on the class:
 `x` is still absent from `C.__dict__` after decoration, as it was before.
@@ -1139,7 +1139,8 @@ print(c.url, c.name)
 #: tcp://localhost:5432 db
 ```
 
-No field declaration produces `url`; `__post_init__()` derives it,
+No field declaration produces `url`.
+`__post_init__()` derives it,
 so printing it proves that `Connection.__init__` ran.
 If you delete `__post_init__()`, the same line raises an `AttributeError`.
 
@@ -1268,8 +1269,8 @@ print(Config("data.csv", retries=5))
 #: Config(source='data.csv', verbose=False, retries=5)
 ```
 
-Passing `kw_only=True` to `@dataclass` makes every field keyword-only;
-the `_: KW_ONLY` marker limits that to the fields after it,
+Passing `kw_only=True` to `@dataclass` makes every field keyword-only.
+The `_: KW_ONLY` marker limits that to the fields after it,
 leaving `source` positional.
 
 `KW_ONLY` also lifts the ordering rule.

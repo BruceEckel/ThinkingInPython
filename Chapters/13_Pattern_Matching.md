@@ -70,8 +70,8 @@ An alternative combines several patterns in one `case` with `|`.
 Every alternative in a `|` must bind the same set of names.
 
 A bare name is a *capture pattern*.
-Like `_`, it matches any value unconditionally; unlike `_`,
-it also binds the matched value to that name.
+Like `_`, it matches any value unconditionally.
+Unlike `_`, it also binds the matched value to that name.
 Here, `other` is the capture pattern:
 
 ```python
@@ -267,7 +267,8 @@ Positional matching depends on `__match_args__`,
 a class attribute listing field names in order.
 `@dataclass` generates it automatically from the field order,
 so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
-`NamedTuple` generates it too; an ordinary class must assign it by hand.
+`NamedTuple` generates it too.
+An ordinary class must assign it by hand.
 Without a `__match_args__` long enough to cover the positions you supply,
 a positional pattern raises a `TypeError`.
 For an ordinary class `R` that lacks one,
@@ -590,8 +591,8 @@ A `match` makes the shape of the dispatch explicit.
 compares the two approaches directly.
 
 The second test below exercises that runtime backstop.
-The string `"x"` is no `Shape`, so the call carries a `# type: ignore`;
-at runtime `assert_never()` is what catches it:
+The string `"x"` is no `Shape`, so the call carries a `# type: ignore`.
+At runtime `assert_never()` is what catches it:
 
 ```python
 # test_exhaustive.py
@@ -635,8 +636,8 @@ every lookup builds the default string, including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases while a dictionary lookup's does not.
-At three entries the difference does not matter;
-the dictionary wins as the table grows,
+At three entries the difference does not matter.
+The dictionary wins as the table grows,
 and it is the only one of the two you can build or change at runtime.
 
 When the set of types is *open* (anyone can add a new one),

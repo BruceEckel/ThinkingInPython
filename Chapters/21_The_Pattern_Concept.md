@@ -11,7 +11,8 @@ and use *design patterns* for the concept.
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
-This chapter introduces the concepts; one listing makes the point,
+This chapter introduces the concepts.
+One listing makes the point,
 and the chapters that follow supply the rest of the code.
 
 ## What Is a Pattern?
@@ -55,7 +56,8 @@ which points to your greatest cost.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
-You discover a vector of change; you do not predict it.
+You discover a vector of change.
+You do not predict it.
 Guessing at it up front often builds complexity for flexibility in a direction nobody uses.
 The second time a requirement shifts the same part of the design,
 you have evidence.
@@ -239,7 +241,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
     the slower the programmer can produce.
-    The cost does not grow one rule at a time; the rules interact.
+    The cost does not grow one rule at a time.
+    The rules interact.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,

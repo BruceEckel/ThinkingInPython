@@ -61,8 +61,8 @@ The subsequent statement is not indented, so it is no longer part of the `if`.
 An indented block groups statements but does not create a scope.
 Assigning `val` inside the `if` leaves it visible afterward,
 unlike a variable declared inside braces in C++ or Java.
-Functions, classes, and modules introduce new scopes;
-an `if` or a `for` block does not.
+Functions, classes, and modules introduce new scopes.
+An `if` or a `for` block does not.
 Binding still follows execution: had `response` not been `"yes"`,
 Python would not have bound `val`, and `print(val)` would raise a `NameError`.
 
@@ -192,14 +192,15 @@ so `round(0.5)` is `0` and `round(1.5)` is `2`,
 rather than rounding half away from zero as C does.
 An f-string's format spec rounds the same way.
 
-Python has no `++` or `--`; use `+= 1` and `-= 1`.
+Python has no `++` or `--`.
+Use `+= 1` and `-= 1`.
 Each arithmetic operator has an augmented-assignment form: `+=`, `-=`, `*=`,
 `/=`, `//=`, `%=`, and `**=`.
 
 A `bool` is a subtype of `int`, so `True` equals `1` and `False` equals `0`.
 Summing a sequence of comparisons therefore counts how many are true.
 The argument to `sum()` is a *generator expression*,
-which hands over one value at a time instead of building a list first;
+which hands over one value at a time instead of building a list first.
 [Comprehensions](16_Comprehensions.md#generator-expressions) covers the form.
 
 Integers also support the bitwise and shift operators,
@@ -256,8 +257,9 @@ and `None` is always false.
 Everything else is true, unless an object's type says otherwise.
 This is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
-A type says otherwise by defining `__bool__()`; without one,
-Python falls back to `__len__()`, which is why an empty container is false.
+A type says otherwise by defining `__bool__()`.
+Without one, Python falls back to `__len__()`,
+which is why an empty container is false.
 
 ```python
 # truthiness.py
@@ -460,7 +462,7 @@ so the leading `''` in `message.strings` does not reach the loop.
 A consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases only the literal text, leaving the values alone,
 which no amount of work on a finished f-string could do reliably.
-Uppercasing is only a demonstration;
+Uppercasing is only a demonstration.
 [Composite and Interpreter](34_Composite_and_Interpreter.md#a-template-is-a-tree)
 builds a query from the parts that way.
 
