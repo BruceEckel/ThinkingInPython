@@ -356,7 +356,12 @@ def main(argv: list[str] | None = None) -> int:
         else:
             rows = (help_picker.section_rows(match) if match is not None
                     else help_picker.all_rows(sections))
-            return help_picker.pick_and_run(rows, color=colored)
+            # The menu reports a target's failure in its own output and
+            # a "(exited with status N)" line; exiting nonzero here too
+            # would only make the outer make add "*** [help] Error N",
+            # a line that points at the wrong recipe.
+            help_picker.pick_and_run(rows, color=colored)
+            return 0
 
     if match is not None:
         print(render_section(match, width, palette))

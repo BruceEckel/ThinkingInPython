@@ -204,9 +204,14 @@ schedule: PSReadLine merges other writers' lines when it next writes, so
 after your next command; zsh with `SHARE_HISTORY` or `INC_APPEND_HISTORY`
 at once; bash at its next startup. No history file is created, and
 cmd.exe has none. When it finishes, a one-line
-prompt waits: Return reopens the menu with the highlight where it was,
-Esc quits, and the exit status is the last target's. The tests drive the
-real key bindings through prompt_toolkit's pipe input, so they need no
+prompt waits: Return reopens the menu with the highlight where it was
+and Esc quits. A target that fails gets a "(make X exited with status
+N)" line before that prompt, and Ctrl-C during a run gets
+"(interrupted: make X)" instead of a traceback; the menu itself always
+exits 0, since the target's own output has already said what happened
+and a nonzero status here would only make the outer make add an
+"Error" line pointing at the `help` recipe. The tests drive the real
+key bindings through prompt_toolkit's pipe input, so they need no
 terminal.
 
 ## run_all.py

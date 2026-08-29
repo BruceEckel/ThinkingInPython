@@ -38,7 +38,12 @@ file uses it; SHARE_HISTORY or INC_APPEND_HISTORY sees it at once), and
 `~/.bash_history` (read at startup, so the next session). No history
 file is created, and cmd.exe keeps none. When the target finishes, a
 one-line prompt waits: Return reopens the menu with the highlight where
-it was, Esc quits, and the exit status is the last target's. MAKEFLAGS
+it was and Esc quits. A failing target gets a "(make X exited with
+status N)" line first, and Ctrl-C during a run gets "(interrupted: make
+X)" rather than a traceback; the menu itself exits 0 either way, since
+the target's own output has said what happened and a nonzero status
+would only make the outer make add an "Error" line naming the `help`
+recipe. MAKEFLAGS
 and MAKELEVEL are dropped from the child's environment: `make help` is
 itself a make recipe, and a sub-make would otherwise announce "Entering
 directory" around every run.
@@ -566,20 +571,41 @@ def record_command(command: str, env: Mapping[str, str] | None = None,
     return record_history(command, history_files(settings, home))
 
 
+INTERRUPTED = 130       # the conventional exit status after Ctrl-C
+
+
 def run_target(target: Target) -> int:
     """Echo and run `make <target>` as a fresh top-level make, after
-    recording the command for the shell history."""
-    argv = make_command(target, ask_variables(target))
+    recording the command for the shell history.
+
+    Ctrl-C reaches every process on the console at once, so the target
+    and its make are already stopping when it lands here as a
+    KeyboardInterrupt; a one-line note replaces the traceback and the
+    menu's Return/Esc prompt follows as usual. Ctrl-C at a variable
+    prompt cancels the run before it starts.
+    """
+    try:
+        values = ask_variables(target)
+    except KeyboardInterrupt:
+        print("\n(cancelled)")
+        return INTERRUPTED
+    argv = make_command(target, values)
     command = f"make {' '.join(argv[1:])}"
     record_command(command)
     print(f"$ {command}", flush=True)
     env = {k: v for k, v in os.environ.items()
            if k not in ("MAKEFLAGS", "MFLAGS", "MAKELEVEL")}
     try:
-        return subprocess.call(argv, cwd=ROOT, env=env)
+        status = subprocess.call(argv, cwd=ROOT, env=env)
+    except KeyboardInterrupt:
+        print(f"\n(interrupted: {command})")
+        return INTERRUPTED
     except OSError as e:
         print(f"could not run make: {e}", file=sys.stderr)
         return 1
+    if status:
+        print(f"({command} exited with status {status})")
+    return status
 
 
 def ask_return_or_esc(input: Input | None = None,
@@ -634,4 +660,10 @@ def pick_and_run(rows: list[Row], *, color: bool = True) -> int:
         picker = Picker(rows, color=color, cursor=cursor)
         return picker.run(), picker.cursor
 
-    return session(pick, run_target, ask_return_or_esc)
+    try:
+        return session(pick, run_target, ask_return_or_esc)
+    except KeyboardInterrupt:
+        # Inside the picker and the prompts Ctrl-C is a key, handled
+        # there; this catches one that lands between them.
+        print()
+        return INTERRUPTED

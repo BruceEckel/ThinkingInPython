@@ -8,10 +8,13 @@ import pytest
 from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
+from unittest import mock
+
 from help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
-    next_version, section_rows, session, split_match, variables)
+    INTERRUPTED, next_version, run_target, section_rows, session,
+    split_match, variables)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -275,6 +278,37 @@ def test_variables_come_from_the_doc_with_their_examples():
 ])
 def test_next_version_guesses_from_the_highest_release_tag(tags, expected):
     assert next_version(tags) == expected
+
+
+def test_ctrl_c_during_the_run_is_a_note_not_a_traceback(capsys):
+    target = _target("test")
+    with mock.patch("help_picker.subprocess.call",
+                    side_effect=KeyboardInterrupt), \
+            mock.patch("help_picker.record_command", return_value=[]):
+        assert run_target(target) == INTERRUPTED
+    out = capsys.readouterr().out
+    assert "$ make test" in out
+    assert "(interrupted: make test)" in out
+    assert "Traceback" not in out
+
+
+def test_ctrl_c_at_a_variable_prompt_cancels_the_run(capsys):
+    target = _target("check-ch")
+    with mock.patch("help_picker.ask_variables",
+                    side_effect=KeyboardInterrupt), \
+            mock.patch("help_picker.subprocess.call") as call:
+        assert run_target(target) == INTERRUPTED
+    call.assert_not_called()
+    assert "(cancelled)" in capsys.readouterr().out
+
+
+def test_a_failing_target_reports_its_status(capsys):
+    target = _target("test")
+    with mock.patch("help_picker.subprocess.call", return_value=2), \
+            mock.patch("help_picker.record_command", return_value=[]), \
+            mock.patch("help_picker.ask_variables", return_value={}):
+        assert run_target(target) == 2
+    assert "(make test exited with status 2)" in capsys.readouterr().out
 
 
 def test_make_command_appends_only_the_variables_given_a_value():
