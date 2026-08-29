@@ -6,8 +6,12 @@ takes a file path on its command line, the same call its Explorer
 "Send to Kindle" context-menu entry makes, and opens its dialog with
 the file queued; the device choice and the final Send click are its
 own, so this script returns as soon as the app is up rather than
-waiting for the upload. Email delivery was the earlier route, but it
-needs a mail client or an authenticated API; the app needs neither.
+waiting for the upload. A file-manager window (Explorer, or Finder
+on macOS) also opens with the EPUB selected, so if the app ever
+starts empty, or a second file is wanted, drag and drop from that
+window is one motion away. Email delivery was the earlier route,
+but it needs a mail client or an authenticated API; the app needs
+neither.
 
 The e-ink variant is the default (a Paperwhite is the target), and
 `VARIANT=color` picks the other. Only a file that `make epub` already
@@ -55,6 +59,15 @@ def age(path: Path) -> str:
     return f"{minutes / 60 / 24:.1f} days"
 
 
+def reveal(path: Path, system: str) -> None:
+    """Open a file-manager window with `path` selected."""
+    if system == "Windows":
+        # explorer's own syntax: no space after the comma.
+        subprocess.Popen(["explorer", f"/select,{path}"])
+    elif system == "Darwin":
+        subprocess.Popen(["open", "-R", str(path)])
+
+
 def launch(path: Path) -> None:
     system = platform.system()
     if system == "Windows":
@@ -62,8 +75,10 @@ def launch(path: Path) -> None:
             raise SystemExit(
                 f"{WINDOWS_APP} not found; install Send to Kindle "
                 "from https://www.amazon.com/sendtokindle/pc")
+        reveal(path, system)
         subprocess.Popen([str(WINDOWS_APP), str(path)])
     elif system == "Darwin":
+        reveal(path, system)
         subprocess.Popen(["open", "-a", "Send to Kindle", str(path)])
     else:
         raise SystemExit(
@@ -76,7 +91,8 @@ def main() -> None:
     path = epub_path(variant)
     launch(path)
     print(f"Queued {path.relative_to(ROOT)} (built {age(path)} ago) "
-          "in Send to Kindle; pick the device and click Send.")
+          "in Send to Kindle and selected it in a file window; "
+          "pick the device and click Send.")
 
 
 if __name__ == "__main__":
