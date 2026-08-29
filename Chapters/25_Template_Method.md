@@ -154,10 +154,10 @@ so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
-and a framework that bans helper methods in its subclasses is one nobody wants to extend.
+and a framework that bans helper methods in its subclasses is too constrained.
 
-If every subclass must supply a step,
-inherit from `ABC` and declare the step with `@abstractmethod`,
+If every subclass is required to supply a step,
+inherit from `ABC` and declare that step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
 The runtime then refuses to instantiate a subclass that forgot it.
 
@@ -187,8 +187,8 @@ def test_template_method_runs_steps_in_order() -> None:
 
 ### Don't Start the Engine in the Constructor {#dont-start-the-engine-in-the-constructor}
 
-`ApplicationFramework` requires the client to start the engine.
-The example below shows why the framework does not start it itself.
+The client starts the engine, not `ApplicationFramework`.
+The example below shows why.
 
 A framework can call `run()` from its own constructor,
 but then a subclass with its own `__init__()` hits a pitfall.
