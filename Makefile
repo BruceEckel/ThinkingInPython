@@ -298,6 +298,13 @@ cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
 epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub with pandoc
 	$(PY) tools/build_epub.py
 
+# Hands the built EPUB to Amazon's Send to Kindle desktop app, which
+# opens its dialog with the file queued; the Send click is the app's.
+# Sends what `make epub` last built (reporting its age), never a
+# rebuild. Excluded from verify-targets' smoke test: it opens a GUI.
+kindle:  ## Send build/epub's e-ink EPUB to a Kindle via the Send to Kindle app (VARIANT=color for the other)
+	$(PY) tools/send_to_kindle.py $(VARIANT)
+
 # One PDF from the same merged, anchor-namespaced Markdown stream the
 # EPUB uses (build_pdf.py reuses build_epub.py's assembly), rendered by
 # pandoc through typst. Typst draws the SVG diagrams directly and
