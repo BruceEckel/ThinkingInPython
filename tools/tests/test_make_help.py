@@ -1,4 +1,4 @@
-"""Tests for tools/make_help.py: parsing, the three-level listing, invariants.
+"""Tests for tools/make_help.py: parsing, the listing, invariants.
 
 The real Makefile is exercised at the end, so a heading or doc comment that
 breaks the conventions fails here rather than at the next `make help`.
@@ -9,9 +9,8 @@ import re
 import pytest
 
 from make_help import (
-    ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, PROMOTED, can_colorize, check,
-    entries, parse, render_all, render_index, render_section, terminal_width,
-    want_picker, wrap_doc)
+    ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, can_colorize, check, entries,
+    parse, render_all, render_section, terminal_width, want_picker, wrap_doc)
 
 _ESCAPES = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -83,11 +82,6 @@ def test_a_slug_that_shadows_a_target_is_rejected():
         check(parse(text))
 
 
-def test_missing_promoted_target_is_rejected():
-    with pytest.raises(SystemExit, match="PROMOTED"):
-        check(parse("##@ Build and site\nbuild-thing:  ## d\n"))
-
-
 LONG = "##@ Style gates\nx:  ## " + "word " * 40 + "\n"
 
 
@@ -134,7 +128,7 @@ def _real() -> list:
 
 def test_the_real_listing_fits_eighty_columns():
     sections = _real()
-    rendered = [render_index(sections, 80), render_all(sections, 80)]
+    rendered = [render_all(sections, 80)]
     rendered += [render_section(s, 80) for s in sections if s.slug]
     for block in rendered:
         for line in block.splitlines():
@@ -143,15 +137,6 @@ def test_the_real_listing_fits_eighty_columns():
 
 def test_the_real_makefile_satisfies_every_invariant():
     check(_real())
-
-
-def test_the_real_index_lists_every_section_and_promoted_target():
-    index = render_index(_real())
-    for section in _real():
-        if section.slug:
-            assert f"  {section.slug}" in index
-    for name in PROMOTED:
-        assert name in index
 
 
 def test_render_all_expands_every_section_and_folds_secondary():
@@ -170,8 +155,9 @@ def test_color_only_adds_escape_codes():
     so color never moves a column or changes a wrap."""
     sections = _real()
     for plain, colored in [
-        (render_index(sections, 80), render_index(sections, 80, ANSI)),
         (render_all(sections, 80), render_all(sections, 80, ANSI)),
+        (render_section(sections[1], 80),
+         render_section(sections[1], 80, ANSI)),
     ]:
         assert "\x1b[" not in plain
         assert "\x1b[" in colored
@@ -179,7 +165,7 @@ def test_color_only_adds_escape_codes():
 
 
 def test_plain_palette_is_the_default():
-    assert render_index(_real(), 80) == render_index(_real(), 80, PLAIN)
+    assert render_all(_real(), 80) == render_all(_real(), 80, PLAIN)
 
 
 def test_wrap_doc_keeps_backticked_commands_whole():

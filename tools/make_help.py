@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-"""Print two-level categorized help for the Makefile, replacing `grep | awk`.
+"""Print categorized help for the Makefile, replacing `grep | awk`.
 
 Every target line ending in a `## text` comment becomes one help entry, and
 a `##@ Name` line starts a new section. A target with no doc comment is left
 out entirely (most are internal or self-explanatory).
 
-The listing has two levels, because a flat one ran to 74 targets. Bare
-`make` prints `help`, the everyday commands, and the section list; `make
-help style` expands one section. A section's *slug*, the name you pass, is
-the first word of its `##@` heading, lowercased. No separate list of slugs
-exists to drift: rename the heading and the slug follows.
+Bare `make` and `make help` both print every section; `make help style`
+prints one. A section's *slug*, the name you pass, is the first word of
+its `##@` heading, lowercased, and each heading in the full listing leads
+with it (`style: Style gates`) so the listing doubles as the index of what
+`make help NAME` takes. No separate list of slugs exists to drift: rename
+the heading and the slug follows.
 
 A target whose comment is `##-` rather than `##` is *secondary*: documented
 and smoke-tested, but folded out of the listing because a sibling's doc text
@@ -40,23 +41,22 @@ comes from the terminal and is capped at MAX_WIDTH, since a doc string run
 across 200 columns is no easier to read than one that overflows 80. A pipe
 or a redirect gets the 80-column fallback.
 
-In a terminal, all three levels open the interactive picker in
-help_picker.py instead of printing: arrow keys or the mouse choose a
-target and Enter runs it. The static listing below is what a pipe, CI,
-`verify-targets`, and `--pick never` get, and what the picker falls back
-to if prompt_toolkit is not installed.
+In a terminal, both forms open the interactive picker in help_picker.py
+instead of printing: arrow keys or the mouse choose a target and Enter
+runs it. The static listing below is what a pipe, CI, `verify-targets`,
+and `--pick never` get, and what the picker falls back to if
+prompt_toolkit is not installed.
 
 Output is colored when stdout is a terminal: section headings bold with the
-slug highlighted, target names in color, the index's per-section counts
-dimmed. `NO_COLOR` turns it off, `FORCE_COLOR` (or `--color always`) turns
+slug highlighted, target names in color. `NO_COLOR` turns it off,
+`FORCE_COLOR` (or `--color always`) turns
 it on for a pipe, and a legacy Windows console has VT processing switched
 on first, since without it the escape codes print as garbage. The render
 functions take a Palette and default to the plain one, so wrapping is
 measured on uncolored text and the tests see no escape codes.
 
 Usage:
-    python tools/make_help.py                    # the index (plain `make`)
-    python tools/make_help.py --all              # every section (`make help`)
+    python tools/make_help.py                    # every section
     python tools/make_help.py style              # one section
     python tools/make_help.py --width 72         # wrap to a fixed width
     python tools/make_help.py --color never      # plain text on a terminal
@@ -92,13 +92,6 @@ _JOINER = "\x00"
 
 _TARGET = re.compile(r"^([a-zA-Z_-]+):.*?##(-?)\s?(.*)$")
 _CATEGORY = re.compile(r"^##@\s?(.*)$")
-
-# The handful of targets worth printing above the section list. Kept here
-# rather than marked in the Makefile because which commands are "everyday"
-# is a judgment about the set as a whole, and reads best in one place;
-# main() fails if a name here is not a documented target.
-PROMOTED: tuple[str, ...] = ("all", "verify", "gate", "check-ch", "sweep")
-
 
 @dataclass(frozen=True)
 class Palette:
@@ -272,8 +265,8 @@ def _heading(section: Section, palette: Palette) -> str:
 
 
 def check(sections: list[Section]) -> None:
-    """Raise SystemExit on a duplicate slug, a slug that shadows a target,
-    or a PROMOTED name that no longer exists."""
+    """Raise SystemExit on a duplicate slug or a slug that shadows a
+    target."""
     named = [s for s in sections if s.slug]
     slugs = [s.slug for s in named]
     if duplicate := {s for s in slugs if slugs.count(s) > 1}:
@@ -288,41 +281,6 @@ def check(sections: list[Section]) -> None:
             "The Makefile's `help` guard would override that recipe; "
             "reword the heading.")
 
-    if missing := sorted(set(PROMOTED) - targets):
-        raise SystemExit(
-            f"make_help: PROMOTED names {missing} are not documented "
-            "targets. Update PROMOTED in tools/make_help.py.")
-
-
-def render_index(sections: list[Section], width: int | None = None,
-                 palette: Palette = PLAIN) -> str:
-    """The default listing: help, the everyday commands, the section list."""
-    width = width or terminal_width()
-    by_name = {t.name: t for s in sections for t in s.targets}
-    lines: list[str] = []
-
-    if preamble := next((s for s in sections if not s.slug), None):
-        lines += _rows(preamble.listed(), width, palette)
-
-    lines.append("\n" + palette.paint(palette.heading, "Everyday:"))
-    lines += _rows([by_name[n] for n in PROMOTED], width, palette)
-
-    lines.append("\n" + palette.paint(
-        palette.heading,
-        "Subtopics (`make help NAME`; `make help` lists them all):"))
-    named = [s for s in sections if s.slug]
-    slug_width = max(len(s.slug) for s in named)
-
-    def paint(label: str) -> str:
-        slug, count = label[:slug_width], label[slug_width:]
-        return (palette.paint(palette.slug, slug)
-                + palette.paint(palette.dim, count))
-
-    lines += _table(
-        [(f"{s.slug:<{slug_width}}  {len(s.listed()):>2}", s.title)
-         for s in named], width, paint)
-    return "\n".join(lines)
-
 
 def render_section(section: Section, width: int | None = None,
                    palette: Palette = PLAIN) -> str:
@@ -334,7 +292,7 @@ def render_section(section: Section, width: int | None = None,
 
 def render_all(sections: list[Section], width: int | None = None,
                palette: Palette = PLAIN) -> str:
-    """Every section expanded, in Makefile order: what `make help` prints.
+    """Every section expanded, in Makefile order: what `make` prints.
 
     Secondary targets stay folded, as in a single section, since the doc
     text of the sibling that names them is right there above.
@@ -354,10 +312,7 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument(
         "topic", nargs="?",
-        help="section to expand (a slug from the default listing)")
-    ap.add_argument(
-        "--all", action="store_true",
-        help="print every section expanded (what `make help` runs)")
+        help="one section to show (the slug its heading starts with)")
     ap.add_argument(
         "--width", type=int, default=None,
         help="wrap doc text to this many columns (default: the terminal's, "
@@ -385,7 +340,7 @@ def main(argv: list[str] | None = None) -> int:
     palette = ANSI if colored else PLAIN
 
     match = None
-    if args.topic and not args.all:
+    if args.topic:
         match = next((s for s in sections if s.slug == args.topic), None)
         if match is None:
             known = ", ".join(s.slug for s in sections if s.slug)
@@ -399,20 +354,14 @@ def main(argv: list[str] | None = None) -> int:
             print("(interactive picker unavailable: `uv sync` installs "
                   "prompt_toolkit)", file=sys.stderr)
         else:
-            if args.all:
-                rows = help_picker.all_rows(sections)
-            elif match is not None:
-                rows = help_picker.section_rows(match)
-            else:
-                rows = help_picker.index_rows(sections)
-            return help_picker.pick_and_run(sections, rows, color=colored)
+            rows = (help_picker.section_rows(match) if match is not None
+                    else help_picker.all_rows(sections))
+            return help_picker.pick_and_run(rows, color=colored)
 
-    if args.all:
-        print(render_all(sections, width, palette))
-    elif match is not None:
+    if match is not None:
         print(render_section(match, width, palette))
     else:
-        print(render_index(sections, width, palette))
+        print(render_all(sections, width, palette))
     return 0
 
 

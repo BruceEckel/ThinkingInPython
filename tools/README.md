@@ -133,15 +133,15 @@ Actions does.
 
 ## make_help.py
 
-Prints the `make help` listing, in three levels, or in a terminal hands
-the same levels to `help_picker.py` (below) so a target can be chosen
-with the arrow keys or the mouse and run with Enter. In the Makefile, a
-target line ending with a `## text` comment becomes one entry; a `##@
-Name` comment line starts a new section. Bare `make` shows the everyday
-commands and the section list; `make help` shows every section
-expanded; `make help NAME` shows one section, where `NAME` is the
-first word of that section's heading, lowercased. A pipe, a CI run
-(`CI` set), or `--pick never` gets the static text.
+Prints the `make help` listing, or in a terminal hands it to
+`help_picker.py` (below) so a target can be chosen with the arrow keys
+or the mouse and run with Enter. In the Makefile, a target line ending
+with a `## text` comment becomes one entry; a `##@ Name` comment line
+starts a new section. Bare `make` and `make help` show every section;
+`make help NAME` shows one, where `NAME` is the first word of that
+section's heading, lowercased (each heading leads with it, as in
+`style: Style gates`). A pipe, a CI run (`CI` set), or `--pick never`
+gets the static text.
 A `##-` comment marks a target secondary: documented and smoke-tested,
 but folded out of the listing because a sibling's doc text names it
 (each `fix-*` under the check it repairs). It replaces a `grep | awk`
@@ -155,8 +155,7 @@ column so the target names stay in one column. A backticked command and a
 hyphenated target name both wrap as one unit.
 
 ```
-make              # everyday commands, then the section list
-make help         # every section's targets
+make              # every section's targets (so does `make help`)
 make help style   # one section's targets
 
 uv run python tools/make_help.py --width 72   # wrap to a fixed width
@@ -169,12 +168,11 @@ The interactive side of `make help`, built on `prompt_toolkit` (a dev
 dependency; without it `make help` falls back to the static listing and
 says so). A full-screen list of the same sections and doc text:
 Up/Down, PageUp/PageDown, Home/End move the highlight, Enter runs the
-highlighted target, Left or Backspace goes back a level, Esc leaves
-without running anything, and typing letters jumps to the first target
-whose name starts with them. A mouse click selects a row, a second click
-on the selected row runs it, and the wheel scrolls. Plain `make` opens
-the index, where Enter on a section drills into it; `make help` opens
-every section; `make help style` opens one.
+highlighted target, Esc leaves without running anything, and typing
+letters jumps to the first target whose name starts with them. A mouse
+click selects a row, a second click on the selected row runs it, and the
+wheel scrolls. `make` and `make help` open every section; `make help
+style` opens one.
 
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the

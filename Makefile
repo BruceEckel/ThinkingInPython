@@ -33,8 +33,8 @@ ARGS ?=
 # accumulates .PHONY across lines, so the effect is the same.
 .PHONY: help
 
-# Self-documenting help, in three levels, interactive in a terminal. Every
-# level opens tools/help_picker.py when stdin and stdout are a terminal:
+# Self-documenting help, interactive in a terminal. `make` and `make help`
+# both open tools/help_picker.py when stdin and stdout are a terminal:
 # arrow keys or the mouse choose a target, Enter runs it, Esc leaves. A
 # pipe, CI, or `--pick never` gets the static listing instead, which is
 # what verify-targets and the tests see. Every target below carries an inline
@@ -54,22 +54,15 @@ ARGS ?=
 # still fails loudly. make_help.py refuses to run if a section slug ever
 # equals a real target name, which is the one case where this guard would
 # override a recipe.
-#
-# Plain `make` (no goals) and `make help` both run this recipe but print
-# different things: with no goals HELP_TOPIC stays empty and make_help.py
-# prints the index; `help` typed explicitly with no topic gets `--all`,
-# the full listing.
 ifeq ($(firstword $(MAKECMDGOALS)),help)
   HELP_TOPIC := $(word 2,$(MAKECMDGOALS))
   ifneq ($(HELP_TOPIC),)
     .PHONY: $(HELP_TOPIC)
     $(eval $(HELP_TOPIC):;@:)
-  else
-    HELP_TOPIC := --all
   endif
 endif
 
-help:  ## Pick a target to run, or list them all when piped (plain `make` shows the index; `make help style` expands one section)
+help:  ## Pick a target to run, or list them all when piped (`make help style` narrows to one section)
 	@$(PY) tools/make_help.py $(HELP_TOPIC)
 
 ##@ Setup

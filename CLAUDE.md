@@ -252,12 +252,11 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.
-- **`make help` is self-documenting, not hand-written, and has three levels.** A
+- **`make help` is self-documenting, not hand-written.** A
   target needs a trailing `## text` comment on its own line (and to sit under the
   right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
-  prints `help`, the everyday commands (`PROMOTED` in `tools/make_help.py`), and
-  the section list; `make help` expands every section; `make help style` expands
-  one section. In a terminal all three open `tools/help_picker.py` instead
+  and `make help` both list every section; `make help style` lists
+  one section. In a terminal both open `tools/help_picker.py` instead
   (arrow keys or mouse, Enter runs the target; `prompt_toolkit`, a dev
   dependency); a pipe, `CI`, or `--pick never` gets the static text, so running
   `make help` from a tool or a test never blocks on input. A section's slug is

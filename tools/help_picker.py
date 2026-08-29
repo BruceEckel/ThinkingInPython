@@ -5,18 +5,14 @@ make_help.py parses the Makefile into sections of documented targets and
 prints them as text. When it is attached to a terminal it hands the same
 sections here instead, and this module shows them as a full-screen list:
 Up/Down (or PageUp/PageDown, Home/End) move the highlight, Enter runs the
-highlighted target, Left or Backspace goes back a level, Esc leaves without
-running anything, and typing letters jumps to the first target whose name
-starts with them. The mouse works too: a click selects a row, a second
-click on the selected row runs it, and the wheel scrolls.
+highlighted target, Esc leaves without running anything, and typing
+letters jumps to the first target whose name starts with them. The mouse
+works too: a click selects a row, a second click on the selected row runs
+it, and the wheel scrolls.
 
-Three views match the three levels of the static listing. Plain `make`
-opens the index: a `help` row that opens every section, the everyday
-targets, then the sections, where Enter on a section drills into it.
-`make help` opens every section expanded directly, and
-`make help style` opens one section. A target whose doc text mentions
-`CH=` gets a one-line prompt for the chapter before it runs, since that
-is how those targets are scoped.
+Plain `make` and `make help` open every section; `make help style` opens
+one. A target whose doc text mentions `CH=` gets a one-line prompt for
+the chapter before it runs, since that is how those targets are scoped.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
@@ -52,7 +48,7 @@ from prompt_toolkit.output import Output
 from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.styles import Style
 
-from make_help import MAX_WIDTH, MIN_DOC, PROMOTED, Section, Target, wrap_doc
+from make_help import MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc
 from tools_config import ROOT
 
 if TYPE_CHECKING:
@@ -80,32 +76,16 @@ MONO = Style.from_dict({
 
 @dataclass(frozen=True)
 class Row:
-    """One line group in a view. Only target and section rows take the
-    highlight; headings and blanks are skipped over."""
-    kind: str          # "heading", "target", "section", "all", "blank"
-    label: str = ""                 # target name, section slug, or a heading
+    """One line group in a view. Only target rows take the highlight;
+    headings and blanks are skipped over."""
+    kind: str                       # "heading", "target", "blank"
+    label: str = ""                 # target name, or a heading's slug
     doc: str = ""                   # doc text, or a heading's title
-    section: Section | None = None
     target: Target | None = None
 
     @property
     def selectable(self) -> bool:
-        return self.kind in ("target", "section", "all")
-
-
-def index_rows(sections: Sequence[Section]) -> list[Row]:
-    """Plain `make`: the everyday targets, then the sections to drill into."""
-    by_name = {t.name: t for s in sections for t in s.targets}
-    rows = [Row("all", "help", "Every target in every section (`make help`)"),
-            Row("blank"),
-            Row("heading", doc="Everyday")]
-    rows += [Row("target", n, by_name[n].doc, target=by_name[n])
-             for n in PROMOTED]
-    rows.append(Row("blank"))
-    rows.append(Row("heading", doc="Sections (Enter opens one)"))
-    rows += [Row("section", s.slug, f"{s.title} ({len(s.listed())})",
-                 section=s) for s in sections if s.slug]
-    return rows
+        return self.kind == "target"
 
 
 def section_rows(section: Section) -> list[Row]:
@@ -116,7 +96,7 @@ def section_rows(section: Section) -> list[Row]:
 
 
 def all_rows(sections: Sequence[Section]) -> list[Row]:
-    """`make help`: every section expanded, a blank line between them."""
+    """`make` and `make help`: every section, a blank line between."""
     rows: list[Row] = []
     for section in sections:
         if not section.slug:
@@ -128,15 +108,12 @@ def all_rows(sections: Sequence[Section]) -> list[Row]:
 
 
 class Picker:
-    """A full-screen list over one view, with a stack of views behind it
-    so Enter on a section and Left afterward round-trip."""
+    """A full-screen list over `rows`; `run()` returns the chosen target."""
 
-    def __init__(self, sections: Sequence[Section], rows: list[Row], *,
-                 color: bool = True, input: Input | None = None,
+    def __init__(self, rows: list[Row], *, color: bool = True,
+                 input: Input | None = None,
                  output: Output | None = None) -> None:
-        self.sections = sections
         self.rows = rows
-        self.stack: list[tuple[list[Row], int]] = []
         self.cursor = self._first_selectable(rows)
         self.prefix = ""
         self.app: Application[Target | None] = Application(
@@ -184,31 +161,8 @@ class Picker:
                 return True
         return False
 
-    def activate(self) -> Target | None:
-        """Enter: a target ends the picker; a section, or the index's
-        `help` row, opens a new view on top of this one."""
-        row = self.rows[self.cursor]
-        if row.kind == "target":
-            return row.target
-        if row.kind == "section" and row.section is not None:
-            self._open(section_rows(row.section))
-        elif row.kind == "all":
-            self._open(all_rows(self.sections))
-        return None
-
-    def _open(self, rows: list[Row]) -> None:
-        self.stack.append((self.rows, self.cursor))
-        self.rows = rows
-        self.cursor = self._first_selectable(rows)
-        self.prefix = ""
-
-    def back(self) -> bool:
-        """Left/Backspace: return to the view Enter came from, if any."""
-        if not self.stack:
-            return False
-        self.rows, self.cursor = self.stack.pop()
-        self.prefix = ""
-        return True
+    def chosen(self) -> Target | None:
+        return self.rows[self.cursor].target
 
     # ---- keys
 
@@ -241,14 +195,9 @@ class Picker:
 
         @kb.add("enter")
         def _enter(event: KeyPressEvent) -> None:
-            target = self.activate()
+            target = self.chosen()
             if target is not None:
                 event.app.exit(result=target)
-
-        @kb.add("left")
-        def _left(event: KeyPressEvent) -> None:
-            if not self.back():
-                event.app.exit(result=None)
 
         @kb.add("backspace")
         def _backspace(event: KeyPressEvent) -> None:
@@ -256,7 +205,7 @@ class Picker:
                 self.prefix = self.prefix[:-1]
                 if self.prefix:
                     self.jump(self.prefix)
-            elif not self.back():
+            else:
                 event.app.exit(result=None)
 
         @kb.add("escape", eager=True)
@@ -292,9 +241,7 @@ class Picker:
                 if not self.rows[index].selectable:
                     return None
                 if self.cursor == index:
-                    target = self.activate()
-                    if target is not None:
-                        self.app.exit(result=target)
+                    self.app.exit(result=self.chosen())
                 else:
                     self.cursor = index
             else:
@@ -331,8 +278,7 @@ class Picker:
                 fragments.append(("class:heading", row.doc, handler))
                 fragments.append(("", "\n", handler))
                 continue
-            label_style = ("class:slug" if row.kind == "section"
-                           else "class:target") + extra
+            label_style = "class:target" + extra
             pad = " " * (label_width - len(row.label))
             lines = (wrap_doc(row.doc, body) if body >= MIN_DOC
                      else [row.doc])
@@ -349,7 +295,7 @@ class Picker:
         return fragments
 
     def _footer(self) -> StyleAndTextTuples:
-        keys = "Up/Down move   Enter run   Left back   Esc quit   type to jump"
+        keys = "Up/Down move   Enter run   Esc quit   type to jump"
         if self.prefix:
             keys += f": {self.prefix}"
         return [("class:footer", f" {keys}")]
@@ -384,10 +330,9 @@ def run_target(target: Target) -> int:
         return 1
 
 
-def pick_and_run(sections: Sequence[Section], rows: list[Row], *,
-                 color: bool = True) -> int:
+def pick_and_run(rows: list[Row], *, color: bool = True) -> int:
     """Open the picker on `rows`; run what it returns. 0 if nothing was."""
-    target = Picker(sections, rows, color=color).run()
+    target = Picker(rows, color=color).run()
     if target is None:
         return 0
     return run_target(target)
