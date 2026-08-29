@@ -154,7 +154,7 @@ Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
 and a framework that bans helper methods in its subclasses is too constrained.
 
-If every subclass is required to supply a step,
+If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
 as shown in [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance).
 The runtime then refuses to instantiate a subclass that forgot it.
