@@ -9,9 +9,9 @@ from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
 from help_picker import (
-    Picker, all_rows, ask_return_or_esc, filter_rows, history_files,
-    make_command, record_history, section_rows, session, split_match,
-    wants_chapter)
+    RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
+    history_files, make_command, record_command, record_history,
+    section_rows, session, split_match, wants_chapter)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -224,6 +224,24 @@ def test_record_history_appends_plain_and_zsh_extended_lines(tmp_path):
     assert plain.read_text().splitlines() == ["make", "make sweep"]
     assert zsh.read_text().splitlines()[-1] == ": 42:0;make sweep"
     assert zsh_plain.read_text().splitlines()[-1] == "make sweep"
+
+
+def test_record_command_prefers_the_wrappers_file(tmp_path):
+    record = tmp_path / "make-menu-abc"        # the wrapper's scratch file
+    psrl = (tmp_path / "appdata" / "Microsoft" / "Windows" / "PowerShell"
+            / "PSReadLine" / "ConsoleHost_history.txt")
+    psrl.parent.mkdir(parents=True)
+    psrl.write_text("make\n")
+    home = tmp_path / "home"
+    home.mkdir()
+    env = {"APPDATA": str(tmp_path / "appdata"), RECORD_VAR: str(record)}
+    assert record_command("make test", env, home) == [record]
+    assert record.read_text().splitlines() == ["make test"]
+    assert psrl.read_text().splitlines() == ["make"]     # left alone
+    # without the variable, the history files get it
+    env.pop(RECORD_VAR)
+    assert record_command("make test", env, home) == [psrl]
+    assert psrl.read_text().splitlines() == ["make", "make test"]
 
 
 def test_record_history_skips_a_file_it_cannot_write(tmp_path):

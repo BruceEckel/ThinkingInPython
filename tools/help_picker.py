@@ -19,15 +19,19 @@ the chapter before it runs, since that is how those targets are scoped.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
-command is echoed first (`$ make sweep`) and appended to every shell
-history file that exists, so Up-arrow can repeat it without the menu:
-PSReadLine's `ConsoleHost_history.txt` (PowerShell re-reads it on the
-next Up, so the entry shows in the same session), `~/.zsh_history` (in
-zsh's extended format when the file uses it; a shell with SHARE_HISTORY
-or INC_APPEND_HISTORY sees it at once), and `~/.bash_history` (bash reads
-that only at startup unless PROMPT_COMMAND runs `history -n`, so there
-it arrives in the next session). No file is created, and cmd.exe keeps
-no history to append to. When the target finishes, a
+command is echoed first (`$ make sweep`) and recorded for the shell's
+history, so Up-arrow can repeat it without the menu. Two routes, since
+a child process cannot add to a shell's live history itself. When
+MAKE_MENU_RECORD names a file, the command is appended there and the
+`make` wrapper in tools/menu_history.ps1 (PowerShell) or
+tools/menu_history.sh (bash, zsh) feeds it to the shell's own history
+API after make returns, which is immediate. Otherwise the command is
+appended to every shell history file that exists: PSReadLine's
+`ConsoleHost_history.txt` (merged in when PSReadLine next writes, so
+after your next command), `~/.zsh_history` (extended format when the
+file uses it; SHARE_HISTORY or INC_APPEND_HISTORY sees it at once), and
+`~/.bash_history` (read at startup, so the next session). No history
+file is created, and cmd.exe keeps none. When the target finishes, a
 one-line prompt waits: Return reopens the menu with the highlight where
 it was, Esc quits, and the exit status is the last target's. MAKEFLAGS
 and MAKELEVEL are dropped from the child's environment: `make help` is
@@ -456,15 +460,35 @@ def _zsh_extended(path: Path) -> bool:
     return bool(lines) and lines[-1].startswith(b": ")
 
 
+RECORD_VAR = "MAKE_MENU_RECORD"
+
+
+def record_command(command: str, env: Mapping[str, str] | None = None,
+                   home: Path | None = None) -> list[Path]:
+    """Record `command` for the shell: into the file MAKE_MENU_RECORD
+    names when a wrapper set it, else into the history files. The
+    paths written."""
+    settings: Mapping[str, str] = os.environ if env is None else env
+    if record := settings.get(RECORD_VAR):
+        path = Path(record)
+        try:
+            with path.open("a", encoding="utf-8") as f:
+                f.write(command + "\n")
+        except OSError:
+            return []
+        return [path]
+    return record_history(command, history_files(settings, home))
+
+
 def run_target(target: Target) -> int:
     """Echo and run `make <target>` as a fresh top-level make, after
-    recording the command in the shell history."""
+    recording the command for the shell history."""
     chapter = ""
     if wants_chapter(target):
         chapter = prompt("CH= (Enter for the whole book): ").strip()
     argv = make_command(target, chapter)
     command = f"make {' '.join(argv[1:])}"
-    record_history(command, history_files())
+    record_command(command)
     print(f"$ {command}", flush=True)
     env = {k: v for k, v in os.environ.items()
            if k not in ("MAKEFLAGS", "MFLAGS", "MAKELEVEL")}
