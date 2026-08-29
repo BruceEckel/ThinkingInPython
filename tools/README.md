@@ -174,7 +174,7 @@ contains the text (`/` also starts a search), the match is underlined in
 the names, the highlight lands on the first name match, Backspace edits
 the query, and Esc clears it. A mouse click selects a row, a second
 click on the selected row runs it, and the wheel scrolls. `?` replaces
-the list with the highlighted target's notes: its doc line, the `#`
+the list with the highlighted target's full help: its doc line, the `#`
 comment block directly above the target in the Makefile (the long-form
 help the one-line summary condenses), and the recipe it runs. Up/Down
 and the wheel scroll the notes, Enter runs the target from there, and

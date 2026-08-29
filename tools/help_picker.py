@@ -11,8 +11,8 @@ what has been typed (`/` also starts a search, for the habit), the
 matched text is underlined in the names, the highlight lands on the first
 name match when there is one, Backspace edits the query, and Esc clears
 it. The mouse works too: a click selects a row, a second click on the
-selected row runs it, and the wheel scrolls. `?` opens the highlighted
-target's notes: its doc line, the `#` comment block above it in the
+selected row runs it, and the wheel scrolls. `?` opens full help for the highlighted
+target: its doc line, the `#` comment block above it in the
 Makefile, and the recipe it runs, in place of the list. Up/Down (and
 PageUp/PageDown, Home/End, the wheel) scroll the notes, Enter runs the
 target from there, and Esc, `?`, or Backspace returns to the list with
@@ -458,7 +458,7 @@ class Picker:
             keys = (f"Search: {self.query}   ({hits})   "
                     "Enter run   Esc clear")
         else:
-            keys = ("Up/Down move   Enter run   ? notes   Esc quit   "
+            keys = ("Up/Down move   Enter run   ? help   Esc quit   "
                     "type to search")
         return [("class:footer", f" {keys}")]
 

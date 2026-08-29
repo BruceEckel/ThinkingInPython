@@ -376,7 +376,7 @@ def test_notes_scroll_clamps_at_both_ends():
 def test_footer_names_the_notes_key_and_the_open_target():
     rows = all_rows(_sections())
     picker = Picker(rows, output=DummyOutput())
-    assert "? notes" in picker._footer()[0][1]
+    assert "? help" in picker._footer()[0][1]
     picker.open_notes()
     assert picker.notes is not None
     assert picker._footer()[0][1].startswith(f" {picker.notes.name}:")

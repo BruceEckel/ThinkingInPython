@@ -257,7 +257,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   right `##@ Name` heading) or it will not appear in `make help`. Bare `make`
   and `make help` both list every section; `make help style` lists
   one section. In a terminal both open `tools/help_picker.py` instead
-  (arrow keys or mouse, Enter runs the target, `?` shows the target's notes:
+  (arrow keys or mouse, Enter runs the target, `?` shows the target's full help:
   the `#` comment block directly above it in the Makefile plus its recipe,
   so keep that block adjacent to the target line, with no blank line between;
   `prompt_toolkit`, a dev
