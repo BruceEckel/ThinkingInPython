@@ -37,12 +37,12 @@ import subprocess
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from prompt_toolkit.application import Application
 from prompt_toolkit.formatted_text import StyleAndTextTuples
 from prompt_toolkit.input import Input
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
-from prompt_toolkit.key_binding.key_bindings import NotImplementedOrNone
 from prompt_toolkit.layout import HSplit, Layout, Window
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.mouse_handlers import MouseHandler
@@ -53,6 +53,10 @@ from prompt_toolkit.styles import Style
 
 from make_help import MAX_WIDTH, MIN_DOC, PROMOTED, Section, Target, wrap_doc
 from tools_config import ROOT
+
+if TYPE_CHECKING:
+    # A type alias prompt_toolkit defines only for checkers.
+    from prompt_toolkit.key_binding.key_bindings import NotImplementedOrNone
 
 PAGE = 10        # rows a PageUp/PageDown moves
 WHEEL = 3        # rows one wheel notch moves
@@ -270,7 +274,7 @@ class Picker:
     # ---- mouse
 
     def _mouse(self, index: int) -> MouseHandler:
-        def handler(event: MouseEvent) -> NotImplementedOrNone:
+        def handler(event: MouseEvent) -> "NotImplementedOrNone":
             if event.event_type == MouseEventType.SCROLL_UP:
                 self.move(-WHEEL)
             elif event.event_type == MouseEventType.SCROLL_DOWN:
