@@ -16,7 +16,7 @@ The test runner calls `run()` on the finished object.
 
 ## The Fixed Algorithm
 
-A Template Method holds the shape of the algorithm fixed in the base class.
+A Template Method anchors the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
@@ -289,7 +289,7 @@ The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.
 Here no subclass exists,
 so a caller supplies the steps but cannot touch the loop.
-Structure holds the algorithm fixed,
+Structure anchors the algorithm,
 with no help from a decorator the runtime ignores.
 
 Passing functions is not the *Strategy* pattern,
@@ -299,9 +299,9 @@ Here the algorithm stays put, and only its steps come from outside.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A stateless hook is usually better as a function than as an overridden method.
 
-## What Holds the Algorithm Fixed
+## What Anchors the Algorithm
 
-The fixed algorithm is only as fixed as the mechanism holding it.
+The fixed algorithm is only as fixed as its anchor.
 This chapter shows four.
 Each has a cost, and each protects against a different way of breaking the flow:
 
