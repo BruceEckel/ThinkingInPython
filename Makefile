@@ -263,7 +263,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site cover epub pdf release local serve
+.PHONY: sync check prune site cover epub pdf release release-prune local serve
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -327,8 +327,14 @@ pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and ty
 # then fresh `make pdf` + `make epub`, then
 # `gh release create v$(VERSION)`. Deliberately excluded from
 # verify-targets' smoke test: it tags the repo and publishes to GitHub.
-release:  ## Verify, rebuild the PDF and both EPUBs, publish all three as a GitHub release (VERSION=1.0)
+release:  ## Verify, rebuild the PDF and EPUBs, publish them with the reader guides as a GitHub release, then prune releases older than the newest two (VERSION=1.0)
 	$(PY) tools/release.py $(VERSION)
+
+# The prune step of `release` on its own. Tags stay, so history and the
+# menu's next-version guess are untouched. Excluded from verify-targets'
+# smoke test: it deletes from GitHub.
+release-prune:  ## Delete GitHub releases older than the newest two (their tags stay)
+	$(PY) tools/release.py --prune
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.

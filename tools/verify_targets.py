@@ -61,6 +61,7 @@ EXCLUDED: dict[str, str] = {
     "serve": "starts a server that runs forever",
     "local": "starts a server that runs forever",
     "release": "tags the repo and publishes a GitHub release",
+    "release-prune": "deletes old GitHub releases",
     "kindle": "opens the Send to Kindle desktop app (a GUI)",
     "verify-targets": "this is the target that runs this script",
 }

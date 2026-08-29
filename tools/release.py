@@ -33,6 +33,16 @@ first so a doomed run dies before the expensive gate:
 4. `gh release create v<VERSION> <pdf> <epubs> <guides>`: creates the
    tag on origin at the branch tip and uploads the five assets. gh
    prints the release URL on success.
+5. Prune: every release older than the newest KEEP_RELEASES (two: the
+   new one and the one before it, a fallback should the new one turn
+   out broken) is deleted with `gh release delete`, assets and all.
+   The git tags stay, so history is intact and the menu's next-version
+   guess (which reads `git tag`) keeps working. Release assets on a
+   public repo count against no GitHub quota; this is tidiness, since
+   the README's `releases/latest/download/` links never point at an
+   old release anyway. A failed prune is a warning, not an error: the
+   release itself has already succeeded. `python tools/release.py
+   --prune` runs just this step.
 
 The tag is the VERSION prefixed with "v" (a bare "v1.0" is accepted
 as-is), the conventional GitHub form. Deleting a bad release is a
@@ -40,6 +50,7 @@ manual, deliberate act: `gh release delete v1.0 --cleanup-tag`.
 
 Usage:
     python tools/release.py 1.0     # normally via `make release VERSION=1.0`
+    python tools/release.py --prune # only delete the old releases
 
 Requires `git` and an authenticated `gh` on PATH, plus everything
 `make verify`, `make pdf`, and `make epub` need.
@@ -57,6 +68,14 @@ import build_epub
 import build_pdf
 from tools_config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
 from tools_repo import run_echoed
+
+# How many releases stay on GitHub after a publish: the new one and
+# the one before it. Older ones are deleted, their tags kept.
+KEEP_RELEASES = 2
+
+# A release tag this script made: "v" plus dotted integers. Anything
+# else on the releases page was made by hand and is never pruned.
+_VERSION_TAG = re.compile(r"^v?(\d+(?:\.\d+)*)$")
 
 # Shipped with every release beside the built files: how to get the
 # EPUB onto a Kindle or an iPad, simplest way first. Hand-written, so
@@ -209,6 +228,56 @@ def publish(tag: str, version: str, branch: str,
                  f"{tag} --cleanup-tag")
 
 
+def version_key(tag: str) -> tuple[int, ...] | None:
+    """The numeric parts of a release tag ("v0.4.2" -> (0, 4, 2)), or
+    None for a tag that is not a plain version."""
+    if m := _VERSION_TAG.match(tag.strip()):
+        return tuple(int(n) for n in m.group(1).split("."))
+    return None
+
+
+def to_prune(tags: list[str], keep: int = KEEP_RELEASES) -> list[str]:
+    """The release tags to delete: every version tag past the newest
+    `keep`, newest first by version number (not by list order, which
+    is whatever gh returned). Non-version tags are never included."""
+    versioned = [(key, tag) for tag in tags
+                 if (key := version_key(tag)) is not None]
+    versioned.sort(reverse=True)
+    return [tag for _, tag in versioned[keep:]]
+
+
+def list_release_tags() -> list[str]:
+    """Every release tag on GitHub, via gh."""
+    result = subprocess.run(
+        ["gh", "release", "list", "--limit", "100",
+         "--json", "tagName", "--jq", ".[].tagName"],
+        capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        print(f"warning: could not list releases to prune: "
+              f"{result.stderr.strip()}", file=sys.stderr)
+        return []
+    return result.stdout.split()
+
+
+def prune_releases(keep: int = KEEP_RELEASES) -> int:
+    """Delete releases older than the newest `keep`; tags stay. The
+    number deleted."""
+    doomed = to_prune(list_release_tags(), keep)
+    if not doomed:
+        print(f"\nNo releases older than the newest {keep} to prune.")
+        return 0
+    print(f"\n--- Pruning {len(doomed)} release(s) older than the "
+          f"newest {keep} (tags stay) ---")
+    deleted = 0
+    for tag in doomed:
+        if run_echoed(["gh", "release", "delete", tag, "--yes"]):
+            deleted += 1
+        else:
+            print(f"warning: could not delete release {tag}; it is "
+                  "still on GitHub.", file=sys.stderr)
+    return deleted
+
+
 def release(version: str) -> int:
     if not VERSION_RE.match(version):
         sys.exit(f"error: {version!r} is not a usable VERSION "
@@ -229,6 +298,7 @@ def release(version: str) -> int:
     publish(tag, version, branch, assets)
     print(f"\nReleased {title_for(version)} as {tag}: "
           f"{', '.join(a.name for a in assets)}.")
+    prune_releases()
     return 0
 
 
@@ -238,11 +308,17 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("version", nargs="?",
                     help='the release version, e.g. 1.0 (tagged as "v1.0")')
+    ap.add_argument("--prune", action="store_true",
+                    help=f"only delete releases older than the newest "
+                         f"{KEEP_RELEASES} (tags stay); no version needed")
     args = ap.parse_args(argv)
+    os.chdir(ROOT)
+    if args.prune:
+        prune_releases()
+        return 0
     if not args.version:
         sys.exit("error: no version given. Run as: "
                  "make release VERSION=1.0")
-    os.chdir(ROOT)
     return release(args.version)
 
 
