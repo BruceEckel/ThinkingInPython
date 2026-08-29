@@ -1,6 +1,6 @@
 # Template Method
 
-Application frameworks build new applications by reusing existing classes and overriding one or more methods to customize behavior.
+Application frameworks build new applications by reusing existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method*: a method,
 defined in the base class,
 that drives the application by calling other base-class methods,
@@ -21,7 +21,7 @@ Subclasses provide the individual steps.
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Metaprogramming.md#making-a-class-final),
 also works on a single method.
-It locks the template method so a subclass cannot change the overall flow.
+It locks the template method so a subclass cannot change the flow.
 Here, `@final` on `run()` rejects any subclass that overrides it:
 
 ```python
@@ -84,13 +84,12 @@ adds a new method and leaves the base's do-nothing version in place.
 That is why every step override in these listings carries `@override`:
 the type checker then rejects a method that overrides nothing.
 
-The checker only sees the decorator.
-Leave `@override` off the misspelled method and it passes as a new method,
-with no complaint.
+The checker sees only the decorator.
+Leave `@override` off the misspelled method and the checker accepts it as a new method.
 No typing construct forbids a subclass from adding methods,
 so the checker cannot catch this case.
 The interpreter can.
-The base class's `__init_subclass__()` runs when each subclass is defined,
+The base class's `__init_subclass__()` runs at each subclass's `class` statement,
 and the standard library's `difflib` finds names that nearly match:
 
 ```python
@@ -148,7 +147,6 @@ is an ordinary new method.
 Both pass.
 Only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
-The `class MyApp` statement builds the class as usual.
 The `class Typo` statement raises a `TypeError` instead of finishing,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
@@ -252,14 +250,13 @@ or leaves a step empty when the flow depends on it.
 Either one corrupts the fixed algorithm.
 The empty step is the price of the `...` defaults above.
 They make a step optional,
-and nothing distinguishes "deliberately empty" from "forgotten"
-(when a subclass must supply a step, use `@abstractmethod`).
+and nothing distinguishes "deliberately empty" from "forgotten".
 The Template Method works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
 
-Subclassing is not the only way to supply the varying steps.
-Python functions are first-class, so you can pass the steps in directly:
+A subclass is one way to supply the varying steps.
+Python functions are first-class, so you can also pass the steps in directly:
 
 ```python
 # template_function.py
