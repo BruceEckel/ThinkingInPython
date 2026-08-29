@@ -31,8 +31,9 @@ def drive(rows, keys: str):
         return picker.run()
 
 
-def test_index_rows_lead_with_the_promoted_targets_then_sections():
+def test_index_rows_lead_with_help_then_promoted_targets_then_sections():
     rows = index_rows(_sections())
+    assert rows[0].kind == "all" and rows[0].label == "help"
     targets = [r.label for r in rows if r.kind == "target"]
     assert targets == list(PROMOTED)
     slugs = [r.label for r in rows if r.kind == "section"]
@@ -95,13 +96,21 @@ def test_escape_leaves_without_a_target():
 def test_index_enter_on_a_section_opens_it_and_left_returns():
     sections = _sections()
     rows = index_rows(sections)
-    to_sections = DOWN * len(PROMOTED)   # past the everyday targets
+    to_sections = DOWN * (1 + len(PROMOTED))   # past help and everyday
     first_section = next(s for s in sections if s.slug)
     opened = drive(rows, to_sections + ENTER + ENTER)
     assert opened is first_section.listed()[0]
     # Left comes back to the index with the section row still highlighted
     back_then_up = drive(rows, to_sections + ENTER + LEFT + UP + ENTER)
     assert back_then_up.name == PROMOTED[-1]
+
+
+def test_index_help_row_opens_every_section_and_left_returns():
+    sections = _sections()
+    rows = index_rows(sections)
+    first_target = next(r for r in all_rows(sections) if r.kind == "target")
+    assert drive(rows, ENTER + ENTER) == first_target.target
+    assert drive(rows, ENTER + LEFT + DOWN + ENTER).name == PROMOTED[0]
 
 
 def test_left_at_the_top_level_quits():

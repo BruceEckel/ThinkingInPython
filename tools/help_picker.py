@@ -11,8 +11,9 @@ starts with them. The mouse works too: a click selects a row, a second
 click on the selected row runs it, and the wheel scrolls.
 
 Three views match the three levels of the static listing. Plain `make`
-opens the index: the everyday targets, then the sections, where Enter on
-a section drills into it. `make help` opens every section expanded, and
+opens the index: a `help` row that opens every section, the everyday
+targets, then the sections, where Enter on a section drills into it.
+`make help` opens every section expanded directly, and
 `make help style` opens one section. A target whose doc text mentions
 `CH=` gets a one-line prompt for the chapter before it runs, since that
 is how those targets are scoped.
@@ -81,7 +82,7 @@ MONO = Style.from_dict({
 class Row:
     """One line group in a view. Only target and section rows take the
     highlight; headings and blanks are skipped over."""
-    kind: str                       # "heading", "target", "section", "blank"
+    kind: str          # "heading", "target", "section", "all", "blank"
     label: str = ""                 # target name, section slug, or a heading
     doc: str = ""                   # doc text, or a heading's title
     section: Section | None = None
@@ -89,13 +90,15 @@ class Row:
 
     @property
     def selectable(self) -> bool:
-        return self.kind in ("target", "section")
+        return self.kind in ("target", "section", "all")
 
 
 def index_rows(sections: Sequence[Section]) -> list[Row]:
     """Plain `make`: the everyday targets, then the sections to drill into."""
     by_name = {t.name: t for s in sections for t in s.targets}
-    rows = [Row("heading", doc="Everyday")]
+    rows = [Row("all", "help", "Every target in every section (`make help`)"),
+            Row("blank"),
+            Row("heading", doc="Everyday")]
     rows += [Row("target", n, by_name[n].doc, target=by_name[n])
              for n in PROMOTED]
     rows.append(Row("blank"))
@@ -182,16 +185,22 @@ class Picker:
         return False
 
     def activate(self) -> Target | None:
-        """Enter: a target ends the picker, a section opens its rows."""
+        """Enter: a target ends the picker; a section, or the index's
+        `help` row, opens a new view on top of this one."""
         row = self.rows[self.cursor]
         if row.kind == "target":
             return row.target
         if row.kind == "section" and row.section is not None:
-            self.stack.append((self.rows, self.cursor))
-            self.rows = section_rows(row.section)
-            self.cursor = self._first_selectable(self.rows)
-            self.prefix = ""
+            self._open(section_rows(row.section))
+        elif row.kind == "all":
+            self._open(all_rows(self.sections))
         return None
+
+    def _open(self, rows: list[Row]) -> None:
+        self.stack.append((self.rows, self.cursor))
+        self.rows = rows
+        self.cursor = self._first_selectable(rows)
+        self.prefix = ""
 
     def back(self) -> bool:
         """Left/Backspace: return to the view Enter came from, if any."""
@@ -322,8 +331,8 @@ class Picker:
                 fragments.append(("class:heading", row.doc, handler))
                 fragments.append(("", "\n", handler))
                 continue
-            label_style = ("class:target" if row.kind == "target"
-                           else "class:slug") + extra
+            label_style = ("class:slug" if row.kind == "section"
+                           else "class:target") + extra
             pad = " " * (label_width - len(row.label))
             lines = (wrap_doc(row.doc, body) if body >= MIN_DOC
                      else [row.doc])
