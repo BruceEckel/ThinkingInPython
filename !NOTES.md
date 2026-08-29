@@ -1,3 +1,7 @@
+Rule: look for place where a sentence with a semicolon could become two sentences.
+
+Implementation is Friction
+
 How can I improve the process on this book?
 
 Check for any unresolved issues in deep_review and readability directories
