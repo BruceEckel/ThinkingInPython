@@ -260,6 +260,8 @@ def test_variables_come_from_the_doc_with_their_examples():
     assert variables(_target("code-width")) == [
         ("WIDTH", "nn"), ("ARGS", "--tsv")]
     assert variables(_target("test")) == []
+    assert "ARGS=" in _target("all").doc          # documented, but
+    assert variables(_target("all")) == []        # never prompted for
 
 
 def test_make_command_appends_only_the_variables_given_a_value():

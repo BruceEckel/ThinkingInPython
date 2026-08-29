@@ -403,13 +403,22 @@ def split_match(label: str, query: str) -> list[tuple[str, bool]]:
 
 _VARIABLE = re.compile(r"\b([A-Z][A-Z_]*)=([^\s,;)]*)")
 
+# Variables a target's doc mentions that the menu should not ask about:
+# `make all ARGS=--help` only lists what `all` would run, which is not
+# what someone picking `all` from a menu wants to be asked on every run.
+NO_PROMPT: dict[str, frozenset[str]] = {
+    "all": frozenset({"ARGS"}),
+}
+
 
 def variables(target: Target) -> list[tuple[str, str]]:
     """The `NAME=example` variables a target's doc mentions, in order,
-    each once: what to prompt for before running it."""
+    each once, minus NO_PROMPT's: what to prompt for before running it."""
+    skip = NO_PROMPT.get(target.name, frozenset())
     found: dict[str, str] = {}
     for name, example in _VARIABLE.findall(target.doc):
-        found.setdefault(name, example)
+        if name not in skip:
+            found.setdefault(name, example)
     return list(found.items())
 
 
