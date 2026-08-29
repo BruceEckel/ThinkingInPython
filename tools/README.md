@@ -179,7 +179,14 @@ click on the selected row runs it, and the wheel scrolls. `make` and
 The chosen target runs as a fresh top-level `make` (MAKEFLAGS and
 MAKELEVEL dropped, so no "Entering directory" chatter), after echoing the
 command; a target whose doc mentions `CH=` first prompts for the
-chapter, Enter meaning the whole book. When it finishes, a one-line
+chapter, Enter meaning the whole book. The command line (`make sweep`,
+`make check-ch CH=12`) is also appended to every shell history file that
+exists, so Up-arrow repeats it without the menu. PowerShell's PSReadLine
+re-reads its history file on the next Up, so the entry shows in the
+same session; zsh with `SHARE_HISTORY` or `INC_APPEND_HISTORY` likewise;
+bash reads `~/.bash_history` only at startup (unless `PROMPT_COMMAND`
+runs `history -n`), so there it arrives in the next session. No history
+file is created, and cmd.exe has none. When it finishes, a one-line
 prompt waits: Return reopens the menu with the highlight where it was,
 Esc quits, and the exit status is the last target's. The tests drive the
 real key bindings through prompt_toolkit's pipe input, so they need no

@@ -9,8 +9,9 @@ from prompt_toolkit.input import create_pipe_input
 from prompt_toolkit.output import DummyOutput
 
 from help_picker import (
-    Picker, all_rows, ask_return_or_esc, filter_rows, make_command,
-    section_rows, session, split_match, wants_chapter)
+    Picker, all_rows, ask_return_or_esc, filter_rows, history_files,
+    make_command, record_history, section_rows, session, split_match,
+    wants_chapter)
 from make_help import MAKEFILE, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -195,6 +196,39 @@ def test_a_section_view_offers_only_that_sections_targets():
     rows = section_rows(section)
     assert drive(rows, END + ENTER).name == section.listed()[-1].name
     assert drive(rows, DOWN * 50 + ENTER).name == section.listed()[-1].name
+
+
+def test_history_files_lists_only_the_ones_that_exist(tmp_path):
+    home = tmp_path / "home"
+    psrl = (tmp_path / "appdata" / "Microsoft" / "Windows" / "PowerShell"
+            / "PSReadLine" / "ConsoleHost_history.txt")
+    psrl.parent.mkdir(parents=True)
+    psrl.write_text("make\n")
+    (home / ".zsh_history").parent.mkdir(parents=True)
+    (home / ".zsh_history").write_text("")
+    env = {"APPDATA": str(tmp_path / "appdata")}
+    assert history_files(env, home) == [psrl, home / ".zsh_history"]
+    assert history_files({}, tmp_path / "nowhere") == []
+
+
+def test_record_history_appends_plain_and_zsh_extended_lines(tmp_path):
+    plain = tmp_path / "ConsoleHost_history.txt"
+    plain.write_text("make\n")
+    zsh = tmp_path / ".zsh_history"
+    zsh.write_text(": 1700000000:0;ls\n")
+    zsh_plain = tmp_path / "plain" / ".zsh_history"
+    zsh_plain.parent.mkdir()
+    zsh_plain.write_text("ls\n")
+    written = record_history("make sweep", [plain, zsh, zsh_plain], now=42)
+    assert written == [plain, zsh, zsh_plain]
+    assert plain.read_text().splitlines() == ["make", "make sweep"]
+    assert zsh.read_text().splitlines()[-1] == ": 42:0;make sweep"
+    assert zsh_plain.read_text().splitlines()[-1] == "make sweep"
+
+
+def test_record_history_skips_a_file_it_cannot_write(tmp_path):
+    missing = tmp_path / "no" / "such" / "history"
+    assert record_history("make sweep", [missing]) == []
 
 
 def test_make_command_appends_the_chapter_only_when_given():

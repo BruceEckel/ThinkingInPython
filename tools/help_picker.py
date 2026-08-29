@@ -19,7 +19,15 @@ the chapter before it runs, since that is how those targets are scoped.
 
 The picker runs in the terminal's alternate screen, so it vanishes on
 exit and the chosen target's output scrolls in the normal buffer. The
-command is echoed first (`$ make sweep`). When the target finishes, a
+command is echoed first (`$ make sweep`) and appended to every shell
+history file that exists, so Up-arrow can repeat it without the menu:
+PSReadLine's `ConsoleHost_history.txt` (PowerShell re-reads it on the
+next Up, so the entry shows in the same session), `~/.zsh_history` (in
+zsh's extended format when the file uses it; a shell with SHARE_HISTORY
+or INC_APPEND_HISTORY sees it at once), and `~/.bash_history` (bash reads
+that only at startup unless PROMPT_COMMAND runs `history -n`, so there
+it arrives in the next session). No file is created, and cmd.exe keeps
+no history to append to. When the target finishes, a
 one-line prompt waits: Return reopens the menu with the highlight where
 it was, Esc quits, and the exit status is the last target's. MAKEFLAGS
 and MAKELEVEL are dropped from the child's environment: `make help` is
@@ -37,8 +45,10 @@ import os
 import shutil
 import subprocess
 import sys
-from collections.abc import Callable, Sequence
+import time
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from prompt_toolkit.application import Application
@@ -398,13 +408,64 @@ def wants_chapter(target: Target) -> bool:
     return "CH=" in target.doc
 
 
+def history_files(env: Mapping[str, str] | None = None,
+                  home: Path | None = None) -> list[Path]:
+    """The shell history files a command can be appended to: each
+    well-known location that already exists, in a stable order."""
+    settings: Mapping[str, str] = os.environ if env is None else env
+    home = Path.home() if home is None else home
+    candidates: list[Path] = []
+    if appdata := settings.get("APPDATA"):
+        candidates.append(Path(appdata) / "Microsoft" / "Windows"
+                          / "PowerShell" / "PSReadLine"
+                          / "ConsoleHost_history.txt")
+    candidates.append(home / ".local" / "share" / "powershell"
+                      / "PSReadLine" / "ConsoleHost_history.txt")
+    if histfile := settings.get("HISTFILE"):
+        candidates.append(Path(histfile))
+    candidates += [home / ".bash_history", home / ".zsh_history"]
+    return [p for p in dict.fromkeys(candidates) if p.is_file()]
+
+
+def record_history(command: str, files: Iterable[Path],
+                   now: float | None = None) -> list[Path]:
+    """Append `command` to each history file; the ones that took it."""
+    written: list[Path] = []
+    for path in files:
+        line = command
+        if path.name == ".zsh_history" and _zsh_extended(path):
+            stamp = int(time.time() if now is None else now)
+            line = f": {stamp}:0;{command}"
+        try:
+            with path.open("a", encoding="utf-8") as f:
+                f.write(line + "\n")
+        except OSError:
+            continue
+        written.append(path)
+    return written
+
+
+def _zsh_extended(path: Path) -> bool:
+    """Whether a zsh history file uses EXTENDED_HISTORY's `: ts:0;cmd`."""
+    try:
+        with path.open("rb") as f:
+            tail = f.read()[-4096:]
+    except OSError:
+        return False
+    lines = [ln for ln in tail.splitlines() if ln.strip()]
+    return bool(lines) and lines[-1].startswith(b": ")
+
+
 def run_target(target: Target) -> int:
-    """Echo and run `make <target>` as a fresh top-level make."""
+    """Echo and run `make <target>` as a fresh top-level make, after
+    recording the command in the shell history."""
     chapter = ""
     if wants_chapter(target):
         chapter = prompt("CH= (Enter for the whole book): ").strip()
     argv = make_command(target, chapter)
-    print(f"$ make {' '.join(argv[1:])}", flush=True)
+    command = f"make {' '.join(argv[1:])}"
+    record_history(command, history_files())
+    print(f"$ {command}", flush=True)
     env = {k: v for k, v in os.environ.items()
            if k not in ("MAKEFLAGS", "MFLAGS", "MAKELEVEL")}
     try:
