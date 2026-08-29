@@ -94,6 +94,26 @@ def test_backspace_edits_the_query_and_escape_clears_it():
     assert drive(rows, "sw" + ESC + ESC) is None
 
 
+def test_rendering_caps_the_scroll_at_the_highlighted_sections_heading():
+    rows = all_rows(_sections())
+    picker = Picker(rows, output=DummyOutput())
+    picker.window.vertical_scroll = 500      # as if arrowed far down
+    picker.search("must be clean")           # doc-only: `ty` first, row 1
+    assert picker.rows[picker.cursor].label == "ty"
+    picker._body()
+    assert picker.window.vertical_scroll == 0    # its heading is line 0
+    picker.move_to_end(last=True)            # under "solutions:"
+    picker.window.vertical_scroll = 500
+    text = "".join(f[1] for f in picker._body())
+    heading_line = next(i for i, line in enumerate(text.splitlines())
+                        if line.startswith("solutions: "))
+    assert heading_line > 0
+    assert picker.window.vertical_scroll == heading_line
+    picker.window.vertical_scroll = 0        # never scrolls forward
+    picker._body()
+    assert picker.window.vertical_scroll == 0
+
+
 def test_filter_rows_keeps_headings_of_matching_sections_only():
     rows = all_rows(_sections())
     kept = filter_rows(rows, "clean")

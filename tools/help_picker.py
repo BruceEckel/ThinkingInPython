@@ -125,10 +125,12 @@ class Picker:
         self.cursor = (cursor if cursor is not None
                        else self._first_selectable(rows))
         self.query = ""
+        self.window = Window(
+            FormattedTextControl(self._body, show_cursor=False),
+            always_hide_cursor=True, wrap_lines=False)
         self.app: Application[Target | None] = Application(
             layout=Layout(HSplit([
-                Window(FormattedTextControl(self._body, show_cursor=False),
-                       always_hide_cursor=True, wrap_lines=False),
+                self.window,
                 Window(FormattedTextControl(self._footer), height=1,
                        style="class:footer"),
             ])),
@@ -273,28 +275,44 @@ class Picker:
         return min(self.app.output.get_size().columns or 80, MAX_WIDTH)
 
     def _body(self) -> StyleAndTextTuples:
+        """The list as fragments; also caps the window's scroll at the
+        highlighted target's section heading.
+
+        prompt_toolkit scrolls only as far as it must to keep the cursor
+        row on screen, so after arrowing past the first screen and then
+        searching, the highlight could sit on the top line with its
+        heading just above it. Capping the scroll here, before the
+        window computes its own, keeps the heading visible whenever the
+        highlight is. Line numbers are counted as the rows render, since
+        a wrapped doc takes more than one.
+        """
         width = self._width()
         label_width = max(
             (len(r.label) for r in self.rows if r.selectable), default=0)
         indent = 2 + label_width + 2
         body = width - indent
         fragments: StyleAndTextTuples = []
+        line = heading_line = cursor_heading = 0
         for i, row in enumerate(self.rows):
             handler = self._mouse(i)
             selected = i == self.cursor
             extra = " class:selected" if selected else ""
             if selected:
                 fragments.append(("[SetCursorPosition]", ""))
+                cursor_heading = heading_line
             if row.kind == "blank":
                 fragments.append(("", "\n", handler))
+                line += 1
                 continue
             if row.kind == "heading":
+                heading_line = line
                 if row.label:
                     fragments.append(("class:slug", row.label, handler))
                     if row.doc:
                         fragments.append(("", " ", handler))
                 fragments.append(("class:heading", row.doc, handler))
                 fragments.append(("", "\n", handler))
+                line += 1
                 continue
             label_style = "class:target" + extra
             pad = " " * (label_width - len(row.label))
@@ -309,9 +327,12 @@ class Picker:
                 (extra.strip(), f"{pad}  {first}", handler),
                 ("", "\n", handler),
             ]
-            for line in lines[1:]:
-                fragments.append((extra.strip(), " " * indent + line, handler))
+            for more in lines[1:]:
+                fragments.append((extra.strip(), " " * indent + more, handler))
                 fragments.append(("", "\n", handler))
+            line += len(lines) or 1
+        self.window.vertical_scroll = min(
+            self.window.vertical_scroll, cursor_heading)
         return fragments
 
     def _footer(self) -> StyleAndTextTuples:
