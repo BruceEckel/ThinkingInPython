@@ -14,10 +14,14 @@ but it needs a mail client or an authenticated API; the app needs
 neither.
 
 The e-ink variant is the default (a Paperwhite is the target), and
-`VARIANT=color` picks the other. Only a file that `make epub` already
-built is sent, never a rebuild: the point is to send the book that
-was just checked, and a stale file is reported with its age so it
-cannot pass for fresh by accident.
+`VARIANT=color` picks the other. The EPUB is rebuilt first when it
+is missing or older than any of its inputs (Chapters/, resources/,
+the builder modules), the same in-process `build_epub.build()` call
+`make epub` makes, so the file sent is never behind the Markdown;
+a current file is sent as-is, and its age is printed either way.
+`make epub` itself always rebuilds; this is the only place the
+inputs are compared, since here a stale file would go to a device
+and pass for the current book.
 
 Usage:
     uv run python tools/send_to_kindle.py            # eink
@@ -31,22 +35,48 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-EPUB_DIR = ROOT / "build" / "epub"
+import build_epub
+from tools_config import BUILD_EPUB_DIR, CHAPTERS_DIR, ROOT, TOOLS_DIR
+
+EPUB_DIR = BUILD_EPUB_DIR
 VARIANTS = ("eink", "color")
+# Everything an EPUB is built from; a change to any of these makes
+# the built file stale.
+INPUTS = (CHAPTERS_DIR, ROOT / "resources",
+          TOOLS_DIR / "build_epub.py", TOOLS_DIR / "build_site.py",
+          TOOLS_DIR / "tools_config.py")
 
 WINDOWS_APP = Path(
     os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
 ) / "Amazon" / "SendToKindle" / "SendToKindle.exe"
 
 
+def newest_input() -> float:
+    """Modification time of the most recently changed input file."""
+    latest = 0.0
+    for root in INPUTS:
+        files = root.rglob("*") if root.is_dir() else (root,)
+        for f in files:
+            if f.is_file():
+                latest = max(latest, f.stat().st_mtime)
+    return latest
+
+
 def epub_path(variant: str) -> Path:
+    """The variant's EPUB, rebuilt first if missing or stale."""
     if variant not in VARIANTS:
         raise SystemExit(
             f"unknown variant {variant!r}; use one of {VARIANTS}")
-    path = EPUB_DIR / f"ThinkingInPython-{variant}.epub"
+    path = EPUB_DIR / build_epub.epub_name(variant)
     if not path.exists():
-        raise SystemExit(f"{path} not found; run `make epub` first")
+        print(f"{path.relative_to(ROOT)} not built yet; building.")
+    elif path.stat().st_mtime < newest_input():
+        print(f"{path.relative_to(ROOT)} is older than its inputs; "
+              "rebuilding.")
+    else:
+        return path
+    if build_epub.build(EPUB_DIR) != 0:
+        raise SystemExit("EPUB build failed; nothing sent")
     return path
 
 

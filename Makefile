@@ -301,9 +301,11 @@ epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub wi
 # Hands the built EPUB to Amazon's Send to Kindle desktop app, which
 # opens its dialog with the file queued, and opens an Explorer window
 # with the file selected for drag and drop; the Send click is the app's.
-# Sends what `make epub` last built (reporting its age), never a
-# rebuild. Excluded from verify-targets' smoke test: it opens a GUI.
-kindle:  ## Send build/epub's e-ink EPUB to a Kindle via the Send to Kindle app (VARIANT=color for the other)
+# Rebuilds the EPUB first (the same build as `epub`) only when it is
+# missing or older than Chapters/, resources/, or the builder, so a
+# fresh build is sent as-is. Excluded from verify-targets' smoke
+# test: it opens a GUI.
+kindle:  ## Send the e-ink EPUB to a Kindle via the Send to Kindle app, rebuilding it first if stale (VARIANT=color for the other)
 	$(PY) tools/send_to_kindle.py $(VARIANT)
 
 # One PDF from the same merged, anchor-namespaced Markdown stream the
