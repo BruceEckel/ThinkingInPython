@@ -40,19 +40,32 @@ comes from the terminal and is capped at MAX_WIDTH, since a doc string run
 across 200 columns is no easier to read than one that overflows 80. A pipe
 or a redirect gets the 80-column fallback.
 
+Output is colored when stdout is a terminal: section headings bold with the
+slug highlighted, target names in color, the index's per-section counts
+dimmed. `NO_COLOR` turns it off, `FORCE_COLOR` (or `--color always`) turns
+it on for a pipe, and a legacy Windows console has VT processing switched
+on first, since without it the escape codes print as garbage. The render
+functions take a Palette and default to the plain one, so wrapping is
+measured on uncolored text and the tests see no escape codes.
+
 Usage:
     python tools/make_help.py                    # the index (plain `make`)
     python tools/make_help.py --all              # every section (`make help`)
     python tools/make_help.py style              # one section
     python tools/make_help.py --width 72         # wrap to a fixed width
+    python tools/make_help.py --color never      # plain text on a terminal
     python tools/make_help.py --makefile PATH    # read another Makefile
 """
 import argparse
+import os
 import re
 import shutil
+import sys
 import textwrap
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import IO
 
 from tools_config import ROOT
 
@@ -78,6 +91,66 @@ _CATEGORY = re.compile(r"^##@\s?(.*)$")
 # is a judgment about the set as a whole, and reads best in one place;
 # main() fails if a name here is not a documented target.
 PROMOTED: tuple[str, ...] = ("all", "verify", "gate", "check-ch", "sweep")
+
+
+@dataclass(frozen=True)
+class Palette:
+    """ANSI codes for each role in the listing; all empty means plain text."""
+    heading: str = ""
+    slug: str = ""
+    target: str = ""
+    dim: str = ""
+    reset: str = ""
+
+    def paint(self, code: str, text: str) -> str:
+        return f"{code}{text}{self.reset}" if code else text
+
+
+PLAIN = Palette()
+ANSI = Palette(
+    heading="\x1b[1m", slug="\x1b[1;36m", target="\x1b[36m",
+    dim="\x1b[2m", reset="\x1b[0m")
+
+
+def _enable_windows_vt() -> bool:
+    """Turn on ANSI processing in a legacy Windows console.
+
+    Windows Terminal has it on already; the old conhost does not, and
+    prints the escape codes literally. Returns whether the console will
+    now interpret them.
+    """
+    import ctypes
+    windll = getattr(ctypes, "windll", None)
+    if windll is None:
+        return False
+    kernel32 = windll.kernel32
+    handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+    mode = ctypes.c_uint32()
+    if not kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
+        return False
+    wanted = mode.value | 0x0004  # ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    return bool(kernel32.SetConsoleMode(handle, wanted))
+
+
+def can_colorize(stream: IO[str] | None = None,
+                 env: Mapping[str, str] | None = None) -> bool:
+    """Whether to emit ANSI codes: NO_COLOR wins, then FORCE_COLOR, then
+    whether the stream is a terminal (and, on Windows, one that understands
+    escape codes)."""
+    settings: Mapping[str, str] = os.environ if env is None else env
+    if settings.get("NO_COLOR"):
+        return False
+    if settings.get("FORCE_COLOR"):
+        return True
+    if settings.get("TERM") == "dumb":
+        return False
+    stream = sys.stdout if stream is None else stream
+    isatty = getattr(stream, "isatty", None)
+    if isatty is None or not isatty():
+        return False
+    if sys.platform == "win32":
+        return _enable_windows_vt()
+    return True
 
 
 @dataclass(frozen=True)
@@ -137,7 +210,8 @@ def terminal_width(override: int | None = None) -> int:
     return min(shutil.get_terminal_size((80, 24)).columns, MAX_WIDTH)
 
 
-def _table(rows: list[tuple[str, str]], width: int) -> list[str]:
+def _table(rows: list[tuple[str, str]], width: int,
+           paint: Callable[[str], str] = str) -> list[str]:
     """Two columns, the second wrapped and hanging-indented under itself.
 
     Three things must survive intact. A hyphenated target name
@@ -146,12 +220,17 @@ def _table(rows: list[tuple[str, str]], width: int) -> list[str]:
     backticked command keeps its two words together, which textwrap cannot
     express, so the spaces inside backticks are swapped for a placeholder
     that is not whitespace and swapped back afterward.
+
+    `paint` colors the label; padding is measured on the raw label so the
+    escape codes it adds never shift the doc column.
     """
     label_width = max((len(label) for label, _ in rows), default=0)
     lines: list[str] = []
     for label, doc in rows:
-        lead = f"  {label:<{label_width}}  "
-        body = width - len(lead)
+        pad = " " * (label_width - len(label))
+        lead = f"  {paint(label)}{pad}  "
+        indent = " " * (2 + label_width + 2)
+        body = width - len(indent)
         if body < MIN_DOC:
             lines.append(f"{lead}{doc}")
             continue
@@ -160,12 +239,20 @@ def _table(rows: list[tuple[str, str]], width: int) -> list[str]:
             body, break_long_words=False, break_on_hyphens=False)
         wrapped = [line.replace(_JOINER, " ") for line in wrapped]
         lines.append(lead + (wrapped[0] if wrapped else ""))
-        lines += [" " * len(lead) + line for line in wrapped[1:]]
+        lines += [indent + line for line in wrapped[1:]]
     return lines
 
 
-def _rows(targets: list[Target], width: int) -> list[str]:
-    return _table([(t.name, t.doc) for t in targets], width)
+def _rows(targets: list[Target], width: int,
+          palette: Palette = PLAIN) -> list[str]:
+    return _table([(t.name, t.doc) for t in targets], width,
+                  lambda name: palette.paint(palette.target, name))
+
+
+def _heading(section: Section, palette: Palette) -> str:
+    """`style: Style gates`, slug and title each in their own color."""
+    return (palette.paint(palette.slug, f"{section.slug}:") + " "
+            + palette.paint(palette.heading, section.title))
 
 
 def check(sections: list[Section]) -> None:
@@ -191,35 +278,46 @@ def check(sections: list[Section]) -> None:
             "targets. Update PROMOTED in tools/make_help.py.")
 
 
-def render_index(sections: list[Section], width: int | None = None) -> str:
+def render_index(sections: list[Section], width: int | None = None,
+                 palette: Palette = PLAIN) -> str:
     """The default listing: help, the everyday commands, the section list."""
     width = width or terminal_width()
     by_name = {t.name: t for s in sections for t in s.targets}
     lines: list[str] = []
 
     if preamble := next((s for s in sections if not s.slug), None):
-        lines += _rows(preamble.listed(), width)
+        lines += _rows(preamble.listed(), width, palette)
 
-    lines.append("\nEveryday:")
-    lines += _rows([by_name[n] for n in PROMOTED], width)
+    lines.append("\n" + palette.paint(palette.heading, "Everyday:"))
+    lines += _rows([by_name[n] for n in PROMOTED], width, palette)
 
-    lines.append("\nSubtopics (`make help NAME`; `make help` lists them all):")
+    lines.append("\n" + palette.paint(
+        palette.heading,
+        "Subtopics (`make help NAME`; `make help` lists them all):"))
     named = [s for s in sections if s.slug]
     slug_width = max(len(s.slug) for s in named)
+
+    def paint(label: str) -> str:
+        slug, count = label[:slug_width], label[slug_width:]
+        return (palette.paint(palette.slug, slug)
+                + palette.paint(palette.dim, count))
+
     lines += _table(
         [(f"{s.slug:<{slug_width}}  {len(s.listed()):>2}", s.title)
-         for s in named], width)
+         for s in named], width, paint)
     return "\n".join(lines)
 
 
-def render_section(section: Section, width: int | None = None) -> str:
+def render_section(section: Section, width: int | None = None,
+                   palette: Palette = PLAIN) -> str:
     """The heading line names the slug first (`style: Style gates`), so
     the full listing doubles as the index of what `make help NAME` takes."""
-    rows = _rows(section.listed(), width or terminal_width())
-    return "\n".join([f"{section.slug}: {section.title}", *rows])
+    rows = _rows(section.listed(), width or terminal_width(), palette)
+    return "\n".join([_heading(section, palette), *rows])
 
 
-def render_all(sections: list[Section], width: int | None = None) -> str:
+def render_all(sections: list[Section], width: int | None = None,
+               palette: Palette = PLAIN) -> str:
     """Every section expanded, in Makefile order: what `make help` prints.
 
     Secondary targets stay folded, as in a single section, since the doc
@@ -228,8 +326,9 @@ def render_all(sections: list[Section], width: int | None = None) -> str:
     width = width or terminal_width()
     blocks: list[str] = []
     if preamble := next((s for s in sections if not s.slug), None):
-        blocks.append("\n".join(_rows(preamble.listed(), width)))
-    blocks += [render_section(s, width) for s in sections if s.slug]
+        blocks.append("\n".join(_rows(preamble.listed(), width, palette)))
+    blocks += [render_section(s, width, palette)
+               for s in sections if s.slug]
     return "\n\n".join(blocks)
 
 
@@ -250,17 +349,26 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--makefile", type=Path, default=MAKEFILE,
         help=f"Makefile to read (default: {MAKEFILE.name})")
+    ap.add_argument(
+        "--color", choices=("auto", "always", "never"), default="auto",
+        help="ANSI color: auto (default) colors only a terminal, and "
+             "honors NO_COLOR and FORCE_COLOR")
     args = ap.parse_args(argv)
 
     sections = parse(args.makefile.read_text(encoding="utf-8"))
     check(sections)
     width = terminal_width(args.width)
+    colored = {"always": True, "never": False}.get(
+        args.color, None)
+    if colored is None:
+        colored = can_colorize()
+    palette = ANSI if colored else PLAIN
 
     if args.all:
-        print(render_all(sections, width))
+        print(render_all(sections, width, palette))
         return 0
     if not args.topic:
-        print(render_index(sections, width))
+        print(render_index(sections, width, palette))
         return 0
 
     match = next((s for s in sections if s.slug == args.topic), None)
@@ -268,7 +376,7 @@ def main(argv: list[str] | None = None) -> int:
         known = ", ".join(s.slug for s in sections if s.slug)
         print(f"No subtopic named {args.topic!r}. Try one of: {known}")
         return 2
-    print(render_section(match, width))
+    print(render_section(match, width, palette))
     return 0
 
 

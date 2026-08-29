@@ -3,11 +3,16 @@
 The real Makefile is exercised at the end, so a heading or doc comment that
 breaks the conventions fails here rather than at the next `make help`.
 """
+import io
+import re
+
 import pytest
 
 from make_help import (
-    MAKEFILE, MAX_WIDTH, MIN_DOC, PROMOTED, check, entries, parse,
-    render_all, render_index, render_section, terminal_width)
+    ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, PROMOTED, can_colorize, check,
+    entries, parse, render_all, render_index, render_section, terminal_width)
+
+_ESCAPES = re.compile(r"\x1b\[[0-9;]*m")
 
 SAMPLE = """\
 help:  ## Show this help
@@ -157,6 +162,30 @@ def test_render_all_expands_every_section_and_folds_secondary():
         for target in section.targets:
             shown = f"  {target.name} " in full
             assert shown is not target.secondary, target.name
+
+
+def test_color_only_adds_escape_codes():
+    """Stripping the codes from the colored listing gives the plain one,
+    so color never moves a column or changes a wrap."""
+    sections = _real()
+    for plain, colored in [
+        (render_index(sections, 80), render_index(sections, 80, ANSI)),
+        (render_all(sections, 80), render_all(sections, 80, ANSI)),
+    ]:
+        assert "\x1b[" not in plain
+        assert "\x1b[" in colored
+        assert _ESCAPES.sub("", colored) == plain
+
+
+def test_plain_palette_is_the_default():
+    assert render_index(_real(), 80) == render_index(_real(), 80, PLAIN)
+
+
+def test_can_colorize_honors_the_environment_and_the_stream():
+    pipe = io.StringIO()
+    assert not can_colorize(pipe, {})
+    assert can_colorize(pipe, {"FORCE_COLOR": "1"})
+    assert not can_colorize(pipe, {"FORCE_COLOR": "1", "NO_COLOR": "1"})
 
 
 @pytest.mark.parametrize("slug", [s.slug for s in _real() if s.slug])
