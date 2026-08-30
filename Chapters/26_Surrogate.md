@@ -1,7 +1,7 @@
 # Surrogate
 
 Both *Proxy* and *State* provide a surrogate class that you use in your code.
-The surrogate hides the real class that does the work.
+The surrogate hides the implementing class that does the work.
 When you call a method in the surrogate,
 it calls that method in the implementing class.
 The two patterns are so similar that *Proxy* is a special case of *State*.
@@ -11,7 +11,7 @@ From a base class, you derive the surrogate along with the class or classes that
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
 That is the shape *GoF Design Patterns* draws.
-Python does not need the shared base, as the listings below show,
+You'll see that Python does not need the shared base,
 but it is the clearest way to see what a surrogate is.
 
 A surrogate object acquires an implementation,
@@ -29,7 +29,7 @@ and the two fit neatly together.
 
 ## Proxy
 
-If you implement *Proxy* by following the above diagram, it looks like this:
+Implementing *Proxy* following the above diagram looks like this:
 
 ```python
 # proxy_1.py
@@ -39,8 +39,6 @@ class Implementation:
         print("Implementation.f()")
     def g(self) -> None:
         print("Implementation.g()")
-    def h(self) -> None:
-        print("Implementation.h()")
 
 class Proxy:
     def __init__(self) -> None:
@@ -48,15 +46,12 @@ class Proxy:
     # Pass method calls to the implementation:
     def f(self) -> None: self.__implementation.f()
     def g(self) -> None: self.__implementation.g()
-    def h(self) -> None: self.__implementation.h()
 
 p = Proxy()
 p.f()
 #: Implementation.f()
 p.g()
 #: Implementation.g()
-p.h()
-#: Implementation.h()
 ```
 
 `Implementation` need not have the same interface as `Proxy`.
@@ -167,7 +162,7 @@ class Implementation:
         print("Implementation.f()")
     def g(self) -> None:
         print("Implementation.g()")
-    def h(self) -> None:
+    def h(self) -> None:  # New; Proxy needs no change
         print("Implementation.h()")
 
 class Proxy:
@@ -188,6 +183,8 @@ p.h()
 `__getattr__()` makes the forwarding generic:
 because `Proxy` names no method of `Implementation`,
 it keeps working when the implementation grows a method.
+`Implementation` here has an `h()` that `proxy_1.py`'s lacked,
+and `p.h()` forwards with no new line in `Proxy`.
 The proxy still depends on one implementation class, which it constructs.
 Accepting an implementation as a constructor argument removes that tie too.
 The double underscore on `self.__implementation` matters:

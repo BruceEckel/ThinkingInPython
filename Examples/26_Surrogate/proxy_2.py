@@ -6,7 +6,7 @@ class Implementation:
         print("Implementation.f()")
     def g(self) -> None:
         print("Implementation.g()")
-    def h(self) -> None:
+    def h(self) -> None:  # New; Proxy needs no change
         print("Implementation.h()")
 
 class Proxy:

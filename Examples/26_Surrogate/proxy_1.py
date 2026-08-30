@@ -5,8 +5,6 @@ class Implementation:
         print("Implementation.f()")
     def g(self) -> None:
         print("Implementation.g()")
-    def h(self) -> None:
-        print("Implementation.h()")
 
 class Proxy:
     def __init__(self) -> None:
@@ -14,12 +12,9 @@ class Proxy:
     # Pass method calls to the implementation:
     def f(self) -> None: self.__implementation.f()
     def g(self) -> None: self.__implementation.g()
-    def h(self) -> None: self.__implementation.h()
 
 p = Proxy()
 p.f()
 #: Implementation.f()
 p.g()
 #: Implementation.g()
-p.h()
-#: Implementation.h()
