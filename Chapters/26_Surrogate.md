@@ -15,6 +15,9 @@ You'll see that Python does not need the shared base,
 but it is the clearest way to see what a surrogate is.
 
 A surrogate object receives an implementation and forwards all method calls to it.
+That indirection is where both patterns do their work:
+the surrogate can refuse a call, delay creating the implementation,
+count or log what passes through, or swap the implementation for another.
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has one implementation.
 *State* has several.
@@ -23,7 +26,7 @@ A *Proxy* has one implementation.
 
 ### Explicit Forwarding
 
-Implementing *Proxy* following the above diagram looks like this:
+The smallest *Proxy* drops the shared base and forwards each call by hand:
 
 ```python
 # proxy_1.py
@@ -338,6 +341,12 @@ A misspelled `self._implementation` trips it directly.
 So does rebuilding a proxy through `copy.copy()` or `pickle`:
 both construct the new instance without calling `__init__()`,
 so no `_implementation` exists when the first lookup reaches `__getattr__()`.
+The cure is a guard at the top of `__getattr__()`:
+raise `AttributeError` for any name that starts with an underscore.
+A misspelled private name then fails with an error that names it,
+and `copy` and `pickle`,
+which probe for `__setstate__()` before `__init__()` has run,
+get the `AttributeError` they expect.
 
 A proxy is not an instance of the implementation's class.
 Delegation forwards the methods, not the type.
@@ -584,7 +593,7 @@ The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
 The Proxy section gives the reason:
 whatever `__getattr__()` returns is unknown at the type level,
-so no type checker can verify `b.f()`, no matter how you annotate the surrogate.
+so no type checker can verify `b.f()` while the call reaches `f()` through `__getattr__()`.
 Declaring each implementation against `Behavior` still catches a missing method,
 because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
 That declaration stops at the surrogate.
