@@ -207,7 +207,7 @@ the checker cannot verify that call.
 With explicit forwarding, as in `proxy_1.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies it.
-`__getattr__()` gives up that check to forward every method,
+`__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 
 One limit: special methods bypass `__getattr__()`.
