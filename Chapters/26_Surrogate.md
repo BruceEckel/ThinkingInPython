@@ -15,7 +15,6 @@ You'll see that Python does not need the shared base,
 but it is the clearest way to see what a surrogate is.
 
 A surrogate object receives an implementation and forwards all method calls to it.
-
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has one implementation.
 *State* has several.
@@ -248,7 +247,7 @@ The two calls look interchangeable and are not.
 `p.__len__()` is ordinary attribute access,
 so the failed instance lookup falls through to `__getattr__()`, which delegates.
 `len(p)` asks `type(p)` for `__len__()` directly, finds none,
-and reports that `Proxy` has no length.
+and reports that `Proxy` has no `len()`.
 The type checker agrees, rejecting `len(p)` statically for the same reason,
 which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
@@ -256,10 +255,9 @@ A proxy that must forward special methods defines them explicitly.
 `len(p)` reports the miss because `object` defines no `__len__()`.
 `print(p)` cannot: `object` defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
-A bypassed dunder that `object` defines fails silently,
-with no error pointing at the miss.
+A bypassed dunder that `object` defines fails silently.
 
-Delegation forwards reads, not writes:
+Delegation using `__getattr__()` forwards reads, not writes:
 
 ```python
 # proxy_writes.py
@@ -288,10 +286,10 @@ print(p.level, settings.level)
 The assignment stores `level` on the proxy, where the next lookup finds it,
 so the proxy stops consulting the implementation and the two disagree.
 The type checker objects to the assignment,
-because `Proxy` declares no `level` and no `__setattr__()` to accept one,
-which is the static half of the same warning.
-A surrogate that must forward writes defines `__setattr__()` as well,
-and that method must let the proxy's own attributes through,
+because `Proxy` declares no `level` and no `__setattr__()` to accept one.
+
+To forward writes, define `__setattr__()`.
+That method must let the proxy's own attributes through,
 or the assignment in `__init__()` recurses:
 
 ```python
@@ -300,11 +298,11 @@ from typing import Any
 
 class WriteProxy:
     def __init__(self, impl: Any) -> None:
-        object.__setattr__(self, "_impl", impl)
+        object.__setattr__(self, "_implementation", impl)
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._impl, name)
+        return getattr(self._implementation, name)
     def __setattr__(self, name: str, value: Any) -> None:
-        setattr(self._impl, name, value)
+        setattr(self._implementation, name, value)
 
 class Settings:
     def __init__(self) -> None:
@@ -320,25 +318,24 @@ print(p.level, settings.level)
 `object.__setattr__()` stores `_impl` on the proxy,
 bypassing the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
 Every assignment after that reaches the implementation, so the two agree.
-The `# type: ignore` that `proxy_writes.py` needed disappears here:
-declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes,
-so the static half closes at the same moment as the runtime half.
-The implementation attribute also shrinks from `__implementation` to `_impl`:
-mangling rewrites identifiers, not string literals,
+The `# type: ignore` required by `proxy_writes.py` disappears because declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes.
+
+The implementation attribute loses its double underscore,
+from `__implementation` to `_implementation`.
+Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
 `"_WriteProxy__impl"`, by hand.
 
-Identity has the same gap.
 A proxy is not an instance of the implementation's class.
 Delegation forwards the methods, not the type.
-A `@runtime_checkable` `Protocol` does not close that gap either.
+A `@runtime_checkable` `Protocol` does not change that.
 Since Python 3.12 that check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries directly and does not call `__getattr__()`,
-so a proxy whose methods all arrive through delegation fails it too.
+so a proxy whose methods all arrive through delegation also fails it.
 Because ordinary attribute access still finds those methods,
 `hasattr(p, "f")` is `True` and `p.f()` runs.
 Code that calls the method, or probes with `hasattr()`, works on a surrogate.
-Code that asks `isinstance()` sees only the proxy's own class.
+Code using `isinstance()` sees only the proxy's own class.
 
 ```python
 # proxy_identity.py

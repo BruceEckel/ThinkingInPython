@@ -3,11 +3,11 @@ from typing import Any
 
 class WriteProxy:
     def __init__(self, impl: Any) -> None:
-        object.__setattr__(self, "_impl", impl)
+        object.__setattr__(self, "_implementation", impl)
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._impl, name)
+        return getattr(self._implementation, name)
     def __setattr__(self, name: str, value: Any) -> None:
-        setattr(self._impl, name, value)
+        setattr(self._implementation, name, value)
 
 class Settings:
     def __init__(self) -> None:
