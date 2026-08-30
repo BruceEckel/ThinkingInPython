@@ -1,19 +1,19 @@
 # dunder_bypass.py
 from typing import Any
 
-class Words:
-    def __init__(self) -> None:
-        self.items = ["spam", "eggs"]
-
-    def __len__(self) -> int:
-        return len(self.items)
-
 class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+
+class Words:
+    def __init__(self) -> None:
+        self.items = ["spam", "eggs"]
+
+    def __len__(self) -> int:
+        return len(self.items)
 
 p = Proxy(Words())
 print(p.__len__())  # The explicit call delegates

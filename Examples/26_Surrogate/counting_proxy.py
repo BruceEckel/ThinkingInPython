@@ -1,10 +1,6 @@
 # counting_proxy.py
 from typing import Any
 
-class Implementation:
-    def f(self) -> None: print("f()")
-    def g(self) -> None: print("g()")
-
 class CountingProxy:
     def __init__(self, impl: Any) -> None:
         self._impl = impl
@@ -18,6 +14,10 @@ class CountingProxy:
                 return attr(*args, **kwargs)
             return counted
         return attr
+
+class Implementation:
+    def f(self) -> None: print("f()")
+    def g(self) -> None: print("g()")
 
 if __name__ == "__main__":
     p = CountingProxy(Implementation())

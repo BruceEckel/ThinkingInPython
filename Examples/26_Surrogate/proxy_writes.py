@@ -1,15 +1,15 @@
 # proxy_writes.py
 from typing import Any
 
-class Settings:
-    def __init__(self) -> None:
-        self.level = "low"
-
 class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+
+class Settings:
+    def __init__(self) -> None:
+        self.level = "low"
 
 settings = Settings()
 p = Proxy(settings)

@@ -32,18 +32,18 @@ Implementing *Proxy* following the above diagram looks like this:
 ```python
 # proxy_1.py
 
-class Implementation:
-    def f(self) -> None:
-        print("Implementation.f()")
-    def g(self) -> None:
-        print("Implementation.g()")
-
 class Proxy:
     def __init__(self, impl: Implementation) -> None:
         self.__implementation = impl
     # Pass method calls to the implementation:
     def f(self) -> None: self.__implementation.f()
     def g(self) -> None: self.__implementation.g()
+
+class Implementation:
+    def f(self) -> None:
+        print("Implementation.f()")
+    def g(self) -> None:
+        print("Implementation.g()")
 
 p = Proxy(Implementation())
 p.f()
@@ -78,6 +78,12 @@ class Service(ABC):
     @abstractmethod
     def g(self) -> None: ...
 
+class Proxy:
+    def __init__(self, service: Service) -> None:
+        self.__service = service
+    def f(self) -> None: self.__service.f()
+    def g(self) -> None: self.__service.g()
+
 class Complete(Service):
     @override
     def f(self) -> None: print("Complete.f()")
@@ -87,12 +93,6 @@ class Complete(Service):
 class Partial(Service):  # Missing g()
     @override
     def f(self) -> None: print("Partial.f()")
-
-class Proxy:
-    def __init__(self, service: Service) -> None:
-        self.__service = service
-    def f(self) -> None: self.__service.f()
-    def g(self) -> None: self.__service.g()
 
 p = Proxy(Complete())
 p.f()
@@ -154,6 +154,12 @@ that makes `Proxy` simpler to implement:
 # proxy_2.py
 from typing import Any
 
+class Proxy:
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
 class Implementation:
     def f(self) -> None:
         print("Implementation.f()")
@@ -161,12 +167,6 @@ class Implementation:
         print("Implementation.g()")
     def h(self) -> None:  # New; Proxy needs no change
         print("Implementation.h()")
-
-class Proxy:
-    def __init__(self, impl: Any) -> None:
-        self.__implementation = impl
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
 
 p = Proxy(Implementation())
 p.f()
@@ -217,19 +217,19 @@ even though an explicit `p.__len__()` would:
 # dunder_bypass.py
 from typing import Any
 
-class Words:
-    def __init__(self) -> None:
-        self.items = ["spam", "eggs"]
-
-    def __len__(self) -> int:
-        return len(self.items)
-
 class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+
+class Words:
+    def __init__(self) -> None:
+        self.items = ["spam", "eggs"]
+
+    def __len__(self) -> int:
+        return len(self.items)
 
 p = Proxy(Words())
 print(p.__len__())  # The explicit call delegates
@@ -265,15 +265,15 @@ Delegation forwards reads, not writes:
 # proxy_writes.py
 from typing import Any
 
-class Settings:
-    def __init__(self) -> None:
-        self.level = "low"
-
 class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+
+class Settings:
+    def __init__(self) -> None:
+        self.level = "low"
 
 settings = Settings()
 p = Proxy(settings)
@@ -298,10 +298,6 @@ or the assignment in `__init__()` recurses:
 # proxy_setattr.py
 from typing import Any
 
-class Settings:
-    def __init__(self) -> None:
-        self.level = "low"
-
 class WriteProxy:
     def __init__(self, impl: Any) -> None:
         object.__setattr__(self, "_impl", impl)
@@ -309,6 +305,10 @@ class WriteProxy:
         return getattr(self._impl, name)
     def __setattr__(self, name: str, value: Any) -> None:
         setattr(self._impl, name, value)
+
+class Settings:
+    def __init__(self) -> None:
+        self.level = "low"
 
 settings = Settings()
 p = WriteProxy(settings)
@@ -348,14 +348,14 @@ from typing import Any, Protocol, runtime_checkable
 class Service(Protocol):
     def f(self) -> None: ...
 
-class Implementation:
-    def f(self) -> None: print("Implementation.f()")
-
 class Proxy:
     def __init__(self, impl: Any) -> None:
         self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
+
+class Implementation:
+    def f(self) -> None: print("Implementation.f()")
 
 p = Proxy(Implementation())
 p.f()
@@ -502,10 +502,6 @@ from typing import Any, Final
 
 READ_ONLY: Final[frozenset[str]] = frozenset({"read"})
 
-class Document:
-    def read(self) -> str: return "contents"
-    def erase(self) -> None: print("erased")
-
 class Guarded:
     def __init__(self, doc: Document, *,
                  admin: bool) -> None:
@@ -515,6 +511,10 @@ class Guarded:
         if not self._admin and name not in READ_ONLY:
             raise PermissionError(name)
         return getattr(self._doc, name)
+
+class Document:
+    def read(self) -> str: return "contents"
+    def erase(self) -> None: print("erased")
 
 guest = Guarded(Document(), admin=False)
 print(guest.read())
@@ -539,10 +539,6 @@ With `__getattr__()` you can wrap every method call, for example to count them:
 # counting_proxy.py
 from typing import Any
 
-class Implementation:
-    def f(self) -> None: print("f()")
-    def g(self) -> None: print("g()")
-
 class CountingProxy:
     def __init__(self, impl: Any) -> None:
         self._impl = impl
@@ -556,6 +552,10 @@ class CountingProxy:
                 return attr(*args, **kwargs)
             return counted
         return attr
+
+class Implementation:
+    def f(self) -> None: print("f()")
+    def g(self) -> None: print("g()")
 
 if __name__ == "__main__":
     p = CountingProxy(Implementation())

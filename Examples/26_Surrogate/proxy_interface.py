@@ -8,6 +8,12 @@ class Service(ABC):
     @abstractmethod
     def g(self) -> None: ...
 
+class Proxy:
+    def __init__(self, service: Service) -> None:
+        self.__service = service
+    def f(self) -> None: self.__service.f()
+    def g(self) -> None: self.__service.g()
+
 class Complete(Service):
     @override
     def f(self) -> None: print("Complete.f()")
@@ -17,12 +23,6 @@ class Complete(Service):
 class Partial(Service):  # Missing g()
     @override
     def f(self) -> None: print("Partial.f()")
-
-class Proxy:
-    def __init__(self, service: Service) -> None:
-        self.__service = service
-    def f(self) -> None: self.__service.f()
-    def g(self) -> None: self.__service.g()
 
 p = Proxy(Complete())
 p.f()

@@ -3,10 +3,6 @@ from typing import Any, Final
 
 READ_ONLY: Final[frozenset[str]] = frozenset({"read"})
 
-class Document:
-    def read(self) -> str: return "contents"
-    def erase(self) -> None: print("erased")
-
 class Guarded:
     def __init__(self, doc: Document, *,
                  admin: bool) -> None:
@@ -16,6 +12,10 @@ class Guarded:
         if not self._admin and name not in READ_ONLY:
             raise PermissionError(name)
         return getattr(self._doc, name)
+
+class Document:
+    def read(self) -> str: return "contents"
+    def erase(self) -> None: print("erased")
 
 guest = Guarded(Document(), admin=False)
 print(guest.read())
