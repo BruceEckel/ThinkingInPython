@@ -165,12 +165,12 @@ class Implementation:
         print("Implementation.h()")
 
 class Proxy:
-    def __init__(self) -> None:
-        self.__implementation = Implementation()
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
-p = Proxy()
+p = Proxy(Implementation())
 p.f()
 #: Implementation.f()
 p.g()
@@ -184,10 +184,6 @@ because `Proxy` names no method of `Implementation`,
 it keeps working when the implementation grows a method.
 `Implementation` here has an `h()` that `proxy_1.py`'s lacked,
 and `p.h()` forwards with no new line in `Proxy`.
-`Proxy` still constructs `Implementation` itself,
-so it works with only that one class.
-To accept any conforming class,
-take the implementation as a constructor argument, as `proxy_interface.py` does.
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
 to `_Proxy__implementation`,

@@ -10,12 +10,12 @@ class Implementation:
         print("Implementation.h()")
 
 class Proxy:
-    def __init__(self) -> None:
-        self.__implementation = Implementation()
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
-p = Proxy()
+p = Proxy(Implementation())
 p.f()
 #: Implementation.f()
 p.g()
