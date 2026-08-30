@@ -858,8 +858,8 @@ try:
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(str(e).partition(" for")[0])
+#: 'Point' object has no attribute 'z' and no __dict__
 ```
 
 A data class can generate the slots.
@@ -885,8 +885,8 @@ try:
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(str(e).partition(" for")[0])
+#: 'Point' object has no attribute 'z' and no __dict__
 
 @dataclass(frozen=True)
 class FrozenPoint:

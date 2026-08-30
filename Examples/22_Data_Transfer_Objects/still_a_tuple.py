@@ -36,5 +36,5 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 try:
     FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(str(e).partition(" and")[0])
+#: '<' not supported between instances of 'FrozenColor'

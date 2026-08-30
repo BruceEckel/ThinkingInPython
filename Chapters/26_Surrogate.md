@@ -104,8 +104,8 @@ p.g()
 try:
     Proxy(Partial())
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(str(e).partition(" without")[0])
+#: Can't instantiate abstract class Partial
 ```
 
 `Proxy` accepts any `Service`, and `Complete` implements both methods,

@@ -25,8 +25,8 @@ tally("nums", 1, 2, total=True)
 try:
     divide(a=10, b=2)  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(str(e).partition("some ")[2].partition(":")[0])
+#: positional-only arguments passed as keyword arguments
 try:
     make_user("Sue", True)  # type: ignore
 except TypeError as e:

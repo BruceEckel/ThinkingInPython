@@ -206,13 +206,13 @@ def rebinds():
 try:
     writes_global()
 except UnboundLocalError as e:
-    print(type(e).__name__)
-#: UnboundLocalError
+    print(str(e).partition(" where")[0])
+#: cannot access local variable 'count'
 try:
     rebinds()
 except UnboundLocalError as e:
-    print(type(e).__name__)
-#: UnboundLocalError
+    print(str(e).partition(" where")[0])
+#: cannot access local variable 'count'
 ```
 
 Both calls raise `UnboundLocalError: cannot access local variable

@@ -152,9 +152,9 @@ try:
         items: list[str] = []
 
 except ValueError as e:
-    print(type(e).__name__)
+    print(str(e).partition(" is not")[0])
     print(str(e).partition(" for ")[0])
-#: ValueError
+#: mutable default <class 'list'> for field items
 #: mutable default <class 'list'>
 ```
 

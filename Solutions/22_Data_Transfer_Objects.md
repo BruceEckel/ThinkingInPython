@@ -70,8 +70,8 @@ print(toast)
 try:
     key = {toast: "breakfast"}
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(str(e).partition(" (")[0])
+#: cannot use 'Recipe' as a dict key
 ```
 
 The record changed, and nothing objected. `NamedTuple` refuses to
