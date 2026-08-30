@@ -615,7 +615,9 @@ def test_subclassing_the_decorated_name_fails() -> None:
             pass
 ```
 
-The type checker complains that defining `Sub` raises a `TypeError` at runtime.
+The type checker rejects `Sub` statically: its base has type `singleton`,
+not a class.
+At runtime the `class` statement raises a `TypeError`.
 `singleton.__init__()` takes two positional arguments and receives four,
 because a class statement hands the name, bases, and namespace to its metaclass,
 and Python takes that metaclass from the type of the base, which is `singleton`.
@@ -630,8 +632,8 @@ A metaclass can also intercept construction.
 shows that singleton: its metaclass overrides `__call__()`,
 which skips `__init__()` on every later construction,
 so the first call's arguments win.
-A class that overrides `__new__()` instead,
-as `singleton_class_variable.py` does, still runs on every call,
+In a class that overrides `__new__()` instead,
+as `singleton_class_variable.py` does, `__new__()` still runs on every call,
 unlike the metaclass form above.
 That listing puts its work inside `__new__()` itself,
 so later calls append to the shared instance instead of overwriting it.

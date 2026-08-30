@@ -530,7 +530,7 @@ Everywhere else you choose between paying for the second dispatch in methods and
     Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
     a `Dwarf` uses `Jargon` or `Play`,
     an `Elf` uses `InventFeature` or `SellImaginaryProduct`,
-    and a `Troll` uses `Edict` and `Schedule`.
+    and a `Troll` uses `Edict` or `Schedule`.
     You must decide which weapons "win" and "lose" in each interaction
     (as in `paper_scissors_rock.py`).
     Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.

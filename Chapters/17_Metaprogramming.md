@@ -448,7 +448,7 @@ dangerous on anything that reaches the program from outside, unchecked.
 ## Self-Registration of Subclasses
 
 Often a base class needs to keep track of its subclasses,
-so you can enumerate them.
+This was the textbook justification for a metaclass.
 This is the textbook reason people used to justify a metaclass.
 Python calls `__init_subclass__()` automatically for every new subclass,
 so a base class can register its own subclasses in a few lines.

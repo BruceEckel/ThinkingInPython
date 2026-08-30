@@ -580,7 +580,7 @@ so none carry pickle's security risk either.
 Version control is the Memento pattern at industrial scale.
 A git commit is an immutable snapshot of your whole tree,
 checkout is `restore()`,
-and git shares unchanged content between commits just as `History` shares unchanged strokes between states.
+and git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.
 Databases hand out savepoints, mementos scoped to a transaction.
 Multiplayer games snapshot the world so they can rewind and replay when a late packet arrives.
 Whenever you see rewind, rollback, or restore, something is producing mementos.

@@ -1285,7 +1285,8 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 The type checker covers the other end too.
-If you leave `Oven(220)` out of `supply()`,
+`ty` rejects the `run()` call,
+finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel,
 `run()` reports a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel,
 the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
 showed, now arising from a dependency two levels down.

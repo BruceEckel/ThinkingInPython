@@ -379,7 +379,8 @@ so a detach during the fan-out cannot skip anyone.
 It does mean an observer that unsubscribes mid-notification still hears this change.
 
 The `alarm` is slower than the log, yet the log prints first.
-Awaiting the observers in sequence prints in subscription order, alarm first.
+Awaiting the observers in sequence would print in subscription order,
+alarm first.
 Concurrent fan-out lets each finish on its own schedule,
 so the faster observer reports first.
 The results `gather()` hands back stay in argument order regardless.
