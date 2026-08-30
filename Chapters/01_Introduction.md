@@ -198,7 +198,7 @@ Output from inside a loop, or from an `import`,
 therefore appears in the run of markers after the loop or the `import`,
 not next to the line that produced it.
 A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
-The build regenerates these markers from a real run,
+The build verifies these markers against a real run,
 so they cannot drift from what the code prints.
 
 If you find a mistake, please send a correction.
