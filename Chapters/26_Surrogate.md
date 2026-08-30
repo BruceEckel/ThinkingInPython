@@ -79,10 +79,12 @@ class Service(ABC):
     @abstractmethod
     def g(self) -> None: ...
 
-class Proxy:
+class Proxy(Service):
     def __init__(self, service: Service) -> None:
         self.__service = service
+    @override
     def f(self) -> None: self.__service.f()
+    @override
     def g(self) -> None: self.__service.g()
 
 class Complete(Service):
@@ -111,6 +113,9 @@ except TypeError as e:
 so the proxy can forward either call.
 Because `Partial` omits `g()`,
 constructing it raises a `TypeError` before any calls are made.
+`Proxy` inherits `Service` as well, the shape in the diagram.
+That makes a `Proxy` acceptable wherever a `Service` is expected,
+and the type checker verifies its `f()` and `g()` against the base.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 is the structural alternative.
@@ -208,6 +213,8 @@ the checker cannot verify that call.
 With explicit forwarding, as in `proxy_1.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies it.
+`proxy_interface.py`'s `Proxy` goes further: because it inherits `Service`,
+code typed against `Service` accepts it.
 `__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 

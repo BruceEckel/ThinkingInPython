@@ -8,10 +8,12 @@ class Service(ABC):
     @abstractmethod
     def g(self) -> None: ...
 
-class Proxy:
+class Proxy(Service):
     def __init__(self, service: Service) -> None:
         self.__service = service
+    @override
     def f(self) -> None: self.__service.f()
+    @override
     def g(self) -> None: self.__service.g()
 
 class Complete(Service):
