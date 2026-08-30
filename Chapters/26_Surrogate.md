@@ -201,11 +201,12 @@ machinery a surrogate rarely needs.
 
 The abstract base class and the `Protocol` above still guard the implementation side:
 the type checker verifies that whatever you hand the proxy has the methods.
-That verification stops at the proxy.
+Calls on the proxy get no such check.
 Because `p.f()` goes through `__getattr__()`, whose return type is unknown,
-nothing the proxy declares can make that call checkable.
-Explicit forwarding, as in `proxy_1.py`,
-is the version a type checker can see through.
+the checker cannot verify that call.
+With explicit forwarding, as in `proxy_1.py`,
+`p.f()` reaches a declared method with a declared return type,
+and the checker verifies it.
 `__getattr__()` trades that for reach.
 
 One limit: special methods bypass `__getattr__()`.
