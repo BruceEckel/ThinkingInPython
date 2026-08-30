@@ -43,6 +43,12 @@ pass: it clears `make prose`'s passive-voice and there-is warnings and
 cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
+`/literal`, `/cohesion`, and `/antecedents` (each under
+`.claude/skills/`) are the other prose passes: figures of speech become
+the mechanism they stand for, paragraphs get old-before-new order and
+one topic string, and every ambiguous "this"/"it"/"which" gets its noun.
+`make rewrite CH=NN` runs these three plus `elements-of-style` and
+`bruce-edit-apply` by default; `make rewrite ARGS=--list` shows the set.
 
 ## Learning from Bruce's own edits
 

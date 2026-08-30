@@ -57,7 +57,10 @@ class Pass:
 
 # Ordered: general rules first, the most specific (Bruce's own captured
 # practices) last, so a later pass never has its work undone by an
-# earlier, blunter one.
+# earlier, blunter one. The two cutting passes (elements-of-style,
+# activate) go before the three that only rephrase or reorder (literal,
+# cohesion, antecedents); cohesion precedes antecedents because moving a
+# sentence can change what a pronoun points at.
 PASSES: tuple[Pass, ...] = (
     Pass(
         "elements-of-style",
@@ -69,6 +72,24 @@ PASSES: tuple[Pass, ...] = (
         "activate",
         "activate",
         "active register: clear passive, there-is, and weak-verb warnings",
+    ),
+    Pass(
+        "literal",
+        "literal",
+        "say what the machinery does: a literal verb for each figure",
+        default=True,
+    ),
+    Pass(
+        "cohesion",
+        "cohesion",
+        "old before new: one topic string per paragraph, news at the end",
+        default=True,
+    ),
+    Pass(
+        "antecedents",
+        "antecedents",
+        "name what each this/it/which points at when two things could",
+        default=True,
     ),
     Pass(
         "readability",

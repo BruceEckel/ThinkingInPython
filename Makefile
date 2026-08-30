@@ -499,15 +499,21 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 #                               omit needless words
 #   activate           opt-in   clear the passive, there-is, and
 #                               weak-verb warnings from `make prose`
+#   literal            default  say what the machinery does: a literal
+#                               verb for each figure of speech
+#   cohesion           default  old before new: one topic string per
+#                               paragraph, the news at the end
+#   antecedents        default  name what each this/it/which points at
+#                               when two things could be meant
 #   readability        opt-in   remove AI-writing tells; its own rule
 #                               is "only when asked", so it never runs
 #                               unless you name it here
 #   bruce-edit-apply   default  apply the promoted rules in
 #                               bruce_edit_db.md
 #
-# A bare `make rewrite CH=25` runs the two defaults. To add an opt-in
+# A bare `make rewrite CH=25` runs the five defaults. To add an opt-in
 # pass to them: ARGS="--also activate". To run only the passes you
-# name: ARGS="--passes activate readability". To run all four:
+# name: ARGS="--passes activate readability". To run all seven:
 # ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
 # commands without running them.
 rewrite:  ## AI editing passes over one chapter's prose (CH=25; ARGS=--list)
