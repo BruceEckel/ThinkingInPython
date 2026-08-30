@@ -199,7 +199,7 @@ so the naive version calls itself forever.
 Writing a `__getattribute__()` means routing every internal access through `object.__getattribute__()`,
 machinery a surrogate rarely needs.
 
-The interface work above still applies on the implementation side:
+The abstract base class and the `Protocol` above still guard the implementation side:
 the type checker verifies that whatever you hand the proxy has the methods.
 That verification stops at the proxy.
 Because `p.f()` goes through `__getattr__()`, whose return type is unknown,
