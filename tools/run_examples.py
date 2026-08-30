@@ -122,8 +122,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="only run examples whose path contains this substring")
     ap.add_argument("--tree", type=Path, default=DEFAULT_TREE,
                     help=f"root of extracted examples (default: {DEFAULT_TREE.name})")
-    ap.add_argument("--timeout", type=float, default=15.0,
-                    help="seconds before an example is killed (default: 15)")
+    ap.add_argument("--timeout", type=float, default=60.0,
+                    help="seconds before an example is killed (default: 60)")
     ap.add_argument("-j", "--jobs", type=jobs_arg, default="auto", metavar="N",
                     help="examples to run concurrently: an int or 'auto' "
                          "for all cores (default: auto). Use -j 1 for serial.")

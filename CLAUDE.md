@@ -177,7 +177,15 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   refresh flipped the chapter, `sync` copied it, and the gate's second
   refresh flipped the chapter back with no sync after, so the generated
   copy is the only trace. Revert it (`git checkout -- Examples/...`);
-  never commit it.
+  never commit it. 2026-08-30: do not shrink the loop to make the
+  script faster. At 200,000 iterations each timed round is ~0.075 s,
+  about five Windows scheduler quanta (~15 ms), so one lost quantum is
+  a 20% error and the boolean flipped inside a quiet `make verify`;
+  at 1,000,000 a round is ~0.38 s and a quantum is 4%. The ratio
+  itself is ~1.02 at either size, so the margin over 0.9 is thin and
+  only the long measurement absorbs scheduler noise. The script's
+  timeouts under the parallel runner were fixed on the runner side
+  instead: `run_examples.py`'s default `--timeout` is 60 s (was 15).
 - **Thousands of live `asyncio` tasks in one process can wedge Windows'
   `ProactorEventLoop` for every later `asyncio.run()` call in that process.**
   Chapter 19's `task_vs_thread_memory.py` used to create and cancel 20,000
