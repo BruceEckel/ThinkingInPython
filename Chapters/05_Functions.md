@@ -429,7 +429,8 @@ Only the named form reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
-The full message reports `got some positional-only arguments passed as keyword arguments: 'a, b'`.
+The full message ends by naming the offenders, `'a, b'`.
+The listing trims that tail to fit.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 The type checker catches both mistakes without running the code,
 so each line carries a `# type: ignore` saying the misuse is deliberate.

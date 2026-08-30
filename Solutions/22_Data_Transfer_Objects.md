@@ -80,7 +80,7 @@ already refers to, so `append()` reaches straight through the record
 and edits its contents. Neither `ty` nor Python reports anything,
 because no assignment to a field ever happens.
 
-Using the record as a `dict` key raises a `TypeError`, whose message
+Using the record as a `dict` key raises a `TypeError`, whose full message
 names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 'list')`. Hashing a tuple hashes each element, so a `Recipe` is
 hashable only when every field is. The `list` has no hash, so the

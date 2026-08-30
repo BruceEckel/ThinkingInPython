@@ -216,7 +216,8 @@ except UnboundLocalError as e:
 ```
 
 Both calls raise `UnboundLocalError: cannot access local variable
-'count' where it is not associated with a value`. Without `global`,
+'count' where it is not associated with a value`,
+which the listing trims after the variable name. Without `global`,
 the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` looks for a local that
 has no value yet. `rebinds()` fails for the same reason even though

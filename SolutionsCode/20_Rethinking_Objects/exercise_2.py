@@ -1,5 +1,5 @@
 # exercise_2.py
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
 
 @dataclass(frozen=True)
 class Immutable:
@@ -11,7 +11,7 @@ print(data)
 #: Immutable(numbers=[1, 2, 999])
 try:
     data.numbers = [3]  # type: ignore
-except Exception as e:
+except FrozenInstanceError as e:
     print(e)
 #: cannot assign to field 'numbers'
 try:
