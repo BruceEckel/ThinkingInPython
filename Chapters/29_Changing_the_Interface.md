@@ -187,7 +187,7 @@ so an adapter that must survive copying or pickling defines `__reduce__()` or gu
 
 The tests verify both halves of the adapter's behavior.
 The new `f()` combines the adaptee's methods,
-and calls to methods it doesn't override forward through to the wrapped object:
+and calls to methods it doesn't override forward to the wrapped object:
 
 ```python
 # test_adapter.py
@@ -244,8 +244,8 @@ print(Facade.make_a(1))
 ```
 
 The cleaner Python façade is a *module*.
-A module already presents a curated set of names over whatever tangle of classes lives behind it,
-and, as [Singleton](24_Singleton.md#a-module-is-already-a-singleton) notes,
+A module already presents a curated set of names over whatever tangle of classes lives behind it.
+As [Singleton](24_Singleton.md#a-module-is-already-a-singleton) notes,
 it loads once, and every importer shares the same module.
 At module level, put the friendly functions and the few classes to expose.
 If you keep the messy internals private
@@ -294,8 +294,8 @@ Mechanically, the underscore keeps the name out of `from checkout import *`,
 and an [`__all__`](06_Modules_and_Packages.md#what-a-module-exports)
 list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call, not a lock on the rest.
-A `Facade` class full of static methods only reproduces, with more ceremony,
-what a module gives you.
+A `Facade` class full of static methods only reproduces what a module gives you,
+with more ceremony.
 
 ## Telling the Wrappers Apart
 
@@ -387,8 +387,8 @@ warning about one call signature while the rest stay current,
 so a function that used to take a string and now takes a `Path` can warn only the string callers.
 That form is static only.
 Python discards the overload declarations at runtime,
-so the `DeprecationWarning` half never fires,
-and type-checker support for it lags the whole-function form,
+so the `DeprecationWarning` half never fires.
+Type-checker support for it lags the whole-function form,
 so verify your type checker reports it before relying on it.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,

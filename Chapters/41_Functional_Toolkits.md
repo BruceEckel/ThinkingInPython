@@ -427,7 +427,7 @@ print(list(islice(cycle("AB"), 5)))
 ```
 
 `cycle()` saves each element the first time through,
-so the whole input stays in memory for as long as the cycle lives.
+so the whole input stays in memory as long as the cycle lives.
 
 ### `chain`
 
@@ -605,7 +605,7 @@ which is right when the missing elements are data in their own right.
 ### `groupby`
 
 Groups consecutive elements that share a key.
-The input must arrive sorted by that key, since it only merges neighbors.
+The input must arrive sorted by that key, since it merges only neighbors.
 
 ```python
 # itertools_groupby.py
@@ -816,8 +816,8 @@ print(sys.getrecursionlimit())
 
 A `for` loop computes this same factorial in about the same number of lines,
 with no risk of hitting that limit.
-Recursion is not a faster or shorter way to count down to zero.
-Its payoff shows up once the problem branches, not just repeats,
+Recursion is neither a faster nor a shorter way to count down to zero.
+Its payoff comes once the problem branches, not just repeats,
 as the next example shows.
 
 Branching brings a cost that counting down does not.
@@ -877,8 +877,8 @@ and a seeded random source that makes the whole schedule reproducible.
 
 The *circle method* solves the pairs-only version exactly,
 by direct construction.
-Fix one player, arrange the rest in a circle,
-and each round pair players sitting across from each other,
+Fix one player and arrange the rest in a circle.
+Each round, pair players sitting across from each other,
 then rotate everyone but the fixed player by one seat.
 For an even number of players `n`,
 that produces `n - 1` rounds where no pair repeats,
@@ -982,7 +982,7 @@ Called with `size=2`,
 at the cost of `14` repeat meetings.
 An odd roster cannot pair everyone,
 so each round folds the leftover player into an existing pair,
-and those triples are where the repeats come from.
+and those triples produce the repeats.
 It does that with no rotation and no notion of a fixed player,
 just a shuffle and a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.

@@ -9,7 +9,7 @@ which you might not miss on small programs.
 Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
 The Python runtime ignores type hints.
-It does not evaluate them until something asks for them.
+It evaluates them only when something asks for them.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool
 (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -95,10 +95,10 @@ print(area("3", 4))  # type: ignore
 #: 3333
 ```
 
-At runtime `area("3", 4)` does not cause an error.
+At runtime `area("3", 4)` runs without error.
 It returns `"3333"`, because `"3" * 4` repeats the string four times.
 The bug surfaces later, often far from the line that caused it.
-The type checker immediately discovers the problem.
+The type checker discovers the problem immediately.
 
 The `# type: ignore` comment tells the type checker to skip this line,
 so this book's build passes.
@@ -433,7 +433,7 @@ Refusing the call prevents that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
-and it accepts more callers as a result.
+and so accepts more callers.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}
@@ -543,7 +543,7 @@ A `@classmethod` that ends with `return cls(...)` returns `Self`.
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
 A wrong type that slips past the type checker behaves as it would have without hints.
-Checking is a separate step you run, the same way you run tests separately.
+Checking is a separate step you run, the same way you run tests.
 If you need a runtime guarantee,
 use `isinstance()` or a library that validates data.
 The [typeguard](https://typeguard.readthedocs.io)
@@ -563,7 +563,7 @@ Gradual typing leaves the amount up to you,
 and the chapter's constructs do not say when each is worth the words.
 Annotate what crosses a boundary: function signatures, public attributes,
 anything another file imports.
-Those are the places where the reader of the code and the writer of the code are different people,
+Those are the places where the code's reader and writer are different people,
 and where a wrong assumption travels farthest before it fails.
 
 Let the type checker infer the rest.

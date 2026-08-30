@@ -260,8 +260,8 @@ So the whole annotation reads as "a callable that takes a `Callable[P, R]` and r
 That describes `decorate`: it takes `func` and returns `wrapper`,
 both typed `Callable[P, R]`.
 
-`@repeat(times=3)` first evaluates `repeat(times=3)`, which returns `decorate`,
-the real decorator, which then wraps `greet`.
+`@repeat(times=3)` first evaluates `repeat(times=3)`.
+That returns `decorate`, the real decorator, which then wraps `greet`.
 Python wraps `greet` when it calls `decorate(greet)`,
 and only then does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
@@ -603,9 +603,9 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 ### A Limitation: Methods Need a Descriptor
 
 The class form has one limitation:
-an instance that replaces the function does not work on methods.
+an instance that replaces the function fails on methods.
 Neither `trace` nor `count_calls` above decorated a method, only bare functions,
-and that was not an accident:
+and that was deliberate:
 
 ```python
 # method_decoration.py
@@ -644,7 +644,7 @@ The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Metaprogramming.md#learning-a-name-with-__set_name__)
 shows the descriptor protocol,
-which a class-based decorator needs to implement to work on methods.
+which a class-based decorator must implement to work on methods.
 
 A function needs none of this: it is already a descriptor,
 so `wrapper()` in the function form binds to an instance like any other method:
@@ -825,7 +825,7 @@ since a decorator only cares that its argument is callable.
 The return side is equally unconstrained.
 This chapter opened by saying a decorator "returns a result,
 which Python binds to the original name."
-That result does not have to be callable:
+That result need not be callable:
 
 ```python
 # run_once.py
@@ -990,8 +990,8 @@ Several decorators from earlier chapters use this mechanism.
 each wrap a function the same way `trace` does,
 but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
-and it also makes them work correctly on methods,
-where a `__call__`-based class, like `logged` above, does not.
+and makes them work correctly on methods, where a `__call__`-based class,
+like `logged` above, does not.
 `@dataclass` (see [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes))
 is a class decorator like `register`,
 except it mutates the class instead of leaving it unchanged,

@@ -63,8 +63,8 @@ print(not_implemented(), not_implemented_yet())
 ```
 
 `pass` marks an indented block with nothing in it yet.
-`...` is the conventional body for a stub whose implementation lives elsewhere,
-and you normally write it on the same line as the signature it stubs,
+`...` is the conventional body for a stub whose implementation lives elsewhere.
+You normally write it on the same line as the signature it stubs,
 as in a `Protocol` method
 ([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
 
@@ -166,7 +166,7 @@ When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
 When it finishes clean, the `continue` moves the outer loop along instead.
 
-When iterating, `for` walks any iterable directly.
+`for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
 Use `range()` for counting and `enumerate()` when you also need the index:
 
@@ -312,8 +312,7 @@ print(run("dance"))
 Only the first matching `case` runs.
 Unlike C, a `case` does not fall through, so it needs no `break`.
 The first `case` destructures the split command:
-it matches a two-item list starting with `"go"`,
-and binds the second item to `direction`.
+it matches a two-item list starting with `"go"` and binds the second item to `direction`.
 A bare name in a `case` captures rather than compares:
 `case direction:` binds anything to `direction` and matches every value.
 Write a constant as a literal (`case "quit":`) or as a dotted name
@@ -371,7 +370,7 @@ divide_and_report(1, 1)
 #: finally always runs
 ```
 
-`checked_divide()` raises `ValueError` rather than letting Python's own `ZeroDivisionError` through,
+`checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through,
 which you do when the caller should hear about the bad argument,
 not the failed arithmetic.
 
@@ -554,7 +553,7 @@ Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Context_Managers.md) shows how to write your own.
 For reading or writing a file,
-`pathlib` provides utility methods like `read_text()` and `write_text()` that open and close the file.
+`pathlib` provides methods like `read_text()` and `write_text()` that open and close the file.
 
 ## Comprehensions
 

@@ -228,7 +228,7 @@ print(after.strokes is before.strokes, len(after.strokes))
 The two objects share the stroke strings, not the tuple holding them.
 Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
 so a history of `k` edits costs pointers, not `k` copies of the text.
-That is why snapshots stay cheap, and also why they are not free:
+That is why snapshots stay cheap, and why they are not free:
 a state whose changed field is large pays for that field on every edit.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
 which would make the identity check print `True` whether the tuple shared the string or rebuilt it.
@@ -245,7 +245,7 @@ and Memento shares them across time.
 The classic form has not disappeared.
 It has narrowed.
 Freezing rebuilds the changed field on every edit,
-so a state large enough that copying it per keystroke is unaffordable still needs a mutable originator and an explicit `save()`.
+so a state too large to copy per keystroke still needs a mutable originator and an explicit `save()`.
 So does a state you do not own: a widget tree, a database row,
 or any object whose class you cannot redesign.
 Everywhere else, prefer the frozen value.
@@ -373,7 +373,7 @@ Each undoable action carries its own inverse,
 the Command variation that [Function Objects](28_Function_Objects.md) mentions.
 Command-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
-Snapshot-based undo is the one to try first,
+Try snapshot-based undo first,
 because immutable states make snapshots inexpensive, as `sharing.py` showed.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}

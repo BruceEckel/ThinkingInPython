@@ -85,7 +85,7 @@ Use this one when you know the problem but not the name.
 | Pattern | Intent |
 |---------|--------|
 | Active Object | Decouple a method call from its execution by giving the object its own thread. |
-| Balking | Refuse an action when the object is not in a suitable state. |
+| Balking | Refuse an action when the object is in an unsuitable state. |
 | [Double-Checked Locking](24_Singleton.md#tests-threads-and-locks) | Cut locking cost when lazily initializing a shared resource. |
 | [Future/Promise](19_Concurrency.md#one-task-many-backends) | Represent a result that becomes available later. |
 | Guarded Suspension | Block a call until a precondition becomes true. |

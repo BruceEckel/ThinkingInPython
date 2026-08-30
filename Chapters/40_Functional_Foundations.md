@@ -177,7 +177,7 @@ print(MAX_SIZE, total([1, 2, 3]))
 The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
-is a type error the type checker catches.
+is a type error.
 The constraint runs one way only.
 `Sequence[int]` states that `total()` does not mutate its argument.
 It says nothing about the caller,
@@ -300,7 +300,7 @@ and a table when the set should grow from outside.
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Functions.md#lambdas).
 The higher-order functions below take them as inline arguments,
-which is where they fit best.
+where they fit best.
 Their value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
@@ -473,7 +473,7 @@ If you delete the `nonlocal` line,
 ## Partial Application
 
 *Partial application* fixes some of a function's arguments and produces a new function that expects the rest.
-`functools.partial()` does this without writing a wrapper by hand:
+`functools.partial()` does this without a hand-written wrapper:
 
 ```python
 # partial.py
@@ -507,8 +507,8 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
-This avoids the late-binding surprise a lambda created in a loop can produce,
-which [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates.
+This avoids the late-binding surprise a lambda created in a loop can produce.
+[Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates that surprise.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
@@ -549,7 +549,7 @@ The `# type: ignore` comments mark a type checker limitation rather than a code 
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
 so the marker looks like an `int` in the wrong place and the resulting callable looks like it takes nothing.
 The runtime behaves correctly.
-The annotations for this feature have not caught up.
+The annotations for this feature lag behind the runtime.
 
 ## Composing Functions
 
@@ -593,7 +593,7 @@ and types the composed function `(int) -> str` rather than `(int) -> int`.
 
 You grow a composition by adding a stage rather than by enlarging one.
 Each stage is also testable on its own,
-and you build larger behavior by naming a new composition rather than writing new logic.
+and you build larger behavior by naming a new composition rather than by writing new logic.
 When a requirement changes,
 you insert or swap a single stage and leave every other one untouched.
 

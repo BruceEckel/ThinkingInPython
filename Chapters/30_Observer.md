@@ -166,7 +166,7 @@ Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
 works the same and lets one object publish more than one kind of change.
 Event-heavy programs have mature libraries
 (signal/slot systems, `asyncio` events),
-but for most cases the *Observer* pattern amounts to nothing more than a list of callbacks.
+but for most cases the *Observer* pattern is only a list of callbacks.
 
 An observer returns `None`.
 Notification runs one way, from observable to observers, and nothing comes back.
@@ -184,8 +184,8 @@ Writing `obj.update` twice builds two objects that are not identical but do comp
 since they share an instance and a function,
 so a bound-method observer detaches without a stashed reference.
 `unsubscribe()` delegates to `list.remove()`,
-so detaching an observer that never subscribed raises `ValueError`,
-and subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
+so detaching an observer that never subscribed raises a `ValueError`.
+Subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
 A list whose `append` is the observer records what arrived:
 
 ```python
@@ -269,7 +269,7 @@ print(seen)
 Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
 
 An observer that raises an exception stops the loop,
-and the observers after it do not hear the change.
+and the observers after it miss the change.
 Decide whether `notify()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 Subscriptions are strong references:
@@ -389,7 +389,7 @@ Below its threshold it returns without sending anything.
 
 A failing observer behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
-and the observers that have not finished keep running with nobody awaiting them.
+and the unfinished observers keep running with nobody awaiting them.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 which is the async form of the catch-collect-continue that exercise 3 asks for.
 [Concurrency](19_Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
@@ -420,7 +420,7 @@ and `recolored()` computes the grid that results from a click: values in,
 values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
 `tkinter` plays no part here.
-It reuses the same `Observable` as the thermometer, from `observers.py`:
+The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python
 # box_observer.py
@@ -508,7 +508,7 @@ It is the only code that touches the screen.
 A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 Run `box_view.py` to play.
-It opens a window, so the example harness does not run it
+It opens a window, so the example harness skips it
 (`tools/data/norun.txt` lists it).
 
 ```python

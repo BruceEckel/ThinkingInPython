@@ -41,7 +41,7 @@ A system that does this is an *Effect Management System*.
 
 An *Effect* causes impurity.
 A function has *side effects* if calling it does anything other than return a result.
-That is, if it modifies the environment outside the function.
+That is, it modifies the environment outside the function.
 For example, it might:
 
 - Display something on the console
@@ -382,7 +382,7 @@ If another function then calls yours,
 the EMS carries the Effect into that function's type as well,
 and so on out to the edge of the program.
 An EMS lets you look at the function signature and know whether it is pure.
-If it is not, the signature names the kinds of impurity involved.
+If it is not, the signature names the kinds of impurity.
 
 A full EMS does three things:
 
@@ -472,8 +472,8 @@ a `print()` in the body would still be invisible.
 returns to that limit.
 
 The technique works, but the bookkeeping falls on you.
-Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down,
-so parameters accumulate at every level of the call stack.
+Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down.
+Parameters accumulate at every level of the call stack.
 Nothing propagates automatically.
 If you add a `Log` Effect three levels down,
 you edit every signature on the path.
@@ -693,7 +693,7 @@ Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
 A library has no other mechanism.
-Deferring execution is the price it pays for delayed binding in a language that was not designed for Effects.
+Deferring execution is the price it pays for delayed binding in a language not designed for Effects.
 That price is a conceptual layer you carry everywhere.
 You must always know whether a value is a description or an action.
 Code that mixes the two compiles cleanly but misbehaves,
@@ -831,10 +831,10 @@ so that declaring Effects stops being manual?
 Nothing in the annotation syntax prevents it.
 You can imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is not syntax but propagation.
-A type checker needs to compute the Effect row of every function from the functions it calls,
+A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.
 `async` succeeded because it arrived with the language and split the world visibly.
-An Effect row needs to spread through an ecosystem of untracked code.
+An Effect row must spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, it will contain the ideas in this chapter.
@@ -884,7 +884,7 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, it does not scale.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions raised earlier in this chapter:
+The function signature answers the questions this chapter raised earlier:
 what does this function depend on, what does it change, what can go wrong.
 Composition stops being a guess,
 because the compiler balances the books at every boundary.

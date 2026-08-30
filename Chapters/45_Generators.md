@@ -175,7 +175,7 @@ It returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`, and the match is deliberate.
 `async def` and generator functions both build descriptions that something else drives.
-Calling `interview()` returns a generator object but doesn't run anything in the function body.
+Calling `interview()` returns a generator object but runs nothing in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
 A generator is the more useful of the two here because the driver can be yours.
@@ -355,7 +355,7 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
 
-The `SendType` is the type of the information a caller sends back into the generator.
+The `SendType` is the type of the value a caller sends back into the generator.
 A generator that receives values but produces no final result needs no `ReturnType`:
 
 ```python
@@ -620,7 +620,7 @@ queues the generator it builds, and hands the function back unchanged,
 the registering-decorator shape from [Decorators](14_Decorators.md#decorating-classes).
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
-One that finishes raises `StopIteration` and is never requeued.
+One that finishes raises `StopIteration` and never rejoins the queue.
 The output interleaves the two tasks,
 though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.

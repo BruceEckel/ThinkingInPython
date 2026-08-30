@@ -219,7 +219,7 @@ The `send()` channel must carry any type, so the SendType is `Any`.
 With `yield from`, a request produces an answer whose type the type checker knows.
 A bare `yield` produces the SendType, the parameter forced to `Any`.
 `yield from` produces the inner generator's `ReturnType`,
-which does not have that conflict.
+which avoids that conflict.
 `need(Console)` builds a small generator that serves one request,
 so its `ReturnType` can name a specific type.
 `need()` returns `Depend[Need[T], T]`,
@@ -465,7 +465,7 @@ The expected type in that message names two things this chapter has not yet cove
 
 `run()` accepts an Effect whose Ability channel has narrowed to those two,
 which is all that remains once you supply every other Ability.
-`greet("Alice")` still has `Need[Console]`, so it does not pass type checking.
+`greet("Alice")` still has `Need[Console]`, so it fails type checking.
 
 ## Swapping the Implementation
 
@@ -809,7 +809,7 @@ but the two are not interchangeable.
 The type checker believes `cast()` even when the object has no relation to `Console`.
 `as_type(Console)` returns a function annotated `(Console) -> Console`,
 so an object that does not implement `Console` produces an error.
-`as_type()` widens a type to a supertype,
+`as_type()` widens a type to a supertype.
 `cast()` makes one type into another without constraint.
 
 Second, the runtime issue, which the library decides using `isinstance()`.
@@ -1045,14 +1045,14 @@ An EMS like Stateless sets a higher bar.
 The dependency must appear in the signature for the type checker to verify it,
 which is why the EMS version of `greet()` returns `Depend[Need[Console], None]` and the `greet()` in `dependency_injection.py` returns `None`.
 The foundation of EMS is tracking all dependencies.
-The goal is to catch errors during type checking rather than relying on programmer memory and exhaustive testing.
+The goal is to catch errors during type checking rather than to rely on programmer memory and exhaustive testing.
 
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
 This has three consequences:
 
 1. Stateless checks come before the program runs.
-   DI only discovers a missing registration when something asks for it.
+   DI discovers a missing registration only when something asks for it.
    That ask can come at startup or much later, on a path no test exercised.
    If you remove the `# type: ignore` from `unsupplied.py`,
    `ty` reports the unsupplied `Need[Console]`
@@ -1086,7 +1086,7 @@ demonstrated with `Need[Log]`.
 DI absorbs the same change in silence, and no signature records it.
 
 Type checking is the earliest practical time to discover these errors.
-The trade is not about correctness, but churn and coupling.
+The trade is not about correctness, but about churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint people made against Java's checked exceptions,
@@ -1459,7 +1459,7 @@ except KeyError as e:
 #: KeyError 'Carol'
 ```
 
-The error channel records those failures that can occur,
+The error channel records the failures that can occur,
 without forcing you to handle them.
 `run()` turns any that reach it back into normal Python exceptions.
 
@@ -1523,7 +1523,7 @@ because `catch()` matches the yielded value before the driver gets it and abando
 `catch()` empties the error channel the way `supply()` empties the Ability channel,
 but the two do different things with what they remove.
 `supply()` provides the Ability inside the Effect,
-so the Ability parameter becomes `Never` and the result type doesn't mention the `Console`
+so the Ability parameter becomes `Never` and the result type omits the `Console`
 ([Supplying the Dependency](#supplying-the-dependency)).
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out as a value in the result:
@@ -1720,7 +1720,7 @@ An Effect with both channels emptied is a `Success`.
 `run()` accepts more than that: its parameter is `Effect[Async, Exception, R]`,
 so an `Async` request or a declared failure can still be in flight when you call it.
 
-The channels do not resolve in the same way:
+The channels resolve differently:
 
 - `unsupplied.py` showed `run()` refusing an Effect that still declares an Ability,
   before the program starts.

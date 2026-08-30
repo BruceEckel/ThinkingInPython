@@ -485,7 +485,7 @@ print(square(9))
 Assigning a lambda to a name, as `square` does,
 gives up the anonymity that is a lambda's point.
 `def` also gives the function a real name for tracebacks.
-Unlike anonymous functions in many other languages,
+Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
 
@@ -501,8 +501,8 @@ For anything more complicated, write a separate function.
     keyword-only, so `print(divide(10, 2, label="half"))` shows `half: 5.0`.
     Confirm that `divide(10, 2, "half")`, passing `label` positionally,
     is now a `TypeError`.
-4.  Rewrite `report()` from `var_args.py` so it also accepts a `total=False` keyword-only flag that,
-    when true, additionally prints `sum(values)`.
+4.  Rewrite `report()` from `var_args.py` so it accepts a `total=False` keyword-only flag that,
+    when true, also prints `sum(values)`.
     Confirm `report("nums", 1, 2, 3, total=True)` prints the sum.
 5.  Write `apply_twice(func, value)` that returns `func(func(value))`,
     then call it with a lambda that appends `"!"` to a string.

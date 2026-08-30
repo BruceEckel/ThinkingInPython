@@ -13,7 +13,7 @@ In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
-the dissolution [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+the dissolution that [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
 describes.
 *Command* appears first as a function,
 then as the classic class-based form for contrast,
@@ -172,8 +172,8 @@ for command in fixed:
 ```
 
 The two comprehensions look alike and differ in when they read `n`.
-A lambda's body runs when you call the command, not when you create it,
-and all three lambdas close over the one loop variable,
+A lambda's body runs when you call the command, not when you create it.
+All three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
 The argument to `functools.partial`
 ([Foundations](40_Functional_Foundations.md#partial-application))
@@ -195,7 +195,7 @@ an interval whose ends straddle the root.
 The secant method reads them as two starting points,
 and Newton's method averages them into one.
 Those two are *open* methods: they need somewhere to start, not a bracket,
-which is why the chain below can fall back on them.
+so the chain below can fall back on them.
 All three share one signature, so they are interchangeable:
 
 ```python
@@ -387,8 +387,8 @@ so a truthiness test would throw away a correct answer and hand the problem to t
 Any sentinel-versus-value check on a numeric result has this hazard.
 
 The chain trusts each handler to know when it failed.
-`secant()` and `newton()` declare success when their latest step shrinks below the tolerance,
-which is not quite the same as reaching a root,
+`secant()` and `newton()` declare success when their latest step shrinks below the tolerance.
+That is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
 These tests wrap each finder so a run records its name,

@@ -263,7 +263,8 @@ you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Readers of [Composite and Interpreter](34_Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker catch the missed case,
-and here it cannot help: exhaustiveness checking needs a *closed* union,
+and here it cannot help.
+Exhaustiveness checking needs a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
 so no type checker can know the set is complete.
 This is a `match` over an open set,
@@ -337,9 +338,9 @@ Two of four pieces reached a bin,
 and the sixty pounds of plastic left no trace in any total on which the plant acts.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
-The registry is not the leak:
-it accepted `Plastic` the moment the `class` statement ran,
-and had the class been missing,
+The registry is not the leak.
+It accepted `Plastic` the moment the `class` statement ran.
+Had the class been missing,
 `create()` would have raised a `KeyError` at the first `Plastic:` line,
 a loud failure at parse time.
 Only the `match` loses trash silently.
@@ -412,7 +413,7 @@ Swapping the `match` for the dictionary is a redesign, not a rename.
 The `defaultdict(list)` creates a bin the first time a material turns up.
 `Bins` is an alias for a plain `dict`,
 so a type checker accepts `bins: Bins = {}` just as happily,
-and that version raises `KeyError` on the first piece of trash.
+and that version raises a `KeyError` on the first piece of trash.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
@@ -486,7 +487,7 @@ plus one registration for each operation that must answer differently for plasti
 Python does not escape the expression problem.
 It makes both sides of it cost a line instead of an edit spread across classes.
 
-Compare this to that classic form: no `Visitor` class exists,
+Compare this with the classic form: no `Visitor` class,
 no `accept()` method bolted onto every material,
 and no second dispatch to arrange.
 
@@ -508,20 +509,20 @@ For an operation that belongs on an object and still varies by type,
 ## Choosing the Lightest Construct
 
 Design patterns are about separating things that change from things that stay the same.
-Polymorphism is one way to do that, but it is not the only one.
+Polymorphism is one way to do that, but not the only one.
 The deeper skill is spotting the *vector of change*
 ([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
 in a problem (here, new types versus new operations)
 and choosing the lightest construct that isolates it.
 This chapter discovered its two vectors one requirement at a time,
 rather than predicting them up front,
-and each ended up costing a single line at the point of use:
+and each cost a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
 and one `@recycling_note.register` absorbs a new operation.
 Neither is a pattern in the *GoF* sense.
 In Python the lightest construct is often a language feature,
-not a multi-class pattern,
-and a pattern is worth keeping only when it is still useful once the language does part of the work.
+not a multi-class pattern.
+A pattern is worth keeping only when it is still useful once the language does part of the work.
 
 ## Exercises
 

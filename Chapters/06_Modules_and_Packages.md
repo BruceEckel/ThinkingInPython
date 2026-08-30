@@ -128,7 +128,7 @@ Import the module and write `app_settings.debug` when the value can change.
 Use `from ... import` for names that keep the same value,
 such as functions and classes.
 
-You can rename a module's namespace during an import using the `as` keyword:
+You can rename a module's namespace during an import with the `as` keyword:
 
 ```python
 # using_as.py
@@ -171,8 +171,7 @@ As your programs get larger, you further organize your code into *packages*.
 A package is a directory that contains multiple modules,
 and it forms its own namespace with the name of that directory.
 
-To make something a package,
-you put a special file named `__init__.py` in that directory.
+To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once, before any module inside the package loads.
 It is often empty, and then it only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 When it isn't, it usually re-exports the package's public names,
@@ -476,7 +475,7 @@ What if your module or package isn't in the same directory as the Python file th
 The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
 `PYTHONPATH` takes multiple paths,
-and Python keeps searching through those paths until it finds your module or package
+and Python searches those paths until it finds your module or package
 (or doesn't, and reports an error).
 
 `PYTHONPATH` still works,
@@ -582,10 +581,10 @@ including the ones whose only purpose is to run the module.
 
 1.  Add a third module, `a_package/module5.py`,
     with its own `function5()` that prints a message when the module loads.
-    Import it three different ways, one each using `import a_package.module5`,
+    Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,
     and `from a_package.module5 import function5`,
-    and confirm the loading message prints only once no matter how many of the three you use together.
+    and confirm the loading message prints only once however many of the three you use together.
 2.  Add `a_package/b_package/module6.py` with a `function6()` that calls `function5()` from `module5`.
     Import and call `function6()` from a script outside `a_package`,
     then rename `b_package` to `bPackage` (and rename it back afterward)

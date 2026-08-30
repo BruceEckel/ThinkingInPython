@@ -88,7 +88,7 @@ Keep singleton state in a module you import, not in the script you run.
 Every construction should return the same object.
 The simplest approach hides construction behind a cached factory.
 That factory applies `functools.cache` to a *constructor function*,
-which is an ordinary function that builds and returns an instance of a class.
+an ordinary function that builds and returns an instance of a class.
 It stands in for a direct call to the class constructor.
 
 `functools.cache` ([Caching](18_Performance.md#caching)) *memoizes* a function.
@@ -120,7 +120,7 @@ print(b)
 
 ### Nothing Keeps the Class Private
 
-You can't prevent a caller from writing `Settings()` and getting a second instance.
+Nothing stops a caller from writing `Settings()` and getting a second instance.
 Naming the class `_Settings` marks it internal and keeps it out of `from module import *`,
 which is as far as Python goes.
 A second underscore is not a stronger version of that.
@@ -380,7 +380,7 @@ This is name mangling.
 asks for an attribute that does not exist under that name,
 so it fails at runtime with `AttributeError`, not at type-checking time.
 The outer class controls creation through its constructor.
-The first time you create an `OnlyOne` it initializes `instance`.
+The first time you create an `OnlyOne`, it initializes `instance`.
 After that it reuses the one inner object,
 and each construction appends its argument to that object's shared list.
 `__getattr__()` delegates access.
@@ -404,7 +404,9 @@ you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`, which removes the sentinel,
 the guard, and the first-call race the cached factory met under threads,
 at the cost of building the object whether or not anything uses it.
-(The bare `__OnlyOne()` works because the nested class exists at that point in the body; the qualified `OnlyOne.__OnlyOne()` fails, since the name `OnlyOne` stays unbound until its own class body finishes running.)
+(The bare `__OnlyOne()` works because the nested class exists at that point in the body.
+The qualified `OnlyOne.__OnlyOne()` fails,
+since the name `OnlyOne` stays unbound until its own class body finishes running.)
 Exercise 1 makes that change.
 
 Either way, this is a lot of code for what a module does on its own.
@@ -443,9 +445,9 @@ print(x.val, x is y is z, isinstance(x, SingletonClassVar))
 so every construction hands back that same instance and `isinstance()` reports `True`.
 Python honors whatever object `__new__()` returns,
 and the return value decides whether `__init__()` runs:
+if the class defines one,
 `__init__()` runs only when `__new__()` returns an instance of the class under construction,
-and then it runs on that shared instance after *every* construction,
-if the class defines one.
+and then it runs on that shared instance after *every* construction.
 `SingletonClassVar` defines none, so `__new__()` does all the work.
 A `__new__()` that returned some other object instead would skip `__init__()`,
 and fail `isinstance()` as well.
@@ -461,8 +463,7 @@ It points every instance's `__dict__` at the same storage:
 
 ![x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three](_images/borg_shared_state)
 
-In contrast with the previous singleton designs,
-you reuse *Borg* through inheritance:
+Unlike the previous singleton designs, you reuse *Borg* through inheritance:
 
 ```python
 # singleton_borg.py
@@ -592,10 +593,10 @@ so `Registry("primary", limit=3)` reaches the real constructor unchanged.
 
 Only the first call constructs a `Registry`.
 Every later constructor call returns the cached instance and discards the constructor arguments,
-which is why `Registry("secondary", limit=99)` does not create a new object.
+so `Registry("secondary", limit=99)` creates no new object.
 A caller who believes those arguments took effect holds an object configured by someone else.
 
-Both `isinstance(first, Registry)` and subclassing `Registry` raise exceptions:
+Both calling `isinstance(first, Registry)` and subclassing `Registry` raise exceptions:
 
 ```python
 # test_singleton_class.py

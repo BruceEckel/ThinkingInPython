@@ -105,10 +105,10 @@ class Rat:
 
 Initializing `number` requires calling `blackboard.next_number()`,
 a side-effecting method, not a static default.
-Marking it `field(init=False)` leaves it out of the generated `__init__`,
-and `__post_init__` runs immediately after that `__init__` finishes,
-so it fills in `number` and logs the rat's start, once `blackboard`, `x`,
-and `y` hold their values.
+Marking it `field(init=False)` leaves it out of the generated `__init__`.
+`__post_init__` runs immediately after that `__init__` finishes,
+when `blackboard`, `x`, and `y` already hold their values,
+so it fills in `number` and logs the rat's start.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -241,8 +241,8 @@ class Blackboard:
 ```
 
 A `TaskGroup` does not close until every task inside it has finished,
-including tasks created after the block began,
-which is the shape this problem has: each rat can create more rats.
+including tasks created after the block began.
+That is the shape of this problem: each rat can create more rats.
 A single `asyncio.gather(*self.tasks)` would not do,
 because `gather()` fixes its argument list at the moment of the call,
 and half the rats do not exist yet.
@@ -463,8 +463,7 @@ and each type of occupant answers for itself.
 ### Rooms, Robots, and the Item Factory
 
 The occupants are `Item`s.
-`Room.enter()` calls `occupant.interact()`,
-and returns the room in which the robot ends up.
+`Room.enter()` calls `occupant.interact()` and returns the room in which the robot ends up.
 A wall keeps the robot where it is, food feeds the robot and lets it in,
 a teleport returns a distant room.
 No `if` or `elif` on the type of occupant appears in the movement code:
@@ -580,8 +579,8 @@ That line stores nothing, not even `None`.
 It is a declaration: it tells the type checker that a `Room` belongs there,
 which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
 The attribute does not exist until then,
-so reading it earlier raises an `AttributeError`, and the builder runs first,
-so nothing reads it earlier.
+so reading it earlier raises an `AttributeError`.
+The builder runs first, so nothing reads it earlier.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
 so no code that reads `room` needs a `None` check.
 
@@ -833,7 +832,7 @@ The sort by target letter lines those partners up beforehand.
 Avoid `zip(teleports, teleports)`,
 which walks two independent passes over the list and pairs every room with itself.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
-each proves to the type checker that the occupant really is a `Teleport` before the code touches `target_room`.
+each proves that the occupant really is a `Teleport` before the code touches `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
@@ -843,8 +842,8 @@ and the movement code that runs afterward never asks again.
 The `Robot` branch also explains `Room(Empty())`:
 the robot is the one item that does not become an occupant.
 Its cell gets an `Empty` occupant instead,
-so when the robot moves away the room behaves like any other empty room,
-and `show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
+so when the robot moves away the room behaves like any other empty room.
+`show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
 
 ### Testing the Walk
 
@@ -956,7 +955,7 @@ which is where a robot that decided its own route would start.
 The two simulations so far confirm designs.
 The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
-In each case you knew the outcome in advance and ran the program to confirm it.
+Both times you knew the outcome in advance and ran the program to confirm it.
 This final example is different.
 Its result appears in no line of its code.
 That is simulation's other purpose,
@@ -964,7 +963,7 @@ to discover behavior instead of confirming it.
 
 In 1787 Ernst Chladni sprinkled sand across a metal plate and drew a violin bow along its edge.
 The bow made the plate ring.
-A ringing plate does not move evenly.
+A ringing plate moves unevenly.
 Standing waves divide it into regions that swing up and down,
 and the *nodal lines* between them stay still.
 The vibration bounces sand out of the moving regions.

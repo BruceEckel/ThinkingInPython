@@ -199,7 +199,7 @@ def test_empty_directory() -> None:
 The classic version is still useful when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that without touching your code,
-while a central `match` needs editing.
+but a central `match` needs editing.
 The guidance from [Pattern Matching](13_Pattern_Matching.md#when-not-to-match)
 applies directly.
 Match over a closed set, use polymorphism for an open one.
@@ -308,7 +308,8 @@ Python's grammar sets the limit of the technique.
 You can overload all the arithmetic, bitwise, and comparison operators,
 so an expression written with them builds nodes instead of computing.
 `and`, `or`, and `not` you cannot: Python asks the operand for a truth value,
-then `and` and `or` hand back one of the two objects and `not` hands back a `bool`.
+then `and` and `or` hand back one of the two objects,
+and `not` hands back a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
 An expression language that needs boolean operators borrows `&` and `|` instead,
 which is why a Pandas filter reads `(a > 1) & (b > 2)` with parentheses that look unnecessary.
@@ -359,7 +360,7 @@ once with `x=3` and once with `x=10`.
 Building `2 * x + 1` does not compute a number.
 It builds a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
 as many times as you like.
-An unbound variable raises `KeyError`, naming the variable.
+An unbound variable raises a `KeyError`, naming the variable.
 The `/` makes `e` positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters)),
 which keeps the parameter name out of the variable namespace so an expression can use `e` as a variable.
@@ -497,7 +498,7 @@ so binding `left` in one and `right` in the other is a `SyntaxError` rather than
 `(Num(a), Num(b))` captures two constants for folding.
 The same syntax does two opposite jobs:
 a `Num(0)` on the left of a `case` is a pattern that never calls `Num`,
-while the one on the right of a `return` is the constructor.
+and the one on the right of a `return` is the constructor.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
@@ -634,7 +635,7 @@ The first one earns its place.
 and it comes out as a value in the parameter list rather than as text in the query.
 The reason is structural rather than clever:
 `to_query()` receives the literal pieces and the values as separate things,
-so it never has the option of confusing them.
+so it can never confuse them.
 Written as an f-string,
 the same line would arrive as one finished `str` with the attack already spliced in,
 and the only remaining defense would be inspecting the result to guess which characters the program wrote and which a user did.
@@ -668,7 +669,7 @@ Here it keeps a decision available to whoever should make it.
     an ill-typed tree the type checker rejects in source it can see.
     Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
     ([Multiple Dispatching](32_Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
-    and confirm `"a" + x` now raises `TypeError`.
+    and confirm `"a" + x` now raises a `TypeError`.
 7.  Write a third walker over `Template` in `template_query.py`, `to_html()`,
     that emits the literal pieces unchanged and replaces `<`, `>`,
     and `&` in every interpolated value with their HTML entities.

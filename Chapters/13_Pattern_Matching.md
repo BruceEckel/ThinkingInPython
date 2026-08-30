@@ -190,7 +190,7 @@ so the language rules it out.
 A tuple does match: `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
 Parentheses group a pattern rather than build a tuple: `case (x)` is `case x`,
-an unconditional capture, while `case (x,)` is a one-element sequence pattern.
+an unconditional capture, and `case (x,)` is a one-element sequence pattern.
 The subject must be a sequence, though, not merely iterable:
 `case [a, b]` matches a `range` but not a generator and not a `set`.
 
@@ -275,10 +275,10 @@ For an ordinary class `R` that lacks one,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
 Keyword patterns work differently.
-`Point(x=0, y=y)` matches by attribute name directly, through attribute access,
+`Point(x=0, y=y)` matches by attribute name, through attribute access,
 not through `__match_args__`.
-They also work on any object with the named attributes, dataclass or not,
-and let you match a subset of attributes while ignoring the rest:
+Keyword patterns also work on any object with the named attributes,
+dataclass or not, and let you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -354,10 +354,9 @@ and Python catches it the same way,
 refusing to compile a `case` that follows it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
-Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs,
-which [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
-relies on.
-There a subclass finds no entry at all.
+Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
+[Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+relies on that dispatch, and there a subclass finds no entry at all.
 
 ```python
 # test_class_patterns.py
@@ -422,12 +421,12 @@ once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
 A pattern tests shape and equality,
 so everything beyond that belongs in the guard: an ordering test like `x > 0`,
-a relation between two captures like `x == y`, or any call,
-such as `len(items) > 3`.
+a relation between two captures like `x == y`,
+or any call like `len(items) > 3`.
 Repeating a name does not express equality:
 `case [x, x]:` fails with `SyntaxError: multiple assignments to name 'x' in pattern`,
 so an equal-elements test is also a guard, `case [x, y] if x == y:`.
-A guard that only compares one capture to a constant is a literal pattern written the long way.
+A guard that merely compares one capture to a constant is a literal pattern written the long way.
 
 ## Mapping Patterns
 
@@ -516,7 +515,7 @@ Without `as` you must choose between testing the shape and keeping the object.
 
 The second case alternates two class patterns and binds `n` from either,
 inside a one-element sequence pattern: `survey([Point(0, 5)])` matches,
-while a list of two points does not.
+but a list of two points does not.
 The compiler enforces the same-names rule stated earlier.
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
@@ -529,7 +528,8 @@ Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
 Adding a type to the union and forgetting its `case` produces a type error.
-The type checker reports it, instead of the value falling through at runtime.
+The type checker reports it,
+instead of letting the value fall through at runtime.
 That is the benefit of static typing applied to control flow:
 
 ```python
@@ -592,7 +592,7 @@ compares the two approaches directly.
 
 The second test below exercises that runtime backstop.
 The string `"x"` is no `Shape`, so the call carries a `# type: ignore`.
-At runtime `assert_never()` is what catches it:
+At runtime `assert_never()` catches it:
 
 ```python
 # test_exhaustive.py
@@ -635,7 +635,8 @@ The lookup is `try`/`except` rather than `STATUS.get(status, f"Status {status}")
 every lookup builds the default string, including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
-so its cost grows with the number of cases while a dictionary lookup's does not.
+so its cost grows with the number of cases.
+A dictionary lookup's does not.
 At three entries the difference does not matter.
 The dictionary wins as the table grows,
 and it is the only one of the two you can build or change at runtime.

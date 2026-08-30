@@ -9,13 +9,13 @@ and the type system tracks it.
 
 Exceptions are Python's default error mechanism, and they have costs.
 An exception unwinds the stack, so it discards any work done so far.
-It does not appear in the function's return type, so the caller cannot see,
-from the signature, that the call might fail.
+It does not appear in the function's return type,
+so the caller cannot see from the signature that the call might fail.
 And forgetting to handle one is easy.
 
 Returning the failure as a value reverses those costs.
 Failure appears in the return type,
-so the type checker does not let a caller read the answer without dealing with the failure first,
+so the type checker forces a caller to deal with the failure before reading the answer,
 and a reviewer sees it without reading the body.
 Control flow stays local,
 with no exception leaping past intermediate frames to a distant handler.
@@ -275,7 +275,7 @@ if __name__ == "__main__":
 Each step returns early when it encounters an `Err`.
 The check names `Err` and not `Result`.
 `Result` is a `type` alias rather than a class,
-so `isinstance(a, Result)` raises `TypeError` at runtime,
+so `isinstance(a, Result)` raises a `TypeError` at runtime,
 and the type checker rejects it before that.
 Ask about one of the two concrete classes.
 
@@ -339,7 +339,7 @@ and exercise 2's `map_error()` is the same idea aimed at the error side.
 
 Because failures are values, you can assert on them directly,
 with no `pytest.raises()`.
-The tests check `unwrap()`,
+The tests check that `unwrap()` returns the answer,
 and that `bind()` chains a success and short-circuits a failure.
 The last assertion uses `is` rather than `==`,
 proving the same `Err` object comes back and the lambda does not run:
@@ -533,8 +533,8 @@ A production one takes the exception types it should catch as an argument and le
 which preserves the distinction that ends this chapter,
 between a failure the caller can handle and a bug the caller cannot.
 
-To test `@safe`, a good input becomes an `Ok`,
-and a raised exception becomes an `Err` holding that exception:
+The tests for `@safe` check that a good input becomes an `Ok`,
+and that a raised exception becomes an `Err` holding that exception:
 
 ```python
 # test_safe.py
@@ -640,7 +640,7 @@ They live in a list called `__notes__`,
 which is absent until the first `add_note()` call.
 The type checker is no help there,
 because typeshed declares `__notes__` on `BaseException` unconditionally,
-so reading it on an exception that has no notes type-checks and then raises `AttributeError`.
+so reading it on an exception that has no notes type-checks and then raises an `AttributeError`.
 `traceback.format_exception_only()` renders the message and the notes without the file paths,
 which is why the listing uses it instead of letting the traceback print.
 
@@ -678,7 +678,7 @@ The note attaches before the exception becomes a value,
 in the one frame that knows both the failure and the field name.
 Everything downstream can report the failure without asking what the code was reading.
 This is the chapter's opening argument, applied one level down:
-`Err` says the call failed and the exception says what went wrong,
+`Err` says the call failed, the exception says what went wrong,
 and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,

@@ -208,7 +208,7 @@ whether you fill it by hand or the classes fill it themselves,
 is the ordinary Python factory.
 That is the dissolution [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
 describes: the pattern does not go away,
-it stops needing a class hierarchy to express it.
+but stops needing a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
 
@@ -369,7 +369,7 @@ When you create the factory object,
 you choose the concrete version of every object that factory creates.
 The example in *GoF Design Patterns* implements portability across graphical user interfaces
 (GUIs).
-You create a factory object appropriate to the GUI that you're working with,
+You create a factory object appropriate to the GUI you're working with,
 and from then on when you ask it for a menu, button, slider, etc.,
 it automatically creates the appropriate version of that item for the GUI.
 Thus you can isolate, in one place,
@@ -448,7 +448,7 @@ g2.play()
 ```
 
 In this environment, `Character` objects interact with `Obstacle` objects,
-but the types of characters and obstacles differ depending on what kind of game you're playing.
+but the types of characters and obstacles depend on the kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
 In this example, the setup and play are simple, but those activities
@@ -472,7 +472,7 @@ They fail at call time:
 a concrete factory that forgets `make_obstacle()` constructs without complaint and raises an exception only when the missing method finally runs.
 An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
-which at least catches the omission before anything calls the missing method.
+and at least catches the omission before anything calls the missing method.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -665,7 +665,7 @@ def test_prototype_untouched() -> None:
 
 ## Builder
 
-*Builder* is the last of the *GoF Design Patterns* creational patterns left to cover
+*Builder* is the last of the *GoF Design Patterns* creational patterns to cover
 ([Singleton](24_Singleton.md) has its own chapter):
 separate the construction of a complex object from its representation,
 assembling it in steps.
@@ -834,8 +834,8 @@ Both exist to work around languages where a class is not an object you can put i
     first to `games.py` and then to `games2.py`.
     In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports.
     Then add it.
-4.  Modify `shape_factory2.py` so that it uses an *Abstract Factory* to create different sets of shapes
-    (for example, one particular type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
+4.  Modify `shape_factory2.py` to use an *Abstract Factory* to create different sets of shapes
+    (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
     In `pizza_direct.py`, enforce it with `__post_init__()`.
     In `pizza_builder.py`,

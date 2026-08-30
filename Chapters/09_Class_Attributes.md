@@ -74,8 +74,8 @@ and `a.show()` finds it by the same fallback that finds `a.x`:
 nothing on the instance, so look at the class.
 `display_object()`, the inspection helper from [Classes](07_Classes.md),
 reports attributes and methods separately,
-but both live in the same class dictionary,
-which is why assigning `a.show = something` would shadow the method for `a` alone.
+but both live in the same class dictionary.
+That is why assigning `a.show = something` would shadow the method for `a` alone.
 
 One kind of class attribute does not follow that lookup rule.
 A `@property` from [Classes](07_Classes.md#properties)
@@ -240,8 +240,8 @@ print(a.total, b.total, Tally.total)
 `self.total += 1` expands to `self.total = self.total + 1`.
 The read falls back to the class and finds `0`.
 The write creates a fresh `total` on the instance.
-Every `Tally` counts itself once and the shared counter never moves,
-which is why `class_var.py` increments through the class name,
+Every `Tally` counts itself once and the shared counter never moves.
+That is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 `ClassVar` does save you here, at check time:
 `ty` rejects the augmented form as it rejects a direct `self.total = 5`,
@@ -411,12 +411,12 @@ a constructor default or a `@dataclass` field for per-object.
     Confirm `Middle` tracks `Base` the way `Left` does.
 3.  In `real_defaults.py`, create `b = B()` and assign `b.x = -1`.
     Then create a second instance, `b2 = B()`,
-    and confirm `b2.x` is still `100`, unaffected.
+    and confirm `b2.x` is still `100`.
 4.  Rewrite `Tally` from `class_var.py` so `total` is a plain (non-`ClassVar`)
     class attribute instead,
-    then have an instance assign to `self.total` directly and explain,
-    using `vars()` as in `inside_objects.py`, what that assignment creates,
-    and where.
+    then have an instance assign to `self.total` directly.
+    Using `vars()` as in `inside_objects.py`,
+    explain what that assignment creates, and where.
 5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
     then repeat the `append` and confirm `b.items` stays empty.
     Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.

@@ -40,8 +40,7 @@ x.show_twice()
 Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
-but you can use any identifier
-(however, anything other than `self` probably confuses people).
+but you can use any identifier (though anything else probably confuses people).
 To refer to the object's fields or its other methods,
 you must go through `self`.
 
@@ -77,7 +76,7 @@ This book follows that practice.
 Python calls the constructor automatically during object creation.
 In the demo, creating an object looks like calling a function named after the class.
 
-In C++ or Java you declare object-level fields inside the class body but outside of the methods.
+In C++ or Java you declare object-level fields inside the class body but outside the methods.
 You do not declare them this way in Python.
 To create an object field, you name it, using `self`, inside a method
 (typically in the constructor, but not always).
@@ -94,8 +93,7 @@ it stores nothing and only records the type.
 and [Data Classes as Types](12_Data_Classes_as_Types.md#data-classes) use it.
 
 `display_object()`, a small inspection helper built in [Metaprogramming](17_Metaprogramming.md#building-display_object),
-shows the shape of an object.
-It prints an object's attributes and methods:
+shows the shape of an object by printing its attributes and methods:
 
 ```python
 # display_simple.py
@@ -119,7 +117,7 @@ so `display_object()` hides it by default.
 
 ## Inheritance
 
-Because Python is dynamically typed, it doesn't really care about interfaces.
+Because Python is dynamically typed, it doesn't care about interfaces.
 All it cares about is applying operations to objects.
 With inheritance in C++ or Java,
 you often inherit only to establish a common interface.
@@ -131,9 +129,10 @@ which describes the shape a function needs instead of demanding a base class.
 
 First import the base class the same way you import any name from a module
 (see [Modules and Packages](06_Modules_and_Packages.md)).
-Then inherit by listing the class
-(or classes, since Python supports multiple inheritance, which [Rethinking Objects](20_Rethinking_Objects.md) argues against in favor of protocols)
-in parentheses after the name of the inheriting class.
+Then inherit by listing the base class in parentheses after the name of the inheriting class.
+Python supports multiple inheritance, so you can list several classes,
+though [Rethinking Objects](20_Rethinking_Objects.md)
+argues against it in favor of protocols.
 This example imports and subclasses `Simple`, from the `simple_class` module.
 Ignore the `@override` decorator for now.
 [Marking Overrides with `@override`](#marking-overrides-with-override)
@@ -205,7 +204,7 @@ A derived class that defines no constructor of its own inherits and runs the bas
 The derived class also inherits `show_twice()` unchanged.
 
 The class `Different` also has a method named `show()`,
-but this class does not derive from `Simple`.
+but does not derive from `Simple`.
 The `f()` function in the demo demonstrates dynamic typing.
 All it cares about is that it can call `show()` on `obj`,
 with no other type requirements.
@@ -315,8 +314,8 @@ and dunders such as `__repr__()` and `__str__()` that replace a default inherite
 
 ## Properties
 
-You can expose a plain attribute and convert it to a computed one later,
-without changing the calling code, using `@property`:
+With `@property`, you can expose a plain attribute and convert it to a computed one later,
+without changing the calling code:
 
 ```python
 # properties.py
@@ -382,8 +381,8 @@ except ValueError as e:
 ```
 
 The section opened with a conversion, and this listing carries it out.
-`radius` began as a plain attribute and is now a validated property,
-and the two lines that read `c.radius` and `c.area` are the ones from the first listing,
+`radius` began as a plain attribute and is now a validated property.
+The two lines that read `c.radius` and `c.area` are the ones from the first listing,
 unchanged.
 Nothing outside the class can tell which version it holds,
 which is why you do not add getters and setters before you need them.
@@ -454,7 +453,7 @@ Cache only what cannot change.
 By default, printing an object shows its class and its address,
 as in `<__main__.Point object at 0x7f2dd669cd70>`,
 which says nothing about the value the object holds.
-Two special methods control the way an object displays.
+Two special methods control how an object displays.
 `__str__()` is the readable form for users,
 and `__repr__()` is the unambiguous form for developers:
 
@@ -518,7 +517,8 @@ shows how `@dataclass` writes the constructor and `__repr__()`.
 
 A method that doesn't use `self` can be a `@staticmethod`.
 A method that needs the class rather than an instance can be a `@classmethod`.
-This receives the class as its first argument, conventionally named `cls`:
+A class method receives the class as its first argument,
+conventionally named `cls`:
 
 ```python
 # class_methods.py

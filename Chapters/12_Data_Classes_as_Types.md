@@ -262,8 +262,8 @@ display_object(Messenger("iris", 12, 3.14))
 #:   None
 ```
 
-The default `display_object()` does not show the generated `__init__()`,
-`__repr__()`, and `__eq__()`.
+The default `display_object()` omits the generated `__init__()`, `__repr__()`,
+and `__eq__()`.
 
 ## Immutability
 
@@ -649,7 +649,7 @@ print(B.__annotations__)
 #: {'x': <class 'int'>, 's': <class 'str'>}
 ```
 
-`show(B())` indicates that both are class variables by tagging them as `[CV]`.
+The `[CV]` tags in `show(B())` mark both as class variables.
 `B` has no `__init__()` to copy them onto each instance,
 so every `B` object reads the same two values straight from the class attributes.
 
@@ -682,7 +682,8 @@ print(C.__annotations__)
 
 `show(C(11, "this is C"))` finds the same two names as `show(B())`.
 Neither `x` nor `s` carries `[CV]` this time.
-As a `@dataclass`, `C`'s generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
+Because `C` is a `@dataclass`,
+its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
 Each `C` instance owns its own copies from the moment of construction.
 `B` runs nothing like that.
 With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
@@ -770,7 +771,7 @@ Only assigning it a value does.
 When the set of values is small and fixed, an `Enum` is the clearest type.
 As an example, a `BirthDate` contains a month, day, and year.
 A year has twelve months, so `Month` is an `Enum`.
-Each month carries its length, and knows how to check a `Day` against it.
+Each month carries its length and knows how to check a `Day` against it.
 A `BirthDate` then validates across its fields.
 The day must fit the month.
 
@@ -960,8 +961,8 @@ That rejection is narrower than it looks.
 `@dataclass` refuses a default it recognizes as shared storage,
 which covers `list`, `dict`, and `set`.
 The test is hashability, not mutability,
-so a mutable object of a class you wrote passes as a default and every instance shares it,
-which is the same bug the check exists to prevent.
+so a mutable object of a class you wrote passes as a default and every instance shares it.
+That is the same bug the check exists to prevent.
 Use `default_factory` for any default that is not an immutable literal.
 
 `default_factory` accepts any callable that takes no arguments.
@@ -1170,7 +1171,7 @@ print(c.host, c.name)
 #: localhost db
 ```
 
-A data class has no way to know what arguments a non-data-class base constructor expects,
+A data class cannot know what arguments a non-data-class base constructor expects,
 so it does not call it.
 Its field list covers its own fields plus any inherited from data class bases,
 and it builds the body by assigning those fields.
@@ -1282,7 +1283,7 @@ so their order no longer matters and the rule stops applying.
 
 ## The General Form of `replace()` {#the-general-form-of-replace}
 
-`dataclasses.replace()` only works on data classes, but "same object,
+`dataclasses.replace()` works only on data classes, but "same object,
 one field different" is not a data class idea.
 It is what you do with any immutable value.
 `copy.replace()` is the general version, and it works on a frozen data class,
@@ -1507,7 +1508,8 @@ print(json.dumps(people, cls=DataClassEncoder, indent=2))
 ```
 
 `json.dumps()` calls `default()` for any object it cannot serialize on its own.
-The encoder converts each data class to a dictionary and the base encoder handles it from there,
+The encoder converts each data class to a dictionary,
+and the base encoder handles it from there,
 recursing through lists and nested objects.
 `is_dataclass()` answers `True` for the class object as well as for an instance,
 and `asdict()` accepts only instances,

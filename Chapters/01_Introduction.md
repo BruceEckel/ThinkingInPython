@@ -98,7 +98,7 @@ a library that brings Effect tracking to Python today.
 I started this book in 2008,
 with the idea of taking the design patterns work I had done in Java and translating it to Python.
 In 2011 I abandoned the project with many of the design patterns still in Java.
-Eventually I even wrote a message confirming I was not going to complete it.
+Eventually I even wrote a message confirming I would not complete it.
 
 In June of 2026, after people mentioned the online book to me at recent PyCons,
 I decided to see what the Claude AI could do with it.
@@ -126,7 +126,7 @@ from things as seemingly straightforward as inserting a new chapter to ones as d
 The result is much better than anything I managed before.
 I keep going until I've tweaked everything that occurs to me.
 
-For things that I have generated rather than written from scratch,
+For things I have generated rather than written from scratch,
 I've become the director of the movie instead of an actor in it.
 This book is what I've always wanted to create,
 but have never had the capacity to flesh out in all its myriad detail.
@@ -151,11 +151,11 @@ My only hope is that this book will be engaging to read,
 and that you will experience some of the same satisfaction that I've had while writing it.
 
 I think most programmers will regularly use AI, if they don't already.
-I have found that the knowledge in this book has helped me guide AIs toward better solutions.
+The knowledge in this book has helped me guide AIs toward better solutions.
 
 Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
-However, Python seems to be the most popular language
-(at the time of this writing) for AI-generated code.
+However, at the time of this writing,
+Python seems to be the most popular language for AI-generated code.
 Some small percentage of people might still wish to analyze what the AIs are generating.
 This book might have some value yet.
 

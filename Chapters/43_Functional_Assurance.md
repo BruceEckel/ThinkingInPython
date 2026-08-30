@@ -7,8 +7,8 @@ I have started to wonder whether it's more about "functionality."
 One definition of science is "what works."
 Science has theories that fit the data, are predictive, and are falsifiable.
 If "computer science" is to live up to its name,
-there should be some ideas and practices that fit that definition,
-and perhaps even some aspects that are mathematically provable.
+some of its ideas and practices should fit that definition,
+and perhaps some should even be mathematically provable.
 This seems to me to be the broader challenge that functional programming takes on,
 and what this chapter explores.
 
@@ -382,7 +382,7 @@ and the chapters after it build a checked system on that idea.
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the minimal counterexample Hypothesis reports,
+    Report the minimal counterexample Hypothesis finds,
     and explain what it reveals about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
@@ -391,7 +391,7 @@ and the chapters after it build a checked system on that idea.
     Then break `group_rounds()` on purpose, run the test twice,
     and confirm the same counterexample arrives both times:
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
-6.  Write a function that is *not* referentially transparent without using `global`:
+6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that would change the program's behavior,
     then rewrite it so the value arrives as an argument.

@@ -16,7 +16,7 @@ the filesystem, or the network instead of receiving them.
 Perhaps more importantly,
 tests tell you immediately if a change you've made causes a failure.
 Immediate feedback saves an enormous amount of time.
-If the problem only surfaces after multiple changes,
+If the problem surfaces only after multiple changes,
 you have no idea which change caused the bug.
 
 ## Test-Driven Development (TDD)
@@ -138,7 +138,7 @@ Run the test suite by typing `pytest` in the project directory.
 which is why `from account import Account` works with no packaging and no path setup,
 as long as `account.py` sits beside `test_account.py`.
 It discovers every `test_*.py` file, collects every `test_` function, runs them,
-and reports success and failures.
+and reports successes and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
@@ -557,9 +557,9 @@ def test_roll_with_seeded_rng() -> None:
 The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
-The `4` here is simply what `Random(0)` produces first,
-and its agreeing with the stubbed value above is a coincidence:
-as with any seed, you record the value it gives you rather than picking one.
+The `4` here is what `Random(0)` produces first,
+and its match with the stubbed value above is a coincidence: as with any seed,
+you record the value it gives you rather than pick one.
 
 ### The Clock
 
@@ -648,7 +648,7 @@ and `tick=False` holds it there so every reading is identical,
 which the test's second assertion demonstrates.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.
-Unlike the prior tools it is a third-party dependency,
+Unlike the prior tools, it is a third-party dependency,
 but it is the standard answer for code built around `datetime`.
 
 ### Network Calls

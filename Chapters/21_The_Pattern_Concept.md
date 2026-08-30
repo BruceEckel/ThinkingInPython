@@ -7,7 +7,7 @@ They became known as the "Gang of Four"^[A wry nod to the Chinese political fact
 I refer to that book as *GoF Design Patterns*,
 and use *design patterns* for the concept.
 
-*GoF Design Patterns* shows 23 different solutions to particular classes of problems,
+*GoF Design Patterns* shows 23 solutions to particular classes of problems,
 along with one or more examples for each,
 typically in C++ but sometimes in Smalltalk.
 Many of those examples inspired the ones in this part of the book.
@@ -21,7 +21,7 @@ Initially, you can think of a pattern as an especially clever and insightful way
 Many people have worked out all the angles of a problem and have come up with the most general,
 flexible solution.
 You may have seen and solved something like it before,
-but your solution probably doesn't have the kind of completeness a pattern embodies.
+but your solution probably lacks the completeness a pattern embodies.
 
 That completeness has a failure mode.
 Once you know a catalog of patterns,
@@ -84,7 +84,7 @@ A pattern arrives in stages, each more general than the last:
 
 1.  **Idiom**: how you write code in a particular language to do this particular type of thing.
     This could be something as common as the way you step through an array in C
-    (and not running off the end).
+    (without running off the end).
 2.  **Specific Design**:
     the solution that arose to solve this particular problem.
     This might be a clever design, but it doesn't try to be general.
@@ -92,7 +92,7 @@ A pattern arrives in stages, each more general than the last:
     not just the one in front of you.
     A design that has become more general, typically through reuse.
 4.  **Design Pattern**: how to solve an entire class of similar problems.
-    This usually appears only after you apply a standard design a number of times,
+    This usually appears only after you apply a standard design several times,
     and then see a common pattern across those uses.
 
 In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
@@ -106,7 +106,7 @@ is a standard design, stage three ([Factory](27_Factory.md) builds both).
 a shape of solution you could build in any language with polymorphism.
 
 This progression doesn't say that one stage is better than another.
-Don't try to take every problem solution and generalize it to a design pattern.
+Don't try to generalize every solution into a design pattern.
 You can't force patterns to appear that way.
 They tend to be subtle and appear over time.
 
@@ -160,7 +160,7 @@ and how much of it becomes functions, data, and protocols?
 
 ## Pattern Taxonomy
 
-*GoF Design Patterns* discusses 23 different patterns and sorts them under three purposes
+*GoF Design Patterns* discusses 23 patterns and sorts them under three purposes
 (all of which revolve around the particular aspect that can vary).
 The three purposes are:
 
@@ -194,13 +194,13 @@ The three purposes are:
 <!-- The quoted "clearly" below is the vague word this paragraph objects to,
      so House.Weasel flagging it is the rule agreeing with the point. -->
 <!-- vale House.Weasel = NO -->
-I've found the *GoF Design Patterns* classification to be too obscure,
+I've found the *GoF Design Patterns* classification too obscure,
 and not always helpful.
 Certainly, the *Creational* patterns are straightforward.
 How will you create objects?
 This is a normal question,
 and the name brings you right to that group of patterns.
-But I find *Structural* and *Behavioral* to be far less useful distinctions.
+But I find *Structural* and *Behavioral* far less useful distinctions.
 I have not been able to look at a problem and say "clearly,
 you need a structural pattern here,"
 so that classification doesn't lead me to a solution
@@ -286,7 +286,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
 <!-- vale write-good.Passive = YES -->
 <!-- vale House.WeakVerb = YES -->
 
-You can hold this small handful of fundamental ideas in your head while analyzing a design.
+You can hold this handful of fundamental ideas in your head while analyzing a design.
 
 ## Reading the Chapters Ahead
 

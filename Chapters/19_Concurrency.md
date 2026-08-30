@@ -64,7 +64,7 @@ All threads in that process share a single heap.
 Context switching between threads is as efficient as possible,
 but it still has overhead.
 Also, the OS must time slice frequently to distribute computing resources evenly across threads.
-Typically a thread only runs a few milliseconds at a time.
+Typically a thread runs only a few milliseconds at a time.
 
 Using more than one thread within a program solves an immediate problem.
 When a thread gets stuck (*blocked*) waiting for I/O
@@ -77,8 +77,7 @@ Another benefit of threads emerged when more CPUs became available on a single m
 Threads were already designed to distribute computing resources,
 so more CPUs simply meant more resources to distribute
 (of course, it wasn't quite that easy).
-By adapting the threading mechanism,
-threads could also perform ad-hoc parallelism:
+Adapting the threading mechanism let threads also perform ad-hoc parallelism:
 multiple CPUs could run multiple parts of a program simultaneously.
 
 Although threads serve these purposes, the OS is always at a disadvantage:
@@ -227,8 +226,8 @@ Scheduling does not mean running.
 The task bodies execute only after `gather()` suspends
 (the event loop drives `gather()` too).
 Each runs until its first `await`, which the trace's `started` lines record.
-The comprehension doesn't achieve multiple coroutines in flight:
-it does not start the next coroutine until the previous one has finished.
+The comprehension never has more than one coroutine in flight:
+it starts the next coroutine only after the previous one has finished.
 
 ## Structured Concurrency with `TaskGroup`
 
@@ -271,7 +270,7 @@ The gap gives cancellation time to arrive first on any platform's timer,
 which keeps the trace deterministic.
 
 `asyncio.TaskGroup` (added in 3.11) is the structured alternative.
-An `async with` block owns every task started inside it and does not exit until it has accounted for every one:
+An `async with` block owns every task started inside it and exits only after it has accounted for every one:
 
 ```python
 # task_group.py
@@ -599,7 +598,7 @@ uses `gather()` to notify slow observers together instead of one at a time.
 
 `asyncio` runs one coroutine at a time, never two at once.
 This makes it tempting to conclude that shared state needs no locking.
-But "one at a time" only protects the instructions between two `await`s,
+But "one at a time" protects only the instructions between two `await`s,
 not a value that lives across one.
 Two coroutines that read a shared value, `await`,
 then write it back can lose an update with no thread and no GIL in sight:
@@ -686,14 +685,15 @@ takes up the rest of the coordination primitives, and the ways they fail.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
-Some values are not the subject of the work, they are the circumstances of it:
+Some values are not the subject of the work but the circumstances of it:
 which request the code is serving, which user authorized it,
 which trace to use for logging.
 Everything deep in the call chain needs them and nothing in the middle uses them.
 Threading such a value through as a parameter puts it in signatures that have no business knowing about it,
 and every new caller must remember to pass it along.
 
-A module-level global is the obvious shortcut and it fails as soon as anything overlaps.
+A module-level global is the obvious shortcut,
+and it fails as soon as anything overlaps.
 `async_race.py` showed why: whatever wrote last wins,
 and the readers resume to find a value that belongs to somebody else.
 A `ContextVar` is the same convenience without that failure.
@@ -895,7 +895,7 @@ Everything `pool.map()` did is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
 *Draining* a queue means reading every item out of it until it is empty.
-Doing that after `join()` only works here because all five results are small enough for every worker to finish writing without needing a reader first.
+Doing that after `join()` works here only because all five results are small enough for every worker to finish writing without needing a reader first.
 Drain a queue carrying bulky data before joining:
 each worker's feeder thread blocks until a reader consumes its data,
 so the `join()` deadlocks.
@@ -1201,12 +1201,12 @@ The GIL can move to another thread between instructions.
 When two threads both read before either writes, they compute the same result,
 and one increment vanishes.
 
-Since 3.10 the interpreter only switches threads at a function call or at the jump that closes a loop iteration,
+Since 3.10 the interpreter switches threads only at a function call or at the jump that closes a loop iteration,
 so nothing interrupts this particular sequence in practice.
 That is scheduling luck, not safety.
 
 Any function call between the read and the write reopens the gap.
-Here the call is a one-microsecond `time.sleep()`, which is a blocking call.
+Here the call is a one-microsecond `time.sleep()`, a blocking call.
 Blocking calls release the GIL:
 
 ```python
@@ -1361,7 +1361,7 @@ but a C extension must support per-interpreter isolation before a subinterpreter
 
 ## Coordinating Threads with Queues
 
-When threads divide up work, the danger comes from shared mutable state.
+When threads divide work, the danger comes from shared mutable state.
 The standard solution is a thread-safe queue that hands each item to a single consumer,
 with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
@@ -1428,7 +1428,7 @@ the first two of which already appeared in this chapter:
   protecting its internals with locks.
 - `multiprocessing.Queue`, seen in `multiprocessing_raw.py`,
   carries items across process boundaries by pickling them.
-- `asyncio.Queue`, which coordinates tasks on an event loop.
+- `asyncio.Queue` coordinates tasks on an event loop.
 
 `asyncio.Queue` has an `await queue.get()` that suspends the calling task instead of blocking the thread:
 
@@ -2232,7 +2232,7 @@ you might not have a choice.
 Some problems preclude immutability.
 For example, a solution might require packing as much data as possible into RAM.
 In those cases you almost inevitably share mutable state.
-These are the kinds of decisions you must make when you move from the examples presented in this chapter into serious real-world concurrency.
+These are the kinds of decisions you must make when you move from the examples in this chapter into serious real-world concurrency.
 
 People continue to work toward better ways of concurrent programming.[^libraries]
 Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.

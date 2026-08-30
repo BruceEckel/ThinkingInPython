@@ -306,16 +306,16 @@ This chapter shows four.
 Each guards against a different way of breaking the flow:
 
 - Structure, in `template_function.py`.
-  There is no subclass, so nothing can replace the loop.
-  This only works when you can pass functions instead of subclassing.
+  No subclass exists, so nothing can replace the loop.
+  This works only when you can pass functions instead of subclassing.
 - The type checker, via `@final`.
-  Discovers an overridden `run()` before the program executes.
+  It discovers an overridden `run()` before the program executes.
 - The interpreter, via `__init_subclass__()`.
-  An offending subclass is refused at its `class` statement,
-  whether it overrides `run()` or misspells a hook.
+  It refuses an offending subclass at its `class` statement,
+  whether the subclass overrides `run()` or misspells a hook.
   This holds at runtime, whereas `@final` is only a type-checking attribute.
 - Discipline, via the Liskov Substitution Principle.
-  This governs the semantics of whether each step is a faithful substitute,
+  This governs whether each step is a faithful substitute,
   but no tool checks it.
 
 Ask how the algorithm might break, and choose the mechanism that protects it.

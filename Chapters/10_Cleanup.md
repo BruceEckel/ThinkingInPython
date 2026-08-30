@@ -1,6 +1,6 @@
 # Cleanup
 
-Python manages memory, so most objects do not need explicit cleanup.
+Python manages memory, so most objects need no explicit cleanup.
 However, when an object owns an external resource (a file, a socket, a lock),
 you must release it.
 
@@ -384,7 +384,7 @@ which [Flyweight](35_Flyweight.md) does with a pool keyed by name.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,
 and one would then displace the other.
-Reused `id()` values are not a hazard,
+Reused `id()` values are harmless,
 since the dictionary holds only live objects and no two live objects share an id.
 `live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
@@ -397,7 +397,7 @@ with no `__del__()` and no explicit cleanup call.
 
 A `dict` or `list` as the registry keeps every instance alive forever,
 so the count cannot fall.
-The weak reference allows the registry to prune itself.
+The weak reference lets the registry prune itself.
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear only when its collector runs,
@@ -423,7 +423,7 @@ so the registry cannot become the leak it exists to catch.
     The two do different things to the list object.
     Say what each one does,
     then say what a second name bound to the same list would see after each.
-2.  Add a classmethod `live_names()` to `Counter` in `weak_value.py` that returns a sorted list of the `.name` of every live instance,
+2.  In `weak_value.py`, add a classmethod `live_names()` to `Counter` that returns a sorted list of the `.name` of every live instance,
     by reading `cls._instances.values()`.
 3.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
     and confirm the output stays the same:

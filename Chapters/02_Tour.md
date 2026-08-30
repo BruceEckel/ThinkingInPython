@@ -16,7 +16,7 @@ It does not impose arbitrary rules or force a particular set of features.
 
 People often call Python a scripting language,
 but scripting languages tend to be limiting,
-especially in the scope of the problems that they solve.
+especially in the scope of the problems they solve.
 Python is a programming language that also supports scripting.
 It is marvelous for scripting, and you may replace all your batch files,
 shell scripts, and simple programs with Python scripts.
@@ -75,7 +75,7 @@ Python code from any two authors therefore lines up the same way,
 which is one of the main reasons for Python's consistent readability.
 
 Python normally has only one statement per line,
-so no terminating semicolon is necessary.
+so a line needs no terminating semicolon.
 (You can put more than one statement on a line by separating them with semicolons.)
 
 ## Variables and References
@@ -144,7 +144,8 @@ Underscores group digits for readability:
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
 `/` always produces a `float`, and `//` is floor division
-(divide, then round down to a whole number; the result's type follows the operands, so `7.0 // 2` is `3.0`).
+(divide, then round down to a whole number).
+The result's type follows the operands, so `7.0 // 2` is `3.0`.
 Floor division rounds toward negative infinity, not toward zero,
 so `-7 // 2` is `-4` where C and Java give `-3`.
 The remainder follows from that: `-7 % 2` is `1` in Python and `-1` in C.
@@ -235,8 +236,8 @@ The `bin()` function converts an integer to a binary string for display.
 Because Python integers have no fixed width,
 `~` has no fixed number of bits to flip.
 It produces `-x - 1`,
-the value that flipping every bit gives in two's complement,
-and `bin()` prints that as a sign followed by a magnitude,
+the value that flipping every bit gives in two's complement.
+`bin()` prints that as a sign followed by a magnitude,
 so `~0b1100` reads as `-0b1101` rather than a row of ones.
 
 Python reserves one further operator, `@` (with `@=` to match),
@@ -339,7 +340,7 @@ Examples often include Python-esque references.
 
 The triple-quote syntax quotes everything, including newlines.
 That suits any block of literal text, such as an embedded template, a SQL query,
-or a chunk of HTML, which you can write out in full without escaping line breaks.
+or a chunk of HTML: you can write it out in full without escaping line breaks.
 
 In an ordinary string, a backslash starts an escape sequence, as in C and Java:
 `\n` is a newline and `\t` is a tab.
@@ -471,11 +472,10 @@ builds a query from the parts that way.
 Use `snake_case` for variables, functions, methods, and file names:
 lower case with words separated by underscores, as in `this_is_snake_case`.
 
-If something represents a constant, use all uppercase letters,
-as in `THIS_IS_A_CONSTANT`.
+For a constant, use all uppercase letters, as in `THIS_IS_A_CONSTANT`.
 
-Class names are `CapWords` (Pascal cased), starting with a capital letter,
-without underscores and capitalizing intermediate words.
+Class names are `CapWords` (Pascal cased): every word, including the first,
+begins with a capital letter, and no underscores separate them.
 For example: `ThisIsMyClass`.
 
 A class may instead use `snake_case` when it serves primarily as a callable,

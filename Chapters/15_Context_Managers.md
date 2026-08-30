@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
 `with trace("A") as t:` runs the body of `trace()` up to the `yield`,
 printing `enter A`.
-The yielded value is what `as` binds, so `t` is `"A"`.
+`as` binds the yielded value, so `t` is `"A"`.
 The block under the `with` then runs.
 When it finishes, `trace()` resumes just after the `yield` and prints `exit A`.
 
@@ -146,8 +146,7 @@ The return annotation `Self`
 declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 
-Comparing this to the generator form,
-`__enter__()` is the portion before the `yield`.
+In generator terms, `__enter__()` is the portion before the `yield`.
 `__exit__()` is the portion after it.
 
 `Trace` is also reusable: the same instance can appear in a second `with`,
@@ -452,7 +451,7 @@ if __name__ == "__main__":
 #: === meeting ends ===
 ```
 
-`banner` works as both a decorator for `report` and in a `with` in `__main__`.
+`banner` works both as a decorator for `report` and in a `with` in `__main__`.
 The parentheses in `@banner("report")` matter: the call constructs the manager,
 which then decorates the function.
 Each call of the decorated function builds a fresh manager,
@@ -764,8 +763,8 @@ if __name__ == "__main__":
 #: available after crash: 2
 ```
 
-`lease()` takes an item out of the queue, yields it to the `with` block,
-and the `finally` puts it back.
+`lease()` takes an item out of the queue and yields it to the `with` block.
+The `finally` puts it back.
 The crash inside the second `with` block still returns the connection,
 so the count is back to two.
 `Pool` is generic over the pooled type,
@@ -821,7 +820,7 @@ def test_objects_reused_not_recreated() -> None:
 A production pool adds refinements to this skeleton,
 such as lazily creating items on first demand,
 validating an item before lending it out,
-and a timeout on `get()` so a starved borrower fails loudly instead of waiting forever.
+and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
 
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.
@@ -850,7 +849,7 @@ and every change you make later goes inside the manager.
 
 1.  In `trace_cm.py`, nest a second `with Trace("B") as u:` block inside the body of the first `with Trace("A") as t:` block,
     with its own `print(f"inside {u.name}")`.
-    Predict the order the six "enter"/"inside"/"exit" lines appear in before running it.
+    Before running it, predict the order in which the six "enter"/"inside"/"exit" lines appear.
 2.  In `demo_exceptions.py`,
     change `ignore(ZeroDivisionError)` to `ignore((ZeroDivisionError, TypeError))`,
     then raise a `TypeError` instead of dividing by zero,

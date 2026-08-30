@@ -129,7 +129,7 @@ OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
 The next sections take them one at a time,
-and ask in each case what Python delivers and what it costs.
+and ask of each what Python delivers and what it costs.
 
 ## Encapsulation Leaks
 
@@ -174,8 +174,8 @@ if __name__ == "__main__":
 
 Encapsulation with private fields and getters still leaks.
 The `is` check shows the mechanism:
-the getter does not return a view or a snapshot of the list,
-it returns a reference to the list, the identical object the underscore hides.
+the getter returns no view or snapshot of the list, but a reference to the list,
+the identical object the underscore hides.
 Python's `return` hands out references, never copies.
 The property blocks reassigning `numbers`,
 but cannot stop the caller from mutating the list it returns.
@@ -518,8 +518,8 @@ print(len(box.items), box.appends)
 
 Nothing arrives from a base class, so nothing slips past the counter:
 the only way into `items` is a method this class wrote.
-Every operation is forwarded by hand,
-the subclass inherits hundreds it didn't write, and gets one wrong.
+`CountingBox` forwards every operation by hand.
+`CountingList` inherits hundreds it didn't write, and gets one wrong.
 Composition does not make the counting bug impossible.
 If `extend()` calls `self.items.extend(more)` instead of going through `append()`,
 the count is still wrong.

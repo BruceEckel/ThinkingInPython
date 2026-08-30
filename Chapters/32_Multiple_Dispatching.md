@@ -171,12 +171,13 @@ A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
 The table version needs neither.
 Its answers are data rather than methods,
-leaving no method for a class to forget, and `Item` declares its one method,
-`compete()`, so the opponent parameter takes `Item` rather than `Any`.
+leaving no method for a class to forget.
+`Item` declares its one method, `compete()`,
+so the opponent parameter takes `Item` rather than `Any`.
 
 Each `Item` type encodes the answers for its own combinations.
 Together they form a table spread across the classes.
-That table is not easy to maintain if you expect to modify the behavior or to add a new `Item` class.
+That table is hard to maintain if you expect to modify the behavior or to add a new `Item` class.
 Making the table explicit can be more sensible, like this:
 
 ```python
@@ -234,7 +235,7 @@ A tuple works as a key, the same as a single object.
 Two properties of the lookup carry over from the [table-driven state machine](31_State_Machines.md#the-engine).
 The lookup matches classes exactly,
 so a subclass of `Paper` finds none of `Paper`'s rows.
-And a missing pair raises `KeyError` at the first duel that needs it,
+And a missing pair raises a `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table under construction.
 Adding `Lizard` in exercise 1 puts you in that situation.
 
@@ -303,7 +304,8 @@ Both patterns in this chapter exist to avoid writing it.
 The double-dispatch version, where each class implements `eval_paper()`,
 `eval_scissors()`, and `eval_rock()`,
 belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
-Python makes the table cheap, so it is both shorter and easier to maintain.
+Python makes the table cheap,
+so the table is both shorter and easier to maintain.
 A table cell can hold a function,
 so the size of the behavior does not force the choice.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
@@ -441,15 +443,15 @@ The first two additions resolve inside `__add__()`:
 the left operand recognizes the type.
 `4 + Meters(3)` asks `int.__add__()` first,
 and `int` has never heard of `Meters`, so it returns `NotImplemented`.
-Python then, with no error anywhere, turns to `Meters.__radd__()`,
+With no error anywhere, Python then turns to `Meters.__radd__()`,
 whose trace line shows the operands arriving swapped.
 The last case shows why the sentinel exists.
-`Meters.__add__()` runs, declines the string,
-`str` has no `__radd__()` to consult,
-and only after both sides have declined does Python raise `TypeError`.
+`Meters.__add__()` runs and declines the string,
+and `str` has no `__radd__()` to consult.
+Only after both sides have declined does Python raise a `TypeError`.
 
 Two details of the fallback are easy to get wrong.
-Raising `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
+Raising a `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
 The exception propagates immediately, so the right operand never gets its turn.
 Only the sentinel keeps the second dispatch alive.
 Python also skips the reflected call when both operands have the same type,
@@ -462,8 +464,8 @@ so the more specific type can answer before its base does.
 
 Both methods declare `-> Meters` even though each can return `NotImplemented`,
 and that is the standard convention rather than a shortcut.
-Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union,
-and it can do that because it gives `NotImplemented` a type that inherits from `Any`,
+Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
+It can do that because it gives `NotImplemented` a type that inherits from `Any`,
 so returning the sentinel satisfies any declared return type.
 Writing the union out, `Meters | NotImplementedType`,
 makes a type checker reject `(Meters(1) + Meters(2)).n`,
@@ -485,7 +487,7 @@ They differ in who performs the second dispatch and where the answers live.
 The methods make the language do it and scatter the answers across the classes.
 The table does it with a dictionary probe and collects the answers in one place.
 The operators are the one case where Python performs the second dispatch for you.
-Everywhere else you choose between paying for the second dispatch in methods or paying for it in data.
+Everywhere else you choose between paying for the second dispatch in methods and paying for it in data.
 
 ## Exercises
 
@@ -513,14 +515,14 @@ Everywhere else you choose between paying for the second dispatch in methods or 
     since Python never calls the reflected form for two `Meters`.
     Subtraction does not commute, so the reflected form must undo the swap:
     check that `10 - Meters(3)` produces `Meters(7)` rather than `Meters(-7)`.
-    Then confirm that `"ten" - Meters(3)` raises `TypeError` rather than building anything.
+    Then confirm that `"ten" - Meters(3)` raises a `TypeError` rather than building anything.
 6.  Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
     as `exact_match.py` does.
     Explain the `KeyError` in terms of how the lookup matches.
     Then make the table tolerate subclasses by walking `type(item).__mro__` for the first class that has a row,
     and say which of the two properties named after the table listing you have just given up.
 7.  Create a business-modeling environment with three types of `Inhabitant`:
-    `Dwarf` (for engineers), `Elf` (for marketers) and `Troll` (for managers).
+    `Dwarf` (for engineers), `Elf` (for marketers), and `Troll` (for managers).
     Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
     Single dispatch is enough here.
     The next exercise adds the second dispatch.
@@ -533,7 +535,7 @@ Everywhere else you choose between paying for the second dispatch in methods or 
     (as in `paper_scissors_rock.py`).
     Add a `battle()` method to `Project` that takes two `Inhabitant`s and matches them against each other.
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
-    `Elf` and `Troll` and battles the groups against each other until only members of one group remain.
+    `Elf`, and `Troll` and battles the groups against each other until only members of one group remain.
     These are the "winners."
 9.  This chapter replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
     When is the table lookup more appropriate than hard-coding the dynamic dispatch?

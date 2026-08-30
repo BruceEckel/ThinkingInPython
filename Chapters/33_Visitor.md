@@ -170,8 +170,8 @@ Notice where the behavior lives.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
 so it adds only `accept()` to the primary hierarchy.
 Python has no method overloading,
-since a second `def visit()` replaces the first,
-so this version puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
+since a second `def visit()` replaces the first.
+This version therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
 Whichever way you write it,
 the primary hierarchy ends up carrying code the pattern exists to keep out of it.
@@ -287,13 +287,14 @@ Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
 When the operation should read like a method,
 use [`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
-instead, which dispatches on the first argument after `self`.
+instead.
+It dispatches on the first argument after `self`.
 
 Because each operation is a plain function, testing is direct.
 Call it with each flower type and assert the result.
 The cases worth covering are the registered types,
 the `@singledispatch` default for an unregistered type,
-and that the two operations dispatch independently:
+and independent dispatch of the two operations:
 
 ```python
 # test_visitor.py

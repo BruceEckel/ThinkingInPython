@@ -204,8 +204,8 @@ print(4_000 < heads < 6_000)
 
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body contains no `random` call, no seed, and no parameter for either.
-`Flip` carries no data, so it needs no fields,
-while `Ask` and `Tell` each carry the payload the request must deliver.
+`Flip` carries no data, so it needs no fields.
+`Ask` and `Tell` each carry the payload the request must deliver.
 The Ability's whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
@@ -232,7 +232,8 @@ That state brings one trap, and it is silent.
 and `StopIteration` is how a driver learns that an Effect has finished,
 so `handle()` reads the exhausted script as the end of the program.
 Asking `count_heads()` for six tosses from this five-value script makes `run()` produce `None` instead of a count,
-with no exception, the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
+with no exception.
+That is the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
 Every other exception a handler raises travels out of `run()` normally.
 This one collides with the protocol.
@@ -346,9 +347,9 @@ def test_batch_due(elapsed: timedelta, due: bool) -> None:
 
 `at()` builds a handler from a moment,
 so each test freezes its own clock in one line.
-The parametrized case one minute short of a day is the reading a real clock cannot produce on demand:
-getting it live means starting the test at the right minute,
-while here the margin is a `timedelta`.
+The parametrized case one minute short of a day is the reading a real clock cannot produce on demand.
+Getting it live means starting the test at the right minute,
+but here the margin is a `timedelta`.
 No fixture patches `datetime`, nothing sleeps,
 and each assertion compares values the test chose.
 
@@ -418,7 +419,7 @@ in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
-The technique does not change between the two.
+The technique is the same for both.
 Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
 What an EMS adds is that you cannot skip the declaration by accident.
 
@@ -507,9 +508,9 @@ and it carries the hour so the handler can consult the conditions at that moment
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
 That decorator matters where `supply()` matches an instance to a requested class
-([Supplying an Interface](46_Stateless.md#supplying-an-interface)),
-and here `handle()` matches on the Ability's own type, `Outlet`,
-while the `Source` that comes back is only a return value.
+([Supplying an Interface](46_Stateless.md#supplying-an-interface)).
+Here `handle()` matches on the Ability's own type, `Outlet`,
+and the `Source` that comes back is only a return value.
 `draw()` is the boundary function:
 it asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
@@ -626,7 +627,7 @@ which is why the second run tells a different story from the same code.
 so the charge drains first and the grid picks up at 19:00.
 Reordering that tuple is the whole difference between the two runs.
 Priority, thresholds, and the outage schedule live in `controller()`,
-while `run_load()` decides when to give up on the source it holds.
+and `run_load()` decides when to give up on the source it holds.
 
 The load's declared dependency does not change.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
@@ -847,7 +848,7 @@ The decorator adds the error the same way it did for `score()` in [The Error Cha
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
 `research()` splits the two because a function that only transforms its arguments is easier to test on its own,
-and because the split keeps the Ability requests collected in one place.
+and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
 The signature is also the only place this information appears.
@@ -1295,8 +1296,8 @@ ZIO makes both of them a `HeatSource` and must report the clash.
 
 Here is what ZIO does that Stateless cannot.
 `Bread.homeMade` is a `ZLayer`: a constructor that is an Effect.
-It can print, it can fail, and you can retry it,
-and the compiler resolves it into a tree with `Oven` and `Dough` beneath it.
+It can print, it can fail, and you can retry it.
+The compiler resolves it into a tree with `Oven` and `Dough` beneath it.
 You provide that layer rather than a finished loaf.
 Stateless has no such thing.
 `supply()` matches instances that exist,
@@ -1374,8 +1375,8 @@ the practice [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 recommends.
 
 Five abilities need five distinct shapes.
-`Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`,
-and then any obstacle would satisfy `Terrain` as well,
+`Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`.
+Then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
 the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
 A wide cast raises the odds of a collision,
@@ -1792,7 +1793,7 @@ Supply first, then fork.
 Notice who manages the pool's lifetime.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
 Stateless has no scoping mechanism of its own,
-so a resource either lives in a `with` block outside the Effect,
+so either a resource lives in a `with` block outside the Effect,
 as the pool does here, or the supplied object owns it:
 the library's own `Files` class opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
@@ -1807,8 +1808,8 @@ so this gap is narrower than it first appears.
 Here is every tool from both chapters that acts on a description:
 each one builds a description, rewrites a description's type, or executes one.
 Three sit outside the tables.
-`as_type()` relabels a value for the type checker and does nothing at runtime,
-while `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
+`as_type()` relabels a value for the type checker and does nothing at runtime.
+`spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 
 Four build a description:
 
@@ -1839,8 +1840,8 @@ Three rows carry a caveat.
 so supply first, then fork.
 `@throws` is an entry point rather than a transformation:
 it decorates an ordinary function that raises exceptions,
-turning it into one that returns an Effect,
-where `throw()` builds the failure as a description directly.
+turning it into one that returns an Effect.
+`throw()` instead builds the failure as a description directly.
 And `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
 
@@ -2030,8 +2031,8 @@ The extra type parameter exists because a Stateless Ability cannot fail,
 and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
 carries one for the same reason.
 `Async` is the other piece.
-Native systems derive asynchronous execution from Effects,
-while Stateless provides `Async` as a built-in that `run()` interprets,
+Native systems derive asynchronous execution from Effects.
+Stateless provides `Async` as a built-in that `run()` interprets,
 because the driver loop can await where a handler cannot.
 
 ### 4. The discipline is all-or-nothing
@@ -2068,8 +2069,8 @@ Forking two Effects that share the `Cell` of [State as an Ability](#state-as-an-
 produces a race no type reports,
 so shared state between forked Effects is your problem and Python's,
 with no help from the type checker.
-Above that sit the resilience patterns a production system eventually needs,
-rate limiting, bulkheads, and circuit breakers, none of which exist here.
+Above that sit the resilience patterns a production system eventually needs
+(rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 and that is different from a platform for building distributed systems.
 
@@ -2123,9 +2124,8 @@ but they remain a separate mechanism from the Effect type.
 What Stateless requires for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
 For most Python code that price is too high.
-The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure),
-returning a `Result`, restricting a type so bad values cannot exist,
-and passing dependencies in rather than constructing them,
+The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure)
+(returning a `Result`, restricting a type so bad values cannot exist, and passing dependencies in rather than constructing them)
 capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
 and when the team will hold the line at every boundary.

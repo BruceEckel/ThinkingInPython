@@ -18,7 +18,7 @@ An iterator has `__next__()`,
 which returns the next item or raises `StopIteration`.
 An iterator is also iterable: its `__iter__()` returns itself,
 so an iterator works anywhere code expects an iterable.
-The `for` loop calls these so you almost never call them directly.
+The `for` loop calls these, so you almost never call them directly.
 Every container uses this protocol,
 so a function written against an iterable stays decoupled from the container.
 
@@ -45,8 +45,8 @@ A loop absorbs `StopIteration` as the normal end rather than an error.
 The first `is` shows that calling `iter()` on a list creates a new iterator each time.
 The second `is` shows that calling `iter()` on an iterator returns that iterator.
 The tempting call is `next(nums)`: `next()` accepts only an iterator,
-and a list has no `__next__()`, so that call raises a `TypeError` at runtime,
-and the type checker rejects it before that.
+and a list has no `__next__()`, so that call raises a `TypeError` at runtime.
+The type checker rejects it before that.
 
 Written out, `for x in nums:` is this loop:
 
@@ -119,7 +119,7 @@ print(total(Countdown(5)))  # and a custom iterable
 #: 15
 ```
 
-`total()` takes an `Iterable` so it works equally well on the generator,
+`total()` takes an `Iterable`, so it works equally well on the generator,
 the list, and the custom `Countdown`.
 
 `fibonacci(8)` returns an iterator, which one pass exhausts.
@@ -384,7 +384,7 @@ and tells you to write `yield from` instead.
 
 The two forms agree for a generator that only produces values,
 as `flatten()` does.
-However, the `yield from` expression has a value:
+The `yield from` expression, however, has a value:
 `result = yield from inner()` binds whatever `inner()` returned when it stopped.
 The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
@@ -446,7 +446,7 @@ Nothing runs until `list()` pulls the values.
 The infinite `count(1)` never runs away.
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
-so the list habit `odd_squares[:5]` raises `TypeError` instead.
+so the list habit `odd_squares[:5]` raises a `TypeError` instead.
 
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
@@ -512,8 +512,8 @@ it stops responding, or it dies when it exhausts memory.
 No tool warns you first.
 `ty` accepts `list(count(1))`,
 and so does `ruff` with every one of its rules enabled.
-No type checker can read the code and decide whether an iterator ever ends,
-and a generator built from `while True` is indistinguishable from a finite one until it runs.
+No type checker can read the code and decide whether an iterator ever ends.
+A generator built from `while True` is indistinguishable from a finite one until it runs.
 The one rule that touches this code is a comprehension check.
 It offers to rewrite `[n for n in count(1)]` as `list(count(1))`,
 the same problem with fewer characters.

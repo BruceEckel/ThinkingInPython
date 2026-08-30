@@ -106,7 +106,7 @@ which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`.
 `filter(None, items)` is the other narrowing form.
-It drops the falsy values and the type checker knows no `None` survives.
+It drops the falsy values, and the type checker knows no `None` survives.
 
 A comprehension has a scope of its own:
 
@@ -211,7 +211,7 @@ If two keys share a value, the later entry wins, just as with any duplicate key.
 
 An identity matrix of size `n` is an `n` by `n` square matrix with ones on the main diagonal and zeros elsewhere.
 Python represents such a matrix as a list of lists,
-where each sub-list represents a row.
+where each sub-list is a row.
 The following comprehension generates an identity matrix:
 
 ```python
@@ -279,7 +279,7 @@ print([f"{n}={v}" for n, v in zip(names, values)])
 ```
 
 `zip()` stops at the end of the shorter sequence.
-Pass `strict=True` to make a length mismatch raise `ValueError` instead of silently truncating.
+Pass `strict=True` to make a length mismatch raise a `ValueError` instead of silently truncating.
 
 Unpack a tuple in the `for` clause's target,
 here a `(name, function)` pair applied to a value:
@@ -334,8 +334,8 @@ without touching any real files or leaving anything behind.
 In the `py_paths` comprehension,
 the first `for` walks the directories and the second `for` walks the files in each,
 flattening the tree into one list of paths.
-The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`,
-which avoids constructing a `Path` for every file in the tree,
+The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
+That avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
 
 A `with` block, unlike a function body, does not create a new scope.
@@ -468,8 +468,7 @@ The `for` loop prints the same values without building a wasted list.
 The brackets no longer suggest a collection the code never uses.
 Use a comprehension when you want the collection it produces,
 and a `for` loop when you want the side effect.
-If nothing assigns or uses a comprehension's result,
-that's a sign it should be a loop instead.
+If nothing assigns or uses a comprehension's result, write it as a loop instead.
 
 ## Generator Expressions {#generator-expressions}
 
@@ -541,7 +540,8 @@ None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
 `str.join()` does not belong on that list: it needs two passes,
 one to size the result and one to fill it,
-so it converts its argument to a list first and a generator expression saves nothing over a list comprehension there.
+so it converts its argument to a list first.
+A generator expression saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
 If you add a second argument, it does:
@@ -648,7 +648,7 @@ so the nested `[2, 3]` above comes through unflattened.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
 Braces plus `*` build a set instead,
-which is the one place where the colon does not decide between a set and a dict,
+the one place where the colon does not decide between a set and a dict,
 because neither form has one.
 The unpacking operator decides instead.
 The asynchronous generator form (`(*a async for a in agen())`)

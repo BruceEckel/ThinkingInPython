@@ -16,7 +16,7 @@ so it can live in the shared object.
 where the context supplies it.
 Second, route construction through a factory that returns the existing instance for a given value.
 
-Handing out one object under many names is only safe when nobody can change it,
+Handing out one object under many names is safe only when nobody can change it,
 so a flyweight must be immutable
 (see [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)).
 
@@ -159,7 +159,7 @@ Exercise 2 measures the memory behind it.
 ### Typing the Symbol Set
 
 `Symbol` names the closed set of valid map characters,
-so `Tile.symbol` and `SPECS` can only hold one of them.
+so `Tile.symbol` and `SPECS` can hold only one of them.
 If you add a kind to `SPECS` without adding it to `Symbol`, or the reverse,
 the type checker rejects the mismatch.
 `tile()` trusts its argument is already a `Symbol`,
@@ -265,8 +265,8 @@ which accepts and ignores the three arguments because this class overrides `__ne
 That rules out `@dataclass`,
 whose generated `__init__()` reintroduces the re-run.
 The damage is invisible at first,
-since re-assigning the same components changes nothing,
-and it appears the moment a field has a `default_factory` or `__post_init__()` has a side effect:
+since re-assigning the same components changes nothing.
+It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect:
 both run again on an object that was already finished.
 `Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
 so printing a `Color` falls back to the default `object.__repr__()`.
@@ -392,7 +392,7 @@ def test_pool_releases_unused() -> None:
 ## A Fixed Set: Enum
 
 When you know the full set of shared values as you write the program,
-you do not need a pool at runtime.
+you need no pool at runtime.
 An [Enum](12_Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains.
 Python constructs each member once, at class creation,

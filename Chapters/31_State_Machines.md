@@ -14,7 +14,7 @@ You can `run()` each state to perform its behavior, and (in this design)
 also pass it an "input" object so it can tell you which state to enter next.
 This design and the next differ in one key way: here,
 each `State` object makes that decision on its own,
-whereas in the subsequent design a single table holds all of the state transitions.
+whereas in the subsequent design a single table holds all the state transitions.
 
 ## Each State Decides
 
@@ -135,7 +135,7 @@ mouse removed
 
 Here's the first version of the mousetrap program.
 Each `State` subclass defines its `run()` behavior,
-and also establishes its next state with a `match` statement:
+and establishes its next state with a `match` statement:
 
 ```python
 # mouse_trap.py
@@ -684,7 +684,7 @@ too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
 
-`__init__()` builds the table, rather than the class body,
+`__init__()`, rather than the class body, builds the table,
 because each entry is a bound method.
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
@@ -778,7 +778,7 @@ The button loop builds sixteen commands with `partial(select, r, c)`,
 not with a lambda: sixteen lambdas closing over `r` and `c` all see the loop's final values,
 the late-binding trap from [Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)
 (the three fixed buttons above use lambdas safely, since they close over nothing that varies).
-Because it requires user interaction the harness skips it
+Because it requires user interaction, the harness skips it
 (`tools/data/norun.txt`):
 
 ```python
@@ -876,12 +876,12 @@ and a machine that arrived as a diagram belongs in the table.
 ## Exercises
 
 1.  Using [State](26_Surrogate.md#state),
-    make a class called `UnpredictablePerson` which changes the kind of response to its `hello()` method depending on its current `Mood`.
-    Add an additional kind of `Mood` called `Prozac`.
+    make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
+    Add another kind of `Mood` called `Prozac`.
 2.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
     Give one `(state, input)` pair two rows told apart by a condition,
     such as a load too heavy for the fast spin.
-3.  Create a *StateMachine* system whereby the current state along with the input determines the next state.
+3.  Create a *StateMachine* system in which the current state and the input together determine the next state.
     Use a `dict` to map a `str` naming a state to its state object.
     Give each state subclass its own transition table,
     which its `next_state()` method consults.

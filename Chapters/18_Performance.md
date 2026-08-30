@@ -41,8 +41,8 @@ A speedup that needs neither new code nor new hardware is rare.
 CPython has an experimental just-in-time compiler.
 Builds that include it,
 as the official 3.14 and later Windows and macOS binaries do,
-keep it switched off unless you set `PYTHON_JIT=1`,
-and the gain is currently modest, roughly 4 to 12 percent depending on platform,
+keep it switched off unless you set `PYTHON_JIT=1`.
+The gain is currently modest, roughly 4 to 12 percent depending on platform,
 so measure it before planning around it.
 Whether it becomes a supported feature is an open question.
 [PEP 836](https://peps.python.org/pep-0836/) lays out the path.
@@ -53,7 +53,7 @@ PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you need.
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
-If it's noticeably less, then buying new hardware might be a quick win.
+If it's noticeably less, buying new hardware might be a quick win.
 
 ## Profilers
 
@@ -186,8 +186,8 @@ monitoring the whole program to answer it pays for data you discard and slows th
 `set_local_events()` with `NO_EVENTS` detaches,
 and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
-and `COVERAGE_ID` carry the names of their intended users,
-and trying to claim one that another tool already holds raises a `ValueError`,
+and `COVERAGE_ID` carry the names of their intended users.
+Trying to claim one that another tool already holds raises a `ValueError`,
 which is how two profilers avoid quietly fighting over the same callbacks.
 
 For an answer you need once rather than continuously,
@@ -302,7 +302,7 @@ A million lookups is the difference between instant and minutes.
 
     python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
-Do your benchmarks using data shaped like production data.
+Benchmark with data shaped like production data.
 A `list` of ten elements can beat a `set`,
 and an optimization tuned to toy input can behave badly in production.
 
@@ -444,7 +444,7 @@ just as readily as it catches one that does.
 ## Choose Better Algorithms and Data Structures
 
 The biggest speedups usually come from a better algorithm.
-An algorithm with lower Big-O complexity beats micro-optimizing a slow algorithm.
+Choosing an algorithm with lower Big-O complexity beats micro-optimizing a slow one.
 Often this means choosing the right container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a `deque` (see [Containers](03_Containers.md#deque))
@@ -819,7 +819,7 @@ but `functools.lru_cache(maxsize=n)` bounds the memory by discarding the least r
 The arguments must be hashable,
 which is another reason to prefer immutable containers.
 
-Caching is only correct when the function is pure.
+Caching is correct only when the function is pure.
 Caching a function with side effects replays the answer but skips the effects,
 and caching a function that reads outside state can replay a stale answer.
 
@@ -915,9 +915,9 @@ print(f"slots at least 5x smaller: "
 ```
 
 The two failed assignments print differently on purpose.
-The slotted message varies between builds,
-so the first block reports only the exception's type,
-while the frozen message is stable and `ignore()` shows it whole.
+The slotted message is too wide for the listing,
+so the first block trims it after `__dict__`,
+while the frozen message is short enough for `ignore()` to show whole.
 The filter catches it because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
@@ -932,7 +932,7 @@ the same restriction `slots` gives you.
 But frozen enforces this by overriding `__setattr__()`.
 The instance still keeps a `__dict__` underneath,
 and `sys.getsizeof()` reports only an object's own size, not what it references,
-so `frozen_bytes` adds the dict's size on top to count it too.
+so `frozen_bytes` adds the dict's size on top.
 `slots=True` removes that `__dict__` entirely,
 so pairing it with `frozen=True` is the natural default,
 giving you the same immutability in a fraction of the space
@@ -1336,8 +1336,8 @@ A million calls that each do a little spend the gain on boundary-crossing overhe
 Passing millions of small Python objects across the boundary loses it too.
 Numbers, strings, bytes, and NumPy arrays cross cheaply.
 The list `collatz_lengths()` takes and returns carries 50,000 integers across the boundary each way,
-which sounds like the thing to avoid,
-but a hundred-odd loop iterations of real work follow each integer,
+which sounds like the thing to avoid.
+But a hundred-odd loop iterations of real work follow each integer,
 so the conversion cost disappears.
 The question is not the object count on its own but the work done per object crossed.
 

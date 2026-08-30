@@ -231,7 +231,7 @@ except ValueError as e:
 At most one target can carry the star, and it always produces a `list`,
 even when the source is a tuple or a string.
 Without a star the number of names must equal the number of elements,
-or the assignment raises `ValueError`.
+or the assignment raises a `ValueError`.
 By convention, a value you never read gets the name `_`,
 so `*_` discards a run of elements.
 [Pattern Matching](13_Pattern_Matching.md)
@@ -301,7 +301,7 @@ which is why `for name in ages` walks the names.
 Only `items()` yields `(key, value)` pairs,
 so `for name, age in ages` is a common slip:
 it iterates the keys and tries to unpack each one.
-Here that raises `ValueError`,
+Here that raises a `ValueError`,
 since a key like `"Alice"` has more than two characters.
 A two-character key would silently unpack into its letters instead.
 
@@ -410,7 +410,8 @@ The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
 They match the `update()`, `intersection_update()`, `difference_update()`,
 and `symmetric_difference_update()` methods.
 Single elements move in and out with `add()`, `remove()`, and `discard()`.
-`remove()` raises `KeyError` on a missing element, `discard()` stays silent.
+`remove()` raises a `KeyError` on a missing element.
+`discard()` stays silent.
 
 Converting a `list` to a `set` before repeated lookups speeds them up.
 A `list` compares against every element in turn.
@@ -476,7 +477,7 @@ print(counts.most_common(2))
 #: [('a', 3), ('cat', 2)]
 ```
 
-A missing key counts as zero rather than raising `KeyError`,
+A missing key counts as zero rather than raising a `KeyError`,
 and `most_common()` returns the highest counts first.
 
 ### `defaultdict`
@@ -607,7 +608,7 @@ print(deque_time * 20 < list_time)  # Not close
 Use a `deque` for a single-threaded queue.
 Indexing its middle is O(n), though,
 so a `deque` does not replace a `list` you index by position.
-A `deque(maxlen=n)` additionally caps its length,
+A `deque(maxlen=n)` also caps its length,
 discarding from the far end when a new item overflows it,
 which is the sliding window a `list` cannot provide.
 For a queue shared between threads, use `queue.Queue`

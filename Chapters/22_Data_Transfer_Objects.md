@@ -48,7 +48,7 @@ If you declare only the first, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
-which is why the next listing needs no annotation.
+so the next listing needs no annotation.
 The price of an ad-hoc attribute bag is that no type checker knows your attribute names.
 A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
@@ -139,7 +139,7 @@ print(red._asdict(), Color._fields)
 #: {'r': 255, 'g': 0, 'b': 0} ('r', 'g', 'b')
 ```
 
-Printing a `NamedTuple` gives the same readable output a data class gives.
+Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
 Assigning to a field raises an `AttributeError`, and `ty` reports it as well.
 The attribute bag catches nothing.

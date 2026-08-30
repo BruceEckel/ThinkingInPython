@@ -64,7 +64,7 @@ even ones already created.
 
 What creates these "class" objects?
 Other special objects, called *metaclasses*.
-The default metaclass is `type`, and almost always it does the right thing.
+The default metaclass is `type`, and it almost always does the right thing.
 You can customize how Python produces classes by running extra code or injecting members as it builds each class.
 That is metaclass programming.
 
@@ -76,7 +76,7 @@ turning every class-body assignment into a member and making `for c in Color` wa
 Iterating a class is behavior on the class object,
 which is where a metaclass can put it and an ordinary class cannot.
 
-Most of the time you do not need a metaclass.
+You rarely need a metaclass.
 It is a fascinating tool and tempting to use,
 but simpler hooks cover almost every case a metaclass used to handle:
 
@@ -314,7 +314,7 @@ if __name__ == "__main__":
 #: 8:00: LightOn
 ```
 
-Now the end user only needs to write and maintain the file containing the schedule:
+Now the end user needs only to write and maintain the schedule file:
 
 ```text
 # schedule.txt
@@ -344,7 +344,7 @@ replacing the colon with a second space before splitting on whitespace.
 `Event._event_maker[class_name]` gets the class object that builds that `Event`.
 The first time a lookup asks for an event type,
 the maker builds the class and registers it under its name.
-An unknown name raises `KeyError`,
+An unknown name raises a `KeyError`,
 which a caller writing `try: ... except KeyError` around a lookup expects.
 
 `Event._event_maker` starts out holding the seven legitimate event names,
@@ -411,8 +411,9 @@ if __name__ == "__main__":
 #: ValueError("Unknown command: 'Reset'")
 ```
 
-`make_class()` execs `klass` into a private `namespace` dict rather than the module's namespace,
-which it seeds with `{"Command": Command}` so the generated class can find its base.
+`make_class()` execs `klass` into a private `namespace` dict,
+not the module's namespace,
+and seeds it with `{"Command": Command}` so the generated class can find its base.
 The type checker can't see into the string,
 so `namespace[class_name]` is just `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
@@ -432,8 +433,8 @@ A function object handed to `type()` does not.
 
 That string is also the danger.
 `exec()` runs its argument with the full power of the language,
-and `klass` splices `class_name` directly into source text,
-so an unvalidated name containing a newline and a second statement could break out of the `class` block and run anything,
+and `klass` splices `class_name` directly into source text.
+An unvalidated name containing a newline and a second statement could then break out of the `class` block and run anything,
 the same way an unescaped value breaks out of a hand-built SQL query.
 The `KNOWN_COMMANDS` check closes that hole:
 only three fixed names ever reach the template.
@@ -1027,8 +1028,9 @@ and reserve `__new__()` for a genuine need.
 
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances.
-These are sometimes called *metamethods*,
-and they differ from `classmethod`s because a `classmethod` stays callable on both the class and its instances,
+These are sometimes called *metamethods*.
+They differ from `classmethod`s:
+a `classmethod` stays callable on both the class and its instances,
 while a metamethod works only through the class.
 The class is an instance of the metaclass.
 The class's own instances are not.
@@ -1281,7 +1283,8 @@ For everything else, `__init_subclass__()`, `__set_name__()`,
 and [class decorators](14_Decorators.md#decorating-classes)
 are simpler and easier to read.
 A class decorator receives the finished class, so it can add, replace,
-or inspect members, but it cannot change the name, the bases, or the namespace,
+or inspect members.
+It cannot change the name, the bases, or the namespace,
 and it cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes *instances* callable.
 Only a metaclass makes the class callable in a new way.
@@ -1606,7 +1609,7 @@ not merely an equal one.
 `exclude` drops specific names regardless of what `dunder` would otherwise show,
 and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
-minus `__hash__`, useful when a listing has already made that particular point and repeating it only adds noise.
+minus `__hash__`, useful when a listing has already made that point and repeating it only adds noise.
 The check runs first, before the `dunder` logic sees the name,
 so an excluded name never reaches `[Attributes]` or `[Methods]` no matter which mode selects it.
 
