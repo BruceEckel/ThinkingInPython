@@ -9,13 +9,13 @@ class Words:
         return len(self.items)
 
 class Proxy:
-    def __init__(self) -> None:
-        self.__implementation = Words()
+    def __init__(self, impl: Any) -> None:
+        self.__implementation = impl
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__implementation, name)
 
-p = Proxy()
+p = Proxy(Words())
 print(p.__len__())  # The explicit call delegates
 #: 2
 try:
