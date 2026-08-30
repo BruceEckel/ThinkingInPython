@@ -22,7 +22,7 @@ try:
     # Special-method lookup skips the instance:
     len(p)  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
-print("Proxy object at" in str(p))
+    print(e)
+#: object of type 'Proxy' has no len()
+print("__main__.Proxy object" in str(p))
 #: True
