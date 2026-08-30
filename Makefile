@@ -516,8 +516,14 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 # name: ARGS="--passes activate readability". To run all seven:
 # ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
 # commands without running them.
-rewrite:  ## AI editing passes over one chapter's prose (CH=25; ARGS=--list)
-	$(PY) tools/rewrite.py $(CH) $(ARGS)
+#
+# MODEL picks the model every pass runs on. The default is Opus: the
+# passes edit an author's voice, and a pass that cuts too much costs
+# more than the token difference on one chapter. MODEL=claude-sonnet-5
+# is the cheap lap. Each pass header prints the model it used.
+MODEL ?= claude-opus-5
+rewrite:  ## AI editing passes over one chapter's prose (CH=25; MODEL=; ARGS=--list)
+	$(PY) tools/rewrite.py $(CH) --model $(MODEL) $(ARGS)
 
 # Spell-check the book and lint it for small mechanical slips. codespell
 # catches known misspellings (prose and code comments); prose_lint catches

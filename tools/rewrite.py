@@ -4,7 +4,11 @@
 Each pass is one headless `claude -p "/<skill> <chapter>"` run: a skill
 from this repo (`.claude/skills/`) or an installed plugin, applied to the
 chapter file in place with `--permission-mode acceptEdits`, so it needs
-no terminal and no confirmation. After every pass the chapter is reflowed
+no terminal and no confirmation. `--model` picks the model for every
+pass (`make rewrite MODEL=claude-sonnet-5`); the default is
+`DEFAULT_MODEL` below, Opus, because the passes' failure mode is
+over-editing and restraint is what the stronger model buys. Each pass
+header prints the model so a diff can be traced to it. After every pass the chapter is reflowed
 (`reflow_prose.py --write`) and the cheap prose gates run
 (`banned_phrases.py`, `heading_links.py`, the `extract_examples.py`
 drift check), so a pass that touched a listing, broke a link, or added a
@@ -31,6 +35,7 @@ Usage:
     python tools/rewrite.py 25 --list         # show the passes, run nothing
     python tools/rewrite.py 25 --dry-run      # print the commands only
     python tools/rewrite.py 25 --also activate    # defaults + activate
+    python tools/rewrite.py 25 --model claude-sonnet-5
     python tools/rewrite.py 25 --passes activate  # activate only
     python tools/rewrite.py Chapters/25_Template_Method.md --all
 """
@@ -104,6 +109,11 @@ PASSES: tuple[Pass, ...] = (
     ),
 )
 
+# The model every pass runs on unless --model says otherwise. Opus: the
+# passes edit an author's voice, and the cost of a pass that cuts too
+# much is higher than the token difference on one chapter.
+DEFAULT_MODEL = "claude-opus-5"
+
 # What the headless run may do. Read/Grep/Glob to read the skill's own
 # reference files and the chapter; Edit/Write for the chapter; `uv run`
 # so a skill that verifies its work with a repo tool can. No git, so a
@@ -128,12 +138,16 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
-def claude_argv(claude: str, skill: str, chapter: Path) -> list[str]:
+def claude_argv(
+    claude: str, skill: str, chapter: Path, model: str
+) -> list[str]:
     """The headless invocation for one pass."""
     return [
         claude,
         "-p",
         f"/{skill} {chapter.as_posix()}",
+        "--model",
+        model,
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
@@ -187,6 +201,8 @@ def main() -> int:
                        help="every pass, including the opt-in ones")
     parser.add_argument("--list", action="store_true",
                         help="list the passes and exit")
+    parser.add_argument("--model", default=DEFAULT_MODEL, metavar="ID",
+                        help=f"model for every pass (default: {DEFAULT_MODEL})")
     parser.add_argument("--dry-run", action="store_true",
                         help="print each command instead of running it")
     args = parser.parse_args()
@@ -236,11 +252,11 @@ def main() -> int:
               "the per-pass diff below includes them")
 
     for p in selected:
-        argv = claude_argv(claude or "claude", p.skill, chapter)
+        argv = claude_argv(claude or "claude", p.skill, chapter, args.model)
         if args.dry_run:
             print(subprocess.list2cmdline(argv))
             continue
-        code = run(argv, f"pass: {p.name} ({p.what})")
+        code = run(argv, f"pass: {p.name} on {args.model} ({p.what})")
         if code != 0:
             print(f"FAILED: pass {p.name} exited {code}; stopping")
             return 1
@@ -249,8 +265,8 @@ def main() -> int:
         print(f"after {p.name}: {changed_lines(chapter) or 'no change'}")
 
     if not args.dry_run:
-        print(f"done: {len(selected)} pass(es) over {chapter.as_posix()}; "
-              "review `git diff` before committing")
+        print(f"done: {len(selected)} pass(es) on {args.model} over "
+              f"{chapter.as_posix()}; review `git diff` before committing")
     return 0
 
 
