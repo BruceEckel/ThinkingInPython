@@ -10,12 +10,13 @@ from prompt_toolkit.output import DummyOutput
 
 from unittest import mock
 
+import help_picker
 from help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
     INTERRUPTED, next_version, notes_lines, run_target, section_rows,
     session,
-    split_match, variables)
+    split_match, variable_default, variables)
 from make_help import MAKEFILE, Target, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
@@ -255,6 +256,28 @@ def test_record_history_skips_a_file_it_cannot_write(tmp_path):
 
 def _target(name):
     return next(t for s in _sections() for t in s.targets if t.name == name)
+
+
+def test_variable_default_reads_the_assignment_above_the_target():
+    assert variable_default(_target("rewrite"), "MODEL") == "claude-opus-5"
+    assert variable_default(_target("code-width"), "WIDTH") == "60"
+    assert variable_default(_target("code-width"), "ARGS") == ""
+    assert variable_default(_target("check-ch"), "CH") == ""
+
+
+def test_prompt_hint_names_the_makefile_default():
+    seen: list[str] = []
+
+    def fake_prompt(message, default=""):
+        seen.append(message)
+        return ""
+
+    with mock.patch("help_picker.prompt", side_effect=fake_prompt):
+        help_picker.ask_variables(_target("rewrite"))
+    hints = {m.split("=")[0]: m for m in seen}
+    assert "Enter for claude-opus-5" in hints["MODEL"]
+    assert "Enter for the whole book" in hints["CH"]
+    assert "Enter to skip" in hints["ARGS"]
 
 
 def test_variables_come_from_the_doc_with_their_examples():

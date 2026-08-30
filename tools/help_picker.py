@@ -547,6 +547,7 @@ def split_match(label: str, query: str) -> list[tuple[str, bool]]:
 
 
 _VARIABLE = re.compile(r"\b([A-Z][A-Z_]*)=([^\s,;)]*)")
+_DEFAULT = re.compile(r"^([A-Z][A-Z_]*)\s*[?:+]?=\s*(.*)$")
 
 # Variables a target's doc mentions that the menu should not ask about:
 # `make all ARGS=--help` only lists what `all` would run, which is not
@@ -579,19 +580,41 @@ def make_command(target: Target,
     return argv
 
 
+def variable_default(target: Target, name: str) -> str:
+    """The value a `NAME ?= value` (or `=`, `:=`) line in the target's
+    notes gives `name`, or "" when the Makefile sets no default there.
+    make_help keeps such an assignment, sitting between the comment
+    block and the target, as the notes' last paragraph, on its own;
+    only that paragraph is read, so a prose line that starts with
+    `ARGS=--tsv ...` never counts as a default."""
+    last = target.notes.rsplit("\n\n", 1)[-1]
+    if "\n" in last:  # a prose paragraph, not the assignment line
+        return ""
+    m = _DEFAULT.match(last)
+    if m and m.group(1) == name:
+        return m.group(2).strip()
+    return ""
+
+
 def ask_variables(target: Target) -> dict[str, str]:
     """Prompt for each variable the target's doc mentions, prefilled
-    with a guess where one exists."""
+    with a guess where one exists, and saying what Enter does: accept
+    the guess, take the Makefile's default, run the whole book (CH),
+    or leave the variable unset."""
     values: dict[str, str] = {}
     for name, example in variables(target):
         guess = guess_value(name)
+        default = variable_default(target, name)
+        example_hint = f"e.g. {example}, " if example else ""
         if guess:
             hint = "Enter accepts"
             example_hint = ""
+        elif default:
+            hint = f"Enter for {default}"
+        elif name == "CH":
+            hint = "Enter for the whole book"
         else:
-            hint = ("Enter for the whole book" if name == "CH"
-                    else "Enter to skip")
-            example_hint = f"e.g. {example}, " if example else ""
+            hint = "Enter to skip"
         values[name] = prompt(f"{name}= ({example_hint}{hint}): ",
                               default=guess).strip()
     return values
