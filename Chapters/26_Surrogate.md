@@ -18,13 +18,10 @@ A surrogate object receives an implementation and forwards all method calls to i
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has one implementation.
 *State* has several.
-*GoF Design Patterns* considers the applications of the two patterns distinct.
-*Proxy* controls access to its implementation,
-while *State* lets you change the implementation dynamically.
-Expand your notion of "controlling access to implementation,"
-and the two fit neatly together.
 
 ## Proxy
+
+### Explicit Forwarding
 
 Implementing *Proxy* following the above diagram looks like this:
 
@@ -50,6 +47,8 @@ p.f()
 p.g()
 #: Implementation.g()
 ```
+
+### What the Implementation Owes
 
 `Implementation` need not have the same interface as `Proxy`.
 As long as `Proxy` "speaks for" the class it forwards method calls to,
@@ -146,6 +145,8 @@ One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only t
 not that their signatures match.
 The static type checker verifies signatures.
 
+### Forwarding with `__getattr__()` {#forwarding-with-getattr}
+
 Python has a built-in delegation mechanism, `__getattr__()`,
 that makes `Proxy` simpler to implement:
 
@@ -207,7 +208,9 @@ and the checker verifies it.
 `__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 
-One limit: special methods bypass `__getattr__()`.
+### The Limits of `__getattr__()` {#the-limits-of-getattr}
+
+Special methods bypass `__getattr__()`.
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
 not on the instance, so `len(p)` and `print(p)` do not delegate,
 even though an explicit `p.__len__()` would:
@@ -315,7 +318,7 @@ print(p.level, settings.level)
 #: high high
 ```
 
-`object.__setattr__()` stores `_impl` on the proxy,
+`object.__setattr__()` stores `_implementation` on the proxy,
 bypassing the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
 Every assignment after that reaches the implementation, so the two agree.
 The `# type: ignore` required by `proxy_writes.py` disappears because declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes.
@@ -324,7 +327,17 @@ The implementation attribute loses its double underscore,
 from `__implementation` to `_implementation`.
 Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
-`"_WriteProxy__impl"`, by hand.
+`"_WriteProxy__implementation"`, by hand.
+
+The fallback hook has a trap of its own:
+when `__getattr__()`'s body touches a proxy attribute that does not exist,
+that failed lookup calls `__getattr__()` again,
+and the error surfaces as `RecursionError`,
+not the `AttributeError` that would point at the cause.
+A misspelled `self._implementation` trips it directly.
+So does rebuilding a proxy through `copy.copy()` or `pickle`:
+both construct the new instance without calling `__init__()`,
+so no `_implementation` exists when the first lookup reaches `__getattr__()`.
 
 A proxy is not an instance of the implementation's class.
 Delegation forwards the methods, not the type.
@@ -373,107 +386,8 @@ Each satisfies the runtime check and neither satisfies a type checker.
 A surrogate is not its implementation,
 and code that needs it to be should ask for a method instead.
 
-## State
-
-The *State* pattern adds more implementations to *Proxy*,
-along with a way to switch implementations during the surrogate's lifetime:
-
-```python
-# state_surrogate.py
-from typing import Any, Protocol
-
-class Behavior(Protocol):
-    def f(self) -> None: ...
-    def g(self) -> None: ...
-    def h(self) -> None: ...
-
-class Surrogate:
-    def __init__(self, implementation: Any) -> None:
-        self.__implementation = implementation
-    def change_to(self, new_implementation: Any) -> None:
-        self.__implementation = new_implementation
-    # Delegate calls to the implementation:
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__implementation, name)
-
-class Implementation1:
-    def f(self) -> None:
-        print("Fiddle de dum, Fiddle de dee,")
-    def g(self) -> None:
-        print("Eric the half a bee.")
-    def h(self) -> None:
-        print("Ho ho ho, tee hee hee,")
-
-class Implementation2:
-    def f(self) -> None:
-        print("We're Knights of the Round Table.")
-    def g(self) -> None:
-        print("We dance whene'er we're able.")
-    def h(self) -> None:
-        print("We do routines and chorus scenes")
-
-def run(b: Any) -> None:
-    b.f()
-    b.g()
-    b.h()
-    b.g()
-
-if __name__ == "__main__":
-    first: Behavior = Implementation1()
-    second: Behavior = Implementation2()
-    b = Surrogate(first)
-    run(b)
-    b.change_to(second)
-    run(b)
-#: Fiddle de dum, Fiddle de dee,
-#: Eric the half a bee.
-#: Ho ho ho, tee hee hee,
-#: Eric the half a bee.
-#: We're Knights of the Round Table.
-#: We dance whene'er we're able.
-#: We do routines and chorus scenes
-#: We dance whene'er we're able.
-```
-
-`run()` never changes and neither does `b`.
-Only the object behind the surrogate does.
-
-The annotations that carry the implementation are all `Any`,
-which the book's typing guidance treats as a last resort.
-The Proxy section gives the reason:
-whatever `__getattr__()` returns is unknown at the type level,
-so no type checker can verify `b.f()`, no matter how you annotate the surrogate.
-Declaring each implementation against `Behavior` still catches a missing method,
-because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
-That declaration stops at the surrogate.
-Annotating `run(b: Behavior)` and handing it `b` is a type error,
-because `Surrogate` defines no `f()` of its own.
-The hop through the surrogate loses the guarantee.
-
-The test hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
-
-```python
-# test_state.py
-from state_surrogate import Surrogate
-
-class StateA:
-    def name(self) -> str:
-        return "A"
-
-class StateB:
-    def name(self) -> str:
-        return "B"
-
-def test_state_delegates_and_change_swaps() -> None:
-    s = Surrogate(StateA())
-    assert s.name() == "A"
-    s.change_to(StateB())
-    assert s.name() == "B"
-```
-
 ## What Proxy Solves
 
-*Proxy* and *State* differ in the problem each solves.
 *GoF Design Patterns* lists these common uses for *Proxy*:
 
 1.  *Remote proxy*.
@@ -571,19 +485,6 @@ one generic proxy can add lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*) to any object,
 with no per-method code.
 
-`CountingProxy` keeps the single underscore,
-so the trap below can misspell `self._imp` without name mangling obscuring the typo.
-
-The fallback hook has a trap of its own:
-when `__getattr__()`'s body touches a proxy attribute that does not exist,
-that failed lookup calls `__getattr__()` again,
-and the error surfaces as `RecursionError`,
-not the `AttributeError` that would point at the cause.
-A misspelled `self._imp` trips it directly.
-So does rebuilding a proxy through `copy.copy()` or `pickle`:
-both construct the new instance without calling `__init__()`,
-so no `_impl` exists when the first lookup reaches `__getattr__()`.
-
 The counting proxy's test confirms that a call reaches the implementation and returns its result,
 and that it counts calls without counting an attribute read:
 
@@ -612,6 +513,104 @@ def test_proxy_counts_only_calls() -> None:
     p2.double(1)
     assert p.calls == 0
     assert p2.calls == 2
+```
+
+## State
+
+The *State* pattern adds more implementations to *Proxy*,
+along with a way to switch implementations during the surrogate's lifetime:
+
+```python
+# state_surrogate.py
+from typing import Any, Protocol
+
+class Behavior(Protocol):
+    def f(self) -> None: ...
+    def g(self) -> None: ...
+    def h(self) -> None: ...
+
+class Surrogate:
+    def __init__(self, implementation: Any) -> None:
+        self.__implementation = implementation
+    def change_to(self, new_implementation: Any) -> None:
+        self.__implementation = new_implementation
+    # Delegate calls to the implementation:
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__implementation, name)
+
+class Implementation1:
+    def f(self) -> None:
+        print("Fiddle de dum, Fiddle de dee,")
+    def g(self) -> None:
+        print("Eric the half a bee.")
+    def h(self) -> None:
+        print("Ho ho ho, tee hee hee,")
+
+class Implementation2:
+    def f(self) -> None:
+        print("We're Knights of the Round Table.")
+    def g(self) -> None:
+        print("We dance whene'er we're able.")
+    def h(self) -> None:
+        print("We do routines and chorus scenes")
+
+def run(b: Any) -> None:
+    b.f()
+    b.g()
+    b.h()
+    b.g()
+
+if __name__ == "__main__":
+    first: Behavior = Implementation1()
+    second: Behavior = Implementation2()
+    b = Surrogate(first)
+    run(b)
+    b.change_to(second)
+    run(b)
+#: Fiddle de dum, Fiddle de dee,
+#: Eric the half a bee.
+#: Ho ho ho, tee hee hee,
+#: Eric the half a bee.
+#: We're Knights of the Round Table.
+#: We dance whene'er we're able.
+#: We do routines and chorus scenes
+#: We dance whene'er we're able.
+```
+
+`run()` never changes and neither does `b`.
+Only the object behind the surrogate does.
+
+The annotations that carry the implementation are all `Any`,
+which the book's typing guidance treats as a last resort.
+The Proxy section gives the reason:
+whatever `__getattr__()` returns is unknown at the type level,
+so no type checker can verify `b.f()`, no matter how you annotate the surrogate.
+Declaring each implementation against `Behavior` still catches a missing method,
+because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
+That declaration stops at the surrogate.
+Annotating `run(b: Behavior)` and handing it `b` is a type error,
+because `Surrogate` defines no `f()` of its own.
+The hop through the surrogate loses the guarantee.
+
+The test hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
+
+```python
+# test_state.py
+from state_surrogate import Surrogate
+
+class StateA:
+    def name(self) -> str:
+        return "A"
+
+class StateB:
+    def name(self) -> str:
+        return "B"
+
+def test_state_delegates_and_change_swaps() -> None:
+    s = Surrogate(StateA())
+    assert s.name() == "A"
+    s.change_to(StateB())
+    assert s.name() == "B"
 ```
 
 ## One Surrogate, Two Intents
