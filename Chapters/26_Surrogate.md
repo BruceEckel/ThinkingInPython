@@ -14,9 +14,7 @@ That is the shape in *GoF Design Patterns*.
 You'll see that Python does not need the shared base,
 but it is the clearest way to see what a surrogate is.
 
-A surrogate object acquires an implementation,
-either constructing one or receiving one.
-The surrogate forwards all method calls to that implementation.
+A surrogate object receives an implementation and forwards all method calls to it.
 
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has one implementation.
