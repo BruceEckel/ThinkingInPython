@@ -486,14 +486,30 @@ reflow:  ## Rewrite prose to one sentence per line (CH=02 for one chapter)
 reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 	$(PY) tools/reflow_prose.py $(CH)
 
-# AI editing passes over one chapter's prose, in place. Each pass is a
-# headless `claude -p "/<skill> <chapter>"` run (elements-of-style and
-# bruce-edit-apply by default; the pass list is PASSES in tools/rewrite.py,
-# ARGS=--list shows it, ARGS="--passes activate" or ARGS=--all picks
-# others). Reflow and the
-# prose gates run after every pass. It costs tokens and is nondeterministic,
-# so it is never part of verify/gate/ci and refuses to run under CI; review
-# `git diff` before committing.
+# AI editing passes over one chapter's prose, edited in place. Each pass
+# is one headless `claude -p "/<skill> <chapter>"` run. Reflow and the
+# prose gates run after every pass, and the chain stops at the first
+# failure. It costs tokens and is nondeterministic, so it is never part
+# of verify/gate/ci, refuses to run under CI, and needs a `git diff`
+# review before you commit.
+#
+# The passes, in the order they run (PASSES in tools/rewrite.py):
+#
+#   elements-of-style  default  Strunk: active voice, positive form,
+#                               omit needless words
+#   activate           opt-in   clear the passive, there-is, and
+#                               weak-verb warnings from `make prose`
+#   readability        opt-in   remove AI-writing tells; its own rule
+#                               is "only when asked", so it never runs
+#                               unless you name it here
+#   bruce-edit-apply   default  apply the promoted rules in
+#                               bruce_edit_db.md
+#
+# A bare `make rewrite CH=25` runs the two defaults. To add an opt-in
+# pass to them: ARGS="--also activate". To run only the passes you
+# name: ARGS="--passes activate readability". To run all four:
+# ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
+# commands without running them.
 rewrite:  ## AI editing passes over one chapter's prose (CH=25; ARGS=--list)
 	$(PY) tools/rewrite.py $(CH) $(ARGS)
 

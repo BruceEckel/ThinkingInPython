@@ -13,9 +13,11 @@ chain stops at the first failure.
 
 The passes live in `PASSES` below, in the order they run. Adding a tool
 is appending an entry. A pass with `default=True` runs on a bare `make
-rewrite`; the rest are opt-in via `--passes NAME ...` (or `--all`), so a
-pass whose own rules say "only when explicitly asked" (`readability`)
-stays off until this command names it, which counts.
+rewrite`; the rest are opt-in. `--also NAME ...` adds opt-in passes to
+the defaults, `--passes NAME ...` runs only the passes named (replacing
+the default set), and `--all` runs every pass. A pass whose own rules
+say "only when explicitly asked" (`readability`) stays off until one of
+those names it, which counts as asking.
 
 This is not a gate. Each run costs tokens and is nondeterministic, so it
 never joins `verify`/`gate`/`ci`, it refuses to run under `CI`, and
@@ -28,7 +30,8 @@ Usage:
     python tools/rewrite.py 25                # default passes on chapter 25
     python tools/rewrite.py 25 --list         # show the passes, run nothing
     python tools/rewrite.py 25 --dry-run      # print the commands only
-    python tools/rewrite.py 25 --passes activate
+    python tools/rewrite.py 25 --also activate    # defaults + activate
+    python tools/rewrite.py 25 --passes activate  # activate only
     python tools/rewrite.py Chapters/25_Template_Method.md --all
 """
 
@@ -154,10 +157,13 @@ def main() -> int:
     )
     parser.add_argument("chapter", nargs="?",
                         help="chapter number, stem prefix, name part, or path")
-    parser.add_argument("--passes", nargs="+", metavar="NAME",
-                        help="run exactly these passes, in PASSES order")
-    parser.add_argument("--all", action="store_true",
-                        help="run every pass, including the opt-in ones")
+    which = parser.add_mutually_exclusive_group()
+    which.add_argument("--also", nargs="+", metavar="NAME",
+                       help="the default passes plus these opt-in ones")
+    which.add_argument("--passes", nargs="+", metavar="NAME",
+                       help="only these passes, replacing the default set")
+    which.add_argument("--all", action="store_true",
+                       help="every pass, including the opt-in ones")
     parser.add_argument("--list", action="store_true",
                         help="list the passes and exit")
     parser.add_argument("--dry-run", action="store_true",
@@ -165,6 +171,8 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.list:
+        print("Passes, in the order they run. A bare run does the defaults;")
+        print("--also NAME adds an opt-in pass to them, --passes NAME runs only it.")
         for p in PASSES:
             tag = "default" if p.default else "opt-in "
             print(f"  {tag}  {p.name:<18} /{p.skill}\n{'':12}{p.what}")
@@ -183,11 +191,14 @@ def main() -> int:
         return 2
     chapter = matched[0].resolve().relative_to(ROOT)
 
+    named = args.passes or args.also or []
+    unknown = set(named) - {p.name for p in PASSES}
+    if unknown:
+        parser.error(f"unknown pass(es): {', '.join(sorted(unknown))}")
     if args.passes:
-        unknown = set(args.passes) - {p.name for p in PASSES}
-        if unknown:
-            parser.error(f"unknown pass(es): {', '.join(sorted(unknown))}")
         selected = [p for p in PASSES if p.name in args.passes]
+    elif args.also:
+        selected = [p for p in PASSES if p.default or p.name in args.also]
     elif args.all:
         selected = list(PASSES)
     else:
