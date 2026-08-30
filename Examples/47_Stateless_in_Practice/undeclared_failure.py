@@ -12,5 +12,5 @@ def caller() -> Success[float | ZeroDivisionError]:
 try:
     run(caller())
 except ZeroDivisionError as e:
-    print(type(e).__name__)
-#: ZeroDivisionError
+    print(e)
+#: division by zero

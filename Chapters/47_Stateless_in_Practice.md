@@ -1903,8 +1903,8 @@ def caller() -> Success[float | ZeroDivisionError]:
 try:
     run(caller())
 except ZeroDivisionError as e:
-    print(type(e).__name__)
-#: ZeroDivisionError
+    print(e)
+#: division by zero
 ```
 
 `@throws` lifts only the exception types it names, and `ratio()` names none,
@@ -1954,8 +1954,8 @@ half = supply(Console())(work)
 try:
     run(half())  # type: ignore
 except MissingAbilityError as e:
-    print(type(e).__name__)
-#: MissingAbilityError
+    print(e)
+#: Need(t=<class '__main__.Log'>)
 ```
 
 `half` is `() -> Depend[Need[Log], None]`.

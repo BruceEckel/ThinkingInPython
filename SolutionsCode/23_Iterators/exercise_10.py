@@ -36,8 +36,8 @@ items: list[object] = [1, "two", 3, None, 4]
 try:
     print(list(typed(items, int)))
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: expected <class 'int'>, got str
 print(list(typed_skipping(items, int)))
 #: [1, 3, 4]
 print(list(SkippingIterator(iter(items), int)))

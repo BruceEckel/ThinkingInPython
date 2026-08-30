@@ -12,5 +12,5 @@ describe("Bob", role="editor", years=12)
 try:
     describe(name="Bob")  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: describe() missing 1 required positional argument: 'name'

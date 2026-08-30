@@ -17,5 +17,5 @@ half = supply(Console())(work)
 try:
     run(half())  # type: ignore
 except MissingAbilityError as e:
-    print(type(e).__name__)
-#: MissingAbilityError
+    print(e)
+#: Need(t=<class '__main__.Log'>)

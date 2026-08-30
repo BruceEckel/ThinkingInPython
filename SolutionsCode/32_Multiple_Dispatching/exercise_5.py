@@ -25,5 +25,5 @@ print(10 - Meters(3))
 try:
     "ten" - Meters(3)
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unsupported operand type(s) for -: 'str' and 'Meters'

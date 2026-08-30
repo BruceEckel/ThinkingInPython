@@ -26,10 +26,10 @@ print(config["level"])
 try:
     primes.add(11)  # type: ignore
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(e)
+#: 'frozenset' object has no attribute 'add'
 try:
     config["level"] = 9  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'mappingproxy' object does not support item assignment

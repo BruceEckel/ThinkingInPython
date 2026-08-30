@@ -7,10 +7,10 @@ print(nested)
 try:
     hash(nested)  # So the tuple cannot be hashed
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unhashable type: 'list'
 try:
     nested[0] = 9  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'tuple' object does not support item assignment

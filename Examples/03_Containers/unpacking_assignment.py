@@ -13,5 +13,5 @@ values = [1, 2, 3]
 try:
     x, y = values  # Without a star the counts must match
 except ValueError as e:
-    print(type(e).__name__)
-#: ValueError
+    print(e)
+#: too many values to unpack (expected 2, got 3)

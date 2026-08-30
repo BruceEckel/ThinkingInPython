@@ -224,8 +224,8 @@ values = [1, 2, 3]
 try:
     x, y = values  # Without a star the counts must match
 except ValueError as e:
-    print(type(e).__name__)
-#: ValueError
+    print(e)
+#: too many values to unpack (expected 2, got 3)
 ```
 
 At most one target can carry the star, and it always produces a `list`,
@@ -690,13 +690,13 @@ print(config["level"])
 try:
     primes.add(11)  # type: ignore
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(e)
+#: 'frozenset' object has no attribute 'add'
 try:
     config["level"] = 9  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'mappingproxy' object does not support item assignment
 ```
 
 Each `# type: ignore` sits on a line that deliberately misbehaves.
@@ -722,8 +722,8 @@ print(cache[frozendict(zoom=125, theme="dark")])
 try:
     prefs["zoom"] = 150  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'frozendict' object does not support item assignment
 ```
 
 Because a `frozendict` cannot change, it is hashable when its values are,
@@ -757,13 +757,13 @@ print(nested)
 try:
     hash(nested)  # So the tuple cannot be hashed
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unhashable type: 'list'
 try:
     nested[0] = 9  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'tuple' object does not support item assignment
 ```
 
 The `tuple` refuses to let go of the `list`,

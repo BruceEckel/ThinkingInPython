@@ -32,6 +32,6 @@ print(4 + Meters(3))
 try:
     Meters(3) + "four"  # Both sides decline
 except TypeError as e:
-    print(type(e).__name__)
+    print(e)
 #: __add__(Meters(n=3), 'four')
-#: TypeError
+#: unsupported operand type(s) for +: 'Meters' and 'str'

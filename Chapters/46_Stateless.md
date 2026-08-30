@@ -1455,8 +1455,8 @@ from stateless import run, supply
 try:
     run(supply(Console())(announce)("Carol"))
 except KeyError as e:
-    print(type(e).__name__)
-#: KeyError
+    print(type(e).__name__, e)
+#: KeyError 'Carol'
 ```
 
 The error channel records those failures that can occur,

@@ -14,8 +14,8 @@ print(red.r, red[0])
 try:
     red.r = 9  # type: ignore
 except AttributeError as e:
-    print(type(e).__name__)
-#: AttributeError
+    print(e)
+#: can't set attribute
 print(red._replace(g=128))
 #: Color(r=255, g=128, b=0)
 print(red._asdict(), Color._fields)

@@ -12,5 +12,5 @@ print(cache[frozendict(zoom=125, theme="dark")])
 try:
     prefs["zoom"] = 150  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'frozendict' object does not support item assignment

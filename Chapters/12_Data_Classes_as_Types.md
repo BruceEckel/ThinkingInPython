@@ -994,8 +994,8 @@ print(type(Unchecked().data).__name__)
 try:
     Unchecked().data["theme"] = "dark"
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: 'set' object does not support item assignment
 print(Checked().data)
 #: {}
 ```

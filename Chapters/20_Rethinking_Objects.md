@@ -114,8 +114,8 @@ print(fill(Stack(), 5))
 try:
     fill(BoundedStack(), 5)
 except OverflowError as e:
-    print(type(e).__name__)
-#: OverflowError
+    print(e)
+#: Stack is full
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type,
@@ -319,14 +319,14 @@ print(fl.numbers)
 try:
     fl.numbers = []  # type: ignore
 except FrozenInstanceError as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+    print(e)
+#: cannot assign to field 'numbers'
 try:
     # A list field makes the whole instance unhashable
     hash(fl)
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unhashable type: 'list'
 ```
 
 Frozen guards the binding, not the object.

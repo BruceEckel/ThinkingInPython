@@ -12,11 +12,11 @@ print(fl.numbers)
 try:
     fl.numbers = []  # type: ignore
 except FrozenInstanceError as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+    print(e)
+#: cannot assign to field 'numbers'
 try:
     # A list field makes the whole instance unhashable
     hash(fl)
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unhashable type: 'list'

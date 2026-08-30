@@ -67,9 +67,7 @@ print(divide(10, 2, label="half"))
 try:
     divide(10, 2, "half")  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
     print(e)
-#: TypeError
 #: divide() takes 2 positional arguments but 3 were given
 ```
 
@@ -157,8 +155,8 @@ describe("Bob", role="editor", years=12)
 try:
     describe(name="Bob")  # type: ignore
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: describe() missing 1 required positional argument: 'name'
 ```
 
 The `/` caused it. `name` is positional-only, so `name="Bob"` cannot

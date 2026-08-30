@@ -76,14 +76,14 @@ print(data)
 try:
     data.numbers = [3]  # type: ignore
 except Exception as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+    print(e)
+#: cannot assign to field 'numbers'
 try:
     # The list field makes the instance unhashable
     hash(data)
 except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+    print(e)
+#: unhashable type: 'list'
 ```
 
 `ty` reports nothing. `frozen=True` blocks rebinding a field, which is

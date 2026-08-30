@@ -29,5 +29,5 @@ print(fill(Stack(), 5))
 try:
     fill(BoundedStack(), 5)
 except OverflowError as e:
-    print(type(e).__name__)
-#: OverflowError
+    print(e)
+#: Stack is full
