@@ -110,8 +110,8 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 22_Data_Transfer_Objects.md     | |
 | 23_Iterators.md                 | |
 | 24_Singleton.md                 | |
-| 25_Template_Method.md           |O|
-| 26_Surrogate.md                 | |
+| 25_Template_Method.md           |X|
+| 26_Surrogate.md                 |O|
 | 27_Factory.md                   | |
 | 28_Function_Objects.md          | |
 | 29_Changing_the_Interface.md    | |

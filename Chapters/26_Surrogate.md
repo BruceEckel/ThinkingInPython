@@ -1,7 +1,7 @@
 # Surrogate
 
 Both *Proxy* and *State* provide a surrogate class that you use in your code.
-This surrogate class hides the real class that does the work.
+The surrogate hides the real class that does the work.
 When you call a method in the surrogate,
 it calls that method in the implementing class.
 The two patterns are so similar that *Proxy* is a special case of *State*.
