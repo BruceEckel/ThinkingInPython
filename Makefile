@@ -487,9 +487,10 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 	$(PY) tools/reflow_prose.py $(CH)
 
 # AI editing passes over one chapter's prose, in place. Each pass is a
-# headless `claude -p "/<skill> <chapter>"` run (elements-of-style by
-# default; the pass list is PASSES in tools/rewrite.py, ARGS=--list shows
-# it, ARGS="--passes activate" or ARGS=--all picks others). Reflow and the
+# headless `claude -p "/<skill> <chapter>"` run (elements-of-style and
+# bruce-edit-apply by default; the pass list is PASSES in tools/rewrite.py,
+# ARGS=--list shows it, ARGS="--passes activate" or ARGS=--all picks
+# others). Reflow and the
 # prose gates run after every pass. It costs tokens and is nondeterministic,
 # so it is never part of verify/gate/ci and refuses to run under CI; review
 # `git diff` before committing.

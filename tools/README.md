@@ -662,10 +662,10 @@ touched a listing or broke a link fails right there. The chain stops at the
 first failure.
 
 ```
-make rewrite CH=25                        # default passes (elements-of-style)
+make rewrite CH=25                        # default passes (elements-of-style, bruce-edit-apply)
 make rewrite CH=25 ARGS=--list            # show the passes, run nothing
 make rewrite CH=25 ARGS=--dry-run         # print the commands only
-make rewrite CH=25 ARGS="--passes activate bruce-edit-apply"
+make rewrite CH=25 ARGS="--passes activate"
 make rewrite CH=25 ARGS=--all             # every pass, opt-in ones included
 ```
 

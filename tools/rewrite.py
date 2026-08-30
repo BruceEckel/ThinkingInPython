@@ -76,6 +76,7 @@ PASSES: tuple[Pass, ...] = (
         "bruce-edit-apply",
         "bruce-edit-apply",
         "apply the promoted rules in bruce_edit_db.md",
+        default=True,
     ),
 )
 
