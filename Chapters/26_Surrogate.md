@@ -110,7 +110,8 @@ except TypeError as e:
 
 `Proxy` accepts any `Service`, and `Complete` implements both methods,
 so the proxy can forward either call.
-Because `Partial` omits `g()`, constructing it raises a `TypeError` before any calls are made.
+Because `Partial` omits `g()`,
+constructing it raises a `TypeError` before any calls are made.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 is the structural alternative.
@@ -183,8 +184,10 @@ because `Proxy` names no method of `Implementation`,
 it keeps working when the implementation grows a method.
 `Implementation` here has an `h()` that `proxy_1.py`'s lacked,
 and `p.h()` forwards with no new line in `Proxy`.
-The proxy still depends on one implementation class, which it constructs.
-Accepting an implementation as a constructor argument removes that tie too.
+The proxy still constructs its own `Implementation`,
+so it depends on that one class.
+Passing the implementation in, as `proxy_interface.py` does,
+removes that dependency as well.
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
 to `_Proxy__implementation`,
