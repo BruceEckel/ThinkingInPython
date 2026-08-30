@@ -517,8 +517,9 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 # ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
 # commands without running them.
 #
-# Several chapters run in parallel: CH="25 28 30" runs one pass chain
-# per chapter, four at a time (ARGS=-j2 changes that). Each chain edits
+# Several chapters run in parallel: CH="25 28 30" or CH=30-40 (a range,
+# inclusive; CH="25 30-32" mixes them) runs one pass chain per chapter,
+# four at a time (ARGS=-j2 changes that). Each chain edits
 # only its own chapter and checks only its own chapter, so they never
 # trip each other, and their output arrives per step under a [NN]
 # prefix. ARGS=--serial runs them one after another with output

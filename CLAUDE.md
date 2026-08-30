@@ -49,8 +49,9 @@ the mechanism they stand for, paragraphs get old-before-new order and
 one topic string, and every ambiguous "this"/"it"/"which" gets its noun.
 `make rewrite CH=NN` runs these three plus `elements-of-style` and
 `bruce-edit-apply` by default; `make rewrite ARGS=--list` shows the set.
-`CH="25 28"` runs several chapters in parallel (each chain edits and
-checks only its own chapter); `ARGS=--serial` runs them one at a time.
+`CH="25 28"` or `CH=30-40` runs several chapters in parallel (each chain
+edits and checks only its own chapter); `ARGS=--serial` runs them one at
+a time.
 
 ## Learning from Bruce's own edits
 

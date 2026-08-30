@@ -45,6 +45,7 @@ review the diff before committing.
 Usage:
     python tools/rewrite.py 25                # default passes on chapter 25
     python tools/rewrite.py 25 28 30          # three chapters, in parallel
+    python tools/rewrite.py 30-40             # a range, inclusive
     python tools/rewrite.py 25 28 --serial    # the same, one at a time
     python tools/rewrite.py --list            # show the passes, run nothing
     python tools/rewrite.py 25 --dry-run      # print the commands only
@@ -56,6 +57,7 @@ Usage:
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -273,11 +275,32 @@ def rewrite_chapter(
     return True
 
 
-def resolve_chapters(specs: list[str]) -> list[Path]:
-    """Each spec (number, stem prefix, name part, path, or a
-    comma-separated run of them) must match exactly one chapter."""
-    chapters: list[Path] = []
+_RANGE = re.compile(r"^(\d+)-(\d+)$")
+
+
+def expand_specs(specs: list[str]) -> list[str]:
+    """Split comma-separated specs and expand numeric ranges: `30-32`
+    becomes `30`, `31`, `32`, zero-padded to two digits so `5-7`
+    resolves `05`..`07` by prefix rather than by substring."""
+    out: list[str] = []
     for spec in (s for arg in specs for s in arg.split(",") if s):
+        m = _RANGE.match(spec)
+        if not m:
+            out.append(spec)
+            continue
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if lo > hi:
+            raise SystemExit(f"rewrite: range {spec!r} runs backwards")
+        out.extend(f"{n:02d}" for n in range(lo, hi + 1))
+    return out
+
+
+def resolve_chapters(specs: list[str]) -> list[Path]:
+    """Each spec (number, stem prefix, name part, path, a numeric range
+    like `30-40`, or a comma-separated run of them) must match exactly
+    one chapter; a range must match one chapter per number."""
+    chapters: list[Path] = []
+    for spec in expand_specs(specs):
         matched = _resolve(spec)
         if len(matched) != 1:
             found = ", ".join(p.name for p in matched) or "nothing"
