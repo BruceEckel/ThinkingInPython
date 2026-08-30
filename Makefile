@@ -517,12 +517,19 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 # ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
 # commands without running them.
 #
+# Several chapters run in parallel: CH="25 28 30" runs one pass chain
+# per chapter, four at a time (ARGS=-j2 changes that). Each chain edits
+# only its own chapter and checks only its own chapter, so they never
+# trip each other, and their output arrives per step under a [NN]
+# prefix. ARGS=--serial runs them one after another with output
+# streamed live, the mode for watching a pass work.
+#
 # MODEL picks the model every pass runs on. The default is Opus: the
 # passes edit an author's voice, and a pass that cuts too much costs
 # more than the token difference on one chapter. MODEL=claude-sonnet-5
 # is the cheap lap. Each pass header prints the model it used.
 MODEL ?= claude-opus-5
-rewrite:  ## AI editing passes over one chapter's prose (CH=25; MODEL=; ARGS=--list)
+rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--list)
 	$(PY) tools/rewrite.py $(CH) --model $(MODEL) $(ARGS)
 
 # Spell-check the book and lint it for small mechanical slips. codespell

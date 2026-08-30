@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the AI editing passes over one chapter's prose (`make rewrite CH=25`).
+"""Run the AI editing passes over chapters' prose (`make rewrite CH=25`).
 
 Each pass is one headless `claude -p "/<skill> <chapter>"` run: a skill
 from this repo (`.claude/skills/`) or an installed plugin, applied to the
@@ -8,12 +8,24 @@ no terminal and no confirmation. `--model` picks the model for every
 pass (`make rewrite MODEL=claude-sonnet-5`); the default is
 `DEFAULT_MODEL` below, Opus, because the passes' failure mode is
 over-editing and restraint is what the stronger model buys. Each pass
-header prints the model so a diff can be traced to it. After every pass the chapter is reflowed
-(`reflow_prose.py --write`) and the cheap prose gates run
-(`banned_phrases.py`, `heading_links.py`, the `extract_examples.py`
-drift check), so a pass that touched a listing, broke a link, or added a
-banned phrase fails right there, not at the next `make verify`. The
-chain stops at the first failure.
+header prints the model so a diff can be traced to it. After every pass
+the chapter is reflowed (`reflow_prose.py --write`) and the cheap prose
+gates run (`banned_phrases.py` and `heading_links.py` on that chapter,
+then the book-wide `extract_examples.py` drift check), so a pass that
+touched a listing, broke a link, or added a banned phrase fails right
+there, not at the next `make verify`. A chapter's chain stops at its
+first failure.
+
+Several chapters run in parallel by default (`CH="25 28 30"`), one
+pass chain per chapter, up to `--jobs` at once. Each chain writes only
+its own chapter, and its banned-phrase and link checks read only that
+chapter, so chains never fail each other; the drift check is book-wide
+because a changed listing anywhere is a problem whichever chain caused
+it, and its message says so. In parallel mode each chain's output is
+captured and printed per step under a `[NN]` prefix instead of
+interleaving. `--serial` runs the chapters one after another with
+output streamed as it happens, the mode to use when watching a pass
+work.
 
 The passes live in `PASSES` below, in the order they run. Adding a tool
 is appending an entry. A pass with `default=True` runs on a bare `make
@@ -32,11 +44,13 @@ review the diff before committing.
 
 Usage:
     python tools/rewrite.py 25                # default passes on chapter 25
-    python tools/rewrite.py 25 --list         # show the passes, run nothing
+    python tools/rewrite.py 25 28 30          # three chapters, in parallel
+    python tools/rewrite.py 25 28 --serial    # the same, one at a time
+    python tools/rewrite.py --list            # show the passes, run nothing
     python tools/rewrite.py 25 --dry-run      # print the commands only
     python tools/rewrite.py 25 --also activate    # defaults + activate
-    python tools/rewrite.py 25 --model claude-sonnet-5
     python tools/rewrite.py 25 --passes activate  # activate only
+    python tools/rewrite.py 25 --model claude-sonnet-5
     python tools/rewrite.py Chapters/25_Template_Method.md --all
 """
 
@@ -45,6 +59,7 @@ import os
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,6 +129,10 @@ PASSES: tuple[Pass, ...] = (
 # much is higher than the token difference on one chapter.
 DEFAULT_MODEL = "claude-opus-5"
 
+# How many chapters run at once in parallel mode. Each is a live
+# `claude` session, so this caps tokens in flight, not CPU.
+DEFAULT_JOBS = 4
+
 # What the headless run may do. Read/Grep/Glob to read the skill's own
 # reference files and the chapter; Edit/Write for the chapter; `uv run`
 # so a skill that verifies its work with a repo tool can. No git, so a
@@ -128,13 +147,20 @@ SCOPE_NOTE = (
     "done, stop."
 )
 
-# (label, argv) pairs run after every pass, in order; the first nonzero
-# exit stops the chain. reflow first, so the gates see settled lines.
-CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
-    ("reflow", ("tools/reflow_prose.py", "--write")),  # + chapter
-    ("banned phrases", ("tools/banned_phrases.py",)),
-    ("heading links", ("tools/heading_links.py",)),
-    ("examples in sync", ("tools/extract_examples.py",)),
+# (label, argv, scoped) triples run after every pass, in order; the
+# first nonzero exit stops that chapter's chain. reflow first, so the
+# gates see settled lines. A scoped check gets the chapter path
+# appended, so parallel chains never read each other's chapter.
+CHECKS: tuple[tuple[str, tuple[str, ...], bool], ...] = (
+    ("reflow", ("tools/reflow_prose.py", "--write"), True),
+    ("banned phrases", ("tools/banned_phrases.py",), True),
+    ("heading links", ("tools/heading_links.py",), True),
+    ("examples in sync", ("tools/extract_examples.py",), False),
+)
+
+DRIFT_NOTE = (
+    "a fenced listing somewhere in Chapters/ no longer matches Examples/; "
+    "if another rewrite is running, its chapter may be the one that changed"
 )
 
 
@@ -157,10 +183,37 @@ def claude_argv(
     ]
 
 
-def run(argv: list[str], label: str) -> int:
-    """Run argv with output streaming to the terminal; return its exit code."""
-    print(f"--- {label}", flush=True)
-    return subprocess.run(argv, cwd=ROOT).returncode
+def chapter_tag(chapter: Path) -> str:
+    """`[25]` from `Chapters/25_Template_Method.md`, for parallel output."""
+    return f"[{chapter.stem.split('_', 1)[0]}]"
+
+
+class Reporter:
+    """Where one chapter's chain sends its output.
+
+    Serial mode streams each subprocess to the terminal as it runs.
+    Parallel mode captures each step and prints it whole under the
+    chapter's tag, so two chains' lines never interleave.
+    """
+
+    def __init__(self, chapter: Path, capture: bool) -> None:
+        self.tag = chapter_tag(chapter)
+        self.capture = capture
+
+    def say(self, text: str) -> None:
+        prefix = f"{self.tag} " if self.capture else ""
+        print(prefix + text, flush=True)
+
+    def run(self, argv: list[str], label: str) -> int:
+        """Run argv; return its exit code. Output goes to the terminal
+        directly, or is captured and printed under the tag."""
+        self.say(f"--- {label}")
+        if not self.capture:
+            return subprocess.run(argv, cwd=ROOT).returncode
+        done = subprocess.run(argv, cwd=ROOT, capture_output=True, text=True)
+        for line in (done.stdout + done.stderr).splitlines():
+            self.say(line)
+        return done.returncode
 
 
 def changed_lines(chapter: Path) -> str:
@@ -174,24 +227,75 @@ def changed_lines(chapter: Path) -> str:
     return out.splitlines()[-1].strip() if out else ""
 
 
-def checks_after(chapter: Path, python: list[str]) -> bool:
+def checks_after(chapter: Path, python: list[str], out: Reporter) -> bool:
     """Reflow the chapter and run the prose gates; False on the first failure."""
-    for label, argv in CHECKS:
+    for label, argv, scoped in CHECKS:
         full = [*python, *argv]
-        if label == "reflow":
+        if scoped:
             full.append(chapter.as_posix())
-        if run(full, f"check: {label}") != 0:
-            print(f"FAILED: {label} (after the pass; the chapter is left as is)")
+        if out.run(full, f"check: {label}") != 0:
+            why = (DRIFT_NOTE if label == "examples in sync"
+                   else "after the pass; the chapter is left as is")
+            out.say(f"FAILED: {label} ({why})")
             return False
     return True
+
+
+def rewrite_chapter(
+    chapter: Path,
+    selected: list[Pass],
+    claude: str,
+    python: list[str],
+    model: str,
+    dry_run: bool,
+    capture: bool,
+) -> bool:
+    """Run every selected pass over one chapter; False if any step failed."""
+    out = Reporter(chapter, capture)
+    if not dry_run and changed_lines(chapter):
+        out.say(f"note: {chapter.as_posix()} already has uncommitted "
+                "changes; the per-pass diff below includes them")
+    for p in selected:
+        argv = claude_argv(claude, p.skill, chapter, model)
+        if dry_run:
+            out.say(subprocess.list2cmdline(argv))
+            continue
+        code = out.run(argv, f"pass: {p.name} on {model} ({p.what})")
+        if code != 0:
+            out.say(f"FAILED: pass {p.name} exited {code}; stopping")
+            return False
+        if not checks_after(chapter, python, out):
+            return False
+        out.say(f"after {p.name}: {changed_lines(chapter) or 'no change'}")
+    if not dry_run:
+        out.say(f"done: {len(selected)} pass(es) on {model} over "
+                f"{chapter.as_posix()}; review `git diff` before committing")
+    return True
+
+
+def resolve_chapters(specs: list[str]) -> list[Path]:
+    """Each spec (number, stem prefix, name part, path, or a
+    comma-separated run of them) must match exactly one chapter."""
+    chapters: list[Path] = []
+    for spec in (s for arg in specs for s in arg.split(",") if s):
+        matched = _resolve(spec)
+        if len(matched) != 1:
+            found = ", ".join(p.name for p in matched) or "nothing"
+            raise SystemExit(
+                f"rewrite: {spec!r} must match one chapter, matched {found}")
+        chapter = matched[0].resolve().relative_to(ROOT)
+        if chapter not in chapters:
+            chapters.append(chapter)
+    return chapters
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(__doc__ or "").split("\n\n")[0]
     )
-    parser.add_argument("chapter", nargs="?",
-                        help="chapter number, stem prefix, name part, or path")
+    parser.add_argument("chapters", nargs="*", metavar="CHAPTER",
+                        help="chapter number, stem prefix, name part, or "
+                             "path; several run in parallel")
     which = parser.add_mutually_exclusive_group()
     which.add_argument("--also", nargs="+", metavar="NAME",
                        help="the default passes plus these opt-in ones")
@@ -203,6 +307,12 @@ def main() -> int:
                         help="list the passes and exit")
     parser.add_argument("--model", default=DEFAULT_MODEL, metavar="ID",
                         help=f"model for every pass (default: {DEFAULT_MODEL})")
+    parser.add_argument("--serial", action="store_true",
+                        help="run the chapters one at a time, output streamed")
+    parser.add_argument("-j", "--jobs", type=int, default=DEFAULT_JOBS,
+                        metavar="N",
+                        help=f"chapters at once in parallel mode "
+                             f"(default: {DEFAULT_JOBS})")
     parser.add_argument("--dry-run", action="store_true",
                         help="print each command instead of running it")
     args = parser.parse_args()
@@ -218,15 +328,10 @@ def main() -> int:
     if os.environ.get("CI"):
         print("rewrite: refusing to run under CI (costs tokens, not a gate)")
         return 2
-    if not args.chapter:
-        parser.error("a chapter is required (CH=25), or --list")
-
-    matched = _resolve(args.chapter)
-    if len(matched) != 1:
-        found = ", ".join(p.name for p in matched) or "nothing"
-        print(f"rewrite: {args.chapter!r} must match one chapter, matched {found}")
-        return 2
-    chapter = matched[0].resolve().relative_to(ROOT)
+    if not args.chapters:
+        parser.error('a chapter is required (CH=25, or CH="25 28" for '
+                     'several), or --list')
+    chapters = resolve_chapters(args.chapters)
 
     named = args.passes or args.also or []
     unknown = set(named) - {p.name for p in PASSES}
@@ -246,27 +351,25 @@ def main() -> int:
         print("rewrite: no `claude` on PATH (Claude Code CLI); nothing run")
         return 2
     python = [sys.executable]
+    parallel = len(chapters) > 1 and not args.serial
 
-    if changed_lines(chapter):
-        print(f"note: {chapter} already has uncommitted changes; "
-              "the per-pass diff below includes them")
+    def one(chapter: Path) -> bool:
+        return rewrite_chapter(chapter, selected, claude or "claude",
+                               python, args.model, args.dry_run, parallel)
 
-    for p in selected:
-        argv = claude_argv(claude or "claude", p.skill, chapter, args.model)
-        if args.dry_run:
-            print(subprocess.list2cmdline(argv))
-            continue
-        code = run(argv, f"pass: {p.name} on {args.model} ({p.what})")
-        if code != 0:
-            print(f"FAILED: pass {p.name} exited {code}; stopping")
-            return 1
-        if not checks_after(chapter, python):
-            return 1
-        print(f"after {p.name}: {changed_lines(chapter) or 'no change'}")
+    if parallel:
+        jobs = max(1, min(args.jobs, len(chapters)))
+        print(f"rewrite: {len(chapters)} chapters, {jobs} at a time "
+              "(--serial for one after another)")
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            results = list(pool.map(one, chapters))
+    else:
+        results = [one(c) for c in chapters]
 
-    if not args.dry_run:
-        print(f"done: {len(selected)} pass(es) on {args.model} over "
-              f"{chapter.as_posix()}; review `git diff` before committing")
+    failed = [c.as_posix() for c, ok in zip(chapters, results) if not ok]
+    if failed:
+        print(f"rewrite: failed: {', '.join(failed)}")
+        return 1
     return 0
 
 
