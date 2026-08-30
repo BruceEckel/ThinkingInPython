@@ -200,14 +200,15 @@ Writing a `__getattribute__()` means routing every internal access through `obje
 machinery a surrogate rarely needs.
 
 The abstract base class and the `Protocol` above still guard the implementation side:
-the type checker verifies that whatever you hand the proxy has the methods.
+the type checker verifies that whatever you hand the proxy has the necessary methods.
 Calls on the proxy get no such check.
 Because `p.f()` goes through `__getattr__()`, whose return type is unknown,
 the checker cannot verify that call.
 With explicit forwarding, as in `proxy_1.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies it.
-`__getattr__()` trades that for reach.
+`__getattr__()` gives up that check to forward every method,
+including ones added later.
 
 One limit: special methods bypass `__getattr__()`.
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
