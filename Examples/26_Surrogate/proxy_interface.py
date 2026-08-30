@@ -30,7 +30,7 @@ p.f()
 p.g()
 #: Complete.g()
 try:
-    Partial()
+    Proxy(Partial())
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError

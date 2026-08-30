@@ -8,9 +8,9 @@ The two patterns are so similar that *Proxy* is a special case of *State*.
 
 From a base class, you derive the surrogate along with the class or classes that provide the implementation:
 
-![A surrogate and the implementation deriving from a common base class](_images/surrogate)
+![A surrogate and the implementation derived from a common base class](_images/surrogate)
 
-That is the shape *GoF Design Patterns* draws.
+That is the shape in *GoF Design Patterns*.
 You'll see that Python does not need the shared base,
 but it is the clearest way to see what a surrogate is.
 
@@ -57,11 +57,11 @@ p.g()
 `Implementation` need not have the same interface as `Proxy`.
 As long as `Proxy` "speaks for" the class it forwards method calls to,
 it qualifies.
-That is a looser definition than *GoF Design Patterns* uses.
-Under GoF's stricter definition the interface separates *Proxy* from *Adapter*.
-Under the looser one here, the intent does.
+That is a looser definition than in *GoF Design Patterns*.
+Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
+The looser definition relies only on the intent.
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
-sorts out both readings.
+clarifies both readings.
 
 A common interface helps, though:
 it forces `Implementation` to supply every method that `Proxy` needs to call.
@@ -102,7 +102,7 @@ p.f()
 p.g()
 #: Complete.g()
 try:
-    Partial()
+    Proxy(Partial())
 except TypeError as e:
     print(type(e).__name__)
 #: TypeError
@@ -110,9 +110,7 @@ except TypeError as e:
 
 `Proxy` accepts any `Service`, and `Complete` implements both methods,
 so the proxy can forward either call.
-Because `Partial` omits `g()`, constructing it raises a `TypeError` at once,
-instead of failing later,
-when the `Proxy` delegates a call the implementation cannot answer.
+Because `Partial` omits `g()`, constructing it raises a `TypeError` before any calls are made.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
 is the structural alternative.
