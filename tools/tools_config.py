@@ -38,6 +38,10 @@ BUILD_PDF_DIR = BUILD_DIR / "pdf"
 
 NORUN_FILE = DATA_DIR / "norun.txt"
 
+# Listings whose #: markers are timing-threshold claims; validate_output
+# retries these toward the committed marker instead of rewriting it
+TIMING_FILE = DATA_DIR / "timing.txt"
+
 # A line marking a listing as unrunnable (GUI, interactive input, infinite
 # loop): skip it rather than execute it unattended.
 INLINE_NORUN_MARKER = "# extract: no-run"

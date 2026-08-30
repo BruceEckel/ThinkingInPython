@@ -23,6 +23,17 @@ from its extracted chapter directory (build/examples/<chapter>/), so imports of
 sibling files and relative data paths resolve the way the book assumes. Run
 `tools/extract_examples.py --write` first so that tree exists.
 
+Markers in the listings named by tools/data/timing.txt are treated as
+claims rather than observations: those listings print booleans derived
+from wall-clock thresholds, so a single run that disagrees with the
+committed marker is evidence of a transient (a scheduler burst, another
+process on the machine), not of the book being wrong. A claim marker is
+never auto-rewritten, even under --update. On a mismatch the block is
+rerun, up to CLAIM_ATTEMPTS times in all, and passes as soon as one run
+matches the committed text; only a marker that misses every run is
+reported as a failure, and then the fix is a human decision: repair the
+listing, or change the marker by hand.
+
 Files are processed in parallel, one fresh interpreter per file. That is
 not only for speed: running every chapter in one shared process is what
 let an orphaned asyncio task wedge a later chapter's asyncio.run(), and
@@ -53,12 +64,25 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_config import INLINE_NORUN_MARKER, NORUN_FILE
+from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
 from tools_pycode import walk_fenced
 from tools_repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
 
 # Matches #: or #: <content> at column 0 only.
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')
+
+# Total runs a claim-marker listing (tools/data/timing.txt) gets before
+# a mismatch counts as real. Three: a transient misses once, a genuine
+# change misses every time, and each run already takes a min over
+# repeats internally.
+CLAIM_ATTEMPTS = 3
+
+
+def is_claim(rel: str | None, claims: list[str]) -> bool:
+    """Whether `rel` (chapter/slug) names a claim-marker listing."""
+    return bool(rel) and any(
+        fnmatch.fnmatch(rel, pat) for pat in claims
+    )
 
 
 def is_marker(line: str) -> bool:
@@ -228,7 +252,9 @@ def process_block(
     return new_lines, ok, changed
 
 
-def process_file(path: Path, *, update: bool) -> bool | None:
+def process_file(
+    path: Path, *, update: bool, claims: list[str] | None = None,
+) -> bool | None:
     """Check or update one .py file.
 
     Returns None  - no #: markers found (file skipped)
@@ -241,16 +267,29 @@ def process_file(path: Path, *, update: bool) -> bool | None:
     if not any(is_marker(line) for line in lines):
         return None
 
-    namespace: dict = {'__name__': '__main__', '__file__': str(path)}
-    new_lines, ok, changed = process_block(
-        lines, str(path), update=update, namespace=namespace
-    )
-    del namespace
-    collect_now()
+    rel = '/'.join(path.parts[-2:])
+    attempts = CLAIM_ATTEMPTS if is_claim(rel, claims or []) else 1
+    for attempt in range(1, attempts + 1):
+        namespace: dict = {'__name__': '__main__', '__file__': str(path)}
+        new_lines, ok, changed = process_block(
+            lines, str(path),
+            update=update and attempts == 1,
+            namespace=namespace,
+        )
+        del namespace
+        collect_now()
+        if ok or attempt == attempts:
+            break
+        print(f"  claim marker mismatch; rerunning "
+              f"({attempt + 1}/{attempts})")
+    if attempts > 1 and not ok:
+        print(f"  claim marker missed all {attempts} runs; not "
+              "rewritten (see tools/data/timing.txt)")
 
     # changed can be True here with update=False only via the placeholder
-    # fill-in above, which should persist regardless of --update.
-    if changed:
+    # fill-in above, which should persist regardless of --update. A claim
+    # file keeps its committed markers unless a run matched them.
+    if changed and (attempts == 1 or ok):
         write_text_lf(path, ''.join(new_lines))
 
     return ok
@@ -291,6 +330,7 @@ def process_markdown(
     update: bool,
     tree: Path = DEFAULT_TREE,
     skips: list[str] | None = None,
+    claims: list[str] | None = None,
 ) -> bool | None:
     """Check or update the #: markers in a Markdown file's python listings.
 
@@ -299,6 +339,7 @@ def process_markdown(
             False - a mismatch or execution error in some block
     """
     skips = skips or []
+    claims = claims or []
     chapter = path.stem
     lines = path.read_text(encoding='utf-8').splitlines(keepends=True)
 
@@ -323,7 +364,7 @@ def process_markdown(
         if any(is_marker(line) for line in block):
             result = process_md_block(
                 block, path, chapter, block_start,
-                tree=tree, skips=skips, update=update,
+                tree=tree, skips=skips, claims=claims, update=update,
             )
             any_markers = True
             ok = ok and result.ok
@@ -361,6 +402,7 @@ def process_md_block(
     tree: Path,
     skips: list[str],
     update: bool,
+    claims: list[str] | None = None,
 ) -> BlockResult:
     """Run one ```python block and check or rewrite its #: markers."""
     slug = block_slug(block)
@@ -382,24 +424,38 @@ def process_md_block(
         return BlockResult(block, ok=True, changed=False)
 
     rundir = filepath.parent if filepath else None
-    namespace: dict = {
-        '__name__': '__main__',
-        '__file__': str(filepath) if filepath else str(path),
-    }
     label = f'{path}:{rel}' if rel else str(path)
+    attempts = CLAIM_ATTEMPTS if is_claim(rel, claims or []) else 1
 
-    with run_location(rundir, tree / 'utils'):
-        new_lines, ok, changed = process_block(
-            block, label, update=update,
-            namespace=namespace, line_offset=block_start,
-        )
-    del namespace
-    collect_now()
+    for attempt in range(1, attempts + 1):
+        namespace: dict = {
+            '__name__': '__main__',
+            '__file__': str(filepath) if filepath else str(path),
+        }
+        with run_location(rundir, tree / 'utils'):
+            new_lines, ok, changed = process_block(
+                block, label,
+                update=update and attempts == 1,
+                namespace=namespace, line_offset=block_start,
+            )
+        del namespace
+        collect_now()
+        if ok or attempt == attempts:
+            break
+        print(f"  {label}: claim marker mismatch; rerunning "
+              f"({attempt + 1}/{attempts})")
+
+    if attempts > 1 and not ok:
+        print(f"  {label}: claim marker missed all {attempts} runs; "
+              "not rewritten (see tools/data/timing.txt)")
+        # Keep the committed markers: a claim is never auto-rewritten.
+        return BlockResult(block, ok=False, changed=False)
     return BlockResult(new_lines, ok, changed)
 
 
 def process_one(
     path: Path, *, update: bool, tree: Path, skips: list[str],
+    claims: list[str] | None = None,
 ) -> tuple[bool | None, str]:
     """Process one file, returning its result and everything it printed.
 
@@ -416,10 +472,11 @@ def process_one(
     with contextlib.redirect_stdout(buf):
         if path.suffix == '.md':
             result = process_markdown(
-                path, update=update, tree=tree, skips=skips
+                path, update=update, tree=tree, skips=skips,
+                claims=claims,
             )
         else:
-            result = process_file(path, update=update)
+            result = process_file(path, update=update, claims=claims)
     return result, buf.getvalue()
 
 
@@ -475,8 +532,10 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     skips = load_glob_list(NORUN_FILE)
+    claims = load_glob_list(TIMING_FILE)
     work = functools.partial(
-        process_one, update=args.update, tree=args.tree, skips=skips
+        process_one, update=args.update, tree=args.tree, skips=skips,
+        claims=claims,
     )
 
     # One fresh process per file, not a pool of reused workers. Files are

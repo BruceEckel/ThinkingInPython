@@ -1,0 +1,30 @@
+# Listings whose #: markers are timing-threshold claims, not
+# observations. validate_output.py never auto-rewrites these: on a
+# mismatch it reruns the block up to three times and passes if any run
+# matches the committed marker, because a transient (scheduler burst,
+# parallel-runner contention) misses once, while a genuine change
+# misses every time. If one of these fails all three runs, the claim
+# itself is in question: fix the listing or change the marker by hand.
+#
+# List only wall-clock threshold booleans. Deterministic measures
+# (sys.getsizeof, tracemalloc byte counts) stay self-healing.
+# Patterns are <chapter>/<slug>, matched like norun.txt.
+
+03_Containers/membership_cost.py
+03_Containers/deque_timing.py
+18_Performance/membership.py
+18_Performance/builtin_sum.py
+18_Performance/search_comparison.py
+18_Performance/vectorize_numpy.py
+19_Concurrency/to_thread.py
+19_Concurrency/io_threads.py
+19_Concurrency/gil_threads.py
+19_Concurrency/subinterpreters.py
+46_Stateless/real_clock.py
+47_Stateless_in_Practice/parallel.py
+
+# Solutions (run against build/solutions/)
+03_Containers/exercise_1.py
+18_Performance/exercise_9.py
+19_Concurrency/exercise_2.py
+19_Concurrency/exercise_12.py

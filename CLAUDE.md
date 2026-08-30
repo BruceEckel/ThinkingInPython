@@ -134,13 +134,17 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   directly, e.g. `uv run ty check tools/whatever.py`.
 - **`#:` output markers must equal stdout exactly.** For nondeterministic output,
   round floats (`f"{x:.6f}"`) or print `type(e).__name__` instead of a message.
-  Since the gate now runs `validate_output.py --update`, a genuinely
-  nondeterministic listing no longer fails the gate: it silently rewrites the
-  marker to whatever this run happened to produce, and can thrash between
-  values across runs with nothing to flag it. Don't assume a marker mismatch
-  is repo drift; run the extracted script directly first
-  (`build/examples/<chapter>/<file>.py`) to check whether the value is
-  actually stable before accepting an auto-fix.
+  A wall-clock threshold boolean is the exception: register it in
+  `tools/data/timing.txt`, and `validate_output.py` treats its markers as
+  claims, never auto-rewritten. On a mismatch it reruns the block, up to
+  three runs in all, and passes as soon as one matches the committed
+  marker; only a marker that misses every run fails, loudly, and the fix
+  is then a human decision. Any *other* genuinely nondeterministic
+  listing still self-heals silently under `--update` and can thrash
+  between values, so don't assume a marker mismatch is repo drift: run
+  the extracted script directly (`build/examples/<chapter>/<file>.py`)
+  to check the value is stable, and if it's a timing boolean, add it to
+  `timing.txt` instead of accepting the auto-fix.
 - **A `#:` marker for output an `import` produced cannot hug that import.**
   Markers otherwise sit directly after the statement that produced them, but a
   marker placed after the last import sits *inside* the import block, and ruff's
@@ -175,12 +179,11 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `validate_output.py` runs, so it is a rare transient that a burst
   covering all three sequential repeats (about a second) can produce.
   Now the two variants are timed alternately, five rounds, `min` of
-  each, so a burst lands on both. The tell of a flip: `Examples/` shows
-  `False` while `Chapters/` still says `True`. `verify`'s first marker
-  refresh flipped the chapter, `sync` copied it, and the gate's second
-  refresh flipped the chapter back with no sync after, so the generated
-  copy is the only trace. Revert it (`git checkout -- Examples/...`);
-  never commit it. 2026-08-30: do not shrink the loop to make the
+  each, so a burst lands on both. 2026-08-30: the listing (and every
+  other wall-clock boolean) is registered in `tools/data/timing.txt`,
+  so the gate retries a mismatch toward the committed `True` instead of
+  rewriting it; a flip now surfaces as a loud validate failure after
+  three misses, never as a silent diff in the generated copy. 2026-08-30: do not shrink the loop to make the
   script faster. At 200,000 iterations each timed round is ~0.075 s,
   about five Windows scheduler quanta (~15 ms), so one lost quantum is
   a 20% error and the boolean flipped inside a quiet `make verify`;

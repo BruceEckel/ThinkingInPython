@@ -297,6 +297,52 @@ def test_multiple_segments_second_wrong(tmp_path: Path) -> None:
               'print("a")\n#: a\nprint("b")\n#: WRONG\n')
     assert process_file(p, update=False) is False
 
+def test_claim_marker_retries_toward_committed(tmp_path: Path) -> None:
+    # First run prints False (and plants the flag); the retry prints
+    # True, matching the committed marker, so the file passes untouched.
+    flag = tmp_path / "flag"
+    content = (
+        "from pathlib import Path\n"
+        f"flag = Path({str(flag)!r})\n"
+        "print(flag.exists())\n"
+        "flag.touch()\n"
+        "#: True\n"
+    )
+    p = write(tmp_path, "flaky.py", content)
+    assert process_file(p, update=True, claims=["*/flaky.py"]) is True
+    assert p.read_text(encoding="utf-8") == content
+
+
+def test_claim_marker_never_rewritten_when_every_run_misses(
+    tmp_path: Path,
+) -> None:
+    content = 'print("False")\n#: True\n'
+    p = write(tmp_path, "steady.py", content)
+    assert process_file(p, update=True, claims=["*/steady.py"]) is False
+    assert p.read_text(encoding="utf-8") == content
+
+
+def test_markdown_claim_block_retries_and_keeps_marker(
+    tmp_path: Path,
+) -> None:
+    flag = tmp_path / "mdflag"
+    src = (
+        "```python\n"
+        "# flaky.py\n"
+        "from pathlib import Path\n"
+        f"flag = Path({str(flag)!r})\n"
+        "print(flag.exists())\n"
+        "flag.touch()\n"
+        "#: True\n"
+        "```\n"
+    )
+    p = write(tmp_path, "ch.md", src)
+    assert process_markdown(
+        p, update=True, claims=["ch/flaky.py"]
+    ) is True
+    assert p.read_text(encoding="utf-8") == src
+
+
 def test_update_rewrites_wrong_marker(tmp_path: Path) -> None:
     p = write(tmp_path, "ex.py", 'print("hello")\n#: goodbye\n')
     assert process_file(p, update=True) is True
