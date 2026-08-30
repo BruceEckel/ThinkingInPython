@@ -2,21 +2,21 @@
 
 When you discover that you need to add new types to a system,
 the most sensible first step is to use polymorphism to create a common interface to those new types.
-This separates the rest of the code in your system from the knowledge of the specific types that you are adding.
+The common interface separates the rest of the code in your system from the knowledge of the specific types that you are adding.
 You may add new types without disturbing existing code ... or so it seems.
-At first it appears that the only place you need to change the code in such a design is the place where you inherit a new type,
-but that isn't the case.
-You must still create an object of your new type,
-and at the point of creation you must specify the exact constructor to use.
+At first, the only place you appear to change such a design is where you inherit a new type.
+But you must still create an object of your new type,
+and at the point of creation you must name the exact constructor.
 Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
-You must still chase down all the places in your code where type matters.
+You must still find and edit every place in your code where the type matters.
 Creating the type matters here, not using it (which polymorphism handles).
-The effect is the same: adding a new type can cause problems.
+The effect is the same:
+adding a new type means edits scattered through the code.
 
-Encapsulate object creation.
-You force every object to come from a common *factory* rather than spreading creational code throughout the system.
-If your program must go through this factory whenever it needs to create one of your objects,
+The solution is to encapsulate object creation:
+make a common *factory* create every object instead of spreading creational code through the system.
+If your program must call this factory whenever it needs to create one of your objects,
 then you change only the factory when you add a new object.
 
 Since every object-oriented program creates objects,
@@ -83,26 +83,28 @@ if __name__ == "__main__":
 ```
 
 The `factory()` takes an argument that selects the type of `Shape` to create.
-Here it is a string, but it could be any kind of data.
-The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`
-(the initialization data for the objects presumably comes from somewhere outside the system, rather than from random generation as in the above example).
+Here the argument is a string, but it could be any kind of data.
+The `factory()` is now the only other code in the system that needs to change when you add a new type of `Shape`.
 
 I have also used a *generator* (see [Iterators](23_Iterators.md#generators)).
 A factory takes information telling it what to build.
-A generator object holds an internal algorithm and produces the next value with no argument.
+A generator object does the opposite:
+it holds an internal algorithm and produces the next value with no argument.
 `shape_name_gen()` takes `n` and returns a generator object,
 and that object then produces names on demand.
-Those names are the data driving `Shape.factory()`.
+Those names are the arguments to `Shape.factory()`.
+In a real program the initialization data comes from outside the system,
+not from random generation as here.
 
 Inside `shape_name_gen()`,
 `Shape.__subclasses__()` produces a list of references to each direct subclass of `Shape`.
 It covers only the first level of inheritance,
-so a class inheriting from `Circle` does not show up in the list.
+so a class inheriting from `Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
 To discourage direct construction of the concrete shapes,
 give them module-level names with a leading underscore:
-a convention rather than concealment, which is as far as Python goes
+a convention rather than concealment, and the convention is all Python provides
 ([Singleton](24_Singleton.md#nothing-keeps-the-class-private) makes the same case).
 Nesting the classes inside `factory()` looks stronger and is worse.
 A `class` statement is executable code,
@@ -116,7 +118,7 @@ and `Shape.__subclasses__()` would no longer name the kinds.
 A factory turns data, such as a name,
 into an object without scattering constructors through your code.
 In Python a class is a first-class object.
-You can store it in a variable and call it to make an instance.
+You can store it in a variable and call it to construct an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
 No factory method and no factory class; the `dict` is the factory:
@@ -150,11 +152,11 @@ make("Square").draw()
 #: Square.draw
 ```
 
-The `dict` values are classes, so `type[Shape]` is their type,
+Because the `dict` values are classes, `type[Shape]` is their type,
 and calling one constructs an instance.
 Adding a `Triangle` means one new class and one new line in `SHAPES`.
 
-You can go one step further,
+You can remove that line too,
 so the factory never needs editing when you add a type,
 by letting each subclass register itself through `__init_subclass__()`
 (see [Metaprogramming](17_Metaprogramming.md#self-registration-of-subclasses)):
@@ -198,45 +200,47 @@ The two `class` statements fill `Shape.registry` on their own,
 as the printed key list shows.
 Adding a `Triangle` is now a single class definition.
 It registers itself, and `make()` builds it with no change to the factory.
+`Shape.__subclasses__()` could have built the table instead,
+but it lists only direct subclasses,
+while `__init_subclass__()` runs for every class anywhere below `Shape`.
 [Pattern Refactoring](37_Pattern_Refactoring.md#simulating-a-trash-recycler)
 uses this same self-registration.
-`Shape.__subclasses__()` could have built the table instead,
-but it stops at direct subclasses.
-`__init_subclass__()` runs for every class anywhere below `Shape`.
+
 A dictionary of classes,
 whether you fill it by hand or the classes fill it themselves,
 is the ordinary Python factory.
 That is the dissolution [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
-describes: the pattern does not go away,
-but stops needing a class hierarchy to express it.
+describes: the pattern remains,
+but no longer needs a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
 
 `__init_subclass__()` runs as the subclass's `class` statement executes.
-In one file that timing is invisible,
-but a subclass defined in another module joins the registry only when something imports that module.
+In one file the registration runs before anything calls `make()`,
+but a subclass defined in another module registers itself only when something imports that module.
 The classic failure is a plugin that "never registered": the class is fine,
-the registry is fine, and nothing imported the module that defines it.
+the registry is fine, and nothing imported the module that defines the class.
 A [lazy import](06_Modules_and_Packages.md#lazy-imports)
 produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
-waits for the first use of the imported name,
+does not run until the first use of the imported name,
 and an import written only to trigger registration never uses that name.
-Running with `-X lazy_imports=all` does this to ordinary imports too.
+Running with `-X lazy_imports=all` makes ordinary imports lazy too.
 Import a plugin module eagerly when the import exists for its side effect.
 
-The registry also keys on `cls.__name__` alone,
-so two classes that share a name, from different modules,
+Because the registry keys on `cls.__name__` alone,
+two classes that share a name, from different modules,
 silently overwrite each other.
 Key on a qualified name when a collision is possible.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
-so a subclass that gives itself a `registry` of its own would quietly start a second table that `make()` never reads.
+so a subclass that gives itself a `registry` of its own would create a second table that `make()` never reads,
+with no error to signal it.
 
 The tests confirm that every subclass registers itself,
 and that a new subclass needs no change to `make()`.
-Defining a fresh subclass of `Shape` inside the test is enough to see it appear in the registry:
+Defining a fresh subclass of `Shape` inside the test is enough to put it in the registry:
 
 ```python
 # test_registry.py
@@ -267,10 +271,11 @@ def test_unknown_name_raises() -> None:
 
 ## Polymorphic Factories
 
-The static `factory()` method in `shape_factory1.py` forces all the creation operations into one spot,
-so that's the only place you need to change the code.
-However, *GoF Design Patterns* emphasizes that the *Factory Method* pattern exists so you can subclass different types of factories from the basic factory
-(the above design is a special case).
+Because the static `factory()` method in `shape_factory1.py` collects all the creation operations in one method,
+that's the only place you need to change the code.
+*GoF Design Patterns*, however,
+emphasizes that the *Factory Method* pattern exists so you can subclass different factories from the basic factory
+(the design in `shape_factory1.py` is a special case).
 For its sample code,
 *GoF Design Patterns* reuses the maze example from the *Abstract Factory*
 (the next section covers that pattern),
@@ -338,40 +343,41 @@ if __name__ == "__main__":
 ```
 
 Now the factory methods are polymorphic:
-each type of shape carries its own nested `Factory` class whose `create()` method builds an object of that type.
+each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
 `FACTORIES` maps each kind's name to an instance of its factory,
 and `create_shape()` looks that factory up and calls it right away.
-A more complex design would hand the factory object back to the caller,
-who could hold it and create objects from it later.
-However, much of the time you don't need the complexity of the polymorphic factory method,
+A more complex design would return the factory object to the caller,
+who could keep it and construct objects from it later.
+Much of the time, however, you don't need the polymorphic factory method,
 and a single static method in the base class (as in `shape_factory1.py`)
-works fine.
+is enough.
 
 A `Factory` class nested in every shape is machinery Python does not need,
 kept here to show the structure *GoF Design Patterns* intends.
-The registry above does the same job with no nested classes.
+The registry in `registry.py` does the same job with no nested classes.
+Write a separate factory class when object creation takes real work beyond calling a constructor,
+such as pooling, caching, or consulting external configuration.
+
 An earlier version of this example did without `FACTORIES` by dispatching through `eval(f"{kind}.Factory()")`,
 which is worse than unnecessary.
 `create_shape()` then compiles and runs whatever string it receives,
-so a `kind` arriving from a configuration file, a request,
+so a `kind` read from a configuration file, a request,
 or a command line is arbitrary code rather than a shape name.
 The dictionary lookup either produces a factory or raises a `KeyError`.
-Exercise 8 stages the attack against both.
-A separate factory class is worth writing when object creation takes real work beyond calling a constructor,
-such as pooling, caching, or consulting external configuration.
+Exercise 8 runs the attack against both.
 
 ## Abstract Factories
 
-The *Abstract Factory* pattern looks like the factory objects above,
+The *Abstract Factory* pattern has the same structure as the factory objects in `shape_factory2.py`,
 with not one but several factory methods.
 Each factory method creates a different kind of object.
 When you create the factory object,
 you choose the concrete version of every object that factory creates.
 The example in *GoF Design Patterns* implements portability across graphical user interfaces
 (GUIs).
-You create a factory object appropriate to the GUI you're working with,
-and from then on when you ask it for a menu, button, slider, etc.,
-it automatically creates the appropriate version of that item for the GUI.
+You create a factory object for the GUI you're working with,
+and from then on when you ask that factory for a menu, button, or slider,
+it creates the version of that item suited to that GUI.
 Thus you can isolate, in one place,
 the effect of changing from one GUI to another.
 
@@ -462,17 +468,17 @@ either a subclass overriding `play()` or a rules object passed alongside the fac
 and `obstacle.action()` dispatches again on the obstacle's,
 so the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Multiple_Dispatching.md)
-develops this into a technique.
+develops that pair of calls into a technique.
 
 The base classes `Obstacle`, `Character`, and `GameElementFactory`
 (translated from the Java version)
 force every concrete class to inherit from them.
 Those `raise NotImplementedError` bodies enforce less than the listing suggests.
 They fail at call time:
-a concrete factory that forgets `make_obstacle()` constructs without complaint and raises an exception only when the missing method finally runs.
+a concrete factory that omits `make_obstacle()` constructs with no error and raises an exception only when something calls the missing method.
 An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Surrogate.md),
-and at least catches the omission before anything calls the missing method.
+and at least reports the omission before anything calls the missing method.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
 and any class with that shape conforms,
@@ -537,24 +543,24 @@ g2.play()
 ```
 
 The concrete classes inherit nothing,
-but the type checker still verifies that each one fits the appropriate `Protocol`.
-`BrokenFactory` supplies `make_character()` and forgets `make_obstacle()`,
-and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
-The Protocol catches the omission earlier than either `@abstractmethod` or `raise NotImplementedError` can.
-A `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
+but the type checker still verifies that each one satisfies the appropriate `Protocol`:
+a `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `action()`.
-This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
-It preserves the purpose of the interfaces,
+`BrokenFactory` supplies `make_character()` and omits `make_obstacle()`,
+and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
+With the Protocol, the checker reports the omission before the program runs,
+earlier than either `@abstractmethod` or `raise NotImplementedError` can.
+Checking against a Protocol is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
 
 ## Prototype
 
 The factories so far build each object from a class and some arguments.
-*Prototype* takes a different route.
-It keeps one fully configured instance and makes new objects by copying it.
-Use it when a ready-made instance is easier to clone than to rebuild,
-or when construction is expensive and the instances share most of the setup.
+*Prototype* instead keeps one fully configured instance and makes new objects by copying it.
+Use Prototype when a ready-made instance is easier to clone than to rebuild,
+or when construction is slow and the instances share most of the setup.
 
 The `copy` module clones any object.
 `copy.deepcopy()` follows every reference,
@@ -590,10 +596,10 @@ print(goblin.powers)  # The original changed too
 #: ['bite', 'shared']
 ```
 
+Because the `clone()` method wraps `copy.deepcopy()`,
 `captain` gets its own `powers` list,
-so appending to it leaves `goblin.powers` unchanged.
-The `clone()` method wraps `copy.deepcopy()`.
-The last three lines are the trap, not the recommendation:
+and appending to it leaves `goblin.powers` unchanged.
+The last three lines show the mistake, not the recommendation:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so changing that list through one object changes it for the other,
 with no error to signal it.
@@ -633,14 +639,14 @@ if __name__ == "__main__":
 #: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
 ```
 
-`spawn()` returns an independent object every time,
-so callers can modify their copy without touching the prototype.
-Compare this with `make()` in `registry.py`.
+Because `spawn()` returns an independent object every time,
+callers can modify their copy without modifying the prototype.
+Compare `spawn()` with `make()` in `registry.py`.
 There the table holds classes and calls a constructor.
-Here it holds instances and copies them.
+In `prototype_registry.py` the table holds instances and copies them.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
-These tests pin down the two required properties for a prototype registry.
+These tests check the two required properties for a prototype registry.
 Each spawn must be independent, and the stored prototype must never change:
 
 ```python
@@ -669,11 +675,11 @@ def test_prototype_untouched() -> None:
 ([Singleton](24_Singleton.md) has its own chapter):
 separate the construction of a complex object from its representation,
 assembling it in steps.
-In Java and C++ it cures the *telescoping constructor*.
+In Java and C++ it takes the place of the *telescoping constructor*.
 A class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
 The workaround is a companion class that collects settings one method call at a time.
-Translated directly into Python, it looks like this:
+Translated into Python with its structure intact, it looks like this:
 
 ```python
 # pizza_builder.py
@@ -718,9 +724,9 @@ if __name__ == "__main__":
 #: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
 ```
 
-Each setter returns `self`,
+Because each setter returns `self`,
 annotated with `Self` from [Static Typing](08_Static_Typing.md#the-self-type),
-so the calls chain.
+the calls chain.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 The class works and reads well, but it solves a problem Python does not have.
 Keyword arguments with defaults are the built-in builder:
@@ -746,12 +752,11 @@ if __name__ == "__main__":
 
 Every combination of settings is a single call,
 the call site names each option just as the chain does,
-and the defaults live on the fields instead of inside a second class.
-`dataclasses.replace()` covers the other use of builder chains:
+and the fields declare the defaults instead of a second class.
+`dataclasses.replace()` covers the second use of builder chains:
 starting from an existing configuration and varying it.
-For a frozen data class,
-`replace()` is Prototype and Builder rolled into one function,
-copying the configured state and changing chosen fields on the way.
+For a frozen data class, `replace()` is Prototype and Builder in one function,
+copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the general form of the same operation,
 working on any object that defines `__replace__()`.
 A data class defines that method for you.
@@ -781,7 +786,7 @@ def test_replace_varies_one_field() -> None:
 modeling toppings as wrapper objects instead of builder-collected fields,
 to illustrate the unrelated Decorator pattern.
 
-Builder survives in Python when construction is genuinely a process.
+Builder remains useful in Python when construction is genuinely a process.
 The steps must come in an order, later steps depend on earlier ones,
 and rules span the steps.
 `GameBuilder` in [Simulation](38_Simulation.md#a-robot-in-a-maze) qualifies.
@@ -793,11 +798,11 @@ The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 
-The humblest builder in Python is easy to overlook.
+The smallest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable product,
 a string, through a mutable intermediate.
 That is the Builder structure.
-`PizzaBuilder` collecting toppings in a list and freezing them into a tuple at `build()` is the same move.
+`PizzaBuilder` collecting toppings in a list and freezing them into a tuple at `build()` is the same structure.
 Reserve the pattern, and the name,
 for construction that is a process with intermediate state and rules of its own.
 When the "steps" are optional values,
@@ -835,7 +840,7 @@ Both exist to work around languages where a class is not an object you can put i
     In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports.
     Then add it.
 4.  Modify `shape_factory2.py` to use an *Abstract Factory* to create different sets of shapes
-    (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles etc.).
+    (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
     In `pizza_direct.py`, enforce it with `__post_init__()`.
     In `pizza_builder.py`,

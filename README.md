@@ -112,7 +112,7 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 24_Singleton.md                 | |
 | 25_Template_Method.md           |X|
 | 26_Surrogate.md                 |O|
-| 27_Factory.md                   | |
+| 27_Factory.md                   |r|
 | 28_Function_Objects.md          | |
 | 29_Changing_the_Interface.md    | |
 | 30_Observer.md                  | |

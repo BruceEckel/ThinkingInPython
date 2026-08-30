@@ -11,13 +11,13 @@ From a base class, you derive the surrogate along with the class or classes that
 ![A surrogate and the implementation derived from a common base class](_images/surrogate)
 
 That is the shape in *GoF Design Patterns*.
-You'll see that Python does not need the shared base,
-but it is the clearest way to see what a surrogate is.
+Python does not need the shared base,
+but the base is the clearest way to see what a surrogate is.
 
 A surrogate object receives an implementation and forwards all method calls to it.
 That indirection is where both patterns do their work:
 the surrogate can refuse a call, delay creating the implementation,
-count or log what passes through, or swap the implementation for another.
+count or log the calls it forwards, or swap the implementation for another.
 Structurally, *Proxy* and *State* differ in one respect.
 A *Proxy* has one implementation.
 *State* has several.
@@ -55,7 +55,7 @@ p.g()
 
 `Implementation` need not have the same interface as `Proxy`.
 As long as `Proxy` "speaks for" the class it forwards method calls to,
-it qualifies.
+`Proxy` qualifies.
 That is a looser definition than in *GoF Design Patterns*.
 Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
 The looser definition relies only on the intent.
@@ -63,8 +63,8 @@ The looser definition relies only on the intent.
 clarifies both readings.
 
 A common interface helps, though:
-it forces `Implementation` to supply every method that `Proxy` needs to call.
-An abstract base class is one way to express that interface.
+`Implementation` must then supply every method that `Proxy` calls.
+One way to express that interface is an abstract base class.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
 so you cannot instantiate an implementation that omits one:
 
@@ -109,17 +109,16 @@ except TypeError as e:
 #: Can't instantiate abstract class Partial
 ```
 
-`Proxy` accepts any `Service`, and `Complete` implements both methods,
-so the proxy can forward either call.
+Because `Proxy` accepts any `Service` and `Complete` implements both methods,
+the proxy can forward either call.
 Because `Partial` omits `g()`,
-constructing it raises a `TypeError` before any calls are made.
+constructing it raises a `TypeError` before the first call.
 `Proxy` inherits `Service` as well, the shape in the diagram.
-That makes a `Proxy` acceptable wherever a `Service` is expected,
+That inheritance makes a `Proxy` acceptable wherever code expects a `Service`,
 and the type checker verifies its `f()` and `g()` against the base.
 
 A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
-is the structural alternative.
-The implementation needs no base class.
+is the structural alternative: the implementation needs no base class.
 The type checker verifies the shape statically, and, with `@runtime_checkable`,
 `isinstance()` does so at runtime:
 
@@ -145,7 +144,7 @@ print(isinstance(Partial(), Service))
 #: False
 ```
 
-The abstract base class forces a complete implementation at construction,
+The abstract base class rejects an incomplete implementation at construction,
 through inheritance.
 A `Protocol` instead reports the mismatch where code uses an object as a `Service`,
 and needs no common base.
@@ -187,13 +186,14 @@ p.h()
 
 `__getattr__()` makes the forwarding generic:
 because `Proxy` names no method of `Implementation`,
-it keeps working when the implementation grows a method.
+the proxy keeps working when you add a method to the implementation.
 `Implementation` here has an `h()` that `proxy_1.py`'s lacked,
 and `p.h()` forwards with no new line in `Proxy`.
+
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
 to `_Proxy__implementation`,
-so it cannot collide with an attribute the implementation carries.
+so it cannot collide with an attribute the implementation defines.
 
 Do not confuse `__getattr__()` with its lookalike, `__getattribute__()`.
 `__getattr__()` is the *fallback* hook:
@@ -202,19 +202,19 @@ which is why `self.__implementation` inside it resolves normally.
 `__getattribute__()` intercepts every attribute access,
 including each `self.` access in its own body,
 so the naive version calls itself forever.
-Writing a `__getattribute__()` means routing every internal access through `object.__getattribute__()`,
+Writing a `__getattribute__()` means calling `object.__getattribute__()` for every internal access,
 machinery a surrogate rarely needs.
 
-The abstract base class and the `Protocol` above still guard the implementation side:
-the type checker verifies that whatever you hand the proxy has the necessary methods.
+The abstract base class in `proxy_interface.py` and the `Protocol` in `proxy_protocol.py` still guard the implementation side:
+the type checker verifies that whatever you pass the proxy has the necessary methods.
 Calls on the proxy get no such check.
-Because `p.f()` goes through `__getattr__()`, whose return type is unknown,
+Because `__getattr__()`, whose return type is `Any`, resolves `p.f()`,
 the checker cannot verify that call.
 With explicit forwarding, as in `proxy_1.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies it.
-`proxy_interface.py`'s `Proxy` goes further: because it inherits `Service`,
-code typed against `Service` accepts it.
+`proxy_interface.py`'s `Proxy` also passes as a `Service`:
+because it inherits `Service`, code typed against `Service` accepts it.
 `__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 
@@ -259,13 +259,13 @@ print("__main__.Proxy object" in str(p))
 The two calls look interchangeable and are not.
 `p.__len__()` is ordinary attribute access,
 so the failed instance lookup falls through to `__getattr__()`, which delegates.
-`len(p)` asks `type(p)` for `__len__()` directly, finds none,
-and reports that `Proxy` has no `len()`.
-The type checker agrees, rejecting `len(p)` statically for the same reason,
-which is why the listing needs the `# type: ignore` to show the runtime failure.
+`len(p)` asks `type(p)` for `__len__()` without consulting the instance,
+finds none, and reports that `Proxy` has no `len()`.
+The type checker rejects `len(p)` statically for the same reason,
+so the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
-`len(p)` reports the miss because `object` defines no `__len__()`.
+`len(p)` reports the missing method because `object` defines no `__len__()`.
 `print(p)` cannot: `object` defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
 A bypassed dunder that `object` defines fails silently.
@@ -297,12 +297,13 @@ print(p.level, settings.level)
 
 `__getattr__()` is a read hook.
 The assignment stores `level` on the proxy, where the next lookup finds it,
-so the proxy stops consulting the implementation and the two disagree.
-The type checker objects to the assignment,
+so later reads of `p.level` never reach the implementation,
+and the proxy's `level` differs from the implementation's.
+The type checker rejects the assignment,
 because `Proxy` declares no `level` and no `__setattr__()` to accept one.
 
 To forward writes, define `__setattr__()`.
-That method must let the proxy's own attributes through,
+That method must store the proxy's own attributes without forwarding them,
 or the assignment in `__init__()` recurses:
 
 ```python
@@ -329,9 +330,11 @@ print(p.level, settings.level)
 ```
 
 `object.__setattr__()` stores `_implementation` on the proxy,
-bypassing the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
-Every assignment after that reaches the implementation, so the two agree.
-The `# type: ignore` required by `proxy_writes.py` disappears because declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes.
+bypassing the `__setattr__()` that would otherwise forward the assignment to an implementation that does not exist yet.
+Every assignment after `__init__()` reaches the implementation,
+so the proxy and the implementation report the same value.
+The `# type: ignore` that `proxy_writes.py` needed disappears,
+because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
 The implementation attribute loses its double underscore,
 from `__implementation` to `_implementation`.
@@ -339,32 +342,33 @@ Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
 
-The fallback hook has a trap of its own:
-when `__getattr__()`'s body touches a proxy attribute that does not exist,
+The fallback hook can also recurse:
+when `__getattr__()`'s body reads a proxy attribute that does not exist,
 that failed lookup calls `__getattr__()` again,
-and the error surfaces as `RecursionError`,
-not the `AttributeError` that would point at the cause.
-A misspelled `self._implementation` trips it directly.
-So does rebuilding a proxy through `copy.copy()` or `pickle`:
+and Python reports the error as `RecursionError`,
+not the `AttributeError` that would name the cause.
+A misspelled `self._implementation` is one cause.
+Rebuilding a proxy through `copy.copy()` or `pickle` is another:
 both construct the new instance without calling `__init__()`,
-so no `_implementation` exists when the first lookup reaches `__getattr__()`.
-The cure is a guard at the top of `__getattr__()`:
+so no `_implementation` exists when the first failed lookup calls `__getattr__()`.
+The fix is a guard at the top of `__getattr__()`:
 raise `AttributeError` for any name that starts with an underscore.
 A misspelled private name then fails with an error that names it,
 and `copy` and `pickle`,
-which probe for `__setstate__()` before `__init__()` has run,
+which look up `__setstate__()` before `__init__()` has run,
 get the `AttributeError` they expect.
 
 A proxy is not an instance of the implementation's class.
-Delegation forwards the methods, not the type.
+Delegation forwards the methods, not the type,
+and `isinstance()` checks only the proxy's own class.
 A `@runtime_checkable` `Protocol` does not change that.
-Since Python 3.12 that check uses `inspect.getattr_static()`,
-which reads the class and instance dictionaries directly and does not call `__getattr__()`,
-so a proxy whose methods all arrive through delegation also fails it.
+Since Python 3.12 the Protocol check uses `inspect.getattr_static()`,
+which reads the class and instance dictionaries instead of running attribute lookup,
+and never calls `__getattr__()`,
+so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check.
 Because ordinary attribute access still finds those methods,
 `hasattr(p, "f")` is `True` and `p.f()` runs.
-Code that calls the method, or probes with `hasattr()`, works on a surrogate.
-Code using `isinstance()` sees only the proxy's own class.
+Code that calls the method, or checks with `hasattr()`, works on a surrogate.
 
 ```python
 # proxy_identity.py
@@ -393,14 +397,15 @@ print(isinstance(p, Implementation), isinstance(p, Service))
 ```
 
 The call works and `hasattr()` finds the method,
-yet neither check recognizes the proxy.
+yet both `isinstance()` checks return `False`.
 
-Two escapes exist, and each makes `isinstance()` answer a question nothing verified.
-`Service.register(Proxy)` tells the ABC machinery to answer `True` without checking anything,
-and a `__class__` property returning the implementation's class makes `isinstance()` answer for the wrong object.
+Two workarounds make `isinstance()` return `True`,
+and neither verifies anything.
+`Service.register(Proxy)` makes the ABC machinery return `True` for every `Proxy` without checking its methods,
+and a `__class__` property returning the implementation's class makes `isinstance()` report the implementation's class for the proxy.
 Each satisfies the runtime check and neither satisfies a type checker.
 A surrogate is not its implementation,
-and code that needs it to be should ask for a method instead.
+and code that checks with `isinstance()` should check for the method instead.
 
 ## What Proxy Solves
 
@@ -409,7 +414,7 @@ and code that needs it to be should ask for a method instead.
 1.  *Remote proxy*.
     Proxies for an object in a different address space.
     Distributed-object systems generate these.
-    In Python, remote procedure call (RPC) libraries play this role.
+    In Python, remote procedure call (RPC) libraries provide them.
 2.  *Virtual proxy*.
     Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
@@ -457,7 +462,7 @@ Guarded(Document(), admin=True).erase()
 
 That refusal separates a *Proxy* from a *Decorator*:
 a decorator adds behavior around a call it always makes,
-while this proxy decides whether the call goes through.
+while this proxy decides whether to forward the call.
 
 A *Smart reference* proxy adds behavior around each access without refusing any.
 With `__getattr__()` you can wrap every method call, for example to count them:
@@ -498,11 +503,10 @@ if __name__ == "__main__":
 
 Because `__getattr__()` intercepts only the lookups that fail on the proxy and its class,
 one generic proxy can add lazy initialization (a *virtual proxy*), access checks
-(a *protection proxy*), or call tracking (a *smart reference*) to any object,
-with no per-method code.
+(a *protection proxy*), or call tracking (a *smart reference*) to any object.
 
 The counting proxy's test confirms that a call reaches the implementation and returns its result,
-and that it counts calls without counting an attribute read:
+and that the proxy counts calls without counting an attribute read:
 
 ```python
 # test_counting_proxy.py
@@ -594,21 +598,21 @@ if __name__ == "__main__":
 ```
 
 `run()` never changes and neither does `b`.
-Only the object behind the surrogate does.
+Only the implementation the surrogate forwards to does.
 
 The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort.
-The Proxy section gives the reason:
-whatever `__getattr__()` returns is unknown at the type level,
-so no type checker can verify `b.f()` while the call reaches `f()` through `__getattr__()`.
-Declaring each implementation against `Behavior` still catches a missing method,
-because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol names.
-That declaration stops at the surrogate.
-Annotating `run(b: Behavior)` and handing it `b` is a type error,
+[Forwarding with `__getattr__()`](#forwarding-with-getattr) gives the reason.
+Because whatever `__getattr__()` returns is unknown at the type level,
+no type checker can verify `b.f()` while `__getattr__()` supplies `f()`.
+Declaring each implementation against `Behavior` still reports a missing method,
+because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares.
+That declaration covers the implementations, not the surrogate.
+Annotating `run(b: Behavior)` and passing it `b` is a type error,
 because `Surrogate` defines no `f()` of its own.
-The hop through the surrogate loses the guarantee.
+The checker cannot verify a method that `__getattr__()` supplies.
 
-The test hands the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
+The test passes the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps the implementation:
 
 ```python
 # test_state.py
@@ -633,14 +637,14 @@ def test_state_delegates_and_change_swaps() -> None:
 
 *GoF Design Patterns* gives *Proxy* and *State* different structures and so treats them as unrelated.
 But both are a *Surrogate*:
-a front object that passes method calls through to an implementation.
-*Proxy* fronts for one implementation to control access to it.
+an object that forwards method calls to an implementation.
+*Proxy* forwards to one implementation to control access to it.
 *State* swaps among several to change behavior over time.
 In Python both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
-The separate implementation hierarchy that *GoF Design Patterns* uses matters when other people write the implementations and you need the base class to state what they owe you.
+The separate implementation hierarchy in *GoF Design Patterns* matters when other people write the implementations and you need the base class to state which methods an implementation must supply.
 When you write both sides,
-the single generic surrogate above is simpler and just as flexible.
+the single generic surrogate in `state_surrogate.py` is simpler and just as flexible.
 
 ## Exercises
 
@@ -650,18 +654,17 @@ the single generic surrogate above is simpler and just as flexible.
 3.  Create a simple copy-on-write implementation.
 4.  In `counting_proxy.py`,
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
-    Explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo,
-    using the fallback-hook behavior described in this chapter.
+    Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
     Implement this with a singleton-like system ([Singleton](24_Singleton.md))
     that controls the number of "connection" objects it creates.
     When a user finishes with a connection,
     the system must check that connection back in for reuse.
-    To guarantee this, hand out a proxy instead of a reference to the actual connection,
+    To guarantee this, return a proxy instead of a reference to the actual connection,
     and design the proxy to release the connection back to the system.
 6.  `dunder_bypass.py`'s `Proxy` cannot answer `len(p)`.
     Give it a `__len__()` that forwards to the implementation,
     and confirm `len(p)` returns 2.
     Then explain why `__getattr__()` could not have supplied it.
 7.  Extend `Surrogate` in `state_surrogate.py` so `change_to()` rejects an implementation missing a method the current one has,
-    and explain why the type checker could not have caught that swap.
+    and explain why the type checker could not have reported that swap.
