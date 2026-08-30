@@ -22,10 +22,6 @@ clean tree, tools upgraded 2026-08-29, `make rewrite` run on 26-28,
    staged version applies a richer rule set the further out it goes.
    Chapters 1-24 get a bulk run last, with the mature DB.
 
-3. **Clean up `deep_review/`.**
-   Fold anything durable from `~26_Surrogate.md` into `deep_review_db.md`,
-   then delete the directory. Everything in it is applied.
-
 4. **Do the book-altitude consistency pass.**
    Nothing currently reviews above chapter level, and the known failure
    modes live exactly there: cross-chapter terminology drift, "previous
@@ -49,7 +45,6 @@ clean tree, tools upgraded 2026-08-29, `make rewrite` run on 26-28,
 
 ## Suggested sequence
 
-1. Item 3 (cleanup, five minutes).
 2. Items 4 and 5 (structural, before polish).
 3. The item 1/2 loop through the remaining chapters.
 4. Item 6 (exercise pass).
