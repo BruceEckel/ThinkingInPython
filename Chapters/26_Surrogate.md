@@ -184,10 +184,10 @@ because `Proxy` names no method of `Implementation`,
 it keeps working when the implementation grows a method.
 `Implementation` here has an `h()` that `proxy_1.py`'s lacked,
 and `p.h()` forwards with no new line in `Proxy`.
-The proxy still constructs its own `Implementation`,
-so it depends on that one class.
-Passing the implementation in, as `proxy_interface.py` does,
-removes that dependency as well.
+`Proxy` still constructs `Implementation` itself,
+so it works with only that one class.
+To accept any conforming class,
+take the implementation as a constructor argument, as `proxy_interface.py` does.
 The double underscore on `self.__implementation` matters:
 the name [mangles](11_Testing.md#white-box-and-black-box-tests)
 to `_Proxy__implementation`,
