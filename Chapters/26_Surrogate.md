@@ -471,7 +471,7 @@ def test_state_delegates_and_change_swaps() -> None:
     assert s.name() == "B"
 ```
 
-## Kinds of Proxy
+## What Proxy Solves
 
 *Proxy* and *State* differ in the problem each solves.
 *GoF Design Patterns* lists these common uses for *Proxy*:

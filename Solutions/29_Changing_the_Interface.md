@@ -167,7 +167,7 @@ object's, and it adds no behavior to a call that goes through. What it
 adds is a decision about whether the call goes through at all. Remove
 it and every call reaches the implementation, including the ones that
 should have been refused, so what you lose is control over when and
-whether the call happens. The [protection proxy](../Chapters/26_Surrogate.md#kinds-of-proxy)
+whether the call happens. The [protection proxy](../Chapters/26_Surrogate.md#what-proxy-solves)
 is this wrapper.
 
 None of the three is a Façade, because a Façade narrows many objects
