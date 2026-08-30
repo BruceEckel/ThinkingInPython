@@ -276,7 +276,8 @@ Subscriptions are strong references:
 an observable that outlives its observers keeps each subscribed bound method's instance alive,
 the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
-or weak references (`weakref.WeakMethod`), which forget automatically.
+or weak references (`weakref.WeakMethod`, see [Cleanup](10_Cleanup.md#watching-objects-without-holding-them)),
+which forget automatically.
 
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
 Two-way bindings are the usual source: the view edits the model,
@@ -560,7 +561,7 @@ a fan-out awaiting network calls, and a GUI repainting a grid.
 In every case the observer was a callable and the observable was a list of them.
 Nothing in the pattern required an interface, a flag, or a class per reaction.
 [Function Objects](28_Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-takes the last step from here:
+already took the last step:
 one list becomes a dictionary of lists keyed by event type,
 and the Observer is an event bus.
 

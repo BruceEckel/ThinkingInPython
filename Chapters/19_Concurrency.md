@@ -601,7 +601,8 @@ This makes it tempting to conclude that shared state needs no locking.
 But "one at a time" protects only the instructions between two `await`s,
 not a value that lives across one.
 Two coroutines that read a shared value, `await`,
-then write it back can lose an update with no thread and no GIL in sight:
+then write it back can lose an update with no thread and no [GIL](#the-gil-and-free-threading)
+in sight:
 
 ```python
 # async_race.py

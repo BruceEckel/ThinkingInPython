@@ -180,7 +180,7 @@ class Messenger:
     depth: float = 0.0  # Default value
 ```
 
-`display_object()`, the inspection helper from [Metaprogramming](17_Metaprogramming.md#building-display_object),
+`display_object()`, the inspection helper built in [Metaprogramming](17_Metaprogramming.md#building-display_object),
 shows what `@dataclass` generates:
 
 ```python

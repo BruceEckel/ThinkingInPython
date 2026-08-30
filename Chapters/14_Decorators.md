@@ -1015,8 +1015,8 @@ takes up.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object Decorator pattern for a coffee shop: plain drinks
-    (Espresso, Cappuccino) and extra decorators
+3.  Implement the object-oriented Decorator pattern for a coffee shop:
+    plain drinks (Espresso, Cappuccino) and extra decorators
     (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,
     then print its cost and description.

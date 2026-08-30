@@ -167,7 +167,7 @@ Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 A loop with `append()` is not the usual way to build a list from another one.
 [Control Flow](04_Control_Flow.md#comprehensions) introduces the comprehension,
 which builds a new list in a single expression,
-and [Comprehensions](16_Comprehensions.md) covers the dict and set forms.
+and [Comprehensions](16_Comprehensions.md) explores every form in depth.
 
 ## Tuples and Unpacking
 

@@ -278,7 +278,7 @@ Keyword patterns work differently.
 `Point(x=0, y=y)` matches by attribute name, through attribute access,
 not through `__match_args__`.
 Keyword patterns also work on any object with the named attributes,
-dataclass or not, and let you match a subset of attributes while ignoring the rest:
+data class or not, and let you match a subset of attributes while ignoring the rest:
 
 ```python
 # keyword_patterns.py
@@ -816,7 +816,8 @@ First, add a new type: a `Webhook` channel.
 In the object version,
 you write one new subclass with its own `render()` and `cost()`,
 and nothing else changes.
-In the match version, you add a `Webhook` dataclass to the `Notification` union,
+In the match version,
+you add a `Webhook` data class to the `Notification` union,
 and the type checker flags `assert_never()` in both `render()` and `cost()` until you add a `case Webhook(...)` to each.
 
 Now try adding a new operation, `priority()`, that ranks channels by urgency.
@@ -846,7 +847,7 @@ explore it further.
     such as `{"type": "click", "at": {"x": x, "y": y}}`,
     binding `x` and `y` from the inner dictionary.
 4.  Add a `Webhook` channel to `notifications_match.py`:
-    a dataclass with a `url` field, added to the `Notification` union.
+    a data class with a `url` field, added to the `Notification` union.
     Run `ty` before adding its `case` to `render()` and `cost()`,
     and read the errors.
     Then add both cases and confirm `ty` passes.

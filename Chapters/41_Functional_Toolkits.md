@@ -654,7 +654,7 @@ stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
-[Generators](23_Iterators.md#generators)
+[Iterators](23_Iterators.md#generators)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
 so handing them to separate threads corrupts it.
@@ -1012,7 +1012,7 @@ Which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`, because no formula predicts,
 from a round number alone,
 which grouping of arbitrary size keeps every pair's meeting count lowest.
-It is still a pure function in the sense that matters for testing.
+It is still deterministic in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` never reaches outside itself for randomness.

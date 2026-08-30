@@ -25,7 +25,7 @@ Factory might be the most common design pattern.
 
 ## Simple Factory Method
 
-As an example, revisit the `Shape` system.
+As an example, revisit the `Shape` hierarchy from [Rethinking Objects](20_Rethinking_Objects.md#abstract-base-classes).
 The factory can be a `@staticmethod` of the base class:
 
 ```python

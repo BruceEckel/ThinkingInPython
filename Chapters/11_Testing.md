@@ -287,6 +287,9 @@ Each test gets its own freshly built `funded` account,
 so tests cannot leak state into each other.
 If a fixture needs cleanup,
 it can `yield` the value and run teardown code after the `yield`.
+A function containing `yield` is a generator.
+[Iterators](23_Iterators.md#generators) covers the mechanism,
+and this chapter needs only the shape.
 For example:
 
 ```python

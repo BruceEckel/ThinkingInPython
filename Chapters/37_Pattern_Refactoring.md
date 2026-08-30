@@ -519,7 +519,7 @@ rather than predicting them up front,
 and each cost a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
 and one `@recycling_note.register` absorbs a new operation.
-Neither is a pattern in the *GoF* sense.
+Neither is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
 A pattern is worth keeping only when it is still useful once the language does part of the work.

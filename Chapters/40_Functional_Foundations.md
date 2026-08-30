@@ -345,7 +345,7 @@ The `list()` calls are not decoration.
 `map()` and `filter()` return one-shot iterators,
 so `print(map(...))` shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing
-([Generators](23_Iterators.md#generators)).
+([Iterators](23_Iterators.md#generators)).
 `sorted()` is the exception:
 it must see every element before it can order any of them,
 so it always returns a list.

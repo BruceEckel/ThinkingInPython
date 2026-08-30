@@ -447,9 +447,8 @@ dangerous on anything that reaches the program from outside, unchecked.
 
 ## Self-Registration of Subclasses
 
-Often a base class needs to keep track of its subclasses,
+Often a base class needs to keep track of its subclasses.
 This was the textbook justification for a metaclass.
-This is the textbook reason people used to justify a metaclass.
 Python calls `__init_subclass__()` automatically for every new subclass,
 so a base class can register its own subclasses in a few lines.
 This example tracks the "leaf" subclasses
@@ -732,7 +731,7 @@ print(u)
 # u.age = 9
 ```
 
-Now both sides hold: the runtime `User` is a real frozen dataclass,
+Now both sides hold: the runtime `User` is a real frozen data class,
 and `frozen_default=True` tells the checker that classes built by `model()` reject assignment statically too.
 
 `@dataclass_transform` generalizes exactly one shape:
