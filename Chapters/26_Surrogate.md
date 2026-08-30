@@ -196,7 +196,7 @@ which is why `self.__implementation` inside it resolves normally.
 `__getattribute__()` intercepts every attribute access,
 including each `self.` access in its own body,
 so the naive version calls itself forever.
-Writing one means routing every internal access through `object.__getattribute__()`,
+Writing a `__getattribute__()` means routing every internal access through `object.__getattribute__()`,
 machinery a surrogate rarely needs.
 
 The interface work above still applies on the implementation side:
