@@ -3,10 +3,10 @@
 Both *Proxy* and *State* provide a surrogate class that you use in your code.
 This surrogate class hides the real class that does the work.
 When you call a method in the surrogate,
-it turns around and calls the method in the implementing class.
-These two patterns are so similar that the *Proxy* is a special case of *State*.
+it calls that method in the implementing class.
+The two patterns are so similar that *Proxy* is a special case of *State*.
 
-From a base class, you derive the surrogate along with the class or classes that provide the actual implementation:
+From a base class, you derive the surrogate along with the class or classes that provide the implementation:
 
 ![A surrogate and the implementation deriving from a common base class](_images/surrogate)
 
@@ -19,12 +19,13 @@ either constructing one or receiving one.
 The surrogate forwards all method calls to that implementation.
 
 Structurally, *Proxy* and *State* differ in one respect.
-A *Proxy* has only one implementation, while *State* has more than one.
+A *Proxy* has one implementation.
+*State* has several.
 *GoF Design Patterns* considers the applications of the two patterns distinct.
 *Proxy* controls access to its implementation,
 while *State* lets you change the implementation dynamically.
-However, if you expand your notion of "controlling access to implementation,"
-the two fit neatly together.
+Expand your notion of "controlling access to implementation,"
+and the two fit neatly together.
 
 ## Proxy
 
@@ -59,15 +60,15 @@ p.h()
 ```
 
 `Implementation` need not have the same interface as `Proxy`.
-As long as `Proxy` is somehow "speaking for" the class to which it forwards method calls,
-it satisfies the basic idea.
+As long as `Proxy` "speaks for" the class it forwards method calls to,
+it qualifies.
 That is a looser definition than *GoF Design Patterns* uses.
 Under GoF's stricter definition the interface separates *Proxy* from *Adapter*.
 Under the looser one here, the intent does.
 [Telling the Wrappers Apart](29_Changing_the_Interface.md#telling-the-wrappers-apart)
 sorts out both readings.
 
-However, a common interface helps:
+A common interface helps, though:
 it forces `Implementation` to supply every method that `Proxy` needs to call.
 An abstract base class is one way to express that interface.
 Each method the `Proxy` delegates to is an `@abstractmethod`,
@@ -114,7 +115,7 @@ except TypeError as e:
 
 `Proxy` accepts any `Service`, and `Complete` implements both methods,
 so the proxy can forward either call.
-`Partial` omits `g()`, so constructing it raises `TypeError` at once,
+Because `Partial` omits `g()`, constructing it raises a `TypeError` at once,
 instead of failing later,
 when the `Proxy` delegates a call the implementation cannot answer.
 
@@ -185,8 +186,8 @@ p.h()
 ```
 
 `__getattr__()` makes the forwarding generic:
-`Proxy` names no method of `Implementation`,
-so it keeps working when the implementation grows a method.
+because `Proxy` names no method of `Implementation`,
+it keeps working when the implementation grows a method.
 The proxy still depends on one implementation class, which it constructs.
 Accepting an implementation as a constructor argument removes that tie too.
 The double underscore on `self.__implementation` matters:
@@ -207,8 +208,8 @@ machinery a surrogate rarely needs.
 The interface work above still applies on the implementation side:
 the type checker verifies that whatever you hand the proxy has the methods.
 That verification stops at the proxy.
-`p.f()` goes through `__getattr__()`, whose return type is unknown,
-so nothing the proxy declares can make that call checkable.
+Because `p.f()` goes through `__getattr__()`, whose return type is unknown,
+nothing the proxy declares can make that call checkable.
 Explicit forwarding, as in `proxy_1.py`,
 is the version a type checker can see through.
 `__getattr__()` trades that for reach.
@@ -258,7 +259,7 @@ The type checker agrees, rejecting `len(p)` statically for the same reason,
 which is why the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
-`len(p)` reports the miss because nothing supplies a default `__len__()`.
+`len(p)` reports the miss because `object` defines no `__len__()`.
 `print(p)` cannot: `object` defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
 A bypassed dunder that `object` defines fails silently,
@@ -322,10 +323,9 @@ print(p.level, settings.level)
 #: high high
 ```
 
-`object.__setattr__()` stores `_impl` directly on the proxy,
-going around the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
-Every assignment after that reaches the implementation,
-so the two no longer disagree.
+`object.__setattr__()` stores `_impl` on the proxy,
+bypassing the `__setattr__()` that would otherwise forward it to an implementation that does not exist yet.
+Every assignment after that reaches the implementation, so the two agree.
 The `# type: ignore` that `proxy_writes.py` needed disappears here:
 declaring `__setattr__()` tells the type checker the proxy accepts arbitrary attributes,
 so the static half closes at the same moment as the runtime half.
@@ -341,8 +341,8 @@ A `@runtime_checkable` `Protocol` does not close that gap either.
 Since Python 3.12 that check uses `inspect.getattr_static()`,
 which reads the class and instance dictionaries directly and does not call `__getattr__()`,
 so a proxy whose methods all arrive through delegation fails it too.
-Ordinary attribute access still finds those methods,
-so `hasattr(p, "f")` is `True` and `p.f()` runs.
+Because ordinary attribute access still finds those methods,
+`hasattr(p, "f")` is `True` and `p.f()` runs.
 Code that calls the method, or probes with `hasattr()`, works on a surrogate.
 Code that asks `isinstance()` sees only the proxy's own class.
 
@@ -385,7 +385,7 @@ and code that needs it to be should ask for a method instead.
 ## State
 
 The *State* pattern adds more implementations to *Proxy*,
-along with a way to switch from one implementation to another during the lifetime of the surrogate:
+along with a way to switch implementations during the surrogate's lifetime:
 
 ```python
 # state_surrogate.py
@@ -482,7 +482,7 @@ def test_state_delegates_and_change_swaps() -> None:
 
 ## Kinds of Proxy
 
-The difference between *Proxy* and *State* is in the problem each one solves.
+*Proxy* and *State* differ in the problem each solves.
 *GoF Design Patterns* lists these common uses for *Proxy*:
 
 1.  *Remote proxy*.
@@ -492,15 +492,15 @@ The difference between *Proxy* and *State* is in the problem each one solves.
 2.  *Virtual proxy*.
     Provides "lazy initialization" to create expensive objects on demand.
 3.  *Protection proxy*.
-    Use this when you don't want the client programmer to have full access to the proxied object.
+    Restricts the client programmer's access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
-    For example, to keep track of the number of references to a particular object,
-    implementing the *copy-on-write* idiom and preventing object aliasing.
-    A simpler example is keeping track of the number of calls to a particular method.
+    For example, it can count the references to an object,
+    implementing the *copy-on-write* idiom and preventing aliasing.
+    A simpler example counts the calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
-`__getattr__()` receives the requested name, so the check is one condition:
+Because `__getattr__()` receives the requested name, the check is one condition:
 
 ```python
 # protection_proxy.py
@@ -646,7 +646,7 @@ the single generic surrogate above is simpler and just as flexible.
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo,
     using the fallback-hook behavior described in this chapter.
-5.  Create a program similar to certain DBMS systems that allow only a fixed number of connections at any time.
+5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
     Implement this with a singleton-like system ([Singleton](24_Singleton.md))
     that controls the number of "connection" objects it creates.
     When a user finishes with a connection,
