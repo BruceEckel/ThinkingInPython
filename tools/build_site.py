@@ -50,11 +50,11 @@ BOOK_TITLE = "Thinking in Python"
 BOOK_SUBTITLE = "Fluency, Types, and Design"
 BOOK_AUTHOR = "Bruce Eckel"
 REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
-# Direct-download URLs for the newest release's assets.
-# `releases/latest/download/<asset>` always points at the latest
-# published release, so these links never go stale when a new
-# version ships (`make release`).
-DOWNLOAD_URL = f"{REPO_URL}/releases/latest/download"
+# The newest release's page, listing every published asset (PDF, both
+# EPUBs). `releases/latest` always resolves to the newest published
+# release, so the link never goes stale when a new version ships
+# (`make release`), and adding an asset needs no change here.
+RELEASE_URL = f"{REPO_URL}/releases/latest"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
@@ -242,10 +242,7 @@ def render_index(chapters: list[Chapter]) -> str:
     <img class="cover-art" src="{cover_art}"
          alt="A python as an ouroboros, coiled into an infinity sign">
     <div class="download-links">
-      <p>Download the book:
-        <a href="{DOWNLOAD_URL}/ThinkingInPython.pdf">PDF</a> ·
-        <a href="{DOWNLOAD_URL}/ThinkingInPython-color.epub">EPUB</a> ·
-        <a href="{DOWNLOAD_URL}/ThinkingInPython-eink.epub">EPUB for e-ink readers</a></p>
+      <p><a href="{RELEASE_URL}" target="_blank" rel="noopener">Download the book: PDF and EPUB</a></p>
       <p><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples &amp; Exercise Solutions on GitHub</a></p>
     </div>
     <ul class="toc-list">
