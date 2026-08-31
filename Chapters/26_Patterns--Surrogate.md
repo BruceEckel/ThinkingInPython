@@ -8,7 +8,7 @@ The two patterns are so similar that *Proxy* is a special case of *State*.
 
 From a base class, you derive the surrogate along with the class or classes that provide the implementation:
 
-![A surrogate and the implementation derived from a common base class](_images/surrogate)
+![Surrogate and each Implementation realize the same Interface, so a Surrogate goes wherever an Implementation goes; below, the Surrogate holds one implementation at a time and forwards every call to it](_images/surrogate)
 
 That is the shape in *GoF Design Patterns*.
 Python does not need the shared base,
@@ -19,8 +19,8 @@ That indirection is where both patterns do their work:
 the surrogate can refuse a call, delay creating the implementation,
 count or log the calls it forwards, or swap the implementation for another.
 Structurally, *Proxy* and *State* differ in one respect.
-A *Proxy* has one implementation.
-*State* has several.
+A *Proxy* forwards to one implementation for its whole life.
+*State* holds several and switches among them.
 
 ## Proxy
 
@@ -353,10 +353,34 @@ both construct the new instance without calling `__init__()`,
 so no `_implementation` exists when the first failed lookup calls `__getattr__()`.
 The fix is a guard at the top of `__getattr__()`:
 raise `AttributeError` for any name that starts with an underscore.
-A misspelled private name then fails with an error that names it,
-and `copy` and `pickle`,
-which look up `__setstate__()` before `__init__()` has run,
-get the `AttributeError` they expect.
+
+```python
+# getattr_guard.py
+from typing import Any
+
+class Proxy:
+    def __init__(self, impl: Any) -> None:
+        self._implementation = impl
+    def __getattr__(self, name: str) -> Any:
+        if name.startswith("_"):  # The guard
+            raise AttributeError(name)
+        return getattr(self._imp, name)  # Typo: _imp
+
+class Implementation:
+    def f(self) -> None: print("Implementation.f()")
+
+try:
+    Proxy(Implementation()).f()
+except AttributeError as e:
+    print(type(e).__name__, e)
+#: AttributeError _imp
+```
+
+Without the guard, the misspelled `self._imp` produces a `RecursionError` that names nothing.
+With it, the second call to `__getattr__()` reports the typo by name.
+The guard also satisfies `copy` and `pickle`,
+which look up `__setstate__()` before `__init__()` has run:
+both get the `AttributeError` they expect instead of recursing.
 
 A proxy is not an instance of the implementation's class.
 Delegation forwards the methods, not the type,
@@ -407,7 +431,7 @@ Each satisfies the runtime check and neither satisfies a type checker.
 A surrogate is not its implementation,
 and code that checks with `isinstance()` should check for the method instead.
 
-## What Proxy Solves
+### What Proxy Solves
 
 *GoF Design Patterns* lists these common uses for *Proxy*:
 
@@ -465,8 +489,12 @@ a decorator adds behavior around a call it always makes,
 while this proxy decides whether to forward the call.
 
 A *Smart reference* proxy adds behavior around each access without refusing any.
-With `__getattr__()` you can wrap every method call, for example to count them
-(the private attribute shortens to `_impl` here; only the name changes):
+With `__getattr__()` you can wrap every method call, for example to count them.
+This proxy names its implementation `_impl`, with one underscore,
+and so gives up the mangling that kept `proxy_2.py`'s attribute from colliding.
+`_impl` and `calls` now share a namespace with the implementation's own attributes:
+ask the proxy for `calls` and you get the counter,
+even when the implementation defines a `calls` of its own.
 
 ```python
 # counting_proxy.py
@@ -502,9 +530,12 @@ if __name__ == "__main__":
 #: calls: 3
 ```
 
-Because `__getattr__()` intercepts only the lookups that fail on the proxy and its class,
-one generic proxy can add lazy initialization (a *virtual proxy*), access checks
-(a *protection proxy*), or call tracking (a *smart reference*) to any object.
+`__getattr__()` fires for any name the proxy and its class lack,
+and never for the proxy's own attributes.
+The proxy therefore needs to know nothing about the implementation while still keeping state of its own,
+which is why the same few lines serve lazy initialization (a *virtual proxy*),
+access checks (a *protection proxy*), or call tracking (a *smart reference*),
+over any object.
 
 The counting proxy's test confirms that a call reaches the implementation and returns its result,
 and that the proxy counts calls without counting an attribute read:
@@ -600,18 +631,33 @@ if __name__ == "__main__":
 
 `run()` never changes and neither does `b`.
 Only the implementation the surrogate forwards to does.
+Here the client programmer calls `change_to()`;
+[State Machines](31_Patterns--State_Machines.md)
+makes each implementation choose its own successor,
+so the surrogate advances without the client asking.
 
 The annotations that carry the implementation are all `Any`,
-which the book's typing guidance treats as a last resort.
-[Forwarding with `__getattr__()`](#forwarding-with-getattr) gives the reason.
-Because whatever `__getattr__()` returns is unknown at the type level,
-no type checker can verify `b.f()` while `__getattr__()` supplies `f()`.
-Declaring each implementation against `Behavior` still reports a missing method,
-because the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares.
-That declaration covers the implementations, not the surrogate.
+which the book's typing guidance treats as a last resort,
+and the two uses of it have different reasons.
+
+`run(b: Any)` has no alternative.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
-because `Surrogate` defines no `f()` of its own.
-The checker cannot verify a method that `__getattr__()` supplies.
+because `Surrogate` defines no `f()` of its own, and,
+as [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
+the checker cannot verify a method that `__getattr__()` supplies.
+
+`Surrogate.__init__()` and `change_to()` are a choice.
+Annotating both parameters `Behavior` type-checks,
+and it buys a real check on what you hand the surrogate.
+It also ties this surrogate to one Protocol,
+which is what the generic surrogate exists to avoid:
+`test_state.py` below hands the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
+Declaring the implementations instead,
+as `first: Behavior` and `second: Behavior` do,
+puts the check where it costs nothing:
+the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
+and reports a missing method.
+That declaration covers the implementations, not the surrogate.
 
 The test passes the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps the implementation:
 

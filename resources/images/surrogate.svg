@@ -26,7 +26,7 @@
   <rect x="270" y="20" width="160" height="50" fill="none"
         stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="350" y="40" font-size="11" font-style="italic" fill="#8b1a1a"
-        text-anchor="middle">&#171;Protocol&#187;</text>
+        text-anchor="middle">&#171;interface&#187;</text>
   <text x="350" y="60" font-size="16" font-weight="bold" fill="#1a1612"
         text-anchor="middle">Interface</text>
 

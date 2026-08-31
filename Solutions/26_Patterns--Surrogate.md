@@ -34,7 +34,7 @@ print(p.query())
 ```
 
 `"creating ExpensiveResource"` prints only when `p.query()` first
-triggers `__getattr__()`, not when `LazyProxy()` is constructed. Every
+triggers `__getattr__()`, not when you construct `LazyProxy()`. Every
 attribute access checks `self._real` and builds the real object on the
 first one that finds it missing. Every later access reuses the same
 instance. This is the same `__getattr__()` delegation `proxy_2.py` and
@@ -78,10 +78,10 @@ print(p.calls["f"], p.calls["g"])
 ```
 
 Where the chapter's version kept one total, this one tallies per
-method name. `__getattr__()` already receives the name being looked
-up, so the wrapper charges the count to that name before forwarding.
-The single `calls` integer becomes a `Counter`, and the report shows
-`f` called twice and `g` once.
+method name. `__getattr__()` already receives the name of the
+attribute, so the wrapper charges the count to that name before
+forwarding. The single `calls` integer becomes a `Counter`, and the
+report shows `f` called twice and `g` once.
 
 ## 3. A simple copy-on-write list
 
@@ -138,8 +138,8 @@ detaches into its own private `Box` holding a fresh copy of the data,
 decrements the shared `Box`'s count back down (since `b` is no longer
 one of its owners), and then appends to its own copy. `a`, which never
 mutated, still points at the original, untouched `Box`. The cost of
-copying is deferred until the moment a write actually happens, and
-paid only by the list that writes, exactly what "copy-on-write" means.
+copying waits for the moment a write actually happens, and falls only
+on the list that writes, exactly what "copy-on-write" means.
 
 ## 4. Why the typo reports as `RecursionError`
 
@@ -177,7 +177,7 @@ calls `__getattr__("f")`. Its first act is to read `self._imp`, which
 does not exist either, so Python calls `__getattr__("_imp")`, whose
 first act is to read `self._imp`. Each attempt to report the missing
 attribute creates another missing-attribute lookup, and the stack runs
-out before any `AttributeError` is raised.
+out before Python can raise an `AttributeError`.
 
 The trap is specific to the fallback hook. `__getattr__()` runs only
 when normal lookup fails, so any name it touches that is also missing
