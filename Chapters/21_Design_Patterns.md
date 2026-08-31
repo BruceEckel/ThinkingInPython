@@ -1,4 +1,4 @@
-# The Pattern Concept
+# Design Patterns
 
 An important step forward in object-oriented design was the "design patterns" movement,
 carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma,

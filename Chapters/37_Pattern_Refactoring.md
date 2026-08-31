@@ -512,8 +512,8 @@ provides the same dispatch in method form.
 Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that, but not the only one.
 The deeper skill is spotting the *vector of change*
-([The Pattern Concept](21_The_Pattern_Concept.md#what-is-a-pattern))
-in a problem (here, new types versus new operations)
+([Design Patterns](21_Design_Patterns.md#what-is-a-pattern)) in a problem
+(here, new types versus new operations)
 and choosing the lightest construct that isolates it.
 This chapter discovered its two vectors one requirement at a time,
 rather than predicting them up front,

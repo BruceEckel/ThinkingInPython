@@ -13,7 +13,7 @@ In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
 That makes all three patterns largely unnecessary.
 Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
-the dissolution that [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+the dissolution that [Design Patterns](21_Design_Patterns.md#when-a-pattern-dissolves)
 describes.
 
 *Command* appears first as a function, then as the classic class-based form,

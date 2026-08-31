@@ -1,4 +1,4 @@
-# The Pattern Concept: Solutions
+# Design Patterns: Solutions
 
 All three exercises ask about code you wrote, so no answer here can be
 the answer. Each one works a single example through instead. The method
@@ -146,7 +146,7 @@ that does not implement it.
 The sentence that remains is the pattern. Everything crossed out was
 the cost of expressing it in a language where a method cannot travel
 without an object around it, which is what
-[When a Pattern Dissolves](../Chapters/21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+[When a Pattern Dissolves](../Chapters/21_Design_Patterns.md#when-a-pattern-dissolves)
 means by the missing piece having been there all along. The intent
 survives the subtraction. Only the scaffolding disappears.
 

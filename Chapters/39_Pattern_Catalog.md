@@ -12,11 +12,11 @@ Listing a pattern here does not recommend it.
 Many overlap, some compete,
 and several exist only to work around limits of a particular language.
 The body of this book argues that a number of them are unnecessary in Python
-([The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves) says why).
+([Design Patterns](21_Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables still follow each source's own grouping,
 so each name sits where its source puts it,
-including the [*Creational*/*Structural*/*Behavioral* split](21_The_Pattern_Concept.md#pattern-taxonomy):
+including the [*Creational*/*Structural*/*Behavioral* split](21_Design_Patterns.md#pattern-taxonomy):
 that chapter calls *Creational* straightforward and questions the other two.
 Each table lists its rows alphabetically,
 which for the classic patterns is also GoF's own order.
@@ -215,6 +215,6 @@ Python includes the piece their inventors set out to supply.
 | [Flyweight](35_Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
 What survives the subtraction is the intent, not the structure.
-[The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+[Design Patterns](21_Design_Patterns.md#when-a-pattern-dissolves)
 argues this in general.
 Each chapter above works one case.

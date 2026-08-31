@@ -3,7 +3,7 @@
 A *singleton* is the simplest design pattern: a class with exactly one instance.
 Before using a classic implementation,
 ask whether the language already solves the problem,
-the question [When a Pattern Dissolves](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+the question [When a Pattern Dissolves](21_Design_Patterns.md#when-a-pattern-dissolves)
 poses for every pattern.
 For the singleton, Python does.
 

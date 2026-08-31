@@ -620,7 +620,7 @@ test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
 Those four methods became two: `__iter__()` and `__next__()`.
 The language calls both on your behalf.
-[The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+[Design Patterns](21_Design_Patterns.md#when-a-pattern-dissolves)
 describes this dissolution.
 
 Writing the four GoF Iterator methods in Python shows what `first()` and `current_item()` do.

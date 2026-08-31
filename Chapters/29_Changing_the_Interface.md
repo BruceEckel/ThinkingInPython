@@ -304,8 +304,7 @@ with more ceremony.
 Adapter and Façade complete a family of wrappers that share one structure,
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
-Intent separates them,
-the distinction [The Pattern Concept](21_The_Pattern_Concept.md)
+Intent separates them, the distinction [Design Patterns](21_Design_Patterns.md)
 says remains when structures match.
 When you cannot decide what to call your wrapper,
 ask what breaks if you remove it:

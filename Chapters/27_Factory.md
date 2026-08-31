@@ -209,7 +209,7 @@ uses this same self-registration.
 A dictionary of classes,
 whether you fill it by hand or the classes fill it themselves,
 is the ordinary Python factory.
-That is the dissolution [The Pattern Concept](21_The_Pattern_Concept.md#when-a-pattern-dissolves)
+That is the dissolution [Design Patterns](21_Design_Patterns.md#when-a-pattern-dissolves)
 describes: the pattern remains,
 but no longer needs a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,

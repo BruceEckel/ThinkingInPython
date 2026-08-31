@@ -106,7 +106,7 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 18_Performance.md               | |
 | 19_Concurrency.md               | |
 | 20_Rethinking_Objects.md        | |
-| 21_The_Pattern_Concept.md       | |
+| 21_Design_Patterns.md           | |
 | 22_Data_Transfer_Objects.md     | |
 | 23_Iterators.md                 | |
 | 24_Singleton.md                 | |
@@ -161,7 +161,7 @@ The first serious edit pass.
 | 18_Performance.md               |X|
 | 19_Concurrency.md               |X|
 | 20_Rethinking_Objects.md        |X|
-| 21_The_Pattern_Concept.md       |X|
+| 21_Design_Patterns.md           |X|
 | 22_Data_Transfer_Objects.md     |X|
 | 23_Iterators.md                 |X|
 | 24_Singleton.md                 |X|
@@ -219,7 +219,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 18_Performance.md               |X|X|
 | 19_Concurrency.md               |X|X|
 | 20_Rethinking_Objects.md        |X|X|
-| 21_The_Pattern_Concept.md       |X|X|
+| 21_Design_Patterns.md           |X|X|
 | 22_Data_Transfer_Objects.md     |X|X|
 | 23_Iterators.md                 |X|X|
 | 24_Singleton.md                 |X|X|
