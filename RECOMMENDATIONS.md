@@ -6,6 +6,13 @@ Last updated 2026-08-30, after applying the consistency review:
 all 39 `CONSISTENCY.md` recommendations are applied and verified
 (`make verify` green); that file now records the outcomes.
 
+## Chapter Edit Steps
+
+1. Adversarial review of that chapter
+2. `make rewrite` on that chapter
+3. Hand-edit the chapter
+4. Run `/bruce-edit-capture` on the chapter
+
 ## The recommendations
 
 1. **Tighten the capture loop before bulk-rewriting.**

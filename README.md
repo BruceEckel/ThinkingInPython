@@ -115,8 +115,8 @@ for details and install links.
 ### Run and test everything
 
 The commands below rebuild `build/examples/` and `build/solutions/` from
-the Markdown first, so they always test the current book, never a stale
-copy. All of them are quick, and `make run` is the slowest.
+the Markdown chapters, so they always test the current book, never a stale
+copy.
 
 | Command | What it does |
 |---|---|
@@ -196,16 +196,9 @@ https://bruceeckel.github.io/ThinkingInPython/
 
 ## Edit checklist
 
-### Post-AI edit (Began August 12, 2026)
+This is for my own bookkeeping.
 
-After doing everything I could think of to do with AI.
-My current strategy is to edit a chapter, ask AI to derive guidelines from my edits,
-then AI-apply those guidelines throughout the book before editing the next chapter.
-Hypothetically this will produce asymptotically-decreasing edits as I proceed through the book.
-
-Note that I am not starting at the beginning, but picking up where I left off during the "Serious Edit."
-
-| Chapter | Edited |
+| Chapter | Edit State |
 |---------|:------:|
 | 01_Introduction.md                        | |
 | 02_Foundations--Tour.md                   | |
@@ -254,116 +247,3 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 45_Effects--Generators.md                 | |
 | 46_Effects--Stateless.md                  | |
 | 47_Effects--Stateless_in_Practice.md      | |
-
-
-### Serious Edit
-
-The first serious edit pass.
-
-| Chapter | Edited |
-|---------|:------:|
-| 01_Introduction.md                        |X|
-| 02_Foundations--Tour.md                   |X|
-| 03_Foundations--Containers.md             |X|
-| 04_Foundations--Control_Flow.md           |X|
-| 05_Foundations--Functions.md              |X|
-| 06_Foundations--Modules_and_Packages.md   |X|
-| 07_Foundations--Classes.md                |X|
-| 08_Foundations--Static_Types.md           |X|
-| 09_Foundations--Class_Attributes.md       |X|
-| 10_Foundations--Cleanup.md                |X|
-| 11_Techniques--Testing.md                 |X|
-| 12_Techniques--Data_Classes_as_Types.md   |X|
-| 13_Techniques--Pattern_Matching.md        |X|
-| 14_Techniques--Decorators.md              |X|
-| 15_Techniques--Context_Managers.md        |X|
-| 16_Techniques--Comprehensions.md          |X|
-| 17_Techniques--Metaprogramming.md         |X|
-| 18_Techniques--Performance.md             |X|
-| 19_Techniques--Concurrency.md             |X|
-| 20_Patterns--Rethinking_Objects.md        |X|
-| 21_Patterns--Design_Patterns.md           |X|
-| 22_Patterns--Data_Transfer_Objects.md     |X|
-| 23_Patterns--Iterators.md                 |X|
-| 24_Patterns--Singleton.md                 |X|
-| 25_Patterns--Template_Method.md           | |
-| 26_Patterns--Surrogate.md                 | |
-| 27_Patterns--Factory.md                   | |
-| 28_Patterns--Function_Objects.md          | |
-| 29_Patterns--Changing_the_Interface.md    | |
-| 30_Patterns--Observer.md                  | |
-| 31_Patterns--State_Machines.md            | |
-| 32_Patterns--Multiple_Dispatching.md      | |
-| 33_Patterns--Visitor.md                   | |
-| 34_Patterns--Composite_and_Interpreter.md | |
-| 35_Patterns--Flyweight.md                 | |
-| 36_Patterns--Memento.md                   | |
-| 37_Patterns--Pattern_Refactoring.md       | |
-| 38_Patterns--Simulation.md                | |
-| 39_Patterns--Pattern_Catalog.md           | |
-| 40_Functional--Foundations.md             | |
-| 41_Functional--Toolkits.md                | |
-| 42_Functional--Error_Handling.md          | |
-| 43_Functional--Confidence.md              | |
-| 44_Effects--Effect_Management.md          | |
-| 45_Effects--Generators.md                 | |
-| 46_Effects--Stateless.md                  |X|
-| 47_Effects--Stateless_in_Practice.md      | |
-
-### Initial Draft
-
-This draft gets all the chapters and sections in place and ready for a serious edit pass.
-Two passes: my own edit pass (**Edited**), then incorporating
-Claude's review and re-checking (**Reviewed**).
-
-The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray.
-
-| Chapter | Edited | Reviewed |
-|---------|:------:|:--------:|
-| 01_Introduction.md                        |X|X|
-| 02_Foundations--Tour.md                   |X|X|
-| 03_Foundations--Containers.md             |X|X|
-| 04_Foundations--Control_Flow.md           |X|X|
-| 05_Foundations--Functions.md              |X|X|
-| 06_Foundations--Modules_and_Packages.md   |X|X|
-| 07_Foundations--Classes.md                |X|X|
-| 08_Foundations--Static_Types.md           |X|X|
-| 09_Foundations--Class_Attributes.md       |X|X|
-| 10_Foundations--Cleanup.md                |X|X|
-| 11_Techniques--Testing.md                 |X|X|
-| 12_Techniques--Data_Classes_as_Types.md   |X|X|
-| 13_Techniques--Pattern_Matching.md        |X|X|
-| 14_Techniques--Decorators.md              |X|X|
-| 15_Techniques--Context_Managers.md        |X|X|
-| 16_Techniques--Comprehensions.md          |X|X|
-| 17_Techniques--Metaprogramming.md         |X|X|
-| 18_Techniques--Performance.md             |X|X|
-| 19_Techniques--Concurrency.md             |X|X|
-| 20_Patterns--Rethinking_Objects.md        |X|X|
-| 21_Patterns--Design_Patterns.md           |X|X|
-| 22_Patterns--Data_Transfer_Objects.md     |X|X|
-| 23_Patterns--Iterators.md                 |X|X|
-| 24_Patterns--Singleton.md                 |X|X|
-| 25_Patterns--Template_Method.md           |X|X|
-| 26_Patterns--Surrogate.md                 |X|X|
-| 27_Patterns--Factory.md                   |X|X|
-| 28_Patterns--Function_Objects.md          |X|X|
-| 29_Patterns--Changing_the_Interface.md    |X|X|
-| 30_Patterns--Observer.md                  |X|X|
-| 31_Patterns--State_Machines.md            |X|X|
-| 32_Patterns--Multiple_Dispatching.md      |X|X|
-| 33_Patterns--Visitor.md                   |X|X|
-| 34_Patterns--Composite_and_Interpreter.md |X|X|
-| 35_Patterns--Flyweight.md                 |X|X|
-| 36_Patterns--Memento.md                   |X|X|
-| 37_Patterns--Pattern_Refactoring.md       |X|X|
-| 38_Patterns--Simulation.md                |X|X|
-| 39_Patterns--Pattern_Catalog.md           |X|X|
-| 40_Functional--Foundations.md             |X|X|
-| 41_Functional--Toolkits.md                |X|X|
-| 42_Functional--Error_Handling.md          |X|X|
-| 43_Functional--Confidence.md              |X|X|
-| 44_Effects--Effect_Management.md          |🔴|🔴|
-| 45_Effects--Generators.md                 |🔴|🔴|
-| 46_Effects--Stateless.md                  |X|X|
-| 47_Effects--Stateless_in_Practice.md      |🔴|🔴|
