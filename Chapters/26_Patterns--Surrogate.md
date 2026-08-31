@@ -218,9 +218,13 @@ because it inherits `Service`, code typed against `Service` accepts it.
 `__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 
-### The Limits of `__getattr__()` {#the-limits-of-getattr}
+The lost static check is the first of four limits on `__getattr__()` delegation.
+The next three sections cover the rest:
+`__getattr__()` never sees a special method, never sees an assignment,
+and calls itself when the name it reads is also missing.
 
-Special methods bypass `__getattr__()`.
+### Special Methods Bypass `__getattr__()` {#special-methods-bypass-getattr}
+
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
 not on the instance, so `len(p)` and `print(p)` do not delegate,
 even though an explicit `p.__len__()` would:
@@ -269,6 +273,8 @@ A proxy that must forward special methods defines them explicitly.
 `print(p)` cannot: `object` defines `__str__()`,
 so the lookup on `type(p)` finds that one and the proxy prints as itself.
 A bypassed dunder that `object` defines fails silently.
+
+### Forwarding Writes
 
 Delegation using `__getattr__()` forwards reads, not writes:
 
@@ -342,7 +348,9 @@ Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
 
-The fallback hook can also recurse:
+### The Recursion Trap
+
+The fallback hook can recurse:
 when `__getattr__()`'s body reads a proxy attribute that does not exist,
 that failed lookup calls `__getattr__()` again,
 and Python reports the error as `RecursionError`,

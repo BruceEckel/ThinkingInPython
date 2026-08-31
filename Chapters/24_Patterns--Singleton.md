@@ -579,7 +579,7 @@ Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`.
 The name `Registry` now refers to the decorated instance rather than to the class.
 Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`
-([Surrogate](26_Patterns--Surrogate.md#the-limits-of-getattr) examines this type-based lookup in full).
+([Surrogate](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).
 For an ordinary class, `type(Plain)` is `type`,
 and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
