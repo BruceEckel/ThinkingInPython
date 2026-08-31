@@ -21,7 +21,7 @@ and the ways Python lets you pass, capture, specialize, and combine functions.
 [Toolkits](41_Functional_Toolkits.md) tours the standard library's support,
 [Error Handling](42_Functional_Error_Handling.md)
 turns failure into an ordinary value,
-and [Assurance](43_Functional_Assurance.md)
+and [Confidence](43_Functional_Confidence.md)
 examines what the discipline lets you claim about your code.
 Those four chapters are Part IV.
 Part V then takes the same discipline further.
@@ -73,7 +73,7 @@ A pure function is the most reliable code you can write,
 because its inputs fully describe its behavior.
 You can call it from many threads at once,
 because it shares no state to corrupt.
-[Automatic Parallelism](43_Functional_Assurance.md#automatic-parallelism)
+[Automatic Parallelism](43_Functional_Confidence.md#automatic-parallelism)
 turns that safety into speed.
 A cache can store its results, knowing the answer never goes stale.
 That makes [`functools.cache`](41_Functional_Toolkits.md#cache)

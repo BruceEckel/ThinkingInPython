@@ -84,7 +84,7 @@ and cataloging the classic patterns together with the ones the literature added 
 Part IV, *Functional Programming*, covers pure functions,
 the `functools` and `itertools` toolkits,
 errors returned as values instead of raised exceptions,
-and a spectrum of assurances that runs from local reasoning up to machine-checked proof.
+and a spectrum of confidence that runs from local reasoning up to machine-checked proof.
 
 Part V, *Effects*, closes the book by covering everything a program does that a pure function cannot.
 One chapter surveys the languages that track Effects in a function's type,

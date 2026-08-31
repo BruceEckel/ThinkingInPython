@@ -1,4 +1,4 @@
-# Assurance
+# Confidence
 
 Introductions to functional programming usually call it "programming with functions,"
 and functions really are a central part of the practice.
@@ -130,7 +130,8 @@ Run as a script, this prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
-No locks, no queues, no shared state: a pure function is ready to run in parallel, unchanged.
+No locks, no queues, no shared state:
+a pure function is ready to run in parallel, unchanged.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
@@ -182,12 +183,12 @@ because `@final` on the two classes lets either one narrow to a single class.
 Destructuring merges the shape test and the extraction into one step.
 It does not extend what the type checker knows.
 
-## An Assurance Spectrum
+## A Confidence Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
 The properties these chapters built, purity, immutability,
-and referential transparency, provide assurance at every level.
+and referential transparency, provide confidence at every level.
 You decide how far to take it.
 
 1. The cheapest rung is local reasoning.
@@ -196,7 +197,7 @@ You decide how far to take it.
    Most code needs no more.
 2. Next are tests over chosen examples, the subject of [Testing](11_Testing.md).
    Each one pins a single input to a single answer,
-   so the assurance you get is no wider than the examples you invent.
+   so what you learn is no wider than the examples you invent.
 3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).

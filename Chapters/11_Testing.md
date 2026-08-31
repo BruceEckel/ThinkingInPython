@@ -715,7 +715,7 @@ The tests in this chapter check specific examples:
 this input produces that output.
 A *property-based* test instead states a law the code must always obey,
 and lets a tool generate the inputs that try to break it.
-[Assurance](43_Functional_Assurance.md#an-assurance-spectrum)
+[Confidence](43_Functional_Confidence.md#a-confidence-spectrum)
 shows the technique,
 including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
 library that automates it.
