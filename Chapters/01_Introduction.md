@@ -81,7 +81,7 @@ The part ends by refactoring one problem through several designs,
 building a simulation out of the pieces,
 and cataloging the classic patterns together with the ones the literature added later.
 
-Part IV, *Functional Programming*, covers pure functions,
+Part IV, *Functional*, covers pure functions,
 the `functools` and `itertools` toolkits,
 errors returned as values instead of raised exceptions,
 and a spectrum of confidence that runs from local reasoning up to machine-checked proof.
