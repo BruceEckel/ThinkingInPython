@@ -116,22 +116,21 @@ for details and install links.
 
 The commands below rebuild `build/examples/` and `build/solutions/` from
 the Markdown first, so they always test the current book, never a stale
-copy. Timings come from a recent desktop machine.
+copy. All of them are quick, and `make run` is the slowest.
 
 | Command | What it does |
 |---|---|
-| `make run` | Executes every example file and reports failures. About 15 seconds. |
-| `make test` | Runs the book's `pytest` examples, the `test_*.py` files. About 5 seconds. |
+| `make run` | Executes every example file and reports failures. |
+| `make test` | Runs the book's `pytest` examples, the `test_*.py` files. |
 | `make ty` | Type-checks every example. Must come out clean. |
 | `make lint` | PEP8-lints every example with `ruff`. Must come out clean. |
-| `make solutions-run` | Executes every extracted solution and reports failures. About 7 seconds. |
-| `make solutions-test` | Runs the solutions' `pytest` examples. About 3 seconds. |
+| `make solutions-run` | Executes every extracted solution and reports failures. |
+| `make solutions-test` | Runs the solutions' `pytest` examples. |
 | `make solutions-ty`, `make solutions-lint` | The same two checks over `build/solutions/`. |
-| `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests. About 17 seconds. |
+| `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests. |
 | `make gate` | Every check over both trees. Run this before committing. |
 
 A first run also pays for downloading the pinned Python and the dev tools.
-After that, `make run` is the slowest of these.
 
 A few examples cannot run unattended because they open a window, wait for
 input, or loop forever. `make run` reports those as "Can't run unattended"
@@ -148,7 +147,7 @@ something else. Expect `git diff Chapters/` to show both.
 ### Work on one chapter
 
 `make check-ch CH=07` runs the whole code-example gate against one chapter
-in about a second: extract, output markers, listing format, types, lint,
+instead of all 47: extract, output markers, listing format, types, lint,
 tests. `CH` takes a number or a filename stem. Make this your edit loop.
 Only `make gate` catches breakage across chapters.
 
