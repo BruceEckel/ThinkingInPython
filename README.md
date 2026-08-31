@@ -8,7 +8,7 @@
 <h3 align="center">Bruce Eckel</h3>
 
 An intermediate-to-advanced book for experienced programmers.
-Includes a fast introduction for programmers from other languages.
+It opens with a fast introduction for programmers coming from other languages.
 
 ## Read the Book Online
 
@@ -35,9 +35,9 @@ All versions are on the
 
 ## Examples and Solutions
 
-Every listing in the book is a real file that runs, and it is in
-`Examples/`, under its chapter's directory and under the name the book
-gives it. The answers to the exercises are in `Solutions/`.
+Every listing in the book is a real file that runs. You will find it in
+`Examples/`, in its chapter's directory, under the name the book gives it.
+The answers to the exercises are in `Solutions/`.
 
 | Directory | What is in it |
 |---|---|
@@ -47,9 +47,9 @@ gives it. The answers to the exercises are in `Solutions/`.
 | `SolutionsCode/` | The solution listings extracted to `.py` files, the same way `Examples/` is. |
 | `Chapters/` | The book itself, one Markdown file per chapter. |
 
-Both code trees are generated from `Chapters/` and `Solutions/`, where each
-listing is a fenced `python` block whose first line is a `# name.py`
-comment. The code you read is therefore the code that runs.
+The build generates both code trees from `Chapters/` and `Solutions/`,
+where each listing is a fenced `python` block whose first line is a
+`# name.py` comment. The code you read is therefore the code that runs.
 
 ### Reading a listing
 
@@ -64,8 +64,8 @@ print(c.area)
 #: 314.159
 ```
 
-The build runs every listing and compares its actual stdout against these
-markers, so a marker in the book is never out of date with the code.
+The build runs every listing and compares its stdout against these markers,
+so a marker in the book always says what the code prints.
 
 ### Working the exercises
 
@@ -76,9 +76,9 @@ that chapter's `Solutions/` file. Each solution is self-contained: it
 repeats whatever it needs from the chapter rather than importing it, so you
 can read or run one on its own.
 
-`Examples/` and `SolutionsCode/` are regenerated from the Markdown, so
-`make sync` discards edits made there. Experiment in them freely, but copy
-anything you want to keep somewhere outside those two trees.
+`make sync` regenerates `Examples/` and `SolutionsCode/` from the Markdown,
+discarding any edits you made there. Experiment in them freely, but keep
+anything you want to save outside those two trees.
 
 ## Setup
 
@@ -90,29 +90,29 @@ anything you want to keep somewhere outside those two trees.
    For Windows: `winget install ezwinports.make`
 3. Install [uv](https://docs.astral.sh/uv/).
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
-   Python (3.15+) and dev tools automatically. No manual Python install is needed.
-5. Run `make tools-check` to verify that the essential tools are available.
+   Python (3.15+) and the dev tools automatically.
+5. Run `make tools-check` to verify the essential tools.
 
 That is everything you need to run and test the examples and the solutions.
-`make doctor` diagnoses the two environment problems that bite in practice,
-a stale `uv` stuck on an old Python prerelease and (on Windows) a process
+`make doctor` diagnoses the two environment problems that bite in practice:
+a stale `uv` stuck on an old Python prerelease, and (on Windows) a process
 holding `.venv` open.
 
 Building the book itself needs more. `make site`, `make local`, and
-`make serve` want `pandoc` on your PATH, `make pdf` also wants `typst`, and
-`make prose` wants the standalone `vale` binary. `make tools-check-full`
-checks for those too. See
+`make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
+`make prose` needs the standalone `vale` binary. `make tools-check-full`
+checks for all of them. See
 [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.
 
-Type `make` to see every target. In a terminal that opens a picker: arrow
-keys choose, Enter runs, `?` shows a target's full documentation.
+Type `make` to see every target. In a terminal it opens a picker instead:
+arrow keys choose, Enter runs, and `?` shows a target's full documentation.
 
 ### Run and test everything
 
 The commands below rebuild `build/examples/` and `build/solutions/` from
 the Markdown first, so they always test the current book, never a stale
-copy. Timings are from a recent desktop machine.
+copy. Timings come from a recent desktop machine.
 
 | Command | What it does |
 |---|---|
@@ -123,33 +123,33 @@ copy. Timings are from a recent desktop machine.
 | `make solutions-test` | Runs the solutions' `pytest` examples. About 3 seconds. |
 | `make solutions-ty`, `make solutions-lint` | The same two checks over `build/solutions/`. |
 | `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, tests. |
-| `make gate` | Every check over both trees. This is the one to run before committing. |
+| `make gate` | Every check over both trees. Run this before committing. |
 
-A first run pays for downloading the pinned Python and the dev tools; after
-that `make run` is the slowest of these.
+A first run also pays for downloading the pinned Python and the dev tools.
+After that, `make run` is the slowest of these.
 
-A few examples cannot run unattended, because they open a window, wait
-for input, or loop forever. `make run` reports those as "Can't run
-unattended" rather than as failures. They are listed in
-`tools/data/norun.txt`, and running one by hand is the way to see it work.
+A few examples cannot run unattended because they open a window, wait for
+input, or loop forever. `make run` reports those as "Can't run unattended"
+rather than as failures. `tools/data/norun.txt` lists them. Run one by hand
+to watch it work.
 
-Two notes on `make gate`. It runs the solutions checks first, as a
-prerequisite, so a failure there hides any `Chapters/` failure behind it.
-`make sweep` runs everything and reports every failure instead of stopping
-at the first. And `gate` refreshes generated content in place: it rewraps
-prose to one sentence per line and rewrites any `#:` marker whose listing
-now prints something else. Expect `git diff Chapters/` to show those.
+`make gate` runs the solutions checks first, as a prerequisite, so a
+failure there hides every `Chapters/` failure behind it. `make sweep` runs
+everything and reports them all instead of stopping at the first. `gate`
+also refreshes generated content in place: it rewraps prose to one sentence
+per line, and it rewrites any `#:` marker whose listing now prints
+something else. Expect `git diff Chapters/` to show both.
 
 ### Work on one chapter
 
 `make check-ch CH=07` runs the whole code-example gate against one chapter
 in about a second: extract, output markers, listing format, types, lint,
-tests. `CH` takes a number or a filename stem. This is the edit loop.
-`make gate` is still what catches breakage across chapters.
+tests. `CH` takes a number or a filename stem. Make this your edit loop.
+Only `make gate` catches breakage across chapters.
 
 ### Run one example by hand
 
-Run it from its own chapter directory, so that the sibling modules and data
+Run it from its own chapter directory, so the sibling modules and data
 files it opens resolve the way the book assumes:
 
 ```bash
