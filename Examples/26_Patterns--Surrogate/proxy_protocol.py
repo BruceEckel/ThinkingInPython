@@ -1,7 +1,7 @@
 # proxy_protocol.py
 from typing import Protocol, runtime_checkable
 
-@runtime_checkable  # Allows isinstance() against a Protocol
+@runtime_checkable  # Allows isinstance() on a Protocol
 class Service(Protocol):
     def f(self) -> None: ...
     def g(self) -> None: ...
