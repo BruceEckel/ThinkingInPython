@@ -101,7 +101,7 @@ Name the listing or link the section:
 - "the single generic surrogate above"
   becomes "the single generic surrogate in `state_surrogate.py`"
 - "as the previous section showed"
-  becomes "as [What the Implementation Owes](#what-the-implementation-owes)
+  becomes "as [What the Implementation Supplies](#what-the-implementation-supplies)
   showed" (a named link fails loudly at `heading_links.py` instead of
   quietly misleading)
 

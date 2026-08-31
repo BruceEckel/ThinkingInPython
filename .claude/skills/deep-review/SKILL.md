@@ -161,8 +161,8 @@ have only one sensible answer. When in doubt, write the block's case in
 your head: if it takes one sentence and no reasonable reader answers
 "well, it depends," implement it and record it in the applied-directly
 list instead. Err toward implementing. A wrong small edit costs Bruce one
-line of `git diff`; a needless block costs him the attention he owes the
-real questions.
+line of `git diff`; a needless block spends the attention the real
+questions need.
 
 Confidence here means you know the fix is right, not that the fix is
 small, and no category of finding is off-limits to implementing.

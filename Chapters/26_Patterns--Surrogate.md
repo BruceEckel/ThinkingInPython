@@ -51,7 +51,7 @@ p.g()
 #: Implementation.g()
 ```
 
-### What the Implementation Owes
+### What the Implementation Supplies
 
 `Implementation` need not have the same interface as `Proxy`.
 As long as `Proxy` "speaks for" the class it forwards method calls to,

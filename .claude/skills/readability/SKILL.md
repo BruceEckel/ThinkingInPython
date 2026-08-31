@@ -1715,7 +1715,7 @@ A finding that is real but that you judge should not be acted on goes
 under "Considered and declined," not into a live block.
 Err toward applying rather than asking.
 A wrong edit costs Bruce a `git diff` revert;
-a needless block costs him the attention he owes the real questions.
+a needless block spends the attention the real questions need.
 
 **The applied-directly list.**
 After the rename instruction and the review's opening paragraph, write a
