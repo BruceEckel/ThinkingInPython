@@ -278,7 +278,7 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   letter-spacing: 0.15em; color: var(--muted); margin-bottom: 0.5rem; }}
 .book-subtitle {{ font-family: 'Cormorant Garamond', serif; font-style: italic;
   font-size: 1.1rem; color: var(--muted); margin-bottom: 0.25rem; }}
-.cover-art {{ display: block; width: min(26rem, 88%);
+.cover-art {{ display: block; width: 100%;
   margin: 2.2rem auto 0.6rem; }}
 .title-rule {{ width: 3rem; height: 1px; background: var(--accent);
   margin: 1.5rem 0 2.5rem; }}
