@@ -1,4 +1,4 @@
 # module.py
 
 def useful_function():
-    return "Use this elsewhere!"
+    return "I'm being useful!"

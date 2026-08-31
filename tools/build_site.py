@@ -273,15 +273,18 @@ figure img {{ max-width: 100%; height: auto; }}
 figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   font-size: 0.85rem; color: var(--ink); margin-top: 0.75rem; }}
 .book-title {{ font-family: '{HEADING_FONT}', sans-serif; font-size: 3.5rem;
-  font-weight: 600; line-height: 1.1; margin-bottom: 0.5rem; }}
-.book-author {{ font-family: 'Cormorant SC', serif; font-size: 0.85rem;
-  letter-spacing: 0.15em; color: var(--muted); margin-bottom: 0.5rem; }}
+  font-weight: 600; line-height: 1.1; margin-bottom: 0.5rem;
+  text-align: center; text-wrap: balance; }}
+.book-author {{ font-family: 'Cormorant SC', serif; font-size: 1.05rem;
+  letter-spacing: 0.15em; color: var(--muted); margin-bottom: 0.5rem;
+  text-align: center; }}
 .book-subtitle {{ font-family: 'Cormorant Garamond', serif; font-style: italic;
-  font-size: 1.1rem; color: var(--muted); margin-bottom: 0.25rem; }}
+  font-size: 1.4rem; color: var(--muted); margin-bottom: 0.25rem;
+  text-align: center; }}
 .cover-art {{ display: block; width: 100%;
   margin: 2.2rem auto 0.6rem; }}
 .title-rule {{ width: 3rem; height: 1px; background: var(--accent);
-  margin: 1.5rem 0 2.5rem; }}
+  margin: 1.5rem auto 2.5rem; }}
 .toc-list {{ list-style: none; margin-top: 2rem; }}
 .toc-list li {{ display: flex; align-items: baseline;
   padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }}

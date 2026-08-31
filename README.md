@@ -168,7 +168,7 @@ The first serious edit pass.
 | 25_Patterns--Template_Method.md           | |
 | 26_Patterns--Surrogate.md                 | |
 | 27_Patterns--Factory.md                   | |
-| 28_Patterns--Function_Objects.md          |r|
+| 28_Patterns--Function_Objects.md          | |
 | 29_Patterns--Changing_the_Interface.md    | |
 | 30_Patterns--Observer.md                  | |
 | 31_Patterns--State_Machines.md            | |

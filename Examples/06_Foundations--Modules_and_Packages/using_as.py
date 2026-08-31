@@ -3,4 +3,4 @@ import module as m
 
 if __name__ == "__main__":
     print(m.useful_function())
-#: Use this elsewhere!
+#: I'm being useful!

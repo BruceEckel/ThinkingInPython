@@ -8,7 +8,7 @@ you can use an unqualified `import` statement:
 # module.py
 
 def useful_function():
-    return "Use this elsewhere!"
+    return "I'm being useful!"
 ```
 
 ```python
@@ -20,7 +20,7 @@ print("'module' imported")
 if __name__ == "__main__":
     print(module.useful_function())
 #: 'module' imported
-#: Use this elsewhere!
+#: I'm being useful!
 ```
 
 Importing a module makes its *namespace* reachable in the importing file,
@@ -93,7 +93,7 @@ from module import useful_function
 
 if __name__ == "__main__":
     print(useful_function())
-#: Use this elsewhere!
+#: I'm being useful!
 ```
 
 `from` copies the name's current value into this file rather than linking to it.
@@ -136,7 +136,7 @@ import module as m
 
 if __name__ == "__main__":
     print(m.useful_function())
-#: Use this elsewhere!
+#: I'm being useful!
 ```
 
 A module's namespace is an ordinary dict you can read and write.
