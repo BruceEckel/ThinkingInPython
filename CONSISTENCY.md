@@ -6,9 +6,11 @@ mechanical link and relative-reference scans. Nineteen confident fixes were
 applied directly (duplicated draft sentences in ch17 and ch47, the ch30
 backward-reference-phrased-as-forward, the `display_object` provenance
 conflict, "dataclass" as a one-word noun, and others; see commit `2e502ecc`).
-Everything below needs Bruce's judgment. Each issue carries a recommendation
-and a `[] Reject` box; check the box to reject, and an unchecked box means
-the recommendation can be applied.
+Applied in full on 2026-08-30: no Reject boxes were checked, so every
+recommendation below was applied (three were accept-as-is no-ops), then
+`make verify` ran green. The ty-pin bump (Oddities 8) was gated on a
+fresh probe: on ty 0.0.75 both the `type`-alias and written-out Effect
+signatures still draw `invalid-yield` for an undeclared Ability.
 
 ## Naming collisions and conventions
 
@@ -22,7 +24,7 @@ the recommendation can be applied.
    disambiguates, but use "Functional Foundations" as link text everywhere
    outside Part IV (fix ch18, ch28, ch34 to match ch16).
 
-   [] Reject
+   **Applied.**
 
 2. **GoF citation coverage.** "*GoF Design Patterns*" is the canonical form
    and holds almost everywhere. But chapters 22, 25, 30, 31, 32, 35, and 36
@@ -36,7 +38,7 @@ the recommendation can be applied.
    Application Architecture* in ch22. Leave ch31/32/35 alone; they present
    nothing labeled classic.
 
-   [] Reject
+   **Applied.**
 
 3. **"dunder" vocabulary.** Defined twice (ch06 and ch07), used before
    definition (ch02's `__bool__`/`__len__`), avoided entirely by ch15
@@ -49,7 +51,7 @@ the recommendation can be applied.
    (ch15's usage survives on that reading). In ch07, settle on "attribute",
    keeping "field" only in the C++/Java comparison sentence.
 
-   [] Reject
+   **Applied.**
 
 4. **Ability capitalization** in ch46/47: singular "Ability" is always
    capitalized, the plural is almost always lowercase ("abilities",
@@ -59,7 +61,7 @@ the recommendation can be applied.
    the concept, a mechanical sweep over ch46/47. If the lowercase plural is
    deliberate, reject this and nothing else changes.
 
-   [] Reject
+   **Applied.**
 
 5. **"channel" is overloaded** across the 45/46 boundary: generator channels
    (yield/send/return) vs Effect channels (Ability/error). Each chapter is
@@ -69,7 +71,7 @@ the recommendation can be applied.
    these are channels in a new sense, the two things an `Effect` declares,
    not the three channels a generator carries.
 
-   [] Reject
+   **Applied.**
 
 6. **"boundary function"** in ch47 names two different idioms: a
    `@throws`-lifting wrapper (`draw()`) and a supply-and-run edge function
@@ -79,7 +81,7 @@ the recommendation can be applied.
    edge (it matches the established "the edge" vocabulary) and rename
    `draw()`'s role to a "lifting wrapper" at its two mentions.
 
-   [] Reject
+   **Applied.**
 
 7. **Tool-naming policy is uneven.** Some chapters name `ty` for specific
    diagnostics, others only say "the type checker"; ch12 says "the linter"
@@ -92,7 +94,7 @@ the recommendation can be applied.
    ch12's "the linter". Paraphrase ch13's exact ruff message so upgrades
    cannot stale it. Show `uv run python` in every ch18 reader command.
 
-   [] Reject
+   **Applied.**
 
 8. **"finalizer"** in ch10 covers three different things: `__del__` methods,
    an explicit `close()`, and `weakref.finalize` objects.
@@ -101,7 +103,7 @@ the recommendation can be applied.
    say "the `__del__()` method" and "an explicit cleanup method" for the
    other two. Three small edits in ch10.
 
-   [] Reject
+   **Applied.**
 
 ## Duplicate teaching (restructure candidates)
 
@@ -113,7 +115,7 @@ the recommendation can be applied.
    `Partial()`). In ch27, keep the `games.py`/`games2.py` listings but
    compress the surrounding prose to a reminder plus a link to ch26.
 
-   [] Reject
+   **Applied.**
 
 2. **Type-based special-method lookup** gets paragraph-depth treatment in
    both ch24 (`__call__`) and ch26 (dunder bypass).
@@ -122,7 +124,7 @@ the recommendation can be applied.
    subject). Trim ch24's to one sentence with a forward link to ch26's
    dunder-bypass section.
 
-   [] Reject
+   **Applied.**
 
 3. **Name mangling**: ch11 owns it; ch24 links it, then re-explains it from
    scratch 250 lines later.
@@ -130,7 +132,7 @@ the recommendation can be applied.
    **Recommendation:** Cut ch24's re-explanation to a clause that leans on
    the ch11 link it already made.
 
-   [] Reject
+   **Applied.**
 
 4. **Mutating-while-iterating** is taught from scratch in both ch03 (list)
    and ch04 (list and dict), with no cross-reference between them.
@@ -138,7 +140,7 @@ the recommendation can be applied.
    **Recommendation:** Keep both (first contact vs the dict extension), but
    ch04's section opens with a back-link to ch03's listing.
 
-   [] Reject
+   **Applied.**
 
 5. **Shallow/deep copy**: ch02 intro, ch20 treatment, ch36 full tutorial
    again.
@@ -147,7 +149,7 @@ the recommendation can be applied.
    but open it with a back-link to ch20 framing it as a recap in a new
    context.
 
-   [] Reject
+   **Applied.**
 
 6. **`sys.modules` caching**: ch06 owns it; ch31 re-explains it (in a
    two-files-collision context that arguably earns its keep).
@@ -155,7 +157,7 @@ the recommendation can be applied.
    **Recommendation:** Keep ch31's explanation, add the ch06 link at its
    start.
 
-   [] Reject
+   **Applied.**
 
 7. **`__init_subclass__`**: ch37 re-explains it inline with no ch17 link, and
    ch27's self-registration section substantially re-covers ch17's.
@@ -164,7 +166,7 @@ the recommendation can be applied.
    ch27 alone; it already links ch17 and its extra failure modes (unimported
    plugin, name collision, MRO trap) are its own material.
 
-   [] Reject
+   **Applied.**
 
 ## Assumed-before-taught (front-to-back reader debts)
 
@@ -178,7 +180,7 @@ the recommendation can be applied.
    that the `@` line is a decorator ch14 explains and here only marks the
    function.
 
-   [] Reject
+   **Applied.**
 
 2. **ch19** uses the iterator protocol and generator mechanics (ch23/45
    territory) with only one parenthetical pointer.
@@ -187,7 +189,7 @@ the recommendation can be applied.
    matching parenthetical at `shared_generator.py` pointing to ch23's
    generator section.
 
-   [] Reject
+   **Applied.**
 
 3. **ch16** names `TypeIs`/`TypeGuard` with zero explanation; verify ch08's
    narrowing section introduces them. It also drops the async-generator
@@ -197,7 +199,7 @@ the recommendation can be applied.
    in ch16; if not, add a five-word gloss instead. Add a ch19 link at the
    async-generator sentence.
 
-   [] Reject
+   **Applied.**
 
 4. **ch22** uses the `__getattr__`/`__setattr__` stub trick before ch24/26
    teach the fallback hook.
@@ -205,7 +207,7 @@ the recommendation can be applied.
    **Recommendation:** Add a forward link to ch26's forwarding section at
    the stub-trick sentence.
 
-   [] Reject
+   **Applied.**
 
 5. **ch28** depends on ch40 for closures, `partial`, and `Placeholder` via
    forward links; the `Placeholder` sentence is hard to follow without ch40.
@@ -215,7 +217,7 @@ the recommendation can be applied.
    ("a sentinel that reserves a positional slot") so the sentence stands
    alone.
 
-   [] Reject
+   **Applied.**
 
 6. **ch17** says "You have used metaclasses already", citing ABC and Enum;
    ABC's real teaching is ch20, three chapters later.
@@ -223,7 +225,7 @@ the recommendation can be applied.
    **Recommendation:** Rest the claim on Enum (ch12) and give the ABC
    mention a forward link to ch20's Abstract Base Classes section.
 
-   [] Reject
+   **Applied.**
 
 7. **`# type: ignore` / `# ty:` conventions** are defined in ch08 but used
    from ch03 onward with ad-hoc local glosses. One sentence in ch01's
@@ -234,7 +236,7 @@ the recommendation can be applied.
    Static Typing defines; until then they only mark lines a type checker
    would flag.
 
-   [] Reject
+   **Applied.**
 
 8. **ch29** names `__reduce__()` as the copy/pickle fix with no explanation
    or link anywhere in the book.
@@ -242,14 +244,14 @@ the recommendation can be applied.
    **Recommendation:** Replace the bare name with a clause: `__reduce__()`,
    the hook `pickle` and `copy` consult, whose details are beyond this book.
 
-   [] Reject
+   **Applied.**
 
 9. **ch06** `app_settings.py` carries unflagged annotations pre-ch08 (ch01
    says early chapters "mostly omit" hints; this is the only unflagged case).
 
    **Recommendation:** Accept as covered by ch01's "mostly omit"; no change.
 
-   [] Reject
+   **Applied.**
 
 ## Chapter-level oddities
 
@@ -261,7 +263,7 @@ the recommendation can be applied.
    non-GoF pattern the previous chapter already used, and a ch39 catalog row
    linking it to ch20 if one is missing.
 
-   [] Reject
+   **Applied.**
 
 2. **ch39 ends Part III cold**; ch40 does all the bridging. Deliberate?
 
@@ -269,7 +271,7 @@ the recommendation can be applied.
    opening does the bridging well. At most, one closing sentence in ch39
    pointing at Part IV.
 
-   [] Reject
+   **Applied.**
 
 3. **ch42 has no forward pointer** to ch43 or Part V, though ch44 reuses its
    `Result`/`@safe` machinery heavily; the hand-off lives only in ch40 and
@@ -279,7 +281,7 @@ the recommendation can be applied.
    the discipline lets you claim, and Effect Management builds on this
    `Result` machinery.
 
-   [] Reject
+   **Applied.**
 
 4. **ch17's opening line** "Other (special) objects create objects." gives
    "Other" no antecedent at the start of a chapter.
@@ -288,7 +290,7 @@ the recommendation can be applied.
    "Objects come from classes. Classes are objects too, created by other,
    special objects."
 
-   [] Reject
+   **Applied.**
 
 5. **ch18** "Ask your AI to convert the hot Python function" is a register
    outlier; deliberate?
@@ -296,7 +298,7 @@ the recommendation can be applied.
    **Recommendation:** Keep it; the pragmatism fits the book and the advice
    is real. Reject the issue rather than the sentence.
 
-   [] Reject
+   **Applied.**
 
 6. **ch44 coins "implicit inputs"** as a synonym and never uses it again
    ("side causes" is the working term everywhere, including ch46/47).
@@ -304,7 +306,7 @@ the recommendation can be applied.
    **Recommendation:** Drop the "implicit inputs" synonym; keep "side
    causes".
 
-   [] Reject
+   **Applied.**
 
 7. **ch46** juxtaposes `Console`'s "`print_line()` and `read_line()`
    accessors" with "implements `input()` as well as `print()`" two sentences
@@ -315,7 +317,7 @@ the recommendation can be applied.
    a bridging clause: the accessors are the Effect-side functions, and
    `print()`/`input()` are the methods the concrete `Console` implements.
 
-   [] Reject
+   **Applied.**
 
 8. **ch46/47 pin behavior claims to "under `ty` 0.0.70"** in four places; the
    repo is past 0.0.75. The claims may still hold, but every ty upgrade
@@ -325,7 +327,7 @@ the recommendation can be applied.
    the version numbers, and add these four spots to the ty-upgrade checklist
    in CLAUDE.md so the next upgrade sweeps them.
 
-   [] Reject
+   **Applied.**
 
 9. **ch26** spells the private implementation attribute four ways across
    listings (`__implementation`, `_implementation`, `_impl`, `_doc`); only
@@ -335,7 +337,7 @@ the recommendation can be applied.
    `_impl` where it first appears; renaming the listings themselves is churn
    without payoff.
 
-   [] Reject
+   **Applied.**
 
 10. **`singledispatchmethod`** is treated three inconsistent ways: inline
     unlinked (ch32), linked to ch41 (ch33), mentioned unlinked (ch37).
@@ -344,7 +346,7 @@ the recommendation can be applied.
     add the ch41 link there; keep ch33's link; add the link at ch37's
     mention.
 
-    [] Reject
+    **Applied.**
 
 11. **`__subclasses__()`** is used unexplained in ch32 and ch33; its
     introduction is inline in ch27. Consider links.
@@ -352,7 +354,7 @@ the recommendation can be applied.
     **Recommendation:** Add "(introduced in [Factory])" at the first use in
     each of ch32 and ch33.
 
-    [] Reject
+    **Applied.**
 
 12. **Enum's home** is ch12's "Enums Are Types Too", but ch12's own Enum
     usage doesn't announce it and ch13 uses Enum without a link.
@@ -360,7 +362,7 @@ the recommendation can be applied.
     **Recommendation:** Open ch12's Enum section with a sentence claiming
     the introduction, and link it from ch13's first Enum use.
 
-    [] Reject
+    **Applied.**
 
 13. **ch47** links "partial handling" to `46#emptying-the-channels`; the
     layered-supply technique it invokes is actually demonstrated in ch46's
@@ -369,7 +371,7 @@ the recommendation can be applied.
     **Recommendation:** Retarget the link to ch46's dependency-injection
     section.
 
-    [] Reject
+    **Applied.**
 
 14. **The parameterize-spelling policy** for the whole book lives in a ch17
     footnote.
@@ -377,14 +379,14 @@ the recommendation can be applied.
     **Recommendation:** Move the policy to ch11, where `parametrize` first
     appears, and have ch17's footnote point there.
 
-    [] Reject
+    **Applied.**
 
 15. **ch41's Memoization row in ch39** links to `#the-functools-toolkit`
     though the finer `#cache` anchor exists.
 
     **Recommendation:** Retarget ch39's Memoization row to `#cache`.
 
-    [] Reject
+    **Applied.**
 
 ## Verified clean (no action needed)
 
