@@ -35,23 +35,25 @@ All versions are on the
 
 ## Examples and Solutions
 
-Every listing in the book is a real file that runs, and the book's Markdown
-source is where it lives. A listing is a fenced `python` block whose first
-line is a `# name.py` comment. Everything below is extracted from those
-blocks, so the code you read is the code that runs.
+Every listing in the book is a real file that runs, and it is in
+`Examples/`, under its chapter's directory and under the name the book
+gives it. The answers to the exercises are in `Solutions/`.
 
 | Directory | What is in it |
 |---|---|
-| `Chapters/` | The book, one Markdown file per chapter. The source of truth. |
 | `Examples/` | The book's listings, one directory per chapter (`Examples/07_Foundations--Classes/`), each file named the way the book names it (`property_setter.py`). |
 | `Examples/utils/` | Helpers that several chapters import, such as `display.py` and `benchmark.py`. Not a chapter. |
 | `Solutions/` | Worked answers to the exercises, one Markdown file per chapter, numbered to match that chapter's exercise list. |
 | `SolutionsCode/` | The solution listings extracted to `.py` files, the same way `Examples/` is. |
+| `Chapters/` | The book itself, one Markdown file per chapter. |
+
+Both code trees are generated from `Chapters/` and `Solutions/`, where each
+listing is a fenced `python` block whose first line is a `# name.py`
+comment. The code you read is therefore the code that runs.
 
 ### Reading a listing
 
-When a chapter names `property_setter.py`, that file is in the chapter's
-`Examples/` directory, byte for byte as printed. A `#:` comment holds the
+The file is byte for byte what the book prints. A `#:` comment holds the
 output of the statement above it:
 
 ```python
