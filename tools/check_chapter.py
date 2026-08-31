@@ -6,7 +6,7 @@ spent executing every listing in all 44 chapters. When you are editing the
 listings in a single chapter, almost none of that work is about your edit.
 This runs the same checks a code example must pass, scoped to one chapter:
 
-    make check-ch CH=12          # or CH=12_Data_Classes_as_Types
+    make check-ch CH=12          # or CH=12_Techniques--Data_Classes_as_Types
 
 The steps, in order:
 

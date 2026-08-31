@@ -200,7 +200,7 @@ caller can now pass `random.Random()` with no seed and get a function
 that is no longer reproducible.
 
 This is dependency injection applied to a source of nondeterminism,
-the same move [Random Numbers](../Chapters/11_Testing.md#random-numbers)
+the same move [Random Numbers](../Chapters/11_Techniques--Testing.md#random-numbers)
 makes for testing. The function does not become more or less pure either way:
 it was always a pure function of its arguments, and the argument it
 depends on simply became explicit.

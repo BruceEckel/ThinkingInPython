@@ -80,7 +80,7 @@ def test_heading_with_no_letters_gets_no_id() -> None:
 # ── rewriting links ───────────────────────────────────────────────────────────
 
 BOOK = Ids(
-    prefixes={"12_Data_Classes": "ch12", "24_Singleton": "ch24"},
+    prefixes={"12_Data_Classes": "ch12", "24_Patterns--Singleton": "ch24"},
     known={"ch12", "ch24", "ch12-immutability", "ch24-borg",
            "ch12-dynamic-binding-vs.-pattern-matching"},
     aliases={"ch24-singleton": "ch24"},
@@ -94,10 +94,10 @@ def test_same_document_anchor_is_namespaced() -> None:
     assert rewritten("see [x](#immutability)") == "see [x](#ch12-immutability)"
 
 def test_cross_chapter_anchor_points_into_that_chapter() -> None:
-    assert rewritten("[x](24_Singleton.md#borg)") == "[x](#ch24-borg)"
+    assert rewritten("[x](24_Patterns--Singleton.md#borg)") == "[x](#ch24-borg)"
 
 def test_whole_chapter_link_points_at_the_chapter() -> None:
-    assert rewritten("[x](24_Singleton.md)") == "[x](#ch24)"
+    assert rewritten("[x](24_Patterns--Singleton.md)") == "[x](#ch24)"
 
 def test_anchor_may_contain_a_period() -> None:
     # Pandoc keeps a period in an auto id, and chapter 13 links to one.
@@ -125,7 +125,7 @@ def test_unknown_anchor_is_reported_and_left_alone() -> None:
     assert unresolved == {"#no-such-section"}
 
 def test_alias_sends_a_title_anchor_to_the_chapter_root() -> None:
-    assert rewritten("[x](24_Singleton.md#singleton)") == "[x](#ch24)"
+    assert rewritten("[x](24_Patterns--Singleton.md#singleton)") == "[x](#ch24)"
 
 def test_outside_code_leaves_code_spans_alone() -> None:
     assert outside_code("a `b` c", str.upper) == "A `b` C"
@@ -165,9 +165,9 @@ def chapters_in(tmp_path: Path, files: dict[str, str]) -> list[Chapter]:
 def test_colliding_headings_land_in_separate_namespaces(
         tmp_path: Path) -> None:
     chapters = chapters_in(tmp_path, {
-        "03_Containers": "# Containers\n\n## Immutability\n\ntext\n",
+        "03_Foundations--Containers": "# Containers\n\n## Immutability\n\ntext\n",
         "12_Data": "# Data\n\n## Immutability\n\n"
-                   "[back](03_Containers.md#immutability)\n",
+                   "[back](03_Foundations--Containers.md#immutability)\n",
     })
     missing: set[str] = set()
     unresolved: set[str] = set()
@@ -180,7 +180,7 @@ def test_colliding_headings_land_in_separate_namespaces(
 
 def test_chapter_title_becomes_a_numbered_level_one_heading(
         tmp_path: Path) -> None:
-    chapters = chapters_in(tmp_path, {"07_Classes": "# Classes\n\nbody\n"})
+    chapters = chapters_in(tmp_path, {"07_Foundations--Classes": "# Classes\n\nbody\n"})
     text = book_markdown(chapters, set(), set())
     # The EPUB form: the number as an eyebrow span above the bare title.
     assert text.startswith(
@@ -195,7 +195,7 @@ def test_part_divider_is_emitted_before_its_chapter(tmp_path: Path) -> None:
     # build_site.PARTS starts Part I at chapter 02.
     chapters = chapters_in(tmp_path, {
         "01_Introduction": "# Introduction\n\nbody\n",
-        "02_Tour": "# Tour\n\nbody\n",
+        "02_Foundations--Tour": "# Tour\n\nbody\n",
     })
     text = book_markdown(chapters, set(), set())
     assert (text.index("# Part I")

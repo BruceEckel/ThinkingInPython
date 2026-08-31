@@ -17,7 +17,7 @@ the book's control.
 
 Usage:
     python tools/list_todos.py            # every marker in Chapters/
-    python tools/list_todos.py Chapters/18_Performance.md
+    python tools/list_todos.py Chapters/18_Techniques--Performance.md
 """
 
 import argparse

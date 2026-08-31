@@ -277,7 +277,7 @@ chapters, almost none of which is about the chapter you just edited. This
 runs the same code-example checks scoped to one:
 
 ```
-make check-ch CH=12     # or CH=12_Data_Classes_as_Types
+make check-ch CH=12     # or CH=12_Techniques--Data_Classes_as_Types
 ```
 
 It rebuilds `build/examples/` whole-book first (cheap, and necessary since
@@ -297,7 +297,7 @@ gate run" but "has anything changed since it did":
 
 ```
 gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
-3 files changed since: 23_Iterators.md, 24_Singleton.md, ...
+3 files changed since: 23_Patterns--Iterators.md, 24_Patterns--Singleton.md, ...
 ```
 
 **`tool_stamp.py` (`make tools-status`)** records when `make tools-upgrade`
@@ -406,7 +406,7 @@ is skipped here on purpose: see `extract_rust.py` below.
 ## extract_rust.py
 
 A second, separate extractor for the Rust/PyO3 examples in
-[Converting a Slow Function to Rust](../Chapters/18_Performance.md#converting-a-slow-function-to-rust),
+[Converting a Slow Function to Rust](../Chapters/18_Techniques--Performance.md#converting-a-slow-function-to-rust),
 extended to a second language. A ` ```rust ` block whose first line is a
 Rust comment naming the file (relative to `rust/`, e.g.
 `// fastcount/src/lib.rs`) extracts there; a ` ```python ` block whose
@@ -601,10 +601,10 @@ notices a missing answer.
 
 It also checks how a solution cites its chapter, which is a trap the layout
 sets. `Solutions/` sits beside `Chapters/` with the same file names, so a link
-copied from a chapter, `](24_Singleton.md#state)`, resolves to
-`Solutions/24_Singleton.md`: a real file, wrong content, no warning from
+copied from a chapter, `](24_Patterns--Singleton.md#state)`, resolves to
+`Solutions/24_Patterns--Singleton.md`: a real file, wrong content, no warning from
 anything. Seventeen links were wrong this way before anything looked. The
-correct form is `](../Chapters/24_Singleton.md#state)`, and a leading `./`
+correct form is `](../Chapters/24_Patterns--Singleton.md#state)`, and a leading `./`
 marks a deliberate link to a neighboring solution.
 
 `heading_links.py` covers the other half. The gate now runs its `anchors`
@@ -904,7 +904,7 @@ make fix-comment-spacing   # collapse the gaps to two spaces
 
 Verifies that every heading-anchor link resolves to a real heading, so a typo
 does not ship as a dead in-page link. Markdown can link to a heading with
-`[text](#id)` (same file) or `[text](08_Static_Types.md#id)` (another chapter).
+`[text](#id)` (same file) or `[text](08_Foundations--Static_Types.md#id)` (another chapter).
 The tool reproduces pandoc's anchor rule (lowercase, spaces to hyphens,
 punctuation and backticks removed, leading non-letters dropped), honors an
 explicit `{#id}` on a heading, collects every id, and checks each `#anchor`
@@ -1009,7 +1009,7 @@ a cross-reference stays a link between files and the builder only rewrites
 the book's anchors ambiguous: 44 chapters end in `## Exercises`, and
 `#immutability`, `#generators`, `#lambdas` and six other anchors each appear in
 two to four chapters. Pandoc's own de-duplication numbers repeats in document
-order, so `[Immutability](12_Data_Classes_as_Types.md#immutability)` would
+order, so `[Immutability](12_Techniques--Data_Classes_as_Types.md#immutability)` would
 quietly open chapter 3.
 
 So every heading gets an explicit id namespaced by chapter number, and every
@@ -1018,9 +1018,9 @@ link is rewritten to match:
 | Markdown | In the EPUB |
 | --- | --- |
 | `## Immutability` | `## Immutability {#ch12-immutability}` |
-| `[x](12_Data_Classes_as_Types.md#immutability)` | `[x](#ch12-immutability)` |
+| `[x](12_Techniques--Data_Classes_as_Types.md#immutability)` | `[x](#ch12-immutability)` |
 | `[x](#immutability)` (same chapter) | `[x](#ch12-immutability)` |
-| `[x](24_Singleton.md)` | `[x](#ch24)` |
+| `[x](24_Patterns--Singleton.md)` | `[x](#ch24)` |
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not start
 with a digit. The old ids come from `heading_links.pandoc_anchor()`, the

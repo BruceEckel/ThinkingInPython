@@ -9,7 +9,7 @@ book's anchors stop being unique: 44 chapters each end in `## Exercises`,
 and `#immutability`, `#generators`, `#lambdas` and six others appear in
 two to four chapters apiece. Pandoc's own de-duplication would number
 them in document order (`immutability`, `immutability-1`, ...), silently
-sending `[Immutability](12_Data_Classes_as_Types.md#immutability)` to
+sending `[Immutability](12_Techniques--Data_Classes_as_Types.md#immutability)` to
 chapter 3's heading instead of chapter 12's.
 
 So this builder does not rely on that de-duplication. It gives every
@@ -19,7 +19,7 @@ link to match:
     ## Immutability                       ->  ## Immutability {#ch12-immutability}
     [x](12_Data_Classes.md#immutability)  ->  [x](#ch12-immutability)
     [x](#immutability)                    ->  [x](#ch12-immutability)
-    [x](24_Singleton.md)                  ->  [x](#ch24)
+    [x](24_Patterns--Singleton.md)                  ->  [x](#ch24)
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not
 start with a digit.

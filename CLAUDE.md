@@ -259,19 +259,33 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any
   `tools/tests/` fixture naming a chapter. Appendices use letter prefixes
   (`A_...`); build_site labels them "Appendix X".
-  The one that hides: **`pyproject.toml`'s `per-file-ignores` keys a few entries
-  by chapter directory** (`"**/46_Effects--Stateless/exercise_8.py"`), so a rename
-  silently drops the waiver and the listing fails `I001` at `solutions-gate`,
-  several steps after the rename looked done. Grep `pyproject.toml` for the old
-  directory name before running `verify`.
+  The ones that hide, both in `pyproject.toml`: **`per-file-ignores` keys a few
+  entries by chapter directory** (`"**/46_Effects--Stateless/exercise_8.py"`), so
+  a rename silently drops the waiver and the listing fails `I001` at
+  `solutions-gate`, several steps after the rename looked done; and
+  **`[tool.ty.environment] extra-paths` names one**
+  (`build/examples/06_Foundations--Modules_and_Packages`), where a stale entry
+  makes `ty` refuse to start with "does not point to a directory". Grep
+  `pyproject.toml` for the old directory name before running `verify`.
   Renaming the *chapter title* additionally means the H1, the Solutions H1
   (`<Title>: Solutions`), and every link whose text was the old title.
-- **Part IV and V filenames carry their part name, set off by `--`:**
+- **Every chapter filename carries its part name, set off by `--`:**
+  `NN_<Part>--<Chapter_Name>.md`, as in `08_Foundations--Static_Types.md`,
+  `18_Techniques--Performance.md`, `34_Patterns--Composite_and_Interpreter.md`,
   `42_Functional--Error_Handling.md`, `47_Effects--Stateless_in_Practice.md`.
-  The H1 drops the qualifier (`# Error Handling`), so the filename and the URL
-  say which part a chapter is in while the book's title stays short.
+  The part name is the one in `build_site.PARTS`, so renaming a part renames its
+  chapters' files. `01_Introduction.md` stays bare: `PARTS` starts Part I at 02,
+  so chapter 01 belongs to no part. The H1 carries only the chapter name
+  (`# Static Types`), so the filename and the URL say which part a chapter is in
+  while the book's own title stays short. Filename stem and H1 therefore never
+  match; do not "fix" one to the other.
   Keep `_` as the separator right after the number: `build_site.py` and
   `check_solutions.py` both pull the chapter number with `split("_", 1)[0]`.
+  **A regex that matches chapter filenames must allow `-`.** `check_solutions.py`'s
+  `BARE_CHAPTER_LINK` was `\d{2}_[A-Za-z_]+\.md` and stopped matching every chapter
+  the moment the `--` landed, so the check reported nothing instead of failing.
+  Its own unit test caught that one. Grep `re.compile` for `\.md` before adding a
+  character to a filename.
   Only `[\w./-]` is safe in a filename, because that is the character class in
   all three link regexes (`build_site.MD_LINK`, `build_epub.ANCHOR_TARGET`,
   `heading_links.ANCHOR_TARGET`). A character outside it fails *silently*, which
@@ -338,7 +352,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `redundant-cast` warning and fails the gate. `if char not in SPECS:
   raise KeyError(char)` (where `SPECS` is keyed by the literal type) is
   enough; `return char` then satisfies the declared return type.
-  Chapter 35's `to_symbol()` and `Solutions/35_Flyweight.md` were written
+  Chapter 35's `to_symbol()` and `Solutions/35_Patterns--Flyweight.md` were written
   against the older behavior and were fixed when 0.0.63 landed. The
   boundary-function idiom itself is still right, only the `cast()` inside
   it went away. Project memory (`typing-construct-hierarchy`) has the

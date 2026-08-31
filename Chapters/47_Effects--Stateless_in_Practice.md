@@ -1311,7 +1311,7 @@ and the graph you can read is the union in the signature.
 The bakery graph went deep.
 Three appliances, one of them reached through another Effect.
 The next example goes wide.
-[Abstract Factories](27_Factory.md#abstract-factories)
+[Abstract Factories](27_Patterns--Factory.md#abstract-factories)
 built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
 and a `GameEnvironment` played whatever that factory produced.
 Here the cast widens to five kinds of actor, each requested as an Ability:
@@ -1797,7 +1797,7 @@ as the pool does here, or the supplied object owns it:
 the library's own `Files` class opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
 which is the flat resource management a native Effect system provides.
-Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Context_Managers.md#combining-context-managers),
+Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Techniques--Context_Managers.md#combining-context-managers),
 which holds a set of managers decided at runtime and unwinds them together.
 It flattens the nesting without knowing anything about Effects,
 so this gap is narrower than it first appears.

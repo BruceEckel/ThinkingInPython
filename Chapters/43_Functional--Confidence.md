@@ -145,7 +145,7 @@ because it pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
 and without the guard every worker would build a pool of its own.
-[Concurrency](19_Concurrency.md#parallelism) covers all of this,
+[Concurrency](19_Techniques--Concurrency.md#parallelism) covers all of this,
 along with the reasons Python parallelism uses processes rather than threads.
 
 ## Declarative Style
@@ -153,7 +153,7 @@ along with the reasons Python parallelism uses processes rather than threads.
 *Declarative* code states the result you want.
 *Imperative* code spells out each step to produce it.
 A comprehension is the everyday example
-(see [Comprehensions](16_Comprehensions.md)).
+(see [Comprehensions](16_Techniques--Comprehensions.md)).
 `squares = []`, then `for n in numbers:`, then `if n % 2 == 0:`,
 then `squares.append(n * n)` says *how*.
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
@@ -168,7 +168,7 @@ or a dataframe operation can run on an optimized or parallel engine you do not s
 You describe the what, not a fixed sequence of moves.
 
 `match` applies the same idea to taking data apart
-(see [Pattern Matching](13_Pattern_Matching.md)).
+(see [Pattern Matching](13_Techniques--Pattern_Matching.md)).
 You describe the shapes you expect and Python binds the pieces,
 so one `match` replaces a stack of `isinstance()` tests, length checks,
 and key or index lookups,
@@ -195,7 +195,8 @@ You decide how far to take it.
    Pure functions and immutable values let you understand one piece at a time,
    with no hidden state to carry in your head.
    Most code needs no more.
-2. Next are tests over chosen examples, the subject of [Testing](11_Testing.md).
+2. Next are tests over chosen examples,
+   the subject of [Testing](11_Techniques--Testing.md).
    Each one pins a single input to a single answer,
    so what you learn is no wider than the examples you invent.
 3. Next is type checking.

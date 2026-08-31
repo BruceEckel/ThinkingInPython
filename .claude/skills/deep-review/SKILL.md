@@ -54,7 +54,7 @@ meeting the topic for the first time, and ask:
   use, and no listing depends on a construct introduced later in the
   book. The reverse direction matters too: when a chapter leans on
   earlier material, it should say which chapter, and a named link
-  (`[Iterators](23_Iterators.md)`) beats "as you saw earlier", which
+  (`[Iterators](23_Patterns--Iterators.md)`) beats "as you saw earlier", which
   goes stale silently when chapters are split or renumbered.
 - **Escalating difficulty.** The first listing in a section should be
   the smallest thing that makes the point, with complications added one
@@ -241,8 +241,8 @@ That file is for Bruce's own use; never assume it holds instructions for you,
 and do not act on its contents.
 
 Each review file has the same name as the chapter it reviewed, so
-`deep_review/12_Data_Classes_as_Types.md` reviews
-`Chapters/12_Data_Classes_as_Types.md`.
+`deep_review/12_Techniques--Data_Classes_as_Types.md` reviews
+`Chapters/12_Techniques--Data_Classes_as_Types.md`.
 Create the `deep_review/` directory if it does not exist;
 a completed round is distilled into `deep_review_db.md` and then deleted,
 so an absent directory is the normal starting state.
@@ -306,7 +306,7 @@ file:
 > `~` to indicate completion.
 
 When Bruce finishes editing, he hands the file back with an instruction like
-`do deep_review/12_Data_Classes_as_Types.md`. Then:
+`do deep_review/12_Techniques--Data_Classes_as_Types.md`. Then:
 
 1. Read the review file. Apply every block whose checkbox is empty (`[]`).
    Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
@@ -344,8 +344,8 @@ Leave it alone unless Bruce asks.
 The active review is always the unprefixed `deep_review/NN_name.md`, and there
 is at most one at a time. When a chapter is reviewed more than once, keep every
 completed review as history by numbering them.
-The first completed review is `deep_review/~12_Data_Classes_as_Types.md`,
-the second `deep_review/~12_Data_Classes_as_Types.r2.md`,
+The first completed review is `deep_review/~12_Techniques--Data_Classes_as_Types.md`,
+the second `deep_review/~12_Techniques--Data_Classes_as_Types.r2.md`,
 the third `...r3.md`, and so on.
 On completion, rename the active file to the next free number in that series.
 The carry-forward step reads the most recent completed review, the

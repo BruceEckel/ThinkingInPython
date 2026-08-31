@@ -1,6 +1,6 @@
 # Generators
 
-[Iterators](23_Iterators.md#generators)
+[Iterators](23_Patterns--Iterators.md#generators)
 presented generators as a way to produce values lazily:
 a function containing `yield`,
 driven by a `for` loop that takes one value at a time.
@@ -258,7 +258,7 @@ The generator declares Effects, the driver interprets them.
 One generator, one driver.
 Nothing states that pairing, but the runtime protects it:
 a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
-[Concurrency](19_Concurrency.md#sharing-an-iterator-between-threads)
+[Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows the failure and `threading.synchronized_iterator()`,
 which serializes the conversation.
 
@@ -617,7 +617,7 @@ task_runner()
 
 `@task` calls each generator function once at definition time,
 queues the generator it builds, and hands the function back unchanged,
-the registering-decorator shape from [Decorators](14_Decorators.md#decorating-classes).
+the registering-decorator shape from [Decorators](14_Techniques--Decorators.md#decorating-classes).
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
 One that finishes raises `StopIteration` and never rejoins the queue.
@@ -626,7 +626,7 @@ though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.
 
 None of this is exotic, and you have run a driver like `drive()` many times.
-[Concurrency](19_Concurrency.md#asyncio-mechanics)
+[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 presented `await` and the event loop as a way to overlap waiting,
 and left the mechanism alone.
 The mechanism is the two halves you have now seen:
@@ -672,7 +672,7 @@ That is the question the next chapter puts into the type system.
     given that the two are equivalent at runtime.
     `send_none_is_next.py` has the answer.
     State it in terms of the `SendType`.
-7.  [A Vending Machine](31_State_Machines.md#a-vending-machine)
+7.  [A Vending Machine](31_Patterns--State_Machines.md#a-vending-machine)
     keeps its current state in an attribute and looks up each transition in a table.
     Write a simplified version as a single generator instead: it collects money,
     takes two digits, then dispenses or refuses,

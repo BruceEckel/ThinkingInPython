@@ -1730,8 +1730,8 @@ When asked to review a chapter rather than rewrite it in place,
 apply the findings that clear the bar above,
 and write the rest to `readability/NN_name.md`,
 a file whose name matches the chapter it reviews.
-So `readability/12_Data_Classes_as_Types.md` reviews
-`Chapters/12_Data_Classes_as_Types.md`.
+So `readability/12_Techniques--Data_Classes_as_Types.md` reviews
+`Chapters/12_Techniques--Data_Classes_as_Types.md`.
 Create the `readability/` directory if it does not exist.
 When you first create it, add a `!Notes.md` file for Bruce's own use.
 That file belongs to the human; never assume it holds instructions for you,
@@ -1791,7 +1791,7 @@ file:
 
 **Applying a review file.**
 When Bruce hands the file back with an instruction like
-`do readability/12_Data_Classes_as_Types.md`:
+`do readability/12_Techniques--Data_Classes_as_Types.md`:
 
 1. Read the review file. Apply every block whose checkbox is empty (`[]`).
    Skip every block marked `[X] Reject`; it is a declined suggestion kept as a
@@ -1835,8 +1835,8 @@ Leave it alone unless Bruce asks.
 The active review is always the unprefixed `readability/NN_name.md`, and there
 is at most one at a time. When a chapter is reviewed more than once, keep every
 completed review as history by numbering them.
-The first completed review is `readability/~12_Data_Classes_as_Types.md`,
-the second `readability/~12_Data_Classes_as_Types.r2.md`,
+The first completed review is `readability/~12_Techniques--Data_Classes_as_Types.md`,
+the second `readability/~12_Techniques--Data_Classes_as_Types.r2.md`,
 the third `...r3.md`, and so on.
 On completion, rename the active file to the next free number in that series.
 The carry-forward step reads the most recent completed review, the

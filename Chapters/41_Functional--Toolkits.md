@@ -75,13 +75,13 @@ The 31 misses are the 31 distinct arguments, `0` through `30`.
 The 28 hits are the calls that found a stored answer instead of recomputing it.
 Fifty-nine calls in all, against 2,692,537 for the undecorated version,
 where every branch recomputes the whole subtree beneath it.
-[Caching](18_Performance.md#caching) runs both versions side by side,
-and [Recursion](#recursion)
+[Caching](18_Techniques--Performance.md#caching)
+runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
-the lapsed-listener leak of [The Pythonic Observer](30_Observer.md#the-pythonic-observer-a-list-of-callables)
+the lapsed-listener leak of [The Pythonic Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables)
 in cache form.
 For the usual case, one expensive value per instance,
 use `@cached_property` below,
@@ -168,7 +168,8 @@ Use `partialmethod` inside a class body and `partial` everywhere else.
 ### `cached_property`
 
 Runs a property's code once, on first access, then reuses the stored result.
-[Classes](07_Classes.md#properties) covers it alongside `@property`.
+[Classes](07_Foundations--Classes.md#properties)
+covers it alongside `@property`.
 
 ```python
 # functools_cached_property.py
@@ -205,8 +206,8 @@ and the next access recomputes it from the current state.
 
 Copies a wrapped function's name and docstring onto its wrapper,
 so introspection still sees the original.
-[Decorators](14_Decorators.md#decorators-as-classes) covers its sibling,
-`update_wrapper()`, for wrapping with a class instance.
+[Decorators](14_Techniques--Decorators.md#decorators-as-classes)
+covers its sibling, `update_wrapper()`, for wrapping with a class instance.
 
 ```python
 # functools_wraps.py
@@ -293,7 +294,7 @@ or when the ordering is not simply the fields in declaration order.
 
 Turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations you register separately.
-[Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch)
+[Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 uses `singledispatch()` as an alternative to the Visitor pattern,
 including why the registered function below takes the name `_`.
 
@@ -314,14 +315,15 @@ print(describe("hi"), "|", describe(5))
 ```
 
 `singledispatch()` examines only the first argument,
-so a rule that depends on two types needs [Multiple Dispatching](32_Multiple_Dispatching.md),
+so a rule that depends on two types needs [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md),
 and a keyword-only argument cannot drive the dispatch.
 
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
 The registered method below again takes the name `_`,
-which [Visitor](33_Visitor.md#the-pythonic-visitor-singledispatch) explains.
+which [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+explains.
 
 ```python
 # functools_singledispatchmethod.py
@@ -358,7 +360,7 @@ the empty iterable, the single element,
 the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
-[Reusable Algorithms](23_Iterators.md#reusable-algorithms)
+[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
 introduced several of these as iterator plumbing.
 This section is the catalog.
 
@@ -435,7 +437,7 @@ Iterates several iterables one after another, as if they were one.
 `chain.from_iterable(iterables)` does the same when the iterables themselves arrive as one lazy sequence,
 rather than as separate arguments.
 Where the iterables come from a loop,
-[unpacking in a comprehension](16_Comprehensions.md#unpacking-in-comprehensions)
+[unpacking in a comprehension](16_Techniques--Comprehensions.md#unpacking-in-comprehensions)
 says the same thing without the import.
 
 ```python
@@ -528,7 +530,8 @@ because filtering skips what fails and keeps looking.
 `takewhile()` stops at the first failure and never reaches the last element.
 On finite data that is a detail.
 On an infinite source it decides whether the program terminates,
-which [Reusable Algorithms](23_Iterators.md#reusable-algorithms) works through.
+which [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
+works through.
 
 ### `dropwhile`
 
@@ -577,7 +580,7 @@ Zips iterables of different lengths,
 filling the gaps instead of stopping at the shortest.
 The default filler is `None`.
 When `None` is a valid element,
-pass a distinct [sentinel](05_Functions.md#default-and-keyword-arguments)
+pass a distinct [sentinel](05_Foundations--Functions.md#default-and-keyword-arguments)
 as the `fillvalue` keyword argument:
 
 ```python
@@ -654,7 +657,7 @@ stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
-[Iterators](23_Iterators.md#generators)
+[Iterators](23_Patterns--Iterators.md#generators)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
 so handing them to separate threads corrupts it.
@@ -781,7 +784,7 @@ so it asks `squares()` for every value before taking five,
 and the program never gets past that line.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
-[Lazy Evaluation with Generators](18_Performance.md#lazy-evaluation-with-generators)
+[Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
 looks at the same idea from the perspective of memory and speed.
 
 Laziness matters most at scale.

@@ -77,10 +77,10 @@ it raises", "whatever `slope()` raises", "what it re-raises"). Code and
 `#:` markers are never touched.
 
 **Sightings.** 2 (additive)
-- `25_Template_Method` 2026-08-29, was Claude-written:
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The `class Typo` statement raises instead of finishing" ->
   "The `class Typo` statement raises a `TypeError` instead of finishing"
-- `Solutions/14_Decorators`, `Solutions/25_Template_Method`,
+- `Solutions/14_Techniques--Decorators`, `Solutions/25_Patterns--Template_Method`,
   `Solutions/47_Effects--Stateless_in_Practice` 2026-08-29, found by sweep after
   Bruce named the rule: "returns or raises." -> "returns or raises an
   exception."; "this one raises instead" -> "this one raises an exception
@@ -100,7 +100,7 @@ Delete the accounting and let the mechanism's own sentence lead.
 
 **Keep when.** A measured cost (time, memory, a benchmark) is the subject.
 
-**Sightings.** 3 (removal), all `25_Template_Method` 2026-08-29, was
+**Sightings.** 3 (removal), all `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "The empty step is the price of the `...` defaults above. They make a
   step optional," -> "The `...` defaults make a step optional,"
@@ -127,7 +127,7 @@ the same section. Choose a synonym for the prose sense ("executes",
 **Keep when.** The prose word names the identifier itself ("`run()` runs
 the steps" is about `run()`).
 
-**Sightings.** 2 (additive), both `25_Template_Method` 2026-08-29, was
+**Sightings.** 2 (additive), both `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "an override of `run()` is reported before the program runs" ->
   "Discovers an overridden `run()` before the program executes"
@@ -148,7 +148,7 @@ sentence's claim. Rewrite as "Because X, Y".
 nothing can replace the loop" keeps "so": the absence of a subclass is the
 point being made.
 
-**Sightings.** 2, both `25_Template_Method` 2026-08-29, was
+**Sightings.** 2, both `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "`run()` calls methods the subclass supplies, so the subclass must
   finish its own setup" -> "Because `run()` calls methods the subclass
@@ -169,7 +169,7 @@ the label starts "This".
 **Keep when.** None seen yet. A colon introducing a listing or a literal
 value is not a label.
 
-**Sightings.** 4, one list in `25_Template_Method` 2026-08-29, was
+**Sightings.** 4, one list in `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "Structure, in `template_function.py`: no subclass exists, so nothing
   can replace the loop." -> "Structure, in `template_function.py`. There
@@ -192,7 +192,7 @@ requirement is that..."); a passive reporting who requires it ("the
 caller is required by the protocol to...") loses the agent if changed
 blindly.
 
-**Sightings.** 1, `25_Template_Method` 2026-08-29 (`19b2b1e3`), was
+**Sightings.** 1, `25_Patterns--Template_Method` 2026-08-29 (`19b2b1e3`), was
 Claude-written:
 - "If every subclass is required to supply a step" -> "If every subclass
   must supply a step"
@@ -210,7 +210,7 @@ listing follows anyway.
 **Keep when.** The pointer carries a claim the listing does not make on
 its own ("The next listing shows the same trap in a generator").
 
-**Sightings.** 1 (removal), `25_Template_Method` 2026-08-29, was
+**Sightings.** 1 (removal), `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "The example below shows why." -> deleted
 
@@ -228,7 +228,7 @@ Delete it.
 **Keep when.** The comparison is the mechanism (the sentence says what the
 others miss and why).
 
-**Sightings.** 1 (removal), `25_Template_Method` 2026-08-29, was
+**Sightings.** 1 (removal), `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "It reaches what the other three cannot: what the steps do once the flow
   itself is safe." -> deleted
@@ -246,7 +246,7 @@ type-checking attribute").
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
 that is the claim ("potentially unbounded") stays.
 
-**Sightings.** 3 (additive), all `25_Template_Method` 2026-08-29, was
+**Sightings.** 3 (additive), all `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written:
 - "pass the steps in directly" -> "pass the steps as arguments"
 - "an attribute nothing reads" -> "a type-checking attribute"
@@ -272,7 +272,7 @@ subclass must work" -> "an instance of a subclass must work").
 **Keep when.** The universality is the claim ("any exception, not only
 `ValueError`").
 
-**Sightings.** 2, both `25_Template_Method` 2026-08-29, was
+**Sightings.** 2, both `25_Patterns--Template_Method` 2026-08-29, was
 Claude-written (same chapter, so not yet independent):
 - "an instance of any subclass must work in its place" -> "an instance of
   a subclass must work in its place"

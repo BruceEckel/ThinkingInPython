@@ -5,13 +5,13 @@ tree; both are recoverable from git.
 
 - **First generation**, 84 files and roughly 6,700 lines, distilled 2026-08-09
   and deleted in `8660e7c1`. Recover any file with
-  `git show 8660e7c1^:readability/~30_Observer.r2.md`.
+  `git show 8660e7c1^:readability/~30_Patterns--Observer.r2.md`.
 - **Second generation**, 47 chapter files written 2026-08-11 (`7f165a08`,
   "readability on the whole deep-review") over the fresh deep-review round.
   Every finding was applied to `Chapters/` at the time, though the files were
   not renamed with the `~` completion prefix until 2026-08-13. Distilled into
   this file 2026-08-13 and deleted. Recover any file with
-  `git show bb81711a:readability/14_Decorators.md`, with **no** `~` on the
+  `git show bb81711a:readability/14_Techniques--Decorators.md`, with **no** `~` on the
   path: the rename and the deletion landed in the same change, so the committed
   second-generation files carry the bare chapter name even though every one of
   them had been applied.
@@ -25,7 +25,7 @@ Everything below survived that examination. Re-raising any of it is churn.
 
 ## Standing rejection
 
-**08_Static_Types: keep the two sentences after "the same idea checked at
+**08_Foundations--Static_Types: keep the two sentences after "the same idea checked at
 different moments".** The review proposed cutting "Dynamic typing trusts the
 object once the code is running, while structural typing proves the shape
 beforehand" as §70 restatement, since the paragraph states the timing contrast
@@ -148,10 +148,10 @@ Recorded so a sweep does not read them as defects:
 - **Imperatives in exercises are exempt.** Exercise text instructs the reader,
   which the global rules carve out. Do not convert exercise imperatives to
   conditions.
-- **Parallel prose decision tables.** 35_Flyweight's four-way `If X, do Y` block
-  and 27_Factory's bullet list under "Which Factory Should You Use?" are
+- **Parallel prose decision tables.** 35_Patterns--Flyweight's four-way `If X, do Y` block
+  and 27_Patterns--Factory's bullet list under "Which Factory Should You Use?" are
   decision tables written as prose; the uniformity is what makes them scannable.
-  25_Template_Method's four-way "Structure fixes it… Discipline fixes the rest"
+  25_Patterns--Template_Method's four-way "Structure fixes it… Discipline fixes the rest"
   anaphora is the same call.
 
 ---
@@ -161,58 +161,58 @@ Recorded so a sweep does not read them as defects:
 These are watch-list hits and pattern matches a mechanical sweep will find
 again. Each was judged and kept.
 
-**27_Factory, "Factory might be the most common design pattern."** An
+**27_Patterns--Factory, "Factory might be the most common design pattern."** An
 unsupported superlative by shape. Kept: it is hedged with "might", it opens the
-chapter, and it is first-edition voice. 11_Testing's "One of the most valuable
+chapter, and it is first-edition voice. 11_Techniques--Testing's "One of the most valuable
 habits in modern programming is unit testing", 01_Introduction's "one of the
 most useful things this book can give you", and 21's "An important step forward
 in object-oriented design" all ride on this precedent.
 
-**28_Function_Objects, "Python's best-known closure trap."** A superlative by
+**28_Patterns--Function_Objects, "Python's best-known closure trap."** A superlative by
 shape, but "best-known" orients the reader toward the trap they have heard of,
 and the late-binding loop variable is the one closure trap with a reputation.
 
-**28_Function_Objects, "to say what one list of functions says directly."** Not
+**28_Patterns--Function_Objects, "to say what one list of functions says directly."** Not
 a finding at all: recorded as the sharpest sentence in the chapter and the
 reason the *Command* section works. Do not "tighten" it.
 
-**30_Observer, "It is simply a callable."** "Simply" is an empty adverb by the
+**30_Patterns--Observer, "It is simply a callable."** "Simply" is an empty adverb by the
 deletion test, but this is the deflating beat in the two-sentence pair carrying
 the chapter's central move, and the word supplies that spoken rhythm.
-11_Testing's "The `4` here is simply what `Random(0)` produces first" and
+11_Techniques--Testing's "The `4` here is simply what `Random(0)` produces first" and
 09's "annotations that merely describe one to come" are the same call.
 
-**30_Observer, "amounts to nothing more than a list of callbacks."** On the
+**30_Patterns--Observer, "amounts to nothing more than a list of callbacks."** On the
 watch list, but the global rule's own carve-out names this exact construction:
 a comparative where the diminishing is the point. The rule's illustrative
 example *is* this sentence. 20's "costs nothing more than having the three
 methods" rides on it.
 
-**30_Observer, "a lambda equals only itself."** Both watched words are
+**30_Patterns--Observer, "a lambda equals only itself."** Both watched words are
 load-bearing: the claim is identity-equality, and "a lambda equals itself"
 without "only" is trivially true of everything. 22's "equals only its own kind"
 is the same shape.
 
-**31_State_Machines, "The conditions and actions are plain methods."** "Plain"
+**31_Patterns--State_Machines, "The conditions and actions are plain methods."** "Plain"
 draws a real contrast: against the `Condition` and `Transition` class
 hierarchies the Java version needed, named a few paragraphs earlier.
 
-**33_Visitor, the `## The Price of the Empty Base` heading covering two
+**33_Patterns--Visitor, the `## The Price of the Empty Base` heading covering two
 paragraphs.** The heading names only the first paragraph. Retitling
 (`## What the Classic Shape Costs`) and splitting were both considered and
 declined: the second paragraph ends on the line that motivates the whole
 `singledispatch` section, so it sits last regardless; a retitle makes the
 heading vaguer, and a new heading adds an anchor for two paragraphs.
 
-**33_Visitor, "The output above shows results, not mechanism."** Flagged as §70
+**33_Patterns--Visitor, "The output above shows results, not mechanism."** Flagged as §70
 metadiscourse. Declined by the block's own criterion: "mechanism" is
 established book vocabulary, thirty-plus uses across the chapters.
 
-**33_Visitor, "a framework you do not own already calls that…"** "Already" is on
+**33_Patterns--Visitor, "a framework you do not own already calls that…"** "Already" is on
 the avoid-if-possible list but earns its place: the call site exists whether
 you want it or not. This is the precedent a dozen other "already" keeps cite.
 
-**26_Surrogate, "in order to implement the *copy-on-write* idiom."** The one
+**26_Patterns--Surrogate, "in order to implement the *copy-on-write* idiom."** The one
 Tier 1B "in order" in the book, and the deep review deliberately restored it:
 the bare comma version read as two unrelated purposes, losing the causal link
 that counting references is how copy-on-write knows when to copy. Binding.

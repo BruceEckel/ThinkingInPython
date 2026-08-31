@@ -1,6 +1,6 @@
 # Error Handling
 
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+[Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 made a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
@@ -54,7 +54,7 @@ except ValueError as e:
 Function calls 0-2 produce correct values,
 but the exception throws away the whole list.
 To keep the good results you must wrap each call in its own `try`,
-the kind of scattering [Data Classes as Types](12_Data_Classes_as_Types.md#a-value-to-check-everywhere)
+the kind of scattering [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
 flags as a problem.
 
 ## Return the Error as a Value
@@ -91,7 +91,7 @@ for r in outputs:
 ```
 
 This keeps every result, and `match`
-(see [Pattern Matching](13_Pattern_Matching.md#matching-values))
+(see [Pattern Matching](13_Techniques--Pattern_Matching.md#matching-values))
 tells the two cases apart.
 But the distinction depends on the types `int` and `str`, which is fragile.
 If a successful answer were also a string, the two cases would collide.
@@ -110,7 +110,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `@final` states that neither can have subclasses,
 which lets the type checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
-(introduced in [Static Types](08_Static_Types.md#generic-functions-and-classes)):
+(introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
@@ -203,7 +203,7 @@ Without that comment `ty` refuses the line,
 reporting that `Err[str]` in the union has no `unwrap`,
 and a reader who writes this in their own code never reaches the traceback.
 
-This is the same idea as in [Static Types](08_Static_Types.md#type-hints):
+This is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
 put the meaning in the type.
 Python's humbler form of the same idea is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
@@ -515,7 +515,7 @@ but `@safe` has changed its return type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 The `**P` parameter carries the wrapped function's whole parameter list through,
-the technique from [Decorators](14_Decorators.md#maintaining-the-wrapped-interface),
+the technique from [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
 so `parse("42")` type-checks and `parse(42)` does not:
 `@safe` changes only the return type, never what the function accepts.
 

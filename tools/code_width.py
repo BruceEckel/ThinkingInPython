@@ -97,7 +97,7 @@ class Wide(NamedTuple):
     path: Path
     """The Markdown file, absolute."""
     tree: str
-    """Where the file's listings extract, e.g. `Examples/05_Functions`."""
+    """Where the file's listings extract, e.g. `Examples/05_Foundations--Functions`."""
     code: str
     """`slug.py:line` within that directory, or `(fragment)`."""
     md_line: int

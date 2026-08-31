@@ -85,19 +85,19 @@ def test_a_gap_in_the_numbering_is_reported() -> None:
 # ── chapter citations ─────────────────────────────────────────────────────────
 
 def test_a_bare_chapter_link_is_flagged() -> None:
-    m = BARE_CHAPTER_LINK.search("see [State](26_Surrogate.md#state) for")
+    m = BARE_CHAPTER_LINK.search("see [State](26_Patterns--Surrogate.md#state) for")
     assert m is not None
-    assert m.group(1) == "26_Surrogate.md"
+    assert m.group(1) == "26_Patterns--Surrogate.md"
 
 def test_a_bare_link_with_no_anchor_is_flagged_too() -> None:
-    assert BARE_CHAPTER_LINK.search("[Classes](07_Classes.md)") is not None
+    assert BARE_CHAPTER_LINK.search("[Classes](07_Foundations--Classes.md)") is not None
 
 def test_a_chapters_prefixed_link_is_clean() -> None:
-    text = "[State](../Chapters/26_Surrogate.md#state)"
+    text = "[State](../Chapters/26_Patterns--Surrogate.md#state)"
     assert BARE_CHAPTER_LINK.search(text) is None
 
 def test_an_explicit_sibling_link_is_the_opt_out() -> None:
-    assert BARE_CHAPTER_LINK.search("[that answer](./26_Surrogate.md)") is None
+    assert BARE_CHAPTER_LINK.search("[that answer](./26_Patterns--Surrogate.md)") is None
 
 def test_a_same_file_anchor_is_not_a_chapter_link() -> None:
     assert BARE_CHAPTER_LINK.search("[above](#the-heading)") is None
@@ -108,4 +108,4 @@ def test_no_arguments_selects_every_chapter() -> None:
     assert selected([]) == sorted((ROOT / "Chapters").glob("*.md"))
 
 def test_a_bare_number_selects_one_chapter() -> None:
-    assert [p.stem for p in selected(["7"])] == ["07_Classes"]
+    assert [p.stem for p in selected(["7"])] == ["07_Foundations--Classes"]

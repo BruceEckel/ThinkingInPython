@@ -52,7 +52,7 @@ Usage:
     python tools/rewrite.py 25 --also activate    # defaults + activate
     python tools/rewrite.py 25 --passes activate  # activate only
     python tools/rewrite.py 25 --model claude-sonnet-5
-    python tools/rewrite.py Chapters/25_Template_Method.md --all
+    python tools/rewrite.py Chapters/25_Patterns--Template_Method.md --all
 """
 
 import argparse
@@ -186,7 +186,7 @@ def claude_argv(
 
 
 def chapter_tag(chapter: Path) -> str:
-    """`[25]` from `Chapters/25_Template_Method.md`, for parallel output."""
+    """`[25]` from `Chapters/25_Patterns--Template_Method.md`, for parallel output."""
     return f"[{chapter.stem.split('_', 1)[0]}]"
 
 

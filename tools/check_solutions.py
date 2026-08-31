@@ -27,8 +27,8 @@ the two side by side.
 
 It also checks how a solution *cites* its chapter. `Solutions/` sits
 beside `Chapters/`, so a link written the way a chapter writes it,
-`](24_Singleton.md#...)`, resolves to `Solutions/24_Singleton.md`, a real
-file with the wrong content. The correct form is `../Chapters/24_Singleton.md`.
+`](24_Patterns--Singleton.md#...)`, resolves to `Solutions/24_Patterns--Singleton.md`, a real
+file with the wrong content. The correct form is `../Chapters/24_Patterns--Singleton.md`.
 Seventeen links were wrong this way before anything looked. Write `./` on
 the front for a deliberate link to a neighboring solution.
 
@@ -67,9 +67,12 @@ ANSWER = re.compile(r"^([\d\s&,-]+?)\.\s+\S")
 JOINERS = re.compile(r"[&,]")
 
 # A Markdown link to a numbered book file with no directory in front of
-# it, so it resolves beside the linking file: "](24_Singleton.md#state)".
+# it, so it resolves beside the linking file: "](24_Patterns--Singleton.md#state)".
 # A leading "./" or "../" fails the match, which is the opt-out.
-BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_]+\.md)([^)]*)\)")
+# The `-` in the class is for the `--` that sets a chapter's part name
+# off from its title (`26_Patterns--Surrogate.md`); without it this check
+# silently stops matching every chapter and reports nothing.
+BARE_CHAPTER_LINK = re.compile(r"\]\((\d{2}_[A-Za-z_-]+\.md)([^)]*)\)")
 
 
 def exercise_numbers(doc: Document) -> list[tuple[int, int]]:

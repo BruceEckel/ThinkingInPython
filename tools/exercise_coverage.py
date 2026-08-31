@@ -19,7 +19,7 @@ An exercise reaches a section three ways, all of them literal:
   maximum depth`). This is the common case by a wide margin: an exercise
   usually names the thing, not the file it lives in.
 - It links to the section's anchor (`(#the-error-channel)` or
-  `(31_State_Machines.md#the-engine)`), for a link inside this chapter.
+  `(31_Patterns--State_Machines.md#the-engine)`), for a link inside this chapter.
 - It quotes the section's heading text.
 
 The matching is literal, so it under-reports coverage rather than over-

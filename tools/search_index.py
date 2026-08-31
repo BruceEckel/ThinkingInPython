@@ -11,7 +11,7 @@ A section is the text under one `##` or `###` heading, plus the chapter's
 opening text (which sits under no heading and links to the page itself). Each
 record carries the URL and anchor needed to deep-link to it:
 
-    {"u": "12_Data_Classes_as_Types.html",  # page
+    {"u": "12_Techniques--Data_Classes_as_Types.html",  # page
      "a": "immutability",                   # heading anchor, "" for the intro
      "l": "Chapter 12",                     # label, as on the index page
      "c": "Data Classes as Types",          # chapter title

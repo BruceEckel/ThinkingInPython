@@ -84,7 +84,7 @@ is blind to thread parallelism. `threading.get_ident()` is the
 equivalent for threads. That the two pools present the identical
 `map()` interface while differing this fundamentally underneath is
 the substitutable-backend point from
-[Concurrency](../Chapters/19_Concurrency.md#one-task-many-backends).
+[Concurrency](../Chapters/19_Techniques--Concurrency.md#one-task-many-backends).
 
 ## 3. Three property shapes for `sorted()`
 
@@ -394,7 +394,7 @@ mapping to read. Both are now referentially transparent, both are
 testable without a clock or a monkeypatched environment, and the
 caller that does read the real clock or the real `os.environ` is one
 line at the edge of the program instead of a dependency buried in the
-middle of it. [Testing](../Chapters/11_Testing.md#random-numbers)
+middle of it. [Testing](../Chapters/11_Techniques--Testing.md#random-numbers)
 makes the same move for a random source.
 
 ## 7. `match` against `isinstance()` on the same function

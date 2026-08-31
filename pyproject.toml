@@ -124,7 +124,7 @@ lines-after-imports = 1
 "**/catch_score.py" = ["I001"]
 "**/casts.py" = ["I001"]
 "**/fetch_guarded.py" = ["I001"]
-"**/38_Simulation/exercise_4.py" = ["I001"]
+"**/38_Patterns--Simulation/exercise_4.py" = ["I001"]
 "**/46_Effects--Stateless/exercise_8.py" = ["I001"]
 "**/46_Effects--Stateless/exercise_10.py" = ["I001"]
 "**/46_Effects--Stateless/exercise_11.py" = ["I001"]
@@ -146,4 +146,4 @@ pythonpath = ["build/examples/utils"]
 # package itself (and "06_..." is not an identifier), so ty cannot establish
 # module4's parent package without being handed the directory.
 [tool.ty.environment]
-extra-paths = ["build/examples/utils", "build/examples/06_Modules_and_Packages"]
+extra-paths = ["build/examples/utils", "build/examples/06_Foundations--Modules_and_Packages"]

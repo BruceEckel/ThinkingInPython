@@ -1,6 +1,6 @@
 # Rust examples for Thinking in Python
 
-The [Converting a Slow Function to Rust](../Chapters/18_Performance.md#converting-a-slow-function-to-rust)
+The [Converting a Slow Function to Rust](../Chapters/18_Techniques--Performance.md#converting-a-slow-function-to-rust)
 section shows moving a hot Python function into a compiled
 [PyO3](https://pyo3.rs)/[maturin](https://www.maturin.rs) extension. This
 directory holds real, buildable copies of those examples.
@@ -77,7 +77,7 @@ other Rust project, scaffolded once by `maturin new --bindings pyo3
 <name>` and committed. `tools/extract_rust.py` never reads, writes, or
 otherwise touches those files.
 
-If you edit the Rust or demo code directly in `Chapters/18_Performance.md`,
+If you edit the Rust or demo code directly in `Chapters/18_Techniques--Performance.md`,
 run `make sync` (or `cd .. && python tools/extract_rust.py --write`) to
 pull the change into this tree before rebuilding.
 

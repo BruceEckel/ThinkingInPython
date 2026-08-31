@@ -11,19 +11,19 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Foundations](40_Functional--Foundations.md#pure-functions)
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
-- [Performance](18_Performance.md#caching)
+- [Performance](18_Techniques--Performance.md#caching)
   turns naive recursive Fibonacci from 242,785 calls into 26 with `functools.cache`.
   Caching works only because the cached function is pure.
-- [Rethinking Objects](20_Rethinking_Objects.md#polymorphism-without-inheritance)
+- [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [Observer](30_Observer.md#a-visual-example-of-observers)
+- [Observer](30_Patterns--Observer.md#a-visual-example-of-observers)
   has `recolored()` return a new grid instead of mutating the one it received,
   so a test checks the change with no GUI in sight.
-- [Multiple Dispatching](32_Multiple_Dispatching.md#one-type-or-many)
+- [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
   reduces competition between items to pure logic,
   a dictionary lookup with nothing to mock.
-- [Composite and Interpreter](34_Composite_and_Interpreter.md#simplification-rewrites-the-tree)
+- [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
   has `simplify()` return a new tree instead of editing the one it receives.
 
 In every one of those cases you can settle the question by reading one function.
@@ -205,7 +205,7 @@ They leaked implementation details and are generally considered a failure
 ### Make the Bad Value Impossible
 
 The third approach removes the failure instead of handling it.
-[Data Classes as Types](12_Data_Classes_as_Types.md#a-value-to-check-everywhere)
+[Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
 makes illegal values impossible to construct.
 If you give `run` a type that cannot hold zero,
 `slope()` never needs to check for zero:
@@ -483,7 +483,7 @@ and tell it again when that changes.
 Nothing verifies the wiring except a runtime failure.
 
 Python does have a mechanism that propagates on its own.
-A `ContextVar` ([Concurrency](19_Concurrency.md#context-that-follows-the-call-chain))
+A `ContextVar` ([Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain))
 holds a value for the current task,
 and anything below reads it without receiving it as an argument,
 which is the automatic propagation the parameter list lacks.
@@ -778,7 +778,7 @@ Calling `greet()` runs nothing.
 It builds a coroutine object, a description of work,
 and the empty list is the evidence: the body never executed.
 The description executes only when something awaits it or hands it to `asyncio.run()`.
-[Concurrency](19_Concurrency.md#asyncio-mechanics)
+[Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 opened with the same demonstration.
 That is the library Effect system model.
 Descriptions compose inside `async def` functions,
@@ -919,8 +919,8 @@ puts it to work.
     Then say what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
-    and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,
-    or exception.
+    and `Thermometer` from [Observer](30_Patterns--Observer.md): side effect,
+    side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
     applies to each?
 4.  `NonZero` guards zero but not negative values,

@@ -14,7 +14,7 @@ question that actually matters, which is not "when did the gate run" but
 "has anything changed since it did":
 
     gate passed 12 minutes ago (2026-07-25 14:03), at commit d6b9ad6
-    3 files changed since: 23_Iterators.md, 24_Singleton.md, ...
+    3 files changed since: 23_Patterns--Iterators.md, 24_Patterns--Singleton.md, ...
 
 It lives in ``build/``, which is gitignored, so it never enters a commit or
 a diff. ``make clean-examples`` and friends remove only their own

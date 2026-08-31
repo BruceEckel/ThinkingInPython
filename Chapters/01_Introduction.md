@@ -12,8 +12,8 @@ Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages make necessary.
 Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
-A [Singleton](24_Singleton.md) is a module.
-A [Visitor](33_Visitor.md) is a function that dispatches on type.
+A [Singleton](24_Patterns--Singleton.md) is a module.
+A [Visitor](33_Patterns--Visitor.md) is a function that dispatches on type.
 Before using an idiom or pattern,
 this book asks whether the language already solves the problem,
 and adds the complexity only when the answer is no.
@@ -57,7 +57,7 @@ and object cleanup.
 This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
-If you skip Part I, come back for [Static Types](08_Static_Types.md):
+If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md):
 every chapter after it annotates its examples,
 and it is the one Part I chapter the rest of the book assumes.
 
@@ -163,8 +163,8 @@ This book might have some value yet.
 
 The book targets Python 3.15 and later, uses type hints,
 and tests with `pytest`.
-Early chapters mostly omit type hints, until [Static Types](08_Static_Types.md)
-introduces the syntax.
+Early chapters mostly omit type hints,
+until [Static Types](08_Foundations--Static_Types.md) introduces the syntax.
 Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
@@ -174,8 +174,8 @@ Some are modules that another listing imports,
 and `pytest` runs each `test_*.py` file.
 These files live in the `Examples/` directory of the [source repository](https://github.com/BruceEckel/ThinkingInPython),
 one folder per chapter,
-so the code block starting with `# tracer.py` in [Decorators](14_Decorators.md#maintaining-the-wrapped-interface)
-is the file `Examples/14_Decorators/tracer.py`.
+so the code block starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
+is the file `Examples/14_Techniques--Decorators/tracer.py`.
 A helper that more than one chapter uses names a `utils/` path instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
@@ -190,7 +190,7 @@ The book's build system extracts the examples, then type-checks
 The code you read is the code that runs,
 and the output you see is the output it produces.
 A few early listings carry `# type: ignore` or `# ty:` comments.
-[Static Types](08_Static_Types.md) defines them;
+[Static Types](08_Foundations--Static_Types.md) defines them;
 until then they only mark lines a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,

@@ -188,7 +188,7 @@ Mind what `Final` does and does not freeze.
 It locks the binding, not the object:
 if you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
-This is the shallow-freezing lesson of [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution)
+This is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 in another costume.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`, and let `Final` guard only the name.
@@ -256,7 +256,7 @@ print(table["title"]("functional python"))
 
 The dictionary holds functions as values,
 so a lookup yields a function you can immediately call.
-The [Function Objects](28_Function_Objects.md)
+The [Function Objects](28_Patterns--Function_Objects.md)
 chapter approaches the same capability from the pattern side.
 
 Treating functions as values lets data drive control flow.
@@ -283,10 +283,10 @@ print(operations["+"](6, 4), operations["-"](6, 4))
 
 Supporting a new operator means adding a row to the table.
 The dispatch code never changes.
-The same structure underlies [the dictionary factory](27_Factory.md#the-pythonic-factory-a-dictionary)
+The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
-[Pattern Matching](13_Pattern_Matching.md)
+[Pattern Matching](13_Techniques--Pattern_Matching.md)
 solves the same `if`/`elif` problem with `match`,
 and the two are not interchangeable.
 A `match` is code: adding an operator means editing the function,
@@ -299,7 +299,7 @@ and a table when the set should grow from outside.
 ## Lambdas
 
 A *lambda* is an unnamed function written as a single expression,
-introduced in [Functions](05_Functions.md#lambdas).
+introduced in [Functions](05_Foundations--Functions.md#lambdas).
 The higher-order functions below take them as inline arguments,
 where they fit best.
 Their value is locality.
@@ -346,14 +346,14 @@ The `list()` calls are not decoration.
 `map()` and `filter()` return one-shot iterators,
 so `print(map(...))` shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing
-([Iterators](23_Iterators.md#generators)).
+([Iterators](23_Patterns--Iterators.md#generators)).
 `sorted()` is the exception:
 it must see every element before it can order any of them,
 so it always returns a list.
 
 The lambdas above exist to show the machinery,
 and for these cases Python offers a lookalike you should usually prefer:
-the comprehension ([Comprehensions](16_Comprehensions.md)).
+the comprehension ([Comprehensions](16_Techniques--Comprehensions.md)).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` earn their keep when the function already exists:
@@ -376,7 +376,7 @@ along with the off-by-one and accumulator-initialization mistakes that scaffold 
 The idea runs the other direction, too.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
-A decorator does this, as [Decorators](14_Decorators.md) shows.
+A decorator does this, as [Decorators](14_Techniques--Decorators.md) shows.
 
 ## Closures
 
@@ -509,7 +509,7 @@ Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes,
 and it binds their values when you build it.
 This avoids the late-binding surprise a lambda created in a loop can produce.
-[Function Objects](28_Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates that surprise.
+[Function Objects](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates that surprise.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
@@ -517,7 +517,7 @@ Binding `exponent` above works because `power()` accepts it by keyword.
 Positional arguments have no such freedom: `partial()` fills them from the left,
 so fixing the third argument used to mean fixing the first two.
 A function whose parameters are positional-only
-(see [Positional-Only and Keyword-Only Parameters](05_Functions.md#positional-only-and-keyword-only-parameters))
+(see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
 had no recourse.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller:

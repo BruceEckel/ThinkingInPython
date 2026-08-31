@@ -9,7 +9,7 @@ A tool cannot settle that question, because it is about meaning. It can
 narrow it. Every cross-chapter link falls into one of three shapes, and only
 the third can be wrong in this way:
 
-1. `[Iterators](23_Iterators.md)` names the chapter. The link text is the
+1. `[Iterators](23_Patterns--Iterators.md)` names the chapter. The link text is the
    chapter's title, so it asserts nothing beyond "this chapter exists."
 2. `[The General Form of `replace()`](12_...#the-general-form-of-replace)`
    quotes the target heading. The text and the target agree by construction;
