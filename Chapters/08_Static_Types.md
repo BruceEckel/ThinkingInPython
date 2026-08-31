@@ -1,4 +1,4 @@
-# Static Typing
+# Static Types
 
 C++ and Java require type declarations,
 and they check those types during compilation.

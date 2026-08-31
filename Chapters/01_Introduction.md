@@ -57,7 +57,7 @@ and object cleanup.
 This part is for programmers coming to Python from another language.
 If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
-If you skip Part I, come back for [Static Typing](08_Static_Typing.md):
+If you skip Part I, come back for [Static Types](08_Static_Types.md):
 every chapter after it annotates its examples,
 and it is the one Part I chapter the rest of the book assumes.
 
@@ -163,8 +163,8 @@ This book might have some value yet.
 
 The book targets Python 3.15 and later, uses type hints,
 and tests with `pytest`.
-Early chapters mostly omit type hints,
-until [Static Typing](08_Static_Typing.md) introduces the syntax.
+Early chapters mostly omit type hints, until [Static Types](08_Static_Types.md)
+introduces the syntax.
 Every chapter afterward uses them consistently.
 
 Every code block that begins with a filename comment, like `# tracer.py`,
@@ -190,7 +190,7 @@ The book's build system extracts the examples, then type-checks
 The code you read is the code that runs,
 and the output you see is the output it produces.
 A few early listings carry `# type: ignore` or `# ty:` comments.
-[Static Typing](08_Static_Typing.md) defines them;
+[Static Types](08_Static_Types.md) defines them;
 until then they only mark lines a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,

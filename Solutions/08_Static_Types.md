@@ -1,4 +1,4 @@
-# Static Typing: Solutions
+# Static Types: Solutions
 
 ## 1. A third shape satisfying `Drawable`
 

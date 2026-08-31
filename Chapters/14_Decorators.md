@@ -166,7 +166,7 @@ so `add.__wrapped__(2, 3)` calls the function without the tracing,
 and `inspect.signature()` follows that chain automatically.
 
 `wraps` keeps the runtime interface.
-The type parameters (introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes))
+The type parameters (introduced in [Static Types](08_Static_Types.md#generic-functions-and-classes))
 keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
@@ -251,7 +251,7 @@ if __name__ == "__main__":
 
 Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
-(see the summary in [Static Typing](08_Static_Typing.md#containers)).
+(see the summary in [Static Types](08_Static_Types.md#containers)).
 The first bracket group is a list: it holds the parameter types,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
@@ -939,7 +939,7 @@ Each topping wraps the pizza inside it and forwards through the same two-propert
 The `Pizza` `Protocol` describes that interface.
 Both the plain pizzas and the toppings satisfy it structurally,
 with no shared base class required.
-This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
+This is [structural typing](08_Static_Types.md#structural-typing-with-protocols).
 A read-only `@property` in a `Protocol` requires that reading the name produce that type,
 and says nothing about how.
 `Margherita` supplies `cost` as a class attribute and `Topping` computes it in a property.

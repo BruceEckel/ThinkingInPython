@@ -117,7 +117,7 @@ constructing it raises a `TypeError` before the first call.
 That inheritance makes a `Proxy` acceptable wherever code expects a `Service`,
 and the type checker verifies its `f()` and `g()` against the base.
 
-A [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+A [`Protocol`](08_Static_Types.md#structural-typing-with-protocols)
 is the structural alternative: the implementation needs no base class.
 The type checker verifies the shape statically, and, with `@runtime_checkable`,
 `isinstance()` does so at runtime:

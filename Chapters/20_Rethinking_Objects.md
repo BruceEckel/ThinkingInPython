@@ -395,7 +395,7 @@ When the function does not belong to a class,
 it can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with matching attributes satisfies it, without inheritance.
-This is [structural typing](08_Static_Typing.md#structural-typing-with-protocols).
+This is [structural typing](08_Static_Types.md#structural-typing-with-protocols).
 When someone hands you a type that does not fit, you adapt it by composition,
 not inheritance:
 
@@ -603,7 +603,7 @@ You write one function.
 The type varies underneath it.
 
 *Parametric polymorphism* is a single implementation for multiple types.
-[Static Typing](08_Static_Typing.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
+[Static Types](08_Static_Types.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
 One body works for any `T`.
 The type checker infers the concrete type behind `T` at each call site.
 
@@ -736,7 +736,7 @@ Each `Any` parameter moves you back into dynamic typing.
 
 ### Protocols
 
-[`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+[`Protocol`](08_Static_Types.md#structural-typing-with-protocols)
 re-establishes static typing:
 
 ```python

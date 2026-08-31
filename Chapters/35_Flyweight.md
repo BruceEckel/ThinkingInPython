@@ -172,7 +172,7 @@ so reaching the line below means `char not in SPECS` was false,
 which narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a `cast()` would assert
-(see [Static Typing](08_Static_Typing.md#typing-decorators-and-directives)).
+(see [Static Types](08_Static_Types.md#typing-decorators-and-directives)).
 Prefer a guard the type checker can read.
 Keep `cast()` for the cases where no guard exists,
 because the type checker believes a `cast()` rather than verifying it.

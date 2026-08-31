@@ -1336,7 +1336,7 @@ annotations and defaults included, as a structured object rather than a string.
 Python does not discard type annotations (a.k.a. type hints) at runtime.
 It keeps them attached to the function and evaluates them on demand,
 the deferred evaluation of PEP 649,
-even though it [never checks them](08_Static_Typing.md#hints-are-not-enforced-at-run-time).
+even though it [never checks them](08_Static_Types.md#hints-are-not-enforced-at-run-time).
 `signature()` requests that stored data (not the original source text)
 to build the `Signature` object.
 The `ALL_DUNDERS` listing in [The Tool in Use](#the-tool-in-use)

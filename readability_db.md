@@ -25,7 +25,7 @@ Everything below survived that examination. Re-raising any of it is churn.
 
 ## Standing rejection
 
-**08_Static_Typing: keep the two sentences after "the same idea checked at
+**08_Static_Types: keep the two sentences after "the same idea checked at
 different moments".** The review proposed cutting "Dynamic typing trusts the
 object once the code is running, while structural typing proves the shape
 beforehand" as §70 restatement, since the paragraph states the timing contrast

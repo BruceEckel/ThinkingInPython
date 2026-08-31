@@ -552,7 +552,7 @@ and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` pro
 With the Protocol, the checker reports the omission before the program runs,
 the earliest rung on the failure-time ladder [Surrogate](26_Surrogate.md#proxy)
 climbed.
-Checking against a Protocol is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+Checking against a Protocol is structural typing from [Static Types](08_Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
 
@@ -726,7 +726,7 @@ if __name__ == "__main__":
 ```
 
 Because each setter returns `self`,
-annotated with `Self` from [Static Typing](08_Static_Typing.md#the-self-type),
+annotated with `Self` from [Static Types](08_Static_Types.md#the-self-type),
 the calls chain.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 The class works and reads well, but it solves a problem Python does not have.

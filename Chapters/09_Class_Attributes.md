@@ -254,7 +254,7 @@ and a constant that all instances read but none change are all class attributes,
 and each reads better when you declare the sharing.
 `Tally.total` is the first of these.
 For the third, a class-level constant,
-`Final[int]` from [Static Typing](08_Static_Typing.md#constants-with-final)
+`Final[int]` from [Static Types](08_Static_Types.md#constants-with-final)
 says more than `ClassVar[int]`:
 it declares the value shared *and* not reassignable.
 Use `ClassVar` when you intend the shared value to change,

@@ -156,7 +156,7 @@ were verified against `ty`: `Messenger` attribute access is
 access reveals `Any`. Chapter 33's link deliberately carries no anchor, because
 chapter 22's `Any` discussion sits in the unheaded intro.
 
-**08_Static_Typing: the missing blank line after `# area.py` is
+**08_Static_Types: the missing blank line after `# area.py` is
 load-bearing.** House style would add one, but the chapter quotes `ty`'s
 diagnostic verbatim including `--> area.py:6:12`, and the call sits on line 6
 only because that blank line is absent.

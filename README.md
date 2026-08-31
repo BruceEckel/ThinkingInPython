@@ -93,7 +93,7 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 05_Functions.md                 | |
 | 06_Modules_and_Packages.md      | |
 | 07_Classes.md                   | |
-| 08_Static_Typing.md             | |
+| 08_Static_Types.md              | |
 | 09_Class_Attributes.md          | |
 | 10_Cleanup.md                   | |
 | 11_Testing.md                   | |
@@ -148,7 +148,7 @@ The first serious edit pass.
 | 05_Functions.md                 |X|
 | 06_Modules_and_Packages.md      |X|
 | 07_Classes.md                   |X|
-| 08_Static_Typing.md             |X|
+| 08_Static_Types.md              |X|
 | 09_Class_Attributes.md          |X|
 | 10_Cleanup.md                   |X|
 | 11_Testing.md                   |X|
@@ -206,7 +206,7 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 | 05_Functions.md                 |X|X|
 | 06_Modules_and_Packages.md      |X|X|
 | 07_Classes.md                   |X|X|
-| 08_Static_Typing.md             |X|X|
+| 08_Static_Types.md              |X|X|
 | 09_Class_Attributes.md          |X|X|
 | 10_Cleanup.md                   |X|X|
 | 11_Testing.md                   |X|X|

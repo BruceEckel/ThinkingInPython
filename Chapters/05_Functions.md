@@ -26,7 +26,7 @@ print(a_function("yes"))
 
 Here the function signature specifies only the function name and the parameter names,
 but no argument types or return types
-([Static Typing](08_Static_Typing.md#type-hints) covers these).
+([Static Types](08_Static_Types.md#type-hints) covers these).
 Python is dynamically typed,
 so type errors surface at runtime rather than at compile time.
 The same function can therefore accept and return different types:
@@ -218,7 +218,7 @@ show(["a", "b"])
 #: (2 items)
 ```
 
-With the type hints from [Static Typing](08_Static_Typing.md#type-hints),
+With the type hints from [Static Types](08_Static_Types.md#type-hints),
 such a parameter reads:
 
     items: Sequence[str] = ()

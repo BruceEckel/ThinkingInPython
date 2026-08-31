@@ -440,7 +440,7 @@ This is one aspect of functional programming
 (see [Functional Foundations](40_Functional_Foundations.md#immutability)).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-[Static Typing](08_Static_Typing.md#type-hints)
+[Static Types](08_Static_Types.md#type-hints)
 argues for letting the type carry the meaning.
 Here the type carries a guarantee.
 

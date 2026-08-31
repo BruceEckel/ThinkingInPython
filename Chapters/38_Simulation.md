@@ -51,7 +51,7 @@ When the last rat dies, the pack has mapped every cell reachable from the entry.
 The rat does not import the blackboard.
 It needs only an object with matching methods,
 so a `Protocol` describes what it expects.
-This is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
+This is structural typing from [Static Types](08_Static_Types.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 

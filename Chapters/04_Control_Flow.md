@@ -66,7 +66,7 @@ print(not_implemented(), not_implemented_yet())
 `...` is the conventional body for a stub whose implementation lives elsewhere.
 You normally write it on the same line as the signature it stubs,
 as in a `Protocol` method
-([Static Typing](08_Static_Typing.md#structural-typing-with-protocols) uses this).
+([Static Types](08_Static_Types.md#structural-typing-with-protocols) uses this).
 
 ## Loops
 

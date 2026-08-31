@@ -136,7 +136,7 @@ A paragraph below says why a `list` would not do.
 
 `Directory` names `Node` before its definition below,
 which works because Python evaluates annotations and `type` aliases lazily
-(see [Naming Types: The `type` Statement](08_Static_Typing.md#the-type-statement)).
+(see [Naming Types: The `type` Statement](08_Static_Types.md#the-type-statement)).
 
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed is where operations live.

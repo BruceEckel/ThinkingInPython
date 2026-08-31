@@ -287,7 +287,7 @@ and when inherited ordering and array-shaped JSON would be wrong rather than con
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
-a `TypedDict` from [Static Typing](08_Static_Typing.md#dictionary-and-record-shapes)
+a `TypedDict` from [Static Types](08_Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
 When it need only *become* a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.

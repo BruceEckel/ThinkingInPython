@@ -124,7 +124,7 @@ you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
 Python does have a way to name an interface without inheritance,
-the `Protocol` in [Static Typing](08_Static_Typing.md),
+the `Protocol` in [Static Types](08_Static_Types.md),
 which describes the shape a function needs instead of demanding a base class.
 
 First import the base class the same way you import any name from a module
@@ -301,7 +301,7 @@ error[invalid-explicit-override]: Method `shwo` is decorated with
 
 Python runs the program either way.
 Catching the mistake takes a separate tool,
-which [Static Typing](08_Static_Typing.md) sets up.
+which [Static Types](08_Static_Types.md) sets up.
 
 At run time `@override` adds no wrapper.
 It returns the same function object,
@@ -580,6 +580,6 @@ and lets a subclass replace it the way it replaces any other method.
 6.  In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
     keeping the `@override` decorator.
     Run the program and confirm it still prints `Base.show`,
-    then run the type checker ([Static Typing](08_Static_Typing.md) sets one up)
+    then run the type checker ([Static Types](08_Static_Types.md) sets one up)
     and read what it says.
     Remove `@override` and confirm the type checker goes quiet while the program's behavior does not change.

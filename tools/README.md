@@ -904,7 +904,7 @@ make fix-comment-spacing   # collapse the gaps to two spaces
 
 Verifies that every heading-anchor link resolves to a real heading, so a typo
 does not ship as a dead in-page link. Markdown can link to a heading with
-`[text](#id)` (same file) or `[text](07_Static_Typing.md#id)` (another chapter).
+`[text](#id)` (same file) or `[text](08_Static_Types.md#id)` (another chapter).
 The tool reproduces pandoc's anchor rule (lowercase, spaces to hyphens,
 punctuation and backticks removed, leading non-letters dropped), honors an
 explicit `{#id}` on a heading, collects every id, and checks each `#anchor`

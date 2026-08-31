@@ -134,7 +134,7 @@ The variations above are Java habits.
 At runtime `WhatIUse.op()` only calls `f()`,
 so any object with an `f()` works and no shared base class takes part.
 A type checker still holds you to the annotation,
-so name the requirement with a [`Protocol`](08_Static_Typing.md#structural-typing-with-protocols)
+so name the requirement with a [`Protocol`](08_Static_Types.md#structural-typing-with-protocols)
 listing `f()` instead of a base class to inherit,
 the same substitution [Surrogate](26_Surrogate.md#proxy)
 makes for a proxy's implementation.

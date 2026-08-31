@@ -526,7 +526,7 @@ fails with `SyntaxError: alternative patterns bind different names`.
 ## Exhaustive Matching
 
 When a value is one of a fixed set of types,
-define that set as a union using the [`type` statement](08_Static_Typing.md#the-type-statement).
+define that set as a union using the [`type` statement](08_Static_Types.md#the-type-statement).
 Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.

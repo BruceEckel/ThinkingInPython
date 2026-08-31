@@ -87,7 +87,7 @@ You need not declare a variable's type,
 and one name can bind to objects of different types over its life.
 This is *dynamic typing*.
 Python also has a full static type system layered on top,
-which this book uses from [Static Typing](08_Static_Typing.md) onward.
+which this book uses from [Static Types](08_Static_Types.md) onward.
 
 ```python
 # references.py

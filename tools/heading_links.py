@@ -4,7 +4,7 @@
 Markdown can link to a heading, not only a whole file:
 
     [text](#anchor)                       a heading in the same file
-    [text](07_Static_Typing.md#anchor)    a heading in another chapter
+    [text](08_Static_Types.md#anchor)    a heading in another chapter
 
 The site is built with pandoc, which derives a heading's anchor from its text:
 strip formatting and backticks, drop punctuation, lowercase, turn spaces into

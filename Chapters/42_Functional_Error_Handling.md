@@ -110,7 +110,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `@final` states that neither can have subclasses,
 which lets the type checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
-(introduced in [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+(introduced in [Static Types](08_Static_Types.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
@@ -203,7 +203,7 @@ Without that comment `ty` refuses the line,
 reporting that `Err[str]` in the union has no `unwrap`,
 and a reader who writes this in their own code never reaches the traceback.
 
-This is the same idea as in [Static Typing](08_Static_Typing.md#type-hints):
+This is the same idea as in [Static Types](08_Static_Types.md#type-hints):
 put the meaning in the type.
 Python's humbler form of the same idea is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"

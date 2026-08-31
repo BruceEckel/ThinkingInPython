@@ -273,7 +273,7 @@ With states as immutable values,
 the caretaker no longer needs to know anything about them.
 Undo and redo are two stacks of past and future states,
 generic over the state type
-(the `class History[S]` syntax is from [Static Typing](08_Static_Typing.md#generic-functions-and-classes)):
+(the `class History[S]` syntax is from [Static Types](08_Static_Types.md#generic-functions-and-classes)):
 
 ![Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future](_images/memento_history)
 

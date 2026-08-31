@@ -79,7 +79,7 @@ def sum_value(items: list[Trash]) -> float:
 a dictionary from a material's class to the pieces made of that material.
 A `type` statement's right side evaluates lazily,
 so the alias can name `Trash` several lines before the `class` statement that defines it
-(see [The `type` Statement](08_Static_Typing.md#the-type-statement)).
+(see [The `type` Statement](08_Static_Types.md#the-type-statement)).
 
 Python implicitly makes [`__init_subclass__()`](17_Metaprogramming.md#self-registration-of-subclasses)
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.

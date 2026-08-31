@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
-(introduced in [Static Typing](08_Static_Typing.md#the-self-type))
+(introduced in [Static Types](08_Static_Types.md#the-self-type))
 declares an instance of the enclosing class.
 `__exit__()` takes three arguments describing any exception (covered below).
 
@@ -314,7 +314,7 @@ print("survived")
 
 `__exit__()` receives `exc_type: type[BaseException] | None` because Python passes it the raised exception's class,
 or `None` when the block finishes cleanly.
-[`type[...]`](08_Static_Typing.md#classes-as-values-type) means the class,
+[`type[...]`](08_Static_Types.md#classes-as-values-type) means the class,
 such as `ZeroDivisionError`, not an instance of it.
 `issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it,
 so a `ZeroDivisionError` still matches `ignore_one(ArithmeticError)`.
@@ -364,7 +364,7 @@ The `Types` alias names that "one class or a tuple of classes" shape once instea
 The second is the default.
 The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Functions.md#default-and-keyword-arguments),
 which makes `ignore()` with no argument catch everything.
-`self.types is not ALL` [narrows](08_Static_Typing.md#narrowing)
+`self.types is not ALL` [narrows](08_Static_Types.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,
 since ruling out `ALL` leaves only `Types`.
 By the time `issubclass(exc_type, self.types)` runs,

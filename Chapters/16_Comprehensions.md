@@ -105,7 +105,7 @@ The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`
-(the [narrowing summary](08_Static_Typing.md#type-narrowing) covers the pair).
+(the [narrowing summary](08_Static_Types.md#type-narrowing) covers the pair).
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values, and the type checker knows no `None` survives.
 
