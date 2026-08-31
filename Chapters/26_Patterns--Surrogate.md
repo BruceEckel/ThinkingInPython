@@ -443,14 +443,18 @@ The call works and `hasattr()` finds the method,
 yet both `isinstance()` checks return `False`.
 
 Two workarounds make `isinstance()` return `True`,
-and neither verifies anything.
-`Service.register(Proxy)` makes the ABC machinery return `True` for every `Proxy` without checking its methods,
-and a `__class__` property returning the implementation's class makes `isinstance()` report the implementation's class for the proxy.
-Each satisfies the runtime check and neither satisfies a type checker.
-Inheritance is the exception:
-`proxy_interface.py`'s `Proxy` passes `isinstance(p, Service)` because it inherits `Service`,
-and the type checker verified its `f()` and `g()` against that base.
-A surrogate that forwards through `__getattr__()` gives up both checks together.
+and neither verifies anything:
+
+-   `Service.register(Proxy)` tells the ABC machinery to answer `True` for every `Proxy`,
+    without looking at its methods.
+-   A `__class__` property returning the implementation's class makes `isinstance()` see that class rather than `Proxy`.
+
+Both satisfy the runtime check and neither satisfies a type checker.
+Inheritance satisfies both.
+`proxy_interface.py`'s `Proxy` inherits `Service`,
+so `isinstance(p, Service)` returns `True`,
+and the type checker confirms that `Proxy`'s `f()` and `g()` match `Service`.
+Forwarding through `__getattr__()` gives up both.
 A surrogate is not its implementation,
 and code that checks with `isinstance()` should check for the method instead.
 
@@ -468,9 +472,9 @@ and code that checks with `isinstance()` should check for the method instead.
     Restricts the client programmer's access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
-    For example, a smart reference can count the references to an object,
+    For example, a smart reference can the calls to a particular method.
+    It can also count the references to an object,
     implementing the *copy-on-write* idiom and preventing aliasing.
-    A simpler example counts the calls to a particular method.
 
 A *Protection proxy* decides whether a call reaches the implementation.
 Because `__getattr__()` receives the requested name, the check is one condition:
