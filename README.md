@@ -113,7 +113,7 @@ Note that I am not starting at the beginning, but picking up where I left off du
 | 25_Template_Method.md           |X|
 | 26_Surrogate.md                 |O|
 | 27_Factory.md                   |r|
-| 28_Function_Objects.md          | |
+| 28_Function_Objects.md          |r|
 | 29_Changing_the_Interface.md    | |
 | 30_Observer.md                  | |
 | 31_State_Machines.md            | |
@@ -168,7 +168,7 @@ The first serious edit pass.
 | 25_Template_Method.md           | |
 | 26_Surrogate.md                 | |
 | 27_Factory.md                   | |
-| 28_Function_Objects.md          | |
+| 28_Function_Objects.md          |r|
 | 29_Changing_the_Interface.md    | |
 | 30_Observer.md                  | |
 | 31_State_Machines.md            | |
