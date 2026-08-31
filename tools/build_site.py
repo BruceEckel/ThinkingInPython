@@ -22,6 +22,7 @@ floating "Contents" link to the index is unaffected.
 """
 
 import argparse
+import hashlib
 import re
 import shutil
 import subprocess
@@ -159,6 +160,25 @@ def rewrite_md_links(text: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Asset cache busting
+# --------------------------------------------------------------------------- #
+# style.css, search.css, and search.js keep the same filename forever, so a
+# browser that already has one reuses it and ignores the rebuilt copy. That
+# makes an edit to render_css() look like it did not happen: index.html is
+# fresh (its own URL is revalidated) while the stylesheet beside it is weeks
+# old, so the new markup renders under the old rules. Suffixing each link
+# with a hash of the file's own bytes gives the asset a new URL whenever its
+# content changes, and the same URL whenever it does not.
+def asset_tag(content: str) -> str:
+    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:8]
+    return f"?v={digest}"
+
+
+def static_tag(name: str) -> str:
+    return asset_tag((STATIC_SRC / name).read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------- #
 # Pandoc
 # --------------------------------------------------------------------------- #
 def check_pandoc() -> None:
@@ -176,6 +196,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=book-title:{BOOK_TITLE}",
         f"--variable=heading-font:{HEADING_FONT}",
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
+        f"--variable=search-css:search.css{static_tag('search.css')}",
+        f"--variable=search-js:search.js{static_tag('search.js')}",
     ]
     if prev is not None:
         variables += [f"--variable=prev-url:{prev.out_name}",
@@ -225,6 +247,9 @@ def render_index(chapters: list[Chapter]) -> str:
     cover_art = ("cover-art.jpg"
                  if (STATIC_SRC / "cover-art.jpg").exists()
                  else "cover-art.svg")
+    css_tag = asset_tag(render_css())
+    search_css_tag = static_tag("search.css")
+    search_js_tag = static_tag("search.js")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,9 +259,9 @@ def render_index(chapters: list[Chapter]) -> str:
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family={HEADING_FONT_GOOGLE}&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="search.css">
-  <script src="search.js" defer></script>
+  <link rel="stylesheet" href="style.css{css_tag}">
+  <link rel="stylesheet" href="search.css{search_css_tag}">
+  <script src="search.js{search_js_tag}" defer></script>
 </head>
 <body>
   <div class="page">
