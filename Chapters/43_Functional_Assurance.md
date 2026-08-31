@@ -77,8 +77,8 @@ It changes `110` into `140`.
 and neither is any expression containing it,
 which is why the substitution reasoning above stops at the first impure call.
 
-This property is also the quiet reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
-is safe.
+This property is also the reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
+is quietly safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
 from a cache to a database query planner,
@@ -130,8 +130,7 @@ Run as a script, this prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
-No locks, no queues, no shared state, and no changes to `count_primes()`.
-The function was ready to run in parallel on day one, because it was pure.
+No locks, no queues, no shared state: a pure function is ready to run in parallel, unchanged.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
