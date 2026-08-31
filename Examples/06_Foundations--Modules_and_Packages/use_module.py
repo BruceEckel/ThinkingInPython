@@ -6,4 +6,4 @@ print("'module' imported")
 if __name__ == "__main__":
     print(module.useful_function())
 #: 'module' imported
-#: I'm
+#: I'm being useful!

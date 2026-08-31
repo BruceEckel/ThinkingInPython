@@ -55,6 +55,11 @@ REPO_URL = "https://github.com/BruceEckel/ThinkingInPython"
 # release, so the link never goes stale when a new version ships
 # (`make release`), and adding an asset needs no change here.
 RELEASE_URL = f"{REPO_URL}/releases/latest"
+# The README section explaining where the examples and solutions
+# live, how the book's listings map onto them, and how to run and
+# test them. Renaming that heading breaks this anchor, and nothing
+# checks it: GitHub serves the page either way, just unscrolled.
+EXAMPLES_URL = f"{REPO_URL}#examples-and-solutions"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
@@ -243,7 +248,7 @@ def render_index(chapters: list[Chapter]) -> str:
          alt="A python as an ouroboros, coiled into an infinity sign">
     <div class="download-links">
       <p><a href="{RELEASE_URL}" target="_blank" rel="noopener">Download the book: PDF and EPUB</a></p>
-      <p><a href="{REPO_URL}" target="_blank" rel="noopener">Book Examples &amp; Exercise Solutions on GitHub</a></p>
+      <p><a href="{EXAMPLES_URL}" target="_blank" rel="noopener">Book Examples &amp; Exercise Solutions on GitHub</a></p>
     </div>
     <ul class="toc-list">
 {rows}
