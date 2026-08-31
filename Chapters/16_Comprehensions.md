@@ -95,7 +95,7 @@ The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
 `map()` and `filter()` pay off when the function already exists,
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
-[Functional Foundations](40_Functional_Foundations.md) returns to the choice.
+[Functional Foundations](40_Functional--Foundations.md) returns to the choice.
 The `lambda` makes the versions above worse, not `map()`.
 
 The `# type: ignore` comments mark a cost beyond readability.

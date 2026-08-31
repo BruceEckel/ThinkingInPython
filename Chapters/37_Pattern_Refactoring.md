@@ -504,7 +504,7 @@ When the operation is the same for every type, you do not need single dispatch.
 The earlier `sum_value()` is an ordinary function.
 Use `singledispatch` only when the behavior differs by type.
 For an operation that belongs on an object and still varies by type,
-[`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
+[`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
 
 ## Choosing the Lightest Construct

@@ -408,7 +408,7 @@ which is how it answers the same question two ways.
 A supplied instance cannot do this, and neither can `frozen` or `tomorrow`,
 since each reports one moment however often you ask.
 
-Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations),
+Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations),
 which made randomness repeatable a different way, by taking a `seed` parameter.
 That works, but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
 Here the return type names the source instead,
@@ -2003,7 +2003,7 @@ Trust a green check only where a red one has shown you it can appear.
 `Effect` is a monad.
 `success()` lifts a value into it, `yield from` chains two of them together,
 and the generator body is syntax that hides the chaining.
-`Result` in [Error Handling](42_Functional_Error_Handling.md#composing-with-bind)
+`Result` in [Error Handling](42_Functional--Error_Handling.md#composing-with-bind)
 had the same two operations, written out by hand.
 The library's documentation calls this an algebraic effect system,
 and both descriptions are right.
@@ -2090,7 +2090,7 @@ Consider the signatures once more:
 
 Each one describes what a function depends on, what it can produce,
 and how it can fail, before you read a single line of the body.
-That is the property this book has been circling since [Foundations](40_Functional_Foundations.md#pure-functions).
+That is the property this book has been circling since [Foundations](40_Functional--Foundations.md#pure-functions).
 Purity is valuable because it is verifiable,
 and verifying it by reading code does not scale.
 
@@ -2098,7 +2098,7 @@ A second gain shows when you put functions together.
 Python has a separate mechanism for each concern an Effect type carries.
 Absence is `T | None`.
 Failure is a raised exception,
-or the `Result` that [Error Handling](42_Functional_Error_Handling.md#a-result-type)
+or the `Result` that [Error Handling](42_Functional--Error_Handling.md#a-result-type)
 built.
 Asynchrony is `async def` and `await`.
 A resource's lifetime is a `with` block.

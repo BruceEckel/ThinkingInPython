@@ -172,7 +172,7 @@ that pairing is what makes it interesting. `balance -= amount` reads
 the global and writes it back, so the function's result depends on
 something no caller passed and its execution changes something no
 caller can see. This is why `withdraw(30)` twice returns `70` then
-`40`, the demonstration the [Foundations](../Chapters/40_Functional_Foundations.md#pure-functions)
+`40`, the demonstration the [Foundations](../Chapters/40_Functional--Foundations.md#pure-functions)
 chapter uses to show referential transparency failing. The conversion
 is to return a result type: take the balance as a parameter and return
 the new one, so the same inputs give the same answer and the caller
@@ -188,7 +188,7 @@ for the same reason `withdraw()` reading `balance` is one: the answer
 depends on history rather than arguments. The functional conversion
 turns the reading into a value returned from the temperature source and
 lets the caller fold new readings into whatever state it keeps, which
-is what [Functional Foundations](../Chapters/40_Functional_Foundations.md)
+is what [Functional Foundations](../Chapters/40_Functional--Foundations.md)
 means by pushing effects to the edges.
 
 Worth noticing across all three: the classification is not a property

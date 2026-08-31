@@ -857,7 +857,7 @@ stream it from the start, like `lazy_first_evens()`.
 ## Caching
 
 If you call a pure function
-([Functional Foundations](40_Functional_Foundations.md#pure-functions))
+([Functional Foundations](40_Functional--Foundations.md#pure-functions))
 repeatedly with the same arguments,
 the fastest way to compute the answer is to not recompute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -1158,7 +1158,7 @@ You keep that speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reintroduces the overhead.
 This is the declarative trade,
-which [Confidence](43_Functional_Confidence.md#declarative-style) examines:
+which [Confidence](43_Functional--Confidence.md#declarative-style) examines:
 describe the whole-array result and let the engine arrange the steps.
 
 One machine measured the vectorized pass at about 11x faster than the loop.

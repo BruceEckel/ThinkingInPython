@@ -383,7 +383,7 @@ The lambdas ignore their parameter, since the second setting does not
 depend on the first one's value. That is the case `bind()` reads worst
 for: it exists to thread an answer forward, and here there is no
 answer to thread, only an ordering. This is where the do-notation
-mentioned in [The returns Library](../Chapters/42_Functional_Error_Handling.md#the-returns-library)
+mentioned in [The returns Library](../Chapters/42_Functional--Error_Handling.md#the-returns-library)
 reads better than nested binds.
 
 ## 6. `int | None` collapses the three failures into one

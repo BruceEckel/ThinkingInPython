@@ -8,7 +8,7 @@ None of that is in any signature on the path.
 
 This book has emphasized the benefits of pure functions in numerous places:
 
-- [Foundations](40_Functional_Foundations.md#pure-functions)
+- [Foundations](40_Functional--Foundations.md#pure-functions)
   contrasts `double()`, a pure function, with `withdraw()`,
   which depends on state left over from earlier calls.
 - [Performance](18_Performance.md#caching)
@@ -106,7 +106,7 @@ Two schools of thought exist:
     functional programming avoids exceptions altogether.
     A *Total Function* doesn't raise exceptions,
     but instead returns errors as data using explicit wrapper types,
-    as you saw in [Error Handling](42_Functional_Error_Handling.md).
+    as you saw in [Error Handling](42_Functional--Error_Handling.md).
 
 From an Effect Management standpoint, exceptions are impure.
 If you write a function `a()` that calls a function `b()` that raises an exception,
@@ -124,7 +124,7 @@ Here are three ways to do it.
 ### Return a Result Type
 
 Wrap the answer and the failure in a `Result`,
-the way [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results)
+the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
 This chapter imports the shared helpers `result.py` and `safe.py` directly instead of rebuilding them.
 If you decorate the original `slope()`, unchanged,
@@ -795,7 +795,7 @@ rather than letting you declare your own.
 
 Third-party libraries supply pieces of the rest.
 The [returns](https://github.com/dry-python/returns)
-library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional_Error_Handling.md),
+library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional--Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
 The [effect](https://pypi.org/project/effect/) library,
@@ -917,7 +917,7 @@ and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
     and note how many of them mention an Effect they never use.
     Then say what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
-    `withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions),
+    `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
     and `Thermometer` from [Observer](30_Observer.md): side effect, side cause,
     or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)

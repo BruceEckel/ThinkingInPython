@@ -178,7 +178,7 @@ A lambda's body runs when you call the command, not when you create it.
 All three lambdas close over the one loop variable,
 which holds 2 by the time anything calls them.
 The argument to `functools.partial`
-([Functional Foundations](40_Functional_Foundations.md#partial-application))
+([Functional Foundations](40_Functional--Foundations.md#partial-application))
 is an ordinary expression, which Python evaluates where you write it,
 so each command stores the string built from that iteration's `n`.
 Nothing remains to look up later.
@@ -295,7 +295,7 @@ The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
 
 When a strategy needs configuration, the next step is not yet a class.
-It is a *closure* ([Functional Foundations](40_Functional_Foundations.md#closures)),
+It is a *closure* ([Functional Foundations](40_Functional--Foundations.md#closures)),
 a function that manufactures the strategy with the settings held in its closure:
 
 ```python
@@ -335,7 +335,7 @@ and so does the chain below.
 `functools.partial` does the same job when a configurable version already exists with the setting as a parameter.
 If that setting is a positional argument sitting after the one the caller supplies,
 `Placeholder`, a sentinel argument
-([Functional Foundations](40_Functional_Foundations.md#leaving-a-gap-with-placeholder)),
+([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)),
 reserves the earlier position for the caller's argument.
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.

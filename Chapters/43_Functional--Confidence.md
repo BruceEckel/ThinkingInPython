@@ -13,10 +13,10 @@ This seems to me to be the broader challenge that functional programming takes o
 and what this chapter explores.
 
 The preceding chapters built the machinery.
-[Foundations](40_Functional_Foundations.md)
+[Foundations](40_Functional--Foundations.md)
 established pure functions and immutable values,
-[Toolkits](41_Functional_Toolkits.md) supplied the standard library's support,
-and [Error Handling](42_Functional_Error_Handling.md)
+[Toolkits](41_Functional--Toolkits.md) supplied the standard library's support,
+and [Error Handling](42_Functional--Error_Handling.md)
 made failure an ordinary value.
 This chapter asks what that machinery lets you claim about your code,
 and how far those claims can go.
@@ -51,7 +51,7 @@ This property lets you check parts of a program,
 and sometimes prove them correct.
 
 Substitution stops working the moment a function reads or writes outside itself.
-`withdraw()` from [Foundations](40_Functional_Foundations.md#pure-functions)
+`withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions)
 does both, reading and writing the module-level `balance`:
 
 ```python
@@ -77,7 +77,7 @@ It changes `110` into `140`.
 and neither is any expression containing it,
 which is why the substitution reasoning above stops at the first impure call.
 
-This property is also the reason [`lru_cache`](41_Functional_Toolkits.md#lru_cache)
+This property is also the reason [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 is quietly safe.
 A memoizer may hand back a stored result only because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
@@ -173,7 +173,7 @@ You describe the shapes you expect and Python binds the pieces,
 so one `match` replaces a stack of `isinstance()` tests, length checks,
 and key or index lookups,
 with no gap between confirming a shape and pulling out its parts.
-[Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+[Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 put that to work, taking a `Result` apart with one branch per kind of failure.
 The win is in the reading rather than in what a type checker can prove.
 On a `Result[float, Exception]`,
@@ -384,7 +384,7 @@ and the chapters after it build a checked system on that idea.
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the minimal counterexample Hypothesis finds,
     and explain what it reveals about Unicode case mapping.
-5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional_Toolkits.md#case-study-pairing-rotations):
+5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
@@ -395,6 +395,6 @@ and the chapters after it build a checked system on that idea.
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that would change the program's behavior,
     then rewrite it so the value arrives as an argument.
-7.  Take the `describe()` function from [Error Handling](42_Functional_Error_Handling.md#matching-on-the-error)
+7.  Take the `describe()` function from [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
     Count the lines, then run `ty` on both and compare what each one knows about the value inside the `Ok`.

@@ -711,7 +711,7 @@ You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.
 The chain either delivers an answer or hands back the first failure,
 and the type checker does not let a caller confuse the two.
-[Confidence](43_Functional_Confidence.md)
+[Confidence](43_Functional--Confidence.md)
 examines what this discipline lets you claim,
 and [Effect Management](44_Effect_Management.md#converting-effectful-to-pure)
 reuses this `Result` machinery to convert Effects.

@@ -177,18 +177,18 @@ Use this one when you know the problem but not the name.
 | [Dependency Injection](11_Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
 | [Double Dispatch](32_Multiple_Dispatching.md) | Resolve behavior from the runtime types of two objects, through two calls. |
 | [Fluent Interface](27_Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
-| [Function Composition](40_Functional_Foundations.md#composing-functions) | Build a function by feeding one function's output into the next. |
+| [Function Composition](40_Functional--Foundations.md#composing-functions) | Build a function by feeding one function's output into the next. |
 | [Function Object](28_Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [Inversion of Control](25_Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
-| [Memoization](41_Functional_Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
+| [Memoization](41_Functional--Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
 | Mixin | Add reusable behavior through multiple inheritance. |
-| [Monad](42_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
+| [Monad](42_Functional--Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [Null Object](20_Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
-| [Partial Application](40_Functional_Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
+| [Partial Application](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
 | Pointer to Implementation (Pimpl) | Hide a class's implementation behind an indirection to cut compile coupling. |
 | [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
 | [Service Locator](46_Stateless.md#dependency-injection) | Look up dependencies through a central registry. |

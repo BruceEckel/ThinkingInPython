@@ -1,6 +1,6 @@
 # Toolkits
 
-[Foundations](40_Functional_Foundations.md) built behavior from small, pure,
+[Foundations](40_Functional--Foundations.md) built behavior from small, pure,
 composable pieces.
 The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.
@@ -117,7 +117,7 @@ a new entry gets in only by pushing another one out.
 ### `partial`
 
 Fixes some of a function's arguments and returns a new function that expects the rest.
-[Partial Application](40_Functional_Foundations.md#partial-application)
+[Partial Application](40_Functional--Foundations.md#partial-application)
 covers it in depth.
 
 ```python
@@ -130,7 +130,7 @@ shout("hello")
 ```
 
 `functools.Placeholder` reserves a position so you can fix a later positional argument and leave an earlier one for the caller.
-[Leaving a Gap with `Placeholder`](40_Functional_Foundations.md#leaving-a-gap-with-placeholder)
+[Leaving a Gap with `Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 shows it.
 
 ### `partialmethod`
@@ -1035,7 +1035,7 @@ the single element, or the last partial batch.
 The second rule is that the pieces exist to stack.
 `islice(count(10, 2), 5)` in this chapter is two stages.
 A real pipeline is five or six, and it still holds one item in memory at a time.
-[Error Handling](42_Functional_Error_Handling.md)
+[Error Handling](42_Functional--Error_Handling.md)
 asks what such a pipeline does when one stage fails,
 the question a chain of pure functions leaves open.
 

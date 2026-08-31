@@ -289,7 +289,7 @@ Adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
 When the operation should read like a method,
-use [`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
+use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 instead.
 It dispatches on the first argument after `self`.
 

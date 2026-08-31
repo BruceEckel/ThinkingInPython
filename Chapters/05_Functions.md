@@ -301,7 +301,7 @@ If you drop the `global` from `writes_global()`,
 so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading,
 which is why `read_only()` needs nothing.
-[Closures](40_Functional_Foundations.md#closures) covers `nonlocal`,
+[Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 the same idea one scope in.
 
 ## Variable Argument Lists
@@ -370,7 +370,7 @@ which is the standard shape of a wrapper.
 A function is an object like any other,
 so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived
-(see [Functions as First-Class Objects](40_Functional_Foundations.md#functions-as-first-class-objects)).
+(see [Functions as First-Class Objects](40_Functional--Foundations.md#functions-as-first-class-objects)).
 [Decorators](14_Decorators.md) builds on this.
 
 ## Positional-Only and Keyword-Only Parameters

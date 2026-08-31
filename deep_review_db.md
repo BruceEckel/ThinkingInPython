@@ -129,7 +129,7 @@ Hugging the code would put an indented marker inside the block, and no indented
 has thirteen `*Proxy*`. This is house convention, not the
 italics-for-emphasis violation it resembles.
 
-**41_Functional_Toolkits: `recursion.py` teaches two things on purpose.** The
+**41_Functional--Toolkits: `recursion.py` teaches two things on purpose.** The
 listing carries both the base-case/recursive-case lesson and
 `sys.getrecursionlimit()`, with an `import sys` serving only the second. That
 breaks "one new thing per listing". Splitting it would leave a two-line second

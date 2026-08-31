@@ -286,7 +286,7 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     as [Data Classes as Types](12_Data_Classes_as_Types.md#immutability)
     describes.
 -   *Make functions pure whenever you can*,
-    as [Pure Functions](40_Functional_Foundations.md#pure-functions) describes.
+    as [Pure Functions](40_Functional--Foundations.md#pure-functions) describes.
 
 <!-- vale write-good.Passive = YES -->
 <!-- vale House.WeakVerb = YES -->

@@ -286,7 +286,7 @@ Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
 `functools.singledispatchmethod`
-([Functional Toolkits](41_Functional_Toolkits.md#singledispatchmethod) catalogs it)
+([Functional Toolkits](41_Functional--Toolkits.md#singledispatchmethod) catalogs it)
 sits between them.
 It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`,

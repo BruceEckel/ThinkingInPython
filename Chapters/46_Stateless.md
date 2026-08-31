@@ -1384,7 +1384,7 @@ The `Generator`'s first parameter carries `A | E`
 ([The Effect Definition](#the-effect-definition)).
 `Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
-This carries the same idea as the `Result` type in [Error Handling](42_Functional_Error_Handling.md#turning-exceptions-into-results),
+This carries the same idea as the `Result` type in [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results),
 though the two are not the same construct.
 A `Result` is a wrapper the function returns at once,
 and the caller matches on it.
@@ -1593,7 +1593,7 @@ error[unsupported-operator]: Unsupported `+` operation
   |                              Has type `int | KeyError`
 ```
 
-This is the same guarantee the `Result` type gives in [Error Handling](42_Functional_Error_Handling.md#a-result-type),
+This is the same guarantee the `Result` type gives in [Error Handling](42_Functional--Error_Handling.md#a-result-type),
 and `catch()` reaches it without rewriting the body of `score()`.
 
 ### Multiple Errors

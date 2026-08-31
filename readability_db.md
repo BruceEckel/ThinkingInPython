@@ -128,7 +128,7 @@ anywhere breaks terminology with the chapter that owns it.
 
 Recorded so a sweep does not read them as defects:
 
-- **Colon reveals in 40_Functional_Foundations** ("A `match` is code: … The
+- **Colon reveals in 40_Functional--Foundations** ("A `match` is code: … The
   table is data: …") are §69 by shape, twice. Both colons introduce a
   definition rather than staging a surprise, and the parallel structure is the
   point of the contrast. The same call covers 06's "The underscore changes one
@@ -217,7 +217,7 @@ Tier 1B "in order" in the book, and the deep review deliberately restored it:
 the bare comma version read as two unrelated purposes, losing the causal link
 that counting references is how copy-on-write knows when to copy. Binding.
 
-**40_Functional_Foundations, "Choose `match` when the set of cases is fixed …
+**40_Functional--Foundations, "Choose `match` when the set of cases is fixed …
 and a table when the set is meant to grow from outside."** §70 by shape, since
 the two sentences above draw the same distinction concretely. Kept: the
 abstraction is short, it is the sentence a reader returns for, and what precedes
