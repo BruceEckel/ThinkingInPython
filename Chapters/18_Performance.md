@@ -38,9 +38,9 @@ and later releases have continued that work.
 Moving a project forward two or three releases costs a test run rather than a rewrite.
 A speedup that needs neither new code nor new hardware is rare.
 
-The same interpreter also has a second speed setting,
-an experimental just-in-time compiler that costs no code change,
-which the next section covers.
+One more speedup needs no new code:
+the experimental just-in-time compiler inside CPython,
+the subject of the next section.
 
 Alternative interpreters for Python exist, notably PyPy,
 which claims about a 3x speedup on average.
@@ -52,33 +52,33 @@ If it's noticeably less, buying new hardware might be a quick win.
 
 ## The CPython JIT
 
-CPython carries an experimental just-in-time compiler,
-added in 3.13 by [PEP 744](https://peps.python.org/pep-0744/)
-and substantially rebuilt in 3.15.
-It watches the bytecode a program actually executes,
-and once a path has run often enough, it compiles that path to machine code.
-Your source does not change.
-The same file runs, and the interpreter stops re-interpreting the part of it that runs most.
+CPython includes an experimental just-in-time compiler.
+[PEP 744](https://peps.python.org/pep-0744/) added it in 3.13,
+and 3.15 rebuilt much of it.
+It watches the bytecode a program executes, and once a path runs often enough,
+it compiles that path to machine code.
+You change nothing.
+The same file runs, and the interpreter stops re-interpreting its busiest paths.
 
-Three separate switches stand between your program and that machine code:
+Three switches stand between your program and that machine code:
 
 1. The interpreter must be *built* with the JIT,
    through the `--enable-experimental-jit` configuration option.
-   Building it needs LLVM; running the result does not.
-2. The process must have the JIT *enabled*,
-   which the `PYTHON_JIT` environment variable controls.
+   Building it needs LLVM.
+   Running the result does not.
+2. The process must *enable* it, through the `PYTHON_JIT` environment variable.
 3. The code must get *hot*.
    A script that runs briefly and exits never reaches the threshold,
    so it pays the compiler's warm-up and collects nothing.
 
-Since 3.14, the official python.org Windows and macOS binaries are built with `--enable-experimental-jit=yes-off`,
+Since 3.14, the official python.org Windows and macOS binaries use `--enable-experimental-jit=yes-off`,
 which compiles the JIT in and leaves it switched off,
 so `PYTHON_JIT=1` turns it on.
-A build configured with plain `yes` starts with the JIT running,
+Plain `yes` builds start with the JIT running,
 and there `PYTHON_JIT=0` turns it off.
 Other distributions decide for themselves,
 so the first question is not "is the JIT on?" but "which build am I running?"
-The `sys._jit` functions answer both:
+`sys._jit` answers it:
 
 ```python
 # jit_status.py
@@ -97,28 +97,30 @@ print(jit_state())
 
 `is_enabled()` implies `is_available()`,
 so testing them in that order names the three states a build can be in.
-Most listings in this book print the same line on every machine.
-This one deliberately does not: the book's interpreter has no JIT compiled in,
-which produces the first line,
-while a python.org binary produces the second until you set `PYTHON_JIT=1`.
-A third function, `sys._jit.is_active()`,
-reports whether the frame that called it is running compiled code at that moment.
-The documentation warns against branching on that one,
-since a tracing compiler can answer the same call differently from one moment to the next.
 
-What does the environment variable buy?
+Most listings in this book print the same line on every machine.
+This one changes with your interpreter.
+The book's build has no JIT compiled in, so it prints the first line.
+A python.org binary prints the second until you set `PYTHON_JIT=1`.
+
+A third function, `sys._jit.is_active()`,
+reports whether the frame that called it is running compiled code.
+The documentation warns against branching on its result,
+since a tracing compiler can give different answers to the same call.
+
+The payoff is a percentage, not a multiple.
 On the `pyperformance` suite,
 3.15 measures 8-9% faster on x86-64 Linux and 12-13% faster on AArch64 macOS,
 each against that platform's fastest build without the JIT.
 Those are geometric means over dozens of benchmarks.
 The individual benchmarks range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
-The measurement is cheap, though.
-Time your own workload twice, with `PYTHON_JIT` set to `1` and to `0`,
+Measuring your own program costs two runs:
+time the workload with `PYTHON_JIT` set to `1` and to `0`,
 and change nothing else.
 
 Numba's `@njit`, later in this chapter, is also a just-in-time compiler,
-and the two trade differently.
+and the two make opposite trades.
 The CPython JIT asks nothing of you,
 applies to whatever code turns out to be hot,
 and pays in single-digit percentages.
@@ -127,12 +129,11 @@ costs a decorator and a compilation pause on the first call,
 and pays in multiples.
 Neither one rescues a quadratic algorithm.
 
-Whether the JIT is ever on by default is undecided.
-[PEP 836](https://peps.python.org/pep-0836/) sets the bar it must clear:
+[PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
 5% over the interpreter alone for 3.16,
 then 20% for the JIT combined with free threading by 3.17,
-which the PEP calls the minimum for continued development inside CPython.
-Turning it on by default would then need separate approval from the release manager.
+which the PEP calls the minimum for continuing to develop it inside CPython.
+Even then, turning it on by default would need separate approval from the release manager.
 
 ## Profilers
 
