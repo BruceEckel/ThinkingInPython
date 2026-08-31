@@ -252,10 +252,34 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   which reads as a broken listing rather than a bad flag; an absolute
   `--tree` fixes all of them at once. GUI/interactive examples are skipped via
   `tools/data/norun.txt` (keep those paths current when chapters are renumbered).
-- **Renumbering a chapter** touches: `Chapters/` and `Examples/` filenames, every
-  `NN_*.md` cross-reference, `build_site.py` `PARTS`, `tools/data/norun.txt`, and the
-  `README.md` tracking table. Appendices use letter prefixes (`A_...`); build_site
-  labels them "Appendix X".
+- **Renumbering or renaming a chapter** touches, in all four trees
+  (`Chapters/`, `Solutions/`, `Examples/`, `SolutionsCode/`): the filenames, every
+  `NN_*.md` cross-reference and its link text, `build_site.py` `PARTS`,
+  `tools/data/norun.txt`, `tools/data/timing.txt`, the `README.md` tracking table,
+  `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any
+  `tools/tests/` fixture naming a chapter. Appendices use letter prefixes
+  (`A_...`); build_site labels them "Appendix X".
+  The one that hides: **`pyproject.toml`'s `per-file-ignores` keys a few entries
+  by chapter directory** (`"**/46_Effects--Stateless/exercise_8.py"`), so a rename
+  silently drops the waiver and the listing fails `I001` at `solutions-gate`,
+  several steps after the rename looked done. Grep `pyproject.toml` for the old
+  directory name before running `verify`.
+  Renaming the *chapter title* additionally means the H1, the Solutions H1
+  (`<Title>: Solutions`), and every link whose text was the old title.
+- **Part IV and V filenames carry their part name, set off by `--`:**
+  `42_Functional--Error_Handling.md`, `47_Effects--Stateless_in_Practice.md`.
+  The H1 drops the qualifier (`# Error Handling`), so the filename and the URL
+  say which part a chapter is in while the book's title stays short.
+  Keep `_` as the separator right after the number: `build_site.py` and
+  `check_solutions.py` both pull the chapter number with `split("_", 1)[0]`.
+  Only `[\w./-]` is safe in a filename, because that is the character class in
+  all three link regexes (`build_site.MD_LINK`, `build_epub.ANCHOR_TARGET`,
+  `heading_links.ANCHOR_TARGET`). A character outside it fails *silently*, which
+  is why brackets were tried and rejected: with `43_[Functional]_Confidence.md`,
+  `heading_links` reported "Anchor links OK" for a link to a nonexistent anchor,
+  and `build_site` emitted un-rewritten `.md` hrefs (404s on the site). No gate
+  went red. Also avoid `[`/`]` because `norun.txt` and `timing.txt` patterns are
+  `fnmatch` globs, where brackets are a character class.
 - **Splitting a chapter silently invalidates every relative cross-reference in
   the later half.** Nothing greps for prose, so no gate catches this. Splitting
   Generators out of Stateless left chapter 46 with fourteen phrases
@@ -264,7 +288,7 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   After any split, `grep -n "previous chapter\|previous section\|last chapter"`
   the later half and check each hit against the content it names, since some
   will legitimately point at the new neighbor. Prefer a named link
-  (`[Effect Management](44_Effect_Management.md#anchor)`) over a relative
+  (`[Effect Management](44_Effects--Effect_Management.md#anchor)`) over a relative
   phrase, so the next split fails loudly at `heading_links.py` instead of
   quietly misleading a reader. Where three references cluster in one section,
   resolve the later ones with "that chapter" against a nearby link rather than

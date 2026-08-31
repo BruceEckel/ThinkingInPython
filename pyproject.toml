@@ -125,9 +125,9 @@ lines-after-imports = 1
 "**/casts.py" = ["I001"]
 "**/fetch_guarded.py" = ["I001"]
 "**/38_Simulation/exercise_4.py" = ["I001"]
-"**/46_Stateless/exercise_8.py" = ["I001"]
-"**/46_Stateless/exercise_10.py" = ["I001"]
-"**/46_Stateless/exercise_11.py" = ["I001"]
+"**/46_Effects--Stateless/exercise_8.py" = ["I001"]
+"**/46_Effects--Stateless/exercise_10.py" = ["I001"]
+"**/46_Effects--Stateless/exercise_11.py" = ["I001"]
 "**/test_ch46_ask_and_greet.py" = ["I001"]
 "**/test_ch46_audit_log.py" = ["I001"]
 

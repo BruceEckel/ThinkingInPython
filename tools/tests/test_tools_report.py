@@ -10,7 +10,7 @@ from tools_report import Finding, report
 def test_format_line_only() -> None:
     # The path prints as os.fspath renders it, so the separator is the
     # platform's; that is what the tools have always printed.
-    path = Path("Chapters/46_Stateless.md")
+    path = Path("Chapters/46_Effects--Stateless.md")
     f = Finding(path, 12, "something is wrong")
     assert f.format() == f"{path}:12: something is wrong"
 

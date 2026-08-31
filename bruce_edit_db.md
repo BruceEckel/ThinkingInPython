@@ -81,7 +81,7 @@ it raises", "whatever `slope()` raises", "what it re-raises"). Code and
   "The `class Typo` statement raises instead of finishing" ->
   "The `class Typo` statement raises a `TypeError` instead of finishing"
 - `Solutions/14_Decorators`, `Solutions/25_Template_Method`,
-  `Solutions/47_Stateless_in_Practice` 2026-08-29, found by sweep after
+  `Solutions/47_Effects--Stateless_in_Practice` 2026-08-29, found by sweep after
   Bruce named the rule: "returns or raises." -> "returns or raises an
   exception."; "this one raises instead" -> "this one raises an exception
   instead"; "returns rather than raises" -> "returns a value rather than

@@ -1,6 +1,6 @@
 # Stateless
 
-[Effect Management](44_Effect_Management.md#library-effect-management)
+[Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 introduced library Effect systems.
 [Stateless](https://github.com/suned/stateless)
 is a library that implements an Effect Management System (EMS).
@@ -13,7 +13,7 @@ That is the Effect tracking and delayed binding of a full EMS,
 with the bookkeeping moved into the type system.
 
 Stateless builds on generators.
-[Generators](45_Generators.md)
+[Generators](45_Effects--Generators.md)
 covered the three-parameter `Generator` annotation,
 a driver that answers a generator's requests one `send()` at a time,
 and `yield from`, which composes generators and produces the inner generator's return value.
@@ -24,7 +24,7 @@ This chapter covers the two channels an Effect declares:
 the dependencies it needs and the ways it can fail.
 These are new channels, in the signature, not the yield, send,
 and return channels a generator carries.
-[Stateless in Practice](47_Stateless_in_Practice.md)
+[Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 builds examples using those channels.
 
 My understanding of Effects came from work with Bill Frasure and James Ward as we created [Effect Oriented Programming](https://effectorientedprogramming.com/).
@@ -38,7 +38,7 @@ Stateless builds everything atop a single type with three type parameters:
 Effect[A, E, R]
 ```
 
-Those three parameters answer the three questions [Effect Management](44_Effect_Management.md#library-effect-management)
+Those three parameters answer the three questions [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 asked of an Effect signature:
 
 - `A` is what the computation needs, an *Ability*.
@@ -89,7 +89,7 @@ print(run(double(21)))
 ```
 
 `run()` is the Stateless library's driver,
-similar to the `drive()` of [Generators](45_Generators.md#a-generator-is-a-description).
+similar to the `drive()` of [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 `run()` primes the generator, drives it to completion, and returns the result.
 Nothing the Effect describes runs until you call `run()`.
 A synchronous program calls it once, at the outermost edge.
@@ -147,7 +147,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
 ```
 
 `greet()` needs a `Console`, cannot fail, and produces nothing.
-It lives in `utils/` because both this chapter and [Stateless in Practice](47_Stateless_in_Practice.md)
+It lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
 Compare that to the version that calls `print()` directly:
 
@@ -196,7 +196,7 @@ Generator[Need[Console] | KeyError, Any, None]
 
 `A` and `E` share the first type parameter, and `R` is the third.
 That leaves the second,
-which [Generators](45_Generators.md#annotating-a-generator)
+which [Generators](45_Effects--Generators.md#annotating-a-generator)
 taught you to read as the type the `yield` expression produces inside the generator.
 That `Any` is deliberate, and it decides how `greet()` must write its request.
 
@@ -231,7 +231,7 @@ so `console` takes its type from that `ReturnType`,
 not from the `Any` in the SendType.
 
 This is why every request in this chapter uses `yield from` rather than `yield`,
-and why the custom abilities of [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
+and why the custom abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 get a small function of their own.
 
 ## Nothing Runs Yet
@@ -248,7 +248,7 @@ print(type(greet("Alice")))
 ```
 
 `greet("Alice")` builds a description of a greeting.
-This is the description/execution split from [Effect Management](44_Effect_Management.md#library-effect-management).
+This is the description/execution split from [Effect Management](44_Effects--Effect_Management.md#library-effect-management).
 A language with builtin Effects intercepts an Effect where it runs.
 Stateless cannot, because it is ordinary Python:
 when a function body calls `console.print()`,
@@ -256,7 +256,7 @@ nothing hands control to the library.
 A library can act on objects handed to it, and on nothing else.
 So the request for a `Console` must be an object.
 Driving `greet()` by hand shows that object,
-the way [Generators](45_Generators.md#a-generator-is-a-description)
+the way [Generators](45_Effects--Generators.md#a-generator-is-a-description)
 drove `interview()`:
 
 ```python
@@ -418,7 +418,7 @@ In Stateless, that decision belongs to whoever still holds the function.
 `memoize()` is the one concession, and it caches rather than replays:
 it wraps the Effect in an object that records the result and hands that same result back on a second `run()`,
 without performing the work again.
-[`repeat()` and `memoize()`](47_Stateless_in_Practice.md#repeat-and-memoize)
+[`repeat()` and `memoize()`](47_Effects--Stateless_in_Practice.md#repeat-and-memoize)
 shows it, and it decorates the function like the others.
 
 ## Forgetting to Supply
@@ -608,14 +608,14 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 A function cannot claim to be pure while calling something impure.
-Compare that to `ask_tell.py` in [Effect Management](44_Effect_Management.md#effects-by-hand),
+Compare that to `ask_tell.py` in [Effect Management](44_Effects--Effect_Management.md#effects-by-hand),
 where `greet(ask, tell)` takes its dependencies as arguments.
 Nothing there stops an intermediate function from constructing its own `Console` and quietly performing an undeclared Effect.
 Here, the signature and the body cannot disagree.
 
 ## Retrofitting an Effect
 
-The second exercise in [Effect Management](44_Effect_Management.md#exercises)
+The second exercise in [Effect Management](44_Effects--Effect_Management.md#exercises)
 has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
 Here it is in Stateless:
 
@@ -770,7 +770,7 @@ because Stateless supplies three dependency classes of its own:
 - `Console` in `stateless.console`,
   whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
 - `Files` in `stateless.files` that reads a whole file,
-- `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
+- `Time` that [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
 
 All three are concrete classes rather than interfaces,
@@ -851,7 +851,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-The second of the three things [a full EMS does](44_Effect_Management.md#effect-management-systems)
+The second of the three things [a full EMS does](44_Effects--Effect_Management.md#effect-management-systems)
 is separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another,
@@ -902,7 +902,7 @@ Most listings in these two chapters use a concrete `Console` instead,
 because under the interface,
 supplying an implementation directly requires `as_type()`.
 That is a real cost of using an interface.
-[Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
+[Composing a Program](47_Effects--Stateless_in_Practice.md#composing-a-program)
 declares its Abilities as `Protocol`s and shows how to avoid that cost:
 write one boundary function whose parameter annotations name the interface types,
 and call `supply()` inside it.
@@ -1041,7 +1041,7 @@ This `greet()` has the same signature as the `untyped_greet.py` version in [Decl
 Both read `(str) -> None`, and both hide a `Console`.
 
 DI meets its goal, because the `Console` is swappable.
-But it relocates a [side cause](44_Effect_Management.md#what-is-an-effect)
+But it relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker never validates the dependency.
 
 An EMS like Stateless sets a higher bar.
@@ -1093,7 +1093,7 @@ The trade is not about correctness, but about churn and coupling.
 A function that never logs still names `Need[Log]` in its type,
 and taking that dependency back out later moves every signature on the path a second time.
 This is the same complaint people made against Java's checked exceptions,
-which [Effect Management](44_Effect_Management.md#catch-the-exception-you-expect)
+which [Effect Management](44_Effects--Effect_Management.md#catch-the-exception-you-expect)
 describes failing this way,
 and it is the reason [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
 compares the spread to `async`.
@@ -1178,7 +1178,7 @@ The channel holds Abilities, and `Async` is one, so it sits there bare.
 and `Need[Console]` is the Ability that asks for it.
 The first type parameter accepts only `Ability` subclasses,
 so the type checker rejects `Depend[Console, None]` at the annotation.
-[Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
+[Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 writes an Ability from scratch and takes that type bound apart.
 
 `Async` asks for no object (no `Need` wraps it), so you supply nothing.
@@ -1257,7 +1257,7 @@ so `delayed_sum()` needs no `async` and no `await` of its own.
 It is an ordinary class whose one method is `async def sleep()`.
 `supply(Time())` binds an instance the way `supply(Console())` did.
 
-Reading a clock is a [side cause](44_Effect_Management.md#what-is-an-effect),
+Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect),
 and `Need[Time]` moves that into the Ability channel.
 A test can then supply a clock that never waits:
 
@@ -1468,7 +1468,7 @@ without forcing you to handle them.
 
 The channel carries only the failures `@throws` lifted into it.
 An exception raised where no `@throws` wraps the body bypasses the type,
-a hole that [Nothing stops an undeclared Effect](47_Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
+a hole that [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
 examines.
 
 Because the driver throws the failure back in,
@@ -1759,7 +1759,7 @@ The type checker covers both, and neither disappears through forgetfulness.
     and add its two rows to the table.
     Then explain why the test function body needed no change.
 6.  This one looks ahead to `handle()`,
-    which [Abilities Are Not Special](47_Stateless_in_Practice.md#abilities-are-not-special)
+    which [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
     covers.
     `default_console.py` defaults by supplying an instance.
     Write the other kind of default, one that builds whatever the request names.

@@ -169,7 +169,7 @@ All three `question` variables receive an `Answer` where their declarations say 
 
 ## A Generator Is a Description
 
-[Effect Management](44_Effect_Management.md#effect-management-for-python)
+[Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
 showed that calling an `async def` function runs nothing.
 It returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,

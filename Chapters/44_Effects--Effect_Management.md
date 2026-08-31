@@ -585,8 +585,8 @@ which is how native systems express retries and backtracking as ordinary handler
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
-[Generators](45_Generators.md) covers the full two-way form,
-and it is the mechanism behind the Python Effect library in [Stateless](46_Stateless.md).
+[Generators](45_Effects--Generators.md) covers the full two-way form,
+and it is the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect set follows a backslash:
@@ -703,11 +703,11 @@ not at its execution.
 Libraries in this family include ZIO, Cats Effect, and Kyo in Scala,
 polysemy and effectful in Haskell, Effect in TypeScript,
 and Stateless in Python.
-Stateless builds on generators, so [Generators](45_Generators.md)
+Stateless builds on generators, so [Generators](45_Effects--Generators.md)
 covers that mechanism first.
-[Stateless](46_Stateless.md)
+[Stateless](46_Effects--Stateless.md)
 then writes these programs again in the language this book is about,
-and [Stateless in Practice](47_Stateless_in_Practice.md#abilities-are-not-special)
+and [Stateless in Practice](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 ### Custom AI Languages with Effects
@@ -808,7 +808,7 @@ Each of these gives you the discipline of one part of an EMS,
 but not the guarantee, because the type checker does not participate.
 
 One library goes the rest of the way.
-[Stateless](46_Stateless.md)
+[Stateless](46_Effects--Stateless.md)
 encodes an Effect's dependencies and failures into the return type of every function that performs them,
 and a type checker verifies that each caller carries them forward.
 Declaring a dependency you never bind is a type error.
@@ -897,9 +897,10 @@ and future programmers will regard a function with hidden Effects the way you re
 
 Python offers no native version of this, and will not soon.
 The next three chapters build the library version:
-[Generators](45_Generators.md) supplies the mechanism,
-[Stateless](46_Stateless.md) builds the Effect type on top of it,
-and [Stateless in Practice](47_Stateless_in_Practice.md) puts it to work.
+[Generators](45_Effects--Generators.md) supplies the mechanism,
+[Stateless](46_Effects--Stateless.md) builds the Effect type on top of it,
+and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
+puts it to work.
 
 ## Exercises
 

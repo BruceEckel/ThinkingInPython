@@ -1,6 +1,6 @@
 # Stateless in Practice
 
-[Stateless](46_Stateless.md)
+[Stateless](46_Effects--Stateless.md)
 established the two channels an `Effect[A, E, R]` carries.
 A dependency is a `Need` that `supply()` answers.
 A failure is an exception that `@throws` lifts into the type and `catch()` takes back out.
@@ -34,7 +34,7 @@ and the handler answering it is an ordinary function,
 so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
-Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effect_Management.md#effects-by-hand):
+Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
 
 ```python
 # ask_tell_stateless.py
@@ -89,7 +89,7 @@ def __iter__(self: Self) -> Generator[Self, T, T]:
 
 It yields once, so the handler receives one request.
 The `yield from` then evaluates to that generator's return value,
-the rule from [The Return Channel](45_Generators.md#the-return-channel),
+the rule from [The Return Channel](45_Effects--Generators.md#the-return-channel),
 and here that value is whatever the handler sent back.
 The Ability produces nothing on its own.
 `prompt` is payload on the request, there for the handler to read,
@@ -99,7 +99,7 @@ which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
 `ask()` and `tell()` are *accessors*:
 small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
-and the ZIO listing in [Effect Management](44_Effect_Management.md#library-effect-management)
+and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
@@ -114,7 +114,7 @@ and writing it at the binding keeps the accessor's claim in one place,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
-the distinction [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine)
+the distinction [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine)
 drew for `Async`.
 `Ask` is an Ability, so it sits in the channel bare,
 and the type bound makes that more than a convention:
@@ -138,12 +138,12 @@ The by-hand version puts two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a type checker can follow them.
-That second channel in the signature is the one [Effect Management](44_Effect_Management.md#effect-management-systems)
+That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#effect-management-systems)
 said an EMS needs.
 
-The whole library is visible in `two_way_generator.py` from [Generators](45_Generators.md#a-generator-is-a-description).
+The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
 An Effect is a generator, so nothing stops you from driving one yourself,
-which `hand_driven.py` in [Nothing Runs Yet](46_Stateless.md#nothing-runs-yet)
+which `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
 did.
 `next()` on `greet("Alice")` produced a `Need` object carrying the requested type,
 as `interview()` yielded `"name"`, and `send(Console())` resumed the body,
@@ -233,7 +233,7 @@ and `StopIteration` is how a driver learns that an Effect has finished,
 so `handle()` reads the exhausted script as the end of the program.
 Asking `count_heads()` for six tosses from this five-value script makes `run()` produce `None` instead of a count,
 with no exception.
-That is the same silent `None` that [An Effect Runs Once](46_Stateless.md#an-effect-runs-once)
+That is the same silent `None` that [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
 Every other exception a handler raises travels out of `run()` normally.
 This one collides with the protocol.
@@ -415,9 +415,9 @@ Here the return type names the source instead,
 and no signature between `handle()` and the request mentions it.
 
 Both Abilities in this section are side causes,
-in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the-impure-portion):
+in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#subdividing-the-impure-portion):
 the function reads something from outside.
-The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
 The technique is the same for both.
 Name each contact with the outside as an Ability and bind it at the edge to whatever the context needs.
@@ -508,7 +508,7 @@ and it carries the hour so the handler can consult the conditions at that moment
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
 That decorator matters where `supply()` matches an instance to a requested class
-([Supplying an Interface](46_Stateless.md#supplying-an-interface)).
+([Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)).
 Here `handle()` matches on the Ability's own type, `Outlet`,
 and the `Source` that comes back is only a return value.
 `draw()` is the lifting wrapper: it asks the source whether it can still supply,
@@ -635,7 +635,7 @@ What changes is the object answering the need, four times, mid-run.
 Binding a dependency before the program starts cannot express this,
 because no single answer stays right for the whole run.
 Here the binding is a function call, so it reads the world at each request.
-[Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+[Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 swapped an implementation between runs.
 This swaps one during a run, and the consumer cannot tell.
 
@@ -843,7 +843,7 @@ def fetch_headline() -> Depend[Need[Feed], str]:
     return feed.latest()
 ```
 
-The decorator adds the error the same way it did for `score()` in [The Error Channel](46_Stateless.md#the-error-channel).
+The decorator adds the error the same way it did for `score()` in [The Error Channel](46_Effects--Stateless.md#the-error-channel).
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
 `research()` splits the two because a function that only transforms its arguments is easier to test on its own,
@@ -964,7 +964,7 @@ If you annotate `report()` as `Success[str]`,
 `outcome()` also earns its annotations.
 `Wire` and `Library` are structural implementations,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
-the mismatch that [Supplying an Interface](46_Stateless.md#supplying-an-interface)
+the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
 fixed with `as_type()`.
 Declaring the parameters as `Feed` and `Encyclopedia` does the same job at the boundary,
 without a cast.
@@ -1052,7 +1052,7 @@ The library provides a second door on each side.
 Where `success(value)` builds a description that produces a value,
 `throw(reason)` builds one that fails.
 Its type is `Try[E, Never]`,
-the alias from [The Effect Type](46_Stateless.md#the-effect-type),
+the alias from [The Effect Type](46_Effects--Stateless.md#the-effect-type),
 with `Never` recording that no value can come out of it.
 `yield from` sends that failure into the channel of the Effect that contains it:
 
@@ -1286,10 +1286,10 @@ error[invalid-yield]: Yield expression type does not match annotation
 The type checker covers the other end too.
 `ty` rejects the `run()` call,
 finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel,
-the rejection that [Forgetting to Supply](46_Stateless.md#forgetting-to-supply)
+the rejection that [Forgetting to Supply](46_Effects--Stateless.md#forgetting-to-supply)
 showed, now arising from a dependency two levels down.
 `Oven` and `Toaster` are distinct types,
-so the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match)
+so the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match)
 cannot arise here.
 ZIO makes both of them a `HeatSource` and must report the clash.
 
@@ -1370,14 +1370,14 @@ so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
 The program constructs no `GameEnvironment` and holds no factory.
 The five-way union appears in full rather than as an alias,
-the practice [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
+the practice [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
 recommends.
 
 Five Abilities need five distinct shapes.
 `Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`.
 Then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
-the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
+the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
 A wide cast raises the odds of a collision,
 since every pair of Abilities is a chance for one.
 
@@ -1505,7 +1505,7 @@ Know which of those you are getting.
 The fourth run swaps one cast member and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching,
-the same swap `test_greeter.py` in [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
+the same swap `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 made with one Ability rather than five.
 The engine holds no printing to intercept.
 
@@ -1522,7 +1522,7 @@ The call still runs correctly, since the implementation is variadic,
 but the checking on which this chapter relies disappears.
 Two chained handlers keep it: `supply()` the first five,
 apply that to the Effect, then `supply()` the rest to what remains,
-which is the layered supply of [Dependency Injection](46_Stateless.md#dependency-injection).
+which is the layered supply of [Dependency Injection](46_Effects--Stateless.md#dependency-injection).
 Nine is also a fair warning about the design.
 An Effect that asks for ten separate things is usually two Effects.
 
@@ -1619,8 +1619,8 @@ That judgment stays with you.
 
 `retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
-for the reason [An Effect Runs Once](46_Stateless.md#an-effect-runs-once) gave:
-the Effect is a generator, one `run()` spends it,
+for the reason [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
+gave: the Effect is a generator, one `run()` spends it,
 and only the function can build a second description.
 
 ### What Retry Costs the Signature
@@ -1715,7 +1715,7 @@ which is the same fact that made `retry()` decorate the function.
 
 `fork()` hands an Effect to an `Executor` and returns a `Task`,
 and `wait()` collects the result.
-This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Stateless.md#waiting-on-a-coroutine).
+This is the same `wait()` that awaited a coroutine in [Waiting on a Coroutine](46_Effects--Stateless.md#waiting-on-a-coroutine).
 It accepts a `Task` as readily as an awaitable:
 
 ```python
@@ -2027,7 +2027,7 @@ Two pieces of the library show that ceiling.
 Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
 The extra type parameter exists because a Stateless Ability cannot fail,
-and the `ZIO[R, E, A]` of [Effect Management](44_Effect_Management.md#library-effect-management)
+and the `ZIO[R, E, A]` of [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 carries one for the same reason.
 `Async` is the other piece.
 Native systems derive asynchronous execution from Effects.
@@ -2075,7 +2075,7 @@ and that is different from a platform for building distributed systems.
 
 ## What Survives the Library
 
-[Effect Management](44_Effect_Management.md#effects-are-the-next-barrier)
+[Effect Management](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
 argued that Effects are the next scaling barrier,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
@@ -2123,7 +2123,7 @@ but they remain a separate mechanism from the Effect type.
 What Stateless requires for that property is the generator discipline,
 the description/execution split, and an ecosystem that has never heard of it.
 For most Python code that price is too high.
-The techniques in [Converting Effectful to Pure](44_Effect_Management.md#converting-effectful-to-pure)
+The techniques in [Converting Effectful to Pure](44_Effects--Effect_Management.md#converting-effectful-to-pure)
 (returning a `Result`, restricting a type so bad values cannot exist, and passing dependencies in rather than constructing them)
 capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
@@ -2138,7 +2138,7 @@ and none of them needs an Effect type to work.
 
 But watch the direction.
 Python got one Effect tracked into its type system with `async`.
-The languages listed under [Native Effect Management](44_Effect_Management.md#native-effect-management)
+The languages listed under [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 track all of them.
 Stateless is the demonstration that Python's type system is expressive enough to do it,
 given a library willing to encode everything into return types.

@@ -25,11 +25,12 @@ and [Confidence](43_Functional--Confidence.md)
 examines what the discipline lets you claim about your code.
 Those four chapters are Part IV.
 Part V then takes the same discipline further.
-[Effect Management](44_Effect_Management.md)
-tracks a function's effects in its type, and [Generators](45_Generators.md)
+[Effect Management](44_Effects--Effect_Management.md)
+tracks a function's effects in its type,
+and [Generators](45_Effects--Generators.md)
 supplies the mechanism Python already has for describing a computation without running it.
-[Stateless](46_Stateless.md)
-and [Stateless in Practice](47_Stateless_in_Practice.md)
+[Stateless](46_Effects--Stateless.md)
+and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 then build a checked Effect system on that mechanism.
 
 ## Pure Functions
@@ -107,7 +108,7 @@ print("ok")
 If you delete either `total = 0`, the second assertion fails.
 That line is the whole fixture, and purity removes it.
 `slope()` appears again later in the book:
-[Are Exceptions Impure?](44_Effect_Management.md#are-exceptions-impure)
+[Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
 asks of this same function whether raising an exception breaks its purity.
 
 ## Immutability

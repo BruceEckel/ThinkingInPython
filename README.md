@@ -86,53 +86,53 @@ Note that I am not starting at the beginning, but picking up where I left off du
 
 | Chapter | Edited |
 |---------|:------:|
-| 01_Introduction.md               | |
-| 02_Tour.md                       | |
-| 03_Containers.md                 | |
-| 04_Control_Flow.md               | |
-| 05_Functions.md                  | |
-| 06_Modules_and_Packages.md       | |
-| 07_Classes.md                    | |
-| 08_Static_Types.md               | |
-| 09_Class_Attributes.md           | |
-| 10_Cleanup.md                    | |
-| 11_Testing.md                    | |
-| 12_Data_Classes_as_Types.md      | |
-| 13_Pattern_Matching.md           | |
-| 14_Decorators.md                 | |
-| 15_Context_Managers.md           | |
-| 16_Comprehensions.md             | |
-| 17_Metaprogramming.md            | |
-| 18_Performance.md                | |
-| 19_Concurrency.md                | |
-| 20_Rethinking_Objects.md         | |
-| 21_Design_Patterns.md            | |
-| 22_Data_Transfer_Objects.md      | |
-| 23_Iterators.md                  | |
-| 24_Singleton.md                  | |
-| 25_Template_Method.md            |X|
-| 26_Surrogate.md                  |O|
-| 27_Factory.md                    |r|
-| 28_Function_Objects.md           |r|
-| 29_Changing_the_Interface.md     | |
-| 30_Observer.md                   | |
-| 31_State_Machines.md             | |
-| 32_Multiple_Dispatching.md       | |
-| 33_Visitor.md                    | |
-| 34_Composite_and_Interpreter.md  | |
-| 35_Flyweight.md                  | |
-| 36_Memento.md                    | |
-| 37_Pattern_Refactoring.md        | |
-| 38_Simulation.md                 | |
-| 39_Pattern_Catalog.md            | |
-| 40_Functional--Foundations.md    | |
-| 41_Functional--Toolkits.md       | |
-| 42_Functional--Error_Handling.md | |
-| 43_Functional--Confidence.md     | |
-| 44_Effect_Management.md          | |
-| 45_Generators.md                 | |
-| 46_Stateless.md                  | |
-| 47_Stateless_in_Practice.md      | |
+| 01_Introduction.md                   | |
+| 02_Tour.md                           | |
+| 03_Containers.md                     | |
+| 04_Control_Flow.md                   | |
+| 05_Functions.md                      | |
+| 06_Modules_and_Packages.md           | |
+| 07_Classes.md                        | |
+| 08_Static_Types.md                   | |
+| 09_Class_Attributes.md               | |
+| 10_Cleanup.md                        | |
+| 11_Testing.md                        | |
+| 12_Data_Classes_as_Types.md          | |
+| 13_Pattern_Matching.md               | |
+| 14_Decorators.md                     | |
+| 15_Context_Managers.md               | |
+| 16_Comprehensions.md                 | |
+| 17_Metaprogramming.md                | |
+| 18_Performance.md                    | |
+| 19_Concurrency.md                    | |
+| 20_Rethinking_Objects.md             | |
+| 21_Design_Patterns.md                | |
+| 22_Data_Transfer_Objects.md          | |
+| 23_Iterators.md                      | |
+| 24_Singleton.md                      | |
+| 25_Template_Method.md                |X|
+| 26_Surrogate.md                      |O|
+| 27_Factory.md                        |r|
+| 28_Function_Objects.md               |r|
+| 29_Changing_the_Interface.md         | |
+| 30_Observer.md                       | |
+| 31_State_Machines.md                 | |
+| 32_Multiple_Dispatching.md           | |
+| 33_Visitor.md                        | |
+| 34_Composite_and_Interpreter.md      | |
+| 35_Flyweight.md                      | |
+| 36_Memento.md                        | |
+| 37_Pattern_Refactoring.md            | |
+| 38_Simulation.md                     | |
+| 39_Pattern_Catalog.md                | |
+| 40_Functional--Foundations.md        | |
+| 41_Functional--Toolkits.md           | |
+| 42_Functional--Error_Handling.md     | |
+| 43_Functional--Confidence.md         | |
+| 44_Effects--Effect_Management.md     | |
+| 45_Effects--Generators.md            | |
+| 46_Effects--Stateless.md             | |
+| 47_Effects--Stateless_in_Practice.md | |
 
 
 ### Serious Edit
@@ -141,53 +141,53 @@ The first serious edit pass.
 
 | Chapter | Edited |
 |---------|:------:|
-| 01_Introduction.md               |X|
-| 02_Tour.md                       |X|
-| 03_Containers.md                 |X|
-| 04_Control_Flow.md               |X|
-| 05_Functions.md                  |X|
-| 06_Modules_and_Packages.md       |X|
-| 07_Classes.md                    |X|
-| 08_Static_Types.md               |X|
-| 09_Class_Attributes.md           |X|
-| 10_Cleanup.md                    |X|
-| 11_Testing.md                    |X|
-| 12_Data_Classes_as_Types.md      |X|
-| 13_Pattern_Matching.md           |X|
-| 14_Decorators.md                 |X|
-| 15_Context_Managers.md           |X|
-| 16_Comprehensions.md             |X|
-| 17_Metaprogramming.md            |X|
-| 18_Performance.md                |X|
-| 19_Concurrency.md                |X|
-| 20_Rethinking_Objects.md         |X|
-| 21_Design_Patterns.md            |X|
-| 22_Data_Transfer_Objects.md      |X|
-| 23_Iterators.md                  |X|
-| 24_Singleton.md                  |X|
-| 25_Template_Method.md            | |
-| 26_Surrogate.md                  | |
-| 27_Factory.md                    | |
-| 28_Function_Objects.md           |r|
-| 29_Changing_the_Interface.md     | |
-| 30_Observer.md                   | |
-| 31_State_Machines.md             | |
-| 32_Multiple_Dispatching.md       | |
-| 33_Visitor.md                    | |
-| 34_Composite_and_Interpreter.md  | |
-| 35_Flyweight.md                  | |
-| 36_Memento.md                    | |
-| 37_Pattern_Refactoring.md        | |
-| 38_Simulation.md                 | |
-| 39_Pattern_Catalog.md            | |
-| 40_Functional--Foundations.md    | |
-| 41_Functional--Toolkits.md       | |
-| 42_Functional--Error_Handling.md | |
-| 43_Functional--Confidence.md     | |
-| 44_Effect_Management.md          | |
-| 45_Generators.md                 | |
-| 46_Stateless.md                  |X|
-| 47_Stateless_in_Practice.md      | |
+| 01_Introduction.md                   |X|
+| 02_Tour.md                           |X|
+| 03_Containers.md                     |X|
+| 04_Control_Flow.md                   |X|
+| 05_Functions.md                      |X|
+| 06_Modules_and_Packages.md           |X|
+| 07_Classes.md                        |X|
+| 08_Static_Types.md                   |X|
+| 09_Class_Attributes.md               |X|
+| 10_Cleanup.md                        |X|
+| 11_Testing.md                        |X|
+| 12_Data_Classes_as_Types.md          |X|
+| 13_Pattern_Matching.md               |X|
+| 14_Decorators.md                     |X|
+| 15_Context_Managers.md               |X|
+| 16_Comprehensions.md                 |X|
+| 17_Metaprogramming.md                |X|
+| 18_Performance.md                    |X|
+| 19_Concurrency.md                    |X|
+| 20_Rethinking_Objects.md             |X|
+| 21_Design_Patterns.md                |X|
+| 22_Data_Transfer_Objects.md          |X|
+| 23_Iterators.md                      |X|
+| 24_Singleton.md                      |X|
+| 25_Template_Method.md                | |
+| 26_Surrogate.md                      | |
+| 27_Factory.md                        | |
+| 28_Function_Objects.md               |r|
+| 29_Changing_the_Interface.md         | |
+| 30_Observer.md                       | |
+| 31_State_Machines.md                 | |
+| 32_Multiple_Dispatching.md           | |
+| 33_Visitor.md                        | |
+| 34_Composite_and_Interpreter.md      | |
+| 35_Flyweight.md                      | |
+| 36_Memento.md                        | |
+| 37_Pattern_Refactoring.md            | |
+| 38_Simulation.md                     | |
+| 39_Pattern_Catalog.md                | |
+| 40_Functional--Foundations.md        | |
+| 41_Functional--Toolkits.md           | |
+| 42_Functional--Error_Handling.md     | |
+| 43_Functional--Confidence.md         | |
+| 44_Effects--Effect_Management.md     | |
+| 45_Effects--Generators.md            | |
+| 46_Effects--Stateless.md             |X|
+| 47_Effects--Stateless_in_Practice.md | |
 
 ### Initial Draft
 
@@ -199,50 +199,50 @@ The 🔴 denotes an unfinished chapter, so expect that to be in greater disarray
 
 | Chapter | Edited | Reviewed |
 |---------|:------:|:--------:|
-| 01_Introduction.md               |X|X|
-| 02_Tour.md                       |X|X|
-| 03_Containers.md                 |X|X|
-| 04_Control_Flow.md               |X|X|
-| 05_Functions.md                  |X|X|
-| 06_Modules_and_Packages.md       |X|X|
-| 07_Classes.md                    |X|X|
-| 08_Static_Types.md               |X|X|
-| 09_Class_Attributes.md           |X|X|
-| 10_Cleanup.md                    |X|X|
-| 11_Testing.md                    |X|X|
-| 12_Data_Classes_as_Types.md      |X|X|
-| 13_Pattern_Matching.md           |X|X|
-| 14_Decorators.md                 |X|X|
-| 15_Context_Managers.md           |X|X|
-| 16_Comprehensions.md             |X|X|
-| 17_Metaprogramming.md            |X|X|
-| 18_Performance.md                |X|X|
-| 19_Concurrency.md                |X|X|
-| 20_Rethinking_Objects.md         |X|X|
-| 21_Design_Patterns.md            |X|X|
-| 22_Data_Transfer_Objects.md      |X|X|
-| 23_Iterators.md                  |X|X|
-| 24_Singleton.md                  |X|X|
-| 25_Template_Method.md            |X|X|
-| 26_Surrogate.md                  |X|X|
-| 27_Factory.md                    |X|X|
-| 28_Function_Objects.md           |X|X|
-| 29_Changing_the_Interface.md     |X|X|
-| 30_Observer.md                   |X|X|
-| 31_State_Machines.md             |X|X|
-| 32_Multiple_Dispatching.md       |X|X|
-| 33_Visitor.md                    |X|X|
-| 34_Composite_and_Interpreter.md  |X|X|
-| 35_Flyweight.md                  |X|X|
-| 36_Memento.md                    |X|X|
-| 37_Pattern_Refactoring.md        |X|X|
-| 38_Simulation.md                 |X|X|
-| 39_Pattern_Catalog.md            |X|X|
-| 40_Functional--Foundations.md    |X|X|
-| 41_Functional--Toolkits.md       |X|X|
-| 42_Functional--Error_Handling.md |X|X|
-| 43_Functional--Confidence.md     |X|X|
-| 44_Effect_Management.md          |🔴|🔴|
-| 45_Generators.md                 |🔴|🔴|
-| 46_Stateless.md                  |X|X|
-| 47_Stateless_in_Practice.md      |🔴|🔴|
+| 01_Introduction.md                   |X|X|
+| 02_Tour.md                           |X|X|
+| 03_Containers.md                     |X|X|
+| 04_Control_Flow.md                   |X|X|
+| 05_Functions.md                      |X|X|
+| 06_Modules_and_Packages.md           |X|X|
+| 07_Classes.md                        |X|X|
+| 08_Static_Types.md                   |X|X|
+| 09_Class_Attributes.md               |X|X|
+| 10_Cleanup.md                        |X|X|
+| 11_Testing.md                        |X|X|
+| 12_Data_Classes_as_Types.md          |X|X|
+| 13_Pattern_Matching.md               |X|X|
+| 14_Decorators.md                     |X|X|
+| 15_Context_Managers.md               |X|X|
+| 16_Comprehensions.md                 |X|X|
+| 17_Metaprogramming.md                |X|X|
+| 18_Performance.md                    |X|X|
+| 19_Concurrency.md                    |X|X|
+| 20_Rethinking_Objects.md             |X|X|
+| 21_Design_Patterns.md                |X|X|
+| 22_Data_Transfer_Objects.md          |X|X|
+| 23_Iterators.md                      |X|X|
+| 24_Singleton.md                      |X|X|
+| 25_Template_Method.md                |X|X|
+| 26_Surrogate.md                      |X|X|
+| 27_Factory.md                        |X|X|
+| 28_Function_Objects.md               |X|X|
+| 29_Changing_the_Interface.md         |X|X|
+| 30_Observer.md                       |X|X|
+| 31_State_Machines.md                 |X|X|
+| 32_Multiple_Dispatching.md           |X|X|
+| 33_Visitor.md                        |X|X|
+| 34_Composite_and_Interpreter.md      |X|X|
+| 35_Flyweight.md                      |X|X|
+| 36_Memento.md                        |X|X|
+| 37_Pattern_Refactoring.md            |X|X|
+| 38_Simulation.md                     |X|X|
+| 39_Pattern_Catalog.md                |X|X|
+| 40_Functional--Foundations.md        |X|X|
+| 41_Functional--Toolkits.md           |X|X|
+| 42_Functional--Error_Handling.md     |X|X|
+| 43_Functional--Confidence.md         |X|X|
+| 44_Effects--Effect_Management.md     |🔴|🔴|
+| 45_Effects--Generators.md            |🔴|🔴|
+| 46_Effects--Stateless.md             |X|X|
+| 47_Effects--Stateless_in_Practice.md |🔴|🔴|

@@ -1075,7 +1075,7 @@ Delete it and the type checker has one description instead of two, so it can no
 longer notice a disagreement. Callers still see a union, but they see whatever
 union the implementation happens to produce, and the new member propagates
 outward until it reaches something with an annotation. That is the same reason
-exercise 4 of [Generators](../Chapters/45_Generators.md) needed a declared type
+exercise 4 of [Generators](../Chapters/45_Effects--Generators.md) needed a declared type
 to catch a missing `yield from`: a type checker verifies claims, and an inferred type
 is not a claim.
 

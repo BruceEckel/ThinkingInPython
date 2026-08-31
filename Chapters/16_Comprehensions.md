@@ -600,7 +600,7 @@ This is also why `path_walk_comprehension.py` uses brackets.
 Its outermost iterable, `root.walk()`, would run at creation,
 but the walking and the filtering would wait for a consumer that arrives after the directory disappears.
 [Iterators](23_Iterators.md#generators) explores generators further,
-and [Generators](45_Generators.md)
+and [Generators](45_Effects--Generators.md)
 covers the values they receive as well as the ones they produce.
 
 ## Unpacking in Comprehensions

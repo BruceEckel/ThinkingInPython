@@ -144,7 +144,7 @@ propagates outward through the type system rather than through hand-edited
 parameter lists: any function calling it inherits the requirement without
 naming it, and the chain of intermediate functions is untouched. The
 binding still has to be supplied, but at one place near the top, where
-the program decides what a `Log` means. [Stateless](../Chapters/46_Stateless.md)
+the program decides what a `Log` means. [Stateless](../Chapters/46_Effects--Stateless.md)
 shows this with a real library, where the requirement rides in the type
 and `Depend` is the annotation that carries it.
 
@@ -323,7 +323,7 @@ exercise 2 measures. The event loop is a scheduler, not a handler.
 
 So `async` is an Effect-tracking system rather than a full EMS, in the
 same sense as most of the AI languages in
-[Custom AI Languages with Effects](../Chapters/44_Effect_Management.md#custom-ai-languages-with-effects).
+[Custom AI Languages with Effects](../Chapters/44_Effects--Effect_Management.md#custom-ai-languages-with-effects).
 It tracks one fixed Effect, chosen by the language, with the
 implementation welded to the call site. That is also why the
 propagation is experienced as a nuisance rather than a benefit: you

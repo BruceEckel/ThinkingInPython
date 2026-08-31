@@ -20,8 +20,8 @@
 19_Concurrency/io_threads.py
 19_Concurrency/gil_threads.py
 19_Concurrency/subinterpreters.py
-46_Stateless/real_clock.py
-47_Stateless_in_Practice/parallel.py
+46_Effects--Stateless/real_clock.py
+47_Effects--Stateless_in_Practice/parallel.py
 
 # Solutions (run against build/solutions/)
 03_Containers/exercise_1.py

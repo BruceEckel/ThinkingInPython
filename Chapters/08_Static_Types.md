@@ -612,7 +612,7 @@ The abstract container types come from `collections.abc`.
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
 | `Sequence[T]`, `Iterable[T]`, `Iterator[T]`, `Mapping[K, V]` | Read-only abstract shapes from `collections.abc`; *covariant* in their element type, so `list[Circle]` satisfies `Sequence[Shape]` (`Mapping[K, V]`'s `K` stays invariant), see [Variance](#variance) |
-| `Generator[Y, S, R]` | A generator's yield, send, and return types; `Iterator[T]` is enough when it only produces values, see [Generators](45_Generators.md#annotating-a-generator) |
+| `Generator[Y, S, R]` | A generator's yield, send, and return types; `Iterator[T]` is enough when it only produces values, see [Generators](45_Effects--Generators.md#annotating-a-generator) |
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
 

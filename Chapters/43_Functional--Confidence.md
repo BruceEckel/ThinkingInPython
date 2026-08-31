@@ -366,7 +366,7 @@ That, more than the presence of functions,
 is the "functionality" the introduction set out to find.
 
 Part V takes the same discipline one step further and asks the type checker to enforce it:
-[Effect Management](44_Effect_Management.md)
+[Effect Management](44_Effects--Effect_Management.md)
 puts a function's effects in its signature,
 and the chapters after it build a checked system on that idea.
 

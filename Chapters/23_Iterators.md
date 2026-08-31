@@ -75,8 +75,8 @@ A function with a `yield` statement returns an iterator that produces each yield
 pausing and resuming its own state.
 The generators in this chapter travel one way, so `Iterator[T]` annotates them.
 That is the short form of a three-part type that also describes what a generator receives and what it returns.
-[Generators](45_Generators.md#annotating-a-generator) covers the full form,
-which an Effect system needs.
+[Generators](45_Effects--Generators.md#annotating-a-generator)
+covers the full form, which an Effect system needs.
 
 Writing `__iter__()` as a generator makes a class iterable:
 
@@ -389,7 +389,7 @@ The `yield from` expression, however, has a value:
 The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
 which the loop cannot do.
-[Generators](45_Generators.md#yield-from-composes-descriptions)
+[Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
 works all three channels.
 
 This tests both a nested list and a flat one:

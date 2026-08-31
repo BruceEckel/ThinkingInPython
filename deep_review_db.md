@@ -54,8 +54,8 @@ accepted and is in the chapter; that is not the rejected part.) Chapters 39 and
 both.
 
 **Do not narrate tool-version history.** Two 2026-08-11 blocks proposed keeping
-a record of what `ty` used to get wrong (46_Stateless's PEP 695 alias gap,
-47_Stateless_in_Practice's citation of it). Both rejected, with the reason:
+a record of what `ty` used to get wrong (46_Effects--Stateless's PEP 695 alias gap,
+47_Effects--Stateless_in_Practice's citation of it). Both rejected, with the reason:
 *"Just modernize everything. I don't want a history of 'what didn't used to
 work'."* This generalizes past those two chapters. When a tool upgrade makes a
 caveat obsolete, delete the caveat rather than dating it, and never add prose of
@@ -144,7 +144,7 @@ explicitly framed as an extension, and that section ends on the chapter's
 strongest sentence, which a trailing summary would flatten. If a future pass
 disagrees, the cheapest fix is a demotion ("… in full for a nested grammar"),
 **not** a move or retitle: `02_Tour.md`, `33_Visitor.md`,
-`39_Pattern_Catalog.md`, and `44_Effect_Management.md` all link to headings in
+`39_Pattern_Catalog.md`, and `44_Effects--Effect_Management.md` all link to headings in
 this chapter by anchor. The same applies to the "A Template Is a Tree" heading
 itself, which chapter 2 links by explicit anchor.
 

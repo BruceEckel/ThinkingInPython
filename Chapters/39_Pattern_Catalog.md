@@ -161,7 +161,7 @@ Use this one when you know the problem but not the name.
 | Circuit Breaker | Stop calling a failing service until it recovers. |
 | Command Query Responsibility Segregation (CQRS) | Separate the read model from the write model. |
 | Event Sourcing | Store state as a log of events instead of current values. |
-| [Retry](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect) | Re-attempt a failed operation, often with backoff. |
+| [Retry](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect) | Re-attempt a failed operation, often with backoff. |
 | Saga | Run a long transaction as a series of compensable steps. |
 | Service Discovery | Locate service instances dynamically. |
 | Sidecar | Attach helper functionality to a service as a separate process. |
@@ -191,7 +191,7 @@ Use this one when you know the problem but not the name.
 | [Partial Application](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
 | Pointer to Implementation (Pimpl) | Hide a class's implementation behind an indirection to cut compile coupling. |
 | [Resource Acquisition Is Initialization (RAII)](15_Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
-| [Service Locator](46_Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
+| [Service Locator](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
 | [State Machine](31_State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |

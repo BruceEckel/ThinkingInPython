@@ -713,7 +713,7 @@ The chain either delivers an answer or hands back the first failure,
 and the type checker does not let a caller confuse the two.
 [Confidence](43_Functional--Confidence.md)
 examines what this discipline lets you claim,
-and [Effect Management](44_Effect_Management.md#converting-effectful-to-pure)
+and [Effect Management](44_Effects--Effect_Management.md#converting-effectful-to-pure)
 reuses this `Result` machinery to convert Effects.
 
 ## Exercises
