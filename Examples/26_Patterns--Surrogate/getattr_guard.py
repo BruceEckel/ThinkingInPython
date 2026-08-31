@@ -7,7 +7,7 @@ class Proxy:
     def __getattr__(self, name: str) -> Any:
         if name.startswith("_"):  # The guard
             raise AttributeError(name)
-        return getattr(self._imp, name)  # Typo: _imp
+        return getattr(self._imp, name)  # Deliberate typo
 
 class Implementation:
     def f(self) -> None: print("Implementation.f()")

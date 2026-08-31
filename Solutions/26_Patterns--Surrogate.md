@@ -156,7 +156,7 @@ class BrokenProxy:
         self.calls = 0
 
     def __getattr__(self, name: str) -> Any:
-        attr = getattr(self._imp, name)  # Typo: _imp
+        attr = getattr(self._imp, name)  # Deliberate typo
         if callable(attr):
             def counted(*args: Any, **kwargs: Any) -> Any:
                 self.calls += 1

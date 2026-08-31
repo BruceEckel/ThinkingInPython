@@ -154,8 +154,9 @@ The static type checker verifies signatures.
 
 ### Forwarding with `__getattr__()` {#forwarding-with-getattr}
 
-Python has a built-in delegation mechanism, `__getattr__()`,
-that makes `Proxy` simpler to implement:
+Python's built-in delegation mechanism, `__getattr__()`,
+which [Singleton](24_Patterns--Singleton.md) used to reach its inner object,
+makes `Proxy` simpler to implement:
 
 ```python
 # proxy_2.py
@@ -348,25 +349,24 @@ so the proxy and the implementation report the same value.
 `WriteProxy` needs no `# type: ignore`,
 because a declared `__setattr__()` makes the type checker accept assignment to any attribute name.
 
-The implementation attribute loses its double underscore,
-from `__implementation` to `_implementation`.
+The implementation attribute no longer needs a double underscore.
 Mangling rewrites identifiers, not string literals,
 so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
 
 ### The Recursion Trap
 
-The fallback hook can recurse:
-when `__getattr__()`'s body reads a proxy attribute that does not exist,
-that failed lookup calls `__getattr__()` again,
-and Python reports the error as `RecursionError`,
+The fallback hook `__getattr__()` can recurse.
+If `__getattr__()`'s body reads a proxy attribute that does not exist,
+the failed lookup calls `__getattr__()` again.
+Python reports this as a `RecursionError`,
 not the `AttributeError` that would name the cause.
+
 A misspelled `self._implementation` is one cause.
 Rebuilding a proxy through `copy.copy()` or `pickle` is another:
 both construct the new instance without calling `__init__()`,
 so no `_implementation` exists when the first failed lookup calls `__getattr__()`.
-The fix is a guard at the top of `__getattr__()`:
-raise `AttributeError` for any name that starts with an underscore.
+The fix is a guard at the top of `__getattr__()` that raises `AttributeError` for any name that starts with an underscore:
 
 ```python
 # getattr_guard.py
@@ -378,7 +378,7 @@ class Proxy:
     def __getattr__(self, name: str) -> Any:
         if name.startswith("_"):  # The guard
             raise AttributeError(name)
-        return getattr(self._imp, name)  # Typo: _imp
+        return getattr(self._imp, name)  # Deliberate typo
 
 class Implementation:
     def f(self) -> None: print("Implementation.f()")
@@ -393,12 +393,11 @@ except AttributeError as e:
 Without the guard, the misspelled `self._imp` produces a `RecursionError` that names nothing.
 With the guard, the second call to `__getattr__()` reports the typo by name.
 The guard also makes the proxy work with `copy` and `pickle`,
-which look up `__setstate__()` before `__init__()` has run:
-both get an `AttributeError`, which those modules handle, instead of recursing.
+which look up `__setstate__()` before `__init__()` has run.
+Both get an `AttributeError`, which those modules handle, instead of recursing.
 
-The chapter's other `__getattr__()` proxies leave the guard out,
-so each listing shows one idea.
-A proxy written for production carries it.
+This chapter's other `__getattr__()` proxies do not include the guard.
+This way, each listing shows one idea.
 
 ### A Surrogate Is Not Its Implementation
 

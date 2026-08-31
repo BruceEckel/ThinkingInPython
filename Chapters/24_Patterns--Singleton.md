@@ -396,7 +396,8 @@ so its return type is whatever the inner object holds under that name.
 `instance` is a single declared field and can say `__OnlyOne | None`.
 `__getattr__()` covers an open set of names and cannot.
 Delegation trades static knowledge for reach,
-which is the cost [Surrogate](26_Patterns--Surrogate.md#proxy) pays throughout.
+which is the cost [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
+pays throughout.
 
 The laziness is a choice.
 When the inner object needs nothing from that first call,
