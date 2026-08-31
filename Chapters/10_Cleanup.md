@@ -80,7 +80,7 @@ Running the same file under this book's output checker,
 which executes every chapter in a single process,
 finalizes the three objects in the opposite order.
 
-The order in which the three finalizers run is an implementation detail.
+The order in which the three `__del__()` methods run is an implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
 Another implementation, such as PyPy with a tracing garbage collector,
@@ -205,9 +205,9 @@ and the code that creates the cycle is often not the code that owns the resource
 
 Two approaches are more reliable:
 
-1. An explicit finalizer such as the `close()` that file objects provide,
+1. An explicit cleanup method such as the `close()` that file objects provide,
    which a `with` block calls.
-   The finalizer runs whether or not an error interrupts the code:
+   The method runs whether or not an error interrupts the code:
 
 ```python
 # closable.py

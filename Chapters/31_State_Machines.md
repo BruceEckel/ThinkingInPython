@@ -427,7 +427,8 @@ The names restart here.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
 and `State` is now an `Enum` of names rather than a base class with behavior.
 The file has a different name from the first engine's `state_machine.py` on purpose.
-Python caches a module in `sys.modules` under its import name,
+Python caches a module in `sys.modules` under its import name
+([Modules and Packages](06_Modules_and_Packages.md) shows the cache),
 and a later `import` takes the cached module without looking at any file.
 Two files named `state_machine.py` in one program therefore collapse into one:
 whichever imported first wins,

@@ -21,7 +21,7 @@ When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
 without the data knowing which views exist.
 
-The classic design says how to arrange it.
+The classic design, from *GoF Design Patterns*, says how to arrange it.
 An `Observer` interface every observer implements,
 an `Observable` base class carrying a `changed` flag,
 and a two-phase notification that sets the flag and then broadcasts:

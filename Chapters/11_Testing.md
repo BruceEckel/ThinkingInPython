@@ -59,7 +59,8 @@ No base class needs inheriting,
 and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-The tests in this chapter check the following `Account` class:
+The tests in this chapter check the following `Account` class, a `@dataclass`
+([Data Classes as Types](12_Data_Classes_as_Types.md) explains the decorator):
 
 ```python
 # account.py
@@ -130,8 +131,10 @@ def test_interest_uses_approx(funded: Account) -> None:
 ```
 
 This file previews two features that get their own sections later in this chapter:
-the `parametrize` mark runs one test over several inputs,
+the `parametrize`[^parametrize] mark runs one test over several inputs,
 and the `funded` fixture builds a prepared account for each test that names it as a parameter.
+The `@` lines apply decorators, which [Decorators](14_Decorators.md) explains;
+here they only mark the functions for `pytest`.
 
 Run the test suite by typing `pytest` in the project directory.
 `pytest` puts each test file's own directory at the front of `sys.path`,
@@ -758,3 +761,13 @@ a line a test happened to execute is not the same as a line a test checks.
     Write a second function that takes a fetcher as an argument instead,
     and test both: one with `monkeypatch`, one with a plain function passed in.
     Then rename `weather.urlopen` to `weather.fetch` and see which test still passes.
+
+[^parametrize]: Four spellings are in use, all correct.
+    The stem is `parametr-` or `parameter-`.
+    The suffix is `-ize` in the US
+    or `-ise` in the UK and Commonwealth countries.
+    The two choices are independent,
+    giving `parametrize`, `parametrise`, `parameterize`, and `parameterise`.
+    This book follows pytest's own spelling for `@pytest.mark.parametrize`,
+    and uses "parameterize" everywhere else,
+    for the general sense of a class or function taking a parameter.

@@ -16,6 +16,8 @@ and removes the need for it when state is immutable.
 
 ## A Snapshot Is Not a Reference
 
+Aliasing and copying return from [Rethinking Objects](20_Rethinking_Objects.md#the-immutability-solution),
+because Memento lives or dies by them.
 The beginner's memento is an assignment, and it does not work:
 
 ```python
@@ -65,7 +67,8 @@ The later `todo[0].append("jam")` never reaches `deep`.
 
 ## The Classic Memento
 
-Every classic memento is some version of copying the state before it changes.
+Every classic memento, as *GoF Design Patterns* presents the pattern,
+is some version of copying the state before it changes.
 Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable even though the originator is not.

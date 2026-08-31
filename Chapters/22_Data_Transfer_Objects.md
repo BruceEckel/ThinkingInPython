@@ -1,6 +1,7 @@
 # Data Transfer Objects
 
-The *Messenger* or *Data Transfer Object* passes a package of information around.
+The *Messenger*, called a *Data Transfer Object* in Martin Fowler's *Patterns of Enterprise Application Architecture*,
+passes a package of information around.
 Most often it carries a function's return values.
 You use tuples and dictionaries for that, but both rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
@@ -43,7 +44,8 @@ Without it, the type checker rejects both `m.more = 11` and `m.info`,
 since the `Messenger` class declares no attributes.
 `Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
-by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one.
+by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one
+([Surrogate](26_Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
 If you declare only the first, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair

@@ -22,6 +22,8 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 
 This chapter covers the two channels an Effect declares:
 the dependencies it needs and the ways it can fail.
+These are new channels, in the signature, not the yield, send,
+and return channels a generator carries.
 [Stateless in Practice](47_Stateless_in_Practice.md)
 builds examples using those channels.
 
@@ -551,7 +553,7 @@ An `async` function's callers must also be `async`,
 all the way to `asyncio.run()`.
 A `Depend` function's callers must also declare the dependency,
 all the way to `supply()`.
-The difference is that you can declare as many abilities as you like.
+The difference is that you can declare as many Abilities as you like.
 
 The `yield from` inside `greet_all()` is not optional.
 If you write that loop body as a bare `greet(name)`,
@@ -673,7 +675,7 @@ A new Ability changes the signatures alone:
 `yield from greet_logged(name)` stays as it is, and the instance appears once,
 at `supply()`.
 
-Multiple abilities combine with `|` because the union describes one request at a time.
+Multiple Abilities combine with `|` because the union describes one request at a time.
 Each `yield` in `greet_all()` produces either a `Need[Console]` or a `Need[Log]`,
 not both at once.
 Over the whole run it makes both kinds of request,
@@ -681,7 +683,7 @@ so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union invites a `type` alias,
 and the book's own habits normally endorse one.
-Under `ty` 0.0.70 the alias checks the same as the written-out signature:
+Under `ty` 0.0.75 the alias checks the same as the written-out signature:
 an undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
 because the union is the information:
@@ -691,7 +693,7 @@ confirm that your type checker reports an undeclared Ability through it.
 
 ## One Effect, Many Environments
 
-`audit_log.py` supplies two abilities at one call site.
+`audit_log.py` supplies two Abilities at one call site.
 A test suite usually needs many, one per environment.
 Because dependencies live in the return type rather than the argument list,
 varying the environment means varying data:
@@ -765,7 +767,8 @@ Every dependency so far has been one this chapter defined.
 You might not need to define one,
 because Stateless supplies three dependency classes of its own:
 
-- `Console` in `stateless.console` with `print_line()` and `read_line()` accessors,
+- `Console` in `stateless.console`,
+  whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
 - `Files` in `stateless.files` that reads a whole file,
 - `Time` that [Adding Behavior to an Existing Effect](47_Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
   supplies to `retry()`.
@@ -900,7 +903,7 @@ because under the interface,
 supplying an implementation directly requires `as_type()`.
 That is a real cost of using an interface.
 [Composing a Program](47_Stateless_in_Practice.md#composing-a-program)
-declares its abilities as `Protocol`s and shows how to avoid that cost:
+declares its Abilities as `Protocol`s and shows how to avoid that cost:
 write one boundary function whose parameter annotations name the interface types,
 and call `supply()` inside it.
 The parameter annotation upcasts the argument,
@@ -955,7 +958,7 @@ ZIO reports two implementations of one requirement as a compile-time error namin
 because its `provide` resolves the dependency graph during compilation.
 `supply()` resolves at runtime by scanning its arguments,
 so the same mistake produces a program that runs and does the wrong thing.
-Give abilities distinct method names when that ambiguity is possible,
+Give Abilities distinct method names when that ambiguity is possible,
 and supply one implementation per Ability.
 
 ## Dependency Injection
@@ -1069,7 +1072,7 @@ This has three consequences:
    An Ability a handler cannot answer travels further out,
    so `supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
    and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
-   You can bind some abilities near the Effect and the others at the edge,
+   You can bind some Abilities near the Effect and the others at the edge,
    with the type recording what each layer left behind.
    DI has one flat registry and no equivalent layering.
 
@@ -1212,7 +1215,7 @@ def delayed_sum(
 ```
 
 `sleep()` returns `Depend[Need[Time] | Async, None]`,
-so `delayed_sum()` inherits both abilities.
+so `delayed_sum()` inherits both Abilities.
 
 Supplying the library's own `Time` waits for real time:
 

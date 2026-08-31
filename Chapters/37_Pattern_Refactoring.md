@@ -81,8 +81,8 @@ A `type` statement's right side evaluates lazily,
 so the alias can name `Trash` several lines before the `class` statement that defines it
 (see [The `type` Statement](08_Static_Typing.md#the-type-statement)).
 
-Python implicitly makes `__init_subclass__()` a classmethod,
-so it needs no `@classmethod` decorator and its first parameter is the new subclass.
+Python implicitly makes [`__init_subclass__()`](17_Metaprogramming.md#self-registration-of-subclasses)
+a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 
@@ -504,7 +504,8 @@ When the operation is the same for every type, you do not need single dispatch.
 The earlier `sum_value()` is an ordinary function.
 Use `singledispatch` only when the behavior differs by type.
 For an operation that belongs on an object and still varies by type,
-`functools.singledispatchmethod` provides the same dispatch in method form.
+[`functools.singledispatchmethod`](41_Functional_Toolkits.md#singledispatchmethod)
+provides the same dispatch in method form.
 
 ## Choosing the Lightest Construct
 

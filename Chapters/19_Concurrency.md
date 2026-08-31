@@ -1541,7 +1541,8 @@ and the workers need no changes.
 If the iterator also defines `send()`, `throw()`, or `close()`,
 the wrapper serializes those too.
 
-A generator fails differently, and louder:
+A generator ([Iterators](23_Iterators.md#generators) covers them)
+fails differently, and louder:
 
 ```python
 # shared_generator.py

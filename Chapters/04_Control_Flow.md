@@ -251,7 +251,8 @@ It also collapses `while_true.py` into its loop header:
 A comprehension can use `:=` the same way,
 which [Comprehensions](16_Comprehensions.md) covers.
 
-Changing a container while a `for` loop walks it is the classic control-flow bug,
+Changing a container while a `for` loop walks it is the classic control-flow bug.
+[Containers](03_Containers.md#lists) hit it while removing from a list,
 and the two containers you are most likely to mutate this way behave differently:
 
 ```python

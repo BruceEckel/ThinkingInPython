@@ -71,7 +71,7 @@ Its numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
 Here's how you run `cProfile` on `my_program.py`:
 
-    python -m cProfile -s cumulative my_program.py
+    uv run python -m cProfile -s cumulative my_program.py
 
 The report is a table, one row per function.
 This one profiles a small script, `prof_demo.py`:
@@ -105,13 +105,13 @@ Instead of tracing every call, it takes periodic snapshots of the call stack,
 so the overhead is near zero and the program runs at full speed while you watch.
 You invoke it like this:
 
-    python -m profiling.sampling run my_program.py
+    uv run python -m profiling.sampling run my_program.py
 
 The new profiler can also attach to a process that is already running,
 using the process ID.
 Attaching makes it the tool for a slowdown you can only reproduce live:
 
-    python -m profiling.sampling attach 12345
+    uv run python -m profiling.sampling attach 12345
 
 Either form ends with a table of hot functions ranked by sample count.
 
@@ -300,7 +300,7 @@ A single lookup costs little either way.
 A million lookups is the difference between instant and minutes.
 `timeit` also has a command-line form for one-off questions:
 
-    python -m timeit -s "s = set(range(100_000))" "99_999 in s"
+    uv run python -m timeit -s "s = set(range(100_000))" "99_999 in s"
 
 Benchmark with data shaped like production data.
 A `list` of ten elements can beat a `set`,
@@ -777,7 +777,7 @@ stream it from the start, like `lazy_first_evens()`.
 ## Caching
 
 If you call a pure function
-([Foundations](40_Functional_Foundations.md#pure-functions))
+([Functional Foundations](40_Functional_Foundations.md#pure-functions))
 repeatedly with the same arguments,
 the fastest way to compute the answer is to not recompute it.
 `functools.cache` stores each result the first time and replays it after that.
@@ -1413,7 +1413,7 @@ not just where it sits on that curve:
     swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
     Then get the same two counts back using two local attachments instead,
     and explain what the two versions would stop agreeing about in a larger program.
-8.  Profile a script of your own with `python -m cProfile -s cumulative`.
+8.  Profile a script of your own with `uv run python -m cProfile -s cumulative`.
     Name the function with the largest `tottime` and the one with the largest `cumtime`,
     and explain why they are usually not the same function.
 9.  `compact_array.py` compares an `array` against a `list` of the same floats.

@@ -1,8 +1,8 @@
 # Template Method
 
 Application frameworks build new applications by reusing existing classes and overriding methods to customize behavior.
-At the heart of a framework is the *Template Method*: a method,
-defined in the base class,
+At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
+a method, defined in the base class,
 that drives the application by calling other base-class methods,
 some of which you override.
 

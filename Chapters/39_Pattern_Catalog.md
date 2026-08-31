@@ -182,7 +182,7 @@ Use this one when you know the problem but not the name.
 | [Inversion of Control](25_Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. |
 | [Lazy Initialization](07_Classes.md#properties) | Create a value on first use. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
-| [Memoization](41_Functional_Toolkits.md#the-functools-toolkit) | Cache a function's results keyed by its arguments. |
+| [Memoization](41_Functional_Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
 | Mixin | Add reusable behavior through multiple inheritance. |
 | [Monad](42_Functional_Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Multiton](35_Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |

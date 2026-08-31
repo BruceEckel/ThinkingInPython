@@ -191,6 +191,11 @@ The three purposes are:
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
     for reasons I give below.
 
+The catalog above is GoF's.
+Patterns from outside it,
+like the *Null Object* that [Rethinking Objects](20_Rethinking_Objects.md#null-object)
+builds, appear in the [Pattern Catalog](39_Pattern_Catalog.md).
+
 <!-- The quoted "clearly" below is the vague word this paragraph objects to,
      so House.Weasel flagging it is the rule agreeing with the point. -->
 <!-- vale House.Weasel = NO -->

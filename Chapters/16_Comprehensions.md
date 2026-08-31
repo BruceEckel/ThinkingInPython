@@ -104,7 +104,8 @@ so the type checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
 which is why `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
-but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`.
+but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`
+(the [narrowing summary](08_Static_Typing.md#type-narrowing) covers the pair).
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values, and the type checker knows no `None` survives.
 
@@ -652,7 +653,7 @@ the one place where the colon does not decide between a set and a dict,
 because neither form has one.
 The unpacking operator decides instead.
 The asynchronous generator form (`(*a async for a in agen())`)
-works the same way.
+works the same way ([Concurrency](19_Concurrency.md#asyncio-mechanics) introduces `async` syntax).
 
 ## Choosing a Form
 

@@ -19,7 +19,7 @@ The rest of the chapter applies the machinery:
   and whose body is only the success path
 - A failure that enters the channel as a value,
   and a catch that takes the whole channel
-- Dependency graphs that go deep, and a cast of abilities that goes wide
+- Dependency graphs that go deep, and a cast of Abilities that goes wide
 - Decorators that add retry and parallelism to code they do not edit
 - An account of what the guarantee does not cover
 
@@ -104,7 +104,7 @@ had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
 and the program still runs,
-but under `ty` 0.0.70 the answer comes back as `Unknown` and the checking quietly stops.
+but under `ty` 0.0.75 the answer comes back as `Unknown` and the checking quietly stops.
 The accessor pins it down.
 The `answer: str` inside `ask()` does that job.
 `yield from Ask(prompt)` produces `Unknown` there too,
@@ -414,7 +414,7 @@ That works, but every function between the caller and the `random.Random` call m
 Here the return type names the source instead,
 and no signature between `handle()` and the request mentions it.
 
-Both abilities in this section are side causes,
+Both Abilities in this section are side causes,
 in the vocabulary of [Effect Management](44_Effect_Management.md#subdividing-the-impure-portion):
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Stateless.md#swapping-the-implementation)
@@ -511,8 +511,7 @@ That decorator matters where `supply()` matches an instance to a requested class
 ([Supplying an Interface](46_Stateless.md#supplying-an-interface)).
 Here `handle()` matches on the Ability's own type, `Outlet`,
 and the `Source` that comes back is only a return value.
-`draw()` is the boundary function:
-it asks the source whether it can still supply,
+`draw()` is the lifting wrapper: it asks the source whether it can still supply,
 and `@throws` lifts the refusal into the error channel.
 
 Here is the consumer and the handler that feeds it:
@@ -665,7 +664,7 @@ Each Ability so far moves information in one direction.
 Shared mutable state is both at once,
 because whoever holds it must read it and write it back.
 An Ability declares one answer type,
-so a cell of state becomes a pair of abilities:
+so a cell of state becomes a pair of Abilities:
 reading answers with the stored value,
 and writing carries a new value and answers with nothing.
 
@@ -956,7 +955,7 @@ while the third reaches the library and fails there.
 
 `report()` is where the two channels come apart.
 `catch()` empties the error channel, so `report()` cannot fail.
-It still declares both abilities,
+It still declares both Abilities,
 because catching an error does nothing about a dependency.
 If you annotate `report()` as `Success[str]`,
 `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
@@ -1168,7 +1167,7 @@ Two failures from two different sources come back as values through one undecora
 and neither the runtime nor the type checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.70 both orders infer the same result type.
+and under `ty` 0.0.75 both orders infer the same result type.
 What both orders need is the intermediate name.
 In one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
@@ -1263,7 +1262,7 @@ Nothing supplies a loaf, because no loaf exists when `supply()` runs.
 The graph arrives in the signature, flattened into a union.
 `toast()` declares all three leaves although its body names one of them.
 `Need[Dough]` and `Need[Oven]` travel up through `yield from bread()`,
-which carries the inner Effect's abilities to its caller.
+which carries the inner Effect's Abilities to its caller.
 The type checker maintains that union.
 If you declare `toast()` with `Need[Toaster]` alone,
 `ty` points at the delegation:
@@ -1374,13 +1373,13 @@ The five-way union appears in full rather than as an alias,
 the practice [Retrofitting an Effect](46_Stateless.md#retrofitting-an-effect)
 recommends.
 
-Five abilities need five distinct shapes.
+Five Abilities need five distinct shapes.
 `Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`.
 Then any obstacle would satisfy `Terrain` as well,
 leaving argument order to decide which request each one answered,
 the ambiguity of [When Two Implementations Match](46_Stateless.md#when-two-implementations-match).
 A wide cast raises the odds of a collision,
-since every pair of abilities is a chance for one.
+since every pair of Abilities is a chance for one.
 
 The cast is a set of ordinary classes that inherit nothing:
 
@@ -1523,7 +1522,7 @@ The call still runs correctly, since the implementation is variadic,
 but the checking on which this chapter relies disappears.
 Two chained handlers keep it: `supply()` the first five,
 apply that to the Effect, then `supply()` the rest to what remains,
-which is the partial handling of [Emptying the Channels](46_Stateless.md#emptying-the-channels).
+which is the layered supply of [Dependency Injection](46_Stateless.md#dependency-injection).
 Nine is also a fair warning about the design.
 An Effect that asks for ten separate things is usually two Effects.
 
@@ -1932,8 +1931,8 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The type checker can give up quietly
 
 How much of a type survives partial handling depends on your type checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.70.
-If you supply one of two abilities, the other stays in the signature:
+Handling some of what an Effect declares works correctly under `ty` 0.0.75.
+If you supply one of two Abilities, the other stays in the signature:
 
 ```python
 # partial_handling.py

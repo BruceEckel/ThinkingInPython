@@ -374,8 +374,7 @@ print(x is y, x.instance is y.instance is z.instance)
 ```
 
 Because the inner class's name starts with a double underscore,
-Python's compiler rewrites it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
-This is name mangling.
+the compiler mangles it to `_OnlyOne__OnlyOne` wherever it appears inside `OnlyOne`'s body.
 `OnlyOne.__OnlyOne`, written from outside the class,
 asks for an attribute that does not exist under that name,
 so it fails at runtime with `AttributeError`, not at type-checking time.
@@ -578,10 +577,8 @@ print(first is second, second.name,
 Applying `@singleton` to `Registry` runs `Registry = singleton(Registry)`.
 The name `Registry` now refers to the decorated instance rather than to the class.
 Why does `__call__()` intercept the constructor for a `Registry`?
-A *call* is parentheses written after an expression.
-That expression can produce anything: a function, a class, or an instance.
-To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`.
-The result depends on that type.
+To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`
+([Surrogate](26_Surrogate.md#the-limits-of-getattr) examines this type-based lookup in full).
 For an ordinary class, `type(Plain)` is `type`,
 and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.

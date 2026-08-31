@@ -1,6 +1,6 @@
 # Metaprogramming
 
-Other (special) objects create objects.
+Every object is created by another, special object.
 These special objects are *classes*,
 and you configure them to produce the objects you want.
 
@@ -69,7 +69,8 @@ You can customize how Python produces classes by running extra code or injecting
 That is metaclass programming.
 
 You have used metaclasses already, without writing one.
-`abc.ABCMeta` builds `abc.ABC`,
+`abc.ABCMeta` builds `abc.ABC`
+([Rethinking Objects](20_Rethinking_Objects.md#abstract-base-classes) puts it to work),
 and makes a class with an unimplemented abstract method refuse instantiation.
 `enum.EnumType` builds each `Enum` subclass,
 turning every class-body assignment into a member and making `for c in Color` walk them.
@@ -1881,12 +1882,6 @@ each time someone calls the finished class.
     before it binds the name `ASingleton`,
     and offers no equivalent incomplete-type stage to exploit.
 
-[^parametrize]: Four spellings are in use, all correct.
-    The stem is `parametr-` or `parameter-`.
-    The suffix is `-ize` in the US
-    or `-ise` in the UK and Commonwealth countries.
-    The two choices are independent,
-    giving `parametrize`, `parametrise`, `parameterize`, and `parameterise`.
-    This book follows pytest's own spelling for `@pytest.mark.parametrize`,
-    and uses "parameterize" everywhere else,
-    for the general sense of a class or function taking a parameter.
+[^parametrize]: pytest's own spelling for `@pytest.mark.parametrize`,
+    and "parameterize" everywhere else;
+    [Testing](11_Testing.md) explains the four possible spellings.

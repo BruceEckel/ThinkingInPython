@@ -97,7 +97,9 @@ print(step("jump"))
 A bare name always binds.
 It does not compare against a variable of that name,
 so a named constant in a `case` silently captures instead.
-A *value pattern* is a dotted name, and it does compare:
+A *value pattern* is a dotted name, and it does compare.
+`Signal` is an `Enum`
+([Data Classes as Types](12_Data_Classes_as_Types.md#enums-are-types-too) introduces them):
 
 ```python
 # value_patterns.py
@@ -138,7 +140,8 @@ and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here, Python does not warn you.
-`ruff` does notice, reporting `N806 Variable DEFAULT in function should be lowercase`:
+`ruff` does notice, flagging `DEFAULT` under its `N806` rule
+(an uppercase name assigned inside a function):
 `DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,

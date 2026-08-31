@@ -339,6 +339,13 @@ as a not-yet-filled-in placeholder and filled in, even without `--update`.
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
   before assuming the first failure is the only one: `make all` stops at
   the first failing gate and `solutions-gate` runs last.
+  Chapters 46-47 also pin four behavior claims to a ty version
+  ("under `ty` 0.0.75"): the `type`-alias probe (46), the
+  accessor-`Unknown`, chained-`supply()` order, and partial-handling
+  claims (47). Re-probe on each upgrade and update those version
+  strings; the alias probe is a scratch generator annotated with a
+  `type X = Depend[...]` alias whose `yield from need(Undeclared)`
+  must still draw `invalid-yield`.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed

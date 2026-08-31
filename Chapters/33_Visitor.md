@@ -101,6 +101,9 @@ if __name__ == "__main__":
 #: Chrysanthemum is toxic to Worm
 ```
 
+`flower_gen()` draws the concrete classes from `Flower.__subclasses__()`,
+the registry-free enumeration [Factory](27_Factory.md#simple-factory-method)
+used.
 The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` hands the concrete flower to the visitor,
 `visit()` resolves the visitor's type,

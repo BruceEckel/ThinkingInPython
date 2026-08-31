@@ -41,7 +41,7 @@ Ordinary methods require a reference to the current object.
 When you define a method you must explicitly specify the reference as the first parameter.
 Python programmers traditionally name the reference `self`,
 but you can use any identifier (though anything else probably confuses people).
-To refer to the object's fields or its other methods,
+To refer to the object's attributes or its other methods,
 you must go through `self`.
 
 ```python
@@ -66,7 +66,7 @@ A type checker sees the mistake without running anything,
 which is why the call carries a `# type: ignore` saying it is deliberate.
 
 The first method, `__init__()`, is the *initializer*.
-The double underscores (a.k.a. "dunder") indicate a special name.
+The double underscores mark it as a dunder.
 The `__new__()` method is the *constructor*, which you rarely use
 ([Singleton](24_Singleton.md) shows a case that needs it).
 Most programmers call `__init__()` the constructor,
@@ -78,11 +78,11 @@ In the demo, creating an object looks like calling a function named after the cl
 
 In C++ or Java you declare object-level fields inside the class body but outside the methods.
 You do not declare them this way in Python.
-To create an object field, you name it, using `self`, inside a method
+To create an object attribute, you name it, using `self`, inside a method
 (typically in the constructor, but not always).
-The assignment creates space for that field when the method runs.
+The assignment creates space for that attribute when the method runs.
 If you assign to a name in the class body, C++/Java style,
-that name becomes a class-level field instead
+that name becomes a class-level attribute instead
 (similar to a static field in C++/Java).
 [Class Attributes](09_Class_Attributes.md)
 shows what that shared storage does when you assign to it.
@@ -453,7 +453,7 @@ Cache only what cannot change.
 By default, printing an object shows its class and its address,
 as in `<__main__.Point object at 0x7f2dd669cd70>`,
 which says nothing about the value the object holds.
-Two special methods control how an object displays.
+Two dunder methods control how an object displays.
 `__str__()` is the readable form for users,
 and `__repr__()` is the unambiguous form for developers:
 

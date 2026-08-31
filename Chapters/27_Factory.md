@@ -550,7 +550,8 @@ and an `Obstacle` must supply `action()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`,
 and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
 With the Protocol, the checker reports the omission before the program runs,
-earlier than either `@abstractmethod` or `raise NotImplementedError` can.
+the earliest rung on the failure-time ladder [Surrogate](26_Surrogate.md#proxy)
+climbed.
 Checking against a Protocol is structural typing from [Static Typing](08_Static_Typing.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.

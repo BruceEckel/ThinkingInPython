@@ -768,7 +768,8 @@ Only assigning it a value does.
 
 ## Enums Are Types Too
 
-When the set of values is small and fixed, an `Enum` is the clearest type.
+When the set of values is small and fixed, an `Enum`,
+met here for the first time, is the clearest type.
 As an example, a `BirthDate` contains a month, day, and year.
 A year has twelve months, so `Month` is an `Enum`.
 Each month carries its length and knows how to check a `Day` against it.
@@ -1002,7 +1003,7 @@ print(Checked().data)
 ```
 
 Nothing objects to `Unchecked`.
-The type checker accepts it, the linter accepts it,
+The type checker accepts it, the linter (`ruff`) accepts it,
 and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.

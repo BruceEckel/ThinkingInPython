@@ -183,7 +183,9 @@ as exercise 1 does with `__getitem__()`.
 That chapter's other trap applies here too:
 `__getattr__()` reading `self._adaptee` recurses to a `RecursionError` on an instance built without `__init__()`,
 which `copy.copy()` and `pickle` do,
-so an adapter that must survive copying or pickling defines `__reduce__()` or guards the lookup.
+so an adapter that must survive copying or pickling guards the lookup,
+or defines `__reduce__()`,
+the hook `pickle` and `copy` consult before ordinary construction.
 
 The tests verify both halves of the adapter's behavior.
 The new `f()` combines the adaptee's methods,

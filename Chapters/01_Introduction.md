@@ -189,6 +189,9 @@ The book's build system extracts the examples, then type-checks
 (with Astral's `ty`), lints, runs, and tests them.
 The code you read is the code that runs,
 and the output you see is the output it produces.
+A few early listings carry `# type: ignore` or `# ty:` comments.
+[Static Typing](08_Static_Typing.md) defines them;
+until then they only mark lines a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.

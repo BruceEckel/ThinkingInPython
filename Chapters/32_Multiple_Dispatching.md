@@ -68,7 +68,10 @@ def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
-`item_pair_gen()` is generic over whichever base class it receives.
+`item_pair_gen()` is generic over whichever base class it receives,
+and `__subclasses__()` lists that base's direct subclasses,
+the registry-free enumeration [Factory](27_Factory.md#simple-factory-method)
+used.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
 
@@ -282,7 +285,9 @@ while the table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
-`functools.singledispatchmethod` sits between them.
+`functools.singledispatchmethod`
+([Functional Toolkits](41_Functional_Toolkits.md#singledispatchmethod) catalogs it)
+sits between them.
 It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`,
 which is the pair of dispatches the `eval_*()` family hand-rolls.

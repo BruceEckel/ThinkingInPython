@@ -465,7 +465,8 @@ a decorator adds behavior around a call it always makes,
 while this proxy decides whether to forward the call.
 
 A *Smart reference* proxy adds behavior around each access without refusing any.
-With `__getattr__()` you can wrap every method call, for example to count them:
+With `__getattr__()` you can wrap every method call, for example to count them
+(the private attribute shortens to `_impl` here; only the name changes):
 
 ```python
 # counting_proxy.py
