@@ -391,6 +391,10 @@ The guard also makes the proxy work with `copy` and `pickle`,
 which look up `__setstate__()` before `__init__()` has run:
 both get an `AttributeError`, which those modules handle, instead of recursing.
 
+The chapter's other `__getattr__()` proxies leave the guard out,
+so each listing shows one idea.
+A proxy written for production carries it.
+
 ### A Surrogate Is Not Its Implementation
 
 A proxy is not an instance of the implementation's class.
@@ -439,6 +443,10 @@ and neither verifies anything.
 `Service.register(Proxy)` makes the ABC machinery return `True` for every `Proxy` without checking its methods,
 and a `__class__` property returning the implementation's class makes `isinstance()` report the implementation's class for the proxy.
 Each satisfies the runtime check and neither satisfies a type checker.
+Inheritance is the exception:
+`proxy_interface.py`'s `Proxy` passes `isinstance(p, Service)` because it inherits `Service`,
+and the type checker verified its `f()` and `g()` against that base.
+A surrogate that forwards through `__getattr__()` gives up both checks together.
 A surrogate is not its implementation,
 and code that checks with `isinstance()` should check for the method instead.
 
