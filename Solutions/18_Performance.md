@@ -434,3 +434,60 @@ the wrong index to read: `xs[right]` is the next larger value, or an
 The pair together answers a third question the chapter does not
 raise. `xs[left:right]` is the run of equal values, and
 `right - left` counts them, both in O(log n) with no scan.
+
+## 12. Which build am I running, and does the JIT show up?
+
+```python
+# ch18_jit_probe.py
+import sys
+
+print(sys._jit.is_available(), sys._jit.is_enabled())
+#: False False
+```
+
+The two flags name the state directly. `False False` means the
+interpreter was built without the JIT, so `PYTHON_JIT` does nothing
+and there is nothing to measure. `True False` is the python.org
+Windows and macOS shape, built with
+`--enable-experimental-jit=yes-off`: the compiler is present and
+waiting for `PYTHON_JIT=1`. `True True` means it is already running,
+and `PYTHON_JIT=0` switches it back off.
+
+On a `True False` build, the comparison is two runs of the same file
+with nothing else changed:
+
+    $ PYTHON_JIT=0 uv run python membership.py --numbers
+    $ PYTHON_JIT=1 uv run python membership.py --numbers
+
+`membership.py` is a poor subject for that comparison, for three
+separate reasons.
+
+The measured work is not bytecode. `target in as_list` and
+`target in as_set` both run their loops inside the interpreter's C
+code, so almost none of the time the listing reports is time the JIT
+could compile. This is the same reason [Write Idiomatic
+Python](../Chapters/18_Performance.md#write-idiomatic-python) speeds
+a program up: work handed to C is work the interpreter is not doing,
+and the JIT only compiles what the interpreter was doing.
+
+The program is too short to get hot. The JIT compiles a code path
+after it has run often enough to look worth compiling. A script that
+starts, times two comprehensions, and exits pays the tracing and
+compilation cost on whatever it does reach, then exits before that
+machine code earns its cost back.
+
+The listing prints a ratio, not a duration. `set at least 100x
+faster` compares the two lookups against each other. Anything that
+speeds up or slows down both of them equally leaves that ratio
+unchanged, so the number the listing prints is close to blind to the
+setting you are trying to measure. Read the `ratio` line under
+`--numbers` and you see this: the two runs differ in the individual
+timings and agree on the ratio.
+
+A workload that would show the difference runs a Python-level loop,
+over Python objects, long enough to reach the compiler's threshold
+and then keep running: `count_primes()` from the Numba section, at
+its full `limit`, timed with `min(timeit.repeat(...))`. Expect a
+single-digit percentage either way, and expect run-to-run noise of
+the same size, which is why the geometric mean over `pyperformance`
+exists rather than one benchmark.
