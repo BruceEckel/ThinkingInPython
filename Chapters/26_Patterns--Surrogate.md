@@ -382,6 +382,8 @@ The guard also satisfies `copy` and `pickle`,
 which look up `__setstate__()` before `__init__()` has run:
 both get the `AttributeError` they expect instead of recursing.
 
+### A Surrogate Is Not Its Implementation
+
 A proxy is not an instance of the implementation's class.
 Delegation forwards the methods, not the type,
 and `isinstance()` checks only the proxy's own class.
