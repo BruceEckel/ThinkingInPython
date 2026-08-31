@@ -34,7 +34,8 @@ Usage:
     uv run python tools/reflow_prose.py --width 100       # change the wrap width
 
 A positional argument may be a file path or a chapter selector matched against
-Chapters/: a number or stem prefix ("02", "02_A_Python") or a substring ("Tour").
+Chapters/: a number or stem prefix ("02", "02_Foundations--Tour") or a
+substring ("Containers").
 """
 
 import argparse
@@ -417,8 +418,8 @@ def _resolve(selector: str) -> list[Path]:
     """Resolve one selector to Markdown files.
 
     A selector may be a path to a file, or a chapter selector matched against
-    `Chapters/`: a number or stem prefix ("02", "02_A_Python") or a substring
-    ("Tour"). Matching is case-insensitive.
+    `Chapters/`: a number or stem prefix ("02", "02_Foundations--Tour") or a
+    substring ("Containers"). Matching is case-insensitive.
     """
     path = Path(selector)
     if path.is_file():

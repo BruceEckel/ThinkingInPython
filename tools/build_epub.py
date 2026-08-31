@@ -16,10 +16,14 @@ So this builder does not rely on that de-duplication. It gives every
 heading an explicit id namespaced by chapter number, and rewrites every
 link to match:
 
-    ## Immutability                       ->  ## Immutability {#ch12-immutability}
-    [x](12_Data_Classes.md#immutability)  ->  [x](#ch12-immutability)
-    [x](#immutability)                    ->  [x](#ch12-immutability)
-    [x](24_Patterns--Singleton.md)                  ->  [x](#ch24)
+    ## Immutability
+        ->  ## Immutability {#ch12-immutability}
+    [x](12_Techniques--Data_Classes_as_Types.md#immutability)
+        ->  [x](#ch12-immutability)
+    [x](#immutability)
+        ->  [x](#ch12-immutability)
+    [x](24_Patterns--Singleton.md)
+        ->  [x](#ch24)
 
 The `ch` prefix is not decoration: an EPUB is XHTML, where an id may not
 start with a digit.

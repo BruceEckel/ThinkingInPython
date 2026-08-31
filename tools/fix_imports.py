@@ -18,7 +18,8 @@ file back into the block it came from.
 Usage:
     python tools/fix_imports.py          # report listings to organize (exit 1)
     python tools/fix_imports.py --fix     # rewrite them in place
-    python tools/fix_imports.py --fix Chapters/05_Modules_and_Packages.md
+    python tools/fix_imports.py --fix \
+        Chapters/06_Foundations--Modules_and_Packages.md
 """
 
 import argparse

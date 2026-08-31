@@ -34,7 +34,7 @@ Usage:
     python tools/spellcheck.py               # check all of Chapters/
     python tools/spellcheck.py --summary     # unique unknowns, by count
     python tools/spellcheck.py --add         # accept every unknown word
-    python tools/spellcheck.py Chapters/09_Testing.md
+    python tools/spellcheck.py Chapters/11_Techniques--Testing.md
 """
 import argparse
 import re

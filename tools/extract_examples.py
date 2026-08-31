@@ -11,8 +11,9 @@ relative to its chapter, e.g.::
     ```
 
 The file is written under a directory named for the chapter it appears in (the
-Markdown file's stem). A ``# trace.py`` slug in ``08_Decorators.md`` is written
-to ``08_Decorators/trace.py``, verbatim block contents and all. Slugs may
+Markdown file's stem). A ``# trace.py`` slug in
+``14_Techniques--Decorators.md`` is written to
+``14_Techniques--Decorators/trace.py``, verbatim block contents and all. Slugs may
 include sub-paths (``# mouse/MouseAction.py``) to group files within a chapter.
 
 A slug starting with ``utils/`` is written to the tree root's ``utils/``

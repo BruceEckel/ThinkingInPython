@@ -80,7 +80,8 @@ def test_heading_with_no_letters_gets_no_id() -> None:
 # ── rewriting links ───────────────────────────────────────────────────────────
 
 BOOK = Ids(
-    prefixes={"12_Data_Classes": "ch12", "24_Patterns--Singleton": "ch24"},
+    prefixes={"12_Techniques--Data_Classes_as_Types": "ch12",
+              "24_Patterns--Singleton": "ch24"},
     known={"ch12", "ch24", "ch12-immutability", "ch24-borg",
            "ch12-dynamic-binding-vs.-pattern-matching"},
     aliases={"ch24-singleton": "ch24"},

@@ -18,8 +18,8 @@ def trace(func): ...
 ````
 
 The file is written under a directory named for the chapter it appears in (the
-Markdown file's stem). So `# trace.py` in `08_Decorators.md` is extracted to
-`08_Decorators/trace.py`. The slug carries no chapter prefix; the extractor adds
+Markdown file's stem). So `# trace.py` in `14_Techniques--Decorators.md` is
+extracted to `14_Techniques--Decorators/trace.py`. The slug carries no chapter prefix; the extractor adds
 it. A slug may include a sub-path (`# mouse/mouse_action.py`) to group related
 files within one chapter. Renaming or renumbering a chapter therefore moves its
 example folder to match. Blocks without such a first line are illustrative
@@ -436,7 +436,7 @@ failed and exits non-zero if anything fails or times out.
 `make test` (`uv run pytest build/examples`), not as standalone scripts. See
 the Testing chapter.
 
-* Narrow the run: `python tools/run_examples.py 16_State_Machines`
+* Narrow the run: `python tools/run_examples.py 31_Patterns--State_Machines`
 * Adjust the kill timeout: `--timeout 20` (default 15s)
 * Parallelism: runs on all cores by default (`-j auto`); each example is its
   own subprocess, so this is safe. Use `-j 1` for serial, or `-j N` for a fixed
@@ -646,8 +646,8 @@ uv run python tools/reflow_prose.py --diff Tour   # diff a chapter by name part
 ```
 
 A positional argument (or `CH=`) may be a file path or a chapter selector
-matched against `Chapters/`: a number or stem prefix (`02`, `02_A_Python`) or a
-substring (`Tour`). With no argument the whole book is processed.
+matched against `Chapters/`: a number or stem prefix (`02`,
+`02_Foundations--Tour`) or a substring (`Containers`). With no argument the whole book is processed.
 
 ## rewrite.py
 
@@ -969,7 +969,8 @@ extension. The builder resolves each to the real file in `resources/images`
 `build/site/images/`, and warns about any reference with no matching file.
 
 Cross-references between chapters use standard relative Markdown links to the
-target chapter's `.md` file, for example `[Factory](18_Factory.md)`.
+target chapter's `.md` file, for example
+`[Factory](27_Patterns--Factory.md)`.
 These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 `.html` so they also resolve in the site. External links (which carry a scheme)
 are left alone.

@@ -10,7 +10,7 @@ from tools_extract import (
 from tools_markdown import Block, Document
 
 
-def doc_of(text: str, name: str = "08_Decorators.md") -> Document:
+def doc_of(text: str, name: str = "14_Techniques--Decorators.md") -> Document:
     return Document.from_text(text, Path(name))
 
 
@@ -24,8 +24,8 @@ def chapter_route(doc: Document, block: Block) -> str | None:
 def test_a_claimed_block_becomes_a_file() -> None:
     doc = doc_of("```python\n# trace.py\nx = 1\n```\n")
     result = extract([doc], [chapter_route])
-    assert set(result.files) == {"08_Decorators/trace.py"}
-    assert result.files["08_Decorators/trace.py"].content == "# trace.py\nx = 1\n"
+    assert set(result.files) == {"14_Techniques--Decorators/trace.py"}
+    assert result.files["14_Techniques--Decorators/trace.py"].content == "# trace.py\nx = 1\n"
 
 def test_an_unclaimed_block_counts_as_a_fragment() -> None:
     doc = doc_of("```python\nx = 1\n```\n")
@@ -48,12 +48,12 @@ def test_a_router_returning_none_falls_through_to_the_next() -> None:
 def test_language_is_recorded() -> None:
     doc = doc_of("```text\n# data.txt\nrows\n```\n")
     result = extract([doc], [chapter_route])
-    assert result.files["08_Decorators/data.txt"].language == "text"
+    assert result.files["14_Techniques--Decorators/data.txt"].language == "text"
 
 def test_source_md_is_recorded() -> None:
-    doc = doc_of("```python\n# a.py\n```\n", "12_Types.md")
+    doc = doc_of("```python\n# a.py\n```\n", "08_Foundations--Static_Types.md")
     result = extract([doc], [chapter_route])
-    assert result.files["12_Types/a.py"].source_md == "12_Types.md"
+    assert result.files["08_Foundations--Static_Types/a.py"].source_md == "08_Foundations--Static_Types.md"
 
 # ── conflicts ─────────────────────────────────────────────────────────────────
 
@@ -87,7 +87,7 @@ def test_write_tree_creates_nested_dirs(tmp_path: Path) -> None:
     doc = doc_of("```python\n# mouse/Move.py\nx = 1\n```\n")
     result = extract([doc], [chapter_route])
     assert write_tree(result, tmp_path) == 1
-    written = tmp_path / "08_Decorators" / "mouse" / "Move.py"
+    written = tmp_path / "14_Techniques--Decorators" / "mouse" / "Move.py"
     assert written.read_text(encoding="utf-8") == "# mouse/Move.py\nx = 1\n"
 
 def test_write_tree_skips_unchanged_files(tmp_path: Path) -> None:
@@ -100,18 +100,18 @@ def test_check_against_reports_missing(tmp_path: Path) -> None:
     doc = doc_of("```python\n# a.py\nx = 1\n```\n")
     result = extract([doc], [chapter_route])
     missing, changed = check_against(result, tmp_path)
-    assert missing == ["08_Decorators/a.py"]
+    assert missing == ["14_Techniques--Decorators/a.py"]
     assert changed == []
 
 def test_check_against_reports_changed(tmp_path: Path) -> None:
     doc = doc_of("```python\n# a.py\nx = 1\n```\n")
     result = extract([doc], [chapter_route])
     write_tree(result, tmp_path)
-    target = tmp_path / "08_Decorators" / "a.py"
+    target = tmp_path / "14_Techniques--Decorators" / "a.py"
     target.write_text("# a.py\nx = 999\n", encoding="utf-8")
     missing, changed = check_against(result, tmp_path)
     assert missing == []
-    assert changed == ["08_Decorators/a.py"]
+    assert changed == ["14_Techniques--Decorators/a.py"]
 
 def test_check_against_clean_tree_reports_nothing(tmp_path: Path) -> None:
     doc = doc_of("```python\n# a.py\nx = 1\n```\n")

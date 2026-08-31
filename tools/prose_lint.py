@@ -30,7 +30,7 @@ as part of `make spell`.
 
 Usage:
     python tools/prose_lint.py                 # all of Chapters/
-    python tools/prose_lint.py Chapters/06_Classes.md
+    python tools/prose_lint.py Chapters/07_Foundations--Classes.md
     python tools/prose_lint.py Chapters        # a directory: every *.md in it
 """
 
