@@ -10,10 +10,18 @@
 # (e.g. 38_Patterns--Simulation/rats_and_mazes/*
 # or 31_Patterns--State_Machines/*gui*.py).
 # A "# extract: no-run" line inside a file does the same job inline.
+#
+# Both trees read this one file: `make run` matches these patterns against
+# build/examples/, and `make solutions-run` against build/solutions/. The
+# chapter directories are named the same in both, so a pattern specific to
+# one tree must name a path that exists only there. Today none of them
+# collide.
 
-# Package submodule whose relative import needs a package context: running
-# it as a script is the failure chapter 6 documents (use `python -m`).
+# Package submodules that need a package context: running one as a script is
+# the failure chapter 6 documents (use `python -m`). module4 is the book's,
+# module6 the sixth exercise's answer; use_module6.py imports it properly.
 06_Foundations--Modules_and_Packages/a_package/module4.py
+06_Foundations--Modules_and_Packages/a_package/b_package/module6.py
 
 # Tkinter views (the model + tests run and are checked headlessly).
 31_Patterns--State_Machines/tabledriven/vending_view.py

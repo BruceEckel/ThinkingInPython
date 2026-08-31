@@ -404,7 +404,7 @@ extract:  ## Write build/examples/ from the Markdown
 
 .PHONY: solutions-sync solutions-check solutions-prune solutions-extract \
         solutions-output solutions-output-check solutions-ty solutions-lint \
-        solutions-test solutions-numbering solutions-gate
+        solutions-run solutions-test solutions-numbering solutions-gate
 
 # Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
 # instead of Chapters/. Each Solutions code block is self-contained (it
@@ -441,6 +441,16 @@ solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
 solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must be clean)
 	$(RUFF) check build/solutions
 
+# The Solutions counterpart of `run`. solutions-output only executes a block
+# that carries a #: marker, and solutions-test only a test_*.py, which
+# together leave two dozen answers that nothing ever runs: importable
+# helpers, and standalone programs whose behavior the answer describes in
+# prose instead of a marker. This runs every one of them. The absolute
+# --tree is required, not stylistic: it goes on PYTHONPATH, and a relative
+# path stops resolving the moment an example changes directory.
+solutions-run: solutions-extract  ## Run every extracted solution and report failures
+	$(PY) tools/run_examples.py --tree "$(CURDIR)/build/solutions"
+
 solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
 	$(PYTEST) $(PYTEST_N) build/solutions
 
@@ -453,21 +463,23 @@ solutions-numbering:  ## Verify each chapter's exercises have matching solutions
 	$(PY) tools/check_solutions.py $(ARGS)
 
 # Mirrors `gate`, but for Solutions/: numbering, drift check, output
-# markers, ty, ruff, pytest. No run_examples.py equivalent: every
-# extractable Solutions block already carries a #: marker (checked by
-# solutions-output above), and a block with none is a deliberately-unrun
-# illustrative fragment (no `# file.py` slug), so there is nothing further
-# to execute. The numbering check runs first because it is the cheapest and
-# reports a missing answer, which no later step here would notice.
-# extract_solutions.py also fails on an orphaned stray under SolutionsCode/;
-# `make solutions-prune` deletes exactly those.
-solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, pytest
+# markers, ty, ruff, run, pytest. This skipped the run step until
+# 2026-08-31, on the reasoning that every extractable block carries a #:
+# marker and so is already executed by solutions-output. That was wrong: 24
+# answers carry no marker and are not tests, so nothing ran them, and the
+# first `solutions-run` found one that could not execute at all. It costs
+# about six seconds. The numbering check runs first because it is the
+# cheapest and reports a missing answer, which no later step here would
+# notice. extract_solutions.py also fails on an orphaned stray under
+# SolutionsCode/; `make solutions-prune` deletes exactly those.
+solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run, pytest
 	$(PY) tools/check_solutions.py
 	$(PY) tools/extract_solutions.py
 	$(PY) tools/extract_solutions.py --write
 	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions
 	$(TY) check build/solutions
 	$(RUFF) check build/solutions
+	$(PY) tools/run_examples.py --tree "$(CURDIR)/build/solutions"
 	$(PYTEST) $(PYTEST_N) build/solutions
 
 # Headed "Writing" rather than "Prose" for the same reason as "Code

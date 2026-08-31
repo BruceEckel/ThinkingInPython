@@ -82,6 +82,8 @@ anything you want to save outside those two trees.
 
 ## Setup
 
+You'll need to do this to experiment with the examples and exercises.
+
 ### Install
 
 1. Clone this repository.
@@ -98,15 +100,17 @@ That is everything you need to run and test the examples and the solutions.
 a stale `uv` stuck on an old Python prerelease, and (on Windows) a process
 holding `.venv` open.
 
+Type `make` to see every target. In a terminal it opens a picker instead:
+arrow keys choose, Enter runs, and `?` shows a target's full documentation.
+
+#### Optional: Building the Book
+
 Building the book itself needs more. `make site`, `make local`, and
 `make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
 `make prose` needs the standalone `vale` binary. `make tools-check-full`
 checks for all of them. See
 [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.
-
-Type `make` to see every target. In a terminal it opens a picker instead:
-arrow keys choose, Enter runs, and `?` shows a target's full documentation.
 
 ### Run and test everything
 
@@ -120,9 +124,10 @@ copy. Timings come from a recent desktop machine.
 | `make test` | Runs the book's `pytest` examples, the `test_*.py` files. About 5 seconds. |
 | `make ty` | Type-checks every example. Must come out clean. |
 | `make lint` | PEP8-lints every example with `ruff`. Must come out clean. |
+| `make solutions-run` | Executes every extracted solution and reports failures. About 7 seconds. |
 | `make solutions-test` | Runs the solutions' `pytest` examples. About 3 seconds. |
 | `make solutions-ty`, `make solutions-lint` | The same two checks over `build/solutions/`. |
-| `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, tests. |
+| `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests. About 17 seconds. |
 | `make gate` | Every check over both trees. Run this before committing. |
 
 A first run also pays for downloading the pinned Python and the dev tools.
