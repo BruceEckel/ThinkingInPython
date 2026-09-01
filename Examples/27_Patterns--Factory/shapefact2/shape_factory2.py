@@ -1,14 +1,17 @@
 # shapefact2/shape_factory2.py
 # One factory object per shape.
 import random
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+    @abstractmethod
     def erase(self) -> None: ...
 
 class Circle(Shape):

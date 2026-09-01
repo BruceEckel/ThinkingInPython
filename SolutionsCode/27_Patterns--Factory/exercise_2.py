@@ -1,10 +1,12 @@
 # exercise_2.py
+from abc import ABC, abstractmethod
 from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Triangle(Shape):

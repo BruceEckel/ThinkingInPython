@@ -1,10 +1,13 @@
 # shapefact1/shape_factory1.py
 import random
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+    @abstractmethod
     def erase(self) -> None: ...
     # Create based on class name:
     @staticmethod

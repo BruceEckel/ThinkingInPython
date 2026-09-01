@@ -6,10 +6,14 @@
 
 ```python
 # exercise_1.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+
+    @abstractmethod
     def erase(self) -> None: ...
 
     @staticmethod
@@ -67,12 +71,14 @@ shape. In the chapter file the entry joins `Circle`'s and
 
 ```python
 # exercise_2.py
+from abc import ABC, abstractmethod
 from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Triangle(Shape):
@@ -166,9 +172,11 @@ third concrete factory slots in beside `KittiesAndPuzzles` and
 
 ```python
 # exercise_4.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
@@ -314,15 +322,17 @@ leaves it open for as long as the caller keeps adding toppings.
 
 ```python
 # shape_registry.py
+from abc import ABC, abstractmethod
 from typing import ClassVar
 
-class Shape:
+class Shape(ABC):
     registry: ClassVar[dict[str, type[Shape]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
         Shape.registry[cls.__name__] = cls
 
+    @abstractmethod
     def draw(self) -> None: ...
 
 def make(kind: str) -> Shape:

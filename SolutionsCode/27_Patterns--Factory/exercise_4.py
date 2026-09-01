@@ -1,7 +1,9 @@
 # exercise_4.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):

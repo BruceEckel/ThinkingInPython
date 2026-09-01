@@ -3,12 +3,12 @@
 When you discover you need to add new types to a system,
 first create a base type as a common interface to those new types.
 The common interface separates the rest of your code from knowledge of the specific types you add.
-You may add new types without editing existing code ... or so it seems.
+You may then add new types without editing existing code ... or so it seems.
 It appears you can change such a design in only one place:
 where you inherit a new type.
 But you must still create an object of your new type,
 and at the point of creation you must name the exact constructor.
-If the code that creates objects appears throughout your application,
+If the code that creates objects is distributed throughout your application,
 adding a type means finding and editing every place that names a concrete type.
 
 The solution is to encapsulate object creation:
@@ -33,11 +33,14 @@ The factory can be a `@staticmethod` of the base class:
 ```python
 # shapefact1/shape_factory1.py
 import random
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+    @abstractmethod
     def erase(self) -> None: ...
     # Create based on class name:
     @staticmethod
@@ -48,8 +51,7 @@ class Shape:
             case "Square":
                 return Square()
             case _:
-                raise ValueError(
-                    f"Bad shape creation: {kind}")
+                raise ValueError(f"Bad shape: {kind}")
 
 class Circle(Shape):
     @override
@@ -89,9 +91,8 @@ Here the argument is a string, but it could be any kind of data.
 Apart from the new subclass itself,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 
-I have also used a *generator*
-(see [Iterators](23_Patterns--Iterators.md#generators)).
-Where a factory takes information telling it what to build,
+I have also used a [*generator*](23_Patterns--Iterators.md#generators).
+Whereas a factory takes information telling it what to build,
 a generator object does the opposite:
 it holds an internal algorithm and produces the next value with no argument.
 `shape_name_gen()` takes `n` and returns a generator object,
@@ -108,12 +109,12 @@ For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
 To discourage direct construction of the concrete shapes,
 give them module-level names with a leading underscore:
-a convention rather than concealment, and the convention is all Python provides
+a convention rather than concealment
 ([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case).
-The listing keeps the plain names because `shape_name_gen()` passes `cls.__name__` unchanged to `factory()`,
+`shape_factory1.py` keeps the plain names because `shape_name_gen()` passes `cls.__name__` unchanged to `factory()`,
 so an underscore in the class name would have to appear in the `case` strings too.
 
-Nesting the classes inside `factory()` looks like stronger enforcement and is worse.
+Nesting the classes inside `factory()` looks like stronger enforcement, but is worse.
 Because a `class` statement is executable code,
 every call would define fresh `Circle` and `Square` classes:
 two shapes from different calls would share behavior but not a class,
@@ -134,9 +135,11 @@ The `dict` is the factory:
 
 ```python
 # shape_table.py
+from abc import ABC, abstractmethod
 from typing import Final, override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
@@ -171,15 +174,17 @@ removes that line too, so the factory never needs editing when you add a type:
 
 ```python
 # registry.py
+from abc import ABC, abstractmethod
 from typing import ClassVar, override
 
-class Shape:
+class Shape(ABC):
     registry: ClassVar[dict[str, type[Shape]]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
         Shape.registry[cls.__name__] = cls
 
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
@@ -294,14 +299,17 @@ rather than passing a string to a `match`:
 # shapefact2/shape_factory2.py
 # One factory object per shape.
 import random
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import Final, Protocol, override
 
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+    @abstractmethod
     def erase(self) -> None: ...
 
 class Circle(Shape):
@@ -489,7 +497,7 @@ Those `raise NotImplementedError` bodies enforce less than the listing suggests.
 The failure comes at call time:
 a concrete factory that omits `make_obstacle()` constructs with no error and raises an exception only when something calls the missing method.
 An `@abstractmethod` fails at instantiation,
-the way `Partial()` did in [Surrogate](26_Patterns--Surrogate.md),
+the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md),
 and at least reports the omission before any call happens.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,

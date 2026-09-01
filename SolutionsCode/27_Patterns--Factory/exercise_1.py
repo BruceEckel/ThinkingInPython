@@ -1,8 +1,12 @@
 # exercise_1.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
+
+    @abstractmethod
     def erase(self) -> None: ...
 
     @staticmethod

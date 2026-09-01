@@ -1,7 +1,9 @@
 # shape_table.py
+from abc import ABC, abstractmethod
 from typing import Final, override
 
-class Shape:
+class Shape(ABC):
+    @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
