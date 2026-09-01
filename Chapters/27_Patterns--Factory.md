@@ -601,7 +601,7 @@ The factories so far build each object from a class and some arguments.
 Use Prototype when a ready-made instance is easier to clone than to rebuild,
 or when construction is slow and the instances share most of the setup.
 
-The `copy` module clones any object.
+The `copy` module does the cloning.
 `copy.deepcopy()` follows every reference,
 so the clone shares no mutable state with the original:
 
@@ -643,14 +643,13 @@ The last three lines are a warning, not an example to follow:
 so changing that list through one object changes it for the other,
 with no error to signal it.
 
-Because `deepcopy()` copies everything it can reach,
-a prototype holding an open file, a socket,
-or a lock raises a `TypeError` instead of cloning:
-`cannot pickle '_thread.lock' object`.
-Define `__deepcopy__()` on such a class to say what the copy holds instead:
-a fresh connection, or nothing until the clone opens one.
+`deepcopy()` copies everything it can reach,
+and it has no way to copy an open file, a socket, or a lock,
+so a prototype holding one makes `deepcopy()` raise `TypeError: cannot pickle '_thread.lock' object`.
+Give such a class a `__deepcopy__()` that says what the copy holds instead:
+a fresh connection, or an empty slot the clone fills when it first needs one.
 
-You can combine prototype with a registry.
+You can combine Prototype with a registry.
 Instead of a registry of classes,
 keep a registry of prototypical instances and clone the chosen one:
 
@@ -687,9 +686,9 @@ if __name__ == "__main__":
 
 Because `spawn()` returns an independent object every time,
 callers can modify their copy without modifying the prototype.
-Compare `spawn()` with `make()` in `registry.py`:
-that table holds classes and calls a constructor,
-while `prototype_registry.py`'s holds instances and copies them.
+Compare `spawn()` with `make()` in `registry.py`.
+There the table holds classes and `make()` calls one.
+Here the table holds instances and `spawn()` copies one.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
 These tests check the two required properties for a prototype registry.
@@ -718,12 +717,13 @@ def test_prototype_untouched() -> None:
 ## Builder
 
 *Builder* is the last of the creational patterns:
-separate the construction of a complex object from its representation,
-assembling it in steps.
-In Java and C++ it takes the place of the *telescoping constructor*.
-A class with many optional settings needs a constructor for every useful combination,
+build a complex object in steps,
+keeping the step-by-step assembly separate from the finished object.
+In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
-The workaround is a companion class that collects settings one method call at a time.
+That pile of constructors is the *telescoping constructor*,
+and Builder is the workaround:
+a companion class that collects settings one method call at a time.
 Translated into Python with its structure intact, it looks like this:
 
 ```python
@@ -812,8 +812,9 @@ if __name__ == "__main__":
 Every combination of settings is a single call,
 the call site names each option just as the chain does,
 and the fields declare the defaults instead of a second class.
-`dataclasses.replace()` covers the second use of builder chains:
-starting from an existing configuration and varying it.
+Builder chains have a second use,
+starting from an existing configuration and varying it,
+and `dataclasses.replace()` covers that one.
 For a frozen data class, `replace()` is Prototype and Builder in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the general form of the same operation,
@@ -861,11 +862,10 @@ and `parse_args()` is the `build()`.
 
 The smallest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
-That is the Builder structure.
-`PizzaBuilder` does the same,
+That is the Builder structure, and `PizzaBuilder` has the same one,
 collecting toppings in a list and freezing them into a tuple at `build()`.
-Reserve the pattern, and the name,
-for construction that is a process with intermediate state and rules of its own.
+The structure is everywhere.
+Reserve the name for construction that is a process with intermediate state and rules of its own.
 When the "steps" are optional values,
 keyword arguments and a data class are the builder.
 
