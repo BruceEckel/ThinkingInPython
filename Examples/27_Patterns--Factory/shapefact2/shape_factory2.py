@@ -1,5 +1,5 @@
 # shapefact2/shape_factory2.py
-# Polymorphic factory methods.
+# One factory object per shape.
 import random
 from collections.abc import Iterator
 from typing import Final, Protocol, override
