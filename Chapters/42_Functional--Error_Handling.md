@@ -60,9 +60,11 @@ flags as a problem.
 ## Return the Error as a Value
 
 The function's return type becomes a union of the answer type and the error type.
-A union like this is Python's untagged form of a *sum type*
-(a *disjoint* union): a value that is one thing or another.
-Nothing disappears, because the error is just another return value:
+A union like this is a *sum type* (a *disjoint* union):
+a value that is one thing or another.
+Python's union carries no tag,
+so only the runtime type of the value says which side you received.
+The error is just another return value, so every result survives:
 
 ```python
 # sum_type.py
@@ -90,10 +92,10 @@ for r in outputs:
 #: answer = 4
 ```
 
-This keeps every result, and `match`
-(see [Pattern Matching](13_Techniques--Pattern_Matching.md#matching-values))
+`match` (see [Pattern Matching](13_Techniques--Pattern_Matching.md#matching-values))
 tells the two cases apart.
-But the distinction depends on the types `int` and `str`, which is fragile.
+But the distinction rests on the types `int` and `str`,
+and that dependence is fragile.
 If a successful answer were also a string, the two cases would collide.
 You need something that says "success" or "failure" no matter what types they carry.
 
@@ -108,7 +110,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are both frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
 `@final` states that neither can have subclasses,
-which lets the type checker narrow a `Result` to exactly one of the two.
+and that closure lets the type checker narrow a `Result` to exactly one of the two.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
@@ -176,12 +178,11 @@ A function reports failure by returning an `Err` object,
 success by returning an `Ok` object.
 
 `Result[int, str]` says this function returns an `int` on success or a `str` on failure.
-The caller cannot pretend the function returns an ordinary value.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()` makes that literal: it exists on `Ok` and not on `Err`,
-so `func_a(i).unwrap()` fails the type checker.
-Using the `Result` as if it were a number fails the same way.
-Narrowing to one of the two classes is the only route to the answer.
+`unwrap()` makes that literal: only `Ok` defines it,
+so `func_a(i).unwrap()` fails the type checker,
+and so does using the `Result` as if it were a number.
+The one route to the answer is narrowing to one of the two classes.
 The asymmetry is visible at runtime as well as to the type checker:
 
 ```python
@@ -201,7 +202,7 @@ except AttributeError as e:
 The `# type: ignore` is the point of the listing rather than an apology for it.
 Without that comment `ty` refuses the line,
 reporting that `Err[str]` in the union has no `unwrap`,
-and a reader who writes this in their own code never reaches the traceback.
+and a reader who writes this in their own code meets that report instead of the traceback.
 
 This is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
 put the meaning in the type.
@@ -214,17 +215,15 @@ or when several different failures must stay distinguishable,
 as [Matching on the Error](#matching-on-the-error) shows below.
 
 A function like this is a *Total Function*:
-its return type accounts for every outcome it can produce, success or failure,
-with nothing left to escape as an exception.
-If you raise an exception instead, the signature no longer tells the truth.
-A caller can't see the failure just by reading the return type.
-Python does not enforce totality.
-Nothing stops a `Result`-returning function from also raising an exception,
-so this is a discipline the author of the function maintains,
-not a guarantee the type checker provides.
-The caller has a matching hole:
-a statement that calls the function and discards what comes back draws no complaint.
-The type checker stops you from misreading a `Result`, not from ignoring one.
+its return type accounts for every outcome it can produce, success or failure.
+Raise an exception instead,
+and the signature hides that outcome from a caller reading the return type.
+Totality is a discipline the function's author keeps,
+since Python lets a `Result`-returning function raise as well and the type checker has no way to tell.
+The caller has a matching gap:
+a statement that calls the function and discards the `Result` passes the checker.
+The type checker stops you from misreading a `Result`;
+ignoring one is still up to you.
 
 ## Composing by Hand
 
@@ -273,11 +272,10 @@ if __name__ == "__main__":
 ```
 
 Each step returns early when it encounters an `Err`.
-The check names `Err` and not `Result`.
-`Result` is a `type` alias rather than a class,
-so `isinstance(a, Result)` raises a `TypeError` at runtime,
-and the type checker rejects it before that.
-Ask about one of the two concrete classes.
+The check names `Err`, one of the two concrete classes,
+because `Result` is a `type` alias rather than a class:
+`isinstance(a, Result)` fails the type checker and, if run anyway,
+raises a `TypeError`.
 
 This works, and it keeps errors as values, but every step is the same dance:
 call, check for `Err`, return early, unwrap, go on.
@@ -288,10 +286,9 @@ call, check for `Err`, return early, unwrap, go on.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` feeds the answer to the next function.
 On an `Err`, it ignores the function and returns the failure unchanged.
-The two signatures differ because `Err` holds no answer:
-it cannot name the argument type the next step would receive,
-so it accepts any callable,
-and its return type states only that an `Err` comes back out.
+The two signatures differ because `Err` holds no answer to feed the next step.
+With nothing to name the argument type, its `bind()` accepts any callable,
+and its return type says an `Err` comes back out.
 An `Err` anywhere in a chain skips the rest of the steps and falls through to the end:
 
 ```python
@@ -316,8 +313,7 @@ if __name__ == "__main__":
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
 `bind()` removes the boilerplate by chaining the steps.
-The error checking has not gone away.
-It moved into `bind()`, where it appears once.
+The error checking moved into `bind()`, where it appears once.
 
 Functional programmers have a name for a type that carries a value plus this chaining operation:
 a *monad*.
@@ -330,8 +326,8 @@ all with the same `bind()`.
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, say `.bind(str)`,
-the type checker rejects that call immediately,
-because `str` is not a callable that returns a `Result`.
+the type checker rejects that call immediately, because `str` returns a `str`,
+and `bind()` expects a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that cannot fail,
@@ -529,9 +525,9 @@ If you misspell a name inside the wrapped function,
 the resulting `NameError` arrives as an ordinary `Err`,
 indistinguishable from bad input.
 The version here is deliberately small.
-A production one takes the exception types it should catch as an argument and lets the rest propagate,
-which preserves the distinction that ends this chapter,
-between a failure the caller can handle and a bug the caller cannot.
+A production one takes the exception types to catch as an argument and lets the rest propagate.
+That keeps the distinction the chapter ends on:
+a failure the caller can handle versus a bug the caller cannot.
 
 The tests for `@safe` check that a good input becomes an `Ok`,
 and that a raised exception becomes an `Err` holding that exception:
@@ -606,7 +602,7 @@ and by the time the exception reaches a handler high enough to report it,
 the local names that would explain it have vanished.
 
 Most code catches the exception and raises a new one carrying a better message,
-which costs you the original type and gives every caller a wrapper to unwrap.
+and that trade costs you the original type and gives every caller a wrapper to unwrap.
 `BaseException.add_note()` (Python 3.11 and later) avoids the trade.
 It appends a line to the exception you already have,
 and the traceback prints it:
@@ -637,14 +633,14 @@ The bare `raise` re-raises the same object,
 so the type stays `ValueError` and the original traceback survives undisturbed.
 Notes accumulate: each frame that knows something the raiser did not can add its own line as the stack unwinds.
 They live in a list called `__notes__`,
-which is absent until the first `add_note()` call.
-The type checker is no help there,
-because typeshed declares `__notes__` on `BaseException` unconditionally,
-so reading it on an exception that has no notes type-checks and then raises an `AttributeError`.
-`traceback.format_exception_only()` renders the message and the notes without the file paths,
-which is why the listing uses it instead of letting the traceback print.
+which the first `add_note()` call creates.
+The type checker treats `__notes__` as always present,
+because typeshed declares it on `BaseException` for every exception,
+so reading it before any `add_note()` call type-checks and then raises an `AttributeError` at runtime.
+The listing prints with `traceback.format_exception_only()`,
+which renders the message and the notes and leaves out the file paths a full traceback would carry.
 
-This matters more here than in ordinary exception code,
+Context matters more here than in ordinary exception code,
 because a `Result` keeps the exception as a value rather than propagating it.
 An `Err` sitting in a list has no traceback to explain it.
 The exception must carry whatever context it needs:
@@ -682,9 +678,9 @@ This is the chapter's opening argument, applied one level down:
 and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
-which checks because `@final` on the two classes rules out a value that inherits from both,
-so the type checker narrows the `Result` to a single class,
-whether you use `match` or `isinstance()`.
+and that read type-checks because the `match` narrowed the `Result` to `Err`.
+The narrowing works because `@final` on both classes rules out a value that inherits from both,
+and it works the same way with `isinstance()`.
 
 ## The returns Library
 
@@ -696,7 +692,7 @@ and do-notation that makes combining multiple results read more directly than ne
 
 ## Which Failures Get a Result
 
-This style does not replace exceptions everywhere.
+A `Result` does not replace every exception.
 Exceptions are still appropriate for truly exceptional conditions,
 the ones no caller can reasonably handle,
 such as running out of memory or a programming bug.
@@ -710,7 +706,7 @@ They are routine, and the type should say so.
 You can now write a function whose signature admits it can fail,
 and chain three of them without a single `try` in the calling code.
 The chain either delivers an answer or hands back the first failure,
-and the type checker does not let a caller confuse the two.
+and the type checker keeps a caller from confusing the two.
 [Confidence](43_Functional--Confidence.md)
 examines what this discipline lets you claim,
 and [Effect Management](44_Effects--Effect_Management.md#converting-effectful-to-pure)

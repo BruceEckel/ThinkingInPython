@@ -24,7 +24,7 @@ and how far those claims can go.
 ## Referential Transparency
 
 An expression is *referentially transparent* when you can replace it with its value without changing the program's behavior.
-Pure functions give you this property, which is the reason purity matters:
+Pure functions have this property, and that is the reason purity matters:
 
 ```python
 # referential_transparency.py
@@ -40,11 +40,10 @@ print(x, y, x == y)
 ```
 
 Because `add(2, 3)` and `5` are interchangeable,
-an implementation is free to cache the call, evaluate it in any order,
-or skip a repeat.
-CPython does none of these on its own,
-because nothing in the language marks `add()` as pure,
-so you ask for the reuse yourself.
+an implementation may cache the call, run the two calls in either order,
+or skip the second.
+CPython leaves all three choices to you,
+because the language has no way to mark `add()` as pure.
 You can also reason about the code by substitution,
 the same move you make in algebra.
 This property lets you check parts of a program,
@@ -74,12 +73,12 @@ The first `withdraw(30)` evaluates to `70`,
 so substituting `70` for it ought to change nothing.
 It changes `110` into `140`.
 `withdraw()` is not referentially transparent,
-and neither is any expression containing it,
-which is why the substitution reasoning above stops at the first impure call.
+and any expression containing it inherits the problem,
+so substitution reasoning stops at the first impure call.
 
-This property is also the reason [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
-is quietly safe.
-A memoizer may hand back a stored result only because the call is interchangeable with its value.
+Referential transparency is also what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
+safe.
+A memoizer can hand back a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
 from a cache to a database query planner,
 benefits from referential transparency.
@@ -96,10 +95,9 @@ and the answers do not change.
 Impure code has no such freedom.
 Two parallel `withdraw()` calls could both read `balance` before either writes it back,
 and one withdrawal vanishes.
-Making that safe means adding a lock,
-and the lock serializes the work you wanted to overlap.
-Purity removes the problem instead of managing it.
-With nothing shared, nothing needs a lock.
+A lock makes that safe, and the lock serializes the work you wanted to overlap.
+Purity removes the problem instead of managing it: with nothing shared,
+a lock has nothing to guard.
 
 `count_primes()` is pure, and each call does enough work to spread across cores:
 
@@ -126,7 +124,7 @@ if __name__ == "__main__":
 `list(map(...))` runs the four calls one at a time, on one core.
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
-Run as a script, this prints `[1229, 2262, 3245, 4203]`.
+The script prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
@@ -139,7 +137,7 @@ Each argument and each result pickles to cross the process boundary,
 and the function travels by name,
 so `count_primes()` must live at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
-which rules out two shapes these chapters favor.
+and that rules out two shapes these chapters favor.
 A `functools.partial` survives,
 because it pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
@@ -154,8 +152,8 @@ along with the reasons Python parallelism uses processes rather than threads.
 *Imperative* code spells out each step to produce it.
 A comprehension is the everyday example
 (see [Comprehensions](16_Techniques--Comprehensions.md)).
-`squares = []`, then `for n in numbers:`, then `if n % 2 == 0:`,
-then `squares.append(n * n)` says *how*.
+Four statements, `squares = []`, `for n in numbers:`, `if n % 2 == 0:`,
+and `squares.append(n * n)`, say *how*.
 `[n * n for n in numbers if n % 2 == 0]` says *what*,
 which is "the squares of the even numbers."
 It leaves the looping to Python.
@@ -178,8 +176,8 @@ put that to work, taking a `Result` apart with one branch per kind of failure.
 The win is in the reading rather than in what a type checker can prove.
 On a `Result[float, Exception]`,
 `match` and a chain of `isinstance()` tests narrow equally well,
-both reaching `float` inside the `Ok`,
-because `@final` on the two classes lets either one narrow to a single class.
+both reaching `float` inside the `Ok`, because `Ok` and `Err` are `@final`,
+so either test narrows to a single class.
 Destructuring merges the shape test and the extraction into one step.
 It does not extend what the type checker knows.
 
@@ -187,9 +185,9 @@ It does not extend what the type checker knows.
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
-The properties these chapters built, purity, immutability,
-and referential transparency, provide confidence at every level.
-You decide how far to take it.
+Purity, immutability, and referential transparency,
+the properties these chapters built, provide confidence at every level.
+You decide how far up the spectrum to go.
 
 1. The cheapest rung is local reasoning.
    Pure functions and immutable values let you understand one piece at a time,
@@ -207,13 +205,12 @@ You decide how far to take it.
    or data arriving from outside the program leaves a gap no type checker can close,
    so the theorem holds only as far as the annotations do.
    Running `ty` over the examples in this book still rules out a useful class of mistakes,
-   which is most of what this rung offers.
+   and that is most of what this rung offers.
 4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
-   It does not prove the law.
-   It searches for a counterexample,
-   which is the falsifiability the opening required of a science.
+   It searches for a counterexample instead of proving the law,
+   and that search is the falsifiability the opening required of a science.
 5. At the top is formal proof.
    In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
@@ -259,7 +256,7 @@ Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
-drawing on the whole of `str` rather than the five-letter alphabet chosen above,
+drawing on the whole of `str` rather than `property_check.py`'s five-letter alphabet,
 so it reaches inputs the loop cannot produce, such as unusual Unicode:
 
 ```python
@@ -283,13 +280,13 @@ because importing `property_check.py` would run its thousand-iteration loop insi
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
 By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand, and they still cover more ground,
-because it aims at boundaries and oddities instead of sampling evenly.
+because Hypothesis aims at boundaries and oddities instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
 so the bug surfaces as the clearest case rather than a random one.
 The framework automates falsification.
 
 The two listings above both pass, so nothing has shrunk yet.
-This codec has a bug:
+The next codec has a bug:
 
 ```python
 # shrinking.py
@@ -323,9 +320,9 @@ That single character is the whole bug statement.
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.
 A real test needs neither.
-The function's name drops the `test_` prefix,
-and the listing calls it directly inside a `try`:
-a failing `test_` function should fail the build, and this one exists to fail.
+This function exists to fail,
+and a failing `test_` function would fail the build,
+so its name drops the `test_` prefix and the listing calls it directly inside a `try`.
 
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
@@ -341,14 +338,14 @@ asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
-All of these lean on purity.
-Hypothesis can rerun and shrink freely only because each call is independent of every other.
+All of these lean on purity:
+Hypothesis can rerun and shrink freely because each call is independent of every other.
 
 ## Affordable Proof
 
 Two caveats keep the chapter's argument from overreaching.
-First, proof is not exclusive to functional code.
-Hoare logic and tools like Dafny verify imperative programs too.
+First, proof works on imperative code too:
+Hoare logic and tools like Dafny verify it.
 What purity changes is the cost.
 With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.

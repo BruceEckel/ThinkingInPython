@@ -12,9 +12,9 @@ so it parallelizes with no new code.
 And code built from small,
 checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
-None of this asks you to abandon loops, classes, or mutation.
-It asks you to notice when a piece of code can depend on its arguments alone,
-and to write it that way when it can.
+The functional style asks you to keep loops, classes, and mutation,
+and to notice when a piece of code can depend on its arguments alone,
+then write it that way.
 
 This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
@@ -67,7 +67,7 @@ print(withdraw(30), withdraw(30))
 `double()` returns the same answer every time.
 `withdraw()` does not,
 because each call changes `balance` and the next call sees the new value.
-You cannot understand a single `withdraw()` call without tracking the history of every call before it.
+To understand one `withdraw()` call you must trace every call before it.
 
 The payoff is trust.
 A pure function is the most reliable code you can write,
@@ -79,7 +79,7 @@ turns that safety into speed.
 A cache can store its results, knowing the answer never goes stale.
 That makes [`functools.cache`](41_Functional--Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
-And you test it with a single assertion and no fixture,
+And a pure function tests with a single assertion and no fixture,
 since it holds no state to set up or restore:
 
 ```python
@@ -115,11 +115,12 @@ asks of this same function whether raising an exception breaks its purity.
 
 An *immutable* value cannot change after creation.
 Tuples, strings, `frozenset`, and frozen dataclasses are immutable.
-Each is immutable in itself, and no deeper:
+Each freezes only its own top level:
 the tuple `([1], 2)` always holds that same list,
-and anyone can still append to it.
+and anyone can still append to the list.
 Removing shared mutable state is the practical core of the functional style.
-A value that never changes cannot develop a bug from some forgotten change elsewhere.
+A value that never changes stays what you last saw,
+whatever code ran in between.
 
 Instead of modifying an object, you build a new one from the old:
 
@@ -144,9 +145,9 @@ print(moved)
 #: Point(x=11, y=2)
 ```
 
-The listing writes the assignment as `setattr(p, "x", 5)` because the direct form `p.x = 5` never gets to run:
-the type checker rejects it statically, as it should.
-`setattr()` slips past the static check so the listing can show the runtime rejection too.
+The type checker rejects the direct form `p.x = 5` before the program runs,
+so the listing writes the assignment as `setattr(p, "x", 5)`,
+which the type checker lets through, to show that the runtime rejects it too.
 The original `p` stays untouched, and `moved` is a separate value.
 When values never change underneath you,
 two parts of a program can share one without coordinating,
@@ -184,12 +185,11 @@ The constraint runs one way only.
 It says nothing about the caller,
 who still holds the `list` and can append to it at any time,
 including from another thread while `total()` is running.
-Mind what `Final` does and does not freeze.
-It locks the binding, not the object:
+`Final` freezes the binding, and only the binding:
 if you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
-This is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-in another costume.
+That is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`, and let `Final` guard only the name.
 
@@ -220,10 +220,9 @@ with ignore(TypeError):
 #: TypeError("unhashable type: 'list'")
 ```
 
-Mutability alone does not remove hashing.
+Equality based on *contents* is what removes hashing, not mutability by itself.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
-What removes hashing is equality based on *contents*.
 A `list` and an unfrozen `@dataclass` both compare that way,
 so Python sets their `__hash__` to `None`:
 the dictionary that stored a key could no longer find it once its contents changed.
@@ -233,8 +232,8 @@ or a shared read across threads is normally a tuple or a frozen dataclass.
 
 ## Functions as First-Class Objects
 
-A function in Python is an object like any other.
-This is what *first-class* means.
+A function in Python is an object like any other,
+which is what *first-class* means.
 You can bind a function to a name, store it in a container,
 pass it as an argument, and return it from another function.
 A function value is data you can move around.
@@ -288,7 +287,7 @@ and the plugin registries that let a program grow without editing its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 solves the same `if`/`elif` problem with `match`,
-and the two are not interchangeable.
+and the two differ in one way that decides between them.
 A `match` is code: adding an operator means editing the function,
 and the type checker sees every case.
 The table is data: adding an operator means adding a row,
@@ -308,7 +307,7 @@ a lambda keeps it at the call site, where the reader already is,
 instead of sending it to a named function defined elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the code sorts.
 Naming that one-liner costs a line, a name to invent,
-and a definition to look up, and gains no clarity.
+and a definition to look up, and buys nothing.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
 and room to grow.
@@ -342,7 +341,7 @@ Each call hands a function to another function and lets it do the looping.
 Returning a function is the other half of the definition.
 [Closures](#closures) covers it below.
 
-The `list()` calls are not decoration.
+The `list()` calls do real work.
 `map()` and `filter()` return one-shot iterators,
 so `print(map(...))` shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing
@@ -358,7 +357,7 @@ the comprehension ([Comprehensions](16_Techniques--Comprehensions.md)).
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` earn their keep when the function already exists:
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
-The two are not quite the same object, either.
+The two also return different things.
 The comprehension hands you a finished list.
 `map()` hands you an iterator you can feed into the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
@@ -382,8 +381,8 @@ A decorator does this, as [Decorators](14_Techniques--Decorators.md) shows.
 
 When an inner function refers to a variable from the function that created it,
 Python keeps that variable alive.
-The inner function plus the captured variables is a *closure*.
-This way, a function can carry state without a class:
+The inner function plus the captured variables is a *closure*,
+and a closure lets a function carry state without a class:
 
 ```python
 # closures.py
@@ -441,16 +440,15 @@ print(tally(), tally(), tally())
 ```
 
 Each call to `make_counter()` builds an independent counter with its own `count`.
-No other code can name that variable, so no accident can corrupt it.
+Only `increment()` can name that variable, so only `increment()` can change it.
 
-`increment()` is impure, and deliberately so.
-The contrast with `withdraw()` is the lesson.
+`increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can touch.
 `increment()` mutates a name that only it can touch.
 When state must exist,
 a closure is one way to give exactly one function the right to change it.
 
-The privacy is Python's usual kind, though, and not a lock.
+The privacy is Python's usual kind, a convention.
 `inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
 and `tally.__closure__[0].cell_contents = 100` rewrites it.
 Like the single leading underscore,
@@ -458,15 +456,15 @@ a closure states an intention that the language does not enforce.
 
 The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
-But assignment is how Python decides a name is local,
-so `count += 1` alone makes `count` a fresh local,
-one the statement reads before assigning it,
+But any assignment to a name inside a function makes that name local,
+so `count += 1` on its own makes `count` a fresh local variable.
+The statement then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 Forgetting it is the standard stumble when a closure first needs to write,
-and the runtime message, complaining about a local variable
-("cannot access local variable 'count' where it is not associated with a value"),
-points nowhere near the missing declaration.
+and the runtime message blames a local variable
+("cannot access local variable 'count' where it is not associated with a value")
+instead of the missing declaration.
 The type checker is the better guide here.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
@@ -514,11 +512,11 @@ This avoids the late-binding surprise a lambda created in a loop can produce.
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
 Binding `exponent` above works because `power()` accepts it by keyword.
-Positional arguments have no such freedom: `partial()` fills them from the left,
-so fixing the third argument used to mean fixing the first two.
+`partial()` fills positional arguments from the left,
+so fixing the third argument used to mean fixing the first two as well.
 A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
-had no recourse.
+had to accept that.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller:
 
@@ -537,14 +535,14 @@ print(percent.args)
 ```
 
 `percent` fixes the bounds and leaves the middle argument open,
-which is the specialization a caller needs and the one `partial()` could not previously express.
-A `Placeholder` is not a default.
-The caller must still fill the reserved position:
+the specialization `partial()` alone could never express.
+A `Placeholder` reserves the position without supplying a value.
+The caller must still fill it:
 calling `percent()` with no argument raises a `TypeError`.
-The library also rejects a *trailing* placeholder, but for the opposite reason:
-it would add nothing.
+The library also rejects a *trailing* placeholder, for the opposite reason:
 `partial()` already appends the call's arguments after the bound ones,
-so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
+so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`,
+and the marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 `ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
@@ -645,8 +643,8 @@ The second `print()` is the payoff.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
-None of this is a different language.
-It is ordinary Python in which each piece depends on its arguments alone,
+All of it is ordinary Python,
+written so that each piece depends on its arguments alone,
 and the chapters ahead build on that single property.
 
 ## Exercises

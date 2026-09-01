@@ -18,8 +18,8 @@ Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table:
 each hides an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
-The ones where speed matters, `reduce()`, `partial()`, and the two caches,
-run as C code.
+Where speed matters most, in `reduce()`, `partial()`, and the two caches,
+the implementation is C.
 What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `reduce`
@@ -52,7 +52,7 @@ so `reduce(add, [], 0)` returns `0` instead of raising an exception.
 Remembers every result forever,
 so repeated calls with the same arguments cost nothing.
 `@cache` works correctly only for pure functions.
-Caching a side-effecting function skips the effects.
+A cached function with side effects runs those effects on the first call and never again.
 
 ```python
 # functools_cache.py
@@ -355,9 +355,9 @@ instead of loops you write and test again.
 Each one produces values on demand instead of building a list up front,
 the property [Lazy Evaluation](#lazy-evaluation) revisits below.
 Each is also a loop you would otherwise write by hand,
-already tuned in C and already correct on the edge cases a hand-rolled version tends to miss,
+already tuned in C and already correct on the edge cases a hand-rolled version tends to miss:
 the empty iterable, the single element,
-the point where two sequences run out at different lengths.
+and the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
@@ -380,8 +380,8 @@ print(list(map(pow, range(5), repeat(2))))
 
 The fixed form replaces the list you would have written as `["x"] * 3`.
 The infinite form is the one that earns the import:
-it supplies an argument that never changes, without building a list to hold it,
-and here it stops when `range(5)` does,
+it supplies an argument that never changes, without building a list to hold it.
+Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
 
 ### `islice`
@@ -478,8 +478,9 @@ print(list(batched(range(7), 3)))
 ```
 
 A short final batch is normal for pagination and wrong for fixed-width records.
-`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` for the second case,
-which is the same choice `zip(strict=True)` offers below.
+For fixed-width records,
+`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` instead,
+the same choice `zip(strict=True)` offers below.
 
 ### `accumulate`
 
@@ -529,9 +530,9 @@ The input carries a trailing `1` to separate `takewhile()` from `filter()`.
 because filtering skips what fails and keeps looking.
 `takewhile()` stops at the first failure and never reaches the last element.
 On finite data that is a detail.
-On an infinite source it decides whether the program terminates,
-which [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
-works through.
+On an infinite source it decides whether the program terminates.
+[Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
+works through that case.
 
 ### `dropwhile`
 
@@ -626,7 +627,7 @@ The second line is what unsorted input costs you:
 `sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
 with the same key function both times.
 
-The `list(g)` also does more work than it looks.
+The `list(g)` in the comprehension is there for a reason.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group invalidates the previous group's view.
 `list(groupby(data))` therefore returns three keys paired with three empty iterators:
@@ -778,10 +779,9 @@ one at a time, the same way any `for` loop consumes a generator.
 `squares()` never runs ahead to precompute several values before handing one back.
 No sixth `computing square` line appears,
 because `islice()` stops asking when it has delivered five.
-The obvious-looking `list(squares())[:5]` is not the same program.
-It slices after building the list,
-so it asks `squares()` for every value before taking five,
-and the program never gets past that line.
+`list(squares())[:5]` looks equivalent and is a different program.
+It builds the whole list before slicing, so it asks `squares()` for every value,
+and `squares()` never runs out.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
@@ -817,10 +817,9 @@ print(sys.getrecursionlimit())
 #: 1000
 ```
 
-A `for` loop computes this same factorial in about the same number of lines,
-with no risk of hitting that limit.
-Recursion is neither a faster nor a shorter way to count down to zero.
-Its payoff comes once the problem branches, not just repeats,
+A `for` loop computes this same factorial in about the same number of lines and stays clear of that limit.
+For counting down to zero, the loop is as fast and as short as the recursion.
+Recursion pays off once the problem branches rather than repeats,
 as the next example shows.
 
 Branching brings a cost that counting down does not.
@@ -834,7 +833,7 @@ Recursion suits problems that are naturally self-similar,
 such as walking a tree.
 Python does not optimize tail calls and limits the call stack,
 so deep recursion raises a `RecursionError`.
-`sys.setrecursionlimit()` raises that ceiling when the depth is genuine,
+`sys.setrecursionlimit()` lifts that ceiling when the depth is genuine,
 but it is the wrong answer for a long flat sequence,
 where a loop or one of the `itertools` tools is the better choice.
 
@@ -884,23 +883,23 @@ Fix one player and arrange the rest in a circle.
 Each round, pair players sitting across from each other,
 then rotate everyone but the fixed player by one seat.
 For an even number of players `n`,
-that produces `n - 1` rounds where no pair repeats,
-which is the best any schedule can do,
-since it uses up every one of the `n * (n - 1) / 2` possible pairs exactly once.
+that produces `n - 1` rounds with no repeated pair.
+No schedule can do better,
+because those rounds use every one of the `n * (n - 1) / 2` possible pairs exactly once.
 The classical fix for an odd roster is a phantom player:
 whoever draws the phantom sits out that round.
 
-None of that trick survives a request for groups of three, four,
-or any other size.
+The trick stops working the moment the groups are threes, fours,
+or any size but two.
 The circle method is a closed-form answer to one narrow question,
 "how do you 1-factorize a complete graph into perfect matchings,"
 and pairs are the only group size where that question has a tidy rotation-based answer.
 Scheduling groups of three without repeats is the far harder problem that *Kirkman's schoolgirl problem* poses,
 solvable only for specific roster sizes and with no simple formula behind it.
 Rather than chase an exact answer that may not exist for a given `students` and `size`,
-a general version can settle for a good one:
-build each group by always adding whoever its current members have met the fewest times before,
-tracked in a running history instead of computed fresh from a round number:
+a general version can settle for a good one: build each group by adding,
+one member at a time, whoever the current members have met the fewest times,
+with those meeting counts kept in a running history instead of computed from a round number:
 
 ```python
 # student_pairs.py
@@ -983,11 +982,11 @@ print(next(group_rounds(["Ana", "Bo"], 5)))
 Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
 at the cost of `14` repeat meetings.
-An odd roster cannot pair everyone,
-so each round folds the leftover player into an existing pair,
+An odd roster leaves one player over,
+so each round folds that player into an existing pair,
 and those triples produce the repeats.
-It does that with no rotation and no notion of a fixed player,
-just a shuffle and a greedy choice repeated until the roster runs out.
+`group_rounds()` covers the pairs with no rotation and no fixed player:
+a shuffle, then a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.
 Seven students do not split evenly into threes,
 so one group grows to four rather than leaving anyone out,
@@ -1002,12 +1001,12 @@ Two students and a requested size of five produce one group of two,
 because the alternative is a round in which nobody meets anyone.
 
 `met()` runs once per candidate per slot,
-which makes it the obvious place to put `@cache` from earlier in this chapter.
-Doing so would be wrong.
+so it looks like the place for `@cache` from earlier in this chapter.
+Caching it would be wrong.
 `met()` reads `history`, and `history` changes at the end of every round,
 so a cached answer from round 0 would still come back in round 6 after every count it summed had moved.
-The `cache` entry's rule that caching works only for pure functions is not a formality.
-A function that reads mutable state is not pure, however simple its body looks.
+The `cache` entry's rule, pure functions only, is the reason:
+a function that reads mutable state is impure, however simple its body looks.
 
 Generality costs something.
 The circle method needs no memory.
@@ -1015,7 +1014,7 @@ Which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`, because no formula predicts,
 from a round number alone,
 which grouping of arbitrary size keeps every pair's meeting count lowest.
-It is still deterministic in the sense that matters for testing.
+`group_rounds()` is still deterministic in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` never reaches outside itself for randomness.
@@ -1032,7 +1031,7 @@ ask whether the loop already has a name.
 A running total is `accumulate()`, a width-two sliding window is `pairwise()`,
 a remainder-safe chunking is `batched()`,
 and a memoized pure function is `@cache`.
-Each of those replaces a small piece of code that works the first time and fails on the empty input,
+Each of those replaces a small piece of code that works on the first input you try and fails on the empty input,
 the single element, or the last partial batch.
 
 The second rule is that the pieces exist to stack.
