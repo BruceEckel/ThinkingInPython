@@ -506,16 +506,18 @@ the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
-Each of `Obstacle`, `Character`,
-and `GameElementFactory` is a base class its concrete versions must inherit from.
-Each `raise NotImplementedError` body marks a method those concrete versions must override.
-Marking is all it does.
-Python accepts a concrete factory class that leaves out `make_obstacle()`,
-and accepts its instances too.
-The exception only occurs when `GameEnvironment.__init__()` calls `make_obstacle()`.
-An `@abstractmethod` moves that error earlier, to the factory's own constructor,
+`Obstacle`, `Character`, and `GameElementFactory` are base classes.
+Each one lists the methods its subclasses must supply,
+and each method body is `raise NotImplementedError`,
+a placeholder for the real method a subclass writes.
+A placeholder raises only when something calls it.
+Suppose you write a factory subclass and forget `make_obstacle()`.
+Python defines the class and creates instances of it.
+The exception appears only when `GameEnvironment.__init__()` calls the placeholder.
+An `@abstractmethod` reports the missing method earlier,
+when you create the instance,
 the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
-A *Protocol* only names the methods a type must supply, without a base class,
+A *Protocol* names the required methods with no base class to inherit from,
 which simplifies the Abstract Factory:
 
 ```python
@@ -577,14 +579,14 @@ g2.play()
 #: Warrior now battles a Weapon
 ```
 
-The concrete classes inherit nothing,
-but the type checker still verifies that each one satisfies the appropriate `Protocol`:
+The type checker verifies that each concrete class satisfies the appropriate `Protocol`:
 a `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `description()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
-Uncomment the line that passes one to `GameEnvironment`,
+Uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
 and the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
+
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy),
 and much earlier than the call-time `NotImplementedError` in `games.py`.
