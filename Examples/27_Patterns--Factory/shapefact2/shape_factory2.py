@@ -1,5 +1,4 @@
 # shapefact2/shape_factory2.py
-# One factory object per shape.
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator

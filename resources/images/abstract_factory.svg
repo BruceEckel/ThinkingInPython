@@ -1,68 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 500"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 310"
      font-family="'JetBrains Mono', Consolas, monospace">
   <defs>
     <marker id="af-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="11" markerHeight="11" orient="auto">
       <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
     </marker>
+    <marker id="af-open" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#8b1a1a" stroke-width="1.4"/>
+    </marker>
   </defs>
 
-  <!-- factory inheritance -->
-  <line x1="150" y1="140" x2="360" y2="70" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="670" y1="140" x2="460" y2="70" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <!-- each concrete factory realizes GameElementFactory -->
+  <line x1="115" y1="170" x2="388" y2="96" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="785" y1="170" x2="512" y2="96" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
-  <!-- character/obstacle inheritance -->
-  <line x1="100" y1="360" x2="155" y2="304" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="265" y1="360" x2="210" y2="304" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="550" y1="360" x2="600" y2="304" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="725" y1="360" x2="660" y2="304" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <!-- the two product hierarchies -->
+  <line x1="344" y1="171" x2="381" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="556" y1="171" x2="519" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="344" y1="273" x2="381" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="556" y1="273" x2="519" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
-  <!-- KittiesAndPuzzles' matched pair (accent, dashed) -->
-  <path d="M150,190 Q120,280 100,358" fill="none" stroke="#8b1a1a" stroke-width="1.3"
-        stroke-dasharray="6,4" marker-end="url(#af-tri)"/>
-  <path d="M150,190 Q400,440 548,358" fill="none" stroke="#8b1a1a" stroke-width="1.3"
-        stroke-dasharray="6,4" marker-end="url(#af-tri)"/>
-  <text x="118" y="270" font-size="10" fill="#8b1a1a" text-anchor="middle">make_character()</text>
-  <text x="330" y="410" font-size="10" fill="#8b1a1a" text-anchor="middle">make_obstacle()</text>
-
-  <!-- WarriorsAndWeapons' matched pair (muted, dotted) -->
-  <path d="M670,190 Q700,280 725,358" fill="none" stroke="#7a6e62" stroke-width="1.3"
-        stroke-dasharray="1,4" marker-end="url(#af-tri)"/>
-  <path d="M670,190 Q420,470 267,358" fill="none" stroke="#7a6e62" stroke-width="1.3"
-        stroke-dasharray="1,4" marker-end="url(#af-tri)"/>
-  <text x="702" y="270" font-size="10" fill="#7a6e62" text-anchor="middle">make_obstacle()</text>
-  <text x="470" y="452" font-size="10" fill="#7a6e62" text-anchor="middle">make_character()</text>
+  <!-- what each factory method returns: one matched pair per factory -->
+  <line x1="189" y1="220" x2="226" y2="180" stroke="#8b1a1a" stroke-width="1.3"
+        stroke-dasharray="6,4" marker-end="url(#af-open)"/>
+  <line x1="189" y1="238" x2="226" y2="264" stroke="#8b1a1a" stroke-width="1.3"
+        stroke-dasharray="6,4" marker-end="url(#af-open)"/>
+  <line x1="711" y1="220" x2="674" y2="180" stroke="#8b1a1a" stroke-width="1.3"
+        stroke-dasharray="6,4" marker-end="url(#af-open)"/>
+  <line x1="711" y1="238" x2="674" y2="264" stroke="#8b1a1a" stroke-width="1.3"
+        stroke-dasharray="6,4" marker-end="url(#af-open)"/>
 
   <!-- GameElementFactory -->
-  <rect x="300" y="20" width="220" height="50" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="410" y="50" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">GameElementFactory</text>
+  <rect x="350" y="14" width="200" height="78" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <line x1="350" y1="46" x2="550" y2="46" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="450" y="36" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="middle">GameElementFactory</text>
+  <text x="450" y="66" font-size="11" fill="#7a6e62" text-anchor="middle">make_character()</text>
+  <text x="450" y="84" font-size="11" fill="#7a6e62" text-anchor="middle">make_obstacle()</text>
 
   <!-- concrete factories -->
-  <rect x="40" y="140" width="220" height="50" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="150" y="170" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">KittiesAndPuzzles</text>
+  <rect x="15" y="172" width="170" height="78" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <line x1="15" y1="204" x2="185" y2="204" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="100" y="194" font-size="12.5" font-weight="bold" fill="#1a1612" text-anchor="middle">KittiesAndPuzzles</text>
+  <text x="100" y="224" font-size="11" fill="#8b1a1a" text-anchor="middle">make_character()</text>
+  <text x="100" y="242" font-size="11" fill="#8b1a1a" text-anchor="middle">make_obstacle()</text>
 
-  <rect x="560" y="140" width="220" height="50" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="670" y="170" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">WarriorsAndWeapons</text>
+  <rect x="715" y="172" width="170" height="78" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <line x1="715" y1="204" x2="885" y2="204" stroke="#c8bfb0" stroke-width="1.3"/>
+  <text x="800" y="194" font-size="12.5" font-weight="bold" fill="#1a1612" text-anchor="middle">WarriorsAndWeapons</text>
+  <text x="800" y="224" font-size="11" fill="#8b1a1a" text-anchor="middle">make_character()</text>
+  <text x="800" y="242" font-size="11" fill="#8b1a1a" text-anchor="middle">make_obstacle()</text>
 
-  <!-- Character / Obstacle -->
-  <rect x="110" y="260" width="140" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="180" y="287" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Character</text>
+  <!-- Character hierarchy -->
+  <rect x="230" y="150" width="110" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="285" y="177" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Kitty</text>
 
-  <rect x="560" y="260" width="140" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="630" y="287" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">Obstacle</text>
+  <rect x="385" y="150" width="130" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="450" y="177" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Character</text>
 
-  <!-- concrete characters/obstacles -->
-  <rect x="40" y="360" width="120" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="100" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Kitty</text>
+  <rect x="560" y="150" width="110" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="615" y="177" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Warrior</text>
 
-  <rect x="200" y="360" width="130" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="265" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Warrior</text>
+  <!-- Obstacle hierarchy -->
+  <rect x="230" y="252" width="110" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="285" y="279" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Puzzle</text>
 
-  <rect x="490" y="360" width="120" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="550" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Puzzle</text>
+  <rect x="385" y="252" width="130" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="450" y="279" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Obstacle</text>
 
-  <rect x="650" y="360" width="150" height="44" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
-  <text x="725" y="387" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Weapon</text>
-
-  <text x="410" y="490" font-size="11.5" fill="#7a6e62" text-anchor="middle">Each concrete factory's two products are the matched pair GameEnvironment.play() relies on</text>
+  <rect x="560" y="252" width="110" height="42" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>
+  <text x="615" y="279" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">Weapon</text>
 </svg>
