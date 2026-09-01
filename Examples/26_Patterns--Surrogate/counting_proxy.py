@@ -24,8 +24,10 @@ if __name__ == "__main__":
     p.f()
     p.g()
     p.f()
+    print(p.f is p.f, p.f.__name__)
     print("calls:", p.calls)
 #: f()
 #: g()
 #: f()
+#: False counted
 #: calls: 3

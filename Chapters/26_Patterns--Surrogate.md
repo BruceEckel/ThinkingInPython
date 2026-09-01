@@ -511,11 +511,9 @@ Guarded(Document(), admin=True).erase()
 #: erased
 ```
 
-That refusal separates a *Proxy* from a *Decorator*:
-a decorator adds behavior around a call it always makes.
-This proxy decides whether to forward the call.
+`Guarded` requires `admin` privileges to call `erase()`.
 
-A *Smart reference* proxy adds behavior around each access without refusing any.
+A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
 This proxy names its implementation `_impl`, with one underscore,
 and so gives up the mangling that kept `proxy_2.py`'s attribute from colliding.
@@ -550,20 +548,35 @@ if __name__ == "__main__":
     p.f()
     p.g()
     p.f()
+    print(p.f is p.f, p.f.__name__)
     print("calls:", p.calls)
 #: f()
 #: g()
 #: f()
+#: False counted
 #: calls: 3
 ```
 
+`__getattr__()` returns a value, and here that value is a new function.
+`counted` closes over `attr`, the implementation's bound method,
+so the tally advances at the call, not at the lookup.
+An attribute that is not callable returns unchanged,
+so reading a data attribute counts nothing.
+
+Lookup fails on every `p.f`, so every access builds another `counted`.
+Two lookups of the same name therefore produce two different objects,
+and the wrapper reports its own name rather than the implementation's.
+Building a `counted` increments nothing.
+Only calling performs the increment,
+so the three lookups in the `print()` leave the tally at three.
+
 Python calls `__getattr__()` for any name the proxy and its class lack,
-and never for the proxy's own attributes.
+but not for the proxy's own attributes.
 The proxy therefore names no method of the implementation while still keeping state of its own.
 The same few lines serve lazy initialization (a *virtual proxy*), access checks
 (a *protection proxy*), or call tracking (a *smart reference*), over any object.
 
-The counting proxy's test confirms that a call reaches the implementation and returns its result,
+Testing confirms that a call reaches the implementation and returns its result,
 and that the proxy counts calls without counting an attribute read:
 
 ```python
@@ -657,9 +670,9 @@ if __name__ == "__main__":
 
 `run()` never changes and neither does `b`.
 Only the implementation the surrogate forwards to does.
-Here the client programmer calls `change_to()`.
-[State Machines](31_Patterns--State_Machines.md)
-makes each implementation choose its own successor,
+Here the client programmer calls `change_to()`, 
+but in a [State Machine](31_Patterns--State_Machines.md),
+each implementation chooses its own successor,
 so the surrogate advances without the client asking.
 
 The annotations that carry the implementation are all `Any`,
@@ -673,11 +686,13 @@ as [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
 the checker cannot verify a method that `__getattr__()` supplies.
 
 `Surrogate.__init__()` and `change_to()` are a choice.
-Annotating both parameters `Behavior` type-checks,
+Annotating both parameters with `Behavior` type-checks the listing on its own,
 and the checker then verifies every implementation that reaches either method.
 That annotation also ties the surrogate to one Protocol,
 and that tie is what the generic surrogate exists to avoid:
 `test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
+With `Behavior` on those parameters, `ty` rejects that test:
+`type StateA is not assignable to protocol Behavior`.
 Declaring the implementations instead,
 as `first: Behavior` and `second: Behavior` do,
 puts the check where it does not restrict the surrogate:
