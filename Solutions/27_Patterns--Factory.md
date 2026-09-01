@@ -158,7 +158,7 @@ GameEnvironment(GnomesAndFairies()).play()
 
 `GameEnvironment` never names `Kitty`, `Warrior`, `Puzzle`, or
 `Weapon` directly. It only calls `make_character()` and
-`make_obstacle()` on whatever `GameElementFactory` it was handed. A
+`make_obstacle()` on whatever `GameElementFactory` it receives. A
 third concrete factory slots in beside `KittiesAndPuzzles` and
 `WarriorsAndWeapons` with no change to `GameEnvironment` at all.
 
@@ -290,9 +290,9 @@ print(pb.build())
 ```
 
 In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
-momentarily. `__post_init__()` runs immediately after all fields are
-assigned and raises before the constructor call returns, so the
-five-topping combination is rejected atomically, before any code
+momentarily. `__post_init__()` runs immediately after the constructor
+assigns every field, and raises before that constructor call returns,
+so it rejects the five-topping combination atomically, before any code
 anywhere could hold a reference to a `Pizza` carrying it. This is
 [A Type Is a Set of Values](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
@@ -302,11 +302,11 @@ same guarantee: the fifth `.topping()` call raises before appending,
 so `self._toppings` itself never grows past four. Placing the check
 in `build()` instead changes this. The builder then accepts
 a fifth, sixth, or tenth `.topping()` call without complaint, silently
-accumulating an already-too-long list, and only discover the problem
+accumulating an already-too-long list, and only discovers the problem
 when `build()` finally runs. During that window, between the fifth
 `.topping()` call and the eventual `build()` call, the builder's own
 internal state (though never a `Pizza` object) already violates the
-rule the finished `Pizza` is supposed to guarantee. Checking in
+rule the finished `Pizza` must guarantee. Checking in
 `topping()` closes that window entirely. Checking only in `build()`
 leaves it open for as long as the caller keeps adding toppings.
 
@@ -367,7 +367,7 @@ print(extra_shapes.Circle.__name__)
 
 The registration happens on the `class Circle(Shape):` line in
 `extra_shapes.py`, and it runs while that `class` statement executes,
-which is while `extra_shapes` is being imported for the first time.
+which happens the first time something imports `extra_shapes`.
 Nothing else triggers it. `shape_registry` knows nothing about
 `extra_shapes` and never imports it, so until some other module does,
 `Shape.registry` is empty and every `make()` call raises `KeyError`.

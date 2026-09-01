@@ -47,7 +47,7 @@ class BrokenFactory:
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
-# ty: invalid-argument-type:
+# ty: expected "GameElementFactory", found "BrokenFactory":
 # GameEnvironment(BrokenFactory())
 g1.play()
 #: Kitty has encountered a Puzzle

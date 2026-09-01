@@ -9,8 +9,8 @@ But you must still create an object of your new type,
 and at the point of creation you must name the exact constructor.
 Thus, if the code that creates objects appears throughout your application,
 you have the same problem when adding new types.
-You must still find and edit every place in your code where the type matters.
-Creating the type matters here, not using it (which polymorphism handles).
+You must still find and edit every place in your code that names a concrete type.
+Creation names the type; use does not, because polymorphism handles use.
 The effect is the same:
 adding a new type means edits scattered through the code.
 
@@ -22,6 +22,12 @@ then you change only the factory when you add a new object.
 Since every object-oriented program creates objects,
 and since you will likely extend your program by adding new types,
 Factory might be the most common design pattern.
+
+This chapter covers the creational patterns of *GoF Design Patterns*:
+*Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
+The fifth, *Singleton*, has [its own chapter](24_Patterns--Singleton.md).
+All five answer the same question,
+which object to build and where the code that builds it lives.
 
 ## Simple Factory Method
 
@@ -107,12 +113,15 @@ To discourage direct construction of the concrete shapes,
 give them module-level names with a leading underscore:
 a convention rather than concealment, and the convention is all Python provides
 ([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case).
+The listing keeps the plain names because `shape_name_gen()` hands `cls.__name__` straight to `factory()`,
+so an underscore in the class name would have to appear in the `case` strings too.
 Nesting the classes inside `factory()` looks stronger and is worse.
 A `class` statement is executable code,
 so every call would define fresh `Circle` and `Square` classes:
 two shapes from different calls would share behavior but not a class,
 failing `type(a) is type(b)` and `isinstance()` alike,
-and `Shape.__subclasses__()` would no longer name the kinds.
+and `Shape.__subclasses__()` would be empty until the first call,
+then gain a duplicate `Circle` and `Square` on every call after that.
 
 ## The Pythonic Factory: a Dictionary
 
@@ -207,15 +216,6 @@ while `__init_subclass__()` runs for every class anywhere below `Shape`.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)
 uses this same self-registration.
 
-A dictionary of classes,
-whether you fill it by hand or the classes fill it themselves,
-is the ordinary Python factory.
-That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-describes: the pattern remains,
-but no longer needs a class hierarchy to express it.
-The remaining sections cover the classic object-oriented factories,
-for contrast.
-
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 In one file the registration runs before anything calls `make()`,
 but a subclass defined in another module registers itself only when something imports that module.
@@ -232,7 +232,7 @@ Import a plugin module eagerly when the import exists for its side effect.
 Because the registry keys on `cls.__name__` alone,
 two classes that share a name, from different modules,
 silently overwrite each other.
-Key on a qualified name when a collision is possible.
+Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
@@ -269,6 +269,15 @@ def test_unknown_name_raises() -> None:
     with pytest.raises(KeyError):
         make("Hexagon")
 ```
+
+A dictionary of classes,
+whether you fill it by hand or the classes fill it themselves,
+is the ordinary Python factory.
+That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+describes: the pattern remains,
+but no longer needs a class hierarchy to express it.
+The remaining sections cover the classic object-oriented factories,
+for contrast.
 
 ## Polymorphic Factories
 
@@ -345,6 +354,9 @@ if __name__ == "__main__":
 
 Now the factory methods are polymorphic:
 each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
+`ShapeMaker` is the shared factory base class *GoF Design Patterns* would derive each `Factory` from.
+Here it is a `Protocol`, so the two nested classes satisfy it without naming it,
+and `FACTORIES` is the annotation that makes the checker verify they do.
 `FACTORIES` maps each kind's name to an instance of its factory,
 and `create_shape()` looks that factory up and calls it right away.
 A more complex design would return the factory object to the caller,
@@ -535,7 +547,7 @@ class BrokenFactory:
 
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
-# ty: invalid-argument-type:
+# ty: expected "GameElementFactory", found "BrokenFactory":
 # GameEnvironment(BrokenFactory())
 g1.play()
 #: Kitty has encountered a Puzzle
@@ -551,8 +563,8 @@ and an `Obstacle` must supply `action()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`,
 and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
 With the Protocol, the checker reports the omission before the program runs,
-the earliest rung on the failure-time ladder [Surrogate](26_Patterns--Surrogate.md#proxy)
-climbed.
+earlier than the `TypeError` at construction that the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy)
+produced, and much earlier than the call-time `NotImplementedError` in `games.py`.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -605,6 +617,12 @@ The last three lines show the mistake, not the recommendation:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so changing that list through one object changes it for the other,
 with no error to signal it.
+
+`deepcopy()` copies everything it can reach,
+so a prototype holding an open file, a socket, or a lock raises a `TypeError`
+(`cannot pickle '_thread.lock' object`) instead of cloning.
+Define `__deepcopy__()` on such a class to say what the copy holds instead:
+a fresh connection, or nothing until the clone opens one.
 
 You can combine prototype with a registry.
 Instead of a registry of classes,
@@ -673,8 +691,7 @@ def test_prototype_untouched() -> None:
 
 ## Builder
 
-*Builder* is the last of the *GoF Design Patterns* creational patterns to cover
-([Singleton](24_Patterns--Singleton.md) has its own chapter):
+*Builder* is the last of the creational patterns:
 separate the construction of a complex object from its representation,
 assembling it in steps.
 In Java and C++ it takes the place of the *telescoping constructor*.
