@@ -17,7 +17,7 @@ This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
 which composes generators without any of them learning who drives.
 The next chapter builds an Effect system on all three,
-but nothing here depends on it.
+and this chapter stands on its own.
 
 ## Annotating a Generator
 
@@ -122,15 +122,12 @@ A returning generator also raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
 A `for` loop never sees that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
-Getting at the `ReturnType` means catching the exception yourself,
-as this listing does.
+To read the `ReturnType`, catch the exception yourself, as this listing does.
 
-The first call on a new generator object cannot carry a value.
 A newly created generator pauses at the top of the function body,
-before any code runs,
-so no suspended `yield` expression can receive a sent value.
-If you call `i.send(Answer("Alice"))` at that point,
-it raises `TypeError: can't send non-None value to a just-started generator`.
+before any code runs, so no `yield` expression is waiting to receive a value.
+The first call must therefore be `next()`:
+`i.send(Answer("Alice"))` at that point raises `TypeError: can't send non-None value to a just-started generator`.
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
@@ -156,8 +153,8 @@ The `# type: ignore` marks a real mismatch:
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
 The type checker rejects the priming `send()` even though the interpreter accepts it.
-The equivalence is a runtime fact the annotation cannot express,
-which is the practical reason a driver primes with `next()`.
+The equivalence holds only at runtime,
+and the annotation has no way to state it, so a driver primes with `next()`.
 
 The `NewType` definitions prevent accidental transposition.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
@@ -171,7 +168,7 @@ All three `question` variables receive an `Answer` where their declarations say 
 
 [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
 showed that calling an `async def` function runs nothing.
-It returns a coroutine: a description of work.
+The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`, and the match is deliberate.
 `async def` and generator functions both build descriptions that something else drives.
@@ -182,7 +179,8 @@ A generator is the more useful of the two here because the driver can be yours.
 A coroutine's requests go to the event loop.
 A generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
-That conversation makes an EMS possible.
+That conversation makes an Effect Management System possible,
+the EMS of [Effect Management](44_Effects--Effect_Management.md#effect-management-systems).
 The generator yields a *request*, and whatever drives it supplies the *answer*.
 Typically, a driver function steps the generator:
 
@@ -234,9 +232,9 @@ so the `# type: ignore` on that line suppresses the type checker's complaint.
 `send()`'s argument supplies the `Answer`,
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map keys on `Question` and holds `Answer`s.
-Only the `send()` call sits inside the `try`.
-Here `StopIteration` means the conversation finished,
-so any other code that could raise it, such as an exhausted answer source,
+Inside the `try`, `StopIteration` means the conversation finished,
+so only the `send()` call sits there.
+Any other code that could raise it, such as an exhausted answer source,
 belongs outside.
 
 The type checker verifies only two of those three parameters.
@@ -305,15 +303,15 @@ print(list(top()))
 Each `yield from` runs its target until that generator runs out,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The target decides how many values each delegation contributes.
-The `from` delegates:
-`yield one()` would hand the generator object to the driver as one value.
+The `from` is what delegates.
+Without it, `yield one()` would hand the generator object itself to the driver as a single value.
 "Exhausted" describes where the delegation ends, not when.
 Each value still leaves the inner generator only when the driver asks for the next one.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
 and the driver still receives one flat sequence.
-`top()`'s single `yield from` does not finish until every generator beneath it has.
+`top()`'s single `yield from` finishes only after every generator beneath it has.
 
 ### The Return Channel
 
@@ -397,10 +395,12 @@ because `yield from` passes the inner generator's yield and send channels throug
 
 The numbers travel down to the `yield` that asked for them.
 `g.send(1)` arrives inside `collect("alpha")`, two frames below the driver.
-`both()` contains no code that forwards the value because `yield from` forwards it.
+`both()` needs no forwarding code of its own,
+because `yield from` does the forwarding.
 
-`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish,
-which completes the first `yield from`, which starts the second one.
+`g.send(2)` supplies alpha's second value.
+That lets `collect("alpha")` finish, finishing completes the first `yield from`,
+and completing it starts the second.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` runs out of delegations.
 
@@ -495,12 +495,12 @@ The answer `drive()` sends back arrives inside `ask()`,
 which also knows nothing about where it originated.
 A single loop at the edge of the program interprets Effects yielded anywhere inside it.
 `yield from` also returns the inner generator's value,
-which is why `name` and `town` read like ordinary assignments.
+and that is why `name` and `town` read like ordinary assignments.
 
 ### Composing Is Not Interpreting
 
 `drive()` and `yield from` both step a generator and both finish at `StopIteration`,
-which makes them easy to confuse.
+so they are easy to confuse.
 Delegation can take over the job the previous listing gave to `drive()`:
 
 ```python
@@ -540,10 +540,10 @@ so the call merges one more pair into `ANSWERS` with the dictionary union operat
 `yield from` replaces `drive()` as the consumer of `interview()`,
 but not as its runner.
 Something must still call `next()` and `send()` at the top,
-which is why the example ends with a `drive()` call.
+and that is why the example ends with a `drive()` call.
 However deep you stack delegations, the number of drivers stays at one.
 
-They differ in how they respond to a request.
+`drive()` and `yield from` differ in how they respond to a request.
 `drive()` answers it: a `Question` comes out, the driver looks it up,
 and the request stops there.
 `yield from` answers nothing.
@@ -625,7 +625,7 @@ The output interleaves the two tasks,
 though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.
 
-None of this is exotic, and you have run a driver like `drive()` many times.
+You have run a driver like `drive()` many times.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 presented `await` and the event loop as a way to overlap waiting,
 and left the mechanism alone.
@@ -635,8 +635,8 @@ A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
 `await` suspends the coroutine and hands a request out to the loop,
 which supplies the answer once it has one and resumes the coroutine by sending it back.
-`asyncio.run()` is the single interpreter at the edge of the program,
-which is why an `await` in a function makes every caller `async` in turn:
+`asyncio.run()` is the single interpreter at the edge of the program.
+That is why an `await` in a function makes every caller `async` in turn:
 the requests must reach the loop.
 
 Once you see a program that way,

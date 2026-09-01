@@ -9,7 +9,7 @@ A type checker verifies that every caller either absorbs an Effect or declares i
 Every Ability so far came from the library: the `Need` that `supply()` answers,
 and the `Async` that `run()` awaits.
 This chapter opens by writing an Ability from scratch,
-which shows it is an ordinary class rather than a special form.
+and that Ability turns out to be an ordinary class rather than a special form.
 The rest of the chapter applies the machinery:
 
 - Handlers that make an unpredictable source testable
@@ -105,12 +105,12 @@ The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
 and the program still runs,
 but under `ty` 0.0.75 the answer comes back as `Unknown` and the checking quietly stops.
-The accessor pins it down.
-The `answer: str` inside `ask()` does that job.
+The accessor pins the answer type down,
+at the `answer: str` binding inside `ask()`.
 `yield from Ask(prompt)` produces `Unknown` there too,
-so the annotation is an assertion the type checker takes on faith rather than a type it worked out.
-`Ability[str]` is where the claim comes from,
-and writing it at the binding keeps the accessor's claim in one place,
+so that annotation is an assertion the type checker accepts rather than a type it worked out.
+Its justification is `Ask`'s base, `Ability[str]`,
+and the binding is the one place the accessor states the type,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
@@ -123,7 +123,7 @@ before it examines any `yield`,
 because `Console` is not assignable to `Ability[Any]`.
 
 `handle()` reads the annotation on its argument to decide which Ability it answers,
-which is why `scripted` and `capture` must annotate their parameters.
+so `scripted` and `capture` must annotate their parameters.
 If you leave the annotation off,
 `handle()` raises a `ValueError` at the point of decoration,
 since nothing names the type a request must match.
@@ -146,7 +146,7 @@ An Effect is a generator, so nothing stops you from driving one yourself,
 which `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
 did.
 `next()` on `greet("Alice")` produced a `Need` object carrying the requested type,
-as `interview()` yielded `"name"`, and `send(Console())` resumed the body,
+the way `interview()` yielded `"name"`, and `send(Console())` resumed the body,
 which printed the greeting and finished.
 Every tool in the library packages those two calls.
 `handle()` is `drive()` with a type lookup in place of the dictionary,
@@ -204,9 +204,9 @@ print(4_000 < heads < 6_000)
 
 `count_heads()` needs a `Flip` and produces an `int`.
 Its body contains no `random` call, no seed, and no parameter for either.
-`Flip` carries no data, so it needs no fields.
-`Ask` and `Tell` each carry the payload the request must deliver.
-The Ability's whole content is its type and the `bool` it produces.
+`Flip` carries no data, so it needs no fields,
+whereas `Ask` and `Tell` each carried a payload the request had to deliver.
+`Flip`'s whole content is its type and the `bool` it produces.
 
 The parentheses in `if (yield from flip()):` are mandatory.
 A `yield` expression can appear on the right side of an assignment,
@@ -405,8 +405,9 @@ They differ in whether midnight falls between them.
 `crossing` follows the same pattern as `scripted` in `coin_toss.py`.
 It walks a fixed list, so it holds state between requests,
 which is how it answers the same question two ways.
-A supplied instance cannot do this, and neither can `frozen` or `tomorrow`,
-since each reports one moment however often you ask.
+A supplied instance answers every request the same way,
+and so do `frozen` and `tomorrow`,
+each reporting one moment however often you ask.
 
 Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations),
 which made randomness repeatable a different way, by taking a `seed` parameter.
@@ -503,7 +504,7 @@ def draw(source: Source, hour: int) -> None:
 ```
 
 `Outlet` is an Ability whose handler returns a `Source`,
-and it carries the hour so the handler can consult the conditions at that moment.
+and the request carries the hour so the handler can consult the conditions at that moment.
 `Ask` carried a prompt for the same reason.
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
@@ -621,7 +622,7 @@ The backup covers the last.
 Four implementations, one Ability, one running program.
 
 `run_load()` names none of them,
-which is why the second run tells a different story from the same code.
+and that is why the second run tells a different story from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid picks up at 19:00.
 Reordering that tuple is the whole difference between the two runs.
@@ -632,7 +633,7 @@ The load's declared dependency does not change.
 `Depend[Outlet, None]` says it needs an `Outlet` from the first hour to the last,
 and that type appears once.
 What changes is the object answering the need, four times, mid-run.
-Binding a dependency before the program starts cannot express this,
+A dependency bound before the program starts cannot express that change,
 because no single answer stays right for the whole run.
 Here the binding is a function call, so it reads the world at each request.
 [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
@@ -827,7 +828,7 @@ and the decorator lifts what they raise into the channel.
 `topic_of()` needs nothing and touches nothing, so it declares no Ability.
 
 `fetch()` and `look_up()` take their dependencies as parameters,
-which makes them ordinary functions rather than generator functions.
+so they are ordinary functions rather than generator functions.
 That is a choice, not a requirement.
 `@throws` decorates a function returning an Effect,
 so the request and the failure can live in one function:
@@ -846,7 +847,8 @@ def fetch_headline() -> Depend[Need[Feed], str]:
 The decorator adds the error the same way it did for `score()` in [The Error Channel](46_Effects--Stateless.md#the-error-channel).
 `ty` reports `fetch_headline` as `() -> Generator[Need[Feed] | Unavailable, Any, str]`,
 which is `Effect[Need[Feed], Unavailable, str]`.
-`research()` splits the two because a function that only transforms its arguments is easier to test on its own,
+`research.py` keeps the request and the failure in separate functions,
+because a function that only transforms its arguments is easier to test on its own,
 and because the split keeps the Ability requests in one place.
 Either shape type-checks and either propagates correctly.
 
@@ -942,7 +944,8 @@ and here a scenario is nothing more than arguments to `supply()`.
 Every printed line in that trace comes from a supplied implementation,
 because the pipeline holds no output of its own.
 The second run also stops after `feed: fetching`.
-`topic_of()` yields a `NotInteresting`, which ends `research()` where it stands,
+`topic_of()` yields a `NotInteresting`,
+and that failure ends `research()` where it stands,
 so the `need(Encyclopedia)` two lines below it does not run and no one consults a library.
 `catch()` receives that failure and `report()` matches on it as a value,
 which is why the run still prints a message.
@@ -961,7 +964,7 @@ If you annotate `report()` as `Success[str]`,
 `ty` names the `yield from` that still carries `Need[Feed] | Need[Encyclopedia]`.
 `supply()` empties that half, and `run()` accepts what remains.
 
-`outcome()` also earns its annotations.
+`outcome()`'s parameter annotations also do a job.
 `Wire` and `Library` are structural implementations,
 so `supply(Wire(...), Library(...))` builds handlers for `Need[Wire]` and `Need[Library]`,
 the mismatch that [Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)
@@ -1012,13 +1015,14 @@ def research_and_report(
 ```
 
 `topic_of()` appears again in full because `research.py`'s version carries a decorator:
-it returns an Effect, and ordinary `try`/`except` code cannot call it directly.
+the decorated version returns an Effect,
+and ordinary `try`/`except` code cannot call it directly.
 
 Three lines of work sit inside nine lines of handling.
 The pipeline is in there, but you have to look for it.
 The Effect version moves those nine lines into `report()`,
 one `match` over the failures instead of a `try` at each step.
-The name records the merge the by-hand version cannot avoid:
+The name `research_and_report()` records the merge the by-hand version forces:
 `research()` and `report()` in one function.
 
 Both versions short-circuit.
@@ -1029,7 +1033,7 @@ The comparison has limits.
 At this size the by-hand version is respectable,
 and a reader who prefers it is not making a mistake.
 Two differences outlast the size argument.
-Its signature, `(Feed, Encyclopedia) -> str`,
+The by-hand signature, `(Feed, Encyclopedia) -> str`,
 mentions none of the three failures,
 so a fourth one can arrive with nothing to tell the caller.
 And the handling interleaves with the logic:
@@ -1101,7 +1105,7 @@ No decorator takes part and nothing raises an exception.
 and the driver takes it from there.
 Execution does not come back: a driver that receives a failure stops sending,
 so anything after a `yield from throw(...)` is unreachable,
-which the `Never` in its type records.
+and the `Never` in its type records that.
 
 The difference between the doors is what the type checker can see.
 If you change `Empty()` to some undeclared exception,
@@ -1176,7 +1180,7 @@ That is why `bound` has a name,
 and it is the gap [The type checker can give up quietly](#the-type-checker-can-give-up-quietly)
 takes apart.
 
-Choosing between the two decides what a new failure does.
+The choice between `catch()` and `catch_all()` decides what happens when a new failure appears.
 When `research()` gains a fourth error,
 `report()`'s named `catch()` leaves it in the channel,
 so `report()`'s declared type no longer matches and `ty` points at the `yield from`:
@@ -1192,9 +1196,9 @@ Without such a guard, the new failure becomes a value that flows on unexamined.
 Two cautions.
 `catch_all` comes from `stateless.effect`,
 since the package root does not export it.
-And it widens nothing about the guarantee:
-a failure that `@throws` did not lift is not in the channel,
-so `catch_all()` passes it by as readily as `catch()` does.
+And it leaves the guarantee where it was:
+`catch_all()` sees only what `@throws` lifted into the channel,
+and passes an unlifted failure by as readily as `catch()` does.
 
 ## Dependencies That Need Dependencies
 
@@ -1302,7 +1306,7 @@ Stateless has no such thing.
 `supply()` matches instances that exist,
 and `handle()` answers an Ability with an ordinary function,
 so a constructor cannot be an Effect.
-That is the shape of the listing above.
+That is why `bakery.py` has the shape it has.
 Leaves bind at the edge, products come from an explicit `yield from`,
 and the graph you can read is the union in the signature.
 
@@ -1498,7 +1502,7 @@ because the pairing lives inside the class.
 `supply()` takes a flat list and checks each argument against one Ability,
 not against the others.
 The matched set comes back only if you write it down,
-which `kitties_and_puzzles()` does.
+and `kitties_and_puzzles()` does.
 The guarantee moved from a class hierarchy into a two-line function.
 Know which of those you are getting.
 
@@ -1520,9 +1524,9 @@ matches arguments
 
 The call still runs correctly, since the implementation is variadic,
 but the checking on which this chapter relies disappears.
-Two chained handlers keep it: `supply()` the first five,
+Two chained handlers keep the checking: `supply()` the first five,
 apply that to the Effect, then `supply()` the rest to what remains,
-which is the layered supply of [Dependency Injection](46_Effects--Stateless.md#dependency-injection).
+the layered supply of [Dependency Injection](46_Effects--Stateless.md#dependency-injection).
 Nine is also a fair warning about the design.
 An Effect that asks for ten separate things is usually two Effects.
 
@@ -1643,7 +1647,7 @@ which is why the third run catches `RetryError` rather than `Crashed`.
 And `Need[Time]` arrived, which is why `supply()` gained a `Time()`.
 Retrying is not free: it needs a clock, and the signature says so.
 If you leave the `Time()` out, `ty` rejects the `run()` call.
-This is the thesis of both chapters applied to a cross-cutting concern.
+That change is the thesis of both chapters applied to a cross-cutting concern.
 Adding retry to a hundred call sites in a system with untracked Effects changes nothing you can see.
 Here it changes a type, and every caller learns about the new dependency.
 
@@ -1771,7 +1775,7 @@ That comes from the two loops.
 `squares()` forks every task before it waits for any of them,
 so the five sleeps overlap.
 Forking and waiting inside a single loop makes each `wait()` block on the task the same iteration just created,
-which runs the sleeps one after another and takes about five times as long.
+so the sleeps run one after another and take about five times as long.
 The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
 Supplying a `ProcessPoolExecutor` instead moves the same work into processes,
@@ -1796,7 +1800,7 @@ so either a resource lives in a `with` block outside the Effect,
 as the pool does here, or the supplied object owns it:
 the library's own `Files` class opens and closes a file inside a single `read_file()` call.
 What you cannot express is acquiring a resource in one Effect and releasing it after a later one finishes,
-which is the flat resource management a native Effect system provides.
+the flat resource management a native Effect system provides.
 Python's own answer to that is `ExitStack` in [Combining Context Managers](15_Techniques--Context_Managers.md#combining-context-managers),
 which holds a set of managers decided at runtime and unwinds them together.
 It flattens the nesting without knowing anything about Effects,
@@ -1993,7 +1997,7 @@ a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
 That makes two type-checker gaps: the nested handler expression here,
 and the direct Ability yield that types as `Unknown`.
-Each has the same shape.
+Both have the same shape.
 The library's types ask the type checker a hard inference question,
 and where the type checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
@@ -2023,7 +2027,7 @@ The ceiling is the substrate rather than the design.
 A Python generator is one-shot, so a handler has nothing to resume twice.
 
 Two pieces of the library show that ceiling.
-`Effect[A, E, R]` carries a separate `E` that `@throws` and `catch()` work.
+`Effect[A, E, R]` carries a separate `E` that `@throws` fills and `catch()` empties.
 Koka needs no such type parameter,
 because an exception there is an ordinary Effect whose handler declines to resume.
 The extra type parameter exists because a Stateless Ability cannot fail,
@@ -2062,7 +2066,7 @@ The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,
 with no exponential backoff and no jitter.
 Stateless provides no timeout, no `race`, no fallback combinator,
-and no finalizer, which rules out the hedging strategy that races a delayed second request.
+and no finalizer, and the missing `race` rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
 Forking two Effects that share the `Cell` of [State as an Ability](#state-as-an-ability)
 produces a race no type reports,
@@ -2079,7 +2083,8 @@ and that is different from a platform for building distributed systems.
 argued that Effects are the next scaling barrier,
 and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
-which is the value of studying it, whether or not you use it in production.
+and that is the value of studying the library,
+whether or not you use it in production.
 
 Consider the signatures once more:
 
@@ -2115,13 +2120,14 @@ and `yield from` is one operator for joining two Effects.
 `research()` joined five steps of two kinds with that one operator,
 once `@throws` had brought the ordinary functions in at the boundary.
 `Async` is one more Ability in the same channel rather than a second viral annotation.
-Resource lifetime is the concern this does not absorb.
+Resource lifetime is the one concern the Effect type does not absorb.
 Stateless has no scoping mechanism, so `with` blocks stay where they are.
 They need not stay nested, since `ExitStack` flattens them,
 but they remain a separate mechanism from the Effect type.
 
-What Stateless requires for that property is the generator discipline,
-the description/execution split, and an ecosystem that has never heard of it.
+The price of that property is the generator discipline,
+the description/execution split,
+and an ecosystem that has never heard of either.
 For most Python code that price is too high.
 The techniques in [Converting Effectful to Pure](44_Effects--Effect_Management.md#converting-effectful-to-pure)
 (returning a `Result`, restricting a type so bad values cannot exist, and passing dependencies in rather than constructing them)
