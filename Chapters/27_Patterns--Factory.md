@@ -510,9 +510,9 @@ Every concrete class must inherit from `Obstacle`, `Character`,
 or `GameElementFactory`.
 Each `raise NotImplementedError` body marks a method that a concrete class must override.
 Marking is all it does.
-Define a factory class with `make_character()` and stop there:
-creating an instance of it still succeeds,
-and the error arrives when `GameEnvironment.__init__()` calls `make_obstacle()`.
+Python accepts a concrete factory that leaves out `make_obstacle()`,
+and accepts its instances too.
+The exception waits for `GameEnvironment.__init__()` to call the method.
 An `@abstractmethod` moves that error earlier, to the factory's own constructor,
 the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
 A *Protocol* only names the methods a type must supply, without a base class,
