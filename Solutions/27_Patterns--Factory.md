@@ -59,7 +59,7 @@ s.erase()
 #: Triangle.erase
 ```
 
-`shape_factory2.py`'s polymorphic version instead needs a `Triangle`
+`shape_factory2.py`'s factory-object version instead needs a `Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of it (shown here with only the new
 shape. In the chapter file the entry joins `Circle`'s and

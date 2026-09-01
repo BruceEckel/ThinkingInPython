@@ -233,6 +233,9 @@ Because the registry keys on `cls.__name__` alone,
 two classes that share a name, from different modules,
 silently overwrite each other.
 Key on `f"{cls.__module__}.{cls.__qualname__}"` when a collision is possible.
+The registry also never forgets:
+a class defined inside a function or a test stays in the table,
+and the strong reference keeps it alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the MRO,
@@ -279,22 +282,18 @@ but no longer needs a class hierarchy to express it.
 The remaining sections cover the classic object-oriented factories,
 for contrast.
 
-## Polymorphic Factories
+## Factory Objects
 
 Because the static `factory()` method in `shape_factory1.py` collects all the creation operations in one method,
 that's the only place you need to change the code.
-*GoF Design Patterns*, however,
-emphasizes that the *Factory Method* pattern exists so you can subclass different factories from the basic factory
-(the design in `shape_factory1.py` is a special case).
-For its sample code,
-*GoF Design Patterns* reuses the maze example from the *Abstract Factory*
-(the next section covers that pattern),
-subclassing the game to override its factory methods.
-This version of `shape_factory1.py` moves the factory methods into separate classes and calls them polymorphically:
+The next step gives each of those operations its own object.
+A *factory object* carries a single `create()` method,
+so choosing what to build becomes choosing which object to ask,
+rather than passing a string to a `match`:
 
 ```python
 # shapefact2/shape_factory2.py
-# Polymorphic factory methods.
+# One factory object per shape.
 import random
 from collections.abc import Iterator
 from typing import Final, Protocol, override
@@ -352,21 +351,25 @@ if __name__ == "__main__":
 #: Square.erase
 ```
 
-Now the factory methods are polymorphic:
-each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
-`ShapeMaker` is the shared factory base class *GoF Design Patterns* would derive each `Factory` from.
+Each type of shape defines its own nested `Factory` class whose `create()` method builds an object of that type.
+`ShapeMaker` is the interface those factories share.
 Here it is a `Protocol`, so the two nested classes satisfy it without naming it,
-and `FACTORIES` is the annotation that makes the checker verify they do.
+and the `FACTORIES` annotation makes the checker verify they do.
 `FACTORIES` maps each kind's name to an instance of its factory,
 and `create_shape()` looks that factory up and calls it right away.
 A more complex design would return the factory object to the caller,
 who could keep it and construct objects from it later.
-Much of the time, however, you don't need the polymorphic factory method,
-and a single static method in the base class (as in `shape_factory1.py`)
-is enough.
+Much of the time, however, a single static method in the base class
+(as in `shape_factory1.py`) is enough.
+
+This is not yet the *Factory Method* pattern of *GoF Design Patterns*,
+which puts the creation method on a class and lets subclasses override it.
+`GameElementFactory` in the next section is that form:
+`make_character()` is a factory method,
+and each concrete factory overrides it to name a different type.
 
 A `Factory` class nested in every shape is machinery Python does not need,
-kept here to show the structure *GoF Design Patterns* intends.
+kept here because it is the shape a factory-object design takes in a language where a class is not an object you can store.
 The registry in `registry.py` does the same job with no nested classes.
 Write a separate factory class when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
@@ -382,7 +385,7 @@ Exercise 8 runs the attack against both.
 ## Abstract Factories
 
 The *Abstract Factory* pattern has the same structure as the factory objects in `shape_factory2.py`,
-with not one but several factory methods.
+with not one but several factory methods, each overridden in a concrete factory.
 Each factory method creates a different kind of object.
 When you create the factory object,
 you choose the concrete version of every object that factory creates.
@@ -747,7 +750,19 @@ Because each setter returns `self`,
 annotated with `Self` from [Static Types](08_Foundations--Static_Types.md#the-self-type),
 the calls chain.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
-The class works and reads well, but it solves a problem Python does not have.
+
+The builder is single-use, and nothing in it says so.
+`build()` reads `self._toppings` without clearing it,
+so a second `build()` on the same builder returns a pizza carrying the first one's toppings,
+and every `.topping()` call in between adds to that same list.
+The chained call in `__main__` hides the problem by throwing the builder away on the same line that creates it.
+Making the builder reusable means resetting the fields in `build()`,
+which then breaks the other reasonable expectation,
+that you can configure a builder once and build from it twice.
+A Java or C++ Builder carries the same ambiguity.
+The pattern does not settle it, and each implementation picks a side.
+
+Even without that ambiguity, the class solves a problem Python does not have.
 Keyword arguments with defaults are the built-in builder:
 
 ```python
@@ -848,7 +863,7 @@ Match the machinery to what varies:
   use Builder.
   When the "steps" are optional values, keyword arguments are the builder.
 
-The static `factory()` method and the nested-`Factory`-class dispatcher are here because *GoF Design Patterns* describes them,
+The static `factory()` method and the nested-`Factory`-class dispatcher are here because the object-oriented tradition writes factories that way,
 not because Python needs them.
 Both exist to work around languages where a class is not an object you can put in a dictionary.
 

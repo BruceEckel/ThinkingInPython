@@ -48,7 +48,7 @@ Use this one when you know the problem but not the name.
 |---------|--------|
 | [Abstract Factory](27_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
 | [Builder](27_Patterns--Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
-| [Factory Method](27_Patterns--Factory.md#polymorphic-factories) | Defer instantiation to a method so subclasses choose the concrete type. |
+| [Factory Method](27_Patterns--Factory.md#simple-factory-method) | Defer instantiation to a method so subclasses choose the concrete type. |
 | [Prototype](27_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |
 | [Singleton](24_Patterns--Singleton.md) | Ensure a class has one instance with a single point of access. |
 
