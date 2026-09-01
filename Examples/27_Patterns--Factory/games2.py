@@ -1,5 +1,4 @@
 # games2.py
-# Simplified Abstract Factory.
 from typing import Protocol
 
 class Obstacle(Protocol):
