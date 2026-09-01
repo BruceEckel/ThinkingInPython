@@ -510,7 +510,7 @@ develops that pair of calls into a technique.
 Each one lists the methods its subclasses must supply,
 and each method body is `raise NotImplementedError`,
 a placeholder for the real method a subclass writes.
-A placeholder raises only when something calls it.
+A placeholder raises an exception only when something calls it.
 Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class and creates instances of it.
 The exception appears only when `GameEnvironment.__init__()` calls the placeholder.
@@ -584,8 +584,8 @@ a `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
 and an `Obstacle` must supply `description()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
-Uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
-and the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
+If you uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
+the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
 
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy),
