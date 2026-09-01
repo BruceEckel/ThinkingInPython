@@ -18,7 +18,7 @@ class Safe:
         finalize(self, print, name, "closed")
 
 leaky, safe = ref(Leaky("L")), ref(Safe("S"))
-gc.collect()
 #: S closed
+gc.collect()
 print(leaky() is None, safe() is None)
 #: False True

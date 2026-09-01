@@ -76,16 +76,14 @@ three more pairs of lines follow the last one above:
     Last Counter object deleted
 
 That was one run on one machine.
-Running the same file under this book's output checker,
-which executes every chapter in a single process,
-finalizes the three objects in the opposite order.
+This book's output checker, which executes every chapter in a single process,
+finalizes the same three objects in the opposite order.
 
 The order in which the three `__del__()` methods run is an implementation detail.
 It depends on how the interpreter tears down the `counters` list at shutdown,
 and it can differ from one CPython build to the next.
 Another implementation, such as PyPy with a tracing garbage collector,
-could destroy the objects in a different order,
-or not run the finalizers before exiting.
+could destroy the objects in a different order, or skip the finalizers at exit.
 
 So `__del__()` is fragile:
 the language specifies neither when it runs nor whether it runs.
@@ -118,7 +116,7 @@ The Python documentation warns:
      against 3.15.0rc1. -->
 
 In the direct run, shutdown destroys the objects,
-which is the precarious moment the warning describes.
+and shutdown is the precarious moment the warning describes.
 `Counter` and `print()` were still available, so the output came out cleanly,
 but nothing guarantees the teardown order that allowed it.
 `__del__()` should do as little as possible, and you should not depend on it.
@@ -149,9 +147,9 @@ A `close()` call in a `with` block fails loudly instead.
 
 ## Reference Cycles Delay Destruction
 
-Unpredictable timing is not the only problem with `__del__()`.
+Unpredictable timing is one of two problems with `__del__()`.
 An object that refers to itself, directly or through another object,
-does not go away at the moment it becomes unreachable:
+outlives the moment it becomes unreachable:
 
 ```python
 # cycle.py
@@ -199,7 +197,7 @@ so a cycle now costs only the delay.
 
 Cycles are a second reason not to put cleanup in `__del__()`:
 one back-reference between two objects is enough to postpone it,
-and the code that creates the cycle is often not the code that owns the resource.
+and the code that creates the cycle often lives far from the code that owns the resource.
 
 ## Reliable Alternatives
 
@@ -284,14 +282,14 @@ print("End of program")
 `finalize()` registers `print(name, "closed")` to run at `a`'s destruction.
 The callback receives `name`, not the `Connection`,
 so registering the cleanup does not keep the object alive.
-`finalize(self, self.close)` looks tidier but defeats this:
+`finalize(self, self.close)` looks tidier and defeats that separation:
 the bound method holds a strong reference to the object,
-which then survives until the program ends.
+so the object survives until the program ends.
 `close()` runs the callback immediately.
 The second `close()` does nothing: a finalizer runs at most once,
 and `alive` reports whether it still can.
-`del b` destroys the object here, where the `del c` in `cleanup.py` did not,
-because `b` held the only reference to it.
+`b` holds the only reference to its `Connection`,
+so `del b` destroys the object here, where the `del c` in `cleanup.py` did not.
 Nobody calls `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
 For an object still alive when the program ends,
@@ -321,19 +319,20 @@ class Safe:
         finalize(self, print, name, "closed")
 
 leaky, safe = ref(Leaky("L")), ref(Safe("S"))
-gc.collect()
 #: S closed
+gc.collect()
 print(leaky() is None, safe() is None)
 #: False True
 ```
 
 A `ref()` is a weak reference: it watches its object without keeping it alive,
 and it reports `None` once the object disappears.
-So `False True` says the collector reclaimed `Safe` but not `Leaky`.
-`Safe` printed as the collector reclaimed it.
+So `False True` says the interpreter reclaimed `Safe` and kept `Leaky`.
+`Safe` printed `S closed` at the `ref()` line:
+reference counting reclaimed it there, before `gc.collect()` ran.
 `Leaky` printed nothing, because its callback never ran and nothing failed.
-Turning `atexit` off on `Leaky`'s finalizer narrows the listing to the question at hand,
-whether the collector reclaimed the object,
+The listing turns `atexit` off on `Leaky`'s finalizer,
+so the question it answers is whether the collector reclaimed the object,
 rather than whether the callback eventually ran at exit.
 
 ## Watching Objects Without Holding Them
@@ -380,7 +379,7 @@ print(Counter.live_count())
 
 A `WeakSet` would do for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
-which [Flyweight](35_Patterns--Flyweight.md) does with a pool keyed by name.
+and [Flyweight](35_Patterns--Flyweight.md) does that with a pool keyed by name.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,
 and one would then displace the other.
@@ -396,15 +395,13 @@ The count falls `3, 2, 1, 0` as the list releases the objects,
 with no `__del__()` and no explicit cleanup call.
 
 A `dict` or `list` as the registry keeps every instance alive forever,
-so the count cannot fall.
+so the count never falls.
 The weak reference lets the registry prune itself.
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
-the entries disappear only when its collector runs,
-so the counts do not fall promptly.
-Unlike the `__del__()` version,
-this listing reads the count during normal execution,
-so it does not depend on the unreliable bookkeeping at interpreter shutdown.
+the entries disappear when its collector runs, so the counts fall late.
+This listing reads the count during normal execution,
+where the `__del__()` version waited for interpreter shutdown and its unreliable bookkeeping.
 
 ## The Rule
 

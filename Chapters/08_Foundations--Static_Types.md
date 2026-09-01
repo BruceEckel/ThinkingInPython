@@ -3,13 +3,13 @@
 C++ and Java require type declarations,
 and they check those types during compilation.
 The Python runtime checks types only when an operation runs.
-The examples up to this point have gone almost entirely without type declarations,
-which you might not miss on small programs.
+The examples so far have used almost no type declarations,
+and on a small program you may not miss them.
 
 Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
-The Python runtime ignores type hints.
-It evaluates them only when something asks for them.
+The Python runtime never acts on a type hint.
+It stores the hint and evaluates it only when something asks.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool
 (this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
@@ -20,8 +20,8 @@ You can add type hints one function at a time.
 Code without annotations still works.
 The type checker treats it as the type `Any`,
 which is compatible with everything.
-Thus, typed and untyped code can coexist.
-This is *gradual typing*.
+Thus, typed and untyped code can coexist,
+and that coexistence is *gradual typing*.
 You can slowly add hints where they earn their keep: the public interfaces,
 the tricky data, the code on which other people depend.
 An explicit `Any` indicates that a value is truly dynamic.
@@ -29,12 +29,12 @@ An explicit `Any` indicates that a value is truly dynamic.
 to distinguish it from an `Any` you wrote yourself.
 They behave the same: both are compatible with everything.
 
-`Any` is not the same as `object`.
+`Any` and `object` differ.
 Both accept every value,
 but `object` guarantees nothing about the value once you have it,
 so the type checker rejects every operation you try on it.
-`Any` accepts every value and then permits every operation,
-which makes it an opt-out rather than a wide type.
+`Any` permits every operation instead,
+and that permission makes it an opt-out rather than a wide type.
 
 ## Type Hints
 
@@ -62,7 +62,7 @@ Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
 A function that returns nothing declares `-> None`,
-which is why every `__init__()` in this chapter's listings ends that way.
+and that is why every `__init__()` in this chapter's listings ends that way.
 
 ## The Type Checker: `ty`
 
@@ -74,7 +74,7 @@ You need a tool to check them:
 `uvx ty check` runs it without installing anything,
 and `uv tool install ty@latest` puts it on your path.
 
-It complains where the hints and the code disagree,
+`ty` complains where the hints and the code disagree,
 and stays quiet when they agree.
 This book checks every runnable example this way.
 The build runs `ty` on every change,
@@ -129,8 +129,8 @@ a neighboring `# ty:` comment summarizes what the type checker reports for it.
 ## Narrowing {#narrowing}
 
 A union type covers every case until you rule some out.
-Testing `is not None` on an `X | None` value proves it to the type checker,
-not just to you:
+Testing `is not None` on an `X | None` value proves to the type checker,
+and not just to you, that the value is an `X`:
 
 ```python
 # narrowing.py
@@ -154,7 +154,7 @@ or an identity test against a specific value such as `is not SOME_SENTINEL`.
 
 ## Constants with Final
 
-Marking a value `Final` catches accidental reassignments during type checking.
+`Final` on a name makes the type checker catch an accidental reassignment.
 
 The naming convention in [Tour](02_Foundations--Tour.md#naming-conventions)
 uses ALL_CAPS to signal a constant, but that is only a hint to human readers.
@@ -182,8 +182,8 @@ The type checker refuses only an assignment to the name.
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
 The rest of the book uses the explicit `Final[T]` form,
-which declares the intended type instead of accepting whatever the initializer produces.
-The difference emerges when the initializer's own type is not the type you mean.
+and that form declares the intended type instead of accepting whatever the initializer produces.
+The two forms part ways when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
 so the type checker ignores whatever goes into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
@@ -324,8 +324,9 @@ so `type(grid)` in the same file returns `dict` as it always has.
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
-(To create a distinct type the type checker keeps separate, use `NewType`, listed in the summary below.)
-That is why an alias belongs on a compound shape and not on a bare rename:
+(To create a distinct type the type checker keeps separate, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
+Because an alias adds no distinctness,
+it belongs on a compound shape rather than on a bare rename:
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
@@ -352,9 +353,8 @@ This function works on a list holding any type.
 A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
-`Any` cannot express that connection.
-It accepts any list,
-but the return type then says nothing about what the list holds.
+`Any` loses that connection: it accepts any list,
+and the return type then says nothing about what the list holds.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -402,7 +402,7 @@ A bound constrains the parameter.
 ### Variance {#variance}
 
 A `list[Circle]` is not a `list[Shape]`,
-which surprises most people the first time:
+and that surprises most people the first time:
 
 ```python
 # variance.py
@@ -429,7 +429,7 @@ print(count(circles))
 
 A `list` accepts writes.
 `add_square()` would append a `Shape` to a list its caller believes holds only circles.
-Refusing the call prevents that.
+The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
@@ -439,7 +439,7 @@ A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 ### Type Parameter Defaults {#type-parameter-defaults}
 
 A type parameter can carry a default,
-which the type checker uses when an annotation names the class without its brackets:
+and the type checker uses it when an annotation names the class without its brackets:
 
 ```python
 # type_defaults.py
@@ -468,7 +468,7 @@ Without the default,
 `words: Stack` leaves `T` unsolved and the type checker falls back to `Unknown`,
 so `words.top().upper()` goes unchecked.
 The default gives the bare form a meaning,
-which matters most for a class whose parameter has one common answer:
+and that matters most for a class whose parameter has one common answer:
 callers content with that answer write nothing,
 and the annotation stays precise.
 
@@ -493,7 +493,7 @@ one release after the bracket syntax.
 
 A special form, `**P`, captures the types of an entire parameter list.
 [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
-uses this to give a wrapper the same signature as the function it wraps.
+uses `**P` to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
 which you still see in older code.
@@ -534,7 +534,7 @@ print(t.bump().bump().report())
 `t.bump()` runs on a `NamedTally`, so `Self` is `NamedTally`,
 and the result has `report()`.
 If `bump()` declares `-> Tally`, the type checker rejects `report()`,
-which `Tally` does not have.
+because `Tally` has no such method.
 Alternative constructors benefit the same way.
 A `@classmethod` that ends with `return cls(...)` returns `Self`.
 
@@ -550,7 +550,7 @@ The [typeguard](https://typeguard.readthedocs.io)
 library reads your existing annotations and enforces them at runtime.
 [Pydantic](https://docs.pydantic.dev)
 validates and parses data against typed models,
-which is useful at the edges of a program where untrusted input enters.
+and that suits the edges of a program, where untrusted input enters.
 The hints are for the tools and for the reader.
 
 From here on, this book assumes the type checker runs on everything.
@@ -560,7 +560,7 @@ The following chapters do not repeat that Python itself would run the line anywa
 ## How Much to Annotate
 
 Gradual typing leaves the amount up to you,
-and the chapter's constructs do not say when each is worth the words.
+so the question is when a hint is worth the words.
 Annotate what crosses a boundary: function signatures, public attributes,
 anything another file imports.
 Those are the places where the code's reader and writer are different people,
