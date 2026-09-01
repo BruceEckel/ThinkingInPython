@@ -60,10 +60,13 @@ It also includes what the environment does to the function.
 Suppose your function reads the time of day, or a random number.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
-Any information a function uses beyond its arguments makes it impure.
+Any information a function uses beyond its arguments makes it impure,
+when that information can change between calls.
 The usual sources are I/O: the time of day, a random number,
 a database or network read.
-Reading a global variable is enough on its own.
+Reading a global variable that something else can rebind is enough on its own;
+a captured constant, as in [Closures](40_Functional--Foundations.md#closures),
+is not.
 These inputs are *side causes*, the counterpart of side effects.
 
 Thus, Effects are the union of side effects and side causes.

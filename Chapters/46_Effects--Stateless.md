@@ -213,7 +213,7 @@ What comes back depends on which Ability the `yield` requested,
 and one SendType cannot vary from one `yield` to the next.
 Pin it to `Console`,
 and the type checker reads `yield Need(Log)` as producing a `Console`.
-So the SendType is `Any`, wide enough to carry every answer.
+So the SendType is `Any`, which accepts every answer unchecked.
 
 A bare `yield` produces that SendType, `Any`.
 `yield from` produces the inner generator's `ReturnType` instead,
@@ -1009,7 +1009,7 @@ and no `Need[Console]` matches it
 ([Supplying an Interface](#supplying-an-interface)).
 
 `DI_CONTAINER` holds instances of unrelated types,
-so its value type has to be `Any`.
+so `Any` is the only type its values can share.
 The key carries the type information,
 but a homogeneous `dict` has no way to say "the value under key `type[T]` is a `T`,"
 so that invariant lives in `register()`'s signature rather than in the container.
@@ -1375,8 +1375,10 @@ and its failure arrives as a yielded value rather than a returned one.
 A `Result`-shaped value appears in Stateless only after `stateless.catch()`
 ([Turning an Error Into a Value](#turning-an-error-into-a-value)),
 and even then it is the bare union `int | KeyError` rather than a wrapper object.
-For `Result`, you rewrite the body to return an `Ok` or an `Err`.
-With Stateless, you leave the body alone and lift the exception into the signature.
+For `Result`, you either rewrite the body to return an `Ok` or an `Err`,
+or wrap the function in `@safe`, which turns every exception into an `Err`.
+`@throws` likewise leaves the body alone,
+but it names the exception types it lifts and puts them in the signature rather than in a returned wrapper.
 
 ### A Failure Travels as a Value
 

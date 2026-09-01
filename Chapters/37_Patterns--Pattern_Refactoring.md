@@ -87,6 +87,12 @@ Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.m
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
+`create()` is a class method reading `cls.registry`,
+the form [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+warns can mislead: `Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
+The lookup is safe here because every subclass writes to `Trash.registry` and none defines a `registry` of its own,
+so `cls.registry` always resolves to that one table.
+Call it as `Trash.create()`.
 
 `@dataclass` builds `__init__()` from the bare `weight: float` annotation alone:
 the two `ClassVar` attributes belong to the class, so they stay out of it

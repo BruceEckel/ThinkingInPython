@@ -175,11 +175,13 @@ This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
 written because the type it received did not fit the function it had to call.
-The forwarding carries the limit [Surrogate](26_Patterns--Surrogate.md#proxy)
-notes: special methods bypass `__getattr__()`,
+The forwarding carries the limits [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
+lists for `__getattr__()`.
+[Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 as exercise 1 does with `__getitem__()`.
-That chapter's other trap applies here too.
+[The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap)
+applies here too.
 `copy.copy()` and `pickle` build an instance without running `__init__()`,
 so `_adaptee` does not exist yet,
 and `__getattr__()` reading `self._adaptee` calls itself until `RecursionError`.

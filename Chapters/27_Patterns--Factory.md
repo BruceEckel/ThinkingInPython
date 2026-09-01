@@ -90,6 +90,10 @@ The `factory()` takes an argument that selects the type of `Shape` to create.
 Here the argument is a string, but it could be any kind of data.
 Apart from the new subclass itself,
 `factory()` is the only code that changes when you add a new type of `Shape`.
+*GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
+`factory()` is the smallest version of that idea: one class, one method,
+and a `match` where the overrides would be.
+[Abstract Factories](#abstract-factories) shows the subclass-override form.
 
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,

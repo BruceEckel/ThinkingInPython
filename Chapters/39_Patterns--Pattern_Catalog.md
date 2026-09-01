@@ -216,6 +216,6 @@ Python includes the piece their inventors set out to supply.
 | [Flyweight](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
 What survives the subtraction is the intent, not the structure.
-[Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
+[Reading the Chapters Ahead](21_Patterns--Design_Patterns.md#reading-the-chapters-ahead)
 argues this in general.
 Each linked chapter shows one case.

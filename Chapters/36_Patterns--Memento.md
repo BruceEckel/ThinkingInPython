@@ -447,7 +447,7 @@ print(restored == drawing, restored is drawing)
 The bytes from `pickle.dumps()` can go to a file and come back in a different process,
 days later.
 The round trip produces a different object with the same value,
-which is all a memento needs, since frozen data classes compare by value.
+which is all a memento needs, since a data class compares by value.
 
 Only unpickle data you trust, because the format can execute code.
 For untrusted storage or other languages,

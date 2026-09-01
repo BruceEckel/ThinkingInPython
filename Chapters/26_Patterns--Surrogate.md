@@ -472,7 +472,7 @@ and code that checks with `isinstance()` should check for the method instead.
     Restricts the client programmer's access to the proxied object.
 4.  *Smart reference*.
     Adds actions when code accesses the proxied object.
-    For example, a smart reference can the calls to a particular method.
+    For example, a smart reference can log the calls to a particular method.
     It can also count the references to an object,
     implementing the *copy-on-write* idiom and preventing aliasing.
 

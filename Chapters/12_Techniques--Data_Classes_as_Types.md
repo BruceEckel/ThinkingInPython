@@ -318,7 +318,8 @@ Adding `slots=True` drops it, for less memory and faster attribute access.
 [Performance](18_Techniques--Performance.md#slots) measures the difference.
 
 The standard library has a second immutable record, `typing.NamedTuple`,
-which also rejects assignment and is also hashable.
+which also rejects assignment and hashes under the same rule,
+every field hashable.
 The two differ in equality.
 A frozen data class equals only another instance of its own class,
 while a `NamedTuple` equals any tuple holding the same values,

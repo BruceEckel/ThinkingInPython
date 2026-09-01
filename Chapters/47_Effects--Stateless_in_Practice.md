@@ -416,7 +416,7 @@ Here the return type names the source instead,
 and no signature between `handle()` and the request mentions it.
 
 Both Abilities in this section are side causes,
-in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#subdividing-the-impure-portion):
+in the vocabulary of [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect):
 the function reads something from outside.
 The `Recorder` of [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 stood in for a side effect, where the function writes something outward.
