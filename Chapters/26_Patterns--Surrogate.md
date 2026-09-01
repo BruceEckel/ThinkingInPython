@@ -670,7 +670,7 @@ if __name__ == "__main__":
 
 `run()` never changes and neither does `b`.
 Only the implementation the surrogate forwards to does.
-Here the client programmer calls `change_to()`, 
+Here the client programmer calls `change_to()`,
 but in a [State Machine](31_Patterns--State_Machines.md),
 each implementation chooses its own successor,
 so the surrogate advances without the client asking.
@@ -686,16 +686,14 @@ as [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
 the checker cannot verify a method that `__getattr__()` supplies.
 
 `Surrogate.__init__()` and `change_to()` are a choice.
-Annotating both parameters with `Behavior` type-checks the listing on its own,
-and the checker then verifies every implementation that reaches either method.
+`state_surrogate.py` successfully type-checks when both parameters are annotated as `Behavior`.
+The checker then verifies every implementation that reaches either method.
 That annotation also ties the surrogate to one Protocol,
 and that tie is what the generic surrogate exists to avoid:
 `test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
 `type StateA is not assignable to protocol Behavior`.
-Declaring the implementations instead,
-as `first: Behavior` and `second: Behavior` do,
-puts the check where it does not restrict the surrogate:
+Declaring the implementations as `first: Behavior` and `second: Behavior` puts the check where it does not restrict the surrogate:
 the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
 and reports a missing method.
 That declaration covers the implementations, not the surrogate.
@@ -727,9 +725,9 @@ Because *GoF Design Patterns* gives *Proxy* and *State* different structures,
 it treats them as unrelated.
 But both are a *Surrogate*:
 an object that forwards method calls to an implementation.
-*Proxy* forwards to one implementation to control access to it.
-*State* swaps among several to change behavior over time.
-In Python both are the same few lines of `__getattr__()` delegation,
+*Proxy* controls access to a single implementation.
+*State* swaps among several implementations to change behavior over time.
+Both are the same few lines of `__getattr__()` delegation,
 with *State* adding a method to change the implementation.
 The separate implementation hierarchy in *GoF Design Patterns* matters when other people write the implementations and you need the base class to state which methods an implementation must supply.
 When you write both sides,
