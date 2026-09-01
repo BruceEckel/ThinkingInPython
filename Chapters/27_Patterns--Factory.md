@@ -114,7 +114,8 @@ a convention rather than concealment
 `shape_factory1.py` keeps the plain names because `shape_name_gen()` passes `cls.__name__` unchanged to `factory()`,
 so an underscore in the class name would have to appear in the `case` strings too.
 
-Nesting the classes inside `factory()` looks like stronger enforcement, but is worse.
+Nesting the classes inside `factory()` looks like stronger enforcement,
+but is worse.
 Because a `class` statement is executable code,
 every call would define fresh `Circle` and `Square` classes:
 two shapes from different calls would share behavior but not a class,
@@ -130,8 +131,7 @@ In Python a class is a first-class object.
 You can store it in a variable and call it to construct an instance.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
-No factory method and no factory class.
-The `dict` is the factory:
+No factory method and no factory class:
 
 ```python
 # shape_table.py
@@ -242,11 +242,17 @@ a class defined inside a function or a test stays in the table,
 and the strong reference keeps it alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
-`cls.registry` resolves through the MRO,
+`cls.registry` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
 so a subclass that gives itself a `registry` of its own would create a second table that `make()` never reads,
 with no error to signal it.
 
-The tests confirm that every subclass registers itself,
+`make()` stays a module-level function for two reasons.
+A `@classmethod` reading `cls.registry` would carry that same hazard,
+and it would make `Circle.make("Square")` legal as well as misleading,
+since the lookup has nothing to do with the class you call it on.
+A method of any kind would also put back the factory method this section set out to remove.
+
+Testing confirms that every subclass registers itself,
 and that a new subclass needs no change to `make()`.
 Defining a fresh subclass of `Shape` inside the test is enough to put it in the registry:
 
@@ -290,14 +296,13 @@ for contrast.
 
 Because the static `factory()` method in `shape_factory1.py` collects all the creation operations in one place,
 that method is the only code you change.
-The next step gives each of those operations its own object.
 A *factory object* defines a single `create()` method,
 so choosing what to build becomes choosing which factory object to call,
-rather than passing a string to a `match`:
+rather than passing a string to a `match` expression.
+Here, we create one factory object per `Shape` subtype:
 
 ```python
 # shapefact2/shape_factory2.py
-# One factory object per shape.
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -376,7 +381,7 @@ that pattern puts the creation method on a class and lets subclasses override it
 and each concrete factory overrides it to name a different type.
 
 A `Factory` class nested in every shape is machinery Python does not need.
-This listing keeps it because that is the form a factory-object design takes where a class is not an object you can store.
+`shape_factory2.py` uses it to show the form a factory-object design takes where a class is not an object you can store.
 The registry in `registry.py` does the same job with no nested classes.
 Write a separate factory class when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.

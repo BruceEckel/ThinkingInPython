@@ -494,7 +494,7 @@ and no second dispatch to arrange.
 The chapter now holds two kinds of dispatch that disagree about subclasses.
 `bins[type(t)]` keys on the exact class,
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
-`singledispatch` resolves through the MRO,
+`singledispatch` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
 so that same piece answers with `Aluminum`'s note.
 Neither is wrong for its job,
 and the difference is the one [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)

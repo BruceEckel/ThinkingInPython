@@ -196,6 +196,14 @@ In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
+`super()` and ordinary attribute lookup both follow one list,
+the class's *method resolution order* (MRO):
+the classes Python searches for a name,
+starting with the class itself and ending at `object`.
+`Simple2.__mro__` is `(Simple2, Simple, object)`.
+With a single base class the order is obvious.
+With several, the MRO decides which base supplies a name that more than one of them defines.
+
 The base-class constructor runs,
 but only because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor automatically.

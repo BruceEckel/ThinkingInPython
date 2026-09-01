@@ -267,7 +267,7 @@ It is writing one where you meant a per-object default.
 
 Subclasses inherit a `ClassVar` declared on a base class like any other class attribute.
 A subclass that doesn't declare its own copy reads straight through to the base's value,
-via the normal method resolution order.
+via the normal [method resolution order](07_Foundations--Classes.md#inheritance).
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
 

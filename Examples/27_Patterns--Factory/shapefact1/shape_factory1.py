@@ -18,8 +18,7 @@ class Shape(ABC):
             case "Square":
                 return Square()
             case _:
-                raise ValueError(
-                    f"Bad shape creation: {kind}")
+                raise ValueError(f"Bad shape: {kind}")
 
 class Circle(Shape):
     @override
