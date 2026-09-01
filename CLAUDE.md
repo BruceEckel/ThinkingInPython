@@ -63,6 +63,27 @@ errors that way, none of them gate-detectable.
 edits and checks only its own chapter); `ARGS=--serial` runs them one at
 a time.
 
+## Model routing
+
+The session model (whatever `/model` set) reads the request, plans,
+gates, and commits. It does not do every kind of work itself: the
+project defines agents in `.claude/agents/` whose frontmatter fixes
+the model, and a request that matches one is delegated there, one
+agent per file, gated and committed by the session afterward. Add a
+row here when a new agent lands.
+
+| Request shape | Agent | Model | Why |
+|---|---|---|---|
+| clarity pass, straighten, clear passives, "make X clearer" on named files | `prose-clarity` | Opus | judgment work that edits the author's voice and verifies claims against listings; both Opus and Fable did it well in the 2026-09-01 Solutions sweep, Opus's reports were the more careful about what they left alone |
+| a list, a count, a location, a gate's output, what a listing prints | `repo-lookup` | Sonnet | read-only, no voice at stake, cheap |
+| `make rewrite` passes | (headless `claude -p`) | per pass, `tools/rewrite.py` `PASSES` | see `MODEL_NOTES` there |
+| deep review of a chapter, thread audits, anything that decides what a chapter claims | the session model, or a `fork` | session | needs the conversation's context; a fresh agent cannot know what Bruce has already ruled on |
+
+Pass `model:` on an `Agent` call only to override a definition for one
+run. A fresh agent costs roughly 70-150k tokens on a chapter-sized
+file; a `fork` carries the whole conversation and costs several times
+that, so forks are for work that needs the session's history.
+
 ## Learning from Bruce's own edits
 
 `/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads a
