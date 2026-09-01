@@ -283,8 +283,8 @@ The algorithms are not equivalent, though,
 and the chain below turns the difference between them into a fallback.
 
 The classic form repeats the move `command_pattern.py` made, at larger scale.
-Each algorithm becomes a class with a `find()` method deriving from a `FindRoot` interface,
-and a "Context" class holds the chosen one:
+Each algorithm becomes a class deriving from a `FindRoot` interface,
+with a `find()` method, and a "Context" class holds the chosen one:
 five classes to produce the same three lines that one function argument produced.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
@@ -295,8 +295,9 @@ The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
 You provide a function that decides how to compare.
 
 When a strategy needs configuration, the next step is not yet a class.
-It is a *closure* ([Functional Foundations](40_Functional--Foundations.md#closures)),
-a function that manufactures the strategy with the settings held in its closure:
+It is a *closure* ([Functional Foundations](40_Functional--Foundations.md#closures)):
+an outer function takes the settings and returns the strategy,
+and the strategy keeps reading those settings after the outer function returns:
 
 ```python
 # configured_strategy.py
@@ -332,11 +333,12 @@ The fine one agrees with the true root to six places.
 Both satisfy `RootFinder`, so `solve()` accepts either unchanged,
 and so does the chain below.
 
-`functools.partial` does the same job when a configurable version already exists with the setting as a parameter.
-If that setting is a positional argument sitting after the one the caller supplies,
-`Placeholder`, a sentinel argument
-([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)),
-reserves the earlier position for the caller's argument.
+When the configurable version already exists, with the setting as a parameter,
+`functools.partial` does the same job.
+`partial` fills parameters from the left,
+so a setting that comes after the caller's argument needs a `Placeholder`
+([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder))
+in the caller's position to hold it open.
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
 
@@ -533,16 +535,16 @@ so their element type is `Handler[Any]`, the parameter erased.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
-`publish` still calls `.get(type(event), [])` instead of indexing.
-Indexing on a read inserts an empty list as a side effect,
-leaving a stray entry behind for every published event type with no subscriber,
-such as `Closed`.
+`publish` reads with `.get(type(event), [])` instead of indexing,
+because indexing a `defaultdict` inserts an empty list as a side effect,
+and every published event type with no subscriber, such as `Closed`,
+would leave a stray entry behind.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
 so `publish()` calls nothing, exactly as it does for `Closed`.
 Walking `type(event).__mro__` and calling every handler along it gives subclass events their parent's handlers,
-but then an event type no longer names its own handlers.
+but then the handlers that run for an event come from its whole ancestry instead of from its own type alone.
 
 The tests confirm that publishing calls every handler registered for a type,
 a handler receives only its own event type,
@@ -583,9 +585,9 @@ The bus is the [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-
 with one shared subject: instead of every observable holding its own list,
 one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
-For a single handler per type,
-one the argument's type picks and open to new types without editing a central function,
-use `functools.singledispatch`.
+When each type needs exactly one,
+and a new type must add its own without editing a central function,
+`functools.singledispatch` is the tool.
 [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)
 both use it.

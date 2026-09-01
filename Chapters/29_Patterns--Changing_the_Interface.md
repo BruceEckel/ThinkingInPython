@@ -109,21 +109,20 @@ which fixes the adapted class at definition time and exposes the adaptee's entir
 Composition keeps the two interfaces separate.
 Inheritance merges them.
 
-The `/` in `WhatIUse.op()` makes its parameter positional-only,
-and removing it breaks the override:
-`WhatIUse2.op()` renames the parameter to `what_i_have`,
-and renaming a keyword-callable parameter in an override breaks substitutability,
-so the type checker rejects it without the `/`.
+The `/` in `WhatIUse.op()` makes its parameter positional-only.
+`WhatIUse2.op()` renames that parameter to `what_i_have`.
+A caller passing it by keyword would break on the rename,
+so the type checker rejects a renamed keyword-capable parameter in an override.
+Positional-only, the name is invisible to callers and the rename is legal.
 The rename is the smaller half of that story.
 `WhatIUse2.op()` also changes the parameter's type.
-Its base accepts a `WhatIWant`, and it accepts a `WhatIHave`.
+The base version accepts a `WhatIWant`, and the override accepts a `WhatIHave`.
 If you annotate both precisely, a type checker rejects the override outright,
 reporting `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 That is why this one parameter stays `Any` while the rest of the listing names real types.
-The `Any` is not laziness.
-It allows an override that cannot substitute for its base to pass the type checker.
-Approach 2 is a different operation wearing an inherited name.
+The `Any` is there to let an override that cannot substitute for its base pass the type checker.
+Approach 2 is a different operation under an inherited name.
 Code holding a `WhatIUse` cannot safely receive a `WhatIUse2`,
 and that is the price of building the adapter into the operation.
 The next section argues Python lets you skip most of this packaging too.
@@ -180,10 +179,11 @@ The forwarding carries the limit [Surrogate](26_Patterns--Surrogate.md#proxy)
 notes: special methods bypass `__getattr__()`,
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
 as exercise 1 does with `__getitem__()`.
-That chapter's other trap applies here too:
-`__getattr__()` reading `self._adaptee` recurses to a `RecursionError` on an instance built without `__init__()`,
-which `copy.copy()` and `pickle` do,
-so an adapter that must survive copying or pickling guards the lookup,
+That chapter's other trap applies here too.
+`copy.copy()` and `pickle` build an instance without running `__init__()`,
+so `_adaptee` does not exist yet,
+and `__getattr__()` reading `self._adaptee` calls itself until `RecursionError`.
+An adapter that must survive copying or pickling guards that lookup,
 or defines `__reduce__()`,
 the hook `pickle` and `copy` consult before ordinary construction.
 
@@ -320,7 +320,7 @@ ask what breaks if you remove it:
 [Surrogate](26_Patterns--Surrogate.md#proxy)
 takes the looser view of the first row:
 a surrogate speaking for its implementation is a Proxy whether or not the interfaces match.
-Under that reading a Proxy becomes an Adapter once you stop insisting on the interface,
+Under that reading the same-interface rule no longer separates a Proxy from an Adapter,
 which is why the `ProxyAdapter` above answers to both names.
 That leaves the "What it adds" column to separate them:
 a Proxy controls access to one implementation,
@@ -367,9 +367,10 @@ print(caught[0].message)
 
 `to_string()` keeps working, which is the point: existing callers get a warning,
 not a break.
-The `# type: ignore` silences `ty`,
-which reports the deprecated call as a diagnostic,
-the half that reaches a caller before they run anything.
+The mark works in two halves.
+The static half is a `ty` diagnostic on the deprecated call,
+which reaches a caller before they run anything;
+the `# type: ignore` silences it here so the listing can run.
 The runtime half is a `DeprecationWarning`.
 Python hides those by default outside `__main__` and test runners,
 which is the trap: the caller who most needs the warning is the least likely to see it.
