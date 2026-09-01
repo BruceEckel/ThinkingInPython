@@ -20,8 +20,8 @@ Pattern matching first appeared in [Control Flow](04_Foundations--Control_Flow.m
 `match` and `case` are *soft keywords*:
 they act as keywords only inside this statement,
 so existing code that uses `match` as a variable name still runs.
-That is also a reason not to write such code.
-A local named `match` shadows nothing, but it reads like the statement.
+Avoid writing new code that does: a local named `match` shadows nothing,
+but it reads like the statement.
 
 ## Matching Values
 
@@ -67,7 +67,7 @@ For a value-to-value lookup like this, a dictionary is often shorter
 ## Alternatives and Capture
 
 An alternative combines several patterns in one `case` with `|`.
-Every alternative in a `|` must bind the same set of names.
+Each alternative joined by `|` must bind the same set of names.
 
 A bare name is a *capture pattern*.
 Like `_`, it matches any value unconditionally.
@@ -145,7 +145,7 @@ When the capture is the last `case`, as here, Python does not warn you.
 `DEFAULT` here is a local variable rather than the constant you meant to compare against.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
-so the type checker sees that the cases cover both members and does not complain about the missing return.
+so the type checker sees that the cases cover both members and accepts the function with no trailing `return`.
 
 ## Sequence Patterns
 
@@ -203,7 +203,7 @@ The subject is any expression, not only a parameter,
 and a comma builds a tuple there too,
 so `match sign(x), sign(y):` matches on a pair computed inline.
 Transforming the subject this way turns a set of comparisons into literal patterns,
-which usually reads better than the guards you would write otherwise.
+and that usually reads better than the guards you would write otherwise.
 
 ```python
 # test_sequence_patterns.py
@@ -344,17 +344,15 @@ Because a subclass matches, the order of the cases decides which one wins.
 so moving `case bool(b)` below `case int(n)` makes it unreachable:
 `describe(True)` would answer `int True`.
 
-The single positional argument in `int(n)` does not name an attribute.
-Python special-cases a handful of builtins
-(`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `set`, `frozenset`)
-so that one positional sub-pattern binds the whole value,
-which is why `case str(s)` reads as "a string, call it `s`."
+In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
+Python special-cases a handful of builtins this way
+(`bool`, `int`, `float`, `str`, `bytes`, `bytearray`, `list`, `tuple`, `dict`, `set`, `frozenset`),
+so `case str(s)` reads as "a string, call it `s`."
 
 Dropping the parentheses flips the meaning: `case str:` is a bare-name capture,
 not a type test, matching any value and binding it to a local named `str`.
-It is the same mistake as `DEFAULT` in `value_patterns.py`,
-and Python catches it the same way,
-refusing to compile a `case` that follows it:
+`case str:` repeats the `DEFAULT` mistake from `value_patterns.py`,
+and Python catches it the same way, by refusing to compile any `case` after it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
@@ -417,8 +415,8 @@ print(quadrant(Point(-1, -1)))
 #: Somewhere else
 ```
 
-The guard runs only after the pattern matches,
-which lets it use the names the pattern bound.
+The guard runs after the pattern matches,
+so it can use the names the pattern bound.
 A false guard moves on to the next `case`, but the names stay bound:
 once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
@@ -436,7 +434,7 @@ A guard that merely compares one capture to a constant is a literal pattern writ
 A mapping pattern matches keys in a dictionary and binds their values.
 It ignores keys you do not mention,
 so it dispatches cleanly on JSON-shaped data.
-That also makes `case {}` a catch-all for any mapping rather than a test for an empty one,
+Ignoring unmentioned keys also makes `case {}` a catch-all for any mapping rather than a test for an empty one,
 the opposite of `case []`, which matches only an empty sequence.
 Test for an empty dictionary with a guard, `case {} if not event:`.
 A `**rest` at the end binds whatever keys the pattern did not mention,
@@ -519,7 +517,7 @@ Without `as` you must choose between testing the shape and keeping the object.
 The second case alternates two class patterns and binds `n` from either,
 inside a one-element sequence pattern: `survey([Point(0, 5)])` matches,
 but a list of two points does not.
-The compiler enforces the same-names rule stated earlier.
+The compiler enforces the same-names rule from [Alternatives and Capture](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
 
@@ -530,9 +528,8 @@ define that set as a union using the [`type` statement](08_Foundations--Static_T
 Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
-Adding a type to the union and forgetting its `case` produces a type error.
-The type checker reports it,
-instead of letting the value fall through at runtime.
+Add a type to the union without its `case`,
+and the type checker reports an error at `assert_never()` instead of letting the value fall through at runtime.
 That is the benefit of static typing applied to control flow:
 
 ```python
@@ -569,19 +566,19 @@ print(area(Square(2.0)))
 If you add a `Triangle` to `Shape` without adding the appropriate `case`,
 the type checker flags `assert_never(shape)`.
 `assert_never()` acts at runtime as well as at check time.
-If a value that lied about its type reaches it,
-it raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
+If a value that lied about its type reaches `assert_never()`,
+the call raises `AssertionError: Expected code to be unreachable, but got: 'x'`,
 naming the value it received.
 
-A `switch` in C, JavaScript, or traditional Java cannot do this.
-Nothing forces you to add a case, and an unhandled value falls through silently.
+A `switch` in C, JavaScript, or traditional Java has no such check:
+nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
-and Java's newer switch expressions do check this,
+and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala,
 as long as the matched type is a sealed hierarchy the compiler can see in full.
 Their versions are also expressions, producing a value you can assign.
 Python's `match` is a statement,
-which is why every `match` in this chapter sits inside a function that returns from each `case`.
+and that is why every `match` in this chapter sits inside a function that returns from each `case`.
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role instead.
@@ -639,10 +636,10 @@ every lookup builds the default string, including the hits that discard it.
 
 A literal `match` compiles to a chain of comparisons, one per `case`,
 so its cost grows with the number of cases.
-A dictionary lookup's does not.
-At three entries the difference does not matter.
+A dictionary lookup costs the same at any size.
+At three entries the difference is invisible.
 The dictionary wins as the table grows,
-and it is the only one of the two you can build or change at runtime.
+and a dictionary is the one of the two you can build or change at runtime.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.
@@ -732,7 +729,8 @@ print(round(email.cost() + sms.cost() + push.cost(), 4))
 `Notification` names the shape every channel must have.
 `@abstractmethod` forces `Email`, `Sms`,
 and `Push` to define both `render()` and `cost()`.
-If you forget one, the class stays abstract, so you cannot instantiate it.
+Leave one out, and the class stays abstract:
+instantiating it raises a `TypeError`.
 
 A type union with `match` takes the opposite shape.
 The channels become plain data,

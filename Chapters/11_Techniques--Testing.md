@@ -1,6 +1,6 @@
 # Testing
 
-One of the most valuable habits in modern programming is unit testing.
+Unit testing is one of the most valuable habits in modern programming.
 You build tests into the code you write and run them on every change.
 A type checker verifies the claims you can write as annotations.
 Tests verify the rest: that a withdrawal reduces the balance,
@@ -40,10 +40,8 @@ not a verification step you skip when the code looks right to you.
 That said, TDD requires that you know what you are creating.
 It assumes you are confident the design is correct,
 so that only implementation remains.
-Often, however, you are not sure what direction the program will take.
-You are experimenting to look for the correct approach.
-When you are not simply producing code, but discovering your design,
-TDD is wasteful.
+Often, however, you are still experimenting to find the direction the program will take.
+When you are discovering the design rather than producing code, TDD is wasteful.
 
 ## pytest
 
@@ -138,10 +136,10 @@ explains; here they only mark the functions for `pytest`.
 
 Run the test suite by typing `pytest` in the project directory.
 `pytest` puts each test file's own directory at the front of `sys.path`,
-which is why `from account import Account` works with no packaging and no path setup,
+so `from account import Account` works with no packaging and no path setup,
 as long as `account.py` sits beside `test_account.py`.
-It discovers every `test_*.py` file, collects every `test_` function, runs them,
-and reports successes and failures.
+`pytest` discovers every `test_*.py` file, collects every `test_` function,
+runs them, and reports successes and failures.
 A failing `assert` prints the expression and the actual values,
 so you rarely need a debugger to see what went wrong.
 
@@ -237,13 +235,12 @@ and you cannot tell by looking which of the two you are writing.
 ## Parametrizing Tests
 
 When the same logic should run against several inputs, do not copy the test.
-If you mark it with `parametrize`, as `test_nonpositive_deposit_raises()` does,
-`pytest` runs it once per case and reports each separately.
+Mark the test with `parametrize`, as `test_nonpositive_deposit_raises()` does,
+and `pytest` runs it once per case and reports each separately.
 That single function becomes three independent tests,
 and a failure names the case that failed.
 
-Nothing limits you to one variable.
-You can give `parametrize` several names and a list of tuples,
+A `parametrize` mark can carry several names, followed by a list of tuples,
 one tuple per case:
 
 ```python
@@ -280,7 +277,7 @@ and the suite stays green without anyone deleting the test that proves the bug.
 JUnit-style frameworks give each test class a `setUp()` and `tearDown()`.
 `pytest` replaces both with *fixtures*: functions that build what a test needs.
 You declare fixtures as parameters to a test,
-which tells `pytest` to call the fixture and pass its result to the test.
+and each parameter name tells `pytest` to call that fixture and pass its result to the test.
 
 The `funded` function in `test_account.py` is a fixture.
 `pytest` is the only thing that calls it:
@@ -324,9 +321,9 @@ so read the error to see which invariant broke.
 A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scope without any test naming it.
 That suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
-It does not save you from naming a fixture you want to use.
-An autouse fixture must still appear in the parameter list before the test can see what it returns,
-so marking `funded` autouse and then writing `funded.withdraw(40)` raises a `NameError`.
+Autouse runs the fixture, and only a parameter delivers its value.
+Mark `funded` autouse, leave it out of the parameter list,
+and `funded.withdraw(40)` raises a `NameError`.
 
 Fixtures eliminate duplicated setup.
 A test that names `funded` states what it needs and nothing about how to build it.
@@ -356,7 +353,7 @@ def preloaded(request: pytest.FixtureRequest) -> Account:
 
 Take `bank_name` first.
 `pytest` builds the `scope="session"` fixture once and reuses it,
-which is useful for expensive resources.
+and that reuse suits expensive resources.
 The reuse is the risk as well as the point: every test receives the same object,
 so one test that mutates it changes what the next test sees.
 Keep session fixtures to values nothing modifies, like `bank_name`,
@@ -404,7 +401,7 @@ changes nothing at the language level.
 Python stores it under that exact name, reachable like any other attribute.
 Only convention says, "this is private, do not rely on it."
 
-A leading double underscore does something real,
+A leading double underscore changes the name Python stores,
 though it is still not access control.
 Python's compiler rewrites `self.__pin`, written inside a class body,
 into `self._ClassName__pin`, a transformation called *name mangling*.
@@ -498,7 +495,7 @@ def test_missing_file_raises(
 ```
 
 `data_dir()` reads `APP_DATA` on every call,
-which lets `monkeypatch.setenv()` redirect it.
+so `monkeypatch.setenv()` can redirect it.
 A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` would read the variable once,
 at import time, before any test body runs,
 so patching the environment afterward would change nothing.
@@ -536,7 +533,8 @@ def test_roll_returns_known_value(
 
 `import random` binds the one module object every importer shares,
 so `dice.random` and `random` are the same object and the patch replaces `randint()` process-wide.
-`monkeypatch` restores the original when the test ends, which keeps that safe.
+`monkeypatch` restores the original when the test ends,
+and that restoration is what makes a process-wide patch safe.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -564,8 +562,8 @@ The function takes its source of randomness as an argument,
 so production code hands it a fresh `random.Random()` while the test hands it a seeded one.
 The randomness is now an input, not a hidden dependency.
 The `4` here is what `Random(0)` produces first,
-and its match with the stubbed value above is a coincidence: as with any seed,
-you record the value it gives you rather than pick one.
+and its match with the stubbed value in `test_dice.py` is a coincidence:
+as with any seed, you record the value it gives you rather than pick one.
 
 ### The Clock
 
@@ -615,9 +613,9 @@ def test_elapsed() -> None:
         40.0, lambda: 100.0) == 60.0
 ```
 
-Both tests check the identical arithmetic.
-Only the injected one needs no `monkeypatch`,
-and only it says in its signature where it gets the time.
+Both tests check the same arithmetic.
+The injected one runs with no `monkeypatch`,
+and its signature says where the time comes from.
 
 `datetime.now()` is harder to patch,
 because `datetime` is an immutable C type that rejects attribute assignment,
@@ -651,10 +649,10 @@ def test_current_year_is_frozen() -> None:
 
 `travel` sets the clock to the given moment for the test,
 and `tick=False` holds it there so every reading is identical,
-which the test's second assertion demonstrates.
+as the test's second assertion shows.
 `time.monotonic()` and `time.perf_counter()` keep running,
 because they measure elapsed intervals rather than dates.
-Unlike the prior tools, it is a third-party dependency,
+Unlike `monkeypatch`, `time-machine` is a third-party dependency,
 but it is the standard answer for code built around `datetime`.
 
 ### Network Calls
@@ -694,7 +692,7 @@ def test_current_temp(
 ```
 
 `weather` imports the function with `from urllib.request import urlopen`,
-which copies it into `weather`'s own namespace,
+and that statement binds `urlopen` in `weather`'s own namespace,
 so `weather.urlopen` is the name the call site reads and the name to patch.
 Patching `urllib.request.urlopen` instead would leave `weather`'s copy untouched.
 The rule covers both cases: patch the name the calling code looks up.
