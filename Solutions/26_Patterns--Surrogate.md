@@ -35,11 +35,11 @@ print(p.query())
 
 `"creating ExpensiveResource"` prints only when `p.query()` first
 triggers `__getattr__()`, not when you construct `LazyProxy()`. Every
-attribute access checks `self._real` and builds the real object on the
-first one that finds it missing. Every later access reuses the same
-instance. This is the same `__getattr__()` delegation `proxy_2.py` and
-`counting_proxy.py` already use, just guarding the moment of creation
-instead of forwarding to an object that already exists.
+attribute access checks `self._real`, and the first access that finds
+it `None` builds the real object. Every later access reuses the same
+instance. `LazyProxy` reuses the `__getattr__()` delegation from
+`proxy_2.py` and `counting_proxy.py`, just guarding the moment of
+creation instead of forwarding to an object that already exists.
 
 ## 2. A per-method tally in the counting proxy
 
@@ -77,11 +77,11 @@ print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
 
-Where the chapter's version kept one total, this one tallies per
-method name. `__getattr__()` already receives the name of the
+Where the chapter's `CountingProxy` kept one total, this one tallies
+per method name. `__getattr__()` already receives the name of the
 attribute, so the wrapper charges the count to that name before
-forwarding. The single `calls` integer becomes a `Counter`, and the
-report shows `f` called twice and `g` once.
+forwarding. The single `calls` integer becomes a `Counter`. The final
+`print()` shows `f` called twice and `g` once.
 
 ## 3. A simple copy-on-write list
 
@@ -131,15 +131,15 @@ print(a._box is b._box)
 ```
 
 `a` and `b` start out sharing one `Box`, the same underlying list, with
-`owners` tracking how many `CowList`s point at it. `share()` looks free
-because it copies nothing, just a reference and a bumped count. The
-copy only happens inside `append()`, and only when `owners > 1`: `b`
-detaches into its own private `Box` holding a fresh copy of the data,
-decrements the shared `Box`'s count back down (since `b` is no longer
-one of its owners), and then appends to its own copy. `a`, which never
-mutated, still points at the original, untouched `Box`. The cost of
-copying waits for the moment a write actually happens, and falls only
-on the list that writes, exactly what "copy-on-write" means.
+`owners` tracking how many `CowList`s point at that `Box`. `share()`
+costs almost nothing: it copies a reference and bumps a count.
+`append()` does the copying, and only when `owners > 1`. `b.append(4)`
+detaches `b` into its own private `Box` holding a fresh copy of the
+data, decrements the shared `Box`'s count (since `b` is no longer one
+of its owners), then appends to that private copy. Since no one called
+`a.append()`, `a` still points at the original, untouched `Box`. The
+copy waits for a write and falls only on the list that writes, exactly
+what "copy-on-write" means.
 
 ## 4. Why the typo reports as `RecursionError`
 
@@ -172,21 +172,21 @@ except RecursionError as e:
 #: RecursionError
 ```
 
-`p.f` is not found on the instance or on `BrokenProxy`, so Python
-calls `__getattr__("f")`. Its first act is to read `self._imp`, which
-does not exist either, so Python calls `__getattr__("_imp")`, whose
-first act is to read `self._imp`. Each attempt to report the missing
-attribute creates another missing-attribute lookup, and the stack runs
-out before Python can raise an `AttributeError`.
+Python finds no `f` on the instance or on `BrokenProxy`, so it calls
+`__getattr__("f")`. That call starts by reading `self._imp`, which does
+not exist either, so Python calls `__getattr__("_imp")`, which starts
+by reading `self._imp`. Each attempt to report the missing attribute
+creates another missing-attribute lookup, and the stack runs out before
+Python can raise an `AttributeError`.
 
 The trap is specific to the fallback hook. `__getattr__()` runs only
-when normal lookup fails, so any name it touches that is also missing
-re-enters it. Reading `self._impl`, which `__init__()` did assign,
-resolves normally and never reaches `__getattr__()`. That is why the
-chapter's working version is safe and this one is not, and why a proxy
-whose `__init__()` never ran (an instance built through
-`object.__new__()`, for example) fails the same way on its first
-attribute access.
+when normal lookup fails, so any missing name it touches sends Python
+straight back into `__getattr__()`. Reading `self._impl`, which
+`__init__()` did assign, resolves normally and never reaches
+`__getattr__()`. That is why the chapter's working version is safe and
+`BrokenProxy` is not. A proxy whose `__init__()` never ran (an instance
+built through `object.__new__()`, for example) fails the same way on
+its first attribute access.
 
 ## 5. A connection pool that hands out proxies
 
@@ -262,18 +262,18 @@ print("outer released:", pool.available())
 
 The client never holds a `Connection`. `acquire()` hands back a
 `ConnectionProxy`, which forwards `query()` through `__getattr__()`
-and owns the one job the connection cannot do for itself: giving
-itself back. Making the proxy a context manager
-([Context Managers](../Chapters/15_Techniques--Context_Managers.md)) is what turns "must check
-it back in" into a guarantee, since `__exit__()` runs whether the
-block ends normally or raises an exception.
+and owns the one job the connection cannot do for itself: returning
+that connection to the pool. The proxy is also a context manager
+([Context Managers](../Chapters/15_Techniques--Context_Managers.md)).
+`__exit__()` runs whether the block ends normally or raises an
+exception, so "must check it back in" becomes a guarantee.
 
 `__exit__()` also drops the proxy's reference to the connection, so a
 released proxy cannot keep using a connection that now belongs to
 someone else. The check in `__getattr__()` reports that misuse instead
-of letting two clients share one connection. This is a *protection
-proxy* and a *smart reference* at once: it controls access, and it
-adds an action (the check-in) around the object's lifetime.
+of letting two clients share one connection. `ConnectionProxy` is a
+*protection proxy* and a *smart reference* at once: it controls access,
+and it adds an action (the check-in) around the object's lifetime.
 
 ## 6. Forwarding `__len__()` explicitly
 
@@ -304,18 +304,17 @@ print(len(p))
 ```
 
 `__getattr__()` could not have supplied `__len__()` because `len()`
-does not perform an attribute lookup on the instance. It asks
-`type(p)` for `__len__()` and calls what it finds there, skipping the
-instance dictionary and therefore skipping `__getattr__()`, which only
-runs when an instance lookup fails. Python treats every implicit
-special-method invocation this way, so the method has to exist on the
-proxy's class.
+never looks the name up on the instance. `len()` asks `type(p)` for
+`__len__()` and calls what it finds there, skipping the instance
+dictionary and therefore skipping `__getattr__()`, which only runs when
+an instance lookup fails. Python looks up every implicitly invoked
+special method this way, so the method must exist on the proxy's class.
 
 `__len__()` here delegates with `len(self.__implementation)` rather
-than `self.__implementation.__len__()`, which reads better and gives
-the same answer. A proxy that must forward many dunders writes one
-such method per dunder, or generates them in a loop over a list of
-names and assigns them onto the class.
+than `self.__implementation.__len__()`. Both give the same answer, and
+`len()` reads better. To forward many dunders, you write one such
+method per dunder, or generate them in a loop over a list of names and
+assign them onto the class.
 
 ## 7. A `change_to()` that refuses a narrower implementation
 
@@ -364,18 +363,19 @@ s.g()  # The old implementation is still in place
 #: Full.g()
 ```
 
-`methods()` reports the public callables an object carries, which is
-what a caller can reach through the surrogate's `__getattr__()`.
+`methods()` reports the public callables an object carries, the set a
+caller can reach through the surrogate's `__getattr__()`.
 `change_to()` compares the two sets and refuses the swap when the
 replacement drops a name the current implementation answered. The
 surrogate keeps what it had, so `s.g()` still works after the
 rejected swap.
 
 The type checker cannot make this decision. It would have to compare
-the type of the value the surrogate is holding right now against the
-type of the argument, and the surrogate's attribute is `Any`: the
-point of `__getattr__()` delegation is that the implementation's type
-is not tracked. Annotating both against a `Protocol` states a fixed
-shape that every implementation must meet, which is a different
-guarantee. It cannot express "at least what the last one had," because
-that relates two runtime values rather than two declarations.
+the type of the value the surrogate holds right now against the type of
+the argument. The surrogate's attribute is `Any`, because
+`__getattr__()` delegation deliberately leaves the implementation's
+type untracked. Annotating both against a `Protocol` states a fixed
+shape that every implementation must meet, a different guarantee. A
+`Protocol` cannot express "at least what the last implementation had,"
+because that comparison relates two runtime values rather than two
+declarations.

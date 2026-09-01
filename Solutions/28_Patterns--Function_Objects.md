@@ -66,9 +66,9 @@ commands needs a name for "callable, plus `undo()`", and in Python
 that name is a `Protocol` declaring both members. `Macro` would then
 annotate `self.commands` against that `Protocol` and `Deposit` would
 inherit nothing. `UndoableCommand` above is the *GoF Design Patterns*
-shape, and its two `raise NotImplementedError` bodies show what it
-costs: a base class pays for itself when the commands share
-implementation, and these do not.
+shape, and its two `raise NotImplementedError` bodies show what that
+shape costs. A base class pays for itself when the commands share
+implementation, and these commands share none.
 
 ## 2. `chain.py`, reporting every attempt
 
@@ -148,20 +148,21 @@ solve(f, 1.0, 1.3, [bisection, secant, newton])
 
 Each handler function already reports its own outcome through its
 return value, `None` for failure, a number for success, so `solve()`
-only needs to print that outcome as it checks it, rather than asking
-each handler for a separate explanation. `finder.__name__` reads the
-function's own name, since every ordinary Python function carries its
-name as an attribute, so the report needs no extra bookkeeping to say
-*which* handler just ran.
+prints that outcome as it checks each return value, rather than
+asking each handler for a separate explanation. `finder.__name__`
+reads the function's own name, since every ordinary Python function
+carries its name as an attribute. The report therefore needs no extra
+bookkeeping to say *which* handler just ran.
 
-The report is why `chain` is typed against a `Protocol` here instead
-of the chapter's `RootFinder` alias. `Callable[...]` describes what a
-handler accepts and returns, and a type checker rejects `finder.__name__`
-on one, because nothing about `Callable` states that the object has a
-name. `Finder` declares `__name__` alongside `__call__()`, and a plain
-function satisfies both, so the copies below need no change and the
-annotation stops lying. The finders are copied from `algorithms.py`
-rather than imported, since a solution listing runs on its own.
+That report is why `chain` needs a `Protocol` here instead of the
+chapter's `RootFinder` alias. `Callable[...]` describes only what a
+handler accepts and returns, and says nothing about a name, so a type
+checker rejects `finder.__name__` on a handler annotated that way.
+`Finder` declares `__name__` alongside `__call__()`, and a plain
+function satisfies both. The finders themselves need no change, and
+the annotation stops lying. The listing copies them from
+`algorithms.py` rather than importing them, because each solution
+runs on its own.
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
@@ -176,13 +177,13 @@ print(by_score_then_name)
 ```
 
 The key function returns a tuple, `(score, name)`, and Python compares
-tuples element by element, so `sorted()` orders primarily by score
-and, among equal scores (`Bob` and `Cid`, both `85`), falls back to
-comparing names. `key` is exactly a *Strategy*: `sorted()` fixes the
-*algorithm* (some comparison-based sort), and the caller supplies the
-interchangeable *policy* that decides what "in order" means for this
-particular call, without `sorted()` itself needing to know anything
-about tuples, scores, or names. Passing a different `key` swaps the
+tuples element by element. `sorted()` therefore orders by score first,
+and among equal scores (`Bob` and `Cid`, both `85`) it compares names.
+`key` is exactly a *Strategy*: `sorted()` fixes the *algorithm* (some
+comparison-based sort), and the caller supplies the interchangeable
+*policy* that decides what "in order" means for this particular call.
+`sorted()` itself knows nothing about tuples, scores, or names.
+Passing a different `key` swaps the
 ordering strategy the same way the chapter's classic Strategy form
 swaps the algorithm its Context holds, except here the "context"
 holding the current strategy is just the call to `sorted()` itself.
@@ -252,16 +253,17 @@ the call. Both produce something matching `RootFinder`, so `solve()`
 accepts either with no change.
 
 The two coarse finders print the same wrong-looking answer, `1.500000`,
-which is how you can tell the tolerance took effect rather than being
-ignored: Newton's method starting at `1.0` reaches `1.5` on its first
-step, and a tolerance of `0.5` accepts the second step as close enough.
-The fine finder runs the same code to `1e-12` and agrees with the true
-root to six places.
+and that answer is how you can tell the tolerance took effect.
+Newton's method starting at `1.0` reaches `1.5` on its first step, and
+a tolerance of `0.5` accepts a step that size as close enough, so the
+loop stops right there. The fine finder runs the same code to `1e-12`
+and agrees with the true root to six places.
 
-`partial` is the shorter of the two, and it works here because
-`tolerance` is passed by keyword. A closure is what you need when the
-setting is not a parameter at all, the way `bisection_within()` builds
-its `while` condition around one.
+`partial` is the shorter of the two ways to configure the finder, and
+it works here because the caller can supply `tolerance` by keyword.
+You need a closure when the setting is not a parameter of the function
+at all, the way `bisection_within()` writes the tolerance into its
+`while` condition.
 
 ## 5. An event bus that walks the MRO, and can unsubscribe
 
@@ -326,24 +328,25 @@ bus.publish(BigDeposit(500))
 
 `type(event).__mro__` already runs from the class outward to `object`,
 so iterating it in order calls the most specific handlers first and the
-inherited ones after, which is what "parents last" asks for. `publish()`
-keeps using `.get()` for the same reason the chapter gives: indexing a
-`defaultdict` on a read would insert an empty list for every class in
-every published event's MRO, `object` included.
+inherited ones after. That order is what "parents last" asks for.
+`publish()` keeps using `.get()` for the same reason the chapter gives:
+indexing a `defaultdict` on a read would insert an empty list for every
+class in every published event's MRO, `object` included.
 
-`unsubscribe()` cannot break an existing caller. It adds a method, and
-code that never calls it behaves exactly as before. The MRO walk can.
+Adding `unsubscribe()` cannot break an existing caller, since code that
+never calls it behaves exactly as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
-`Deposit`, including ones defined after it was written, so a bus where
-`BigDeposit` used to reach only `on_big` now reaches `on_deposit` too.
-That is the intended feature, and it is still a behavior change to
-existing code: any handler that assumed `type(event) is Deposit`, or
-that counts events, now sees more than it did.
+`Deposit`, including subclasses written after the handler, so a bus
+where `BigDeposit` used to reach only `on_big` now reaches
+`on_deposit` too. That wider reach is the intended feature, and it is
+still a behavior change to existing code. Any handler that assumed
+`type(event) is Deposit`, or that counts events, now sees more than it
+did before.
 
 `unsubscribe()` guards with `if handler in handlers` rather than calling
 `remove()` outright, since `remove()` raises a `ValueError` for a handler
-that was never subscribed. Whether that should be silent or loud is a
-design decision: silent matches the bus's existing habit of letting an
+that was never subscribed. Whether that case should be silent or loud
+is a design decision: silent matches the bus's habit of letting an
 unmatched event pass without complaint.
 
 ## 6. Three fixes for late binding, and what none of them fix
@@ -403,24 +406,24 @@ report()
 
 A `for` loop does not create a scope, so `n` is one variable that the
 loop rebinds three times. All three lambdas close over that one
-variable rather than over its value, and by the time anything calls
-them the loop has finished and `n` holds 2. Nothing is wrong with the
-lambdas. They are reading the variable they were told to read, at the
-moment they are asked.
+variable rather than over its value. By the time anything calls them,
+the loop has finished and `n` holds 2. Nothing is wrong with the
+lambdas. They read the variable they name, at the moment of the call.
 
 The three fixes all work, and all work the same way: each one
 evaluates `n` while the loop is still running and stores the result.
 `lambda n=n:` evaluates the default at definition. `partial(print, n)`
-evaluates the argument where it is written. `make(n)` gives each
-lambda its own `n` in its own function scope, which is the only one of
-the three that would still read correctly if the body needed the
-variable for more than one purpose.
+evaluates the argument where it appears. `make(n)` gives each lambda
+its own `n` in its own function scope, and only that fix keeps the
+value private. `lambda n=n:` exposes the value as a parameter a caller
+can override, and `partial(print, n)` can only feed it to one call.
 
 None of the three preserves late lookup, and that is the point of the
-last clause. If the value must be computed when the command runs, all
-three are wrong: they froze it when the command was built. What you
-want then is the original behavior aimed at something that outlives
-the loop, as `report()` does by reading `settings` at call time. The
-late-binding trap and late binding as a feature are the same mechanism.
-Which one you have depends on whether the name you close over still
-means what you wanted when the call finally happens.
+exercise's closing question. If the command must compute the value
+when it runs, all three fixes are wrong: they froze the value when the
+loop built the command. You then want the original behavior, aimed at
+something that outlives the loop, as `report()` does by reading
+`settings` at call time. The late-binding trap and late binding as a
+feature are the same mechanism. Which one you have depends on whether
+the name you close over still means what you wanted when the call
+finally happens.

@@ -27,11 +27,11 @@ print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-No separate `Observer` class exists at all, the same design
-`observers.py` already uses. Any callable, here two `lambda`s, is an
-observer. `subscribe()` collects them in a list, and `notify()` calls
-each one in turn with whatever arguments it was given, so every
-subscribed observer sees the same update, in subscription order.
+Like `observers.py`, this solution has no separate `Observer` class at
+all. Any callable, here two `lambda`s, is an observer. `subscribe()`
+collects them in a list. `notify()` then hands its own arguments to
+each one in turn, so every subscribed observer sees the same update,
+in subscription order.
 
 ## 2. Turning `box_observer.py` into a flood-fill game
 
@@ -107,19 +107,19 @@ print("solved in", game.clicks, "clicks")
 `_flood()` is a plain graph search (depth-first, using a stack)
 starting from `origin`, walking to every neighbor `adjacent()` already
 knows how to test, as long as that neighbor is still the same color.
-It reuses `new_grid()` and `adjacent()` from `box_observer.py`
-unchanged. `click()` is the game move: repaint every cell in the
-*currently owned* patch to the clicked cell's color, then re-run
-`_flood()` to discover which previously-unowned neighbors now match
-that new color and have joined the patch. `game.clicks` gives the
+`FloodGame` reuses `new_grid()` and `adjacent()` from
+`box_observer.py` unchanged. `click()` is the game move: it repaints
+every cell in the *currently owned* patch to the clicked cell's color,
+then re-runs `_flood()` to pick up the neighbors that now match that
+new color and have joined the patch. `game.clicks` gives the
 single-player scoring the exercise asks for, "how many clicks to turn
-the field into one color." Two-player competition follows the same
-`click()` method, alternating whose turn supplies the next color, with
-whoever's move leaves the larger owned patch after a fixed number of
-rounds. `FloodGame` inheriting from `Observable[Grid]`, the same as
-`BoxModel`, and calling `self.notify(self.grid)` at the end of a
-successful `click()` lets `box_view.py`'s existing view repaint
-after every move with no changes to the view itself.
+the field into one color." Two players can share the same `click()`
+method, alternating whose turn supplies the next color, and after a
+fixed number of rounds whoever owns the larger patch wins. `FloodGame`
+can also inherit from `Observable[Grid]`, as `BoxModel` does, and call
+`self.notify(self.grid)` at the end of a successful `click()`.
+`box_view.py`'s existing view then repaints after every move, with no
+changes to the view itself.
 
 ## 3. A `notify()` that survives a failing observer
 
@@ -186,19 +186,19 @@ The loop catches each failure and keeps going, so subscription order
 stops deciding who hears the change. Collecting the exceptions rather
 than discarding them is the other half: an observer that fails
 silently is worse than one that stops the loop, because nothing
-reports that a notification was lost.
+reports the failure.
 
-`ExceptionGroup` is the right container because more than one
-observer can fail on a single notification, and the caller needs all
-of them, not the first. `except*` then lets a caller handle one kind
-of failure and re-raise the rest, which a plain `except` on a single
+`ExceptionGroup` is the right container because more than one observer
+can fail on a single notification, and the caller needs every failure,
+not the first. `except*` then lets a caller handle one kind of failure
+and re-raise the rest, something a plain `except` on a single
 re-raised exception cannot do.
 
 Catching bare `Exception` here is deliberate: `notify()` has no idea
-what its observers do, so it cannot name their failure modes. It
-still lets `BaseException` through, so a `KeyboardInterrupt` or an
-`asyncio.CancelledError` passing through an observer stops the
-notification instead of being collected as data.
+what its observers do, so it cannot name their failure modes. Catching
+`Exception` still lets `BaseException` through, so a
+`KeyboardInterrupt` or an `asyncio.CancelledError` passing through an
+observer stops the notification instead of joining `failures`.
 
 ## 4. The same rescue, for the async fan-out
 
@@ -287,13 +287,13 @@ it filters with `isinstance(r, Exception)` and drops the `None`s that
 successful observers returned.
 
 The exception filter uses `Exception`, not `BaseException`, for the
-reason exercise 3 gives, and here it also matters that
-`asyncio.CancelledError` derives from `BaseException`:
+reason exercise 3 gives, and for a second reason here.
+`asyncio.CancelledError` derives from `BaseException`, and
 `return_exceptions=True` still returns a cancellation among the
-results, and treating it as an ordinary observer failure would swallow
-a cancellation the event loop meant to propagate.
+results. Treating that result as an ordinary observer failure would
+swallow a cancellation the event loop meant to propagate.
 
 The synchronous and asynchronous versions now answer the same
 question, and both end in an `ExceptionGroup`. The difference is only
-where the loop lives: written by hand in one, supplied by `gather()`
-in the other.
+where the loop lives: written by hand in the synchronous version,
+supplied by `gather()` in the async one.

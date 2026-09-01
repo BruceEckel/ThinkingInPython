@@ -2,9 +2,9 @@
 
 ## 1. A file-processing framework, customized both ways
 
-The framework fixes the shape: read every file but the last, run an
-undetermined `process()` step over each one's text, and write the
-combined result to the last file.
+The framework anchors the shape: read every file but the last, run the
+varying `process()` step over each one's text, and write the combined
+result to the last file.
 
 ```python
 # exercise_1.py
@@ -67,26 +67,26 @@ demo()
 #: 'HELLO\nWORLD\n'
 ```
 
-Both produce identical output, `'HELLO\nWORLD\n'`, since both express
-the exact same `process()` step, an uppercase conversion, through two
-different mechanisms for supplying it. The fixed algorithm, "read
-every input, transform it, concatenate into the output," lives in
-exactly one place either way: the base class's `run()`, or the free
-function `run_file_framework()`.
+Both produce identical output, `'HELLO\nWORLD\n'`, because both
+express the same `process()` step, an uppercase conversion, through
+two different mechanisms for supplying that step. The anchored
+algorithm, "read every input, transform it, concatenate into the
+output," lives in exactly one place either way: the base class's
+`run()`, or the free function `run_file_framework()`.
 
 The second customization idea, searching every input file for words
 listed in the first, fits the same shape with a different `process()`
-step: a version whose `process(text)` checks the text against a
-word list (read once, before the loop, from the first input file) and
-returns a report of which words it found, rather than transforming the
-text itself. Nothing about `FileFramework.run()` or
-`run_file_framework()` needs to change to support it. Only the step
-does, which is the entire point of the pattern.
+step. That version reads the word list once from the first input
+file, before the loop starts. Its `process(text)` then checks each
+text against that list and returns a report of the words it found,
+rather than a transformed text. The word search needs no change to
+`FileFramework.run()` or `run_file_framework()`. Only the step
+changes, which is the entire point of the pattern.
 
 ## 2. Two fixes for the premature engine
 
-The quick fix reorders the two lines so the subclass finishes its own
-setup before handing control to the base class:
+The quick repair reorders the two lines so the subclass finishes its
+own setup before handing control to the base class:
 
 ```python
 # exercise_2_reorder.py
@@ -148,18 +148,18 @@ works, but it works only for the subclass that performs it, and it
 survives only as long as everyone remembers it. It asks every future
 subclass author to invert the convention they have used everywhere
 else, which is to call `super().__init__()` first. Nothing in the
-signature says so, no type checker objects to the usual order, and the
-failure arrives as an `AttributeError` inside a base class the author
-did not write. A rule that must be remembered by people who have not
-read this chapter is not a fix.
+signature says so, and no type checker objects to the usual order.
+The failure arrives as an `AttributeError` inside a base class
+someone else wrote. A rule the next author must remember, without
+having read this chapter, is not a repair.
 
 Separating construction from starting makes the mistake unavailable.
 No window exists in which the engine runs against half-built state,
-because construction runs no engine. The cost is one extra line at
-every call site, `greeter.run()`, and that line is worth it: it moves
-the decision about *when* the algorithm starts out of the base class
-and into the hands of the code that knows the object is ready. This
-is the same reasoning behind eager versus lazy construction in
+because construction runs no engine. The extra line at every call
+site, `greeter.run()`, moves the decision about *when* the algorithm
+starts out of the base class and into the hands of the code that
+knows the object is ready. The same reasoning drives eager versus
+lazy construction in
 [Singleton](../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance),
 where the timing of a hidden step makes the difference.
 
@@ -202,29 +202,30 @@ Reversed().run()
 ```
 
 Python objects to nothing. The program runs, and the steps come out
-in the reversed order the subclass chose, which is the fixed algorithm
-no longer being fixed.
+in the reversed order the subclass chose. The anchored algorithm is
+no longer anchored.
 
-`ty` is the one that complains, which is why the override carries a
-`# type: ignore` to keep this listing in the book's build:
+`ty` is the one that complains. The override carries a `# type: ignore`
+so this listing stays in the book's build:
 
 ```
 error[override-of-final-method]: Cannot override `ApplicationFramework.run`
 info: `ApplicationFramework.run` is decorated with `@final`, forbidding overrides
 ```
 
-The guarantee comes from the type checker, not the language. `@final` sets
-`__final__ = True` on the function and does nothing else. No runtime
-check consults it. That places the Template Method's central promise
-in the same category as every other annotation in this book: enforced
-before the program runs, by a tool you have to actually run.
+The guarantee comes from the type checker, not the language. `@final`
+sets `__final__ = True` on the function and does nothing else. No
+runtime check consults it. That missing check places the Template
+Method's central promise in the same category as every other
+annotation in this book: enforced before the program executes, by a
+tool you have to actually invoke.
 
-The practical consequence is that `@final` protects a codebase whose
-build runs a type checker and protects nothing in a codebase that does not.
-When the interpreter itself must refuse the override, use the
+`@final` therefore protects a codebase whose build runs a type
+checker, and protects nothing in a codebase that does not. When the
+interpreter itself must refuse the override, use the
 `__init_subclass__()` technique the chapter points at, which raises a
 `TypeError` while the subclass's own class body is executing, long
-before anyone constructs one.
+before anyone constructs an instance.
 
 ## 4. Two faithless substitutes the type checker accepts
 
@@ -273,43 +274,43 @@ name, the right parameters, and the right return type, so both satisfy
 `@override` and every signature rule the base class states.
 
 `Exploder` breaks the algorithm on the first step of the first pass.
-Code written against `ApplicationFramework` sees `run()` return
-normally for every subclass the base contemplates, and this one raises
-an exception instead, so a caller who wrapped `run()` in nothing finds an exception
-coming out of a method that never advertised one.
+Code written against `ApplicationFramework` expects `run()` to return
+normally for every subclass the base contemplates. `Exploder` raises
+an exception instead, so a caller with no `try` around `run()` gets an
+exception out of a method that never advertised one.
 
-`HalfDone` breaks it more quietly, which makes it the worse of the two.
-`customize1()` accumulates work and `customize2()` is supposed to
-consume it, so the pair is a two-step flow. Leaving `customize2()` at
-its default breaks the second half, and the program neither raises nor
-prints anything wrong. `pending` simply grows forever. Nothing is
-visible from outside until whatever `pending` feeds runs out of memory
-or reports stale data.
+`HalfDone` breaks the algorithm more quietly, which makes it the
+worse of the two. `customize1()` accumulates work for `customize2()`
+to consume, so the pair is a two-step flow. Leaving `customize2()` at
+its default breaks the second half, and the program neither raises an
+exception nor prints anything wrong. `pending` simply grows forever.
+Nothing shows from outside until whatever `pending` feeds runs out of
+memory or reports stale data.
 
-The two need different things from a type checker, and only one of them is
-available.
+`Exploder` and `HalfDone` need different things from a type checker,
+and only one of those things exists.
 
-The omission is fixable. `...` is what makes the step optional, and it
-is a decision the base class makes: it declares that a subclass may
-skip this step. Declare instead that a subclass may not, by inheriting
-from `ABC` and marking `customize2()` with `@abstractmethod`, and both
-tools object. `ty` reports the instantiation of an abstract class, and
-Python refuses to construct `HalfDone` at all. The type checker could not
-catch it before, because "deliberately empty" and "forgotten" were the
-same code, and the base class was the only place that difference could
-have been written down.
+`HalfDone`'s omission is repairable. The `...` body makes the step
+optional, and that is the base class's decision: it declares that a
+subclass may skip this step. Declare instead that a subclass may not,
+by inheriting from `ABC` and marking `customize2()` with
+`@abstractmethod`, and both tools object. `ty` reports the
+instantiation of an abstract class, and Python refuses to construct
+`HalfDone` at all. The type checker could not catch the omission
+before, because "deliberately empty" and "forgotten" were the same
+code, and only the base class could have recorded that difference.
 
-The exception is not fixable this way. Catching it would require the
-base class to state which exceptions a step may raise and the type checker
-to hold every override to that list, which is Java's `throws` clause.
-Python has no such declaration, and no annotation expresses "this
-raises nothing." An exception type in a docstring is a note to a human.
-So the first subclass is caught by discipline, review, or a test, and
-by nothing else.
+`Exploder`'s exception is not repairable this way. Catching it would
+require the base class to state which exceptions a step may raise, and
+the type checker to hold every override to that list, which is Java's
+`throws` clause. Python has no such declaration, and no annotation
+expresses "this raises nothing." An exception type in a docstring is
+a note to a human. Only discipline, review, or a test catches
+`Exploder`.
 
 That split is the chapter's point stated from the other side. `@final`
 protects the shape of the algorithm, and `@abstractmethod` protects the
 presence of a step, because both are properties of the class structure
 that a base class can declare. What a step *does* once called is
-behavior, and Liskov substitution is a rule about behavior, so it
-stays where the chapter left it: with you.
+behavior, and Liskov substitution is a rule about behavior, so
+enforcing it stays where the chapter left it: with you.

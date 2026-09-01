@@ -65,9 +65,9 @@ s.erase()
 
 `shape_factory2.py`'s factory-object version instead needs a `Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
-mapping the name to an instance of it (shown here with only the new
-shape. In the chapter file the entry joins `Circle`'s and
-`Square`'s):
+mapping the name to an instance of that `Factory`. The listing below
+shows the new shape alone; in the chapter file its entry joins
+`Circle`'s and `Square`'s:
 
 ```python
 # exercise_2.py
@@ -101,14 +101,15 @@ create_shape("Triangle").draw()
 #: Triangle.draw
 ```
 
-The first version required touching one function
-(`Shape.factory()`), where the new `case` sits inside logic that
-must be re-read. The second touches the new class and one data line
-in `FACTORIES`. That is the trade-off the chapter draws between
-them: more ceremony up front (a nested `Factory` per shape) in
-exchange for a dispatcher that changes by table entry rather than by
-code. The chapter's `registry.py` goes one step further and removes
-even the table entry, by letting each class register itself.
+Both versions add the `Triangle` class itself. Beyond that, the first
+edits one function, `Shape.factory()`, where the new `case` sits inside
+logic you must re-read. The second adds a nested `Factory` to
+`Triangle` and one data line to `FACTORIES`. That is the trade-off the
+chapter draws between the two versions: more ceremony up front (a
+nested `Factory` per shape) in exchange for a dispatcher that changes
+by table entry rather than by code. The chapter's `registry.py` goes
+one step further: each class registers itself, so even the table entry
+disappears.
 
 ## 3. `GnomesAndFairies`
 
@@ -235,14 +236,14 @@ for shape in build_shapes(ThinShapeFactory()):
 #: thin Square.draw
 ```
 
-This is the same shape as `games.py`'s `GameElementFactory`, applied
-to shapes instead of game elements: one abstract factory with a method
-per product (`make_circle()`, `make_square()`), and concrete factories
-that each produce a consistent *family* of products, here "all thick"
-or "all thin." `build_shapes()` works with any `ShapeAbstractFactory`,
-so switching a whole family of shapes from thick to thin is choosing a
-different factory object, not editing every call site that creates a
-shape.
+`ShapeAbstractFactory` has the same shape as `games.py`'s
+`GameElementFactory`, applied to shapes instead of game elements: one
+abstract factory with a method per product (`make_circle()`,
+`make_square()`), and concrete factories that each produce a consistent
+*family* of products, here "all thick" or "all thin."
+`build_shapes()` works with any `ShapeAbstractFactory`, so switching a
+whole family of shapes from thick to thin is choosing a different
+factory object, not editing every call site that creates a shape.
 
 ## 5. A four-topping limit, in both pizza styles
 
@@ -299,24 +300,25 @@ print(pb.build())
 
 In `pizza_direct.py`, an invalid `Pizza` can never exist, not even
 momentarily. `__post_init__()` runs immediately after the constructor
-assigns every field, and raises before that constructor call returns,
-so it rejects the five-topping combination atomically, before any code
-anywhere could hold a reference to a `Pizza` carrying it. This is
+assigns every field, and raises a `ValueError` before that constructor
+call returns. The rejection is therefore atomic: no code anywhere can
+hold a reference to a `Pizza` carrying five toppings. That guarantee is
 [A Type Is a Set of Values](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 again: illegal values are unrepresentable.
 
 Placing the check in `topping()`, as above, gives `PizzaBuilder` the
-same guarantee: the fifth `.topping()` call raises before appending,
-so `self._toppings` itself never grows past four. Placing the check
-in `build()` instead changes this. The builder then accepts
-a fifth, sixth, or tenth `.topping()` call without complaint, silently
-accumulating an already-too-long list, and only discovers the problem
-when `build()` finally runs. During that window, between the fifth
-`.topping()` call and the eventual `build()` call, the builder's own
-internal state (though never a `Pizza` object) already violates the
-rule the finished `Pizza` must guarantee. Checking in
-`topping()` closes that window entirely. Checking only in `build()`
-leaves it open for as long as the caller keeps adding toppings.
+same guarantee: the fifth `.topping()` call raises a `ValueError`
+before appending, so `self._toppings` itself never grows past four.
+Placing the check in `build()` instead gives up that guarantee. The
+builder then accepts a fifth, sixth, or tenth `.topping()` call without
+complaint, silently accumulating an already-too-long list, and
+discovers the problem only when `build()` finally runs, leaving a
+window between the fifth `.topping()` call and that `build()` call.
+During that window the builder's own internal state violates the rule
+the finished `Pizza` must guarantee, though no `Pizza` object ever
+violates it. Checking in `topping()` closes that window entirely.
+Checking only in `build()` leaves it open for as long as the caller
+keeps adding toppings.
 
 ## 6. A registry whose classes live somewhere else
 
@@ -375,20 +377,21 @@ print(extra_shapes.Circle.__name__)
 #: Circle
 ```
 
-The registration happens on the `class Circle(Shape):` line in
-`extra_shapes.py`, and it runs while that `class` statement executes,
-which happens the first time something imports `extra_shapes`.
-Nothing else triggers it. `shape_registry` knows nothing about
-`extra_shapes` and never imports it, so until some other module does,
-`Shape.registry` is empty and every `make()` call raises `KeyError`.
+`Shape.__init_subclass__()` registers `Circle` as the
+`class Circle(Shape):` line in `extra_shapes.py` executes, and that
+line executes the first time something imports `extra_shapes`.
+Nothing else triggers the registration. `shape_registry` knows nothing
+about `extra_shapes` and never imports it, so until some other module
+does, `Shape.registry` is empty and every `make()` call raises a
+`KeyError`.
 
 That is the plugin failure the chapter describes, reproduced in
 miniature. The registry is correct, the subclass is correct, and the
 program still fails, because registration is a side effect of import
-and nobody imported the module. Real systems solve this by importing
-the plugin package explicitly at startup, by walking a directory with
-`importlib`, or by declaring entry points that the packaging system
-imports for them.
+and nobody imported the module. Real systems solve that failure by
+importing the plugin package explicitly at startup, by walking a
+directory with `importlib`, or by declaring entry points that the
+packaging system imports for them.
 
 ## 7. What `copy.copy()` costs a prototype registry
 
@@ -424,18 +427,21 @@ print(shallow_spawn("hydra").parts)
 #: {'heads': 1}
 ```
 
-With `copy.copy()`, `test_clone_is_independent()` fails first:
+With `copy.copy()`, `test_clone_is_independent()` fails first.
 `b.powers.append("curse")` appends to the one list both spawns share,
-so `a.powers` is `["bite", "curse"]` and the assertion that it equals
-`["bite"]` fails. `test_prototype_untouched()` still passes, because
-`spawned.hp = 1` rebinds an `int` field on the copy rather than
-mutating a shared object, and `int` is immutable anyway.
+so `a.powers` becomes `["bite", "curse"]` and the assertion that it
+equals `["bite"]` fails. `test_prototype_untouched()` fails too, but
+only on its second assertion: `spawned.powers.append("bellow")`
+mutates the shared list, so `PROTOTYPES["troll"].powers` grows a third
+entry. Its first assertion still holds, because `spawned.hp = 1`
+rebinds an `int` field on the copy rather than mutating a shared
+object.
 
-That split is the whole lesson. A shallow copy duplicates the top
-object and shares everything it refers to, so the fields that break
-are exactly the mutable ones, and only when something mutates them
-in place. Assignment to a field is always safe. `append()`, `[k] = v`,
-and `.update()` are not.
+The split between those two assertions is the whole lesson. A shallow
+copy duplicates the top object and shares everything it refers to, so
+the fields that break are exactly the mutable ones, and only when
+something mutates them in place. Assignment to a field is always safe.
+`append()`, `[k] = v`, and `.update()` are not.
 
 A test through `parts` would have caught it either way:
 
@@ -467,8 +473,8 @@ def test_nested_dict_is_copied() -> None:
 
 The second assertion is the one worth writing. Checking that the
 prototype survived is good. Checking that the *next* spawn is still
-correct is what a user of the registry actually depends on, and it
-fails loudly under `copy.copy()`.
+correct is what a user of the registry actually depends on, and that
+assertion fails loudly under `copy.copy()`.
 
 ## 8. What the `eval()` dispatcher accepts
 
@@ -523,16 +529,16 @@ except KeyError as e:
 
 `create_shape()` builds the string `print('side effect!') or
 Circle.Factory()` and hands it to `eval()`. Python evaluates the
-`print()` call first, which is the side effect, and `None or
-Circle.Factory()` then produces a perfectly good factory, so the
-attack leaves no trace: the caller receives the `Circle` it asked
-for and the injected code has already run. Anything reachable from
-the module's namespace, and anything `__import__()` can reach, is
-available to that string.
+`print()` call first, which is the injected side effect. `None or
+Circle.Factory()` then produces a perfectly good factory, so
+`create_shape()` returns a working `Circle` and the caller sees no
+error at all. That string can reach anything in the module's
+namespace, and anything `__import__()` can reach.
 
-`TableFactory` keys a dictionary on the same names. A `kind` that is
-not a key is a `KeyError` naming the string, and nothing evaluates it.
-The dictionary is also shorter, needs no `Factory` lookup by name, and
-lets a type checker see that every value is a `ShapeMaker`. Whenever
-`kind` can come from a configuration file, a request, or a command
-line, this is the only acceptable version of the two.
+`TableFactory` keys a dictionary on the same names. Looking up a `kind`
+that is not a key raises a `KeyError` naming the string, and nothing
+evaluates that string. `TableFactory.create_shape()` is also shorter,
+needs no `Factory` lookup by name, and lets a type checker see that
+every value is a `ShapeMaker`. Whenever `kind` can come from a
+configuration file, a request, or a command line, `TableFactory` is the
+only acceptable version of the two.

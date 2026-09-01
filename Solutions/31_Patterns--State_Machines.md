@@ -1,7 +1,7 @@
 # State Machines: Solutions
 
 Several exercises below reuse the book's generic table-driven engine,
-so it is defined once, here, as its own file that the others import:
+so it appears once here, in its own file that the others import:
 
 ```python
 # table_machine.py
@@ -78,10 +78,10 @@ print(person.hello())
 
 `Prozac` needs nothing beyond `Happy` and `Grumpy`'s own shape: one
 `hello()` method. `UnpredictablePerson` never mentions any specific
-mood by name, so adding a third one changes nothing about the
-surrogate itself, only which `Mood` object gets swapped in through
-`change_to()`. This is the *State* surrogate from
-[Surrogate](../Chapters/26_Patterns--Surrogate.md#state), applied to a new domain.
+mood by name, so a third mood changes only which `Mood` object
+`change_to()` swaps in. `UnpredictablePerson` is the *State*
+surrogate from [Surrogate](../Chapters/26_Patterns--Surrogate.md#state),
+applied to a new domain.
 
 ## 2. A washing machine, table-driven
 
@@ -163,13 +163,13 @@ print(light.log)
 ```
 
 The `(RINSING, RinseDone)` key holds the two rows the exercise asks
-for, told apart by `too_heavy()`: a load over six kilograms takes the
+for, told apart by `too_heavy()`. A load over six kilograms takes the
 slow spin, and anything lighter falls through to the unconditional
-fast-spin row below it. The condition reads `load_kg` off the machine,
-where `begin()` recorded it when the cycle started, since a `RinseDone`
-event carries no data of its own. The rest of the cycle is a straight
-line, one event type per state, and the machine is still the chapter's
-`table_machine.py` engine unchanged.
+fast-spin row below it. A `RinseDone` event carries no data of its
+own, so the condition reads `load_kg` off the machine, where
+`begin()` recorded it when the cycle started. The rest of the cycle
+is a straight line, one event type per state, and the machine is
+still the chapter's `table_machine.py` engine unchanged.
 
 ## 3. A word-driven state machine with per-state transition tables
 
@@ -218,19 +218,19 @@ print(" ".join(history))
 This is the classic turnstile: `push` while locked does nothing (the
 `"*"` fallback), `coin` unlocks it, and `push` while unlocked locks it
 again. Each state subclass carries its own transition table as a class
-attribute and looks itself up with `.get(word, ...["*"])`, so
-`Controller` does not branch on which state or word it is
-processing. It asks the current state object what comes next,
-the same delegation `state.py`'s `next()` method uses. Reading a
-sequence of words from a file one per line is a one-line change:
+attribute. `next_state()` looks the word up in that table with
+`.get(word, ...["*"])`, so `Controller` never branches on the current
+state or word. It asks the current state object what comes next, the
+same delegation `state.py`'s `next()` method uses. Reading the words
+from a file, one per line, takes one line of code:
 `words = Path("moves.txt").read_text().split()`.
 
 ## 4. Configuring the machine from one transition table
 
 The per-state design in exercise 3 spreads the turnstile's rules
-across two classes, one dictionary each. Collecting both into a single
-table, keyed by `(state, word)`, makes the whole machine's behavior
-editable in one place:
+across two classes, one dictionary each. A single table keyed by
+`(state, word)` collects both dictionaries and makes the whole
+machine's behavior editable in one place:
 
 ```python
 # exercise_4.py
@@ -262,11 +262,11 @@ print(" ".join(history))
 
 Both versions produce the same history. The per-state design (exercise
 3) puts each state's rules with that state, which reads well when a
-state's behavior involves more than a lookup. The single-table design
-puts every rule for the whole machine in one dictionary, which is
-easier to audit and edit as a unit, the same trade-off the chapter's
-own [table-driven state machine](../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine) makes
-over the per-state `mouse_trap.py`.
+state does more than look a word up. The single-table design puts
+every rule for the whole machine in one dictionary, which is easier to
+audit and edit as a unit. The chapter's own
+[table-driven state machine](../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
+makes the same trade-off over the per-state `mouse_trap.py`.
 
 ## 5. The mood machine, rebuilt on `table_machine.py`
 
@@ -323,10 +323,10 @@ print(mm.state, mm.message)
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
 object through `change_to()`, this version drives the same mood
 transitions through events and a table. Both model "a thing that
-changes behavior over time." The *State* surrogate suits it when each
-mood needs real per-mood logic, and the table-driven machine suits it
-when the transitions themselves, not the mood behaviors, are the part
-worth making explicit and easy to audit.
+changes behavior over time." The *State* surrogate suits that job
+when each mood needs real per-mood logic. The table-driven machine
+wins when the transitions themselves, not the mood behaviors, are the
+part worth making explicit and easy to audit.
 
 ## 6. An elevator, table-driven
 
@@ -416,15 +416,16 @@ print(elevator.state)
 #: ElevatorState.IDLE
 ```
 
-The "doors closing" state carries the two rows the exercise asks for:
-`(DOORS_CLOSING, DoorSensor)` reopens the doors when `obstructed()`
-passes, and the unconditional row below it lets an unobstructed close
-finish in `IDLE`. The `(IDLE, CallButton)` key shows the same idiom
-three wide, the vending machine's `(State.SELECTING, SecondDigit)`
-shape: candidate transitions sharing one key, tried in order, the
-first whose condition passes wins. `above()`/`below()` pick
-`MOVING_UP` or `MOVING_DOWN`, and a call for the current floor falls
-through both conditions to open the doors with no travel.
+The "doors closing" state carries the two rows the exercise asks for.
+Under `(DOORS_CLOSING, DoorSensor)`, the first row reopens the doors
+when `obstructed()` passes, and the unconditional row below it
+finishes the close in `IDLE`. The `(IDLE, CallButton)` key shows the
+same idiom three wide, in the vending machine's
+`(State.SELECTING, SecondDigit)` shape: candidate transitions share
+one key, `handle()` tries them in order, and the first whose condition
+passes wins. `above()` and `below()` pick `MOVING_UP` or
+`MOVING_DOWN`, and a call for the current floor falls through both
+conditions to open the doors with no travel.
 
 ## 7. A heating/air-conditioning system, table-driven
 
@@ -482,15 +483,15 @@ for degrees in [15, 17, 21, 30, 20]:
 #: 20 IDLE
 ```
 
-The machine has one input type, and the `(IDLE, TemperatureReading)`
-key holds three rows, so a single reading leads to heating, cooling,
-or staying idle, decided entirely by the two conditions, as the
-exercise requires. The running states carry their own two-row groups:
-a reading still outside the band keeps the system running, and one
-inside the band falls through to the unconditional row back to
-`IDLE`. Every decision in the machine is a condition on the one event
-type. No transition needs an action, which confirms that both slots
-are genuinely optional per row.
+The machine has one input type. The `(IDLE, TemperatureReading)` key
+holds three rows, so a single reading leads to heating, cooling, or
+staying idle, and the two conditions decide which, as the exercise
+requires. The running states carry their own two-row groups: a reading
+still outside the band keeps the system running, and one inside the
+band falls through to the unconditional row back to `IDLE`. Every
+decision in the machine is a condition on the one event type. Every
+action slot here holds `None`, and the fall-through rows leave the
+condition slot `None` too, so both slots really are optional per row.
 
 ## 8. `mouse_move_generator()`
 
@@ -540,13 +541,13 @@ print(" ".join(m.name for m in moves[4:]))
 `NEXT_ACTIONS` is a small state machine of its own: a dictionary from
 "the action just produced" to "the legal actions that can follow it,"
 including the special `None` key for "nothing has happened yet," which
-leads only to `APPEARS`. The generator's own state is just
-`previous`, the last action it yielded. Each call to `next()` (each
-iteration of the `for` loop that consumes it) picks a legal successor
-and remembers it for the following call. Because every choice is
-constrained by `NEXT_ACTIONS`, any sequence this generator produces is
-automatically a legal one, the same guarantee `mouse_trap.py`'s
-`next()` methods enforce by hand, one state class at a time.
+leads only to `APPEARS`. The generator's own state is just `previous`,
+the last action it yielded. Each call to `next()` (one iteration of
+the consuming `for` loop) picks a legal successor and remembers it for
+the following call. `NEXT_ACTIONS` constrains every choice, so every
+sequence this generator produces is legal by construction.
+`mouse_trap.py`'s `next()` methods enforce the same guarantee by hand,
+one state class at a time.
 
 ## 9. A `Nickel` the table has never heard of
 
@@ -610,22 +611,22 @@ print(m2.amount)
 #: 5
 ```
 
-The exception is `NoTransition`, not a `TypeError` or a silent
-no-op, and it names the class that was not found. `handle()` looks up
-`(self.state, type(event))`, and `type(Nickel("nickel", 5))` is
-`Nickel`. A dictionary probe compares keys by equality, so `Nickel`
-does not match the `Money` key however closely the two are related.
-Nothing walks the MRO. That is the exact-type dispatch the chapter
-describes, and a subclass of an event type is the way most readers
-first meet it.
+The exception is `NoTransition`, not a `TypeError` or a silent no-op,
+and its message names the event class that found no row: `Nickel`.
+`handle()` looks up `(self.state, type(event))`, and
+`type(Nickel("nickel", 5))` is `Nickel`. A dictionary probe compares
+keys by equality, so the `Nickel` key misses the `Money` row even
+though `Nickel` subclasses `Money`. Nothing walks the MRO. That lookup
+is the exact-type dispatch the chapter describes, and a subclass of an
+event type is how most readers first meet it.
 
-**Fix 1** adds `(state, Nickel)` rows. This works, and it scales
+**Fix 1** adds `(state, Nickel)` rows. Those rows work, and they scale
 badly: every new denomination needs a row for every state that accepts
-money, so a machine with five states and six coins carries thirty
-rows that all do the same thing. It is the right fix when the new
-subclass really does behave differently, which is what `FirstDigit`
-and `SecondDigit` do in `vending_machine.py`. There the subclassing
-exists so the two arrive under different keys.
+money, so a machine with five states and six coins carries thirty rows
+that all do the same thing. Fix 1 is the right fix when the new
+subclass really does behave differently, as `FirstDigit` and
+`SecondDigit` do in `vending_machine.py`. They exist as separate
+classes so they arrive under different keys.
 
 **Fix 2** stops making a class for something that is a value. A
 nickel is not a new kind of money. It is a `Money` whose `value` is 5.
@@ -633,8 +634,8 @@ nickel is not a new kind of money. It is a `Money` whose `value` is 5.
 class, because it arrives under the key the table already has.
 
 Keep fix 2. A subclass is worth creating when the machine must treat
-the input differently, and a nickel differs from a quarter only in a
-number the existing action already reads. The general rule the two
-fixes illustrate: under exact-type dispatch, a class is a dispatch
-key, so create one when you want a separate row and not when you want
-a separate value.
+the input differently. A nickel differs from a quarter only in a
+number the existing action already reads. The two fixes illustrate a
+general rule: under exact-type dispatch, a class is a dispatch key,
+so create one when you want a separate row and not when you want a
+separate value.

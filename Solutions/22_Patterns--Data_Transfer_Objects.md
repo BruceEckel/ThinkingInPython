@@ -20,10 +20,10 @@ print(hasattr(m1, "name"), hasattr(m2, "info"))
 #: False False
 ```
 
-Each `Messenger()` call assigns a fresh `dict` (the one `**kwargs`
-built from that call's own arguments) to that instance's `__dict__`.
-Every instance gets its own independent dictionary, unlike a class
-attribute from [Class Attributes](../Chapters/09_Foundations--Class_Attributes.md), which is
+Each `Messenger()` call assigns a fresh `dict` to that instance's
+`__dict__`: the one `**kwargs` built from that call's own arguments.
+Every instance gets its own independent dictionary. A class attribute
+from [Class Attributes](../Chapters/09_Foundations--Class_Attributes.md) works the other way:
 one object shared by every instance until something shadows it. `m1`
 and `m2` share nothing: `m1` has no `name`, and `m2` has no `info`.
 
@@ -75,10 +75,10 @@ except TypeError as e:
 ```
 
 The record changed, and nothing objected. `NamedTuple` refuses to
-rebind `toast.steps`, and says nothing about the list that field
-already refers to, so `append()` reaches straight through the record
-and edits its contents. Neither `ty` nor Python reports anything,
-because no assignment to a field ever happens.
+rebind `toast.steps`. It says nothing about the list that field
+already refers to, so `append()` edits that list through the record.
+Both `ty` and Python stay silent, because `append()` mutates the
+list instead of assigning to a field.
 
 Using the record as a `dict` key raises a `TypeError`, whose full message
 names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
@@ -88,12 +88,12 @@ record has none either.
 
 The two results are one fact seen twice. The immutability a
 `NamedTuple` gives you stops at the field, and a field pointing at a
-mutable object hands that object's mutability back. This is the same
-shallowness `frozen=True` has in
-[Rethinking Objects](../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution).
-Declaring `steps: tuple[str, ...]` fixes both at once: the contents
-stop being editable and the record becomes hashable, which is the clue
-that they were never two problems.
+mutable object hands that object's mutability back. `frozen=True` in
+[Rethinking Objects](../Chapters/20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+is shallow the same way. Declaring `steps: tuple[str, ...]` fixes
+both at once: the contents stop being editable and the record becomes
+hashable. One declaration fixing both is the clue that they were
+never two problems.
 
 ## 4. A fourth attribute supplied at construction
 
@@ -117,11 +117,11 @@ print(vars(built) == vars(assigned))
 ```
 
 A keyword argument and a later assignment both add one entry to the
-instance's `__dict__`, and `vars()` reads that dict. The two
+instance's `__dict__`. `vars()` reads that dict, and the two
 namespaces are indistinguishable afterward. Even the order matches,
-because a dict keeps insertion order and both routes add `tag`
-last. If you assign the attributes in a different sequence, the dicts
-still compare equal, since dict equality ignores order.
+because a dict keeps insertion order and both routes add `tag` last.
+If you assign the attributes in a different sequence, the dicts still
+compare equal, since dict equality ignores order.
 
 ## 5. Returning a bare `tuple[float, int]`
 
@@ -143,30 +143,29 @@ everything above the mechanics.
 
 The call sites lost the names. `summarize([2.0, 4.0, 6.0])` now prints
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
-says which number is which, and a reader of the call site has to open
+says which number is which. A reader of the call site has to open
 `summarize()` to find out. They also lost attribute access:
-`result.mean` becomes `result[0]`, which is the same information
-written in a form that stops carrying its meaning. And they lost the
-type as a name. Nothing can be annotated `Stats` anymore, so a function
-accepting a summary now advertises `tuple[float, int]`, which any pair
-of a `float` and an `int` satisfies.
+`result.mean` becomes `result[0]`, which holds the same value and no
+longer says what it is. And they lost the type as a name. Nothing can
+carry a `Stats` annotation anymore, so a function accepting a summary
+now advertises `tuple[float, int]`, which any pair of a `float` and an
+`int` satisfies.
 
 The type checker still catches a fair amount. Unpacking into the wrong
 number of names fails, since the tuple's length is part of its type.
-Passing `mean` where an `int` is expected fails, since the element
+Passing `mean` to a parameter declared `int` fails, since the element
 types are still known positionally. Indexing past the end fails, and
 so does calling a `str` method on `count`.
 
-What it cannot catch is the mistake this exercise is about: swapping
-the two. `mean, count = summarize(data)` and
-`count, mean = summarize(data)` are both `tuple[float, int]`
-destructured into two
-names, and the second one type-checks cleanly while being wrong in
-every use afterward. With `Stats`, that mistake either does not arise
-(you write `result.count`) or fails immediately, because `Stats` and a
-reversed `tuple[int, float]` are different types. Position is
-something the type checker can verify and a reader cannot. A name is
-something both can.
+What the checker cannot catch is the mistake this exercise is about:
+swapping `mean` and `count`. `mean, count = summarize(data)` and
+`count, mean = summarize(data)` destructure the same
+`tuple[float, int]` into two names. The second type-checks cleanly and
+misnames both values. With `Stats` you write `result.count`, so the
+order never enters the code. A function annotated `Stats` also rejects
+a reversed `tuple[int, float]`, because the two are different types.
+Position is something the type checker can verify and a reader cannot.
+A name is something both can.
 
 ## 6. Structural equality across three-field types
 
@@ -207,15 +206,16 @@ grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
 `FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen dataclass's
-generated `__eq__()` starts by checking `other.__class__ is
-self.__class__` and returns `NotImplemented` when it is not, so Python
-falls back to the tuple's own comparison, which also declines, and
-`==` settles on identity, which fails. A dataclass is not a tuple and
-never pretends to be one.
+generated `__eq__()` first checks `other.__class__ is
+self.__class__`, and returns `NotImplemented` for a plain tuple.
+Python then tries the tuple's own comparison, which also returns
+`NotImplemented`. With both sides declining, `==` falls back to
+identity, which is `False` for two distinct objects. A dataclass is
+not a tuple and never pretends to be one.
 
-That is the choice the two constructs offer. A `NamedTuple` is a tuple
-with labels, so it interoperates with everything expecting a tuple and
-accepts equality with anything of the same shape. A frozen dataclass is
-a distinct type, so it refuses those comparisons and catches the
-mismatch instead. Which one is right depends on whether you want your
-three numbers to travel as data or to mean something.
+`NamedTuple` and the frozen dataclass offer a choice. A `NamedTuple`
+is a tuple with labels, so it interoperates with everything expecting
+a tuple and accepts equality with anything of the same shape. A frozen
+dataclass is a distinct type, so it refuses those comparisons and
+catches the mismatch instead. Which one is right depends on whether
+you want your three numbers to travel as data or to mean something.

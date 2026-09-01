@@ -9,8 +9,9 @@ then take away one more thing and see whether anything breaks.
 
 The example is a small report writer. It printed plain text, then had
 to emit CSV for a spreadsheet, then JSON for a web front end. Three
-changes, one axis: the output format. Everything else, the rows, where
-they came from, what the numbers meant, stayed put through all three.
+changes along one axis, the output format. Everything else stayed put
+through all three: the rows, where they came from, what the numbers
+meant.
 
 Here is the version that survived the first two changes:
 
@@ -79,20 +80,20 @@ print(render(rows, "json"))
 #: {"name": "paper", "amount": 7}
 ```
 
-The third format arrives without touching `render()`, and it arrives
-from outside the module that defines `render()`, which is the part
-worth noticing. `STYLES` absorbs the change because a format is now
-data. What stays edited by hand is everything the axis does not cover:
-adding a field to `Row` still touches every entry in `STYLES`, because
-that is a different vector of change, and this design does nothing
-about it.
+The third format arrives without touching `render()`. The part worth
+noticing is where the assignment that adds it can sit: in any module
+that imports `STYLES`. `STYLES` absorbs the change because a format is
+now data. Everything the axis does not cover still needs hand edits.
+Adding a field to `Row` touches every entry in `STYLES`, because a
+field is a different vector of change, one this design does nothing
+about.
 
-Two things generalize from this. First, the axis is visible in the
-history rather than in the code: the same function appearing in three
-consecutive commits names it for you. Second, absorbing one vector says
-nothing about the others. A design that makes formats pluggable and
-fields painful is the right answer only if formats are what keep
-changing.
+Two things generalize from the example. First, the axis is visible in
+the history rather than in the code: the same function appearing in
+three consecutive commits names it for you. Second, absorbing one
+vector says nothing about the others. A design that makes formats
+pluggable and fields painful is the right answer only if formats are
+what keep changing.
 
 ## 2. Subtracting a pattern
 
@@ -117,7 +118,7 @@ Now cross out what Python supplies:
   is no object left to hold, only an argument to pass.
 - The `new` goes with the classes. A function needs no instantiation.
 
-What is left is one sentence: make the varying step a parameter.
+One sentence remains: make the varying step a parameter.
 
 ```python
 # exercise_2.py
@@ -139,16 +140,17 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 ```
 
 Five constructs became one parameter, and the type checker still knows
-what may be passed: `Callable[[float], float]` rejects a function
-taking the wrong arguments as surely as an interface rejects a class
-that does not implement it.
+what the parameter accepts: `Callable[[float], float]` rejects a
+function taking the wrong arguments as surely as an interface rejects
+a class that does not implement it.
 
 The sentence that remains is the pattern. Everything crossed out was
-the cost of expressing it in a language where a method cannot travel
-without an object around it, which is what
+the cost of expressing the pattern in a language where a method cannot
+travel without an object around it. Python supplies the missing piece,
+a function that travels on its own, and
 [When a Pattern Dissolves](../Chapters/21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
-means by the missing piece having been there all along. The intent
-survives the subtraction. Only the scaffolding disappears.
+describes that case as the language having the piece all along. The
+intent survives the subtraction. Only the scaffolding disappears.
 
 ## 3. Applying *Subtraction*
 
@@ -181,22 +183,22 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 #: 25.0 23.0
 ```
 
-Remove the inheritance level and both classes with it, and you have
-exercise 2's version. What stopped working? Nothing. The numbers are
-identical, `ty` still rejects a wrongly-shaped argument, and adding a
-third rule is still one new definition. Both classes carried a single
-method and no state, so the hierarchy was a container for functions
-that did not need containing. By the rule that a design is finished
-when you cannot take anything else away, the class version was not
-finished.
+Remove the abstract base and turn both subclasses into functions, and
+you have exercise 2's version. What stopped working? Nothing. The
+numbers are identical, `ty` still rejects a wrongly-shaped argument,
+and adding a third rule is still one new definition. Both classes
+carried a single method and no state, so the hierarchy was a container
+for functions that did not need containing. By the rule that a design
+is complete when you cannot take anything else away, the class version
+was not complete.
 
 Take away one more thing and the answer changes. Remove `checkout()`'s
 `shipping` parameter, inlining `5.0` where the call was, and the
 program still runs and still prints a number. What stops working is the
 requirement: there is now no way to charge by weight without editing
-`checkout()`. That is the floor. The parameter is the last piece that
-carries the design's actual intent, so removing it removes the design
-rather than its scaffolding.
+`checkout()`. That is the floor, the point where subtraction stops.
+The parameter is the last piece that carries the design's actual
+intent, so removing it removes the design rather than its scaffolding.
 
 Both outcomes are the exercise working correctly. Subtraction is a test
 you run rather than a direction you push in: take something away, run

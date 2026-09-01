@@ -34,10 +34,10 @@ The trace splits into two halves that run in opposite directions.
 `gather()` starts its tasks in argument order, so `d` starts last. Each
 task then suspends at its own `await`, and the event loop resumes them
 in the order their timers fire, so the shortest delay wakes first and
-`d` resumes before the other three. The returned list ignores both
-orders. `gather()` fills each position from the argument that occupied
-it, which is why `'D'` is last in the list even though `d` finished
-first.
+`d` resumes before the other three. The returned list follows the
+argument order, not the finishing order: `gather()` fills each
+position from the coroutine passed in that position, so `'D'` is last
+in the list even though `d` finished first.
 
 ## 2. Awaiting in a comprehension
 
@@ -73,19 +73,18 @@ asyncio.run(main())
 #: took the sum, not the longest: True
 ```
 
-Each `started` line is immediately followed by its own `resumed` line,
-which is the signature of no overlap. The comprehension awaits one
-coroutine at a time, and `await` does not return until that coroutine
-finishes, so `b` cannot start until `a` is done. Nothing schedules the
-later coroutines while the current one waits.
+Each `started` line has its own `resumed` line directly beneath it,
+the signature of no overlap. The comprehension awaits one coroutine at
+a time, and `await` does not return until that coroutine finishes, so
+`b` cannot start until `a` finishes. Nothing schedules the later
+coroutines while the current one waits.
 
 The timing follows from the trace. `gather()` finishes in about the
 longest delay, 0.03 seconds, because all three waits overlap. This
-version takes their sum, about 0.06 seconds, because no two waits ever
-happen at the same time. The list comprehension is not the problem.
-Building the coroutine objects created work that had not started, and
-only `gather()` or `TaskGroup` schedules every one of them as a task
-before waiting on any.
+version takes their sum, about 0.06 seconds, because the waits never
+overlap. The list comprehension is not the problem. Calling `fetch()`
+builds a coroutine object and starts nothing. Only `gather()` or a
+`TaskGroup` schedules every coroutine as a task before waiting on any.
 
 ## 3. A task that mixes waiting and computing
 
@@ -137,10 +136,10 @@ their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
 If you move the loop above the `await`, the peak drops back to `1`. Each
-coroutine then runs its full million iterations before yielding,
-and the event loop never gets the chance to overlap them. What
-decides overlap is where the `await` sits relative to the computation,
-not that the function contains one somewhere.
+coroutine then runs its full million iterations before yielding, so
+the event loop never gets a chance to overlap them. Overlap depends on
+where the `await` sits relative to the computation, not on whether the
+function contains one somewhere.
 
 ## 4. Blocking inside a coroutine
 
@@ -185,15 +184,15 @@ The peak falls from `5` to `1`, the same figure the CPU-bound version
 produced. `time.sleep()` is where `blocking_the_loop.py`'s lesson lands:
 it stops the thread instead of suspending the task, and the event loop
 runs on that thread. A coroutine that never awaits never gives the loop
-a chance to start another, so each task runs start to finish before the
-next begins.
+a chance to start another task, so each task runs start to finish
+before the next begins.
 
 Waiting is not what creates overlap. Suspending is. These five tasks
-spend almost all their time waiting and still overlap not at all, while
-`cpu_price()` overlapped not at all for the opposite reason, having no
+spend almost all their time waiting and still never overlap, while
+`cpu_price()` never overlaps for the opposite reason: it has no
 `await` to reach. The total run time makes the cost visible: five
-blocking sleeps of 0.05 seconds take about a quarter second, where five
-awaited ones took about 0.05.
+blocking sleeps of 0.05 seconds take about a quarter second, while
+five awaited ones take about 0.05.
 
 ## 5. A semaphore of one, and a stray release
 
@@ -222,9 +221,9 @@ asyncio.run(main())
 
 A semaphore holds a count of how many holders it admits at once, and
 `async with` decrements that count on the way in and restores it on the
-way out. Initialized to `1`, the count is exhausted by the first task
-through, so every other task suspends at `async with` until that task
-leaves. One read-modify-write is in progress at a time, exactly as with
+way out. With the count initialized to `1`, the first task through
+exhausts it, so every other task suspends at `async with` until that
+task leaves. Only one read-modify-write runs at a time, exactly as with
 `asyncio.Lock`, and all 400 increments land.
 
 The equivalence is only as good as the count. If you add one stray
@@ -257,11 +256,11 @@ asyncio.run(main())
 
 Exactly half the increments survive. Two tasks now sit inside the
 critical section together, both reading `counter` before either writes,
-so each pair of increments collapses into one. The count reports no
-error, because raising the limit is what `release()` is defined to do.
+so each pair of increments collapses into one. The semaphore reports
+no error, because raising the limit is exactly what `release()` does.
 
-This is the difference between the two objects. `asyncio.Lock` refuses
-a release it never granted, raising `RuntimeError: Lock is not
+That silence is the difference between the two objects. `asyncio.Lock`
+refuses a release it never granted, raising `RuntimeError: Lock is not
 acquired.` A semaphore has no such notion of ownership, so the same
 mistake silently widens the gate and reintroduces the race the lock was
 there to prevent.
@@ -303,18 +302,18 @@ its own, whose workers would import the module again.
 
 The error is a guard rail rather than the real failure. Python detects
 that a child process is spawning children during its own bootstrap and
-refuses, instead of letting the recursion consume the machine. The
-`if __name__ == "__main__"` line prevents it because a spawned worker
-imports the module under its real name, `parallel_cpu`, not
-`"__main__"`, so the pool-building code is skipped in the child and
-runs only in the process you launched.
+refuses to start them, instead of letting the recursion consume the
+machine. The `if __name__ == "__main__"` line prevents that recursion.
+A spawned worker imports the module under its real name,
+`parallel_cpu`, rather than `"__main__"`, so the child skips the
+pool-building code and only the process you launched runs it.
 
-This is a start-method problem. On a platform using `fork`, the child
-inherits the parent's memory instead of importing the module, and the
-missing guard does no damage. But no platform forks by default
-anymore: Windows and macOS default to `spawn`, and since 3.14 Linux
-defaults to `forkserver`, which also imports the module, so every
-platform's default requires the guard.
+The whole failure is a start-method problem. On a platform using
+`fork`, the child inherits the parent's memory instead of importing the
+module, and the missing guard does no damage. But no platform forks by
+default anymore. Windows and macOS default to `spawn`, and since 3.14
+Linux defaults to `forkserver`, which also imports the module. Every
+platform's default therefore requires the guard.
 
 ## 7. Removing the `sleep` from `gil_race.py`
 
@@ -339,20 +338,19 @@ for t in threads:
 print(counter, counter == 400)
 ```
 
-Running this repeatedly on CPython 3.11 or later reliably prints `400
-True`, every time. Since 3.11, the interpreter only considers
-switching threads at a function call or at the jump that closes a loop
+Running this repeatedly on CPython 3.11 or later prints `400 True`
+every time. Since 3.11, the interpreter only considers switching
+threads at a function call or at the jump that closes a loop
 iteration. With the `time.sleep()` call removed, the read and the
-write happen back to back with no function call between them, so
-there is no longer a scheduling point where the GIL can hand off to
-another thread in the middle of the sequence. That absence of a
-visible race is scheduling luck tied to how the current interpreter
-happens to schedule switches, not a guarantee. Any function call
-reintroduced between the read and the write, a blocking I/O call, a
-`print()`, even an innocuous-looking helper function, reopens exactly
-the same gap, because nothing about `counter += 1`'s underlying
-bytecode sequence became atomic. The fix is still a lock, not the
-absence of an explicit sleep.
+write run back to back, with no function call between them, so the
+interpreter finds no scheduling point at which to hand the GIL to
+another thread mid-sequence. That reliability is luck rather than a
+guarantee: the race stays invisible only because this interpreter
+happens to place its switch points elsewhere. Put any function call
+back between the read and the write, a blocking I/O call, a `print()`,
+even an innocuous-looking helper, and the same gap reopens, because
+`counter += 1`'s underlying bytecode sequence never became atomic. The
+fix is still a lock, not the absence of an explicit sleep.
 
 ## 8. A third thread submitting jobs
 
@@ -395,11 +393,11 @@ while not tasks.empty():
 
 The six jobs still arrive in an unpredictable interleaving from three
 racing threads, but `PriorityQueue` sorts strictly by the tuple's
-value, so the drain order is always priority first, `1` before `2`
-before `3`, and within a priority, alphabetically by the description
-(the tuple's second field): `"alert"` before `"page oncall"` before
-`"zzz"`, and `"aaa"` before `"backup"`. Which thread happened to submit
-a job first never affects the final order.
+value. The drain order is therefore always priority first, `1` before
+`2` before `3`, then alphabetically by the description within a
+priority (the tuple's second field): `"alert"` before `"page oncall"`
+before `"zzz"`, and `"aaa"` before `"backup"`. Which thread happened to
+submit a job first never affects the final order.
 
 ## 9. A task that finishes before the failures land
 
@@ -465,17 +463,17 @@ asyncio.run(main())
 
 Only `f` reports `cancelled` now. With `e` at `0.005` its timer fires
 long before `c` and `d` fail at `0.03`, so `e` prints `fetched`,
-returns `"E"`, and is a completed task by the time the group starts
+returns `"E"`, and has finished by the time the group starts
 cancelling. `f` still sleeps for `0.3`, so cancellation reaches it
-while it is suspended and its task ends cancelled.
+during that sleep and its task ends cancelled.
 
-That is the line between what a `TaskGroup` can and cannot undo. It
-cancels what is still running, which is why the original `PAIRS` had
-both `e` and `f` cancelled. It cannot reach into a task that already
-returned, and it cannot unprint `e: fetched` or undo whatever a real
-`fetch()` wrote to a database on its way out. Structured concurrency
-guarantees that no task outlives the block, not that no task had an
-effect before the failure.
+That is the line between what a `TaskGroup` can and cannot undo. A
+`TaskGroup` cancels what is still running, which is why the original
+`PAIRS` had both `e` and `f` cancelled. It cannot reach into a task
+that already returned, and it cannot unprint `e: fetched` or undo
+whatever a real `fetch()` wrote to a database on its way out.
+Structured concurrency guarantees that no task outlives the block, not
+that no task had an effect before the failure.
 
 The distinction matters when the tasks do more than sleep. A group of
 six writes where two fail leaves the successful writes in place, so
@@ -531,28 +529,31 @@ asyncio.run(main())
 ```
 
 Two `fetched` lines print, `a` and `b`, the two whose timers fire
-before `c` fails at `0.03`. `e` and `f` never print one, and neither
-does the `results` list, because the `await` no longer returns a value.
+before `c` fails at `0.03`. `e` and `f` never print one, and
+`print(results)` never runs, because the `await` raises instead of
+returning a value.
 
 Without `return_exceptions=True`, the first child exception propagates
 out of the `await` immediately, and `gather()` reports that one
 exception rather than a list of six outcomes. `d` fails in the same
-tick, but the `gather()` future is resolved by then, so `d`'s failure
-is retrieved and discarded rather than raised. The four results the
-call was collecting are lost, including `a` and `b`, which had already
-succeeded.
+tick, but the `gather()` future has already resolved by then, so
+`gather()` retrieves `d`'s failure and discards it instead of raising
+it. The call loses the four results it was collecting, including `a`
+and `b`, which had already succeeded.
 
 The other tasks are the interesting part. `gather()` does not cancel
-them when it propagates, unlike a `TaskGroup`, so `e` and `f` are still
-sleeping when `main()` returns. `asyncio.run()` then cancels whatever
-is left as it shuts the loop down, which is why they print nothing
-further. Had `main()` gone on to other work, they would have run to
-completion in the background with nobody waiting on their results.
+them when the exception propagates, unlike a `TaskGroup`, so `e` and
+`f` are still sleeping when `main()` returns. `asyncio.run()` then
+cancels whatever tasks remain as it shuts the loop down, which is why
+`e` and `f` print nothing further. Had `main()` gone on to other work,
+they would have run to completion in the background with nobody
+waiting on their results.
 
 That combination, results discarded and siblings left running, is why
-`return_exceptions=True` and `TaskGroup` exist. One keeps every outcome
-so partial success stays visible. The other guarantees nothing outlives
-the block. Bare `gather()` gives you neither.
+`return_exceptions=True` and `TaskGroup` exist.
+`return_exceptions=True` keeps every outcome, so partial success stays
+visible. A `TaskGroup` guarantees that nothing outlives the block.
+Bare `gather()` gives you neither.
 
 ## 11. Setting the `ContextVar` in the parent
 
@@ -591,7 +592,7 @@ All three tasks print `context main`. Every task starts with a copy of
 the context that created it, and that context already carried
 `request_id = "main"`, so each copy inherits the same value. No task
 writes to the variable afterward, so all three copies stay identical
-and the per-request identity the original version tracked is gone.
+and the original version's per-request identity disappears.
 
 The `after:` line changes too. In the chapter's version it printed
 `context -`, the default, because each `set()` happened inside a task's
@@ -660,12 +661,12 @@ together and `t_seq > t_thr * 1.5` is `False`.
 
 `InterpreterPoolExecutor` wins the same benchmark because each
 subinterpreter has its own GIL. The work spreads across processors
-rather than time-slicing on one, which is the distinction from
-[The GIL and Free Threading](../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading):
-the GIL is per interpreter, not per process, so more interpreters mean
-more locks and real parallelism. A free-threaded build reaches the same
-end by removing the GIL instead of multiplying it, letting ordinary
-threads do what this listing's threads cannot.
+instead of time-slicing on one.
+[The GIL and Free Threading](../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading)
+gives the reason: the GIL is per interpreter, not per process, so more
+interpreters mean more locks and real parallelism. A free-threaded
+build reaches the same end by removing the GIL instead of multiplying
+it, letting ordinary threads do what this listing's threads cannot.
 
 ## 13. A lock around the loop body, not around `next()`
 
@@ -724,16 +725,16 @@ because the race is not in the loop body.
 indented block. The `with lock:` inside the body therefore starts
 *after* `next()` has already returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
-same moment, read the same `next_number`, and be handed the same
-ticket, exactly as they were without the lock.
+same moment, read the same `next_number`, and come away with the same
+ticket, exactly as they did without the lock.
 
 The lock does cover `out.append(item)`, which never needed covering:
 `out` is a local list, one per worker, so no other thread can touch
 it.
 
 Serializing an iterator means putting the lock where the mutation is,
-inside `__next__()`, which is what `threading.serialize_iterator()`
-does. The lesson generalizes past iterators: a lock protects the
+inside `__next__()`, exactly where `threading.serialize_iterator()`
+puts it. The lesson generalizes past iterators: a lock protects the
 statements it encloses, and a `for` loop's own call to `next()` is not
 one of them.
 
@@ -771,7 +772,7 @@ asyncio.run(main())
 #: both workers finished
 ```
 
-The program prints `both workers finished`, and it does so in about
+The program prints `both workers finished`, and finishes in about
 twenty milliseconds rather than waiting out the half-second timeout.
 
 Follow who waits for whom. The first task takes `lock_a`, sleeps, then
@@ -783,11 +784,11 @@ and the second task walks the same path through an empty field.
 
 The deadlock version made the waiting circular: task one held `lock_a`
 and wanted `lock_b`, task two held `lock_b` and wanted `lock_a`, so
-each task's progress depended on the other task's progress. A cycle
-like that is the thing a deadlock is. Ordering the acquisitions
-globally makes a cycle impossible to construct, because a task can
-only ever wait on a lock that comes later in the order than every lock
-it already holds, and "later" cannot loop back to "earlier."
+each task's progress depended on the other task's progress. A deadlock
+is exactly that cycle. Ordering the acquisitions globally makes such a
+cycle impossible. A task can only ever wait on a lock that comes later
+in the order than every lock it already holds, and "later" never loops
+back to "earlier."
 
 ## 15. Awaiting `pool.submit()` directly
 
@@ -804,7 +805,7 @@ async def process_price(
 
     error[invalid-await]: `Future[int]` is not awaitable
 
-Running it anyway fails before any pricing happens:
+Running it anyway raises before any price comes back:
 
     + Exception Group Traceback (most recent call last):
       ...
@@ -814,9 +815,9 @@ Running it anyway fails before any pricing happens:
       | TypeError: 'Future' object can't be awaited
 
 `pool.submit()` hands back a `concurrent.futures.Future`, the
-executor's own handle on a result that is still being computed. Its
-interface is blocking: you wait by calling `result()`, which blocks
-the calling thread until the worker finishes. Nothing about it
+executor's own handle on a result a worker is still computing. Its
+interface blocks: you wait by calling `result()`, which stops the
+calling thread until the worker finishes. Nothing about that future
 cooperates with an event loop, and it defines no `__await__`, so
 `await` refuses it, first statically and then at runtime.
 

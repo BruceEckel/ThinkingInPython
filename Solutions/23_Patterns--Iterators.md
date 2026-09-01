@@ -19,12 +19,12 @@ print(total(evens(5)))
 #: 20
 ```
 
-`evens()` is a generator function which is the same shape as
+`evens()` is a generator function with the same shape as
 `fibonacci()`: a function containing `yield`, so calling it returns an
 iterator rather than running the body immediately. `total()` calls
-`sum()` on whatever iterable it receives, so it sums `evens(5)`'s
-values without needing to know that a new kind of generator now exists
-alongside `fibonacci()` and `Countdown`.
+`sum()` on whatever iterable it receives, so `total()` sums
+`evens(5)`'s values without needing to know that a new kind of
+generator now exists alongside `fibonacci()` and `Countdown`.
 
 ## 2. `Countdown` with `__len__()`
 
@@ -56,21 +56,21 @@ print(len(c))  # Still works after iterating
 ```
 
 `Countdown` supports `len()` because it is a reusable *iterable*,
-not the iterator itself: each `for` loop or `list()` call gets a fresh
-generator from a fresh call to `__iter__()`, so `c.start` is
-untouched by iterating and `len(c)` can compute directly from it,
-any number of times, before or after.
+not the iterator itself. Each `for` loop or `list()` call gets a fresh
+generator from a fresh call to `__iter__()`, so iterating leaves
+`c.start` alone. `len(c)` computes from `c.start` directly, any number
+of times, before or after.
 
-A plain generator cannot do this. Once you call a generator function,
-you have the iterator itself, and an iterator's whole state is "how
-far through have I gotten," which is exactly what makes counting its
-remaining items expensive: the only way to know how many values are
-left is to consume them, which uses them up. No `start` field
+A plain generator cannot support `len()`. Once you call a generator
+function, you have the iterator itself, and an iterator's whole state
+is "how far through have I gotten." That is what makes counting its
+remaining items expensive: the only way to learn how many values
+remain is to consume them, which uses them up. No `start` field
 remains to inspect, and nothing can ask a paused generator "how many
-more times will you yield?" without running it to exhaustion. `Countdown`
-sidesteps this because it is a container that *produces* a generator
-on demand. The container itself keeps the value a `len()` can read
-without consuming anything.
+more times will you yield?" without running it to exhaustion.
+`Countdown` escapes that expense because it is a container that
+*produces* a generator on demand. The container itself keeps the value
+`len()` reads, and reading it consumes nothing.
 
 ## 3. The first ten values of `fibonacci(1_000_000)`
 
@@ -89,12 +89,12 @@ print(list(islice(fibonacci(1_000_000), 10)))
 #: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-`fibonacci(1_000_000)` builds a generator that is prepared to yield a
-million values, but building it computes nothing yet, since a
-generator's body only runs as far as the next `yield` each time
-something asks it for a value. `islice(..., 10)` asks for exactly ten,
-so only the first ten iterations of `fibonacci()`'s loop ever run. The
-other 999,990 are never computed, the same laziness
+`fibonacci(1_000_000)` builds a generator ready to yield a million
+values, but building it computes nothing. A generator's body runs only
+as far as the next `yield`, each time something asks it for a value.
+`islice(..., 10)` asks for exactly ten, so only the first ten
+iterations of `fibonacci()`'s loop ever run. The other 999,990 never
+run, the same laziness
 [Comprehensions](../Chapters/16_Techniques--Comprehensions.md#generator-expressions) and
 [Performance](../Chapters/18_Techniques--Performance.md) both rely on.
 
@@ -143,8 +143,8 @@ resource that fails catastrophically, as
 describes: a data set that fits runs at full speed and one that does
 not falls off a cliff into swapping or a `MemoryError`. Recomputation
 merely costs time, in proportion. The list wins only when a pass is
-expensive and the data is known to be small, or when the source cannot
-be replayed at all, as with a network response.
+expensive and you know the data is small, or when nothing can replay
+the source, as with a network response.
 
 ## 5. `tee` consumed in lockstep
 
@@ -186,11 +186,12 @@ lockstep loop against 4,095,200 for draining a branch, about 1,900 to
 one.
 
 `tee` buffers what the leading branch has consumed and the trailing one
-has not. Draining `first` completely makes that gap the whole stream.
+has not. Draining `ahead` completely makes that gap the whole stream.
 Advancing both together keeps the gap at one item, so the buffer never
-grows. This is the rule the section ends on, measured: `tee` is cheap
-when consumers move together and costs a full copy when they do not.
-Nothing about the call changes, only how the results are used.
+grows. The measurement confirms the rule the chapter gives: `tee` is
+cheap when consumers move together and costs a full copy when they do
+not. Nothing about the call changes, only how the loops consume the
+results.
 
 ## 6. A test for `filter()`
 
@@ -218,17 +219,17 @@ def test_filter_skips_but_never_stops() -> None:
         list(filter(lambda n: n < 3, counter(LIMIT)))
 ```
 
-It should resemble `test_the_if_clause_skips_but_never_stops()`,
-because `filter()` and the generator expression's `if` clause are the
-same operation written two ways. Both skip what does not match and
-both keep asking forever, so both trip the wire. Only `takewhile()`
-stops.
+The test should resemble
+`test_the_if_clause_skips_but_never_stops()`, because `filter()` and
+the generator expression's `if` clause are the same operation written
+two ways. Both skip what does not match and both keep asking forever,
+so both trip the wire. Only `takewhile()` stops.
 
 Writing this test is how you confirm the pairing the prose asserts. A
 reader might reasonably guess that `filter()`, being a function rather
-than a clause, gets a chance to decide when to stop. It does not: it
-receives values one at a time and can only answer "keep" or "skip"
-about the value in front of it, never "stop."
+than a clause, gets a chance to decide when to stop. `filter()` gets
+no such chance: it receives values one at a time and can answer only
+"keep" or "skip" about the value in front of it, never "stop."
 
 ## 7. `OverSequence`, and `first()` on an endless source
 
@@ -310,22 +311,23 @@ print(len(endless.seen))
 #: 50000
 ```
 
-`traverse()` needs no change, because it was written against the
+`traverse()` needs no change, because its parameter names the
 `GoFIterator` protocol rather than a class. `OverSequence` and
-`OverStream` share no base class and never mention the protocol, and
-both satisfy it by having the four methods.
+`OverStream` share no base class and never mention the protocol.
+Defining its four methods is enough to satisfy it.
 
-`OverSequence` needs no `seen` list because the sequence already is
-one. It can be indexed repeatedly, in any order, without consuming
-anything, which the *GoF* interface assumes a collection can
-do. `OverStream` builds `seen` to fake that ability.
+`OverSequence` needs no `seen` list because its `items` sequence
+already holds every value. A caller can index that sequence
+repeatedly, in any order, without consuming it, and the *GoF*
+interface assumes a collection allows exactly that. `OverStream`
+builds `seen` to fake the same ability.
 
 The endless source shows what the faking costs. After 50,000 steps
 `seen` holds 50,000 items, and it holds a million after a million.
-`first()` is only implementable if every value stays reachable, so on a
-source with no end, supporting it means unbounded memory. Python's
-`__next__()` has no such requirement, which is why `itertools.count()`
-is safe to iterate and impossible to rewind.
+`first()` works only if every value stays reachable, so supporting it
+on an endless source costs unbounded memory. Python's `__next__()` has
+no such requirement, which is why `itertools.count()` is safe to
+iterate and impossible to rewind.
 
 ## 8. A peekable iterator
 
@@ -366,23 +368,23 @@ print(it.peek() is DONE)
 #: True
 ```
 
-A bare `peek(it)` function cannot be written. Reading a value requires
+You cannot write a bare `peek(it)` function. Reading a value requires
 `next()`, `next()` advances, and nothing in the protocol puts a value
 back. The information you want does not exist anywhere you can reach
 without changing the thing you are asking about.
 
 `Peekable` stores what a bare iterator does not: one item, pulled
-early. That is the entire difference, and it buys back the
-`current_item()` that *GoF* had and Python dropped. `peek()` is now
-free and repeatable, exactly as the three identical `2`s show, because
-it reads a field rather than the source.
+early. That is the entire difference, and that stored item buys back
+the `current_item()` that *GoF* had and Python dropped. `peek()` is
+now free and repeatable, exactly as the three identical `2`s show,
+because it reads a field rather than the source.
 
 The cost appears in the constructor. `Peekable` pulls from the source
-before any caller asks for a value, so an expensive first item is
-computed whether or not it is ever used, and a source that blocks on
-its first read blocks at construction. That is the same eagerness
-`tee`, `OverStream`, and this chapter's other lookahead all pay: a
-question about the future is answered by fetching the future.
+before any caller asks for a value, so the constructor computes an
+expensive first item whether or not anything uses it. A source that
+blocks on its first read blocks at construction. That is the same
+eagerness `tee`, `OverStream`, and this chapter's other lookahead all
+pay: answering a question about the future means fetching the future.
 
 ## 9. A string that never bottoms out
 
@@ -422,30 +424,32 @@ print(list(flatten_str([1, ["ab", [2]], 3])))
 
 `flatten()` asks one question, "is this an `int`?", and treats every
 other answer as something to recurse into. A `str` is not an `int`, so
-`"ab"` goes to `flatten("ab")`, which iterates it into `"a"`. That is
-also not an `int`, so it recurses into `flatten("a")`, which iterates
-`"a"` into `"a"`. The string has stopped getting shorter. Every other
-sequence bottoms out because indexing it eventually yields a non-
-sequence, and `str` is the one built-in that never does: a
-one-character string is still a `Sequence` of one-character strings.
-The recursion has no base case, so it runs until the stack is gone.
+`"ab"` goes to `flatten("ab")`, which iterates it into `"a"`. That
+`"a"` is also not an `int`, so `flatten("ab")` recurses into
+`flatten("a")`, which iterates `"a"` into `"a"`. The string has
+stopped getting shorter. Every other sequence bottoms out because
+indexing it eventually yields a non-sequence, and `str` is the one
+built-in that never does: a one-character string is still a `Sequence`
+of one-character strings. The recursion has no base case, so it runs
+until Python raises a `RecursionError`.
 
 The fix widens the base case rather than the recursive one. Testing
-`isinstance(item, int | str)` makes `str` a leaf, so it is yielded
-whole and never iterated. The return type widens to
-`Iterator[int | str]` to say so.
+`isinstance(item, int | str)` makes `str` a leaf, so `flatten_str()`
+yields each string whole instead of iterating it. The return type
+widens to `Iterator[int | str]` to say so.
 
-`flatten_loop()` takes the identical fix, since the two differ only in
-how they re-yield: `if isinstance(item, int | str)` in the same place,
-and the `for x in flatten_loop(item)` branch left alone. The bug is in
-the question each version asks, not in the delegation, which is why
+`flatten_loop()` takes the identical fix, since `flatten()` and
+`flatten_loop()` differ only in how they re-yield: the same
+`if isinstance(item, int | str)` test in the same place, with the
+`for x in flatten_loop(item)` branch left alone. The bug is in the
+question each version asks, not in the delegation, which is why
 `yield from` neither causes it nor cures it.
 
-Worth noting what did not help: `Nested` says a leaf is an `int`, so
+The annotation does not help. `Nested` says a leaf is an `int`, so
 the type already claims `"ab"` cannot be there. `ty` accepts the call
-anyway. A recursive alias of this shape is checked loosely enough that
-the annotation documents the intent without enforcing it, which is why
-the failure arrives as a `RecursionError` at runtime rather than an
+anyway, because it checks a recursive alias of this shape loosely: the
+annotation documents the intent without enforcing it. The failure
+therefore arrives as a `RecursionError` at runtime rather than an
 error at the call.
 
 ## 10. Skipping instead of raising
@@ -497,30 +501,32 @@ print(list(SkippingIterator(iter(items), int)))
 #: [1, 3, 4]
 ```
 
-`typed()` and `typed_skipping()` differ by one word, and the
-difference decides what a bad item costs. `typed()` ends the stream:
-the `1` before `"two"` is delivered, everything after it is not, and
-the caller gets an exception instead of a list. `typed_skipping()`
-delivers `[1, 3, 4]` and never mentions `"two"` or the `None`.
+`typed()` and `typed_skipping()` ask the same `isinstance()` question
+and part on the answer, and that difference decides what a bad item
+costs. `typed()` ends the stream: the consumer receives the `1` before
+`"two"` and nothing after it. The caller gets an exception instead of
+a list. `typed_skipping()` delivers `[1, 3, 4]` and never mentions
+`"two"` or the `None`.
 
 For a parsed log file, take the skipping version. A log is an
-append-only record written by many processes, so a malformed line is
-an expected event rather than a broken contract, and one truncated
-line should not cost you the rest of the file. The raising version
+append-only record that many processes write, so a malformed line is
+an expected event rather than a broken contract. One truncated line
+should not cost you the rest of the file. The raising version
 gives the caller no way to resume: the generator is spent, so
 continuing means parsing the file again and somehow starting past the
 line that failed.
 
 That choice has a price, and it is the one this chapter keeps
 returning to. Skipping is silent, so a filter that quietly drops every
-line cannot be told from a file with nothing to report. If you take
-the skipping version, count what it drops and report the count.
+line looks exactly like a file with nothing to report. If you take the
+skipping version, count what it drops and report the count.
 
 The class form is harder to write, and the reason is instructive.
-A generator may decline to produce: `typed_skipping()` reaches an item
-it does not want and simply does not `yield`, and the `for` loop
-continues. `__next__()` has no such option. Every call must return a
-value or raise `StopIteration`, so `SkippingIterator` needs its own
-loop to keep pulling until a match arrives. The raising version needs
-no loop at all, since it acts on the one item it just read. Generators
+A generator may decline to produce a value: `typed_skipping()` reaches
+an item it does not want and simply does not `yield`, and the `for`
+loop continues. `__next__()` has no such option. Every call must
+return a value or raise `StopIteration`, so `SkippingIterator` needs
+its own loop to keep pulling until a match arrives. A raising
+`__next__()` needs no loop at all, since it acts on the one item it
+just read. Generators
 write the state machine for you, and skipping is where you notice.

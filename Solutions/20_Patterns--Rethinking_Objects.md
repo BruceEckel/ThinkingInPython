@@ -55,9 +55,10 @@ print(plugged.tags)
 ```
 
 `.copy()` closes the leak the same way it does for `numbers`: the
-caller now mutates a throwaway copy, and `plugged`'s real `_tags` is
-untouched. Every new mutable field needs this same defensive copy
-repeated. This is the tedium that motivates freezing the data instead.
+caller now mutates a throwaway copy, and `plugged`'s real `_tags`
+keeps the items it had. Every new mutable field needs its own
+defensive copy. That repetition is the tedium that motivates freezing
+the data instead.
 
 ## 2. A mutable field in a frozen data class
 
@@ -87,25 +88,26 @@ except TypeError as e:
 ```
 
 `ty` reports nothing. `frozen=True` blocks rebinding a field, which is
-why the assignment raises `FrozenInstanceError`, and it says nothing at
-all about what the field refers to. The `append()` never assigns to
-`data.numbers`, so nothing the decorator generated is involved.
+why the assignment raises `FrozenInstanceError`. That block says
+nothing about what the field refers to. The `append()` never assigns
+to `data.numbers`, so none of the code the decorator generated runs.
 
-The `hash()` failure is the same shallowness seen from another side.
+The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
 values, so hashing an `Immutable` hashes its `list`, and a `list` has no
-hash. The instance the decorator promised was usable as a dict key is
-not, and nothing said so until the first `hash()`. With `tuple` restored,
-both the mutation and the hash failure go away together, which is the
-clue that they were one problem: a frozen wrapper around a mutable
-value.
+hash. The decorator promised an instance usable as a dict key and
+delivered one that raises a `TypeError` at the first `hash()`. Declare
+the field a `tuple` and both the mutation and the hash failure go away
+together, the clue that they were one problem: a frozen wrapper around
+a mutable value.
 
-Nobody enforces it, which is the answer: making immutability go all the
-way down is the author's job, one field at a time. Declare `tuple`
-rather than `list`, `frozenset` rather than `set`, `frozendict` rather
-than `dict`, and a frozen data class rather than a mutable one for any
-nested value. The type checker will hold you to those declarations once
-you write them. It will not choose them for you.
+Nothing enforces deep immutability, and that is the answer: taking
+immutability all the way down is the author's job, one field at a time.
+Declare `tuple` rather than `list`, `frozenset` rather than `set`,
+`frozendict` rather than `dict`, and a frozen data class rather than a
+mutable one for any nested value. The type checker will hold you to
+those declarations once you write them. It will not choose them for
+you.
 
 ## 3. `NewType` at the protocol boundary
 
@@ -139,17 +141,17 @@ info: └── protocol member `total` is incompatible
 info:     └── incompatible return types: `Weight` is not assignable to `Price`
 ```
 
-The structural match is unchanged: `Package.total()` still takes no
-arguments and still returns a float at runtime. What the two `NewType`
-declarations add is a distinction the shapes never carried, so the
-type checker can finally see that a weight is not a price.
+The structural match still holds: `Package.total()` still takes no
+arguments and still returns a float at runtime. The two `NewType`
+declarations add a distinction the shapes never carried, so the type
+checker can finally see that a weight is not a price.
 
 Delete the annotations and the program behaves exactly as it does now.
-It prints `$2.50` and charges the customer for a number of kilograms,
-because `NewType` exists only for the type checker: `Weight(2.5)` returns the
-`float` `2.5` and no wrapper survives to run time. The distinction is
-real in the source and absent in the process, which is the whole bargain
-the chapter describes.
+It prints `$2.50` and charges the customer for a number of kilograms.
+`NewType` exists only for the type checker: `Weight(2.5)` returns the
+`float` `2.5`, and no wrapper survives to run time. The distinction is
+real in the source and absent in the process, and that split is the
+whole bargain the chapter describes.
 
 ## 4. A `Triple`, adapted by composition
 
@@ -194,9 +196,9 @@ print(distance(TripleCoord(Triple(3, 0, 99)),
 `Triple` has fields `a`, `b`, `c`, none named `x` or `y`, and `c` is
 irrelevant to a 2D distance. `TripleCoord` wraps a `Triple` and exposes
 only the two properties `distance()` actually needs, ignoring `c`
-entirely. `distance()` itself never changes: it only ever asked for
-`.x` and `.y`, and `TripleCoord` supplies that shape, the same
-way `PairCoord` adapted `Pair`.
+entirely. `distance()` itself never changes: it only ever asks for
+`.x` and `.y`. `TripleCoord` supplies that shape, the same way
+`PairCoord` adapts `Pair`.
 
 ## 5. Adding `Square` to the closed `Shape` union
 
@@ -245,11 +247,11 @@ for shape in shapes:
 matching `case`. Commenting out the `Square` case makes the `match`
 non-exhaustive: the type checker can prove that a `Square` argument
 falls through every `case` to `case _`, which calls `assert_never(shape)`.
-Since `shape` could genuinely be a `Square` at that point, the type checker
-reports that `assert_never()`'s argument is not the `Never` type it
-requires, exactly the exhaustiveness check the union was added for. It
-turns a missed case into a caught type error instead of a silent
-`None` or a runtime crash.
+Since `shape` could genuinely be a `Square` at that point, the type
+checker reports that `assert_never()`'s argument is not the `Never`
+type it requires. That report is exactly the exhaustiveness check the
+closed union delivers, turning a missed case into a caught type error
+instead of a silent `None` or a runtime crash.
 
 ## 6. A `NullCache`, following `NullLogger`'s shape
 
@@ -275,10 +277,10 @@ print(nc.get("a"))
 ```
 
 `NullCache` is neutral the same way `NullLogger` is: `set()` does
-nothing, and `get()` always reports "not found," so a function that
-takes an optional cache can take a required `Cache` instead, defaulting
-to a shared `NullCache()` instance, with no `is None` branch anywhere
-that uses it.
+nothing, and `get()` always reports "not found." A function that takes
+an optional cache can take a required `Cache` instead, defaulting to a
+shared `NullCache()` instance, so no code that uses the cache needs an
+`is None` branch.
 
 ## 7. Counting every route into the list
 
@@ -341,20 +343,20 @@ The subclass counts one append out of three and misses `insert()`
 entirely. `extend()` and `insert()` both add elements through `list`'s
 own C implementation, which never calls the Python-level `append()` or
 `__setitem__()` you overrode. Other routes past the counters include
-`+=`, slice assignment, and `list.__init__` with an iterable, and the
-list is not fixed: a future CPython could add another.
+`+=`, slice assignment, and `list.__init__` with an iterable. A future
+CPython could add another.
 
-`CountingBox` reports `3 3 1` because there is no other route. The
-class holds a list rather than being one, so every mutation is a method
-this class wrote. Nothing inherited can bypass a counter that nothing
-inherited knows about.
+`CountingBox` reports `3 3 1` because no other route into the list
+exists. The class holds a list rather than being one, so every mutation
+goes through a method this class wrote. Nothing inherited can bypass a
+counter that nothing inherited knows about.
 
 The trade is explicit. `CountingList` got `sort()`, `index()`,
 `__len__()`, slicing, and everything else `list` offers, and got the
-counting wrong. `CountingBox` gets nothing it did not write, and a
-caller who wants `sort()` has to be given one. That is the choice
-composition asks you to make on purpose, instead of discovering later
-that inheritance made it for you.
+counting wrong. `CountingBox` gets only the methods you write for it,
+and a caller who wants `sort()` waits until you write one. That is the
+choice composition asks you to make on purpose, instead of discovering
+later that inheritance made it for you.
 
 ## 8. `BoundedStack` without breaking the contract
 
@@ -402,24 +404,24 @@ print(bounded.full(), bounded.items)
 #: True [1, 2]
 ```
 
-`fill()` was written against a `Stack` whose `push()` always succeeds,
-so the fix keeps that promise. `BoundedStack.push()` accepts every item
-and discards the oldest to stay inside the limit, and callers who care
-about the limit ask `full()` before pushing. `fill()` now runs on both
-classes, which is what substitutability means.
+`fill()` assumes a `Stack` whose `push()` always succeeds, so the fix
+keeps that promise. `BoundedStack.push()` accepts every item and
+discards the oldest to stay inside the limit. Callers who care about
+the limit ask `full()` before pushing. `fill()` now runs on both
+classes, and that is what substitutability means.
 
-What you gave up is the refusal. The original `BoundedStack` guaranteed
-that no more than two items were ever accepted. This one guarantees
-only that no more than two are ever *kept*. A caller who pushes five
-items loses three of them silently, which is the right behavior for a
-ring buffer of recent events and the wrong behavior for a queue of work
-that must not be dropped.
+You gave up the refusal. The original `BoundedStack` guaranteed that it
+never accepted more than two items. This one guarantees only that it
+never *keeps* more than two. A caller who pushes five items loses three
+of them silently. That loss is the right behavior for a ring buffer of
+recent events and the wrong behavior for a queue of work that must keep
+every item.
 
 Should `BoundedStack` have been a subclass at all? Probably not. The
 two versions of this exercise are the two ways out of the same bind:
 either weaken the guarantee until it fits the base contract, or admit
-that "a stack that can refuse" is a different type. A separate class
-with its own `push()` returning `bool`, or raising, is honest about
-that, and nothing then hands it to a `fill()` that was never written
-for it. Inheritance is a claim about substitutability, and this class
-was making a claim it could not keep.
+that "a stack that can refuse" is a different type. A separate class is
+honest about that, with its own `push()` returning `bool` or raising an
+exception. Nothing then hands that class to a `fill()` written for a
+different contract. Inheritance is a claim about substitutability, and
+this class was making a claim it could not keep.
