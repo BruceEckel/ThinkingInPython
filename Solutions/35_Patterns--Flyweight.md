@@ -61,13 +61,13 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 5
 ```
 
-Adding two symbols to `SPECS` (and to the `Symbol` literal so the
-type checker still catches a mismatch between the two) is the whole change
-needed to support door and tree tiles. `tile()` and `parse_map()`
-never change. Twenty-four cells still collapse to only five distinct
-objects, one per kind (`grass`, `water`, `rock`, `door`, `tree`),
-however large the map grows, because `@cache` keys on the symbol
-alone.
+Door and tree tiles need two new symbols in `SPECS`, and the same two
+in the `Symbol` literal, so the type checker still flags a `SPECS` key
+that `Symbol` does not list. That is the entire edit. `tile()` and
+`parse_map()` never change. Twenty-four cells collapse to five
+distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
+`tree`), and that count stays at five however large the map grows,
+because `@cache` keys on the symbol alone.
 
 ## 2. `tracemalloc`, cached vs. uncached `tile()`
 
@@ -134,14 +134,14 @@ for size in (50, 100, 200):
 #: 200 ratio uncached/cached: 11.1
 ```
 
-The ratio grows as the map grows: from roughly 10x at a 50x50 map to
-over 11x at 200x200. The cached version's peak memory stays flat at
-essentially three `Tile` objects no matter the map size, while the
-uncached version allocates a brand-new `Tile` for every single cell,
-so its memory grows with the number of cells (quadratically with map
-side length). The flyweight's advantage is not a fixed multiplier. It
-widens as the map grows, because the cached cost is constant and the
-uncached cost is not.
+The ratio holds near ten at every size: roughly 10x at a 50x50 map,
+a little over 11x at 200x200. Both peaks grow with the number of
+cells, because both versions build the same nested list of references.
+The two differ in what one cell costs. A cell in the cached field
+costs one reference into a pool of three `Tile` objects, while a cell
+in the uncached field costs a brand-new `Tile`, roughly ten times as
+much memory. The flyweight's saving is therefore per cell: the
+multiplier stays near ten, and the bytes saved grow with the map.
 
 ## 3. Removing `frozen=True` exposes the sharing bug
 
@@ -176,10 +176,11 @@ print(field[0][1].walkable, field[1][0].walkable,
 #: False False False
 ```
 
-Setting `walkable = False` on the tile at `(0, 0)` changes it for
-every other grass cell in the map too, because all four cells share
-one `MutableTile` object. There is only one grass tile in memory, and
-every cell just holds a reference to it. A test that pins down the bug:
+Setting `walkable = False` on the tile at `(0, 0)` changes `walkable`
+for every other grass cell in the map too, because all four cells
+share one `MutableTile` object. Only one grass tile exists in memory,
+and every cell holds a reference to that one object. This test pins
+down the bug:
 
 ```python
 # test_ch35_mutation_leak.py
@@ -213,9 +214,10 @@ def test_mutation_without_frozen_leaks_across_cells(
 ```
 
 Restoring `frozen=True` turns this same test into a demonstration of
-the fix: `field[0][0].walkable = False` instead raises
-`FrozenInstanceError` immediately, since a frozen `Tile` cannot be
-mutated at all, which is exactly what makes sharing it safe.
+the fix. `field[0][0].walkable = False` now raises a
+`FrozenInstanceError` immediately, because a frozen dataclass rejects
+assignment to every field. That refusal makes sharing one object
+safe.
 
 ## 4. Modeling chess
 
@@ -286,24 +288,25 @@ print(queen.color, queen.kind)
 #: Color.WHITE Kind.QUEEN
 ```
 
-Thirty-two occupied squares, but only twelve distinct `Piece` objects:
-two colors times six kinds. Every white pawn is the same object,
-and likewise for every other color-and-kind combination. The board is
-just a `dict` mapping squares to references, the extrinsic position
-kept separate from the intrinsic color-and-kind that `@cache` shares.
+`starting_position()` fills thirty-two squares with only twelve
+distinct `Piece` objects: two colors times six kinds. Every white pawn
+is the same object, and every other color-and-kind combination
+collapses the same way. The board is a `dict` mapping squares to
+references. That mapping keeps the extrinsic position separate from
+the intrinsic color-and-kind that `@cache` shares.
 
-Capturing needs no `Piece` object destroyed at all. `board[dst] = ...`
-simply replaces whatever reference was at `dst` (the captured piece)
-with the moving piece's reference. The captured piece's *flyweight* is
-untouched. Twelve `Piece` objects still exist even after every piece
-on the board has been captured, because those flyweights represent "a
-white rook" in the abstract, not any particular rook on the board.
-Capturing only removes a board *position*.
+Capturing leaves every `Piece` object alive. `board[dst] = ...`
+replaces whatever reference sits at `dst` (the captured piece) with
+the moving piece's reference. The captured piece's *flyweight* stays
+in the cache. Twelve `Piece` objects still exist after captures clear
+the whole board, because those flyweights represent "a white rook" in
+the abstract rather than any particular rook on a square. Capturing
+removes a board *position* and nothing more.
 
-Promotion swaps which flyweight a square points to, since a `Piece`
-cannot change color or kind (it is frozen): `piece(current.color,
-kind)` looks up (or builds) a different, shared `Piece`, and the board
-simply points at it instead.
+`promote()` swaps which flyweight a square points to, because a frozen
+`Piece` cannot change its color or kind. `piece(current.color, kind)`
+looks up (or builds) a different shared `Piece`, and the board points
+at that one instead.
 
 ## 5. `interned_color.py`, rewritten on a weak pool
 
@@ -343,16 +346,18 @@ print(len(_pool))
 #: 0
 ```
 
-This is `weak_pool.py`'s exact shape applied to colors instead of
-names: a factory function, `make_color()`, replacing the
+This listing is `weak_pool.py`'s exact shape applied to colors instead
+of names: a factory function, `make_color()`, replacing the
 `Color(...)` constructor call, and a `WeakValueDictionary` instead of
-a plain `dict`. Being a plain function rather than an overridden
-`__new__()` means `Color` can stay an ordinary frozen `@dataclass`,
-with a real `__repr__()` and `__eq__()` generated for it, unlike
-`interned_color.py`'s `Color`, which loses both by skipping
-`__init__()`. Once every reference to the fifty-shade palette and both
-crimson names is gone, nothing keeps those `Color` objects alive, and
-the pool empties itself with no explicit cleanup.
+a plain `dict`. Because `make_color()` is a plain function rather than
+an overridden `__new__()`, `Color` stays an ordinary frozen
+`@dataclass`, and the decorator generates a real `__repr__()` and
+`__eq__()` for it. `interned_color.py`'s `Color` defines no
+`__init__()`, and that omission rules out `@dataclass`, so it inherits
+`object`'s versions of both. Once `del` drops every reference to the
+fifty-shade palette and both crimson names, nothing keeps those
+`Color` objects alive, so the pool empties itself with no explicit
+cleanup.
 
 ## 6. Constraining `interned_color.py`'s components
 
@@ -432,13 +437,12 @@ def test_out_of_range_component_raises() -> None:
 ```
 
 The check runs first in `__new__()`, before the pool lookup, so an
-out-of-range component is rejected before either finding a cached
-instance or building a new one. No invalid `Color` is ever pooled or
-returned. This is the same *parse, don't validate* move
+out-of-range component raises a `ValueError` before `__new__()` can
+find a cached instance or build a new one. No invalid `Color` is ever
+pooled or returned. That check is the same *parse, don't validate* move
 [Data Classes as Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
-makes with `__post_init__()`, applied to a class that validates in
-`__new__()` instead because it needs to intercept construction for
-interning.
+makes with `__post_init__()`. Here the class validates in `__new__()`
+instead, because interning must intercept construction.
 
 ## 7. `tile_map.py` rebuilt on the enum
 
@@ -482,23 +486,23 @@ except ValueError as e:
 ```
 
 `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
-are the spec table, `Tile(s)` is the pool lookup, and the value-to-member
-table the metaclass builds is the runtime membership check `to_symbol()`
-was written to perform.
+are the spec table, and `Tile(s)` is the pool lookup. The
+value-to-member table the metaclass builds performs the runtime
+membership check `to_symbol()` did by hand.
 
-The `Literal` version caught a `Symbol` that `SPECS` did not cover, and
-the enum catches the same class of mistake, since a symbol with no member
-has no way into the map. What the enum adds is that the *set itself* is
-one declaration rather than two kept in step: the `Literal` version could
-drift, with `Symbol` and `SPECS` disagreeing, and the type checker only caught
-that because the two were annotated against each other. Here there is
-nothing to disagree with.
+The `Literal` version catches a character `SPECS` does not cover, and
+the enum catches the same class of mistake, since a symbol with no
+member has no way into the map. The enum adds one thing: the *set
+itself* is a single declaration rather than two kept in step. The
+`Literal` version could drift, with `Symbol` and `SPECS` disagreeing,
+and only the annotation tying the two together catches that drift. The
+enum leaves nothing to disagree with.
 
-What the enum gives up is the moment of failure. `to_symbol()` raised a
-`KeyError` at a named boundary the chapter could point at. `Tile("?")`
-raises a `ValueError` from deep inside `parse_map()`'s comprehension. If
-the boundary matters, keep a `to_tile()` wrapper that catches the
-`ValueError` and re-raises with the offending line and column.
+The enum gives up the moment of failure. `to_symbol()` raises a
+`KeyError` at a named boundary the chapter can point at. `Tile("?")`
+raises a `ValueError` from deep inside `parse_map()`'s comprehension.
+If the boundary matters, keep a `to_tile()` wrapper that catches the
+`ValueError` and re-raises it with the offending line and column.
 
 ## 8. Four threads on a cold key
 
@@ -574,27 +578,28 @@ print(len({id(t) for t in gather(locked_tile, "~")}))
 #: 1
 ```
 
-Four objects get built and each thread keeps its own, so `is` fails
-between all four results. `@cache` looks up the key, misses, calls the
-function, and stores the result, and nothing holds a lock across those
-three steps. Four threads that all miss on the same cold key therefore
-all run the body. The last store wins the cache, so every later caller
-agrees with each other and with none of the four.
+Each thread builds its own `Tile` and keeps it, so `is` fails between
+all four results. `@cache` looks up the key, misses, calls the
+function, and stores the result. No lock spans those steps, so four
+threads that all miss on the same cold key all run the body. The last
+store wins the cache, and every later caller gets that one object,
+while the three losing threads hold objects nothing else sees.
 
 Nothing here is a `@cache` defect. A cache that held a lock across the
-call would serialize every miss in the program, which is a worse default
-than occasionally building a value twice. For an ordinary memoized
-computation, a duplicate build costs time and no correctness. It is
-Flyweight that raises the stakes, because the whole point is that
+call would serialize every miss in the program, a worse default than
+occasionally building a value twice. For an ordinary memoized
+computation, a duplicate build costs time but not correctness.
+Flyweight raises the stakes, because its whole point is that
 `tile("^") is tile("^")`.
 
-The eager fix builds every value before any thread exists, so there is no
-miss to race on. It is the better answer whenever the value set is known
-and small, which is the same condition that makes an `Enum` work, and it
-costs nothing at runtime.
+The eager fix builds every value before any thread exists, so no miss
+remains to race on. It is the better answer whenever the whole value
+set fits in one small table, the same condition that makes an `Enum`
+work. It costs nothing at runtime.
 
-The lock fix handles an unbounded value set, and its cost is real: every
-lookup now serializes, including the hits, which are the overwhelming
-majority once the pool is warm. If that matters, lock only on the miss
-path with a hand-written pool, checking the key again inside the lock,
-since another thread may have filled it while this one waited.
+The lock fix handles an unbounded value set, and its cost is real.
+Every lookup now serializes, including the hits, which are the
+overwhelming majority once the pool is warm. If that matters, lock
+only on the miss path with a hand-written pool, checking the key again
+inside the lock, since another thread may have filled that entry while
+this one waited.

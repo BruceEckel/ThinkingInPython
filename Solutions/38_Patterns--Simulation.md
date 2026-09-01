@@ -78,13 +78,14 @@ print(fake.spawned)
 ```
 
 `Rat` never imports `Blackboard`, only the `Recorder` `Protocol`, so
-`FakeBlackboard` satisfies it purely by shape: it has `claim()`,
-`spawn()`, `log()`, and `next_number()`, with none of them touching a
-real `Maze` or `asyncio.create_task()`. Scripting `claim()`'s return
-values in a fixed sequence pins down exactly which neighbor the rat
-keeps for itself (the first the loop finds open, `(0, -1)`) and which
-neighbors it spawns down (every open one after that, here just
-`(1, 0)`), with no randomness and no real maze needed.
+`FakeBlackboard` satisfies that `Protocol` purely by shape: it defines
+`claim()`, `spawn()`, `log()`, and `next_number()`, and none of the
+four touches a real `Maze` or `asyncio.create_task()`. Scripting
+`claim()`'s return values in a fixed sequence pins down exactly which
+neighbor the rat keeps for itself and which cells it spawns new rats
+into: the first cell the loop finds open, `(0, -1)`, and every open
+one after that, here just `(1, 0)`. The test needs no randomness and
+no real maze.
 
 ## 2. Reporting unreached cells
 
@@ -196,9 +197,10 @@ asyncio.run(main())
 
 The classes are the chapter's, trimmed of what the exercise does not
 need: rat numbers, logging, and the file loader.
-The structure that matters survives the trim: `claim()` is unchanged,
-and `explore()` still opens a `TaskGroup` and lets `spawn()` add tasks
-to it, since new rats keep arriving after the block begins.
+The structure that matters survives the trim. `claim()` keeps the
+chapter's body word for word, and `explore()` still opens a
+`TaskGroup` and lets `spawn()` add tasks to that group, because new
+rats keep arriving after the block begins.
 
 For a maze built with two separate rooms and no connecting opening
 between them:
@@ -212,13 +214,13 @@ between them:
 ```
 
 the rats, starting in the left room, map every cell of that room and
-none of the right room's, so `unreached` is the right room's
-nine open cells. What makes a cell unreachable is not being walled
-off in the abstract but having no path of open cells connecting it to
-the entry. `Maze.entry()` finds the first open cell scanning row by
-row, and every rat traces back to that single starting point through
-`claim()`, so a cell with no open-cell path back to the entry can
-never be claimed no matter how many rats spawn.
+none of the right room's, so `unreached` is the right room's nine open
+cells. A cell is unreachable when no path of open cells connects it to
+the entry, not when a wall happens to surround it. `Maze.entry()`
+scans row by row and returns the first open cell it finds, and every
+rat traces back to that single starting point through `claim()`. No
+rat can therefore reach a cell that has no open-cell path back to the
+entry, however many rats spawn.
 
 ## 3. Breaking `claim()`'s atomicity
 
@@ -335,43 +337,42 @@ asyncio.run(main())
 #: cells visited: 24
 ```
 
-The one requested change drags three signatures with it, which is the
-exercise's quiet lesson: `async` is contagious.
+The one requested change drags three more edits with it, and that
+spread is the exercise's quiet lesson: `async` is contagious.
 Once `claim()` is an `async def`, the `Recorder` protocol must declare
 it `async` too, `Rat.run()`'s comprehension needs
 `if await self.blackboard.claim(*pos)`, and `explore()` must `await`
 its own first claim.
-`spawn()` stays synchronous. Nothing in it suspends.
+`spawn()` stays synchronous, because nothing in it suspends.
 
 On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
 times for 24 open cells: one pair of rats collided.
-Both reached `await asyncio.sleep(0)` while the same cell still looked
-unclaimed, since neither had added it to `visited` yet, so both
-membership tests passed, and only then did each one call
-`self.visited.add(...)`.
+Both rats reached `await asyncio.sleep(0)` while the same cell still
+looked unclaimed, because neither had added that cell to `visited`
+yet. Both membership tests therefore passed, and only afterward did
+each rat call `self.visited.add(...)`.
 The result is two rats that each believe they alone claimed that cell.
-Both move into it, which breaks the invariant that no two rats cover
-the same ground. Nothing goes unexplored. Both rats proceed from the
-shared cell and duplicate each other's work from there, while
+Both move into it, and that overlap breaks the invariant that no two
+rats cover the same ground. Nothing goes unexplored. Both rats proceed
+from the shared cell and duplicate each other's work from there, while
 `visited` stays correct, because adding the same cell twice to a set
-changes nothing. That is why `test_rats_and_mazes.py` passes on the
-broken version every time: it asserts the set of cells reached. The
-extra success costs the rats wasted effort, two tasks tracing
-overlapping paths, and the count of `True` returns against
-`len(blackboard.visited)` exposes it.
+changes nothing. That correctness is why `test_rats_and_mazes.py`
+passes on the broken version every time: the test asserts the set of
+cells reached. The extra success costs the rats wasted effort, two
+tasks tracing overlapping paths. Comparing the count of `True` returns
+with the size of `visited` exposes the collision.
 
 The original `claim()` needs no lock because it has no `await`
 between the test and the add. A coroutine yields control only at an
-`await`, so with nothing to await in between, the two statements run
-as one uninterruptible unit as far as any other coroutine is
-concerned. There is no scheduling point in the middle for another rat
-to slip into. Adding the `await` creates that scheduling point, and
-the whole guarantee depends on there being none.
+`await`, so the two statements run as one uninterruptible unit: the
+event loop can hand control to another rat before the test or after
+the add, but never between them. Adding the `await` opens exactly that
+gap in the middle, and the whole guarantee depends on its absence.
 
 Exercises 4 and 5 both build on the same `robot_explorer` world,
-so that shared apparatus (`Item` and its subclasses, `Room`, `Doors`,
-`GameBuilder`) lives once in `robot_world.py`, and each exercise
-imports it:
+so `robot_world.py` holds that shared apparatus once (`Item` and its
+subclasses, `Room`, `Doors`, `GameBuilder`), and each exercise imports
+the module:
 
 ```python
 # robot_world.py
@@ -561,11 +562,12 @@ print(game.robot.coins)
 somewhere to count (folded into `robot_world.py` above so this
 exercise's file stays a single, runnable unit). `item_factory()` needs
 no change at all. It already searches `Item.__subclasses__()` for a
-class whose `symbol` matches the character it was given, so the moment
-`Coin` is defined anywhere the module has imported, it is automatically
-one of the classes the factory searches. `Room` and `GameBuilder` need
-no change either, since both only ever call
-`occupant.interact(robot, room)` through the shared `Item` interface.
+class whose `symbol` matches the character it receives, and
+`__subclasses__()` reports the subclasses that exist right now, so
+`class Coin(Item)` in `exercise_4.py` puts `Coin` on the list the
+factory searches. `Room` and `GameBuilder` need no change either,
+since both only ever call `occupant.interact(robot, room)` through the
+shared `Item` interface.
 Neither one has ever needed to know which concrete `Item` subclasses
 exist.
 
@@ -648,22 +650,22 @@ exactly the same `doors.open(urge)` calls `Robot.move()` uses, so it
 never has to know anything about coordinates, only rooms and the
 moves that connect them. It refuses to step through a `Wall` or off
 the `Edge`, and it stops the moment it reaches a room occupied by
-`EndGame`, returning the sequence of move letters that got there, the
-shortest one first since a breadth-first search always finds the
-shortest path in an unweighted graph. That returned string is exactly
-what `run()` already expects, the same as the previously hard-coded
-`solution`, so `game.run(solution)` and the assertion that follows are
-unchanged from `test_robot.py`. Unlike the pre-computed `solution`
-string, this one adapts automatically if the maze layout changes.
+`EndGame`, returning the sequence of move letters that got there.
+Breadth-first search reaches every room by the fewest moves in an
+unweighted graph, so that sequence is the shortest path. `run()`
+expects exactly such a string, the same as the previously hard-coded
+`solution`, so `game.run(solution)` and the assertion that follows
+match `test_robot.py`. Unlike the pre-computed `solution` string, the
+computed one adapts automatically if the maze layout changes.
 
 ## 6, 7, and 8: the Chladni plate
 
-The last three exercises all shake the same plate, so the chapter's
-`chladni.py` is repeated here once, with one change: `Plate` takes the
-field function as a constructor argument instead of calling the
-module-level `amplitude()` directly. That makes exercise 7's different
-physics a second function rather than an edit, so both can run side by
-side in one program.
+The last three exercises all shake the same plate, so this file
+carries the chapter's `chladni.py` once, with one change: `Plate`
+takes the field function as a constructor argument instead of calling
+the module-level `amplitude()` directly. That argument makes exercise
+7's different physics a second function rather than an edit, so both
+functions can run side by side in one program.
 
 ```python
 # chladni.py
@@ -767,22 +769,22 @@ approximately zero: the two multiplications produce identical floats,
 so the difference is exactly `0.0` at every point on the plate.
 
 A zero field means a zero kick. `step()` scales each grain's random
-displacement by the amplitude under it, so `uniform(-kick, kick) * 0.0`
-moves nothing, and 1200 steps leave every grain exactly where the
-constructor scattered it. The result is neither chaos nor a figure
-because there is no motion at all: what you see is the initial random
-scatter, frozen. Agitation reads `0.000` from the first step, which is
-the same number a perfectly settled plate reports, so the summary
-statistic cannot tell "finished" from "never started."
+displacement by the amplitude under that grain, so
+`uniform(-kick, kick) * 0.0` moves nothing, and 1200 steps leave every
+grain exactly where the constructor scattered it. The result is
+neither chaos nor a figure because no grain ever moves: what you see
+is the initial random scatter, frozen. Agitation reads `0.000` from
+the first step, the same number a perfectly settled plate reports, so
+the summary statistic cannot tell "finished" from "never started."
 
-The diagonal follows from the same symmetry. Swapping `x` and `y`
-turns the first term into the second and the second into the first, so
-`amplitude(y, x, mode)` is `amplitude(x, y, mode)` with the
-subtraction reversed. The absolute value hides the sign, but on the
-line `x == y` the swap changes nothing, so a value that equals its own
-negation must be zero. Every mode this plate can ring in therefore has
-a nodal line straight down the main diagonal, which is why the figures
-all share that one feature no matter which `(m, n)` produced them.
+The main diagonal in every figure follows from the same symmetry.
+Swapping `x` and `y` turns the first term into the second and the
+second into the first, so the swap reverses the subtraction inside
+`amplitude()`'s `abs()`. On the line `x == y` the swap changes
+nothing, so the subtraction there must equal its own negation, which
+forces that value to zero. Every mode this plate can ring in therefore
+has a nodal line straight down the main diagonal, and the figures all
+share that one feature no matter which `(m, n)` produced them.
 
 ## 7. Changing the physics
 
@@ -831,24 +833,26 @@ and two horizontal lines cutting it into thirds, with the four edges
 filled in as well.
 
 The nodal lines are straight because the new field is a product of one
-function of `x` and one function of `y`. It vanishes when either factor
-does, and `sin(mπx)` is zero at `x = 0, 1/2, 1` for `m = 2`, regardless
-of `y`. That gives vertical lines at those three values of `x`.
+function of `x` and one function of `y`. The product vanishes when
+either factor does, and `sin(mπx)` is zero at `x = 0, 1/2, 1` for
+`m = 2`, regardless of `y`. Those three zeros give vertical lines.
 `sin(nπy)` is zero at `y = 0, 1/3, 2/3, 1` for `n = 3`, regardless of
 `x`, giving horizontal lines. Every nodal point lies on one of those
-seven lines, and the number of interior lines is `m - 1` vertical and
+seven lines, and the interior lines number `m - 1` vertical and
 `n - 1` horizontal, so the mode numbers are readable straight off the
 picture.
 
-The plate's own field factors the other way. Its two terms mix `x` and
-`y` in both, and subtracting them creates zeros along curves where the
+The plate's own field never separates into a factor in `x` times a
+factor in `y`. Each of its two terms mixes `x` and `y`, and
+subtracting one from the other leaves zeros along the curves where the
 two products happen to agree, which is why the original figures are
-diagonals, crosses, and rings rather than a grid. Fixing a real plate
-at its edges only, rather than at a rim, is what produces those mixed
-terms. The simulation machinery does not change at all between the two:
-same grains, same random walk, same rule that a grain moves in
-proportion to the vibration under it. Only the field changed, and with
-it every pattern the model produces.
+diagonals, crosses, and rings rather than a grid. Those mixed terms
+come from the physics the chapter's formula approximates, a real plate
+with free edges rather than a membrane clamped all around its rim. The
+simulation machinery stays the same across both fields: same grains,
+same random walk, same rule that a grain moves in proportion to the
+vibration under it. Only the field changed, and with it every pattern
+the model produces.
 
 ## 8. Tuning the noise
 
@@ -875,26 +879,26 @@ for kick in (0.005, 0.05, 0.5):
 at most half a percent of the plate, so a grain starting in the middle
 of a bright region needs hundreds of steps to walk anywhere near a
 nodal line. After 1200 steps agitation has fallen from `0.585` to
-`0.380`, roughly a third of the way, where the default kick reached
-`0.000` in a quarter of the time. Rendered, this run still looks like
-noise with a faint grain of structure in it. Nothing is wrong with the
-physics. The run is simply not finished, and finishing it means more
-steps than anyone wants to watch.
+`0.380`, roughly a third of the way, while the default kick was
+already down to `0.005` by step 400. Rendered, this run still looks
+like noise with a faint trace of structure in it. Nothing is wrong
+with the physics. The run is simply not finished, and finishing it
+means more steps than anyone wants to watch.
 
 `kick=0.5` fails differently, and the agitation column is what makes
-it interesting: it collapses to `0.000` as convincingly as the default
-does. The figure never appears anyway. A half-unit displacement can
-throw a grain across the plate in one step, so a grain never traces a
-descent toward the nearest nodal line. It jumps somewhere unrelated and
-stays only if that spot happens to be quiet. Grains accumulate in
-whichever quiet regions they land in first, mostly the corners, and the
-lines between them stay empty. The plate reports settled sand in the
-wrong places.
+that failure interesting: agitation collapses to `0.000` as
+convincingly as it does at the default kick. The figure never appears
+anyway. A half-unit displacement can throw a grain across the plate in
+one step, so a grain never traces a descent toward the nearest nodal
+line. The grain jumps somewhere unrelated and stays only if that spot
+happens to be quiet. Grains accumulate in whichever quiet regions they
+land in first, mostly the corners, and the lines between them stay
+empty. The plate reports settled sand in the wrong places.
 
-That is worth keeping. Agitation measures whether the grains are
-sitting where the field is weak, not whether the figure is right, so
-one number cannot distinguish a sharp pattern from three blobs. The
-render is the check the number cannot perform.
+That failure is worth keeping in mind. Agitation measures whether the
+grains are sitting where the field is weak, not whether the figure is
+right, so one number cannot distinguish a sharp pattern from three
+blobs. The render is the check the number cannot perform.
 
 An intermediate kick avoids both failures because the amplitude scaling
 in `step()` is a feedback loop, and the loop only works within a range

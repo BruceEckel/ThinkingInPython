@@ -41,20 +41,20 @@ for flower in (Ranunculus(), Chrysanthemum()):
 Everything on the visitor side disappears: the `Visitor` base, `Bug`,
 `Pollinator`, `Predator`, `Bee`, `Fly`, and `Worm`, and the two
 `visit()` methods. So does `accept()` on `Flower`, and with it the
-`Any` annotation the chapter had to explain. What remains is two
-functions and one registration.
+`Any` annotation the chapter had to explain. Two functions and one
+registration remain.
 
-The `Bug` classes were never carrying state. The middle layer existed
-to name one operation, and the leaves existed to be types the second
-dispatch could resolve. Once the operation is a function, naming it at
-the call site does that selection, so `pollinate(flower, "Bee")` says
-what `flower.accept(bee)` said with a class and a method.
+The `Bug` classes held no state. `Pollinator` and `Predator` each
+existed to name one operation, and `Bee`, `Fly`, and `Worm` existed
+to be types the second dispatch could resolve. Once the operation is a
+function, the call site names it: `pollinate(flower, "Bee")` says what
+`flower.accept(bee)` said with a class and a method.
 
-The one thing lost is the ability to hold a visitor in a variable and
-pass it around as an object. When that matters, the function is still
-a value: `op = eat` works, and a `dict[str, Callable[[Flower], str]]`
-keyed by operation name recovers the "choose an operation at runtime"
-half of what the `Visitor` hierarchy provided, without the classes.
+You lose one thing: holding a visitor in a variable and passing it
+around as an object. When that matters, the function is still a value.
+`op = eat` works, and a `dict[str, Callable[[Flower], str]]` keyed by
+operation name recovers the "choose an operation at runtime" half of
+what the `Visitor` hierarchy provided, without the classes.
 
 ## 2. Adding a type against adding an operation
 
@@ -107,16 +107,16 @@ print(thorns(Gladiolus()))
 ```
 
 Adding `Rose` cost two lines for the class plus one registration per
-operation that needed a non-default answer, and nothing existing was
-touched. Adding `thorns()` cost one new function plus one registration
-for the flower that differs, and again nothing existing was touched.
+operation that needed a non-default answer, and no existing line
+changed. Adding `thorns()` cost one new function plus one registration
+for the flower that differs, and again no existing line changed.
 
-`@singledispatch` makes adding an *operation* the cheaper of the two,
-because an operation is a whole function and lives in one place. Adding
-a type is cheap here only because most flowers accept the default. A
-type that needs a distinct answer from every operation costs one
-registration per operation, scattered across the file. That is the
-expression problem from
+`@singledispatch` makes adding an *operation* cheaper than adding a
+type, because an operation is a whole function and lives in one place.
+Adding a type is cheap here only because most flowers accept the
+default. A type that needs a distinct answer from every operation
+costs one registration per operation, scattered across the file. That
+is the expression problem from
 [Pattern Matching](../Chapters/13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching):
 methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
@@ -170,21 +170,22 @@ except AttributeError as e:
 ```
 
 `Visits` names the one method `accept()` calls, so the parameter
-declares what it needs instead of accepting anything. `Bee` neither
-mentions `Visits` nor inherits from it: a `Protocol` matches on
-structure, so any class with a compatible `visit()` satisfies it, and
-the `Visitor` hierarchy stays as the chapter wrote it.
+declares what `accept()` needs instead of accepting anything. `Bee`
+neither mentions `Visits` nor inherits from it, because a `Protocol`
+matches on structure: any class with a compatible `visit()` satisfies
+`Visits`. The `Visitor` hierarchy stays as the chapter wrote it.
 
 The two versions report the `Beetle` mistake at different times. Under
-`Any`, the type checker has nothing to compare `Beetle` against, so the call
-type-checks and the program dies at runtime with the `AttributeError`
-above. Under `Visits`, `ty` rejects the argument before the program
-runs, because `Beetle` inherits no `visit()` and so does not match the
-protocol. The `ty: ignore` comment above is what makes the listing
-compile at all. Deleting it is how you see the check working.
+`Any`, the type checker has nothing to compare `Beetle` against, so
+the call type-checks and the program dies at runtime with the
+`AttributeError` above. Under `Visits`, `ty` rejects the argument
+before the program runs, because `Beetle` inherits no `visit()` and so
+does not match the protocol. Only the `# type: ignore` comment in the
+listing keeps `ty` quiet about that call. Delete it and `ty` reports
+the mismatch.
 
-That is the price the chapter names for keeping `Any`. It moves an
-error a type checker could have caught into the run. The classic pattern
-pays it because its `Visitor` base is empty, and either fix, declaring
-`visit()` abstract on that base or writing the protocol above, buys the
-check back.
+That is the price the chapter names for keeping `Any`. The `Any` moves
+an error a type checker could have caught into the run. The classic
+pattern pays that price because its `Visitor` base is empty. Either
+fix buys the check back: declaring `visit()` abstract on that base, or
+writing the `Visits` protocol above.

@@ -1,7 +1,7 @@
 # Multiple Dispatching: Solutions
 
-Both exercises use the same rule for the new `Lizard`: it beats Paper
-and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
+Every exercise that adds `Lizard` uses the same rule: `Lizard` beats
+Paper and Scissors, and loses to Rock. Lizard versus Lizard is a draw.
 
 ## 1. Adding `Lizard` to the table version
 
@@ -149,22 +149,20 @@ print(Lizard().compete(Paper()),
 
 This version costs far more to extend. Every *existing* class
 (`Paper`, `Scissors`, `Rock`) needs a brand-new `eval_lizard()` method,
-one line each, and the new `Lizard` class needs a `compete()` plus
-four `eval_*()` methods, one per opponent type including its own,
-all of it encoding the same sixteen answers already sitting in the
-table version's `OUTCOME` dictionary, just spread across four classes
-instead of collected in one place. Both versions were checked against each other
-while developing this solution: all sixteen combinations of the two
-implementations agree.
+one line each. The new `Lizard` class needs a `compete()` plus four
+`eval_*()` methods, one per opponent type including its own. Those
+methods encode the same sixteen answers already sitting in the table
+version's `OUTCOME` dictionary, spread across four classes instead of
+collected in one place. The two implementations agree on all sixteen
+combinations.
 
 The comparison makes the chapter's point concrete. The table costs one
 class and seven dictionary rows to extend. The method version costs
 one class and five new methods, plus retrofitting a method onto every
-class that already existed. That cost only grows as more item types
-are added, which is exactly why the chapter recommends the table for
-data that is mostly pure lookup, and reserves the method version for
-combinations that need real, type-specific logic too large for one
-table cell.
+class that already existed. That cost only grows as you add more item
+types. The chapter therefore recommends the table for data that is
+mostly pure lookup, and reserves the method version for combinations
+that need real, type-specific logic too large for one table cell.
 
 ## 3. Sixteen matchups in `EXPECTED`
 
@@ -201,12 +199,12 @@ print(len(EXPECTED))
 #: 16
 ```
 
-With this `EXPECTED` in place, `test_matches_expected()`,
-parametrized over both modules, passes unchanged: it hardcodes no
-number of item types. It is parametrized from `MATCHUPS`, which is
-built from whatever `EXPECTED` contains, so growing it from nine
-entries to sixteen produces sixteen independently reported cases per
-module with no change to the test function itself.
+With this `EXPECTED` in place, `test_matches_expected()` passes
+unchanged over both modules: it hardcodes no number of item types.
+`pytest` parametrizes it from `MATCHUPS`, which a comprehension builds
+from `EXPECTED`, so growing `EXPECTED` from nine entries to sixteen
+produces sixteen independently reported cases per module with no
+change to the test function itself.
 
 ## 4. Counting how often each item type appears
 
@@ -330,18 +328,18 @@ except TypeError as e:
 `__sub__()` is `__add__()` with the sign changed, and the three cases
 line up the same way: a `Meters`, a number, or `NotImplemented` for
 anything else. `__rsub__()` needs only the numeric case, because
-Python asks the left operand first and `Meters(10) - Meters(3)` is
-answered there. The reflected form is reached only when the left
-operand declined, which two `Meters` never do.
+Python asks the left operand first, and `Meters.__sub__()` already
+answers `Meters(10) - Meters(3)`. Python tries the reflected form only
+when the left operand declines, and two `Meters` never decline.
 
 The swap is where subtraction differs from addition. Python calls
 `Meters.__rsub__(Meters(3), 10)` for the expression `10 - Meters(3)`,
-so `self` is the right operand and `other` is the left one, and the
-method has to put them back in the order the source wrote them.
+so `self` is the right operand and `other` is the left one. The method
+must put them back in the order the source wrote them.
 `Meters(other - self.n)` gives `Meters(7)`. Writing
 `Meters(self.n - other)`, the same body `__sub__()` uses, would give
 `Meters(-7)`: a correct-looking method that quietly returns the
-negative of every reflected subtraction. `__radd__()` hides this
+negative of every reflected subtraction. `__radd__()` hides that swap
 because addition commutes, so the mistake costs nothing there and
 costs the wrong answer here.
 
@@ -349,8 +347,8 @@ costs the wrong answer here.
 straight to `Meters.__rsub__`, which returns `NotImplemented` for a
 `str`. With both sides declining, Python raises the `TypeError`, and
 the message names both types. Returning `NotImplemented` rather than
-raising an exception is what makes that message possible: an exception
-raised inside `__rsub__()` would report `Meters`'s complaint instead of
+raising an exception makes that message possible: an exception raised
+inside `__rsub__()` would report `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
 
 ## 6. Making the table tolerate subclasses
@@ -417,39 +415,41 @@ print(TolerantOrigami().compete(TolerantRock()))
 ```
 
 The `KeyError` comes from a dictionary probe, which compares keys by
-equality. `(Origami, Rock)` is not `(Paper, Rock)`, because `Origami`
-is not `Paper`, however closely the two are related. Inheritance never
-enters the lookup: a `dict` hashes the key and compares, and neither
-step consults an MRO. That is what "the match is on classes exactly"
-means, and it is the property `singledispatch` does not share.
+equality. `Origami` inherits from `Paper` but is not `Paper`, so
+`(Origami, Rock)` is not `(Paper, Rock)`. Inheritance never enters the
+lookup: a `dict` hashes the key and compares, and neither step
+consults an MRO. That is what the chapter's "matches classes exactly"
+means, and exact matching is the property `singledispatch` does not
+share.
 
 The tolerant version walks both MROs and takes the first pair that has
 a row, so `TolerantOrigami` finds `(TolerantPaper, TolerantRock)` one
-step up on the left. What it gives up is exactly the property the
-chapter names first: the match is no longer exact. Three consequences
-follow, and only the first is obvious.
+step up on the left. What that version gives up is exactly the
+property the chapter names first: the match is no longer exact. Three
+consequences follow, and only the first is obvious.
 
 The lookup is no longer one probe. It is a nested loop over two MROs,
 so a miss now costs the product of the two depths instead of a single
-hash. For a table consulted once per duel that is nothing, and for one
-consulted in an inner loop it is not.
+hash. For a table consulted once per duel, that cost vanishes into the
+noise. In an inner loop, it matters.
 
 Order now decides the answer. `(TolerantPaper, TolerantRock)` and
-`(TolerantOrigami, TolerantItem)` could both match, and which one wins
+`(TolerantOrigami, TolerantItem)` could both match. Which one wins
 depends on the order the loops happen to walk, not on anything a
 reader of the table can see. The exact version has no such question:
 either the pair is in the table or it is not.
 
-The failure that made the exact version safe is gone. A `Lizard` whose
-rows you forgot to write no longer raises `KeyError`. It silently
-inherits its parent's answers and plays as whatever it derives from.
-That is the fail-fast policy the chapter recommends for a table under
-construction, traded away for the convenience of not writing rows.
+The tolerant version also loses the failure that made the exact
+version safe. A `Lizard` whose rows you forgot to write no longer
+raises `KeyError`. It silently inherits its parent's answers and plays
+as whatever it derives from. Tolerance buys the convenience of
+skipping rows at the price of the fail-fast policy the chapter
+recommends for a table under construction.
 
 Which behavior you want depends on whether a subclass is a new
 competitor or a variation on an existing one. `Origami` really is
-paper for the purposes of this game, and a `WetPaper` that loses to
-everything is not.
+paper for the purposes of this game. A `WetPaper` that loses to
+everything is a new competitor.
 
 ## 7. A business-modeling environment
 
@@ -494,18 +494,18 @@ for a, b in zip(team, team[1:]):
 #: Dwarf (engineer) negotiates with Elf
 ```
 
-This uses single dispatch, not double: `a.interact(b)` resolves on
-`a`'s type only, and `other` is printed generically rather than
-inspected for its own type. It becomes genuinely *double* dispatch
-once `interact()`'s behavior must also vary by `other`'s type,
-which is what exercise 8 adds.
+Exercise 7 uses single dispatch, not double: `a.interact(b)` resolves
+on `a`'s type only, and `interact()` prints `other` generically
+instead of inspecting its type. The design becomes genuinely *double*
+dispatch once `interact()`'s behavior must vary by `other`'s type too,
+and exercise 8 adds that dependence.
 
 ## 8. Weapons, battles, and a full meeting
 
-Six weapon types, two per `Inhabitant` kind, ranked around a cycle
-(each weapon beats the next two in the ranking and loses to the
-previous two, the same shape `paper_scissors_rock.py` uses for three
-items, extended to six):
+The listing gives each `Inhabitant` kind two of six weapon types,
+ranked around a cycle: each weapon beats the previous two in the
+ranking and loses to the next two, the same shape
+`paper_scissors_rock.py` uses for three items, extended to six.
 
 ```python
 # exercise_8.py
@@ -597,10 +597,10 @@ print(p2.meeting(group_size=5))
 #: Troll
 ```
 
-Since the weapon ranking is a genuine cycle (nothing dominates
-everything), no group is guaranteed to win. The outcome depends on the
-random weapon draws each round, the same as real rock-paper-scissors
-tournaments have no fixed victor.
+The weapon ranking is a genuine cycle: nothing dominates everything,
+so no group can count on winning. The outcome depends on the random
+weapon draws each round, exactly as it does in a real
+rock-paper-scissors tournament.
 
 ## 9. When the table beats the hard-coded dispatch
 
@@ -609,17 +609,17 @@ mapping from combination to outcome, with no per-combination logic
 beyond "look up the answer." That describes both
 `paper_scissors_rock_table.py` and this exercise's weapon rankings.
 The hard-coded double dispatch earns its keep only when a specific
-combination needs real code, not just a value, such as a combination
-that triggers a special effect or consults outside state, something
-too large to fit in one table cell.
+combination needs real code rather than a value. A combination that
+triggers a special effect or consults outside state is too large to
+fit in one table cell.
 
 You can keep the calling code as simple as the object version while
 using a table underneath, the way `paper_scissors_rock.py`'s
 `Item.compete()` and `paper_scissors_rock_table.py`'s `Item.compete()`
-both read as `item1.compete(item2)` at the call site. The table only
-changes what happens *inside* `compete()`, a dictionary lookup instead
-of a chain of `eval_*()` calls. Nothing about how a caller uses the
-object changes.
+both read as `item1.compete(item2)` at the call site. The table
+changes only what happens *inside* `compete()`: a dictionary lookup
+instead of a chain of `eval_*()` calls. Nothing about how a caller
+uses the object changes.
 
 ## 10. Exercise 8, rebuilt on a table
 
@@ -696,9 +696,10 @@ print(isinstance(winner, (Inhabitant2, type(None))))
 `OUTCOME_TABLE` holds the same 36 answers `weapon_outcome()` computes
 on the fly, one entry per ordered pair of the six weapon names.
 Generating the table from the formula, rather than writing all 36
-entries by hand, confirms the two agree everywhere while keeping the
+entries by hand, makes the two agree by construction while keeping the
 lookup itself trivial: `battle_table()` no longer calls any per-weapon
-logic, only indexes into a dictionary. This is the conclusion
+logic, only indexes into a dictionary.
 [One Type or Many](../Chapters/32_Patterns--Multiple_Dispatching.md#one-type-or-many)
-reaches: the table is both shorter to write and easier to audit for a
-ruleset that is fundamentally a fixed set of answers.
+reaches the same conclusion: the table is both shorter to write and
+easier to audit for a ruleset that is fundamentally a fixed set of
+answers.
