@@ -1,35 +1,29 @@
 # Factory
 
 When you discover you need to add new types to a system,
-first use polymorphism to create a common interface to those new types.
+first create a base type as a common interface to those new types.
 The common interface separates the rest of your code from knowledge of the specific types you add.
 You may add new types without editing existing code ... or so it seems.
-At first you seem to change such a design in only one place,
+It appears you can change such a design in only one place:
 where you inherit a new type.
 But you must still create an object of your new type,
 and at the point of creation you must name the exact constructor.
-Thus, if the code that creates objects appears throughout your application,
-you have the same problem when adding new types.
-You must still find and edit every place that names a concrete type.
-Creation names the type.
-Use does not, because polymorphism handles use.
-The effect is the same:
-adding a new type means edits scattered through the code.
+If the code that creates objects appears throughout your application,
+adding a type means finding and editing every place that names a concrete type.
 
 The solution is to encapsulate object creation:
 make a common *factory* create every object instead of spreading creational code through the system.
-If your program must call this factory whenever it needs one of your objects,
-you change only the factory when you add a new type.
+Your program must call this factory whenever it needs one of your objects,
+so you change only the factory when you add a new type.
 
-Since every object-oriented program creates objects,
-and since you will likely extend your program by adding new types,
-Factory might be the most common design pattern.
+Every object-oriented program creates objects,
+and you often extend that program by adding new types.
+Thus, *Factory* might be the most common design pattern.
 
 This chapter covers the creational patterns of *GoF Design Patterns*:
 *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
 The fifth, *Singleton*, has [its own chapter](24_Patterns--Singleton.md).
-All five answer the same question,
-which object to build and where the code that builds it lives.
+All five answer two questions: which object to build, and what code builds it.
 
 ## Simple Factory Method
 
@@ -92,7 +86,8 @@ if __name__ == "__main__":
 
 The `factory()` takes an argument that selects the type of `Shape` to create.
 Here the argument is a string, but it could be any kind of data.
-The `factory()` is now the only other code that changes when you add a new type of `Shape`.
+Apart from the new subclass itself,
+`factory()` is the only code that changes when you add a new type of `Shape`.
 
 I have also used a *generator*
 (see [Iterators](23_Patterns--Iterators.md#generators)).
@@ -230,7 +225,8 @@ produces the same failure even when the import statement is in the file.
 The module body, and with it the registration,
 does not run until the first use of the imported name,
 and an import written only to trigger registration never uses that name.
-Running with `-X lazy_imports=all` makes ordinary imports lazy too.
+Running with `-X lazy_imports=all` makes ordinary imports lazy too,
+so the same failure can appear in a program with no `lazy` keyword in it.
 Import a plugin module eagerly when the import exists for its side effect.
 
 The registry keys on `cls.__name__` alone, so two classes that share a name,
@@ -359,7 +355,7 @@ Each type of shape defines its own nested `Factory` class whose `create()` metho
 Here it is a `Protocol`, so the two nested classes satisfy it without naming it,
 and the `FACTORIES` annotation makes the checker verify they do.
 `FACTORIES` maps each kind's name to an instance of its factory,
-and `create_shape()` looks that factory up and calls it right away.
+and `create_shape()` looks that factory up and calls its `create()` immediately.
 A more complex design would return the factory object to the caller,
 who could keep it and construct objects from it later.
 Much of the time, however, a single static method in the base class
@@ -371,8 +367,8 @@ that pattern puts the creation method on a class and lets subclasses override it
 `make_character()` is a factory method,
 and each concrete factory overrides it to name a different type.
 
-A `Factory` class nested in every shape is machinery Python does not need,
-kept here because it is the form a factory-object design takes in a language where a class is not an object you can store.
+A `Factory` class nested in every shape is machinery Python does not need.
+This listing keeps it because that is the form a factory-object design takes where a class is not an object you can store.
 The registry in `registry.py` does the same job with no nested classes.
 Write a separate factory class when object creation takes real work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
@@ -397,8 +393,7 @@ The example in *GoF Design Patterns* implements portability across graphical use
 You create a factory object for the GUI you're working with,
 and from then on when you ask that factory for a menu, button, or slider,
 it creates the version of that item suited to that GUI.
-Thus you can isolate, in one place,
-the effect of changing from one GUI to another.
+The change from one GUI to another then touches one place in your code.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
@@ -476,12 +471,11 @@ In this environment, `Character` objects interact with `Obstacle` objects,
 but the types of characters and obstacles depend on the kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
-In this example, the setup and play are simple, but those activities
-(the *initial conditions* and the *state change*)
-can determine much of the game's outcome.
+Setup and play are simple here,
+but the initial conditions and the state change can determine much of a game's outcome.
 `GameEnvironment` has no place to vary the rules of play,
-so a real game would need one,
-either a subclass overriding `play()` or a rules object passed alongside the factory.
+so a real game would add one: a subclass overriding `play()`,
+or a rules object passed alongside the factory.
 
 Because `interact_with()` dispatches on the character's type and `obstacle.action()` dispatches again on the obstacle's,
 the pair of calls chooses behavior from both types.
@@ -492,15 +486,15 @@ The base classes `Obstacle`, `Character`, and `GameElementFactory`
 (translated from the Java version)
 force every concrete class to inherit from them.
 Those `raise NotImplementedError` bodies enforce less than the listing suggests.
-Those bodies fail at call time:
+The failure comes at call time:
 a concrete factory that omits `make_obstacle()` constructs with no error and raises an exception only when something calls the missing method.
 An `@abstractmethod` fails at instantiation,
 the way `Partial()` did in [Surrogate](26_Patterns--Surrogate.md),
 and at least reports the omission before any call happens.
 Python does not need that inheritance to keep the same checking.
 A *Protocol* describes the required shape,
-and any class with that shape conforms,
-with no base class to derive from while still type checking:
+and any class with that shape conforms without deriving from a base class.
+The checker verifies conformance all the same:
 
 ```python
 # games2.py
@@ -568,8 +562,8 @@ and an `Obstacle` must supply `action()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`,
 and uncommenting the line that passes a `BrokenFactory` to `GameEnvironment` produces `protocol member make_obstacle is not defined on type BrokenFactory`.
 With the Protocol, the checker reports the omission before the program runs,
-earlier than the `TypeError` at construction that the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy)
-produced, and much earlier than the call-time `NotImplementedError` in `games.py`.
+earlier than the construction-time `TypeError` from the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy),
+and much earlier than the call-time `NotImplementedError` in `games.py`.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -666,9 +660,9 @@ if __name__ == "__main__":
 
 Because `spawn()` returns an independent object every time,
 callers can modify their copy without modifying the prototype.
-Compare `spawn()` with `make()` in `registry.py`.
-In `registry.py` the table holds classes and calls a constructor.
-In `prototype_registry.py` the table holds instances and copies them.
+Compare `spawn()` with `make()` in `registry.py`:
+that table holds classes and calls a constructor,
+while `prototype_registry.py`'s holds instances and copies them.
 Use the prototype form when the interesting part of an object is its configured state rather than its type.
 
 These tests check the two required properties for a prototype registry.
@@ -827,20 +821,19 @@ to illustrate the unrelated Decorator pattern.
 
 Builder remains useful in Python when construction is genuinely a process.
 The steps must come in an order, later steps depend on earlier ones,
-and rules span the steps.
+and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
 qualifies.
-It assembles a maze in three stages, creating rooms, connecting doors,
-then pairing the teleports that share a target letter,
-and each stage relies on what the previous stage established.
+It assembles a maze in three stages: creating rooms, connecting doors,
+then pairing the teleports that share a target letter.
+Each stage relies on what the previous stage established.
 No single constructor call can express that.
 The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
 and `parse_args()` is the `build()`.
 
 The smallest builder in Python is easy to overlook.
-Appending parts to a list and finishing with `"".join(parts)` builds an immutable product,
-a string, through a mutable intermediate.
+Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
 That is the Builder structure.
 `PizzaBuilder` collecting toppings in a list and freezing them into a tuple at `build()` is the same structure.
 Reserve the pattern, and the name,
@@ -853,8 +846,7 @@ keyword arguments and a data class are the builder.
 Match the machinery to what varies:
 
 - A name maps to a class: use a dictionary.
-  Add `__init_subclass__()` registration once the set of classes is open,
-  or spread across modules.
+  Add `__init_subclass__()` registration when the set of classes is open-ended or spread across modules.
 - Construction takes real work beyond calling a constructor
   (pooling, caching, consulting configuration): write a factory function,
   and a factory class only when that work has state of its own.

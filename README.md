@@ -226,7 +226,7 @@ This is for my own bookkeeping.
 | 24_Patterns--Singleton.md                 | |
 | 25_Patterns--Template_Method.md           |X|
 | 26_Patterns--Surrogate.md                 |X|
-| 27_Patterns--Factory.md                   |r|
+| 27_Patterns--Factory.md                   |O|
 | 28_Patterns--Function_Objects.md          |r|
 | 29_Patterns--Changing_the_Interface.md    | |
 | 30_Patterns--Observer.md                  | |
