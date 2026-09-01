@@ -33,20 +33,21 @@ and its output shows that the attributes and the keyword arguments are one dict:
 `m.more = 11` adds a key, just as passing `more=11` to the constructor would.
 
 Because `**kwargs` is the only parameter,
-`Messenger` accepts only keyword arguments.
-`Messenger("Spam")` raises a `TypeError`.
-The `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
-is unnecessary here, and `def __init__(self, *, **kwargs)` is a syntax error,
+`Messenger` accepts keyword arguments alone:
+`Messenger("Spam")` raises a `TypeError`,
+with no `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
+needed.
+Writing `def __init__(self, *, **kwargs)` anyway is a syntax error,
 since a named parameter must follow a bare `*`.
 
-The `m: Any` annotation is not decoration.
-Without it, the type checker rejects both `m.more = 11` and `m.info`,
-since the `Messenger` class declares no attributes.
+The `m: Any` annotation does real work.
+The `Messenger` class declares no attributes,
+so without that annotation the type checker rejects both `m.more = 11` and `m.info`.
 `Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one
 ([Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
-If you declare only the first, the type checker still rejects the write,
+With `__getattr__()` alone, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair
 (its read half is `__getattribute__()`, which intercepts every attribute access),
@@ -80,12 +81,12 @@ The first `print()` shows the same instance `__dict__` the hand-rolled version h
 `SimpleNamespace` adds the rest: a readable `repr()` and equality by contents.
 `Messenger` prints as `<Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
-because it inherits `object`'s identity-based equality.
+because `Messenger` inherits `object`'s identity-based equality.
 
 A `SimpleNamespace` also accepts any name you invent,
 so no type checker can know which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
-and no type checker reports `m.inof` here either.
+so `m.inof` passes the type checker here too.
 
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
@@ -112,8 +113,9 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 `typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
-so a type checker knows a `Color`'s `r` is an `int` while the functional form leaves it unknown.
-Because it is a tuple underneath,
+so a type checker knows a `Color`'s `r` is an `int`,
+where the functional form declares none.
+Because a `Color` is a tuple underneath,
 you can read each field by name or by position:
 
 ```python
@@ -143,10 +145,12 @@ print(red._asdict(), Color._fields)
 
 Printing a `NamedTuple` gives the same readable output as a data class.
 A bare tuple prints `(255, 0, 0)` and leaves you counting positions.
-Assigning to a field raises an `AttributeError`, and `ty` reports it as well.
-The attribute bag catches nothing.
-A declared field catches this.
-Since nothing can mutate the fields, `_replace()` produces an updated copy.
+Assigning to a field raises an `AttributeError`,
+and `ty` reports the assignment as well.
+An attribute bag accepts every write; a declared field rejects this one,
+at runtime and in the checker.
+Because no field can change, `_replace()` is the way to change one:
+it produces an updated copy.
 `copy.replace()` from [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
 Immutability also makes the record hashable,
@@ -155,14 +159,14 @@ so a `Color` can key a `dict` or join a `set`.
 The immutability guarantee reaches the fields, not the objects they name.
 A `NamedTuple` holding a list still lets that list change,
 the same leak [`frozen=True` has](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
-Nor can you hash such a record, whether or not anyone mutates the list,
+Such a record is also unhashable, mutated or not,
 because hashing a tuple hashes its contents.
 An immutable record needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
-and `_fields` does not mean private.
-`NamedTuple` marks its own members that way so they cannot collide with a field you name.
-A record can declare a field called `replace` or `fields`.
+and `_fields` keeps every unprefixed name free for your fields:
+a record can declare a field called `replace` or `fields`.
+The underscore marks `NamedTuple`'s own members, and says nothing about privacy.
 
 ## Returning Multiple Values
 
@@ -192,11 +196,11 @@ knowledge the code no longer states anywhere.
 `Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
 
-A data class cannot do that last part.
+Unpacking is the part a data class lacks.
 `mean, count = summarize(data)` against a `@dataclass` version of `Stats` raises a `TypeError`,
 since a data class is not iterable.
-`dataclasses.astuple()` converts one when you need the positional form.
-It recurses, though: a nested data class comes back as a nested tuple,
+`dataclasses.astuple()` converts a data class when you need the positional form.
+`astuple()` recurses, though: a nested data class comes back as a nested tuple,
 and `astuple()` deep-copies every other field rather than sharing it.
 
 ## A NamedTuple Is Still a Tuple
@@ -249,8 +253,8 @@ except TypeError as e:
 ```
 
 `Color` and `Dimensions` mean different things,
-but the first comparison cannot tell them apart.
-The frozen data classes can,
+yet `Color(1, 2, 3) == Dimensions(1, 2, 3)` is `True`.
+The frozen data classes tell the two apart,
 because a dataclass's generated `__eq__()` checks the class before the fields.
 
 A `NamedTuple` inherits ordering from `tuple` the same way,
@@ -264,11 +268,11 @@ and a comparison between two different frozen types raises one even then.
 Tuple behavior shows up in serialization too.
 `json.dumps(Color(1, 2, 3))` writes the array `[1, 2, 3]`,
 since `json` sees a sequence and the field names never reach the output.
-Converting first, `json.dumps(Color(1, 2, 3)._asdict())`,
-writes `{"r": 1, "g": 2, "b": 3}`.
+Convert first, `json.dumps(Color(1, 2, 3)._asdict())`,
+and the output is `{"r": 1, "g": 2, "b": 3}`.
 `json.dumps()` on a data class raises a `TypeError` instead.
 That is the safer failure of the two,
-because the array version loses the names without saying so.
+because the array version drops the names silently.
 
 ## Which Should You Use?
 
@@ -289,7 +293,7 @@ When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
 a `TypedDict` from [Static Types](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
-When it need only *become* a dict on the way out,
+When the data need only *become* a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
 To make a `@dataclass` guarantee that its values are legal, not merely typed,
 see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values).

@@ -1,9 +1,9 @@
 # Design Patterns
 
-An important step forward in object-oriented design was the "design patterns" movement,
-carried into the mainstream by the 1994 book *Design Patterns* by Erich Gamma,
-Richard Helm, Ralph Johnson, and John Vlissides.
-They became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
+The "design patterns" movement was an important step forward in object-oriented design.
+The 1994 book *Design Patterns* by Erich Gamma, Richard Helm, Ralph Johnson,
+and John Vlissides carried it into the mainstream.
+Its four authors became known as the "Gang of Four"^[A wry nod to the Chinese political faction of the same name.].
 I refer to that book as *GoF Design Patterns*,
 and use *design patterns* for the concept.
 
@@ -30,21 +30,19 @@ and to install patterns as proof of sophistication.
 A pattern earns its place only when you have the problem it solves.
 If nothing varies, you do not need machinery for isolating variation.
 
-Although they're called "design patterns," they don't apply only to design.
-Patterns seem to stand apart from the traditional way of thinking about analysis,
-design, and implementation.
-Instead, a pattern embodies a complete idea within a program.
-It can therefore appear at the analysis phase or high-level design phase,
-where you are still describing what the system does rather than how to build it.
+Although they're called "design patterns," they apply beyond design.
 Because a pattern translates directly into code,
 you might expect it to appear no earlier than low-level design.
-But it appears at every level,
+But a pattern embodies a complete idea within a program,
+so it can appear at the analysis phase or high-level design phase,
+where you are still describing what the system does rather than how to build it.
+It appears at every level,
 and you often discover that you need one only once you reach the code.
 
 The basic concept of a pattern is also the basic concept of program design:
 adding a layer of abstraction.
 Whenever you abstract something, you isolate particular details.
-One of the most compelling motivations behind this is to *separate things that change from things that stay the same*.
+One of the most compelling motivations for abstraction is to *separate things that change from things that stay the same*.
 Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
 That isolation makes the code cheaper to maintain and usually simpler to understand.
@@ -52,7 +50,7 @@ That isolation makes the code cheaper to maintain and usually simpler to underst
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 You look for the most important thing that changes in your system,
-which points to your greatest cost.
+because that is where your greatest cost lies.
 Once you discover the vector of change,
 you have the focal point around which to structure your design.
 
@@ -99,17 +97,15 @@ In Python terms: `with open(...)` for guaranteed cleanup is an idiom, stage one,
 meaningless outside a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
-The same dictionary,
-which each subclass fills at its definition so that adding a type never edits the factory,
-is a standard design, stage three
+The same dictionary is a standard design, stage three,
+once each subclass fills it at its own definition so that adding a type never edits the factory
 ([Factory](27_Patterns--Factory.md) builds both).
 [Template Method](25_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
 
-This progression doesn't say that one stage is better than another.
-Don't try to generalize every solution into a design pattern.
-You can't force patterns to appear that way.
-They tend to be subtle and appear over time.
+The stages are a history, not a ranking.
+Patterns are subtle and appear over time,
+so leave a solution at the stage it has reached rather than forcing it toward a design pattern.
 
 The progression runs downward too.
 A pattern a language builds in drops back to stage one,
@@ -119,8 +115,8 @@ Stepping through a container is stage one in Python and was stage four in the *G
 ## When a Pattern Dissolves
 
 A pattern is often a sign of something missing in a language.
-Programmers wrote the same scaffolding often enough that it acquired a name.
-It exists only because the language does not write it for them.
+Programmers wrote the same scaffolding often enough that it acquired a name,
+and the pattern exists because the language leaves that scaffolding for them to write.
 
 A pattern meets its missing piece in two ways.
 Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Patterns--Singleton.md)
@@ -156,24 +152,23 @@ The classic form declares a `Strategy` interface,
 writes one class per algorithm, and adds a context class to hold the chosen one.
 The `how` parameter replaces all three.
 
-This is why the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
+That replacement is why the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
 posed: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
 
 ## Pattern Taxonomy
 
-*GoF Design Patterns* discusses 23 patterns and sorts them under three purposes
-(all of which revolve around the particular aspect that can vary).
-The three purposes are:
+*GoF Design Patterns* discusses 23 patterns and sorts them under three purposes,
+each named for the aspect that can vary:
 
 1.  **Creational**: how to create an object.
-    Isolating the details of object creation means your code doesn't depend on which object types exist,
-    and doesn't change when you add a new one.
+    Isolate the details of object creation,
+    and your code stops depending on which object types exist and stays the same when you add one.
     [Singleton](24_Patterns--Singleton.md) counts as a *Creational* pattern,
     and [Factory](27_Patterns--Factory.md) covers the other four:
     *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
-2.  **Structural**: designing objects to satisfy particular project constraints.
-    How objects connect with other objects to ensure that changes in the system don't require changes to those connections.
+2.  **Structural**: how objects connect to other objects,
+    arranged so that changes in the system leave those connections alone.
     [Surrogate](26_Patterns--Surrogate.md),
     [Changing the Interface](29_Patterns--Changing_the_Interface.md),
     [Flyweight](35_Patterns--Flyweight.md),
@@ -193,7 +188,7 @@ The three purposes are:
     [Memento](36_Patterns--Memento.md),
     [State](26_Patterns--Surrogate.md#state), and *Interpreter*,
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
-    for reasons I give below.
+    for the reason this section ends with.
 
 The catalog above is GoF's.
 Patterns from outside it,
@@ -217,7 +212,7 @@ so that classification doesn't lead me to a solution
 <!-- vale House.Weasel = YES -->
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
-and that is how this book groups them.
+and this book groups them by that resemblance.
 [Surrogate](26_Patterns--Surrogate.md)
 treats *Proxy* and *State* as one front-object structure.
 [Function Objects](28_Patterns--Function_Objects.md) treats *Command*,
@@ -256,10 +251,10 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,
     not to the internals of objects it reached through something else.
-    This is another way to say "minimize coupling."
+    The Law of Demeter is another way to say "minimize coupling."
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
-    This complements separating what varies from what stays the same,
+    Orthogonality complements separating what varies from what stays the same,
     and is part of the Low-Coupling-High-Cohesion message:
     few connections between parts, and one subject per part.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
