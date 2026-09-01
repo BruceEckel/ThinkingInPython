@@ -506,18 +506,20 @@ the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
-The base classes `Obstacle`, `Character`,
-and `GameElementFactory` force every concrete class to inherit from them.
-Those `raise NotImplementedError` bodies enforce less than the listing suggests.
-Constructing a concrete factory that supplies only `make_character()` succeeds,
-and the error waits until something calls `make_obstacle()`.
-An `@abstractmethod` moves that error earlier, to the constructor,
+Every concrete class must inherit from `Obstacle`, `Character`,
+or `GameElementFactory`.
+Each `raise NotImplementedError` body marks a method that a concrete class must override.
+Marking is all it does.
+A factory that defines `make_character()` and stops there still constructs,
+and the error arrives later,
+when `GameEnvironment.__init__()` calls `make_obstacle()`.
+An `@abstractmethod` moves that error earlier, to the factory's own constructor,
 the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
-A *Protocol* names the methods a type must supply and asks for no base class:
+A *Protocol* only names the methods a type must supply, without a base class,
+which simplifies the Abstract Factory:
 
 ```python
 # games2.py
-# Simplified Abstract Factory.
 from typing import Protocol
 
 class Obstacle(Protocol):
