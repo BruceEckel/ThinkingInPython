@@ -259,7 +259,7 @@ def _target(name):
 
 
 def test_variable_default_reads_the_assignment_above_the_target():
-    assert variable_default(_target("rewrite"), "MODEL") == "claude-opus-5"
+    assert variable_default(_target("rewrite"), "MODEL") == ""  # per-pass
     assert variable_default(_target("code-width"), "WIDTH") == "60"
     assert variable_default(_target("code-width"), "ARGS") == ""
     assert variable_default(_target("check-ch"), "CH") == ""
@@ -275,7 +275,7 @@ def test_prompt_hint_names_the_makefile_default():
     with mock.patch("help_picker.prompt", side_effect=fake_prompt):
         help_picker.ask_variables(_target("rewrite"))
     hints = {m.split("=")[0]: m for m in seen}
-    assert "Enter for claude-opus-5" in hints["MODEL"]
+    assert "Enter to skip" in hints["MODEL"]  # each pass names its own
     assert "Enter for the whole book" in hints["CH"]
     assert "Enter to skip" in hints["ARGS"]
 

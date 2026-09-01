@@ -156,3 +156,27 @@ Pointer shapes Bruce has flagged that the categories above do not name yet.
 When he identifies a new one,
 add it here as a bullet with a before/after pair,
 and it becomes part of every future pass.
+
+- **"The two", "the other two", "both", "neither" with the items unnamed.**
+  "without providing the rest ... the other two parts are liabilities"
+  when the three parts were listed a page earlier;
+  "`research()` splits the two" with no pair in sight;
+  "`@final` on the two classes" when the classes were named in another
+  chapter.
+  Name the items where the count appears.
+- **A pointer at a listing or example by position.**
+  "This codec has a bug:" (the one below), "the last example",
+  "the single generic surrogate above".
+  Adjacent-listing pointers ("the listing below") are fine;
+  anything further names the file: "`property_check.py`'s five-letter
+  alphabet", "The next codec has a bug:".
+- **A noun that assumes an introduction the text never made.**
+  "the simulation" before any listing was called a simulation;
+  "this opacity" when the earlier sentence said "restraint";
+  "the naive loop" for a loop never called naive.
+  Use the noun the text did introduce, or introduce this one first.
+- **An "it" whose grammatical subject is the wrong noun.**
+  "`tkinter` plays no part here. It reuses the same `Observable`" hands
+  "It" to `tkinter` by grammar even though the model is meant;
+  "`Outlet` ... and it carries the hour" when the request carries it.
+  Name the intended noun.

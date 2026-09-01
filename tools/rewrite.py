@@ -75,6 +75,7 @@ class Pass:
     skill: str  # the slash command, without the leading "/"
     what: str
     default: bool = False
+    model: str = ""  # "" means DEFAULT_MODEL; --model overrides every pass
 
 
 # Ordered: general rules first, the most specific (Bruce's own captured
@@ -144,10 +145,36 @@ PASSES: tuple[Pass, ...] = (
     ),
 )
 
-# The model every pass runs on unless --model says otherwise. Opus: the
-# passes edit an author's voice, and the cost of a pass that cuts too
-# much is higher than the token difference on one chapter.
-DEFAULT_MODEL = "claude-opus-5"
+# The model a pass runs on when its Pass entry names none, and the one
+# --model forces on every pass. Every pass currently resolves to this
+# one; the per-pass field exists so a measured difference can be acted
+# on without touching the runner. MODEL_NOTES holds the evidence so far.
+DEFAULT_MODEL = "claude-fable-5"
+
+MODEL_NOTES = """
+2026-09-01, chapter 25, straighten and positive, Opus 5 vs Fable 5,
+same prompt, same chapter reset between runs:
+  straighten  Opus 10 edits / 144 s   Fable 6 edits / 138 s
+  positive    Opus 14 edits / 183 s   Fable 18 edits / 121 s
+Both models made the same core edits. Opus's extra straighten edits
+were splits of two-fact sentences that read fine as one thought; its
+positive pass added two "only"s (on that pass's own negation list) and
+three flourishes ("for free", "in silence", "has force"). Fable's
+positive pass removed three "only"s and produced two odd phrasings.
+Net: Fable slightly more restrained on straighten, a wash on positive.
+Bruce's wider observation, chapters 28-47 on Fable against 27 on Opus,
+pointed the same way, so the judgment passes run on Fable.
+
+The rule passes (activate, bruce-edit-apply, readability) looked like
+candidates for a cheaper model, but no objective A/B was possible:
+Chapters/ carries zero vale warnings (every make prose warning is in
+Solutions/), so activate's measurable job is done and what remains of
+it is judgment. Until a measured run says otherwise they stay on the
+default. MODEL=claude-sonnet-5 is the cheap lap to try one by hand;
+score bruce-edit-apply by its rule-firing report against a by-hand
+count, and activate by the metadiscourse it removes and the voice it
+keeps.
+"""
 
 # How many chapters run at once in parallel mode. Each is a live
 # `claude` session, so this caps tokens in flight, not CPU.
@@ -162,9 +189,13 @@ ALLOWED_TOOLS = ("Read", "Edit", "Write", "Grep", "Glob", "Bash(uv run *)")
 SCOPE_NOTE = (
     "You are running as one pass of tools/rewrite.py. Edit only the "
     "chapter file named in the prompt. Never change a fenced code block "
-    "or a line starting with #: (an output marker); prose only. Do not "
-    "run git. Do not ask questions; there is no one to answer. When "
-    "done, stop."
+    "or a line starting with #: (an output marker); prose only. Before "
+    "rewriting a sentence that describes what a listing does, read the "
+    "listing and confirm the claim; fix a wrong claim in the same edit. "
+    "Leave a term of art the book uses in other chapters (grep first). "
+    "Run `uv run vale` on the chapter before and after, and undo any "
+    "warning you introduced. Do not run git. Do not ask questions; "
+    "there is no one to answer. When done, stop."
 )
 
 # (label, argv, scoped) triples run after every pass, in order; the
@@ -276,11 +307,12 @@ def rewrite_chapter(
         out.say(f"note: {chapter.as_posix()} already has uncommitted "
                 "changes; the per-pass diff below includes them")
     for p in selected:
-        argv = claude_argv(claude, p.skill, chapter, model)
+        use = model or p.model or DEFAULT_MODEL
+        argv = claude_argv(claude, p.skill, chapter, use)
         if dry_run:
             out.say(subprocess.list2cmdline(argv))
             continue
-        code = out.run(argv, f"pass: {p.name} on {model} ({p.what})")
+        code = out.run(argv, f"pass: {p.name} on {use} ({p.what})")
         if code != 0:
             out.say(f"FAILED: pass {p.name} exited {code}; stopping")
             return False
@@ -288,7 +320,7 @@ def rewrite_chapter(
             return False
         out.say(f"after {p.name}: {changed_lines(chapter) or 'no change'}")
     if not dry_run:
-        out.say(f"done: {len(selected)} pass(es) on {model} over "
+        out.say(f"done: {len(selected)} pass(es) over "
                 f"{chapter.as_posix()}; review `git diff` before committing")
     return True
 
@@ -346,8 +378,9 @@ def main() -> int:
                        help="every pass, including the opt-in ones")
     parser.add_argument("--list", action="store_true",
                         help="list the passes and exit")
-    parser.add_argument("--model", default=DEFAULT_MODEL, metavar="ID",
-                        help=f"model for every pass (default: {DEFAULT_MODEL})")
+    parser.add_argument("--model", default="", metavar="ID",
+                        help="force one model on every pass (default: each "
+                             "pass's own, shown by --list)")
     parser.add_argument("--serial", action="store_true",
                         help="run the chapters one at a time, output streamed")
     parser.add_argument("-j", "--jobs", type=int, default=DEFAULT_JOBS,
@@ -363,7 +396,8 @@ def main() -> int:
         print("--also NAME adds an opt-in pass to them, --passes NAME runs only it.")
         for p in PASSES:
             tag = "default" if p.default else "opt-in "
-            print(f"  {tag}  {p.name:<18} /{p.skill}\n{'':12}{p.what}")
+            print(f"  {tag}  {p.name:<18} /{p.skill}  "
+                  f"[{p.model or DEFAULT_MODEL}]\n{'':12}{p.what}")
         return 0
 
     if os.environ.get("CI"):

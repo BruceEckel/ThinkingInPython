@@ -104,6 +104,19 @@ Let the later passage carry it.
 - **A negation with no positive term.**
   "not a data class" has no single word. Leave it rather than invent
   one, or restate the sentence around what the thing *is*.
+- **A list of negations that is a definition.**
+  "It has no side effects: no printing, no file or network access, no
+  mutation" and "The test needs no `capsys`, no monkeypatching, and no
+  mock" enumerate what the definition excludes, and each item is a
+  distinct fact.
+  The count test flags them; the per-item test clears them.
+- **The deliberate two-beat contrast.**
+  "The `list()` copy looks redundant. It is not." and "Failures never
+  vanish. They only relocate." are rhythm the author chose, with the
+  positive half present.
+  Leave a contrast whose second beat supplies the positive; rewrite one
+  that stops at the negation ("The `Any` is not laziness." with no
+  second beat became "The `Any` is there to let ...").
 - **Check the exemption records first.**
   `deep_review_db.md` in the repo root carries standing exemptions,
   and `bruce_edit_db.md` carries the promoted editing rules.

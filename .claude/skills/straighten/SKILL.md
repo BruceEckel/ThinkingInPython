@@ -171,13 +171,30 @@ Small, but they are what makes a straightened sentence still feel heavy:
   which is why this pass runs before both.
   If the fix is to move a sentence, leave it for `cohesion`.
 
+## Check the claim while you have the sentence open
+
+A straightened sentence states its claim more plainly than the tangled
+one did, which is exactly when a wrong claim becomes visible.
+Before rewriting any sentence that describes what a listing does,
+read the listing and confirm the claim.
+The chapter 30-47 sweep found nine factual errors this way, none of
+which any gate could catch: a click that recolors neighbors described
+as recoloring the clicked cell, "every concrete class must inherit"
+when one concrete class in the listing did not, "two details" that
+listed three, a method credited with promoting the wrong operand.
+Fix the claim in the same edit; a clear sentence that says the wrong
+thing is worse than the muddle it replaced.
+
 ## Verify and report
 
 Touched prose gets `make reflow CH=NN` (Semantic Line Breaks),
 then `make verify`, then read `git diff Chapters/`:
 a changed `#:` marker means an edit strayed into code, so investigate it.
 A split sentence can add a `prose` warning (a new sentence opening with
-"There is", a new passive), so run `make prose CH=NN` too.
+"There is", a new passive), so run `make prose CH=NN` too,
+and compare its warning count against the committed chapter
+(`git show HEAD:Chapters/NN_*.md > scratch.md; vale scratch.md`,
+never `git stash`, which races with any other pass running beside you).
 Report each change as the sentence's failing shape and the fix.
 List any sentence you judged overloaded but left, with the reason.
 Bruce reviews the diff and commits himself.
@@ -187,3 +204,49 @@ Bruce reviews the diff and commits himself.
 Sentence shapes Bruce has flagged that the categories above do not name
 yet. When he identifies a new one, add it here as a bullet with a
 before/after pair, and it becomes part of every future pass.
+
+- **The intransitive verb that reads as transitive.**
+  "A factory that omits `make_obstacle()` still constructs" means "can
+  be instantiated" but invites "constructs what?", and worse when the
+  subject is a factory, whose job is constructing.
+  Name what succeeds: "Python accepts a concrete factory class that
+  leaves out `make_obstacle()`, and accepts its instances too."
+- **The misplaced modifier.**
+  "a class with a `find()` method deriving from a `FindRoot` interface"
+  has the method deriving.
+  Move the modifier next to what it modifies: "a class deriving from a
+  `FindRoot` interface, with a `find()` method".
+- **Cause after effect.**
+  "`publish` still calls `.get()` instead of indexing. Indexing inserts
+  an empty list as a side effect" makes the reader hold the effect open
+  until the cause arrives.
+  Lead with the cause, or join them with "because":
+  "`publish` reads with `.get()` because indexing a `defaultdict` inserts
+  an empty list as a side effect."
+  Within one sentence the same rule: the construction that succeeds
+  comes before the error that waits for the call.
+- **A term used before it is introduced.**
+  "the half that reaches a caller before they run anything" three lines
+  before "the mark works in two halves"; "untagged" a page before "tag"
+  is explained; "the naive loop" for a loop the text never called naive.
+  Introduce the term at its first use, or use the plain noun there and
+  save the term for where it is defined.
+- **A definition quoted instead of explained.**
+  "Separate the construction of a complex object from its representation"
+  is GoF's sentence, the one everyone repeats and nobody parses.
+  Say what it means: "build a complex object in steps, keeping the
+  step-by-step assembly separate from the finished object."
+  The book may still cite the source; the reader gets the meaning first.
+- **The verbless fragment posing as a sentence.**
+  "An `Observer` interface, an `Observable` base class, and a two-phase
+  notification:" before a listing, or "A well-known object others use to
+  find services" in a table of imperative intents.
+  Give it a verb: "The classic design has three parts: ..." and "Keep
+  one well-known object where ...".
+- **A hypothetical the reader must build mid-sentence.**
+  "Define a factory class and stop there: creating an instance of it
+  still succeeds" asks the reader to write imaginary code, then changes
+  subject twice.
+  Give the sentence one actor for its whole length, the one that is
+  really acting (Python, the checker, the driver), and state what that
+  actor does with the case.
