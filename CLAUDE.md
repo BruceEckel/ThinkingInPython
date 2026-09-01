@@ -43,14 +43,15 @@ pass: it clears `make prose`'s passive-voice and there-is warnings and
 cuts metadiscourse, empty frames, and expletive constructions; new
 passive-feeling phrasings Bruce flags accrue in its "Accrued patterns"
 section.
-`/literal`, `/straighten`, `/cohesion`, and `/antecedents` (each under
-`.claude/skills/`) are the other prose passes: figures of speech become
-the mechanism they stand for, a sentence the reader must read twice gets
-its actor named or splits at the seam, paragraphs get old-before-new
-order and one topic string, and every ambiguous "this"/"it"/"which" gets
-its noun. `make rewrite CH=NN` runs these four plus `elements-of-style`
-and `bruce-edit-apply` by default; `make rewrite ARGS=--list` shows the
-set.
+`/literal`, `/positive`, `/straighten`, `/cohesion`, and `/antecedents`
+(each under `.claude/skills/`) are the other prose passes: figures of
+speech become the mechanism they stand for, a passage that makes the
+reader cancel one image after another gets restated in positive form, a
+sentence the reader must read twice gets its actor named or splits at
+the seam, paragraphs get old-before-new order and one topic string, and
+every ambiguous "this"/"it"/"which" gets its noun. `make rewrite CH=NN`
+runs these five plus `elements-of-style` and `bruce-edit-apply` by
+default; `make rewrite ARGS=--list` shows the set.
 `CH="25 28"` or `CH=30-40` runs several chapters in parallel (each chain
 edits and checks only its own chapter); `ARGS=--serial` runs them one at
 a time.
