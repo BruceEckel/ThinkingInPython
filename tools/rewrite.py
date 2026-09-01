@@ -80,9 +80,12 @@ class Pass:
 # Ordered: general rules first, the most specific (Bruce's own captured
 # practices) last, so a later pass never has its work undone by an
 # earlier, blunter one. The two cutting passes (elements-of-style,
-# activate) go before the three that only rephrase or reorder (literal,
-# cohesion, antecedents); cohesion precedes antecedents because moving a
-# sentence can change what a pronoun points at.
+# activate) go before the four that only rephrase or reorder (literal,
+# straighten, cohesion, antecedents). straighten follows literal, whose
+# mechanism-for-figure swaps can leave a long noun phrase behind, and
+# precedes cohesion and antecedents, which clean up after a split
+# sentence; cohesion precedes antecedents because moving a sentence can
+# change what a pronoun points at.
 PASSES: tuple[Pass, ...] = (
     Pass(
         "elements-of-style",
@@ -99,6 +102,12 @@ PASSES: tuple[Pass, ...] = (
         "literal",
         "literal",
         "say what the machinery does: a literal verb for each figure",
+        default=True,
+    ),
+    Pass(
+        "straighten",
+        "straighten",
+        "one sentence, one load: name the actor, split at the seam",
         default=True,
     ),
     Pass(

@@ -513,6 +513,8 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 #                               weak-verb warnings from `make prose`
 #   literal            default  say what the machinery does: a literal
 #                               verb for each figure of speech
+#   straighten         default  one sentence, one load: name the actor,
+#                               split at the seam
 #   cohesion           default  old before new: one topic string per
 #                               paragraph, the news at the end
 #   antecedents        default  name what each this/it/which points at
@@ -523,9 +525,9 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 #   bruce-edit-apply   default  apply the promoted rules in
 #                               bruce_edit_db.md
 #
-# A bare `make rewrite CH=25` runs the five defaults. To add an opt-in
+# A bare `make rewrite CH=25` runs the six defaults. To add an opt-in
 # pass to them: ARGS="--also activate". To run only the passes you
-# name: ARGS="--passes activate readability". To run all seven:
+# name: ARGS="--passes activate readability". To run all eight:
 # ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
 # commands without running them.
 #
