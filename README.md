@@ -225,7 +225,7 @@ This is for my own bookkeeping.
 | 23_Patterns--Iterators.md                 | |
 | 24_Patterns--Singleton.md                 | |
 | 25_Patterns--Template_Method.md           |X|
-| 26_Patterns--Surrogate.md                 |O|
+| 26_Patterns--Surrogate.md                 |X|
 | 27_Patterns--Factory.md                   |r|
 | 28_Patterns--Function_Objects.md          |r|
 | 29_Patterns--Changing_the_Interface.md    | |

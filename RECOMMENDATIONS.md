@@ -8,7 +8,7 @@ all 39 `CONSISTENCY.md` recommendations are applied and verified
 
 ## Chapter Edit Steps
 
-1. Adversarial review of that chapter
+1. Do an adversarial review of chapter 27. Fix everything you can, only present unresolved issues here on the console.
 2. `make rewrite` on that chapter
 3. Hand-edit the chapter
 4. Run `/bruce-edit-capture` on the chapter

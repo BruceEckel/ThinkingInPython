@@ -228,7 +228,7 @@ and `__getattr__()` calls itself when the name it reads is also missing.
 ### Special Methods Bypass `__getattr__()` {#special-methods-bypass-getattr}
 
 Python looks up dunders like `__len__()` and `__str__()` on the proxy's type,
-not on the implementation, so `len(p)` and `print(p)` do not delegate,
+not on the instance, so `len(p)` and `print(p)` do not delegate,
 even though an explicit `p.__len__()` does:
 
 ```python
@@ -686,7 +686,7 @@ as [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
 the checker cannot verify a method that `__getattr__()` supplies.
 
 `Surrogate.__init__()` and `change_to()` are a choice.
-`state_surrogate.py` successfully type-checks when both parameters are annotated as `Behavior`.
+`state_surrogate.py` successfully type-checks when both parameters carry `Behavior`.
 The checker then verifies every implementation that reaches either method.
 That annotation also ties the surrogate to one Protocol,
 and that tie is what the generic surrogate exists to avoid:

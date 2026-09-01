@@ -146,17 +146,29 @@ sentence's claim. Rewrite as "Because X, Y".
 
 **Keep when.** X is new information. Bruce's own "no subclass exists, so
 nothing can replace the loop" keeps "so": the absence of a subclass is the
-point being made.
+point being made. Chapter 26 confirmed this boundary from the other side.
+Bruce fronted "Every assignment after `__init__()` reaches the
+implementation, so ..." with "Because", then later rewrote the same
+sentence back to "so" once he had added "Now" and "via the new
+`__setattr__()`", which turned the clause into new information. The revert
+is evidence for the exception, not against the rule.
 
-**Sightings.** 2, both `25_Patterns--Template_Method` 2026-08-29, was
-Claude-written:
-- "`run()` calls methods the subclass supplies, so the subclass must
+**Sightings.** 3 (2 chapters):
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+  "`run()` calls methods the subclass supplies, so the subclass must
   finish its own setup" -> "Because `run()` calls methods the subclass
   supplies, the subclass must finish its own setup"
-- "Python functions are first-class, so you can also pass the steps" ->
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+  "Python functions are first-class, so you can also pass the steps" ->
   "Because Python functions are first-class, you can also pass the steps"
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
+  "*GoF Design Patterns* gives *Proxy* and *State* different structures
+  and so treats them as unrelated" -> "Because *GoF Design Patterns*
+  gives *Proxy* and *State* different structures, it treats them as
+  unrelated"
 
-**Home.** this file only. Promoted at Bruce's call (2026-08-29).
+**Home.** this file only. Promoted at Bruce's call (2026-08-29); first
+independent-chapter sighting 2026-08-31.
 
 ### R5. In a labeled list, end the label with a period and explain in sentences
 
@@ -278,6 +290,132 @@ Claude-written (same chapter, so not yet independent):
   a subclass must work in its place"
 - "trusting that whatever a subclass supplies still fits" -> "trusting
   that what the subclass supplies fits"
+
+### C2. Name the actor for a language mechanism
+
+**Test.** A language feature sits in subject position under a verb it
+cannot perform on its own: a hook "fires", a lookup "sees", a call
+"asks", a checker "wants". Name the actor that performs it (Python, the
+type checker, the caller) and use the verb that actor performs.
+
+**Keep when.** The mechanism really is the actor. A function that returns
+or raises does so itself, and "`__getattr__()` returns a value" needs no
+rewriting.
+
+**Sightings.** 3, all `26_Patterns--Surrogate` 2026-08-31, was
+Claude-written (same chapter, so not yet independent):
+- "`__getattr__()` fires for any name the proxy and its class lack" ->
+  "Python calls `__getattr__()` for any name the proxy and its class
+  lack"
+- "`__getattr__()` never sees a special method, never sees an assignment"
+  -> "Python never calls `__getattr__()` for a special-method lookup or
+  for an assignment"
+- "`len(p)` asks `type(p)` for `__len__()` without consulting the
+  instance" -> "`len(p)` looks up `__len__()` on `type(p)`, skips the
+  instance"
+
+### C3. Replace a judgment about the mechanism with the mechanism
+
+**Test.** A phrase that evaluates or characterizes rather than describes
+("costs nothing", "satisfies", "is the exception", "they expect"), or a
+scare-quoted idiom, where the sentence can state what actually happens.
+Ask what the reader would observe; if the phrase does not say, replace it.
+
+**Keep when.** The judgment is the claim being made and the mechanism is
+already stated nearby, as in a summary sentence that closes a section.
+
+**Sightings.** 5, all `26_Patterns--Surrogate` 2026-08-31, was
+Claude-written (same chapter, so not yet independent):
+- "puts the check where it costs nothing" -> "puts the check where it
+  does not restrict the surrogate"
+- "The guard also satisfies `copy` and `pickle`" -> "The guard also makes
+  the proxy work with `copy` and `pickle`"
+- "both get the `AttributeError` they expect" -> "both get an
+  `AttributeError`, which those modules handle"
+- "Inheritance is the exception:" -> "Inheritance satisfies both."
+- "As long as `Proxy` "speaks for" the class it forwards method calls to"
+  -> "As long as code calls `Proxy` in place of the class that `Proxy`
+  forwards method calls to"
+
+### C4. Cut the clause that defines this thing by contrast with the one just discussed
+
+**Test.** A sentence or trailing clause whose work is to say how the
+current subject differs from the previous section's subject, where the
+current subject's own description already stands without it.
+
+**Keep when.** The contrast is the section's point, or the two are a
+lookalike pair the chapter exists to separate.
+
+**Note.** Both sightings are deletions. The first removed a
+Proxy/Decorator contrast that `29_Patterns--Changing_the_Interface`
+already carries in its comparison table, so the underlying rule may be
+narrower: leave cross-pattern comparison to the chapter that owns it. Two
+sightings in one chapter cannot decide between the two readings.
+
+**Sightings.** 2, both `26_Patterns--Surrogate` 2026-08-31, was
+Claude-written (same chapter, so not yet independent):
+- "That refusal separates a *Proxy* from a *Decorator*: a decorator adds
+  behavior around a call it always makes. This proxy decides whether to
+  forward the call." -> "`Guarded` requires `admin` privileges to call
+  `erase()`."
+- "A *Smart reference* proxy adds behavior around each access without
+  refusing any." -> "A *Smart reference* proxy adds behavior around each
+  access."
+
+### C5. Cut "In Python" in a Python book
+
+**Test.** "In Python" (or "in Python code") introducing a claim that the
+whole book already scopes to Python.
+
+**Keep when.** The sentence contrasts Python with another language, which
+is the usual reason the phrase was written.
+
+**Sightings.** 1, `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
+- "In Python both are the same few lines of `__getattr__()` delegation"
+  -> "Both are the same few lines of `__getattr__()` delegation"
+
+### C6. Name a pointer's antecedent only where a competitor exists
+
+**Test.** A refinement of the `/antecedents` pass rather than a new sweep.
+A pronoun or demonstrative with a competing candidate in reach gets its
+noun; one whose subject just appeared unopposed keeps the pronoun.
+`/antecedents` fires on ambiguity, not on pronouns.
+
+**Keep when.** This *is* the keep-when for `/antecedents`. The reverse
+sighting below is the whole point of the entry: a sweep that reads the
+other ten as "prefer the noun" will overshoot.
+
+**Sightings.** 11, all `26_Patterns--Surrogate` 2026-08-31, was
+Claude-written (same chapter, so not yet independent). Ten resolved a
+pointer that had a competitor:
+- "it calls that method in the implementing class" -> "the surrogate
+  calls that method in the implementing class"
+- "the class it forwards method calls to" -> "the class that `Proxy`
+  forwards method calls to"
+- "constructing it raises a `TypeError`" -> "constructing a `Partial`
+  raises a `TypeError`"
+- "the type checker verifies its `f()` and `g()`" -> "the type checker
+  verifies the `Proxy`'s `f()` and `g()`"
+- "the lookup on `type(p)` finds that one" -> "the lookup on `type(p)`
+  finds `object`'s `__str__()`"
+- "For example, it can count the references" -> "For example, a smart
+  reference can count the references"
+- "Give it a `__len__()` that forwards" -> "Give that `Proxy` a
+  `__len__()` that forwards"
+- "instead of running attribute lookup, and never calls `__getattr__()`"
+  -> "instead of running attribute lookup. That function never calls
+  `__getattr__()`"
+- "It also ties this surrogate to one Protocol" -> "That annotation also
+  ties the surrogate to one Protocol"
+- "which is what the generic surrogate exists to avoid" -> "and that tie
+  is what the generic surrogate exists to avoid"
+
+One went the other way, where the subject had just appeared unopposed:
+- "because `Proxy` names no methods in `Implementation`, the proxy keeps
+  working" -> "because `Proxy` names no methods in `Implementation`, it
+  keeps working"
+
+**Home.** the `antecedents` skill, as a keep-when. Not a separate sweep.
 
 ---
 
