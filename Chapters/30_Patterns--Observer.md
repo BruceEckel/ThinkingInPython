@@ -21,8 +21,8 @@ When the data changes, every view must refresh.
 The *Observer* pattern arranges that,
 without the data knowing which views exist.
 
-The classic design, from *GoF Design Patterns*, says how to arrange it.
-An `Observer` interface every observer implements,
+The classic design from *GoF Design Patterns* has three parts:
+an `Observer` interface every observer implements,
 an `Observable` base class carrying a `changed` flag,
 and a two-phase notification that sets the flag and then broadcasts:
 
@@ -75,10 +75,11 @@ t.set_celsius(25)
 
 The flag lets several mutations coalesce into one broadcast,
 and lets a subclass decide a change is not worth announcing.
-`set_celsius()` calls both halves at once, so nothing here needs it.
+This listing uses neither ability:
+`set_celsius()` sets the flag and broadcasts on consecutive lines.
 
-Clearing the flag before the loop, not after,
-lets a change made during notification survive to the next broadcast.
+`notify_observers()` clears the flag before the loop rather than after,
+so a change made during notification sets the flag again and survives to the next broadcast.
 
 Python expresses this with far less machinery.
 The rest of the chapter shows the Pythonic version first,
@@ -130,7 +131,7 @@ class Thermometer(Observable[float]):
         self.notify(value)
 ```
 
-Using it, subscribed callables react to every temperature change:
+Subscribed callables then react to every assignment to `celsius`:
 
 ```python
 # thermometer.py
@@ -179,14 +180,14 @@ that a subscriber sees only the changes made after it subscribes,
 and that an unsubscribed observer stops hearing them.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
-A bound method is the exception.
-Writing `obj.update` twice builds two objects that are not identical but do compare equal,
-since they share an instance and a function,
-so a bound-method observer detaches without a stashed reference.
+A bound method needs no stashed reference.
+Writing `obj.update` twice builds two distinct objects that compare equal,
+because they share an instance and a function,
+so `unsubscribe(obj.update)` finds the one that subscribed.
 `unsubscribe()` delegates to `list.remove()`,
 so detaching an observer that never subscribed raises a `ValueError`.
 Subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
-A list whose `append` is the observer records what arrived:
+The tests subscribe a list's `append`, so the list records what arrived:
 
 ```python
 # test_observers.py
@@ -266,7 +267,8 @@ print(seen)
 
 `once` hears the first change and detaches.
 `always` hears both.
-Under the naive loop, `always: 1` is missing: `once`'s self-removal skips it.
+Without the copy, `always: 1` would be missing:
+`once`'s self-removal would skip it.
 
 An observer that raises an exception stops the loop,
 and the observers after it miss the change.
@@ -371,13 +373,13 @@ which calling an `async` function produces.
 Its type parameter does the same job as the synchronous `Observer[T]`'s.
 The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Observable`:
-calling it returns a coroutine rather than `None`,
+calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
 
 `notify()` needs no `list()` copy here:
 `*` drains the generator into a tuple before `gather()` runs,
 so a detach during the fan-out cannot skip anyone.
-It does mean an observer that unsubscribes mid-notification still hears this change.
+The tuple also means an observer that unsubscribes mid-notification still hears this change.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscription order,
@@ -405,15 +407,15 @@ is the same fan-out, routed by event type.
 
 ## A Visual Example of Observers
 
-This is the model-view split from the chapter's opening,
+The last example is the model-view split from the chapter's opening,
 made visible with `tkinter` (in the standard library, so you install nothing),
 and split across two files.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
 It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
-Clicking a box repaints it and every box touching it, diagonals included,
-to the clicked box's color.
+Clicking a box gives every box touching it, diagonals included,
+the clicked box's color.
 
 The model is an `Observable`.
 `new_grid()` builds a size x size grid banded into three colors,
@@ -547,8 +549,8 @@ if __name__ == "__main__":
 ```
 
 `draw()` clears the canvas before repainting.
-Without that line each notification adds another `size * size` rectangles on top of the last set,
-which looks identical and grows without limit,
+Without that line each notification adds another `size * size` rectangles on top of the last set.
+The canvas looks identical and grows without limit,
 the same quiet accumulation as a lapsed listener.
 
 The model and the view share only the subscribe-and-notify contract,

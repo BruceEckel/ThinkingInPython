@@ -262,14 +262,14 @@ def wrap(value: Expr | int) -> Expr:
 
 The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
-`Add` and `Mul` hold other expressions, which makes it a composite.
+`Add` and `Mul` hold other expressions, so the tree is a composite.
 
 `Operators` is a base class but not a member of `Expr`,
 and the split is on purpose.
 Every node shares the operator methods,
 so those live on a base and arrive by inheritance.
-No node shares its meaning, so meaning lives in the walkers,
-which need the union to know they have covered every case.
+Each node's meaning is its own, so meaning lives in the walkers,
+and the walkers need the union to know they have covered every case.
 `Expr` is the contract: if you annotate `evaluate()` with `Operators` instead,
 `assert_never()` stops working,
 because a base class is an open set and any new subclass silently belongs to it.
@@ -278,14 +278,14 @@ Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
 They build nodes.
 Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)` type-check.
-`Self` would mean "some subclass of `Operators`,"
+Left implicit, `self` would mean "some subclass of `Operators`,"
 and the type checker cannot know that every such subclass is in the `Expr` union.
-The annotation says so.
+The `Expr` annotation tells it so.
 Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
-and `wrap()` promotes integers to `Num` nodes,
-so `2 * x + 1` is a valid sentence in the little language.
+`wrap()` promotes an integer on the right to a `Num` node,
+and so `2 * x + 1` is a valid sentence in the little language.
 Python has parsed it, honoring precedence, before the interpreter runs.
 
 The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice):
@@ -313,7 +313,7 @@ and `not` hands back a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
 An expression language that needs boolean operators borrows `&` and `|` instead,
 which is why a Pandas filter reads `(a > 1) & (b > 2)` with parentheses that look unnecessary.
-They are not: `&` binds tighter than `>`,
+The parentheses do real work: `&` binds tighter than `>`,
 so without them Python parses `1 & b` first.
 
 ## Evaluation Is a Tree Walk
@@ -496,9 +496,9 @@ every alternative in a `|` must bind the same set of names,
 so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
 (see [Alternatives and Capture](13_Techniques--Pattern_Matching.md#alternatives-and-capture)).
 `(Num(a), Num(b))` captures two constants for folding.
-The same syntax does two opposite jobs:
-a `Num(0)` on the left of a `case` is a pattern that never calls `Num`,
-and the one on the right of a `return` is the constructor.
+The same syntax does two opposite jobs: `Num(0)` after `case` is a pattern,
+and Python never calls `Num` to match it,
+while `Num(0)` after `return` is a constructor call.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
@@ -630,7 +630,7 @@ print(to_shape(query))
 two operations over one structure, which knows neither of them,
 and adding a third changes nothing that already exists.
 
-The first one earns its place.
+`to_query()` earns its place.
 `name` holds an injection attempt,
 and it comes out as a value in the parameter list rather than as text in the query.
 The reason is structural rather than clever:

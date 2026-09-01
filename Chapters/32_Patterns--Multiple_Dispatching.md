@@ -10,10 +10,10 @@ how can you get them to interact properly?
 
 The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
-That is, if you operate on more than one object whose type is unknown,
-Python can invoke the dynamic binding mechanism on only one of those types.
-You end up testing the remaining types by hand,
-writing out the dispatch the language performs for the first one.
+When two objects of unknown type interact,
+a method call resolves the type of only one of them, its receiver.
+You end up testing the other type by hand,
+writing out the dispatch the language performed for the first one.
 
 The solution is *Multiple Dispatching*.
 Polymorphism broadly means that a function accepts arguments of more than one type
@@ -27,9 +27,9 @@ That is why one method call can resolve only one unknown type.
 
 To dispatch on two unknown types, you need two method calls.
 The first resolves the first type, and the second resolves the second.
-The following example dispatches through methods named `compete()` and `eval_*()`,
-where both interacting objects come from a single hierarchy.
 Two unknown types means two dispatches, which is *double dispatching*.
+In the example below, both interacting objects come from a single hierarchy,
+and the two dispatches go through methods named `compete()` and `eval_*()`.
 If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
@@ -70,8 +70,8 @@ def duel(item1: Any, item2: Any) -> None:
 
 `item_pair_gen()` is generic over whichever base class it receives,
 and `__subclasses__()` lists that base's direct subclasses,
-the registry-free enumeration [Factory](27_Patterns--Factory.md#simple-factory-method)
-used.
+as `shape_name_gen()` in [Factory](27_Patterns--Factory.md#simple-factory-method)
+did.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
 
@@ -158,7 +158,7 @@ Whose result does it return?
 and that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running: scissors cut paper.
 Every `eval_*()` method answers for the original caller,
-the object named in the method's own name.
+the type named in the method's own name.
 If you misread that convention, every result in the class appears backward.
 Each `eval_*()` method also receives an `item` argument, the original caller:
 the same object `compete()` held as `self` before passing it along.
@@ -166,16 +166,15 @@ This game ignores it, since the outcome depends only on the two types.
 A richer game would read the caller's state through it.
 
 Those `Any` annotations give up static checking.
-`Item` declares neither `compete()` nor any `eval_*()` method,
+`Item` declares only `__str__()`,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
-With `Any`, a type checker cannot tell you when a class is missing one of the nine answers.
+With `Any`, a class can omit one of the nine answers and the type checker stays silent.
 The gap surfaces as an `AttributeError` during whichever duel first needs it.
 A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
-The table version needs neither.
-Its answers are data rather than methods,
-leaving no method for a class to forget.
-`Item` declares its one method, `compete()`,
+The table version sidesteps the problem.
+Its answers are data rather than methods, so a class has nothing to forget,
+and its `Item` declares its one method, `compete()`,
 so the opponent parameter takes `Item` rather than `Any`.
 
 Each `Item` type encodes the answers for its own combinations.
@@ -288,15 +287,15 @@ not just how many types it considers.
 
 `functools.singledispatchmethod`
 ([Functional Toolkits](41_Functional--Toolkits.md#singledispatchmethod) catalogs it)
-sits between them.
+combines the two dispatches in one decorator.
 It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`,
 which is the pair of dispatches the `eval_*()` family hand-rolls.
-Each class needs its own `@singledispatchmethod`.
-Registering on a shared base gives every subclass one dispatcher,
-so the resolution on `self` no longer distinguishes them.
-That mistake is easy to make and hard to see.
 Like `singledispatch`, it matches on the MRO rather than exactly.
+One trap is easy to fall into and hard to see:
+each class needs its own `@singledispatchmethod`,
+because registering on a shared base gives every subclass one dispatcher,
+and the resolution on `self` then treats them all alike.
 
 The version most programmers write first is neither of these:
 it is an `isinstance()` ladder inside `compete()`,
@@ -307,13 +306,13 @@ with none of dispatch's automatic resolution,
 and every new `Item` forces an edit to every ladder.
 Both patterns in this chapter exist to avoid writing it.
 
-The double-dispatch version, where each class implements `eval_paper()`,
-`eval_scissors()`, and `eval_rock()`,
-belongs to languages where keying a table by a pair of types is awkward enough that spreading the table across the classes wins.
+The double-dispatch version, with `eval_paper()`, `eval_scissors()`,
+and `eval_rock()` on every class,
+comes from languages where a table keyed by a pair of types is awkward to write.
+There, spreading the table across the classes wins.
 Python makes the table cheap,
 so the table is both shorter and easier to maintain.
-A table cell can hold a function,
-so the size of the behavior does not force the choice.
+A table cell can hold a function, so even elaborate behavior fits the table.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
@@ -456,7 +455,7 @@ The last case shows why the sentinel exists.
 and `str` has no `__radd__()` to consult.
 Only after both sides have declined does Python raise a `TypeError`.
 
-Two details of the fallback are easy to get wrong.
+Three details of the fallback are easy to miss.
 Raising a `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
 The exception propagates immediately, so the right operand never gets its turn.
 Only the sentinel keeps the second dispatch alive.
@@ -490,9 +489,10 @@ Three techniques in this chapter do the same thing.
 The `eval_*()` family, the `OUTCOME` table,
 and `__add__()` with `__radd__()` all take a type the first dispatch could not resolve and dispatch again on it.
 They differ in who performs the second dispatch and where the answers live.
-The methods make the language do it and scatter the answers across the classes.
+The methods hand the second dispatch to a second method call that you write,
+and scatter the answers across the classes.
 The table does it with a dictionary probe and collects the answers in one place.
-The operators are the one case where Python performs the second dispatch for you.
+The operators are the one case where Python makes the second call itself.
 Everywhere else you choose between paying for the second dispatch in methods and paying for it in data.
 
 ## Exercises

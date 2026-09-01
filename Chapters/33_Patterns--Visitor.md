@@ -13,12 +13,13 @@ How do you get around this?
 *Visitor*, the final pattern in *GoF Design Patterns*,
 solves this kind of problem.
 It lets you extend the interface of the primary class hierarchy.
-It requires that the primary class hierarchy have a method,
+It requires one method on the primary class hierarchy,
 typically called `accept()`,
-which takes an object of a secondary class hierarchy called `Visitor`.
-The operations on the primary hierarchy become dynamically bound.
-The objects of the primary hierarchy `accept()` the `Visitor`,
-then call the `Visitor`'s dynamically bound method:
+which takes an object from a secondary hierarchy called `Visitor`.
+`accept()` calls the visitor's `visit()` and passes itself in.
+The visitor's type chooses which `visit()` runs,
+so each `Visitor` subclass is a new operation on the primary hierarchy,
+added without editing it:
 
 ```python
 # flower_visitors.py
@@ -102,8 +103,7 @@ if __name__ == "__main__":
 ```
 
 `flower_gen()` draws the concrete classes from `Flower.__subclasses__()`,
-the registry-free enumeration [Factory](27_Patterns--Factory.md#simple-factory-method)
-used.
+the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
 The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` hands the concrete flower to the visitor,
 `visit()` resolves the visitor's type,
@@ -151,7 +151,7 @@ One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method:
 declaring that parameter as `Visitor` instead fails the type checker.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base.
-A `Protocol` removes the `Any` for two new lines and an import:
+A `Protocol` removes the `Any` at the cost of two new lines and an import:
 
     class Visits(Protocol):
         def visit(self, flower: Flower) -> None: ...
@@ -176,8 +176,7 @@ Python has no method overloading,
 since a second `def visit()` replaces the first.
 This version therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
-Whichever way you write it,
-the primary hierarchy ends up carrying code the pattern exists to keep out of it.
+So in Python the primary hierarchy ends up carrying the operations the pattern exists to keep out of it.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -262,7 +261,7 @@ an unregistered subclass uses its nearest registered ancestor,
 falling back to the base implementation only when no registered ancestor exists
 (the tests below pin this down).
 
-The listing's last two output lines print the dispatch table the decorator built.
+The listing's last two output lines inspect the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
 and `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
 Nothing registers `Ranunculus`,
@@ -277,12 +276,12 @@ The default reaches further than `Flower`, too:
 not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
 The type checker does not object either,
-because the dispatcher it builds declares its parameters as `Any`.
+because the dispatcher `@singledispatch` builds declares its parameters as `Any`.
 When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
-The omission then fails at the first call.
+A forgotten registration then fails at its first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
-goes further and lets the type checker catch it instead
+goes further and lets the type checker catch the omission instead
 ([Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
 Adding a new operation is a new function.
@@ -344,7 +343,7 @@ def test_dispatch_follows_inheritance() -> None:
 when the elements must drive the traversal themselves from inside `accept()`,
 or when a framework you do not own already calls that method.
 But in Python that is rare.
-As with [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example,
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example reaches the same conclusion:
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 ## One Dispatch Is Enough
@@ -360,7 +359,7 @@ calling `nectar()` instead of `fragrance()` selects the operation before anythin
 and only the flower's type is still unknown.
 One dispatch covers it.
 
-That is the intent difference from the chapter's opening.
+That is the intent difference the chapter opened with.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself:
