@@ -47,7 +47,7 @@ The `pass` statement does nothing.
 Use it where Python's syntax requires a statement but you have none to run yet.
 
 `...` (the *Ellipsis* literal) is a second placeholder.
-Using it alone as a statement does nothing, the same as `pass`:
+On its own as a statement it does nothing, the same as `pass`:
 
 ```python
 # placeholders.py
@@ -66,7 +66,7 @@ print(not_implemented(), not_implemented_yet())
 `...` is the conventional body for a stub whose implementation lives elsewhere.
 You normally write it on the same line as the signature it stubs,
 as in a `Protocol` method
-([Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols) uses this).
+([Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols) uses that form).
 
 ## Loops
 
@@ -112,7 +112,8 @@ The loop prints `0 1 2`, skips `3` with `continue`, prints `4 5`,
 then stops at `6` with `break`, so `6` through `9` never print.
 Both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
-a `return` from a function that holds both loops, or the loop `else` below.
+a `return` from a function that holds both loops,
+or the loop `else` technique that follows `loop_else.py`.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers print on one line,
@@ -137,8 +138,8 @@ print(total)
 ```
 
 A loop may have an `else` clause.
-It runs only if the loop finishes without hitting `break`,
-which makes it natural for search loops:
+It runs when the loop finishes with no `break`,
+and that makes it natural for search loops:
 
 ```python
 # loop_else.py
@@ -187,8 +188,8 @@ for index, name in enumerate(names):
 ```
 
 `enumerate()` yields `(index, item)` pairs counting from zero,
-which the loop here unpacks into `index` and `name`.
-Writing `for i in range(len(names)):` and then indexing `names[i]` does the same job,
+and the loop here unpacks each pair into `index` and `name`.
+`for i in range(len(names)):` with `names[i]` inside does the same job,
 but that form names the index and looks the item up again on every line that needs it.
 `enumerate()` hands you both.
 `zip()` walks several sequences at once:
@@ -215,9 +216,8 @@ except ValueError as e:
 so the extra score never appears.
 That silence is convenient when the lengths differ on purpose and a bug when you expect them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
-When you need the index as well, wrap the whole thing.
-The extra nesting shows up in the loop header,
-which needs parentheses around the inner pair:
+When you need the index as well, wrap the `zip()` in `enumerate()`.
+The nesting shows up in the loop header, where the inner pair needs parentheses:
 `for i, (name, score) in enumerate(zip(names, scores)):`.
 
 The *walrus operator* `:=` assigns a value as part of an expression,
@@ -243,13 +243,13 @@ while stack and (item := stack.pop()) != "a":
 #: processing b
 ```
 
-The `while` loop is where this pays off.
-It pops a value, names it, and tests it in one place,
+The `while` loop is where the walrus pays off.
+The header pops a value, names it, and tests it,
 so the body needs no second pop and no separate copy.
-It also collapses `while_true.py` into its loop header:
+The walrus also collapses `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
-which [Comprehensions](16_Techniques--Comprehensions.md) covers.
+and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#lists)
@@ -281,8 +281,7 @@ Removing an item shifts the next one down into the slot the loop already passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
 The dictionary refuses outright instead of skipping silently.
-Neither behavior calls for a workaround:
-build a new container with a comprehension,
+The fix is the same for both: build a new container with a comprehension,
 or collect what to remove first and remove it after the loop.
 
 ## Pattern Matching
@@ -373,12 +372,11 @@ divide_and_report(1, 1)
 ```
 
 `checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through,
-which you do when the caller should hear about the bad argument,
-not the failed arithmetic.
+Raise your own exception that way when the caller should hear about the bad argument rather than the failed arithmetic.
 
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
-The optional `finally` always runs, which makes it the place for cleanup.
+The optional `finally` always runs, and that makes it the place for cleanup.
 
 Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,
@@ -456,10 +454,9 @@ for parse in (implicit, explicit, suppressed):
 #:   nothing shown above it
 ```
 
-`BadNumber` is a custom exception type,
-which you create by deriving a class from `Exception`.
+`BadNumber` is a custom exception type: a class derived from `Exception`.
 Its body is `pass` because it needs no behavior of its own.
-The handler matches on the class name.
+The handler matches on the class.
 [Classes](07_Foundations--Classes.md) covers class definitions in full.
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
@@ -469,7 +466,7 @@ With no `from`, Python still records the earlier exception in `__context__` and 
 `from None` sets `__suppress_context__`,
 and nothing appears above the new exception.
 Use `from e` when the earlier exception explains this one,
-and `from None` when it would only distract from your own message.
+and `from None` when the earlier exception would only distract from your own message.
 
 Python's culture leans on "easier to ask forgiveness than permission,"
 abbreviated EAFP.
@@ -545,12 +542,12 @@ path.unlink()  # Delete the file
 ```
 
 The exception propagates, but the `with` closes the file first.
-`f` is still in scope afterward, which is how the listing can check it.
-The `with` statement does not create a scope, only a guarantee about the exit.
+`f` is still in scope afterward, and that is how the listing can check it:
+a `with` statement creates a guarantee about the exit, not a scope.
 
 Closing the file is cleanup that runs whether or not the block succeeds.
 [Cleanup](10_Foundations--Cleanup.md)
-contrasts this with letting Python's garbage collector do it.
+contrasts that guarantee with leaving the close to Python's garbage collector.
 Anything that acquires a resource (a file, a lock, a network connection)
 can be a context manager.
 [Context Managers](15_Techniques--Context_Managers.md)

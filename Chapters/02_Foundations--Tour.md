@@ -50,44 +50,44 @@ print(val)
 ```
 
 A C/C++ `if` requires parentheses around the conditional.
-Python needs no parentheses, although it doesn't complain if you use them.
+Python makes them optional.
 
 The conditional clause ends with a colon.
 A group of indented statements follows: the "then" part of the `if` statement.
 The `print()` function sends its argument to standard output.
 The next line assigns to a variable named `val`.
-The subsequent statement is not indented, so it is no longer part of the `if`.
+The next statement returns to the left margin, and that return ends the `if`.
 
-An indented block groups statements but does not create a scope.
-Assigning `val` inside the `if` leaves it visible afterward,
+An indented block groups statements without creating a scope, so `val`,
+assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
-Functions, classes, and modules introduce new scopes.
-An `if` or a `for` block does not.
-Binding still follows execution: had `response` not been `"yes"`,
-Python would not have bound `val`, and `print(val)` would raise a `NameError`.
+New scopes come from functions, classes, and modules,
+never from an `if` or a `for` block.
+Binding still follows execution: with any answer other than `"yes"`,
+the assignment never runs, and `print(val)` raises a `NameError`.
 
 Indenting can nest to any level.
 Four spaces per level is the convention,
 and mixing tabs and spaces inside one block is a `TabError`.
-Unlike the brace-placement debates of C++ or Java,
-the indentation is not a matter of taste: it is the structure.
+C++ and Java programmers debate where braces go.
+In Python the indentation is the structure,
+so the language settles the question and taste plays no part.
 Python code from any two authors therefore lines up the same way,
-which is one of the main reasons for Python's consistent readability.
+and that sameness is one of the main reasons for Python's consistent readability.
 
-Python normally has only one statement per line,
-so a line needs no terminating semicolon.
-(You can put more than one statement on a line by separating them with semicolons.)
+A statement ends with its line, so it needs no terminating semicolon.
+A semicolon's one job is to separate two statements that share a line.
 
 ## Variables and References
 
 A variable in Python is a name bound to an object, not a box that holds a value.
 Assignment binds a name.
 It does not copy.
-You need not declare a variable's type,
+You never declare a variable's type,
 and one name can bind to objects of different types over its life.
-This is *dynamic typing*.
+That freedom is *dynamic typing*.
 Python also has a full static type system layered on top,
-which this book uses from [Static Types](08_Foundations--Static_Types.md)
+and this book uses it from [Static Types](08_Foundations--Static_Types.md)
 onward.
 
 ```python
@@ -136,7 +136,7 @@ Numbers, strings, and tuples are *immutable*:
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Knowing which is which explains when another name sees a change,
-as with `a` and `b` above.
+as `a` and `b` did in `references.py`.
 
 ## Numbers and Arithmetic
 
@@ -259,11 +259,11 @@ You can test any object in a boolean context.
 Numbers are false when zero, containers are false when empty,
 and `None` is always false.
 Everything else is true, unless an object's type says otherwise.
-This is *truthiness*,
+That rule is *truthiness*,
 and it lets you write `if items:` instead of `if len(items) != 0:`.
 A type says otherwise by defining `__bool__()`.
 Without one, Python falls back to `__len__()`,
-which is why an empty container is false.
+and that fallback is why an empty container is false.
 
 ```python
 # truthiness.py
@@ -296,10 +296,9 @@ so the empty string shows as `''` and not as blank.
 
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean.
-`x or default` is a common way to supply a fallback.
-It has a sharp edge.
-It replaces every falsy `x`, not only a missing one,
-so it throws away a legitimate `0` or `""`.
+`x or default` is a common way to supply a fallback,
+and it replaces every falsy `x`:
+a legitimate `0` or `""` gets thrown away along with a missing value.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
 That is a conditional expression,
@@ -348,10 +347,11 @@ or a chunk of HTML: you can write it out in full without escaping line breaks.
 
 In an ordinary string, a backslash starts an escape sequence, as in C and Java:
 `\n` is a newline and `\t` is a tab.
-The `r` right before a string means "raw."
-Python takes backslashes literally, so you don't need to double them.
-A raw string still cannot end with a backslash,
-because the backslash escapes the closing quote even here.
+The `r` right before a string means "raw":
+Python takes each backslash literally, as a single character.
+One limit remains.
+A raw string cannot end with a backslash,
+because even there the backslash escapes the closing quote.
 
 ### Common String Operations
 
@@ -385,7 +385,7 @@ String methods return new strings rather than changing the original.
 
 Modern Python uses *f-strings*.
 Prefix the string with `f` and put expressions in curly braces.
-It is readable and fast:
+The result is readable and fast:
 
 ```python
 # fstrings.py
@@ -414,7 +414,7 @@ Existing code also carries two older styles: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,
 as in `"val: {}".format(val)`.
 Both still work, and both use the same format mini-language.
-F-strings replaced them, so this book does not use them.
+F-strings replaced them, so this book uses f-strings throughout.
 
 ### t-Strings {#t-strings}
 
@@ -461,15 +461,16 @@ print(shout(message))
 Iterating a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
-which `piece.expression` reports.
+and `piece.expression` reports that text.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
 A consumer cannot assume that literals and interpolations alternate.
-`shout()` uppercases only the literal text, leaving the values alone,
-which no amount of work on a finished f-string could do reliably.
-Uppercasing is only a demonstration.
+`shout()` uppercases the literal text and leaves the values alone.
+No amount of work on a finished f-string could do that reliably,
+because the finished string no longer says which characters came from where.
+Uppercasing is a demonstration;
 [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
-builds a query from the parts that way.
+builds a query from the parts the same way.
 
 ## Naming Conventions
 
@@ -482,17 +483,14 @@ Class names are `CapWords` (Pascal cased): every word, including the first,
 begins with a capital letter, and no underscores separate them.
 For example: `ThisIsMyClass`.
 
-A class may instead use `snake_case` when it serves primarily as a callable,
-documented and used the way a function is.
-The standard library does this for `contextlib.suppress` and `functools.partial`,
-and for builtins like `property` and `staticmethod`.
-Reserve it for classes that behave like a function to their users.
-The default for a class is still `CapWords`.
+A class that its users call the way they call a function may use `snake_case` instead.
+The standard library names `contextlib.suppress`, `functools.partial`,
+and the builtins `property` and `staticmethod` that way.
+Every other class is `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)
 covers style issues.
-Tools such as ruff can apply these to your code automatically
-(or at least point them out).
+Tools such as ruff point out violations and fix many of them automatically.
 
 ## Exercises
 

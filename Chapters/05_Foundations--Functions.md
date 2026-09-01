@@ -49,9 +49,9 @@ print(flexible_args_and_returns(2))
 ```
 
 Every Python function returns a value.
-The third call matches neither test,
-so the function reaches its end without returning anything and produces `None`.
-A bare `return` and a missing `return` both produce `None`.
+The third call matches neither test, so the function runs off its end,
+and a function that runs off its end returns `None`.
+A bare `return` returns `None` too.
 
 A `return` with several expressions produces a tuple,
 which the caller usually unpacks:
@@ -90,8 +90,8 @@ Nothing checks the arguments on the way in.
 ## Default and Keyword Arguments
 
 Parameters can have default values,
-and keyword arguments let callers pass them by name, in any order,
-which makes a call self-documenting:
+and keyword arguments let callers pass them by name, in any order.
+A call that names its arguments documents itself:
 
 ```python
 # default_args.py
@@ -154,13 +154,14 @@ A mutable default persists because it lives on the function object.
 No call rebuilds it.
 `__defaults__` holds the tuple of default values,
 and both calls append to the same list inside it.
-The default looks like an expression the call evaluates, and it is not.
+The default looks like an expression each call evaluates,
+but Python evaluated it once, at the `def`.
 
 Underneath, a parameter is another name bound to the caller's object,
 the binding that [Variables and References](02_Foundations--Tour.md#variables-and-references)
 describes.
 When that object is mutable, the caller sees the changes the function makes.
-`bad_append()` combines this with a default Python builds once,
+`bad_append()` combines that binding with a default Python builds once,
 so each call mutates the object the next call uses.
 
 ```python
@@ -187,7 +188,7 @@ print(mine)
 `append_all()` calls a method on the object the caller passed,
 so the caller sees the change.
 `rebind()` assigns to the parameter,
-which points the local name at a new list and leaves the caller's list alone.
+so the local name points at a new list and the caller's list stays as it was.
 Mutating an argument reaches outside the function.
 Rebinding one does not.
 
@@ -199,7 +200,8 @@ Test it with `is None` rather than truthiness:
 `if not target:` also discards an empty list the caller passed on purpose.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
-Calls still share it, but sharing is harmless because it cannot change:
+Calls still share that tuple,
+and the sharing is harmless because a tuple cannot change:
 
 ```python
 # immutable_default.py
@@ -223,8 +225,8 @@ such a parameter reads:
 
     items: Sequence[str] = ()
 
-The `None` sentinel works only because `None` is not a meaningful value here.
-When `None` is also a valid argument, you need a distinct marker.
+The `None` sentinel works here because `None` carries no meaning for `target`.
+When `None` is itself a valid argument, you need a distinct marker.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
 adds a `sentinel` builtin that creates a unique self-describing value for this purpose:
 
@@ -252,10 +254,11 @@ print(get(prefs, "theme", "dark"))
 #: dark
 ```
 
-Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied."
-The `MISSING` sentinel keeps the two cases apart.
-A missing key with no default normally raises an exception.
-A stored `None` comes back untouched.
+Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied,"
+and the `MISSING` sentinel keeps the two cases apart.
+A stored `None` comes back untouched,
+and a missing key with no default comes back as `MISSING`
+(a real `get()` would re-raise the `KeyError` there, as the comment says).
 
 Create a sentinel once and share that name.
 Each `sentinel()` call builds a new object, even for the same name,
@@ -300,7 +303,7 @@ If you drop the `global` from `writes_global()`,
 `count += 1` reads a local before assigning it,
 so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading,
-which is why `read_only()` needs nothing.
+and that is why `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 the same idea one scope in.
 
@@ -366,26 +369,26 @@ trace(report, "point", *nums, **opts)
 Because collecting and unpacking are inverses,
 a function can gather arguments it knows nothing about and pass them on unchanged.
 `trace()` accepts any call and forwards it,
-which is the standard shape of a wrapper.
+and that is the standard shape of a wrapper.
 A function is an object like any other,
 so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived
 (see [Functions as First-Class Objects](40_Functional--Foundations.md#functions-as-first-class-objects)).
-[Decorators](14_Techniques--Decorators.md) builds on this.
+[Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
 ## Positional-Only and Keyword-Only Parameters
 
 Two markers in a parameter list control how callers may pass arguments,
-which decides how much of a signature you commit to keeping.
-A parameter a caller can name is part of the contract.
-One it cannot is not.
+and that control decides how much of a signature you commit to keeping:
+a parameter a caller can name is part of the contract,
+and a parameter a caller must pass by position stays outside it.
 A `/` ends the *positional-only* parameters.
 You must pass every parameter before it by position, not by name.
 A `*` begins the *keyword-only* parameters.
 You must pass every parameter after it by name.
 A `*args` parameter has the same effect as a bare `*`.
-It absorbs every remaining positional argument,
-so you can pass a parameter declared after it only by name.
+`*args` absorbs every remaining positional argument,
+so a parameter declared after it can arrive by name alone.
 
 ```python
 # param_markers.py
@@ -425,7 +428,7 @@ except TypeError as e:
 ```
 
 The `True` in the first `tally()` call joins `values` like any other positional argument.
-Only the named form reaches `total`.
+The named form, `total=True`, is what reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
@@ -456,7 +459,7 @@ many built-in functions and methods take positional-only parameters,
 such as `dict.get(key, default=None, /)`.
 Marking a parameter positional-only also keeps its name out of the method's contract.
 That matters when a subclass overrides a method:
-the subclass can rename the parameter, and a type checker does not object.
+the subclass can rename the parameter, and the type checker accepts the rename.
 
 ## Lambdas
 
@@ -466,7 +469,7 @@ which accepts a `key` function, calls it on each element,
 and orders by the results.
 When an existing function already computes the key, pass the function itself:
 `key=len` needs no lambda.
-Write a lambda when nothing existing computes what you want,
+Write a lambda when no existing function computes the key you want,
 such as ordering by a word's last letter:
 
 ```python
@@ -482,9 +485,8 @@ print(square(9))
 #: 81
 ```
 
-Assigning a lambda to a name, as `square` does,
-gives up the anonymity that is a lambda's point.
-`def` also gives the function a real name for tracebacks.
+`square = lambda n: n * n` gives up the anonymity that is a lambda's point,
+and `def` would also give the function a real name for tracebacks.
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.

@@ -103,9 +103,8 @@ so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas) shows how `key=` changes that.
 
-A `list` does not restrict its elements to one type.
-Since each slot holds a reference to whatever object you put there,
-the same `list` can mix strings, numbers, `None`, and other containers:
+Each slot of a `list` holds a reference to whatever object you put there,
+so the same `list` can mix strings, numbers, `None`, and other containers:
 
 ```python
 # mixed_types.py
@@ -143,7 +142,7 @@ print(grid)
 #: [[1], [0], [0]]
 ```
 
-This is [Variables and References](02_Foundations--Tour.md#variables-and-references)
+The grid is [Variables and References](02_Foundations--Tour.md#variables-and-references)
 again: `*` binds the same object into every slot, and assignment never copies.
 
 Removing items from a `list` while iterating over it is the same kind of surprise:
@@ -158,15 +157,17 @@ print(xs)
 #: [2, 4]
 ```
 
-The loop advances an index as the list shrinks under it,
-so it skips the element that slides into each removed one's slot,
-with no exception to tell you.
+Each `remove()` slides the next element into the vacated slot,
+and the loop's index has already moved past that slot,
+so the loop skips that element.
+No exception reports the skip.
 That is why half of `xs` survives.
 Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 
-A loop with `append()` is not the usual way to build a list from another one.
-[Control Flow](04_Foundations--Control_Flow.md#comprehensions)
-introduces the comprehension, which builds a new list in a single expression,
+The usual way to build a list from another one is a *comprehension*,
+a single expression that builds the new list,
+rather than a loop with `append()`.
+[Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces it,
 and [Comprehensions](16_Techniques--Comprehensions.md)
 explores every form in depth.
 
@@ -205,7 +206,7 @@ print(low, high)
 The empty tuple `()` is the exception to the comma rule,
 because it has nothing to separate.
 
-Unpacking does not require one name per element.
+One name per element is the simplest unpacking, and two extensions relax it.
 A starred name absorbs whatever remains,
 and a target can nest to match the shape of the value:
 
@@ -229,7 +230,8 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 3)
 ```
 
-At most one target can carry the star, and it always produces a `list`,
+At most one target can carry the star,
+and the starred target always receives a `list`,
 even when the source is a tuple or a string.
 Without a star the number of names must equal the number of elements,
 or the assignment raises a `ValueError`.
@@ -257,17 +259,17 @@ print(person[2], type(person[2]).__name__)
 
 A tuple used this way is a fixed-length immutable record,
 where each position has a distinct meaning.
-Used the other way, holding many values of one type, it is an immutable `list`.
+A tuple holding many values of one type is instead an immutable `list`.
 
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-Lookup computes a *hash* from each key,
-a small integer derived from the key's contents that says where the entry lives,
-so keys must be *hashable*.
-The mutable built-in containers (`list`, `dict`, `set`) are not hashable,
+Lookup computes a *hash* from each key: a small integer,
+derived from the key's contents, that says where the entry lives.
+So keys must be *hashable*.
+Strings, numbers, and tuples of hashable values are hashable;
+the mutable built-in containers (`list`, `dict`, `set`) are not,
 so they cannot be keys.
-Strings, numbers, and tuples of hashable values can.
 
 ```python
 # dictionaries.py
@@ -297,16 +299,14 @@ for name, age in ages.items():
 Use `dict.get()` instead of `[]` to avoid a `KeyError` when a key might be absent.
 
 A `dict` has three views: `keys()`, `values()`, and `items()`.
-Iterating the `dict` is the same as iterating `keys()`,
-which is why `for name in ages` walks the names.
-Only `items()` yields `(key, value)` pairs,
-so `for name, age in ages` is a common slip:
-it iterates the keys and tries to unpack each one.
-Here that raises a `ValueError`,
-since a key like `"Alice"` has more than two characters.
-A two-character key would silently unpack into its letters instead.
+Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
+`items()` alone yields `(key, value)` pairs,
+and leaving it off is a common slip:
+`for name, age in ages` iterates the keys and tries to unpack each one.
+Here that raises a `ValueError`, since `"Alice"` has more than two characters.
+A two-character key such as `"Bo"` would unpack into its letters and the loop would run on.
 
-A `dict` iterates in insertion order, which the language guarantees.
+A `dict` iterates in insertion order, and the language guarantees that order.
 
 Entries come out as easily as they go in, and two dictionaries combine:
 
@@ -328,11 +328,12 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 
 `|` builds a merged `dict` and `|=` updates in place,
 the same job `update()` does.
-The next section uses `|` for set union, where the operands are symmetric.
-They are not symmetric here: on a key both dictionaries hold,
-the right operand's value wins, which is why `"y"` comes out as `20`.
+The next section uses `|` for set union,
+where the order of the operands makes no difference.
+Here it does: on a key both dictionaries hold, the right operand's value wins,
+so `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
-which it accepts from any source.
+and `dict()` accepts those from any source.
 `zip()` pairs up two sequences element by element.
 [Control Flow](04_Foundations--Control_Flow.md#loops)
 covers it with the other loop tools.
@@ -373,9 +374,10 @@ print(2 in a)
 The order these sets print comes from CPython's hashing, not from any guarantee,
 so do not write code, or a test, that depends on it.
 
-Every set-algebra operator above has a named method.
-The methods are a little more flexible because they accept any iterable,
-not only a set, and they can take several arguments at once.
+Every set-algebra operator in `sets.py` has a named method.
+The methods are more flexible:
+they accept any iterable where the operators need a set on both sides,
+and they take several arguments at once.
 `isdisjoint()` adds one more test, with no operator form:
 
 ```python
@@ -405,7 +407,7 @@ print(a.isdisjoint({8, 9}))  # No operator form
 #: True
 ```
 
-A few operators do not appear above.
+`sets.py` leaves out a few operators.
 `<` and `>` test *proper* subset and superset.
 They behave like `<=` and `>=` but also require the two sets to differ.
 The augmented assignments `|=`, `&=`, `-=`, and `^=` modify a set in place.
@@ -415,7 +417,7 @@ Single elements move in and out with `add()`, `remove()`, and `discard()`.
 `remove()` raises a `KeyError` on a missing element.
 `discard()` stays silent.
 
-Converting a `list` to a `set` before repeated lookups speeds them up.
+Repeated lookups run faster against a `set` than against a `list`.
 A `list` compares against every element in turn.
 A `set` computes one hash and looks in one place.
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
@@ -445,11 +447,10 @@ a scan of all `n` elements before it gives up.
 
 A timing depends on the machine that took it,
 so every measured listing in this book prints a comparison rather than a number.
-`report()` comes from a small helper the book supplies,
-and it stays silent unless you ask for the figures:
-running the listing with `--numbers`
+`report()` comes from a small helper the book supplies.
+By default it prints the comparison alone; run the listing with `--numbers`
 (see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine))
-prints the two times it measured.
+and it prints the two times it measured as well.
 
 ## Specialized Containers
 
@@ -485,7 +486,7 @@ and `most_common()` returns the highest counts first.
 ### `defaultdict`
 
 A `defaultdict` supplies a value the first time you touch a missing key,
-which removes the setup-on-first-use boilerplate:
+and that removes the setup-on-first-use boilerplate:
 
 ```python
 # defaultdict.py
@@ -520,11 +521,11 @@ so touching a missing key grows it.
 Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
 
-A plain `dict` has a second option:
-`plain.setdefault(kind, []).append(name)` stores the default and returns it when the key is missing,
-and returns the existing value when it is not.
-It builds the empty list on every call, used or not,
-and you must repeat it everywhere you touch the dictionary.
+A plain `dict` has a second option, `setdefault()`:
+`plain.setdefault(kind, []).append(name)` returns the existing value for a present key,
+and for a missing key stores the default and returns that.
+The `[]` argument builds an empty list on every call, used or not,
+and every place that touches the dictionary must repeat the whole expression.
 A `defaultdict` states the default once, where you create the dictionary.
 
 ### `deque`
@@ -576,7 +577,7 @@ print(lst)
 A `list` can stand in for a `deque`,
 but `insert(0, x)` and `pop(0)` must shift every remaining element,
 so both are O(n) instead of O(1).
-Timing the two at the left end shows it:
+Timing the two at the left end shows the difference:
 
 ```python
 # deque_timing.py
@@ -611,8 +612,8 @@ Use a `deque` for a single-threaded queue.
 Indexing its middle is O(n), though,
 so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` also caps its length,
-discarding from the far end when a new item overflows it,
-which is the sliding window a `list` cannot provide.
+discarding from the far end when a new item would overflow it.
+That is a sliding window, and a `list` has no equivalent.
 For a queue shared between threads, use `queue.Queue`
 (see [Concurrency](19_Techniques--Concurrency.md)), and for a priority queue,
 `heapq`.
@@ -638,7 +639,7 @@ print(height)
 #: 1.65
 ```
 
-A `namedtuple` is a fixed-length record like the heterogeneous tuple above,
+A `namedtuple` is a fixed-length record like the tuple in `heterogeneous.py`,
 but its fields are self-documenting.
 `typing.NamedTuple` is the class form of the same idea:
 it declares a type for each field instead of listing bare names,
@@ -663,7 +664,7 @@ completes the trio: a built-in,
 hashable mapping that rejects changes after creation.
 The example below uses tuples and frozensets,
 plus `MappingProxyType` from the `types` module,
-which is not a container of its own but a read-only *view* onto a `dict` you still hold:
+a read-only *view* onto a `dict` you still hold rather than a container of its own:
 
 ```python
 # immutable_containers.py
@@ -703,11 +704,11 @@ except TypeError as e:
 #: 'mappingproxy' object does not support item assignment
 ```
 
-Each `# type: ignore` sits on a line that deliberately misbehaves.
-Modifying an immutable container is a type error as well as a runtime one,
-so the comment lets the example demonstrate the exception it expects.
+Modifying an immutable container is a type error as well as a runtime error,
+so each line that deliberately misbehaves carries a `# type: ignore`.
+The comment lets the example run far enough to show the exception it expects.
 
-Where a `MappingProxyType` is only a read-only window onto a `dict` that still exists and can change,
+A `MappingProxyType` is a window onto a `dict` that still exists and can change;
 a `frozendict` owns its contents outright.
 This listing requires Python 3.15:
 
@@ -770,8 +771,8 @@ except TypeError as e:
 #: 'tuple' object does not support item assignment
 ```
 
-The `tuple` refuses to let go of the `list`,
-but nothing stops that `list` from changing,
+The `tuple` holds the same `list` for its whole life,
+that `list` stays free to change,
 and a container holding an unhashable object is itself unhashable.
 Immutability pays off when it goes all the way down.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
