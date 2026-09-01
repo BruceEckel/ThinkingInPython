@@ -77,6 +77,13 @@ Keep a passive when both moves fail:
 when the natural rewrite needs a fabricated subject
 ("the system", "one", "the programmer")
 or when cohesion wins (see Boundaries).
+Keep it too when the verb names an arrangement rather than an act,
+and no agent is worth naming:
+"the code that creates objects is distributed throughout your application"
+describes where the code sits, and Bruce chose it over
+"appears throughout" (chapter 27, 2026-09-01).
+Vale still flags it; the recorded reason is what makes the warning
+acceptable.
 A kept passive is a judgment call, not a defeat;
 note it in the report so the warning's persistence has a recorded reason.
 

@@ -76,7 +76,10 @@ it, otherwise "an exception".
 it raises", "whatever `slope()` raises", "what it re-raises"). Code and
 `#:` markers are never touched.
 
-**Sightings.** 2 (additive)
+**Sightings.** 3 (additive)
+- `27_Patterns--Factory` 2026-09-01 (`6f638b05`), was Claude-written:
+  "A placeholder raises only when something calls it" -> "A placeholder
+  raises an exception only when something calls it"
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The `class Typo` statement raises instead of finishing" ->
   "The `class Typo` statement raises a `TypeError` instead of finishing"
@@ -127,9 +130,12 @@ the same section. Choose a synonym for the prose sense ("executes",
 **Keep when.** The prose word names the identifier itself ("`run()` runs
 the steps" is about `run()`).
 
-**Sightings.** 2 (additive), both `25_Patterns--Template_Method` 2026-08-29, was
-Claude-written:
-- "an override of `run()` is reported before the program runs" ->
+**Sightings.** 3 (additive), 2 chapters
+- `27_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written, in
+  a chapter whose class is `Shape`: "the shape a factory-object design
+  takes" -> "the form a factory-object design takes"
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+  "an override of `run()` is reported before the program runs" ->
   "Discovers an overridden `run()` before the program executes"
 - "the quick fix" / "the fixed algorithm" / "What Actually Fixes the
   Algorithm" -> "the quick repair" / "the anchored algorithm" / "What
@@ -153,7 +159,19 @@ sentence back to "so" once he had added "Now" and "via the new
 `__setattr__()`", which turned the clause into new information. The revert
 is evidence for the exception, not against the rule.
 
-**Sightings.** 3 (2 chapters):
+**Sightings.** 6 (3 chapters), plus one keep-when
+- `27_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written,
+  three: "A `class` statement is executable code, so every call would
+  define fresh ... classes" -> "Because a `class` statement is
+  executable code, every call ..."; "`deepcopy()` copies everything it
+  can reach, so a prototype holding ..." -> "Because `deepcopy()` copies
+  everything it can reach, a prototype ..."; "`interact_with()`
+  dispatches on the character's type, and `obstacle.action()` dispatches
+  again on the obstacle's, so the pair of calls" -> "Because
+  `interact_with()` dispatches ... the pair of calls". The keep-when from
+  the same commit: "Because the registry keys on `cls.__name__` alone,
+  two classes ... overwrite" -> "The registry keys on `cls.__name__`
+  alone, so two classes ...", where the keying is new information.
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "`run()` calls methods the subclass supplies, so the subclass must
   finish its own setup" -> "Because `run()` calls methods the subclass
@@ -222,9 +240,14 @@ listing follows anyway.
 **Keep when.** The pointer carries a claim the listing does not make on
 its own ("The next listing shows the same trap in a generator").
 
-**Sightings.** 1 (removal), `25_Patterns--Template_Method` 2026-08-29, was
-Claude-written:
-- "The example below shows why." -> deleted
+**Sightings.** 3 (removal), 2 chapters
+- `27_Patterns--Factory` 2026-09-01 (`0b7ff81d`), was Claude-written:
+  "The next step gives each of those operations its own object." ->
+  deleted, ahead of "A *factory object* defines a single `create()`
+  method"; "No factory method and no factory class. The `dict` is the
+  factory:" -> "No factory method and no factory class:"
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+  "The example below shows why." -> deleted
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -258,14 +281,75 @@ type-checking attribute").
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
 that is the claim ("potentially unbounded") stays.
 
-**Sightings.** 3 (additive), all `25_Patterns--Template_Method` 2026-08-29, was
-Claude-written:
-- "pass the steps in directly" -> "pass the steps as arguments"
+**Sightings.** 5 (additive), 2 chapters
+- `27_Patterns--Factory` 2026-09-01 (`2b18eed8`), was Bruce-written
+  (older draft): "you will likely extend your program" -> "you often
+  extend that program"; "first use polymorphism to create a common
+  interface" -> "first create a base type as a common interface"
+- `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
+  "pass the steps in directly" -> "pass the steps as arguments"
 - "an attribute nothing reads" -> "a type-checking attribute"
 - "code written later, potentially years later" -> "code written later,
   sometimes years later"
 
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
+
+### R10. Replace a judgment or figure about a mechanism with the mechanism
+
+**Test.** A phrase that evaluates or characterizes rather than describes
+("costs nothing", "satisfies", "is the exception", "they expect"), or a
+scare-quoted idiom, where the sentence can state what actually happens.
+Ask what the reader would observe; if the phrase does not say, replace it.
+
+**Keep when.** The judgment is the claim being made and the mechanism is
+already stated nearby, as in a summary sentence that closes a section.
+
+**Sightings.** 8 (2 chapters)
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
+- "puts the check where it costs nothing" -> "puts the check where it
+  does not restrict the surrogate"
+- "The guard also satisfies `copy` and `pickle`" -> "The guard also makes
+  the proxy work with `copy` and `pickle`"
+- "both get the `AttributeError` they expect" -> "both get an
+  `AttributeError`, which those modules handle"
+- "Inheritance is the exception:" -> "Inheritance satisfies both."
+- "As long as `Proxy` "speaks for" the class it forwards method calls to"
+  -> "As long as code calls `Proxy` in place of the class that `Proxy`
+  forwards method calls to"
+- `27_Patterns--Factory` 2026-09-01, was Claude-written, three:
+  "The registry also never forgets:" -> "The registry also never
+  removes an entry:"; "The chained call in `__main__` hides the problem
+  by throwing the builder away on the same line that creates it" ->
+  "never shows the problem, because it keeps no reference to the
+  builder after `build()` returns"; "each implementation picks a side"
+  -> "chooses one behavior or the other"
+
+**Home.** literal (Accrued patterns), the pass that owns figures.
+Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
+
+### R11. Cut a scope phrase the book already supplies
+
+**Test.** "In Python", "in Python code", "in your code", "in the system",
+"in this design" introducing or qualifying a claim that the chapter
+already scopes that way. Delete the phrase.
+
+**Keep when.** The phrase contrasts with another language or another
+system ("in Python, unlike Java"), which is the usual reason it was
+written.
+
+**Sightings.** 3 (2 chapters)
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
+  "In Python both are the same few lines of `__getattr__()` delegation"
+  -> "Both are the same few lines of `__getattr__()` delegation"
+- `27_Patterns--Factory` 2026-09-01, was Claude-written:
+  "every place in your code that names a concrete type" -> "every place
+  that names a concrete type"
+- `27_Patterns--Factory` 2026-09-01, was Bruce-written (older draft):
+  "the only other code in the system that needs to change" -> "the only
+  other code that changes"
+
+**Home.** CLAUDE.md watch list (global, Writing Style). Promoted
+2026-09-01 (C5 -> R11, widened from "In Python" to the family).
 
 ---
 
@@ -314,29 +398,6 @@ Claude-written (same chapter, so not yet independent):
   instance" -> "`len(p)` looks up `__len__()` on `type(p)`, skips the
   instance"
 
-### C3. Replace a judgment about the mechanism with the mechanism
-
-**Test.** A phrase that evaluates or characterizes rather than describes
-("costs nothing", "satisfies", "is the exception", "they expect"), or a
-scare-quoted idiom, where the sentence can state what actually happens.
-Ask what the reader would observe; if the phrase does not say, replace it.
-
-**Keep when.** The judgment is the claim being made and the mechanism is
-already stated nearby, as in a summary sentence that closes a section.
-
-**Sightings.** 5, all `26_Patterns--Surrogate` 2026-08-31, was
-Claude-written (same chapter, so not yet independent):
-- "puts the check where it costs nothing" -> "puts the check where it
-  does not restrict the surrogate"
-- "The guard also satisfies `copy` and `pickle`" -> "The guard also makes
-  the proxy work with `copy` and `pickle`"
-- "both get the `AttributeError` they expect" -> "both get an
-  `AttributeError`, which those modules handle"
-- "Inheritance is the exception:" -> "Inheritance satisfies both."
-- "As long as `Proxy` "speaks for" the class it forwards method calls to"
-  -> "As long as code calls `Proxy` in place of the class that `Proxy`
-  forwards method calls to"
-
 ### C4. Cut the clause that defines this thing by contrast with the one just discussed
 
 **Test.** A sentence or trailing clause whose work is to say how the
@@ -361,18 +422,6 @@ Claude-written (same chapter, so not yet independent):
 - "A *Smart reference* proxy adds behavior around each access without
   refusing any." -> "A *Smart reference* proxy adds behavior around each
   access."
-
-### C5. Cut "In Python" in a Python book
-
-**Test.** "In Python" (or "in Python code") introducing a claim that the
-whole book already scopes to Python.
-
-**Keep when.** The sentence contrasts Python with another language, which
-is the usual reason the phrase was written.
-
-**Sightings.** 1, `26_Patterns--Surrogate` 2026-08-31, was Claude-written:
-- "In Python both are the same few lines of `__getattr__()` delegation"
-  -> "Both are the same few lines of `__getattr__()` delegation"
 
 ### C6. Name a pointer's antecedent only where a competitor exists
 
@@ -417,6 +466,104 @@ One went the other way, where the subject had just appeared unopposed:
 
 **Home.** the `antecedents` skill, as a keep-when. Not a separate sweep.
 
+### C7. Give a bare comparative its noun
+
+**Test.** "looks/seems/is [comparative]" ("looks stronger", "is
+simpler") with the compared quality unnamed. Supply the noun the
+comparative modifies.
+
+**Keep when.** The noun is the previous sentence's subject and repeating
+it would be padding.
+
+**Sightings.** 1 (additive), `27_Patterns--Factory` 2026-09-01
+(`40323f50`), was Claude-written:
+- "Nesting the classes inside `factory()` looks stronger and is worse"
+  -> "looks like stronger enforcement and is worse"
+
+### C8. Cut the sentence the next sentence restates
+
+**Test.** Two consecutive sentences where the second says the first
+again at a different altitude (abstract after concrete, or a claim
+after its example). Keep the concrete one.
+
+**Keep when.** The second sentence adds a consequence or a mechanism
+the first did not state.
+
+**Sightings.** 3, all `27_Patterns--Factory` 2026-09-01, was
+Claude-written (same chapter, so not yet independent):
+- "You must still find and edit every place that names a concrete type.
+  Creation names the type. Use does not, because polymorphism handles
+  use. The effect is the same: adding a new type means edits scattered
+  through the code." -> "adding a type means finding and editing every
+  place that names a concrete type." (`2b18eed8`)
+- "No factory method and no factory class. The `dict` is the factory:"
+  -> "No factory method and no factory class:" (`0b7ff81d`)
+- "The next step gives each of those operations its own object. A
+  *factory object* defines a single `create()` method" -> the second
+  sentence alone (`0b7ff81d`)
+
+### C9. A reader's experiment is "If you X, Y", not "X, and Y"
+
+**Test.** An imperative whose only purpose is to set up a hypothetical
+for the clause after it ("Uncomment the line, and the checker
+reports ..."; "Define a factory class and stop there: creating an
+instance still succeeds"). Rewrite as "If you X, Y".
+
+**Keep when.** The imperative is an instruction to follow, as in an
+exercise.
+
+**Sightings.** 2, both `27_Patterns--Factory` 2026-09-01, was
+Claude-written (same chapter, so not yet independent):
+- "Uncomment the line that passes a `BrokenFactory` to
+  `GameEnvironment`, and the checker reports" -> "If you uncomment the
+  line ..., the checker reports" (`6f638b05`)
+- in conversation: "Define a factory class with `make_character()` and
+  stop there: creating an instance of it still succeeds" flagged as
+  "still hard to follow"; rewritten with Python as the actor
+
+### C10. Join a two-sentence contrast with "Whereas"
+
+**Test.** Two adjacent sentences with the same frame and opposite
+predicates and no connective ("A factory takes information telling it
+what to build. A generator object does the opposite:"). Join them:
+"Whereas a factory ..., a generator object does the opposite:".
+
+**Keep when.** The two sentences are a deliberate two-beat ("Failures
+never vanish. They only relocate.").
+
+**Sightings.** 1 (additive), `27_Patterns--Factory` 2026-09-01, was
+Claude-written; "Where" in `40323f50`, corrected to "Whereas" in
+`d6144479`.
+
+### C11. Cut "need(s) to" where the sentence describes rather than obliges
+
+**Test.** "needs to VERB" / "need to VERB" describing what happens or
+what is the case, not an obligation on the reader. Use the plain verb.
+
+**Keep when.** The obligation is the claim ("every subclass must
+supply a step", which R6 covers).
+
+**Sightings.** 2, both `27_Patterns--Factory` 2026-09-01 (`40323f50`),
+was Bruce-written (older draft) and Claude-written respectively:
+- "the only other code in the system that needs to change" -> "the
+  only other code that changes"
+- "that's the only place you need to change the code" -> "that method
+  is the only code you change"
+
+### C12. Link the term instead of appending "(see Chapter)"
+
+**Test.** A term followed by a parenthetical citation "(see [Chapter](
+...#anchor))" where the term itself could carry the link.
+
+**Keep when.** The citation points somewhere other than the term's
+definition, or the term is already a link to something else.
+
+**Sightings.** 1, `27_Patterns--Factory` 2026-09-01 (`d6144479`), was
+Claude-written:
+- "I have also used a *generator* (see
+  [Iterators](23_Patterns--Iterators.md#generators))." -> "I have also
+  used a [*generator*](23_Patterns--Iterators.md#generators)."
+
 ---
 
 ## Retired
@@ -425,4 +572,12 @@ Rejected by Bruce, or promoted and later withdrawn. Never propose these
 again. Record the reason: a bare "rejected" tells a future round nothing and
 invites a reworded re-proposal.
 
-*(none yet)*
+### X1. Do not activate a passive that names an arrangement
+
+Proposed 2026-09-01 as a contradiction: `27_Patterns--Factory` had
+"If the code that creates objects appears throughout your application"
+(Claude-written) and Bruce changed it to "is distributed throughout",
+which vale flags. Bruce: "keep 'distributed'". The passive describes
+where the code sits, with no agent worth naming. Recorded as a keep-when
+in the `activate` skill (Step 2, passives). Do not propose "appears" or
+any active rewrite for this shape again.

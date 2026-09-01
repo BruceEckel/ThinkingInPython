@@ -190,3 +190,12 @@ and it becomes part of every future pass.
   and the checker verifies it" (`458530ea`).
 - "Each has a cost, and each protects against" becomes
   "Each guards against" (`74d84ea3`).
+- "The registry also never forgets:" becomes
+  "The registry also never removes an entry:" (`40323f50`).
+- "hides the problem by throwing the builder away on the same line that
+  creates it" becomes "never shows the problem, because it keeps no
+  reference to the builder after `build()` returns" (`40323f50`).
+- "each implementation picks a side" becomes
+  "each implementation chooses one behavior or the other" (`40323f50`).
+  These three are R10 in `bruce_edit_db.md`: a judgment or figure about a
+  mechanism becomes the mechanism.
