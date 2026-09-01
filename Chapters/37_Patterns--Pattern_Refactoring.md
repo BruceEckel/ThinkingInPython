@@ -9,7 +9,9 @@ applied to patterns rather than single statements.
 It is also a Python lesson.
 Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages:
 single dispatch, closed classes, and types that are not values.
-Python lacks those limitations, so some of those patterns become unnecessary.
+Python's classes stay open, its types are values,
+and `functools.singledispatch` adds an operation from outside a class,
+so some of those patterns become unnecessary.
 This chapter points out each one as the example reaches it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
@@ -27,8 +29,8 @@ and you must recover the type of each piece to sort it.
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically,
-and a `create()` method builds an instance from a material name
-(this is a [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)):
+and a `create()` method builds an instance from a material name,
+the dictionary factory from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 
@@ -89,10 +91,9 @@ so each one can register itself in `Trash.registry` automatically.
 `@dataclass` builds `__init__()` from the bare `weight: float` annotation alone:
 the two `ClassVar` attributes belong to the class, so they stay out of it
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)).
-Each subclass's `value = ...` line creates its own class attribute,
-separate from `Trash.value`, sharing no storage with its siblings,
-and none of them restates the annotation:
-a subclass inherits the declaration along with the name
+Each subclass's `value = ...` line creates a class attribute of its own,
+separate from `Trash.value` and from its siblings'.
+The subclasses omit the annotation because a subclass inherits the declaration along with the name
 ([Class Attributes](09_Foundations--Class_Attributes.md#classvar-and-inheritance)).
 
 Adding a new recyclable type is a single class definition.
@@ -262,16 +263,15 @@ When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Readers of [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md)
-may expect `assert_never()` to make the type checker catch the missed case,
-and here it cannot help.
-Exhaustiveness checking needs a *closed* union,
+may expect `assert_never()` to make the type checker catch the missed case.
+Exhaustiveness checking works on a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
-so no type checker can know the set is complete.
-This is a `match` over an open set,
+so `assert_never()` has nothing to check against here.
+This `match` runs over an open set,
 which [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against.
-When the set is open, sorting must not enumerate it,
-and the next section shows a sorter that doesn't.
+A sorter over an open set has to find the bin without naming any type,
+and the next section shows one that does.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you do dispatch's job by hand.
 
@@ -338,12 +338,12 @@ Two of four pieces reached a bin,
 and the sixty pounds of plastic left no trace in any total on which the plant acts.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
-The registry is not the leak.
-It accepted `Plastic` the moment the `class` statement ran.
-Had the class been missing,
-`create()` would have raised a `KeyError` at the first `Plastic:` line,
-a loud failure at parse time.
-Only the `match` loses trash silently.
+The leak is in the `match`.
+The registry accepted `Plastic` the moment its `class` statement ran,
+and without that `class` statement,
+`create()` would have raised a `KeyError` at the first `Plastic:` line, loudly,
+at parse time.
+The `match` alone loses trash silently.
 
 ## Let a Dictionary Do the Sorting
 
@@ -398,21 +398,21 @@ for kind, items in bins.items():
 `type(t)` is the perfect key because it adapts to new types,
 including ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
-The key is the *exact* class,
-the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
+The key is the *exact* class.
+That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md),
 and it first appeared in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
 but keep it in mind before you subclass a material.
-This is the one place where the two versions disagree:
+Subclasses are the one place where the two sorters disagree:
 `case Aluminum()` matches any subclass,
 so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
 Swapping the `match` for the dictionary is a redesign, not a rename.
 
 The `defaultdict(list)` creates a bin the first time a material turns up.
 `Bins` is an alias for a plain `dict`,
-so a type checker accepts `bins: Bins = {}` just as happily,
+so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
 ## Adding Operations: Visitor, and Why Python Skips It
@@ -431,12 +431,12 @@ In its C++ and Java form a `Visitor` base class declares one overload per materi
 every element grows an `accept()` method,
 and *double dispatch* routes each piece to the correct overload.
 Python has no method overloading, so even writing that down takes work
-(that chapter shows the shape on which the book's version settles).
-Visitor exists because languages like Java and C++ dispatch on only one type at a time and cannot add methods to a class from outside.
-Python has neither limitation.
-The standard library provides `functools.singledispatch`,
-which dispatches on the type of its first argument,
-and any module can register a new type.
+(that chapter shows the shape the book's version settles on).
+Visitor exists because Java and C++ cannot add an operation to a class from outside,
+and because their method calls dispatch on one type at a time,
+so reaching the right overload takes two calls.
+In Python, `functools.singledispatch` chooses the implementation by the type of its first argument in one call,
+and any module can register an implementation for a new type.
 
 In Python, a single-dispatch function implements *Visitor*:
 
@@ -479,13 +479,13 @@ a material nobody registers gets the default answer,
 with no exception at runtime and no complaint from the type checker.
 Here "no special handling" is a genuine answer, so the fallback earns its keep.
 When no default makes sense,
-that chapter advises making the base function raise `NotImplementedError`,
+the Visitor chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 Adding another operation that varies by material means writing another single-dispatch function.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
-Python does not escape the expression problem.
-It makes both sides of it cost a line instead of an edit spread across classes.
+Python still has the expression problem.
+It makes both sides of the problem cost a line instead of an edit spread across classes.
 
 Compare this with the classic form: no `Visitor` class,
 no `accept()` method bolted onto every material,
@@ -496,13 +496,13 @@ The chapter now holds two kinds of dispatch that disagree about subclasses.
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
 so that same piece answers with `Aluminum`'s note.
-Neither is wrong for its job,
+Each is right for its job,
 and the difference is the one [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 draws between a table keyed by class and dispatch that follows inheritance.
 
-When the operation is the same for every type, you do not need single dispatch.
-The earlier `sum_value()` is an ordinary function.
-Use `singledispatch` only when the behavior differs by type.
+`singledispatch` is for behavior that differs by type.
+The earlier `sum_value()` does the same thing for every type,
+so it stays an ordinary function.
 For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
@@ -512,8 +512,8 @@ provides the same dispatch in method form.
 Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that, but not the only one.
 The deeper skill is spotting the *vector of change*
-([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern))
-in a problem (here, new types versus new operations)
+([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern)),
+here new types versus new operations,
 and choosing the lightest construct that isolates it.
 This chapter discovered its two vectors one requirement at a time,
 rather than predicting them up front,

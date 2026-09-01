@@ -14,12 +14,13 @@ and several exist only to work around limits of a particular language.
 The body of this book argues that a number of them are unnecessary in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
-The tables still follow each source's own grouping,
-so each name sits where its source puts it,
-including the [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy):
-that chapter calls *Creational* straightforward and questions the other two.
+The tables follow each source's own grouping,
+so each name sits where its source puts it.
+That includes GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
+which [Design Patterns](21_Patterns--Design_Patterns.md)
+accepts for *Creational* and questions for the other two.
 Each table lists its rows alphabetically,
-which for the classic patterns is also GoF's own order.
+and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the pattern appears only in this catalog.
 
@@ -47,7 +48,7 @@ Use this one when you know the problem but not the name.
 | Pattern | Intent |
 |---------|--------|
 | [Abstract Factory](27_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
-| [Builder](27_Patterns--Factory.md#builder) | Separate constructing a complex object from its representation, building it in steps. |
+| [Builder](27_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the step-by-step assembly separate from the finished object. |
 | [Factory Method](27_Patterns--Factory.md#simple-factory-method) | Defer instantiation to a method so subclasses choose the concrete type. |
 | [Prototype](27_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |
 | [Singleton](24_Patterns--Singleton.md) | Ensure a class has one instance with a single point of access. |
@@ -125,15 +126,15 @@ Use this one when you know the problem but not the name.
 | Identity Map | Load each object only once per session. |
 | Lazy Load | Defer loading a persisted object until something needs it. |
 | Money | Represent monetary amounts together with their currency. |
-| Plugin | Choose behavior with classes named at configuration time. |
-| [Registry](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A well-known object others use to find services or data. |
-| Repository | Mediate the domain and data with a collection-like query interface. |
+| Plugin | Select an implementation by naming its class in configuration rather than in code. |
+| [Registry](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | Keep one well-known object where the rest of the program looks up services or data. |
+| Repository | Stand between the domain and the data store, presenting stored objects as a queryable collection. |
 | Service Layer | Define an application boundary as a set of operations. |
 | [Special Case](20_Patterns--Rethinking_Objects.md#null-object) | Supply a subclass for a special case instead of scattering null checks. |
 | Table Module | Let one class handle all rows of a table. |
 | Transaction Script | Organize logic as one procedure per request. |
 | Unit of Work | Track changes in a transaction and commit them together. |
-| [Value Object](12_Techniques--Data_Classes_as_Types.md#immutability) | A small immutable object compared by value, not identity. |
+| [Value Object](12_Techniques--Data_Classes_as_Types.md#immutability) | Model a small value as an immutable object compared by value, not identity. |
 
 ## Integration and Messaging (Hohpe and Woolf)
 
@@ -142,7 +143,7 @@ Use this one when you know the problem but not the name.
 | Aggregator | Combine related messages into one. |
 | Content-Based Router | Route by inspecting the message content. |
 | Dead Letter Channel | Hold messages that no one can deliver or process. |
-| Message | A packet of data sent over a channel. |
+| Message | Package data to send over a channel. |
 | Message Channel | Connect senders and receivers through a logical pipe. |
 | Message Endpoint | Connect an application to the messaging system. |
 | Message Router | Send a message to a destination chosen at runtime. |
@@ -189,7 +190,7 @@ Use this one when you know the problem but not the name.
 | [Null Object](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
 | [Partial Application](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
-| Pointer to Implementation (Pimpl) | Hide a class's implementation behind an indirection to cut compile coupling. |
+| Pointer to Implementation (Pimpl) | Hide a class's implementation behind a pointer so changing it recompiles less. |
 | [Resource Acquisition Is Initialization (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
 | [Service Locator](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
@@ -217,4 +218,4 @@ Python includes the piece their inventors set out to supply.
 What survives the subtraction is the intent, not the structure.
 [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 argues this in general.
-Each chapter above works one case.
+Each linked chapter shows one case.

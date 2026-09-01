@@ -16,7 +16,7 @@ so it can live in the shared object.
 where the context supplies it.
 Second, route construction through a factory that returns the existing instance for a given value.
 
-Handing out one object under many names is safe only when nobody can change it,
+Sharing one object under many names is safe when the object stays the same for everyone,
 so a flyweight must be immutable
 (see [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
 
@@ -35,17 +35,16 @@ print(low is low2, high is high2)
 Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
 The cache covers a fixed range of values chosen at CPython build time.
-The number usually quoted is `-5` through `256`, but that is not a guarantee:
-the build used here caches up to 1024,
-which is why the uncached example is `100000` and not `257`.
-Calling `int("...")` on a string, not a literal, matters here.
-If you write the literals directly, `low, low2 = 256, 256`,
-the demonstration silently breaks:
-the compiler pools equal constants within a code object,
-so even `100000 is 100000` prints `True`,
-sharing that comes from constant folding rather than from the integer cache.
-Parsing the value out of a string at runtime defeats the compiler's pooling and leaves only the cache to explain any sharing.
-(Python warns about `is` on a literal because the compiler makes the answer misleading.)
+The range usually quoted is `-5` through `256`, but each build picks its own.
+This one caches up to 1024,
+so the example that needs a fresh object uses `100000` rather than `257`.
+The listing parses each value from a string for a reason.
+The compiler pools equal constants within one code object, so with literals,
+`low, low2 = 256, 256`, even `100000 is 100000` prints `True`,
+and that sharing comes from constant folding rather than from the integer cache.
+Parsing at runtime keeps the compiler out,
+so any sharing that remains comes from the cache.
+(That pooling is also why Python warns about `is` on a literal.)
 
 String *interning* keeps one copy of identifier-like strings.
 `sys.intern()` gives you the string pool directly:
@@ -143,7 +142,7 @@ if __name__ == "__main__":
 Twenty-four cells, three objects.
 `[*row for row in field]` flattens the grid into one list of cells,
 the comprehension unpacking from [Comprehensions](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
-Counting `id(t)` rather than `len(set(cells))` is deliberate.
+The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 `Tile` is a frozen data class,
 so its generated `__eq__()` compares field values,
 and a set of cells would collapse to three with or without sharing.
@@ -166,10 +165,9 @@ the type checker rejects the mismatch.
 so the untrusted boundary is `to_symbol()`,
 the one place raw text meets the checked type.
 It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
-The type checker reads that guard.
-`SPECS` has key type `Symbol`,
-so reaching the line below means `char not in SPECS` was false,
-which narrows `char` to `Symbol`,
+The type checker reads that guard too.
+`SPECS` has key type `Symbol`, so past the guard `char` is a key of `SPECS`,
+the checker narrows it to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a `cast()` would assert
 (see [Static Types](08_Foundations--Static_Types.md#typing-decorators-and-directives)).
@@ -216,8 +214,8 @@ A factory function like `tile()` has a visibly different name and call syntax,
 which warns callers of something unusual.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__()` instead.
-This is the same maneuver the [Singleton](24_Patterns--Singleton.md#the-classic-implementations)
-chapter uses.
+Hiding the pool in `__new__()` is the maneuver [Singleton](24_Patterns--Singleton.md#the-classic-implementations)
+uses.
 Here the cache keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*:
 
@@ -268,42 +266,42 @@ The damage is invisible at first,
 since re-assigning the same components changes nothing.
 It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect:
 both run again on an object that was already finished.
-`Color` loses the `__repr__()` and `__eq__()` that `Tile` gets,
-so printing a `Color` falls back to the default `object.__repr__()`.
+`Tile`'s `@dataclass` generated its `__repr__()` and `__eq__()`;
+`Color` has only `object`'s versions,
+so printing a `Color` shows the default `object.__repr__()`.
 The missing `__eq__()` costs less than it appears:
 for a perfectly interned type, equal values are the same object,
 so the default identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods, at a price:
 the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,
 and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
-A `defaultdict` cannot replace `_pool` either:
-it calls its `default_factory` with no arguments,
-so the factory cannot see the components the missing `Color` needs.
+A `defaultdict` calls its `default_factory` with no arguments,
+and building a `Color` needs the three components,
+so `_pool` stays a plain dict with an explicit `get()`.
 
-`_pool` keys on the components alone, and every subclass inherits it,
-so no one can subclass `Color` safely.
-A subclass would collide with it,
-receiving whichever object asked for those components first.
+`_pool` keys on the components alone, and every subclass shares the one dict,
+so a subclass and `Color` asking for the same components receive whichever object asked first.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
-The two forms are not quite interchangeable.
-`tile()` interns only the calls that go through it,
-so `Tile("~", "water", False)` still builds a separate object,
-equal to the pooled water tile but not the same one.
-`Color(...)` has no such gap, because every construction goes through the pool.
-The difference matters when you want to trust `is` instead of `==`.
-Unless you need the constructor syntax or that guarantee,
+The two forms differ in one guarantee.
+`tile()` interns the calls that go through it,
+and a direct `Tile("~", "water", False)` bypasses it,
+building a second object equal to the pooled water tile.
+`Color(...)` routes every construction through the pool,
+so `is` is as trustworthy as `==`.
+That guarantee, or the constructor syntax, is what the bookkeeping buys.
+When you need neither,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
 One more property carries over from [Singleton](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object,
 one wins the pool, and identity between their two results fails.
-`@cache` is not exempt.
-Being C code in the standard library invites the assumption that it is atomic,
+`@cache` races the same way.
+Its C implementation invites the assumption that one call is atomic,
 but the lookup, the call to your function,
-and the store are three separate steps.
-Threads that all miss on the same key each run the function and each keep their own result.
+and the store are three separate steps,
+so threads that all miss on the same key each run the function and each keep their own result.
 When flyweights meet threads,
 populate the pool eagerly or guard the insert with a lock.
 
@@ -317,7 +315,7 @@ When the universe grows without bound, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
 the live-instance registry from [Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-fixes this.
+fixes the leak.
 It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
 
@@ -363,15 +361,16 @@ at the price of keeping the most recent `n` alive whether or not anyone uses the
 Eviction also weakens the sharing guarantee:
 requesting an evicted value builds a fresh object,
 equal to any surviving original but not the same one.
-The weak pool cannot produce such a pair,
-because its entry lives as long as anyone holds the object.
+The weak pool never produces such a pair:
+its entry lives exactly as long as someone holds the object.
 
 Flyweight cuts the number of objects, and `slots=True`
 ([Performance](18_Techniques--Performance.md#slots)) cuts the size of each one,
 so the two are worth combining once memory is the point.
-They collide at one spot:
-a slotted class has no `__weakref__` unless you also pass `weakref_slot=True`,
-so slotting `Name` without it makes `_pool[text] = found` raise a `TypeError`.
+They collide at one spot.
+A slotted class drops the `__weakref__` slot a weak reference needs,
+so slotting `Name` makes `_pool[text] = found` raise a `TypeError`.
+`weakref_slot=True` puts that slot back.
 
 ```python
 # test_weak_pool.py
@@ -429,8 +428,8 @@ if __name__ == "__main__":
 It declares a per-member attribute, the same role a dataclass field plays,
 except `__new__()` assigns it by hand instead of a generated `__init__()`.
 `__new__()` runs before any member becomes visible,
-so nothing can observe an unset `walkable`.
-It needs no default or sentinel.
+so every member has its `walkable` by the time anything can read it,
+and the annotation needs no default or sentinel.
 
 Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
@@ -443,8 +442,8 @@ With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,
 skipping `Tile.__new__()` so the call does not recurse.
-`_value_` is not an ordinary attribute name.
-Enum's metaclass reads it to build the `Tile(".")` lookup table and the member's `repr()`,
+`_value_` is a name Enum's metaclass reads,
+to build the `Tile(".")` lookup table and the member's `repr()`,
 so `__new__()` must assign to that exact name rather than something like `_symbol_`.
 
 Name, symbol, and attribute access all reach the same shared member.

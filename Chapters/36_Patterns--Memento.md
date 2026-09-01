@@ -11,8 +11,8 @@ stores mementos and hands one back when asked, without looking inside.
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
 so you must copy the past and guard it.
-Python offers the classic form when you need it,
-and removes the need for it when state is immutable.
+Python has the classic form when you need it,
+and immutable state removes the need.
 
 ## A Snapshot Is Not a Reference
 
@@ -116,9 +116,9 @@ if __name__ == "__main__":
 ```
 
 The caretaker's side of the contract is restraint.
-Whoever holds `checkpoint` stores it and gives it back.
-It does not reach inside and edit the strokes.
-Languages with access control enforce this opacity.
+Whoever holds `checkpoint` stores it and gives it back,
+and never reaches inside to edit the strokes.
+Languages with access control enforce that restraint.
 In Python it is a convention,
 though freezing the memento means an accidental edit
 (swapping the snapshot's strokes for different ones) fails loudly.
@@ -128,7 +128,7 @@ Every call site would still type-check.
 But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
-`NewType("Memento", tuple[str, ...])` answers only the type checker.
+`NewType("Memento", tuple[str, ...])` exists only for the type checker.
 It vanishes at runtime, so the caretaker still holds a plain tuple it can index,
 unpack, or build from scratch.
 Wrapping the tuple in a one-field data class gives `Memento` an identity that exists while the program runs.
@@ -164,7 +164,7 @@ def test_drawing_after_restore_spares_memento() -> None:
     assert checkpoint.strokes == ()
 ```
 
-The third test checks for the subtle bug.
+The third test checks for the sharing bug.
 If the memento shares a mutable list with the sketch,
 as in the variant that exercise 4 explores,
 drawing after a restore corrupts the snapshot.
@@ -234,11 +234,11 @@ so a history of `k` edits costs pointers, not `k` copies of the text.
 That is why snapshots stay cheap, and why they are not free:
 a state whose changed field is large pays for that field on every edit.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
-which would make the identity check print `True` whether the tuple shared the string or rebuilt it.
+and interning would make the identity check print `True` even for a copied string.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-makes this argument.
-That section is also why `strokes` is a tuple and not a list:
+makes this argument about sharing.
+That section also explains why `strokes` is a tuple rather than a list:
 `frozen=True` guards the binding, not the object,
 so a frozen data class holding a list still lets that list change underneath it,
 as `frozen_leaky.py` shows there.
@@ -329,9 +329,10 @@ because acting after an undo starts a new timeline.
 Redo can no longer reach the states you undid, which is how editors behave.
 `undo()` and `redo()` just shuttle the present between the two stacks.
 Every change must go through `do()`.
-A new state built from `history.present` and never handed back is not in the history,
-and since nothing mutates, nothing else shows it is missing.
-Neither checks its own precondition:
+Build a new state from `history.present` and keep it without handing it back,
+and the history omits it; because nothing mutates,
+every other state stays valid and the gap goes unnoticed.
+`undo()` and `redo()` check no precondition of their own:
 undoing with no past raises `IndexError` from `pop()`.
 `can_undo()` and `can_redo()` exist so callers ask first,
 which is how an editor knows to gray out the menu item.
@@ -340,7 +341,7 @@ so it never interprets anything.
 That works for any state type, from `int` to a full `Drawing`,
 with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place.
-It is a stack of aliases, the bug that opened this chapter.
+A `History` of lists is a stack of aliases, the bug that opened this chapter.
 
 ```python
 # test_history.py
@@ -387,8 +388,8 @@ Editors face a narrower one.
 Undo the drawing, but keep the rename.
 `History` cannot express that,
 because it moves whole states and never looks inside them.
-The state must answer it,
-and for any immutable value `copy.replace()` is the answer:
+The answer has to come from the state itself,
+and for any immutable value `copy.replace()` supplies it:
 
 ```python
 # partial_restore.py
@@ -413,7 +414,7 @@ print(history.undo())
 ```
 
 `checkpoint` names a past `Drawing`,
-which is the whole trick immutability makes possible.
+and naming a past state is the whole trick immutability makes possible.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
 It goes through `do()` like any other action,
@@ -422,9 +423,8 @@ so the partial restore is undoable, as the last line shows.
 `copy.replace()` is the general version of `dataclasses.replace()`,
 which [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 describes.
-Using it here rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds,
-since `NamedTuple`, `datetime`,
-and any class defining `__replace__()` all accept it.
+`copy.replace()` rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds:
+`NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
 
 ## Mementos That Outlive the Process
 
@@ -460,8 +460,8 @@ not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 What breaks is whatever later touches a field the bytes never carried.
-Splitting the class into its own module keeps the simulation faithful,
-since in reality a class drifts between two separate runs of a program,
+The listing simulates that drift,
+and puts the class in its own module because in reality a class drifts between two runs of a program,
 not inside one script:
 
 ```python
@@ -508,13 +508,14 @@ with a field added between the save and the load.
 The type checker flags that reassignment as unsound,
 so it carries a `# type: ignore`.
 No practical annotation declares that `SketchV1` can become a different class.
-`pickle.loads()` never calls `__init__()`.
-It looks up the class by the name pickle recorded, `sketch_v1.SketchV1`.
+`pickle.loads()` looks up the class by the name pickle recorded,
+`sketch_v1.SketchV1`.
 That name now points at `SketchV2`.
-`pickle.loads()` builds a bare `SketchV2` and copies in only the fields the old bytes had.
+`pickle.loads()` builds a bare `SketchV2`, skipping `__init__()`,
+and copies in only the fields the old bytes had.
 The fields go straight into the object's `__dict__`,
-so `frozen=True` does not interfere: freezing guards attribute assignment,
-and pickle does not assign attributes.
+so `frozen=True` stays out of the way: freezing guards attribute assignment,
+and pickle writes the dictionary directly.
 `title` is absent, since the old bytes never had one.
 The same shortcut skips `__post_init__()`,
 so a memento saved before a validated field existed can load a value nothing ever validated.

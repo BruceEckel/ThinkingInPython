@@ -38,8 +38,8 @@ Nothing interrupts a rat partway through an update.
 A *rat* explores.
 Each rat runs as its own task.
 From its current cell it looks at the four neighbors and tries to claim the open ones.
-By claiming a cell, a rat both marks it visited and reserves it.
-This way, no two rats cover the same ground.
+Claiming a cell both marks it visited and reserves it,
+so no two rats cover the same ground.
 When a rat finds more than one open neighbor,
 it keeps the first for itself and spawns a new rat down each of the others,
 then yields so its siblings can run.
@@ -48,10 +48,10 @@ When the last rat dies, the pack has mapped every cell reachable from the entry.
 
 ### The Rat and the Blackboard
 
-The rat does not import the blackboard.
+The rat never imports the blackboard.
 It needs only an object with matching methods,
 so a `Protocol` describes what it expects.
-This is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
+That `Protocol` is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 
@@ -103,9 +103,9 @@ class Rat:
             await asyncio.sleep(0)
 ```
 
-Initializing `number` requires calling `blackboard.next_number()`,
-a side-effecting method, not a static default.
-Marking it `field(init=False)` leaves it out of the generated `__init__`.
+`number` comes from a call to `blackboard.next_number()`,
+which advances a counter, so no static default can supply it.
+`field(init=False)` leaves `number` out of the generated `__init__`.
 `__post_init__` runs immediately after that `__init__` finishes,
 when `blackboard`, `x`, and `y` already hold their values,
 so it fills in `number` and logs the rat's start.
@@ -240,12 +240,12 @@ class Blackboard:
         return "\n".join(lines)
 ```
 
-A `TaskGroup` does not close until every task inside it has finished,
+A `TaskGroup` stays open until every task inside it has finished,
 including tasks created after the block began.
 That is the shape of this problem: each rat can create more rats.
-A single `asyncio.gather(*self.tasks)` would not do,
+A single `asyncio.gather(*self.tasks)` would miss most of them,
 because `gather()` fixes its argument list at the moment of the call,
-and half the rats do not exist yet.
+before those rats exist.
 
 `group`'s declaration is `field(init=False)`, and only `explore()` assigns it,
 the same declaration-without-assignment the robot example later in this chapter uses for `Robot.room`.
@@ -276,9 +276,10 @@ naming the file's path, drops out and the rest is the maze.
 *********************
 ```
 
-Running it turns the rats loose,
+Running the demo turns the rats loose,
 then prints the first eight log messages and the mapped maze.
-The log shows what the map cannot: rat 1 spawns rat 2 and then dies before it,
+The log shows what the map cannot:
+rat 1 spawns rat 2 and then dies before rat 2 does,
 and numbers arrive in spawn order rather than completion order.
 The full log runs to eighteen messages, two per rat.
 
@@ -383,7 +384,7 @@ the model-view split of [Observer](30_Patterns--Observer.md#a-visual-example-of-
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
-The harness skips it, like every windowed view in this book
+The harness skips this view, like every windowed view in this book
 (`tools/data/norun.txt` lists all three of this chapter's views):
 
 ```python
@@ -566,23 +567,20 @@ def item_factory(symbol: str) -> Item:
 
 `world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
 so `from world import Room` here is circular.
-`if TYPE_CHECKING:` is `False` at runtime, so that import never runs,
-and no cycle forms.
-It is `True` only for a type checker reading the file.
+`TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
+so that import never runs and no cycle forms.
 Every use of `Room` below is an annotation (`room: Room`, `-> Room`),
 never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
-The code only declares `room`, writing `room: Room` with no value.
-That line stores nothing, not even `None`.
-It is a declaration: it tells the type checker that a `Room` belongs there,
-which `GameBuilder` guarantees when it places the robot and sets `robot.room`.
-The attribute does not exist until then,
-so reading it earlier raises an `AttributeError`.
-The builder runs first, so nothing reads it earlier.
+`room` gets only a declaration, `room: Room` with no value.
+That line tells the type checker a `Room` belongs there and stores nothing at runtime.
+`GameBuilder` creates the attribute when it places the robot and sets `robot.room`.
+Reading `room` before then raises an `AttributeError`,
+and the builder runs first, so every read comes after.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
-so no code that reads `room` needs a `None` check.
+so code that reads `room` skips the `None` check.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
@@ -825,10 +823,10 @@ The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
 
 Stage 3 pairs the teleports with a small idiom.
-`pairs = iter(teleports)` makes one iterator,
+The sort by target letter puts each pair of partners side by side.
+Then `pairs = iter(teleports)` makes one iterator,
 and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
 so each pass consumes two rooms: the first and second `a`, then the two `b`s.
-The sort by target letter lines those partners up beforehand.
 Avoid `zip(teleports, teleports)`,
 which walks two independent passes over the list and pairs every room with itself.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
@@ -978,11 +976,11 @@ The model needs almost nothing.
 Physics supplies the formula, an approximation for a plate with free edges.
 Treat it as given.
 All that matters here is its shape.
-It is zero along curves, and those curves are the nodal lines.
+The field is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
 `step()` is the entire simulation.
 Every grain takes one random step,
-and the plate's vibration at that grain's location scales it.
+and the plate's vibration at that grain's location scales the step.
 Grains never look at each other and remember nothing.
 Nothing in the code knows the pattern exists.
 
