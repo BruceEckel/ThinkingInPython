@@ -1,7 +1,7 @@
 # Comprehensions
 
-*Comprehensions* (first introduced in [Control Flow](04_Foundations--Control_Flow.md#comprehensions))
-build one collection from another in a single expression.
+*Comprehensions* build one collection from another in a single expression
+([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduced them).
 The idea originated in mathematical set-builder notation,
 and passed into functional programming.
 Haskell had list comprehensions, and Python borrowed them.
@@ -96,13 +96,13 @@ and its brackets show at a glance that it produces a list.
 `map()` and `filter()` pay off when the function already exists,
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
 [Functional Foundations](40_Functional--Foundations.md) returns to the choice.
-The `lambda` makes the versions above worse, not `map()`.
+So the `lambda` is what makes `map_and_filter.py` worse, not `map()`.
 
 The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
 so the type checker still sees `int | str` coming out and rejects `e ** 2`.
 The comprehension's `if isinstance(e, int)` does narrow,
-which is why `list_comprehension.py` needs no such comment.
+so `list_comprehension.py` needs no such comment.
 `filter()` can narrow,
 but only when its predicate is a named function annotated to return `TypeIs[int]` or `TypeGuard[int]` rather than `bool`
 (the [narrowing summary](08_Foundations--Static_Types.md#type-narrowing) covers the pair).
@@ -129,13 +129,14 @@ so the outer `e` survives untouched.
 A `for` loop behaves the opposite way:
 its loop variable stays behind in the enclosing scope after the loop ends.
 
-The walrus operator is the exception.
+The walrus operator is the exception to that scope.
 `total := total + n` assigns in the enclosing scope,
 so `total` holds the running sum after the comprehension finishes.
-That is deliberate, and it lets a comprehension accumulate a value without a separate loop.
-The walrus cannot rebind the comprehension's own iteration variable,
-and it cannot appear in a comprehension inside a class body.
-Both are a `SyntaxError`.
+That leak is deliberate:
+it lets a comprehension accumulate a value without a separate loop.
+Two uses are a `SyntaxError`:
+a walrus that rebinds the comprehension's own iteration variable,
+and a walrus in a comprehension inside a class body.
 
 ## Set Comprehensions
 
@@ -170,7 +171,7 @@ print(unique == same)
 ```
 
 `same` builds a list with a list comprehension, then passes it to `set()`.
-It produces the same result,
+The result is the same,
 but the throwaway list costs time and memory that the set comprehension avoids.
 
 ## Dictionary Comprehensions
@@ -299,7 +300,7 @@ print([
 #: ['doubled(10) = 20', 'squared(3) = 9']
 ```
 
-`values` has a third element, and `zip()` drops it, as it did above.
+`values` has a third element, and `zip()` drops it, as in `zip_pairs.py`.
 
 Here's a two-level list comprehension using `Path.walk()`:
 
@@ -343,13 +344,13 @@ A `with` block, unlike a function body, does not create a new scope.
 The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
-By then the directory no longer exists.
-The comprehension finishes building `py_paths` as strings while the directory still exists,
-so nothing later needs the files.
-Turning those brackets into parentheses would break it:
+The comprehension finishes building `py_paths`, as strings,
+while the directory still exists, so by the time that `for` loop runs,
+after the directory has disappeared, nothing needs the files.
+Turning those brackets into parentheses would break the program:
 a generator expression would not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
-[Generator Expressions](#generator-expressions) returns to this.
+[Generator Expressions](#generator-expressions) returns to that gap.
 
 ## Breaking Up a Complex Comprehension
 
@@ -398,8 +399,8 @@ and how each line renders.
 A comprehension nested inside `sorted()`,
 itself nested inside the outer comprehension, does four jobs in one expression.
 
-Splitting it into named steps removes none of the logic,
-but each step now states its own purpose:
+Split into named steps, the logic is all still there,
+and each step now states its own purpose:
 
 ```python
 # comprehension_steps.py
@@ -436,7 +437,7 @@ Use this split whenever a comprehension needs a comment to explain what it does.
 
 A comprehension's output expression can be any expression,
 including a call with a side effect, such as `print()`.
-Nothing stops you from using a comprehension to run code and throw away the result it builds:
+A comprehension can run code for its side effect and throw away the list it builds:
 
 ```python
 # comprehension_side_effects.py
@@ -452,7 +453,7 @@ The comprehension calls `print()` for its side effect.
 `print()` returns `None`, so `wasted` ends up holding three `None`s,
 a list built and immediately discarded.
 Worse, a reader scanning `[...]` expects a meaningful collection,
-and this is a loop written with the wrong punctuation.
+and this comprehension is a loop written with the wrong punctuation.
 
 The idiomatic version says what it does:
 
@@ -516,11 +517,10 @@ print(initials)
 #: {'pol': 'p', 'parrot': 'p', 'fjord': 'f', 'ex': 'e'}
 ```
 
-No lazy `set` or `dict` exists.
-A set or dict must hold every element,
-so `set(...)` or `dict(...)` consumes the whole generator immediately.
-Neither saves anything over the set comprehension `{len(w) for w in words}` or the dict comprehension `{w: w[0] for w in words}`,
-which read more directly and are the better choice.
+A set or dict must hold every element, so no lazy `set` or `dict` exists:
+`set(...)` or `dict(...)` consumes the whole generator immediately.
+The set comprehension `{len(w) for w in words}` and the dict comprehension `{w: w[0] for w in words}` build the same results,
+read more directly, and are the better choice.
 
 Use a generator expression when the consumer takes values one at a time and does not need them all at once,
 such as `sum()`, `any()`, `all()`, `min()`, or `max()`:
@@ -539,10 +539,10 @@ print(max(len(str(n)) for n in nums))
 
 None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
-`str.join()` does not belong on that list: it needs two passes,
+`str.join()` is the exception: it needs two passes,
 one to size the result and one to fill it,
-so it converts its argument to a list first.
-A generator expression saves nothing over a list comprehension there.
+so it converts its argument to a list first,
+and a generator expression saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
 If you add a second argument, it does:
@@ -551,7 +551,7 @@ and `sum((n * n for n in nums), 0)` is the fix.
 
 `genexp_consumers.py` iterates `nums` three times because `range` is re-iterable:
 each `for` over it starts again at zero.
-A generator expression is not:
+A generator expression is not re-iterable:
 
 ```python
 # spent_generator.py
@@ -571,8 +571,8 @@ with no exception to say the question was never asked.
 When you must traverse something twice,
 either materialize it with `list()` or write the generator expression again.
 
-A generator expression does not defer everything.
-Creating one evaluates a single thing immediately, the outermost iterable:
+A generator expression defers everything but one thing.
+Creating one evaluates the outermost iterable immediately:
 
 ```python
 # genexp_timing.py
@@ -593,10 +593,10 @@ print(list(gen))
 `source()` runs as Python builds the generator expression,
 before the line below it prints.
 The output expression waits,
-so the code reads `factor` when `list()` pulls the values rather than when you wrote the generator,
+so the code reads `factor` when `list()` pulls the values rather than at the generator's creation,
 and the answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
-This is also why `path_walk_comprehension.py` uses brackets.
+That gap is also why `path_walk_comprehension.py` uses brackets.
 Its outermost iterable, `root.walk()`, would run at creation,
 but the walking and the filtering would wait for a consumer that arrives after the directory disappears.
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
@@ -648,17 +648,16 @@ It is a shallow flatten, splicing only the outer iterable,
 so the nested `[2, 3]` above comes through unflattened.
 `**` does the same for dictionaries,
 merging each mapping with later keys winning.
-Braces plus `*` build a set instead,
-the one place where the colon does not decide between a set and a dict,
-because neither form has one.
-The unpacking operator decides instead.
+With braces, `*` builds a set and `**` builds a dict.
+Everywhere else the colon decides between the two;
+here neither form has a colon, so the unpacking operator decides.
 The asynchronous generator form (`(*a async for a in agen())`)
 works the same way ([Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics) introduces `async` syntax).
 
 ## Choosing a Form
 
 The four forms are one expression with different delimiters,
-which is why learning the list form teaches all four.
+and that is why learning the list form teaches all four.
 Brackets when you want a list.
 Braces for a set, or for a dict when a colon separates a key from a value.
 Parentheses when the consumer takes values one at a time and does not need them all at once.

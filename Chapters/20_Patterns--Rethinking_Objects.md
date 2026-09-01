@@ -31,8 +31,8 @@ fit naturally.
 
 *Smalltalk* took the other path: everything is an object,
 and you act on them only by sending messages, always late-bound.
-It was an emphatically dynamic,
-runtime world where you built programs by finding the closest existing object and inheriting from it to add behavior.
+Smalltalk was emphatically dynamic:
+you built a program at runtime by finding the closest existing object and inheriting from it to add behavior.
 That style guarantees nothing about substitutability.
 
 *C++* drew from Simula.
@@ -43,7 +43,7 @@ and it brought object-oriented programming and exceptions into the mainstream.
 Everything lives inside a class, even when all you need is a function.
 Java is statically compiled, so substitutability matters,
 yet it encouraged reusing code by inheriting implementation,
-which pulls in the other direction.
+and that reuse pulls in the other direction.
 
 Newer languages backed away from inheritance.
 Rust, Swift, Go, and Kotlin lean on data structures over deep class hierarchies.
@@ -66,21 +66,21 @@ It returns a result the caller can use where it expects the base's result,
 and raises no surprising exceptions.
 When subclasses obey it,
 code you write against the base class works unchanged on any of them.
-This makes polymorphism,
+That obedience is what makes polymorphism,
 and patterns like the [Template Method](25_Patterns--Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
-The base class calls a method and trusts every subclass to stand in for it.
+The base class calls a method and trusts every subclass to stand in for the base.
 
 Python has no such compiler,
 but the line between what a tool checks and what it cannot falls in the same place.
 A type checker reads an override's signature and reports one that no longer fits,
 especially when [`@override`](07_Foundations--Classes.md#marking-overrides-with-override)
 marks the intent.
-No tool reads the behavior behind the signature.
-Nothing stops a subclass from breaking the base class contract while matching its signature perfectly.
-The interpreter runs code that violates the LSP without objection.
-That code may or may not fail at runtime:
+No tool reads the behavior behind the signature,
+so a subclass can break the base class contract while matching its signature perfectly.
+The interpreter runs such code without objection,
+and it may or may not fail at runtime:
 
 ```python
 # lsp_violation.py
@@ -136,7 +136,7 @@ and ask of each what Python delivers and what it costs.
 The first OOP promise is encapsulation: hide the data,
 expose it only through methods you control.
 Python hides a field with a leading underscore and a read-only property.
-This does not work as well as it looks.
+That hiding is weaker than it looks.
 A getter that returns a mutable object hands the caller a reference to the underlying internals:
 
 ```python
@@ -183,8 +183,8 @@ but cannot stop the caller from mutating the list it returns.
 ## Plugging Leaks Is Tedious
 
 You can stop the leak by copying everything a getter returns.
-It works, but every getter must remember to do it,
-and so does every getter in every subclass, forever:
+Copying works, but every getter must remember to copy,
+and so must every getter in every subclass, forever:
 
 ```python
 # plugged.py
@@ -229,8 +229,8 @@ but its generated `__repr__` prints `_numbers` and `_bob` directly,
 leaking the internals yet again.
 
 The two getters also copy differently, and the difference is its own trap.
-`list.copy()` is *shallow*: it duplicates the container but shares the elements,
-which is safe here only because the elements are immutable `int`s.
+`list.copy()` is *shallow*: it duplicates the container but shares the elements.
+That sharing is safe here because the elements are immutable `int`s.
 `Bob` gets `deepcopy()`,
 which recursively copies everything the object references,
 the conservative choice when a field's own fields might be mutable.
@@ -337,8 +337,8 @@ Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
 The listing shows all three side by side: the rebinding `frozen=True` catches,
-and the mutation and the failed hash it does not.
-That is why `immutable.py` needs those two changes.
+and the mutation and the failed hash that get past it.
+That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
@@ -385,17 +385,15 @@ When you fetch it from the class instead of from an instance,
 and the call passes `p1` as the first argument.
 `p1.distance_to(p2)` is shorthand for that call.
 The dot fills in `self`.
-The function reads the same and computes the same.
-It is not worse, and it has an advantage.
-It need not live inside `Point`.
+The function reads the same and computes the same, and it has one advantage:
+it can live outside `Point`.
 
 ## Protocols Generalize, Composition Adapts
 
-When the function does not belong to a class,
-it can work on anything shaped like a point.
+A function outside any class can work on anything shaped like a point.
 A `Protocol` describes that shape,
 and any type with matching attributes satisfies it, without inheritance.
-This is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
+That matching is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 When someone hands you a type that does not fit, you adapt it by composition,
 not inheritance:
 
@@ -446,7 +444,7 @@ if __name__ == "__main__":
 ```
 
 `Point` and `PairCoord` share no base class.
-They both have `x` and `y`, which is all `distance()` requires.
+Both have `x` and `y`, and those two attributes are all `distance()` requires.
 `Coord` declares `x` and `y` as properties rather than as bare `x: float` annotations.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
@@ -483,10 +481,10 @@ print(len(counted), counted.appends)
 
 `list.extend()` appends its items without calling `append()`,
 so the count is wrong the moment anyone uses the base class's other method.
-Nothing in the subclass is incorrect.
+The subclass is correct line by line.
 It inherits an implementation and now depends on that implementation's details,
-which is a fact about `list` that no signature records and no type checker reports.
-This is the *fragile base class* problem:
+a dependence no signature records and no type checker reports.
+That dependence is the *fragile base class* problem:
 a base class cannot change its own internals without risking every subclass that came to depend on them.
 
 Composition answers it by delegation.
@@ -520,11 +518,11 @@ Nothing arrives from a base class, so nothing slips past the counter:
 the only way into `items` is a method this class wrote.
 `CountingBox` forwards every operation by hand.
 `CountingList` inherits hundreds it didn't write, and gets one wrong.
-Composition does not make the counting bug impossible.
-If `extend()` calls `self.items.extend(more)` instead of going through `append()`,
-the count is still wrong.
-The difference is where the bug lives: in the class you read,
-not in `list` internals hidden in `CountingList`.
+Composition still allows the counting bug.
+Write `extend()` as `self.items.extend(more)` instead of going through `append()`,
+and the count is wrong again.
+What changes is where the bug lives: in the class you read,
+rather than in `list` internals hidden behind `CountingList`.
 
 Composition does more than repair a broken subclass.
 A type holds other types as fields,
@@ -726,7 +724,7 @@ if __name__ == "__main__":
 ```
 
 `show()` accepts anything because `t`'s type is `Any`,
-which is not the same as `object`.
+a different thing from `object`.
 If you pass it something without a `display()` method,
 the call raises an exception when the line runs.
 If you use `t: object` (the safe top type),
@@ -764,8 +762,8 @@ Dynamic typing and protocols are the same idea, checked at different times.
 An abstract base class is *nominal* (named): a type joins by inheriting from it.
 The subclass's own source declares membership,
 and the base can carry shared implementation for its children.
-A protocol is *structural*: it works with any type that has matching members.
-This includes types in libraries you cannot edit.
+A protocol is *structural*: it works with any type that has matching members,
+including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
 They connect pieces without requiring any piece to change.
@@ -984,7 +982,7 @@ Adding a member to the `Shape` union leaves every existing `match` incomplete,
 and `assert_never()` turns each one into a type checker error naming the shape you missed.
 
 The OOP approach assumes you add types more often than operations,
-which is often not true.
+and that assumption often fails.
 This trade-off is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 and [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)

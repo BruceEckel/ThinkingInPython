@@ -75,7 +75,7 @@ and makes a class with an unimplemented abstract method refuse instantiation.
 `enum.EnumType` builds each `Enum` subclass,
 turning every class-body assignment into a member and making `for c in Color` walk them.
 Iterating a class is behavior on the class object,
-which is where a metaclass can put it and an ordinary class cannot.
+and a metaclass is what puts behavior there; an ordinary class cannot.
 
 You rarely need a metaclass.
 It is a fascinating tool and tempting to use,
@@ -223,9 +223,9 @@ It is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
 The dict comprehension builds all seven classes whether the schedule uses them or not.
-Seven is cheap and hundreds would not be,
-so the next version delays building each class until the first lookup asks for it,
-which costs a `dict` subclass and a placeholder for the classes that do not exist yet:
+Seven is cheap; hundreds would cost.
+So the next version delays building each class until the first lookup asks for it,
+at the price of a `dict` subclass and a placeholder for the classes not yet built:
 
 ```python
 # greenhouse.py
@@ -350,8 +350,7 @@ which a caller writing `try: ... except KeyError` around a lookup expects.
 
 `Event._event_maker` starts out holding the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
-Populating that dict does not build any classes.
-It only reserves the names,
+Populating that dict reserves the names and builds nothing yet,
 so `EventMakers.__getitem__()` has something to check a `class_name` against before building anything.
 The dict's value type is `EventMaker | NOT_CREATED`,
 naming the sentinel value rather than the generic `sentinel` class,
@@ -418,14 +417,14 @@ and seeds it with `{"Command": Command}` so the generated class can find its bas
 The type checker can't see into the string,
 so `namespace[class_name]` is just `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
-which is the other reason the values can carry no type more precise than `Any`.
+and that entry is the second reason the values carry no type more precise than `Any`.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class,
 the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
 calling `make_class("Start")` twice builds two distinct classes.
 
 `__init__`'s definition sits textually inside a `class` block.
-The compiler doesn't care that the block arrived as a string.
+The compiler treats a block that arrived as a string the same as one read from a file.
 That is the difference from `greenhouse.py`,
 whose `init()` is a nested function rather than a method in a class body,
 so it gets no `__class__` cell and cannot use zero-argument `super()`.
@@ -449,7 +448,7 @@ dangerous on anything that reaches the program from outside, unchecked.
 ## Self-Registration of Subclasses
 
 Often a base class needs to keep track of its subclasses.
-This was the textbook justification for a metaclass.
+Tracking subclasses was the textbook justification for a metaclass.
 Python calls `__init_subclass__()` automatically for every new subclass,
 so a base class can register its own subclasses in a few lines.
 This example tracks the "leaf" subclasses
@@ -516,15 +515,16 @@ leaving `Circle` and `Square`.
 None of this needs a metaclass.
 `__init_subclass__()` is implicitly a class method.
 Its first argument is the new subclass.
-It never runs for the class whose body defines it,
-only for classes derived from that class,
-which is why neither `Color` nor `Shape` appears in its own registry.
+It runs for classes derived from the class whose body defines it,
+and never for that class itself,
+so neither `Color` nor `Shape` appears in its own registry.
 
 The keyword arguments come from the subclass header.
 Writing `class Blue(Color, shade="cool"):` delivers `shade="cool"` to `__init_subclass__()`,
 so a subclass can configure its own registration.
-Passing the rest on with `super().__init_subclass__(**kwargs)` lets a base further up the chain take the keywords it declared,
-and makes an unrecognized keyword an error rather than a silent no-op.
+`super().__init_subclass__(**kwargs)` passes the rest up the chain,
+so a base further up can take the keywords it declared,
+and an unrecognized keyword becomes an error rather than a silent no-op.
 
 Testing shows that each registry holds only its current leaf classes:
 
@@ -582,10 +582,8 @@ At runtime the decorator only marks the class, setting `__final__ = True`
 (as `test_final.py` below confirms),
 so the interpreter still runs `class C(B): pass`.
 
-If you need the interpreter to refuse subclassing,
-older literature claims this requires a metaclass.
-It does not.
-`__init_subclass__()` can enforce it at each subclass creation:
+Older literature claims that making the interpreter refuse subclassing requires a metaclass.
+`__init_subclass__()` does the job at each subclass creation:
 
 ```python
 # final_runtime.py
@@ -612,7 +610,7 @@ Python builds `B` normally.
 A class's own `__init_subclass__()` never runs for that class,
 and the version that does run at `B`'s creation is the one `B` inherits from `A`,
 which is `object`'s do-nothing default.
-Use the runtime version only when `@final` is not enough, which is rare.
+Use the runtime version when `@final` is not enough, a rare case.
 
 Tests confirm the `@final` marker is present,
 the runtime-final class refuses subclassing,
@@ -647,8 +645,8 @@ The language devices you have met divide into four families.
 `@final` and `@override` are *markers*.
 At runtime each sets a single attribute that nothing reads.
 The type checker carries the entire meaning,
-and the runtime half of [Making a Class Final](#making-a-class-final)
-had to be built by hand with `__init_subclass__()`.
+and [Making a Class Final](#making-a-class-final)
+built the runtime half by hand with `__init_subclass__()`.
 
 `@dataclass` is *mirrored machinery*.
 At runtime it is a code generator,
@@ -676,8 +674,8 @@ so a library can read the checker's types and enforce them live.
 
 How does the checker know what `@dataclass` does?
 For the standard library, the knowledge is built in.
-For a class-building decorator of your own it cannot know,
-unless you declare it.
+For a class-building decorator of your own,
+the checker knows only what you declare.
 `@dataclass_transform` marks a decorator as dataclass-like,
 and the declaration alone changes what the checker believes:
 
@@ -706,9 +704,9 @@ with `name` required and `age` defaulted, exactly as it would for `@dataclass`.
 It believes the declaration without ever running `model()`,
 so the call checks clean and fails at runtime: this `model()` generates nothing,
 and `object`'s constructor takes no arguments.
-The declaration is a promise, and this one lies.
-Libraries like attrs and pydantic keep the promise by generating the methods their `@dataclass_transform` claims,
-which is how their classes get first-class checking without any checker hard-coding them.
+The declaration is a claim, and this one is false.
+Libraries like attrs and pydantic make the claim true by generating the methods their `@dataclass_transform` declares,
+and that is how their classes get first-class checking without any checker hard-coding them.
 The shortest honest `model()` delegates the generation:
 
 ```python
@@ -740,7 +738,7 @@ a decorator that builds a class's methods from its field declarations.
 Anything stranger stays invisible to the checker,
 which never imports or executes your code.
 That is why the classes assembled by `type()` in [Generating Classes with `type`](#generating-classes-with-type)
-needed a `cast()` to state what was built:
+needed a `cast()` to state their real signature:
 the checker models what it recognizes, believes what you declare,
 and sees nothing else.
 
@@ -756,7 +754,7 @@ a read calls `__get__()` and a write calls `__set__()`.
 [Decorators](14_Techniques--Decorators.md#a-limitation-methods-need-a-descriptor)
 already relied on this without naming it.
 A function is an object like any other, and its class defines `__get__()`,
-which makes every function a descriptor:
+so every function is a descriptor:
 
 ```python
 # function_is_descriptor.py
@@ -785,9 +783,9 @@ print(plain.__get__(p, Person)())
 ```
 
 The last line performs by hand what `p.greet()` does automatically.
-Method binding is not special machinery, just the descriptor protocol at work.
+Method binding is the descriptor protocol at work.
 
-Learning its own name is another job that once needed a metaclass.
+A class attribute learning its own name is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
 so the new instance cannot know it is about to get the name `x`.
 Python delivers that name automatically.
@@ -856,7 +854,7 @@ That branch returns `self`, the descriptor object,
 which is why `isinstance(Point.x, Field)` is `True`.
 
 Each `Field` stores values under `_x` or `_y` in the instance's `__dict__`.
-The underscore prefix is not decoration.
+The underscore prefix does real work.
 A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
 If `__get__()` asks `obj` for plain `"x"`,
@@ -868,7 +866,7 @@ and the ranking reverses: the instance's `__dict__` wins.
 That is why assigning `p.greet = something` shadows the method on that one instance,
 while `p.x = 3` cannot shadow `Field`, because `Field` defines `__set__()`.
 
-This is metaprogramming, but it needs no metaclass.
+`__set_name__()` is metaprogramming with no metaclass in sight.
 
 Testing confirms the descriptor learns its name,
 stores each value under the storage key built from that name,
@@ -941,8 +939,8 @@ so `Simple` inherits `type` and becomes a second metaclass,
 not a class built by `SimpleMeta`.
 `metaclass=` is the mechanism for naming what builds a class,
 independent of its base classes.
-A subclass repeats `metaclass=` only if its bases do not already carry the same metaclass,
-since Python computes a new class's metaclass from all of its bases.
+Python computes a new class's metaclass from all of its bases,
+so a subclass of `Simple` inherits `SimpleMeta` without repeating `metaclass=`.
 
 By convention the first argument of a metaclass method is `cls` rather than `self`,
 except for `__new__()`,
@@ -1028,7 +1026,7 @@ and reserve `__new__()` for a genuine need.
 
 A method defined on the metaclass becomes a method of the *class object*,
 callable on the class but not on its instances.
-These are sometimes called *metamethods*.
+Such methods are sometimes called *metamethods*.
 They differ from `classmethod`s:
 a `classmethod` stays callable on both the class and its instances,
 while a metamethod works only through the class.
@@ -1040,12 +1038,11 @@ It is the same method that makes any object callable.
 `obj()` invokes `type(obj).__call__(obj, ...)`.
 A class is an object, an instance of its metaclass,
 so `ClassName()` invokes `__call__()` on the metaclass the same way.
-It runs first when you create an instance of the class.
+That `__call__()` runs first when you create an instance of the class.
 `__new__()` and `__init__()` normally run only because the default `type.__call__()` calls them.
-A metaclass that overrides `__call__()` sits above that step and decides whether to call them.
-That lets it skip building a new instance,
-for example by returning one it already cached.
-This is one way to build a [Singleton](24_Patterns--Singleton.md):
+A metaclass that overrides `__call__()` sits above that step and decides whether to call them,
+so it can skip building a new instance and return one it already cached.
+Caching there is one way to build a [Singleton](24_Patterns--Singleton.md):
 
 ```python
 # singleton.py
@@ -1092,24 +1089,24 @@ Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
 so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
-Without it, every singleton loses its type and a type checker can no longer catch a misspelled attribute access on the result.
+Without it, every singleton comes back as `Any`,
+and a misspelled attribute access on the result passes the type checker.
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
-which a type checker must confirm before it accepts a zero-argument `super()`.
+and a type checker must confirm that before it accepts a zero-argument `super()`.
 Both forms do the same work at run time.
 
 You might expect to parameterize[^parametrize] the class,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
-That does not work.
-A `ClassVar` cannot depend on a type parameter of its own class,
-because `ClassVar` means one shared value for the whole class,
-not a different value per instantiation.
-Even ignoring that, a subclass needs to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
+That fails twice.
+A `ClassVar` means one shared value for the whole class,
+so it cannot depend on a type parameter that varies per instantiation.
+And a subclass would have to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finishes defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
-which runs only after `ASingleton` already exists.
+and that call happens after `ASingleton` exists.
 
 The metaclass version works,
 but it is heavier than the problem usually requires.
@@ -1119,8 +1116,8 @@ Choose the lightest tool that solves your problem.
 
 ### Multiple Inheritance and Metaclasses
 
-`Singleton` stores its cache in `_instances`, a `dict` attribute.
-It doesn't inherit from `dict` directly.
+`Singleton` stores its cache in `_instances`, a `dict` attribute,
+rather than inheriting from `dict`.
 Can a metaclass inherit from more than one class, the way an ordinary class can?
 
 Trying the obvious version fails.
@@ -1216,11 +1213,11 @@ except TypeError as error:
 #: TypeError
 ```
 
-This creates a metaclass conflict you must resolve,
-by giving `C` a metaclass that inherits both.
+The result is a metaclass conflict,
+and the fix is a metaclass for `C` that inherits both.
 As with the layout conflict just shown,
 ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
-which is why the line carries a `# type: ignore`.
+so the line carries a `# type: ignore`.
 Both failures have the same shape:
 an inheritance graph that looks legal until you notice what the bases carry with them.
 It's one more reason to avoid metaclasses (and, arguably, multiple inheritance)
@@ -1273,12 +1270,11 @@ so an ordinary method would receive the class name as its `self` and leave `base
 producing a `TypeError` that says nothing about the real mistake.
 No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
-by which time the duplicate has already won.
-The `# noqa: F811` suppresses ruff's own report of the same mistake,
-which is the static half of the check.
+by which time the duplicate has already won. ruff's own report of the same mistake is the static half of the check,
+and the `# noqa: F811` suppresses it so the listing can run.
 `__prepare__()` catches it at run time, including on names the body computes.
 
-These are real but uncommon.
+These needs are real but uncommon.
 For everything else, `__init_subclass__()`, `__set_name__()`,
 and [class decorators](14_Techniques--Decorators.md#decorating-classes)
 are simpler and easier to read.
@@ -1333,8 +1329,8 @@ print(list(inspect.signature(greet).parameters))
 
 `signature()` recovers the full call interface,
 annotations and defaults included, as a structured object rather than a string.
-Python does not discard type annotations (a.k.a. type hints) at runtime.
-It keeps them attached to the function and evaluates them on demand,
+Python keeps type annotations (a.k.a. type hints) at runtime,
+attached to the function and evaluated on demand,
 the deferred evaluation of PEP 649,
 even though it [never checks them](08_Foundations--Static_Types.md#hints-are-not-enforced-at-run-time).
 `signature()` requests that stored data (not the original source text)
@@ -1482,7 +1478,7 @@ Without either, `from display import display_object` fails with `ModuleNotFoundE
 The static variant reads members from the object and its classes directly,
 without invoking descriptors, properties, or `__getattr__()`.
 Inspecting an object therefore never runs its code or triggers a side effect,
-which matters when you point this tool at something unfamiliar.
+and that safety matters when you point this tool at something unfamiliar.
 
 The tool sorts each member into one of two lists.
 Callables become methods,
@@ -1497,9 +1493,8 @@ The value is the member's `repr()`,
 truncated to keep the line within `max_width`.
 
 An attribute tagged `[CV]`, for *class variable*,
-does not live in `obj`'s own `__dict__`.
-A class has no instance-level storage for the comparison:
-every attribute `display_object()` shows for a class already lives on that class or a base class,
+lives on the class or a base class rather than in `obj`'s own `__dict__`.
+When `obj` is itself a class, every attribute lives on a class,
 so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
@@ -1510,7 +1505,7 @@ the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--
 tags `B.x` and `B.s`,
 while `display_object(Messenger("iris", 12, 3.14))` tags none,
 since `@dataclass` assigns every field straight onto the new instance.
-The tag reports this dynamically, from where the value lives,
+The tag comes from where the value lives,
 so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
 ### Choosing Which Dunders to Show
@@ -1594,9 +1589,9 @@ display_object(Point, REDEFINED_DUNDERS,
 `Plain` writes none of the four,
 so `INTERESTING_DUNDERS` shows `object`'s versions and `REDEFINED_DUNDERS` shows nothing.
 `@dataclass` writes three of them and sets `__hash__` to `None`,
-which is why `Point` reports a `__hash__` attribute rather than a method.
+so `Point` reports a `__hash__` attribute rather than a method.
 The last call drops that row,
-the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes)
+for the same reason `comparison.py` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes)
 passes `exclude=("__hash__",)`.
 
 Every class, even an empty one, has its own `__module__`, `__dict__`,
@@ -1704,8 +1699,8 @@ The first two calls show the same class from two angles.
 `display_object(Fraggle)` inspects the class object.
 It lists `y` and `z`, the fields with defaults.
 `x`'s declaration is `x: int` with no default,
-so on the class it is only an annotation, not a bound attribute,
-and `getmembers_static()` does not return it.
+so on the class it is an annotation with no bound attribute,
+and `getmembers_static()` skips it.
 
 `display_object(Fraggle(9, 2.3))` inspects an instance,
 whose attributes hold its field values, so `x` now appears beside `y` and `z`.
@@ -1789,7 +1784,7 @@ class Derived(Base):
 and they also show that `Base.__init_subclass__()` never runs for `Base` itself,
 the rule [Making a Class Final](#making-a-class-final) needs.
 `Derived` adds the rest.
-`__prepare__()` runs before the body, which is why its line comes first.
+`__prepare__()` runs before the body, so its line comes first.
 The body then executes, printing `class body`.
 `__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`,
 because `type.__new__()` calls them as it assembles the class,

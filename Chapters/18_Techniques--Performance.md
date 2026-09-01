@@ -10,8 +10,8 @@ As to the second issue, Python has a reputation for slowness.
 
 ## Is It Too Slow?
 
-Computer programming projects have a long history of *premature optimization*.
-This means optimizing before any measurement shows where the time goes.
+Computer programming projects have a long history of *premature optimization*:
+optimizing before any measurement shows where the time goes.
 Often people decide ahead of time, based on biases,
 that runtime performance will be insufficient.
 They then build elaborate, expensive designs that solve nonexistent problems.
@@ -55,8 +55,8 @@ If it's noticeably less, buying new hardware might be a quick win.
 CPython includes an experimental just-in-time compiler.
 [PEP 744](https://peps.python.org/pep-0744/) added it in 3.13,
 and 3.15 rebuilt much of it.
-It watches the bytecode a program executes, and once a path runs often enough,
-it compiles that path to machine code.
+The JIT watches the bytecode a program executes,
+and once a path runs often enough, it compiles that path to machine code.
 You change nothing.
 The same file runs, and the interpreter stops re-interpreting its busiest paths.
 
@@ -96,7 +96,7 @@ print(jit_state())
 ```
 
 `is_enabled()` implies `is_available()`,
-so testing them in that order names the three states a build can be in.
+so testing `is_available()` first and `is_enabled()` second names the three states a build can be in.
 
 Most listings in this book print the same line on every machine.
 This one changes with your interpreter.
@@ -131,15 +131,15 @@ Neither one rescues a quadratic algorithm.
 
 [PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
 5% over the interpreter alone for 3.16,
-then 20% for the JIT combined with free threading by 3.17,
-which the PEP calls the minimum for continuing to develop it inside CPython.
-Even then, turning it on by default would need separate approval from the release manager.
+then 20% for the JIT combined with free threading by 3.17.
+The PEP calls that the minimum for continuing to develop the JIT inside CPython,
+and even then, turning it on by default would need separate approval from the release manager.
 
 ## Profilers
 
 A *profiler* looks for the slow spots in your code, so you know where to focus.
 You may think you "have a pretty good idea where the slowdown is,"
-but programmers turn out to be bad at guessing this.
+but programmers turn out to be bad at guessing.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library includes two.
@@ -204,8 +204,8 @@ A profiler answers a broad question about the whole program.
 Sometimes you have a narrow one:
 how many times does this function run during a request,
 and does that branch run at all?
-Editing the function to add a counter changes the code you are studying,
-and turning on a full profiler to answer it costs more than the answer is worth.
+A counter added to the function changes the code you are studying,
+and a full profiler costs more than the answer is worth.
 
 `sys.monitoring` ([PEP 669](https://peps.python.org/pep-0669/))
 is the interpreter's own instrumentation mechanism,
@@ -214,7 +214,8 @@ You claim a tool identifier, register a callback for an event,
 and say which code the event applies to.
 Registering nothing costs nothing:
 the interpreter specializes the bytecode that has no callback attached,
-so unmonitored code runs at full speed rather than paying the per-line toll that `sys.settrace()` imposes on everything:
+so unmonitored code runs at full speed.
+`sys.settrace()`, by contrast, imposes a per-line toll on everything:
 
 ```python
 # monitoring_counts.py
@@ -254,7 +255,7 @@ The counting lives outside them, in `on_start()`,
 which the interpreter calls each time a monitored Python function begins.
 `set_local_events()` is the narrow instrument:
 it attaches the event to one code object,
-which is why `square()` is absent from the count even though it ran.
+and that is why `square()` is absent from the count even though it ran.
 The event does not spread to whatever that code calls,
 so a helper that `fib()` invokes would go uncounted as well.
 The global form is `set_events()`,
@@ -267,8 +268,8 @@ monitoring the whole program to answer it pays for data you discard and slows th
 and `free_tool_id()` releases the identifier.
 The identifiers are a shared resource: `PROFILER_ID`, `DEBUGGER_ID`,
 and `COVERAGE_ID` carry the names of their intended users.
-Trying to claim one that another tool already holds raises a `ValueError`,
-which is how two profilers avoid quietly fighting over the same callbacks.
+Claiming one that another tool already holds raises a `ValueError`,
+so two profilers never fight silently over the same callbacks.
 
 For an answer you need once rather than continuously,
 the callback can turn its own event off:
@@ -316,7 +317,7 @@ and after the first hit the monitored code returns to full speed.
 The trade against a profiler is the usual one.
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function,
-which is the better tool when you know which function matters and the profiler's overhead would change the answer.
+and that is the better tool when you know which function matters and the profiler's overhead would change the answer.
 
 ## Benchmark Alternatives with `timeit`
 
@@ -417,7 +418,7 @@ def report(**measured: float) -> None:
         print(f"  {name:<{width}} {shown}")
 ```
 
-`report()` prints nothing unless the flag is present,
+`report()` prints when the flag is present and stays silent otherwise,
 so the listing's own output, the line the book shows, never changes.
 Running `membership.py` with the flag adds the measurements above it:
 
@@ -428,8 +429,9 @@ Running `membership.py` with the flag adds the measurements above it:
     set at least 100x faster: True
 
 The names are the keyword arguments at the call site,
-which is why each listing can label its own measurements.
-Your ratio differs from the one above, which is the point of running it.
+so each listing labels its own measurements.
+Your ratio differs from the one above;
+seeing your own number is the point of running it.
 
 ## Write Idiomatic Python
 
@@ -525,7 +527,7 @@ just as readily as it catches one that does.
 
 The biggest speedups usually come from a better algorithm.
 Choosing an algorithm with lower Big-O complexity beats micro-optimizing a slow one.
-Often this means choosing the right container.
+Often the better algorithm is a better container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a `deque` (see [Containers](03_Foundations--Containers.md#deque))
 when you add and remove at both ends.
@@ -568,8 +570,8 @@ while `bisect_left()` returns the position before them
 Either one answers "where does this go,"
 but only `bisect_left()` points at an existing value,
 so a membership test must use it, as `search_comparison.py` does below.
-Only the search is fast,
-because `insort()` still shifts everything after the insertion point.
+The speed is in the search alone:
+`insort()` still shifts everything after the insertion point.
 Under heavy insert traffic consider the heap below instead.
 
 ### Comparison
@@ -616,8 +618,8 @@ print(f"hashing at least 3x faster than binary search: "
 The scan loses badly,
 since it walks roughly half the `list` before reaching `target`.
 `bisect` narrows that to a handful of comparisons,
-one per halving of the remaining range, which is why moving from O(n)
-to O(log n) shows up as orders of magnitude here rather than a modest improvement.
+one per halving of the remaining range, and that is why the move from O(n)
+to O(log n) shows up here as orders of magnitude rather than a modest improvement.
 Hashing wins again over `bisect`,
 since it needs only one hash and one equality check no matter how large `as_set` grows.
 One machine measured `bisect` at about 2,000 times faster than the scan,
@@ -687,12 +689,12 @@ print(max_nums)  # Heap ordering is maintained
 Every operation mirrors its min-heap partner,
 with `heapify_max()` putting the largest element at index 0.
 
-The output shows that the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
-maintains the list according to its own logic.
-So you must always use the heap version of an operation, not the list version.
-Although calling the list's own `pop(0)` does produce the smallest value the first time,
-it also destroys the heap ordering,
-so if you call it again you don't get the smallest value:
+The output shows the list in the order the [heap-management algorithm](https://docs.python.org/3.15/library/heapq.html#priority-queue-implementation-notes)
+keeps it, which is not sorted order.
+Use the heap version of every operation.
+The list's own `pop(0)` returns the smallest value the first time,
+but it also destroys the heap ordering,
+so a second `pop(0)` would return 6 while 4 is still in the list:
 
 ```python
 # heap_corruption.py
@@ -841,13 +843,12 @@ needs the same thing: a whole array in memory,
 not values arriving one at a time.
 
 The risk is the cliff at the edge of that memory.
-Performance does not degrade in proportion to how close the data gets to available RAM.
+Performance holds steady as the data approaches available RAM,
+then collapses at the boundary.
 A data set that fits runs at full speed.
 One that no longer fits forces the operating system to swap pages to disk,
-turning microseconds into milliseconds, a thousandfold slowdown,
-not a modest one.
-If you push further, the process fails outright,
-with `MemoryError` or an OS kill.
+turning microseconds into milliseconds, a thousandfold slowdown.
+Push further and the process fails outright, with `MemoryError` or an OS kill.
 Nothing warns you as the data approaches the limit,
 and everything changes the moment it crosses.
 
@@ -859,7 +860,7 @@ stream it from the start, like `lazy_first_evens()`.
 If you call a pure function
 ([Functional Foundations](40_Functional--Foundations.md#pure-functions))
 repeatedly with the same arguments,
-the fastest way to compute the answer is to not recompute it.
+the fastest way to get the answer is to reuse the one you already computed.
 `functools.cache` stores each result the first time and replays it after that.
 The classic demonstration is the naive recursive Fibonacci,
 which recomputes the same subproblems exponentially many times:
@@ -998,20 +999,20 @@ The two failed assignments print differently on purpose.
 The slotted message is too wide for the listing,
 so the first block trims it after `__dict__`,
 while the frozen message is short enough for `ignore()` to show whole.
-The filter catches it because `FrozenInstanceError` subclasses `AttributeError`.
+`ignore(AttributeError)` catches the frozen error because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
 `@dataclass(slots=True)` both shrinks the instances and writes the methods.
 The tradeoff is that instances can no longer grow attributes outside the declared set.
 
-`frozen=True` does not imply `slots=True`.
-Frozen blocks every attribute assignment, not just reassignment,
-so it already stops an instance from growing new fields,
+`frozen=True` and `slots=True` are independent.
+Frozen blocks every attribute assignment, new fields included,
+so a frozen instance already cannot grow,
 the same restriction `slots` gives you.
-But frozen enforces this by overriding `__setattr__()`.
-The instance still keeps a `__dict__` underneath,
-and `sys.getsizeof()` reports only an object's own size, not what it references,
+But frozen enforces that restriction by overriding `__setattr__()`,
+and the instance keeps its `__dict__` underneath.
+`sys.getsizeof()` reports only an object's own size, not what it references,
 so `frozen_bytes` adds the dict's size on top.
 `slots=True` removes that `__dict__` entirely,
 so pairing it with `frozen=True` is the natural default,
@@ -1082,10 +1083,9 @@ print(view.nbytes)
 #: 6
 ```
 
-The view shares storage with `data`,
-so writing through it changes the original and copies no bytes.
-`bytes(chunk)` does copy, but only to print the slice.
-The view copies nothing.
+The view shares storage with `data`, so writing through it changes the original.
+`bytes(chunk)` copies, but only to print the slice;
+the view itself copies nothing.
 
 The saving shows up at a size worth measuring:
 
@@ -1157,9 +1157,8 @@ NumPy is a fast library you call, not a compiled extension you write.
 You keep that speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reintroduces the overhead.
-This is the declarative trade,
-which [Confidence](43_Functional--Confidence.md#declarative-style) examines:
-describe the whole-array result and let the engine arrange the steps.
+That is the declarative trade [Confidence](43_Functional--Confidence.md#declarative-style)
+examines: describe the whole-array result and let the engine arrange the steps.
 
 One machine measured the vectorized pass at about 11x faster than the loop.
 The 3x threshold sits far below any multiple you should see.
@@ -1196,7 +1195,7 @@ compiles such a function to machine code on its first call:
 
 `njit(count_primes)` wraps the same function `@njit` would decorate,
 and returns something that compiles itself at the first call.
-Calling it once first pays the compilation and warm-up cost outside the timed region,
+Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
 Numba shines on numeric code over simple types and NumPy arrays,
 often running nearly as fast as C.
@@ -1219,8 +1218,7 @@ NumPy and Numba solve different halves of the same problem,
 and a single function often uses both.
 NumPy gives you a compact array.
 `@njit` compiles a loop that walks it,
-for the case where the loop cannot become one vectorized expression,
-because the amount of work per element depends on the element's value.
+for the case where the work per element depends on the element's value and no single vectorized expression fits.
 The [Collatz conjecture](https://en.wikipedia.org/wiki/Collatz_conjecture)
 is such a case: from `n`,
 halve an even value or triple-and-increment an odd one,
@@ -1261,7 +1259,7 @@ so no single array expression produces it:
 so it composes with vectorized NumPy code on either side.
 Compiling changes only the loop's interior:
 the same Python source runs as machine code instead of as bytecode over boxed `int` objects.
-This is the pattern in practice:
+That division is the pattern in practice:
 use a vectorized NumPy expression wherever the shape of the computation allows it,
 and drop to a `@njit` loop for the steps that resist vectorizing,
 keeping the array as the shared data structure throughout.
