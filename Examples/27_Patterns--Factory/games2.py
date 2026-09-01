@@ -3,7 +3,7 @@
 from typing import Protocol
 
 class Obstacle(Protocol):
-    def action(self) -> str: ...
+    def description(self) -> str: ...
 
 class Character(Protocol):
     def interact_with(self, obstacle: Obstacle) -> None: ...
@@ -14,17 +14,19 @@ class GameElementFactory(Protocol):
 
 class Kitty:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a", obstacle.action())
+        print("Kitty has encountered a",
+              obstacle.description())
 
 class Warrior:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a", obstacle.action())
+        print("Warrior now battles a",
+              obstacle.description())
 
 class Puzzle:
-    def action(self) -> str: return "Puzzle"
+    def description(self) -> str: return "Puzzle"
 
 class Weapon:
-    def action(self) -> str: return "Weapon"
+    def description(self) -> str: return "Weapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:

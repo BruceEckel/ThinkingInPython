@@ -117,7 +117,7 @@ even the table entry, by letting each class register itself.
 from typing import override
 
 class Obstacle:
-    def action(self) -> str:
+    def description(self) -> str:
         raise NotImplementedError
 
 class Character:
@@ -142,11 +142,11 @@ class GameEnvironment:
 class Gnome(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Gnome discovers a", obstacle.action())
+        print("Gnome discovers a", obstacle.description())
 
 class Riddle(Obstacle):
     @override
-    def action(self) -> str:
+    def description(self) -> str:
         return "Riddle"
 
 class GnomesAndFairies(GameElementFactory):

@@ -427,7 +427,7 @@ Choosing the factory chooses both halves at once:
 from typing import override
 
 class Obstacle:
-    def action(self) -> str:
+    def description(self) -> str:
         raise NotImplementedError
 
 class Character:
@@ -437,21 +437,23 @@ class Character:
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a", obstacle.action())
+        print("Kitty has encountered a",
+              obstacle.description())
 
 class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a", obstacle.action())
+        print("Warrior now battles a",
+              obstacle.description())
 
 class Puzzle(Obstacle):
     @override
-    def action(self) -> str:
+    def description(self) -> str:
         return "Puzzle"
 
 class Weapon(Obstacle):
     @override
-    def action(self) -> str:
+    def description(self) -> str:
         return "Weapon"
 
 # The Abstract Factory:
@@ -499,7 +501,7 @@ but the initial conditions and the state change can determine much of a game's o
 so a real game would add one: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
 
-Because `interact_with()` dispatches on the character's type and `obstacle.action()` dispatches again on the obstacle's,
+Because `interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's,
 the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
@@ -525,7 +527,7 @@ The checker verifies conformance all the same:
 from typing import Protocol
 
 class Obstacle(Protocol):
-    def action(self) -> str: ...
+    def description(self) -> str: ...
 
 class Character(Protocol):
     def interact_with(self, obstacle: Obstacle) -> None: ...
@@ -536,17 +538,19 @@ class GameElementFactory(Protocol):
 
 class Kitty:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a", obstacle.action())
+        print("Kitty has encountered a",
+              obstacle.description())
 
 class Warrior:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a", obstacle.action())
+        print("Warrior now battles a",
+              obstacle.description())
 
 class Puzzle:
-    def action(self) -> str: return "Puzzle"
+    def description(self) -> str: return "Puzzle"
 
 class Weapon:
-    def action(self) -> str: return "Weapon"
+    def description(self) -> str: return "Weapon"
 
 # Concrete factories:
 class KittiesAndPuzzles:
@@ -581,7 +585,7 @@ The concrete classes inherit nothing,
 but the type checker still verifies that each one satisfies the appropriate `Protocol`:
 a `GameElementFactory` must supply `make_character()` and `make_obstacle()`,
 a `Character` must supply `interact_with()`,
-and an `Obstacle` must supply `action()`.
+and an `Obstacle` must supply `description()`.
 `BrokenFactory` supplies `make_character()` and omits `make_obstacle()`.
 Uncomment the line that passes one to `GameEnvironment`,
 and the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.

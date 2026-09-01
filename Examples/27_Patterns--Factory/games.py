@@ -2,7 +2,7 @@
 from typing import override
 
 class Obstacle:
-    def action(self) -> str:
+    def description(self) -> str:
         raise NotImplementedError
 
 class Character:
@@ -12,21 +12,23 @@ class Character:
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a", obstacle.action())
+        print("Kitty has encountered a",
+              obstacle.description())
 
 class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a", obstacle.action())
+        print("Warrior now battles a",
+              obstacle.description())
 
 class Puzzle(Obstacle):
     @override
-    def action(self) -> str:
+    def description(self) -> str:
         return "Puzzle"
 
 class Weapon(Obstacle):
     @override
-    def action(self) -> str:
+    def description(self) -> str:
         return "Weapon"
 
 # The Abstract Factory:
