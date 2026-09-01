@@ -3,9 +3,9 @@
 ## 1. Leap-year support for `Month`, tests written first
 
 `Year` gains an `is_leap()` method using the standard rule (divisible
-by 4, and not by 100 unless also by 400), and `Month.check_day()`
-takes the `Year` as a second argument so it can raise February's cap
-to 29 only when the year is leap:
+by 4, and not by 100 unless also by 400). `Month.check_day()` takes
+the `Year` as a second argument so it can raise February's cap to 29
+only when the year is leap:
 
 ```python
 # test_ch12_leap_year.py
@@ -102,9 +102,10 @@ def test_feb_30_always_rejected() -> None:
 ```
 
 `BirthDate(Month.of(2), Day(29), Year(2020))` succeeds because 2020 is
-divisible by 4 and not by 100. `Year(2021)` is not leap, so the same
-day is rejected. February 30 is rejected regardless of the year,
-because `max_days` never exceeds 29 even in a leap year.
+divisible by 4 and not by 100. `Year(2021)` is not leap, so
+`check_day()` rejects the same day. `check_day()` rejects February 30
+regardless of the year, because `max_days` is 29 at most, even in a
+leap year.
 
 ## 2. A stricter `EmailAddress`
 
@@ -156,8 +157,8 @@ print(EmailAddress("grace@example.com"))
 
 The original check, `"@" in self.text`, only confirms an `@` appears
 somewhere. `count("@") == 1` additionally rejects two-`@` strings like
-`"b@@x.com"`, and splitting on `@` and checking both halves are
-non-empty rejects an `@` with nothing before or after it.
+`"b@@x.com"`. The second check splits on `@` and requires text on both
+sides, so it rejects `"@x.com"` and `"b@"`.
 
 ## 3. The `NamedTuple` subclass workaround, and the hole it leaves
 
@@ -203,17 +204,18 @@ print(copy.replace(Stars(5), number=99))
 #: Stars(number=99)
 ```
 
-`typing.NamedTuple` refuses a `__new__()` in its own class body, but it
-does not refuse one in a subclass, so `Stars(11)` now raises a
-`TypeFailure` the factory function could only advise against.
+`typing.NamedTuple` refuses a `__new__()` in its own class body but
+accepts one in a subclass, so `Stars(11)` now raises a `TypeFailure`.
+The chapter's factory function could only advise against that call.
 
 The guarantee still leaks. `_replace()` builds the new tuple through
-`tuple.__new__()` rather than through `cls.__new__()`, so it never sees
-the check, and `copy.replace()` calls `_replace()`. A validated `Stars`
-therefore produces an unvalidated one, which is worse than no check at
-all: the type now looks like it guarantees its values.
+`tuple.__new__()` rather than through `cls.__new__()`, so the check
+never runs. `copy.replace()` calls `_replace()` and inherits the hole.
+A validated `Stars` therefore produces an unvalidated one, and that is
+worse than no check at all: the type now looks like it guarantees its
+values.
 
-A frozen data class has no equivalent hole because there is only one
+A frozen data class has no equivalent hole because it has only one
 construction path. `copy.replace()` calls the constructor, the
 constructor calls `__post_init__()`, and the check runs.
 
@@ -278,9 +280,9 @@ except TypeFailure as e:
 `from_json()` never validates the email string itself. It hands the
 raw JSON value straight to `EmailAddress(...)`, and `EmailAddress`'s
 own `__post_init__()` runs the same check it runs for any other
-caller. The validation written once, inside `EmailAddress`, protects
-every path that constructs a `Person`, including this one from
-untrusted JSON input, with no additional code in `from_json()` itself.
+caller. One check, inside `EmailAddress`, protects every path that
+constructs a `Person`. The path from untrusted JSON input is one of
+those, with no additional code in `from_json()` itself.
 
 ## 5. `__replace__()` on an ordinary class
 
@@ -330,8 +332,8 @@ except TypeFailure as e:
 keyword changes. This implementation recovers the constructor
 arguments (`{"number": self.number}`), overrides the named ones with
 `|`, and rebuilds through `type(self)(...)`. The validation runs
-because the rebuild goes through `__init__()`, which is the same
-reason a frozen data class stays validated across a replacement. Any
+because the rebuild goes through `__init__()`. A frozen data class
+stays validated across a replacement for the same reason. Any
 `__replace__()` that restored the state directly, the way
 `copy.copy()` does, would skip the check.
 
@@ -392,20 +394,19 @@ except Exception as e:
 #: FrozenInstanceError: cannot assign to field 'built'
 ```
 
-`built` never reaches `__init__()`. `dataclasses.fields()` reports
-only `number`, and the generated signature takes only `number`, so a
-`ClassVar` is invisible to construction: `@dataclass` reads the
-annotation, sees `ClassVar`, and leaves the name alone as an ordinary
-class attribute.
+`@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`
+alone as an ordinary class attribute, so `built` never reaches
+`__init__()`. `dataclasses.fields()` reports only `number`, and the
+generated signature takes only `number`.
 
-`Stars.built += 1` works on a frozen class because it assigns to the
-class, and `frozen=True` installs its rejecting `__setattr__()` on
-instances. `Wrong` writes the same intent a different way, and fails.
+`frozen=True` installs a `__setattr__()` that rejects assignment to
+an instance. `Stars.built += 1` assigns to the class instead, so it
+works. `Wrong` writes the same intent a different way, and fails:
 `self.built += 1` reads the class attribute, adds one, and then tries
-to store the result on the instance, which is the assignment
-`frozen=True` refuses. `ty` rejects the line before it ever runs
-(fields of a frozen class are read-only to the type checker), so the
-listing carries a `# type: ignore` to demonstrate the runtime failure.
+to store the result on the instance. That store is the assignment
+`frozen=True` refuses. `ty` rejects the line before it ever runs,
+reporting `built` as read-only on a frozen instance, so the listing
+carries a `# type: ignore` to demonstrate the runtime failure.
 
 ## 7. A `dict` field default, three ways
 
@@ -447,17 +448,17 @@ print(Bare().index, Subscripted().index)
 ```
 
 `= {}` never reaches a running program. `@dataclass` inspects the
-default while the class is being created, finds an unhashable object,
-and raises a `ValueError` naming the fix. The full message is `mutable
+default as the decorator runs, finds an unhashable object, and raises
+a `ValueError` naming the fix. The full message is `mutable
 default <class 'dict'> for field index is not allowed: use
 default_factory`.
 
 `Bare` and `Subscripted` both work, and they differ in what a type checker
 can see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
-loose enough to satisfy any `dict` annotation, so a type checker cannot
-compare the factory against the field. `dict[str, Month]` is callable
-too, and its return type is concrete, so writing
-`field(default_factory=dict[int, int])` on this field is an error
-before the program runs. The bare form is fine where the factory and
-the annotation obviously agree. Subscript it when you want the
-agreement checked.
+loose enough to satisfy any `dict` annotation, so a type checker never
+compares the factory against the field. `dict[str, Month]` is callable
+too, and its return type is concrete, so
+`field(default_factory=dict[int, int])` on this field draws a type
+error before the program runs. The bare form is fine where a reader
+can see that the factory and the annotation agree. Subscript the
+factory when you want the checker to confirm the agreement.

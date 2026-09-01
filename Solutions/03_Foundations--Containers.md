@@ -54,10 +54,11 @@ print(dict(counts))
 #: {'dog': 2, 'cat': 1}
 ```
 
-`defaultdict(int)` supplies `0` the first time a key is touched, since
-`int()` returns `0`. That turns `counts[kind] += 1` into working code
-with no "does this key exist yet" check, the same way `defaultdict(list)`
-removed the check for appending to a fresh list.
+`defaultdict(int)` supplies `0` the first time the loop reads a key,
+because `int()` returns `0`. That default turns `counts[kind] += 1`
+into working code with no "does this key exist yet" check, the same
+way `defaultdict(list)` removed the check for appending to a fresh
+list.
 
 ## 3. Set operations across three sets
 
@@ -91,12 +92,11 @@ except TypeError as e:
 #: cannot use 'list' as a set element
 ```
 
-A `set`'s membership test relies on hashing every element once, up
-front, so every element must be hashable. `frozenset` is hashable
-because it is immutable: nothing can change its contents after
-creation, so its hash never goes stale. A `list` is mutable, so Python
-refuses to hash it at all, which is exactly why it cannot be a set
-member or a dictionary key.
+A `set` hashes each element once, at insertion, so every element must
+be hashable. `frozenset` is hashable because it is immutable: its
+contents stay fixed after creation, so its hash stays valid. A `list`
+is mutable, so Python refuses to hash it at all, which is exactly why
+it cannot be a set member or a dictionary key.
 
 ## 5. Four slices of one list
 
@@ -114,8 +114,8 @@ print(xs[3:0:-1])  # The same three, in one slice
 ```
 
 A negative `start` counts from the end, so `xs[-2:]` needs no length.
-`xs[1:-1]` trims one from each end. The reversed middle can be written
-two ways: slice, then reverse the copy, or walk backwards with a
+`xs[1:-1]` trims one from each end. The reversed middle has two
+spellings: slice, then reverse the copy, or walk backwards with a
 negative `step`. The one-slice form is harder to read because the
 bounds swap roles: `3` is now the first index visited and `0` is the
 excluded stop, so the element at index `0` never appears.
@@ -140,12 +140,12 @@ print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
 
 The tally loop is the same length either way, since `defaultdict(int)`
 removes the same "does this key exist yet" check that `Counter` does.
-What has to be written by hand is everything else `Counter` supplies:
+What you write by hand is everything else `Counter` supplies:
 `most_common()` becomes a `sorted()` call with a key function and a
 slice, and the `Counter({...})` repr becomes a `dict()` conversion.
-`Counter` also leaves the dictionary alone when a missing key is read,
-while `defaultdict(int)` stores a `0` for `"dog"`, so the two disagree
-about their own contents after the last line above.
+A read of a missing key also leaves a `Counter` alone, while
+`defaultdict(int)` stores a `0` for `"dog"`, so their contents differ
+after the `counts["dog"]` line.
 
 ## 7. `heterogeneous.py` as a `namedtuple`
 
@@ -166,12 +166,11 @@ print(person[0], type(person[0]).__name__)
 #: Alice str
 ```
 
-The unpacking line does not change, because a `namedtuple` is a tuple
-subclass: it unpacks by position like any other tuple. What the names
-add is the second line, where `person.height` says what `person[2]`
-meant. Nothing is given up, which is why a heterogeneous tuple that
-outlives one function is usually better as a `namedtuple` or a data
-class.
+The unpacking line stays the same, because a `namedtuple` is a tuple
+subclass: it unpacks by position like any other tuple. The names add
+the second `print()`, where `person.height` says what `person[2]`
+meant. They cost nothing, so a heterogeneous tuple that outlives one
+function is usually better as a `namedtuple` or a data class.
 
 ## 8. Building and merging a `dict`
 
@@ -197,15 +196,16 @@ same constructor fed from two parallel sequences.
 `30` ends up under `"c"`, because `|` resolves a collision in favor of
 the right operand. The rule follows from what a merge has to be: the
 result is one value per key, and the two dictionaries disagree about
-`"c"`, so one of them has to lose. Reading `a | b` as "start from `a`,
-then apply `b`" gives the right intuition, and it matches `a.update(b)`,
-which has always worked that way.
+`"c"`, so one of them has to lose. The right intuition for `a | b` is
+"start from `a`, then apply `b`", and that reading matches
+`a.update(b)`, which has always worked that way.
 
-That makes `|` on dictionaries asymmetric, unlike `|` on sets, where
-`a | b` and `b | a` are the same set. The operator is spelled the same
-because both mean "combine," but only one of them commutes. `|=`
-updates the left dictionary in place instead of building a new one,
-which the last line above confirms is what `|` did not do.
+Letting the right operand win makes `|` on dictionaries asymmetric,
+unlike `|` on sets, where `a | b` and `b | a` are the same set. The
+two uses share one spelling because both mean "combine," but only the
+set version commutes. `|=` updates the left dictionary in place, while
+`|` builds a new one and leaves the left operand alone, as the last
+`print(counts)` above confirms.
 
 ## 9. Unpacking without indexing
 
@@ -229,21 +229,21 @@ except ValueError as e:
 #: too many values to unpack (expected 2, got 5)
 ```
 
-A starred target absorbs however many items are left over, so one
-assignment reaches any of the three positions without an index. The
-star may appear anywhere in the target list, which is what makes the
-third line work: `first` and `last` each take one item and `middle`
-takes the rest, however many that is.
+A starred target absorbs however many items remain, so one assignment
+reaches any of the three positions without an index. The star may
+appear anywhere in the target list, so `first, *middle, last = row`
+works: `first` and `last` each take one item and `middle` takes the
+rest, however many that is.
 
 `a, b = row` fails because an unstarred target list states an exact
-count. Five values cannot fill two names, and Python raises a
-`ValueError` rather than dropping the extras, since silently discarding
-data is never the intent. The same error appears in the other
-direction, as `too few values to unpack`, when the list is shorter than
-the target.
+count, two, and `row` holds five. Python raises a `ValueError` rather
+than dropping the extras, since silently discarding data is never the
+intent. The same error appears in the other direction, as
+`too few values to unpack`, when the list is shorter than the target.
 
 `a, *b = row` states a minimum instead: at least one item for `a`, and
-the rest, possibly none, for `b`. That is why it accepts a five-item
-list, a one-item list, and everything between, and fails only on an
-empty one. The star turns a fixed-shape assertion into a flexible one,
-which is the same reason `*args` works in a function signature.
+the rest, possibly none, for `b`. So the assignment accepts a
+five-item list, a one-item list, and everything between. Only an
+empty list falls short. The star turns a fixed-shape assertion into a
+flexible one, and the same flexibility lets `*args` work in a
+function signature.

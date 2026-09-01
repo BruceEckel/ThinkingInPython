@@ -52,9 +52,8 @@ print(f"{score = }")
 
 `.2f` always shows two digits after the decimal point, even when the
 second digit is a trailing zero. `{score = }` prints both the
-expression's source text and its value, which is why it is useful for
-quick debugging prints: no need to write `print("score", score)`
-separately.
+expression's source text and its value, so a quick debugging print
+needs no separate `print("score", score)`.
 
 ## 4. What a name signals
 
@@ -126,20 +125,20 @@ whole mechanism. Each piece arrives already labelled as text the author
 typed or as a value the program supplied, so deciding what to do with
 each is a two-line `if` rather than a parsing problem.
 
-An f-string cannot be post-processed this way because the label is gone
-by the time you have one. `f"{name} scored {score:.0f}%"` evaluates to
+You cannot post-process an f-string this way, because the string it
+produces carries no label. `f"{name} scored {score:.0f}%"` evaluates to
 the single string `Alice scored 92%`, and nothing in that string records
 that `Alice` came from a variable and ` scored ` came from the source.
 A post-processor has only the characters, so it would have to guess
-which spans to quote by matching them against the values, and the guess
+which spans to quote by matching them against the values. The guess
 fails as soon as a literal happens to look like a value: with
-`name = "scored"`, the finished string reads `scored scored 92%` and no
-rule can tell the first word from the second.
+`name = "scored"`, the finished string reads `scored scored 92%`, and
+no rule can tell the first word from the second.
 
-That is the argument for `Template` in one example. Quoting is a
-harmless demonstration, but the same reasoning covers escaping a value
-before it enters SQL or HTML, which is the case where guessing wrong is
-a security hole rather than a typo.
+That failed guess is the argument for `Template` in one example.
+Quoting is a harmless demonstration, but the same reasoning covers
+escaping a value before it enters SQL or HTML, where a wrong guess is a
+security hole rather than a typo.
 
 ## 6. Negative floor division and modulo
 
@@ -151,8 +150,8 @@ print(-9 // 4, -9 % 4)
 
 C and Java truncate integer division toward zero, so their integer
 `-9 / 4` is `-2` and `-9 % 4` is `-1`. Python floors toward negative
-infinity, so `-9 // 4` is `-3`, and the identity
-`a == (a // b) * b + a % b` then forces the remainder to `3`. The
-rule: the result of `%` takes the sign of the divisor. With a
+infinity, so `-9 // 4` is `-3`. The identity
+`a == (a // b) * b + a % b` then forces the remainder to `3`. The rule
+is that the result of `%` takes the sign of the divisor. With a
 positive divisor the remainder is nonnegative, which is why
 `index % len(items)` wraps cleanly in either direction.

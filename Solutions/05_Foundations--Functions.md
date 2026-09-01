@@ -16,9 +16,9 @@ print(bad_append(3))
 #: [1, 2, 3]
 ```
 
-Each call keeps appending to the same list, since the default is
-created once, at function-definition time, and every call that omits
-`target` reuses that same object.
+Each call keeps appending to the same list. Python creates the
+default once, when it defines the function, and every call that
+omits `target` reuses that same object.
 
 Changing the default to `()` does not fix anything, because the bug
 is not really about mutability by itself. It is about calling a
@@ -92,10 +92,10 @@ report("nums", 1, 2, 3, total=True)
 ```
 
 `total` sits between `*values` and `**options` in the parameter list,
-which makes it keyword-only: callers must write `total=True`, and it
-can never be swallowed into `values` or `options` by accident. Adding
-the flag needed no change to how `report()` already collected its
-positional and keyword arguments.
+so it is keyword-only. Callers must write `total=True`, and neither
+`values` nor `options` can swallow it by accident. Adding the flag
+needed no change to how `report()` already collected its positional
+and keyword arguments.
 
 ## 5. `apply_twice()` with a lambda
 
@@ -159,35 +159,37 @@ except TypeError as e:
 #: describe() missing 1 required positional argument: 'name'
 ```
 
-The `/` caused it. `name` is positional-only, so `name="Bob"` cannot
-reach it. Where the argument goes instead is the part worth tracing:
-`**facts` accepts any keyword the parameters do not claim, and after
-the `/` the name `name` is not one of them, so `"Bob"` lands in
-`facts` and the positional `name` is left unfilled. The message is
-therefore `describe() missing 1 required positional argument: 'name'`,
+The `/` causes the `TypeError`. `name` is positional-only, so
+`name="Bob"` cannot reach it. Where the argument goes instead is the
+part worth tracing. `**facts` accepts any keyword the parameters do
+not claim, and after the `/` no parameter claims `name`. So `"Bob"`
+lands in `facts`, and the positional `name` stays unfilled. The message
+is therefore `describe() missing 1 required positional argument: 'name'`,
 which points at the parameter the caller thought they were filling.
 The mistake is visible without running the code, so the call carries a
-`# type: ignore` telling the type checker it is deliberate, the same way
-`param_markers.py` marks its two.
+`# type: ignore` telling the type checker the misuse is deliberate,
+the same way `param_markers.py` marks its two bad calls.
 
-Take the `**facts` away and the same call reports the mismatch
-directly: `divide(a=1, b=2)` against `def divide(a, b, /)` gives
-`got some positional-only arguments passed as keyword arguments:
-'a, b'`. Catch-all keywords hide that message, because there is now
-somewhere for the stray name to go. Without the `/`, the call
+Take the `**facts` away and Python reports the mismatch directly:
+`describe() got some positional-only arguments passed as keyword
+arguments: 'name'`, the same error `divide(a=10, b=2)` raises in
+`param_markers.py`. Catch-all keywords hide that message, because
+the stray name now has somewhere to go. Without the `/`, the call
 succeeds and `facts` stays empty.
 
-`**facts` is the opposite direction from exercise 6. There, a
-dictionary at the call site was spread into separate keyword
-arguments. Here, separate keyword arguments are collected back into a
-dictionary inside the function. The two forms use the same `**` and
-are inverses of each other, which is why a function declaring
-`**kwargs` can forward them to another call as `**kwargs` unchanged.
+`**facts` is the opposite direction from exercise 6. There, `**opts`
+at the call site spread a dictionary into separate keyword arguments.
+Here, `**facts` in the parameter list collects separate keyword
+arguments back into a dictionary. The two forms use the same `**` and
+are inverses of each other, and that inversion is why a function
+declaring `**kwargs` can forward them to another call as `**kwargs`
+unchanged.
 
-The pair is also why the two markers are worth using together. `/`
-fixes what `name` is called, so a later rename breaks no caller, while
-`**facts` accepts names the function has never heard of. One parameter
-is closed to the caller's vocabulary and the rest is open to it.
+The two markers are also worth using together. `/` hides the
+parameter name `name` from callers, so a later rename breaks no
+caller, while `**facts` accepts names the function has never heard
+of. One parameter refuses the caller's vocabulary and the rest accept
+it.
 
 ## 8. `UnboundLocalError` from both directions
 
@@ -221,12 +223,12 @@ which the listing trims after the variable name. Without `global`,
 the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` looks for a local that
 has no value yet. `rebinds()` fails for the same reason even though
-its `print` comes first in time: Python decides which names are local
-when it compiles the function body, and the `count = 99` below the
-`print` already made `count` local throughout. The `print` therefore
-reads the unassigned local, never the module-level name. The second
-`print`, after the assignment, is never reached. Both mistakes are
-visible without running the code. The type checker and the linter
+its `print` comes first in time. Python decides which names are local
+when it compiles the function body, so the `count = 99` below the
+`print` already made `count` local throughout. The first `print`
+therefore reads the unassigned local, never the module-level name.
+The second `print`, after the assignment, never runs. Both mistakes
+are visible without running the code. The type checker and the linter
 each flag them, so the offending lines carry `# type: ignore` and
 `# noqa` markers saying the misuse is deliberate, the way
-`param_markers.py` marks its two.
+`param_markers.py` marks its two bad calls.

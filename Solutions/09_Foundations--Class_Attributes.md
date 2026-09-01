@@ -17,11 +17,11 @@ print(c.rating)
 ```
 
 `c` is a brand-new instance with no instance attribute of its own, so
-reading `c.rating` falls through to the class attribute, which is now
-`9`. It differs from `a.rating` (still `1`) because `a` got its own
-shadowing instance attribute back when `a.rating = 1` ran, before
-`Stars.rating` was changed to `9`. `c` never shadowed anything, so it
-simply sees whatever the class attribute currently holds.
+reading `c.rating` falls back to the class attribute, which is now
+`9`. `c.rating` differs from `a.rating` (still `1`) because `a` got
+its own shadowing instance attribute when `a.rating = 1` ran, before
+`Stars.rating = 9` ran. `c` never shadowed anything, so it sees
+whatever the class attribute currently holds.
 
 ## 2. A third subclass with no override
 
@@ -54,9 +54,9 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 `Middle` behaves exactly like `Left`: neither declares its own
 `shared`, so both track `Base.shared` through the normal attribute
 lookup chain, right up until something assigns to `Left.shared` or
-`Middle.shared` directly. `Right` is unaffected throughout, because it
-created its own separate class attribute the moment it wrote `shared =
-100` in its class body.
+`Middle.shared` directly. `Right` holds `100` throughout, because it
+created its own separate class attribute the moment its class body ran
+`shared = 100`.
 
 ## 3. A second `B()` instance is unaffected by the first
 
@@ -77,11 +77,11 @@ print(b.x, b2.x)
 
 Each call to `B()` runs the generated `__init__()`, which assigns `100`
 to `self.x` as a fresh instance attribute for that particular object.
-`b.x = -1` only touches `b`'s own attribute. `b2` was constructed
-independently and keeps its own `100`. This is the same guarantee
-`real_defaults.py` demonstrates with `A`: a constructor default
-creates one value per instance, unlike a class-body attribute, which
-creates one value shared by all instances until something shadows it.
+`b.x = -1` only touches `b`'s own attribute. `b2` came from its own
+`B()` call and keeps its own `100`. `real_defaults.py` demonstrates
+the same guarantee with `A`: a constructor default creates one value
+per instance, unlike a class-body attribute, which creates one value
+shared by all instances until something shadows it.
 
 ## 4. A plain class attribute masquerading as shared state
 
@@ -107,15 +107,16 @@ print(Tally.total)
 ```
 
 `a.total = 99` looks like it should update the shared count, but
-assignment always writes to the instance, never the class. It creates
-a brand-new instance attribute named `total` on `a`, which then
-shadows `Tally.total` for `a` specifically. `vars(a)` shows this
-directly: `a` now has its own `total` entry. `Tally.total`, read
-through the class, is completely untouched and still reports `2`.
-This is precisely the shadowing bug `ClassVar` exists to catch. If
-`total` is declared `total: ClassVar[int] = 0`, the type checker
-flags `a.total = 99` as an error before this line ever runs,
-because it can see this assignment creates this confusing shadow.
+assignment through an instance always writes to the instance, never
+the class. That assignment creates a brand-new instance attribute
+named `total` on `a`, which then shadows `Tally.total` for `a`
+specifically. `vars(a)` shows the shadow directly: `a` now has its
+own `total` entry. `Tally.total`, read through the class, still
+reports `2`, because nothing wrote to the class. This shadow is
+precisely the bug `ClassVar` exists to catch. Declare `total:
+ClassVar[int] = 0` instead, and the type checker flags `a.total = 99`
+as an error before the line ever runs, because it can see the
+assignment would create this shadow.
 
 ## 5. A per-instance list, via `default_factory`
 
@@ -138,9 +139,9 @@ generated `__init__()` assigns a brand-new list to `self.items` on
 every `Cart`. Each object owns its list from birth, and `a`'s append
 cannot reach `b`.
 
-Writing the same class with a bare `items: list[str] = []` does not
-produce the shared-list bug, because `@dataclass` refuses to build the
-class at all:
+`@dataclass` refuses to build the same class written with a bare
+`items: list[str] = []`, so the shared-list bug never gets a chance to
+appear:
 
 ```python
 # exercise_5_rejected.py
@@ -158,11 +159,11 @@ except ValueError as e:
 #: mutable default <class 'list'>
 ```
 
-The full message ends with the remedy: `use default_factory`. The
-error arrives at class-definition time, not at first use, and it
-names the fix. `@dataclass` can detect the mistake because it inspects
-every default before generating the constructor. A plain class body,
-as `shared_mutable.py` showed, has nobody doing that inspection.
+The error arrives at class-definition time, not at first use, and
+the full message ends with the remedy: `use default_factory`.
+`@dataclass` can detect the mistake because it inspects every default
+before generating the constructor. Nobody inspects a plain class body,
+which is why `shared_mutable.py`'s `Cart` built without complaint.
 
 ## 6. `del` unshadows, once
 
@@ -187,16 +188,15 @@ except AttributeError as e:
 
 `del a.x` removes the entry from the instance dictionary, which is
 the only place assignment ever wrote. `vars(a)` is empty again, and
-`a.x` reads `100`, because the lookup falls through to the class the
-way it did before any assignment. Nothing was lost: the class
-attribute was never touched in either direction.
+`a.x` reads `100`, because the lookup falls back to the class the
+way it did before any assignment. The class attribute kept its `100`
+throughout: the assignment and the `del` both stayed on the instance.
 
-The second `del a.x` fails because there is nothing left on the
-instance to delete. `del` does not follow the same fallback path that
-reading does, so it never reaches `vars(A)["x"]`, which still holds
-`100`. Deleting a class attribute takes `del A.x`, naming the class,
-the same asymmetry as assignment: reads fall back to the class,
-writes and deletes do not.
+The second `del a.x` fails because the instance dictionary is empty.
+`del` stops at the instance, the way assignment does, so
+`vars(A)["x"]` keeps its `100`. Deleting the class attribute takes
+`del A.x`, naming the class. The asymmetry is the same one assignment
+has: reads fall back to the class, writes and deletes do not.
 
 ## 7. Why `self.total += 1` leaves the class counter at zero
 
@@ -229,25 +229,26 @@ print(vars(c), vars(Counting)["total"])
 #: {} 2
 ```
 
-`vars(a)` holds `{'total': 1}` and the class still holds `0`, which is
-the whole explanation. `self.total += 1` expands to
+`vars(a)` holds `{'total': 1}` and the class still holds `0`, and
+those two facts are the whole explanation. `self.total += 1` expands to
 `self.total = self.total + 1`. The read finds nothing on the instance,
 falls back to the class, and gets `0`. The write then goes where every
 write through an instance goes: onto the instance. Each object ends up
-with its own `total` of `1`, shadowing a class attribute that was never
-touched.
+with its own `total` of `1`, shadowing a class attribute that still
+holds `0`.
 
 The fix names the class on the left. `Counting.total += 1` reads and
-writes the same class dictionary, so both instances report `2` and
-`vars(c)` is empty: nothing was ever created on an instance, and
-`c.total` is the fallback finding the shared value.
+writes the same class dictionary, so both instances report `2`.
+`vars(c)` is empty because the constructor wrote only to the class,
+and `c.total` is the read falling back to that shared value.
 
 With the `# type: ignore` removed, `ty` reports
 `invalid-attribute-access`: "Cannot assign to ClassVar `total` from an
 instance." The augmented form expands to an assignment through `self`,
-and the type checker treats it as it treats `a.total = 99`: a write to a
-`ClassVar` through an instance. The declaration catches the mistake at
-check time. The listing suppresses the report so it can demonstrate
+and the type checker treats that assignment the way it treats
+`a.total = 99`: a write to a `ClassVar` through an instance. The
+`ClassVar` declaration catches the mistake at check time. The listing
+suppresses the report so it can demonstrate
 what the write does when it runs.
 
 ## 8. A mutable `ClassVar` shared down the hierarchy
@@ -287,28 +288,29 @@ print(Base2.shared, Left2.shared, Right2.shared)
 #: [1] [1] [2]
 ```
 
-`Base.shared` holds `[1, 2]`, and so do both subclasses, because there
-is only one list. Neither `Left` nor `Right` declared its own, so both
-names resolve up to `Base`, and `.append()` mutates what it finds
-there. `Left.shared is Base.shared` proves they are one object rather
-than three that happen to be equal.
+`Base.shared` holds `[1, 2]`, and so do both subclasses, because all
+three names share one list. Neither `Left` nor `Right` declared its
+own, so both names read through to `Base`, and `.append()` mutates
+what it finds there. `Left.shared is Base.shared` proves they are one
+object rather than three that happen to be equal.
 
-This is section 1's mutable-value trap and section 3's inheritance rule
-meeting. Each is harmless on its own: an immutable `ClassVar` survives
-inheritance because nothing can change it in place, and a mutable one
-in a single class at least keeps the sharing visible. Together they
-produce a base-class list that every subclass writes to and none of
-them declared.
+Here the mutable-value trap of `shared_mutable.py` meets the
+inheritance rule of `class_var_inheritance.py`. Each is harmless on
+its own: an immutable `ClassVar` survives inheritance because nothing
+can change it in place, and a mutable one in a single class keeps the
+sharing visible. Together they produce a base-class list that every
+subclass writes to and none of them declared.
 
 Giving `Right2` its own `shared = []` splits it off, and only it. The
 assignment in the class body creates a new entry in `Right2`'s own
-dictionary, so `Right2.shared` stops resolving up, while `Left2` still
-shares `Base2`'s list. The result, `[1] [1] [2]`, is the same
-one-per-class-that-declares-it pattern the integer version showed.
+dictionary, so `Right2.shared` stops reading through to `Base2`,
+while `Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
+follows the same rule the integer `shared` in exercise 2 showed: one
+value per class that declares it.
 
-The real bug this models is a registry on a base class. Every subclass
-appends its own entry, and they all land in one list nobody meant to
-share. The fix is the one the chapter gives for instances: build the
-mutable value per owner rather than once in the class body, with
-`__init_subclass__()` giving each subclass its own, or a
-`default_factory` field giving each instance its own.
+The real bug this listing models is a registry on a base class. Every
+subclass appends its own entry, and the entries all land in one list
+nobody meant to share. The fix is the chapter's: build the mutable
+value per owner rather than once in the class body. A
+`default_factory` field gives each instance its own list, and
+`__init_subclass__()` gives each subclass its own.

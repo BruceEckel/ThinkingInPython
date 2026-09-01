@@ -64,11 +64,11 @@ info: Function defined here
 ```
 
 The type checker pinpoints the mistake the chapter describes: `"3"`
-is a `str`, not an `int`, so it violates `width: int`, even though the
-call runs without error at runtime (`"3" * 4` is valid string
-repetition). The `# type: ignore` comment that was on this line in the
-book existed only to let this deliberately-wrong example pass the
-book's own build. Removing it restores the error `ty` is meant to
+is a `str`, not an `int`, so it violates `width: int`. The call still
+runs without error at runtime, because `"3" * 4` is valid string
+repetition. In the book, the `# type: ignore` comment on this line
+existed only to let this deliberately-wrong example pass the book's
+own build. Removing the comment restores the error `ty` exists to
 catch.
 
 ## 3. A second generic function, `last()`
@@ -88,10 +88,11 @@ print(last(["a", "b", "c"]))
 ```
 
 `last()` mirrors `first()`: one type parameter `T`, inferred from
-whatever `list[T]` is passed in. Calling it on a `list[int]` makes `T`
-`int` for that call, and on a `list[str]` makes `T` `str`, exactly as
-`first()` does, so the type checker knows `last([10, 20, 30])` returns an
-`int` and `last(["a", "b", "c"])` returns a `str`.
+whatever `list[T]` the caller passes. Calling `last()` on a `list[int]`
+makes `T` `int` for that call, and on a `list[str]` makes `T` `str`,
+exactly as `first()` does. The type checker therefore knows that
+`last([10, 20, 30])` returns an `int` and `last(["a", "b", "c"])`
+returns a `str`.
 
 ## 4. A subclass of `NamedTally` still chains through `Self`
 
@@ -124,15 +125,15 @@ print(t.bump().bump().report())
 #: CLICKS: 2
 ```
 
-`bump()` is declared on `Tally` with return type `Self`, which the
-type checker resolves to whatever class `bump()` was actually called on.
-Called on a `LoudTally`, `Self` means `LoudTally`, so
-`t.bump().bump()` type-checks as a `LoudTally`, and `.report()` is
-available on it, resolving to `LoudTally.report()` since Python always
-starts method lookup from the actual (most derived) class. If
-`bump()` is declared to return the fixed type `Tally` instead of
-`Self`, the type checker rejects `.report()` on the chained result,
-since plain `Tally` has no `report()` method.
+`Tally` declares `bump()` with return type `Self`, which the type
+checker resolves to whatever class `bump()` was actually called on. On
+a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
+type-checks as a `LoudTally` and `.report()` is available on the
+result. That call resolves to `LoudTally.report()`, because Python
+always starts method lookup from the actual (most derived) class. If
+`bump()`'s return annotation were the fixed type `Tally` instead of
+`Self`, the type checker would reject `.report()` on the chained
+result, since plain `Tally` has no `report()` method.
 
 ## 5. What a missing type parameter default costs
 
@@ -158,14 +159,15 @@ print(words.top().upper())
 ```
 
 With `= str` in place, `ty check` reports `str` for
-`reveal_type(words.top())`. Remove the default and it reports
-`Unknown`, and `ty` still finds no errors in the file. That is the
+`reveal_type(words.top())`. Remove the default and `ty` reports
+`Unknown` while still finding no errors in the file. That is the
 lesson: an unsolved type parameter does not fail the check, it
 switches the check off for every expression downstream of it.
 `words.top().upper()` passes either way, and so would
 `words.top().no_such_method()`. A default converts a silently
-unchecked annotation into a checked one, which is why it earns its
-place on a class whose parameter has one common answer.
+unchecked annotation into a checked one. That conversion is why a
+default earns its place on a class whose parameter has one common
+answer.
 
 ## 6. A `Literal` that does not admit `"purple"`
 
@@ -200,13 +202,13 @@ error[invalid-argument-type]: Argument to function `paint` is incorrect
    |                              found `Literal["purple"]`
 ```
 
-The expected type is spelled out in full, which is the practical
-argument for naming the union once as `Color` rather than repeating
-the four strings in every signature: the error message stays readable
-and the allowed set has one place to change. Adding `"purple"` to that
-one alias silences the error everywhere, and `grid[cell] = color`
-needed no change, since `Grid`'s values are plain `str` and every
-`Color` is one.
+The diagnostic spells out the expected type in full even though
+`paint()` names it as `Color`. That is the practical argument for
+naming the union once rather than repeating the four strings in every
+signature: the alias costs nothing in the error message, and the
+allowed set has one place to change. Adding `"purple"` to that one
+alias silences the error everywhere. `grid[cell] = color` needs no
+change, since `Grid`'s values are plain `str` and every `Color` is one.
 
 ## 7. Widening `add_square()` to `Sequence[Shape]`
 
@@ -235,7 +237,7 @@ print(count(circles))
 #: 2
 ```
 
-The call is accepted because `Sequence` is covariant in its element
+`ty` accepts the call because `Sequence` is covariant in its element
 type. A `Sequence[Shape]` promises only that you can read `Shape`s out
 of it, and every `Circle` you read out is a `Shape`, so a
 `list[Circle]` satisfies that promise. `list[Shape]` refused the same
@@ -272,10 +274,10 @@ print(shout(""))  # The empty string is falsy
 #: (nothing)
 ```
 
-`ty` is satisfied either way, and for a good reason: truthiness
-narrows too. An empty `str` is falsy and so is `None`, so inside
-`if text:` the type checker can rule out `None` exactly as `is not None`
-did, and `.upper()` is safe under both spellings.
+`ty` accepts either version, and for a good reason: truthiness
+narrows too. `None` is falsy, so inside `if text:` the type checker
+rules out `None` exactly as `is not None` did, and `.upper()` is safe
+under both spellings.
 
 What changed is which values reach which branch. `is not None` asks
 one question, whether the value is missing. `if text:` asks a
@@ -285,8 +287,9 @@ purpose is now indistinguishable from no string at all.
 
 Whether that matters depends on the caller, and that is the point of
 the exercise: the type checker cannot tell you, because both versions are
-type-correct. This is the same trap as `if not target:` on a mutable
-default in [Functions](../Chapters/05_Foundations--Functions.md), and the same
+type-correct. The truthiness test is the same trap as `if not target:`
+on a mutable default in
+[Functions](../Chapters/05_Foundations--Functions.md), and the same
 answer applies. Test for the condition you mean. Use `is None` when
 you mean "was anything supplied," and truthiness only when an empty
 value genuinely belongs with the missing one.

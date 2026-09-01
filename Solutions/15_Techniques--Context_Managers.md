@@ -33,9 +33,9 @@ Entering is outside-in (`A` then `B`), and exiting is inside-out (`B`
 then `A`). `B`'s whole lifetime, enter and exit, sits nested inside
 `A`'s, the same last-in-first-out order [Combining Context
 Managers](../Chapters/15_Techniques--Context_Managers.md#combining-context-managers) shows for `tag("ul")` and
-`tag("li")` written on one `with` line. Writing the nesting as two
-separate `with` statements instead of one comma-separated line makes
-no difference to the order.
+`tag("li")` written on one `with` line. The order is the same whether
+you write the nesting as two separate `with` statements or as one
+comma-separated line.
 
 ## 2. Suppressing a second exception type
 
@@ -77,7 +77,7 @@ print("survived")
 ```
 
 The class is the chapter's `ignore` with the `ALL` default left out,
-since the exercise never calls it with no argument. Everything the
+since the exercise always passes an argument. Everything the
 exercise asks for happens at the call site: `ignore` takes one `types`
 argument that is either an exception class or a tuple of them, and
 `issubclass(exc_type, self.types)` accepts either shape. Passing
@@ -87,9 +87,10 @@ block printed before the change.
 
 Note the double parentheses. `ignore((ZeroDivisionError, TypeError))`
 passes one argument, a tuple. `ignore(ZeroDivisionError, TypeError)`
-passes two, which is a `TypeError` at the call itself, since `ignore`
-declares a single parameter. A version taking `*types` would accept the
-second spelling, and that is the design `contextlib.suppress` chose.
+passes two, and Python raises a `TypeError` at the call itself, since
+`ignore` declares a single parameter. A version taking `*types` would
+accept the second spelling, and that is the design
+`contextlib.suppress` chose.
 
 ## 3. A third manager on one `with` line
 
@@ -165,12 +166,12 @@ print("available after both returned:", pool.available())
 
 The first `lease()` takes one connection out of the queue, and the
 nested second `lease()` takes the other, so `pool.available()` reports
-`0` while both are checked out. Exiting the inner `with` returns its
+`0` inside the inner `with`. Exiting the inner `with` returns its
 connection first, then exiting the outer `with` returns the second,
-restoring `pool.available()` to `2`. This confirms the pool has no
-built-in limit of "one lease at a time." It only has as many items as
-you gave it in the constructor, and it happily hands out however many
-distinct leases there are connections for.
+restoring `pool.available()` to `2`. The `0` confirms the pool has no
+built-in limit of "one lease at a time." The pool holds exactly the
+items you gave its constructor, and it hands out as many concurrent
+leases as it has items.
 
 ## 5. Two `banner` decorators stacked on one function
 
@@ -200,20 +201,21 @@ report()
 #: === outer ends ===
 ```
 
-The prediction is the same one stacking produces anywhere: this is
-`report = banner("outer")(banner("inner")(report))`. `@banner("inner")`
-is nearest the `def`, so it wraps `report()` first, and `@banner("outer")`
-then wraps that result. Calling `report()` therefore enters the outer
-manager, which calls the inner wrapper, which enters the inner manager
-before running the body. Unwinding reverses it, so the four bracketing
-lines nest rather than interleave.
+The prediction is the same one stacking produces anywhere. Python reads
+the stack as `report = banner("outer")(banner("inner")(report))`.
+`@banner("inner")` is nearest the `def`, so it wraps `report()` first,
+and `@banner("outer")` then wraps that result. Calling `report()`
+therefore enters the outer manager, which calls the inner wrapper,
+which enters the inner manager before running the body. Unwinding
+reverses that order, so the four bracketing lines nest rather than
+interleave.
 
 Each decoration is one `banner(...)` object reused for every call, not
-one per call. It works because `@contextmanager` returns a
+one per call. Reuse works because each `banner(...)` call returns a
 `ContextDecorator`, whose `__call__()` recreates the generator on each
-invocation. A hand-written class-based manager decorating a function has
-to do that itself, or the second call finds a generator that is
-already exhausted.
+invocation. A hand-written class-based manager decorating a function
+re-enters the same instance on every call instead, so every call
+shares any state the instance holds.
 
 ## 6. `ignore_missing`, which suppresses only `KeyError`
 
@@ -253,18 +255,18 @@ except ValueError as e:
 `__exit__()` decides an exception's fate through its return value:
 truthy suppresses, falsy lets the exception continue. Returning
 `issubclass(exc_type, KeyError)` therefore suppresses `KeyError` and
-propagates everything else, which the second block confirms by catching
-the `ValueError` outside the `with`.
+propagates everything else. The second block confirms the propagation
+by catching the `ValueError` outside the `with`.
 
-The `exc_type is not None` test is what keeps the normal path working.
-When a block finishes without an exception, Python still calls
-`__exit__()`, passing `None` for all three arguments, and
+The `exc_type is not None` test keeps the normal path working. When a
+block finishes without an exception, Python still calls `__exit__()`,
+passing `None` for all three arguments, and
 `issubclass(None, KeyError)` raises a `TypeError`. Checking for `None`
-first also gives the type checker what it needs to narrow `exc_type` to
-`type[BaseException]`, which is what `issubclass()` requires.
+first also lets the type checker narrow `exc_type` to
+`type[BaseException]`, the type `issubclass()` requires.
 
-The class is named like a function because you use it like one, the
-same reason `contextlib.suppress` carries a lowercase name.
+The class uses a lowercase name because you use it like a function.
+`contextlib.suppress` is lowercase for the same reason.
 
 ## 7. `exit_stack.py` driven from the command line
 
@@ -295,22 +297,24 @@ using []
 ```
 
 `enter_context()` pushes each manager onto the stack as the
-comprehension walks the list left to right, and leaving the `with`
-unwinds that stack, so the closes come out in reverse. The order does
-not depend on how many names arrive, which is the property to confirm.
+comprehension walks the list left to right. Leaving the `with` unwinds
+that stack, so the closes come out in reverse. The reversal holds for
+any number of names, including zero, the property the exercise asks
+you to confirm.
 
 The empty run is the more interesting one. Nothing opened, so nothing
 closes, and `with ExitStack() as stack:` still enters and exits
-correctly around a body that manages nothing. That degenerate case is
-why `ExitStack` exists: the same code covers zero managers, which a
-fixed `with a, b, c:` line cannot express, and a count known only at
-runtime is the situation a command line hands you.
+correctly around a body whose stack stays empty. That degenerate case
+shows why `ExitStack` exists. A fixed `with a, b, c:` line settles its
+count in the source. `ExitStack` accepts a count settled only at
+runtime, zero included, and a command line is exactly where that count
+comes from.
 
-This solution's listing is not extracted and run like the others,
-because a script reading `sys.argv` produces different output under the
-book's output checker, which runs every listing inside one process with
-its own arguments. The version below passes the names to `wrap()`
-directly, which is checkable and shows both cases:
+The `sys.argv` rewrite stays out of the extracted listings, because
+the book's output checker runs every listing inside one process with
+its own arguments, and a script reading `sys.argv` would see the
+checker's arguments instead. The listing below passes the names to
+`wrap()` directly, so the checker can run it, and it shows both cases:
 
 ```python
 # exercise_7.py

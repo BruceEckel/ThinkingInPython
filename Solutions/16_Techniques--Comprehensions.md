@@ -13,10 +13,10 @@ print(result)
 
 The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
 both of which must be true before `int(e)` ever runs. `"a"` fails
-`isdigit()` (letters are not digits), so it never reaches `int()`,
-which would otherwise raise `ValueError`. Only `"4"` in the list is
-both a string and made entirely of digits, so it is the only element
-that survives to be converted and squared.
+`isdigit()`, so it never reaches `int()`, which would otherwise raise a
+`ValueError`. `"4"` is the only element that is both a string and made
+entirely of digits, so it is the one the comprehension converts and
+squares.
 
 ## 2. A `2` on the diagonal instead of `1`
 
@@ -32,9 +32,8 @@ for row in matrix:
 ```
 
 Only the literal in the conditional expression changes, from `1` to
-`2`. The comprehension's structure, two nested loops producing a list
-of lists, does the same work either way. Only the value placed on the
-diagonal is different.
+`2`. Two nested loops still produce a list of lists, with a different
+value on the diagonal.
 
 ## 3. Adding `"Galahad"` to `names`
 
@@ -54,9 +53,9 @@ print(lengths["GALAHAD"], "NI" in lengths)
 `"Galahad"` is seven characters, so it passes the `len(name) > 3`
 filter and adds one entry. `"Ni"` is still the only name the filter
 drops. The filter tests the original name, not the upper-cased key, so
-a name is judged before the output expression ever runs. That ordering
-matters when the output expression changes the length, as `name * 2`
-would.
+the filter judges a name before the output expression ever runs. That
+ordering matters when the output expression changes the length, as
+`name * 2` would.
 
 Two names that upper-case to the same string would collide, since the
 comprehension builds a `dict` and a later key overwrites an earlier
@@ -79,16 +78,16 @@ print(sorted(unique))
 #: ['Alice', 'Bob', 'J', 'John']
 ```
 
-Four entries, one more than the filtered version. The seven names
-normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`, `Bob`, and a
-set keeps one of each, so the duplicates and the case variants collapse
-and `J` joins the three that were already there.
+The set holds four entries, one more than the filtered version. The
+seven names normalize to `Bob`, `John`, `Alice`, `Bob`, `Alice`, `J`,
+`Bob`. A set keeps one of each, so the duplicates and the case variants
+collapse to `Bob`, `John`, and `Alice`, and `J` joins them.
 
 `"J"` does not collide with `"JOHN"` because the normalization is a
 string transformation, not a truncation: `"J"` becomes `"J"` and
 `"JOHN"` becomes `"John"`. `name[1:]` on a one-character string is the
-empty string, so nothing is appended to the capital. Two distinct
-strings hash differently, so both survive.
+empty string, so the concatenation adds nothing to the capital. `"J"`
+and `"John"` are distinct strings, so the set keeps both.
 
 The filter existed to drop the initial `"J"` as noise. Removing it
 shows what the set is doing on its own: it collapses only exact
@@ -145,13 +144,13 @@ print({**d for d in dicts})
 #: {'a': 5, 'b': 2, 'c': 9}
 ```
 
-`**` merges the dictionaries in iteration order, and when the same key
+`**` merges the dictionaries in iteration order. When the same key
 appears more than once, the value from the *later* dictionary
 overwrites the earlier one. The key `"a"` appears in the first, third,
 and fourth dictionaries (`1`, then `3`, then `5`), so the final value
-is `5`, the last one written. Order among distinct keys is preserved
-by first insertion, which is why `"a"` still prints first despite its
-value coming from the last dictionary in the list.
+is `5`, the last one written. The result orders keys by first
+insertion, which is why `"a"` still prints first even though its value
+comes from the last dictionary in the list.
 
 ## 7. Running `any()` before `sum()`
 
@@ -167,9 +166,10 @@ print(list(nums))
 ```
 
 `any()` pulls values until one matches, so it consumes `0` through `5`,
-reports `True`, and stops. That leaves the generator part-way through,
-not empty: `sum()` continues from `6` and adds `36 + 49 + 64 + 81`,
-giving `230` rather than the full `285`. By then every value is gone,
-so `list()` gets nothing. A generator holds a position rather than a
-beginning. Each consumer picks up where the previous one stopped, and
-`any()`'s early exit leaves values behind for `sum()` to find.
+reports `True`, and stops. Stopping there leaves the generator part-way
+through, not empty: `sum()` continues from `6` and adds `36 + 49 + 64 +
+81`, giving `230` rather than the full `285`. By then `sum()` has
+drained every value, so `list()` gets nothing. A generator holds a
+position rather than a beginning. Each consumer picks up where the
+previous one stopped, and `any()`'s early exit leaves values behind for
+`sum()` to find.

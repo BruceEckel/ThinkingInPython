@@ -67,11 +67,12 @@ print(round(t1.celsius, 2), round(t2.celsius, 2))
 ```
 
 212°F, 373.15 K, and 100°C are the same temperature (water's boiling
-point), so both alternative constructors agree once each result is
-rounded to hide floating-point noise. Both classmethods end with
-`return cls(...)`, so `Temperature.from_kelvin` builds a `Temperature`
-exactly like `from_fahrenheit` does, only with a different formula for
-`celsius`.
+point), so both alternative constructors produce `100.0`. The exercise
+asks for agreement within rounding, so the `print()` call passes each
+`celsius` through `round()` to guard against floating-point noise in
+the arithmetic. Both classmethods end with `return cls(...)`, so
+`Temperature.from_kelvin` builds a `Temperature` exactly like
+`from_fahrenheit` does, only with a different formula for `celsius`.
 
 ## 3. A third override in the chain, `Simple3`
 
@@ -119,14 +120,15 @@ This solution strips the constructor `print()` calls from
 `Simple3` to `simple2.py` itself, the two constructor lines print
 first.
 
-`show_twice()` is inherited unchanged from `Simple`, and it calls
-`self.show()` twice. Because `self` is a `Simple3`, each call resolves
-to `Simple3.show()` first (Python always starts from the most derived
-class), which prints its own message, then calls `super().show(msg)`,
-running `Simple2.show()`, which prints its message and calls
-`super().show(msg)` again, running `Simple.show()`, which finally
-prints `x`. Each `super()` call hands off to the next class up the
-chain, so the messages appear in derived-to-base order, twice.
+`Simple3` inherits `show_twice()` unchanged from `Simple`, and
+`show_twice()` calls `self.show()` twice. Because `self` is a
+`Simple3`, each call resolves to `Simple3.show()` first (Python always
+starts from the most derived class). `Simple3.show()` prints its own
+message, then calls `super().show(msg)`, which runs `Simple2.show()`.
+`Simple2.show()` prints its message and calls `super().show(msg)`
+again, which runs `Simple.show()`, and `Simple.show()` finally prints
+`x`. Each `super()` call hands off to the next class up the chain, so
+the messages appear in derived-to-base order, twice.
 
 ## 4. A second `cached_property` that reads the first
 
@@ -161,7 +163,7 @@ Accessing `n.total` first runs its body once, prints the `"summing"`
 message, and stores `30` on the instance. When `average`'s body then
 reads `self.total`, it hits that stored value directly. No second
 `"summing"` message appears, because `total` was already computed and
-cached before `average` ever asked for it. If `average` is accessed
+cached before `average` ever asked for it. If you access `average`
 first, its own body triggers `total`'s computation the same way,
 just on first use instead of in advance.
 
@@ -188,13 +190,13 @@ print(f"{t} is {t!r}")
 #: 21.0C is Temperature(21.0)
 ```
 
-With only `__repr__()` defined, both lines show
-`Temperature(21.0)`: `print()` finds no `__str__()` and falls back.
-Adding `__str__()` splits them. `print(t)` and `f"{t}"` take the
-readable form, while the list keeps showing `Temperature(21.0)` for
-each element, because a container formats its elements with `repr()`
-and never with `str()`. `{t!r}` asks for the same developer form
-inside an f-string.
+With only `__repr__()` defined, `print(t)` and the printed list both
+show `Temperature(21.0)`: `print()` finds no `__str__()` and falls
+back to `__repr__()`. Adding `__str__()` splits the two lines.
+`print(t)` and `f"{t}"` take the readable form, while the list keeps
+showing `Temperature(21.0)` for each element, because a container
+formats its elements with `repr()` and never with `str()`. `{t!r}`
+asks for the same `Temperature(21.0)` form inside an f-string.
 
 The two forms answer different questions. `Temperature(21.0)` says
 what would rebuild this object, which is what you want in a traceback
@@ -222,8 +224,8 @@ Derived().show()
 The program prints `Base.show`. Nothing overrode anything: `shwo()` is
 a new method that happens to sit in a subclass, and `show()` resolves
 up the chain to `Base` as it always would. Python has no opinion about
-whether a subclass method was meant to replace one, so the misspelling
-is not an error, it is a third method nobody calls.
+whether you meant a subclass method to replace a base-class method, so
+the misspelling is not an error, it is a third method nobody calls.
 
 Add `from typing import override`, uncomment the decorator,
 and the program still prints `Base.show`,
@@ -241,9 +243,9 @@ program's behavior never changed at any point in the exercise. That is
 the whole shape of the feature: `@override` states an intention, the
 type checker verifies it, and the runtime is indifferent.
 
-The value is in what it catches later. The typo is easy to spot in six
-lines. The same failure arrives silently when someone renames or
-deletes `Base.show` a year from now, and every `@override` in the
-codebase turns that rename into a list of exact locations to fix. A
-decorator that does nothing at runtime is worth writing when a tool
-reads it.
+The value of `@override` is in what the type checker catches later.
+The typo is easy to spot in six lines. The same failure arrives
+silently when someone renames or deletes `Base.show` a year from now.
+With `@override` on every overriding method in the codebase, that
+rename becomes a list of exact locations to fix. A decorator that does
+nothing at runtime is worth writing when a tool reads it.

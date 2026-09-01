@@ -56,7 +56,7 @@ def test_transfer_overdraft_leaves_both_unchanged(
 `transfer()` calls `self.withdraw(amount)` before `other.deposit(amount)`.
 `withdraw()` checks the balance and raises `InsufficientFunds` *before*
 touching `self.balance`, so an overdrafting transfer never reaches the
-`deposit()` call at all: both accounts are left exactly as they were.
+`deposit()` call at all. Both accounts keep the balances they had.
 Writing the overdraft test first makes this ordering a
 deliberate decision rather than an accident. A version that deposits
 first and withdraws second leaves `other` credited even when the
@@ -96,12 +96,13 @@ def test_add_interest_rates(funded: Account,
 `parametrize` runs this one test body four times, once per rate,
 reported individually as `test_add_interest_rates[0.0]`,
 `test_add_interest_rates[0.05]`, and so on. `pytest.approx()` is here
-because the relationship the test states is not guaranteed to be
-exact, not because these four rates round. For `0.0`, `0.05`, `0.5`,
-and `1.0` on a balance of `100`, the two forms are bit-identical and
-`==` would pass just as well. A rate that does not land on a binary
-fraction, or interest applied more than once, is where the assertion
-needs the tolerance.
+because the two sides of the assertion, `100 + 100 * rate` in the method
+and `100 * (1 + rate)` in the test, can round differently, not because
+these four rates round. For `0.0`, `0.05`, `0.5`, and `1.0` on a balance
+of `100`, the two sides are bit-identical and `==` would pass just as
+well. A rate such as `0.1`, where the two sides differ by one bit, or
+interest applied more than once, is where the assertion needs the
+tolerance.
 
 ## 3. A fixture asserting an invariant after the test
 
@@ -152,8 +153,8 @@ that used the fixture finishes, whether it passed or raised. Here that
 teardown is itself an assertion, so it doubles as a check: no matter
 what either test does to the account, `never_negative`'s balance must
 still be non-negative once the test body returns control to the
-fixture. Both tests pass the same shared invariant check with no
-duplicated assertion in either test body.
+fixture. Both tests pass the same invariant check, with no assertion
+duplicated in either test body.
 
 ## 4. The environment variable, patched and then injected
 
@@ -189,10 +190,10 @@ def test_settings_path_in_takes_the_directory(
     assert settings.settings_path_in(tmp_path) == expected
 ```
 
-The first test has to know two things about the implementation: that
-the function reads an environment variable, and that the variable is
-spelled `APP_CONFIG`. Renaming it to `APP_SETTINGS_DIR` breaks the
-test even though the behavior is unchanged, and the failure is a
+The first test has to know two things about the implementation: that the
+function reads an environment variable, and that the variable's name is
+`APP_CONFIG`. Renaming the variable to `APP_SETTINGS_DIR` breaks the
+test even though the function still behaves the same. The failure is a
 `KeyError` from inside the function rather than a message about the
 name. The second test knows only what the function promises: give it a
 directory, get the settings file inside it. That test survives the
@@ -200,12 +201,12 @@ rename, and it survives dropping the environment variable entirely.
 
 `tmp_path` is still worth taking in the second test, even though
 nothing touches the disk, because it supplies a real, valid path
-without hard-coding one that would differ across operating systems.
+where a hard-coded one would differ across operating systems.
 
 The trade is that injection moves the decision outward: somebody has
 to read `APP_CONFIG` and pass the directory in. That somebody is
-usually one function at the program's edge, which is the one place a
-patching test is worth writing.
+usually one function at the program's edge, and that function is the
+one place a patching test is worth writing.
 
 ## 5. Stubbing a boundary, patched and then injected
 
@@ -249,23 +250,26 @@ Both tests pass and neither touches the network. The stub is the same
 function in both: a fetcher returning a `BytesIO` that behaves enough
 like a response to satisfy the `with` block and `.read()`.
 
-Renaming `urlopen` to `fetch` in `ch11_weather.py` separates them.
+Renaming `urlopen` to `fetch` in `ch11_weather.py` separates the two
+tests.
 `test_injected()` still passes, because it never named the dependency.
-It hands one in, and `current_temp_with()` calls whatever it was
-given. `test_patched()` fails with
+It passes one in, and `current_temp_with()` calls whatever it
+receives. `test_patched()` fails with
 `AttributeError: <module 'ch11_weather'> has no attribute 'urlopen'`,
 because `monkeypatch.setattr()` looks the name up by string and the
 string is now wrong.
 
-That is the same lesson exercise 4 draws from the environment variable,
-applied to a different kind of dependency. A patched test is coupled to
-the *name* of the thing it replaces, in the module where that name
-lives. An injected test is coupled only to the shape of what it passes.
-Rename the import, move the call to a helper, or import `urlopen` a
-different way, and the patched test breaks while the code still works.
+That separation is the same lesson exercise 4 draws from the environment
+variable, applied to a different kind of dependency. A patched test
+depends on the *name* of the thing it replaces, in the module where that
+name lives. An injected test depends only on the shape of what it
+passes. Rename the import, move the call into a helper module, or import
+`urlopen` a different way, and the patched test breaks while the code
+still works.
 
 `monkeypatch` earns its place where you cannot change the code:
 someone else's library, or a function you are not ready to refactor.
 Where you can change the signature, injection turns the dependency into
-part of the contract, which is what the chapter means by a function
-that goes looking for something it was never handed.
+part of the contract. The function then receives what it needs instead
+of going looking for something no caller handed it, the chapter's
+description of a function that is hard to test.

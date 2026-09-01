@@ -38,12 +38,11 @@ print(classify("hi"))
 
 `[]` matches only the empty list. `[_]` matches a list with exactly
 one element (the `_` throws the value away without a name). `[_, *_]`
-matches two or more elements: the first `_` matches the first element,
-and `*_` collects everything after it, requiring the list to have at
-least that first element plus more. Order matters here: the more
-specific patterns (`[]`, `[_]`) must come before the more general one
-(`[_, *_]`), or the general one matches first and the specific
-cases never run. `Point()` matches any `Point` instance without
+matches one or more elements: the first `_` matches the first element,
+and `*_` collects the rest, even when the rest is empty. So
+`[_, *_]` also fits a singleton, and order matters: `[_]` must come
+before `[_, *_]`, or the general pattern claims `[1]` first and
+"singleton" never runs. `Point()` matches any `Point` instance without
 binding its fields at all, since `classify()` doesn't need `x` or `y`.
 
 ## 2. Adding `Rectangle` without its `case`
@@ -82,12 +81,12 @@ info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 
 Once `Rectangle` joins the `Shape` union, the type checker can prove that a
 `Rectangle` value falls through both `case`s and reaches `case _`.
-`assert_never()` demands its argument have type `Never`, meaning "this
-code is unreachable," but the type checker now knows `shape` could
-genuinely be a `Rectangle` at that point, so the two types disagree
-and it reports an error. This is the safety net the chapter
-describes: the missing case becomes a caught type error instead of a
-silent gap that only shows up when an actual `Rectangle` reaches
+`assert_never()` demands an argument of type `Never`, meaning "this
+code is unreachable." The type checker now knows `shape` can be a
+`Rectangle` at that point, so the two types disagree and the checker
+reports an error. That error is the safety net the chapter describes:
+the missing case becomes a type error at check time instead of a
+silent gap that shows up only when an actual `Rectangle` reaches
 `area()` at runtime.
 
 ## 3. Matching a nested shape
@@ -117,12 +116,15 @@ print(handle({"type": "key", "key": "Enter"}))
 
 The new `case` nests a mapping pattern inside a mapping pattern:
 `{"at": {"x": x, "y": y}}` matches when `"at"` maps to a dictionary
-that itself has `"x"` and `"y"` keys, binding both in one step. Placing
-it before the flat `{"type": "click", "x": x, "y": y}` case lets both
-shapes of a click event share the same handling logic while keeping
-each pattern focused on one shape. `match` tries cases top to bottom
-and stops at the first one that fits, so the flat form still works
-for events that were never nested to begin with.
+that itself has `"x"` and `"y"` keys, binding both in one step. The
+nested case and the flat `{"type": "click", "x": x, "y": y}` case
+each describe one shape of click event, and both return the same
+string. The two cases never compete: a flat event has no `"at"` key
+and a nested one has no top-level `"x"`, so each event fits only one
+of them. Order matters for `{"type": kind}`, which any event with a
+`"type"` key satisfies. `match` tries cases top to bottom and stops
+at the first one that fits, so that catchall sits after the specific
+click and key cases.
 
 ## 4. A `Webhook` channel added to the union
 
@@ -154,8 +156,8 @@ print(render(Webhook("https://example.com/hook"), "Dana"))
 #: POST for Dana to https://example.com/hook
 ```
 
-Adding `Webhook` to the union and running `ty` before adding the
-`case` reports, at each `assert_never()` call:
+Add `Webhook` to the union and run `ty` before adding its `case`. At
+each `assert_never()` call the checker reports:
 
 ```
 error[invalid-argument-type]: Argument to function `assert_never` is incorrect
@@ -166,11 +168,11 @@ error[invalid-argument-type]: Argument to function `assert_never` is incorrect
 
 The message names the type that has no case. `assert_never()` declares
 its parameter as `Never`, the type no value has, so the call checks
-only when every other case has already been eliminated. One unhandled
-member leaves `Webhook` reaching that line, and the type checker says so.
-The same error appears once per function that matches on the union,
-which is the cost the chapter describes: adding a type touches every
-operation.
+only when the cases above it have already eliminated every member of
+the union. `Webhook` has no case, so it can reach that line, and the
+type checker says so. The same error appears once per function that
+matches on the union. That repetition is the cost the chapter
+describes: adding a type touches every operation.
 
 ## 5. Quadrants with guards, and without them
 
@@ -243,8 +245,8 @@ print(quadrant(Point(0, 7)))
 ```
 
 The second version reads better, and the reason is worth naming. A
-guard hides the shape of the dispatch: five nearly identical `if`
-clauses have to be read one at a time to see that they enumerate sign
+guard hides the shape of the dispatch: you have to read five nearly
+identical `if` clauses one at a time to see that they enumerate sign
 combinations. Once the subject is `sign(p.x), sign(p.y)`, the cases
 are literals in a two-column table, and a missing combination is
 visible at a glance. The `|` alternation then handles both axis cases
@@ -314,17 +316,17 @@ fallback value. `case FALLBACK:` is a bare name, so it captures: it
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
 `broken()`, and never compares anything. The module-level constant
 still holds `Signal.CAUTION` afterward, which is why the mistake is
-easy to miss. Python allows this only because the capture is the last
-case. Another case after it fails to compile.
+easy to miss. Python accepts `case FALLBACK:` only because it is the
+last case. Another case after it fails to compile.
 
 The first fix gives the constant a dotted name by putting it in a
 namespace. `Defaults.FALLBACK` is a value pattern, so `dotted()`
 compares against it and answers "brake" for `Signal.STOP`. Any dotted
-name works, including `Signal.CAUTION` itself, and moving the constant
+name works, including `Signal.CAUTION` itself. Moving the constant
 into a class keeps one definition for the rest of the program to use.
 
 The second fix keeps the bare constant and moves the comparison into a
 guard, where `FALLBACK` is an ordinary expression rather than a
 pattern. `case other if other is FALLBACK:` is more verbose than the
-dotted name, and it is what you want when the test is more than
+dotted name, but it is what you want when the test is more than
 equality.

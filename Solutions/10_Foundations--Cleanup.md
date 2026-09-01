@@ -56,9 +56,9 @@ print(other)
 
 `clear()` changes the object every name can see. Rebinding changes
 only which object this one name points at. The two coincide in
-`weak_value.py` because that list has exactly one reference. With two,
-rebinding would leave the `Counter` objects alive and `live_count()`
-stuck at `3`.
+`weak_value.py` because that list has exactly one reference. With
+two references, rebinding would leave the `Counter` objects alive
+and `live_count()` stuck at `3`.
 
 ## 2. Listing the names of every live instance
 
@@ -88,10 +88,10 @@ print(Counter.live_names())
 ```
 
 `cls._instances.values()` iterates the live `Counter` objects
-currently tracked (a `WeakValueDictionary` behaves like a normal
-`dict` for reading), and the generator expression pulls out each
-one's `.name`. Sorting gives a deterministic order, since a
-dictionary's iteration order here follows insertion, not name order.
+currently tracked, since a `WeakValueDictionary` reads like a normal
+`dict`. The generator expression pulls out each one's `.name`. Sorting
+gives a deterministic order, since a dictionary's iteration order here
+follows insertion, not name order.
 
 ## 3. Building the `list` with a comprehension instead of a loop
 
@@ -136,13 +136,13 @@ print("End of delete loop")
 ```
 
 The output is identical to the original `for`-loop-with-`append()`
-version. A comprehension still calls `Counter(name)` once per name,
-in order, and still keeps the resulting list as the only thing holding
-references to those three objects. `del c` inside the loop still only
-unbinds the name `c`. It does not touch the list. Nothing about how
-the list gets built changes when its contents get destroyed, so the
-`deleted` messages still only appear at interpreter shutdown, after
-`End of delete loop` has already printed.
+version. A comprehension calls `Counter(name)` once per name, in
+order, and the resulting list is again the only thing holding
+references to those three objects. `del c` inside the loop unbinds the
+name `c` and leaves the list alone. How the list gets built has no
+bearing on when its contents get destroyed, so the `deleted` messages
+appear, as before, at interpreter shutdown, after `End of delete loop`
+has printed.
 
 ## 4. A strong registry that never lets go
 
@@ -179,12 +179,12 @@ print(Counter.live_count())
 The count never falls. A `dict` holds a strong reference to each
 value, so `_instances` alone keeps every `Counter` alive no matter
 what `counters` does. `pop()` removes one reference and the registry
-still holds another, so the object's reference count never reaches
-zero and nothing is ever collected.
+keeps another, so the object's reference count stays above zero and
+the object survives.
 
-The registry has become the leak it was meant to observe:
-`live_count()` now reports how many `Counter` objects were ever
-created, which is exactly the number it can never report correctly. A
+The registry has become the leak it exists to catch: `live_count()`
+now reports how many `Counter` objects the program ever created,
+because the registry itself is what keeps them all alive. A
 `WeakValueDictionary` holds its values weakly, so it can answer the
 question without changing the answer.
 
@@ -229,28 +229,28 @@ B closed
 ```
 
 `B closed` now prints *after* `End of program`, where the chapter's
-version printed it at the `del b`. It is missing from the markers
-above because it arrives during interpreter shutdown, later than the
-book's output checker captures, which is a demonstration of the point
-in its own right. Nothing else about the output
-changes, which is what makes the mistake hard to see: the callback
-still runs, just at a different time and for a different reason.
+version printed it at the `del b`. The listing has no marker for it
+because the line arrives during interpreter shutdown, after the book's
+output checker has stopped capturing. That late arrival demonstrates
+the point in its own right. The rest of the output matches the
+chapter's exactly, so the mistake is hard to see: the callback still
+runs, just at a different time and for a different reason.
 
 What keeps the `Connection` alive is the callback itself. `self.close`
-is a bound method, and a bound method holds a strong reference to the
-object it is bound to. `finalize()` stores the callback, so the
-finalizer registry now holds a reference to the object whose
-death it is waiting for. `del b` drops the last reference the program
+is a bound method, and a bound method holds a strong reference to
+its instance. `finalize()` stores the callback, so the finalizer
+registry now holds a reference to the object whose death it is
+waiting for. `del b` drops the last reference the program
 has, but not the last reference that exists, so the object survives.
 
-`B closed` prints at all only because of `finalize()`'s `atexit`
-backstop, which runs every still-alive finalizer as the interpreter
-shuts down. That is the fallback the chapter describes, doing exactly
-its job, on an object that should have been collected at `del b`.
+`B closed` prints only because `finalize()`'s `atexit` backstop runs
+every still-alive finalizer as the interpreter shuts down. That
+backstop is the fallback the chapter describes, doing exactly its job,
+on an object that `del b` should have destroyed.
 
-The chapter's `finalize(self, print, name, "closed")` avoids this by
-passing the pieces the callback needs rather than the object that has
-them. `name` is a `str` the `Connection` also happens to hold. The
+The chapter's `finalize(self, print, name, "closed")` avoids the trap
+by passing the pieces the callback needs rather than the object that
+has them. `name` is a `str` the `Connection` also happens to hold. The
 finalizer's reference to it keeps a string alive, not a connection.
 The rule generalizes: a finalizer may capture anything except a path
 back to its own object.
@@ -287,23 +287,23 @@ print("after collect")
 #: after collect
 ```
 
-Both finalizers run at `gc.collect()`, in creation order. Nothing
-changed in principle: reference counting cannot reclaim either object,
-because each holds the other, and the cycle collector reclaims both
-together when it runs. A cycle through two objects behaves exactly
-like a cycle through one. The self-reference in `cycle.py` is only the
-smallest case.
+Both finalizers run at `gc.collect()`, in creation order. The
+principle is the same as before. Reference counting cannot reclaim
+either object, because each holds the other. The cycle collector
+reclaims both together when it runs. A cycle through two objects
+behaves exactly like a cycle through one. The self-reference in
+`cycle.py` is only the smallest case.
 
-Removing the `gc.disable()`/`gc.enable()` pair is what makes the output
+Removing the `gc.disable()`/`gc.enable()` pair makes the output
 unpredictable. The collector then runs on its own schedule, triggered
-by allocation counts rather than by your call, so the two `finalized`
-lines can appear anywhere after `pair_link()` returns: between the two
-`print()` calls, after both, or not until the interpreter shuts down.
-Whether they land before `after collect` depends on how many objects
-the program happens to have allocated by then, which is not a fact
-about this program.
+by allocation counts rather than by your call. The two `finalized`
+lines can therefore appear anywhere after `pair_link()` returns:
+between the two `print()` calls, after both, or not until the
+interpreter shuts down. Whether they land before `after collect`
+depends on how many objects the program has allocated by then, and
+nothing in the listing's source fixes that number.
 
-`gc.disable()` is in the chapter's listing for that reason alone. It
-is not advice. It buys a deterministic transcript for a demonstration
-whose entire subject is the absence of determinism, which is why the
-listing turns the collector back on immediately afterward.
+`gc.disable()` is in the chapter's listing only to keep the output
+predictable. It is not advice. It buys a deterministic transcript for
+a demonstration whose entire subject is the absence of determinism, so
+the listing turns the collector back on immediately afterward.
