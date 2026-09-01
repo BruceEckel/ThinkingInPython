@@ -491,7 +491,7 @@ g2.play()
 #: Warrior now battles a Weapon
 ```
 
-In this environment, `Character` objects interact with `Obstacle` objects,
+`Character` objects interact with `Obstacle` objects,
 but the types of characters and obstacles depend on the kind of game you're playing.
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
@@ -506,20 +506,14 @@ the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
-The base classes `Obstacle`, `Character`, and `GameElementFactory`
-(translated from the Java version)
-force every concrete class to inherit from them.
+The base classes `Obstacle`, `Character`,
+and `GameElementFactory` force every concrete class to inherit from them.
 Those `raise NotImplementedError` bodies enforce less than the listing suggests.
-The failure comes at call time:
-constructing a concrete factory that omits `make_obstacle()` succeeds,
-and the exception arrives only when something calls the missing method.
-An `@abstractmethod` fails at instantiation,
-the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md),
-and at least reports the omission before any call happens.
-Python does not need that inheritance to keep the same checking.
-A *Protocol* describes the required shape,
-and any class with that shape conforms without deriving from a base class.
-The checker verifies conformance all the same:
+Constructing a concrete factory that supplies only `make_character()` succeeds,
+and the error waits until something calls `make_obstacle()`.
+An `@abstractmethod` moves that error earlier, to the constructor,
+the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
+A *Protocol* names the methods a type must supply and asks for no base class:
 
 ```python
 # games2.py
