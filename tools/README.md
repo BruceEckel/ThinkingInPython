@@ -437,11 +437,34 @@ failed and exits non-zero if anything fails or times out.
 the Testing chapter.
 
 * Narrow the run: `python tools/run_examples.py 31_Patterns--State_Machines`
-* Adjust the kill timeout: `--timeout 20` (default 15s)
+* Adjust the kill timeout: `--timeout 20` (default 60s)
 * Parallelism: runs on all cores by default (`-j auto`); each example is its
   own subprocess, so this is safe. Use `-j 1` for serial, or `-j N` for a fixed
   count. (pytest runs serially by default; enable xdist with
   `make test PYTEST_N="-n auto"`.)
+
+### run_one_example.py: one example, by hand
+
+`run_examples.py` captures output and reports pass/fail, which is what a gate
+wants and not what a reader wants. `run_one_example.py` runs a single example
+and streams its output:
+
+```
+make run-one F=deque_timing
+python tools/run_one_example.py Examples/03_Foundations--Containers/deque_timing.py
+```
+
+The argument is a path, a bare file name, or any substring of the path; a
+substring matching several files lists them and exits 2. It reads `Examples/`
+first, the committed tree, so it needs no extract step, and falls back to
+`build/examples/`.
+
+It supplies the same two things `run_one()` above does, the example's own
+directory as the working directory and the tree's `utils/` on `PYTHONPATH`,
+and prints the equivalent `cd` and `PYTHONPATH` commands before running. That
+banner is the point: `ModuleNotFoundError: No module named 'benchmark'` is
+what a reader gets running an example from the repo root, and the fix should
+be visible rather than buried in a wrapper.
 
 ### Skipping examples that can't run unattended
 

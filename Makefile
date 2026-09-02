@@ -349,8 +349,8 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 # and `examples` is a target below.
 ##@ Code examples (build/examples/)
 
-.PHONY: check-ch examples run output output-check test ty lint fix-imports \
-        extract
+.PHONY: check-ch examples run run-one output output-check test ty lint \
+        fix-imports extract
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
 # spends most of its time executing listings you did not touch; this runs the
@@ -371,6 +371,16 @@ examples: extract run  ##- Extract then run (an alias for `run`)
 # checked. Use `make reset` to force a clean regeneration.
 run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
 	$(PY) tools/run_examples.py
+
+# Run one example the way the book assumes: from inside its own chapter
+# directory, with the tree's utils/ on PYTHONPATH, so its sibling imports
+# and data files resolve and `from benchmark import report` finds the shared
+# helper. F takes a path or just the file's name (F=deque_timing). It reads
+# Examples/, the committed tree, so it needs no extract step, and it prints
+# the equivalent cd + PYTHONPATH commands before running: that is what you
+# type when this target is not at hand.
+run-one:  ## Run one example and show its output (F=deque_timing)
+	$(PY) tools/run_one_example.py $(F)
 
 # Rewrite the #: output markers inside the Markdown's ```python listings to the
 # stdout each listing actually produces. Depends on extract so each listing runs

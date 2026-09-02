@@ -132,6 +132,9 @@ copy.
 
 A first run also pays for downloading the pinned Python and the dev tools.
 
+To run one example instead of all of them, see
+[Run one example by hand](#run-one-example-by-hand) below.
+
 A few examples cannot run unattended because they open a window, wait for
 input, or loop forever. `make run` reports those as "Can't run unattended"
 rather than as failures. `tools/data/norun.txt` lists them. Run one by hand
@@ -153,22 +156,35 @@ Only `make gate` catches breakage across chapters.
 
 ### Run one example by hand
 
-Run it from its own chapter directory, so the sibling modules and data
-files it opens resolve the way the book assumes:
+`make run-one` runs any single example from the repo root and shows its
+output. `F` takes the file's name, or as much of its path as you care to
+type:
 
 ```bash
-cd Examples/07_Foundations--Classes
-uv run python property_setter.py
+make run-one F=deque_timing
+make run-one F=Examples/07_Foundations--Classes/property_setter.py
 ```
 
-A listing that imports a shared helper (`from display import display_object`)
-also needs `Examples/utils` on the import path:
+It sets up what the example expects, and prints the commands it stood in
+for, because those are what you type when `make` is not at hand:
 
 ```bash
-PYTHONPATH=../utils uv run python display_simple.py
+cd Examples/03_Foundations--Containers
+PYTHONPATH=../utils uv run python deque_timing.py
 ```
 
-In PowerShell that first line is `$env:PYTHONPATH = "../utils"`.
+Both lines matter. An example reads its sibling modules and data files by
+relative path, so it must run from its own chapter directory. About 70 of
+them also import a shared helper that lives in `Examples/utils`
+(`from benchmark import report`), so that directory has to be on the
+import path. Miss the second line and Python says:
+
+```
+ModuleNotFoundError: No module named 'benchmark'
+```
+
+In PowerShell the `PYTHONPATH` line is `$env:PYTHONPATH = "../utils"`;
+`make run-one` prints whichever form fits your shell.
 
 Use `uv run python`, not a bare `python`. A `python` already on your PATH is
 usually an older release, and these examples use Python 3.15 syntax.
