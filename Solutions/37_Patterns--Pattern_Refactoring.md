@@ -47,8 +47,10 @@ for kind, group in bins.items():
 That is the entire change to Python code. `__init_subclass__()`
 registers `Plastic` in `Trash.registry` automatically, the moment the
 `class` statement runs, so `Trash.create("Plastic", weight)` works
-with no further wiring. `recycle_dict.py` needs no change because
-`bins[type(t)].append(t)` keys on whatever type `t` actually is.
+with no further wiring. `recycle_dict.py`'s sorting loop needs no
+change because `bins[type(t)].append(t)` keys on whatever type `t`
+actually is. Only the filename it parses has to change, since the
+script hardcodes `parse("trash.dat")`.
 `type(t)` for a piece of `Plastic` is simply `Plastic`, a key the
 dictionary has never seen before, which `defaultdict` handles the same
 way it handles every other new key. `parse_trash.py` needs no change

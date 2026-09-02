@@ -1840,6 +1840,9 @@ each time someone calls the finished class.
 9.  `commander.py` validates `class_name` against `KNOWN_COMMANDS` before splicing it into source text.
     Remove that check, call `Command.make_class()` with a name containing a newline and a second statement,
     and confirm that the injected statement runs.
+    `make_class()` splices the name in twice, the second time inside a string literal,
+    so a bare newline ends the payload as an unterminated string;
+    the payload's last line must close or swallow that second splice.
     Restore the check.
 10. Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
     it keeps the *first* definition of a duplicated name and discards the later one.

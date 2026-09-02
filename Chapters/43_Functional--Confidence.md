@@ -371,7 +371,9 @@ and the chapters after it build a checked system on that idea.
 ## Exercises
 
 1.  Change `count_primes()` to return `(count, os.getpid())` and print the distinct process IDs alongside the counts.
-    Compare that number to `os.process_cpu_count()`,
+    Narrow `assert parallel == serial` to compare only the counts,
+    since the serial run now carries the parent's ID and the parallel one carries the workers'.
+    Compare the number of distinct IDs to `os.process_cpu_count()`,
     and run it three times before deciding what it means.
 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
 3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:

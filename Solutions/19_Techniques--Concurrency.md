@@ -338,8 +338,8 @@ for t in threads:
 print(counter, counter == 400)
 ```
 
-Running this repeatedly on CPython 3.11 or later prints `400 True`
-every time. Since 3.11, the interpreter only considers switching
+Running this repeatedly on CPython 3.10 or later prints `400 True`
+every time. Since 3.10, the interpreter only considers switching
 threads at a function call or at the jump that closes a loop
 iteration. With the `time.sleep()` call removed, the read and the
 write run back to back, with no function call between them, so the

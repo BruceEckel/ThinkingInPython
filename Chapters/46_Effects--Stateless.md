@@ -1747,7 +1747,7 @@ The type checker covers both, and forgetting either is a type error.
     Write the other kind of default, one that builds whatever the request names.
     `handle()` reads its handler's parameter annotation to decide what it answers,
     so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
-    Run it against `greet()` and confirm the greeting prints.
+    Run it against `greeter.py`'s `greet()`, whose `Console` constructs with no arguments, and confirm the greeting prints.
     Then declare a second Ability and request that one too,
     and report which requests your handler answered at runtime and which ones `ty` believes it answered.
     Account for the difference,
@@ -1770,6 +1770,7 @@ The type checker covers both, and forgetting either is a type error.
     and why its type is `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than an operation on an Effect.
 9.  Write `report_all()`,
     which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
+    Importing that module runs its own unguarded `print(run(...))`, so expect one line of its output before yours.
     Work out what its annotation must be, and confirm it with `ty`.
     Then call it from inside an `async def`,
     once with `run()` and once with `await run_async()`,
@@ -1780,6 +1781,7 @@ The type checker covers both, and forgetting either is a type error.
     a helper that formats the score and raises a `ValueError` on a negative one,
     lifted with `@throws(ValueError)`.
     Follow `ty` until the program builds,
+    add a negative score to `scores.py`'s `SCORES` so the new failure can fire,
     then run it on a name that triggers each failure and on one that succeeds,
     and say where each failure surfaced.
     Then delete `ValueError` from `announce()`'s annotation and record what `ty` reports and at which line.
@@ -1787,6 +1789,8 @@ The type checker covers both, and forgetting either is a type error.
     Add a third implementation and predict, before running it,
     which of the six orderings send Alice's greeting where.
     Then follow the section's advice:
-    give the two recording implementations a method name the screen one does not have,
+    give the recording implementation a method name the screen one does not have,
     declare each as its own `Protocol`,
-    and show that the ambiguity is now a type error rather than a silent choice.
+    and show that handing the wrong implementation to an Effect is now a type error rather than a silent choice.
+    Two implementations sharing one method name stay ambiguous under both `Protocol`s,
+    so say what the technique does and does not buy.

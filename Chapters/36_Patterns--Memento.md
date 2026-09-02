@@ -614,8 +614,9 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 6.  A `History` of `Drawing` states records a rename and three strokes.
     Write `restore_field(history, name, past)` that pushes a new state taking one named field from `past` and the rest from `history.present`.
     Why must it go through `do()` rather than editing `_past` directly?
-7.  Save a `Drawing` with `pickle`,
+7.  Save two `Drawing`s with `pickle`, one of them with an empty title,
     then add a field with a default to `Drawing` and load the old bytes.
     Does the default appear?
-    Now add a `__post_init__()` that rejects an empty title, and load again.
+    Now add a `__post_init__()` that rejects an empty title,
+    and load the blank one again.
     What did pickle skip, and what would `copy.replace()` have caught?

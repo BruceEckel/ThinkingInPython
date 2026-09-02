@@ -924,7 +924,8 @@ puts it to work.
     and `Thermometer` from [Observer](30_Patterns--Observer.md): side effect,
     side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
-    applies to each?
+    applies to the exceptions,
+    and which technique from [Effects by Hand](#effects-by-hand) applies to the rest?
 4.  `NonZero` guards zero but not negative values,
     while `validate()` in `slope_catch.py` rejects negatives but not zero.
     Build a `PositiveInt` that makes both bad values unconstructable,

@@ -534,8 +534,8 @@ A pattern is worth keeping only when it is still useful once the language does p
 ## Exercises
 
 1.  Add a `Plastic` material to `trash.py`,
-    then run `recycle_dict.py` over `plastic.dat`.
-    Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
+    then point `recycle_dict.py` at `plastic.dat` and run it.
+    Confirm that its sorting loop and `parse_trash.py` need no other changes,
     then account for every pound of plastic that `plastic_dropped.py` loses.
     Which test in `test_trash.py` fails, and why is that failure correct?
 2.  Write a `price()` operation as a function over a list of `Trash`,
@@ -543,7 +543,9 @@ A pattern is worth keeping only when it is still useful once the language does p
     Decide for each whether it needs `singledispatch`.
 3.  Replace the `recycling_note()` single-dispatch function with a `singledispatchmethod` on a `Sorter` class,
     and explain what changed.
-4.  Derive `CrushedAluminum` from `Aluminum` and run both `recycle_dict.py` and `recycling_note.py` over data containing it.
+4.  Derive `CrushedAluminum` from `Aluminum`,
+    add it to the data `recycle_dict.py` reads,
+    then run that and `recycling_note.py`.
     Explain why it gets its own bin but not its own note.
     Then change `recycle_dict.py` so a subclass shares its parent's bin,
     without naming any material in the sorting loop.

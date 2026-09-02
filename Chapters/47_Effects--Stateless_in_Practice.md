@@ -2186,6 +2186,9 @@ It is a language that does the encoding for you.
     then say what an Effect system needs for you to retry only `Unavailable`.
 8.  Change `parallel.py` to use a `ProcessPoolExecutor` instead of a `ThreadPoolExecutor`,
     and confirm `squares()` stays unchanged.
+    Processes re-import the module, so the driver needs the
+    `if __name__ == "__main__":` guard [Concurrency](19_Techniques--Concurrency.md) describes;
+    without it the pool breaks before any work starts.
     Then try to fork an Effect that still declares a `Need`,
     and record what `ty` says.
 9.  `wallet.py` runs `spree()` against a `Cell`.

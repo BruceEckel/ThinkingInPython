@@ -154,10 +154,10 @@ annotation carries the requirement in the type.
 | --- | --- | --- | --- |
 | `slope_catch.py` | `validate()` raises a `ValueError` | Exception | Catch the expected exception, or make the bad value impossible |
 | `slope_catch.py` | `rise / 0` raises a `ZeroDivisionError` | Exception | Catch the expected exception, or make the bad value impossible |
-| `withdraw()` | writes the `balance` global | Side effect | Return a result type |
-| `withdraw()` | reads the `balance` global | Side cause | Return a result type |
-| `Thermometer` | `notify()` calls into every observer | Side effect | Return a result type |
-| `Thermometer` | `_celsius` read by `celsius` | Side cause | Return a result type |
+| `withdraw()` | writes the `balance` global | Side effect | Pass the implementation in as a parameter |
+| `withdraw()` | reads the `balance` global | Side cause | Pass the implementation in as a parameter |
+| `Thermometer` | `notify()` calls into every observer | Side effect | Pass the implementation in as a parameter |
+| `Thermometer` | `_celsius` read by `celsius` | Side cause | Pass the implementation in as a parameter |
 
 Neither function in `slope_catch.py` has a side effect or a side
 cause. Both read only their arguments and change nothing outside
@@ -175,9 +175,11 @@ something no caller passed, and the call changes something no caller
 can see. Reading and rewriting the global is why `withdraw(30)` twice
 returns `70` then `40`, the demonstration the
 [Foundations](../Chapters/40_Functional--Foundations.md#pure-functions)
-chapter uses to show referential transparency failing. The conversion
-is to return a result type: take the balance as a parameter and return
-the new one. The same inputs then give the same answer, and the caller
+chapter uses to show referential transparency failing. The three
+conversions in [Converting Effectful to Pure](../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
+all manage the exception Effect, so none of them applies here. The
+by-hand technique for a side cause and a side effect is the other one:
+take the balance as a parameter and return the new one. The same inputs then give the same answer, and the caller
 holds the state.
 
 `Thermometer` is the same pair wearing a design pattern.

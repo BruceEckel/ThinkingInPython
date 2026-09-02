@@ -669,7 +669,8 @@ and the chapters ahead build on that single property.
 7.  In `higher_order.py`,
     replace the `map()` and `filter()` calls with comprehensions,
     and the `sorted(key=len)` call with one that sorts by last letter.
-    Then delete the `list()` around the `map()` call, print the result,
+    Then start again from the original file,
+    delete the `list()` around the `map()` call, print the result,
     and say what you see and why.
 8.  In `make_counter.py`, give `make_counter()` a `step: int = 1` parameter,
     so `make_counter(10)` builds a counter that counts 10, 20, 30.

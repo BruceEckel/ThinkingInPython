@@ -678,7 +678,7 @@ and pays it only for the values the consumer pulls.
     Only `str` has `isdigit()`,
     so the predicate must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,
-    change the comprehension to build a 3 by 3 matrix with `2` on the diagonal instead of `1`,
+    change the comprehension to put `2` on the diagonal instead of `1`,
     without adding a second pass over the result.
 3.  In `dict_comprehension.py`, add `"Galahad"` to `names`,
     then predict which entries the comprehension produces before running it,

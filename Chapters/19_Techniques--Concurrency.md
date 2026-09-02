@@ -2287,7 +2287,8 @@ Here are a few of the topics beyond it:
     change `io_price()`'s `await asyncio.sleep(0.05)` to `time.sleep(0.05)` and predict what happens to its `meter.peak` before running it.
     Explain the result using `blocking_the_loop.py`.
 5.  In `async_locks.py`,
-    replace `lock = asyncio.Lock()` with `lock = asyncio.Semaphore(1)`.
+    replace `lock = asyncio.Lock()` with `semaphore = asyncio.Semaphore(1)`,
+    renaming its uses to match.
     Confirm `counter` still reaches `400`,
     and explain why a semaphore initialized to `1` stands in for a lock here.
     Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
