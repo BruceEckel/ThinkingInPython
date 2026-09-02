@@ -525,7 +525,7 @@ Everywhere else you choose between paying for the second dispatch in methods and
 6.  Subclass `Paper` as `Origami` and duel it against `Rock` in the table version,
     as `exact_match.py` does.
     Explain the `KeyError` in terms of how the lookup matches.
-    Then make the table tolerate subclasses by walking `type(item).__mro__` for the first class that has a row,
+    Then make the table tolerate subclasses by walking `type(self).__mro__` for the first class that has a row,
     and say which of the two properties named after the table listing you have just given up.
 7.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers), and `Troll` (for managers).

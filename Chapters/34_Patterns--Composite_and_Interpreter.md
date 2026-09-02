@@ -298,7 +298,7 @@ and `Add(Num("a"), x)` appears without complaint,
 an ill-typed tree instead of an error.
 Exercise 6 closes the hole with the declining-`NotImplemented` idiom.
 
-SymPy expressions, Pandas and Polars column arithmetic,
+SymPy expressions, Polars column arithmetic,
 and SQLAlchemy filter conditions all use this technique.
 Overloaded operators build an expression tree,
 and a library interprets that tree later, symbolically, over a whole column,

@@ -300,8 +300,8 @@ so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
 `gather()` still waits for all of them,
 so the change finishes only after every notification succeeds.
-One limitation: a `@property` setter cannot be a coroutine,
-so you cannot await an assignment.
+One limitation: an assignment discards whatever the setter returns,
+so an `async` setter never runs its body and you cannot await an assignment.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).

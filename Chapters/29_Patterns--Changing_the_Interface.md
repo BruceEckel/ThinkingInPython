@@ -372,7 +372,8 @@ not a break.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
 which reaches a caller before they run anything;
-the `# type: ignore` silences it here so the listing can run.
+the `# type: ignore` silences it here,
+since this listing calls the deprecated method on purpose.
 The runtime half is a `DeprecationWarning`.
 Python hides those by default outside `__main__` and test runners,
 which is the trap: the caller who most needs the warning is the least likely to see it.
