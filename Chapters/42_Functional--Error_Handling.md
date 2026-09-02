@@ -109,8 +109,8 @@ so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are both frozen data classes,
 `Ok` parameterized over the answer type and `Err` over the error type.
-`@final` states that neither can have subclasses,
-and that closure lets the type checker narrow a `Result` to exactly one of the two.
+`@final` states that neither can have subclasses.
+Narrowing a `Result` to exactly one of the two comes from the union itself.
 `A`, `B`, and `E` are type parameters
 (introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
@@ -287,7 +287,7 @@ Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` feeds the answer to the next function.
 On an `Err`, it ignores the function and returns the failure unchanged.
 The two signatures differ because `Err` holds no answer to feed the next step.
-With nothing to name the argument type, its `bind()` accepts any callable,
+With nothing to name the argument type, its `bind()` accepts any parameter list,
 and its return type says an `Err` comes back out.
 An `Err` anywhere in a chain skips the rest of the steps and falls through to the end:
 
@@ -679,7 +679,7 @@ and a note says which piece of work produced it.
 
 The `Err` branch reads `error.__notes__`,
 and that read type-checks because the `match` narrowed the `Result` to `Err`.
-The narrowing works because `@final` on both classes rules out a value that inherits from both,
+The narrowing works because `Result` is a union of exactly two classes,
 and it works the same way with `isinstance()`.
 
 ## The returns Library

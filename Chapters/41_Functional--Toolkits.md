@@ -235,7 +235,8 @@ If you delete the `@wraps(func)` line,
 that same `print()` reports `wrapper - None`,
 because `greet` now refers to the inner function and nothing copied the original's identity onto it.
 Everything that reads those attributes reads the wrapper instead: `help()`,
-a traceback, a debugger, and a test framework that collects functions by name.
+`inspect.signature()`,
+and any tool that reports a function by its name or docstring.
 `wraps()` also sets `greet.__wrapped__` to the original function,
 so a tool that needs the undecorated version can still find it.
 

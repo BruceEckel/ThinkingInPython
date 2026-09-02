@@ -153,7 +153,8 @@ for args in [(10, 2), (10, 0)]:
 
 `@safe` catches whatever `slope()` raises,
 so the fix lives outside the function it repairs.
-`slope()` is now total, and `match` forces the caller to handle both outcomes.
+`slope()` is now total,
+and the caller must unpack the `Result` to reach the number.
 Nothing escapes through a raised exception.
 
 ### Catch the Exception You Expect
@@ -208,7 +209,7 @@ C++ reduced its version to a single bit: whether a function throws at all.
 ### Make the Bad Value Impossible
 
 The third approach removes the failure instead of handling it.
-[Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-value-to-check-everywhere)
+[Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes illegal values impossible to construct.
 If you give `run` a type that cannot hold zero,
 `slope()` never needs to check for zero:
@@ -242,7 +243,7 @@ inherits that guarantee.
 `slope()` is never in danger of dividing by zero,
 so it needs no `try` and no `Result` to say so.
 
-All three approaches produce a pure `slope()`,
+All three approaches take the division failure out of `slope()`,
 but they push the cost to different places.
 A `Result` makes every caller handle failure explicitly, at every call site.
 Catching by hand hides the fix inside `slope()`,

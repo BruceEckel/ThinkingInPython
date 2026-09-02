@@ -22,8 +22,8 @@ Stateless supplies the vocabulary for the requests and the driver that answers t
 
 This chapter covers the two channels an Effect declares:
 the dependencies it needs and the ways it can fail.
-Both channels live in the signature, separate from the yield, send,
-and return channels a generator carries.
+Both channels live in the signature,
+riding the yield channel a generator already carries.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 builds examples using those channels.
 

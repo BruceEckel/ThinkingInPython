@@ -256,7 +256,7 @@ Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
-drawing on the whole of `str` rather than `property_check.py`'s five-letter alphabet,
+drawing on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
 so it reaches inputs the loop cannot produce, such as unusual Unicode:
 
 ```python
