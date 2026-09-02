@@ -19,7 +19,7 @@ WEAPONS_BY_KIND = {
 }
 
 def weapon_outcome(a: str, b: str) -> Outcome:
-    ("A weapon beats the next two "
+    ("A weapon beats the previous two "
      "in WEAPON_ORDER (cyclically).")
     ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
     diff = (ia - ib) % 6
@@ -27,6 +27,8 @@ def weapon_outcome(a: str, b: str) -> Outcome:
         return Outcome.DRAW
     if diff in (1, 2):
         return Outcome.WIN
+    if diff == 3:  # Opposite: neither beats the other
+        return Outcome.DRAW
     return Outcome.LOSE
 
 class Inhabitant2:

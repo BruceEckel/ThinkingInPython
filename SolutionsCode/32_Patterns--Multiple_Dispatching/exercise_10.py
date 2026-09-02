@@ -19,7 +19,7 @@ WEAPONS_BY_KIND = {
 def weapon_outcome(a: str, b: str) -> Outcome:
     order = WEAPON_ORDER
     diff = (order.index(a) - order.index(b)) % 6
-    if diff == 0:
+    if diff in (0, 3):  # Same or opposite: no winner
         return Outcome.DRAW
     return Outcome.WIN if diff in (1, 2) else Outcome.LOSE
 
