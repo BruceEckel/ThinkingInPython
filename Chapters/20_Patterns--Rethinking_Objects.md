@@ -514,10 +514,10 @@ print(len(box.items), box.appends)
 #: 3 3
 ```
 
-Nothing arrives from a base class, so nothing slips past the counter:
-the only way into `items` is a method this class wrote.
+Nothing arrives from a base class,
+so no inherited method slips past the counter.
 `CountingBox` forwards every operation by hand.
-`CountingList` inherits hundreds it didn't write, and gets one wrong.
+`CountingList` inherits dozens it didn't write, and gets one wrong.
 Composition still allows the counting bug.
 Write `extend()` as `self.items.extend(more)` instead of going through `append()`,
 and the count is wrong again.

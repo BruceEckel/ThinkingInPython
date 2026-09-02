@@ -207,9 +207,8 @@ Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are distinct subclasses of `Event`,
 so `isinstance()` tells them apart and you can later give either one behavior of its own.
 
-The type checker cannot follow a class built by `type()`,
-so it reads `make()`'s result as `Event`,
-whose `__init__()` takes three arguments.
+The type checker cannot follow a class built by `type()`.
+It models `new_cls` as unknown, so it checks nothing about the generated class.
 `EventMaker` names the two-argument signature the generated classes really have,
 and the `cast()` records it at the one place that creates a class.
 
@@ -738,7 +737,7 @@ a decorator that builds a class's methods from its field declarations.
 Anything stranger stays invisible to the checker,
 which never imports or executes your code.
 That is why the classes assembled by `type()` in [Generating Classes with `type`](#generating-classes-with-type)
-needed a `cast()` to state their real signature:
+use a `cast()` to state their real signature:
 the checker models what it recognizes, believes what you declare,
 and sees nothing else.
 

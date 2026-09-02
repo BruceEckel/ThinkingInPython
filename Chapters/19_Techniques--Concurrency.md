@@ -1120,7 +1120,7 @@ Use a thread pool for I/O when the blocking calls already exist and rewriting th
 `asyncio` pays off when you have thousands of waits,
 since tasks are far lighter than threads.
 
-In contrast, a thread that is computing never releases the GIL for another thread to run:
+In contrast, a thread that is computing gains nothing when the GIL changes hands:
 
 ```python
 # gil_threads.py
@@ -1658,7 +1658,7 @@ but because two small pieces of them genuinely are.
 The first is `concurrent.futures.Executor`.
 `ThreadPoolExecutor`, `ProcessPoolExecutor`,
 and `InterpreterPoolExecutor` share more than a resemblance:
-all three subclass `Executor` and inherit `submit()` and `map()` from it.
+all three subclass `Executor` and present its `submit()` and `map()` interface.
 A function written against that base class runs unmodified on all three:
 
 ```python
@@ -2315,7 +2315,8 @@ Here are a few of the topics beyond it:
     Predict how many `fetched` lines still print,
     and explain what became of the tasks on which the `gather()` call never reported.
 11. In `context_var.py`,
-    move `request_id.set(name)` out of `handle()` and into `main()` above the `TaskGroup`.
+    move the `request_id.set()` call out of `handle()` and into `main()` above the `TaskGroup`,
+    setting it to `"main"`.
     Predict what each task prints,
     then explain the result with "every task starts with a copy of the context that created it."
 12. In `subinterpreters.py`,

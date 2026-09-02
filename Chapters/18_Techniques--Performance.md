@@ -1205,7 +1205,7 @@ does not compile.
 When the hot spot is number-crunching,
 `@njit` is a lighter step than rewriting in another language.
 
-(Numba is a third-party dependency that does not yet support the book's Python 3.15 target, so unlike the rest of the book's listings, the build does not run this snippet.
+(Numba is a third-party dependency that does not yet support the book's Python 3.15 target, so unlike most of the book's listings, the build does not run this snippet.
 The comment above shows one machine's actual output.
 Expect a different, but still large, multiple on yours.)
 
