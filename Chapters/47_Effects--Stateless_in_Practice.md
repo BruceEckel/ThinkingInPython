@@ -626,7 +626,8 @@ and that is why the second run tells a different story from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid picks up at 19:00.
 Reordering that tuple is the whole difference between the two runs.
-Priority, thresholds, and the outage schedule live in `controller()`,
+Priority lives in `controller()`,
+thresholds and the outage schedule in the sources themselves,
 and `run_load()` decides when to give up on the source it holds.
 
 The load's declared dependency does not change.
@@ -1976,7 +1977,8 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |         `Generator[Need[Log], Any, None]`
 ```
 
-The `# type: ignore` lets the listing run far enough to show the matching runtime failure.
+The `# type: ignore` silences that diagnostic,
+since the listing provokes the matching runtime failure on purpose.
 `catch()` behaves the same way.
 If you catch one of two declared errors, the other stays in the error channel.
 
@@ -2130,7 +2132,7 @@ the description/execution split,
 and an ecosystem that has never heard of either.
 For most Python code that price is too high.
 The techniques in [Converting Effectful to Pure](44_Effects--Effect_Management.md#converting-effectful-to-pure)
-(returning a `Result`, restricting a type so bad values cannot exist, and passing dependencies in rather than constructing them)
+(returning a `Result`, catching the exception you expect, and restricting a type so bad values cannot exist)
 capture much of the benefit at a fraction of the cost.
 Use Stateless when a system is large enough that hidden Effects have already cost you a production incident,
 and when the team will hold the line at every boundary.
