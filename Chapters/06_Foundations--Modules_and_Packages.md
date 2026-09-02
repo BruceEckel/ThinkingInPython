@@ -450,7 +450,7 @@ Prefer a single run-together word when you can.
 This book uses `test_*.py`, e.g. `test_result.py`.
 
 Don't shadow standard-library modules.
-A file named `random.py`, `types.py`,
+A file named `random.py`, `string.py`,
 or `weakref.py` can hide the stdlib one and break imports,
 because Python searches the directory of the script you ran before the standard library
 (see [`PYTHONPATH`](#pythonpath) below).

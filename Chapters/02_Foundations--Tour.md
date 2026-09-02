@@ -61,7 +61,7 @@ The next statement returns to the left margin, and that return ends the `if`.
 An indented block groups statements without creating a scope, so `val`,
 assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
-New scopes come from functions, classes, and modules,
+New scopes come from functions, classes, modules, and comprehensions,
 never from an `if` or a `for` block.
 Binding still follows execution: with any answer other than `"yes"`,
 the assignment never runs, and `print(val)` raises a `NameError`.
@@ -379,7 +379,7 @@ print(s.strip()[0:5])
 #: Hello
 ```
 
-String methods return new strings rather than changing the original.
+String methods return new values rather than changing the original.
 
 ### f-Strings
 
@@ -413,7 +413,9 @@ formats the value with `repr()` instead of `str()`.
 Existing code also carries two older styles: C's `printf()` syntax,
 as in `"val: %d" % val`, and the `str.format()` method,
 as in `"val: {}".format(val)`.
-Both still work, and both use the same format mini-language.
+Both still work.
+`str.format()` shares the f-string's format mini-language,
+while the `%` form has its own, inherited from C's `printf()`.
 F-strings replaced them, so this book uses f-strings throughout.
 
 ### t-Strings {#t-strings}
@@ -504,8 +506,7 @@ Tools such as ruff point out violations and fix many of them automatically.
 3.  In `fstrings.py`, add a line that formats `score` with two decimal places instead of zero,
     using `{score:.2f}` in place of `{score:.0f}%`,
     and a second line using the debug specifier, `f"{score = }"`.
-4.  `arithmetic.py` and `bitwise.py` each define one variable,
-    `total` and `flags`.
+4.  `arithmetic.py` defines `total` and `bitwise.py` defines `flags`.
     Rename them to `totalSum` and `flagBits`,
     then to `TOTAL_SUM` and `FLAG_BITS`.
     Every version runs.

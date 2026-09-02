@@ -264,8 +264,9 @@ A tuple holding many values of one type is instead an immutable `list`.
 ## Dictionaries
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
-Lookup computes a *hash* from each key: a small integer,
-derived from the key's contents, that says where the entry lives.
+Lookup computes a *hash* from each key:
+an integer derived from the key's contents,
+which Python reduces to the slot where the entry lives.
 So keys must be *hashable*.
 Strings, numbers, and tuples of hashable values are hashable;
 the mutable built-in containers (`list`, `dict`, `set`) are not,
@@ -706,7 +707,8 @@ except TypeError as e:
 
 Modifying an immutable container is a type error as well as a runtime error,
 so each line that deliberately misbehaves carries a `# type: ignore`.
-The comment lets the example run far enough to show the exception it expects.
+The comment silences the type checker.
+The runtime exception is what the listing exists to show.
 
 A `MappingProxyType` is a window onto a `dict` that still exists and can change;
 a `frozendict` owns its contents outright.
