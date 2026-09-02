@@ -166,7 +166,7 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 # either now fails the gate rather than sitting in a backlog. widths also
 # runs over Solutions/ (a separate recipe line below), since Solutions
 # listings render on the same small screens.
-GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors prose-lint
+GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors self-reference prose-lint
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -605,7 +605,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors unique-slugs checks fix-checks gate-checks
+        fix-comment-spacing anchors self-reference self-reference-report unique-slugs checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -679,6 +679,21 @@ fix-comment-spacing:  ##- Collapse inline-comment gaps to two spaces
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
 	$(PY) tools/heading_links.py Chapters $(GATE_DOCS)
+
+# Fail if the book says something about its own chapters that those
+# chapters disprove: an "appears nowhere else" that does appear, or an
+# "earlier chapter" link pointing forward. Both are settled by substring
+# search, which is why they gate. The third rule in the tool, grounding,
+# is advisory and lives in `self-reference-report` below.
+self-reference:  ## Fail if a claim the book makes about its own chapters is false
+	$(PY) tools/check_self_reference.py
+
+# Advisory, like `claims`. Adds the grounding rule: a sentence linking to
+# a chapter that contains none of the code terms the sentence names. It
+# catches real misattributions and also fires on sentences whose terms
+# belong to the linking chapter, so it reports rather than gates.
+self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
+	$(PY) tools/check_self_reference.py --advisory $(ARGS)
 
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,

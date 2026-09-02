@@ -39,6 +39,7 @@ from collections.abc import Iterable
 
 import banned_phrases
 import capitalize_comments
+import check_self_reference
 import comment_periods
 import comment_spacing
 import heading_links
@@ -58,6 +59,7 @@ CHECKS: list[Check] = [
     capitalize_comments.CHECK,
     banned_phrases.CHECK,
     heading_links.CHECK,
+    check_self_reference.CHECK,
     prose_lint.CHECK,
 ]
 

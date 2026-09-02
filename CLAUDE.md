@@ -77,6 +77,7 @@ row here when a new agent lands.
 | clarity pass, straighten, clear passives, "make X clearer" on named files | `prose-clarity` | Opus | judgment work that edits the author's voice and verifies claims against listings; both Opus and Fable did it well in the 2026-09-01 Solutions sweep, Opus's reports were the more careful about what they left alone |
 | a list, a count, a location, a gate's output, what a listing prints | `repo-lookup` | Sonnet | read-only, no voice at stake, cheap |
 | `make rewrite` passes | (headless `claude -p`) | per pass, `tools/rewrite.py` `PASSES` | see `MODEL_NOTES` there |
+| verify a chapter's factual claims against its listings and against the chapters it names | a fresh agent per chapter, report-only | Opus | verification fails by under-reading, not by over-editing, so `MODEL_NOTES`' result for the rewrite passes inverts here; in the 2026-09-02 calibration Opus found three real errors Fable read past, with zero false positives from either |
 | deep review of a chapter, thread audits, anything that decides what a chapter claims | the session model, or a `fork` | session | needs the conversation's context; a fresh agent cannot know what Bruce has already ruled on |
 
 Pass `model:` on an `Agent` call only to override a definition for one
@@ -120,8 +121,9 @@ sequence is:
 7. `uv run pytest build/examples/NN_Chapter`                      # tests
 8. `uv run python tools/run_examples.py NN_Chapter`               # runs scripts, honors norun.txt
 
-Prose-only edits still need `heading_links.py` (cross-references) and
-`banned_phrases.py`; both are in `make verify`. `make verify`'s gate also
+Prose-only edits still need `heading_links.py` (cross-references),
+`banned_phrases.py`, and `check_self_reference.py` (claims the book makes
+about its own chapters); all three are in `make verify`. `make verify`'s gate also
 runs `validate_output.py --update` over all of `Chapters/` now, so a stale
 `#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
 the build, the same way `fix-eol`/`sync` already self-heal other drift.
@@ -130,6 +132,35 @@ still land in the diff if its output actually changed. An exception
 raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
+
+## What the book says about itself
+
+`check_self_reference.py` gates the shape that produced the most errors
+in the 2026-09-02 correctness sweep: prose asserting something about
+another chapter, or about the book, that reading the named place
+disproves. Chapter 07 said "[Rethinking Objects] uses it" of
+`slots=True`, and chapter 20 contains the string "slot" zero times. The
+link resolved, the anchor was fine, every gate was green.
+
+Two rules gate, because a substring search settles them. `absence`
+catches "X appears nowhere else" where X is used elsewhere, searching
+code spans and listings only, since the book's type names are also
+English words ("a more complex design" must not disprove a claim about
+`complex`). `direction` catches an ordering phrase that names a chapter
+("an earlier chapter") within 80 characters of a link pointing the other
+way.
+
+A third rule, `grounding`, reports and never gates: a sentence links to a
+chapter that contains *none* of the code terms the sentence names. It
+finds the real thing (it catches chapter 07's case), and it also fires on
+31 sentences whose terms belong to the *linking* chapter, which a target
+has no reason to mention. `make self-reference-report` reads it, the same
+bargain `make claims` strikes. Do not promote it into the gate without
+first getting that count to zero.
+
+The rules are literal and under-report by design: a claim with no code
+term in it is invisible to them. They are a floor, not a substitute for
+reading.
 
 ## Traps (learned the hard way)
 

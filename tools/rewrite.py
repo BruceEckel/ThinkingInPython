@@ -165,6 +165,28 @@ Net: Fable slightly more restrained on straighten, a wash on positive.
 Bruce's wider observation, chapters 28-47 on Fable against 27 on Opus,
 pointed the same way, so the judgment passes run on Fable.
 
+2026-09-02, the whole-book correctness sweep, calibrating on chapters
+08, 09, 16, and 26 with byte-identical report-only prompts:
+  chapter 08  Opus 2 findings   Fable 0
+  chapter 09  Opus 1 finding    Fable 0
+  chapter 16  Opus 0            Fable 0
+  chapter 26  Opus 0            Fable 0
+Zero false positives from either model, and both returned clean on 16
+and 26 and said so, rather than padding. All three Opus findings were
+real: restating `ClassVar[int]` on an override restores a check the bare
+override drops (09), a whole-book claim a grep settles (08), and one
+that needed Bruce's judgment (08's `object` sentence). Fable weighed
+that last one explicitly and declined it.
+
+This inverts the result above, and the reason matters more than the
+numbers. The editing passes fail by over-editing, so restraint is what
+the more conservative model buys. A verification pass fails by not
+looking hard enough, and there the same conservatism shows up as a
+miss, not as restraint. An A/B measured on one says nothing about the
+other. The sweep ran Opus over all 47 chapters on that basis and found
+56 false claims with no false positives; see CLAUDE.md's routing table
+for the row this produced.
+
 The rule passes (activate, bruce-edit-apply, readability) looked like
 candidates for a cheaper model, but no objective A/B was possible:
 Chapters/ carries zero vale warnings (every make prose warning is in

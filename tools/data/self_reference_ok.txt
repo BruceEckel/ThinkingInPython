@@ -1,0 +1,14 @@
+# Waivers for check_self_reference.py, one per line.
+#
+# Format:
+#   <chapter-file-stem>:<term>        suppress that term in that chapter
+#   <chapter-file-stem>:<target.md>   suppress a link target in that chapter
+#   <chapter-file-stem>:*             suppress the whole chapter
+#
+# A waiver is for the case where the literal rule is wrong and the prose
+# is right: a claim about a type whose name is also an English word, or a
+# chapter deliberately naming something it does not otherwise use. Prefer
+# fixing the prose. Blank lines and `#` comments are ignored.
+#
+# Empty on purpose: the book currently passes the gating rules with no
+# waivers, which is the state worth defending.
