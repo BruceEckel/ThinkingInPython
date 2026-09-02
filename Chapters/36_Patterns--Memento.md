@@ -389,7 +389,7 @@ Undo the drawing, but keep the rename.
 `History` cannot express that,
 because it moves whole states and never looks inside them.
 The answer has to come from the state itself,
-and for any immutable value `copy.replace()` supplies it:
+and for a state that defines `__replace__()`, `copy.replace()` supplies it:
 
 ```python
 # partial_restore.py

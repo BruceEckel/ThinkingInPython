@@ -105,7 +105,7 @@ print("ok")
 #: ok
 ```
 
-If you delete either `total = 0`, the second assertion fails.
+If you delete the second `total = 0`, the second assertion fails.
 That line is the whole fixture, and purity removes it.
 `slope()` appears again later in the book:
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)

@@ -106,7 +106,7 @@ class Rat:
 `number` comes from a call to `blackboard.next_number()`,
 which advances a counter, so no static default can supply it.
 `field(init=False)` leaves `number` out of the generated `__init__`.
-`__post_init__` runs immediately after that `__init__` finishes,
+The generated `__init__` calls `__post_init__` as its last step,
 when `blackboard`, `x`, and `y` already hold their values,
 so it fills in `number` and logs the rat's start.
 
@@ -589,7 +589,7 @@ If you define the subclass with its symbol, the factory finds it.
 This is the registry idea from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses
-(that chapter's [Simple Factory Method](27_Patterns--Factory.md#simple-factory-method) shows the recursion for deeper hierarchies),
+(that chapter's [Simple Factory Method](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies),
 so a new item must inherit from `Item` itself.
 Deriving from `Food` to borrow its behavior hides the class from the factory,
 which falls through to the last line and builds a `Teleport` instead.
@@ -1243,7 +1243,10 @@ Run it.
     Make `claim()` an `async def`, which pulls the `Recorder` protocol,
     `Rat.run()`'s comprehension, and `explore()` along with it,
     and put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
-    Then count how many calls return `True` and compare that count with `len(blackboard.visited)`.
+    Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
+    using a maze that contains a loop.
+    `amaze.txt` is a perfect maze,
+    so no two rats ever reach one unclaimed cell and the counts always agree.
     `test_rats_and_mazes.py` still passes, because `visited` is a set:
     the guarantee that broke is "one rat per cell", not "every cell visited".
     What does the extra success cost the rats,
@@ -1260,9 +1263,12 @@ Run it.
     the way `flood()` searches maze cells in `test_rats_and_mazes.py`.
     The room graph has no `is_open()`,
     so the occupant decides whether a room is passable:
-    refuse any room holding a `Wall` or an `Edge`.
+    refuse any room holding a `Wall` or an `Edge`,
+    and follow a `Teleport` to its target room,
+    since stepping onto one moves the robot.
     Turning the room path back into `n`/`s`/`e`/`w` means tracking which `Urge` produced each step.
-    Your path comes out shorter than the hard-coded `solution` and need not use the teleports,
+    Your path comes out the same length as the hard-coded `solution`,
+    which is already a shortest one,
     so assert only that the robot finishes on the `!` square,
     as `test_robot.py` does.
 6.  Freeze the plate.
@@ -1279,5 +1285,7 @@ Run it.
 8.  Tune the noise.
     Rerun `chladni_demo.py` passing `kick=0.005` and then `kick=0.5` to `plate.step()`,
     printing agitation at the same checkpoints.
-    One setting produces order too slowly and the other never sharpens.
+    One setting produces order too slowly.
+    The other drives agitation down as convincingly as the default kick,
+    yet the figure never appears.
     Explain both failures, and why an intermediate kick avoids them.

@@ -41,7 +41,7 @@ so the example that needs a fresh object uses `100000` rather than `257`.
 The listing parses each value from a string for a reason.
 The compiler pools equal constants within one code object, so with literals,
 `low, low2 = 256, 256`, even `100000 is 100000` prints `True`,
-and that sharing comes from constant folding rather than from the integer cache.
+and that sharing comes from the pooling rather than from the integer cache.
 Parsing at runtime keeps the compiler out,
 so any sharing that remains comes from the cache.
 (That pooling is also why Python warns about `is` on a literal.)
@@ -88,7 +88,7 @@ so caching produces one shared instance overall.
 Here `tile()` takes a symbol,
 so caching produces one shared instance per distinct symbol instead.
 
-![Two water cells at opposite corners of the grid are the same object; the whole 24-cell map reduces to 3 shared Tile instances](_images/flyweight_tiles)
+![Two water cells far apart in the grid are the same object; the whole 24-cell map reduces to 3 shared Tile instances](_images/flyweight_tiles)
 
 ```python
 # tile_map.py
@@ -159,7 +159,7 @@ Exercise 2 measures the memory behind it.
 
 `Symbol` names the closed set of valid map characters,
 so `Tile.symbol` and `SPECS` can hold only one of them.
-If you add a kind to `SPECS` without adding it to `Symbol`, or the reverse,
+If you add a kind to `SPECS` without adding it to `Symbol`,
 the type checker rejects the mismatch.
 `tile()` trusts its argument is already a `Symbol`,
 so the untrusted boundary is `to_symbol()`,

@@ -181,7 +181,7 @@ def parse(filename: str | Path) -> list[Trash]:
     return items
 ```
 
-The test parses a small in-memory file, so it does not depend on `trash.dat`:
+The test parses a small temporary file, so it does not depend on `trash.dat`:
 
 ```python
 # test_parse_trash.py
@@ -411,7 +411,7 @@ and it first appeared in [Function Objects](28_Patterns--Function_Objects.md#an-
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
 but keep it in mind before you subclass a material.
-Subclasses are the one place where the two sorters disagree:
+Subclasses are another place where the two sorters disagree:
 `case Aluminum()` matches any subclass,
 so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
 Swapping the `match` for the dictionary is a redesign, not a rename.
@@ -525,7 +525,7 @@ This chapter discovered its two vectors one requirement at a time,
 rather than predicting them up front,
 and each cost a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
-and one `@recycling_note.register` absorbs a new operation.
+and one `@recycling_note.register` teaches an existing operation about it.
 Neither is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
