@@ -89,13 +89,13 @@ Removing the `# type: ignore` from `undeclared_need.py` produces:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
- --> undeclared_need.py:6:20
+ --> undeclared_need.py:7:20
   |
-4 | def greet_all(names: list[str]) -> Success[None]:
+5 | def greet_all(names: list[str]) -> Success[None]:
   |                                    ------------- Function annotated
   |                                    with yield type `Never` here
-5 |     for name in names:
-6 |         yield from greet(name)
+6 |     for name in names:
+7 |         yield from greet(name)
   |                    ^^^^^^^^^^^ expression of type `Need[Console]`,
   |                    expected `Never`
 ```
@@ -484,17 +484,17 @@ def greet(name: str) -> Depend[Need[Console], None]:
 error[invalid-return-type]: Function always implicitly returns `None`,
 which is not assignable to return type
 `Generator[Need[Console], Any, None]`
- --> greeter.py:7:25
+ --> greeter.py:8:25
   |
-7 | def greet(name: str) -> Depend[Need[Console], None]:
+8 | def greet(name: str) -> Depend[Need[Console], None]:
   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error[unresolved-attribute]: Object of type
 `Generator[Need[Console], Any, Console]` has no attribute `print`
- --> greeter.py:9:5
-  |
-9 |     console.print(f"Hello, {name}!")
-  |     ^^^^^^^^^^^^^
+  --> greeter.py:10:5
+   |
+10 |     console.print(f"Hello, {name}!")
+   |     ^^^^^^^^^^^^^
 ```
 
 The `invalid-return-type` error says the function stopped being a
@@ -721,19 +721,19 @@ Deleting `ValueError` from the annotation gives:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
-  --> exercise_10.py:21:28
+  --> exercise_10.py:28:28
    |
-19 | ) -> Effect[Need[Console], KeyError, None]:
+26 | ) -> Effect[Need[Console], KeyError, None]:
    |      ------------------------------------- Function annotated with
    |      yield type `Need[Console] | KeyError` here
-20 |     value: int = yield from score(name)
-21 |     line: str = yield from format_score(name, value)
+27 |     value: int = yield from score(name)
+28 |     line: str = yield from format_score(name, value)
    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^
    |                            expression of type `ValueError`,
    |                            expected `Need[Console] | KeyError`
 ```
 
-The error appears on line 21, the `yield from` that would introduce the
+The error appears on line 28, the `yield from` that would introduce the
 undeclared failure, not on the signature and not at the call site. That
 is the useful place for it. The diagnostic names both the failure that
 escaped and the delegation it escaped through, so the fix is either to
@@ -796,15 +796,17 @@ Renaming `Capture.print()` to `record()` is the whole change. The two
 `Protocol`s no longer overlap, so no object satisfies both, and each
 Effect names the one it needs.
 
-That change buys a diagnostic where a coin flip used to be. `ty` now
-rejects the wrong implementation before the program runs:
+That change buys a diagnostic where a coin flip used to be. Add one
+more line to the end of the listing, handing `to_log` the object that
+prints instead of the one that records, and `ty` rejects it before the
+program runs:
 
 ```text
 error[invalid-argument-type]: Argument is incorrect
- --> exercise_11.py:31:30
-  |
-  | run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))
-  |                              ^^^^^^^^^^ Expected `Recorder`, found `Terminal`
+  --> exercise_11.py:40:30
+   |
+40 | run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))
+   |                              ^^^^^^^^^^ Expected `Recorder`, found `Terminal`
 info: type `Terminal` is not assignable to protocol `Recorder`
 info: └── protocol member `record` is not defined on type `Terminal`
 ```

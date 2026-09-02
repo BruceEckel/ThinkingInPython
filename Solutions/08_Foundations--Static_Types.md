@@ -195,18 +195,17 @@ reports:
 
 ```
 error[invalid-argument-type]: Argument to function `paint` is incorrect
-  --> type_aliases.py:14:21
+  --> type_aliases.py:12:21
    |
-14 | paint(grid, (2, 3), "purple")
-   |                     ^^^^^^^^ Expected `Literal["red", "blue", "green", "yellow"]`,
-   |                              found `Literal["purple"]`
+12 | paint(grid, (2, 3), "purple")
+   |                     ^^^^^^^^ Expected `Color`, found `Literal["purple"]`
 ```
 
-The diagnostic spells out the expected type in full even though
-`paint()` names it as `Color`. That is the practical argument for
-naming the union once rather than repeating the four strings in every
-signature: the alias costs nothing in the error message, and the
-allowed set has one place to change. Adding `"purple"` to that one
+The diagnostic names the alias rather than the union behind it, so
+`Color` is what you read and the four permitted strings stay one hop
+away, in the `type` statement. That is the trade an alias makes: a
+short message and one place to change the allowed set, against having
+to follow the name to see what that set is. Adding `"purple"` to the
 alias silences the error everywhere. `grid[cell] = color` needs no
 change, since `Grid`'s values are plain `str` and every `Color` is one.
 

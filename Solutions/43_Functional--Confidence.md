@@ -461,7 +461,8 @@ recent, and it rests on one decorator: both `Ok` and `Err` carry
 `@final`, in the listing above and in `utils/result.py`. Without that
 decorator a type checker must allow for a class inheriting from both,
 so a positive `isinstance()` leaves the intersection of the two alive
-and `result.answer` comes back as `object`. The measurement the
+and `result.answer` comes back as `float | Unknown` under `ty` 0.0.77
+rather than plain `float`. The measurement the
 exercise asks for therefore has two answers depending on one
 decorator, and that is a more useful finding than either version
 winning.

@@ -138,41 +138,74 @@ class Email:
     subject: str
 
 @dataclass(frozen=True)
+class Sms:
+    body: str
+
+@dataclass(frozen=True)
+class Push:
+    title: str
+
+@dataclass(frozen=True)
 class Webhook:
     url: str
 
-type Notification = Email | Webhook
+type Notification = Email | Sms | Push | Webhook
 
 def render(note: Notification, recipient: str) -> str:
     match note:
         case Email(subject):
             return f"Email to {recipient}: {subject}"
+        case Sms(body):
+            return f"SMS to {recipient}: {body}"
+        case Push(title):
+            return f"Push to {recipient}: {title}"
         case Webhook(url):
             return f"POST for {recipient} to {url}"
         case _:
             assert_never(note)
 
-print(render(Webhook("https://example.com/hook"), "Dana"))
+def cost(note: Notification) -> float:
+    match note:
+        case Email():
+            return 0.001
+        case Sms():
+            return 0.02
+        case Push():
+            return 0.0005
+        case Webhook():
+            return 0.0
+        case _:
+            assert_never(note)
+
+hook = Webhook("https://example.com/hook")
+print(render(hook, "Dana"))
 #: POST for Dana to https://example.com/hook
+print(cost(hook))
+#: 0.0
 ```
 
-Add `Webhook` to the union and run `ty` before adding its `case`. At
-each `assert_never()` call the checker reports:
+Add `Webhook` to the union and run `ty` before adding either `case`.
+The checker reports two diagnostics, one per function that matches on
+the union:
 
 ```
-error[invalid-argument-type]: Argument to function `assert_never` is incorrect
-  |
-  |             assert_never(note)
-  |                          ^^^^ Expected `Never`, found `Webhook`
+error[type-assertion-failure]: Argument does not have asserted type `Never`
+  --> notifications_match.py:32:13
+   |
+32 |             assert_never(note)
+   |             ^^^^^^^^^^^^^----^
+   |                          |
+   |                          Inferred type of argument is `Webhook & ~Email & ~Sms & ~Push`
+info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 ```
 
-The message names the type that has no case. `assert_never()` declares
-its parameter as `Never`, the type no value has, so the call checks
-only when the cases above it have already eliminated every member of
-the union. `Webhook` has no case, so it can reach that line, and the
-type checker says so. The same error appears once per function that
-matches on the union. That repetition is the cost the chapter
-describes: adding a type touches every operation.
+`assert_never()` declares its parameter as `Never`, the type no value
+has, so the call checks only when the cases above it have already
+eliminated every member of the union. The inferred type spells out
+what survived those cases: a `Webhook` that is none of the three
+handled types. That is the value which can reach the line, so the
+check fails. Two diagnostics for one new channel is the cost the
+chapter describes: adding a type touches every operation.
 
 ## 5. Quadrants with guards, and without them
 

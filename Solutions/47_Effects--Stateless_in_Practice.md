@@ -591,10 +591,12 @@ Four edits, and the type checker names three of them.
 Adding line 3 without line 4 is the one `ty` reports, at the new line rather than
 at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
-Fixing that then breaks every caller that matched exhaustively on the old set:
-`assert_never()` reports the new member as an unhandled branch in `report()`.
-Both diagnostics are compile-time stops rather than surprises in production.
-The type checker walked the change through the program.
+Fixing that then breaks every caller that named the old set. `report()` stops at
+its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
+type it did not expect. Widen `catch()` and the `found:` annotation to match, and
+`assert_never()` reports `TooLong` as an unhandled branch. Every one of these is a
+compile-time stop rather than a surprise in production.
+The type checker walked the change through the program, one edit at a time.
 
 The by-hand version takes a comparable edit and reports none of it:
 

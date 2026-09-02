@@ -251,10 +251,14 @@ in, tuple out, because it serializes Python's own object
 representations rather than translating into a shared,
 language-neutral format. The reconstruction compensates for what
 JSON lost: it wraps `data["strokes"]` back in `tuple(...)` before
-passing it to `Drawing`. `Drawing` declares `strokes` as
-`tuple[str, ...]`, so a `Drawing` built with a `list` there fails
-`ty check`. The `list` also costs the `Drawing` the hashability a
-frozen dataclass otherwise supplies.
+passing it to `Drawing`. A type checker cannot catch the omission
+here, because `json.loads()` returns `Any`, and an `Any` satisfies the
+declared `tuple[str, ...]`. Drop the `tuple(...)` and `ty check` still
+passes. The mismatch surfaces only when the program runs:
+`reconstructed == drawing` becomes `False`, since a `list` never
+equals a `tuple`, and the `list` costs the `Drawing` the hashability a
+frozen dataclass otherwise supplies (`hash()` raises a `TypeError`,
+`unhashable type: 'list'`).
 
 ## 4. `Memento` holding the list itself
 

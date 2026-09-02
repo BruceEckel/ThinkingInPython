@@ -222,12 +222,14 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 ## 6. The static diagnostic beside the runtime `TypeError`
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
-the class header bare:
+the class header unsuppressed, inside the `try` the listing already has:
 
 ```python
-with ignore(TypeError):
+try:
     class Singleton(type, dict[type, Any]):
         pass
+except TypeError as e:
+    print(e)
 ```
 
 `uv run ty check metaclass_layout_conflict.py` then reports:
@@ -235,15 +237,15 @@ with ignore(TypeError):
 ```text
 error[instance-layout-conflict]: Class will raise `TypeError` at runtime
 due to incompatible bases
- --> metaclass_layout_conflict.py:6:11
+ --> metaclass_layout_conflict.py:5:11
   |
-6 |     class Singleton(type, dict[type, Any]):
+5 |     class Singleton(type, dict[type, Any]):
   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Bases `type` and `dict`
   |           cannot be combined in multiple inheritance
 info: Two classes cannot coexist in a class's MRO if their instances
 have incompatible memory layouts
   |
-6 |     class Singleton(type, dict[type, Any]):
+5 |     class Singleton(type, dict[type, Any]):
   |                     ----  --------------- `dict` instances have a
   |                     |                     distinct memory layout
   |                     |                     because of the way `dict`
@@ -255,7 +257,7 @@ have incompatible memory layouts
 ```
 
 Running the same file prints
-`TypeError('multiple bases have instance lay-out conflict')`.
+`multiple bases have instance lay-out conflict`.
 
 The diagnostic and the exception describe one collision. `ty`'s summary
 line even names the consequence, "Class will raise `TypeError` at
