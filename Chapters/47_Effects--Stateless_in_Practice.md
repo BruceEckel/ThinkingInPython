@@ -1168,7 +1168,7 @@ Two failures from two different sources come back as values through one undecora
 and neither the runtime nor the type checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.75 both orders infer the same result type.
+and under `ty` 0.0.77 both orders infer the same result type.
 What both orders need is the intermediate name.
 In one nested expression the inference collapses:
 `supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
@@ -1933,7 +1933,7 @@ so the exception leaves `run()` as an ordinary Python exception.
 ### 2. The type checker can give up quietly
 
 How much of a type survives partial handling depends on your type checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.75.
+Handling some of what an Effect declares works correctly under `ty` 0.0.77.
 If you supply one of two Abilities, the other stays in the signature:
 
 ```python

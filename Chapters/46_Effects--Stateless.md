@@ -673,7 +673,7 @@ so `supply()` must provide a `Console` and a `Log`.
 
 The repeated union invites a `type` alias,
 and the book's own habits normally endorse one.
-Under `ty` 0.0.75 the alias checks the same as the written-out signature:
+Under `ty` 0.0.77 the alias checks the same as the written-out signature:
 an undeclared Ability behind `type Greeting = Depend[...]` draws the same `invalid-yield`.
 This book still writes Effect signatures out in full,
 because the union is the information:

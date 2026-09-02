@@ -33,6 +33,19 @@ rest carry the agent's own reproduction (command and output) in its
 report, but a second pair of eyes has not seen them. Treat an unmarked
 finding as credible and unconfirmed.
 
+**Tool versions.** The pass ran under `ty` 0.0.75 and Python 3.15.0b3.
+Both moved the same day, to `ty` 0.0.77 and 3.15.0rc2, after the pass
+finished. I re-verified the two `ty` findings a version bump could
+plausibly have made stale, and both hold unchanged under 0.0.77: chapter
+08's diagnostic still reports `Expected \`Color\`` at line 12, and
+chapter 13's is still a `type-assertion-failure`, not the
+`invalid-argument-type` the solution quotes. The other eight in that
+group are unaffected in kind, and their fix is to re-capture the block
+from a live run anyway, so whoever applies them will get 0.0.77's
+wording by construction. Chapters 46 and 47's four version-pinned claims
+were separately re-probed and all four hold; their version strings now
+read 0.0.77.
+
 ---
 
 ## The one systemic cause

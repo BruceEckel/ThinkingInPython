@@ -439,13 +439,35 @@ reading.
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
   before assuming the first failure is the only one: `make all` stops at
   the first failing gate and `solutions-gate` runs last.
+  The 0.0.75 to 0.0.77 upgrade (2026-09-02, alongside Python 3.15.0b3 to
+  3.15.0rc2) was the first with **no fallout at all**: `make sweep` green
+  on both trees, no marker or reflow drift, and all four version-pinned
+  claims below re-probed unchanged. Record the quiet ones too, so the
+  next upgrade knows what a clean one looks like.
+  **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
+  The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
+  them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
+  wrong diagnostic codes, wrong message text, and twice a claim built on
+  the wrong wording that inverts the point being taught (see
+  `exercise_review.md` Part 2.1). Earlier upgrade sweeps went through
+  `Chapters/` and stopped. Nothing gates this: `solutions-output-check`
+  validates `#:` markers, and a diagnostic quoted in prose is not a
+  marker. `grep -rn "error\[" Chapters/ Solutions/` finds all 31 in the
+  book, so the sweep is small once you remember it.
   Chapters 46-47 also pin four behavior claims to a ty version
-  ("under `ty` 0.0.75"): the `type`-alias probe (46), the
+  ("under `ty` 0.0.77"): the `type`-alias probe (46), the
   accessor-`Unknown`, chained-`supply()` order, and partial-handling
   claims (47). Re-probe on each upgrade and update those version
   strings; the alias probe is a scratch generator annotated with a
   `type X = Depend[...]` alias whose `yield from need(Undeclared)`
-  must still draw `invalid-yield`.
+  must still draw `invalid-yield`. The other three probe against
+  `build/examples/47_*/`: both `supply`/`catch_all` orders must reveal
+  the same union while the two nested forms give `invalid-argument-type`
+  and `no-matching-overload`+`Unknown`; `partial_handling.py` with its
+  `# type: ignore` stripped must still report `Generator[Need[Log], Any,
+  None]` against `run()`; and `handle(scripted)(handle(capture)(greet))`
+  must still reveal `Unknown` where the named intermediates reveal
+  `() -> Generator[Ask, Any, None]` and `() -> Generator[Never, Any, None]`.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
