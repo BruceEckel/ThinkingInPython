@@ -2,10 +2,12 @@
 
 What to work on next, in priority order.
 Claude maintains this file and rewrites it when something new occurs to it.
-Last updated 2026-09-02, after the whole-book correctness sweep:
-all 47 chapters checked, 56 false claims fixed
-(commits `7583395d` through `e2e5ba75`, plus `e4a4e6cd` applying the
-review file), `make verify` green.
+Last updated 2026-09-02, after the whole-book exercise pass:
+45 chapters, ~320 exercises performed cold, 75 findings in 30 chapters,
+queued in `exercise_review.md` (not yet applied).
+It followed the whole-book correctness sweep: all 47 chapters checked,
+56 false claims fixed (commits `7583395d` through `e2e5ba75`, plus
+`e4a4e6cd` applying the review file), `make verify` green.
 The sweep's record and its reasoning live in
 `archive/~correctness_review.md`.
 
@@ -26,21 +28,33 @@ new prose.
 
 ## The recommendations
 
-1. **The exercise pass is now the highest-value item, and the evidence is
-   in.** It used to sit at number 4 on a hunch. The correctness sweep
-   turned that hunch into a count: eight of its findings were exercise
-   premises that do not hold when performed, and in five of those the
-   chapter was wrong while `Solutions/` was already right. Chapter 10's
-   exercise 5 named one edit where the solution makes three. Chapter 38's
-   exercise 3 could not produce its stated result on the chapter's own
-   maze. Chapter 37's exercise 1 said to edit the file it then said needs
-   no edits. Nothing gates the relationship between an exercise, its
-   listing, and its solution, and it is visibly drifting.
+1. **Apply `exercise_review.md`.** The exercise pass is done (2026-09-02,
+   45 chapters, ~320 exercises, one fresh agent each performing every
+   exercise cold before reading its solution). It found **75 findings in
+   30 chapters: 0 blocking, 27 wrong, 15 drift, 33 minor**; fifteen
+   chapters came back clean. `make sweep` was green before and after,
+   which was the premise.
 
-   Run it as the sweep was run: one fresh agent per chapter, performing
-   each exercise cold from the chapter alone, then diffing against
-   `Solutions/`. Report-only, verify before applying. Budget roughly what
-   the correctness sweep cost.
+   Two results worth acting on beyond the queue itself:
+
+   - **Ten of the 27 `wrong` findings are stale `ty` output quoted in
+     `Solutions/`, and not one is in `Chapters/`.** The last `ty`-upgrade
+     sweeps went through `Chapters/` and stopped. CLAUDE.md's
+     `ty`-upgrade entry needs one more line: re-capture the quoted
+     diagnostics in `Solutions/` too. Only 31 `error[...]` codes exist
+     book-wide, so the sweep is small.
+   - **`Solutions/40` and `Solutions/41` extract nothing** (16 python
+     blocks, zero with a `# slug.py` first line), so they are never
+     type-checked, linted, run, or pytest'd. Nothing is broken there
+     today; nothing would tell you if it broke.
+
+   Chapter 38 and chapter 10's exercise 5, the two the correctness sweep
+   flagged, are both fixed. Chapter 37's exercise 1 is **not**: it still
+   tells the reader to edit the file it then says needs no edits.
+
+   Apply in the order the review's last section gives, and reproduce any
+   finding not marked `[reproduced]` first. Evidence per chapter is in
+   `exercise_review_reports/`; delete it with the review file when done.
 
 2. **Tighten the capture loop before bulk-rewriting.**
    After each hand-edited chapter, run `/bruce-edit-capture` before
@@ -75,7 +89,7 @@ are worth a check against your copy.
 
 ## Suggested sequence
 
-1. Item 1 (the exercise pass). The evidence is fresh and the drift is real.
+1. Item 1 (apply `exercise_review.md`). The evidence is fresh.
 2. Item 4 (adversarial review, structural, before polish).
 3. The item 2/3 loop through the remaining chapters.
 4. Item 5 (readability sweep).
