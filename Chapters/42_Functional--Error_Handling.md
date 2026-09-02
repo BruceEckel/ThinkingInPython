@@ -732,6 +732,7 @@ reuses this `Result` machinery to convert Effects.
 5.  Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
     Chain two of them with `bind()` and print the notes from whichever one failed.
     What happens to the note the successful call would have added?
-6.  Rewrite `func_a()`, `func_b()`, and `func_c()` to return `int | None` instead of `Result[int, str]`,
+6.  Rewrite `func_a()`, `func_b()`,
+    and `func_c()` to return `int | None` instead of `Result[int, str]`,
     and adjust `composing.py` to match.
     What can the caller still tell about which of the three steps failed?

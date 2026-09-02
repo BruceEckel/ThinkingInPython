@@ -921,12 +921,12 @@ puts it to work.
     Then say what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
-    and the `Thermometer` that keeps a `_celsius`
-    from [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables): side effect,
-    side cause, or exception.
+    and the `Thermometer` that keeps a `_celsius` from [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables):
+    side effect, side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
     applies to the exceptions,
-    and which technique from [Effects by Hand](#effects-by-hand) applies to the rest?
+    and which technique from [Effects by Hand](#effects-by-hand)
+    applies to the rest?
 4.  `NonZero` guards zero but not negative values,
     while `validate()` in `slope_catch.py` rejects negatives but not zero.
     Build a `PositiveInt` that makes both bad values unconstructable,

@@ -1747,7 +1747,9 @@ The type checker covers both, and forgetting either is a type error.
     Write the other kind of default, one that builds whatever the request names.
     `handle()` reads its handler's parameter annotation to decide what it answers,
     so a function annotated `Need[Console]` and returning `ability.t()` hands back a default-constructed instance of the requested class.
-    Run it against `greeter.py`'s `greet()`, whose `Console` constructs with no arguments, and confirm the greeting prints.
+    Run it against `greeter.py`'s `greet()`,
+    whose `Console` constructs with no arguments,
+    and confirm the greeting prints.
     Then declare a second Ability and request that one too,
     and report which requests your handler answered at runtime and which ones `ty` believes it answered.
     Account for the difference,
@@ -1770,7 +1772,8 @@ The type checker covers both, and forgetting either is a type error.
     and why its type is `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than an operation on an Effect.
 9.  Write `report_all()`,
     which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
-    Importing that module runs its own unguarded `print(run(...))`, so expect one line of its output before yours.
+    Importing that module runs its own unguarded `print(run(...))`,
+    so expect one line of its output before yours.
     Work out what its annotation must be, and confirm it with `ty`.
     Then call it from inside an `async def`,
     once with `run()` and once with `await run_async()`,

@@ -421,7 +421,8 @@ a constructor default or a `@dataclass` field for per-object.
     explain what that assignment creates, and where.
 5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
     importing `field` from `dataclasses`.
-    [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes) covers `default_factory`;
+    [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
+    covers `default_factory`;
     this exercise needs only the one expression given here.
     Repeat the `append` and confirm `b.items` stays empty.
     Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.
