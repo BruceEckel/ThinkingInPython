@@ -9,6 +9,8 @@ review file), `make verify` green.
 The sweep's record and its reasoning live in
 `archive/~correctness_review.md`.
 
+[[Note: find the GoF CD and upload it so Claude can verify against it]]
+
 ## Chapter Edit Steps
 
 1. Do an adversarial review of the chapter. Fix everything you can, only present unresolved issues here on the console.
