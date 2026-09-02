@@ -323,7 +323,8 @@ That suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
 Autouse runs the fixture, and only a parameter delivers its value.
 Mark `funded` autouse, leave it out of the parameter list,
-and `funded.withdraw(40)` raises a `NameError`.
+and `funded.withdraw(40)` raises an `AttributeError`:
+the bare name finds the fixture function, not the `Account` it returns.
 
 Fixtures eliminate duplicated setup.
 A test that names `funded` states what it needs and nothing about how to build it.

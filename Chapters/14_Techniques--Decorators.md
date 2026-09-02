@@ -855,7 +855,8 @@ a module-level constant computed the ordinary way reads better.
 
 Classes collapse the same way.
 [Singleton](24_Patterns--Singleton.md#singleton-by-class-decorator)
-decorates a class with a callable that replaces it with one cached instance,
+decorates a class with a callable that stands in for it,
+constructing one instance on the first call and returning that same one afterward,
 so the name that follows `class` refers to an object, not a type.
 
 ## The Decorator Pattern
@@ -983,7 +984,7 @@ def test_single_topping() -> None:
 
 ## Decorators You Already Know
 
-Several decorators from earlier chapters use this mechanism.
+Several decorators elsewhere in this book use this mechanism.
 `@property`, `@cached_property`, `@staticmethod`, and `@classmethod`
 (see [Properties](07_Foundations--Classes.md#properties) and [Static and Class Methods](07_Foundations--Classes.md#static-and-class-methods))
 each wrap a function the same way `trace` does,

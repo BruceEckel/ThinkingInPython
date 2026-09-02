@@ -1217,8 +1217,11 @@ which the `# type: ignore` silences so the listing can reach the runtime failure
 
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
 and a subclass inherits that method.
-Either mix would produce a class whose fields are half writable,
-so `@dataclass` refuses at class-definition time rather than at the first surprising assignment.
+A plain subclass of a frozen class would be half writable,
+its own fields assignable and the inherited ones not.
+A frozen subclass of a plain base is the opposite,
+freezing every attribute the mutable base expects to set.
+So `@dataclass` refuses at class-definition time rather than at the first surprising assignment.
 Every validated type in this chapter carries `frozen=True`,
 so anything you derive from one must carry it too.
 

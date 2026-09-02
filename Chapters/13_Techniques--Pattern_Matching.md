@@ -577,8 +577,8 @@ and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala,
 as long as the matched type is a sealed hierarchy the compiler can see in full.
 Their versions are also expressions, producing a value you can assign.
-Python's `match` is a statement,
-and that is why every `match` in this chapter sits inside a function that returns from each `case`.
+Python's `match` is a statement, not an expression,
+so a `match` that must produce a value goes inside a function that returns from each `case`.
 
 Python has no `sealed` keyword.
 `assert_never()` plus a type checker fills that role instead.

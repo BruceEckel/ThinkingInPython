@@ -447,8 +447,8 @@ The attribute is *lazily initialized*, created on first use,
 so it costs nothing until something reads it.
 The stored value lives in the instance's `__dict__`.
 A class declared with `slots=True`
-([Rethinking Objects](20_Patterns--Rethinking_Objects.md) uses it)
-has no `__dict__`, so `cached_property` has nowhere to store the value.
+([Performance](18_Techniques--Performance.md#slots) uses it) has no `__dict__`,
+so `cached_property` has nowhere to store the value.
 
 `cached_property` trades freshness for speed, so if `n.values` changes,
 `total` becomes stale, as the appended `20` in `cached_property_demo.py` shows.
