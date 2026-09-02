@@ -178,6 +178,8 @@ at length, so you can settle in a second what would cost me an unreliable web
 search. If it is Java's, the fix is small: attribute the flag protocol to
 `java.util.Observable` and let GoF keep Subject/Observer.
 
+[[Change this so that it follows the GoF pattern and remove references to Java if you can]]
+
 `[] Reject`
 
 ---
@@ -198,6 +200,9 @@ The fourth placement most plausibly comes from your own *Thinking in
 Patterns* / *Thinking in Java* treatment. Same reasoning as block 3: reported,
 not applied, because it is an attribution to a named work you know far better
 than I can verify. If it is yours, the fix is one clause.
+
+[[Change this so that it follows the GoF pattern and remove references to Java if you can]]
+
 
 `[] Reject`
 
@@ -225,6 +230,8 @@ So the exercise means `trash.py` and says `recycle_dict.py`. Fixing it is a
 one-word change plus untangling the first two sentences, but which file the
 exercise intends is your call, and the `Solutions/` coupling means I would
 rather you confirm than guess.
+
+[[I actually haven't been following the exercises so do your best to untangle this one]]
 
 `[] Reject`
 
@@ -259,6 +266,9 @@ attaching it to exercise 4's variant. The narrow fix is to drop "as in the
 variant that exercise 4 explores". The broader question, whether exercise 4
 should break both `save()` and `restore()` so the sentence becomes true, is
 about what you want the exercise to teach.
+
+[[I actually haven't been following the exercises so do your best to untangle this one]]
+
 
 `[] Reject`
 
@@ -305,6 +315,9 @@ caveat to a Foundations explanation that has not taught `*` unpacking yet
 (that comes at line 333). The cost to a first-time reader may exceed the
 benefit.
 
+[[Can we somehow say this is an overview and there are other detaails not appropriate to cover here?
+Or some other hand-waving that keeps us from overwhelming the reader in this introductory part]]
+
 `[] Reject`
 
 ---
@@ -325,6 +338,8 @@ Adding a row means restating the row's count ("Four build a description"), so
 it is a small edit with a knock-on. Reported rather than applied because
 whether the table means to be exhaustive over the library or over the two
 chapters' listings is your intent, not a fact I can check.
+
+[[apply]]
 
 `[] Reject`
 
@@ -348,6 +363,8 @@ Reported rather than applied because the remedy is awkward either way: a
 footnote has no anchor to link to, so the choice is between softening the
 legend and restructuring. "Appears only in this catalog" may also be intended
 to mean "has no section of its own," which is true of both rows.
+
+[[restructure]]
 
 `[] Reject`
 
