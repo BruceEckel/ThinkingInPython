@@ -3,6 +3,7 @@
 ## 1. `deep_sum()` with an explicit stack
 
 ```python
+# exercise_1.py
 type Nested = int | list[Nested]
 
 def deep_sum(items: list[Nested]) -> int:
@@ -39,6 +40,7 @@ cannot make any of these mistakes, because it never has the choice.
 ## 2. `lru_cache` with `maxsize=3`
 
 ```python
+# exercise_2.py
 from functools import lru_cache
 
 @lru_cache(maxsize=3)
@@ -70,6 +72,7 @@ recently used," stops being true here.
 ## 3. `batch_totals()` stays lazy
 
 ```python
+# exercise_3.py
 from collections.abc import Iterable, Iterator
 from itertools import batched, count, islice
 
@@ -95,6 +98,7 @@ advances the source by three.
 ## 4. `grouped()` cannot repeat a key
 
 ```python
+# exercise_4.py
 from collections import defaultdict
 from collections.abc import Callable, Hashable, Iterable
 
@@ -129,6 +133,7 @@ memory.
 ## 5. `@cache` on `deep_sum()`
 
 ```python
+# exercise_5.py
 from functools import cache
 
 type Nested = int | list[Nested]
@@ -138,7 +143,7 @@ def deep_sum(items: list[Nested]) -> int:
     return 0
 
 try:
-    deep_sum([1, [2, 3]])
+    deep_sum([1, [2, 3]])  # type: ignore
 except TypeError as e:
     print(f"{type(e).__name__}: {e}")
 #: TypeError: unhashable type: 'list'
@@ -166,6 +171,7 @@ argument type alone.
 ## 6. Injecting the random source
 
 ```python
+# exercise_6.py
 import random
 from collections.abc import Iterator
 

@@ -3,6 +3,7 @@
 ## 1. `deposit()` is impure for the same reason `withdraw()` is
 
 ```python
+# exercise_1.py
 balance = 100
 
 def deposit(amount):
@@ -27,6 +28,7 @@ tracking is the problem the chapter raises for `withdraw()`.
 ## 2. A `"*"` operator added to the dispatch table
 
 ```python
+# exercise_2.py
 from collections.abc import Callable
 
 def add(a, b):
@@ -54,6 +56,7 @@ claims.
 ## 3. A fourth independent closure
 
 ```python
+# exercise_3.py
 def multiplier(factor):
     def multiply(n):
         return n * factor
@@ -76,6 +79,7 @@ function that captured it.
 ## 4. A three-stage composition
 
 ```python
+# exercise_4.py
 def compose(f, g):
     def composed(x):
         return f(g(x))
@@ -104,6 +108,7 @@ a third stage: wrapping one composed function inside another
 ## 5. Fixing a leading argument, and why the trailing one differs
 
 ```python
+# exercise_5.py
 import textwrap
 from functools import partial
 
@@ -114,7 +119,7 @@ at_least_ten = partial(clamp, 10)
 print(at_least_ten(3, 100), at_least_ten(50, 100))
 #: 10 50
 try:
-    partial(clamp, high=100)(0, 5)
+    partial(clamp, high=100)(0, 5)  # type: ignore
 except TypeError as e:
     for line in textwrap.wrap(str(e), 57):
         print(line)
@@ -138,12 +143,13 @@ works, and it is what `Placeholder` exists for.
 ## 6. `Final` locks the name, not the object
 
 ```python
+# exercise_6.py
 from typing import Final
 
 CONFIG: Final[list[int]] = [1, 2]
 CONFIG.append(3)
 MAX_SIZE: Final[int] = 100
-MAX_SIZE = 200
+MAX_SIZE = 200  # type: ignore
 print(CONFIG, MAX_SIZE)
 #: [1, 2, 3] 200
 ```
@@ -171,6 +177,7 @@ a different object.
 To reject the append, the value's own type has to be immutable:
 
 ```python
+# exercise_6_tuple.py
 from typing import Final
 
 CONFIG: Final[tuple[int, ...]] = (1, 2)
@@ -191,6 +198,7 @@ own type guards the contents. You need both.
 ## 7. Comprehensions, a different `key`, and a bare `map` object
 
 ```python
+# exercise_7.py
 numbers = [1, 2, 3, 4, 5]
 squares = [n * n for n in numbers]
 print(squares)
@@ -213,6 +221,7 @@ Check an order like that rather than assuming it.
 Dropping the `list()` is the part that surprises:
 
 ```python
+# exercise_7_map.py
 numbers = [1, 2, 3, 4, 5]
 raw = map(lambda n: n * n, numbers)
 print(type(raw).__name__)
@@ -234,6 +243,7 @@ back a finished list, which you can walk as many times as you like.
 ## 8. Only the assigned name needs `nonlocal`
 
 ```python
+# exercise_8.py
 from collections.abc import Callable
 
 def make_counter(step: int = 1) -> Callable[[], int]:

@@ -440,11 +440,14 @@ reader of the table can see. The exact version has no such question:
 either the pair is in the table or it is not.
 
 The tolerant version also loses the failure that made the exact
-version safe. A `Lizard` whose rows you forgot to write no longer
-raises `KeyError`. It silently inherits its parent's answers and plays
-as whatever it derives from. Tolerance buys the convenience of
-skipping rows at the price of the fail-fast policy the chapter
-recommends for a table under construction.
+version safe, though only for a subclass of a concrete item. An
+`Origami(Paper)` whose rows you forgot to write no longer raises a
+`KeyError`. It silently inherits `Paper`'s answers and plays as
+paper. A `Lizard(Item)` still fails fast, since no row is keyed on
+`Item` and the MRO walk finds nothing to inherit. Tolerance buys the
+convenience of skipping rows at the price of the fail-fast policy the
+chapter recommends for a table under construction, and it buys it
+exactly where a new type is most likely to be mistaken for an old one.
 
 Which behavior you want depends on whether a subclass is a new
 competitor or a variation on an existing one. `Origami` really is
@@ -504,8 +507,13 @@ and exercise 8 adds that dependence.
 
 The listing gives each `Inhabitant` kind two of six weapon types,
 ranked around a cycle: each weapon beats the previous two in the
-ranking and loses to the next two, the same shape
-`paper_scissors_rock.py` uses for three items, extended to six.
+ranking and loses to the next two. Six is an even number, so one pair
+is left over. Each weapon has an opposite, three steps around the
+circle, which it neither beats nor loses to, and that pair draws.
+`paper_scissors_rock.py` needs no such case because three items leave
+nothing over: with an odd count every weapon beats half the rest and
+loses to the other half. An even count always leaves the opposite pair
+to define.
 
 ```python
 # exercise_8.py
@@ -529,7 +537,7 @@ WEAPONS_BY_KIND = {
 }
 
 def weapon_outcome(a: str, b: str) -> Outcome:
-    ("A weapon beats the next two "
+    ("A weapon beats the previous two "
      "in WEAPON_ORDER (cyclically).")
     ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
     diff = (ia - ib) % 6
@@ -537,6 +545,8 @@ def weapon_outcome(a: str, b: str) -> Outcome:
         return Outcome.DRAW
     if diff in (1, 2):
         return Outcome.WIN
+    if diff == 3:  # Opposite: neither beats the other
+        return Outcome.DRAW
     return Outcome.LOSE
 
 class Inhabitant2:
@@ -598,9 +608,13 @@ print(p2.meeting(group_size=5))
 ```
 
 The weapon ranking is a genuine cycle: nothing dominates everything,
-so no group can count on winning. The outcome depends on the random
-weapon draws each round, exactly as it does in a real
-rock-paper-scissors tournament.
+so no group can count on winning. At the group level the same cycle
+appears one level up. An `Elf` beats a `Dwarf` on three of their four
+weapon pairings, a `Troll` beats an `Elf` on three of four, and a
+`Dwarf` beats a `Troll` on three of four, with the fourth pairing in
+each case the draw. Over two hundred seeds all three kinds win
+`meeting(5)`, so the outcome depends on the random draws each round,
+exactly as it does in a real rock-paper-scissors tournament.
 
 ## 9. When the table beats the hard-coded dispatch
 
@@ -645,7 +659,7 @@ WEAPONS_BY_KIND = {
 def weapon_outcome(a: str, b: str) -> Outcome:
     order = WEAPON_ORDER
     diff = (order.index(a) - order.index(b)) % 6
-    if diff == 0:
+    if diff in (0, 3):  # Same or opposite: no winner
         return Outcome.DRAW
     return Outcome.WIN if diff in (1, 2) else Outcome.LOSE
 
