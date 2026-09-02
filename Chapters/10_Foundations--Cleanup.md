@@ -428,7 +428,10 @@ so the registry cannot become the leak it exists to catch.
 4.  In `weak_value.py`, change `_instances` from a `WeakValueDictionary` to a `dict[int, Counter]` and run the file again.
     Report what `live_count()` prints after each `pop()`,
     and explain the difference in terms of what each container holds.
-5.  In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)` and run the file again.
+5.  In `finalizer.py`, change the `finalize()` call to `finalize(self, self.close)`,
+    make `close()` print `name, "closed"` instead of invoking the finalizer,
+    and call `a.closer()` where the file now calls `a.close()`.
+    Run it again.
     Report when `B closed` now prints relative to `End of program`,
     and say what keeps the `Connection` alive.
 6.  In `cycle.py`, change `self_link()` to build a two-object cycle

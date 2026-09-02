@@ -103,14 +103,10 @@ and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#libr
 had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
-and the program still runs,
-but under `ty` 0.0.75 the answer comes back as `Unknown` and the checking quietly stops.
-The accessor pins the answer type down,
-at the `answer: str` binding inside `ask()`.
-`yield from Ask(prompt)` produces `Unknown` there too,
-so that annotation is an assertion the type checker accepts rather than a type it worked out.
-Its justification is `Ask`'s base, `Ability[str]`,
-and the binding is the one place the accessor states the type,
+and both the program and the type checker still work:
+`ty` reads the answer type from `Ask`'s base, `Ability[str]`.
+What the accessor buys is a name for the request and one place to state that answer type,
+at the `answer: str` binding inside `ask()`,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
@@ -1815,7 +1811,7 @@ Three sit outside the tables.
 `as_type()` relabels a value for the type checker and does nothing at runtime.
 `spaced()` and `recurs()` build the `Schedule` that `retry()` and `repeat()` consume.
 
-Four build a description:
+Five build a description:
 
 | Tool | Applied to | What it does to the type |
 |---|---|---|
@@ -1823,6 +1819,7 @@ Four build a description:
 | `throw(reason)` | An exception instance | Wraps it as `Try[E, Never]` |
 | `need(C)` | A class | Builds `Depend[Need[C], C]`, producing an instance |
 | `wait(target)` | A `Task` or any awaitable | Adds `Async`; produces the awaited `R` |
+| `sleep(seconds)` | A number of seconds | Adds `Need[Time]` and `Async`; produces `None` |
 
 The rest decorate a function that returns an Effect,
 rewriting the type that function declares:
@@ -1997,9 +1994,7 @@ That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting t
 Keep the habit generally:
 a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
-That makes two type-checker gaps: the nested handler expression here,
-and the direct Ability yield that types as `Unknown`.
-Both have the same shape.
+That leaves one type-checker gap, the nested handler expression here.
 The library's types ask the type checker a hard inference question,
 and where the type checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.

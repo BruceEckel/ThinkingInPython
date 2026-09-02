@@ -98,7 +98,7 @@ Counting the object adapter above, three structures produce one behavior:
 every route ends at the same two methods on a `WhatIHave`.
 The approaches differ only in where the adaptation lives.
 When the output cannot tell them apart, only packaging separates them.
-(GoF adds a fourth placement, an inner-class adapter the adaptee hands out, which is Java packaging for the same forwarding.)
+(GoF varies the same forwarding two further ways: a *pluggable adapter* takes the adapting operation as a delegate the client supplies, and a *two-way adapter* presents both interfaces at once.)
 
 The three split into two families *GoF Design Patterns* names.
 `ProxyAdapter` is an *object adapter*:

@@ -533,7 +533,8 @@ A pattern is worth keeping only when it is still useful once the language does p
 
 ## Exercises
 
-1.  Add the `Plastic` material and its `plastic.dat` lines to `recycle_dict.py`.
+1.  Add a `Plastic` material to `trash.py`,
+    then run `recycle_dict.py` over `plastic.dat`.
     Confirm that `recycle_dict.py` and `parse_trash.py` need no changes,
     then account for every pound of plastic that `plastic_dropped.py` loses.
     Which test in `test_trash.py` fails, and why is that failure correct?

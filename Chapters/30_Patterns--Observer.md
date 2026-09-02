@@ -23,8 +23,8 @@ without the data knowing which views exist.
 
 The classic design from *GoF Design Patterns* has three parts:
 an `Observer` interface every observer implements,
-an `Observable` base class carrying a `changed` flag,
-and a two-phase notification that sets the flag and then broadcasts:
+a `Subject` base class that keeps the observer list,
+and a `notify()` that broadcasts to each observer in turn:
 
 ```python
 # classic_observer.py
@@ -34,52 +34,52 @@ from typing import override
 class Observer(ABC):
     @abstractmethod
     def update(
-        self, source: Observable, arg: object
+        self, subject: Subject, arg: object
     ) -> None: ...
 
-class Observable:
+class Subject:
     def __init__(self) -> None:
         self._observers: list[Observer] = []
-        self._changed = False
 
-    def add_observer(self, observer: Observer) -> None:
+    def attach(self, observer: Observer) -> None:
         self._observers.append(observer)
 
-    def set_changed(self) -> None:
-        self._changed = True
+    def detach(self, observer: Observer) -> None:
+        self._observers.remove(observer)
 
-    def notify_observers(self, arg: object = None) -> None:
-        if not self._changed:
-            return
-        self._changed = False
+    def notify(self, arg: object = None) -> None:
         for observer in list(self._observers):
             observer.update(self, arg)
 
 class Display(Observer):
     @override
     def update(
-        self, source: Observable, arg: object
+        self, subject: Subject, arg: object
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Observable):
+class Thermometer(Subject):
     def set_celsius(self, value: float) -> None:
-        self.set_changed()
-        self.notify_observers(value)
+        self.notify(value)
 
 t = Thermometer()
-t.add_observer(Display())
+t.attach(Display())
 t.set_celsius(25)
 #: display: 25C
 ```
 
-The flag lets several mutations coalesce into one broadcast,
-and lets a subclass decide a change is not worth announcing.
-This listing uses neither ability:
-`set_celsius()` sets the flag and broadcasts on consecutive lines.
+Passing `arg` is the *push* model: the subject hands observers what changed,
+so an observer needs no reference back into the subject's state.
+The *pull* model sends only `subject` and lets each observer ask for what it wants,
+which decouples the two further and costs a call back.
 
-`notify_observers()` clears the flag before the loop rather than after,
-so a change made during notification sets the flag again and survives to the next broadcast.
+GoF leaves one choice open: who calls `notify()`.
+Here `set_celsius()` calls it, so every change broadcasts at once.
+The alternative leaves that call to the client,
+which lets several changes coalesce into one broadcast,
+at the price of a caller who can forget to make it.
+`notify()` walks a copy of the list,
+so an observer that detaches itself mid-broadcast cannot disturb the loop.
 
 Python expresses this with far less machinery.
 The rest of the chapter shows the Pythonic version first,
@@ -90,7 +90,7 @@ It closes with a visual model-view example built on the same callable observers.
 
 In Python an *observer* need not be an object implementing an `Observer` interface.
 It is simply a callable.
-An *observable* need not be a base class with a `changed` flag.
+An *observable* need not be a `Subject` base class with `attach()` and `detach()`.
 It is a list of callables and a way to notify them.
 A `@property` setter is a natural place to fire the notification when state changes:
 
@@ -150,10 +150,9 @@ t.celsius = 150
 
 The observers here are lambdas, but any function or bound method works.
 Assigning to `celsius` notifies everyone.
-Four things from the classic version disappear: the interface,
-the `changed` flag, the two-phase `set_changed()` then `notify_observers()`,
-and a class per reaction.
-The `source` argument goes too.
+Three things from the classic version disappear: the `Observer` interface,
+the `update()` method it demanded, and a class per reaction.
+The `subject` argument goes too.
 An observer that needs to know who changed takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.

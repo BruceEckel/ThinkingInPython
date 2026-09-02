@@ -603,8 +603,10 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
 3.  Serialize a `Drawing` to JSON using `dataclasses.asdict()` and reconstruct it.
     What did the round trip change that `pickle` preserved,
     and where must your reconstruction compensate?
-4.  Change `sketch.py` so `Memento` holds the list instead of a tuple copy,
-    then write the test that exposes the corruption.
+4.  Change `sketch.py` so `Memento` holds the list itself instead of a tuple copy,
+    and so `restore()` assigns that list rather than copying it,
+    leaving the sketch and the memento sharing one list in both directions.
+    Then write the test that exposes the corruption.
     Which of the three tests in `test_sketch.py` catches it first?
 5.  Add `goto(steps_back)` to `History`:
     jump the present several states into the past in one call,

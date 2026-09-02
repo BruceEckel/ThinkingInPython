@@ -111,9 +111,11 @@ print(connect(port=80, host="web.example.com"))
 
 Passing by name does not require a default: `host` has none,
 and the last call still names it.
-At the call site, every keyword argument must come after the positional ones.
+At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
+The grammar has corners this chapter leaves alone,
+and writing the arguments in that order stays clear of all of them.
 
 A parameter with a default cannot come before one without.
 `def f(a=1, b):` is a `SyntaxError`:

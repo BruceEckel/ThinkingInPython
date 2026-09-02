@@ -5,40 +5,35 @@ from typing import override
 class Observer(ABC):
     @abstractmethod
     def update(
-        self, source: Observable, arg: object
+        self, subject: Subject, arg: object
     ) -> None: ...
 
-class Observable:
+class Subject:
     def __init__(self) -> None:
         self._observers: list[Observer] = []
-        self._changed = False
 
-    def add_observer(self, observer: Observer) -> None:
+    def attach(self, observer: Observer) -> None:
         self._observers.append(observer)
 
-    def set_changed(self) -> None:
-        self._changed = True
+    def detach(self, observer: Observer) -> None:
+        self._observers.remove(observer)
 
-    def notify_observers(self, arg: object = None) -> None:
-        if not self._changed:
-            return
-        self._changed = False
+    def notify(self, arg: object = None) -> None:
         for observer in list(self._observers):
             observer.update(self, arg)
 
 class Display(Observer):
     @override
     def update(
-        self, source: Observable, arg: object
+        self, subject: Subject, arg: object
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Observable):
+class Thermometer(Subject):
     def set_celsius(self, value: float) -> None:
-        self.set_changed()
-        self.notify_observers(value)
+        self.notify(value)
 
 t = Thermometer()
-t.add_observer(Display())
+t.attach(Display())
 t.set_celsius(25)
 #: display: 25C

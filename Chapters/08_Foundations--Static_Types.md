@@ -32,7 +32,7 @@ They behave the same: both are compatible with everything.
 `Any` and `object` differ.
 Both accept every value,
 but `object` guarantees nothing about the value once you have it,
-so the type checker rejects every operation you try on it.
+so the type checker rejects every operation beyond `object`'s own.
 `Any` permits every operation instead,
 and that permission makes it an opt-out rather than a wide type.
 

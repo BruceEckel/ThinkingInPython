@@ -22,7 +22,7 @@ accepts for *Creational* and questions for the other two.
 Each table lists its rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
-An unlinked name means the pattern appears only in this catalog.
+An unlinked name means the book has no section on that pattern.
 
 ## Finding a Pattern by Problem
 
