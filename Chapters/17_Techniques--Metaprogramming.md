@@ -1846,7 +1846,8 @@ each time someone calls the finished class.
     Restore the check.
 10. Change `prepare_namespace.py`'s `NoDuplicates` so that instead of raising an exception,
     it keeps the *first* definition of a duplicated name and discards the later one.
-    Confirm that `Handlers().on_open()` then runs the first `on_open`.
+    Give the two `on_open` bodies different `print()` calls so you can tell them apart,
+    then confirm that `Handlers().on_open()` runs the first one.
     Explain why no class decorator could achieve the same thing.
 
 [^crtp]: C++ templates can do this via the *Curiously Recurring Template Pattern*

@@ -582,7 +582,8 @@ and the Observer is an event bus.
     every other observer still hears the change,
     and `notify()` re-raises the failures afterward, together,
     as an `ExceptionGroup`
-    (the container [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) introduced).
+    (the container [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup) introduced,
+    which you build yourself here: `raise ExceptionGroup("message", failures)`).
     Write a test in which the first observer raises an exception and the second still records its notification.
 4.  Redo exercise 3 for `async_observers.py`.
     Make `notify()` use `gather(*coros, return_exceptions=True)`,

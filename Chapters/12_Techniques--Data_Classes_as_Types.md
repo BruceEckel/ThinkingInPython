@@ -1568,7 +1568,7 @@ and a function receiving one does its work without asking whether the value make
     and confirm that `copy.replace()` still runs your validation.
 6.  Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
     Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
-    then check with `display_object()`.
+    then check by printing `inspect.signature(Stars.__init__)`.
     Incrementing the counter from `__post_init__()` works on a frozen class.
     Explain why.
 7.  Give `Months` a second field,

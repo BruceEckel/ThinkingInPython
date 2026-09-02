@@ -420,7 +420,10 @@ a constructor default or a `@dataclass` field for per-object.
     Using `vars()` as in `inside_objects.py`,
     explain what that assignment creates, and where.
 5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
-    then repeat the `append` and confirm `b.items` stays empty.
+    importing `field` from `dataclasses`.
+    [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes) covers `default_factory`;
+    this exercise needs only the one expression given here.
+    Repeat the `append` and confirm `b.items` stays empty.
     Then try the same class with `items: list[str] = []` and report what `@dataclass` does about it.
 6.  In `inside_objects.py`, add `del a.x` after the final `print`,
     then print `vars(a)` and `a.x` again.

@@ -36,11 +36,12 @@ function body on every call.
 MISSING = sentinel("MISSING")
 
 def get(data, key, default=MISSING):
-    if key in data:
+    try:
         return data[key]
-    if default is MISSING:
-        raise KeyError(key)
-    return default
+    except KeyError:
+        if default is MISSING:
+            return MISSING  # Normally re-raises here
+        return default
 
 prefs = {"volume": 3, "mute": None, "volume2": None}
 print(get(prefs, "volume2"))
@@ -48,8 +49,8 @@ print(get(prefs, "volume2"))
 ```
 
 `volume2` is a real key whose stored value happens to be `None`. The
-`in` check finds it, so `get()` returns the stored `None` directly,
-without ever consulting `default`. The `MISSING` sentinel only matters
+subscript finds it and raises nothing, so `get()` returns the stored
+`None` directly, without ever consulting `default`. The `MISSING` sentinel only matters
 when the key is genuinely absent. Here it never comes into play,
 which is the point: a present `None` and an absent key are
 different situations, and the sentinel exists to tell them apart.

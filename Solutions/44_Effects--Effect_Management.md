@@ -118,11 +118,12 @@ for line in captured.messages:
 #: Hello, Alice!
 ```
 
-Five signatures had to change, and only two of them wanted to.
-`format_greeting()` uses the new Effect. `greet()` both uses a `Log`
-and accepts one, to hand down to `format_greeting()`. Then
-`session()`, `menu()`, and `main()` each gained a `log` parameter that
-they only hand to the next function.
+Five signatures name the new Effect, and only two of them wanted to.
+One of the five is new rather than edited: `format_greeting()`, the
+helper that uses the `Log`. Four existing signatures had to be edited.
+`greet()` both uses a `Log` and accepts one, to hand down to
+`format_greeting()`. Then `session()`, `menu()`, and `main()` each
+gained a `log` parameter that they only hand to the next function.
 
 Three of five is the number worth sitting with. The functions that pay
 sit between the Effect's user and the call site that binds it, and

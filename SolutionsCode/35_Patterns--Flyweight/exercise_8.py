@@ -22,7 +22,7 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
 @cache
 def tile(symbol: str) -> Tile:
     # Widen the window between miss and store
-    time.sleep(0.1)
+    time.sleep(0.05)
     name, walkable = SPECS[symbol]
     return Tile(symbol, name, walkable)
 

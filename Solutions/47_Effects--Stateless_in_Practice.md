@@ -1145,9 +1145,8 @@ Deleting the annotation on the handler's parameter fails much louder, and
 earlier:
 
 ```text
-ValueError: Not enough annotated arguments to handler function 'scripted'.
-Expected 1, got 0. 'handle' uses type annotations to match handlers with
-abilities, so the argument to 'scripted' must be annotated.
+ValueError: Handler function <function scripted_from.<locals>.scripted
+at 0x...> was not annotated.
 ```
 
 `handle()` raises that `ValueError` as soon as you call it, before any Effect
@@ -1374,8 +1373,9 @@ Adding a sixth actor to the chapter's five-actor version shows where the cost
 falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
 union, and a `yield from`, so four edits. `casts.py` gains a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an
-argument in each of the two factory calls, so seven. `two_games.py` needs one
-edit, for its direct `play()` call, and none for its two factory calls. The
+argument in each of the two factory calls, so seven. `two_games.py` needs two
+edits, its direct `play()` call and the `from casts import` list it draws the
+new actor from, and none for its two factory calls. The
 `Cast` alias does not change at all, because the new actor never reaches the
 caller.
 

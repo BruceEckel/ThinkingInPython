@@ -81,22 +81,35 @@ import tracemalloc
 
 N = 1_000_000
 
+def eager_first_evens():  # The original, two lists
+    squares = [x * x for x in range(N)]
+    evens = [s for s in squares if s % 2 == 0]
+    return evens[:5]
+
 def eager_first_evens_comprehension():
     return [x * x for x in range(N) if (x * x) % 2 == 0][:5]
 
-tracemalloc.start()
-result = eager_first_evens_comprehension()
-_, peak = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-print(result)
+def peak_of(func) -> int:
+    tracemalloc.start()
+    func()
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return peak
+
+print(eager_first_evens_comprehension())
 #: [0, 4, 16, 36, 64]
+two, one = peak_of(eager_first_evens), peak_of(
+    eager_first_evens_comprehension)
+print("peak ratio, one list to two:", round(one / two, 1))
+#: peak ratio, one list to two: 0.5
 ```
 
 The single comprehension filters `x * x` directly instead of first
 building a `squares` list and then an `evens` list from it, so it
 removes one of the two million-element intermediate lists. Peak
-memory drops accordingly, roughly half of the original two-list
-version, but it is still enormously larger than the lazy version's
+memory drops accordingly, to half of the original two-list version as
+the measurement above reports, but it is still enormously larger than
+the lazy version's
 peak: this comprehension still must build and hold the whole list of
 even squares before slicing `[:5]` can throw almost all of it away.
 No amount of restructuring the eager version closes that gap, because
@@ -254,8 +267,9 @@ print(counts)
 With `set_events()` in place of the local attachment, the new entry
 is `'square': 1`. Nothing else appears, because `PY_START` fires when
 a Python code object starts running, and the module's own frame
-started before the tool attached. CPython implements `print()` and
-`sum()` in C, so a program this small has no other candidates.
+started before the tool attached. CPython implements `print()` in C,
+so it never starts a Python frame, and a program this small has no
+other candidates.
 
 The two local attachments above produce the identical `Counter`, and
 that agreement is an artifact of the example's size. In a real

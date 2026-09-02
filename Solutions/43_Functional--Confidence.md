@@ -442,9 +442,10 @@ for sample in ("4", "0", "OOPS"):
 #: OOPS: Not a number
 ```
 
-The two versions produce identical output and are the same length in
-statements, but the `match` reads as one description of four shapes
-while the `isinstance()` version reads as four separate questions.
+The two versions produce identical output, and the `match` is the
+shorter of the two by a few lines, but length is not what separates
+them. The `match` reads as one description of four shapes while the
+`isinstance()` version reads as four separate questions.
 The difference shows in what each version repeats: `result.error`
 appears three times in `describe_isinstance.py` and never in the
 `match`, because each `case` matches on the error directly instead of

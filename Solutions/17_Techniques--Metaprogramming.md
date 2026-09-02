@@ -416,7 +416,8 @@ a bare newline would be a `SyntaxError` before anything runs. So the
 payload's last line opens a triple-quoted string, `Y = """`. That
 string swallows the second splice, and the trailing `#` comments out
 the `")` left over after it closes. The result compiles, and the
-injected `print()` runs while `exec()` is executing the class body.
+injected `print()` runs at module level inside `exec()`, after the
+class body has finished.
 
 The `KeyError` afterward is incidental damage, not protection.
 `namespace[class_name]` looks for a class named after the whole

@@ -382,8 +382,9 @@ and the chapters after it build a checked system on that idea.
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
-    Report the minimal counterexample Hypothesis finds,
-    and explain what it reveals about Unicode case mapping.
+    Report the counterexample Hypothesis shrinks to,
+    run it a few times to see which characters it settles on,
+    and explain what they reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations):
     for any roster and any group size,
     every student appears in exactly one group per round.

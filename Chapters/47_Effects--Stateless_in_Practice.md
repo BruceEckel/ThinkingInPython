@@ -2217,7 +2217,8 @@ It is a language that does the encoding for you.
     and read the diagnostic before fixing it.
     Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
 14. `play()` in `casts.py` accepts any five actors, matched or not.
-    Give `kitties_and_puzzles()` and `warriors_and_weapons()` a shared signature so a caller can pass either one where a cast belongs,
+    `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature;
+    give that shape a name so a caller can pass either one where a cast belongs,
     and say what that recovers of the Abstract Factory and what it does not.
     Then add a sixth actor to `encounter()` and count the lines you edit in `quest.py`,
     `casts.py`, and `two_games.py`.

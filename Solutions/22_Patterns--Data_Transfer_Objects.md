@@ -101,16 +101,18 @@ never two problems.
 # exercise_4.py
 from types import SimpleNamespace
 
-built = SimpleNamespace(info="Spam", b=["x", "y"], more=11,
-                        tag=12)
-print(vars(built))
-#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11, 'tag': 12}
+TAGS = ["urgent", "todo"]
 
-assigned = SimpleNamespace(info="Spam", b=["x", "y"],
-                           more=11)
-assigned.tag = 12
-print(vars(assigned))
-#: {'info': 'Spam', 'b': ['x', 'y'], 'more': 11, 'tag': 12}
+built = SimpleNamespace(
+    info="Spam", tags=TAGS, more=11, note=12)
+print(list(vars(built)))
+#: ['info', 'tags', 'more', 'note']
+
+assigned = SimpleNamespace(
+    info="Spam", tags=TAGS, more=11)
+assigned.note = 12
+print(list(vars(assigned)))
+#: ['info', 'tags', 'more', 'note']
 
 print(vars(built) == vars(assigned))
 #: True
@@ -119,7 +121,7 @@ print(vars(built) == vars(assigned))
 A keyword argument and a later assignment both add one entry to the
 instance's `__dict__`. `vars()` reads that dict, and the two
 namespaces are indistinguishable afterward. Even the order matches,
-because a dict keeps insertion order and both routes add `tag` last.
+because a dict keeps insertion order and both routes add `note` last.
 If you assign the attributes in a different sequence, the dicts still
 compare equal, since dict equality ignores order.
 

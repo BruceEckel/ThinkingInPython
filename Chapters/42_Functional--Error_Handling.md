@@ -716,7 +716,9 @@ reuses this `Result` machinery to convert Effects.
 
 1.  Add a `func_e()` that returns a `Result[int, str]`,
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
-    Confirm an `Err` from `func_e()` still short-circuits.
+    Put it in the middle of the chain rather than at the end,
+    so an `Err` from it has a later step to skip,
+    and confirm that the step never runs.
 2.  Give `Err` a `map_error()` method that transforms the error it holds,
     leaving an `Ok` untouched
     (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).

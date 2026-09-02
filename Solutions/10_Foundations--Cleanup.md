@@ -270,13 +270,13 @@ class Node:
     def __del__(self) -> None:
         print(self.name, "finalized")
 
-def pair_link() -> None:
+def self_link() -> None:
     a, b = Node("a"), Node("b")
     a.peer = b
     b.peer = a
 
 gc.disable()
-pair_link()
+self_link()
 print("unreachable, but still alive")
 #: unreachable, but still alive
 gc.collect()
@@ -297,7 +297,7 @@ behaves exactly like a cycle through one. The self-reference in
 Removing the `gc.disable()`/`gc.enable()` pair makes the output
 unpredictable. The collector then runs on its own schedule, triggered
 by allocation counts rather than by your call. The two `finalized`
-lines can therefore appear anywhere after `pair_link()` returns:
+lines can therefore appear anywhere after `self_link()` returns:
 between the two `print()` calls, after both, or not until the
 interpreter shuts down. Whether they land before `after collect`
 depends on how many objects the program has allocated by then, and

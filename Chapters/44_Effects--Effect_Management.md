@@ -915,13 +915,14 @@ puts it to work.
     Wrap `greet()` in three callers, `session()`, `menu()`, and `main()`,
     each calling the next and none of them using `Ask` or `Tell`.
     Now add a `Log` Effect (a protocol with `log(message)`)
-    used by a new helper that `greet()` calls.
-    Count the signatures you had to edit,
+    used by a new helper that `greet()` calls, and log from `greet()` too.
+    Count the signatures that end up naming `Log`,
     and note how many of them mention an Effect they never use.
     Then say what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
-    and `Thermometer` from [Observer](30_Patterns--Observer.md): side effect,
+    and the `Thermometer` that keeps a `_celsius`
+    from [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables): side effect,
     side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
     applies to the exceptions,
