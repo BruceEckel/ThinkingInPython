@@ -307,7 +307,9 @@ the way `a` reads through to `Stars` until `a.rating = 1`.
 A subclass stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
 A subclass overriding a `ClassVar` inherits the declaration along with the name,
-so restating `ClassVar[int]` adds nothing.
+but the bare override drops the type checker's guard.
+`ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`,
+so restating `ClassVar[int]` on an override keeps that check.
 
 ## Real Per-Object Defaults
 
