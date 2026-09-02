@@ -92,7 +92,7 @@ PAGEBREAK_TYPST = """\
     } else { "CHAPTER " + num }
     // Spacing follows proximity: the eyebrow, title, and
     // band are one group (small gaps inside), and the body
-    // follows after a full-line break (24pt), so the opening
+    // follows after a full-line break (28pt), so the opening
     // reads as a unit rather than crowding its text.
     text(size: 10pt, tracking: 3pt, weight: "regular",
          fill: rgb("<<moss>>"), eyebrow)
@@ -102,10 +102,14 @@ PAGEBREAK_TYPST = """\
     linebreak()
     // Explicit size: pandoc's typst template sets level-1
     // headings modestly, and a chapter opening deserves more.
+    // The band clears the descenders: at a 9pt offset it
+    // touched the tail of a "p" or "g", so it sits at 13pt,
+    // and the gap to the body grows by the same 4pt to keep
+    // the opening's proportions.
     text(size: 28pt,
-         underline(stroke: 5pt + orn-band, offset: 9pt,
+         underline(stroke: 5pt + orn-band, offset: 13pt,
                    evade: false, background: true, title))
-    v(24pt)
+    v(28pt)
   }
   it
 }
