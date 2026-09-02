@@ -303,7 +303,7 @@ Because the static `factory()` method in `shape_factory1.py` collects all the cr
 that method is the only code you change.
 A *factory object* defines a single `create()` method,
 so choosing what to build becomes choosing which factory object to call,
-rather than passing a string to a `match` expression.
+rather than passing a string to a `match` statement.
 Here, we create one factory object per `Shape` subtype:
 
 ```python

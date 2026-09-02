@@ -335,8 +335,9 @@ and so does the chain below.
 
 When the configurable version already exists, with the setting as a parameter,
 `functools.partial` does the same job.
-`partial` fills parameters from the left,
-so a setting that comes after the caller's argument needs a `Placeholder`
+`partial` fills positional parameters from the left,
+so bind a trailing setting by keyword.
+A positional-only parameter takes no keyword, and needs a `Placeholder`
 ([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder))
 in the caller's position to hold it open.
 Save the strategy class for an algorithm that carries several related methods or mutable state.
@@ -400,8 +401,8 @@ and reports that decision as its return value.
 That is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
-These tests wrap each finder so a run records its name.
-The recorded names let each test assert not just the root but *which* finders ran:
+The first two tests wrap each finder so a run records its name,
+letting them assert not just the root but *which* finders ran:
 the first that converges returns the root and the rest never run,
 a later finder succeeds where an earlier one fails,
 an empty chain returns `None`,
