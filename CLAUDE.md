@@ -500,6 +500,26 @@ reading.
   over both trees, reports all failures, exits nonzero if any failed)
   whenever the first failure is unlikely to be the only one. A tool
   upgrade is the standard case, and `tools-upgrade` now ends with it.
+- **A green `make sweep` does not mean the committed trees are current,
+  and does not mean the `#:` markers are right.** `sweep` runs
+  gate-checks, solutions-numbering, ty, lint, solutions-ty,
+  solutions-lint, run, test, and solutions-test. It does *not* run
+  `solutions-check` (the `SolutionsCode/` drift check) or the output
+  validators. Editing a `Solutions/*.md` listing therefore leaves
+  `SolutionsCode/` stale behind a green sweep, and a stale marker
+  survives too. `make verify` covers both, through `solutions-sync` and
+  `solutions-output`. When iterating with `sweep`, run
+  `uv run python tools/extract_solutions.py` and
+  `uv run python tools/validate_output.py --tree "$(pwd)/build/solutions" Solutions`
+  before believing the tree is clean.
+- **A `#:` marker that measures memory or time is a claim about the
+  process the gate runs it in, not about a standalone run.** Chapter
+  35's `exercise_2.py` prints a `tracemalloc` peak ratio; standalone it
+  reports 9.8 every time, and under `validate_output.py`, which execs
+  the block alongside everything else, it reports the committed 9.9.
+  The gate's context is the authoritative one. Before "fixing" such a
+  marker, reproduce it the way the gate does, or you will correct a
+  value that was already right.
 - **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
   line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`).
   `gate` (so `verify`/`all`/`ci`) runs `reflow_prose.py --write`, so
