@@ -207,14 +207,72 @@ def evaluate(e: Expr, **env: int) -> float:
         case _:
             assert_never(e)
 
+def to_infix(e: Expr) -> str:
+    match e:
+        case Num(value):
+            return str(value)
+        case Var(name):
+            return name
+        case Add(left, right):
+            return f"({to_infix(left)} + {to_infix(right)})"
+        case Mul(left, right):
+            return f"({to_infix(left)} * {to_infix(right)})"
+        case Neg(operand):
+            return f"-{to_infix(operand)}"
+        case Div(left, right):
+            return f"({to_infix(left)} / {to_infix(right)})"
+        case _:
+            assert_never(e)
+
+def simplify(e: Expr) -> Expr:
+    match e:
+        case Num(_) | Var(_):
+            return e
+        case Add(left, right):
+            lhs, rhs = simplify(left), simplify(right)
+            match (lhs, rhs):
+                case (Num(0), other) | (other, Num(0)):
+                    return other
+                case (Num(a), Num(b)):
+                    return Num(a + b)
+                case _:
+                    return Add(lhs, rhs)
+        case Mul(left, right):
+            lhs, rhs = simplify(left), simplify(right)
+            match (lhs, rhs):
+                case (Num(0), _) | (_, Num(0)):
+                    return Num(0)
+                case (Num(1), other) | (other, Num(1)):
+                    return other
+                case (Num(a), Num(b)):
+                    return Num(a * b)
+                case _:
+                    return Mul(lhs, rhs)
+        case Neg(operand):
+            match simplify(operand):
+                case Num(a):
+                    return Num(-a)
+                case Neg(deeper):
+                    return deeper  # Double negation
+                case inner:
+                    return Neg(inner)
+        case Div(left, right):
+            # Division by Num(0) is deliberately left alone:
+            return Div(simplify(left), simplify(right))
+        case _:
+            assert_never(e)
+
 x = Var("x")
 expr = (2 * x + 1) / -x
+print(to_infix(expr))
+#: (((2 * x) + 1) / -x)
 print(evaluate(expr, x=3))
 #: -2.3333333333333335
+print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
+#: x
 ```
 
-`to_infix()` needs a case for each too (`f"-{to_infix(operand)}"` and
-`f"({to_infix(left)} / {to_infix(right)})"`). `simplify()` is the
+`to_infix()` needs a case for each too. `simplify()` is the
 interesting one: for `Neg`, a constant operand folds
 (`Neg(Num(a))` → `Num(-a)`), and a double negation cancels
 (`Neg(Neg(inner))` → `inner`). For `Div`, division by `Num(0)` should
@@ -367,9 +425,11 @@ def to_infix(e: Expr) -> str:
         case Var(name):
             return name
         case Add(left, right):
-            return f"{to_infix(left)} + {to_infix(right)}"
+            return f"({to_infix(left)} + {to_infix(right)})"
         case Mul(left, right):
-            return f"{to_infix(left)} * {to_infix(right)}"
+            return f"({to_infix(left)} * {to_infix(right)})"
+        case _:
+            assert_never(e)
 
 def simplify(e: Expr) -> Expr:
     match e:
@@ -416,9 +476,9 @@ def derivative(e: Expr, name: str) -> Expr:
 x = Var("x")
 d = derivative(x * x, "x")
 print(to_infix(d))
-#: 1 * x + x * 1
+#: ((1 * x) + (x * 1))
 print(to_infix(simplify(d)))
-#: x + x
+#: (x + x)
 ```
 
 `derivative()` walks the tree exactly like `evaluate()` and
@@ -429,8 +489,8 @@ respect to itself and `0` with respect to every other variable.
 `Add`'s case is the sum rule. `Mul`'s case is the product rule, which
 must keep both the derivative *and* the original, undifferentiated
 subtree on each side, because the product rule genuinely needs both.
-Running the raw result through `simplify()` turns `1 * x + x * 1`
-into the much more readable `x + x` (reaching `2 * x` takes a further
+Running the raw result through `simplify()` turns `((1 * x) + (x * 1))`
+into the much more readable `(x + x)` (reaching `2 * x` takes a further
 rule, "combine like terms," that this `simplify()` does not
 implement). A full `Expr` that also includes `Neg` and `Div`
 (exercise 3's additions) needs a quotient rule for `Div`, which
@@ -497,6 +557,11 @@ try:
 except TypeError as e:
     print(type(e).__name__, e)
 #: TypeError can only concatenate str (not "Var") to str
+try:
+    x + "a"  # type: ignore
+except TypeError as e:
+    print(e)  # Same exception type, other message
+#: unsupported operand type(s) for +: 'Var' and 'str'
 ```
 
 Before the change, `"a" + x` produced `Add(Num("a"), Var("x"))`: a
@@ -511,6 +576,13 @@ Python raises the `TypeError` it would have raised for any other
 mismatched pair. The message comes from `str`, which is the right
 source: the left operand is what the caller wrote first, and nothing
 in this expression language ever claimed to extend `str`.
+
+The forward methods need the same guard for the same reason. Without
+it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
+from the other direction, so all four methods decline what they cannot
+use. The two messages differ because a different object gets the last
+word: `str` reports the first case, and Python's own fallback reports
+the second, once both operands have declined.
 
 Each method declares the type it really returns, `Add` or `Mul`,
 even though it can also return `NotImplemented`.

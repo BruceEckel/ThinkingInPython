@@ -1,4 +1,4 @@
-# shape_registry.py
+# registry.py
 from abc import ABC, abstractmethod
 from typing import ClassVar
 

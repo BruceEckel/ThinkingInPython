@@ -77,7 +77,66 @@ def evaluate(e: Expr, **env: int) -> float:
         case _:
             assert_never(e)
 
+def to_infix(e: Expr) -> str:
+    match e:
+        case Num(value):
+            return str(value)
+        case Var(name):
+            return name
+        case Add(left, right):
+            return f"({to_infix(left)} + {to_infix(right)})"
+        case Mul(left, right):
+            return f"({to_infix(left)} * {to_infix(right)})"
+        case Neg(operand):
+            return f"-{to_infix(operand)}"
+        case Div(left, right):
+            return f"({to_infix(left)} / {to_infix(right)})"
+        case _:
+            assert_never(e)
+
+def simplify(e: Expr) -> Expr:
+    match e:
+        case Num(_) | Var(_):
+            return e
+        case Add(left, right):
+            lhs, rhs = simplify(left), simplify(right)
+            match (lhs, rhs):
+                case (Num(0), other) | (other, Num(0)):
+                    return other
+                case (Num(a), Num(b)):
+                    return Num(a + b)
+                case _:
+                    return Add(lhs, rhs)
+        case Mul(left, right):
+            lhs, rhs = simplify(left), simplify(right)
+            match (lhs, rhs):
+                case (Num(0), _) | (_, Num(0)):
+                    return Num(0)
+                case (Num(1), other) | (other, Num(1)):
+                    return other
+                case (Num(a), Num(b)):
+                    return Num(a * b)
+                case _:
+                    return Mul(lhs, rhs)
+        case Neg(operand):
+            match simplify(operand):
+                case Num(a):
+                    return Num(-a)
+                case Neg(deeper):
+                    return deeper  # Double negation
+                case inner:
+                    return Neg(inner)
+        case Div(left, right):
+            # Division by Num(0) is deliberately left alone:
+            return Div(simplify(left), simplify(right))
+        case _:
+            assert_never(e)
+
 x = Var("x")
 expr = (2 * x + 1) / -x
+print(to_infix(expr))
+#: (((2 * x) + 1) / -x)
 print(evaluate(expr, x=3))
 #: -2.3333333333333335
+print(to_infix(simplify(Neg(Neg(x)) + Num(0))))
+#: x

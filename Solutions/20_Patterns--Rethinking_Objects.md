@@ -113,6 +113,7 @@ you.
 
 ```python
 # exercise_3.py
+from dataclasses import dataclass
 from typing import NewType, Protocol
 
 Price = NewType("Price", float)
@@ -121,21 +122,32 @@ Weight = NewType("Weight", float)
 class Priced(Protocol):
     def total(self) -> Price: ...
 
+class Weighted(Protocol):
+    def total(self) -> Weight: ...
+
+@dataclass(frozen=True)
 class Package:
+    weight_kg: float
+
     def total(self) -> Weight:
-        return Weight(2.5)
+        return Weight(self.weight_kg)
 
-def charge(item: Priced) -> str:
-    return f"${item.total():.2f}"
+def charge(item: Priced) -> float:
+    return item.total()
 
-print(charge(Package()))  # type: ignore
-#: $2.50
+package = Package(4.5)
+print(charge(package))  # type: ignore
+#: 4.5
 ```
 
 `ty` now rejects the call:
 
 ```
 error[invalid-argument-type]: Argument to function `charge` is incorrect
+  --> protocol_collision.py:25:14
+   |
+25 | print(charge(package))
+   |              ^^^^^^^ Expected `Priced`, found `Package`
 info: type `Package` is not assignable to protocol `Priced`
 info: └── protocol member `total` is incompatible
 info:     └── incompatible return types: `Weight` is not assignable to `Price`
@@ -147,7 +159,7 @@ declarations add a distinction the shapes never carried, so the type
 checker can finally see that a weight is not a price.
 
 Delete the annotations and the program behaves exactly as it does now.
-It prints `$2.50` and charges the customer for a number of kilograms.
+It prints `4.5` and charges the customer for a number of kilograms.
 `NewType` exists only for the type checker: `Weight(2.5)` returns the
 `float` `2.5`, and no wrapper survives to run time. The distinction is
 real in the source and absent in the process, and that split is the

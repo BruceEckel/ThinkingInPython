@@ -902,7 +902,8 @@ and a machine that arrived as a diagram belongs in the table.
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
-9.  Add a `Nickel` class deriving from `Money` to `vending_machine.py` and feed one to the machine without touching the table.
+9.  Build a two-state machine that collects `Money`, modeled on `vending_machine.py`'s.
+    Add a `Nickel` class deriving from `Money` and feed one in without touching the table.
     Explain the exception, then make it work two ways: by adding a row,
     and by making `Nickel` an instance of `Money` rather than a subclass.
     Say which you would keep.

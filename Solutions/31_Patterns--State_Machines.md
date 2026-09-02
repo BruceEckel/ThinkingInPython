@@ -268,65 +268,97 @@ audit and edit as a unit. The chapter's own
 [table-driven state machine](../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
 makes the same trade-off over the per-state `mouse_trap.py`.
 
-## 5. The mood machine, rebuilt on `table_machine.py`
+## 5. The mood machine, on the first design
 
 ```python
 # exercise_5.py
-from enum import Enum, auto
-from table_machine import StateMachine, Table
+from collections.abc import Iterable
 
-class MoodState(Enum):
-    HAPPY = auto()
-    GRUMPY = auto()
-    PROZAC = auto()
+# The chapter's state.py and state_machine.py, inlined:
+class State:
+    def run(self) -> None:
+        raise NotImplementedError("run not implemented")
+    def next(self, event: object) -> State:
+        raise NotImplementedError("next not implemented")
+
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def run_all(self, inputs: Iterable[object]) -> None:
+        for event in inputs:
+            print(event)
+            self.current_state = (
+                self.current_state.next(event))
+            self.current_state.run()
 
 class TakePill:
-    pass
+    def __repr__(self) -> str:
+        return "TakePill"
+
 class Annoy:
-    pass
+    def __repr__(self) -> str:
+        return "Annoy"
+
 class Calm:
-    pass
+    def __repr__(self) -> str:
+        return "Calm"
 
-class MoodMachine(StateMachine):
-    def __init__(self) -> None:
-        self.message = ""
-        happy_takes_pill = (
-            None, self.say("Everything is wonderful."),
-            MoodState.PROZAC)
-        table: Table = {
-            (MoodState.HAPPY, Annoy): [(
-                None, self.say("What do you want?"),
-                MoodState.GRUMPY)],
-            (MoodState.GRUMPY, Calm): [(
-                None, self.say("Great to see you!"),
-                MoodState.HAPPY)],
-            (MoodState.HAPPY, TakePill): [happy_takes_pill],
-            (MoodState.GRUMPY, TakePill):
-                [happy_takes_pill],
-        }
-        super().__init__(MoodState.HAPPY, table)
+class Happy(State):
+    def run(self) -> None:
+        print("Great to see you!")
+    def next(self, event: object) -> State:
+        if isinstance(event, Annoy):
+            return Grumpy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-    def say(self, msg: str):
-        def action(event: object) -> None:
-            self.message = msg
-        return action
+class Grumpy(State):
+    def run(self) -> None:
+        print("What do you want?")
+    def next(self, event: object) -> State:
+        if isinstance(event, Calm):
+            return Happy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-mm = MoodMachine()
-mm.handle(Annoy())
-print(mm.state, mm.message)
-#: MoodState.GRUMPY What do you want?
-mm.handle(TakePill())
-print(mm.state, mm.message)
-#: MoodState.PROZAC Everything is wonderful.
+class Prozac(State):
+    def run(self) -> None:
+        print("Everything is wonderful.")
+    def next(self, event: object) -> State:
+        return self
+
+StateMachine(Happy()).run_all(
+    [Annoy(), Calm(), TakePill(), Annoy()])
+#: Great to see you!
+#: Annoy
+#: What do you want?
+#: Calm
+#: Great to see you!
+#: TakePill
+#: Everything is wonderful.
+#: Annoy
+#: Everything is wonderful.
 ```
 
+Each state decides its own successor. `Happy.next()` answers `Annoy`
+with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
+both answer `TakePill` with a `Prozac` that returns itself for
+everything after. Nothing outside the states holds the transition
+rules, which is exactly what distinguishes this design from the
+table-driven one exercise 6 uses: there the rules live in a dictionary
+a reader can audit in one place, and here they live in the `next()`
+method of whichever state is current.
+
 Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
-object through `change_to()`, this version drives the same mood
-transitions through events and a table. Both model "a thing that
-changes behavior over time." The *State* surrogate suits that job
-when each mood needs real per-mood logic. The table-driven machine
-wins when the transitions themselves, not the mood behaviors, are the
-part worth making explicit and easy to audit.
+object through `change_to()`, this version reaches the same moods by
+returning a new `State` from `next()`. Both model "a thing that
+changes behavior over time." The *State* surrogate suits that job when
+each mood needs real per-mood logic. The table-driven machine wins
+when the transitions themselves, not the mood behaviors, are the part
+worth making explicit and easy to audit.
 
 ## 6. An elevator, table-driven
 

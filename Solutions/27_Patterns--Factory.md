@@ -169,6 +169,64 @@ GameEnvironment(GnomesAndFairies()).play()
 third concrete factory slots in beside `KittiesAndPuzzles` and
 `WarriorsAndWeapons` with no change to `GameEnvironment` at all.
 
+`games2.py` asks for the same factory without a base class. Leaving
+`make_obstacle()` out at first is the point of the second half:
+
+```python
+# exercise_3_protocol.py
+from typing import Protocol
+
+class Obstacle(Protocol):
+    def description(self) -> str: ...
+
+class Character(Protocol):
+    def interact_with(self, obstacle: Obstacle) -> None: ...
+
+class GameElementFactory(Protocol):
+    def make_character(self) -> Character: ...
+    def make_obstacle(self) -> Obstacle: ...
+
+class Gnome:
+    def interact_with(self, obstacle: Obstacle) -> None:
+        print("Gnome discovers a", obstacle.description())
+
+class Riddle:
+    def description(self) -> str: return "Riddle"
+
+class GnomesAndFairies:  # Declares no base class
+    def make_character(self) -> Gnome: return Gnome()
+    def make_obstacle(self) -> Riddle: return Riddle()
+
+def play(factory: GameElementFactory) -> None:
+    factory.make_character().interact_with(
+        factory.make_obstacle())
+
+play(GnomesAndFairies())
+#: Gnome discovers a Riddle
+```
+
+With `make_obstacle()` deleted, `ty` reports:
+
+```text
+error[invalid-argument-type]: Argument to function `play` is incorrect
+  --> exercise_3_protocol.py:28:6
+   |
+28 | play(GnomesAndFairies())
+   |      ^^^^^^^^^^^^^^^^^^ Expected `GameElementFactory`,
+   |                         found `GnomesAndFairies`
+info: type `GnomesAndFairies` is not assignable to protocol
+`GameElementFactory`
+info: └── protocol member `make_obstacle` is not defined on type
+`GnomesAndFairies`
+```
+
+The two halves fail differently. In `games.py` the base class is
+declared, so an unimplemented `make_obstacle()` inherits the base's
+`raise NotImplementedError` and fails when the game runs. In
+`games2.py` nothing is declared, so the mismatch surfaces at the call
+that needs the protocol, before anything runs, and the diagnostic
+names the missing method rather than the missing base.
+
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 
 ```python
@@ -323,7 +381,7 @@ keeps adding toppings.
 ## 6. A registry whose classes live somewhere else
 
 ```python
-# shape_registry.py
+# registry.py
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
@@ -344,7 +402,7 @@ def make(kind: str) -> Shape:
 ```python
 # extra_shapes.py
 from typing import override
-from shape_registry import Shape
+from registry import Shape
 
 class Circle(Shape):
     @override
@@ -357,21 +415,21 @@ class Square(Shape):
 
 ```python
 # exercise_6.py
-import shape_registry
+import registry
 
-print(shape_registry.Shape.registry)
+print(registry.Shape.registry)
 #: {}
 try:
-    shape_registry.make("Circle")
+    registry.make("Circle")
 except KeyError as e:
     print("KeyError:", e)
 #: KeyError: 'Circle'
 
 import extra_shapes  # noqa: E402  (the import is the point)
 
-print(sorted(shape_registry.Shape.registry))
+print(sorted(registry.Shape.registry))
 #: ['Circle', 'Square']
-shape_registry.make("Circle").draw()
+registry.make("Circle").draw()
 #: Circle.draw
 print(extra_shapes.Circle.__name__)
 #: Circle
@@ -380,7 +438,7 @@ print(extra_shapes.Circle.__name__)
 `Shape.__init_subclass__()` registers `Circle` as the
 `class Circle(Shape):` line in `extra_shapes.py` executes, and that
 line executes the first time something imports `extra_shapes`.
-Nothing else triggers the registration. `shape_registry` knows nothing
+Nothing else triggers the registration. `registry` knows nothing
 about `extra_shapes` and never imports it, so until some other module
 does, `Shape.registry` is empty and every `make()` call raises a
 `KeyError`.

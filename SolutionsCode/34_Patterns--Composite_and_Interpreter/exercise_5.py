@@ -46,9 +46,11 @@ def to_infix(e: Expr) -> str:
         case Var(name):
             return name
         case Add(left, right):
-            return f"{to_infix(left)} + {to_infix(right)}"
+            return f"({to_infix(left)} + {to_infix(right)})"
         case Mul(left, right):
-            return f"{to_infix(left)} * {to_infix(right)}"
+            return f"({to_infix(left)} * {to_infix(right)})"
+        case _:
+            assert_never(e)
 
 def simplify(e: Expr) -> Expr:
     match e:
@@ -95,6 +97,6 @@ def derivative(e: Expr, name: str) -> Expr:
 x = Var("x")
 d = derivative(x * x, "x")
 print(to_infix(d))
-#: 1 * x + x * 1
+#: ((1 * x) + (x * 1))
 print(to_infix(simplify(d)))
-#: x + x
+#: (x + x)

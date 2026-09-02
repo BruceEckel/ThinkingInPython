@@ -667,9 +667,9 @@ Here it keeps a decision available to whoever should make it.
     Run its results through `simplify()` and compare.
 6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
     an ill-typed tree the type checker rejects in source it can see.
-    Rewrite `__radd__()` and `__rmul__()` to return `NotImplemented` for a non-`int` operand
+    Rewrite all four operator methods to return `NotImplemented` for an operand they cannot use
     ([Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
-    and confirm `"a" + x` now raises a `TypeError`.
+    and confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
 7.  Write a third walker over `Template` in `template_query.py`, `to_html()`,
     that emits the literal pieces unchanged and replaces `<`, `>`,
     and `&` in every interpolated value with their HTML entities.

@@ -53,3 +53,8 @@ try:
 except TypeError as e:
     print(type(e).__name__, e)
 #: TypeError can only concatenate str (not "Var") to str
+try:
+    x + "a"  # type: ignore
+except TypeError as e:
+    print(e)  # Same exception type, other message
+#: unsupported operand type(s) for +: 'Var' and 'str'

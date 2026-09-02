@@ -1,6 +1,6 @@
 # extra_shapes.py
 from typing import override
-from shape_registry import Shape
+from registry import Shape
 
 class Circle(Shape):
     @override

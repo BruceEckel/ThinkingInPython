@@ -12,7 +12,7 @@ FALLBACK: Final[Signal] = Signal.CAUTION
 class Defaults:
     FALLBACK: Final[Signal] = Signal.CAUTION
 
-def broken(s: Signal) -> str:
+def act(s: Signal) -> str:
     match s:
         case Signal.GO:
             return "accelerate"
@@ -38,7 +38,7 @@ def guarded(s: Signal) -> str:
         case _:
             return "brake"
 
-print(broken(Signal.STOP))
+print(act(Signal.STOP))
 #: fallback, FALLBACK is now Signal.STOP
 print(FALLBACK)
 #: Signal.CAUTION

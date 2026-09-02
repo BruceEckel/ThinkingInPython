@@ -571,6 +571,19 @@ shared `Item` interface.
 Neither one has ever needed to know which concrete `Item` subclasses
 exist.
 
+Deriving `Coin` from `Food` instead breaks the maze, and the reason is
+the search order rather than the inheritance. `item_factory()` walks
+`Item.__subclasses__()`, which lists only the *direct* subclasses of
+`Item`, so a `Coin(Food)` never appears there at all. No entry matches
+`$`, and the loop falls through to the factory's last line, which
+treats any unrecognized symbol as a teleport target. So
+`item_factory("$")` returns `Teleport("$")`. The robot then walks into a
+teleporter where a coin was meant to be, the topology of the maze
+changes underneath the hard-coded route, and `game.robot.finished`
+never becomes `True`. A one-word change to a class header moves a
+character out of the factory's search and silently substitutes a
+different `Item`.
+
 ## 5. Solving the maze instead of hard-coding the solution
 
 ```python

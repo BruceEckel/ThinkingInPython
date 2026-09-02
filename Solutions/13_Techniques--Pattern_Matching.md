@@ -308,7 +308,7 @@ FALLBACK: Final[Signal] = Signal.CAUTION
 class Defaults:
     FALLBACK: Final[Signal] = Signal.CAUTION
 
-def broken(s: Signal) -> str:
+def act(s: Signal) -> str:
     match s:
         case Signal.GO:
             return "accelerate"
@@ -334,7 +334,7 @@ def guarded(s: Signal) -> str:
         case _:
             return "brake"
 
-print(broken(Signal.STOP))
+print(act(Signal.STOP))
 #: fallback, FALLBACK is now Signal.STOP
 print(FALLBACK)
 #: Signal.CAUTION
@@ -344,10 +344,10 @@ print(guarded(Signal.STOP), guarded(Signal.CAUTION))
 #: brake fallback
 ```
 
-`broken()` answers "fallback" for `Signal.STOP`, which is not the
+`act()` answers "fallback" for `Signal.STOP`, which is not the
 fallback value. `case FALLBACK:` is a bare name, so it captures: it
 matches `Signal.STOP`, binds it to a local named `FALLBACK` inside
-`broken()`, and never compares anything. The module-level constant
+`act()`, and never compares anything. The module-level constant
 still holds `Signal.CAUTION` afterward, which is why the mistake is
 easy to miss. Python accepts `case FALLBACK:` only because it is the
 last case. Another case after it fails to compile.
