@@ -2,9 +2,9 @@
 
 What to work on next, in priority order.
 Claude maintains this file and rewrites it when something new occurs to it.
-Last updated 2026-09-02, after the whole-book exercise pass:
+Last updated 2026-09-02, after the whole-book exercise pass was applied:
 45 chapters, ~320 exercises performed cold, 75 findings in 30 chapters,
-queued in `exercise_review.md` (not yet applied).
+73 applied and 2 declined. Its record is `archive/~exercise_review.md`.
 It followed the whole-book correctness sweep: all 47 chapters checked,
 56 false claims fixed (commits `7583395d` through `e2e5ba75`, plus
 `e4a4e6cd` applying the review file), `make verify` green.
@@ -28,33 +28,21 @@ new prose.
 
 ## The recommendations
 
-1. **Apply `exercise_review.md`.** The exercise pass is done (2026-09-02,
-   45 chapters, ~320 exercises, one fresh agent each performing every
-   exercise cold before reading its solution). It found **75 findings in
-   30 chapters: 0 blocking, 27 wrong, 15 drift, 33 minor**; fifteen
-   chapters came back clean. `make sweep` was green before and after,
-   which was the premise.
+1. **Adversarial review, results to a review file.**
+   Promoted from item 4 now that the exercise pass is applied.
+   Structural findings should land before hand-polish. The consistency
+   pass covered coherence between chapters, the correctness sweep
+   covered truth, and the exercise pass covered whether the exercises
+   can be done. This one asks what does not work, what is missing, and
+   what could be better. It is the one remaining review dimension with
+   no coverage.
 
-   Two results worth acting on beyond the queue itself:
-
-   - **Ten of the 27 `wrong` findings are stale `ty` output quoted in
-     `Solutions/`, and not one is in `Chapters/`.** The last `ty`-upgrade
-     sweeps went through `Chapters/` and stopped. CLAUDE.md's
-     `ty`-upgrade entry needs one more line: re-capture the quoted
-     diagnostics in `Solutions/` too. Only 31 `error[...]` codes exist
-     book-wide, so the sweep is small.
-   - **`Solutions/40` and `Solutions/41` extract nothing** (16 python
-     blocks, zero with a `# slug.py` first line), so they are never
-     type-checked, linted, run, or pytest'd. Nothing is broken there
-     today; nothing would tell you if it broke.
-
-   Chapter 38 and chapter 10's exercise 5, the two the correctness sweep
-   flagged, are both fixed. Chapter 37's exercise 1 is **not**: it still
-   tells the reader to edit the file it then says needs no edits.
-
-   Apply in the order the review's last section gives, and reproduce any
-   finding not marked `[reproduced]` first. Evidence per chapter is in
-   `exercise_review_reports/`; delete it with the review file when done.
+   Run it the way the last two were run: one fresh agent per chapter,
+   report-only, verify before applying. Both of those passes found that
+   the agents were right far more often than not, but the two findings
+   declined this time were both cases where an agent measured something
+   in a different context from the one the gate uses. Reproduce the way
+   the gate does, not the way that is convenient.
 
 2. **Tighten the capture loop before bulk-rewriting.**
    After each hand-edited chapter, run `/bruce-edit-capture` before
@@ -67,14 +55,7 @@ new prose.
    the further out it goes. Chapters 1-24 get a bulk run last, with the
    mature DB.
 
-4. **Adversarial review, results to a review file.**
-   Structural findings should land before hand-polish. The consistency
-   pass covered coherence between chapters and the correctness sweep
-   covered truth; this one asks what does not work, what is missing, and
-   what could be better. It is the one remaining review dimension with no
-   coverage.
-
-5. **Defer the whole-book readability sweep to last.**
+4. **Defer the whole-book readability sweep to last.**
    Every rewrite and review round adds new prose, and new prose is where
    AI tells appear. One sweep after chapter-level work settles mops it
    all up; running it earlier audits text that will change.
@@ -89,11 +70,10 @@ are worth a check against your copy.
 
 ## Suggested sequence
 
-1. Item 1 (apply `exercise_review.md`). The evidence is fresh.
-2. Item 4 (adversarial review, structural, before polish).
-3. The item 2/3 loop through the remaining chapters.
-4. Item 5 (readability sweep).
-5. One green `make sweep`.
-6. The hand-editing pass.
+1. Item 1 (adversarial review, structural, before polish).
+2. The item 2/3 loop through the remaining chapters.
+3. Item 4 (readability sweep).
+4. One green `make sweep`.
+5. The hand-editing pass.
 
-Items 1 and 4 are each a single Claude session, runnable on request.
+Item 1 is a single Claude session, runnable on request.

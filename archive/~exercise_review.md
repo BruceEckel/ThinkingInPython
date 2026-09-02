@@ -1,5 +1,13 @@
-When this file has been applied, change this file's name so it has a leading
-`~` to indicate completion.
+**Applied 2026-09-02**, in commits `57a0a193` (Part 2.1), `4b067f7e`
+(Part 1), `abc1e7aa` (Parts 2.2 and 6.1), `8f0fffac` (Part 3),
+`2980cec5` (Part 4) and `40832bb4` (reflow). Seventy-three of the 75
+findings were applied. Two were declined, both recorded in Part 4's
+commit message: chapter 29's "its classes" plural, which `facade.py`'s
+own comment justifies, and chapter 35's solution-2 marker, which is not
+stale (its `tracemalloc` peak depends on the process, and under
+`validate_output.py`, which is how the gate measures it, the committed
+9.9 is what the program produces). The per-chapter reports that backed
+this queue were deleted with it.
 
 # Whole-book exercise pass: the decision queue
 
