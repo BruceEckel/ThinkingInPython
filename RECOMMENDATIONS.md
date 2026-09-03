@@ -20,10 +20,9 @@ The sweep's record and its reasoning live in
 
 ## Chapter Edit Steps
 
-1. Do an adversarial review of the chapter. Fix everything you can, only present unresolved issues here on the console.
-2. `make rewrite` on the chapter
-3. Hand-edit the chapter
-4. Run `/bruce-edit-capture` on the chapter
+1. `make rewrite` on the chapter
+2. Hand-edit the chapter
+3. Run `/bruce-edit-capture` on the chapter
 
 The correctness review that used to be step 4 is done book-wide and is
 now a gate for the part of it a machine can decide
@@ -41,18 +40,7 @@ new prose.
    The other 37 queue entries were approved and performed 2026-09-03;
    `make verify` green.
 
-2. **Tighten the capture loop before bulk-rewriting.**
-   After each hand-edited chapter, run `/bruce-edit-capture` before
-   rewriting the next range. Every rule promoted early applies to every
-   chapter still ahead of the cursor.
-
-3. **Run `make rewrite` a few ranges ahead of the hand-editing cursor**,
-   not the whole book at once. A whole-book run now would apply today's
-   rule set to chapter 47; the staged version applies a richer rule set
-   the further out it goes. Chapters 1-24 get a bulk run last, with the
-   mature DB.
-
-4. **Defer the whole-book readability sweep to last.**
+2. **Defer the whole-book readability sweep to last.**
    Every rewrite and review round adds new prose, and new prose is where
    AI tells appear. One sweep after chapter-level work settles mops it
    all up; running it earlier audits text that will change.
@@ -68,7 +56,6 @@ are worth a check against your copy.
 ## Suggested sequence
 
 1. Item 1 (the chapter 01 anecdote, the queue's last entry).
-2. The item 2/3 loop through the remaining chapters.
-3. Item 4 (readability sweep).
-4. One green `make sweep`.
-5. The hand-editing pass.
+2. readability sweep
+3. One green `make sweep`.
+4. 'Chapter Edit Steps' through the remaining chapters.
