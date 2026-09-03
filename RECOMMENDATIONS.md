@@ -2,7 +2,9 @@
 
 What to work on next, in priority order.
 Claude maintains this file and rewrites it when something new occurs to it.
-Last updated 2026-09-02, after the whole-book exercise pass was applied:
+Last updated 2026-09-02, after the whole-book adversarial review ran
+(results in `adversarial_review.md`, not yet applied). Before that,
+the whole-book exercise pass was applied:
 45 chapters, ~320 exercises performed cold, 75 findings in 30 chapters,
 73 applied and 2 declined. Its record is `archive/~exercise_review.md`.
 It followed the whole-book correctness sweep: all 47 chapters checked,
@@ -28,21 +30,17 @@ new prose.
 
 ## The recommendations
 
-1. **Adversarial review, results to a review file.**
-   Promoted from item 4 now that the exercise pass is applied.
-   Structural findings should land before hand-polish. The consistency
-   pass covered coherence between chapters, the correctness sweep
-   covered truth, and the exercise pass covered whether the exercises
-   can be done. This one asks what does not work, what is missing, and
-   what could be better. It is the one remaining review dimension with
-   no coverage.
-
-   Run it the way the last two were run: one fresh agent per chapter,
-   report-only, verify before applying. Both of those passes found that
-   the agents were right far more often than not, but the two findings
-   declined this time were both cases where an agent measured something
-   in a different context from the one the gate uses. Reproduce the way
-   the gate does, not the way that is convenient.
+1. **Apply `adversarial_review.md`.**
+   The adversarial review ran 2026-09-02: one fresh agent per chapter,
+   all 47 chapters, report-only, Sonnet for the mechanical chapters and
+   Opus for the 13 dense ones, 18 and 19 last under the timing brief.
+   252 findings (40 does-not-work, 143 missing, 69 could-be-better),
+   no chapter clean. The file's header names the five systemic
+   patterns and the eight behavior holes to start with. Findings are
+   verified by their agents (command and output in the finding text)
+   but not yet reproduced by a second reader: verify before applying,
+   the gate's way, as both prior passes did. Structural findings
+   should land before hand-polish.
 
 2. **Tighten the capture loop before bulk-rewriting.**
    After each hand-edited chapter, run `/bruce-edit-capture` before
@@ -70,10 +68,8 @@ are worth a check against your copy.
 
 ## Suggested sequence
 
-1. Item 1 (adversarial review, structural, before polish).
+1. Item 1 (apply the adversarial review, structural, before polish).
 2. The item 2/3 loop through the remaining chapters.
 3. Item 4 (readability sweep).
 4. One green `make sweep`.
 5. The hand-editing pass.
-
-Item 1 is a single Claude session, runnable on request.
