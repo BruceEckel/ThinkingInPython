@@ -319,11 +319,11 @@ which another module can do at import time and a test can do at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
 and a table when the set should grow from outside.
 
-## Lambdas
+## Higher-Order Functions
 
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Foundations--Functions.md#lambdas).
-The higher-order functions below take them as inline arguments,
+The higher-order functions in this section take lambdas as inline arguments,
 where they fit best.
 Their value is locality.
 When a transformation is one short expression,
@@ -335,8 +335,6 @@ and a definition to look up, and buys nothing.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
 and room to grow.
-
-## Higher-Order Functions
 
 A *higher-order function* takes a function as an argument, returns one, or both.
 Three built-ins are the workhorses.
@@ -704,3 +702,8 @@ and the chapters ahead build on that single property.
     `increment()` reads `step` without declaring it `nonlocal`:
     explain why `count` needs the declaration and `step` does not.
     Then delete the `nonlocal` line and compare `ty`'s report with the runtime failure.
+9.  In `pipeline.py`, add `colder_than(limit, r)` beside `warmer_than()`,
+    and give `report()` a second `filter()` stage built with `partial()`,
+    so only readings between 20.0 and 30.0 Celsius reach the output.
+    Then write a second version of `report()` that calls `map(to_fahrenheit, ...)` ahead of both filters,
+    and explain the list it returns.

@@ -426,7 +426,7 @@ and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
 Python still builds the default value once, at definition time
-(see [Default and Keyword Arguments](05_Foundations--Functions.md#default-and-keyword-arguments)),
+(see [Default Arguments](05_Foundations--Functions.md#default-arguments)),
 so a *mutable* default argument brings the sharing straight back.
 `100` is immutable, so this default is safe.
 

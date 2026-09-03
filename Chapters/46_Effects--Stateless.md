@@ -146,7 +146,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
 It lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
 This chapter builds its own `Console` rather than the one Stateless ships;
-[Builtin Dependencies](#builtin-dependencies) says why.
+[Builtin Dependencies](#builtin-dependencies), below, says why.
 Compare that to the version that calls `print()` directly:
 
 ```python
@@ -241,6 +241,29 @@ not from the `Any` in the SendType.
 This is why every request in this chapter uses `yield from` rather than `yield`,
 and why the custom abilities of [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
 get a small function of their own.
+
+## Builtin Dependencies
+
+The `Console` above is one this chapter defines.
+Stateless also ships three dependencies of its own:
+
+- `Console` in `stateless.console`,
+  whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
+- `Files` in `stateless.files` that reads a whole file,
+- `Time` that [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
+  supplies to `retry()`.
+
+All three are concrete classes rather than interfaces.
+That constrains what a test double for one of them can be,
+a cost [Supplying an Interface](#supplying-an-interface) works through.
+
+`read_file()` is also the library's own example of both channels at once:
+its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
+so its type declares an Ability and two failures together.
+[The Error Channel](#the-error-channel) introduces that decorator.
+
+This chapter builds a `Console` of its own for illustration rather than using `stateless.console`.
+In your own code, first check what the library declares.
 
 ## Nothing Runs Yet
 
@@ -364,6 +387,65 @@ It accepts an Effect that can still fail,
 and raises the failure as an ordinary exception
 ([The Error Channel](#the-error-channel)).
 Binding an implementation and satisfying the type checker are the same act.
+
+## Layering Handlers
+
+A handler answers the Abilities it knows and leaves the rest alone.
+An Ability a handler cannot answer travels further out,
+so a second `supply()` wrapped around the first answers what the inner one left behind.
+`greet_all()` in [Retrofitting an Effect](#retrofitting-an-effect)
+declares two Abilities:
+`supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
+and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
+You can bind some Abilities near the Effect and the others at the edge,
+with the type recording what each layer left behind.
+
+### A Default Binding
+
+A dependency injection container often lets you register a fallback for a type nobody else provides.
+Stateless has no such registration, and `need()` takes no default argument.
+Layering produces one all the same.
+This `Console` carries a tag so the output says which handler answered:
+
+```python
+# default_console.py
+from dataclasses import dataclass
+from stateless import Depend, Need, need, run, supply
+
+@dataclass
+class Console:
+    tag: str
+    def print(self, message: str) -> None:
+        print(f"[{self.tag}] {message}")
+
+def greet(name: str) -> Depend[Need[Console], None]:
+    console = yield from need(Console)
+    console.print(f"Hello, {name}!")
+
+fallback = supply(Console("default"))
+run(fallback(greet)("Alice"))
+#: [default] Hello, Alice!
+chosen = supply(Console("chosen"))(greet)
+run(fallback(chosen)("Bob"))
+#: [chosen] Hello, Bob!
+```
+
+`fallback` is an ordinary handler, applied at the edge,
+while `chosen` is a second handler already applied to `greet`.
+The first run has nothing between `greet()` and that edge,
+so the default answers.
+The second wraps `greet()` in its own `supply()` first,
+which empties the Ability channel before `fallback` sees a request.
+The handler nearest the Effect wins,
+and the outer one answers only what remains.
+The type records this: `chosen` is already `(str) -> Success[None]`,
+so `fallback(chosen)` adds nothing the type checker did not know.
+
+A default costs you the guarantee that made `Need` worth declaring.
+An Effect that fails the type check for a missing `Console` now compiles and runs,
+and a forgotten binding shows up as a wrong-looking result rather than an error.
+Use one for a genuine default, a null logger or a no-op console,
+not to quiet a type checker that is telling you something.
 
 ## An Effect Runs Once
 
@@ -787,34 +869,6 @@ and neither `greet_all()` nor `greet_logged()` gained a parameter.
 The parameter-passed version would add a `console` argument to both,
 even though only `greet_logged()` uses it.
 
-## Builtin Dependencies
-
-Every dependency so far was one this chapter defined.
-Stateless also ships three of its own:
-
-- `Console` in `stateless.console`,
-  whose `print_line()` and `read_line()` accessors call its `print()` and `input()` methods,
-- `Files` in `stateless.files` that reads a whole file,
-- `Time` that [Adding Behavior to an Existing Effect](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect)
-  supplies to `retry()`.
-
-All three are concrete classes rather than interfaces,
-and the accessors name those classes,
-so `isinstance()` accepts an instance of the class or a subclass and nothing else.
-A structurally identical double fails with a `MissingAbilityError` no matter what `as_type()` claims.
-A double for the builtin `Console` must inherit from it,
-and that `Console` implements `input()` as well as `print()`,
-so a double that overrides only `print()` reads live stdin.
-[Supplying an Interface](#supplying-an-interface), next,
-explains the source of that cost and how an interface avoids it.
-
-`read_file()` is also the library's own example of both channels at once:
-its accessor carries `@throws(FileNotFoundError, PermissionError)` on a function that already returns an Effect,
-so its type declares an Ability and two failures together.
-
-For illustration, this chapter builds a `Console` rather than using the one from Stateless.
-In your own code, first check what the library declares.
-
 ## Supplying an Interface
 
 [Swapping the Implementation](#swapping-the-implementation)
@@ -854,6 +908,15 @@ so today the parent contributes only the name `isinstance()` matches.
 Add a `read_line()` method to `Console` tomorrow,
 and `Recorder` inherits the real one silently,
 so a test meant to record performs live console I/O.
+
+Stateless's own `Console` pays that cost.
+[Builtin Dependencies](#builtin-dependencies) named it a concrete class,
+and its accessors name that class,
+so `isinstance()` accepts an instance of the class or a subclass and nothing else.
+A structurally identical double fails with a `MissingAbilityError` no matter what `as_type()` claims.
+A double for the builtin `Console` must inherit from it,
+and that `Console` implements `input()` as well as `print()`,
+so a double that overrides only `print()` reads live stdin.
 An interface has no implementation to inherit by accident:
 
 ```python
@@ -1099,14 +1162,7 @@ This has three consequences:
    so two bindings for the same type can be live at once,
    as the screen and memory `Console`s were in [When Two Implementations Match](#when-two-implementations-match).
    Test cases need no reset between them.
-
-   Handlers also layer.
-   An Ability a handler cannot answer travels further out,
-   so `supply(Log())(greet_all)` still has the type `(list[str]) -> Depend[Need[Console], None]`,
-   and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
-   You can bind some Abilities near the Effect and the others at the edge,
-   with the type recording what each layer left behind.
-   DI has one flat registry and no equivalent layering.
+   DI has one flat registry and no equivalent to the handler layering of [Layering Handlers](#layering-handlers).
 
 3. Stateless function requirements live in the function type.
    DI leaves that information in the bodies that ask for it.
@@ -1128,53 +1184,6 @@ which [Effect Management](44_Effects--Effect_Management.md#catch-the-exception-y
 describes failing this way,
 and that complaint is why [Effects Propagate, and the Type Checker Verifies It](#effects-propagate-and-the-type-checker-verifies-it)
 compares the spread to `async`.
-
-### A Default Binding
-
-A DI container often lets you register a fallback for a type nobody else provides.
-Stateless has no such registration, and `need()` takes no default argument.
-Layering produces one all the same.
-This `Console` carries a tag so the output says which handler answered:
-
-```python
-# default_console.py
-from dataclasses import dataclass
-from stateless import Depend, Need, need, run, supply
-
-@dataclass
-class Console:
-    tag: str
-    def print(self, message: str) -> None:
-        print(f"[{self.tag}] {message}")
-
-def greet(name: str) -> Depend[Need[Console], None]:
-    console = yield from need(Console)
-    console.print(f"Hello, {name}!")
-
-fallback = supply(Console("default"))
-run(fallback(greet)("Alice"))
-#: [default] Hello, Alice!
-chosen = supply(Console("chosen"))(greet)
-run(fallback(chosen)("Bob"))
-#: [chosen] Hello, Bob!
-```
-
-`fallback` is an ordinary handler, applied at the edge,
-while `chosen` is a second handler already applied to `greet`.
-The first run has nothing between `greet()` and that edge,
-so the default answers.
-The second wraps `greet()` in its own `supply()` first,
-which empties the Ability channel before `fallback` sees a request.
-The handler nearest the Effect wins,
-and the outer one answers only what remains.
-The type records this: `chosen` is already `(str) -> Success[None]`,
-so `fallback(chosen)` adds nothing the type checker did not know.
-
-A default costs you the guarantee that made `Need` worth declaring.
-An Effect that fails the type check for a missing `Console` now compiles and runs,
-and a forgotten binding shows up as a wrong-looking result rather than an error.
-Use one for a genuine default, a null logger or a no-op console,
-not to quiet a type checker that is telling you something.
 
 ## Waiting on a Coroutine
 

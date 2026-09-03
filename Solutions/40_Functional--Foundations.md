@@ -274,3 +274,71 @@ line before the program runs. Running anyway raises an
 variable 'count' where it is not associated with a value". The type
 checker points at the assignment that went wrong. The runtime message
 complains about a local variable the code never meant to create.
+
+## 9. A second filter, and why the stages are not interchangeable
+
+```python
+# exercise_9.py
+from collections.abc import Sequence
+from dataclasses import dataclass
+from functools import partial
+
+@dataclass(frozen=True)
+class Reading:
+    sensor: str
+    celsius: float
+
+def warmer_than(limit: float, r: Reading) -> bool:
+    return r.celsius > limit
+
+def colder_than(limit: float, r: Reading) -> bool:
+    return r.celsius < limit
+
+def to_fahrenheit(r: Reading) -> Reading:
+    return Reading(r.sensor, r.celsius * 9 / 5 + 32)
+
+def report(readings: Sequence[Reading]) -> list[str]:
+    warm = filter(partial(warmer_than, 20.0), readings)
+    band = filter(partial(colder_than, 30.0), warm)
+    return [f"{r.sensor} {r.celsius:.1f}"
+            for r in map(to_fahrenheit, band)]
+
+def converted_first(
+    readings: Sequence[Reading],
+) -> list[str]:
+    hot = map(to_fahrenheit, readings)
+    warm = filter(partial(warmer_than, 20.0), hot)
+    band = filter(partial(colder_than, 30.0), warm)
+    return [f"{r.sensor} {r.celsius:.1f}" for r in band]
+
+data = [Reading("a", 18.0), Reading("b", 25.0),
+        Reading("c", 30.5)]
+print(report(data))
+#: ['b 77.0']
+print(converted_first(data))
+#: []
+print([r.celsius for r in data])
+#: [18.0, 25.0, 30.5]
+```
+
+`colder_than()` mirrors `warmer_than()`, and `partial()` turns each
+into the one-argument callable `filter()` wants. Chaining the two
+filters leaves only `b`, whose 25.0 Celsius sits inside the band:
+`a` is too cold and `c` is too warm. The two filters commute, because
+each one tests the same untouched Celsius value, so swapping the
+`warm` and `band` lines reports the same reading.
+
+`converted_first()` shows that the `map()` does not commute with
+them. It returns an empty list. Once `to_fahrenheit()` has run, every
+reading carries a Fahrenheit number, and 64.4, 77.0, and 86.9 all pass
+`warmer_than(20.0)` and all fail `colder_than(30.0)`. The predicates
+still read `r.celsius`, so they now compare a Fahrenheit number
+against a Celsius limit and quietly answer the wrong question. Nothing
+raises an exception, because both stages are correct on their own.
+The unit lives only in the field name. A stage that changes what a
+value means must run after every stage that reads the old meaning.
+
+The last `print()` repeats the chapter's point. Both reports read
+`data` and neither writes it, so the Celsius values are unchanged
+after three traversals, and you can run either report again and get
+the same answer.

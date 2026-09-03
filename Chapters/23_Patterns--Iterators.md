@@ -823,7 +823,7 @@ Each question costs an item.
 Nothing in the protocol looks ahead without advancing.
 That is why a peekable iterator must buffer,
 and why `tee` buffered a whole stream in `tee.py`.
-`DONE` is a [sentinel](05_Foundations--Functions.md#default-and-keyword-arguments),
+`DONE` is a [sentinel](05_Foundations--Functions.md#sentinel-values),
 because the answer must differ from every value the source could yield.
 `None` collapses an exhausted source and a source that yields `None` into the same reply.
 The builtin `iter()` uses a sentinel the same way in its two-argument form:

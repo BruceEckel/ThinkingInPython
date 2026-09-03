@@ -668,6 +668,7 @@ and writing carries a new value and answers with nothing.
 
 ```python
 # wallet.py
+from collections.abc import Callable
 from dataclasses import dataclass
 from stateless import Ability, Depend, handle, run
 
@@ -705,14 +706,17 @@ def spree(prices: tuple[int, ...]) -> Depend[
 class Cell:
     amount: int
 
+def ledger(cell: Cell) -> tuple[
+    Callable[[Get], int], Callable[[Put], None]
+]:
+    def read(request: Get) -> int:
+        return cell.amount
+    def write(request: Put) -> None:
+        cell.amount = request.amount
+    return read, write
+
 cell = Cell(100)
-
-def read(request: Get) -> int:
-    return cell.amount
-
-def write(request: Put) -> None:
-    cell.amount = request.amount
-
+read, write = ledger(cell)
 half = handle(read)(spree)
 shop = handle(write)(half)
 print(run(shop((60, 50, 30, 20))))
@@ -731,13 +735,32 @@ Its signature announces the shared state:
 `spree()` composes purchases, and the union travels up unchanged.
 
 The handlers own the cell.
-`read()` and `write()` are two functions sharing one `Cell`,
-chained through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
+`ledger()` builds `read()` and `write()` from one `Cell`,
+the way `at()` builds a clock from a moment,
+and the run chains that pair through the named stages of [Abilities Are Not Special](#abilities-are-not-special).
 After the run, the cell shows what the program did to it:
 two purchases went through, and 10 remained.
-A test builds its own pair from a fresh `Cell`,
-the way `at()` builds a clock from a moment, and asserts on what remains,
-with no global to reset between tests.
+
+A test calls `ledger()` too, on a `Cell` of its own,
+and asserts on what that cell holds afterward:
+
+```python
+# test_wallet.py
+from stateless import handle, run
+from wallet import Cell, ledger, spree
+
+def test_spree_spends_from_its_own_cell() -> None:
+    cell = Cell(100)
+    read, write = ledger(cell)
+    half = handle(read)(spree)
+    shop = handle(write)(half)
+    assert run(shop((60, 50, 30, 20))) == 2
+    assert cell.amount == 10
+```
+
+The test asserts on the cell it built itself,
+so nothing needs resetting between tests and two tests can run in either order.
+`spree()` and `purchase()` are the same functions the run above used.
 
 For a number one function owns, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
@@ -1311,11 +1334,11 @@ and the graph you can read is the union in the signature.
 
 The bakery graph went deep.
 Three appliances, one of them reached through another Effect.
-The next example goes wide.
+The next example goes wide instead.
 [Abstract Factories](27_Patterns--Factory.md#abstract-factories)
 built a gaming environment where a `GameElementFactory` returned a matched `Character` and `Obstacle`,
 and a `GameEnvironment` played whatever that factory produced.
-Here the cast widens to five kinds of actor, each requested as an Ability:
+Here each kind of actor is an Ability the program requests for itself:
 
 ```python
 # quest.py
@@ -1335,59 +1358,41 @@ class Hero(Protocol):
 class Obstacle(Protocol):
     def blocks(self) -> str: ...
 
-@runtime_checkable
-class Terrain(Protocol):
-    def underfoot(self) -> str: ...
-
-@runtime_checkable
-class Reward(Protocol):
-    def prize(self) -> str: ...
-
 def encounter() -> Depend[
-    Need[Narrator]
-    | Need[Hero]
-    | Need[Obstacle]
-    | Need[Terrain]
-    | Need[Reward],
-    None,
+    Need[Narrator] | Need[Hero] | Need[Obstacle], None
 ]:
     narrator = yield from need(Narrator)
     hero = yield from need(Hero)
-    terrain = yield from need(Terrain)
     obstacle = yield from need(Obstacle)
-    reward = yield from need(Reward)
-    narrator.say(
-        f"{hero.name()} crosses the {terrain.underfoot()}")
+    narrator.say(f"{hero.name()} arrives")
     narrator.say(hero.approach(obstacle.blocks()))
-    narrator.say(f"and wins {reward.prize()}")
 ```
 
 `encounter()` is the entire engine,
-and the only types it mentions are the five Protocols.
+and the only types it mentions are the three Protocols.
 No concrete class appears in it, and it prints nothing.
-Output is an Ability like the other four:
-`Narrator` is one of the five requests,
+Output is an Ability like the other two:
+`Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
 The program constructs no `GameEnvironment` and holds no factory.
-The five-way union appears in full rather than as an alias,
+The union appears in full rather than as an alias,
 the practice [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
 recommends.
 
-Five Abilities need five distinct shapes.
-`Obstacle.blocks()` and `Terrain.underfoot()` could each have carried the name `describe()`.
-Then any obstacle would satisfy `Terrain` as well,
-leaving argument order to decide which request each one answered,
+Each Ability needs a shape of its own.
+`Obstacle.blocks()` could have been named `name()`,
+which `Hero` already declares.
+`Hero` would stay distinct, since it also declares `approach()`,
+but each actor you add is another chance for a genuine collision.
+Two Protocols with matching methods leave argument order to decide which request each one answers,
 the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
-A wide cast raises the odds of a collision,
-since every pair of Abilities is a chance for one.
 
 The cast is a set of ordinary classes that inherit nothing:
 
 ```python
 # casts.py
-from quest import (Hero, Narrator, Obstacle, Reward,
-                   Terrain, encounter)
+from quest import Hero, Narrator, Obstacle, encounter
 from stateless import run, supply
 
 class Kitty:
@@ -1398,12 +1403,6 @@ class Kitty:
 class Puzzle:
     def blocks(self) -> str: return "puzzle"
 
-class Garden:
-    def underfoot(self) -> str: return "garden path"
-
-class Yarn:
-    def prize(self) -> str: return "a ball of yarn"
-
 class Warrior:
     def name(self) -> str: return "Warrior"
     def approach(self, obstacle: str) -> str:
@@ -1412,31 +1411,21 @@ class Warrior:
 class Weapon:
     def blocks(self) -> str: return "nasty weapon"
 
-class Wasteland:
-    def underfoot(self) -> str: return "cracked wasteland"
-
-class Gold:
-    def prize(self) -> str: return "a chest of gold"
-
 def play(
-    narrator: Narrator,
-    hero: Hero,
-    obstacle: Obstacle,
-    terrain: Terrain,
-    reward: Reward,
+    narrator: Narrator, hero: Hero, obstacle: Obstacle
 ) -> None:
-    cast = supply(narrator, hero, obstacle, terrain, reward)
+    cast = supply(narrator, hero, obstacle)
     run(cast(encounter)())
 
 def kitties_and_puzzles(narrator: Narrator) -> None:
-    play(narrator, Kitty(), Puzzle(), Garden(), Yarn())
+    play(narrator, Kitty(), Puzzle())
 
 def warriors_and_weapons(narrator: Narrator) -> None:
-    play(narrator, Warrior(), Weapon(), Wasteland(), Gold())
+    play(narrator, Warrior(), Weapon())
 ```
 
 `play()` is the boundary function of [Composing a Program](#composing-a-program),
-grown from two parameters to five.
+grown from two parameters to three.
 Its annotations do the upcasting, so no actor needs `as_type()`,
 and its body is the one place in the program where an Ability meets an implementation.
 `kitties_and_puzzles()` and `warriors_and_weapons()` are what the two concrete factories became.
@@ -1452,9 +1441,7 @@ and the engine names no class:
 from dataclasses import dataclass, field
 from casts import (
     Kitty,
-    Wasteland,
     Weapon,
-    Yarn,
     kitties_and_puzzles,
     play,
     warriors_and_weapons,
@@ -1470,27 +1457,24 @@ class Script:
         self.lines.append(line)
 
 kitties_and_puzzles(Loud())
-#: Kitty crosses the garden path
+#: Kitty arrives
 #: and bats at the puzzle
-#: and wins a ball of yarn
 warriors_and_weapons(Loud())
-#: Warrior crosses the cracked wasteland
+#: Warrior arrives
 #: and battles the nasty weapon
-#: and wins a chest of gold
-play(Loud(), Kitty(), Weapon(), Wasteland(), Yarn())
-#: Kitty crosses the cracked wasteland
+play(Loud(), Kitty(), Weapon())
+#: Kitty arrives
 #: and bats at the nasty weapon
-#: and wins a ball of yarn
 script = Script()
 kitties_and_puzzles(script)
 print(len(script.lines), script.lines[1])
-#: 3 and bats at the puzzle
+#: 2 and bats at the puzzle
 ```
 
 One engine, four runs, and the only difference is what you supply.
 
 The third mixes the casts, and nothing objects.
-A `Kitty` bats at a `Weapon` across a `Wasteland`.
+A `Kitty` bats at a `Weapon`.
 It type-checks, and it runs.
 That is a real loss against the Abstract Factory,
 whose purpose is families of matched products:
@@ -1507,7 +1491,7 @@ The fourth run swaps one cast member and captures the output.
 `Script` records what arrives,
 so a test reads the lines back as a list with no `capsys` and no monkeypatching,
 the same swap `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-made with one Ability rather than five.
+made with one Ability rather than three.
 The engine holds no printing to intercept.
 
 The cast has a ceiling on how wide it can get.
@@ -1521,7 +1505,7 @@ matches arguments
 
 The call still runs correctly, since the implementation is variadic,
 but the checking on which this chapter relies disappears.
-Two chained handlers keep the checking: `supply()` the first five,
+Two chained handlers keep the checking: `supply()` some of the actors,
 apply that to the Effect, then `supply()` the rest to what remains,
 the layered supply of [Dependency Injection](46_Effects--Stateless.md#dependency-injection).
 Nine is also a fair warning about the design.
@@ -2030,9 +2014,63 @@ so the exception leaves `run()` as an ordinary Python exception.
 
 ### 2. The type checker can give up quietly
 
-How much of a type survives partial handling depends on your type checker rather than on the library.
-Handling some of what an Effect declares works correctly under `ty` 0.0.77.
-If you supply one of two Abilities, the other stays in the signature:
+How much of a type survives handling depends on your type checker rather than on the library.
+Applying two handlers in one expression defeats `ty` 0.0.77.
+`nested` and `full` below are the same object,
+built by the same two calls in the same order:
+
+```python
+# nested_handle.py
+from typing import reveal_type
+from ask_tell_stateless import capture, greet, scripted
+from stateless import handle
+
+nested = handle(scripted)(handle(capture)(greet))
+half = handle(capture)(greet)
+full = handle(scripted)(half)
+
+if __name__ == "__main__":
+    reveal_type(nested)
+    reveal_type(half)
+    reveal_type(full)
+```
+
+`ty check nested_handle.py` reads the two spellings differently:
+
+```text
+info[revealed-type]: Revealed type
+  --> nested_handle.py:11:17
+   |
+11 |     reveal_type(nested)
+   |                 ^^^^^^ `Unknown`
+
+info[revealed-type]: Revealed type
+  --> nested_handle.py:12:17
+   |
+12 |     reveal_type(half)
+   |                 ^^^^ `() -> Generator[Ask, Any, None]`
+
+info[revealed-type]: Revealed type
+  --> nested_handle.py:13:17
+   |
+13 |     reveal_type(full)
+   |                 ^^^^ `() -> Generator[Never, Any, None]`
+```
+
+The named pair reports what the rest of the chapter has been reading:
+`half` still needs an `Ask`, and `full` needs nothing.
+The nested expression reports `Unknown`, which is `ty` declining to answer.
+`Unknown` is assignable to anything,
+so `run()` accepts a nested expression whatever is still unanswered inside it,
+and the missing handler surfaces at runtime rather than at the check.
+That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
+Keep the habit generally:
+a named intermediate is where you read the Ability that remains,
+which is the information this library exists to give you.
+
+Name the stages and the subtraction is checked,
+including where you answer only part of what an Effect declares.
+Here `supply()` answers one `Need` of two:
 
 ```python
 # partial_handling.py
@@ -2058,8 +2096,8 @@ except MissingAbilityError as e:
 #: Need(t=<class '__main__.Log'>)
 ```
 
-`half` is `() -> Depend[Need[Log], None]`.
-The handler subtracts the `Console` and not the `Log`,
+`half` is `() -> Depend[Need[Log], None]`,
+because the handler subtracts the `Console` and not the `Log`,
 so `run()` rejects it before the program starts:
 
 ```text
@@ -2073,26 +2111,12 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 ```
 
 The `# type: ignore` silences that diagnostic,
-since the listing provokes the matching runtime failure on purpose.
+since the listing provokes the matching runtime failure on purpose,
+and the `MissingAbilityError` it prints names the `Log` nobody supplied.
 `catch()` behaves the same way.
 If you catch one of two declared errors, the other stays in the error channel.
+Nesting those calls loses this diagnostic, the way nesting lost the type above.
 
-What still defeats the type checker is applying two handlers in one expression.
-If you write `handle(scripted)(handle(capture)(greet))`,
-`ty` gives up on the nested inference and infers `Unknown`,
-which is permissive enough to hide a genuinely missing handler.
-If you name the intermediate, the types come back:
-
-```python
-half = handle(capture)(greet)  # () -> Depend[Ask, None]
-full = handle(scripted)(half)  # () -> Success[None]
-```
-
-That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
-Keep the habit generally:
-a named intermediate is where you read the Ability that remains,
-which is the information this library exists to give you.
-That leaves one type-checker gap, the nested handler expression here.
 The library's types ask the type checker a hard inference question,
 and where the type checker gives up, it gives up quietly.
 Trust a green check only where a red one has shown you it can appear.
@@ -2375,9 +2399,9 @@ It is a language that does the encoding for you.
     Write `buttered()`'s signature with only `Need[Butter]` first, run `ty`,
     and read the diagnostic before fixing it.
     Then remove `Toaster(3)` from `supply()` and say which of the two diagnostics tells you about a dependency two levels down.
-14. `play()` in `casts.py` accepts any five actors, matched or not.
+14. `play()` in `casts.py` accepts any three actors, matched or not.
     `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature;
     give that shape a name so a caller can pass either one where a cast belongs,
     and say what that recovers of the Abstract Factory and what it does not.
-    Then add a sixth actor to `encounter()` and count the lines you edit in `quest.py`,
+    Then add a fourth actor to `encounter()` and count the lines you edit in `quest.py`,
     `casts.py`, and `two_games.py`.

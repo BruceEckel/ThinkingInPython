@@ -1,4 +1,5 @@
 # wallet.py
+from collections.abc import Callable
 from dataclasses import dataclass
 from stateless import Ability, Depend, handle, run
 
@@ -36,14 +37,17 @@ def spree(prices: tuple[int, ...]) -> Depend[
 class Cell:
     amount: int
 
+def ledger(cell: Cell) -> tuple[
+    Callable[[Get], int], Callable[[Put], None]
+]:
+    def read(request: Get) -> int:
+        return cell.amount
+    def write(request: Put) -> None:
+        cell.amount = request.amount
+    return read, write
+
 cell = Cell(100)
-
-def read(request: Get) -> int:
-    return cell.amount
-
-def write(request: Put) -> None:
-    cell.amount = request.amount
-
+read, write = ledger(cell)
 half = handle(read)(spree)
 shop = handle(write)(half)
 print(run(shop((60, 50, 30, 20))))

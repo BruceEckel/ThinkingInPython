@@ -1281,8 +1281,8 @@ one required a comment or a docstring to say what depends on what.
 ## 14. A shared signature for a cast
 
 The two factories in `casts.py` already have the same signature. The exercise
-is to name it and see what naming it buys. Here is the chapter's arrangement
-reduced to three actors so the whole thing fits in one listing:
+is to name it and see what naming it buys. Here is the chapter's cast, with
+each actor trimmed to one method so the whole thing fits in one listing:
 
 ```python
 # exercise_14.py
@@ -1299,42 +1299,43 @@ class Hero(Protocol):
     def name(self) -> str: ...
 
 @runtime_checkable
-class Reward(Protocol):
-    def prize(self) -> str: ...
+class Obstacle(Protocol):
+    def blocks(self) -> str: ...
 
 def encounter() -> Depend[
-    Need[Narrator] | Need[Hero] | Need[Reward], None
+    Need[Narrator] | Need[Hero] | Need[Obstacle], None
 ]:
     narrator = yield from need(Narrator)
     hero = yield from need(Hero)
-    reward = yield from need(Reward)
-    narrator.say(f"{hero.name()} wins {reward.prize()}")
+    obstacle = yield from need(Obstacle)
+    blocker = obstacle.blocks()
+    narrator.say(f"{hero.name()} meets the {blocker}")
 
 class Kitty:
     def name(self) -> str: return "Kitty"
 
-class Yarn:
-    def prize(self) -> str: return "a ball of yarn"
+class Puzzle:
+    def blocks(self) -> str: return "puzzle"
 
 class Warrior:
     def name(self) -> str: return "Warrior"
 
-class Gold:
-    def prize(self) -> str: return "a chest of gold"
+class Weapon:
+    def blocks(self) -> str: return "nasty weapon"
 
 class Loud:
     def say(self, line: str) -> None: print(line)
 
 def play(
-    narrator: Narrator, hero: Hero, reward: Reward
+    narrator: Narrator, hero: Hero, obstacle: Obstacle
 ) -> None:
-    run(supply(narrator, hero, reward)(encounter)())
+    run(supply(narrator, hero, obstacle)(encounter)())
 
 def kitties(narrator: Narrator) -> None:
-    play(narrator, Kitty(), Yarn())
+    play(narrator, Kitty(), Puzzle())
 
 def warriors(narrator: Narrator) -> None:
-    play(narrator, Warrior(), Gold())
+    play(narrator, Warrior(), Weapon())
 
 type Cast = Callable[[Narrator], None]
 
@@ -1343,10 +1344,10 @@ def run_season(casts: list[Cast]) -> None:
         cast(Loud())
 
 run_season([kitties, warriors])
-#: Kitty wins a ball of yarn
-#: Warrior wins a chest of gold
-play(Loud(), Kitty(), Gold())
-#: Kitty wins a chest of gold
+#: Kitty meets the puzzle
+#: Warrior meets the nasty weapon
+play(Loud(), Kitty(), Weapon())
+#: Kitty meets the nasty weapon
 ```
 
 What the shared signature recovers is the Abstract Factory's *interface*.
@@ -1359,7 +1360,7 @@ What it does not recover is the guarantee that made the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other. The last line is the proof,
 and the chapter runs the same line in `two_games.py`: `play()` accepts a
-`Kitty` winning a chest of gold, both satisfy their `Protocol`s, and nothing
+`Kitty` facing a `Weapon`, both satisfy their `Protocol`s, and nothing
 objects. An Abstract Factory in a language with a family type expresses "these
 come from one world" in the type itself. Here the matching lives inside
 `kitties()`'s body, a fact about how someone wrote that function, and nothing
@@ -1369,8 +1370,8 @@ So the shared signature narrows the loss without closing it. A caller that
 takes a `Cast` can no longer assemble a mismatched set by accident, because it
 never sees the actors. `play()` is still there and still accepts any of them.
 
-Adding a sixth actor to the chapter's five-actor version shows where the cost
-falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
+Adding a fourth actor to the chapter's three-actor version shows where the
+cost falls. `quest.py` gains a `Protocol`, a member in `encounter()`'s `Need[...]`
 union, and a `yield from`, so four edits. `casts.py` gains a parameter on
 `play()`, an argument in the `supply()` call, a class for each family, and an
 argument in each of the two factory calls, so seven. `two_games.py` needs two

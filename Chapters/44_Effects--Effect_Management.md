@@ -39,9 +39,25 @@ A system that does so is an *Effect Management System*.
 
 ## What Is an Effect?
 
-An *Effect* causes impurity.
-A function has *side effects* if calling it does anything besides return a result,
-that is, if the call changes the environment outside the function.
+An *Effect* is anything a caller takes on by making a call,
+beyond receiving the return value.
+Call a function that writes to an audit log,
+and your function writes to an audit log.
+Call one that reads the time of day, and your result depends on the time of day.
+Call one that raises a `ValueError`, and your function raises a `ValueError`.
+You inherit each of these by calling,
+and ordinarily no signature on the path mentions any of them.
+
+That inheritance is the difficulty.
+Something that stays inside the function performing it needs no system to manage it,
+because one read of that function settles the question.
+An Effect travels outward instead, one call at a time,
+and each step is invisible until something in the types records it.
+
+Three things travel that way.
+The first is a *side effect*:
+calling the function does something besides return a result,
+changing the environment outside the function.
 For example, the function might:
 
 - Display something on the console
@@ -52,25 +68,27 @@ For example, the function might:
 - Modify a non-local variable
 - Acquire a lock, or coordinate with another thread
 
-Side effects are easy to spot in the function that performs them,
-because they change something outside it.
+A side effect is easy to spot in the function that performs it,
+because it changes something outside that function.
+One call up, it is invisible.
 
-But the meaning of "Effect" is broader than side effects.
-It also includes what the environment does to the function.
+The second is a *side cause*, the counterpart of a side effect:
+what the environment does to the function.
 Suppose your function reads the time of day, or a random number.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
-Any information a function uses beyond its arguments makes it impure,
+Any information a function uses beyond its arguments is a side cause,
 when that information can change between calls.
 The usual sources are I/O: the time of day, a random number,
 a database or network read.
-Reading a global variable that something else can rebind is enough on its own;
-a captured constant, as in [Closures](40_Functional--Foundations.md#closures),
+Reading a global variable that something else can rebind is enough on its own.
+A captured constant, as in [Closures](40_Functional--Foundations.md#closures),
 is not.
-These inputs are *side causes*, the counterpart of side effects.
 
-Thus, Effects are the union of side effects and side causes.
-One more kind sits outside both categories.
+The third is an exception,
+which travels the same path and hides in the same place.
+People argue about whether an exception makes a function *impure*,
+so it gets the next section to itself.
 
 ## Are Exceptions Impure?
 
@@ -110,13 +128,12 @@ Two schools of thought exist:
     but instead returns errors as data using explicit wrapper types,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
 
-From an Effect Management standpoint, exceptions are impure.
+The argument over purity does not settle the question this chapter asks.
 If you write a function `a()` that calls a function `b()` that raises an exception,
-then `a()` also raises that exception unless `a()` catches it.
-To know the Effects that your function has,
-you must track exceptions as Effects on all functions.
-Effects therefore come in three kinds: side effects, side causes,
-and exceptions.
+then `a()` raises that exception too, unless `a()` catches it,
+and `a()`'s signature says nothing about it.
+`a()` takes the exception on by calling `b()`, whichever school you join,
+so an exception is an Effect alongside the side effect and the side cause.
 
 ## Converting Effectful to Pure
 
@@ -394,19 +411,7 @@ and the rest of this chapter is about what replaces it.
 ## Effect Management Systems
 
 Return to the failing test from the chapter's opening.
-The name and parameters of the function it calls say it calculates a total price for a list of items.
-The logic looks correct.
-The math checks out.
-But sometimes the test is slow.
-Sometimes, run alongside another test, one of the two fails.
-Three calls deep, inside a helper that formats currency, you find the problem:
-a read from a configuration service, a write to an audit log,
-and a network call that fetches the current exchange rate.
-None of this appears in the function's signature.
-To discover what the function does, you must read every line of it,
-and every line of everything it calls.
-
-Most functions in most programs have this hidden life,
+Most functions in most programs have that hidden life,
 and it makes code hard to understand:
 
 - Can you call this function in a test without mocking half the world?
@@ -822,32 +827,15 @@ For their purpose the other two parts, interface separation and delayed binding,
 would be liabilities:
 a host that pins every implementation can guarantee what generated code can do.
 
-- [Vera](https://veralang.dev):
-  mandatory contracts checked with Z3 SMT verification.
-- [Aria](https://www.aria-lang.com): built for AI code generation,
-  not human readability.
-- [Aver](https://averlang.dev): Effects visible in the type system,
-  with a verify block beside each function.
-- [Mog](https://moglang.org): small enough to fit in a model's context window;
-  Effects gated by capabilities.
-- [Lumen](https://alliecatowo.github.io/lumen/):
-  markdown-native source with algebraic effects;
-  `bind effect` rebinds a handler separately from its use, a full-EMS feature.
-- [Dream](https://dreamlang.dev):
-  pairs formal verification with AI-native code generation.
-- [AILANG](https://ailang.sunholo.com): capability-based Effects
-  (`IO`, `FS`, `Net`, `Clock`, `AI`) granted per run.
-- [Pact](https://github.com/KikotVit/pact-lang):
-  functions declare a `needs` clause,
-  and a separate `using` clause rebinds each implementation,
-  so tests can swap Effects deterministically, another full-EMS feature.
-- [Zero](https://zerolang.ai): capability-based Effects,
-  with structured JSON diagnostics instead of prose error messages.
-- [Boruna](https://github.com/escapeboy/boruna):
-  Effects declared and policy-gated at the VM level, with tamper-evident replay.
-
-Pact and Lumen are the exceptions.
-Each separates an Effect's interface from its implementation and binds the implementation later,
+Two go further.
+In [Pact](https://github.com/KikotVit/pact-lang),
+a function declares a `needs` clause,
+and a separate `using` clause rebinds each implementation,
+so tests can swap Effects deterministically.
+[Lumen](https://alliecatowo.github.io/lumen/)
+writes source as markdown with algebraic effects,
+and its `bind effect` rebinds a handler separately from its use.
+Both separate an Effect's interface from its implementation and bind the implementation later,
 the second and third properties of a full EMS.
 
 ## Effect Management for Python?

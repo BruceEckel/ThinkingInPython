@@ -12,42 +12,43 @@ class Hero(Protocol):
     def name(self) -> str: ...
 
 @runtime_checkable
-class Reward(Protocol):
-    def prize(self) -> str: ...
+class Obstacle(Protocol):
+    def blocks(self) -> str: ...
 
 def encounter() -> Depend[
-    Need[Narrator] | Need[Hero] | Need[Reward], None
+    Need[Narrator] | Need[Hero] | Need[Obstacle], None
 ]:
     narrator = yield from need(Narrator)
     hero = yield from need(Hero)
-    reward = yield from need(Reward)
-    narrator.say(f"{hero.name()} wins {reward.prize()}")
+    obstacle = yield from need(Obstacle)
+    blocker = obstacle.blocks()
+    narrator.say(f"{hero.name()} meets the {blocker}")
 
 class Kitty:
     def name(self) -> str: return "Kitty"
 
-class Yarn:
-    def prize(self) -> str: return "a ball of yarn"
+class Puzzle:
+    def blocks(self) -> str: return "puzzle"
 
 class Warrior:
     def name(self) -> str: return "Warrior"
 
-class Gold:
-    def prize(self) -> str: return "a chest of gold"
+class Weapon:
+    def blocks(self) -> str: return "nasty weapon"
 
 class Loud:
     def say(self, line: str) -> None: print(line)
 
 def play(
-    narrator: Narrator, hero: Hero, reward: Reward
+    narrator: Narrator, hero: Hero, obstacle: Obstacle
 ) -> None:
-    run(supply(narrator, hero, reward)(encounter)())
+    run(supply(narrator, hero, obstacle)(encounter)())
 
 def kitties(narrator: Narrator) -> None:
-    play(narrator, Kitty(), Yarn())
+    play(narrator, Kitty(), Puzzle())
 
 def warriors(narrator: Narrator) -> None:
-    play(narrator, Warrior(), Gold())
+    play(narrator, Warrior(), Weapon())
 
 type Cast = Callable[[Narrator], None]
 
@@ -56,7 +57,7 @@ def run_season(casts: list[Cast]) -> None:
         cast(Loud())
 
 run_season([kitties, warriors])
-#: Kitty wins a ball of yarn
-#: Warrior wins a chest of gold
-play(Loud(), Kitty(), Gold())
-#: Kitty wins a chest of gold
+#: Kitty meets the puzzle
+#: Warrior meets the nasty weapon
+play(Loud(), Kitty(), Weapon())
+#: Kitty meets the nasty weapon

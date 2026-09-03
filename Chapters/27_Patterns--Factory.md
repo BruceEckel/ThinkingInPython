@@ -144,7 +144,8 @@ Apart from the new subclass itself,
 *GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
 `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
-[Subclasses Choose the Type](#subclasses-choose-the-type) shows the subclass-override form.
+[Subclasses Choose the Type](#subclasses-choose-the-type)
+shows the subclass-override form.
 
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
@@ -470,8 +471,8 @@ you get either a factory or a `KeyError`.
 
 ## Subclasses Choose the Type
 
-Every factory so far keeps the choice in one place:
-a `match` in `factory()`, a key in `SHAPES`, a lookup in `FACTORIES`.
+Every factory so far keeps the choice in one place: a `match` in `factory()`,
+a key in `SHAPES`, a lookup in `FACTORIES`.
 *Factory Method* moves the choice into the type of the object you already hold.
 A base class calls a creation method it does not implement,
 and each subclass overrides that method to name a concrete product:

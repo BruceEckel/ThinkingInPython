@@ -33,16 +33,13 @@ new prose.
 
 ## The recommendations
 
-1. **Resolve `adversarial_undecided.md`.**
-   The 38 findings the application pass could not decide alone:
-   section cuts and moves, new exercises that need solutions, voice
-   calls, and a few fixes whose right shape only the author can pick.
-   Each entry carries a recommendation. Deciding against one is as
-   valid as applying it; delete resolved entries, and archive the
-   file when it empties. Several (the chapter 44 catalog cut, the
-   chapter 38 robot section, chapter 17's inspect section) are quick
-   yes/no reads; the exercise additions (03, 40, 32) each need a
-   Solutions entry written alongside.
+1. **Write the chapter 01 AI anecdote.**
+   The last entry in `adversarial_undecided.md`: one concrete case
+   where book-level Python judgment steered an AI to a better
+   solution, closing the AI section's now-final sentence with
+   evidence. Only you can write it. Archive the file when it lands.
+   The other 37 queue entries were approved and performed 2026-09-03;
+   `make verify` green.
 
 2. **Tighten the capture loop before bulk-rewriting.**
    After each hand-edited chapter, run `/bruce-edit-capture` before
@@ -70,7 +67,7 @@ are worth a check against your copy.
 
 ## Suggested sequence
 
-1. Item 1 (resolve the undecided queue, structural, before polish).
+1. Item 1 (the chapter 01 anecdote, the queue's last entry).
 2. The item 2/3 loop through the remaining chapters.
 3. Item 4 (readability sweep).
 4. One green `make sweep`.

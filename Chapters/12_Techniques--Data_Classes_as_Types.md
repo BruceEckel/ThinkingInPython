@@ -980,7 +980,7 @@ For a small fixed set, that is an `Enum`.
 with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
 Python evaluates a default value once, at class definition,
 so every `Months` would read and write that one list,
-the trap shown in [Functions](05_Foundations--Functions.md#default-and-keyword-arguments).
+the trap shown in [Functions](05_Foundations--Functions.md#default-arguments).
 `field(default_factory=make_months)` supplies a function instead of a value,
 and each new `Months` calls it and gets its own fresh list.
 

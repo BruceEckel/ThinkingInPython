@@ -394,7 +394,7 @@ so `ignore((ZeroDivisionError, TypeError))` covers several types in one manager.
 The `Types` alias names that "one class or a tuple of classes" shape once instead of writing it out at every use.
 
 The second is the default.
-The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Foundations--Functions.md#default-and-keyword-arguments),
+The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Foundations--Functions.md#sentinel-values),
 which makes `ignore()` with no argument catch everything.
 `self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,

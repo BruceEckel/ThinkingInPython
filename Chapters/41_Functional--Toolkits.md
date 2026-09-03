@@ -591,7 +591,7 @@ Zips iterables of different lengths,
 filling the gaps instead of stopping at the shortest.
 The default filler is `None`.
 When `None` is a valid element,
-pass a distinct [sentinel](05_Foundations--Functions.md#default-and-keyword-arguments)
+pass a distinct [sentinel](05_Foundations--Functions.md#sentinel-values)
 as the `fillvalue` keyword argument:
 
 ```python
@@ -694,8 +694,7 @@ before anything asks for a value.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
-Three ways to draw `r` elements from an iterable,
-separated by two questions:
+Three ways to draw `r` elements from an iterable, separated by two questions:
 does order matter, and may an element repeat?
 The same input and the same `r` make the answers comparable:
 
@@ -715,16 +714,13 @@ print(list(product("AB", repeat=2)))
 #: [('A', 'A'), ('A', 'B'), ('B', 'A'), ('B', 'B')]
 ```
 
-`permutations()` counts orderings,
-so `AB` and `BA` are two results.
+`permutations()` counts orderings, so `AB` and `BA` are two results.
 `combinations()` treats those as the same draw and keeps one,
 which is right when you want each pair of distinct elements once.
 `combinations_with_replacement()` also ignores order,
-but draws from the full input each time,
-which is where `AA` comes from.
+but draws from the full input each time, which is where `AA` comes from.
 `product()` with `repeat=` fills the fourth corner:
-order matters and elements repeat,
-so all four pairs survive.
+order matters and elements repeat, so all four pairs survive.
 
 ### Composing the Pieces
 

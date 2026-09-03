@@ -1,8 +1,11 @@
 # exercise_5.py
 from collections import deque
+from collections.abc import Callable
+from typing import Final
 from robot_world import (
     Edge,
     EndGame,
+    Food,
     GameBuilder,
     Room,
     Teleport,
@@ -10,32 +13,40 @@ from robot_world import (
     Wall,
 )
 
-def landing(room: Room, urge: Urge) -> Room | None:
-    ("Where this door actually leads, "
-     "or None if it's blocked.")
-    next_room = room.doors.open(urge)
-    if isinstance(next_room.occupant, (Wall, Edge)):
-        return None
-    if isinstance(next_room.occupant, Teleport):
-        return next_room.occupant.target_room
-    return next_room
+MOVES: Final[dict[Urge, str]] = {
+    Urge.NORTH: "n", Urge.SOUTH: "s",
+    Urge.EAST: "e", Urge.WEST: "w"}
 
-def solve(builder: GameBuilder) -> str:
-    start = builder.robot.room
-    move_chars = {Urge.NORTH: "n", Urge.SOUTH: "s",
-                  Urge.EAST: "e", Urge.WEST: "w"}
+def landing(room: Room, urge: Urge) -> Room | None:
+    beyond = room.doors.open(urge)
+    if isinstance(beyond.occupant, Wall | Edge):
+        return None
+    if isinstance(beyond.occupant, Teleport):
+        return beyond.occupant.target_room
+    return beyond
+
+def solve(game: GameBuilder,
+          arrived: Callable[[Room], bool]) -> str | None:
+    start = game.robot.room
     queue: deque[tuple[Room, str]] = deque([(start, "")])
-    seen = {id(start)}
+    seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()
-        if isinstance(room.occupant, EndGame):
+        if arrived(room):
             return path
-        for urge, char in move_chars.items():
-            dest = landing(room, urge)
-            if dest is not None and id(dest) not in seen:
-                seen.add(id(dest))
-                queue.append((dest, path + char))
-    raise ValueError("no path to EndGame found")
+        for urge, char in MOVES.items():
+            beyond = landing(room, urge)
+            if beyond is None or beyond in seen:
+                continue
+            seen.add(beyond)
+            queue.append((beyond, path + char))
+    return None
+
+def food(room: Room) -> bool:
+    return isinstance(room.occupant, Food)
+
+def end(room: Room) -> bool:
+    return isinstance(room.occupant, EndGame)
 
 string_maze = """
 ###############################
@@ -62,8 +73,17 @@ string_maze = """
 """.strip()
 
 game = GameBuilder(string_maze)
-solution = solve(game)
-game.run(solution)
-assert isinstance(game.robot.room.occupant, EndGame)
-print("reached EndGame in", len(solution), "moves")
-#: reached EndGame in 198 moves
+meals = 0
+moves = 0
+while (leg := solve(game, food)) is not None:
+    game.run(leg)
+    meals += 1
+    moves += len(leg)
+last = solve(game, end)
+assert last is not None
+game.run(last)
+moves += len(last)
+print(meals, "meals,", moves, "moves")
+#: 16 meals, 282 moves
+print("finished:", game.robot.finished)
+#: finished: True

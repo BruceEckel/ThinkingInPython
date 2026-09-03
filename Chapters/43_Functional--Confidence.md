@@ -213,47 +213,27 @@ and without the guard every worker would build a pool of its own.
 [Concurrency](19_Techniques--Concurrency.md#parallelism) covers all of this,
 along with the reasons Python parallelism uses processes rather than threads.
 
-## Declarative Style
-
-*Declarative* code states the result you want.
-*Imperative* code spells out each step to produce it.
-A comprehension is the everyday example
-(see [Comprehensions](16_Techniques--Comprehensions.md)).
-Four statements, `squares = []`, `for n in numbers:`, `if n % 2 == 0:`,
-and `squares.append(n * n)`, say *how*.
-`[n * n for n in numbers if n % 2 == 0]` says *what*,
-which is "the squares of the even numbers."
-It leaves the looping to Python.
-A description of the result is also easier to check than a sequence of steps,
-because less of it can be wrong.
-By naming the result instead of the steps,
-you hand the reader your intent and give the runtime freedom to choose how to deliver it.
-That freedom is why a SQL query, a NumPy expression,
-or a dataframe operation can run on an optimized or parallel engine you do not see.
-You describe the what, not a fixed sequence of moves.
-
-`match` applies the same idea to taking data apart
-(see [Pattern Matching](13_Techniques--Pattern_Matching.md)).
-You describe the shapes you expect and Python binds the pieces,
-so one `match` replaces a stack of `isinstance()` tests, length checks,
-and key or index lookups,
-with no gap between confirming a shape and pulling out its parts.
-[Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
-put that to work, taking a `Result` apart with one branch per kind of failure.
-The win is in the reading rather than in what a type checker can prove.
-On a `Result[float, Exception]`,
-`match` and a chain of `isinstance()` tests narrow equally well,
-both reaching `float` inside the `Ok`, because `Ok` and `Err` are `@final`,
-so either test narrows to a single class.
-Destructuring merges the shape test and the extraction into one step.
-It does not extend what the type checker knows.
-
 ## A Confidence Spectrum
 
 The chapter opened by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
 Purity, immutability, and referential transparency,
 the properties these chapters built, provide confidence at every level.
+
+Style contributes before the first rung.
+*Declarative* code states the result you want,
+while *imperative* code spells out each step to produce it.
+A comprehension names the result, "the squares of the even numbers"
+(see [Comprehensions](16_Techniques--Comprehensions.md)),
+and `match` names the shapes you expect
+(see [Pattern Matching](13_Techniques--Pattern_Matching.md)),
+the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
+took a `Result` apart with one branch per kind of failure.
+A description of the result is easier to check than a sequence of steps,
+because less of it can be wrong.
+It also leaves the runtime free to choose the steps, which is why a SQL query,
+a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see.
+
 You decide how far up the spectrum to go.
 
 1. The cheapest rung is local reasoning.

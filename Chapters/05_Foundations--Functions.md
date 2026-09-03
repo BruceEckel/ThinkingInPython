@@ -113,7 +113,7 @@ A function argument works as long as the function can apply its operations to it
 The failure comes from `+`, inside the call, not from the call itself.
 Nothing checks the arguments on the way in.
 
-## Default and Keyword Arguments
+## Default Arguments
 
 Parameters can have default values,
 and keyword arguments let callers pass them by name, in any order.
@@ -220,12 +220,8 @@ so the local name points at a new list and the caller's list stays as it was.
 Mutating an argument reaches outside the function.
 Rebinding one does not.
 
-The `None` default in `good_append()` is a *sentinel*:
-a value chosen to mean "the caller passed nothing" rather than to serve as data.
-You need one when the function mutates that parameter,
-because the default must then be a fresh object on every call.
-Test it with `is None` rather than truthiness:
-`if not target:` also discards an empty list the caller passed on purpose.
+`good_append()` builds a fresh list on every call,
+which the function must do whenever it mutates that parameter.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
 Calls still share that tuple,
@@ -253,7 +249,14 @@ such a parameter reads:
 
     items: Sequence[str] = ()
 
-The `None` sentinel works here because `None` carries no meaning for `target`.
+## Sentinel Values
+
+The `None` default in `good_append()` is a *sentinel*:
+a value chosen to mean "the caller passed nothing" rather than to serve as data.
+Test it with `is None` rather than truthiness:
+`if not target:` also discards an empty list the caller passed on purpose.
+
+`None` works there because `None` carries no meaning for `target`.
 When `None` is itself a valid argument, you need a distinct marker.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
 adds a `sentinel` builtin that creates a unique self-describing value for this purpose:

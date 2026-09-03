@@ -15,28 +15,11 @@ class Hero(Protocol):
 class Obstacle(Protocol):
     def blocks(self) -> str: ...
 
-@runtime_checkable
-class Terrain(Protocol):
-    def underfoot(self) -> str: ...
-
-@runtime_checkable
-class Reward(Protocol):
-    def prize(self) -> str: ...
-
 def encounter() -> Depend[
-    Need[Narrator]
-    | Need[Hero]
-    | Need[Obstacle]
-    | Need[Terrain]
-    | Need[Reward],
-    None,
+    Need[Narrator] | Need[Hero] | Need[Obstacle], None
 ]:
     narrator = yield from need(Narrator)
     hero = yield from need(Hero)
-    terrain = yield from need(Terrain)
     obstacle = yield from need(Obstacle)
-    reward = yield from need(Reward)
-    narrator.say(
-        f"{hero.name()} crosses the {terrain.underfoot()}")
+    narrator.say(f"{hero.name()} arrives")
     narrator.say(hero.approach(obstacle.blocks()))
-    narrator.say(f"and wins {reward.prize()}")

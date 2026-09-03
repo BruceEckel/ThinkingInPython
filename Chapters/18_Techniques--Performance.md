@@ -1318,7 +1318,7 @@ NumPy is a fast library you call, not a compiled extension you write.
 You keep that speedup only while the data stays inside NumPy.
 Calling a Python function on each element,
 or converting arrays to lists and back, reintroduces the overhead.
-That is the declarative trade [Confidence](43_Functional--Confidence.md#declarative-style)
+That is the declarative trade [Confidence](43_Functional--Confidence.md#a-confidence-spectrum)
 examines: describe the whole-array result and let the engine arrange the steps.
 
 One machine measured the vectorized pass at about 11x faster than the loop.

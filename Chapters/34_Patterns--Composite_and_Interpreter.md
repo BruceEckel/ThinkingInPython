@@ -83,7 +83,8 @@ for path in root.walk():
 `Directory.disk_usage()` calls `disk_usage()` on each entry without knowing whether the entry is a `File` or another `Directory`.
 The same call works on the whole tree, on a subtree, and on a single file.
 
-Adding a node type is cheap: a plugin writes one class and touches nothing above it.
+Adding a node type is cheap:
+a plugin writes one class and touches nothing above it.
 Adding an *operation* is what exposes the weakness.
 `walk()` cost a method in every class,
 and counting files or finding an entry by name would each cost another.
@@ -149,7 +150,8 @@ if __name__ == "__main__":
 ```
 
 `Node` is a *recursive* union.
-`Directory` holds a `tuple[Node, ...]`, so the alias names itself through one of its own members,
+`Directory` holds a `tuple[Node, ...]`,
+so the alias names itself through one of its own members,
 and that self-reference is what makes the tree a tree.
 `Directory` mentions `Node` above the `type` statement that defines it,
 which works because Python evaluates annotations and `type` aliases lazily
@@ -157,15 +159,16 @@ which works because Python evaluates annotations and `type` aliases lazily
 The alias can therefore sit below the classes it unites,
 where it reads as a summary of them rather than as a forward declaration.
 The recursion in the type predicts the recursion everywhere else:
-`Directory` contains `Node`s, so `disk_usage()` and `walk()` call themselves on each entry,
+`Directory` contains `Node`s,
+so `disk_usage()` and `walk()` call themselves on each entry,
 and each `match` needs one case per member of the union and no more.
 
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
 What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
-The classic version made the opposite trade,
-and the pairing has a name: the *expression problem*
+The classic version made the opposite trade, and the pairing has a name:
+the *expression problem*
 (see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching)).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works the same split out with shapes,
