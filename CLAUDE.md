@@ -307,6 +307,14 @@ reading.
   `extract_examples.py --write` dies with `PermissionError [WinError 32]`. Keep the
   shell at the repo root and run chapter-dir commands in a subshell, e.g.
   `(cd build/examples && uv run ty check NN_Chapter)`.
+  Orphaned python processes cause the same error: on 2026-09-03,
+  worker/load-test processes left behind by subagents (ProcessPool
+  workers, synthetic-load loops) held `build/examples/<chapter>` long
+  after their agents finished, and `make verify` died at the extract
+  step. After a multi-agent run that executed listings, check
+  `Get-Process python` before a verify and kill strays rooted in this
+  repo's `.venv`. Also: piping make through `tail` swallows its exit
+  code; capture `$?` or redirect to a log instead.
 - **`run_examples.py` and `validate_output.py`: never pass a relative
   `--tree`.** It goes on `PYTHONPATH` and breaks once an example changes cwd.
   `validate_output.py` manifests this as `ModuleNotFoundError` on a `utils/`
