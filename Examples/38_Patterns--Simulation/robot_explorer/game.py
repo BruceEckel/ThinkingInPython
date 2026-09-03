@@ -82,10 +82,3 @@ string_maze = """
 #.#___________#___#____.__#___#
 ###############################
 """.strip()
-
-solution = (
-    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeee"
-    "nneesseenneeeesseeeenneennwwnneenneennnnwwwwnnnneess"
-    "eennnnwwwwwwsswweesswwsswwwwsseesseeeesswwwwwwwwwwww"
-    "wwnnnneennnnnnnnnneesssseesssswwsseesswwww"
-)

@@ -1,8 +1,9 @@
 # robot_explorer/maze_view.py
 import tkinter as tk
 from typing import Final
-from game import GameBuilder, solution, string_maze
+from game import GameBuilder, string_maze
 from items import Urge
+from solver import solve
 
 CELL: Final[int] = 20
 FILL: Final[dict[str, str]] = {
@@ -12,9 +13,10 @@ MOVES: Final[dict[str, Urge]] = {
     "n": Urge.NORTH, "s": Urge.SOUTH,
     "e": Urge.EAST, "w": Urge.WEST}
 
-def show(maze: str = string_maze, moves: str = solution,
+def show(maze: str = string_maze,
          step_ms: int = 80) -> None:
     game = GameBuilder(maze)
+    moves = solve(game)
     rows = maze.splitlines()
     width = max(len(row) for row in rows)
     root = tk.Tk()

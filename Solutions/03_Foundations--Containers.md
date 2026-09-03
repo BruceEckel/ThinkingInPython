@@ -247,3 +247,55 @@ five-item list, a one-item list, and everything between. Only an
 empty list falls short. The star turns a fixed-shape assertion into a
 flexible one, and the same flexibility lets `*args` work in a
 function signature.
+
+## 10. A `frozendict` as a dictionary key
+
+```python
+# exercise_10.py
+
+pairs = [("host", "localhost"), ("port", 8080)]
+config = frozendict(pairs)
+print(config)
+#: frozendict({'host': 'localhost', 'port': 8080})
+connections = {config: "primary"}
+same = frozendict(port=8080, host="localhost")
+print(connections[same])
+#: primary
+try:
+    config["port"] = 9090  # type: ignore
+except TypeError as e:
+    print(e)
+#: 'frozendict' object does not support item assignment
+
+nested = frozendict(tags=["a", "b"])
+try:
+    hash(nested)
+except TypeError as e:
+    print(e)
+#: unhashable type: 'list'
+```
+
+`frozendict` takes the same arguments `dict` does: an iterable of
+two-item pairs, keyword arguments, or another mapping. So `pairs`
+builds the same object `frozendict(host="localhost", port=8080)`
+would.
+
+The lookup with `same` succeeds because a dictionary finds a key by
+hash and equality, never by identity. `config` and `same` are separate
+objects built in different entry orders, but they hold the same pairs,
+so they compare equal and hash the same. That is the property a
+`frozendict` key buys: any equal configuration reaches the same entry,
+whoever built it and whenever.
+
+Assigning to an entry raises a `TypeError` rather than quietly
+succeeding, and the type checker rejects the line too, which is why it
+carries a `# type: ignore`. The runtime exception is the point of the
+listing.
+
+`nested` shows how far the guarantee reaches. A `frozendict` fixes
+which objects it maps its keys to, not what those objects contain, so
+`hash(nested)` has to hash a `list` and fails. The immutability is
+shallow, exactly as it is for the `tuple` in `shallow_immutability.py`.
+`frozendict` is hashable *when its values are*, so keep values
+immutable, a `tuple` here instead of a `list`, whenever the mapping has
+to serve as a key.

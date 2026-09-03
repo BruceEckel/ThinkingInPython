@@ -288,6 +288,215 @@ display_object(Messenger("iris", 12, 3.14))
 The default `display_object()` omits the generated `__init__()`, `__repr__()`,
 and `__eq__()`.
 
+## Comparing Ordinary Classes and Data Classes
+
+`Messenger` shows what `@dataclass` produces,
+but not what adding the decorator changes.
+Four small classes show the difference between a class body that declares fields and one that stores them,
+and go further than [Class Attributes](09_Foundations--Class_Attributes.md) did:
+
+- `A` is an ordinary class with bare annotations.
+- `B` adds default values but no constructor.
+- `C` is a `@dataclass`.
+- `D` adds a `ClassVar` field alongside an ordinary one.
+
+The same helper inspects each one:
+
+```python
+# comparison.py
+from display import REDEFINED_DUNDERS, display_object
+
+def show(obj: object) -> None:
+    display_object(obj, REDEFINED_DUNDERS,
+                   exclude=("__hash__",))
+```
+
+`show()` calls `display_object()` with `REDEFINED_DUNDERS`,
+so each report lists only the dunders a class customizes,
+not the standard machinery every object inherits from `object`.
+For clarity, `show()` also excludes `__hash__` from these reports
+([Data Classes](#data-classes) showed `@dataclass` disabling `__hash__` for `Messenger`).
+
+### `A`: Annotations Only
+
+`A` is the simplest case, with no defaults and no constructor,
+but with field declarations that look like class variables:
+
+```python
+# ordinary_class.py
+from comparison import show
+
+class A:
+    x: int
+    s: str
+
+show(A())
+#: [Attributes]
+#:   None
+#: [Methods]
+#:   None
+
+print(A.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
+```
+
+`A` does not override `__init__`, `__repr__`, `__eq__`, or `__hash__`,
+so every one of them is `object`'s generic version,
+and `show(A())` reports none as redefined.
+
+`x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
+As [Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
+puts it, a bare annotation is a declaration rather than a placeholder.
+It records, in `A.__annotations__`,
+that some future `A` will carry an `x` and an `s`,
+but stores nothing until code assigns a value.
+`A` has no `__init__()` to assign them, so the declaration goes unfulfilled.
+That is why `show(A())` finds nothing: no `x` and no `s` exist to report,
+on the class or on the instance.
+
+### `B`: Class-Level Defaults
+
+`B` adds default values to `x` and `s`.
+The assignments allocate storage,
+so the two turn from bare annotations into class variables:
+
+```python
+# class_with_defaults.py
+from comparison import show
+
+class B:
+    x: int = 42
+    s: str = "Answer"
+
+show(B())
+#: [Attributes]
+#:   • s: str = 'Answer' [CV]
+#:   • x: int = 42 [CV]
+#: [Methods]
+#:   None
+
+print(B.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
+```
+
+The `[CV]` tags in `show(B())` mark both as class variables.
+`B` has no `__init__()` to copy them onto each instance,
+so every `B` object reads the same two values straight from the class attributes.
+
+### `C`: The Same Annotations, Decorated
+
+`C` is `A` decorated with `@dataclass`:
+
+```python
+# plain_dataclass.py
+from dataclasses import dataclass
+from comparison import show
+
+@dataclass
+class C:
+    x: int
+    s: str
+
+show(C(11, "this is C"))
+#: [Attributes]
+#:   • s: str = 'this is C'
+#:   • x: int = 11
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int, s: str) -> None
+#:   • __repr__(self)
+
+print(C.__annotations__)
+#: {'x': <class 'int'>, 's': <class 'str'>}
+```
+
+`show(C(11, "this is C"))` finds the same two names as `show(B())`.
+Neither `x` nor `s` carries `[CV]` this time.
+Because `C` is a `@dataclass`,
+its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
+Each `C` instance owns its own copies from the moment of construction.
+`B` runs nothing like that.
+With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
+tagged `[CV]`, no matter how many `B` instances exist.
+
+`C` starts from the same bare annotations as `A`.
+`@dataclass` reads them to learn what fields exist and in what order,
+then uses that to write `__init__`'s parameter list and the assignments inside it.
+`dataclasses.fields()` reports the field list it recorded.
+`@dataclass` stores nothing on the class:
+`x` is still absent from `C.__dict__` after decoration, as it was before.
+The generated `__init__()` fulfills the declaration when it runs,
+once per instance.
+That is the difference from `A`: not that `@dataclass` changes the annotations,
+but that it builds something to act on them.
+
+### `D`: A Real `ClassVar`
+
+`D` adds a real `ClassVar` alongside an ordinary field:
+
+```python
+# classvar_dataclass.py
+from dataclasses import dataclass
+from typing import ClassVar
+from comparison import show
+
+@dataclass
+class D:
+    x: int = 99
+    s: ClassVar[str] = "Initializer"
+    f: ClassVar[float]  # No initializer
+
+show(D)
+#: [Attributes]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
+#:   • x: int = 99 [CV]
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int = 99) -> None
+#:   • __repr__(self)
+
+show(D())
+#: [Attributes]
+#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
+#:   • x: int = 99
+#: [Methods]
+#:   • __eq__(self, other)
+#:   • __init__(self, x: int = 99) -> None
+#:   • __repr__(self)
+
+for k, v in D.__annotations__.items():
+    print(f"'{k}': {v}")
+#: 'x': <class 'int'>
+#: 's': typing.ClassVar[str]
+#: 'f': typing.ClassVar[float]
+```
+
+`show(D)` tags both attributes `[CV]`,
+since no instance owns either of them yet.
+`show(D())` tags only one,
+and what `@dataclass` generates for each field decides which.
+
+`x` is an ordinary field.
+`__init__()` takes it as a parameter and runs `self.x = x`,
+so each new `D` gets its own copy at construction.
+That is why `show(D())`'s `x: int = 99` carries no tag.
+It now lives in that instance's own `__dict__`, not on the class.
+
+`s`, declared `ClassVar[str]`, behaves differently.
+`@dataclass` treats a `ClassVar` field as belonging to the class,
+not to any instance, and leaves it out of `__init__()`.
+`__init__(self, x: int = 99) -> None` has no `s` parameter,
+so no constructor call can assign one.
+`s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
+
+`f: ClassVar[float]` appears in neither report.
+It has no initializer, so it is a bare annotation,
+as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
+with no value stored anywhere to report.
+`D.f` raises `AttributeError`, for the same reason `A().x` would.
+Assigning a value is what creates the attribute;
+declaring it `ClassVar` creates nothing by itself.
+
 ## Immutability
 
 Passing `frozen=True` makes the data class immutable.
@@ -582,215 +791,6 @@ builds validation and parsing into the type,
 which is especially useful at the edges of a program where untrusted data can enter.
 The principle is the same.
 Make the type guarantee its own values.
-
-## Comparing Ordinary Classes and Data Classes
-
-So far this chapter has used `@dataclass` without opening it up:
-you declare fields and a constructor appears.
-Four small classes show the difference between a class body that declares fields and one that stores them,
-and go further than [Class Attributes](09_Foundations--Class_Attributes.md) did:
-
-- `A` is an ordinary class with bare annotations.
-- `B` adds default values but no constructor.
-- `C` is a `@dataclass`.
-- `D` adds a `ClassVar` field alongside an ordinary one.
-
-The same helper inspects each one:
-
-```python
-# comparison.py
-from display import REDEFINED_DUNDERS, display_object
-
-def show(obj: object) -> None:
-    display_object(obj, REDEFINED_DUNDERS,
-                   exclude=("__hash__",))
-```
-
-`show()` calls `display_object()` with `REDEFINED_DUNDERS`,
-so each report lists only the dunders a class customizes,
-not the standard machinery every object inherits from `object`.
-For clarity, `show()` also excludes `__hash__` from these reports
-([Data Classes](#data-classes) showed `@dataclass` disabling `__hash__` for `Messenger`).
-
-### `A`: Annotations Only
-
-`A` is the simplest case, with no defaults and no constructor,
-but with field declarations that look like class variables:
-
-```python
-# ordinary_class.py
-from comparison import show
-
-class A:
-    x: int
-    s: str
-
-show(A())
-#: [Attributes]
-#:   None
-#: [Methods]
-#:   None
-
-print(A.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
-```
-
-`A` does not override `__init__`, `__repr__`, `__eq__`, or `__hash__`,
-so every one of them is `object`'s generic version,
-and `show(A())` reports none as redefined.
-
-`x` and `s` in `A` are *bare annotations*: declared, but never assigned a value.
-As [Class Attributes](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
-puts it, a bare annotation is a declaration rather than a placeholder.
-It records, in `A.__annotations__`,
-that some future `A` will carry an `x` and an `s`,
-but stores nothing until code assigns a value.
-`A` has no `__init__()` to assign them, so the declaration goes unfulfilled.
-That is why `show(A())` finds nothing: no `x` and no `s` exist to report,
-on the class or on the instance.
-
-### `B`: Class-Level Defaults
-
-`B` adds default values to `x` and `s`.
-The assignments allocate storage,
-so the two turn from bare annotations into class variables:
-
-```python
-# class_with_defaults.py
-from comparison import show
-
-class B:
-    x: int = 42
-    s: str = "Answer"
-
-show(B())
-#: [Attributes]
-#:   • s: str = 'Answer' [CV]
-#:   • x: int = 42 [CV]
-#: [Methods]
-#:   None
-
-print(B.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
-```
-
-The `[CV]` tags in `show(B())` mark both as class variables.
-`B` has no `__init__()` to copy them onto each instance,
-so every `B` object reads the same two values straight from the class attributes.
-
-### `C`: The Same Annotations, Decorated
-
-`C` is `A` decorated with `@dataclass`:
-
-```python
-# plain_dataclass.py
-from dataclasses import dataclass
-from comparison import show
-
-@dataclass
-class C:
-    x: int
-    s: str
-
-show(C(11, "this is C"))
-#: [Attributes]
-#:   • s: str = 'this is C'
-#:   • x: int = 11
-#: [Methods]
-#:   • __eq__(self, other)
-#:   • __init__(self, x: int, s: str) -> None
-#:   • __repr__(self)
-
-print(C.__annotations__)
-#: {'x': <class 'int'>, 's': <class 'str'>}
-```
-
-`show(C(11, "this is C"))` finds the same two names as `show(B())`.
-Neither `x` nor `s` carries `[CV]` this time.
-Because `C` is a `@dataclass`,
-its generated `__init__(self, x: int, s: str) -> None` runs `self.x = x` and `self.s = s` for every new `C`.
-Each `C` instance owns its own copies from the moment of construction.
-`B` runs nothing like that.
-With no `__init__()`, `show(B())` keeps finding `x` and `s` on the class,
-tagged `[CV]`, no matter how many `B` instances exist.
-
-`C` starts from the same bare annotations as `A`.
-`@dataclass` reads them to learn what fields exist and in what order,
-then uses that to write `__init__`'s parameter list and the assignments inside it.
-`dataclasses.fields()` reports the field list it recorded.
-`@dataclass` stores nothing on the class:
-`x` is still absent from `C.__dict__` after decoration, as it was before.
-The generated `__init__()` fulfills the declaration when it runs,
-once per instance.
-That is the difference from `A`: not that `@dataclass` changes the annotations,
-but that it builds something to act on them.
-
-### `D`: A Real `ClassVar`
-
-`D` adds a real `ClassVar` alongside an ordinary field:
-
-```python
-# classvar_dataclass.py
-from dataclasses import dataclass
-from typing import ClassVar
-from comparison import show
-
-@dataclass
-class D:
-    x: int = 99
-    s: ClassVar[str] = "Initializer"
-    f: ClassVar[float]  # No initializer
-
-show(D)
-#: [Attributes]
-#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
-#:   • x: int = 99 [CV]
-#: [Methods]
-#:   • __eq__(self, other)
-#:   • __init__(self, x: int = 99) -> None
-#:   • __repr__(self)
-
-show(D())
-#: [Attributes]
-#:   • s: typing.ClassVar[str] = 'Initializer' [CV]
-#:   • x: int = 99
-#: [Methods]
-#:   • __eq__(self, other)
-#:   • __init__(self, x: int = 99) -> None
-#:   • __repr__(self)
-
-for k, v in D.__annotations__.items():
-    print(f"'{k}': {v}")
-#: 'x': <class 'int'>
-#: 's': typing.ClassVar[str]
-#: 'f': typing.ClassVar[float]
-```
-
-`show(D)` tags both attributes `[CV]`,
-since no instance owns either of them yet.
-`show(D())` tags only one,
-and what `@dataclass` generates for each field decides which.
-
-`x` is an ordinary field.
-`__init__()` takes it as a parameter and runs `self.x = x`,
-so each new `D` gets its own copy at construction.
-That is why `show(D())`'s `x: int = 99` carries no tag.
-It now lives in that instance's own `__dict__`, not on the class.
-
-`s`, declared `ClassVar[str]`, behaves differently.
-`@dataclass` treats a `ClassVar` field as belonging to the class,
-not to any instance, and leaves it out of `__init__()`.
-`__init__(self, x: int = 99) -> None` has no `s` parameter,
-so no constructor call can assign one.
-`s` stays on `D` and keeps its `[CV]` tag no matter how many `D` objects exist.
-
-`f: ClassVar[float]` appears in neither report.
-It has no initializer, so it is a bare annotation,
-as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
-with no value stored anywhere to report.
-`D.f` raises `AttributeError`, for the same reason `A().x` would.
-Assigning a value is what creates the attribute;
-declaring it `ClassVar` creates nothing by itself.
 
 ## Enums Are Types Too
 

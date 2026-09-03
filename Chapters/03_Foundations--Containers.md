@@ -866,3 +866,9 @@ and freeze whichever you pick as soon as it stops changing.
     pull the first element, the last element,
     and everything in between out of `row = [1, 2, 3, 4, 5]`.
     Then explain why `a, b = row` raises a `ValueError` while `a, *b = row` does not.
+10. Build a `frozendict` from the pairs `[("host", "localhost"), ("port", 8080)]`,
+    then use it as a key in a `dict` that maps a configuration to a connection name.
+    Look that value up again with a separately built, equal `frozendict`.
+    Catch the `TypeError` that assigning to one of its entries raises.
+    Finally, build a `frozendict` whose value is a `list`, try to hash it,
+    and explain the result in terms of shallow immutability.

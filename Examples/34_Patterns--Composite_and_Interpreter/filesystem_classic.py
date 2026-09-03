@@ -1,36 +1,55 @@
 # filesystem_classic.py
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import override
 
 class Node(ABC):
-    def __init__(self, name: str) -> None:
-        self.name = name
+    name: str
 
     @abstractmethod
-    def size(self) -> int: ...
+    def disk_usage(self) -> int: ...
 
+    @abstractmethod
+    def walk(self, prefix: str = "") -> Iterator[str]: ...
+
+@dataclass(frozen=True)
 class File(Node):
-    def __init__(self, name: str, byte_count: int) -> None:
-        super().__init__(name)
-        self.byte_count = byte_count
+    name: str
+    size: int
 
     @override
-    def size(self) -> int:
-        return self.byte_count
+    def disk_usage(self) -> int:
+        return self.size
 
+    @override
+    def walk(self, prefix: str = "") -> Iterator[str]:
+        yield prefix + self.name
+
+@dataclass(frozen=True)
 class Directory(Node):
-    def __init__(self, name: str, *entries: Node) -> None:
-        super().__init__(name)
-        self.entries = entries
+    name: str
+    entries: tuple[Node, ...]
 
     @override
-    def size(self) -> int:
-        return sum(e.size() for e in self.entries)
+    def disk_usage(self) -> int:
+        return sum(e.disk_usage() for e in self.entries)
 
-src = Directory(
-    "src", File("main.py", 400), File("util.py", 250))
-root = Directory(
-    "root", File("readme.md", 90), src,
-    File("data.csv", 1200))
-print(root.size(), src.size(), File("lone.txt", 10).size())
+    @override
+    def walk(self, prefix: str = "") -> Iterator[str]:
+        for e in self.entries:
+            yield from e.walk(f"{prefix}{self.name}/")
+
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
+root = Directory("root", (
+    File("readme.md", 90), src, File("data.csv", 1200)))
+print(root.disk_usage(), src.disk_usage(),
+      File("lone.txt", 10).disk_usage())
 #: 1940 650 10
+for path in root.walk():
+    print(path)
+#: root/readme.md
+#: root/src/main.py
+#: root/src/util.py
+#: root/data.csv

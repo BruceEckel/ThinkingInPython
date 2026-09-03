@@ -32,9 +32,7 @@ for kind, items in bins.items():
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
-#: weight of Glass = 10.0
 #: Total value = 2.30
 #: --- Aluminum ---
-#: weight of Aluminum = 30.0
 #: Total value = 50.10
 #: parsed 4, binned 2

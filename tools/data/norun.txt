@@ -26,6 +26,4 @@
 # Tkinter views (the model + tests run and are checked headlessly).
 31_Patterns--State_Machines/tabledriven/vending_view.py
 30_Patterns--Observer/box_view.py
-38_Patterns--Simulation/robot_explorer/maze_view.py
-38_Patterns--Simulation/rats_and_mazes/rats_view.py
 38_Patterns--Simulation/chladni_plate/chladni_view.py

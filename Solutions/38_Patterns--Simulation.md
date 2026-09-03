@@ -587,14 +587,17 @@ never becomes `True`. A one-word change to a class header moves a
 character out of the factory's search and silently substitutes a
 different `Item`.
 
-## 5. Solving the maze instead of hard-coding the solution
+## 5. Sending the robot somewhere other than the `!`
 
 ```python
 # exercise_5.py
 from collections import deque
+from collections.abc import Callable
+from typing import Final
 from robot_world import (
     Edge,
     EndGame,
+    Food,
     GameBuilder,
     Room,
     Teleport,
@@ -602,32 +605,40 @@ from robot_world import (
     Wall,
 )
 
-def landing(room: Room, urge: Urge) -> Room | None:
-    ("Where this door actually leads, "
-     "or None if it's blocked.")
-    next_room = room.doors.open(urge)
-    if isinstance(next_room.occupant, (Wall, Edge)):
-        return None
-    if isinstance(next_room.occupant, Teleport):
-        return next_room.occupant.target_room
-    return next_room
+MOVES: Final[dict[Urge, str]] = {
+    Urge.NORTH: "n", Urge.SOUTH: "s",
+    Urge.EAST: "e", Urge.WEST: "w"}
 
-def solve(builder: GameBuilder) -> str:
-    start = builder.robot.room
-    move_chars = {Urge.NORTH: "n", Urge.SOUTH: "s",
-                  Urge.EAST: "e", Urge.WEST: "w"}
+def landing(room: Room, urge: Urge) -> Room | None:
+    beyond = room.doors.open(urge)
+    if isinstance(beyond.occupant, Wall | Edge):
+        return None
+    if isinstance(beyond.occupant, Teleport):
+        return beyond.occupant.target_room
+    return beyond
+
+def solve(game: GameBuilder,
+          arrived: Callable[[Room], bool]) -> str | None:
+    start = game.robot.room
     queue: deque[tuple[Room, str]] = deque([(start, "")])
-    seen = {id(start)}
+    seen: set[Room] = {start}
     while queue:
         room, path = queue.popleft()
-        if isinstance(room.occupant, EndGame):
+        if arrived(room):
             return path
-        for urge, char in move_chars.items():
-            dest = landing(room, urge)
-            if dest is not None and id(dest) not in seen:
-                seen.add(id(dest))
-                queue.append((dest, path + char))
-    raise ValueError("no path to EndGame found")
+        for urge, char in MOVES.items():
+            beyond = landing(room, urge)
+            if beyond is None or beyond in seen:
+                continue
+            seen.add(beyond)
+            queue.append((beyond, path + char))
+    return None
+
+def food(room: Room) -> bool:
+    return isinstance(room.occupant, Food)
+
+def end(room: Room) -> bool:
+    return isinstance(room.occupant, EndGame)
 
 string_maze = """
 ###############################
@@ -654,25 +665,51 @@ string_maze = """
 """.strip()
 
 game = GameBuilder(string_maze)
-solution = solve(game)
-game.run(solution)
-assert isinstance(game.robot.room.occupant, EndGame)
-print("reached EndGame in", len(solution), "moves")
-#: reached EndGame in 198 moves
+meals = 0
+moves = 0
+while (leg := solve(game, food)) is not None:
+    game.run(leg)
+    meals += 1
+    moves += len(leg)
+last = solve(game, end)
+assert last is not None
+game.run(last)
+moves += len(last)
+print(meals, "meals,", moves, "moves")
+#: 16 meals, 282 moves
+print("finished:", game.robot.finished)
+#: finished: True
 ```
 
-`solve()` is a breadth-first search over `Room` objects, following
-exactly the same `doors.open(urge)` calls `Robot.move()` uses, so it
-never has to know anything about coordinates, only rooms and the
-moves that connect them. It refuses to step through a `Wall` or off
-the `Edge`, and it stops the moment it reaches a room occupied by
-`EndGame`, returning the sequence of move letters that got there.
-Breadth-first search reaches every room by the fewest moves in an
-unweighted graph, so that sequence is the shortest path. `run()`
-expects exactly such a string, the same as the previously hard-coded
-`solution`, so `game.run(solution)` and the assertion that follows
-match `test_robot.py`. Unlike the pre-computed `solution` string, the
-computed one adapts automatically if the maze layout changes.
+`solve()` changes in one place. The `isinstance(room.occupant,
+EndGame)` test becomes `arrived(room)`, a predicate the caller
+supplies. Nothing else in the search knows or cares what it is
+looking for. The `EndGame` version is now one line at the call site,
+`end`, and `food` is another. The other change is the return type.
+The chapter's version raises a `ValueError` when the search runs out
+of rooms, because a maze with no reachable `!` is a broken maze.
+Here, running out of rooms is the ordinary way the food loop ends,
+so `solve()` returns `None` and the walrus in the `while` reads it as
+"nothing left to eat."
+
+The search has to run again after every meal because both of its ends
+move. `Food.interact()` replaces the food with an `Empty()`, so the
+room the robot just arrived at stops being a goal, and the robot's
+own room is now the new start. A single search at the start would
+plan a route to a piece of food and then eat, on the way, some of the
+food it was going to visit later. Re-searching costs almost nothing:
+each search touches at most a few hundred rooms.
+
+Nearest-first does not give the shortest tour that eats everything.
+Choosing the closest food each time is a greedy choice made with no
+view of what comes after it, and the maze punishes that. Two pieces
+of food can sit close together down one dead-end corridor while a
+third sits one step nearer in the opposite direction. Taking the
+single near one first means walking the corridor twice. The shortest
+complete tour is a travelling-salesman problem over the food rooms,
+and its first leg is often not the shortest leg available. What the
+greedy tour does guarantee is that every leg is itself a shortest
+path, which is all breadth-first search promises.
 
 ## 6, 7, and 8: the Chladni plate
 

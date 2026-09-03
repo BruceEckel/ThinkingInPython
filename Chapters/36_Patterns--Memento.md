@@ -367,6 +367,7 @@ generic over the state type
 
 ```python
 # history.py
+from collections.abc import Callable
 
 class History[S]:
     def __init__(self, initial: S) -> None:
@@ -382,6 +383,10 @@ class History[S]:
         self._past.append(self._present)
         self._present = new_state
         self._future.clear()
+
+    def apply(self, edit: Callable[[S], S]) -> S:
+        self.do(edit(self._present))
+        return self._present
 
     def undo(self) -> S:
         self._future.append(self._present)
@@ -402,8 +407,8 @@ class History[S]:
 if __name__ == "__main__":
     from frozen_sketch import Drawing
     history = History(Drawing("Duck"))
-    history.do(history.present.draw("circle"))
-    history.do(history.present.draw("beak"))
+    history.apply(lambda d: d.draw("circle"))
+    history.apply(lambda d: d.draw("beak"))
     print(history.present)
     print(history.undo())
     print(history.redo())
@@ -416,10 +421,19 @@ if __name__ == "__main__":
 because acting after an undo starts a new timeline.
 Redo can no longer reach the states you undid, which is how editors behave.
 `undo()` and `redo()` just shuttle the present between the two stacks.
-Every change must go through `do()`.
-Build a new state from `history.present` and keep it without handing it back,
-and the history omits it; because nothing mutates,
+
+`apply()` exists because `do()` alone leaves work to the caller.
+`do()` takes a finished state,
+so every call site must remember to build that state from `history.present` and then hand the result back.
+Build a new state and keep it without handing it back, and the history omits it.
+Because nothing mutates,
 every other state stays valid and the gap goes unnoticed.
+`apply()` takes the edit instead of its result.
+It reads `present` itself and passes whatever the edit returns straight to `do()`,
+so no call site can forget either half.
+`do()` stays public for a state that arrives from somewhere other than an edit of the present,
+as `history_classic.py` shows below.
+
 `undo()` and `redo()` check no precondition of their own:
 undoing with no past raises `IndexError` from `pop()`.
 `can_undo()` and `can_redo()` exist so callers ask first,
@@ -463,6 +477,12 @@ def test_undo_and_redo() -> None:
     assert history.undo() == 1
     assert history.undo() == 0
     assert history.redo() == 1
+
+def test_apply_edits_the_present() -> None:
+    history = History("a")
+    assert history.apply(lambda s: s + "b") == "ab"
+    assert history.present == "ab"
+    assert history.undo() == "a"
 
 def test_new_action_clears_redo() -> None:
     history = History("a")
@@ -508,15 +528,15 @@ from frozen_sketch import Drawing
 from history import History
 
 history = History(Drawing("Duck"))
-history.do(history.present.draw("circle"))
+history.apply(lambda d: d.draw("circle"))
 checkpoint = history.present
-history.do(history.present.draw("beak"))
-history.do(copy.replace(history.present, title="Goose"))
-history.do(history.present.draw("scribble"))
+history.apply(lambda d: d.draw("beak"))
+history.apply(lambda d: copy.replace(d, title="Goose"))
+history.apply(lambda d: d.draw("scribble"))
 print(history.present)
 #: Goose: circle beak scribble
-history.do(copy.replace(history.present,
-                        strokes=checkpoint.strokes))
+history.apply(lambda d: copy.replace(
+    d, strokes=checkpoint.strokes))
 print(history.present)
 #: Goose: circle
 print(history.undo())
@@ -527,8 +547,10 @@ print(history.undo())
 and naming a past state is the whole trick immutability makes possible.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
-It goes through `do()` like any other action,
+It goes through `apply()` like any other action,
 so the partial restore is undoable, as the last line shows.
+The edit that `apply()` receives is a lambda here rather than a method call,
+because a partial restore combines two states and no single method on `Drawing` does that.
 
 `copy.replace()` is the general version of `dataclasses.replace()`,
 which [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)

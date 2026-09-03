@@ -9,6 +9,12 @@ def test_undo_and_redo() -> None:
     assert history.undo() == 0
     assert history.redo() == 1
 
+def test_apply_edits_the_present() -> None:
+    history = History("a")
+    assert history.apply(lambda s: s + "b") == "ab"
+    assert history.present == "ab"
+    assert history.undo() == "a"
+
 def test_new_action_clears_redo() -> None:
     history = History("a")
     history.do("ab")

@@ -453,70 +453,10 @@ the model-view split of [Observer](30_Patterns--Observer.md#a-visual-example-of-
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
-The harness skips this view, like every windowed view in this book
-(`tools/data/norun.txt` lists all three of this chapter's views):
-
-```python
-# rats_and_mazes/rats_view.py
-import asyncio
-import tkinter as tk
-from typing import Final, override
-from blackboard import Blackboard
-from maze import Coord, Maze
-
-CELL: Final[int] = 26
-
-class RecordingBlackboard(Blackboard):
-    def __init__(self, maze: Maze) -> None:
-        super().__init__(maze)
-        self.order: list[Coord] = []
-
-    @override
-    def claim(self, x: int, y: int) -> bool:
-        claimed = super().claim(x, y)
-        if claimed:
-            self.order.append((x, y))
-        return claimed
-
-def show(layout: str = "amaze.txt",
-         step_ms: int = 60) -> None:
-    maze = Maze.from_file(layout)
-    board = RecordingBlackboard(maze)
-    asyncio.run(board.explore())
-
-    root = tk.Tk()
-    root.title("Rats and Mazes")
-    canvas = tk.Canvas(root, highlightthickness=0,
-                       width=maze.width * CELL,
-                       height=maze.height * CELL)
-    canvas.pack()
-
-    def box(x: int, y: int, color: str) -> None:
-        canvas.create_rectangle(
-            x * CELL, y * CELL,
-            (x + 1) * CELL, (y + 1) * CELL,
-            fill=color, outline="gray")
-
-    for y in range(maze.height):
-        for x in range(maze.width):
-            box(x, y,
-                "white" if maze.is_open(x, y)
-                else "dimgray")
-
-    cells = iter(board.order)
-
-    def step() -> None:
-        cell = next(cells, None)
-        if cell is not None:
-            box(cell[0], cell[1], "palegreen")
-            root.after(step_ms, step)
-
-    step()
-    root.mainloop()
-
-if __name__ == "__main__":
-    show()
-```
+It records that order by subclassing `Blackboard` and overriding `claim()`,
+so the model itself needs no change.
+The code is in `Examples/38_Patterns--Simulation/rats_and_mazes/rats_view.py`.
+The harness skips it, like every windowed view in this book.
 
 Concurrency here is a shape for the code, not a source of speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
@@ -834,20 +774,102 @@ string_maze = """
 #.#___________#___#____.__#___#
 ###############################
 """.strip()
-
-solution = (
-    "sseesssssseennnnnnnneesseesswwsseesswwsswwsseesseeee"
-    "nneesseenneeeesseeeenneennwwnneenneennnnwwwwnnnneess"
-    "eennnnwwwwwwsswweesswwsswwwwsseesseeeesswwwwwwwwwwww"
-    "wwnnnneennnnnnnnnneesssseesssswwsseesswwww"
-)
 ```
 
-Running the demo prints the maze before and after the walk:
+Stage 3 pairs the teleports by target letter.
+The sort by target letter puts each pair of partners side by side.
+`groupby(teleports, key=target)` then walks the sorted rooms in one pass,
+handing each run of matching letters to `pair = list(group)`.
+`assert len(pair) == 2, letter` checks the maze's own promise:
+every target letter marks exactly two rooms, never one, never three.
+A typo that leaves a letter unpaired, or repeats it a third time, fails here,
+at build time, naming the offending letter,
+instead of leaving a `Teleport` whose `target_room` was never set for the robot to step into later.
+The `assert isinstance` lines that follow are for the type checker as much as for safety:
+each proves that the occupant really is a `Teleport` before the code touches `target_room`.
+
+Stage 1 does test types,
+with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
+That is not the type switch polymorphism removes.
+`GameBuilder` still must tell the kinds of item apart, once,
+and the movement code that runs afterward never asks again.
+The `Robot` branch also explains `Room(Empty())`:
+the robot is the one item that does not become an occupant.
+Its cell gets an `Empty` occupant instead,
+so when the robot moves away the room behaves like any other empty room.
+`show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
+
+### Choosing the Path
+
+The robot can now move, but nothing tells it where to go.
+A string of `n`/`s`/`e`/`w` characters would replay a route somebody else worked out.
+Instead the robot searches the room graph for its own.
+
+`solve()` is a breadth-first search over `Room` objects.
+It expands the room reached in the fewest moves first,
+so the first route it finds to the `!` is a shortest one.
+It makes the same `doors.open(urge)` calls `Robot.move()` makes,
+so it never needs coordinates, only rooms and the moves between them.
+Deciding whether a door is passable is `landing()`'s job,
+and it asks the occupant, the way `Room.enter()` does:
+a `Wall` or an `Edge` blocks, a `Teleport` reports the room it throws you to,
+and anything else is the room itself:
+
+```python
+# robot_explorer/solver.py
+from collections import deque
+from typing import Final
+from game import GameBuilder
+from items import Edge, EndGame, Teleport, Urge, Wall
+from world import Room
+
+MOVES: Final[dict[Urge, str]] = {
+    Urge.NORTH: "n", Urge.SOUTH: "s",
+    Urge.EAST: "e", Urge.WEST: "w"}
+
+def landing(room: Room, urge: Urge) -> Room | None:
+    # Where a door leads, or None when it is blocked
+    beyond = room.doors.open(urge)
+    if isinstance(beyond.occupant, Wall | Edge):
+        return None
+    if isinstance(beyond.occupant, Teleport):
+        return beyond.occupant.target_room
+    return beyond
+
+def solve(game: GameBuilder) -> str:
+    start = game.robot.room
+    queue: deque[tuple[Room, str]] = deque([(start, "")])
+    seen: set[Room] = {start}
+    while queue:
+        room, path = queue.popleft()
+        if isinstance(room.occupant, EndGame):
+            return path
+        for urge, char in MOVES.items():
+            beyond = landing(room, urge)
+            if beyond is None or beyond in seen:
+                continue
+            seen.add(beyond)
+            queue.append((beyond, path + char))
+    raise ValueError("No path to the EndGame room")
+```
+
+`seen` holds `Room` objects.
+`Room` defines no `__eq__`,
+so it keeps `object`'s identity comparison and identity hash,
+which is what a graph search wants:
+two rooms holding the same kind of item are still two different places.
+Adding a room to `seen` when it enters the queue, rather than when it leaves,
+keeps a room from entering the queue twice.
+
+Searching changes nothing.
+`solve()` reads doors and occupants and never calls `enter()`,
+so no food is eaten and the robot stays where it started.
+The path it returns is exactly the string `run()` expects:
 
 ```python
 # robot_explorer/robot_demo.py
-from game import GameBuilder, solution, string_maze
+from game import GameBuilder, string_maze
+from solver import solve
 
 game = GameBuilder(string_maze)
 print("start:")
@@ -874,6 +896,9 @@ print(game.show_maze())
 #: #_#_#####_###_#_#_###_###_###_#
 #: #.#___________#___#____.__#___#
 #: ###############################
+solution = solve(game)
+print(len(solution), "moves")
+#: 198 moves
 game.run(solution)
 if game.robot.finished:
     print("Game over!")
@@ -907,45 +932,27 @@ print(game.show_maze())
 
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
-
-Stage 3 pairs the teleports by target letter.
-The sort by target letter puts each pair of partners side by side.
-`groupby(teleports, key=target)` then walks the sorted rooms in one pass,
-handing each run of matching letters to `pair = list(group)`.
-`assert len(pair) == 2, letter` checks the maze's own promise:
-every target letter marks exactly two rooms, never one, never three.
-A typo that leaves a letter unpaired, or repeats it a third time, fails here,
-at build time, naming the offending letter,
-instead of leaving a `Teleport` whose `target_room` was never set for the robot to step into later.
-The `assert isinstance` lines that follow are for the type checker as much as for safety:
-each proves that the occupant really is a `Teleport` before the code touches `target_room`.
-
-Stage 1 does test types,
-with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
-That is not the type switch polymorphism removes.
-`GameBuilder` still must tell the kinds of item apart, once,
-and the movement code that runs afterward never asks again.
-The `Robot` branch also explains `Room(Empty())`:
-the robot is the one item that does not become an occupant.
-Its cell gets an `Empty` occupant instead,
-so when the robot moves away the room behaves like any other empty room.
-`show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
+The teleports are not shortcuts here.
+Make `landing()` refuse them the way it refuses a `Wall`,
+and `solve()` raises a `ValueError`:
+without the teleports no route to the `!` exists at all.
 
 ### Testing the Walk
 
 `show_maze()` renders the maze into a string,
 so a test can check the model without opening a window.
-Build the maze, run the solution,
+Build the maze, search it, walk the result,
 and check that the robot finished on the `!` square:
 
 ```python
 # robot_explorer/test_robot.py
-from game import GameBuilder, solution, string_maze
+from game import GameBuilder, string_maze
 from items import EndGame
+from solver import solve
 
-def test_solution_walks_the_robot_to_the_end() -> None:
+def test_search_walks_the_robot_to_the_end() -> None:
     game = GameBuilder(string_maze)
-    game.run(solution)
+    game.run(solve(game))
     room = game.robot.room
     # Finished on the "!"
     assert isinstance(room.occupant, EndGame)
@@ -964,63 +971,12 @@ def test_walls_block_and_food_is_eaten() -> None:
 ```
 
 That same model drives a graphical view.
-`maze_view.py` imports the maze and the moves,
+`maze_view.py` builds the maze, calls `solve()` for the route,
 draws each room as a colored cell,
-and steps the robot along the solution on a timer.
-The view is the only part that touches the screen.
-
-```python
-# robot_explorer/maze_view.py
-import tkinter as tk
-from typing import Final
-from game import GameBuilder, solution, string_maze
-from items import Urge
-
-CELL: Final[int] = 20
-FILL: Final[dict[str, str]] = {
-    "#": "dimgray", "!": "tomato", ".": "khaki",
-    "_": "white", "R": "royalblue"}
-MOVES: Final[dict[str, Urge]] = {
-    "n": Urge.NORTH, "s": Urge.SOUTH,
-    "e": Urge.EAST, "w": Urge.WEST}
-
-def show(maze: str = string_maze, moves: str = solution,
-         step_ms: int = 80) -> None:
-    game = GameBuilder(maze)
-    rows = maze.splitlines()
-    width = max(len(row) for row in rows)
-    root = tk.Tk()
-    root.title("Robot in a Maze")
-    canvas = tk.Canvas(root, highlightthickness=0,
-                       width=width * CELL,
-                       height=len(rows) * CELL)
-    canvas.pack()
-
-    def draw() -> None:
-        canvas.delete("all")
-        for (row, col), room in game.rooms.items():
-            symbol = ("R" if room is game.robot.room
-                      else str(room.occupant))
-            canvas.create_rectangle(
-                col * CELL, row * CELL,
-                (col + 1) * CELL, (row + 1) * CELL,
-                fill=FILL.get(symbol, "palegreen"),
-                outline="gray")
-
-    queue = list("".join(moves.split()))
-
-    def step() -> None:
-        draw()
-        if queue:
-            game.robot.move(MOVES[queue.pop(0)])
-            root.after(step_ms, step)
-
-    step()
-    root.mainloop()
-
-if __name__ == "__main__":
-    show()
-```
+and steps the robot along that route on a timer.
+The view is the only part that touches the screen,
+and the model neither knows nor cares that it exists.
+The code is in `Examples/38_Patterns--Simulation/robot_explorer/maze_view.py`.
 
 Three ideas from earlier chapters carry the design.
 [Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
@@ -1034,7 +990,8 @@ None of them needs concurrency.
 Two further resources on mazes:
 a survey of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm),
 and Craig Reynolds on [steering behavior for autonomous moving objects](https://www.red3d.com/cwr/steer/),
-which is where a robot that decided its own route would start.
+which is where a robot that steered continuously,
+instead of planning a grid path before it moved, would start.
 
 ## Order from Noise
 
@@ -1365,19 +1322,19 @@ Run it.
     You shouldn't need to touch `item_factory()`, `Room`, or `GameBuilder`.
     Explain why the factory finds your new item on its own,
     and what it does if you derive `Coin` from `Food` instead.
-5.  Compute the solution instead of hard-coding it.
-    Write a function that takes a `GameBuilder` and searches the rooms for a path from the robot's room to the `EndGame` room,
-    the way `flood()` searches maze cells in `test_rats_and_mazes.py`.
-    The room graph has no `is_open()`,
-    so the occupant decides whether a room is passable:
-    refuse any room holding a `Wall` or an `Edge`,
-    and follow a `Teleport` to its target room,
-    since stepping onto one moves the robot.
-    Turning the room path back into `n`/`s`/`e`/`w` means tracking which `Urge` produced each step.
-    Your path comes out the same length as the hard-coded `solution`,
-    which is already a shortest one,
-    so assert only that the robot finishes on the `!` square,
-    as `test_robot.py` does.
+5.  Send the robot to something other than the `!`.
+    `solve()` stops at whatever room holds an `EndGame`,
+    which is the one goal it can express.
+    Replace that test with a `Callable[[Room], bool]` parameter,
+    so the caller says what counts as arriving,
+    and keep `solve()` itself unchanged otherwise.
+    Then use the new parameter to feed the robot:
+    search for the nearest room holding a `Food`, walk there,
+    and repeat until no `Food` remains, then search for the `!` and walk that.
+    Report how many pieces of food the robot ate and how many moves the whole tour took.
+    Two questions the run answers for you.
+    Why does the search have to run again after every meal instead of once at the start?
+    And why does asking for the nearest food each time not produce the shortest tour that eats everything?
 6.  Freeze the plate.
     Run the Chladni view with `MODES` starting at `(2, 2)`.
     Work out what `amplitude()` returns whenever `m == n`,

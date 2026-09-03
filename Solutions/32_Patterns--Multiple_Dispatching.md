@@ -616,24 +616,109 @@ each case the draw. Over two hundred seeds all three kinds win
 `meeting(5)`, so the outcome depends on the random draws each round,
 exactly as it does in a real rock-paper-scissors tournament.
 
-## 9. When the table beats the hard-coded dispatch
+## 9. A table of callables
 
-The table wins whenever the rules themselves are just data: a fixed
-mapping from combination to outcome, with no per-combination logic
-beyond "look up the answer." That describes both
-`paper_scissors_rock_table.py` and this exercise's weapon rankings.
-The hard-coded double dispatch earns its keep only when a specific
-combination needs real code rather than a value. A combination that
-triggers a special effect or consults outside state is too large to
-fit in one table cell.
+```python
+# exercise_9.py
+from collections.abc import Callable
+from enum import StrEnum
+from typing import Final
 
-You can keep the calling code as simple as the object version while
-using a table underneath, the way `paper_scissors_rock.py`'s
-`Item.compete()` and `paper_scissors_rock_table.py`'s `Item.compete()`
-both read as `item1.compete(item2)` at the call site. The table
-changes only what happens *inside* `compete()`: a dictionary lookup
-instead of a chain of `eval_*()` calls. Nothing about how a caller
-uses the object changes.
+class Outcome(StrEnum):
+    WIN = "win"
+    LOSE = "lose"
+    DRAW = "draw"
+
+class Item:
+    def compete(self, item: Item) -> Outcome:
+        # Look the cell up, then call it:
+        return OUTCOME[type(self), type(item)](self, item)
+    def __str__(self) -> str:
+        return type(self).__name__
+
+class Paper(Item):
+    def __init__(self, wet: bool = False) -> None:
+        self.wet = wet
+    def __str__(self) -> str:
+        return "WetPaper" if self.wet else "Paper"
+
+class Scissors(Item):
+    pass
+class Rock(Item):
+    pass
+
+type Cell = Callable[[Item, Item], Outcome]
+
+def always(outcome: Outcome) -> Cell:
+    return lambda item1, item2: outcome
+
+def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
+    if isinstance(item1, Paper) and item1.wet:
+        return Outcome.DRAW  # Too soggy to wrap a rock
+    return Outcome.WIN
+
+OUTCOME: Final[
+    dict[tuple[type[Item], type[Item]], Cell]] = {
+    (Paper, Rock): paper_vs_rock,
+    (Paper, Scissors): always(Outcome.LOSE),
+    (Paper, Paper): always(Outcome.DRAW),
+    (Scissors, Paper): always(Outcome.WIN),
+    (Scissors, Rock): always(Outcome.LOSE),
+    (Scissors, Scissors): always(Outcome.DRAW),
+    (Rock, Scissors): always(Outcome.WIN),
+    (Rock, Paper): always(Outcome.LOSE),
+    (Rock, Rock): always(Outcome.DRAW),
+}
+
+for item1, item2 in [
+    (Paper(), Rock()),
+    (Paper(wet=True), Rock()),
+    (Scissors(), Paper()),
+    (Rock(), Rock()),
+]:
+    print(f"{item1} <--> {item2} : {item1.compete(item2)}")
+#: Paper <--> Rock : win
+#: WetPaper <--> Rock : draw
+#: Scissors <--> Paper : win
+#: Rock <--> Rock : draw
+```
+
+`compete()` changes by one pair of parentheses. It still finds the
+cell with a single probe keyed on both types, and now calls what it
+finds instead of returning it. The call site never learns any of
+this: `item1.compete(item2)` reads exactly as it does in
+`paper_scissors_rock.py`, where three method definitions per class
+stand behind it. That answers the part of the question about keeping
+the syntax of a method call over a table.
+
+`always()` is what keeps the table readable. It returns a closure
+over one `Outcome` that ignores both operands, so the eight
+combinations with a fixed answer stay one line each and still read as
+a table of answers. Only the cell that needs code looks like code.
+
+The `(Paper, Rock)` cell receives both items, so it can consult
+`item1.wet`. That is the first of the two reasons the chapter gives
+for preferring the double-dispatch version: behavior that reads the
+object's own state. A cell holding a function answers it. Whatever
+`Paper.eval_rock()` could have read, `paper_vs_rock()` can read too,
+from the same two objects.
+
+The second reason survives. A subclass still cannot override one
+combination and inherit the rest, because the lookup still matches
+types exactly: an `Origami(Paper)` finds no row at all, callable or
+not, and the fix is to write `Origami`'s rows rather than to override
+one. Changing a cell changes it for every `Item`, since `OUTCOME` is
+one shared dictionary. `paper_scissors_rock_subclass.py`'s
+`DampPaper` gets its exception by overriding `compete()`, and this
+version has nothing to override: `compete()` is defined once on
+`Item`.
+
+One cost comes with the change. `paper_vs_rock()` takes two `Item`s,
+because every cell must, so it recovers `Paper` with an
+`isinstance()` test. That is the type test the chapter warns about in
+the ladder version, and here it sits inside one cell rather than
+running through every class, which is the difference between a test
+you write once and a test every new `Item` forces you to edit.
 
 ## 10. Exercise 8, rebuilt on a table
 

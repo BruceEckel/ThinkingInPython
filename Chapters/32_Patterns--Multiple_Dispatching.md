@@ -387,7 +387,8 @@ comes from languages where a table keyed by a pair of types is awkward to write.
 There, spreading the table across the classes wins.
 Python makes the table cheap,
 so the table is both shorter and easier to maintain.
-A table cell can hold a function, so even elaborate behavior fits the table.
+A table cell can hold a function, so even elaborate behavior fits the table,
+which is what exercise 9 builds.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
@@ -649,7 +650,18 @@ or replacing both dispatches with one lookup in data.
     Now create a `meeting()` method for `Project` that creates groups of `Dwarf`,
     `Elf`, and `Troll` and battles the groups against each other until only members of one group remain.
     These are the "winners."
-9.  This chapter replaces the double dispatching of `paper_scissors_rock.py` with the table lookup of `paper_scissors_rock_table.py`.
-    When is the table lookup more appropriate than hard-coding the dynamic dispatch?
-    Can you keep the syntactic simplicity of the dispatch while using a table underneath?
+9.  The chapter claims that a table cell can hold a function,
+    so even elaborate behavior fits the table.
+    Build that version.
+    In `paper_scissors_rock_table.py`,
+    give every `OUTCOME` cell a `Callable[[Item, Item], Outcome]` in place of its `Outcome`,
+    and have `compete()` call the cell it finds:
+    `OUTCOME[type(self), type(item)](self, item)`.
+    The call site stays `item1.compete(item2)`.
+    Write a helper that wraps a constant `Outcome` in a callable,
+    so the eight unchanged cells stay one line each.
+    Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` cell read it:
+    dry paper wraps the rock and wins, wet paper is too soggy and draws.
+    The chapter gives two reasons for preferring the double-dispatch version.
+    Say which one this change answers, and which one survives it.
 10. Modify Exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.

@@ -4,15 +4,15 @@ from frozen_sketch import Drawing
 from history import History
 
 history = History(Drawing("Duck"))
-history.do(history.present.draw("circle"))
+history.apply(lambda d: d.draw("circle"))
 checkpoint = history.present
-history.do(history.present.draw("beak"))
-history.do(copy.replace(history.present, title="Goose"))
-history.do(history.present.draw("scribble"))
+history.apply(lambda d: d.draw("beak"))
+history.apply(lambda d: copy.replace(d, title="Goose"))
+history.apply(lambda d: d.draw("scribble"))
 print(history.present)
 #: Goose: circle beak scribble
-history.do(copy.replace(history.present,
-                        strokes=checkpoint.strokes))
+history.apply(lambda d: copy.replace(
+    d, strokes=checkpoint.strokes))
 print(history.present)
 #: Goose: circle
 print(history.undo())

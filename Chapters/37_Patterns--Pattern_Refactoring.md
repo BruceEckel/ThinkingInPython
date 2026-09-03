@@ -71,10 +71,7 @@ class Cardboard(Trash):
     value = 0.79
 
 def sum_value(items: list[Trash]) -> float:
-    total = 0.0
-    for t in items:
-        print(f"weight of {type(t).__name__} = {t.weight}")
-        total += t.weight * t.value
+    total = sum(t.weight * t.value for t in items)
     print(f"Total value = {total:.2f}")
     return total
 ```
@@ -108,7 +105,7 @@ Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` builds it.
 `sum_value()` is an ordinary function.
 It reads `t.value` and `t.weight` polymorphically,
-and uses the type only to label the printed line, never to decide what to do.
+and never asks what type a piece is.
 
 The tests confirm that each subclass registers itself,
 `create()` builds one by name, the per-pound values are correct,
@@ -234,34 +231,12 @@ for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
 #: --- Glass ---
-#: weight of Glass = 54.0
-#: weight of Glass = 17.0
-#: weight of Glass = 11.0
-#: weight of Glass = 68.0
-#: weight of Glass = 43.0
-#: weight of Glass = 63.0
-#: weight of Glass = 50.0
-#: weight of Glass = 80.0
 #: Total value = 88.78
 #: --- Paper ---
-#: weight of Paper = 22.0
-#: weight of Paper = 11.0
-#: weight of Paper = 88.0
-#: weight of Paper = 91.0
 #: Total value = 21.20
 #: --- Aluminum ---
-#: weight of Aluminum = 89.0
-#: weight of Aluminum = 76.0
-#: weight of Aluminum = 25.0
-#: weight of Aluminum = 34.0
-#: weight of Aluminum = 27.0
-#: weight of Aluminum = 18.0
-#: weight of Aluminum = 81.0
 #: Total value = 584.50
 #: --- Cardboard ---
-#: weight of Cardboard = 96.0
-#: weight of Cardboard = 44.0
-#: weight of Cardboard = 12.0
 #: Total value = 120.08
 ```
 
@@ -336,10 +311,8 @@ for kind, items in bins.items():
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
-#: weight of Glass = 10.0
 #: Total value = 2.30
 #: --- Aluminum ---
-#: weight of Aluminum = 30.0
 #: Total value = 50.10
 #: parsed 4, binned 2
 ```
@@ -377,34 +350,12 @@ for kind, items in bins.items():
     print(f"--- {kind.__name__} ---")
     sum_value(items)
 #: --- Glass ---
-#: weight of Glass = 54.0
-#: weight of Glass = 17.0
-#: weight of Glass = 11.0
-#: weight of Glass = 68.0
-#: weight of Glass = 43.0
-#: weight of Glass = 63.0
-#: weight of Glass = 50.0
-#: weight of Glass = 80.0
 #: Total value = 88.78
 #: --- Paper ---
-#: weight of Paper = 22.0
-#: weight of Paper = 11.0
-#: weight of Paper = 88.0
-#: weight of Paper = 91.0
 #: Total value = 21.20
 #: --- Aluminum ---
-#: weight of Aluminum = 89.0
-#: weight of Aluminum = 76.0
-#: weight of Aluminum = 25.0
-#: weight of Aluminum = 34.0
-#: weight of Aluminum = 27.0
-#: weight of Aluminum = 18.0
-#: weight of Aluminum = 81.0
 #: Total value = 584.50
 #: --- Cardboard ---
-#: weight of Cardboard = 96.0
-#: weight of Cardboard = 44.0
-#: weight of Cardboard = 12.0
 #: Total value = 120.08
 ```
 
@@ -451,14 +402,10 @@ for kind, items in bins.items():
 binned = sum(len(v) for v in bins.values())
 print(f"parsed {len(pieces)}, binned {binned}")
 #: --- Glass ---
-#: weight of Glass = 10.0
 #: Total value = 2.30
 #: --- Plastic ---
-#: weight of Plastic = 20.0
-#: weight of Plastic = 40.0
 #: Total value = 9.00
 #: --- Aluminum ---
-#: weight of Aluminum = 30.0
 #: Total value = 50.10
 #: parsed 4, binned 4
 ```
@@ -474,31 +421,90 @@ So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
 and the two ordinarily pull against each other:
 that trade is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
-`Trash` should not grow a method for every question the plant learns to ask.
-Recycling instructions, disposal hazards,
-and transport volume are all operations that vary by material,
-and none of them belongs in `trash.py`.
-That claim needs the comparison, not just the assertion.
+
+Here is the requirement that makes the second axis concrete.
+The plant already prints a recycling instruction for each material.
+Now the safety officer wants a disposal hazard printed beside it.
+That is a second operation that varies by material,
+and the obvious home for it is a method on each material class:
+
+```python
+# note_methods.py
+from dataclasses import dataclass
+from typing import ClassVar
+
+@dataclass(frozen=True)
+class Trash:
+    weight: float
+    value: ClassVar[float] = 0.0
+
+    def note(self) -> str:
+        return f"{type(self).__name__}: nothing special"
+
+    # New requirement, so a new method here
+    def hazard(self) -> str:
+        return "none"
+
+class Aluminum(Trash):
+    value = 1.67
+
+    def note(self) -> str:
+        return "Aluminum: crush and bale"
+
+    def hazard(self) -> str:
+        return "sharp edges"
+
+class Glass(Trash):
+    value = 0.23
+
+    def note(self) -> str:
+        return "Glass: sort by color, then crush"
+
+    def hazard(self) -> str:
+        return "sharp edges"
+
+class Cardboard(Trash):
+    value = 0.79
+
+    def note(self) -> str:
+        return "Cardboard: flatten and bundle"
+
+    def hazard(self) -> str:
+        return "none"
+
+materials = [Aluminum, Glass, Cardboard]
+for cls in materials:
+    t = cls(1.0)
+    print(f"{t.note()} | hazard: {t.hazard()}")
+edited = [c for c in materials if "hazard" in c.__dict__]
+print(f"classes edited for one operation: {len(edited)}")
+#: Aluminum: crush and bale | hazard: sharp edges
+#: Glass: sort by color, then crush | hazard: sharp edges
+#: Cardboard: flatten and bundle | hazard: none
+#: classes edited for one operation: 3
+```
+
+Both operations answer correctly, and the cost is the last line.
+One new question cost an edit to all three material classes,
+and the question after it costs three more edits.
+Those edits must happen inside `trash.py`,
+because a method can only be written in its own class body.
+A plant that buys its material classes from a supplier cannot write them at all.
+
+The method form is not a strawman.
 This hierarchy is small and the book owns every subclass,
-so overriding `note()` per subclass is a real option here, not a strawman.
-The method wins when you own the hierarchy and the operations stay few:
+so `note()` on each material is a real option here.
+The method wins while you own the hierarchy and the operations stay few:
 each subclass answers for itself,
 with no separate table to keep in step with the class list.
-`singledispatch` wins once you do not own the hierarchy,
-or once operations start to outnumber materials:
-a fifth operation costs one function under `singledispatch`,
-against one new method on every existing subclass.
-[Visitor](33_Patterns--Visitor.md) is the classic way to add them from outside,
-and it is elaborate.
-In its C++ and Java form a `Visitor` base class declares one overload per material,
-every element grows an `accept()` method,
-and *double dispatch* routes each piece to the correct overload.
-Python has no method overloading, so even writing that down takes work
-(that chapter shows the shape the book's version settles on).
-Visitor exists because Java and C++ cannot add an operation to a class from outside,
-and because their method calls dispatch on one type at a time,
-so reaching the right overload takes two calls.
-In Python, `functools.singledispatch` chooses the implementation by the type of its first argument in one call,
+It loses once you do not own the hierarchy,
+or once operations start to outnumber materials.
+
+[Visitor](33_Patterns--Visitor.md) is the classic escape, and it is elaborate:
+a visitor class, an `accept()` method on every element,
+and double dispatch to reach the right overload,
+all to work around a language that cannot add a method to a class from outside.
+`functools.singledispatch` reaches the same implementation in one call,
 and any module can register an implementation for a new type.
 
 In Python, a single-dispatch function implements *Visitor*:
@@ -544,15 +550,55 @@ Here "no special handling" is a genuine answer, so the fallback earns its keep.
 When no default makes sense,
 the Visitor chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
-Adding another operation that varies by material means writing another single-dispatch function.
+
+Now give the safety officer's question the same treatment.
+It arrives as its own file, and edits no material class:
+
+```python
+# disposal_hazard.py
+from functools import singledispatch
+from trash import Aluminum, Glass, Trash
+
+@singledispatch
+def hazard(t: Trash) -> str:
+    return "none"
+
+@hazard.register
+def _(t: Aluminum) -> str:
+    return "sharp edges"
+
+@hazard.register
+def _(t: Glass) -> str:
+    return "sharp edges"
+
+for cls in Trash.registry.values():
+    print(f"{cls.__name__}: {hazard(cls(1.0))}")
+edited = [c for c in Trash.registry.values()
+          if "hazard" in c.__dict__]
+print(f"classes edited for one operation: {len(edited)}")
+#: Aluminum: sharp edges
+#: Paper: none
+#: Glass: sharp edges
+#: Cardboard: none
+#: classes edited for one operation: 0
+```
+
+The counter reads zero.
+`hazard()` reaches every material through the registry,
+and `trash.py` is the file that did not change.
+A third question and a fourth cost one more file each,
+where `note_methods.py` charges one edit per material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
 Python still has the expression problem.
 It makes both sides of the problem cost a line instead of an edit spread across classes.
 
-Compare this with the classic form: no `Visitor` class,
-no `accept()` method bolted onto every material,
-and no second dispatch to arrange.
+`singledispatch` is for behavior that differs by type.
+The earlier `sum_value()` does the same thing for every type,
+so it stays an ordinary function.
+For an operation that belongs on an object and still varies by type,
+[`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
+provides the same dispatch in method form.
 
 The chapter now holds two kinds of dispatch that disagree about subclasses.
 `bins[type(t)]` keys on the exact class,
@@ -563,13 +609,6 @@ Each is right for its job,
 and the difference is the one [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 draws between a table keyed by class and dispatch that follows inheritance.
 
-`singledispatch` is for behavior that differs by type.
-The earlier `sum_value()` does the same thing for every type,
-so it stays an ordinary function.
-For an operation that belongs on an object and still varies by type,
-[`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
-provides the same dispatch in method form.
-
 ## Choosing the Lightest Construct
 
 Design patterns are about separating things that change from things that stay the same.
@@ -578,11 +617,9 @@ The deeper skill is spotting the *vector of change*
 ([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern)),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
-This chapter met its first vector, new types, through a concrete requirement:
-plastic.
-It introduced the second, new operations,
-by naming the cost directly rather than by breaking a running example.
-Either way, each vector costs a single line at the point of use:
+This chapter met each vector through a concrete requirement:
+plastic for new types, and the disposal hazard for new operations.
+Each vector costs a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
 and one `@recycling_note.register` teaches an existing operation about it.
 Neither is a pattern in the GoF sense.

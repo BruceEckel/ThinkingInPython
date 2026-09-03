@@ -124,6 +124,7 @@ lines-after-imports = 1
 "**/catch_score.py" = ["I001"]
 "**/casts.py" = ["I001"]
 "**/fetch_guarded.py" = ["I001"]
+"**/itertools_selections.py" = ["I001"]
 "**/38_Patterns--Simulation/exercise_4.py" = ["I001"]
 "**/46_Effects--Stateless/exercise_8.py" = ["I001"]
 "**/46_Effects--Stateless/exercise_10.py" = ["I001"]

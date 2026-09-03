@@ -692,41 +692,39 @@ Unlike the tools above,
 so none of them can be infinite: `product(count(1), "AB")` hangs at the call,
 before anything asks for a value.
 
-### `permutations`
+### `permutations` and `combinations` {#permutations-and-combinations}
 
-Every ordering of `r` elements from the iterable.
+Three ways to draw `r` elements from an iterable,
+separated by two questions:
+does order matter, and may an element repeat?
+The same input and the same `r` make the answers comparable:
 
 ```python
-# itertools_permutations.py
-from itertools import permutations
+# itertools_selections.py
+from itertools import (combinations,
+                       combinations_with_replacement,
+                       permutations, product)
 
-print(list(permutations("AB")))
+print(list(permutations("AB", 2)))
 #: [('A', 'B'), ('B', 'A')]
-```
-
-### `combinations`
-
-Every way to choose `r` elements where order does not matter and nothing repeats.
-
-```python
-# itertools_combinations.py
-from itertools import combinations
-
-print(list(combinations("ABC", 2)))
-#: [('A', 'B'), ('A', 'C'), ('B', 'C')]
-```
-
-### `combinations_with_replacement`
-
-Like `combinations()`, but the same element can appear more than once.
-
-```python
-# itertools_combinations_with_replacement.py
-from itertools import combinations_with_replacement
-
+print(list(combinations("AB", 2)))
+#: [('A', 'B')]
 print(list(combinations_with_replacement("AB", 2)))
 #: [('A', 'A'), ('A', 'B'), ('B', 'B')]
+print(list(product("AB", repeat=2)))
+#: [('A', 'A'), ('A', 'B'), ('B', 'A'), ('B', 'B')]
 ```
+
+`permutations()` counts orderings,
+so `AB` and `BA` are two results.
+`combinations()` treats those as the same draw and keeps one,
+which is right when you want each pair of distinct elements once.
+`combinations_with_replacement()` also ignores order,
+but draws from the full input each time,
+which is where `AA` comes from.
+`product()` with `repeat=` fills the fourth corner:
+order matters and elements repeat,
+so all four pairs survive.
 
 ### Composing the Pieces
 

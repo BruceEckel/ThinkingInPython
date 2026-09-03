@@ -32,9 +32,6 @@ class Cardboard(Trash):
     value = 0.79
 
 def sum_value(items: list[Trash]) -> float:
-    total = 0.0
-    for t in items:
-        print(f"weight of {type(t).__name__} = {t.weight}")
-        total += t.weight * t.value
+    total = sum(t.weight * t.value for t in items)
     print(f"Total value = {total:.2f}")
     return total

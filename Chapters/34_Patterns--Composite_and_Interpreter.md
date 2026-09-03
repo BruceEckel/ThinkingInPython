@@ -19,61 +19,81 @@ A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
 The payoff is uniformity.
 
-The traditional version puts the operation in a class hierarchy,
-hand-written constructors and all:
+The traditional version puts each operation inside the node classes,
+under an abstract method on a shared base:
 
 ```python
 # filesystem_classic.py
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import override
 
 class Node(ABC):
-    def __init__(self, name: str) -> None:
-        self.name = name
+    name: str
 
     @abstractmethod
-    def size(self) -> int: ...
+    def disk_usage(self) -> int: ...
 
+    @abstractmethod
+    def walk(self, prefix: str = "") -> Iterator[str]: ...
+
+@dataclass(frozen=True)
 class File(Node):
-    def __init__(self, name: str, byte_count: int) -> None:
-        super().__init__(name)
-        self.byte_count = byte_count
+    name: str
+    size: int
 
     @override
-    def size(self) -> int:
-        return self.byte_count
+    def disk_usage(self) -> int:
+        return self.size
 
+    @override
+    def walk(self, prefix: str = "") -> Iterator[str]:
+        yield prefix + self.name
+
+@dataclass(frozen=True)
 class Directory(Node):
-    def __init__(self, name: str, *entries: Node) -> None:
-        super().__init__(name)
-        self.entries = entries
+    name: str
+    entries: tuple[Node, ...]
 
     @override
-    def size(self) -> int:
-        return sum(e.size() for e in self.entries)
+    def disk_usage(self) -> int:
+        return sum(e.disk_usage() for e in self.entries)
 
-src = Directory(
-    "src", File("main.py", 400), File("util.py", 250))
-root = Directory(
-    "root", File("readme.md", 90), src,
-    File("data.csv", 1200))
-print(root.size(), src.size(), File("lone.txt", 10).size())
+    @override
+    def walk(self, prefix: str = "") -> Iterator[str]:
+        for e in self.entries:
+            yield from e.walk(f"{prefix}{self.name}/")
+
+src = Directory("src", (
+    File("main.py", 400), File("util.py", 250)))
+root = Directory("root", (
+    File("readme.md", 90), src, File("data.csv", 1200)))
+print(root.disk_usage(), src.disk_usage(),
+      File("lone.txt", 10).disk_usage())
 #: 1940 650 10
+for path in root.walk():
+    print(path)
+#: root/readme.md
+#: root/src/main.py
+#: root/src/util.py
+#: root/data.csv
 ```
 
-`Directory.size()` calls `size()` on each entry without knowing whether the entry is a `File` or another `Directory`.
+`Directory.disk_usage()` calls `disk_usage()` on each entry without knowing whether the entry is a `File` or another `Directory`.
 The same call works on the whole tree, on a subtree, and on a single file.
 
-Adding operations exposes the weakness.
-Counting files, finding an entry by name,
-and printing the tree each require a new method in every class.
+Adding a node type is cheap: a plugin writes one class and touches nothing above it.
+Adding an *operation* is what exposes the weakness.
+`walk()` cost a method in every class,
+and counting files or finding an entry by name would each cost another.
 [Visitor](33_Patterns--Visitor.md) exists to solve this problem.
 
 ## A Composite of Data Classes
 
-In Python, define the node types as frozen data classes.
-Name the closed set of alternatives with a union.
-Write each operation as a recursive function that matches on the union:
+Now move the operations out of the classes and change nothing else.
+The nodes keep their fields, a union names the closed set of alternatives,
+and each operation becomes a recursive function that matches on that union:
 
 ```python
 # filesystem.py
@@ -128,50 +148,31 @@ if __name__ == "__main__":
 #: root/data.csv
 ```
 
-`Directory` now takes its entries as one tuple rather than as varargs,
-because `@dataclass` generates `__init__()` from the field declarations,
-and a field is one parameter.
-The tuple keeps the tree immutable.
-A paragraph below says why a `list` would not do.
-
-`Directory` names `Node` before its definition below,
+`Node` is a *recursive* union.
+`Directory` holds a `tuple[Node, ...]`, so the alias names itself through one of its own members,
+and that self-reference is what makes the tree a tree.
+`Directory` mentions `Node` above the `type` statement that defines it,
 which works because Python evaluates annotations and `type` aliases lazily
 (see [Naming Types: The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
+The alias can therefore sit below the classes it unites,
+where it reads as a summary of them rather than as a forward declaration.
+The recursion in the type predicts the recursion everywhere else:
+`Directory` contains `Node`s, so `disk_usage()` and `walk()` call themselves on each entry,
+and each `match` needs one case per member of the union and no more.
 
 `disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
-What changed is where operations live.
+What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
+The classic version made the opposite trade,
+and the pairing has a name: the *expression problem*
+(see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching)).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
-explores the same trade: a closed set of types,
-with each operation gathered in one place.
-The `assert_never()` in each `case _` makes that closed set pay off.
-If you add a `Symlink` class to the `Node` union,
-every function whose `case _` calls `assert_never()` fails type checking,
-because `entry` could be a `Symlink` that no case handles.
-The type checker flags each function that still needs a new case,
-so you cannot forget one.
-For example, adding
-
-```python
-@dataclass(frozen=True)
-class Symlink:
-    name: str
-    target: str
-
-type Node = File | Directory | Symlink
-```
-
-to `filesystem.py` and running `ty check` on it reports:
-
-```text
-error[type-assertion-failure]: Argument does not
-have asserted type `Never`
-```
-
-once for `disk_usage()` and once for `walk()`,
-each error pointing at the function's `assert_never(entry)` that still needs a `Symlink` case.
-Exercise 2 asks you to add the case and decide what it should do.
+works the same split out with shapes,
+including the `assert_never()` in each `case _`:
+add a `Symlink` to the `Node` union,
+and every function whose `case _` calls `assert_never()` fails type checking until it handles one.
+Exercise 2 asks you to do that here, and to decide what a link should weigh.
 
 `walk()` is a generator, so traversing a composite is lazy.
 The `yield from` flattens the recursion into a single stream of paths,

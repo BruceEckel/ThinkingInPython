@@ -1,4 +1,5 @@
 # history.py
+from collections.abc import Callable
 
 class History[S]:
     def __init__(self, initial: S) -> None:
@@ -14,6 +15,10 @@ class History[S]:
         self._past.append(self._present)
         self._present = new_state
         self._future.clear()
+
+    def apply(self, edit: Callable[[S], S]) -> S:
+        self.do(edit(self._present))
+        return self._present
 
     def undo(self) -> S:
         self._future.append(self._present)
@@ -34,8 +39,8 @@ class History[S]:
 if __name__ == "__main__":
     from frozen_sketch import Drawing
     history = History(Drawing("Duck"))
-    history.do(history.present.draw("circle"))
-    history.do(history.present.draw("beak"))
+    history.apply(lambda d: d.draw("circle"))
+    history.apply(lambda d: d.draw("beak"))
     print(history.present)
     print(history.undo())
     print(history.redo())

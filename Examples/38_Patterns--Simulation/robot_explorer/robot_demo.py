@@ -1,5 +1,6 @@
 # robot_explorer/robot_demo.py
-from game import GameBuilder, solution, string_maze
+from game import GameBuilder, string_maze
+from solver import solve
 
 game = GameBuilder(string_maze)
 print("start:")
@@ -26,6 +27,9 @@ print(game.show_maze())
 #: #_#_#####_###_#_#_###_###_###_#
 #: #.#___________#___#____.__#___#
 #: ###############################
+solution = solve(game)
+print(len(solution), "moves")
+#: 198 moves
 game.run(solution)
 if game.robot.finished:
     print("Game over!")
