@@ -21,7 +21,7 @@ The sweep's record and its reasoning live in
 ## Chapter Edit Steps
 
 1. Do an adversarial review of the chapter. Fix everything you can, only present unresolved issues here on the console.
-2. `make rewrite` on that chapter
+2. `make rewrite` on the chapter
 3. Hand-edit the chapter
 4. Run `/bruce-edit-capture` on the chapter
 
