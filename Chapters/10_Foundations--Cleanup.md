@@ -186,10 +186,8 @@ when the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
-Before disabling the collector,
-`self_link()` calls `gc.get_referrers(node)`,
-which lists every object that directly refers to `node`
-without collecting or destroying anything.
+Before disabling the collector, `self_link()` calls `gc.get_referrers(node)`,
+which lists every object that directly refers to `node` without collecting or destroying anything.
 The only referrer is `node` itself, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
 `gc.get_referrers()` is how you find what still holds it,
@@ -303,10 +301,8 @@ except RuntimeError as e:
 `C opened` has no matching `closed`:
 `__init__()` raised before the `with` statement could bind its target,
 so `__exit__()` never ran to release what `__init__()` had already acquired.
-Acquire the resource in `__enter__()` instead of `__init__()`
-when construction itself can fail,
-or wrap the acquisition in its own `try`/`except`
-and release what you already opened before re-raising.
+Acquire the resource in `__enter__()` instead of `__init__()` when construction itself can fail,
+or wrap the acquisition in its own `try`/`except` and release what you already opened before re-raising.
 
 2. `weakref.finalize()`,
    which registers a cleanup callback for an object without giving that callback a reference to the object:
@@ -416,8 +412,8 @@ except TypeError as e:
 #: TypeError
 ```
 
-`__slots__` removes the instance `__dict__` and,
-by default, the `__weakref__` slot along with it,
+`__slots__` removes the instance `__dict__` and, by default,
+the `__weakref__` slot along with it,
 so `finalize()` has nothing to attach a reference to.
 Listing `__weakref__` among the slots opts back in.
 
@@ -492,9 +488,9 @@ where the `__del__()` version waited for interpreter shutdown and its unreliable
 ## The Rule
 
 Never put resource release in `__del__()`.
-The standard library bends that rule only as a diagnostic backstop:
-`io.IOBase` (so every file object) and `socket.socket` each define
-a `__del__()` that closes the resource and raises a `ResourceWarning`,
+The standard library bends that rule only as a diagnostic backstop: `io.IOBase`
+(so every file object)
+and `socket.socket` each define a `__del__()` that closes the resource and raises a `ResourceWarning`,
 catching a forgotten `close()` rather than replacing it:
 
 ```python

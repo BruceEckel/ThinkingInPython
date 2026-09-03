@@ -1621,8 +1621,8 @@ That judgment stays with you.
 `retry()` is also all-or-nothing over the error channel.
 Its body catches every declared error and retries on any of them,
 with no way to name the ones worth another attempt.
-Retrying `research()` with the `WEATHER` feed of [Composing a Program](#composing-a-program) shows the cost:
-a `WEATHER` headline names no known topic,
+Retrying `research()` with the `WEATHER` feed of [Composing a Program](#composing-a-program)
+shows the cost: a `WEATHER` headline names no known topic,
 so `topic_of()` raises `NotInteresting` on every attempt, deterministically,
 and `retry()` cannot tell that failure from one worth retrying.
 Three attempts fetch the headline three times and collect three identical `NotInteresting` errors in the `RetryError`.
@@ -1905,8 +1905,7 @@ which is the description/execution split in table form.
 The rule has a reason, and the reason has a cost.
 `run()` is `asyncio.run(run_async(effect))`,
 building a fresh event loop for the call and tearing it down after.
-Call it from inside a loop already running,
-the shape of any async web handler,
+Call it from inside a loop already running, the shape of any async web handler,
 and `asyncio.run()` raises before your Effect runs at all:
 
 ```python
@@ -1952,7 +1951,8 @@ print(f"run() at least 50x slower: "
 `run_async()` reuses the loop already running and costs almost nothing beyond the Effect itself.
 `run()` pays for a loop's setup and teardown on every call,
 hundreds of times that cost, measured here.
-From synchronous code there is no loop to reuse, so `run()` is the only option and the cost is unavoidable.
+From synchronous code there is no loop to reuse,
+so `run()` is the only option and the cost is unavoidable.
 From inside one, `run_async()` is both the one that works and the one that is fast.
 
 ## Where the Guarantee Stops
@@ -2160,7 +2160,8 @@ The operator set is thin in the same way.
 The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,
 with no exponential backoff and no jitter,
-and `retry()` retries every declared error alike, with no way to name the one worth retrying.
+and `retry()` retries every declared error alike,
+with no way to name the one worth retrying.
 Stateless provides no timeout, no `race`, no fallback combinator,
 and no finalizer, and the missing `race` rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
@@ -2175,7 +2176,8 @@ and that is different from a platform for building distributed systems.
 
 ### 6. `fork()` drops the error channel
 
-[Running Effects in Parallel](#running-effects-in-parallel) named the one restriction `ty` enforces on a forked function:
+[Running Effects in Parallel](#running-effects-in-parallel)
+named the one restriction `ty` enforces on a forked function:
 nothing left to supply.
 It enforces nothing on what that function can fail with.
 Every one of `fork()`'s four overloads accepts an Effect that still declares an error,
@@ -2224,8 +2226,7 @@ with no `try`/`except` around that call,
 so a raised failure crosses the thread boundary as an ordinary exception and surfaces at `wait()`,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(fork(bad))` under `ty` 0.0.77 reports
-`(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(fork(bad))` under `ty` 0.0.77 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.

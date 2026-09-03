@@ -402,7 +402,7 @@ from paper_scissors_rock import Paper, Rock, Scissors
 class DampPaper(Paper):
     def compete(self, item: Any) -> Outcome:
         if isinstance(item, Rock):
-            return Outcome.DRAW  # too soggy to wrap
+            return Outcome.DRAW  # Too soggy to wrap
         return super().compete(item)
 
 print(DampPaper().compete(Rock()))

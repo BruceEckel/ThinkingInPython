@@ -73,8 +73,10 @@ A class declared with `slots=True`
 ([Classes](07_Foundations--Classes.md#properties) shows the trade-off)
 has no instance `__dict__` at all.
 Assigning to a slotted attribute of the same name as a class attribute does not shadow it:
-it raises an `AttributeError` instead, because there is no instance dictionary to write into.
-The rest of this chapter assumes an ordinary class, one with an instance `__dict__`.
+it raises an `AttributeError` instead,
+because there is no instance dictionary to write into.
+The rest of this chapter assumes an ordinary class,
+one with an instance `__dict__`.
 
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
@@ -119,8 +121,7 @@ show(b)  # sell() never touched b
 ```
 
 `sell()` and `show()` share no line of source between them.
-A reader debugging `show(b)`'s surprising `5` has to trace back
-through every earlier call that touched a `Stars` instance,
+A reader debugging `show(b)`'s surprising `5` has to trace back through every earlier call that touched a `Stars` instance,
 because the shadowing happened inside `sell()`,
 a function `show()` never calls and does not import.
 
@@ -385,8 +386,7 @@ the augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 Write the increment through the literal class name, as `class_var.py` does,
 whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)'s
-registry sidesteps this by mutating `Trash.registry` in place,
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)'s registry sidesteps this by mutating `Trash.registry` in place,
 never reassigning it through `cls`.
 
 ## Real Per-Object Defaults

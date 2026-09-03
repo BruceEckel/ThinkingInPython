@@ -424,6 +424,50 @@ You can also stop a `TaskGroup` deliberately.
 `tg.cancel()` (3.15) cancels every task in the group,
 for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
 
+### Bounding a Wait with `asyncio.timeout()`
+
+Every delay in this chapter so far is a fixed `asyncio.sleep()`,
+so nothing has needed a time limit.
+A real network call carries no such guarantee.
+`asyncio.timeout()` (3.11) bounds how long a block of code may run,
+and it composes with `TaskGroup` the way a `with` block composes with anything inside it:
+
+```python
+# async_timeout.py
+import asyncio
+
+async def slow(delay: float) -> str:
+    await asyncio.sleep(delay)
+    return "done"
+
+async def main() -> None:
+    try:
+        async with asyncio.timeout(0.05):
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(slow(0.01))
+                tg.create_task(slow(0.5))
+    except TimeoutError:
+        print("timed out")
+
+asyncio.run(main())
+#: timed out
+```
+
+The group holds a fast task and a slow one.
+`asyncio.timeout()`'s deadline passes well before the slow task's,
+so it cancels the task running `main()`.
+The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
+which cancels both children and re-raises as it exits.
+Because the cancellation traces back to its own deadline,
+`asyncio.timeout()` converts that `CancelledError` into a `TimeoutError` on its way out,
+so the caller sees an ordinary exception instead of a bare cancellation.
+`asyncio.wait_for()` bounds one awaitable the same way;
+[`async_deadlock.py`](#deadlock)
+uses it as an escape hatch so that demo doesn't hang forever.
+`asyncio.timeout()` is the newer, composable form,
+scoping the deadline over an entire block, `TaskGroup` included,
+instead of one call.
+
 ## Overlapping the Waits
 
 `asyncio` runs many tasks on one thread by switching between them at each `await`.
@@ -550,6 +594,63 @@ each stalls the loop for its full duration, so the total is at least their sum.
 `await time.sleep()` raises a `TypeError`,
 since the call returns `None` and `None` is not awaitable:
 another sign that `time.sleep()` is the wrong function here.
+
+### A Real Socket
+
+Every listing so far stands in for network I/O with `asyncio.sleep()`.
+[`async def`, `await`, and the Event Loop](#asyncio-mechanics)
+claimed that a real request "asks the loop to watch a socket for the reply,"
+and every example since has left that claim untested.
+`asyncio.start_server()` and `asyncio.open_connection()` are the real thing,
+a listening socket and a client connecting to it, both on `localhost`:
+
+```python
+# network_io.py
+import asyncio
+
+async def handle_client(
+    reader: asyncio.StreamReader,
+    writer: asyncio.StreamWriter,
+) -> None:
+    line = await reader.readline()
+    writer.write(b"echo: " + line)
+    await writer.drain()
+    writer.close()
+    await writer.wait_closed()
+
+async def request(port: int, message: str) -> str:
+    reader, writer = await asyncio.open_connection(
+        "127.0.0.1", port)
+    writer.write(message.encode() + b"\n")
+    await writer.drain()
+    reply = await reader.readline()
+    writer.close()
+    await writer.wait_closed()
+    return reply.decode().strip()
+
+async def main() -> None:
+    server = await asyncio.start_server(
+        handle_client, "127.0.0.1", 0)
+    port = server.sockets[0].getsockname()[1]
+    async with server:
+        replies = await asyncio.gather(
+            request(port, "a"), request(port, "b"))
+    print(replies)
+
+asyncio.run(main())
+#: ['echo: a', 'echo: b']
+```
+
+`start_server()` opens a listening socket on an OS-assigned port
+(port `0` asks the OS to choose one)
+and hands each new connection to `handle_client()`.
+`open_connection()` opens the client side of that same socket.
+Both awaits suspend their task exactly the way `asyncio.sleep()` did,
+except the wake-up condition is now "the socket has bytes to read," not a timer.
+Two clients connect at once,
+and `gather()` returns their replies in argument order, `a` then `b`,
+the same guarantee `async_mechanics.py` made for sleeps.
+`async with server:` closes the listening socket once both requests finish.
 
 ## Escaping to a Thread
 
@@ -1244,6 +1345,38 @@ At full speed, with no deliberate sleep, the GIL makes this race rare.
 But it never makes it impossible.
 Threads that share mutable state need a lock,
 or a queue like the one in [Coordinating Threads with Queues](#coordinating-threads-with-queues).
+The fix mirrors `async_locks.py`'s: wrap the read, the sleep,
+and the write in a `threading.Lock`:
+
+```python
+# gil_locks.py
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+counter = 0
+lock = threading.Lock()
+
+def increment(count: int) -> None:
+    global counter
+    for _ in range(count):
+        with lock:
+            value = counter  # Read
+            time.sleep(0.000_001)  # Let others run
+            counter = value + 1  # Write back
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    list(pool.map(increment, [50] * 8))
+print(f"lock preserves every update: "
+      f"{counter == 8 * 50}")
+#: lock preserves every update: True
+```
+
+The only change from `gil_race.py` is the `with lock:` block wrapped around the read-modify-write.
+Eight threads still take turns,
+but now no two of them ever read the same value before either writes,
+so `counter` reaches 400 every time,
+the same fix `asyncio.Lock` gave the coroutines in `async_locks.py`.
 
 ### Free Threading
 
@@ -1371,12 +1504,14 @@ The standard solution is a thread-safe queue that hands each item to a single co
 with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
 (the threaded form of `heapq` seen in [Performance](18_Techniques--Performance.md))
-always produces the smallest item:
+always produces the smallest item.
+A live consumer thread calls `get()` and lets the block do the waiting,
+rather than polling whether the queue is empty:
 
 ```python
 # priority_queue.py
 from concurrent.futures import ThreadPoolExecutor
-from queue import PriorityQueue
+from queue import PriorityQueue, ShutDown
 
 type Job = tuple[int, str]  # (priority, description)
 
@@ -1386,44 +1521,58 @@ def enqueue(jobs: list[Job]) -> None:
     for job in jobs:
         tasks.put(job)
 
-with ThreadPoolExecutor(max_workers=2) as pool:
+def consume() -> None:
+    while True:
+        try:
+            print(tasks.get())
+        except ShutDown:
+            return
+
+with ThreadPoolExecutor(max_workers=3) as pool:
     producers = [
         pool.submit(enqueue,
                     [(3, "backup"), (1, "page oncall")]),
         pool.submit(enqueue,
                     [(2, "rotate logs"), (1, "alert")]),
     ]
-for p in producers:
-    p.result()  # Surface any producer failure
-
-while not tasks.empty():
-    print(tasks.get())
+    for p in producers:
+        p.result()  # Surface any producer failure
+    consumer = pool.submit(consume)
+    tasks.shutdown()
+    consumer.result()
 #: (1, 'alert')
 #: (1, 'page oncall')
 #: (2, 'rotate logs')
 #: (3, 'backup')
 ```
 
-The four jobs arrive from two threads in an unpredictable interleaving,
-but the drain comes out in priority order no matter who won each race.
-Collecting the futures and calling `result()` turns a producer's exception into one you can see,
+The four jobs arrive from two threads in an unpredictable interleaving.
+Waiting for both producer futures before submitting the consumer guarantees every job is already in the queue once `consume()` starts,
+so the drain still comes out in priority order no matter who won each race.
+Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
 as [Parallelism](#parallelism)'s third point describes.
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 
-Producers calling `put()` and consumers calling `get()` is how thread pools distribute work.
-`get()` blocks until an item is available, so an idle consumer waits.
+`consume()` calls `get()` in a loop, the way a live consumer should:
+parked there, it costs nothing while it waits,
+and it wakes the instant `put()` adds an item, with no polling in between.
+This listing's queue already holds every job by the time `consume()` starts,
+so its first `get()` returns immediately,
+but the same code runs unchanged whether the queue is empty or already stocked.
 The [Object Pool](15_Techniques--Context_Managers.md#an-object-pool)
 in Context Managers uses the same `Queue` as a throttle.
 
-`while not tasks.empty()` is trustworthy here only because the `with` block already waited for both producers to finish before it exited,
-so nothing can add or remove an item while this loop runs.
-
-That guarantee is specific to this listing.
-While other threads are still adding or removing items,
-`empty()`'s answer can be true the instant it returns and already wrong by the time the loop acts on it.
-A live consumer does not poll `empty()`.
-It calls `get()` directly and lets the block do the waiting.
+A consumer parked in `get()` still needs a way to stop.
+`tasks.shutdown()` (3.13) answers that: once the queue runs empty,
+every blocked or future `get()` raises `queue.ShutDown` instead of waiting forever.
+`consume()` catches it and returns,
+so `consumer.result()` completes instead of hanging.
+Calling `shutdown()` before every item is drained is safe too;
+items already in the queue still come out through `get()` normally,
+and only a `get()` against an empty, shut-down queue raises.
+A `put()` after `shutdown()` raises the same exception immediately,
+which is how a producer discovers that its consumers have already left.
 
 Python provides three queue classes with near-identical interfaces,
 the first two of which already appeared in this chapter:
@@ -1748,19 +1897,19 @@ async def process_price(
     return await loop.run_in_executor(pool,
                                       cpu_price, order)
 
-async def main() -> None:
-    with ProcessPoolExecutor() as pool:
-        async with asyncio.TaskGroup() as tg:
-            tasks = [
-                tg.create_task(io_price(1)),
-                tg.create_task(
-                    asyncio.to_thread(blocking_price, 2)),
-                tg.create_task(process_price(pool, 3)),
-            ]
+async def main(pool: ProcessPoolExecutor) -> None:
+    async with asyncio.TaskGroup() as tg:
+        tasks = [
+            tg.create_task(io_price(1)),
+            tg.create_task(
+                asyncio.to_thread(blocking_price, 2)),
+            tg.create_task(process_price(pool, 3)),
+        ]
     print([t.result() for t in tasks])
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    with ProcessPoolExecutor() as pool:
+        asyncio.run(main(pool))
 ```
 
 Three different backends run inside one `TaskGroup`.
@@ -1773,6 +1922,13 @@ so the printed `[10, 20, 30]` holds one result from each backend.
 The event loop is doing the job it has done all chapter:
 it schedules awaitables, whatever runs underneath, a coroutine, a thread,
 or a process.
+
+`main()` receives an already-built `pool` instead of creating one itself.
+`ProcessPoolExecutor.__enter__` can spawn worker processes,
+and `__exit__` joins them: both are ordinary blocking calls.
+Running either on the thread driving the event loop would freeze every task on it,
+the same failure `blocking_the_loop.py` demonstrated with `time.sleep()`.
+Building the pool before `asyncio.run()` and tearing it down after keeps that cost off the loop entirely.
 
 Each of these two interfaces unifies one small piece of the backends,
 not the whole.
@@ -1905,12 +2061,17 @@ so they stay alive doing nothing.
 The two `tracemalloc` snapshots capture the heap they add.
 The listing reads `threading.stack_size()`, sets it, reads it again,
 then restores it, so the measurement leaves the rest of the program untouched.
+That stack figure is stipulated, not measured:
+`STACK_SIZE` is a constant this listing sets and reads back,
+standing for a common one-mebibyte default,
+not a number the OS reports for a thread it actually ran.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.
 The stack figure is address space set aside whether the thread touches every byte or not.
 The task figure is heap measured by `tracemalloc`.
-The comparison favors tasks over threads by hundreds to one.
+The comparison favors tasks over threads by hundreds to one,
+against that stipulated reservation rather than a measured thread footprint.
 The exact figures move from machine to machine,
 so the listing asserts the two bounds that hold anywhere and prints what it measured under `--numbers`
 (see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)).

@@ -1,7 +1,12 @@
-When this file has been applied, change this file's name so it has a leading
-`~` to indicate completion, and move it to `archive/`.
+**Applied 2026-09-03**, in commits `bd249365` (chapters 01-12),
+`e8d6db51` (13-16, 20-27), `27a738fa` (28-31, 33, 35, 39-41, 45),
+`97803bca` (the dense chapters), and the chapters-18/19-and-cleanup
+commit that follows the archive. 213 of the 252 findings were applied,
+one was declined with a contra-reproduction (chapter 32's Protocol
+suggestion, recorded in `adversarial_undecided.md`), and the 38 that
+need the author's call moved to `adversarial_undecided.md`.
+`make verify` was green before this pass and is green after it.
 
-# Whole-book adversarial review: the findings queue
 
 RECOMMENDATIONS item 1, run 2026-09-02.
 Scope was the one review dimension no prior pass covered: what does not

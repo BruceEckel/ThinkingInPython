@@ -1,31 +1,31 @@
 # heap_vs_hash.py
 import heapq
+import random
 import timeit
 from benchmark import report
 
 n = 10_000
-data = list(range(n, 0, -1))
-print(data[:8])
-#: [10000, 9999, 9998, 9997, 9996, 9995, 9994, 9993]
+data = list(range(n))
+random.seed(0)
+random.shuffle(data)  # Neither side gets a free ride
 
 def heap_min_extractions() -> list[int]:
     heap = data.copy()
     heapq.heapify(heap)
     return [heapq.heappop(heap) for _ in range(100)]
 
-def hash_min_extractions() -> list[int]:
-    remaining = set(data)
-    result = []
-    for _ in range(100):
-        smallest = min(remaining)
-        remaining.remove(smallest)
-        result.append(smallest)
-    return result
+def sorted_min_extractions() -> list[int]:
+    return sorted(data)[:100]
 
-assert heap_min_extractions() == hash_min_extractions()
-t_heap = timeit.timeit(heap_min_extractions, number=50)
-t_hash = timeit.timeit(hash_min_extractions, number=50)
-report(heap=t_heap, repeated_min=t_hash)
-print(f"heap at least 10x faster than min() on a set: "
-      f"{t_heap * 10 < t_hash}")
-#: heap at least 10x faster than min() on a set: True
+assert (heap_min_extractions()
+        == sorted_min_extractions())
+t_heap = min(timeit.repeat(
+    heap_min_extractions, number=50, repeat=5
+))
+t_sorted = min(timeit.repeat(
+    sorted_min_extractions, number=50, repeat=5
+))
+report(heap=t_heap, sorted_slice=t_sorted)
+print(f"heap beats sorted() by 1.5x+ on shuffled "
+      f"data: {t_heap * 1.5 < t_sorted}")
+#: heap beats sorted() by 1.5x+ on shuffled data: True

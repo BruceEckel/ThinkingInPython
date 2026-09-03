@@ -216,11 +216,11 @@ print(MAX_RETRIES, GREETING, HISTORY)
 ```
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
-`HISTORY.append("first")` checks and runs,
-the same as it would on a plain, non-`Final` list.
+`HISTORY.append("first")` checks and runs, the same as it would on a plain,
+non-`Final` list.
 The type checker refuses only an assignment to the name `HISTORY` itself.
-This is the misconception `Final` invites:
-it reads like immutability, and it isn't.
+This is the misconception `Final` invites: it reads like immutability,
+and it isn't.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
@@ -536,8 +536,7 @@ callers content with that answer write nothing,
 and the annotation stays precise.
 
 Drop the default and that meaning goes with it.
-`Queue[T]` carries none,
-so a bare `Queue` annotation leaves `T` unsolved:
+`Queue[T]` carries none, so a bare `Queue` annotation leaves `T` unsolved:
 
 ```python
 # type_defaults_bare.py

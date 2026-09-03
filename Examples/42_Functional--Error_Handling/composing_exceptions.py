@@ -11,7 +11,7 @@ def func_b(i: int) -> int:
     return i
 
 def func_c(i: int) -> int:
-    _ = 1 / (i - 3)  # raises when i == 3
+    _ = 1 / (i - 3)  # Raises when i == 3
     return i
 
 def composed(i: int) -> int:

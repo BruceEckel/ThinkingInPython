@@ -168,8 +168,9 @@ A name that matches `run` exactly is rejected outright:
 `class Hijack` never finishes,
 because letting a subclass replace the anchor would defeat it,
 and `@final` only stops that replacement for the type checker.
-A name that matches a step, `customize1` or `customize2`, is an ordinary override,
-and a name that resembles none of them, like `report()`, is an ordinary new method.
+A name that matches a step, `customize1` or `customize2`,
+is an ordinary override, and a name that resembles none of them,
+like `report()`, is an ordinary new method.
 Both of those pass.
 Only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
@@ -179,12 +180,11 @@ not later when the framework runs and the step silently does nothing.
 Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
-The heuristic cuts the other way too:
-`class Weird` never finishes either,
-because `customized_report()` shares enough letters with `customize2`
-for `get_close_matches` to flag it, even though it is not a typo.
-A team that adopts this check should expect to rename an occasional
-legitimate method, not just catch misspellings for free.
+The heuristic cuts the other way too: `class Weird` never finishes either,
+because `customized_report()` shares enough letters with `customize2` for `get_close_matches` to flag it,
+even though it is not a typo.
+A team that adopts this check should expect to rename an occasional legitimate method,
+not just catch misspellings for free.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,

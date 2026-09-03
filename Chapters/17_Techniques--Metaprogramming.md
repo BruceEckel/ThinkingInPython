@@ -212,8 +212,8 @@ print(type(light) is type(water))
 Each generated class is a real type, not a label.
 `LightOn` and `WaterOff` are both `Event` instances,
 so `isinstance(light, Event)` is `True`,
-but `type(light) is type(water)` is `False`:
-they are distinct subclasses, and `isinstance()` tells them apart.
+but `type(light) is type(water)` is `False`: they are distinct subclasses,
+and `isinstance()` tells them apart.
 The next section shows what a distinct subclass buys: behavior of its own.
 
 The type checker cannot follow a class built by `type()`.
@@ -331,8 +331,7 @@ LightOn 8:00
 
 The schedule names three of the seven declared event types.
 `EventMakers` builds only those three,
-which is the laziness the section promised:
-seven classes declared, three built.
+which is the laziness the section promised: seven classes declared, three built.
 
 `run_events()` puts the type distinction to work.
 It fetches the `RingBell` class through `_event_maker`,
@@ -344,7 +343,8 @@ a generated class doing something a plain string could not.
 Calling `Event(class_name, hour, minute)` directly would still produce the right field values,
 but every entry would share one type,
 and `run_events()` would have no class left to check against.
-The `* ` marker depends on `RingBell` being a distinct class, not just a distinct name.
+The `* ` marker depends on `RingBell` being a distinct class,
+not just a distinct name.
 
 `EventMakers` subclasses `dict` so the laziness is invisible at the call site.
 `Event._event_maker[class_name]` reads as an ordinary lookup,
@@ -473,7 +473,8 @@ so pickle looks for `eager_event_classes.LightOn` and does not find that either,
 and `inspect.getsource()` raises an `OSError` instead.
 Neither generator's classes survive a round trip through `pickle`,
 and neither yields source to `inspect.getsource()`,
-a real cost given that [The `inspect` Module](#the-inspect-module) is a few pages away.
+a real cost given that [The `inspect` Module](#the-inspect-module)
+is a few pages away.
 A class built this way serves the process that built it.
 It is not for storage or introspection.
 
@@ -1264,8 +1265,8 @@ ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
 `textwrap.fill()` wraps `str(error)` so the message fits the page;
 the message itself is Python's, unwrapped.
-It names the fix: `D`'s metaclass, `MetaC`, must be a
-subclass of every base's metaclass, `MetaA` and `MetaB` both.
+It names the fix: `D`'s metaclass, `MetaC`,
+must be a subclass of every base's metaclass, `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
 Both failures have the same shape:
 an inheritance graph that looks legal until you notice what the bases carry with them.

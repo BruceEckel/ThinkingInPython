@@ -332,7 +332,8 @@ asyncio.run(main())
 every open cell connects to the rest of the maze by exactly one path.
 Every rejected `claim()` in the run above is a rat looking back at the cell it just left,
 never two rats reaching for the same open cell.
-On this maze, `claim()`'s atomicity is never tested against two rats, only against one rat's own trail.
+On this maze, `claim()`'s atomicity is never tested against two rats,
+only against one rat's own trail.
 
 ### Contention on a Loop
 
@@ -523,7 +524,8 @@ so the tasks take turns in round robin and the run stays deterministic.
 Nothing runs at the same instant as anything else,
 and no thread or process ever overlaps another,
 so the design buys no throughput a single-threaded worklist would lack.
-A plain stack of frontiers, popped and pushed in a loop, visits the same 139 cells.
+A plain stack of frontiers, popped and pushed in a loop,
+visits the same 139 cells.
 What `asyncio` buys is control flow:
 each rat's own path through the maze stays one `while` loop in `run()`,
 instead of a stack of pending frontiers threaded through one function by hand.
@@ -912,10 +914,9 @@ The sort by target letter puts each pair of partners side by side.
 handing each run of matching letters to `pair = list(group)`.
 `assert len(pair) == 2, letter` checks the maze's own promise:
 every target letter marks exactly two rooms, never one, never three.
-A typo that leaves a letter unpaired, or repeats it a third time,
-fails here, at build time, naming the offending letter,
-instead of leaving a `Teleport` whose `target_room` was never set
-for the robot to step into later.
+A typo that leaves a letter unpaired, or repeats it a third time, fails here,
+at build time, naming the offending letter,
+instead of leaving a `Teleport` whose `target_room` was never set for the robot to step into later.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves that the occupant really is a `Teleport` before the code touches `target_room`.
 
@@ -1210,8 +1211,9 @@ It cannot carry the grain back out.
 The randomness is not fighting the order but producing it.
 The curves themselves are no mystery:
 `amplitude()`'s zero set draws them directly, without simulating a single grain.
-What the run demonstrates is the trap, not the shape:
-blind, uncoordinated steps concentrate onto a curve that no grain, and no line of `step()`, ever names.
+What the run demonstrates is the trap, not the shape: blind,
+uncoordinated steps concentrate onto a curve that no grain,
+and no line of `step()`, ever names.
 
 ### Testing a Random Process
 
@@ -1320,10 +1322,12 @@ The model has a limit worth naming.
 Run it longer and agitation never stops falling:
 a grain moves roughly five orders of magnitude less per step at 20,000 steps than it did at 100.
 The nodal lines keep thinning as long as the plate shakes,
-so their width in any one run is set by how many steps you ran, not by the plate.
+so their width in any one run is set by how many steps you ran,
+not by the plate.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Telling the physics from the rule that models it is exercise 7's job:
-swap `amplitude()`'s formula for a membrane's, and watch which parts of the figure change and which do not.
+swap `amplitude()`'s formula for a membrane's,
+and watch which parts of the figure change and which do not.
 
 When behavior emerges, reading the code is not enough.
 Run it.

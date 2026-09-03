@@ -11,8 +11,8 @@ Fowler's DTO crosses a process or network boundary,
 batching several values into one object to cut round trips.
 The object shape below is the same one,
 whether or not it ever leaves the process:
-[Parallelism](19_Techniques--Concurrency.md#parallelism) pickles arguments
-and return values across a process boundary the same way,
+[Parallelism](19_Techniques--Concurrency.md#parallelism)
+pickles arguments and return values across a process boundary the same way,
 and [Serializing to JSON](12_Techniques--Data_Classes_as_Types.md#serializing-to-json)
 turns one into the wire format for a network call.
 This chapter teaches the object, not the crossing.

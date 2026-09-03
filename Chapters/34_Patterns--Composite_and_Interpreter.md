@@ -170,8 +170,7 @@ have asserted type `Never`
 ```
 
 once for `disk_usage()` and once for `walk()`,
-each error pointing at the function's `assert_never(entry)`
-that still needs a `Symlink` case.
+each error pointing at the function's `assert_never(entry)` that still needs a `Symlink` case.
 Exercise 2 asks you to add the case and decide what it should do.
 
 `walk()` is a generator, so traversing a composite is lazy.
@@ -237,13 +236,11 @@ Representing each construct as a node type turns evaluation into a tree walk.
 In most languages the pattern has a reputation for heaviness,
 because you must write a class per construct and a parser to build the trees.
 Python removes both costs, for one specific case:
-sentences written as Python source,
-with operands that are already nodes.
+sentences written as Python source, with operands that are already nodes.
 Data classes make the node declarations nearly free,
 and operator overloading lets Python's own parser build the trees.
-A GoF Interpreter more often parses a rules file,
-a configuration value, or a query a user types at runtime,
-and none of those arrive as Python source,
+A GoF Interpreter more often parses a rules file, a configuration value,
+or a query a user types at runtime, and none of those arrive as Python source,
 so this technique does not reach them.
 They still need a real parser.
 Here is the complete grammar for a small arithmetic language:
@@ -342,8 +339,7 @@ and a class's own method always wins over one it inherits,
 so that generated `__eq__()` shadows anything `Operators` defines.
 `expr.py` never overloads `==`; the nodes compare by value instead,
 which is what the demo below and its tests rely on.
-A library whose `==` must build a node,
-the way SQLAlchemy's `col == 5` does,
+A library whose `==` must build a node, the way SQLAlchemy's `col == 5` does,
 trades away structural comparison for it (`eq=False` on the dataclass)
 and writes its own `__eq__()`.
 This chapter keeps structural comparison, so its nodes cannot do both.
@@ -410,8 +406,8 @@ which keeps the parameter name out of the variable namespace so an expression ca
 Each recursive call packs a fresh dict from `**env`,
 so evaluating one expression allocates memory proportional to the tree's depth times the number of bound variables,
 on the same deep trees the closing section warns can run thousands of levels.
-`**env` also creates the name collision the `/` exists to close:
-without it, `e` would be an eligible keyword,
+`**env` also creates the name collision the `/` exists to close: without it,
+`e` would be an eligible keyword,
 and `test_e_is_available_as_a_variable()` below confirms the guard works.
 A `dict[str, int]` parameter would pass the same bindings by reference at every call,
 needing neither the `/` nor this explanation.
@@ -544,8 +540,8 @@ if __name__ == "__main__":
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
 `2` and `3` are both `int`, so Python adds them to `5` before any node exists,
 and the fold this section teaches would never fire.
-`Num(2)` is already a node, so `+` dispatches to `Operators.__add__()`
-and builds an `Add` for `simplify()` to fold back down.
+`Num(2)` is already a node,
+so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
 This is the limit of borrowing the host parser:
 an operation builds a node only when at least one operand already is one.
 
@@ -645,8 +641,7 @@ so the walk itself is a loop rather than a recursion.
 The value an interpolation holds is not restricted the same way.
 It can itself be a `Template`,
 built by combining `t`-strings with `+` or by nesting one `t`-string inside another,
-so a walker that only loops over the top level still needs to recurse
-into any value that turns out to be a `Template`.
+so a walker that only loops over the top level still needs to recurse into any value that turns out to be a `Template`.
 Everything else about it is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
@@ -710,8 +705,7 @@ print(values2)
 `outer` interpolates `inner`, another `Template`, rather than a plain value.
 `to_query()` checks for that case and recurses,
 so `inner`'s pieces flatten into the same `sql` string and `values` list,
-instead of leaving a `Template` object sitting in `values2`
-where no database driver could use it.
+instead of leaving a `Template` object sitting in `values2` where no database driver could use it.
 Composing `t`-strings this way builds a nested composite,
 even though iterating any one `Template` stays flat.
 

@@ -201,8 +201,7 @@ two bounds on the library's type variables do that instead.
 and `E` is bound to `Exception`,
 so a class that subclassed both would satisfy each bound at once,
 a case no listing here builds.
-At runtime, `run()`'s driver tells the two apart with
-`case Exception() as error`:
+At runtime, `run()`'s driver tells the two apart with `case Exception() as error`:
 whatever the generator yields that matches `Exception` is a failure,
 and everything else is an Ability request.
 That leaves the second,
@@ -762,8 +761,7 @@ because `holds(material, nailer)` is easy to call four times.
 The two diverge when the dependency sits three calls deep.
 The parameter version then adds two parameters to every function on the path,
 while this version still changes only the row.
-`audit_log.py`'s `greet_all()` is that depth:
-the test calls `greet_all()`,
+`audit_log.py`'s `greet_all()` is that depth: the test calls `greet_all()`,
 `greet_all()` calls `greet_logged()`,
 and `greet_logged()` is where `Need[Log]` and `Need[Console]` are requested.
 Varying the environment there still touches only the row:
@@ -1335,16 +1333,13 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 its entire body is `return asyncio.run(run_async(effect))`.
 Building and tearing down that loop costs something,
 even for an Effect with no `Async` in it.
-One machine measured `run(success(42))` at about
-650 microseconds, against a few hundredths of a microsecond
-for the equivalent plain function call, roughly four orders
-of magnitude apart.
+One machine measured `run(success(42))` at about 650 microseconds,
+against a few hundredths of a microsecond for the equivalent plain function call,
+roughly four orders of magnitude apart.
 That is the cost behind "a synchronous program calls it once,
-at the outermost edge"
-([The Simplest Effect](#the-simplest-effect)):
+at the outermost edge" ([The Simplest Effect](#the-simplest-effect)):
 `test_nailer.py` pays it once per parametrized case,
-which is fine for four rows and worth remembering
-for a much longer parametrized list.
+which is fine for four rows and worth remembering for a much longer parametrized list.
 That has a consequence when you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so you cannot call `run()` from any `async def`:
@@ -1571,10 +1566,9 @@ because `catch()` matches the yielded value before the driver gets it and abando
 A `Handler`, what `supply()` returns
 ([Supplying the Dependency](#supplying-the-dependency)),
 breaks the direct-drive condition above.
-Its loop re-yields an error it cannot handle
-instead of throwing that error back into the Effect it wraps,
-so the driver's `throw()` lands in the `Handler`'s own frame,
-not `guarded()`'s, and the error escapes before the inner `except` runs:
+Its loop re-yields an error it cannot handle instead of throwing that error back into the Effect it wraps,
+so the driver's `throw()` lands in the `Handler`'s own frame, not `guarded()`'s,
+and the error escapes before the inner `except` runs:
 
 ```python
 # handler_blocks_except.py
@@ -1600,12 +1594,12 @@ except KeyError as e:
 #: escaped: KeyError 'Carol'
 ```
 
-`guarded()` here is otherwise the same function, only needing a `Console` it never reaches on this path.
+`guarded()` here is otherwise the same function,
+only needing a `Console` it never reaches on this path.
 Wrapping it in `supply(Console())` is enough to break the `except`.
-`catch_score.py`, ahead in
-[Turning an Error Into a Value](#turning-an-error-into-a-value),
-sits under the identical shape (`supply()` wraps a function `run()` drives) and still works,
-because `catch()` matches the yielded value itself rather than relying on the driver to throw it back in.
+`catch_score.py`, ahead in [Turning an Error Into a Value](#turning-an-error-into-a-value),
+sits under the identical shape (`supply()` wraps a function `run()` drives)
+and still works, because `catch()` matches the yielded value itself rather than relying on the driver to throw it back in.
 
 ## Turning an Error Into a Value
 

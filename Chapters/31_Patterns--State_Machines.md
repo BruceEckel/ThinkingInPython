@@ -717,9 +717,9 @@ while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
 The last two events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
-Both conditions are now true,
-and `too_expensive` sits first in that row's list, so it wins:
-the machine reports `COLLECTING`, as though a dollar more would sell it,
+Both conditions are now true, and `too_expensive` sits first in that row's list,
+so it wins: the machine reports `COLLECTING`,
+as though a dollar more would sell it,
 when the slot is empty and no amount of money would.
 Swap the row order and the same input would report `UNAVAILABLE` instead.
 That is the cost of the ordering rule stated above:
@@ -913,8 +913,7 @@ Everything is in one place, in the same order as the diagram,
 and adding a state or an input is an entry in the table and a method or two.
 The states shrink to `Enum` members with no behavior,
 so that per-state action has no home:
-an action shared by several edges into the same state
-must repeat on every row that leads there,
+an action shared by several edges into the same state must repeat on every row that leads there,
 or route through a helper the table does not provide on its own.
 
 The tell is which you would rather read: one state's transitions,
@@ -923,12 +922,11 @@ A machine small enough to hold in your head goes either way,
 and a machine that arrived as a diagram belongs in the table.
 
 Both designs also cost you a dependency you did not take.
-Mature libraries such as `transitions` and `python-statemachine`
-add guards, callbacks, and hierarchical states
-for the price of an import.
-Reach for one of the two designs here when you cannot take that dependency,
+Mature libraries such as `transitions` and `python-statemachine` add guards,
+callbacks, and hierarchical states for the price of an import.
+Choose one of the two designs here when you cannot take that dependency,
 or want the mechanism visible in your own code.
-Reach for a library once the machine outgrows what a page of code should carry.
+Choose a library once the machine outgrows what a page of code should carry.
 
 ## Exercises
 

@@ -327,8 +327,7 @@ print(count or 10)  # 0 is falsy, so the fallback wins
 
 `repr()` returns a value's unambiguous representation,
 so the empty string shows as `''` and not as blank.
-`Bucket` defines only `__len__()`,
-so `bool()` falls back to it:
+`Bucket` defines only `__len__()`, so `bool()` falls back to it:
 `Bucket(0)` is false and `Bucket(3)` is true.
 
 `and` and `or` short-circuit and return one of their operands,
@@ -544,7 +543,7 @@ Uppercasing and rejecting are small demonstrations;
 builds a full query from the parts the same way.
 
 Keep using f-strings for ordinary output.
-Reach for a t-string only when a consumer must inspect, escape,
+Use a t-string only when a consumer must inspect, escape,
 or reject the interpolated values before they become part of the result,
 the way `safe()` does above.
 

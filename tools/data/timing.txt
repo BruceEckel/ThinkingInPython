@@ -16,6 +16,7 @@
 18_Techniques--Performance/builtin_sum.py
 18_Techniques--Performance/search_comparison.py
 18_Techniques--Performance/vectorize_numpy.py
+18_Techniques--Performance/heap_vs_hash.py
 19_Techniques--Concurrency/to_thread.py
 19_Techniques--Concurrency/io_threads.py
 19_Techniques--Concurrency/gil_threads.py

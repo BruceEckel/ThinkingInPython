@@ -1,5 +1,6 @@
 # robot_world.py
 from enum import Enum, auto
+from itertools import groupby
 from typing import ClassVar, Final, override
 
 class Urge(Enum):
@@ -144,8 +145,10 @@ class GameBuilder:
             return room.occupant.target
 
         teleports.sort(key=target)
-        pairs = iter(teleports)
-        for room1, room2 in zip(pairs, pairs):
+        for letter, group in groupby(teleports, key=target):
+            pair = list(group)
+            assert len(pair) == 2, letter
+            room1, room2 = pair
             assert isinstance(room1.occupant, Teleport)
             assert isinstance(room2.occupant, Teleport)
             room1.occupant.target_room = room2

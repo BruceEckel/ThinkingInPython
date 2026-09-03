@@ -1,8 +1,8 @@
 # Functions
 
 Functions package behavior behind a name and a parameter list.
-This chapter covers defining and calling them: default and keyword
-arguments, scope and `global`, `*args`/`**kwargs`,
+This chapter covers defining and calling them: default and keyword arguments,
+scope and `global`, `*args`/`**kwargs`,
 positional-only and keyword-only parameters, and lambdas.
 
 The `def` keyword defines a function.
@@ -335,9 +335,8 @@ and that is why `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 the same idea one scope in.
 A function that rebinds a global couples every caller to that shared,
-mutable state:
-[Closures](40_Functional--Foundations.md#closures) and
-[Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+mutable state: [Closures](40_Functional--Foundations.md#closures)
+and [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
 both treat a mutable global as the anti-pattern this leads to.
 
 ## Variable Argument Lists
@@ -409,10 +408,9 @@ and `func.__name__` reads the name of whatever function arrived
 (see [Functions as First-Class Objects](40_Functional--Foundations.md#functions-as-first-class-objects)).
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
-Forwarding an arbitrary `**kwargs` can still collide with a name
-the wrapped function already receives.
-If the dictionary being unpacked has a key matching a parameter
-supplied another way, Python raises a `TypeError`:
+Forwarding an arbitrary `**kwargs` can still collide with a name the wrapped function already receives.
+If the dictionary being unpacked has a key matching a parameter supplied another way,
+Python raises a `TypeError`:
 
 ```python
 # forwarding_collision.py
@@ -434,11 +432,11 @@ except TypeError as e:
 #: report() got multiple values for argument 'label'
 ```
 
-`opts` carries a `"label"` key, and `trace()` forwards it as
-`label=`, but `report()` already receives `1`, the first of
-`nums`, as `label` positionally through `func(*args, **kwargs)`.
-The collision surfaces at the call `trace()` makes, not at the
-call into `trace()` itself,
+`opts` carries a `"label"` key, and `trace()` forwards it as `label=`,
+but `report()` already receives `1`, the first of `nums`,
+as `label` positionally through `func(*args, **kwargs)`.
+The collision surfaces at the call `trace()` makes,
+not at the call into `trace()` itself,
 so the wrapper cannot check for it in advance.
 
 ## Positional-Only and Keyword-Only Parameters
@@ -558,9 +556,8 @@ For anything more complicated, write a separate function.
 
 For a key that just reads an index or an attribute,
 `operator.itemgetter`/`attrgetter` name the same operation without a lambda:
-`sorted(words, key=operator.itemgetter(-1))` replaces
-`key=lambda w: w[-1]` above.
-Reach for a lambda when the key needs an expression neither builds.
+`sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` above.
+Write a lambda when the key needs an expression neither builds.
 
 ## Exercises
 

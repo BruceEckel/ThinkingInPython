@@ -155,11 +155,11 @@ print(cubes)
 #: [0, 8, 64]
 ```
 
-`(y := cube_if_even(x))` calls `cube_if_even` once,
-binds its result to `y`, and the `if` tests that same result.
+`(y := cube_if_even(x))` calls `cube_if_even` once, binds its result to `y`,
+and the `if` tests that same result.
 The output expression then reuses `y`.
-Without the walrus, the filter and the output would each need
-their own call, `cube_if_even(x) is not None` and `cube_if_even(x)`,
+Without the walrus, the filter and the output would each need their own call,
+`cube_if_even(x) is not None` and `cube_if_even(x)`,
 computing it twice for every element that passes.
 
 ## Set Comprehensions
@@ -292,8 +292,7 @@ print([x for row in rows for x in row])
 #: [1, 2, 3, 4, 5]
 ```
 
-Get that order backward and `row` is not bound yet
-when Python evaluates the first `for` clause:
+Get that order backward and `row` is not bound yet when Python evaluates the first `for` clause:
 
 ```python
 # flatten_wrong_order.py
@@ -383,8 +382,8 @@ including the ones the filter skips.
 `root.rglob("*.py")` finds the same two files in one line,
 with no explicit walk and no comprehension at all.
 Try `rglob()` first: a glob pattern already says what you want.
-`walk()` earns its place when the filter needs more than a glob pattern
-can express, a file's size or its contents rather than its name, say,
+`walk()` earns its place when the filter needs more than a glob pattern can express,
+a file's size or its contents rather than its name, say,
 or when the comprehension needs the directory structure itself,
 not just the files at the bottom of it.
 

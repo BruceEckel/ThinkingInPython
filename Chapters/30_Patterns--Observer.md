@@ -164,8 +164,7 @@ so subscribing a `list[str]`'s `append` to a `Thermometer` fails the type checke
 not because the pattern demands a base class.
 Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
 works the same and lets one object publish more than one kind of change.
-Event-heavy programs have mature libraries
-(signal/slot systems),
+Event-heavy programs have mature libraries (signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
 An observer returns `None`.
@@ -313,8 +312,7 @@ except RecursionError:
 #: RecursionError
 ```
 
-The setter calls `notify()`,
-the observer writes back through the same setter,
+The setter calls `notify()`, the observer writes back through the same setter,
 and each write calls `notify()` again.
 Making the write conditional on the value changing breaks the cycle:
 
@@ -355,8 +353,7 @@ print(seen)
 so the setter returns before it reaches `notify()` again,
 and the model still notified once.
 The alternative, a re-entry flag set before `notify()` and cleared after,
-works the same way when the write should proceed
-even for a value that hasn't changed.
+works the same way when the write should proceed even for a value that hasn't changed.
 
 ## Observer and I/O
 
@@ -500,10 +497,8 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-This repeats `async_observers.py`'s `Observable`
-rather than importing it,
-because that module's own top-level `asyncio.run(main())`
-would run its thermometer demo again on import.
+This repeats `async_observers.py`'s `Observable` rather than importing it,
+because that module's own top-level `asyncio.run(main())` would run its thermometer demo again on import.
 
 `once` still hears the change it unsubscribes during,
 because `gather()` already holds its coroutine before `once` runs.
@@ -547,11 +542,10 @@ asyncio.run(main())
 ```
 
 `caught` prints the moment `loud()` raises.
-`slow` is still sleeping at that point,
-with nothing left awaiting it,
+`slow` is still sleeping at that point, with nothing left awaiting it,
 and it prints only because `main()` sleeps long enough afterward to let it finish.
-A real caller rarely adds that wait,
-so the orphaned task's work, and any exception it later raises, is easy to lose.
+A real caller rarely adds that wait, so the orphaned task's work,
+and any exception it later raises, is easy to lose.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 which is the async form of the catch-collect-continue that exercise 3 asks for.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,

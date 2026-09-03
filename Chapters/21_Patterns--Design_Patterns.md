@@ -254,7 +254,8 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     The rules interact.
 -   *Liskov Substitution Principle* (LSP):
     a subtype must work anywhere code expects its base type,
-    as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#liskov-substitution) describes.
+    as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#liskov-substitution)
+    describes.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,

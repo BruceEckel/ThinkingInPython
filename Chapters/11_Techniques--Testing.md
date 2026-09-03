@@ -64,8 +64,7 @@ At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs:
 `pytest` cannot import a module that is not there.
 That failure is the point.
-It confirms the test would catch a missing implementation,
-not just a wrong one.
+It confirms the test would catch a missing implementation, not just a wrong one.
 Only now does the implementation appear,
 sized to make every case in the test pass and nothing more:
 
@@ -78,8 +77,7 @@ def is_palindrome(s: str) -> bool:
 The test written first stayed the same.
 Only the code changed to satisfy it.
 That is the design-tool benefit TDD promises:
-the test already said what "done" means
-before any implementation existed to argue otherwise.
+the test already said what "done" means before any implementation existed to argue otherwise.
 
 ## pytest
 
@@ -420,10 +418,8 @@ def test_second_sees_leftover(
 ```
 
 Both tests pass, and that is the problem:
-`test_second_sees_leftover()` only passes
-because `test_first_write()` ran first and left its entry behind.
-Swap the two functions' order in the file
-and `test_second_sees_leftover()` fails,
+`test_second_sees_leftover()` only passes because `test_first_write()` ran first and left its entry behind.
+Swap the two functions' order in the file and `test_second_sees_leftover()` fails,
 since nothing has written `"seen"` yet.
 Keep session fixtures to values nothing modifies, like `bank_name`,
 or to a resource with its own reset,
@@ -635,17 +631,13 @@ and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
 
 Injection is not free.
-The `rng` or `now` parameter must appear
-on every function between the caller and the code that needs it,
-which several calls deep in a real codebase
-means widening a signature all the way up the call stack,
+The `rng` or `now` parameter must appear on every function between the caller and the code that needs it,
+which several calls deep in a real codebase means widening a signature all the way up the call stack,
 or introducing a context object to carry it.
-`monkeypatch` skips that plumbing:
-it patches the name in place,
+`monkeypatch` skips that plumbing: it patches the name in place,
 at the cost of the global, restore-on-teardown patch shown above.
-Reach for injection when the parameter already sits near the boundary.
-Reach for `monkeypatch` when threading it through
-would touch more code than the test is worth.
+Choose injection when the parameter already sits near the boundary.
+Choose `monkeypatch` when threading it through would touch more code than the test is worth.
 
 ### The Clock
 
@@ -786,8 +778,7 @@ it answers with a canned value and records nothing.
 The standard library's `unittest.mock` builds stubs for you,
 along with *mocks* that also record the calls they receive,
 and it turns up in most existing code.
-A `Mock` goes further than a stub:
-it remembers every call it received,
+A `Mock` goes further than a stub: it remembers every call it received,
 so a test can check the call itself, not just what it returned.
 
 ```python
@@ -814,12 +805,10 @@ def test_negative_balance_sends_message() -> None:
         "balance is negative: -5")
 ```
 
-`Mock()` accepts any call and returns another `Mock`
-unless told otherwise,
+`Mock()` accepts any call and returns another `Mock` unless told otherwise,
 recording every call as it goes.
 `assert_called_once_with()` checks two things at once:
-that `send` ran exactly once,
-and that it ran with this exact argument.
+that `send` ran exactly once, and that it ran with this exact argument.
 A plain stub cannot make that check.
 `fake_urlopen()` has no memory of how it was called.
 This book patches with `monkeypatch` and prefers injection where you can change the code,

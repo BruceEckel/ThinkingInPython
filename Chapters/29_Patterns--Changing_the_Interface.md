@@ -17,8 +17,7 @@ When you've got "this", and you need "that", *Adapter* solves the problem.
 The adapter only needs to produce a "that".
 A common real case: a third-party library names its methods `g()` and `h()`,
 your code was written against a `f()`-calling interface,
-and you cannot change either one,
-so an adapter sits between them instead.
+and you cannot change either one, so an adapter sits between them instead.
 The smallest version puts the adaptation in an object of its own:
 
 ```python
@@ -125,8 +124,7 @@ The base version accepts a `WhatIWant`, and the override accepts a `WhatIHave`.
 If you annotate both precisely, a type checker rejects the override outright,
 reporting `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
-Uncomment the commented-out signature above,
-`what_i_have: WhatIHave`,
+Uncomment the commented-out signature above, `what_i_have: WhatIHave`,
 and the checker reports:
 
 ```text
@@ -277,17 +275,14 @@ Facade.start_car()
 #: Engine.start()
 ```
 
-Turning the key primes the pump,
-and priming starts the engine:
-`Ignition` needs `FuelPump`, and `FuelPump` needs `Engine`,
-in that order, or the call sequence is wrong.
+Turning the key primes the pump, and priming starts the engine:
+`Ignition` needs `FuelPump`, and `FuelPump` needs `Engine`, in that order,
+or the call sequence is wrong.
 That is the "confusing collection of classes and interactions,"
-small enough to read in one glance here;
-in real code, wiring three or thirty classes together in the right
-order is exactly the mess a caller should never have to know.
-`Facade.start_car()` hides the wiring and the order behind one call
-that also builds the object, the "static factory method" GoF pairs
-with Façade.
+small enough to read in one glance here; in real code,
+wiring three or thirty classes together in the right order is exactly the mess a caller should never have to know.
+`Facade.start_car()` hides the wiring and the order behind one call that also builds the object,
+the "static factory method" GoF pairs with Façade.
 
 The cleaner Python façade is a *module*.
 A module already presents a curated set of names over whatever tangle of classes lives behind it.
@@ -342,18 +337,15 @@ list of the public names states the same boundary explicitly.
 A façade is an agreement about which names to call, not a lock on the rest.
 A `Facade` class full of static methods only reproduces what a module gives you,
 with more ceremony.
-`checkout.py` is one file;
-a façade that outgrows one file scales the same way, one level up.
-A package's `__init__.py` re-exports a curated set of names
-from private submodules,
+`checkout.py` is one file; a façade that outgrows one file scales the same way,
+one level up.
+A package's `__init__.py` re-exports a curated set of names from private submodules,
 the same underscore convention, applied to modules instead of classes.
 That is the idiomatic place for a façade that fronts a whole subsystem,
-several modules deep,
-GoF's usual case for the pattern.
+several modules deep, GoF's usual case for the pattern.
 
 Façade has a failure mode too.
-An advanced caller who needs a name the façade never exposed
-has two bad options:
+An advanced caller who needs a name the façade never exposed has two bad options:
 reach past the underscore anyway,
 or wait for the façade's author to widen the façade.
 Widen it enough times and it stops simplifying anything;

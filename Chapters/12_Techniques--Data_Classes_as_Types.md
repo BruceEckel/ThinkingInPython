@@ -177,12 +177,11 @@ That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value without constraining it to a set of legal values.
 
 That scattering is a real cost, and sometimes it's still the right one.
-A value that must change in place over its lifetime,
-a counter, a connection's open-or-closed state, a running total,
+A value that must change in place over its lifetime, a counter,
+a connection's open-or-closed state, a running total,
 cannot always be replaced with a fresh instance on every change.
 For those, a validating setter that checks before assigning,
-the fix `f1()` skipped above,
-is the accepted answer: pay DbC's scattering cost,
+the fix `f1()` skipped above, is the accepted answer: pay DbC's scattering cost,
 because the value has to stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
 where a fresh, validated instance replacing the old one is cheap enough.

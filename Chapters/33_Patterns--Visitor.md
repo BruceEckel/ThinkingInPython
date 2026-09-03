@@ -20,7 +20,8 @@ which takes an object from a secondary hierarchy called `Visitor`.
 The visitor's type chooses which `visit()` runs.
 A new `Visitor` subclass that reuses an existing operation costs the primary hierarchy nothing.
 A genuinely new operation is not free;
-[The Price of the Empty Base](#the-price-of-the-empty-base) below shows what it costs in Python:
+[The Price of the Empty Base](#the-price-of-the-empty-base)
+below shows what it costs in Python:
 
 ```python
 # flower_visitors.py

@@ -283,8 +283,7 @@ and the next section shows one that does.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you do dispatch's job by hand.
 A `case _:` wildcard could catch what the named cases miss:
-`case _: raise ValueError(f"unsorted {type(t).__name__}")`
-turns the silent drop into a crash.
+`case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a crash.
 That is worth doing, but it does not remove the flaw.
 Every new material still means editing this `match`,
 where `bins[type(t)]` needs no edit at all.
@@ -464,8 +463,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4
 ```
 
-Every piece reaches a bin, plastic included:
-`parsed 4, binned 4`.
+Every piece reaches a bin, plastic included: `parsed 4, binned 4`.
 Defining `Plastic` is the only change here.
 The sorting loop needed no edit,
 unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
@@ -580,8 +578,8 @@ The deeper skill is spotting the *vector of change*
 ([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern)),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
-This chapter met its first vector, new types,
-through a concrete requirement: plastic.
+This chapter met its first vector, new types, through a concrete requirement:
+plastic.
 It introduced the second, new operations,
 by naming the cost directly rather than by breaking a running example.
 Either way, each vector costs a single line at the point of use:

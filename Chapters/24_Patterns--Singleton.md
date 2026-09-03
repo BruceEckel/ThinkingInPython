@@ -315,8 +315,7 @@ test `_instance` before taking the lock,
 take it when the test finds the object missing, then test again inside.
 The second test is the one note 3 insists on.
 The first exists to skip the lock once the object is there.
-Double-checked locking works,
-but both checks must be exactly right,
+Double-checked locking works, but both checks must be exactly right,
 and a subtle mistake reintroduces the race the lock exists to close.
 That is a bad trade for saving one lock acquisition.
 Eager creation is a better answer when you can build the object at import time:

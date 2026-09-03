@@ -24,16 +24,16 @@ async def process_price(
     return await loop.run_in_executor(pool,
                                       cpu_price, order)
 
-async def main() -> None:
-    with ProcessPoolExecutor() as pool:
-        async with asyncio.TaskGroup() as tg:
-            tasks = [
-                tg.create_task(io_price(1)),
-                tg.create_task(
-                    asyncio.to_thread(blocking_price, 2)),
-                tg.create_task(process_price(pool, 3)),
-            ]
+async def main(pool: ProcessPoolExecutor) -> None:
+    async with asyncio.TaskGroup() as tg:
+        tasks = [
+            tg.create_task(io_price(1)),
+            tg.create_task(
+                asyncio.to_thread(blocking_price, 2)),
+            tg.create_task(process_price(pool, 3)),
+        ]
     print([t.result() for t in tasks])
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    with ProcessPoolExecutor() as pool:
+        asyncio.run(main(pool))

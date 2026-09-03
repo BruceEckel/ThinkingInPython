@@ -198,7 +198,8 @@ so the gap is easy to spot.
 A real call stack usually puts the raise many files away,
 where reading every callee to find it is the tedious,
 error-prone work an Effect Management System replaces.
-Because `slope()` calls `validate()`, `validate()`'s Effect becomes `slope()`'s Effect.
+Because `slope()` calls `validate()`,
+`validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand covers exactly the exceptions you know a callee can raise,
 and knowing every one of them is the tracking problem an Effect Management System exists to solve.
 
@@ -253,7 +254,8 @@ but they push the cost to different places.
 A `Result` makes every caller handle failure explicitly, at every call site,
 but `@safe` catches `Exception` broadly,
 so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug,
-the same cost [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results) names.
+the same cost [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
+names.
 Catching by hand hides the fix inside `slope()`,
 at the cost of a blind spot for an exception nobody thought to catch.
 A restrictive type pays once, at construction,
@@ -573,9 +575,8 @@ print(captured.messages)
 yet each must name both parameters just to pass them to the function below it.
 Nothing propagates automatically.
 If you add a `Log` Effect three levels down,
-you edit every signature on the path:
-`greet()`, `session()`, `menu()`, and `main()`,
-plus the new function that logs, five signatures in all.
+you edit every signature on the path: `greet()`, `session()`, `menu()`,
+and `main()`, plus the new function that logs, five signatures in all.
 Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you still must tell the injector what every function needs,

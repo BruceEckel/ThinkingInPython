@@ -143,9 +143,11 @@ A parameter typed `Memento` does not:
 only code that already imports `Memento` and constructs one correctly can satisfy it,
 so the type checker catches a caretaker that passes the wrong tuple by mistake.
 `frozen=True` makes reassigning `checkpoint.strokes` fail at runtime instead of silently succeeding.
-Neither guarantee stops code holding a `Memento` from reading `.strokes`, unpacking it, or building one by hand;
-that boundary is still a convention, the one the classic pattern always relied on.
-What changes is the accidental case, a caretaker that mixes up a `Memento` with some other tuple:
+Neither guarantee stops code holding a `Memento` from reading `.strokes`,
+unpacking it, or building one by hand; that boundary is still a convention,
+the one the classic pattern always relied on.
+What changes is the accidental case,
+a caretaker that mixes up a `Memento` with some other tuple:
 
 ```python
 # memento_type_safety.py
@@ -184,12 +186,13 @@ except FrozenInstanceError as e:
 #: FrozenInstanceError
 ```
 
-`restore_tuple()` accepts either tuple without complaint, since both are `tuple[str, ...]`.
+`restore_tuple()` accepts either tuple without complaint,
+since both are `tuple[str, ...]`.
 `restore_memento()` accepts the checkpoint,
-and the type checker flags the plain tuple before the program runs;
-run anyway, it fails at the first line that expects `.strokes`.
-Reassigning `checkpoint.strokes` fails too,
-for the same reason: the attribute, not just the tuple inside it, is frozen.
+and the type checker flags the plain tuple before the program runs; run anyway,
+it fails at the first line that expects `.strokes`.
+Reassigning `checkpoint.strokes` fails too, for the same reason: the attribute,
+not just the tuple inside it, is frozen.
 
 ```python
 # test_sketch.py
@@ -284,13 +287,16 @@ print(after.strokes is before.strokes, len(after.strokes))
 
 The two objects share the stroke strings, not the tuple holding them.
 Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
-so one `draw()` costs pointers proportional to the current length of `strokes`, not the whole `Drawing`.
+so one `draw()` costs pointers proportional to the current length of `strokes`,
+not the whole `Drawing`.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
 and interning would make the identity check print `True` even for a copied string.
 
 A single `draw()` is cheap.
-A `History` that keeps every past state is not, once a field grows by accretion the way `strokes` does:
-edit `n` costs `n` pointers, so `k` edits held in `_past` cost `O(k^2)` pointers in total, not `O(k)`.
+A `History` that keeps every past state is not,
+once a field grows by accretion the way `strokes` does:
+edit `n` costs `n` pointers,
+so `k` edits held in `_past` cost `O(k^2)` pointers in total, not `O(k)`.
 
 ```python
 # growth_cost.py
@@ -307,10 +313,10 @@ print(pointers, len(drawing.strokes))
 
 Two thousand edits held in a `History` cost about two million pointers;
 the final `Drawing` alone costs two thousand.
-A field that stays small, or that replaces instead of growing, never reaches this cost.
-For one that grows without bound,
-bound the history's depth (exercise 2 asks for exactly this),
-coalesce edits before they reach `History`,
+A field that stays small, or that replaces instead of growing,
+never reaches this cost.
+For one that grows without bound, bound the history's depth
+(exercise 2 asks for exactly this), coalesce edits before they reach `History`,
 use a persistent structure that shares more than a flat tuple can,
 or fall back to Command-based undo, which stores an edit instead of a state.
 
@@ -347,8 +353,8 @@ def test_replace_carries_other_fields() -> None:
 
 ## The Caretaker: a Generic History
 
-The caretaker needs to know nothing about the states it holds,
-frozen or not: opacity is the pattern's whole point,
+The caretaker needs to know nothing about the states it holds, frozen or not:
+opacity is the pattern's whole point,
 and `History[S]` below works unchanged on the classic `Memento` from `sketch.py`.
 What immutability buys is not opacity, which the classic form always had,
 but freedom from an explicit `save()` and `restore()` at every edit,
@@ -481,8 +487,8 @@ the Command variation that [Function Objects](28_Patterns--Function_Objects.md)
 mentions.
 Command-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
-Try snapshot-based undo first:
-immutable states make one edit inexpensive, as `sharing.py` showed,
+Try snapshot-based undo first: immutable states make one edit inexpensive,
+as `sharing.py` showed,
 and switch to Command once `growth_cost.py`'s `O(k^2)` starts to matter.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}

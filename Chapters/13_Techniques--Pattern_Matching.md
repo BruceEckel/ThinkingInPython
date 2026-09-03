@@ -196,7 +196,8 @@ so the wildcard stays to satisfy the declared return type.
 
 A starred name can appear anywhere in a sequence pattern, not only at the end,
 as long as the pattern has no more than one.
-`last_of()` puts it first: `[*init, last]` binds every element but the last to `init`.
+`last_of()` puts it first:
+`[*init, last]` binds every element but the last to `init`.
 `[first, *middle, last]` would put it in the middle instead,
 binding the two ends by name and everything between them to `middle`.
 
@@ -444,10 +445,8 @@ so it can use the names the pattern bound.
 A false guard moves on to the next `case`, but the names stay bound:
 once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
-`leaky()` shows why that matters:
-`case _:` binds nothing,
-yet `x` still holds `3`,
-left over from the failed guard in the case above it.
+`leaky()` shows why that matters: `case _:` binds nothing,
+yet `x` still holds `3`, left over from the failed guard in the case above it.
 A case that does not rebind a name inherits whatever an earlier,
 failed case left behind.
 A pattern tests shape and equality,
@@ -516,8 +515,7 @@ because `Point` declares its fields that way.
 Matching on a mapping is inherently untyped at the value level,
 even though the shape test itself is precise.
 When the data has a known shape, parse it into a dataclass first,
-then match on the dataclass:
-you keep the shape test and gain the field types.
+then match on the dataclass: you keep the shape test and gain the field types.
 
 ## Patterns Nest
 

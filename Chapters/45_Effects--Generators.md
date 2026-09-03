@@ -582,15 +582,13 @@ g.close()
 #: cleanup
 ```
 
-`g.throw(ValueError("bad input"))` raises that exception
-at the suspended `yield`, inside `worker()`'s frame,
-the same way the `with` block's exception did.
+`g.throw(ValueError("bad input"))` raises that exception at the suspended `yield`,
+inside `worker()`'s frame, the same way the `with` block's exception did.
 `worker()` catches it, prints, and yields again,
 so the generator survives a `throw()` its `except` clause handles.
 `g.close()` raises `GeneratorExit` at the same suspended point.
-`worker()` has no matching `except`,
-so `GeneratorExit` passes through, the `finally` block runs,
-and the generator ends.
+`worker()` has no matching `except`, so `GeneratorExit` passes through,
+the `finally` block runs, and the generator ends.
 Nothing prints the `GeneratorExit` itself,
 because `close()` swallows it once the generator finishes.
 
@@ -618,8 +616,7 @@ except RuntimeError as e:
 
 `close()` expects the generator to stop.
 `stubborn()` instead answers `GeneratorExit` with another `yield`,
-so `close()` raises `RuntimeError: generator ignored GeneratorExit`
-rather than returning quietly.
+so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
 A driver like `task_runner()`, further down,
 must call `close()` on every generator it abandons,
 so this is the failure mode to avoid in a generator meant to be driven by others.
@@ -698,8 +695,8 @@ Each `yield` is a task agreeing to pause so the others can run.
 
 `task_runner()` only ever calls `next()`,
 so it takes turns without answering anything.
-Giving each job a question closes the loop:
-turn-taking and question-answering, together:
+Giving each job a question closes the loop: turn-taking and question-answering,
+together:
 
 ```python
 # task_runner_send.py

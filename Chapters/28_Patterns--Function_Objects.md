@@ -132,8 +132,8 @@ for command in macro:
 #: balance: 200
 ```
 
-`account.deposit` sits in the same list as `alert`,
-a plain function, with no `Command` class in sight.
+`account.deposit` sits in the same list as `alert`, a plain function,
+with no `Command` class in sight.
 Each call still reads and updates `account.balance`,
 the state the bound method carries with it.
 

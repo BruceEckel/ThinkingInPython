@@ -129,8 +129,7 @@ This chapter already writes such tests for guarantees no type checker sees:
 `test_plugged.py` pins down that a getter's copy holds,
 and `test_immutable.py` pins down that a frozen field refuses assignment.
 The same pattern covers substitutability:
-a test written against `Stack`'s contract,
-run against `BoundedStack` too,
+a test written against `Stack`'s contract, run against `BoundedStack` too,
 would have caught `fill()` failing on the third item.
 
 Substitutability is the first thing OOP promised that no tool can check.
@@ -265,8 +264,8 @@ Encapsulation exists only because of mutability.
 If the data cannot change, you have nothing to protect.
 If you freeze it, the whole apparatus disappears.
 That argument covers only the mutation reason for encapsulation.
-A second reason survives freezing:
-representation hiding, so the internal type can change later without breaking callers.
+A second reason survives freezing: representation hiding,
+so the internal type can change later without breaking callers.
 A public frozen field skips that protection too.
 Swap `numbers` from a `tuple` to some other sequence later,
 and every caller that named `tuple` breaks.
@@ -784,8 +783,7 @@ A protocol is *structural*: it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-It has a cost:
-nothing in a class's own source names the protocols it satisfies,
+It has a cost: nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
 They connect pieces without requiring any piece to change.
@@ -803,8 +801,8 @@ Python resolves which version to call with C3 linearization,
 its method resolution order (MRO).
 The choice is deterministic, never ambiguous,
 but a deep hierarchy still makes it easy to lose track of which method runs.
-Protocols avoid the question:
-with no inheritance graph, there is nothing to linearize.
+Protocols avoid the question: with no inheritance graph,
+there is nothing to linearize.
 Satisfying three of them costs nothing more than having the three methods:
 
 ```python
@@ -1181,8 +1179,7 @@ if __name__ == "__main__":
 so no call site can forget to thread it through.
 `account.` also lists every operation the object supports,
 the dot-completion this section opened with.
-This is what "bundling behavior with state" buys:
-one place holds the state,
+This is what "bundling behavior with state" buys: one place holds the state,
 and every method that changes it lives next to it.
 OOP is useful, sometimes.
 But not everywhere, all the time.

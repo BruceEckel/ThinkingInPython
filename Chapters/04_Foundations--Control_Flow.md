@@ -190,8 +190,7 @@ locate(9)
 #: not found
 ```
 
-`locate(3)` finds `3` in the first row,
-`break`s the inner loop,
+`locate(3)` finds `3` in the first row, `break`s the inner loop,
 so its `else` never runs and the outer `break` fires right after.
 `locate(9)` never breaks either loop,
 so both `else` clauses run and `"not found"` prints.
@@ -284,8 +283,8 @@ Changing a container while a `for` loop walks it is the classic control-flow bug
 [Containers](03_Foundations--Containers.md#lists)
 hit it while removing from a list,
 and the two containers you are most likely to mutate this way behave differently.
-The fix below uses a list comprehension,
-[Comprehensions](#comprehensions) later in this chapter,
+The fix below uses a list comprehension, [Comprehensions](#comprehensions)
+later in this chapter,
 to build the filtered list directly instead of mutating in place:
 
 ```python
@@ -409,7 +408,8 @@ Raise your own exception that way when the caller should hear about the bad argu
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
 The optional `finally` always runs, and that makes it the place for cleanup.
-A `return`, `break`, or `continue` inside `finally` swallows any exception in flight,
+A `return`, `break`,
+or `continue` inside `finally` swallows any exception in flight,
 so cleanup code must never contain one:
 
 ```python

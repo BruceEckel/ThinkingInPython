@@ -242,10 +242,8 @@ except ValueError as error:
 so the `ValueError` from cleanup is what the caller sees.
 Python does not discard `original`: it becomes `error.__context__`,
 the same chaining a nested `except` produces.
-A broken cleanup path that hides the real failure
-is one of the most common context-manager bugs in practice,
-so write `__exit__()` methods that only fail
-for reasons worse than the exception they are cleaning up after.
+A broken cleanup path that hides the real failure is one of the most common context-manager bugs in practice,
+so write `__exit__()` methods that only fail for reasons worse than the exception they are cleaning up after.
 
 ## The `__exit__()` Arguments
 
@@ -625,11 +623,10 @@ wrap(["a", "b", "c"])
 `wrap()` finds out how many managers to enter when it runs,
 and a comma-separated `with` cannot express that.
 
-`wrap()` never has a failing entry,
-so `ExitStack`'s own promise, unwinding whatever already entered
-when a later one fails, has not actually run yet.
-Fail the third manager and watch the first two unwind
-while the third's `__exit__()` never runs at all:
+`wrap()` never has a failing entry, so `ExitStack`'s own promise,
+unwinding whatever already entered when a later one fails,
+has not actually run yet.
+Fail the third manager and watch the first two unwind while the third's `__exit__()` never runs at all:
 
 ```python
 # exit_stack_fails.py
@@ -849,8 +846,7 @@ Hand the same pool to several threads,
 and it becomes the throttle that limits concurrent use,
 the way a real database connection pool does.
 Here it is under real contention:
-eight threads share a pool of two connections
-and lease and release two hundred times each.
+eight threads share a pool of two connections and lease and release two hundred times each.
 
 ```python
 # pool_contention.py
@@ -891,8 +887,7 @@ print("pool size after:", pool.available())
 Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` never climbs past two:
-a thread that arrives while the pool is empty
-blocks in `get()` instead of racing past it.
+a thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
 `over capacity` staying `False` is `Queue`'s blocking doing the throttling,
 not the demo assuming it.
 `available()` is a snapshot for the demo, not a synchronization primitive:
@@ -943,8 +938,7 @@ validating an item before lending it out,
 and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
 
 None of those refinements guard the mirror mistake:
-nothing in `Pool` stops a borrower from keeping a reference
-after the `with` block ends,
+nothing in `Pool` stops a borrower from keeping a reference after the `with` block ends,
 then using it once the lease has moved on to someone else.
 The pool hands out the same object again, not a copy,
 so a stale reference and the new borrower's object are one and the same:
@@ -965,11 +959,9 @@ with pool.lease() as second:
 ```
 
 `stale` still points at the `Connection` that `second` now legitimately holds.
-Calling `stale.query()` after the first `with` block ended
-works exactly as if `second` had called it,
+Calling `stale.query()` after the first `with` block ended works exactly as if `second` had called it,
 because they are the same object.
-For a mutable pooled resource,
-that is where corruption comes from:
+For a mutable pooled resource, that is where corruption comes from:
 two borrowers each believe they have exclusive use of one connection.
 Guarding against it takes a wrapper that invalidates the borrower's handle on exit,
 one more refinement the skeleton above leaves out.
@@ -985,7 +977,7 @@ and everything hard about custody lives on the other side of the `yield`.
 Not every setup and teardown pair needs a context manager at all.
 One used exactly once, in one place,
 is often clearest as a plain `try`/`finally` written inline.
-Reach for a manager once you want the `with` syntax at the call site,
+Write a manager once you want the `with` syntax at the call site,
 or once the same setup and teardown needs to be reused elsewhere.
 
 Four forms give you a context manager, once you have decided you want one.

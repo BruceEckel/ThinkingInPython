@@ -77,8 +77,7 @@ and any expression containing it inherits the problem,
 so substitution reasoning stops at the first impure call.
 
 `global` is not the only way to break substitution.
-A function that mutates an argument breaks it too,
-with no global in sight:
+A function that mutates an argument breaks it too, with no global in sight:
 
 ```python
 # mutates_argument.py
@@ -96,8 +95,7 @@ print(cart)
 Each call to `add_item()` returns the same list it was given,
 so substituting the call by that return value looks safe.
 It is not.
-The call also appends to `cart`,
-a change substitution cannot see,
+The call also appends to `cart`, a change substitution cannot see,
 so calling it twice leaves `cart` different from calling it once.
 
 Referential transparency is also what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
@@ -131,8 +129,7 @@ print(f"balance: {balance}")
 ```
 
 Two withdrawals of `30` should leave `balance` at `40`.
-The second call is a cache hit,
-so `withdraw()` never runs a second time,
+The second call is a cache hit, so `withdraw()` never runs a second time,
 and the missing `30` vanishes with no error.
 `lru_cache` trusts every call it wraps to be referentially transparent,
 and nothing in the language checks that trust.
@@ -191,8 +188,8 @@ The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
 The limits above are large enough for the difference to show:
-on the machine that built this book, the serial run took a few seconds
-and the parallel run about half that,
+on the machine that built this book,
+the serial run took a few seconds and the parallel run about half that,
 comfortably clearing the 30% margin the last line checks.
 Smaller limits finish too fast for spawning worker processes to pay for itself,
 so a reader who shrinks the limits back down will watch parallel lose.
@@ -325,11 +322,9 @@ The law is "decoding an encoding returns the original,"
 and it holds for every input the loop tries.
 A property test states what must always be true.
 The machine searches for a counterexample.
-A bare `assert` like this one reports only `AssertionError`
-if the law fails.
+A bare `assert` like this one reports only `AssertionError` if the law fails.
 Python prints the assert's source code, not the value that broke it,
-so finding the failing input means adding a `print()`
-and rerunning by hand.
+so finding the failing input means adding a `print()` and rerunning by hand.
 
 Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,

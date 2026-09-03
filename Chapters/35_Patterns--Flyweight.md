@@ -454,8 +454,7 @@ so `__new__()` must assign to that exact name rather than something like `_symbo
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
-A `match` over `Tile` needs no `case _:` catch-all once every member
-has a case,
+A `match` over `Tile` needs no `case _:` catch-all once every member has a case,
 and leaving one out reports the gap at the type checker,
 before any `Tile` value reaches the code at runtime:
 
@@ -507,12 +506,12 @@ If the set grows without bound,
 use a `WeakValueDictionary` so the pool cannot become a leak.
 Otherwise use a `@cache` factory, which is the least machinery for the job.
 
-These four answers read as an if/elif chain, but the questions behind
-them are independent.
+These four answers read as an if/elif chain,
+but the questions behind them are independent.
 Constructor syntax and leak-safety are separate axes,
 so nothing stops `__new__()` interning from also holding its pool weakly:
-key the `WeakValueDictionary` on the constructor arguments the way
-`interned_color.py` keys `_pool`, the combination Exercise 5 builds.
+key the `WeakValueDictionary` on the constructor arguments the way `interned_color.py` keys `_pool`,
+the combination Exercise 5 builds.
 Combine mechanisms when more than one requirement applies.
 
 ## Flyweights in the Wild

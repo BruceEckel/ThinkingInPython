@@ -318,7 +318,7 @@ def func_b(i: int) -> int:
     return i
 
 def func_c(i: int) -> int:
-    _ = 1 / (i - 3)  # raises when i == 3
+    _ = 1 / (i - 3)  # Raises when i == 3
     return i
 
 def composed(i: int) -> int:
@@ -397,8 +397,7 @@ and exercise 2's `map_error()` is the same idea aimed at the error side.
 
 A second mistake: every step's error type feeds the same `E`.
 `Result[A, E]` names one error type for the whole chain,
-so a step whose `Err` carries a different type
-than an earlier step's widens what the chain actually returns,
+so a step whose `Err` carries a different type than an earlier step's widens what the chain actually returns,
 and the annotation you wrote no longer names that wider type.
 Keep a chain's error type the same at every step,
 or annotate the chain with the union each step can produce.
@@ -510,8 +509,7 @@ Exercise 3 asks you to collect every failure instead of stopping at the first.
 
 Three inputs cost three levels of nesting,
 and the shape gets worse with each one you add.
-[The returns Library](#the-returns-library),
-covered at the end of this chapter,
+[The returns Library](#the-returns-library), covered at the end of this chapter,
 offers do-notation as a flatter alternative to this nesting.
 
 The tests confirm that `combined()` returns the correct value,

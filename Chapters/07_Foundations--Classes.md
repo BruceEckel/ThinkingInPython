@@ -203,8 +203,7 @@ starting with the class itself and ending at `object`.
 `Simple2.__mro__` is `(Simple2, Simple, object)`.
 With a single base class the order is obvious.
 With several, the MRO decides which base supplies a name that more than one of them defines.
-`A` and `B` below both define `show()`,
-and `C` inherits from both:
+`A` and `B` below both define `show()`, and `C` inherits from both:
 
 ```python
 # mro_conflict.py
@@ -226,8 +225,7 @@ C().show()  # A comes first in the MRO
 #: A.show
 ```
 
-`C.__mro__` visits `A` before `B`,
-so `C().show()` runs `A`'s version,
+`C.__mro__` visits `A` before `B`, so `C().show()` runs `A`'s version,
 not `B`'s.
 
 The base-class constructor runs because `Simple2`'s constructor calls it.
@@ -451,15 +449,15 @@ Naming both the property and the backing attribute `radius` reproduces it:
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # calls the setter
+        self.radius = radius  # Calls the setter
 
     @property
     def radius(self):
-        return self.radius  # calls itself again
+        return self.radius  # Calls itself again
 
     @radius.setter
     def radius(self, value):
-        self.radius = value  # calls itself again
+        self.radius = value  # Calls itself again
 
 try:
     Circle(10)
@@ -626,12 +624,10 @@ print(type(r).__name__)
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor produces the right kind of object,
 and a subclass inherits it unchanged.
-`Reading.from_fahrenheit(212)` proves it:
-`cls` is `Reading` there, not `Temperature`,
-so `type(r).__name__` reports `'Reading'`.
+`Reading.from_fahrenheit(212)` proves it: `cls` is `Reading` there,
+not `Temperature`, so `type(r).__name__` reports `'Reading'`.
 Naming the class directly, `return Temperature(...)`,
-would hard-code `Temperature` into every subclass,
-including `Reading`.
+would hard-code `Temperature` into every subclass, including `Reading`.
 
 `is_freezing()` would also work as a module-level function.
 Inside the class it sits where a reader looks for it,

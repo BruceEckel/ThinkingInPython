@@ -2,15 +2,15 @@
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius  # calls the setter
+        self.radius = radius  # Calls the setter
 
     @property
     def radius(self):
-        return self.radius  # calls itself again
+        return self.radius  # Calls itself again
 
     @radius.setter
     def radius(self, value):
-        self.radius = value  # calls itself again
+        self.radius = value  # Calls itself again
 
 try:
     Circle(10)

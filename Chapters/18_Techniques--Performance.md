@@ -47,6 +47,11 @@ which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you need.
 
+For a parallel, CPU-bound workload, the free-threaded build
+([The GIL and Free Threading](19_Techniques--Concurrency.md#the-gil-and-free-threading))
+is the largest platform-level speedup available in 3.15,
+since it removes the lock that otherwise serializes Python bytecode across threads.
+
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, buying new hardware might be a quick win.
 
@@ -131,7 +136,8 @@ Neither one rescues a quadratic algorithm.
 
 [PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
 5% over the interpreter alone for 3.16,
-then 20% for the JIT combined with free threading by 3.17.
+then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#the-gil-and-free-threading)
+by 3.17.
 The PEP calls that the minimum for continuing to develop the JIT inside CPython,
 and even then, turning it on by default would need separate approval from the release manager.
 
@@ -154,25 +160,47 @@ Here's how you run `cProfile` on `my_program.py`:
     uv run python -m cProfile -s cumulative my_program.py
 
 The report is a table, one row per function.
-This one profiles a small script, `prof_demo.py`:
+This one profiles a small script, `prof_demo.py`,
+built with one obvious hot spot and one function called too many times:
 
+```python
+# prof_demo.py
+def helper() -> int:
+    return sum(i * i for i in range(10_000))
+
+def slow() -> None:
+    total = 0
+    for i in range(2_000_000):
+        total += i
+    helper()
+
+if __name__ == "__main__":
+    slow()
+```
+
+Running it under the profiler prints a table like this one
+(the exact times vary by machine, so treat these as one sample run, not a value the book asserts):
+
+    $ uv run python -m cProfile -s cumulative prof_demo.py
        ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-            1    0.000    0.000    0.007    0.007 {built-in method builtins.exec}
-            1    0.000    0.000    0.007    0.007 prof_demo.py:1(<module>)
-            1    0.006    0.006    0.006    0.006 prof_demo.py:1(slow)
-            1    0.000    0.000    0.001    0.001 prof_demo.py:7(helper)
-            1    0.001    0.001    0.001    0.001 {built-in method builtins.sum}
-        10001    0.000    0.000    0.000    0.000 prof_demo.py:8(<genexpr>)
+            1    0.000    0.000    0.077    0.077 {built-in method builtins.exec}
+            1    0.000    0.000    0.077    0.077 prof_demo.py:1(<module>)
+            1    0.074    0.074    0.077    0.077 prof_demo.py:5(slow)
+            1    0.000    0.000    0.003    0.003 prof_demo.py:2(helper)
+            1    0.002    0.002    0.003    0.003 {built-in method builtins.sum}
+        10001    0.001    0.000    0.001    0.000 prof_demo.py:3(<genexpr>)
 
 `tottime` is the time spent inside that function alone.
 `cumtime` adds the time spent in everything it called.
 Sorting by `cumtime` puts `exec` and `<module>` on top, which tells you nothing:
 they call everything, so they contain everything.
-Scan down to the first row where `tottime` is large.
-That is the function to attack.
+Scan down to the first row where `tottime` is large: here, `slow()`.
+That is the function to attack, since its own loop, not anything it calls,
+burns most of the time.
 `ncalls` decides how to attack it:
-the one call burning six milliseconds needs a better algorithm,
-while a row with ten thousand calls and a large `tottime` needs fewer calls rather than a faster body.
+`slow()`'s one call spending most of the total needs a better algorithm,
+while `<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
+where fewer calls would help more than a faster body.
 
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
@@ -719,54 +747,67 @@ For a priority queue shared across threads,
 [Concurrency](19_Techniques--Concurrency.md#coordinating-threads-with-queues)
 shows it in use.
 
-A heap and a hash solve different problems.
-Hashing answers "is this here?" in O(1) but has no notion of order,
-so finding the smallest element still means scanning every item.
-A heap keeps that order updated as you go,
-so pulling the smallest item costs only O(log n),
-no matter how many times you repeat it:
+A heap answers a different question than a hash-based container.
+A `set` tells you whether a value is present in O(1),
+but it knows nothing about order,
+so finding the smallest values still means scanning or sorting every item.
+A heap keeps the smallest item at hand as you push and pop,
+so pulling it costs only O(log n) each time,
+no matter how many times you repeat it.
+The natural competitor for "give me the 100 smallest" is not a scan,
+but `sorted(data)[:100]`, so that is what the heap needs to beat:
 
 ```python
 # heap_vs_hash.py
 import heapq
+import random
 import timeit
 from benchmark import report
 
 n = 10_000
-data = list(range(n, 0, -1))
-print(data[:8])
-#: [10000, 9999, 9998, 9997, 9996, 9995, 9994, 9993]
+data = list(range(n))
+random.seed(0)
+random.shuffle(data)  # Neither side gets a free ride
 
 def heap_min_extractions() -> list[int]:
     heap = data.copy()
     heapq.heapify(heap)
     return [heapq.heappop(heap) for _ in range(100)]
 
-def hash_min_extractions() -> list[int]:
-    remaining = set(data)
-    result = []
-    for _ in range(100):
-        smallest = min(remaining)
-        remaining.remove(smallest)
-        result.append(smallest)
-    return result
+def sorted_min_extractions() -> list[int]:
+    return sorted(data)[:100]
 
-assert heap_min_extractions() == hash_min_extractions()
-t_heap = timeit.timeit(heap_min_extractions, number=50)
-t_hash = timeit.timeit(hash_min_extractions, number=50)
-report(heap=t_heap, repeated_min=t_hash)
-print(f"heap at least 10x faster than min() on a set: "
-      f"{t_heap * 10 < t_hash}")
-#: heap at least 10x faster than min() on a set: True
+assert (heap_min_extractions()
+        == sorted_min_extractions())
+t_heap = min(timeit.repeat(
+    heap_min_extractions, number=50, repeat=5
+))
+t_sorted = min(timeit.repeat(
+    sorted_min_extractions, number=50, repeat=5
+))
+report(heap=t_heap, sorted_slice=t_sorted)
+print(f"heap beats sorted() by 1.5x+ on shuffled "
+      f"data: {t_heap * 1.5 < t_sorted}")
+#: heap beats sorted() by 1.5x+ on shuffled data: True
 ```
 
-Each `min()` call on `remaining` walks the whole `set`,
-so extracting 100 smallest items costs roughly O(100n).
+`sorted(data)` orders every element up front, costing O(n log n)
+no matter how few items you then take.
 `heapify()` pays O(n) once, then each `heappop()` costs only O(log n),
-so the same 100 extractions cost roughly O(n + 100 log n).
-That gap is why the heap wins by more than an order of magnitude here,
-and the gap widens as `n` grows.
-One machine measured the heap at about 50 times faster.
+so the same 100 extractions cost roughly O(n + 100 log n),
+smaller than sorting whenever the fraction you extract stays small.
+One machine measured the heap at about 3 times faster here.
+The comparison only holds when the input order gives neither side an advantage.
+On descending data, the kind used earlier in this chapter,
+Timsort detects the existing run and `sorted()` wins outright.
+A heap is not automatically the right choice.
+Measure with data shaped like production data.
+`heapq.nsmallest(100, data)`, introduced above,
+answers this exact "top-N" question directly,
+and is the tool to use before hand-rolling either comparison here.
+The heap earns its keep on a different shape of problem:
+pushes and pops interleaved over time, with nothing to presort in advance,
+where re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
 
 The immutable containers from [Containers](03_Foundations--Containers.md#immutability)
 are not a speed upgrade.
@@ -910,12 +951,20 @@ so the cache holds a reference to each instance it has seen,
 and the collector can reclaim none of them.
 For a value computed once per object, use `functools.cached_property`
 (see [Classes](07_Foundations--Classes.md#properties)),
-which stores the result on the instance and dies with it.
+which stores the result on the instance and dies with it,
+unless the class also declares `__slots__`
+(see [When Slots Does Not Fit](#when-slots-does-not-fit) below).
 
 ## Reduce Memory Overhead
 
 With millions of objects, per-object overhead can dominate performance.
 Three tools reduce that overhead.
+A smaller instance means fewer bytes for the allocator and garbage collector to manage,
+more instances fitting in the CPU cache at once, and,
+for `__slots__` specifically,
+attribute access through a fixed offset instead of a `__dict__` lookup.
+The byte counts below are what each tool buys.
+Multiply by a population in the millions to see why it matters.
 
 ### Slots
 
@@ -1021,6 +1070,73 @@ giving you the same immutability in a fraction of the space
 The exact byte counts vary by platform and Python build,
 so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
 
+### When Slots Does Not Fit {#when-slots-does-not-fit}
+
+`__slots__` removes more than `__dict__`.
+It removes everything that dict would have held:
+
+```python
+# slots_limits.py
+import weakref
+from dataclasses import dataclass
+from functools import cached_property
+
+@dataclass(slots=True)
+class Node:
+    value: int
+
+    @cached_property
+    def doubled(self) -> int:
+        return self.value * 2
+
+node = Node(3)
+try:
+    print(node.doubled)
+except TypeError as e:
+    # cached_property needs a __dict__ to write into:
+    print(str(e).partition(" to cache")[0])
+#: No '__dict__' attribute on 'Node' instance
+
+@dataclass(slots=True)
+class Slotted:
+    x: int
+
+try:
+    weakref.ref(Slotted(1))
+except TypeError as e:
+    # No __weakref__ slot unless you declare one:
+    print(str(e))
+#: cannot create weak reference to 'Slotted' object
+
+@dataclass(slots=True)
+class OtherSlotted:
+    y: int
+
+try:
+    class Both(  # type: ignore
+        Slotted, OtherSlotted
+    ):
+        pass
+except TypeError as e:
+    # Two nonempty slot layouts cannot combine:
+    print(str(e))
+#: multiple bases have instance lay-out conflict
+```
+
+`cached_property` writes its cached value into the instance's `__dict__`,
+so a slotted class needs a `"__dict__"` entry of its own in `__slots__` before `cached_property` works,
+which gives back the per-instance dict that `slots=True` exists to remove.
+The same is true of weak references:
+add `"__weakref__"` to `__slots__` if some other object needs to hold one.
+Multiple inheritance is the sharpest edge.
+Python lays out a slotted instance as a fixed block of storage,
+and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
+so a class cannot inherit from both.
+A single slotted base with everything else contributing no new slots of its own avoids the conflict.
+Exercise 6 covers a fourth trap:
+a subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
+undoing the saving for every instance of that subclass.
+
 ### Array Instead of List
 
 A `list` of numbers stores full Python objects, each with its own header.
@@ -1086,6 +1202,51 @@ print(view.nbytes)
 The view shares storage with `data`, so writing through it changes the original.
 `bytes(chunk)` copies, but only to print the slice;
 the view itself copies nothing.
+A view can also read fields out of a buffer without copying it,
+the way a real protocol parser reads a header:
+
+```python
+# memory_view_traps.py
+data = bytearray(b"\x01\x02XYZ")
+view = memoryview(data)
+kind, version, payload = view[0], view[1], view[2:]
+print(kind, version, bytes(payload))
+#: 1 2 b'XYZ'
+print(payload.obj is data)  # No copy: same buffer
+#: True
+
+try:
+    # An open view blocks resizing the buffer:
+    data.append(1)
+except BufferError as e:
+    print(str(e))
+#: Existing exports of data: object cannot be re-sized
+
+readonly = memoryview(b"ABCDEF")
+try:
+    # bytes is immutable, so a view over it stays read-only:
+    readonly[0] = ord("z")
+except TypeError as e:
+    print(str(e))
+#: cannot modify read-only memory
+```
+
+`payload` is a second `memoryview`, not a copy of `data`.
+`payload.obj` names the buffer it reads from, and that buffer is `data` itself.
+That sharing is also the trap.
+`memoryview(data)` keeps an export open on `data` for as long as `view`
+(or `payload`, sliced from it) stays alive,
+and `bytearray.append()` needs to resize the buffer,
+so it refuses while an export is open,
+which is exactly why `data.append(1)` fails here:
+`view` and `payload` are both still alive at that point.
+The fix is to release every view first, explicitly (`view.release()`)
+or by letting them go out of scope, before resizing the buffer they read.
+The second trap is about direction, not lifetime:
+a `memoryview` over immutable `bytes` supports reading and slicing,
+but writing through it raises regardless of whether anything else has it open.
+`memory_view.py` above writes through a view of a `bytearray`, which is mutable.
+Only a view of `bytes` is read-only.
 
 The saving shows up at a size worth measuring:
 
@@ -1401,13 +1562,20 @@ and runs this same comparison, printing your machine's own numbers.
 The main book build never does this and never requires a Rust toolchain.
 Building `rust/` is a separate, opt-in step.
 
-That is one baseline and three ways past it.
+That is one baseline and three ways past it,
+but not a ladder where each step outruns the last.
 The plain Python loop from the Numba example above is the baseline.
 NumPy alone handles the parts of a problem that reduce to whole-array arithmetic.
 `@njit` compiles the untranslatable loop on its first call, from inside Python.
 Rust compiles that loop ahead of time,
 removing both the warm-up and the runtime Numba dependency,
 at the cost of a second language and a build step.
+On both sample runs above, Numba matches or beats Rust
+(15.9x against 12.2x on `count_primes`, 54.4x against 34.3x on `collatz_lengths`),
+so Rust is not the faster option here.
+What Rust buys instead is no warm-up call, no Numba dependency at runtime,
+and code Numba refuses to compile,
+such as functions over general Python objects.
 
 Keep the interface coarse.
 A single call that does significant work wins.
@@ -1437,7 +1605,14 @@ That is a design decision with its own chapter,
 ## Choosing a Strategy
 
 Measure first.
-A profiler finds the slow spots without guessing.
+A profiler finds the slow spots without guessing,
+and it also answers a question the rest of this list assumes you already know:
+is the program spending its time computing, or waiting?
+A program mostly waiting on a database, a socket, or a subprocess is I/O-bound,
+and steps 2 through 9 below will not help it much.
+Skip to step 10 and restructure around `asyncio` instead.
+A program mostly consuming CPU is compute-bound,
+and the list below is written for that case, cheapest change first.
 Every performance optimization costs something in effort, complexity,
 or dependencies.
 Work down this list from the cheapest change to the most involved,

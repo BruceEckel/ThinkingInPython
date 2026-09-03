@@ -308,7 +308,8 @@ Here that raises a `ValueError`, since `"Alice"` has more than two characters.
 A two-character key such as `"Bo"` would unpack into its letters and the loop would run on.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable:
-each supports `&`, `|`, `-`, and `^` directly, against another dict's view or against any set.
+each supports `&`, `|`, `-`, and `^` directly,
+against another dict's view or against any set.
 
 ```python
 # dict_views.py
@@ -353,8 +354,7 @@ and `dict()` accepts those from any source.
 [Control Flow](04_Foundations--Control_Flow.md#loops)
 covers it with the other loop tools.
 
-Mutating a `dict` while iterating it does not fail silently
-the way `remove_while_iterating.py`'s `list` does:
+Mutating a `dict` while iterating it does not fail silently the way `remove_while_iterating.py`'s `list` does:
 
 ```python
 # dict_iteration_trap.py
@@ -480,7 +480,8 @@ print(large_gap > small_gap)  # The gap widens
 
 Searching the `list` is O(n) and searching the `set` is O(1),
 so the gap widens without limit as `n` grows:
-`large_gap` comes out bigger than `small_gap`, not the same ratio at ten times the size.
+`large_gap` comes out bigger than `small_gap`,
+not the same ratio at ten times the size.
 The probe value is missing on purpose: that is the `list`'s worst case,
 a scan of all `n` elements before it gives up.
 

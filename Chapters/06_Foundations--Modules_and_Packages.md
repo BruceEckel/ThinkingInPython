@@ -362,9 +362,7 @@ not to have finished running.
 That exact message assumes a package-relative cycle, `from . import ...`.
 Two plain top-level modules that import each other raise a different message,
 with no "circular import" wording at all:
-`ImportError: cannot import name 'f' from 'modx'
-(consider renaming 'modx.py' if it has the same name
-as a library you intended to import)`.
+`ImportError: cannot import name 'f' from 'modx' (consider renaming 'modx.py' if it has the same name as a library you intended to import)`.
 The failure then surfaces later,
 wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
@@ -544,10 +542,9 @@ by giving `__init__.py` a module-level `__getattr__`
 ([PEP 562](https://peps.python.org/pep-0562/))
 that imports and returns a submodule the first time a caller asks for it by name,
 the technique pandas and numpy use to keep import time low.
-`lazy import` needs no hand-written `__getattr__`,
-and defers any imported name, not only a package's submodules,
-but the `__getattr__` pattern still matters for code that must run
-on a Python older than 3.15.
+`lazy import` needs no hand-written `__getattr__`, and defers any imported name,
+not only a package's submodules,
+but the `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
 You can watch `lazy` defer the load by importing a module whose body prints when it runs:
 
 ```python
@@ -578,8 +575,7 @@ so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
 `sys.lazy_modules` holds the names still waiting to load,
-but CPython's own interpreter startup adds lazy imports of its own to that set
-before your code marks anything lazy:
+but CPython's own interpreter startup adds lazy imports of its own to that set before your code marks anything lazy:
 
 ```python
 # lazy_modules_check.py
@@ -600,7 +596,8 @@ print("noisy" in sys.lazy_modules)
 The set already holds more than one name before this script marks `noisy` lazy,
 so `sys.lazy_modules` is not a clean "what my program deferred" list.
 `noisy` leaves the set once `noisy.announce()` loads it,
-so the set tracks only names still waiting, not names your program ever deferred.
+so the set tracks only names still waiting,
+not names your program ever deferred.
 Filter it for the names you marked instead of reading it directly.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
