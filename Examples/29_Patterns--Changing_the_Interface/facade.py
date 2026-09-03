@@ -2,18 +2,34 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class A:
-    x: object
+class Engine:
+    def start(self) -> None:
+        print("Engine.start()")
 
-# Other classes that aren't exposed by the
-# facade go here ...
+@dataclass(frozen=True)
+class FuelPump:
+    engine: Engine
+
+    def prime(self) -> None:
+        print("FuelPump.prime()")
+        self.engine.start()
+
+@dataclass(frozen=True)
+class Ignition:
+    pump: FuelPump
+
+    def turn_key(self) -> None:
+        print("Ignition.turn_key()")
+        self.pump.prime()
 
 class Facade:
     @staticmethod
-    def make_a(x: object) -> A:
-        return A(x)
+    def start_car() -> Ignition:
+        ignition = Ignition(FuelPump(Engine()))
+        ignition.turn_key()
+        return ignition
 
-# The client programmer gets the objects
-# by calling the static methods:
-print(Facade.make_a(1))
-#: A(x=1)
+Facade.start_car()
+#: Ignition.turn_key()
+#: FuelPump.prime()
+#: Engine.start()

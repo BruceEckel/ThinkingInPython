@@ -178,7 +178,7 @@ because the type checker believes a `cast()` rather than verifying it.
 ```python
 # test_tile_map.py
 import pytest
-from tile_map import parse_map, tile, to_symbol
+from tile_map import Tile, parse_map, tile, to_symbol
 
 def test_same_symbol_same_object() -> None:
     assert tile(".") is tile(".")
@@ -193,6 +193,11 @@ def test_map_shares_tiles() -> None:
 def test_unknown_symbol_raises() -> None:
     with pytest.raises(KeyError):
         to_symbol("?")
+
+def test_direct_construction_bypasses_pool() -> None:
+    bypassed = Tile("~", "water", False)
+    assert bypassed == tile("~")
+    assert bypassed is not tile("~")
 ```
 
 Freezing `Tile` hides the sharing from clients.
@@ -449,6 +454,42 @@ so `__new__()` must assign to that exact name rather than something like `_symbo
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
+A `match` over `Tile` needs no `case _:` catch-all once every member
+has a case,
+and leaving one out reports the gap at the type checker,
+before any `Tile` value reaches the code at runtime:
+
+```python
+# tile_enum_match.py
+from tile_enum import Tile
+
+# ty: function can implicitly return `None`,
+# not assignable to return type `str`
+def describe(tile: Tile) -> str:  # type: ignore
+    match tile:
+        case Tile.GRASS:
+            return "grass"
+        case Tile.WATER:
+            return "water"
+
+if __name__ == "__main__":
+    print(describe(Tile.GRASS))
+#: grass
+```
+
+Without the `# type: ignore`, `ty check` reports:
+
+```
+error[invalid-return-type]: Function can implicitly return
+`None`, which is not assignable to return type `str`
+ --> tile_enum_match.py:6:29
+  |
+6 | def describe(tile: Tile) -> str:
+  |                             ^^^
+```
+
+The missing `Tile.ROCK` case is the gap;
+add it back and the diagnostic disappears with no other change.
 The cost is flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The table-driven state machine in [State Machines](31_Patterns--State_Machines.md#table-driven-state-machine)
@@ -465,6 +506,14 @@ intern in `__new__()` and pay the bookkeeping.
 If the set grows without bound,
 use a `WeakValueDictionary` so the pool cannot become a leak.
 Otherwise use a `@cache` factory, which is the least machinery for the job.
+
+These four answers read as an if/elif chain, but the questions behind
+them are independent.
+Constructor syntax and leak-safety are separate axes,
+so nothing stops `__new__()` interning from also holding its pool weakly:
+key the `WeakValueDictionary` on the constructor arguments the way
+`interned_color.py` keys `_pool`, the combination Exercise 5 builds.
+Combine mechanisms when more than one requirement applies.
 
 ## Flyweights in the Wild
 

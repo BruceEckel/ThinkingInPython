@@ -23,7 +23,7 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 if __name__ == "__main__":
     conversation = interview()
-    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+    print(f"{type(conversation)}: {conversation.__name__}")  # type: ignore
     result = drive(conversation, ANSWERS)
     print(f"{result = }")
 #: <class 'generator'>: interview

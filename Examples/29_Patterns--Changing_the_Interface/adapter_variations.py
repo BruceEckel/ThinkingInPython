@@ -7,6 +7,7 @@ from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
     @override
+    # def op(self, what_i_have: WhatIHave) -> None:
     def op(self, what_i_have: Any) -> None:
         ProxyAdapter(what_i_have).f()
 

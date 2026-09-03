@@ -24,5 +24,9 @@ def test_only_the_matching_type_is_called() -> None:
 def test_no_handler_is_a_noop() -> None:
     bus = EventBus()
     bus.publish(Closed("done"))  # Must not raise
+
+def test_get_leaves_no_stray_handler_list() -> None:
     # publish() reads with .get(): no stray entry appears
+    bus = EventBus()
+    bus.publish(Closed("done"))
     assert Closed not in bus._handlers

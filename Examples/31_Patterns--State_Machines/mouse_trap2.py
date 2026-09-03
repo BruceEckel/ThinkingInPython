@@ -88,3 +88,13 @@ MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
+
+# ESCAPES is not a key in Waiting.transitions:
+trap2 = MouseTrap()
+try:
+    trap2.run_all([MouseAction.ESCAPES])
+except RuntimeError as e:
+    print(e)
+#: Waiting: Broadcasting cheese smell
+#: mouse escapes
+#: Waiting has no transition for mouse escapes

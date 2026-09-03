@@ -128,6 +128,11 @@ if __name__ == "__main__":
         # Sold out
         FirstDigit("D", 3), SecondDigit("col 0", 0),
         Quit(),  # Refund and reset
+        # Row D, col 0 is both too expensive (a dime
+        # isn't 25 cents) and sold out (quantity 0);
+        # too_expensive is listed first, so it wins:
+        Money("dime", 10),
+        FirstDigit("D", 3), SecondDigit("col 0", 0),
     ]
     machine = VendingMachine()
     for event in events:
@@ -146,3 +151,6 @@ if __name__ == "__main__":
 #: D: Row D [SELECTING]
 #: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
 #: Quit: Returning 50 [QUIESCENT]
+#: dime: Total = 10 [COLLECTING]
+#: D: Row D [SELECTING]
+#: col 0: Cleared: costs 25, quantity 0 [COLLECTING]

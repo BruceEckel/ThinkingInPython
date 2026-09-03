@@ -165,7 +165,7 @@ not because the pattern demands a base class.
 Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
 works the same and lets one object publish more than one kind of change.
 Event-heavy programs have mature libraries
-(signal/slot systems, `asyncio` events),
+(signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
 An observer returns `None`.
@@ -283,8 +283,80 @@ which forget automatically.
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
 Two-way bindings are the usual source: the view edits the model,
 the model notifies the view, the view edits the model.
-Either make the write conditional on the value changing,
-or guard the setter with a re-entry flag.
+Without a guard, an observer that always writes back never stops:
+
+```python
+# reentrant_notify.py
+from observers import Observable
+
+class TwoWay(Observable[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self._value = 0
+
+    @property
+    def value(self) -> int:
+        return self._value
+
+    @value.setter
+    def value(self, new: int) -> None:
+        self._value = new
+        self.notify(new)  # Re-enters if written back
+
+model = TwoWay()
+model.subscribe(
+    lambda v: setattr(model, "value", v))
+try:
+    model.value = 1
+except RecursionError:
+    print("RecursionError")
+#: RecursionError
+```
+
+The setter calls `notify()`,
+the observer writes back through the same setter,
+and each write calls `notify()` again.
+Making the write conditional on the value changing breaks the cycle:
+
+```python
+# reentrant_notify_fixed.py
+from observers import Observable
+
+class TwoWay(Observable[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self._value = 0
+
+    @property
+    def value(self) -> int:
+        return self._value
+
+    @value.setter
+    def value(self, new: int) -> None:
+        if new == self._value:
+            return  # Breaks the re-entry
+        self._value = new
+        self.notify(new)
+
+model = TwoWay()
+seen: list[int] = []
+
+def echo(v: int) -> None:
+    seen.append(v)
+    model.value = v  # Now a no-op
+
+model.subscribe(echo)
+model.value = 1
+print(seen)
+#: [1]
+```
+
+`echo`'s write-back matches the value the setter already holds,
+so the setter returns before it reaches `notify()` again,
+and the model still notified once.
+The alternative, a re-entry flag set before `notify()` and cleared after,
+works the same way when the write should proceed
+even for a value that hasn't changed.
 
 ## Observer and I/O
 
@@ -378,7 +450,64 @@ and a coroutine discarded without an `await` does nothing.
 `notify()` needs no `list()` copy here:
 `*` drains the generator into a tuple before `gather()` runs,
 so a detach during the fan-out cannot skip anyone.
-The tuple also means an observer that unsubscribes mid-notification still hears this change.
+The tuple also means an observer that unsubscribes mid-notification still hears this change,
+an async counterpart to `self_removing_observer.py`:
+
+```python
+# async_self_removing_observer.py
+import asyncio
+from collections.abc import Awaitable, Callable
+
+type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+
+class Observable[T]:
+    def __init__(self) -> None:
+        self._observers: list[AsyncObserver[T]] = []
+
+    def subscribe(
+        self, observer: AsyncObserver[T]
+    ) -> None:
+        self._observers.append(observer)
+
+    def unsubscribe(
+        self, observer: AsyncObserver[T]
+    ) -> None:
+        self._observers.remove(observer)
+
+    async def notify(self, data: T) -> None:
+        await asyncio.gather(
+            *(obs(data) for obs in self._observers))
+
+obs = Observable[object]()
+seen: list[str] = []
+
+async def once(data: object) -> None:
+    seen.append(f"once: {data}")
+    # Unsubscribes mid-notification
+    obs.unsubscribe(once)
+
+async def always(data: object) -> None:
+    seen.append(f"always: {data}")
+
+async def main() -> None:
+    obs.subscribe(once)
+    obs.subscribe(always)
+    await obs.notify(1)
+    await obs.notify(2)
+
+asyncio.run(main())
+print(seen)
+#: ['once: 1', 'always: 1', 'always: 2']
+```
+
+This repeats `async_observers.py`'s `Observable`
+rather than importing it,
+because that module's own top-level `asyncio.run(main())`
+would run its thermometer demo again on import.
+
+`once` still hears the change it unsubscribes during,
+because `gather()` already holds its coroutine before `once` runs.
+The next `notify()` no longer reaches it.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the observers in sequence would print in subscription order,
@@ -392,7 +521,37 @@ Below its threshold it returns without sending anything.
 
 A failing observer behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
-and the unfinished observers keep running with nobody awaiting them.
+and the unfinished observers keep running with nobody awaiting them:
+
+```python
+# gather_orphan.py
+import asyncio
+
+async def loud(data: int) -> None:
+    raise ValueError(f"bad: {data}")
+
+async def slow(data: int) -> None:
+    await asyncio.sleep(0.05)
+    print(f"slow finished: {data}")
+
+async def main() -> None:
+    try:
+        await asyncio.gather(loud(1), slow(1))
+    except ValueError as e:
+        print(f"caught: {e}")
+    await asyncio.sleep(0.25)  # Let the orphan finish
+
+asyncio.run(main())
+#: caught: bad: 1
+#: slow finished: 1
+```
+
+`caught` prints the moment `loud()` raises.
+`slow` is still sleeping at that point,
+with nothing left awaiting it,
+and it prints only because `main()` sleeps long enough afterward to let it finish.
+A real caller rarely adds that wait,
+so the orphaned task's work, and any exception it later raises, is easy to lose.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 which is the async form of the catch-collect-continue that exercise 3 asks for.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,

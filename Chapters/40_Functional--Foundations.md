@@ -153,6 +153,15 @@ When values never change underneath you,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
+That safety has a cost.
+Python's immutable types share no structure:
+`moved = Point(p.x + 10, p.y)` above builds an entirely new `Point`,
+and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
+not patching one slot in place.
+A two-field `Point` makes that copy free to ignore.
+A large structure changed often pays it every time,
+the price immutability charges for the coordination it removes.
+
 Type annotations can state immutability so a type checker enforces it.
 `typing.Final` marks a name you must not rebind.
 The read-only collection types in `collections.abc`,
@@ -265,23 +274,38 @@ because you select the behavior by looking it up:
 ```python
 # dispatch.py
 from collections.abc import Callable
+from operator import mod
+from exceptions import ignore
 
 def add(a: int, b: int) -> int:
     return a + b
 def sub(a: int, b: int) -> int:
     return a - b
+def floordiv(a: int, b: int) -> int:
+    return a // b
 
 # A table of functions replaces a long if/elif chain:
 operations: dict[str, Callable[[int, int], int]] = {
     "+": add,
     "-": sub,
+    "//": floordiv,
 }
-print(operations["+"](6, 4), operations["-"](6, 4))
-#: 10 2
+# A row can come from outside the literal, unchanged:
+operations["%"] = mod
+print(operations["+"](6, 4), operations["-"](6, 4),
+      operations["//"](6, 4), operations["%"](6, 4))
+#: 10 2 1 2
+# A missing key is a plain KeyError, no else branch:
+with ignore(KeyError):
+    operations["^"](6, 4)
+#: KeyError('^')
 ```
 
-Supporting a new operator means adding a row to the table.
-The dispatch code never changes.
+Supporting a new operator means adding a row to the table,
+whether that row sits in the literal or lands afterward, as `%` did here.
+The dispatch code itself never changes.
+A key the table has no row for raises a plain `KeyError`,
+where an `if`/`elif` chain would normally end in an `else`.
 The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
@@ -518,7 +542,10 @@ A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
 had to accept that.
 `functools.Placeholder` (Python 3.14 and later)
-is a marker that reserves a position for the caller:
+is a marker that reserves a position for the caller.
+The listing below carries two `# type: ignore` comments.
+They mark a type-checker limitation, not a mistake in the code,
+as the paragraph after the listing explains:
 
 ```python
 # placeholder.py

@@ -17,9 +17,10 @@ It requires one method on the primary class hierarchy,
 typically called `accept()`,
 which takes an object from a secondary hierarchy called `Visitor`.
 `accept()` calls the visitor's `visit()` and passes itself in.
-The visitor's type chooses which `visit()` runs,
-so each `Visitor` subclass is a new operation on the primary hierarchy,
-added without editing it:
+The visitor's type chooses which `visit()` runs.
+A new `Visitor` subclass that reuses an existing operation costs the primary hierarchy nothing.
+A genuinely new operation is not free;
+[The Price of the Empty Base](#the-price-of-the-empty-base) below shows what it costs in Python:
 
 ```python
 # flower_visitors.py
@@ -345,6 +346,38 @@ or when a framework you do not own already calls that method.
 But in Python that is rare.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example reaches the same conclusion:
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
+
+A minimal example shows the traversal case.
+`Corsage.accept()` decides which elements to visit and recurses into any nested `Corsage`,
+so nothing outside the object drives the walk:
+
+```python
+# recursive_accept.py
+from typing import Any
+from flower_visitors import Bee, Gladiolus, Ranunculus
+
+# accept() drives the traversal itself:
+class Corsage:
+    def __init__(self, *elements: Any) -> None:
+        self.elements = elements
+
+    def accept(self, visitor: Any) -> None:
+        for element in self.elements:
+            element.accept(visitor)
+
+if __name__ == "__main__":
+    corsage = Corsage(
+        Gladiolus(), Corsage(Ranunculus()))
+    corsage.accept(Bee())
+#: Gladiolus pollinated by Bee
+#: Ranunculus pollinated by Bee
+```
+
+The recursive call works because `Gladiolus` and `Corsage` both define `accept()`,
+so neither has to know which one it's calling.
+`flower_gen()` drove the earlier traversal from outside, one flower at a time.
+Here `accept()` drives it,
+the situation where the classic pattern still earns its keep.
 
 ## One Dispatch Is Enough
 

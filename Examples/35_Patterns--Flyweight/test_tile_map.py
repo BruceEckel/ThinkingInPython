@@ -1,6 +1,6 @@
 # test_tile_map.py
 import pytest
-from tile_map import parse_map, tile, to_symbol
+from tile_map import Tile, parse_map, tile, to_symbol
 
 def test_same_symbol_same_object() -> None:
     assert tile(".") is tile(".")
@@ -15,3 +15,8 @@ def test_map_shares_tiles() -> None:
 def test_unknown_symbol_raises() -> None:
     with pytest.raises(KeyError):
         to_symbol("?")
+
+def test_direct_construction_bypasses_pool() -> None:
+    bypassed = Tile("~", "water", False)
+    assert bypassed == tile("~")
+    assert bypassed is not tile("~")

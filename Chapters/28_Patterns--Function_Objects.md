@@ -16,8 +16,9 @@ Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
 the dissolution that [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes.
 
-*Command* appears first as a function, then as the classic class-based form,
-a contrast that holds for *Strategy* as well.
+*Command* appears first as a function, then as the classic class-based form.
+*Strategy*'s function form gets the same fuller listing.
+Its classic form appears only in prose, at the larger scale it needs.
 *Chain of Responsibility* needs only the function form:
 its class version is the same idea with the list written as a linked chain.
 A closing section keys the chain's handlers by event type instead of by position,
@@ -104,7 +105,37 @@ Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance attached,
 so a command list can hold it alongside plain functions,
-and the method keeps its state without any `Command` class.
+and the method keeps its state without any `Command` class:
+
+```python
+# bound_method.py
+from collections.abc import Callable
+
+class Account:
+    def __init__(self, balance: int) -> None:
+        self.balance = balance
+    def deposit(self) -> None:
+        self.balance += 50
+        print(f"balance: {self.balance}")
+
+def alert() -> None:
+    print("audit: checking balance")
+
+account = Account(100)
+macro: list[Callable[[], None]] = [
+    account.deposit, alert, account.deposit,
+]
+for command in macro:
+    command()
+#: balance: 150
+#: audit: checking balance
+#: balance: 200
+```
+
+`account.deposit` sits in the same list as `alert`,
+a plain function, with no `Command` class in sight.
+Each call still reads and updates `account.balance`,
+the state the bound method carries with it.
 
 An object can be callable too.
 A class with `__call__()`
@@ -336,7 +367,37 @@ and so does the chain below.
 When the configurable version already exists, with the setting as a parameter,
 `functools.partial` does the same job.
 `partial` fills positional parameters from the left,
-so bind a trailing setting by keyword.
+so bind a trailing setting by keyword:
+
+```python
+# partial_bisection.py
+from functools import partial
+from algorithms import Fn
+
+def bisection_tol(f: Fn, a: float, b: float,
+                   tolerance: float) -> float | None:
+    while abs(b - a) > tolerance:
+        mid = (a + b) / 2
+        if f(a) * f(mid) <= 0:
+            b = mid
+        else:
+            a = mid
+    return (a + b) / 2
+
+def f(x: float) -> float:
+    return x * x - 2  # Root at the square root of 2
+
+coarse = partial(bisection_tol, tolerance=0.1)
+fine = partial(bisection_tol, tolerance=1e-9)
+print(f"{coarse(f, 0.0, 2.0):.6f}")
+#: 1.406250
+print(f"{fine(f, 0.0, 2.0):.6f}")
+#: 1.414214
+```
+
+`bisection_tol` takes `tolerance` as an ordinary parameter,
+so `partial` binds it by keyword, once per strategy,
+in place of `bisection_within`'s closure.
 A positional-only parameter takes no keyword, and needs a `Placeholder`
 ([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder))
 in the caller's position to hold it open.
@@ -578,7 +639,11 @@ def test_only_the_matching_type_is_called() -> None:
 def test_no_handler_is_a_noop() -> None:
     bus = EventBus()
     bus.publish(Closed("done"))  # Must not raise
+
+def test_get_leaves_no_stray_handler_list() -> None:
     # publish() reads with .get(): no stray entry appears
+    bus = EventBus()
+    bus.publish(Closed("done"))
     assert Closed not in bus._handlers
 ```
 

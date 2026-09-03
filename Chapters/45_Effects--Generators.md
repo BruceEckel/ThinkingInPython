@@ -210,7 +210,7 @@ def drive(conversation: Generator[Question, Answer, Result],
 
 if __name__ == "__main__":
     conversation = interview()
-    print(f"{type(c := conversation)}: {c.__name__}")  # type: ignore
+    print(f"{type(conversation)}: {conversation.__name__}")  # type: ignore
     result = drive(conversation, ANSWERS)
     print(f"{result = }")
 #: <class 'generator'>: interview
@@ -553,6 +553,77 @@ A driver can also `throw()` an exception into a generator or `close()` it,
 and `yield from` relays both:
 a thrown exception surfaces inside the innermost generator rather than at the delegating one,
 and a `close()` unwinds every frame in the chain.
+[A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
+showed this already, without naming it:
+"Python resumes the generator by raising the block's exception at the `yield`."
+`throw()` is that same resumption, called directly instead of by a `with` block:
+
+```python
+# throw_and_close.py
+from collections.abc import Generator
+
+def worker() -> Generator[str]:
+    try:
+        yield "ready"
+        yield "still going"
+    except ValueError as e:
+        print(f"caught: {e}")
+        yield "recovered"
+    finally:
+        print("cleanup")
+
+g = worker()
+print(next(g))
+#: ready
+print(g.throw(ValueError("bad input")))
+#: caught: bad input
+#: recovered
+g.close()
+#: cleanup
+```
+
+`g.throw(ValueError("bad input"))` raises that exception
+at the suspended `yield`, inside `worker()`'s frame,
+the same way the `with` block's exception did.
+`worker()` catches it, prints, and yields again,
+so the generator survives a `throw()` its `except` clause handles.
+`g.close()` raises `GeneratorExit` at the same suspended point.
+`worker()` has no matching `except`,
+so `GeneratorExit` passes through, the `finally` block runs,
+and the generator ends.
+Nothing prints the `GeneratorExit` itself,
+because `close()` swallows it once the generator finishes.
+
+A generator that catches `GeneratorExit` and yields again instead of letting it end the frame breaks `close()`:
+
+```python
+# throw_and_close_gotcha.py
+from collections.abc import Generator
+
+def stubborn() -> Generator[str]:
+    try:
+        yield "go"
+    except GeneratorExit:
+        yield "not done"
+
+s = stubborn()
+print(next(s))
+#: go
+try:
+    s.close()
+except RuntimeError as e:
+    print(f"{type(e).__name__}: {e}")
+#: RuntimeError: generator ignored GeneratorExit
+```
+
+`close()` expects the generator to stop.
+`stubborn()` instead answers `GeneratorExit` with another `yield`,
+so `close()` raises `RuntimeError: generator ignored GeneratorExit`
+rather than returning quietly.
+A driver like `task_runner()`, further down,
+must call `close()` on every generator it abandons,
+so this is the failure mode to avoid in a generator meant to be driven by others.
+
 `StopIteration` splits the same way.
 Both catch it and both take `stop.value`, but they hand it to different places.
 `drive()` returns the `Result` to its own caller, ending the conversation.
@@ -625,11 +696,80 @@ The output interleaves the two tasks,
 though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.
 
+`task_runner()` only ever calls `next()`,
+so it takes turns without answering anything.
+Giving each job a question closes the loop:
+turn-taking and question-answering, together:
+
+```python
+# task_runner_send.py
+from collections import deque
+from collections.abc import Callable, Generator
+
+type Job = Callable[[], Generator[str, str]]
+
+ready: deque[Generator[str, str]] = deque()
+to_send: dict[Generator[str, str], str | None] = {}
+
+def task(fn: Job) -> Job:
+    job = fn()
+    ready.append(job)
+    to_send[job] = None
+    return fn
+
+def answer(request: str) -> str:
+    return f"answer to {request}"
+
+@task
+def download() -> Generator[str, str]:
+    reply = yield "download: headers?"
+    print(f"download: {reply}")
+    yield "download: checksum"
+
+@task
+def index() -> Generator[str, str]:
+    yield "index: build"
+    yield "index: merge"
+
+def task_runner() -> None:
+    while ready:
+        job = ready.popleft()
+        try:
+            request = job.send(to_send.pop(job))  # type: ignore
+        except StopIteration:
+            continue
+        print(request)
+        to_send[job] = answer(request)
+        ready.append(job)
+
+task_runner()
+#: download: headers?
+#: index: build
+#: download: answer to download: headers?
+#: download: checksum
+#: index: merge
+```
+
+`to_send` holds what each job's next turn will receive:
+`None` until the runner has answered that job's most recent request.
+`job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` did,
+since `send(None)` and `next()` are equivalent,
+and delivers the runner's answer on every later turn.
+`Job`'s `SendType` is `str`, not `str | None`,
+so the priming call needs the `# type: ignore` from `send_none_is_next.py` again:
+the type checker cannot see that `to_send.pop(job)` is `None` only on a generator's first turn.
+`download()` reads what it receives, into `reply`.
+`index()`'s bare `yield` statements discard theirs;
+a task that only takes turns is free to ignore the send channel.
+The queue still rotates task to task,
+and now the runner also plays `drive()`'s part,
+answering each request before the next turn.
+
 You have run a driver like `drive()` many times.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 presented `await` and the event loop as a way to overlap waiting,
 and left the mechanism alone.
-The mechanism is the two halves you have now seen:
+The mechanism is the two halves `task_runner_send.py` just combined:
 `task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.

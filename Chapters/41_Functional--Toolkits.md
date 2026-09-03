@@ -78,6 +78,12 @@ where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
+Fibonacci also has an iterative form,
+`a, b = b, a + b` in a loop,
+that needs neither recursion nor a cache.
+It stays the running example here because it keeps the point about caching small:
+the branching and the repeated subproblem are what matter,
+not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
@@ -201,6 +207,10 @@ changing an attribute the property read doesn't recalculate the cached result.
 The escape hatch is `del x.squared`:
 deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
+First access isn't thread-safe either:
+`cached_property` no longer locks,
+so two threads racing on the first read can both find the value missing
+and both run the property's code.
 
 ### `wraps`
 
@@ -290,6 +300,10 @@ In real code this `Weight` would be `@dataclass(frozen=True, order=True)`,
 which generates all six comparisons from the field order and makes `total_ordering` unnecessary.
 `total_ordering` earns its keep when the class cannot be a dataclass,
 or when the ordering is not simply the fields in declaration order.
+Even then, each synthesized comparison costs more than a hand-written one:
+it wraps a call to your `__lt__` or `__eq__`,
+an extra Python-level call on every comparison
+that a directly generated method skips.
 
 ### `singledispatch`
 
@@ -830,8 +844,9 @@ That is why the recursive `fib()` under [`cache`](#cache)
 gets a decorator rather than a rewrite as a loop:
 the recursion states the definition, and the cache removes the repetition.
 
-Recursion suits problems that are naturally self-similar,
-such as walking a tree.
+A different reason to recurse: some problems are naturally self-similar,
+such as walking a tree,
+with no repeated subproblem and so no need for a cache.
 Python does not optimize tail calls and limits the call stack,
 so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` lifts that ceiling when the depth is genuine,
@@ -898,7 +913,8 @@ and pairs are the only group size where that question has a tidy rotation-based 
 Scheduling groups of three without repeats is the far harder problem that *Kirkman's schoolgirl problem* poses,
 solvable only for specific roster sizes and with no simple formula behind it.
 Rather than chase an exact answer that may not exist for a given `students` and `size`,
-a general version can settle for a good one: build each group by adding,
+a general version gives up rotation entirely
+and settles for a good one: build each group by adding,
 one member at a time, whoever the current members have met the fewest times,
 with those meeting counts kept in a running history instead of computed from a round number:
 

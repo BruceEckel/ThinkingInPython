@@ -11,6 +11,11 @@ Each entry has a one-line intent so you can recognize a pattern by name and look
 Listing a pattern here does not recommend it.
 Many overlap, some compete,
 and several exist only to work around limits of a particular language.
+[State](26_Patterns--Surrogate.md#state)
+and [State Machine](31_Patterns--State_Machines.md) are one such pair.
+State changes an object's behavior when its internal state changes.
+State Machine drives an object through a fixed set of states in response to inputs.
+A design rarely needs both at once.
 The body of this book argues that a number of them are unnecessary in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
@@ -19,6 +24,12 @@ so each name sits where its source puts it.
 That includes GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for the other two.
+A few idioms below belong to no single source.
+This chapter groups them by what they share instead:
+language idioms tied to C++ or Java's limits, functional idioms,
+and the patterns that supply a collaborator from outside.
+What that grouping leaves over sits in Other Patterns and Idioms,
+the catalog's remaining grab-bag.
 Each table lists its rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
@@ -32,8 +43,18 @@ Use this one when you know the problem but not the name.
 | If the problem is | Look at |
 |-------------------|---------|
 | Creating objects without naming their classes | Abstract Factory, Builder, Factory Method, Prototype, Registry, Plugin |
-| Making one object stand in for another | Proxy, Decorator, Adapter, Façade, Ambassador, Sidecar |
-| Choosing behavior at runtime | Strategy, Command, Chain of Responsibility, State, State Machine, Visitor, Double Dispatch |
+| Controlling access to another object | Proxy |
+| Adding behavior to an object without changing its class | Decorator |
+| Converting one interface into another a client expects | Adapter |
+| Simplifying access to a subsystem | Façade |
+| Proxying a service's calls from a helper process | Ambassador, Sidecar |
+| Swapping an algorithm at runtime | Strategy |
+| Encapsulating a request as an object | Command |
+| Passing a request along a chain until something handles it | Chain of Responsibility |
+| Changing behavior when an object's internal state changes | State |
+| Driving an object through a fixed set of states | State Machine |
+| Adding an operation without changing the classes it visits | Visitor |
+| Resolving behavior from the runtime types of two objects | Double Dispatch |
 | Structuring recursive or tree-shaped data | Composite, Interpreter, Visitor, Blackboard |
 | Keeping the number of objects down | Flyweight, Multiton, Object Pool, Singleton |
 | Saving and restoring state | Memento, Event Sourcing, Unit of Work, Identity Map |
@@ -41,7 +62,12 @@ Use this one when you know the problem but not the name.
 | Coordinating concurrent work | Thread Pool, Producer-Consumer, Future/Promise, Active Object, Reactor |
 | Surviving a failing dependency | Circuit Breaker, Retry, Bulkhead, Timeout, Dead Letter Channel |
 | Moving data across a boundary | Data Transfer Object, Message Translator, Gateway, Data Mapper |
-| Supplying a collaborator from outside | Dependency Injection, Service Locator, Inversion of Control, Strategy |
+| Persisting domain objects to a database | Active Record, Repository, Table Module, Lazy Load |
+| Organizing application logic by request or use case | Transaction Script, Domain Model, Service Layer, Front Controller |
+| Modeling a value, amount, or special case instead of null | Value Object, Money, Special Case |
+| Routing or transforming a message | Content-Based Router, Message Router, Splitter, Aggregator |
+| Connecting an application to a messaging system | Message, Message Channel, Message Endpoint, Point-to-Point Channel |
+| Supplying a collaborator from outside, an application of Inversion of Control | Dependency Injection, Service Locator, Strategy |
 
 ## Creational (GoF)
 
@@ -169,30 +195,45 @@ Use this one when you know the problem but not the name.
 | Strangler Fig | Replace a legacy system incrementally by routing around it. |
 | Timeout | Bound how long to wait for a response. |
 
+## Language and Implementation Idioms
+
+| Pattern | Intent |
+|---------|--------|
+| Curiously Recurring Template Pattern (CRTP) | Parameterize a base class by the subclass that inherits from it. |
+| Marker Interface | Tag a class with an empty interface to signal a capability. |
+| Mixin | Add reusable behavior through multiple inheritance. |
+| Pointer to Implementation (Pimpl) | Hide a class's implementation behind a pointer so changing it recompiles less. |
+| [Resource Acquisition Is Initialization (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
+
+## Functional Idioms
+
+| Pattern | Intent |
+|---------|--------|
+| [Function Composition](40_Functional--Foundations.md#composing-functions) | Build a function by feeding one function's output into the next. |
+| [Memoization](41_Functional--Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
+| [Monad](42_Functional--Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
+| [Partial Application](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
+
+## Dependency Supply
+
+| Pattern | Intent |
+|---------|--------|
+| [Dependency Injection](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
+| [Inversion of Control](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. Dependency Injection and Service Locator each implement it. |
+| [Service Locator](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
+
 ## Other Patterns and Idioms
 
 | Pattern | Intent |
 |---------|--------|
 | [Borg (Monostate)](24_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |
-| Curiously Recurring Template Pattern (CRTP) | Parameterize a base class by the subclass that inherits from it. |
-| [Dependency Injection](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
 | [Double Dispatch](32_Patterns--Multiple_Dispatching.md) | Resolve behavior from the runtime types of two objects, through two calls. |
 | [Fluent Interface](27_Patterns--Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
-| [Function Composition](40_Functional--Foundations.md#composing-functions) | Build a function by feeding one function's output into the next. |
 | [Function Object](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
-| [Inversion of Control](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. |
 | [Lazy Initialization](07_Foundations--Classes.md#properties) | Create a value on first use. |
-| Marker Interface | Tag a class with an empty interface to signal a capability. |
-| [Memoization](41_Functional--Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
-| Mixin | Add reusable behavior through multiple inheritance. |
-| [Monad](42_Functional--Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
 | [Multiton](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [Null Object](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [Object Pool](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
-| [Partial Application](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
-| Pointer to Implementation (Pimpl) | Hide a class's implementation behind a pointer so changing it recompiles less. |
-| [Resource Acquisition Is Initialization (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
-| [Service Locator](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 | Specification | Encapsulate a rule as a predicate that combines with others. |
 | [State Machine](31_Patterns--State_Machines.md) | Drive an object through a fixed set of states in response to inputs. |
 | Type Object | Represent a "kind of" thing as data rather than a subclass. |

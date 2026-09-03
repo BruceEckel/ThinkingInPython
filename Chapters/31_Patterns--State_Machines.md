@@ -247,6 +247,14 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
+
+# ESCAPES has no case in Waiting, so case _
+# fires and the machine stays at Waiting:
+trap = MouseTrap()
+trap.run_all([MouseAction.ESCAPES])
+#: Waiting: Broadcasting cheese smell
+#: mouse escapes
+#: Waiting: Broadcasting cheese smell
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
@@ -363,6 +371,16 @@ MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
+
+# ESCAPES is not a key in Waiting.transitions:
+trap2 = MouseTrap()
+try:
+    trap2.run_all([MouseAction.ESCAPES])
+except RuntimeError as e:
+    print(e)
+#: Waiting: Broadcasting cheese smell
+#: mouse escapes
+#: Waiting has no transition for mouse escapes
 ```
 
 The demonstration stops after the first nine moves,
@@ -393,6 +411,13 @@ Staying put suits a machine fed from a noisy source that includes events meant f
 Raising suits a table you are still building,
 where a missing entry is a bug to flag,
 and the table-driven engine below raises for the same reason.
+
+Both listings end with one more call that puts this to the test:
+feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
+where no `case` names it.
+Version 1 prints `Waiting: Broadcasting cheese smell` a second time:
+the state stayed put and ran again.
+Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 
 ## Table-Driven State Machine
 
@@ -658,6 +683,11 @@ if __name__ == "__main__":
         # Sold out
         FirstDigit("D", 3), SecondDigit("col 0", 0),
         Quit(),  # Refund and reset
+        # Row D, col 0 is both too expensive (a dime
+        # isn't 25 cents) and sold out (quantity 0);
+        # too_expensive is listed first, so it wins:
+        Money("dime", 10),
+        FirstDigit("D", 3), SecondDigit("col 0", 0),
     ]
     machine = VendingMachine()
     for event in events:
@@ -676,12 +706,25 @@ if __name__ == "__main__":
 #: D: Row D [SELECTING]
 #: col 0: Cleared: costs 25, quantity 0 [UNAVAILABLE]
 #: Quit: Returning 50 [QUIESCENT]
+#: dime: Total = 10 [COLLECTING]
+#: D: Row D [SELECTING]
+#: col 0: Cleared: costs 25, quantity 0 [COLLECTING]
 ```
 
 The two `Cleared` lines read alike and end in different states:
 too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
+The last two events insert a dime and pick the same sold-out slot again,
+this time with too little money for it as well.
+Both conditions are now true,
+and `too_expensive` sits first in that row's list, so it wins:
+the machine reports `COLLECTING`, as though a dollar more would sell it,
+when the slot is empty and no amount of money would.
+Swap the row order and the same input would report `UNAVAILABLE` instead.
+That is the cost of the ordering rule stated above:
+a row lower in the list can never override one above it,
+even when the lower row is the one that matters.
 
 `__init__()` builds the table, rather than the class body,
 because each entry is a bound method:
@@ -860,17 +903,32 @@ The state class owns both halves,
 so reading `Luring` tells you what luring does and where it can go next,
 and adding a state is one class.
 It reads best when the transitions are obvious from the state's own name.
+An action that must run on every entry into one state,
+such as chiming whenever the machine reaches `COLLECTING`,
+belongs in that state's `run()`, written once.
 
 One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram,
 and adding a state or an input is an entry in the table and a method or two.
-The states shrink to `Enum` members with no behavior.
+The states shrink to `Enum` members with no behavior,
+so that per-state action has no home:
+an action shared by several edges into the same state
+must repeat on every row that leads there,
+or route through a helper the table does not provide on its own.
 
 The tell is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
 A machine small enough to hold in your head goes either way,
 and a machine that arrived as a diagram belongs in the table.
+
+Both designs also cost you a dependency you did not take.
+Mature libraries such as `transitions` and `python-statemachine`
+add guards, callbacks, and hierarchical states
+for the price of an import.
+Reach for one of the two designs here when you cannot take that dependency,
+or want the mechanism visible in your own code.
+Reach for a library once the machine outgrows what a page of code should carry.
 
 ## Exercises
 
