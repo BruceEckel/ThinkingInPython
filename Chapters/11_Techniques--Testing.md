@@ -19,6 +19,14 @@ Immediate feedback saves an enormous amount of time.
 If the problem surfaces only after multiple changes,
 you have no idea which change caused the bug.
 
+When a bug does get through, the patch is only half the job.
+Start by writing a test that reproduces the bug, and watch it fail.
+The fix then turns that test green, and the bug cannot return unnoticed.
+The other half is asking what let the bug through: a case no test covered,
+a claim no annotation stated, an interface that invites misuse.
+Put out the fire, and also find what is starting fires.
+A team that only patches fixes the same kind of bug forever.
+
 ## Test-Driven Development (TDD)
 
 Writing the code, getting it working,

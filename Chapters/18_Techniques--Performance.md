@@ -23,6 +23,17 @@ Do not automatically assume that a simply written program will be too slow.
 Try it out first.
 It might be fine.
 
+The opposite assumption fails just as often:
+a program that works in the small may not scale.
+A run over a hundred records says nothing about a million,
+because costs grow at different rates.
+An algorithm that revisits its data looks instant at one size and takes hours at another,
+and every layer of abstraction hides costs
+(a copy per call, a query behind an attribute)
+that only a realistic load reveals.
+So "try it out" means try it at the size you expect in production,
+not at the size that is convenient to type.
+
 If it is too slow, try the simplest remedy first.
 That might be enough, and if it is, you save time and money.
 

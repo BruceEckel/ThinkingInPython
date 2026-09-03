@@ -47,6 +47,24 @@ Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
 That isolation makes the code cheaper to maintain and usually simpler to understand.
 
+Isolation has a price.
+An abstraction is a bet about which details no caller will ever need,
+and a good abstraction does more than hide those details.
+It erases them.
+Code outside the boundary cannot recover information the boundary discards,
+so a caller that turns out to need an erased detail cannot work around the interface.
+Someone must reopen it.
+The art of design lies in guessing well about which details you can hide and which you must expose.
+
+Erased details are also where scaling limits come from.
+Every abstraction discards something
+(a copy, an ordering, a lookup behind an attribute)
+that costs nothing at the size you built it.
+A growing system eventually reaches the size where one discarded detail dominates,
+and the layer that made the code simple now stands between you and the fix.
+This is one reason [Performance](18_Techniques--Performance.md)
+tells you to measure at a realistic size rather than trust a small trial.
+
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 You look for the most important thing that changes in your system,
