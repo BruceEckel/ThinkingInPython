@@ -236,6 +236,9 @@ A principle is a test you apply to whatever shape you chose:
 a claim you can hold the design up against.
 Most hold for any code,
 but *Reflexivity* and the *Law of Demeter* assume classes and objects.
+The list is a reference:
+later chapters name a few of these principles when a design turns on
+them, and the rest are here for your own designs.
 
 <!-- Several principles below quote their sources word for word (Saint-Exupery
      in the Subtraction footnote, Kevlin Henney under Simplicity before

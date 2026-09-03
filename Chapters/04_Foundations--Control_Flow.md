@@ -1,8 +1,13 @@
 # Control Flow
 
-Control-flow statements decide which code runs and how often.
-This chapter covers conditionals, placeholders, loops, pattern matching,
-exceptions, the `with` statement, and comprehensions.
+In C++ and Java the careful move is to test before you act:
+check that the string parses, that the file is there, that the key exists.
+Python goes the other way.
+Run the operation and catch the exception when it fails.
+The test and the operation can disagree, and the world can change between them.
+Exceptions are ordinary control flow here, not a last resort.
+This chapter covers them along with conditionals, placeholders, loops,
+pattern matching, the `with` statement, and comprehensions.
 
 ## Conditionals
 

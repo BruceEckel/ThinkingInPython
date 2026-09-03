@@ -105,10 +105,11 @@ print("solved in", game.clicks, "clicks")
 ```
 
 `_flood()` is a plain graph search (depth-first, using a stack)
-starting from `origin`, walking to every neighbor `adjacent()` already
-knows how to test, as long as that neighbor is still the same color.
-`FloodGame` reuses `new_grid()` and `adjacent()` from
-`box_observer.py` unchanged. `click()` is the game move: it repaints
+starting from `origin`, walking to every neighbor `adjacent()` says it
+touches, as long as that neighbor is still the same color.
+`FloodGame` reuses `new_grid()` from `box_observer.py` unchanged and
+adds the `adjacent()` the exercise asks for. `click()` is the game
+move: it repaints
 every cell in the *currently owned* patch to the clicked cell's color,
 then re-runs `_flood()` to pick up the neighbors that now match that
 new color and have joined the patch. `game.clicks` gives the

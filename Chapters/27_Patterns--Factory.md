@@ -144,7 +144,7 @@ Apart from the new subclass itself,
 *GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
 `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
-[Abstract Factories](#abstract-factories) shows the subclass-override form.
+[Subclasses Choose the Type](#subclasses-choose-the-type) shows the subclass-override form.
 
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
@@ -450,9 +450,9 @@ Much of the time, however, a single static method in the base class
 
 This factory-object design is not yet the *Factory Method* pattern of *GoF Design Patterns*.
 That pattern puts the creation method on a class and lets subclasses override it.
-`GameElementFactory` in the next section is that form.
-`make_character()` is a factory method,
-and each concrete factory overrides it to produce a different type.
+`Sketch` in the next section is that form.
+`new_shape()` is a factory method,
+and each subclass overrides it to produce a different type.
 
 Python does not need a `Factory` class nested in every shape.
 `shape_factory2.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
@@ -468,9 +468,74 @@ or a command line can hand it arbitrary code instead of a shape name.
 Using the dictionary lookup gives you type safety:
 you get either a factory or a `KeyError`.
 
+## Subclasses Choose the Type
+
+Every factory so far keeps the choice in one place:
+a `match` in `factory()`, a key in `SHAPES`, a lookup in `FACTORIES`.
+*Factory Method* moves the choice into the type of the object you already hold.
+A base class calls a creation method it does not implement,
+and each subclass overrides that method to name a concrete product:
+
+```python
+# shape_sketch.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+class Circle(Shape):
+    @override
+    def draw(self) -> None: print("Circle.draw")
+
+class Square(Shape):
+    @override
+    def draw(self) -> None: print("Square.draw")
+
+class Sketch(ABC):
+    # The factory method:
+    @abstractmethod
+    def new_shape(self) -> Shape: ...
+    def render(self, n: int) -> None:
+        for _ in range(n):
+            self.new_shape().draw()
+
+class CircleSketch(Sketch):
+    @override
+    def new_shape(self) -> Shape: return Circle()
+
+class SquareSketch(Sketch):
+    @override
+    def new_shape(self) -> Shape: return Square()
+
+for sketch in (CircleSketch(), SquareSketch()):
+    sketch.render(2)
+#: Circle.draw
+#: Circle.draw
+#: Square.draw
+#: Square.draw
+```
+
+`render()` uses a `Shape` without naming one.
+`new_shape()` is the factory method,
+and the only thing `CircleSketch` and `SquareSketch` change.
+Adding a `Triangle` means one new `Shape` subclass and one new `Sketch` subclass,
+with no edit to code that already works.
+This is the form *GoF Design Patterns* describes,
+and the reason the pattern is named for a method rather than for a class.
+
+The price is a second hierarchy.
+Each product needs a creator that produces it,
+so the two hierarchies grow together.
+That price buys something only when the creator does work of its own,
+as `render()` does here.
+When choosing the class is the creator's only job,
+the dictionary in `shape_table.py` says the same thing with no hierarchy at all.
+
 ## Abstract Factories
 
-The *Abstract Factory* pattern has the same structure as the factory objects in `shape_factory2.py`,
+The *Abstract Factory* pattern has the same structure as `Sketch`,
 with not one but several factory methods, each overridden in a concrete factory.
 Each factory method creates a different kind of object.
 When you create the factory object,

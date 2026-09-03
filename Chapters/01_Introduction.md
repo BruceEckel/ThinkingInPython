@@ -18,6 +18,72 @@ Before using an idiom or pattern,
 this book asks whether the language already solves the problem,
 and adds the complexity only when the answer is no.
 
+## AI Trigger Warning
+
+I started this book in 2008,
+with the idea of taking the design patterns work I had done in Java and translating it to Python.
+In 2011 I abandoned the project with many of the design patterns still in Java.
+Eventually I even wrote a message confirming I would not complete it.
+
+In June of 2026, after people mentioned the online book to me at recent PyCons,
+I decided to see what the Claude AI could do with it.
+The experience was amazing,
+and I began adding material from my blog posts and presentations.
+Claude allowed me to create tooling for the book that I had imagined but never fully realized.
+
+This book never would have happened without the help of Claude.
+That said, it is still my work, derived from existing work, designed by me,
+checked and rewritten by me.
+It has my voice, and I've gone over every sentence multiple times, editing,
+rewriting, and adding.
+
+I know some people don't like AI.
+Without it, this book wouldn't exist.
+The book is free, so if AI bothers you more than the resulting product might benefit you,
+please ignore this book.
+
+Using Claude made me realize how many compromises I've made on books in the past.
+I would get a good idea about something
+(for example, automatically interleaving commented output in the listings).
+I either couldn't implement it, or it seemed too hard, so I didn't do it.
+But with AI I can explore and often implement every whim,
+from things as seemingly straightforward as inserting a new chapter to ones as daunting as that commented-output system.
+The result is much better than anything I managed before.
+I keep going until I've tweaked everything that occurs to me.
+
+For things I have generated rather than written from scratch,
+I've become the director of the movie instead of an actor in it.
+This book is what I've always wanted to create,
+but have never had the capacity to flesh out in all its myriad detail.
+With Claude and my directing and rewriting, I can build my ideal book.
+
+Using Claude greatly simplified and sped the writing process.
+It did not make it trivial.
+Once Claude had translated and integrated my own work into the book,
+and once it had generated the first versions of new material,
+I went through line by line and concept by concept,
+inevitably rewriting and asking for clarification,
+often creating more examples to answer further questions.
+One pass would often change the book enough that it needed another pass.
+It was much faster than without Claude, but it still took time and effort.
+
+I can't predict the future of books.
+The internet and eBooks have been changing the print book industry for decades.
+But with AI, how many people will keep reading computer programming books?
+I hardly do.
+If I need something, I ask AI.
+My only hope is that this book will be engaging to read,
+and that you will experience some of the same satisfaction that I've had while writing it.
+
+I think most programmers will regularly use AI, if they don't already.
+Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
+However, at the time of this writing,
+Python seems to be the most popular language for AI-generated code.
+Some small percentage of people might still wish to analyze what the AIs are generating.
+This book might have some value yet.
+
+The knowledge in this book has helped me guide AIs toward better solutions.
+
 ## Who This Book Is For
 
 I am writing for the programmer who already knows how to program,
@@ -94,72 +160,6 @@ The last two put that idea to work with `stateless`,
 a library that brings Effect tracking to Python today.
 Read these four chapters in order.
 Each depends on the one before it.
-
-## AI Trigger Warning
-
-I started this book in 2008,
-with the idea of taking the design patterns work I had done in Java and translating it to Python.
-In 2011 I abandoned the project with many of the design patterns still in Java.
-Eventually I even wrote a message confirming I would not complete it.
-
-In June of 2026, after people mentioned the online book to me at recent PyCons,
-I decided to see what the Claude AI could do with it.
-The experience was amazing,
-and I began adding material from my blog posts and presentations.
-Claude allowed me to create tooling for the book that I had imagined but never fully realized.
-
-This book never would have happened without the help of Claude.
-That said, it is still my work, derived from existing work, designed by me,
-checked and rewritten by me.
-It has my voice, and I've gone over every sentence multiple times, editing,
-rewriting, and adding.
-
-I know some people don't like AI.
-Without it, this book wouldn't exist.
-The book is free, so if AI bothers you more than the resulting product might benefit you,
-please ignore this book.
-
-Using Claude made me realize how many compromises I've made on books in the past.
-I would get a good idea about something
-(for example, automatically interleaving commented output in the listings).
-I either couldn't implement it, or it seemed too hard, so I didn't do it.
-But with AI I can explore and often implement every whim,
-from things as seemingly straightforward as inserting a new chapter to ones as daunting as that commented-output system.
-The result is much better than anything I managed before.
-I keep going until I've tweaked everything that occurs to me.
-
-For things I have generated rather than written from scratch,
-I've become the director of the movie instead of an actor in it.
-This book is what I've always wanted to create,
-but have never had the capacity to flesh out in all its myriad detail.
-With Claude and my directing and rewriting, I can build my ideal book.
-
-Using Claude greatly simplified and sped the writing process.
-It did not make it trivial.
-Once Claude had translated and integrated my own work into the book,
-and once it had generated the first versions of new material,
-I went through line by line and concept by concept,
-inevitably rewriting and asking for clarification,
-often creating more examples to answer further questions.
-One pass would often change the book enough that it needed another pass.
-It was much faster than without Claude, but it still took time and effort.
-
-I can't predict the future of books.
-The internet and eBooks have been changing the print book industry for decades.
-But with AI, how many people will keep reading computer programming books?
-I hardly do.
-If I need something, I ask AI.
-My only hope is that this book will be engaging to read,
-and that you will experience some of the same satisfaction that I've had while writing it.
-
-I think most programmers will regularly use AI, if they don't already.
-The knowledge in this book has helped me guide AIs toward better solutions.
-
-Perhaps I am teaching the equivalent of assembly language after everyone has started using the equivalent of compilers.
-However, at the time of this writing,
-Python seems to be the most popular language for AI-generated code.
-Some small percentage of people might still wish to analyze what the AIs are generating.
-This book might have some value yet.
 
 ## The Examples
 

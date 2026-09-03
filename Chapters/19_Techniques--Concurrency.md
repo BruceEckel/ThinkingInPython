@@ -784,8 +784,53 @@ no matter how many times the event loop switches to another task in between.
 The counter now reaches 400, the same fix `threading.Lock` produces for threads.
 An `asyncio.Lock` orders tasks on one event loop and gives no protection across threads.
 A worker thread reached through `asyncio.to_thread()` needs a `threading.Lock`.
-[Locks, Semaphores, and Failure Modes](#locks-semaphores-and-failure-modes)
-takes up the rest of the coordination primitives, and the ways they fail.
+
+### Semaphores
+
+A *semaphore* generalizes a lock from a single lock-holder to a fixed number of them.
+Where a lock admits one task,
+`asyncio.Semaphore(n)` admits up to `n` at once and suspends the rest:
+
+```python
+# async_semaphore.py
+import asyncio
+
+active = 0
+peak = 0
+semaphore = asyncio.Semaphore(2)
+
+async def worker() -> None:
+    global active, peak
+    async with semaphore:
+        active += 1
+        peak = max(peak, active)
+        await asyncio.sleep(0.05)
+        active -= 1
+
+async def main() -> None:
+    await asyncio.gather(*(worker() for _ in range(5)))
+    print(f"peak concurrent workers: {peak}")
+
+asyncio.run(main())
+#: peak concurrent workers: 2
+```
+
+Five tasks start together, but `semaphore` admits only two at a time.
+`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
+A threaded equivalent of this worker needs its own lock around `active += 1` and `peak = max(peak, active)`,
+since a preemptive switch could fall between them.
+Here, the first `await` comes after both updates,
+so the task keeps control through them and needs no lock.
+
+A semaphore initialized to one behaves like a lock, with one difference.
+A `Lock` refuses a release it never granted,
+raising `RuntimeError: Lock is not acquired`.
+An over-released `Semaphore` quietly raises its own limit instead,
+so a stray `release()` turns a semaphore of one into a semaphore of two.
+Raising the count deliberately turns it into a throttle on a limited resource,
+such as a fixed number of database connections.
+[Deadlock and Livelock](#deadlock-and-livelock)
+takes up the two ways these primitives fail.
 
 ## Context That Follows the Call Chain {#context-that-follows-the-call-chain}
 
@@ -2133,61 +2178,13 @@ raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an excep
 Tasks have no equivalent ceiling,
 because a task consumes none of the OS resources that limit threads.
 
-## Locks, Semaphores, and Failure Modes
+## Deadlock and Livelock
 
-`async_race.py` in [A Single Thread Still Races](#a-single-thread-still-races)
-lost updates to shared mutable state, and an `asyncio.Lock` restored them,
-with no thread involved either time.
 Shared mutable state, not threads, is the source of deadlock and livelock,
 and `asyncio` shares it just as readily as threads do.
 Removing the OS thread scheduler moves where these failures arise and leaves the failures themselves in place.
 With threads, that point is anywhere the OS decides to preempt you.
 `asyncio` narrows this to the `await` points you wrote yourself.
-
-### Semaphores
-
-A *semaphore* generalizes a lock from a single lock-holder to a fixed number of them.
-Where a lock admits one task,
-`asyncio.Semaphore(n)` admits up to `n` at once and suspends the rest:
-
-```python
-# async_semaphore.py
-import asyncio
-
-active = 0
-peak = 0
-semaphore = asyncio.Semaphore(2)
-
-async def worker() -> None:
-    global active, peak
-    async with semaphore:
-        active += 1
-        peak = max(peak, active)
-        await asyncio.sleep(0.05)
-        active -= 1
-
-async def main() -> None:
-    await asyncio.gather(*(worker() for _ in range(5)))
-    print(f"peak concurrent workers: {peak}")
-
-asyncio.run(main())
-#: peak concurrent workers: 2
-```
-
-Five tasks start together, but `semaphore` admits only two at a time.
-`peak` tracks the same live-count idea as `Meter` in [Overlapping the Waits](#overlapping-the-waits).
-A threaded equivalent of this worker needs its own lock around `active += 1` and `peak = max(peak, active)`,
-since a preemptive switch could fall between them.
-Here, the first `await` comes after both updates,
-so the task keeps control through them and needs no lock.
-
-A semaphore initialized to one behaves like a lock, with one difference.
-A `Lock` refuses a release it never granted,
-raising `RuntimeError: Lock is not acquired`.
-An over-released `Semaphore` quietly raises its own limit instead,
-so a stray `release()` turns a semaphore of one into a semaphore of two.
-Raising the count deliberately turns it into a throttle on a limited resource,
-such as a fixed number of database connections.
 
 ### Deadlock
 

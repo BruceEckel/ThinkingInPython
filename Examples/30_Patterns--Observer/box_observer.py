@@ -11,15 +11,9 @@ def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
-def adjacent(a: Coord, b: Coord) -> bool:
-    return (a != b and abs(a[0] - b[0]) <= 1
-            and abs(a[1] - b[1]) <= 1)
-
 def recolored(grid: Grid, clicked: Coord) -> Grid:
-    color = grid[clicked]
-    return {cell: color if adjacent(cell, clicked)
-            else current
-            for cell, current in grid.items()}
+    nxt = COLORS.index(grid[clicked]) + 1
+    return grid | {clicked: COLORS[nxt % len(COLORS)]}
 
 class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:

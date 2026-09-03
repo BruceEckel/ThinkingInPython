@@ -258,46 +258,12 @@ but does not derive from `Simple`.
 it requires one thing of `obj`, a `show()` it can call,
 so it accepts a `Simple2` and a `Different` alike.
 
-## Composing Methods with `import`
-
-You can compose methods into a class using `import`.
-More than one class can reuse a method defined this way:
-
-```python
-# utility.py
-
-def f(self):
-    print(f"utility.f() called on {self.name}")
-```
-
-`compose.py` composes that method into two unrelated classes:
-
-```python
-# compose.py
-
-class Compose:
-    from utility import f
-
-    def __init__(self, name):
-        self.name = name
-
-class Other:
-    from utility import f
-
-    def __init__(self, name):
-        self.name = name
-
-Compose("example").f()
-#: utility.f() called on example
-Other("second").f()
-#: utility.f() called on second
-```
-
-Because `f` is now an ordinary method, its first parameter is `self`,
-whichever class imported it.
-The import works because `import` inside a class body binds a name like any other assignment,
-but it is a curiosity more than a technique:
-a helper object or a module-level function is almost always the clearer choice.
+An `import` inside a class body binds that name like any other assignment,
+so importing a module-level function there attaches it to the class as a method,
+`self` and all.
+More than one unrelated class can pick up the same function this way,
+but that import trick is a curiosity more than a technique:
+a helper object or a plain module-level function is almost always clearer.
 
 ## Marking Overrides with `@override`
 

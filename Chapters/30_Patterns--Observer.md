@@ -566,15 +566,14 @@ The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
 It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
-Clicking a box gives every box touching it, diagonals included,
-the clicked box's color.
+Clicking a box advances that box to the next color.
 
 The model is an `Observable`.
 `new_grid()` builds a size x size grid banded into three colors,
-`adjacent()` tests whether two distinct cells touch, including diagonally,
 and `recolored()` computes the grid that results from a click: values in,
 values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
+That is the whole model.
 `tkinter` plays no part here.
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
@@ -592,15 +591,9 @@ def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
-def adjacent(a: Coord, b: Coord) -> bool:
-    return (a != b and abs(a[0] - b[0]) <= 1
-            and abs(a[1] - b[1]) <= 1)
-
 def recolored(grid: Grid, clicked: Coord) -> Grid:
-    color = grid[clicked]
-    return {cell: color if adjacent(cell, clicked)
-            else current
-            for cell, current in grid.items()}
+    nxt = COLORS.index(grid[clicked]) + 1
+    return grid | {clicked: COLORS[nxt % len(COLORS)]}
 
 class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:
@@ -615,11 +608,11 @@ class BoxModel(Observable[Grid]):
 
 Because the model carries no display code, a test drives it without a GUI.
 Build a model, click a cell,
-and check that the neighbors took its color and that observers received the new grid:
+and check that only that cell changed and that observers received the new grid:
 
 ```python
 # test_box_observer.py
-from box_observer import (BoxModel, Grid, adjacent,
+from box_observer import (COLORS, BoxModel, Grid,
                           new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
@@ -629,33 +622,26 @@ def test_new_grid_size_and_banding() -> None:
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_adjacent() -> None:
-    assert adjacent((1, 1), (2, 2))  # Diagonal
-    assert adjacent((1, 1), (1, 2))  # Edge
-    # Not its own neighbor
-    assert not adjacent((1, 1), (1, 1))
-    assert not adjacent((0, 0), (2, 0))  # Two away
-
-def test_recolored_touches_only_neighbors() -> None:
-    grid = new_grid(5)
-    out = recolored(grid, (2, 2))
-    # Diagonal neighbor: changed
-    assert out[(1, 1)] == grid[(2, 2)]
-    # Edge neighbor: changed
-    assert out[(2, 3)] == grid[(2, 2)]
-    # Two away: unchanged
-    assert out[(0, 0)] == grid[(0, 0)]
+def test_recolored_changes_one_cell() -> None:
+    grid = new_grid(3)
+    out = recolored(grid, (1, 1))
+    # The clicked cell takes the next color
+    was = COLORS.index(grid[(1, 1)])
+    assert out[(1, 1)] == COLORS[(was + 1) % 3]
+    assert all(out[c] == grid[c]
+               for c in grid if c != (1, 1))
     assert out is not grid  # Pure: a new grid
 
 def test_model_notifies_with_the_new_grid() -> None:
-    model = BoxModel(5)
+    model = BoxModel(3)
+    before = model.grid[(1, 1)]
     seen: list[Grid] = []
     # The observer is a callable
     model.subscribe(seen.append)
-    model.click((2, 2))
+    model.click((1, 1))
     # Observer got the new grid
     assert seen[-1] is model.grid
-    assert model.grid[(1, 1)] == model.grid[(2, 2)]
+    assert model.grid[(1, 1)] != before
 ```
 
 The view lives in its own file.
@@ -729,6 +715,7 @@ and the Observer is an event bus.
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and clicking any square recolors your patch to that square's color,
     absorbing neighbors that now match.
+    Write the neighbor test yourself, counting diagonals.
     Track the clicks it takes to make the whole field one color.
     For competition, alternate turns between players.
 3.  Make `Observable.notify()` survive an observer that raises an exception:

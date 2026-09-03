@@ -921,6 +921,65 @@ def test_descriptor_on_class_returns_itself() -> None:
     assert isinstance(set_name.Point.x, set_name.Field)
 ```
 
+### A Descriptor That Validates
+
+`Field` shows the protocol and stores whatever you hand it.
+A descriptor pays for itself when the write must do more than store.
+`Positive` checks the value on its way in,
+so every attribute declared with one enforces the same rule:
+
+```python
+# validating_descriptor.py
+from exceptions import ignore
+
+class Positive:
+    def __set_name__(self, owner: type, name: str) -> None:
+        self.storage = f"_{name}"
+
+    def __get__(self, obj: object,
+                owner: type | None = None) -> float:
+        return getattr(obj, self.storage)
+
+    def __set__(self, obj: object, value: float) -> None:
+        if value <= 0:
+            raise ValueError(f"{value} is not positive")
+        setattr(obj, self.storage, value)
+
+class Rectangle:
+    width = Positive()
+    height = Positive()
+
+    def __init__(
+        self, width: float, height: float
+    ) -> None:
+        self.width = width
+        self.height = height
+
+    def area(self) -> float:
+        return self.width * self.height
+
+r = Rectangle(3.0, 4.0)
+print(r.area())
+#: 12.0
+
+with ignore(ValueError):
+    r.width = -1.0
+#: ValueError('-1.0 is not positive')
+
+print(r.area())
+#: 12.0
+```
+
+`Rectangle` names the rule twice and writes no checking code of its own.
+`self.width = width` inside `__init__()` routes through `Positive.__set__()` like any other write,
+so the constructor validates its arguments without a line devoted to it.
+The rejected assignment never reaches `_width`,
+which is why `r.area()` still reports the value set before it.
+A `property` protects one attribute the same way,
+but `Rectangle` would then carry the check twice, once per attribute.
+A descriptor is the reusable form.
+The rule lives in one class, and each attribute that wants it says `Positive()`.
+
 ## Writing a Metaclass
 
 A metaclass is a subclass of `type`,
@@ -1280,7 +1339,9 @@ Use a metaclass when you need to change the class object rather than react to it
 - Adding methods *to the class*
   (metamethods such as the `__call__()` shown above, or the `__iter__()` that lets `EnumType` make `for c in Color` work).
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
-- Enforcing an invariant across an entire family of classes through their shared metaclass.
+- Enforcing an invariant across a family of classes that shares no base class.
+  `__init_subclass__()` needs a common base to live on,
+  and the shared metaclass is what such a family has instead.
 
 The first bullet has a listing to show for it.
 A metaclass can give the class itself an `__iter__()`,
@@ -1428,6 +1489,147 @@ shows that machinery on a class:
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
+`display_object()` is built from three of these functions:
+`getmembers_static()` finds the members, `signature()` renders each method,
+and `get_annotations()` supplies the declared types.
+The next section describes what it does with them.
+Its source and its display options are reference material,
+collected in [`display_object()` Reference](#display_object-reference)
+at the end of this chapter.
+
+### Sorting Members into Attributes and Methods
+
+`display_object()` walks every member that `inspect.getmembers_static()` returns.
+The static variant reads members from the object and its classes directly,
+without invoking descriptors, properties, or `__getattr__()`.
+Inspecting an object therefore never runs its code or triggers a side effect,
+and that safety matters when you point this tool at something unfamiliar.
+
+The tool sorts each member into one of two lists.
+Callables become methods,
+printed with the signature that `inspect.signature()` reports,
+or `(...)` when a built-in has no inspectable signature.
+Everything else becomes an attribute, printed as `name: type = value`.
+The declared type comes from the class annotations,
+gathered across the whole inheritance chain with `inspect.get_annotations()`.
+An attribute with no annotation, such as one assigned dynamically,
+prints as `name = value`.
+The value is the member's `repr()`,
+truncated to keep the line within `max_width`.
+
+An attribute tagged `[CV]`, for *class variable*,
+lives on the class or a base class rather than in `obj`'s own `__dict__`.
+When `obj` is itself a class, every attribute lives on a class,
+so all of them carry the tag.
+In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
+`classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
+even though `D` declares them directly, because neither belongs to an instance.
+For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
+the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--Class_Attributes.md#class-attributes-are-not-default-values).
+`class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
+tags `B.x` and `B.s`,
+while `display_object(Messenger("iris", 12, 3.14))` tags none,
+since `@dataclass` assigns every field straight onto the new instance.
+The tag comes from where the value lives,
+so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
+
+## Which Hook for Which Job
+
+Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction.
+Putting them all in one class shows the sequence:
+
+```python
+# hook_order.py
+from typing import Any
+
+class Watched:
+    def __set_name__(self, owner: type, name: str) -> None:
+        print(f"__set_name__({owner.__name__}, {name})")
+
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, name: str, bases: tuple[type, ...],
+                    **kwargs: Any) -> dict[str, Any]:
+        print(f"__prepare__ {name}")
+        return {}
+
+    def __new__(mcls, name: str, bases: tuple[type, ...],
+                nmspc: dict[str, Any]) -> type:
+        print(f"__new__ {name} enter")
+        cls = super().__new__(mcls, name, bases, nmspc)
+        print(f"__new__ {name} exit")
+        return cls
+
+    def __init__(cls, name: str, bases: tuple[type, ...],
+                 nmspc: dict[str, Any]) -> None:
+        super().__init__(name, bases, nmspc)
+        print(f"__init__ {name}")
+
+def tag[T: type](cls: T) -> T:
+    print(f"decorator {cls.__name__}")
+    return cls
+
+class Base(metaclass=Meta):
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        print(f"__init_subclass__ {cls.__name__}")
+#: __prepare__ Base
+#: __new__ Base enter
+#: __new__ Base exit
+#: __init__ Base
+
+@tag
+class Derived(Base):
+    field = Watched()
+    print("class body")
+#: __prepare__ Derived
+#: class body
+#: __new__ Derived enter
+#: __set_name__(Derived, field)
+#: __init_subclass__ Derived
+#: __new__ Derived exit
+#: __init__ Derived
+#: decorator Derived
+```
+
+`Base`'s four lines are the bare sequence,
+and they also show that `Base.__init_subclass__()` never runs for `Base` itself,
+the rule [Making a Class Final](#making-a-class-final) needs.
+`Derived` adds the rest.
+`__prepare__()` runs before the body, so its line comes first.
+The body then executes, printing `class body`.
+`__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`,
+because `type.__new__()` calls them as it assembles the class,
+so they are not merely "after the body" but inside the metaclass's own construction step.
+The decorator is last, because it receives a class that is already finished.
+
+Knowing that sequence picks the hook for the job:
+
+- React to each new subclass: `__init_subclass__()`.
+- Let a class attribute learn its own name: `__set_name__()`.
+- Rewrite a finished class: a class decorator.
+- Build a family of classes from data: `type()` with three arguments,
+  or an `exec()`ed class body when the definition is easier to read as source.
+- Change the name, the bases, or the namespace before Python builds the class:
+  a metaclass `__new__()`.
+- Control the namespace the body executes into: `__prepare__()`.
+- Decide whether an instance gets built: a metaclass `__call__()`.
+- Read a class you did not write: `inspect`.
+
+None of this is a special facility bolted onto the language.
+A class is an object that Python builds at run time by executing its body,
+and `hook_order.py` displays each step of that construction as it runs.
+The one hook missing from its trace is `__call__()`, which runs later still,
+each time someone calls the finished class.
+
+## `display_object()` Reference {#display_object-reference}
+
+The rest of `display_object()` is presentation:
+how it formats what `inspect` reports, and which members it shows.
+That belongs to the tool rather than to metaprogramming,
+so it is collected here.
+Read it when a listing's output raises a question, and skip it otherwise.
+
 ### Building `display_object()`
 
 Throughout the book you've seen `display_object()` show the layout of an object.
@@ -1559,42 +1761,6 @@ not because Python searches other directories automatically.
 `tools/run_examples.py` sets `PYTHONPATH` to the tree's `utils/` directory before running each script.
 The same directory reaches pytest through `pythonpath` in `pyproject.toml`.
 Without either, `from display import display_object` fails with `ModuleNotFoundError`.
-
-### Sorting Members into Attributes and Methods
-
-`display_object()` walks every member that `inspect.getmembers_static()` returns.
-The static variant reads members from the object and its classes directly,
-without invoking descriptors, properties, or `__getattr__()`.
-Inspecting an object therefore never runs its code or triggers a side effect,
-and that safety matters when you point this tool at something unfamiliar.
-
-The tool sorts each member into one of two lists.
-Callables become methods,
-printed with the signature that `inspect.signature()` reports,
-or `(...)` when a built-in has no inspectable signature.
-Everything else becomes an attribute, printed as `name: type = value`.
-The declared type comes from the class annotations,
-gathered across the whole inheritance chain with `inspect.get_annotations()`.
-An attribute with no annotation, such as one assigned dynamically,
-prints as `name = value`.
-The value is the member's `repr()`,
-truncated to keep the line within `max_width`.
-
-An attribute tagged `[CV]`, for *class variable*,
-lives on the class or a base class rather than in `obj`'s own `__dict__`.
-When `obj` is itself a class, every attribute lives on a class,
-so all of them carry the tag.
-In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
-`classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
-even though `D` declares them directly, because neither belongs to an instance.
-For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
-the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--Class_Attributes.md#class-attributes-are-not-default-values).
-`class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
-tags `B.x` and `B.s`,
-while `display_object(Messenger("iris", 12, 3.14))` tags none,
-since `@dataclass` assigns every field straight onto the new instance.
-The tag comes from where the value lives,
-so it applies whether or not the attribute's declaration uses `typing.ClassVar`.
 
 ### Choosing Which Dunders to Show
 
@@ -1808,95 +1974,6 @@ The generated `__init__`, `__eq__`, and `__repr__` give `Fraggle` a constructor,
 equality, and a `repr()` that you never wrote.
 
 The rest is the bookkeeping every class carries.
-
-## Which Hook for Which Job
-
-Every hook in this chapter is an ordinary function that Python calls at a known moment during class construction.
-Putting them all in one class shows the sequence:
-
-```python
-# hook_order.py
-from typing import Any
-
-class Watched:
-    def __set_name__(self, owner: type, name: str) -> None:
-        print(f"__set_name__({owner.__name__}, {name})")
-
-class Meta(type):
-    @classmethod
-    def __prepare__(cls, name: str, bases: tuple[type, ...],
-                    **kwargs: Any) -> dict[str, Any]:
-        print(f"__prepare__ {name}")
-        return {}
-
-    def __new__(mcls, name: str, bases: tuple[type, ...],
-                nmspc: dict[str, Any]) -> type:
-        print(f"__new__ {name} enter")
-        cls = super().__new__(mcls, name, bases, nmspc)
-        print(f"__new__ {name} exit")
-        return cls
-
-    def __init__(cls, name: str, bases: tuple[type, ...],
-                 nmspc: dict[str, Any]) -> None:
-        super().__init__(name, bases, nmspc)
-        print(f"__init__ {name}")
-
-def tag[T: type](cls: T) -> T:
-    print(f"decorator {cls.__name__}")
-    return cls
-
-class Base(metaclass=Meta):
-    def __init_subclass__(cls, **kwargs: object) -> None:
-        super().__init_subclass__(**kwargs)
-        print(f"__init_subclass__ {cls.__name__}")
-#: __prepare__ Base
-#: __new__ Base enter
-#: __new__ Base exit
-#: __init__ Base
-
-@tag
-class Derived(Base):
-    field = Watched()
-    print("class body")
-#: __prepare__ Derived
-#: class body
-#: __new__ Derived enter
-#: __set_name__(Derived, field)
-#: __init_subclass__ Derived
-#: __new__ Derived exit
-#: __init__ Derived
-#: decorator Derived
-```
-
-`Base`'s four lines are the bare sequence,
-and they also show that `Base.__init_subclass__()` never runs for `Base` itself,
-the rule [Making a Class Final](#making-a-class-final) needs.
-`Derived` adds the rest.
-`__prepare__()` runs before the body, so its line comes first.
-The body then executes, printing `class body`.
-`__set_name__()` and `__init_subclass__()` both run between `__new__ Derived enter` and `__new__ Derived exit`,
-because `type.__new__()` calls them as it assembles the class,
-so they are not merely "after the body" but inside the metaclass's own construction step.
-The decorator is last, because it receives a class that is already finished.
-
-Knowing that sequence picks the hook for the job:
-
-- React to each new subclass: `__init_subclass__()`.
-- Let a class attribute learn its own name: `__set_name__()`.
-- Rewrite a finished class: a class decorator.
-- Build a family of classes from data: `type()` with three arguments,
-  or an `exec()`ed class body when the definition is easier to read as source.
-- Change the name, the bases, or the namespace before Python builds the class:
-  a metaclass `__new__()`.
-- Control the namespace the body executes into: `__prepare__()`.
-- Decide whether an instance gets built: a metaclass `__call__()`.
-- Read a class you did not write: `inspect`.
-
-None of this is a special facility bolted onto the language.
-A class is an object that Python builds at run time by executing its body,
-and `hook_order.py` displays each step of that construction as it runs.
-The one hook missing from its trace is `__call__()`, which runs later still,
-each time someone calls the finished class.
 
 ## Exercises
 

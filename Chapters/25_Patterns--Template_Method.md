@@ -274,10 +274,44 @@ when code expects a base-class instance,
 an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
 trusting that what the subclass supplies fits the algorithm's shape.
-An override can break that trust and still type-check:
-it raises an exception where the base would not,
-or leaves a step empty when the flow depends on it.
-Either one corrupts the anchored algorithm.
+An override can break that trust and still type-check.
+It raises an exception where the base would not,
+leaves a step empty when the flow depends on it,
+or performs the step on one pass and skips the next:
+
+```python
+# faithless_step.py
+from typing import final, override
+
+class ApplicationFramework:
+    @final
+    def run(self) -> None:
+        for _ in range(2):
+            self.customize1()
+            self.customize2()
+
+    def customize1(self) -> None: ...
+    def customize2(self) -> None: ...
+
+class OnlyOnce(ApplicationFramework):
+    ran = False
+
+    @override
+    def customize1(self) -> None:
+        if not self.ran:  # The second pass does nothing
+            self.ran = True
+            print("Nudge, nudge, wink, wink!")
+
+OnlyOnce().run()
+#: Nudge, nudge, wink, wink!
+```
+
+`run()` calls `customize1()` twice, and `OnlyOnce` prints once.
+The name, the parameters, and the return type all match the base,
+so `@override` is satisfied and `ty` reports nothing.
+The base states its algorithm in the loop, not in any type:
+each pass calls the step, so each pass must perform it.
+Every one of these breaks corrupts the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten".
 The Template Method works only when every subclass is a faithful substitute for its base.
