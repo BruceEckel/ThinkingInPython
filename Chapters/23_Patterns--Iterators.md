@@ -165,6 +165,41 @@ Generators are lazy.
 `fibonacci(1_000_000)` computes nothing until you iterate,
 and produces one value at a time,
 so it works on streams too large to hold in memory.
+Measure it:
+
+```python
+# generator_memory.py
+import tracemalloc
+from collections.abc import Iterator
+from typing import Final
+from benchmark import report
+
+def squares(n: int) -> Iterator[int]:
+    return (i * i for i in range(n))
+
+N: Final[int] = 1_000_000
+
+tracemalloc.start()
+total = 0
+for x in squares(N):
+    total += x
+lazy_peak, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+tracemalloc.start()
+collected = list(squares(N))
+eager_peak, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+
+report(lazy_bytes=lazy_peak, eager_bytes=eager_peak)
+print(f"generator used far less memory: "
+      f"{lazy_peak < eager_peak * 0.01}")
+#: generator used far less memory: True
+```
+
+Iterating the generator keeps one squared value alive at a time.
+Collecting the same million values into a list keeps all of them alive at once,
+so the generator's peak stays a rounding error next to the list's.
 
 A generator can be *infinite*.
 A `while True` loop that yields forever, or `itertools.count()`,
@@ -318,6 +353,19 @@ report(tee_bytes=buffered, list_bytes=listed)
 print(f"tee held as much as the list: "
       f"{buffered > listed * 0.9}")
 #: tee held as much as the list: True
+
+# Same N, but both branches advance together:
+first2, second2 = tee(squares(N))
+tracemalloc.start()
+for x, y in zip(first2, second2,
+                strict=True):
+    pass
+lockstep, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+report(lockstep_bytes=lockstep)
+print(f"lockstep buffered far less: "
+      f"{lockstep < listed * 0.1}")
+#: lockstep buffered far less: True
 ```
 
 Both branches see all five squares,
@@ -327,6 +375,10 @@ The second half of the listing shows the price.
 so when `first` drains while `second` waits, the buffer holds the whole stream.
 That is the memory a list would use, and the comparison confirms it
 (one machine measured 4,096,544 bytes buffered against 3,999,992 for the list).
+The last block advances `first2` and `second2` together instead,
+one `zip()` step at a time,
+so `tee` never buffers more than the gap between them.
+That gap stays near zero, and the measurement confirms it.
 Use `tee` when two consumers advance together,
 not when one finishes before the other starts.
 
@@ -448,6 +500,9 @@ The infinite `count(1)` never runs away.
 `islice()` is also how you slice an iterator.
 A generator defines no `__getitem__()`,
 so the list habit `odd_squares[:5]` raises a `TypeError` instead.
+[Functional Toolkits](41_Functional--Toolkits.md#chain)
+covers `chain()` and `groupby()` in full,
+including the sorted-input trap `groupby()` sets for an unwary caller.
 
 Choose `takewhile()` deliberately,
 because its lookalike is the `if` clause of a generator expression
@@ -537,6 +592,7 @@ from typing import override
 class TypedIterator[T](Iterator[T]):
     imp: Iterator[object]
     expected: type[T]
+    accepted: int = 0  # State a generator can't expose
 
     @override
     def __next__(self) -> T:
@@ -545,7 +601,15 @@ class TypedIterator[T](Iterator[T]):
             raise TypeError(
                 f"TypedIterator for {self.expected} "
                 f"encountered {type(obj).__name__}")
+        self.accepted += 1
         return obj
+
+if __name__ == "__main__":
+    checked = TypedIterator(iter([1, 2, 3]), int)
+    print(next(checked), next(checked))
+    print(checked.accepted)  # Read mid-stream
+#: 1 2
+#: 2
 ```
 
 `collections.abc.Iterator` supplies `__iter__()` to its subclasses,
@@ -581,7 +645,9 @@ if __name__ == "__main__":
 #: [1, 2, 3]
 ```
 
-Use the class when the wrapper needs its own state or extra methods.
+Use the class when the wrapper needs its own state or extra methods,
+such as `accepted` above: a caller reads it mid-stream,
+a generator's local variables stay invisible outside the generator.
 Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because every such place uses the same protocol.

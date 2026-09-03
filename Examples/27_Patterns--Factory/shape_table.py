@@ -1,6 +1,6 @@
 # shape_table.py
 from abc import ABC, abstractmethod
-from typing import Final, override
+from typing import Final, Literal, override
 
 class Shape(ABC):
     @abstractmethod
@@ -14,15 +14,20 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-SHAPES: Final[dict[str, type[Shape]]] = {
+Kind = Literal["Circle", "Square"]
+
+SHAPES: Final[dict[Kind, type[Shape]]] = {
     "Circle": Circle,
     "Square": Square,
 }
 
-def make(kind: str) -> Shape:
+def make(kind: Kind) -> Shape:
     return SHAPES[kind]()
 
 make("Circle").draw()
 #: Circle.draw
 make("Square").draw()
 #: Square.draw
+# ty: expected Literal["Circle", "Square"],
+# found Literal["Hexagon"]:
+# make("Hexagon").draw()

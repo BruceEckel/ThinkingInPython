@@ -25,5 +25,10 @@ try:
 except PermissionError as e:
     print(type(e).__name__, e)
 #: PermissionError erase
+try:
+    hasattr(guest, "erase")
+except PermissionError as e:
+    print(type(e).__name__, e)
+#: PermissionError erase
 Guarded(Document(), admin=True).erase()
 #: erased

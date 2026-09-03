@@ -12,6 +12,13 @@ def quadrant(p: Point) -> str:
         case _:
             return "Somewhere else"
 
+def leaky(p: Point) -> int:
+    match p:
+        case Point(x, _) if x > 100:
+            return 0
+        case _:
+            return x
+
 print(quadrant(Point(0, 0)))
 #: Origin
 print(quadrant(Point(3, 4)))
@@ -20,3 +27,5 @@ print(quadrant(Point(-3, 4)))
 #: Second quadrant
 print(quadrant(Point(-1, -1)))
 #: Somewhere else
+print(leaky(Point(3, 4)))
+#: 3

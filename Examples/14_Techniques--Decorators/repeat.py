@@ -10,8 +10,7 @@ def repeat[**P, R](
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            result = func(*args, **kwargs)
-            for _ in range(times - 1):
+            for _ in range(times):
                 result = func(*args, **kwargs)
             return result
         return wrapper

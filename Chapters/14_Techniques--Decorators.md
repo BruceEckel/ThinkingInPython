@@ -1,5 +1,12 @@
 # Decorators
 
+Logging, timing, retrying, and validating arguments are cross-cutting concerns:
+they show up in unrelated functions, not just one.
+Writing them into each function's own body spreads the same few lines everywhere they apply,
+and a change to that logic means editing every copy.
+A decorator factors that behavior out once and reapplies it wherever needed,
+without changing the function's own code.
+
 A decorator is a callable that you apply to a function or a class.
 The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
@@ -189,6 +196,16 @@ discarding the signature the decorator should preserve.
 The `# type: ignore` comments mark where the type checker cannot follow:
 a `Callable` need not have a `__name__` attribute, though every function does.
 
+`trace` assumes `func` runs to completion inside the call that invokes it,
+which is true of an ordinary function and false of an `async def` function.
+Decorating a coroutine function raises no exception:
+`func(*args, **kwargs)` returns a coroutine object immediately,
+without running the coroutine's body, so `result` is that coroutine object,
+not the value it will eventually produce,
+and the trace line prints `<- add = <coroutine object add at 0x...>`.
+A wrapper over a coroutine function must itself be `async def` and `await func(*args, **kwargs)`,
+the shape covered in [`async def`, `await`, and the Event Loop](19_Techniques--Concurrency.md#asyncio-mechanics).
+
 The tests verify two things: the wrapper reports the original function's name,
 and it still returns the original result:
 
@@ -229,8 +246,7 @@ def repeat[**P, R](
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            result = func(*args, **kwargs)
-            for _ in range(times - 1):
+            for _ in range(times):
                 result = func(*args, **kwargs)
             return result
         return wrapper
@@ -286,14 +302,12 @@ at the decoration rather than at the call:
 A second diagnostic follows at `greet("Bob")`,
 but that one is harder to read back to the missing `()`.
 
-`wrapper()` calls `func` once before the loop,
-so `result` always holds a value of type `R` to return.
-The loop adds the remaining `times - 1` calls.
-That first call is unconditional,
-so a `times` below one would still call `func` once rather than zero times.
-`repeat()` rejects those values rather than quietly rounding them up to one.
+`repeat()` rejects `times` below one rather than quietly rounding it up to one.
 The check runs at decoration,
 so the failure appears at the `@` line rather than at some later call.
+Because that check already guarantees `times >= 1`,
+`wrapper()`'s loop always runs at least once,
+so `result` always holds a value of type `R` to return.
 `test_repeat.py` parametrizes over `times` and covers the rejection:
 
 ```python
@@ -320,6 +334,100 @@ def test_repeat_call_count(times: int,
 def test_repeat_rejects_times_below_one(times: int) -> None:
     with pytest.raises(ValueError):
         repeat(times=times)
+```
+
+## Decorators With Optional Parentheses
+
+`trace` never takes arguments; `repeat` always does.
+A decorator can support both conventions at once, `@name` and `@name(...)`,
+letting a caller add arguments only when the defaults don't fit.
+`pytest.fixture` and `click.command` both work this way.
+
+The two forms differ in what Python passes first.
+`@label` calls `label(one)`: a function arrives as the only argument.
+`@label(prefix="TAG")` calls `label(prefix="TAG")` first, with no function,
+then applies the result to `two`.
+Checking whether that first argument is callable tells the two calls apart:
+
+```python
+# optional_parens.py
+from collections.abc import Callable
+from functools import wraps
+from typing import Any, overload
+
+@overload
+def label[**P, R](
+        func: Callable[P, R],
+) -> Callable[P, R]: ...
+@overload
+def label[**P, R](
+        func: None = None, *, prefix: str = "LOG"
+) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+
+def label[**P, R](
+        func: Callable[P, R] | None = None,
+        *, prefix: str = "LOG",
+) -> Any:
+    def decorate(
+            f: Callable[P, R]
+    ) -> Callable[P, R]:
+        @wraps(f)
+        def wrapper(
+                *args: P.args, **kwargs: P.kwargs
+        ) -> R:
+            print(f"[{prefix}] {f.__name__}")  # type: ignore
+            return f(*args, **kwargs)
+        return wrapper
+    return decorate(func) if callable(func) else decorate
+
+@label
+def one() -> None: ...
+
+@label(prefix="TAG")
+def two() -> None: ...
+
+if __name__ == "__main__":
+    one()
+    two()
+#: [LOG] one
+#: [TAG] two
+```
+
+`func` defaults to `None`, and the body branches on `callable(func)`.
+Called bare, `func` is `one` itself, `callable(func)` is `True`,
+so `label` decorates it immediately by calling `decorate(func)`.
+Called with arguments, `func` stays `None`, `callable(func)` is `False`,
+so `label` returns `decorate` for Python to apply to `two`.
+The two `@overload` declarations tell the type checker the same story the runtime branch tells:
+given a function, `label` returns a function of the same signature;
+given only keyword arguments, it returns a decorator.
+The implementation's own signature satisfies both,
+so its return type widens to `Any`,
+which the overloads narrow back down at every call site.
+
+This idiom assumes nothing else callable can land in that first position.
+Where a decorator's own argument could itself be callable,
+checking `func is None` instead of `callable(func)` removes the ambiguity.
+
+```python
+# test_optional_parens.py
+from optional_parens import label
+
+def test_bare_decoration() -> None:
+    @label
+    def greet() -> str:
+        return "hi"
+
+    assert greet() == "hi"
+    assert greet.__name__ == "greet"
+
+def test_decoration_with_arguments() -> None:
+    @label(prefix="TAG")
+    def greet() -> str:
+        return "hi"
+
+    assert greet() == "hi"
+    assert greet.__name__ == "greet"
 ```
 
 ## Stacking Decorators
@@ -955,6 +1063,18 @@ Changing the price of a topping means changing one number, in one place.
 Compare that to a class per combination,
 where a price change touches every class that includes that topping.
 
+A `Pizza` with a `toppings: list[Topping]` field,
+summing each topping's `add_cost` and joining its name,
+solves the same combinatorial problem, with no wrapping and no `Protocol`.
+Here, where a topping only contributes a number and a name,
+that list is the simpler design.
+The Decorator pattern earns its structure when a topping needs behavior,
+not just data: one that changes how `cost` rounds,
+adds a description only under some condition,
+or must itself be handed elsewhere as a `Pizza`.
+The list stores toppings; the decorator chain *is* one,
+each layer still satisfying the same interface the plain pizzas do.
+
 [Factory](27_Patterns--Factory.md#builder) has its own `Pizza`,
 a frozen data class that a `PizzaBuilder` assembles,
 to illustrate the unrelated Builder pattern.
@@ -1006,6 +1126,16 @@ They are ordinary decorators.
 The one piece of machinery left for later is the descriptor protocol those first four return;
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
 takes it up.
+
+Every decorator costs two things `wraps` does not remove,
+since `wraps` copies metadata, not the call itself.
+A traceback through a decorated function shows `wrapper`,
+one more frame than the caller and the original body alone would show.
+Each call also pays for an extra Python-level function call, the wrapper's own,
+before the real body runs.
+Neither matters for a function called occasionally;
+both add up for one called in a tight loop,
+and stacking decorators multiplies both by the number of layers.
 
 ## Exercises
 

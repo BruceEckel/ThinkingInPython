@@ -124,6 +124,15 @@ so `@override` holds and `ty` reports nothing.
 and a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
+No tool catches this, but a test can.
+This chapter already writes such tests for guarantees no type checker sees:
+`test_plugged.py` pins down that a getter's copy holds,
+and `test_immutable.py` pins down that a frozen field refuses assignment.
+The same pattern covers substitutability:
+a test written against `Stack`'s contract,
+run against `BoundedStack` too,
+would have caught `fill()` failing on the third item.
+
 Substitutability is the first thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
@@ -255,6 +264,12 @@ def test_defensive_copy_prevents_the_leak() -> None:
 Encapsulation exists only because of mutability.
 If the data cannot change, you have nothing to protect.
 If you freeze it, the whole apparatus disappears.
+That argument covers only the mutation reason for encapsulation.
+A second reason survives freezing:
+representation hiding, so the internal type can change later without breaking callers.
+A public frozen field skips that protection too.
+Swap `numbers` from a `tuple` to some other sequence later,
+and every caller that named `tuple` breaks.
 The fields are public, with no getters and no copies:
 
 ```python
@@ -387,6 +402,9 @@ and the call passes `p1` as the first argument.
 The dot fills in `self`.
 The function reads the same and computes the same, and it has one advantage:
 it can live outside `Point`.
+The method keeps one advantage of its own:
+`p1.` shows every operation `Point` supports,
+a discoverability the free function does not offer.
 
 ## Protocols Generalize, Composition Adapts
 
@@ -766,6 +784,10 @@ A protocol is *structural*: it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
+It has a cost:
+nothing in a class's own source names the protocols it satisfies,
+so you cannot grep a codebase for every type that implements one,
+the way you can search for subclasses of a base class.
 They connect pieces without requiring any piece to change.
 
 Because membership is structural,
@@ -777,8 +799,12 @@ or `Describable`.
 
 Classic multiple inheritance has the *diamond problem*.
 If two base classes trace back to a common ancestor,
-the interpreter must pick which version of an overridden method to call.
-Protocols avoid that question.
+Python resolves which version to call with C3 linearization,
+its method resolution order (MRO).
+The choice is deterministic, never ambiguous,
+but a deep hierarchy still makes it easy to lose track of which method runs.
+Protocols avoid the question:
+with no inheritance graph, there is nothing to linearize.
 Satisfying three of them costs nothing more than having the three methods:
 
 ```python
@@ -1102,6 +1128,62 @@ Start with functions and data.
 When a program truly needs an object, it tells you:
 you are passing the same data into every function,
 or bundling behavior with state.
+Compare the two on a running balance:
+
+```python
+# 20_Patterns--Rethinking_Objects/balance_functions.py
+def deposit(balance: float, amount: float) -> float:
+    return balance + amount
+
+def withdraw(balance: float, amount: float) -> float:
+    if amount > balance:
+        raise ValueError("Insufficient funds")
+    return balance - amount
+
+if __name__ == "__main__":
+    balance = 100.0
+    balance = deposit(balance, 50.0)
+    balance = withdraw(balance, 30.0)
+    print(balance)
+#: 120.0
+```
+
+Every call threads `balance` through,
+and every call site must remember to capture the return value.
+Drop one reassignment and the balance silently reverts on the next call.
+An object closes that gap:
+
+```python
+# 20_Patterns--Rethinking_Objects/balance_object.py
+from dataclasses import dataclass
+
+@dataclass
+class Account:
+    balance: float = 0.0
+
+    def deposit(self, amount: float) -> None:
+        self.balance += amount
+
+    def withdraw(self, amount: float) -> None:
+        if amount > self.balance:
+            raise ValueError("Insufficient funds")
+        self.balance -= amount
+
+if __name__ == "__main__":
+    account = Account(100.0)
+    account.deposit(50.0)
+    account.withdraw(30.0)
+    print(account.balance)
+#: 120.0
+```
+
+`deposit()` and `withdraw()` know where the state lives,
+so no call site can forget to thread it through.
+`account.` also lists every operation the object supports,
+the dot-completion this section opened with.
+This is what "bundling behavior with state" buys:
+one place holds the state,
+and every method that changes it lives next to it.
 OOP is useful, sometimes.
 But not everywhere, all the time.
 

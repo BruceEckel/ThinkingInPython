@@ -15,3 +15,10 @@ def test_replace_varies_one_field() -> None:
     variant = replace(base, size=18)
     assert base.size == 12 and variant.size == 18
     assert variant.toppings == base.toppings
+
+def test_second_build_reuses_toppings() -> None:
+    builder = pb.PizzaBuilder().topping("basil")
+    first = builder.build()
+    second = builder.topping("olives").build()
+    assert first.toppings == ("basil",)
+    assert second.toppings == ("basil", "olives")

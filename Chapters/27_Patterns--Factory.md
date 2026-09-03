@@ -11,6 +11,57 @@ and at the point of creation you must name the exact constructor.
 If the code that creates objects is distributed throughout your application,
 adding a type means finding and editing every place that names a concrete type.
 
+Here three call sites build shapes directly,
+each naming `Circle` or `Square` by its exact class:
+
+```python
+# shapefact1/shapes_naive.py
+from abc import ABC, abstractmethod
+from typing import override
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+
+class Circle(Shape):
+    @override
+    def draw(self) -> None: print("Circle.draw")
+
+class Square(Shape):
+    @override
+    def draw(self) -> None: print("Square.draw")
+
+def render(kind: str) -> None:
+    if kind == "Circle":
+        Circle().draw()
+    elif kind == "Square":
+        Square().draw()
+
+def preview(kind: str) -> None:
+    if kind == "Circle":
+        Circle().draw()
+    elif kind == "Square":
+        Square().draw()
+
+def export_svg(kind: str) -> None:
+    if kind == "Circle":
+        Circle().draw()
+    elif kind == "Square":
+        Square().draw()
+
+render("Circle")
+#: Circle.draw
+preview("Square")
+#: Square.draw
+export_svg("Circle")
+#: Circle.draw
+```
+
+Adding a `Triangle` means finding and editing `render()`, `preview()`,
+and `export_svg()`, and any call site the search misses keeps building only `Circle` and `Square`,
+with no error to signal the gap.
+The rest of this chapter replaces call sites like these with a single place that knows about every shape.
+
 The solution is to encapsulate object creation:
 make a common *factory* create every object instead of spreading creational code through the system.
 Your program must call this factory whenever it needs one of your objects,
@@ -140,7 +191,7 @@ No factory method and no factory class:
 ```python
 # shape_table.py
 from abc import ABC, abstractmethod
-from typing import Final, override
+from typing import Final, Literal, override
 
 class Shape(ABC):
     @abstractmethod
@@ -154,23 +205,40 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-SHAPES: Final[dict[str, type[Shape]]] = {
+Kind = Literal["Circle", "Square"]
+
+SHAPES: Final[dict[Kind, type[Shape]]] = {
     "Circle": Circle,
     "Square": Square,
 }
 
-def make(kind: str) -> Shape:
+def make(kind: Kind) -> Shape:
     return SHAPES[kind]()
 
 make("Circle").draw()
 #: Circle.draw
 make("Square").draw()
 #: Square.draw
+# ty: expected Literal["Circle", "Square"],
+# found Literal["Hexagon"]:
+# make("Hexagon").draw()
 ```
 
 Because the `dict` values are classes, `type[Shape]` is their type,
 and calling one constructs an instance.
-Adding a `Triangle` means one new class and one new line in `SHAPES`.
+Adding a `Triangle` means one new class and one new line in `SHAPES`,
+and one new member in `Kind`.
+Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a runtime `KeyError` to a check-time error,
+the same trade [Abstract Factories](#abstract-factories)
+makes with a `Protocol`.
+`Kind` names the two members `SHAPES` already has,
+so widening the type checks that the dictionary stays in sync with it.
+`registry.py`, below, cannot take the same fix:
+its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
+and a closed `Literal` would need editing on every new subclass,
+which defeats that.
+A closed set of names suits `Literal`; an open set, growing by subclassing,
+does not.
 
 `__init_subclass__()`
 (see [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses))
@@ -824,7 +892,8 @@ copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the general form of the same operation,
 working on any object that defines `__replace__()`.
 A data class defines that method for you.
-A test confirms the two forms produce the same pizza:
+A test confirms the two forms produce the same pizza,
+and another makes the single-use hazard concrete:
 
 ```python
 # test_pizza.py
@@ -844,6 +913,13 @@ def test_replace_varies_one_field() -> None:
     variant = replace(base, size=18)
     assert base.size == 12 and variant.size == 18
     assert variant.toppings == base.toppings
+
+def test_second_build_reuses_toppings() -> None:
+    builder = pb.PizzaBuilder().topping("basil")
+    first = builder.build()
+    second = builder.topping("olives").build()
+    assert first.toppings == ("basil",)
+    assert second.toppings == ("basil", "olives")
 ```
 
 [Decorators](14_Techniques--Decorators.md#the-decorator-pattern)

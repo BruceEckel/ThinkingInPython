@@ -221,3 +221,34 @@ a tuple and accepts equality with anything of the same shape. A frozen
 dataclass is a distinct type, so it refuses those comparisons and
 catches the mismatch instead. Which one is right depends on whether
 you want your three numbers to travel as data or to mean something.
+
+## 7. Choosing a type for three scenarios
+
+**The configuration bag is a `SimpleNamespace`.** Its keys arrive at
+runtime, so no fixed set of fields exists to declare. A `@dataclass`
+or `NamedTuple` needs every field named in the class body before any
+instance exists, which this scenario cannot supply. `SimpleNamespace`
+accepts any name at construction or later, which is exactly the
+looseness the scenario needs, at the cost of a type checker unable to
+catch a typo in a key name.
+
+**The grid coordinate is a `NamedTuple`.** It must work as a `dict`
+key, so it must hash, and a `NamedTuple` hashes as long as its fields
+do. A `@dataclass` also hashes, but only frozen and with `eq=True`
+(the default), so a plain mutable `@dataclass` is disqualified outright.
+Between a frozen dataclass and a `NamedTuple` here, the tuple form
+wins on convenience: unpacking a coordinate as `x, y = point` and
+using it wherever a plain tuple is expected (a `dict` key is one such
+place) are both things the scenario wants and a frozen dataclass would
+refuse.
+
+**The JSON record is a `@dataclass`.** JSON's own encoding already
+loses field names when the shape is a `NamedTuple`
+(`json.dumps()` writes it as a bare array), which defeats the point of
+decoding into named fields in the first place. A `@dataclass` raises
+instead of silently dropping names, and its fields, being distinct
+from a tuple's positions, are also where the validation this scenario
+wants belongs: [Data Classes as
+Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+makes a `@dataclass`'s `__post_init__()` the place to reject a
+value the JSON decoder would otherwise accept unchecked.

@@ -152,6 +152,11 @@ The classic form declares a `Strategy` interface,
 writes one class per algorithm, and adds a context class to hold the chosen one.
 The `how` parameter replaces all three.
 
+This listing shows only the shape.
+Nobody designs a `Strategy` class hierarchy around calling `max` or `sum`;
+[Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime)
+works through a case with a real motivation.
+
 That replacement is why the chapters ahead keep asking the question [Rethinking Objects](20_Patterns--Rethinking_Objects.md#guidelines)
 posed: how much of each pattern's machinery does Python still need,
 and how much of it becomes functions, data, and protocols?
@@ -247,6 +252,9 @@ but *Reflexivity* and the *Law of Demeter* assume classes and objects.
     the slower the programmer can produce.
     The cost does not grow one rule at a time.
     The rules interact.
+-   *Liskov Substitution Principle* (LSP):
+    a subtype must work anywhere code expects its base type,
+    as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#liskov-substitution) describes.
 -   *Law of Demeter*: a.k.a. "Don't talk to strangers."
     A method should talk only to itself, its own attributes, its parameters,
     and objects it creates,

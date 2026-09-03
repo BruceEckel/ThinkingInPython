@@ -29,3 +29,16 @@ report(tee_bytes=buffered, list_bytes=listed)
 print(f"tee held as much as the list: "
       f"{buffered > listed * 0.9}")
 #: tee held as much as the list: True
+
+# Same N, but both branches advance together:
+first2, second2 = tee(squares(N))
+tracemalloc.start()
+for x, y in zip(first2, second2,
+                strict=True):
+    pass
+lockstep, _ = tracemalloc.get_traced_memory()
+tracemalloc.stop()
+report(lockstep_bytes=lockstep)
+print(f"lockstep buffered far less: "
+      f"{lockstep < listed * 0.1}")
+#: lockstep buffered far less: True

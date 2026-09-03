@@ -7,6 +7,16 @@ You use tuples and dictionaries for that, but both rely on indexing.
 A tuple requires the consumer to keep track of numerical order.
 A `dict` requires the clumsier `d["name"]` syntax.
 
+Fowler's DTO crosses a process or network boundary,
+batching several values into one object to cut round trips.
+The object shape below is the same one,
+whether or not it ever leaves the process:
+[Parallelism](19_Techniques--Concurrency.md#parallelism) pickles arguments
+and return values across a process boundary the same way,
+and [Serializing to JSON](12_Techniques--Data_Classes_as_Types.md#serializing-to-json)
+turns one into the wire format for a network call.
+This chapter teaches the object, not the crossing.
+
 A Messenger is an object with attributes corresponding to the names of the data you pass or return:
 
 ```python
@@ -57,6 +67,8 @@ A typo like `m.inof` is a runtime `AttributeError`, not a static error.
 
 ## The Standard-Library Versions
 
+### `SimpleNamespace`
+
 In the standard Python library,
 `types.SimpleNamespace` is a ready-made Messenger.
 Here, too, keyword arguments become attributes in the instance's `__dict__`:
@@ -88,6 +100,8 @@ so no type checker can know which names to expect.
 Its type declaration says so: reading any attribute yields `Any`,
 so `m.inof` passes the type checker here too.
 
+### `@dataclass`
+
 When you want the fields named and checked, declare them.
 A `@dataclass` generates `__init__()`, `__repr__()`,
 and equality from those declarations, and produces a mutable record:
@@ -108,6 +122,8 @@ p.x = 3.5
 print(p)
 #: Point(x=3.5, y=2.0)
 ```
+
+### `NamedTuple`
 
 A `NamedTuple` declares its fields the same way but produces an immutable record.
 `typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Foundations--Containers.md#namedtuple).
@@ -200,8 +216,8 @@ Unpacking is the part a data class lacks.
 `mean, count = summarize(data)` against a `@dataclass` version of `Stats` raises a `TypeError`,
 since a data class is not iterable.
 `dataclasses.astuple()` converts a data class when you need the positional form.
-`astuple()` recurses, though: a nested data class comes back as a nested tuple,
-and `astuple()` deep-copies every other field rather than sharing it.
+[More Data Class Tools](12_Techniques--Data_Classes_as_Types.md#more-data-class-tools)
+covers its recursive, copying behavior.
 
 ## A NamedTuple Is Still a Tuple
 
@@ -250,6 +266,24 @@ try:
 except TypeError as e:
     print(str(e).partition(" and")[0])
 #: '<' not supported between instances of 'FrozenColor'
+
+@dataclass(frozen=True, order=True)
+class OrderedColor:
+    r: int
+    g: int
+    b: int
+
+@dataclass(frozen=True, order=True)
+class OrderedDimensions:
+    width: int
+    height: int
+    depth: int
+
+try:
+    OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
+except TypeError as e:
+    print(str(e).partition(" and")[0])
+#: '<' not supported between instances of 'OrderedColor'
 ```
 
 `Color` and `Dimensions` mean different things,
@@ -323,3 +357,8 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
     `z`.
     Predict `Color(1, 2, 3) == Point3(1, 2, 3)` before running it,
     then predict `FrozenColor(1, 2, 3) == (1, 2, 3)` and check that too.
+7.  For each scenario, name the type from "Which Should You Use?" that fits,
+    and say why the others do not:
+    a configuration bag whose keys arrive at runtime and are not known in advance;
+    a 2D grid coordinate that must work as a `dict` key;
+    a record decoded from a JSON API response whose fields you also validate.

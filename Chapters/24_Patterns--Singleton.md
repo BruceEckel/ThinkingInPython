@@ -85,7 +85,7 @@ Keep singleton state in a module you import, not in the script you run.
 
 ## When You Want a Class, Cache the Instance
 
-The goal is that every construction returns the same object.
+The goal is that every call to the constructor function returns the same object.
 The simplest approach hides construction behind a cached factory:
 `functools.cache` applied to a *constructor function*,
 an ordinary function that builds and returns an instance of a class.
@@ -118,6 +118,31 @@ a.data["theme"] = "dark"
 print(b)
 #: Settings(data={'theme': 'dark'})
 ```
+
+Give the constructor function a parameter, and the guarantee breaks.
+`functools.cache` keys its cache on the arguments,
+so each distinct argument value gets its own entry and its own instance:
+
+```python
+# singleton_cached_factory_footgun.py
+from dataclasses import dataclass, field
+from functools import cache
+
+@dataclass
+class Settings:
+    data: dict[str, str] = field(default_factory=dict)
+
+@cache
+def settings(env: str = "prod") -> Settings:
+    return Settings()
+
+print(settings("prod") is settings("dev"))
+#: False
+```
+
+One parameter turns "one singleton" into one singleton per argument value.
+Keep the constructor function's signature empty,
+or accept that you built a cache, not a singleton.
 
 ### Nothing Keeps the Class Private
 
@@ -291,8 +316,9 @@ take it when the test finds the object missing, then test again inside.
 The second test is the one note 3 insists on.
 The first exists to skip the lock once the object is there.
 Double-checked locking works,
-but it asks the reader to reason about what a [free-threaded](19_Techniques--Concurrency.md#free-threading)
-interpreter may reorder, and that is a bad trade for saving a lock acquisition.
+but both checks must be exactly right,
+and a subtle mistake reintroduces the race the lock exists to close.
+That is a bad trade for saving one lock acquisition.
 Eager creation is a better answer when you can build the object at import time:
 
 ```python
@@ -512,11 +538,19 @@ so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
 
-The test confirms the objects differ but share one set of state:
+The test confirms the objects differ but share one set of state.
+Borg has no `cache_clear()`:
+whatever one test leaves in `_shared_state` is still there for the next.
+A pytest fixture closes that gap by clearing the dict before each test:
 
 ```python
 # test_singleton_borg.py
-from singleton_borg import Singleton
+import pytest
+from singleton_borg import Borg, Singleton
+
+@pytest.fixture(autouse=True)
+def reset_shared_state() -> None:
+    Borg._shared_state.clear()
 
 def test_borg_shares_state_but_not_identity() -> None:
     x = Singleton("first")
@@ -524,6 +558,13 @@ def test_borg_shares_state_but_not_identity() -> None:
     assert x is not y  # Distinct objects
     assert x.val == y.val  # But sharing one set of state
     assert x.val == "second"
+
+def test_pollutes_shared_state() -> None:
+    setattr(Singleton("first"), "extra", "leftover")
+
+def test_fixture_cleared_it() -> None:
+    y = Singleton("second")
+    assert not hasattr(y, "extra")  # Reset ran
 ```
 
 ### Singleton by Class Decorator
@@ -651,7 +692,11 @@ Use the lightest tool that fits:
 - If you want a class, hide construction behind a cached factory (`@cache`),
   or override `__new__()` as `singleton_class_variable.py` does.
   Under threads, prime the factory at import time or use the module form.
-- If you really want many handles sharing one set of state, use *Borg*.
+- If you really want many handles sharing one set of state, use *Borg*,
+  but only when something needs those handles to be objects:
+  an existing class-based interface, an `isinstance()` check, or subclassing.
+  A module already shares that state with every importer and needs no class,
+  so data sharing by itself is not Borg's case to make.
 - The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.
 

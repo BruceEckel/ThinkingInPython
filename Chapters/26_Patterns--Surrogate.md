@@ -411,7 +411,11 @@ That function never calls `__getattr__()`,
 so a proxy that supplies every method through `__getattr__()` also fails the `isinstance()` check.
 Because ordinary attribute access still finds those methods,
 `hasattr(p, "f")` is `True` and `p.f()` runs.
-Code that calls the method, or checks with `hasattr()`, works on a surrogate.
+Code that calls the method, or checks with `hasattr()`, works on a surrogate,
+as long as `__getattr__()` raises only `AttributeError` for a name it does not have.
+The protection proxy below raises `PermissionError` instead,
+and `hasattr()` catches only `AttributeError`,
+so `hasattr()` propagates that exception rather than returning `False`.
 
 ```python
 # proxy_identity.py
@@ -476,6 +480,44 @@ and code that checks with `isinstance()` should check for the method instead.
     It can also count the references to an object,
     implementing the *copy-on-write* idiom and preventing aliasing.
 
+The standard library's own `weakref.proxy()` is a transparent forwarding wrapper too,
+but it solves none of these four:
+it forwards to a weakly referenced object and raises `ReferenceError` once nothing else holds a strong reference to that object.
+[Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
+uses `weakref.ref()` and `WeakValueDictionary` from the same module without needing this one.
+
+A *Virtual proxy* delays building an expensive object until something asks for it:
+
+```python
+# virtual_proxy.py
+from typing import Any
+
+class Expensive:
+    def __init__(self) -> None:
+        print("Expensive built")
+    def query(self) -> str:
+        return "result"
+
+class Lazy:
+    def __init__(self) -> None:
+        self._real: Expensive | None = None
+    def __getattr__(self, name: str) -> Any:
+        if self._real is None:
+            self._real = Expensive()
+        return getattr(self._real, name)
+
+p = Lazy()
+print("proxy ready")
+#: proxy ready
+print(p.query())
+#: Expensive built
+#: result
+```
+
+Building `Lazy` prints nothing.
+The first attribute `__getattr__()` forwards builds `Expensive`,
+and every later access reuses that same instance.
+
 A *Protection proxy* decides whether a call reaches the implementation.
 Because `__getattr__()` receives the requested name, the check is one condition:
 
@@ -507,11 +549,21 @@ try:
 except PermissionError as e:
     print(type(e).__name__, e)
 #: PermissionError erase
+try:
+    hasattr(guest, "erase")
+except PermissionError as e:
+    print(type(e).__name__, e)
+#: PermissionError erase
 Guarded(Document(), admin=True).erase()
 #: erased
 ```
 
 `Guarded` requires `admin` privileges to call `erase()`.
+`hasattr()` catches only `AttributeError`.
+`guest.__getattr__()` raises `PermissionError` instead,
+so `hasattr(guest, "erase")` does not return `False`,
+it raises `PermissionError` too.
+A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()` the same way it breaks `isinstance()`.
 
 A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
@@ -674,6 +726,11 @@ Here the client programmer calls `change_to()`,
 but in a [State Machine](31_Patterns--State_Machines.md),
 each implementation chooses its own successor,
 so the surrogate advances without the client asking.
+`change_to()` reassigns `__implementation` with no lock.
+A thread running a multi-call sequence like `run()` can have another thread's `change_to()` land between two of those calls,
+splitting the sequence across both implementations;
+see [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
+for what an unsynchronized swap costs.
 
 The annotations that carry the implementation are all `Any`,
 which the book's typing guidance treats as a last resort,

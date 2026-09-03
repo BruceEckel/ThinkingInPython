@@ -139,10 +139,10 @@ rebinds `DEFAULT` as a local name inside `broken()`,
 and leaves the module-level constant untouched.
 Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
-When the capture is the last `case`, as here, Python does not warn you.
-`ruff` does notice, flagging `DEFAULT` under its `N806` rule
-(an uppercase name assigned inside a function):
-`DEFAULT` here is a local variable rather than the constant you meant to compare against.
+When the capture is the last `case`, as here, Python does not warn you,
+and neither `ty` nor `ruff` catches it either:
+`DEFAULT` is a local variable rather than the constant you meant to compare against,
+and nothing in the toolchain says so.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
 so the type checker sees that the cases cover both members and accepts the function with no trailing `return`.
@@ -168,6 +168,13 @@ def summarize(items: list[int]) -> str:
         case _:
             return "Unreachable"
 
+def last_of(items: list[int]) -> tuple[list[int], int]:
+    match items:
+        case [*init, last]:
+            return init, last
+        case _:
+            return [], 0
+
 print(summarize([]))
 #: Empty
 print(summarize([5]))
@@ -176,6 +183,8 @@ print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
 #: 1, then 3 more
+print(last_of([1, 2, 3, 4]))
+#: ([1, 2, 3], 4)
 ```
 
 `summarize()` shows the structural part of "structural pattern matching."
@@ -184,6 +193,12 @@ The last `case _` never runs:
 `[first, *rest]` catches every nonempty list and `[]` the empty one.
 The type checker cannot prove that,
 so the wildcard stays to satisfy the declared return type.
+
+A starred name can appear anywhere in a sequence pattern, not only at the end,
+as long as the pattern has no more than one.
+`last_of()` puts it first: `[*init, last]` binds every element but the last to `init`.
+`[first, *middle, last]` would put it in the middle instead,
+binding the two ends by name and everything between them to `middle`.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 `case [a, b, c]` does not match `"abc"`,
@@ -405,6 +420,13 @@ def quadrant(p: Point) -> str:
         case _:
             return "Somewhere else"
 
+def leaky(p: Point) -> int:
+    match p:
+        case Point(x, _) if x > 100:
+            return 0
+        case _:
+            return x
+
 print(quadrant(Point(0, 0)))
 #: Origin
 print(quadrant(Point(3, 4)))
@@ -413,6 +435,8 @@ print(quadrant(Point(-3, 4)))
 #: Second quadrant
 print(quadrant(Point(-1, -1)))
 #: Somewhere else
+print(leaky(Point(3, 4)))
+#: 3
 ```
 
 The guard runs after the pattern matches,
@@ -420,6 +444,12 @@ so it can use the names the pattern bound.
 A false guard moves on to the next `case`, but the names stay bound:
 once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
+`leaky()` shows why that matters:
+`case _:` binds nothing,
+yet `x` still holds `3`,
+left over from the failed guard in the case above it.
+A case that does not rebind a name inherits whatever an earlier,
+failed case left behind.
 A pattern tests shape and equality,
 so everything beyond that belongs in the guard: an ordering test like `x > 0`,
 a relation between two captures like `x == y`,
@@ -477,6 +507,18 @@ def test_mapping_patterns() -> None:
         {"nope": 1}) == "Unrecognized event: {'nope': 1}"
 ```
 
+Binding through a mapping pattern loses type information a class pattern keeps.
+`handle()`'s parameter is `event: dict[str, object]`,
+so `x` and `y` come out typed `object`,
+the same as every other value the dictionary could hold.
+`class_patterns.py`'s `Point(x, y)` binds `x` and `y` as `int`,
+because `Point` declares its fields that way.
+Matching on a mapping is inherently untyped at the value level,
+even though the shape test itself is precise.
+When the data has a known shape, parse it into a dataclass first,
+then match on the dataclass:
+you keep the shape test and gain the field types.
+
 ## Patterns Nest
 
 Each section so far introduced one pattern form on its own.
@@ -520,6 +562,12 @@ but a list of two points does not.
 The compiler enforces the same-names rule from [Alternatives and Capture](#alternatives-and-capture).
 Adding a third alternative `| Point(1, 1)`, which binds nothing,
 fails with `SyntaxError: alternative patterns bind different names`.
+
+A pattern can also nest inside a copy of its own case,
+matching a self-referential type such as a tree.
+[Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
+walks an expression tree this way:
+each `case` matches one node type and recurses into that node's own children.
 
 ## Exhaustive Matching
 

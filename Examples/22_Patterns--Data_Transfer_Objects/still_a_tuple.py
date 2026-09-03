@@ -38,3 +38,21 @@ try:
 except TypeError as e:
     print(str(e).partition(" and")[0])
 #: '<' not supported between instances of 'FrozenColor'
+
+@dataclass(frozen=True, order=True)
+class OrderedColor:
+    r: int
+    g: int
+    b: int
+
+@dataclass(frozen=True, order=True)
+class OrderedDimensions:
+    width: int
+    height: int
+    depth: int
+
+try:
+    OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
+except TypeError as e:
+    print(str(e).partition(" and")[0])
+#: '<' not supported between instances of 'OrderedColor'

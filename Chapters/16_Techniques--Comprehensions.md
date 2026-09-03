@@ -138,6 +138,30 @@ Two uses are a `SyntaxError`:
 a walrus that rebinds the comprehension's own iteration variable,
 and a walrus in a comprehension inside a class body.
 
+The running sum is a rare use of the walrus.
+The common one avoids computing the same value twice,
+once to filter and once to produce the output:
+
+```python
+# walrus_filter.py
+def cube_if_even(n: int) -> int | None:
+    return n ** 3 if n % 2 == 0 else None
+
+data = range(6)
+cubes = [
+    y for x in data if (y := cube_if_even(x)) is not None
+]
+print(cubes)
+#: [0, 8, 64]
+```
+
+`(y := cube_if_even(x))` calls `cube_if_even` once,
+binds its result to `y`, and the `if` tests that same result.
+The output expression then reuses `y`.
+Without the walrus, the filter and the output would each need
+their own call, `cube_if_even(x) is not None` and `cube_if_even(x)`,
+computing it twice for every element that passes.
+
 ## Set Comprehensions
 
 Set comprehensions use the same principles as list comprehensions,
@@ -199,15 +223,18 @@ A common variant swaps a dictionary's keys and values to invert a lookup:
 
 ```python
 # invert_dict.py
-seat_of = {"Arthur": 1, "Galahad": 2, "Robin": 3}
+seat_of = {"Arthur": 1, "Galahad": 2, "Robin": 1}
 
 name_at = {seat: name for name, seat in seat_of.items()}
 print(name_at)
-#: {1: 'Arthur', 2: 'Galahad', 3: 'Robin'}
+#: {1: 'Robin', 2: 'Galahad'}
 ```
 
 Inverting assumes the values are unique.
-If two keys share a value, the later entry wins, just as with any duplicate key.
+`Arthur` and `Robin` both sit at seat `1`.
+`Robin`, entered later, overwrites `Arthur` at key `1`,
+the same rule any duplicate dictionary key follows,
+and `Arthur` never appears in `name_at`.
 
 ## Nested Comprehensions
 
@@ -263,6 +290,19 @@ in the order the equivalent nested loops would appear:
 rows = [[1, 2], [3, 4], [5]]
 print([x for row in rows for x in row])
 #: [1, 2, 3, 4, 5]
+```
+
+Get that order backward and `row` is not bound yet
+when Python evaluates the first `for` clause:
+
+```python
+# flatten_wrong_order.py
+rows = [[1, 2], [3, 4], [5]]
+try:
+    print([x for x in row for row in rows])  # type: ignore
+except NameError as e:
+    print(e)
+#: name 'row' is not defined
 ```
 
 ## Feeding the Iterator Clause
@@ -339,6 +379,14 @@ flattening the tree into one list of paths.
 The filter tests `f.endswith(".py")` on the bare filename rather than building a `Path` and reading its `.suffix`.
 That avoids constructing a `Path` for every file in the tree,
 including the ones the filter skips.
+
+`root.rglob("*.py")` finds the same two files in one line,
+with no explicit walk and no comprehension at all.
+Try `rglob()` first: a glob pattern already says what you want.
+`walk()` earns its place when the filter needs more than a glob pattern
+can express, a file's size or its contents rather than its name, say,
+or when the comprehension needs the directory structure itself,
+not just the files at the bottom of it.
 
 A `with` block, unlike a function body, does not create a new scope.
 The assignment to `py_paths` sits inside the `with`,

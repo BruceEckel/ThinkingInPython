@@ -21,7 +21,14 @@ class ApplicationFramework:
             if not name.startswith("__")
         }
         for name in vars(cls):
-            if name in hooks or name.startswith("__"):
+            if name.startswith("__"):
+                continue
+            if name == "run":
+                raise TypeError(
+                    f"{cls.__name__}.run "
+                    "overrides the anchor"
+                )
+            if name in hooks:
                 continue
             if near := get_close_matches(name, hooks):
                 raise TypeError(
@@ -43,3 +50,18 @@ try:
 except TypeError as e:
     print(e)
 #: Typo.customise1: did you mean customize1?
+
+try:
+    class Hijack(ApplicationFramework):
+        def run(self) -> None:  # type: ignore
+            print("never runs")
+except TypeError as e:
+    print(e)
+#: Hijack.run overrides the anchor
+
+try:
+    class Weird(ApplicationFramework):
+        def customized_report(self) -> None: ...
+except TypeError as e:
+    print(e)
+#: Weird.customized_report: did you mean customize2?

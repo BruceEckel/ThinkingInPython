@@ -15,3 +15,9 @@ run_framework(
 #: Say no more, say no more!
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
+
+try:
+    run_framework(lambda: print("one"))  # type: ignore
+except TypeError as e:
+    print(f"{type(e).__name__}: missing customize2")
+#: TypeError: missing customize2

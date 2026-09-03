@@ -116,7 +116,14 @@ class ApplicationFramework:
             if not name.startswith("__")
         }
         for name in vars(cls):
-            if name in hooks or name.startswith("__"):
+            if name.startswith("__"):
+                continue
+            if name == "run":
+                raise TypeError(
+                    f"{cls.__name__}.run "
+                    "overrides the anchor"
+                )
+            if name in hooks:
                 continue
             if near := get_close_matches(name, hooks):
                 raise TypeError(
@@ -138,21 +145,46 @@ try:
 except TypeError as e:
     print(e)
 #: Typo.customise1: did you mean customize1?
+
+try:
+    class Hijack(ApplicationFramework):
+        def run(self) -> None:  # type: ignore
+            print("never runs")
+except TypeError as e:
+    print(e)
+#: Hijack.run overrides the anchor
+
+try:
+    class Weird(ApplicationFramework):
+        def customized_report(self) -> None: ...
+except TypeError as e:
+    print(e)
+#: Weird.customized_report: did you mean customize2?
 ```
 
-`hooks` collects every non-dunder name the base classes define.
-A subclass name that matches one exactly is an override,
-and a name that resembles none of them, like `report()`,
-is an ordinary new method.
-Both pass.
+`hooks` collects every non-dunder name the base classes define,
+including `run` itself.
+A name that matches `run` exactly is rejected outright:
+`class Hijack` never finishes,
+because letting a subclass replace the anchor would defeat it,
+and `@final` only stops that replacement for the type checker.
+A name that matches a step, `customize1` or `customize2`, is an ordinary override,
+and a name that resembles none of them, like `report()`, is an ordinary new method.
+Both of those pass.
 Only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
-The `class Typo` statement raises a `TypeError` instead of finishing,
+The `class Typo` statement raises a `TypeError` instead of finishing too,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
 Rejecting every new method would catch the typo too,
 but it would also forbid `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
+The heuristic cuts the other way too:
+`class Weird` never finishes either,
+because `customized_report()` shares enough letters with `customize2`
+for `get_close_matches` to flag it, even though it is not a typo.
+A team that adopts this check should expect to rename an occasional
+legitimate method, not just catch misspellings for free.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
@@ -274,6 +306,12 @@ run_framework(
 #: Say no more, say no more!
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
+
+try:
+    run_framework(lambda: print("one"))  # type: ignore
+except TypeError as e:
+    print(f"{type(e).__name__}: missing customize2")
+#: TypeError: missing customize2
 ```
 
 Both the Template Method and the function version have an anchored algorithm and varying steps.
@@ -283,7 +321,8 @@ If each step is independent,
 passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
-The function form must give each parameter a default of its own.
+The function form must give each parameter a default of its own:
+omit `customize2` above and the call raises a `TypeError` instead.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.

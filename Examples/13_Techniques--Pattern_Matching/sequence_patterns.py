@@ -13,6 +13,13 @@ def summarize(items: list[int]) -> str:
         case _:
             return "Unreachable"
 
+def last_of(items: list[int]) -> tuple[list[int], int]:
+    match items:
+        case [*init, last]:
+            return init, last
+        case _:
+            return [], 0
+
 print(summarize([]))
 #: Empty
 print(summarize([5]))
@@ -21,3 +28,5 @@ print(summarize([3, 4]))
 #: Two items: 3, 4
 print(summarize([1, 2, 3, 4]))
 #: 1, then 3 more
+print(last_of([1, 2, 3, 4]))
+#: ([1, 2, 3], 4)
