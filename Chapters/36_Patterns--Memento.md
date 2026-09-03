@@ -53,6 +53,8 @@ print(shallow)
 
 deep = copy.deepcopy(todo)
 todo[0].append("jam")
+print(todo)
+#: [['eggs', 'milk', 'cheese', 'jam'], ['bread']]
 print(deep)
 #: [['eggs', 'milk', 'cheese'], ['bread']]
 ```
@@ -63,7 +65,10 @@ But their elements are the same inner lists,
 so `todo[0].append("cheese")` shows up in `shallow` too.
 `copy.deepcopy()` walks the whole structure and rebuilds every nested container from scratch,
 so `deep`'s inner lists share nothing with `todo`'s.
-The later `todo[0].append("jam")` never reaches `deep`.
+The later `todo[0].append("jam")` reaches `todo` but never `deep`.
+That walk costs time and memory proportional to the whole nested structure it rebuilds,
+not just the part that changed,
+which is the price `sketch.py` pays below for a state that nests containers inside containers.
 
 ## The Classic Memento
 
@@ -132,10 +137,59 @@ including one a caretaker builds or unpacks by hand.
 It vanishes at runtime, so the caretaker still holds a plain tuple it can index,
 unpack, or build from scratch.
 Wrapping the tuple in a one-field data class gives `Memento` an identity that exists while the program runs.
-The only way to see the strokes is through `.strokes`,
-so reaching inside becomes visible in the code, not just a convention to honor.
-`frozen=True` makes reassigning `checkpoint.strokes` fail instead of silently succeeding.
-The tuple inside was already immutable, but the attribute was not.
+A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
+whatever built it.
+A parameter typed `Memento` does not:
+only code that already imports `Memento` and constructs one correctly can satisfy it,
+so the type checker catches a caretaker that passes the wrong tuple by mistake.
+`frozen=True` makes reassigning `checkpoint.strokes` fail at runtime instead of silently succeeding.
+Neither guarantee stops code holding a `Memento` from reading `.strokes`, unpacking it, or building one by hand;
+that boundary is still a convention, the one the classic pattern always relied on.
+What changes is the accidental case, a caretaker that mixes up a `Memento` with some other tuple:
+
+```python
+# memento_type_safety.py
+from dataclasses import FrozenInstanceError
+from sketch import Memento, Sketch
+
+def restore_tuple(strokes: tuple[str, ...]) -> None:
+    print(strokes)
+
+def restore_memento(memento: Memento) -> None:
+    print(memento.strokes)
+
+sketch = Sketch()
+sketch.draw("circle")
+checkpoint = sketch.save()
+
+restore_tuple(checkpoint.strokes)
+#: ('circle',)
+restore_tuple(("unrelated", "tuple"))
+#: ('unrelated', 'tuple')
+
+restore_memento(checkpoint)
+#: ('circle',)
+# ty: tuple[str, str] is not a Memento:
+try:
+    restore_memento(("unrelated", "tuple"))  # type: ignore
+except AttributeError as e:
+    print(e)
+#: 'tuple' object has no attribute 'strokes'
+
+try:
+    # ty: strokes is read-only on Memento:
+    checkpoint.strokes = ("forged",)  # type: ignore
+except FrozenInstanceError as e:
+    print(type(e).__name__)
+#: FrozenInstanceError
+```
+
+`restore_tuple()` accepts either tuple without complaint, since both are `tuple[str, ...]`.
+`restore_memento()` accepts the checkpoint,
+and the type checker flags the plain tuple before the program runs;
+run anyway, it fails at the first line that expects `.strokes`.
+Reassigning `checkpoint.strokes` fails too,
+for the same reason: the attribute, not just the tuple inside it, is frozen.
 
 ```python
 # test_sketch.py
@@ -230,11 +284,35 @@ print(after.strokes is before.strokes, len(after.strokes))
 
 The two objects share the stroke strings, not the tuple holding them.
 Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
-so a history of `k` edits costs pointers, not `k` copies of the text.
-That is why snapshots stay cheap, and why they are not free:
-a state whose changed field is large pays for that field on every edit.
+so one `draw()` costs pointers proportional to the current length of `strokes`, not the whole `Drawing`.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
 and interning would make the identity check print `True` even for a copied string.
+
+A single `draw()` is cheap.
+A `History` that keeps every past state is not, once a field grows by accretion the way `strokes` does:
+edit `n` costs `n` pointers, so `k` edits held in `_past` cost `O(k^2)` pointers in total, not `O(k)`.
+
+```python
+# growth_cost.py
+from frozen_sketch import Drawing
+
+drawing = Drawing("Duck")
+pointers = 0
+for i in range(2000):
+    drawing = drawing.draw(str(i))
+    pointers += len(drawing.strokes)
+print(pointers, len(drawing.strokes))
+#: 2001000 2000
+```
+
+Two thousand edits held in a `History` cost about two million pointers;
+the final `Drawing` alone costs two thousand.
+A field that stays small, or that replaces instead of growing, never reaches this cost.
+For one that grows without bound,
+bound the history's depth (exercise 2 asks for exactly this),
+coalesce edits before they reach `History`,
+use a persistent structure that shares more than a flat tuple can,
+or fall back to Command-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 makes this argument about sharing.
@@ -269,8 +347,12 @@ def test_replace_carries_other_fields() -> None:
 
 ## The Caretaker: a Generic History
 
-With states as immutable values,
-the caretaker no longer needs to know anything about them.
+The caretaker needs to know nothing about the states it holds,
+frozen or not: opacity is the pattern's whole point,
+and `History[S]` below works unchanged on the classic `Memento` from `sketch.py`.
+What immutability buys is not opacity, which the classic form always had,
+but freedom from an explicit `save()` and `restore()` at every edit,
+since a state that already cannot change is already a memento.
 Undo and redo are two stacks of past and future states,
 generic over the state type
 (the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
@@ -343,6 +425,27 @@ with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place.
 A `History` of lists is a stack of aliases, the bug that opened this chapter.
 
+`History` does not require a frozen state class either.
+The classic `Memento` from `sketch.py` is already immutable,
+so the same generic caretaker drives the mutable `Sketch` it snapshots,
+calling `save()` and `restore()` where `frozen_sketch.py`'s version needed neither:
+
+```python
+# history_classic.py
+from history import History
+from sketch import Memento, Sketch
+
+sketch = Sketch()
+sketch.draw("circle")
+history: History[Memento] = History(
+    sketch.save())
+sketch.draw("beak")
+history.do(sketch.save())
+sketch.restore(history.undo())
+print(sketch)
+#: circle
+```
+
 ```python
 # test_history.py
 from history import History
@@ -378,8 +481,9 @@ the Command variation that [Function Objects](28_Patterns--Function_Objects.md)
 mentions.
 Command-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
-Try snapshot-based undo first,
-because immutable states make snapshots inexpensive, as `sharing.py` showed.
+Try snapshot-based undo first:
+immutable states make one edit inexpensive, as `sharing.py` showed,
+and switch to Command once `growth_cost.py`'s `O(k^2)` starts to matter.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 

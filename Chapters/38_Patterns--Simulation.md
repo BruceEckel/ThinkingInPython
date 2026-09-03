@@ -328,6 +328,74 @@ asyncio.run(main())
 #: 9 rats mapped 139 cells.
 ```
 
+`amaze.txt` has no loop:
+every open cell connects to the rest of the maze by exactly one path.
+Every rejected `claim()` in the run above is a rat looking back at the cell it just left,
+never two rats reaching for the same open cell.
+On this maze, `claim()`'s atomicity is never tested against two rats, only against one rat's own trail.
+
+### Contention on a Loop
+
+A maze with a loop closes a second path between two cells,
+so two different rats can approach the same open cell from opposite directions.
+Eight open cells around one wall block, with one loop, are enough to force it:
+
+```python
+# rats_and_mazes/ring_contention.py
+import asyncio
+from typing import override
+from blackboard import Blackboard
+from maze import Maze
+
+RING = """\
+*****
+*   *
+* * *
+*   *
+*****
+"""
+
+class CountingBlackboard(Blackboard):
+    def __init__(self, maze: Maze) -> None:
+        super().__init__(maze)
+        self.taken = 0
+
+    @override
+    def claim(self, x: int, y: int) -> bool:
+        won = super().claim(x, y)
+        if not won and self.maze.is_open(x, y):
+            self.taken += 1
+        return won
+
+async def main() -> None:
+    maze = Maze.from_text(RING)
+    blackboard = CountingBlackboard(maze)
+    await blackboard.explore()
+    for message in blackboard.messages:
+        print(message)
+    backtracks = len(blackboard.visited) - 1
+    print(f"{blackboard.taken} rejections, "
+          f"{backtracks} from backtracking alone.")
+
+asyncio.run(main())
+#: Rat 1 starts at (1, 1).
+#: Rat 2 starts at (2, 1).
+#: Rat 1 dead-ends at (2, 3).
+#: Rat 2 dead-ends at (3, 3).
+#: 9 rejections, 7 from backtracking alone.
+```
+
+The entry's two open neighbors spawn two rats at once, one per arm of the ring.
+`CountingBlackboard` tallies every rejected `claim()`.
+Seven of the nine rejections are backtracking, `len(blackboard.visited) - 1`,
+one per non-entry cell looking back at the cell it came from.
+The other two belong to the loop's closing edge, examined from both ends:
+rat 1 dead-ends wanting `(3, 3)`, already claimed by rat 2,
+and rat 2 dead-ends wanting `(2, 3)`, already claimed by rat 1.
+Each rat loses a cell to the other, not to itself.
+That is the race `claim()`'s atomicity exists to resolve,
+and a perfect maze like `amaze.txt` never puts it to the test.
+
 ### Testing Full Coverage
 
 Because claiming is atomic,
@@ -448,6 +516,19 @@ def show(layout: str = "amaze.txt",
 if __name__ == "__main__":
     show()
 ```
+
+Concurrency here is a shape for the code, not a source of speed.
+Every rat awaits `asyncio.sleep(0)` at the same point,
+so the tasks take turns in round robin and the run stays deterministic.
+Nothing runs at the same instant as anything else,
+and no thread or process ever overlaps another,
+so the design buys no throughput a single-threaded worklist would lack.
+A plain stack of frontiers, popped and pushed in a loop, visits the same 139 cells.
+What `asyncio` buys is control flow:
+each rat's own path through the maze stays one `while` loop in `run()`,
+instead of a stack of pending frontiers threaded through one function by hand.
+The cost is the runtime itself,
+one more moving part for a program that never overlaps anything.
 
 Jeremy Meyer wrote the original Java version of this example.
 
@@ -670,6 +751,7 @@ because construction here is genuinely a process rather than a single call.
 # robot_explorer/game.py
 # Build the maze in three stages, then run it.
 
+from itertools import groupby
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room, RoomMap
 
@@ -699,8 +781,10 @@ class GameBuilder:
             return room.occupant.target
 
         teleports.sort(key=target)
-        pairs = iter(teleports)
-        for room1, room2 in zip(pairs, pairs):
+        for letter, group in groupby(teleports, key=target):
+            pair = list(group)
+            assert len(pair) == 2, letter
+            room1, room2 = pair
             assert isinstance(room1.occupant, Teleport)
             assert isinstance(room2.occupant, Teleport)
             room1.occupant.target_room = room2
@@ -822,13 +906,16 @@ print(game.show_maze())
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
 
-Stage 3 pairs the teleports with a small idiom.
+Stage 3 pairs the teleports by target letter.
 The sort by target letter puts each pair of partners side by side.
-Then `pairs = iter(teleports)` makes one iterator,
-and `zip(pairs, pairs)` pulls from that same iterator twice per loop,
-so each pass consumes two rooms: the first and second `a`, then the two `b`s.
-Avoid `zip(teleports, teleports)`,
-which walks two independent passes over the list and pairs every room with itself.
+`groupby(teleports, key=target)` then walks the sorted rooms in one pass,
+handing each run of matching letters to `pair = list(group)`.
+`assert len(pair) == 2, letter` checks the maze's own promise:
+every target letter marks exactly two rooms, never one, never three.
+A typo that leaves a letter unpaired, or repeats it a third time,
+fails here, at build time, naming the offending letter,
+instead of leaving a `Teleport` whose `target_room` was never set
+for the robot to step into later.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves that the occupant really is a `Teleport` before the code touches `target_room`.
 
@@ -955,7 +1042,8 @@ The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you knew the outcome in advance and ran the program to confirm it.
 This final example is different.
-Its result appears in no line of its code.
+`amplitude()` fixes the shape the sand will trace: the curves are its zero set.
+No line of the code computes how two thousand independent random walks find that shape and stay there.
 That is simulation's other purpose,
 to discover behavior instead of confirming it.
 
@@ -982,7 +1070,8 @@ A `Grain` is a position.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
 Grains never look at each other and remember nothing.
-Nothing in the code knows the pattern exists.
+No line of the code decides where a grain settles,
+only the local scaling of its own blind steps.
 
 ```python
 # chladni_plate/chladni.py
@@ -1119,6 +1208,10 @@ where the kicks shrink toward nothing.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
 The randomness is not fighting the order but producing it.
+The curves themselves are no mystery:
+`amplitude()`'s zero set draws them directly, without simulating a single grain.
+What the run demonstrates is the trap, not the shape:
+blind, uncoordinated steps concentrate onto a curve that no grain, and no line of `step()`, ever names.
 
 ### Testing a Random Process
 
@@ -1222,6 +1315,16 @@ This is *emergence*:
 global order arising from local rules that never mention it.
 The less the agents understand, the more the run can tell you,
 because the outcome lives in the interactions rather than the instructions.
+
+The model has a limit worth naming.
+Run it longer and agitation never stops falling:
+a grain moves roughly five orders of magnitude less per step at 20,000 steps than it did at 100.
+The nodal lines keep thinning as long as the plate shakes,
+so their width in any one run is set by how many steps you ran, not by the plate.
+Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
+Telling the physics from the rule that models it is exercise 7's job:
+swap `amplitude()`'s formula for a membrane's, and watch which parts of the figure change and which do not.
+
 When behavior emerges, reading the code is not enough.
 Run it.
 

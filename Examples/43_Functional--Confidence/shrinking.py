@@ -2,10 +2,10 @@
 from hypothesis import given, settings, strategies
 
 def encode(text: str) -> str:
-    return text.replace(" ", "_")
+    return text.encode().hex()
 
 def decode(text: str) -> str:
-    return text.replace("_", " ")
+    return bytes.fromhex(text).decode("latin-1")
 
 @settings(derandomize=True, database=None)
 @given(strategies.text())
@@ -17,5 +17,5 @@ try:
 except AssertionError as e:
     print(e.__notes__[0])
 #: Failing test case: roundtrip(
-#:     sample='_',
+#:     sample='\x80',
 #: )

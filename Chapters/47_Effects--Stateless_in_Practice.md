@@ -1618,6 +1618,17 @@ because `Effect[A, E, R]` tracks what a function needs and how it fails,
 not whether running it twice means the same as running it once.
 That judgment stays with you.
 
+`retry()` is also all-or-nothing over the error channel.
+Its body catches every declared error and retries on any of them,
+with no way to name the ones worth another attempt.
+Retrying `research()` with the `WEATHER` feed of [Composing a Program](#composing-a-program) shows the cost:
+a `WEATHER` headline names no known topic,
+so `topic_of()` raises `NotInteresting` on every attempt, deterministically,
+and `retry()` cannot tell that failure from one worth retrying.
+Three attempts fetch the headline three times and collect three identical `NotInteresting` errors in the `RetryError`.
+Retry what can change between attempts,
+and let `catch()` take a deterministic failure out before it reaches `retry()`.
+
 `retry()` decorates the function, not the Effect.
 `retry(three)(save_user("Morty"))` is not available,
 for the reason [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
@@ -1712,6 +1723,35 @@ and it wraps the Effect in an object that records the result and replays it rath
 That wrapper exists because a generator cannot run twice,
 which is the same fact that made `retry()` decorate the function.
 
+That cache key is only the argument, not the environment.
+`memoize()` wraps `save_user()` before `supply()` ever runs,
+so a different `Database` supplied to the same memoized call is invisible to the cache:
+
+```python
+# memoize_environment.py
+from flaky import Database, save_user
+from stateless import memoize, run, supply
+
+db1 = Database(failures=0)
+db2 = Database(failures=0)
+m = memoize(save_user)
+print(run(supply(db1)(m)("Morty")))
+#: attempt 1: saving Morty
+#: Morty saved
+print(run(supply(db2)(m)("Morty")))
+#: Morty saved
+print(db1.attempts, db2.attempts)
+#: 1 0
+```
+
+`db2` never runs.
+The second call's answer came from `db1`'s cache entry,
+because `"Morty"` is the only thing `memoize()` looks at.
+A chapter built on a swappable environment needs this caution stated:
+memoize a function only where the environment is fixed for the memoized call's lifetime,
+the way [State as an Ability](#state-as-an-ability)'s `Cell` is fixed once bound,
+or key the cache on the environment too.
+
 ## Running Effects in Parallel
 
 `fork()` hands an Effect to an `Executor` and returns a `Task`,
@@ -1790,6 +1830,11 @@ If you decorate a function that still declares a `Need`, `ty` rejects it,
 listing the overloads it failed to match.
 Supply first, then fork.
 
+That restriction is the only one `ty` enforces.
+It says nothing about a declared error,
+and every one of those same four overloads drops it.
+[Where the Guarantee Stops](#fork-drops-the-error-channel) covers that hole.
+
 Notice who manages the pool's lifetime.
 The `with` block sits outside `run()`, at the edge, in ordinary Python.
 Stateless has no scoping mechanism of its own,
@@ -1857,9 +1902,62 @@ raising a leftover error rather than returning it:
 These two are the only functions that perform work,
 which is the description/execution split in table form.
 
+The rule has a reason, and the reason has a cost.
+`run()` is `asyncio.run(run_async(effect))`,
+building a fresh event loop for the call and tearing it down after.
+Call it from inside a loop already running,
+the shape of any async web handler,
+and `asyncio.run()` raises before your Effect runs at all:
+
+```python
+# run_cost.py
+import asyncio
+import time
+from stateless import Success, run, run_async, success
+
+def bound(n: int) -> Success[int]:
+    return success(n)
+
+async def inside_loop() -> str:
+    try:
+        run(bound(1))
+    except RuntimeError as e:
+        return str(e)
+    return "no error"
+
+print(asyncio.run(inside_loop()))
+#: asyncio.run() cannot be called from a running event loop
+
+ROUNDS = 2000
+
+def time_run() -> float:
+    start = time.perf_counter()
+    for _ in range(ROUNDS):
+        run(bound(1))
+    return (time.perf_counter() - start) / ROUNDS
+
+async def time_run_async() -> float:
+    start = time.perf_counter()
+    for _ in range(ROUNDS):
+        await run_async(bound(1))
+    return (time.perf_counter() - start) / ROUNDS
+
+per_run = time_run()
+per_run_async = asyncio.run(time_run_async())
+print(f"run() at least 50x slower: "
+      f"{per_run > per_run_async * 50}")
+#: run() at least 50x slower: True
+```
+
+`run_async()` reuses the loop already running and costs almost nothing beyond the Effect itself.
+`run()` pays for a loop's setup and teardown on every call,
+hundreds of times that cost, measured here.
+From synchronous code there is no loop to reuse, so `run()` is the only option and the cost is unavoidable.
+From inside one, `run_async()` is both the one that works and the one that is fast.
+
 ## Where the Guarantee Stops
 
-The guarantee has five limits.
+The guarantee has six limits.
 
 ### 1. Nothing stops an undeclared Effect
 
@@ -2061,7 +2159,8 @@ and the type checker verifies a `supply()` call for completeness but not for how
 The operator set is thin in the same way.
 The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,
-with no exponential backoff and no jitter.
+with no exponential backoff and no jitter,
+and `retry()` retries every declared error alike, with no way to name the one worth retrying.
 Stateless provides no timeout, no `race`, no fallback combinator,
 and no finalizer, and the missing `race` rules out the hedging strategy that races a delayed second request.
 Concurrency is `fork()` and `wait()` with no guarded mutable cell.
@@ -2073,6 +2172,65 @@ Above that sit the resilience patterns a production system eventually needs
 (rate limiting, bulkheads, and circuit breakers), none of which exist here.
 The library is a working demonstration of Effect tracking in Python's type system,
 and that is different from a platform for building distributed systems.
+
+### 6. `fork()` drops the error channel
+
+[Running Effects in Parallel](#running-effects-in-parallel) named the one restriction `ty` enforces on a forked function:
+nothing left to supply.
+It enforces nothing on what that function can fail with.
+Every one of `fork()`'s four overloads accepts an Effect that still declares an error,
+and every one returns a `Task` with no error type on it:
+
+```python
+# fork_leak.py
+from concurrent.futures import Executor, ThreadPoolExecutor
+from stateless import (
+    Async,
+    Depend,
+    Need,
+    Try,
+    as_type,
+    fork,
+    run,
+    supply,
+    throw,
+    wait,
+)
+
+class Boom(Exception):
+    pass
+
+@fork
+def bad(n: int) -> Try[Boom, int]:
+    yield from throw(Boom(n))
+    return 0
+
+def go() -> Depend[Need[Executor] | Async, int]:
+    task = yield from bad(1)
+    value = yield from wait(task)
+    return value
+
+with ThreadPoolExecutor(max_workers=1) as pool:
+    supplied = supply(as_type(Executor)(pool))(go)
+    try:
+        run(supplied())
+    except Boom as e:
+        print(f"escaped: {e}")
+#: escaped: 1
+```
+
+`fork()` runs the wrapped Effect with `run()` inside the worker thread,
+with no `try`/`except` around that call,
+so a raised failure crosses the thread boundary as an ordinary exception and surfaces at `wait()`,
+past any `catch()` the caller wraps around the result.
+The type agrees with the runtime.
+`reveal_type(fork(bad))` under `ty` 0.0.77 reports
+`(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+with `Boom` nowhere in it.
+The fix is the discipline `catch()` and `catch_all` already teach:
+move the failure into the result before you fork.
+`fork(catch_all(bad))` matches the overload for an Effect with no declared error,
+and `wait()` returns the union instead of raising it.
 
 ## What Survives the Library
 

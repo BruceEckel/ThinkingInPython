@@ -183,6 +183,10 @@ To get the answer, the caller must unpack the `Result`.
 so `func_a(i).unwrap()` fails the type checker,
 and so does using the `Result` as if it were a number.
 The one route to the answer is narrowing to one of the two classes.
+`unwrap()` is a name borrowed from Rust;
+reading the `answer` field directly works the same way,
+since `Err` doesn't define that field either.
+Use whichever name reads better in your own code.
 The asymmetry is visible at runtime as well as to the type checker:
 
 ```python
@@ -224,6 +228,24 @@ The caller has a matching gap:
 a statement that calls the function and discards the `Result` passes the checker.
 The type checker stops you from misreading a `Result`;
 ignoring one is still up to you.
+Both gaps type-check clean:
+
+```python
+# totality_gap.py
+from result import Result
+from returning_result import func_a
+
+func_a(1)  # Result discarded; nothing complains
+
+def lies(i: int) -> Result[int, str]:
+    raise RuntimeError("not total after all")
+    # ty accepts this: a function that always
+    # raises satisfies any declared return type.
+```
+
+`func_a(1)` returns a `Result` that this line throws away,
+and `lies()` never returns the `Result` its signature promises.
+`ty` has no complaint about either one.
 
 ## Composing by Hand
 
@@ -279,6 +301,46 @@ raises a `TypeError`.
 
 This works, and it keeps errors as values, but every step is the same dance:
 call, check for `Err`, return early, unwrap, go on.
+Written with exceptions and one `try` at the top,
+the same composition is shorter:
+
+```python
+# composing_exceptions.py
+
+def func_a(i: int) -> int:
+    if i == 1:
+        raise ValueError(f"func_a({i})")
+    return i
+
+def func_b(i: int) -> int:
+    if i == 2:
+        raise ValueError(f"func_b({i})")
+    return i
+
+def func_c(i: int) -> int:
+    _ = 1 / (i - 3)  # raises when i == 3
+    return i
+
+def composed(i: int) -> int:
+    return func_c(func_b(func_a(i)))
+
+if __name__ == "__main__":
+    for i in range(5):
+        try:
+            print(i, composed(i))
+        except (ValueError, ZeroDivisionError) as e:
+            print(i, f"failed: {e}")
+#: 0 0
+#: 1 failed: func_a(1)
+#: 2 failed: func_b(2)
+#: 3 failed: division by zero
+#: 4 4
+```
+
+The two agree on every input, and the exception version is shorter.
+What it can't do: report which step failed as anything but a message to parse,
+or survive past the `except` clause as data,
+the way `sum_type.py` kept every result in a list at the start of this chapter.
 
 ## Composing With bind
 
@@ -332,6 +394,14 @@ To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
 a sibling of `bind()` for steps that cannot fail,
 and exercise 2's `map_error()` is the same idea aimed at the error side.
+
+A second mistake: every step's error type feeds the same `E`.
+`Result[A, E]` names one error type for the whole chain,
+so a step whose `Err` carries a different type
+than an earlier step's widens what the chain actually returns,
+and the annotation you wrote no longer names that wider type.
+Keep a chain's error type the same at every step,
+or annotate the chain with the union each step can produce.
 
 Because failures are values, you can assert on them directly,
 with no `pytest.raises()`.
@@ -429,11 +499,20 @@ Nested binds carry each answer inward.
 An `Err` anywhere short-circuits to the end.
 Only the last input passes all three steps,
 so it's the only one that reaches `add()`.
+
+Short-circuiting is right for a dependent chain,
+where each step needs the previous step's answer,
+as `composing_with_bind.py` does above.
+`func_a()`, `func_b()`, and `func_c()` here take independent inputs instead,
+so stopping at the first `Err` discards whatever the later steps would have found,
+the same discarding the opening section's plain exceptions caused.
+Exercise 3 asks you to collect every failure instead of stopping at the first.
+
 Three inputs cost three levels of nesting,
 and the shape gets worse with each one you add.
-[The returns Library](#the-returns-library)
-at the end of this chapter has do-notation,
-which writes the same combination flat.
+[The returns Library](#the-returns-library),
+covered at the end of this chapter,
+offers do-notation as a flatter alternative to this nesting.
 
 The tests confirm that `combined()` returns the correct value,
 or the first failure in the chain:
@@ -510,6 +589,13 @@ if __name__ == "__main__":
 but `@safe` has changed its return type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
+That error type is the whole exception hierarchy, not a specific failure.
+Earlier in this chapter, `Result[int, str]` named exactly what could go wrong;
+`Result[int, Exception]` says only that something did,
+no narrower than a bare `except Exception`.
+`@safe` trades that narrower type for not writing the `try`/`except` by hand.
+Write the `Ok`/`Err` wrapper yourself, as `func_c()` did in `composing.py`,
+when the narrower type matters more than the convenience.
 The `**P` parameter carries the wrapped function's whole parameter list through,
 the technique from [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
 so `parse("42")` type-checks and `parse(42)` does not:
@@ -567,9 +653,12 @@ def parse(text: str) -> int:
 def reciprocal(n: int) -> float:
     return 1 / n
 
-def describe(text: str) -> str:
-    result: Result[float, Exception] = parse(text).bind(
-        reciprocal)
+def compute(text: str) -> Result[float, Exception]:
+    return parse(text).bind(reciprocal)
+
+def describe(
+    text: str, result: Result[float, Exception]
+) -> str:
     match result:
         case Ok(answer):
             return f"{text}: {answer}"
@@ -581,16 +670,22 @@ def describe(text: str) -> str:
             return f"{text}: {type(error).__name__}"
 
 if __name__ == "__main__":
-    for text in ("4", "0", "OOPS"):
-        print(describe(text))
+    texts = ("4", "0", "OOPS")
+    # Every Result computed first, matched after:
+    results = [compute(text) for text in texts]
+    for text, result in zip(texts, results):
+        print(describe(text, result))
 #: 4: 0.25
 #: 0: Cannot divide by zero
 #: OOPS: Not a number
 ```
 
 `@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
-A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Err` values,
-and the `match` tells them apart.
+A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero arrive as ordinary `Err` values.
+`compute()` produces the `Result` and returns it;
+`describe()` matches it afterward, once every input has been computed,
+the `Result` surviving past the call that produced it,
+which a raised exception cannot do.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
 

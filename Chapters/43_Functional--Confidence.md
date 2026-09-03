@@ -76,6 +76,30 @@ It changes `110` into `140`.
 and any expression containing it inherits the problem,
 so substitution reasoning stops at the first impure call.
 
+`global` is not the only way to break substitution.
+A function that mutates an argument breaks it too,
+with no global in sight:
+
+```python
+# mutates_argument.py
+def add_item(cart: list[str], item: str) -> list[str]:
+    cart.append(item)
+    return cart
+
+cart: list[str] = ["milk"]
+add_item(cart, "eggs")
+add_item(cart, "eggs")
+print(cart)
+#: ['milk', 'eggs', 'eggs']
+```
+
+Each call to `add_item()` returns the same list it was given,
+so substituting the call by that return value looks safe.
+It is not.
+The call also appends to `cart`,
+a change substitution cannot see,
+so calling it twice leaves `cart` different from calling it once.
+
 Referential transparency is also what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
 A memoizer can hand back a stored result because the call is interchangeable with its value.
@@ -84,6 +108,34 @@ from a cache to a database query planner,
 benefits from referential transparency.
 The more your program is referentially transparent, the more of it a machine,
 or a proof, can verify.
+Caching an impure function breaks silently instead of raising an exception.
+`withdraw()` is not referentially transparent,
+so decorating it with `lru_cache` corrupts its own bookkeeping:
+
+```python
+# cached_withdraw.py
+from functools import lru_cache
+
+balance = 100
+
+@lru_cache
+def withdraw(amount: int) -> int:
+    global balance
+    balance -= amount
+    return balance
+
+print(withdraw(30), withdraw(30))
+#: 70 70
+print(f"balance: {balance}")
+#: balance: 70
+```
+
+Two withdrawals of `30` should leave `balance` at `40`.
+The second call is a cache hit,
+so `withdraw()` never runs a second time,
+and the missing `30` vanishes with no error.
+`lru_cache` trusts every call it wraps to be referentially transparent,
+and nothing in the language checks that trust.
 
 ## Automatic Parallelism
 
@@ -103,7 +155,9 @@ a lock has nothing to guard.
 
 ```python
 # parallel_pure.py
+import time
 from concurrent.futures import ProcessPoolExecutor
+from benchmark import report
 
 def count_primes(limit: int) -> int:
     count = 0
@@ -113,21 +167,37 @@ def count_primes(limit: int) -> int:
     return count
 
 if __name__ == "__main__":
-    limits = [10_000, 20_000, 30_000, 40_000]
+    limits = [200_000, 400_000, 600_000, 800_000]
+    start = time.perf_counter()
     serial = list(map(count_primes, limits))
+    serial_time = time.perf_counter() - start
+    start = time.perf_counter()
     with ProcessPoolExecutor() as pool:
         parallel = list(pool.map(count_primes, limits))
+    parallel_time = time.perf_counter() - start
     assert parallel == serial
+    report(serial=serial_time, parallel=parallel_time)
     print(parallel)
+    #: [17984, 33860, 49098, 63951]
+    faster = serial_time > 1.3 * parallel_time
+    print(f"parallel at least 30% faster: {faster}")
+    #: parallel at least 30% faster: True
 ```
 
 `list(map(...))` runs the four calls one at a time, on one core.
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
-The script prints `[1229, 2262, 3245, 4203]`.
 The `assert` passes on every run,
 because a pure call returns the same answer no matter which process ran it,
 or when.
+The limits above are large enough for the difference to show:
+on the machine that built this book, the serial run took a few seconds
+and the parallel run about half that,
+comfortably clearing the 30% margin the last line checks.
+Smaller limits finish too fast for spawning worker processes to pay for itself,
+so a reader who shrinks the limits back down will watch parallel lose.
+Purity makes parallel safe.
+It says nothing about whether parallel is worth it at a given size.
 No locks, no queues, no shared state:
 a pure function is ready to run in parallel, unchanged.
 
@@ -211,6 +281,10 @@ You decide how far up the spectrum to go.
    then check it against many generated inputs.
    It searches for a counterexample instead of proving the law,
    and that search is the falsifiability the opening required of a science.
+   The climb from rung 3 is in expressiveness, not certainty.
+   A type states only what shape a value has.
+   A property can state a fact about its behavior,
+   at the cost of checking a sample of inputs instead of every one.
 5. At the top is formal proof.
    In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
@@ -251,6 +325,11 @@ The law is "decoding an encoding returns the original,"
 and it holds for every input the loop tries.
 A property test states what must always be true.
 The machine searches for a counterexample.
+A bare `assert` like this one reports only `AssertionError`
+if the law fails.
+Python prints the assert's source code, not the value that broke it,
+so finding the failing input means adding a `print()`
+and rerunning by hand.
 
 Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
@@ -281,22 +360,25 @@ because importing `property_check.py` would run its thousand-iteration loop insi
 By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand, and they still cover more ground,
 because Hypothesis aims at boundaries and oddities instead of sampling evenly.
-When a law fails, Hypothesis reports the failing input and shrinks it to the smallest example that still fails,
+When a law fails, Hypothesis reports the failing input,
+the first improvement over the bare `assert` above.
+It also shrinks that input to the smallest example that still fails,
+a second improvement,
 so the bug surfaces as the clearest case rather than a random one.
 The framework automates falsification.
 
 The two listings above both pass, so nothing has shrunk yet.
-The next codec has a bug:
+The next codec has a bug, and it is the Unicode gap promised earlier:
 
 ```python
 # shrinking.py
 from hypothesis import given, settings, strategies
 
 def encode(text: str) -> str:
-    return text.replace(" ", "_")
+    return text.encode().hex()
 
 def decode(text: str) -> str:
-    return text.replace("_", " ")
+    return bytes.fromhex(text).decode("latin-1")
 
 @settings(derandomize=True, database=None)
 @given(strategies.text())
@@ -308,14 +390,22 @@ try:
 except AssertionError as e:
     print(e.__notes__[0])
 #: Failing test case: roundtrip(
-#:     sample='_',
+#:     sample='\x80',
 #: )
 ```
 
-An underscore in the input comes back as a space.
-Hypothesis finds a failing string and then keeps cutting it down until removing anything more makes the test pass again,
-so it reports `'_'` rather than the longer string that failed first.
-That single character is the whole bug statement.
+`encode()` still turns text into UTF-8 bytes,
+but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
+The two agree on the 128 ASCII code points,
+so `property_check.py`'s five-letter alphabet, built only from those,
+can run all thousand cases and never reach the mismatch.
+Hypothesis draws from the full range a Python string holds,
+and shrinks its failure down to the smallest code point outside that agreement,
+`'\x80'`, the first character UTF-8 needs more than one byte to encode.
+Decoding those two bytes as Latin-1 returns two characters where one went in,
+so the round trip breaks.
+This is the unusual Unicode the hand loop's alphabet could never draw,
+found because Hypothesis searches a wider space, not a smarter one.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.

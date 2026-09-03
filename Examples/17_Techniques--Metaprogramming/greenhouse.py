@@ -60,26 +60,22 @@ class Event:
 
     @staticmethod
     def run_events() -> None:
+        bell = cast(
+            type, Event._event_maker["RingBell"])
         for e in sorted(
                 Event.events,
                 key=lambda e: (e.hour, e.minute)):
-            print(f"{e.hour}:{e.minute:02d}: {e.action}")
+            prefix = "* " if isinstance(e, bell) else ""
+            line = f"{e.hour}:{e.minute:02d}: {e.action}"
+            print(prefix + line)
 
 if __name__ == "__main__":
     Event.load_schedule(Path("schedule.txt"))
     Event.run_events()
-#: Creating ThermostatNight
 #: Creating LightOff
-#: Creating WaterOn
-#: Creating WaterOff
 #: Creating LightOn
 #: Creating RingBell
-#: Creating ThermostatDay
 #: 1:00: LightOn
 #: 2:00: LightOff
-#: 3:30: WaterOn
-#: 4:45: WaterOff
-#: 5:00: ThermostatNight
-#: 6:00: ThermostatDay
-#: 7:00: RingBell
+#: * 7:00: RingBell
 #: 8:00: LightOn

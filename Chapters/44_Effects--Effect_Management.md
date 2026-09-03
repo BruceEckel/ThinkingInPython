@@ -190,10 +190,15 @@ except ValueError as e:
 ```
 
 This works, and it needs no new type.
-But it guards only the exception `slope()`'s author expected.
+But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
-an exception `slope()` never anticipated.
-Because `slope()` calls it, `validate()`'s Effect becomes `slope()`'s Effect.
+and the `try` around it catches only `ZeroDivisionError`.
+This listing puts `validate()` four lines from `slope()`,
+so the gap is easy to spot.
+A real call stack usually puts the raise many files away,
+where reading every callee to find it is the tedious,
+error-prone work an Effect Management System replaces.
+Because `slope()` calls `validate()`, `validate()`'s Effect becomes `slope()`'s Effect.
 Catching by hand covers exactly the exceptions you know a callee can raise,
 and knowing every one of them is the tracking problem an Effect Management System exists to solve.
 
@@ -245,7 +250,10 @@ so it needs no `try` and no `Result` to say so.
 
 All three approaches take the division failure out of `slope()`,
 but they push the cost to different places.
-A `Result` makes every caller handle failure explicitly, at every call site.
+A `Result` makes every caller handle failure explicitly, at every call site,
+but `@safe` catches `Exception` broadly,
+so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug,
+the same cost [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results) names.
 Catching by hand hides the fix inside `slope()`,
 at the cost of a blind spot for an exception nobody thought to catch.
 A restrictive type pays once, at construction,
@@ -254,6 +262,50 @@ None of the three makes the failure disappear.
 A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
+
+These three are not a menu to pick one from.
+The standard practice combines the first and third:
+parse untrusted input into the restrictive type at the boundary,
+using a `Result` to report a bad value instead of raising one,
+and let every function past that boundary take `NonZero` and stay total:
+
+```python
+# slope_edge.py
+from dataclasses import dataclass
+from result import Err, Ok
+from safe import safe
+
+@dataclass(frozen=True)
+class NonZero:
+    value: int
+
+    def __post_init__(self) -> None:
+        if self.value == 0:
+            raise ValueError("NonZero cannot hold 0")
+
+def slope(rise: int, run: NonZero) -> float:
+    return rise / run.value
+
+@safe
+def parse_run(text: str) -> NonZero:
+    return NonZero(int(text))
+
+for text in ["2", "0"]:
+    match parse_run(text):
+        case Ok(run):
+            print(slope(10, run))
+        case Err(error):
+            print(f"{text!r}: {type(error).__name__}")
+#: 5.0
+#: '0': ValueError
+```
+
+`parse_run()` is the only place that can fail,
+and `@safe` turns that failure into a `Result` its caller must unpack.
+Past that one `match`, `slope()` never checks anything:
+`NonZero` already guarantees `run.value` isn't 0.
+One technique handles the input a caller doesn't trust,
+the other handles everything downstream that does.
 
 ## A Program Can Never Be Pure
 
@@ -267,7 +319,6 @@ that program is indistinguishable from a program that computes nothing.
 ```python
 # pure_and_pointless.py
 import timeit
-from benchmark import report
 
 def compute_and_discard() -> None:
     total = 0
@@ -279,7 +330,6 @@ def do_nothing() -> None:
 
 busy = timeit.timeit(compute_and_discard, number=5)
 idle = timeit.timeit(do_nothing, number=5)
-report(busy_loop=busy, empty_function=idle)
 print(f"burned real CPU time for nothing: "
       f"{busy > idle * 100}")
 #: burned real CPU time for nothing: True
@@ -476,10 +526,57 @@ returns to that limit.
 
 The technique works, but the bookkeeping falls on you.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down.
-Parameters accumulate at every level of the call stack.
+Parameters accumulate at every level of the call stack:
+
+```python
+# bookkeeping_scales.py
+from dataclasses import dataclass, field
+from typing import Protocol
+
+class Ask(Protocol):
+    def ask(self, prompt: str) -> str: ...
+
+class Tell(Protocol):
+    def tell(self, message: str) -> None: ...
+
+def greet(ask: Ask, tell: Tell) -> None:
+    name = ask.ask("What is your name? ")
+    tell.tell(f"Hello, {name}!")
+
+def session(ask: Ask, tell: Tell) -> None:
+    greet(ask, tell)
+
+def menu(ask: Ask, tell: Tell) -> None:
+    session(ask, tell)
+
+def main(ask: Ask, tell: Tell) -> None:
+    menu(ask, tell)
+
+class Scripted:
+    def ask(self, prompt: str) -> str:
+        return "Alice"
+
+@dataclass
+class Capture:
+    messages: list[str] = field(default_factory=list)
+
+    def tell(self, message: str) -> None:
+        self.messages.append(message)
+
+captured = Capture()
+main(Scripted(), captured)
+print(captured.messages)
+#: ['Hello, Alice!']
+```
+
+`session()`, `menu()`, and `main()` never call `ask.ask()` or `tell.tell()`,
+yet each must name both parameters just to pass them to the function below it.
 Nothing propagates automatically.
 If you add a `Log` Effect three levels down,
-you edit every signature on the path.
+you edit every signature on the path:
+`greet()`, `session()`, `menu()`, and `main()`,
+plus the new function that logs, five signatures in all.
+Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you still must tell the injector what every function needs,
 and tell it again when that changes.

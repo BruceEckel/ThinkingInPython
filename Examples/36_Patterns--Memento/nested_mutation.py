@@ -9,5 +9,7 @@ print(shallow)
 
 deep = copy.deepcopy(todo)
 todo[0].append("jam")
+print(todo)
+#: [['eggs', 'milk', 'cheese', 'jam'], ['bread']]
 print(deep)
 #: [['eggs', 'milk', 'cheese'], ['bread']]

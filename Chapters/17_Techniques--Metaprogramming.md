@@ -199,13 +199,22 @@ def make(name: str) -> EventMaker:
 makers = {name: make(name) for name in NAMES}
 print(len(makers))
 #: 7
-print(makers["LightOn"](1, 0))
+light = makers["LightOn"](1, 0)
+water = makers["WaterOff"](2, 0)
+print(light)
 #: LightOn(action='LightOn', hour=1, minute=0)
+print(isinstance(light, Event))
+#: True
+print(type(light) is type(water))
+#: False
 ```
 
 Each generated class is a real type, not a label.
-`LightOn` and `WaterOff` are distinct subclasses of `Event`,
-so `isinstance()` tells them apart and you can later give either one behavior of its own.
+`LightOn` and `WaterOff` are both `Event` instances,
+so `isinstance(light, Event)` is `True`,
+but `type(light) is type(water)` is `False`:
+they are distinct subclasses, and `isinstance()` tells them apart.
+The next section shows what a distinct subclass buys: behavior of its own.
 
 The type checker cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
@@ -289,28 +298,24 @@ class Event:
 
     @staticmethod
     def run_events() -> None:
+        bell = cast(
+            type, Event._event_maker["RingBell"])
         for e in sorted(
                 Event.events,
                 key=lambda e: (e.hour, e.minute)):
-            print(f"{e.hour}:{e.minute:02d}: {e.action}")
+            prefix = "* " if isinstance(e, bell) else ""
+            line = f"{e.hour}:{e.minute:02d}: {e.action}"
+            print(prefix + line)
 
 if __name__ == "__main__":
     Event.load_schedule(Path("schedule.txt"))
     Event.run_events()
-#: Creating ThermostatNight
 #: Creating LightOff
-#: Creating WaterOn
-#: Creating WaterOff
 #: Creating LightOn
 #: Creating RingBell
-#: Creating ThermostatDay
 #: 1:00: LightOn
 #: 2:00: LightOff
-#: 3:30: WaterOn
-#: 4:45: WaterOff
-#: 5:00: ThermostatNight
-#: 6:00: ThermostatDay
-#: 7:00: RingBell
+#: * 7:00: RingBell
 #: 8:00: LightOn
 ```
 
@@ -318,18 +323,28 @@ Now the end user needs only to write and maintain the schedule file:
 
 ```text
 # schedule.txt
-ThermostatNight 5:00
 LightOff 2:00
-WaterOn 3:30
-WaterOff 4:45
 LightOn 1:00
 RingBell 7:00
-ThermostatDay 6:00
 LightOn 8:00
 ```
 
-Calling `Event(class_name, hour, minute)` directly would print the same schedule,
-but every entry would be the same type with its kind reduced to a string.
+The schedule names three of the seven declared event types.
+`EventMakers` builds only those three,
+which is the laziness the section promised:
+seven classes declared, three built.
+
+`run_events()` puts the type distinction to work.
+It fetches the `RingBell` class through `_event_maker`,
+the same lookup `load_schedule()` uses,
+and marks every event `isinstance()` recognizes as one with a leading `* `.
+That is the behavior the earlier claim promised:
+a generated class doing something a plain string could not.
+
+Calling `Event(class_name, hour, minute)` directly would still produce the right field values,
+but every entry would share one type,
+and `run_events()` would have no class left to check against.
+The `* ` marker depends on `RingBell` being a distinct class, not just a distinct name.
 
 `EventMakers` subclasses `dict` so the laziness is invisible at the call site.
 `Event._event_maker[class_name]` reads as an ordinary lookup,
@@ -339,7 +354,7 @@ would push that decision into every caller.
 
 `load_schedule()` reads that file, filtering out blank lines and comments,
 then builds an `Event` from each resulting line.
-`line.replace(":", " ").split()` turns `"WaterOn 3:30"` into three strings in a single step,
+`line.replace(":", " ").split()` turns `"LightOn 1:00"` into three strings in a single step,
 replacing the colon with a second space before splitting on whitespace.
 `Event._event_maker[class_name]` gets the class object that builds that `Event`.
 The first time a lookup asks for an event type,
@@ -443,6 +458,24 @@ never as source code.
 Treat `exec()` and `eval()` like string-built SQL:
 safe on values you've already validated,
 dangerous on anything that reaches the program from outside, unchecked.
+
+Both generators carry a second cost, unrelated to injection.
+`exec()`'s private `namespace` has no `__name__` key,
+so the class it creates gets `__module__` set to `"builtins"`.
+`pickle.dumps()` on an instance then raises a `PicklingError`,
+because pickle looks the class up as `builtins.Start` and never finds it,
+and `inspect.getsource()` raises a `TypeError`,
+because a built-in class carries no source.
+`type()`-built classes fail differently, but just as completely:
+`LightOn` gets `__module__` set to `eager_event_classes` correctly,
+but it lives only in the `makers` dict, never as a module attribute,
+so pickle looks for `eager_event_classes.LightOn` and does not find that either,
+and `inspect.getsource()` raises an `OSError` instead.
+Neither generator's classes survive a round trip through `pickle`,
+and neither yields source to `inspect.getsource()`,
+a real cost given that [The `inspect` Module](#the-inspect-module) is a few pages away.
+A class built this way serves the process that built it.
+It is not for storage or introspection.
 
 ## Self-Registration of Subclasses
 
@@ -1192,6 +1225,8 @@ so inheriting from two classes built by different metaclasses has no answer:
 
 ```python
 # multiple_metaclass_inheritance.py
+import textwrap
+
 class MetaA(type):
     pass
 
@@ -1208,15 +1243,30 @@ try:
     class C(A, B):  # type: ignore
         pass
 except TypeError as error:
-    print(type(error).__name__)
-#: TypeError
+    print(textwrap.fill(str(error), 56))
+#: metaclass conflict: the metaclass of a derived class
+#: must be a (non-strict) subclass of the metaclasses of
+#: all its bases
+
+class MetaC(MetaA, MetaB):
+    pass
+
+class D(A, B, metaclass=MetaC):
+    pass
+
+print(type(D).__name__)
+#: MetaC
 ```
 
-The result is a metaclass conflict,
-and the fix is a metaclass for `C` that inherits both.
+The result is a metaclass conflict.
 As with the layout conflict just shown,
 ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
+`textwrap.fill()` wraps `str(error)` so the message fits the page;
+the message itself is Python's, unwrapped.
+It names the fix: `D`'s metaclass, `MetaC`, must be a
+subclass of every base's metaclass, `MetaA` and `MetaB` both.
+Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
 Both failures have the same shape:
 an inheritance graph that looks legal until you notice what the bases carry with them.
 It's one more reason to avoid metaclasses (and, arguably, multiple inheritance)
@@ -1230,6 +1280,44 @@ Use a metaclass when you need to change the class object rather than react to it
   (metamethods such as the `__call__()` shown above, or the `__iter__()` that lets `EnumType` make `for c in Color` work).
 - Replacing the namespace mapping with `__prepare__()` so the class body populates a custom dictionary.
 - Enforcing an invariant across an entire family of classes through their shared metaclass.
+
+The first bullet has a listing to show for it.
+A metaclass can give the class itself an `__iter__()`,
+the same hook that lets `EnumType` make `for c in Color` work:
+
+```python
+# iterable_class.py
+from collections.abc import Iterator
+from typing import Any
+
+class IterableMeta(type):
+    def __iter__(cls) -> Iterator[Any]:
+        return (
+            v for k, v in vars(cls).items()
+            if not k.startswith("_")
+        )
+
+class Color(metaclass=IterableMeta):
+    red = "red"
+    green = "green"
+    blue = "blue"
+
+for c in Color:
+    print(c)
+#: red
+#: green
+#: blue
+```
+
+`IterableMeta.__iter__()` fires when you write `for c in Color`,
+iterating the class object itself, not an instance of it.
+It walks `vars(cls)`, the class's own namespace,
+skipping the dunder entries every class carries,
+so it yields the three names the body assigned: `red`, `green`, `blue`.
+A class decorator cannot do this.
+It can only add methods that instances see,
+never a protocol method the class object itself must answer,
+which is why `Color` needed a metaclass, not a decorator.
 
 `__prepare__()` is the one with no simpler substitute:
 

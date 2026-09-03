@@ -33,6 +33,14 @@ and the two dispatches go through methods named `compete()` and `eval_*()`.
 If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
+Python already performs this second dispatch for you when the interaction is an operator:
+`a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines,
+which is how the opening `Number + Number` question resolves
+([Operators Dispatch Twice](#operators-dispatch-twice) below).
+The rest of this chapter builds the general technique,
+for an interaction that is not an operator, using a game of paper, scissors,
+rock as the working example.
+
 Both versions below share one result type, an enumeration called `Outcome`:
 either `WIN`, `LOSE`, or `DRAW`.
 `Outcome` is a `StrEnum`,
@@ -285,6 +293,37 @@ while the table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
+A `match` statement with class patterns is a third option for a two-type decision.
+Like `singledispatch`, it tests with `isinstance()`,
+so a subclass matches the pattern its base would:
+
+```python
+# match_dispatch.py
+from outcome import Outcome
+from paper_scissors_rock_table import Paper, Rock
+
+class Origami(Paper):
+    pass
+
+def compete(a: object, b: object) -> Outcome:
+    match a, b:
+        case Paper(), Rock():
+            return Outcome.WIN
+        case Rock(), Paper():
+            return Outcome.LOSE
+        case _:
+            raise ValueError(f"{a}, {b}")
+
+print(compete(Origami(), Rock()))
+#: win
+```
+
+`Origami` inherits `compete()` from `Paper` and matches the `Paper()` case,
+the same subclass `exact_match.py` showed the table refusing.
+Unlike `singledispatch`, every case sits together in one block,
+closed the way the table is: adding an `Item` means adding cases,
+not registering a function elsewhere.
+
 `functools.singledispatchmethod`
 ([Functional Toolkits](41_Functional--Toolkits.md#singledispatchmethod) catalogs it)
 combines the two dispatches in one decorator.
@@ -296,6 +335,42 @@ One trap is easy to fall into and hard to see:
 each class needs its own `@singledispatchmethod`,
 because registering on a shared base gives every subclass one dispatcher,
 and the resolution on `self` then treats them all alike.
+Here is the collapse:
+
+```python
+# singledispatch_trap.py
+from functools import singledispatchmethod
+
+class Item:
+    @singledispatchmethod
+    def compete(self, item: object) -> str:
+        raise NotImplementedError
+
+class Paper(Item):
+    pass
+
+class Rock(Item):
+    pass
+
+@Paper.compete.register  # type: ignore
+def _(self: Item, item: Rock) -> str:
+    return "paper wins"
+
+@Rock.compete.register  # type: ignore
+def _(self: Item, item: Rock) -> str:
+    return "rock draws"
+
+print(Paper().compete(Rock()))
+#: rock draws
+print(Rock().compete(Rock()))
+#: rock draws
+```
+
+Both registrations attach to `Item.compete`,
+the attribute `Paper` and `Rock` both inherit,
+so the second `@register` silently overwrites the first's entry for `Rock`.
+`self`'s type never entered that lookup, so both duels return the same answer,
+even though each was registered against its own class.
 
 The version most programmers write first is neither of these:
 it is an `isinstance()` ladder inside `compete()`,
@@ -316,6 +391,31 @@ A table cell can hold a function, so even elaborate behavior fits the table.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
+A subclass can do that by overriding `compete()` itself:
+
+```python
+# paper_scissors_rock_subclass.py
+from typing import Any
+from outcome import Outcome
+from paper_scissors_rock import Paper, Rock, Scissors
+
+class DampPaper(Paper):
+    def compete(self, item: Any) -> Outcome:
+        if isinstance(item, Rock):
+            return Outcome.DRAW  # too soggy to wrap
+        return super().compete(item)
+
+print(DampPaper().compete(Rock()))
+#: draw
+print(DampPaper().compete(Scissors()))
+#: lose
+```
+
+`DampPaper` overrides its outcome against `Rock` and inherits every other combination from `Paper`,
+unchanged, through `super().compete(item)`.
+The table version has no comparable hook:
+overriding one cell means editing the shared `OUTCOME` dictionary,
+which affects every `Item`, not just one subclass.
 
 ## Testing Both Versions
 
@@ -485,15 +585,21 @@ using these two methods to let Python's own parser assemble the tree.
 
 ## Turning One Unknown Type Into a Second Dispatch
 
-Three techniques in this chapter do the same thing.
-The `eval_*()` family, the `OUTCOME` table,
-and `__add__()` with `__radd__()` all take a type the first dispatch could not resolve and dispatch again on it.
-They differ in who performs the second dispatch and where the answers live.
+Three techniques in this chapter answer the same question:
+what do you do with a type the first dispatch could not resolve?
+The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second dispatch,
+a second method call that resolves the type by running a method lookup.
+The `OUTCOME` table answers it differently.
+`compete()` is defined once on `Item` and no subclass overrides it,
+so `OUTCOME[type(self), type(item)]` is one dictionary lookup keyed on both types at once,
+not a second method resolution.
 The methods hand the second dispatch to a second method call that you write,
 and scatter the answers across the classes.
-The table does it with a dictionary probe and collects the answers in one place.
-The operators are the one case where Python makes the second call itself.
-Everywhere else you choose between paying for the second dispatch in methods and paying for it in data.
+The table replaces both dispatches with a single lookup,
+and collects the answers in one place.
+The operators are the one case where Python performs the second dispatch itself.
+Everywhere else you choose between paying for a second dispatch in methods,
+or replacing both dispatches with one lookup in data.
 
 ## Exercises
 

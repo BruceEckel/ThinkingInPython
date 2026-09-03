@@ -145,6 +145,8 @@ def greet(name: str) -> Depend[Need[Console], None]:
 `greet()` needs a `Console`, cannot fail, and produces nothing.
 It lives in `utils/` because both this chapter and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 import it.
+This chapter builds its own `Console` rather than the one Stateless ships;
+[Builtin Dependencies](#builtin-dependencies) says why.
 Compare that to the version that calls `print()` directly:
 
 ```python
@@ -192,6 +194,17 @@ Generator[Need[Console] | KeyError, Any, None]
 ```
 
 `A` and `E` share the first type parameter, and `R` is the third.
+Nothing in the union itself tells a request from a failure;
+two bounds on the library's type variables do that instead.
+`A` is bound to `Ability[Any]`
+([Waiting on a Coroutine](#waiting-on-a-coroutine) states the rule for `Depend`),
+and `E` is bound to `Exception`,
+so a class that subclassed both would satisfy each bound at once,
+a case no listing here builds.
+At runtime, `run()`'s driver tells the two apart with
+`case Exception() as error`:
+whatever the generator yields that matches `Exception` is a failure,
+and everything else is an Ability request.
 That leaves the second,
 which [Generators](45_Effects--Generators.md#annotating-a-generator)
 taught you to read as the type the `yield` expression produces inside the generator.
@@ -749,6 +762,32 @@ because `holds(material, nailer)` is easy to call four times.
 The two diverge when the dependency sits three calls deep.
 The parameter version then adds two parameters to every function on the path,
 while this version still changes only the row.
+`audit_log.py`'s `greet_all()` is that depth:
+the test calls `greet_all()`,
+`greet_all()` calls `greet_logged()`,
+and `greet_logged()` is where `Need[Log]` and `Need[Console]` are requested.
+Varying the environment there still touches only the row:
+
+```python
+# test_audit_log.py
+import pytest
+from audit_log import Log, greet_all
+from greeter import Console
+from recorder import Recorder
+from stateless import as_type, run, supply
+
+@pytest.mark.parametrize("console", [
+    Console(), as_type(Console)(Recorder())])
+def test_greet_all(console: Console) -> None:
+    log = Log()
+    run(supply(console, log)(greet_all)(["Alice"]))
+    assert log.entries == ["greeted Alice"]
+```
+
+Two rows, two `Console` implementations,
+and neither `greet_all()` nor `greet_logged()` gained a parameter.
+The parameter-passed version would add a `console` argument to both,
+even though only `greet_logged()` uses it.
 
 ## Builtin Dependencies
 
@@ -1029,6 +1068,17 @@ DI meets its goal: the `Console` is swappable.
 But it relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
 rather than declaring one, so the type checker never validates the dependency.
 
+`dependency_injection.py` demonstrates one shape of DI, a service locator:
+a body reads the container directly, with `get(Console)`.
+Constructor injection is the stronger, more common shape,
+the one frameworks such as FastAPI's `Depends` build on:
+the dependency arrives as a parameter,
+so a static type checker validates every call that supplies one.
+It avoids the container-lookup complaint above.
+The binding still happens once, though, at the endpoint or the constructor;
+every function that boundary calls still threads the dependency onward by hand,
+the same parameter an EMS replaces with a channel in the return type.
+
 An EMS sets a higher bar:
 the dependency must appear in the signature so the type checker can verify it,
 which is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s returns `None`.
@@ -1283,6 +1333,18 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 `run()` starts an event loop and drives the Effect inside it:
 its entire body is `return asyncio.run(run_async(effect))`.
+Building and tearing down that loop costs something,
+even for an Effect with no `Async` in it.
+One machine measured `run(success(42))` at about
+650 microseconds, against a few hundredths of a microsecond
+for the equivalent plain function call, roughly four orders
+of magnitude apart.
+That is the cost behind "a synchronous program calls it once,
+at the outermost edge"
+([The Simplest Effect](#the-simplest-effect)):
+`test_nailer.py` pays it once per parametrized case,
+which is fine for four rows and worth remembering
+for a much longer parametrized list.
 That has a consequence when you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so you cannot call `run()` from any `async def`:
@@ -1456,7 +1518,8 @@ a hole that [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practi
 examines.
 
 Because the driver throws the failure back in,
-an ordinary `try`/`except` around a `yield from` catches it.
+an ordinary `try`/`except` around a `yield from` catches it,
+provided `run()` drives that Effect directly.
 Catching is different from handling.
 The exception leaves as a yielded value, travels out to `run()`,
 and comes back down into the innermost suspended frame,
@@ -1504,6 +1567,45 @@ The two functions behave identically at the edge and differ in their types.
 while `moved()` is a `Success`.
 Wrapping `guarded()` in a `catch()` makes its inner `except` dead code,
 because `catch()` matches the yielded value before the driver gets it and abandons the inner generator where it stands.
+
+A `Handler`, what `supply()` returns
+([Supplying the Dependency](#supplying-the-dependency)),
+breaks the direct-drive condition above.
+Its loop re-yields an error it cannot handle
+instead of throwing that error back into the Effect it wraps,
+so the driver's `throw()` lands in the `Handler`'s own frame,
+not `guarded()`'s, and the error escapes before the inner `except` runs:
+
+```python
+# handler_blocks_except.py
+from greeter import Console
+from scores import score
+from stateless import Effect, Need, need, run, supply
+
+def guarded(
+    name: str
+) -> Effect[Need[Console], KeyError, str]:
+    try:
+        value = yield from score(name)
+    except KeyError:
+        return f"{name}: unknown"
+    console = yield from need(Console)
+    console.print(f"{name}: {value}")
+    return f"{name}: {value}"
+
+try:
+    run(supply(Console())(guarded)("Carol"))
+except KeyError as e:
+    print("escaped:", type(e).__name__, e)
+#: escaped: KeyError 'Carol'
+```
+
+`guarded()` here is otherwise the same function, only needing a `Console` it never reaches on this path.
+Wrapping it in `supply(Console())` is enough to break the `except`.
+`catch_score.py`, ahead in
+[Turning an Error Into a Value](#turning-an-error-into-a-value),
+sits under the identical shape (`supply()` wraps a function `run()` drives) and still works,
+because `catch()` matches the yielded value itself rather than relying on the driver to throw it back in.
 
 ## Turning an Error Into a Value
 

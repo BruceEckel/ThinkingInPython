@@ -15,7 +15,9 @@ so some of those patterns become unnecessary.
 This chapter points out each one as the example reaches it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
-an initial solution, then successive redesigns as new requirements appear.
+one design, then a requirement that breaks it,
+then a reshaping that absorbs the change,
+then a second axis of change the reshaped design does not touch.
 Read that evolution as a template for your own designs,
 which can start as an adequate fit for one problem and grow into a flexible fit for a class of problems.
 
@@ -280,6 +282,12 @@ A sorter over an open set has to find the bin without naming any type,
 and the next section shows one that does.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you do dispatch's job by hand.
+A `case _:` wildcard could catch what the named cases miss:
+`case _: raise ValueError(f"unsorted {type(t).__name__}")`
+turns the silent drop into a crash.
+That is worth doing, but it does not remove the flaw.
+Every new material still means editing this `match`,
+where `bins[type(t)]` needs no edit at all.
 
 That is the argument.
 Here is the requirement that makes it concrete.
@@ -421,6 +429,47 @@ The `defaultdict(list)` creates a bin the first time a material turns up.
 so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
+Point this sorter at `plastic.dat`, the file that defeated `recycle_rtti.py`,
+defining `Plastic` the same way `plastic_dropped.py` did:
+
+```python
+# recycle_dict_plastic.py
+from collections import defaultdict
+from parse_trash import parse
+from trash import Bins, Trash, sum_value
+
+class Plastic(Trash):
+    value = 0.15
+
+pieces = parse("plastic.dat")
+bins: Bins = defaultdict(list)
+for t in pieces:
+    bins[type(t)].append(t)  # Bin chosen by the trash piece
+
+for kind, items in bins.items():
+    print(f"--- {kind.__name__} ---")
+    sum_value(items)
+binned = sum(len(v) for v in bins.values())
+print(f"parsed {len(pieces)}, binned {binned}")
+#: --- Glass ---
+#: weight of Glass = 10.0
+#: Total value = 2.30
+#: --- Plastic ---
+#: weight of Plastic = 20.0
+#: weight of Plastic = 40.0
+#: Total value = 9.00
+#: --- Aluminum ---
+#: weight of Aluminum = 30.0
+#: Total value = 50.10
+#: parsed 4, binned 4
+```
+
+Every piece reaches a bin, plastic included:
+`parsed 4, binned 4`.
+Defining `Plastic` is the only change here.
+The sorting loop needed no edit,
+unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
+
 ## Adding Operations: Visitor, and Why Python Skips It
 
 So far the chapter has made new *types* cheap.
@@ -431,6 +480,16 @@ that trade is the expression problem from [Pattern Matching](13_Techniques--Patt
 Recycling instructions, disposal hazards,
 and transport volume are all operations that vary by material,
 and none of them belongs in `trash.py`.
+That claim needs the comparison, not just the assertion.
+This hierarchy is small and the book owns every subclass,
+so overriding `note()` per subclass is a real option here, not a strawman.
+The method wins when you own the hierarchy and the operations stay few:
+each subclass answers for itself,
+with no separate table to keep in step with the class list.
+`singledispatch` wins once you do not own the hierarchy,
+or once operations start to outnumber materials:
+a fifth operation costs one function under `singledispatch`,
+against one new method on every existing subclass.
 [Visitor](33_Patterns--Visitor.md) is the classic way to add them from outside,
 and it is elaborate.
 In its C++ and Java form a `Visitor` base class declares one overload per material,
@@ -521,9 +580,11 @@ The deeper skill is spotting the *vector of change*
 ([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern)),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
-This chapter discovered its two vectors one requirement at a time,
-rather than predicting them up front,
-and each cost a single line at the point of use:
+This chapter met its first vector, new types,
+through a concrete requirement: plastic.
+It introduced the second, new operations,
+by naming the cost directly rather than by breaking a running example.
+Either way, each vector costs a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
 and one `@recycling_note.register` teaches an existing operation about it.
 Neither is a pattern in the GoF sense.
