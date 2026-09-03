@@ -13,9 +13,11 @@ class Node:
 def self_link() -> None:
     node = Node("a")
     node.peer = node
+    print(gc.get_referrers(node)[0] is node)
 
 gc.disable()
 self_link()
+#: True
 print("unreachable, but still alive")
 #: unreachable, but still alive
 gc.collect()

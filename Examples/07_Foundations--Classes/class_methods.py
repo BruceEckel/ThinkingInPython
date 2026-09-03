@@ -13,8 +13,14 @@ class Temperature:
     def is_freezing(celsius):  # Needs no self or cls
         return celsius <= 0
 
+class Reading(Temperature):
+    pass  # Adds nothing; inherits from_fahrenheit()
+
 t = Temperature.from_fahrenheit(212)
 print(round(t.celsius))
 #: 100
 print(Temperature.is_freezing(-4))
 #: True
+r = Reading.from_fahrenheit(212)
+print(type(r).__name__)
+#: Reading

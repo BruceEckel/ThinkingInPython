@@ -66,6 +66,24 @@ never from an `if` or a `for` block.
 Binding still follows execution: with any answer other than `"yes"`,
 the assignment never runs, and `print(val)` raises a `NameError`.
 
+```python
+# unbound_val.py
+
+response = "no"
+if response == "yes":
+    val = 1
+try:
+    print(val)  # type: ignore
+except NameError as e:
+    print(e)
+#: name 'val' is not defined
+```
+
+The `if` never ran, so `val` was never bound.
+Nothing about the block itself protected `print(val)`.
+`ty` proves `val` unbound here and refuses to check the line,
+so `# type: ignore` tells it the mistake is deliberate.
+
 Indenting can nest to any level.
 Four spaces per level is the convention,
 and mixing tabs and spaces inside one block is a `TabError`.
@@ -105,14 +123,20 @@ print(a is b)  # Identical objects
 c = a[:]  # Copies the list, not its contents
 print(a is c, a == c)  # Different object, equal value
 #: False True
+nested = [[1], [2, 3]]
+shallow = nested[:]
+shallow[1].append(99)
+print(nested)  # The inner list is shared
+#: [[1], [2, 3, 99]]
 ```
 
 Use `==` to ask whether two objects have equal values.
 Use `is` to ask whether two names refer to the same object.
 Reserve `is` for `None` and other singletons.
 `a[:]` is a *shallow* copy:
-it duplicates the list but not the objects inside it,
-so `a` and `c` would still share a nested list.
+it duplicates the outer list but not the objects inside it.
+`nested` and `shallow` still share the same inner list,
+so `shallow[1].append(99)` changes what `nested` sees too.
 
 You can assign several names at once, so a swap needs no temporary:
 
@@ -278,6 +302,16 @@ for value in [0, 1, "", "hi", [], [1], None]:
 #: [1] -> True
 #: None -> False
 
+class Bucket:
+    def __init__(self, count: int) -> None:
+        self.count = count
+
+    def __len__(self) -> int:
+        return self.count
+
+print(bool(Bucket(0)), bool(Bucket(3)))
+#: False True
+
 if not []:
     print("empty")  # An empty list is falsy
 #: empty
@@ -293,6 +327,9 @@ print(count or 10)  # 0 is falsy, so the fallback wins
 
 `repr()` returns a value's unambiguous representation,
 so the empty string shows as `''` and not as blank.
+`Bucket` defines only `__len__()`,
+so `bool()` falls back to it:
+`Bucket(0)` is false and `Bucket(3)` is true.
 
 `and` and `or` short-circuit and return one of their operands,
 not a coerced boolean.
@@ -458,21 +495,58 @@ def shout(template: Template) -> str:
 
 print(shout(message))
 #: Alice SCORED 92%
+
+def safe(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            value = str(piece.value)
+            if "'" in value:
+                raise ValueError(
+                    f"unsafe value: {value!r}")
+            parts.append(value)
+        else:
+            parts.append(piece)
+    return "".join(parts)
+
+print(safe(t"Hello, {name}"))
+#: Hello, Alice
+trouble = "Bob'; rm -rf /"
+try:
+    safe(t"Hello, {trouble}")
+except ValueError as e:
+    print(e)
+#: unsafe value: "Bob'; rm -rf /"
 ```
 
 Iterating a `Template` produces the pieces in order,
 each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.
+Collecting every `piece.expression` above uses a list comprehension,
+the same new syntax as the generator expression earlier;
+[Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
+covers the general form.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
 A consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases the literal text and leaves the values alone.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.
-Uppercasing is a demonstration;
+`safe()` puts that separation to work:
+it passes the literal text through unchanged,
+and it rejects an interpolated value that carries a quote character,
+the way `trouble` does above.
+An f-string would have finished assembling the result, quote and all,
+before any code had a chance to object.
+Uppercasing and rejecting are small demonstrations;
 [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
-builds a query from the parts the same way.
+builds a full query from the parts the same way.
+
+Keep using f-strings for ordinary output.
+Reach for a t-string only when a consumer must inspect, escape,
+or reject the interpolated values before they become part of the result,
+the way `safe()` does above.
 
 ## Naming Conventions
 

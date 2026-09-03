@@ -3,9 +3,13 @@
 class Socket:
     def __init__(self, name: str) -> None:
         self.name = name
+        self.closed = False
         print(name, "opened")
 
     def close(self) -> None:
+        if self.closed:
+            return
+        self.closed = True
         print(self.name, "closed")
 
     def __enter__(self) -> Socket:
@@ -16,6 +20,7 @@ class Socket:
 
 with Socket("A") as sock:
     print("using", sock.name)
+sock.close()
 #: A opened
 #: using A
 #: A closed

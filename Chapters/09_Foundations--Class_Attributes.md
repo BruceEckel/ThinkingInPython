@@ -68,6 +68,14 @@ print(vars(A)["x"])
 The listing subscripts `vars(A)` because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`.
 The instance dictionary is a plain `dict` holding only what the code assigned.
 
+That instance dictionary is not guaranteed.
+A class declared with `slots=True`
+([Classes](07_Foundations--Classes.md#properties) shows the trade-off)
+has no instance `__dict__` at all.
+Assigning to a slotted attribute of the same name as a class attribute does not shadow it:
+it raises an `AttributeError` instead, because there is no instance dictionary to write into.
+The rest of this chapter assumes an ordinary class, one with an instance `__dict__`.
+
 A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
 and `a.show()` finds it by the same fallback that finds `a.x`:
@@ -87,7 +95,34 @@ The rest of this chapter covers ordinary values stored in a class body.
 A class attribute reads like a default right up until someone assigns to an attribute of the same name on one instance.
 After that, a change to the class attribute reaches every other object,
 while the object that assigned keeps its own value.
-The bug surfaces far from the line that caused it.
+The bug surfaces far from the line that caused it,
+often in a different function that never mentions the assignment:
+
+```python
+# far_from_the_cause.py
+
+class Stars:
+    rating = 5  # Shared across all instances
+
+def sell(star: Stars) -> None:
+    star.rating = 1  # Shadows, buried in a helper
+
+def show(star: Stars) -> None:
+    print(star.rating)  # Reads far from where it shadowed
+
+a, b = Stars(), Stars()
+sell(a)
+show(a)
+#: 1
+show(b)  # sell() never touched b
+#: 5
+```
+
+`sell()` and `show()` share no line of source between them.
+A reader debugging `show(b)`'s surprising `5` has to trace back
+through every earlier call that touched a `Stars` instance,
+because the shadowing happened inside `sell()`,
+a function `show()` never calls and does not import.
 
 The shadowing rule protects you only while the shared value is immutable:
 
@@ -310,6 +345,49 @@ A subclass overriding a `ClassVar` inherits the declaration along with the name,
 but the bare override drops the type checker's guard.
 `ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`,
 so restating `ClassVar[int]` on an override keeps that check.
+
+### `type(self)` Forks the Counter
+
+"A subclass stands to its base class as an instance stands to its class" cuts both ways.
+`class_var.py` increments `Tally.total` through the literal class name.
+Write that same increment through `type(self)` instead,
+a common idiom for reaching "my own class" from a method,
+and a base class with subclasses forks the counter the same way `Right` forked `shared`:
+
+```python
+# classvar_fork.py
+from typing import ClassVar
+
+class Base:
+    total: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        type(self).total += 1  # Looks like Base.total += 1
+
+class Sub(Base):
+    pass
+
+Base()
+Sub()
+Sub()
+print(Base.total, Sub.total)
+#: 1 3
+```
+
+`type(self)` is `Base` for the one `Base()` call and `Sub` for both `Sub()` calls.
+`Base()` increments `Base.total` to `1`.
+The first `Sub()` reads through to that `1`, adds one,
+and the assignment creates `Sub.total = 2` on `Sub` alone,
+the same shadowing `Right` demonstrated in `class_var_inheritance.py`.
+The second `Sub()` increments that separate copy to `3`.
+`Base.total` never moves past `1`, and `ty` reports no diagnostic:
+the augmented assignment is a valid `ClassVar[int]` update either way,
+and nothing in the annotation says which class name should receive it.
+Write the increment through the literal class name, as `class_var.py` does,
+whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)'s
+registry sidesteps this by mutating `Trash.registry` in place,
+never reassigning it through `cls`.
 
 ## Real Per-Object Defaults
 

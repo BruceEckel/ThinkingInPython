@@ -43,6 +43,44 @@ so that only implementation remains.
 Often, however, you are still experimenting to find the direction the program will take.
 When you are discovering the design rather than producing code, TDD is wasteful.
 
+For example, here is a test for `is_palindrome()`,
+written before that function exists anywhere in the project:
+
+```python
+# test_palindrome.py
+from palindrome import is_palindrome
+
+def test_empty_string_is_a_palindrome() -> None:
+    assert is_palindrome("")
+
+def test_racecar_is_a_palindrome() -> None:
+    assert is_palindrome("racecar")
+
+def test_hello_is_not_a_palindrome() -> None:
+    assert not is_palindrome("hello")
+```
+
+At this point `palindrome.py` does not exist,
+so running this file fails before a single assertion runs:
+`pytest` cannot import a module that is not there.
+That failure is the point.
+It confirms the test would catch a missing implementation,
+not just a wrong one.
+Only now does the implementation appear,
+sized to make every case in the test pass and nothing more:
+
+```python
+# palindrome.py
+def is_palindrome(s: str) -> bool:
+    return s == s[::-1]
+```
+
+The test written first stayed the same.
+Only the code changed to satisfy it.
+That is the design-tool benefit TDD promises:
+the test already said what "done" means
+before any implementation existed to argue otherwise.
+
 ## pytest
 
 Python has a testing framework in the standard library, `unittest`,
@@ -134,7 +172,7 @@ and the `funded` fixture builds a prepared account for each test that names it a
 The `@` lines apply decorators, which [Decorators](14_Techniques--Decorators.md)
 explains; here they only mark the functions for `pytest`.
 
-Run the test suite by typing `pytest` in the project directory.
+Run the test suite by typing `pytest` in the project directory.[^book-tests]
 `pytest` puts each test file's own directory at the front of `sys.path`,
 so `from account import Account` works with no packaging and no path setup,
 as long as `account.py` sits beside `test_account.py`.
@@ -357,6 +395,36 @@ Take `bank_name` first.
 and that reuse suits expensive resources.
 The reuse is the risk as well as the point: every test receives the same object,
 so one test that mutates it changes what the next test sees.
+A session fixture that returns a mutable object shows the leak directly:
+
+```python
+# test_session_leak.py
+import pytest
+
+@pytest.fixture(scope="session")
+def shared_cache() -> dict[str, int]:
+    return {}
+
+def test_first_write(
+    shared_cache: dict[str, int]
+) -> None:
+    shared_cache["seen"] = 1
+    assert shared_cache == {"seen": 1}
+
+def test_second_sees_leftover(
+    shared_cache: dict[str, int]
+) -> None:
+    # The dict test_first_write() left behind,
+    # not a fresh one.
+    assert shared_cache == {"seen": 1}
+```
+
+Both tests pass, and that is the problem:
+`test_second_sees_leftover()` only passes
+because `test_first_write()` ran first and left its entry behind.
+Swap the two functions' order in the file
+and `test_second_sees_leftover()` fails,
+since nothing has written `"seen"` yet.
 Keep session fixtures to values nothing modifies, like `bank_name`,
 or to a resource with its own reset,
 and leave anything a test mutates at the default per-test scope.
@@ -566,6 +634,19 @@ The `4` here is what `Random(0)` produces first,
 and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
 
+Injection is not free.
+The `rng` or `now` parameter must appear
+on every function between the caller and the code that needs it,
+which several calls deep in a real codebase
+means widening a signature all the way up the call stack,
+or introducing a context object to carry it.
+`monkeypatch` skips that plumbing:
+it patches the name in place,
+at the cost of the global, restore-on-teardown patch shown above.
+Reach for injection when the parameter already sits near the boundary.
+Reach for `monkeypatch` when threading it through
+would touch more code than the test is worth.
+
 ### The Clock
 
 Code that reads `time.time()` gives a different answer every run:
@@ -705,6 +786,42 @@ it answers with a canned value and records nothing.
 The standard library's `unittest.mock` builds stubs for you,
 along with *mocks* that also record the calls they receive,
 and it turns up in most existing code.
+A `Mock` goes further than a stub:
+it remembers every call it received,
+so a test can check the call itself, not just what it returned.
+
+```python
+# notifier.py
+from collections.abc import Callable
+
+def notify_low_balance(
+    balance: float,
+    send: Callable[[str], None],
+) -> None:
+    if balance < 0:
+        send(f"balance is negative: {balance}")
+```
+
+```python
+# test_notifier.py
+from unittest.mock import Mock
+import notifier
+
+def test_negative_balance_sends_message() -> None:
+    send = Mock()
+    notifier.notify_low_balance(-5, send)
+    send.assert_called_once_with(
+        "balance is negative: -5")
+```
+
+`Mock()` accepts any call and returns another `Mock`
+unless told otherwise,
+recording every call as it goes.
+`assert_called_once_with()` checks two things at once:
+that `send` ran exactly once,
+and that it ran with this exact argument.
+A plain stub cannot make that check.
+`fake_urlopen()` has no memory of how it was called.
 This book patches with `monkeypatch` and prefers injection where you can change the code,
 because a function that takes its clock or its fetcher as an argument needs no patching library.
 
@@ -718,13 +835,6 @@ and lets a tool generate the inputs that try to break it.
 shows the technique,
 including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
 library that automates it.
-
-## How This Book Runs Its Tests
-
-The build automatically extracts and checks the examples in this book.
-It runs plain programs and reports their failures.
-It hands files named `test_*.py` and `conftest.py` to `pytest` instead,
-and a failing test fails the build.
 
 ## Making Code Testable
 
@@ -770,3 +880,10 @@ a line a test happened to execute is not the same as a line a test checks.
     This book follows pytest's own spelling for `@pytest.mark.parametrize`,
     and uses "parameterize" everywhere else,
     for the general sense of a class or function taking a parameter.
+
+[^book-tests]: This book's own build extracts every listing,
+    including this chapter's `test_*.py` and `conftest.py` files,
+    and hands them to `pytest` instead of running them as plain programs.
+    A failing test fails the build,
+    the same way a failing type check or an unexpected exception does
+    elsewhere in the book.

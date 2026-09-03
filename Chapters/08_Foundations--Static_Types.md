@@ -11,8 +11,11 @@ which look like the type declarations of statically typed languages.
 The Python runtime never acts on a type hint.
 It stores the hint and evaluates it only when something asks.
 If you want static type checking like you get from a compiler in a typed language,
-you must run a separate type-checking tool
-(this book uses [Astral's `ty`](https://docs.astral.sh/ty/)).
+you must run a separate type-checking tool.
+Mypy is the original and most widely deployed one,
+and pyright is the one most editors run.
+This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
+the same group's toolchain that already gives you `uv` and `ruff`.
 
 ## Gradual Typing
 
@@ -152,6 +155,41 @@ Outside the `if`, `text` is still the full `str | None`.
 The same narrowing follows an `isinstance()` check, an equality test,
 or an identity test against a specific value such as `is not SOME_SENTINEL`.
 
+Narrowing an attribute is riskier than narrowing a local variable.
+A call between the check and the use can reset that attribute,
+and the type checker has no way to see inside that call:
+
+```python
+# narrowing_attribute.py
+
+class Box:
+    def __init__(self, val: str | None) -> None:
+        self.val = val
+
+    def reset(self) -> None:
+        self.val = None
+
+def show(b: Box) -> str:
+    if b.val is not None:
+        b.reset()  # ty can't see this clears val
+        return b.val.upper()
+    return "(nothing)"
+
+try:
+    show(Box("hi"))
+except AttributeError as e:
+    print(e)
+#: 'NoneType' object has no attribute 'upper'
+```
+
+`ty check` passes this file.
+The `if` narrows `b.val` to `str`,
+and nothing in the checker's model connects `reset()` to that narrowing,
+so it never widens `b.val` back to `str | None`.
+The crash proves the narrowing was already stale by the time `.upper()` ran.
+Narrow a local variable and hold that trust;
+narrow an attribute and recheck it after any call that might touch the object.
+
 ## Constants with Final
 
 `Final` on a name makes the type checker catch an accidental reassignment.
@@ -167,17 +205,22 @@ from typing import Final
 
 MAX_RETRIES: Final = 3
 GREETING: Final[str] = "hello"
+HISTORY: Final[list[str]] = []
 
 # ty: cannot assign to final name "MAX_RETRIES":
 # MAX_RETRIES = 5
 
-print(MAX_RETRIES, GREETING)
-#: 3 hello
+HISTORY.append("first")
+print(MAX_RETRIES, GREETING, HISTORY)
+#: 3 hello ['first']
 ```
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
-You can still append to a `Final[list[str]]`.
-The type checker refuses only an assignment to the name.
+`HISTORY.append("first")` checks and runs,
+the same as it would on a plain, non-`Final` list.
+The type checker refuses only an assignment to the name `HISTORY` itself.
+This is the misconception `Final` invites:
+it reads like immutability, and it isn't.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
@@ -354,7 +397,27 @@ A useful annotation makes the return type match the list's element type,
 whatever that type is.
 
 `Any` loses that connection: it accepts any list,
-and the return type then says nothing about what the list holds.
+and the return type then says nothing about what the list holds:
+
+```python
+# first_any.py
+from typing import Any
+
+def first_any(items: list) -> Any:
+    return items[0]
+
+n = first_any([10, 20, 30])
+try:
+    n.nonexistent_method()
+except AttributeError as e:
+    print(e)
+#: 'int' object has no attribute 'nonexistent_method'
+```
+
+`ty check` passes this file with no complaint.
+`n` is `Any`, so every attribute access on it type-checks,
+including one that runs and fails.
+A type parameter closes exactly this hole.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -471,6 +534,33 @@ The default gives the bare form a meaning,
 and that matters most for a class whose parameter has one common answer:
 callers content with that answer write nothing,
 and the annotation stays precise.
+
+Drop the default and that meaning goes with it.
+`Queue[T]` carries none,
+so a bare `Queue` annotation leaves `T` unsolved:
+
+```python
+# type_defaults_bare.py
+from typing import reveal_type
+
+class Queue[T]:
+    def __init__(self) -> None:
+        self.items: list[T] = []
+
+    def push(self, item: T) -> None:
+        self.items.append(item)
+
+    def top(self) -> T:
+        return self.items[-1]
+
+line: Queue = Queue()  # No brackets, T unsolved
+line.push("first")
+reveal_type(line.top())  # ty: Unknown
+```
+
+`ty` reports `Unknown`, not an error,
+so `line.top()` and everything built on it go unchecked from here.
+Exercise 5 does the same to `Stack` itself.
 
 The same applies to a `type` alias, as `Pair` shows:
 

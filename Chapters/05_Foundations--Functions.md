@@ -1,5 +1,10 @@
 # Functions
 
+Functions package behavior behind a name and a parameter list.
+This chapter covers defining and calling them: default and keyword
+arguments, scope and `global`, `*args`/`**kwargs`,
+positional-only and keyword-only parameters, and lambdas.
+
 The `def` keyword defines a function.
 It is followed by the function name and parameter list,
 and a colon to begin the function body:
@@ -23,6 +28,27 @@ print(a_function("yes"))
 #: continuing...
 #: 1
 ```
+
+A string literal directly under `def`, before any other statement,
+becomes the function's *docstring*, stored on `__doc__`:
+
+```python
+# documented_function.py
+
+def greet(name):
+    """Return a greeting for name."""
+    return f"Hello, {name}!"
+
+print(greet("Ann"))
+#: Hello, Ann!
+print(greet.__doc__)
+#: Return a greeting for name.
+```
+
+A docstring documents the function for a reader or a tool,
+not for the interpreter, which ignores its value.
+[Metaprogramming](17_Techniques--Metaprogramming.md#the-inspect-module)
+reads it back with `inspect.getdoc()`.
 
 Here the function signature specifies only the function name and the parameter names,
 but no argument types or return types
@@ -308,6 +334,11 @@ so the call raises an `UnboundLocalError`.
 and that is why `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 the same idea one scope in.
+A function that rebinds a global couples every caller to that shared,
+mutable state:
+[Closures](40_Functional--Foundations.md#closures) and
+[Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
+both treat a mutable global as the anti-pattern this leads to.
 
 ## Variable Argument Lists
 
@@ -377,6 +408,38 @@ so you can pass `report` to `trace()` as an argument,
 and `func.__name__` reads the name of whatever function arrived
 (see [Functions as First-Class Objects](40_Functional--Foundations.md#functions-as-first-class-objects)).
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
+
+Forwarding an arbitrary `**kwargs` can still collide with a name
+the wrapped function already receives.
+If the dictionary being unpacked has a key matching a parameter
+supplied another way, Python raises a `TypeError`:
+
+```python
+# forwarding_collision.py
+
+def report(label, *values, **options):
+    print(label, values, options)
+
+def trace(func, *args, **kwargs):
+    print("calling", func.__name__)
+    return func(*args, **kwargs)
+
+nums = (1, 2, 3)
+opts = {"label": "oops", "color": "red"}
+try:
+    trace(report, *nums, **opts)
+except TypeError as e:
+    print(e)
+#: calling report
+#: report() got multiple values for argument 'label'
+```
+
+`opts` carries a `"label"` key, and `trace()` forwards it as
+`label=`, but `report()` already receives `1`, the first of
+`nums`, as `label` positionally through `func(*args, **kwargs)`.
+The collision surfaces at the call `trace()` makes, not at the
+call into `trace()` itself,
+so the wrapper cannot check for it in advance.
 
 ## Positional-Only and Keyword-Only Parameters
 
@@ -492,6 +555,12 @@ and `def` would also give the function a real name for tracebacks.
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
+
+For a key that just reads an index or an attribute,
+`operator.itemgetter`/`attrgetter` name the same operation without a lambda:
+`sorted(words, key=operator.itemgetter(-1))` replaces
+`key=lambda w: w[-1]` above.
+Reach for a lambda when the key needs an expression neither builds.
 
 ## Exercises
 

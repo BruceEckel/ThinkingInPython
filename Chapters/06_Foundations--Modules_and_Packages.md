@@ -359,6 +359,12 @@ so a `from` import in the second finds a partially initialized module and fails 
 A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
 not to have finished running.
+That exact message assumes a package-relative cycle, `from . import ...`.
+Two plain top-level modules that import each other raise a different message,
+with no "circular import" wording at all:
+`ImportError: cannot import name 'f' from 'modx'
+(consider renaming 'modx.py' if it has the same name
+as a library you intended to import)`.
 The failure then surfaces later,
 wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
@@ -457,6 +463,17 @@ because Python searches the directory of the script you ran before the standard 
 Give a shared module a distinctive name for the same reason:
 the first `config.py` imported anywhere in the process is the one every later `import config` gets.
 
+Windows and macOS default to case-insensitive filesystems,
+so `module.py` and `Module.py` name the same file there.
+Python's import system still matches names case-sensitively by default,
+so `import module` fails to find a file saved as `Module.py`,
+even on a filesystem that treats the two names as one.
+`PYTHONCASEOK` turns that case check off,
+letting the import resolve regardless of case,
+which reopens the ambiguity the check exists to catch.
+Keep a module's file name and its import spelled with the same case,
+rather than relying on either behavior.
+
 ## `PYTHONPATH`
 
 Python searches `sys.path`, a list of directories it builds at startup.
@@ -522,6 +539,15 @@ tools that read imports miss it,
 and the `import` statement re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top where a reader and a tool can see it,
 and pays the loading cost once, at first use.
+Packages have also deferred this without `lazy import`,
+by giving `__init__.py` a module-level `__getattr__`
+([PEP 562](https://peps.python.org/pep-0562/))
+that imports and returns a submodule the first time a caller asks for it by name,
+the technique pandas and numpy use to keep import time low.
+`lazy import` needs no hand-written `__getattr__`,
+and defers any imported name, not only a package's submodules,
+but the `__getattr__` pattern still matters for code that must run
+on a Python older than 3.15.
 You can watch `lazy` defer the load by importing a module whose body prints when it runs:
 
 ```python
@@ -552,7 +578,30 @@ so `noisy module loaded` prints after `before first use`.
 If a lazily imported module is missing or broken,
 the error surfaces at that first use rather than at the import line.
 `sys.lazy_modules` holds the names still waiting to load,
-so you can check what a run actually put off without instrumenting the modules.
+but CPython's own interpreter startup adds lazy imports of its own to that set
+before your code marks anything lazy:
+
+```python
+# lazy_modules_check.py
+import sys
+lazy import noisy
+
+print(len(sys.lazy_modules) > 1)
+#: True
+print("noisy" in sys.lazy_modules)
+#: True
+noisy.announce()
+#: noisy module loaded
+#: noisy.announce() called
+print("noisy" in sys.lazy_modules)
+#: False
+```
+
+The set already holds more than one name before this script marks `noisy` lazy,
+so `sys.lazy_modules` is not a clean "what my program deferred" list.
+`noisy` leaves the set once `noisy.announce()` loads it,
+so the set tracks only names still waiting, not names your program ever deferred.
+Filter it for the names you marked instead of reading it directly.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,

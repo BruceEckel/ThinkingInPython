@@ -307,6 +307,20 @@ and leaving it off is a common slip:
 Here that raises a `ValueError`, since `"Alice"` has more than two characters.
 A two-character key such as `"Bo"` would unpack into its letters and the loop would run on.
 
+`keys()` is also set-like, and so is `items()` when every value is hashable:
+each supports `&`, `|`, `-`, and `^` directly, against another dict's view or against any set.
+
+```python
+# dict_views.py
+
+ages = {"Alice": 30, "Bob": 25, "Carol": 41}
+other = {"Bob": 0, "Dan": 0}
+print(ages.keys() & other.keys())  # Set algebra on a view
+#: {'Bob'}
+```
+
+The Sets section, next, names every one of these operators.
+
 A `dict` iterates in insertion order, and the language guarantees that order.
 
 Entries come out as easily as they go in, and two dictionaries combine:
@@ -338,6 +352,25 @@ and `dict()` accepts those from any source.
 `zip()` pairs up two sequences element by element.
 [Control Flow](04_Foundations--Control_Flow.md#loops)
 covers it with the other loop tools.
+
+Mutating a `dict` while iterating it does not fail silently
+the way `remove_while_iterating.py`'s `list` does:
+
+```python
+# dict_iteration_trap.py
+
+d = {"a": 1, "b": 2, "c": 3}
+try:
+    for k in d:
+        del d[k]
+except RuntimeError as e:
+    print(e)
+#: dictionary changed size during iteration
+```
+
+A `set` raises the same way,
+with `RuntimeError: Set changed size during iteration`.
+Only the `list` hides the mistake; the `dict` and the `set` both shout it.
 
 ## Sets
 
@@ -430,19 +463,24 @@ The `lambda:` prefix wraps an expression into the callable it needs
 from timeit import timeit
 from benchmark import report
 
-n = 200_000
-items = list(range(n))
-lookup = set(items)
-missing = -1
-list_time = timeit(lambda: missing in items, number=20)
-set_time = timeit(lambda: missing in lookup, number=20)
-report(list_scan=list_time, set_lookup=set_time)
-print(set_time * 100 < list_time)  # Not close
+def scan_gap(n: int) -> float:
+    items = list(range(n))
+    lookup = set(items)
+    missing = -1
+    list_time = timeit(lambda: missing in items, number=20)
+    set_time = timeit(lambda: missing in lookup, number=20)
+    return list_time / set_time
+
+small_gap = scan_gap(20_000)
+large_gap = scan_gap(200_000)
+report(small_n=small_gap, large_n=large_gap)
+print(large_gap > small_gap)  # The gap widens
 #: True
 ```
 
 Searching the `list` is O(n) and searching the `set` is O(1),
-so the gap widens without limit as `n` grows.
+so the gap widens without limit as `n` grows:
+`large_gap` comes out bigger than `small_gap`, not the same ratio at ten times the size.
 The probe value is missing on purpose: that is the `list`'s worst case,
 a scan of all `n` elements before it gives up.
 
@@ -479,10 +517,15 @@ print("dog" in counts)  # Reading it added nothing
 #: False
 print(counts.most_common(2))
 #: [('a', 3), ('cat', 2)]
+print(Counter("aab") - Counter("ab"))  # Multiset diff
+#: Counter({'a': 1})
 ```
 
 A missing key counts as zero rather than raising a `KeyError`,
 and `most_common()` returns the highest counts first.
+`+`, `-`, `&`, and `|` work between two counters too,
+the same set-algebra vocabulary the Sets section just built,
+now reading as multiset sum, difference, minimum, and maximum.
 
 ### `defaultdict`
 

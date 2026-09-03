@@ -13,3 +13,5 @@ print("dog" in counts)  # Reading it added nothing
 #: False
 print(counts.most_common(2))
 #: [('a', 3), ('cat', 2)]
+print(Counter("aab") - Counter("ab"))  # Multiset diff
+#: Counter({'a': 1})

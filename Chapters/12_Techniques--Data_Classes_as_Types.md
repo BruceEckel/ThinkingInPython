@@ -43,6 +43,12 @@ An exception is a value like any other, and the values it carries deserve names.
 such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
+`check()` calls `raise` explicitly, instead of `assert 1 <= stars <= 10`.
+Python strips every `assert` when you run with `-O` or `-OO`,
+which would silently disable every validation this chapter builds,
+exactly the failure this chapter exists to prevent.
+No flag removes a `raise`.
+
 `eq=False` turns off the generated `__eq__()`, for two reasons.
 A data class that defines `__eq__()` sets `__hash__` to `None`
 ([Data Classes](#data-classes) shows this for `Messenger`),
@@ -151,6 +157,14 @@ That check runs after the mutation, not instead of it:
 `Stars(8).f1()` sets `_number` to 13, then raises `TypeFailure`,
 and the object goes on holding that illegal value.
 Catching the exception does not undo the damage.
+
+The order is a choice, not something mutation forces.
+`f1()` could check the sum before assigning it,
+and then `damaged` would stay `Stars(8)` instead of holding a corrupted `13`.
+What mutation forces is that every method must choose that order correctly,
+every time it changes the value.
+`f1()` here is what happens the one time a method doesn't.
+
 *Design by Contract* (DbC)
 is the practice of checking arguments on the way in and results on the way out,
 with a class invariant that must hold between calls.
@@ -161,6 +175,17 @@ The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
 That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value without constraining it to a set of legal values.
+
+That scattering is a real cost, and sometimes it's still the right one.
+A value that must change in place over its lifetime,
+a counter, a connection's open-or-closed state, a running total,
+cannot always be replaced with a fresh instance on every change.
+For those, a validating setter that checks before assigning,
+the fix `f1()` skipped above,
+is the accepted answer: pay DbC's scattering cost,
+because the value has to stay mutable.
+[Immutability](#immutability) covers the case the rest of this chapter prefers,
+where a fresh, validated instance replacing the old one is cheap enough.
 
 ## Data Classes
 
@@ -1545,6 +1570,16 @@ It reads untrusted text and hands the pieces to `FullName` and `EmailAddress`,
 and that boundary is the last point where a bad value is cheap to reject.
 Past that line your code holds types rather than raw data,
 and a function receiving one does its work without asking whether the value makes sense.
+
+The price also has a memory and time side, not only a boundary side.
+Every value is now an object:
+a constructor call and attribute access where a bare `int` or `str` needed neither.
+`copy.replace()` re-validates the whole object on every change,
+even when only one field moved.
+For a hot path, or a structure nesting many values
+(many `Point`s inside a `Line`),
+that cost is worth measuring before you pay it everywhere.
+[Performance](18_Techniques--Performance.md) covers how.
 
 ## Exercises
 

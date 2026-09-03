@@ -10,6 +10,16 @@ for value in [0, 1, "", "hi", [], [1], None]:
 #: [1] -> True
 #: None -> False
 
+class Bucket:
+    def __init__(self, count: int) -> None:
+        self.count = count
+
+    def __len__(self) -> int:
+        return self.count
+
+print(bool(Bucket(0)), bool(Bucket(3)))
+#: False True
+
 if not []:
     print("empty")  # An empty list is falsy
 #: empty

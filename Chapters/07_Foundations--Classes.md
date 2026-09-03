@@ -203,11 +203,54 @@ starting with the class itself and ending at `object`.
 `Simple2.__mro__` is `(Simple2, Simple, object)`.
 With a single base class the order is obvious.
 With several, the MRO decides which base supplies a name that more than one of them defines.
+`A` and `B` below both define `show()`,
+and `C` inherits from both:
+
+```python
+# mro_conflict.py
+
+class A:
+    def show(self):
+        print("A.show")
+
+class B:
+    def show(self):
+        print("B.show")
+
+class C(A, B):
+    pass  # Defines no show() of its own
+
+print([c.__name__ for c in C.__mro__])
+#: ['C', 'A', 'B', 'object']
+C().show()  # A comes first in the MRO
+#: A.show
+```
+
+`C.__mro__` visits `A` before `B`,
+so `C().show()` runs `A`'s version,
+not `B`'s.
 
 The base-class constructor runs because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
+Dropping the call and then calling `show()` confirms it:
+
+```python
+# missing_super.py
+from simple_class import Simple
+
+class Broken(Simple):
+    def __init__(self, text):
+        pass  # Forgot super().__init__(text)
+
+try:
+    Broken("ignored").show()
+except AttributeError as e:
+    print(e)
+#: 'Broken' object has no attribute 's'
+```
+
 A derived class that defines no constructor of its own inherits and runs the base version.
 The derived class also inherits `show_twice()` unchanged.
 
@@ -401,6 +444,29 @@ a convention rather than a language rule.
 The separate name matters: `self.radius` inside the getter,
 or `self.radius = value` inside the setter, calls that same method again,
 and again, until the interpreter raises a `RecursionError`.
+Naming both the property and the backing attribute `radius` reproduces it:
+
+```python
+# property_recursion.py
+
+class Circle:
+    def __init__(self, radius):
+        self.radius = radius  # calls the setter
+
+    @property
+    def radius(self):
+        return self.radius  # calls itself again
+
+    @radius.setter
+    def radius(self, value):
+        self.radius = value  # calls itself again
+
+try:
+    Circle(10)
+except RecursionError as e:
+    print(type(e).__name__)
+#: RecursionError
+```
 
 The getter and setter are independent,
 so you choose the access you want by defining one or both.
@@ -543,18 +609,29 @@ class Temperature:
     def is_freezing(celsius):  # Needs no self or cls
         return celsius <= 0
 
+class Reading(Temperature):
+    pass  # Adds nothing; inherits from_fahrenheit()
+
 t = Temperature.from_fahrenheit(212)
 print(round(t.celsius))
 #: 100
 print(Temperature.is_freezing(-4))
 #: True
+r = Reading.from_fahrenheit(212)
+print(type(r).__name__)
+#: Reading
 ```
 
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
 so the alternative constructor produces the right kind of object,
 and a subclass inherits it unchanged.
-Naming the class directly would hard-code `Temperature` into every subclass.
+`Reading.from_fahrenheit(212)` proves it:
+`cls` is `Reading` there, not `Temperature`,
+so `type(r).__name__` reports `'Reading'`.
+Naming the class directly, `return Temperature(...)`,
+would hard-code `Temperature` into every subclass,
+including `Reading`.
 
 `is_freezing()` would also work as a module-level function.
 Inside the class it sits where a reader looks for it,

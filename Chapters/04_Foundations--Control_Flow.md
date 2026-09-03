@@ -165,7 +165,36 @@ This `else` is also how you leave two nested loops at once:
 put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
-When it finishes clean, the `continue` moves the outer loop along instead.
+When it finishes clean, the `continue` moves the outer loop along instead:
+
+```python
+# nested_break.py
+
+grid = [[1, 2], [3, 4]]
+
+def locate(target):
+    for row in grid:
+        for cell in row:
+            if cell == target:
+                print(f"found {cell}")
+                break
+        else:
+            continue
+        break
+    else:
+        print("not found")
+
+locate(3)
+#: found 3
+locate(9)
+#: not found
+```
+
+`locate(3)` finds `3` in the first row,
+`break`s the inner loop,
+so its `else` never runs and the outer `break` fires right after.
+`locate(9)` never breaks either loop,
+so both `else` clauses run and `"not found"` prints.
 
 `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
@@ -254,7 +283,10 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#lists)
 hit it while removing from a list,
-and the two containers you are most likely to mutate this way behave differently:
+and the two containers you are most likely to mutate this way behave differently.
+The fix below uses a list comprehension,
+[Comprehensions](#comprehensions) later in this chapter,
+to build the filtered list directly instead of mutating in place:
 
 ```python
 # mutating_while_looping.py
@@ -377,6 +409,25 @@ Raise your own exception that way when the caller should hear about the bad argu
 The optional `else` runs when the `try` block raises no exception,
 the same shape as the loop `else` that runs when the loop hits no `break`.
 The optional `finally` always runs, and that makes it the place for cleanup.
+A `return`, `break`, or `continue` inside `finally` swallows any exception in flight,
+so cleanup code must never contain one:
+
+```python
+# finally_swallows.py
+
+def risky():
+    try:
+        raise ValueError("boom")
+    finally:
+        return "swallowed"
+
+print(risky())
+#: swallowed
+```
+
+`risky()` raises a `ValueError`,
+but the `return` in `finally` discards it before it reaches the caller,
+so the caller sees only `"swallowed"` with no trace of the exception.
 
 Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,

@@ -43,7 +43,7 @@ If a language feature is new to you, look it up as you go.
 
 You do not need to know design patterns, metaclasses, or type checking.
 This book covers them.
-The book is about the language, not the tooling around it.
+The book is about the language, not IDE setup or deployment.
 
 ## How the Book Fits Together
 
@@ -92,6 +92,8 @@ and asks what Python could adopt.
 Another develops the full generator protocol on which such tracking depends.
 The last two put that idea to work with `stateless`,
 a library that brings Effect tracking to Python today.
+Read these four chapters in order.
+Each depends on the one before it.
 
 ## AI Trigger Warning
 

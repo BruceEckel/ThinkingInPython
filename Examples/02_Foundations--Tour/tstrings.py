@@ -22,3 +22,25 @@ def shout(template: Template) -> str:
 
 print(shout(message))
 #: Alice SCORED 92%
+
+def safe(template: Template) -> str:
+    parts: list[str] = []
+    for piece in template:
+        if isinstance(piece, Interpolation):
+            value = str(piece.value)
+            if "'" in value:
+                raise ValueError(
+                    f"unsafe value: {value!r}")
+            parts.append(value)
+        else:
+            parts.append(piece)
+    return "".join(parts)
+
+print(safe(t"Hello, {name}"))
+#: Hello, Alice
+trouble = "Bob'; rm -rf /"
+try:
+    safe(t"Hello, {trouble}")
+except ValueError as e:
+    print(e)
+#: unsafe value: "Bob'; rm -rf /"

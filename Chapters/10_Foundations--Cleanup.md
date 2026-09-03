@@ -167,9 +167,11 @@ class Node:
 def self_link() -> None:
     node = Node("a")
     node.peer = node
+    print(gc.get_referrers(node)[0] is node)
 
 gc.disable()
 self_link()
+#: True
 print("unreachable, but still alive")
 #: unreachable, but still alive
 gc.collect()
@@ -184,6 +186,14 @@ when the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
+Before disabling the collector,
+`self_link()` calls `gc.get_referrers(node)`,
+which lists every object that directly refers to `node`
+without collecting or destroying anything.
+The only referrer is `node` itself, which confirms the self-reference.
+When a real object won't disappear and you don't know why,
+`gc.get_referrers()` is how you find what still holds it,
+the same way this listing uses it to show its own cycle.
 Freeing it takes the cyclic garbage collector,
 a separate mechanism that runs on allocation counts rather than when the object becomes unreachable.
 `gc.disable()` above keeps that collector from running on its own,
@@ -213,9 +223,13 @@ Two approaches are more reliable:
 class Socket:
     def __init__(self, name: str) -> None:
         self.name = name
+        self.closed = False
         print(name, "opened")
 
     def close(self) -> None:
+        if self.closed:
+            return
+        self.closed = True
         print(self.name, "closed")
 
     def __enter__(self) -> Socket:
@@ -226,6 +240,7 @@ class Socket:
 
 with Socket("A") as sock:
     print("using", sock.name)
+sock.close()
 #: A opened
 #: using A
 #: A closed
@@ -247,6 +262,51 @@ where the cleanup runs at an unknowable moment after the program's last statemen
 the `@contextmanager` shorthand, and what `__exit__`'s arguments mean.
 This chapter shows the shape.
 That one explains it.
+
+`close()` also guards against a second call:
+the explicit `sock.close()` after the `with` block prints nothing,
+because `self.closed` blocks the repeat.
+The `with` protocol calls `close()` for you once;
+nothing stops your own code from calling it again,
+so a real `close()` must guard itself against being called more than once,
+the way a file object's `close()` does.
+
+`Socket.__init__()` also prints "opened" before `__enter__()` ever runs,
+which hides a trap: if `__init__()` raises after acquiring the resource,
+the `with` statement's target is never bound,
+so `__enter__()` and `__exit__()` never run and the resource leaks silently:
+
+```python
+# faulty_init.py
+
+class Faulty:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        print(name, "opened")
+        raise RuntimeError("boom")
+
+    def __enter__(self) -> Faulty:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        print(self.name, "closed")
+
+try:
+    with Faulty("C"):
+        pass
+except RuntimeError as e:
+    print("caught", e)
+#: C opened
+#: caught boom
+```
+
+`C opened` has no matching `closed`:
+`__init__()` raised before the `with` statement could bind its target,
+so `__exit__()` never ran to release what `__init__()` had already acquired.
+Acquire the resource in `__enter__()` instead of `__init__()`
+when construction itself can fail,
+or wrap the acquisition in its own `try`/`except`
+and release what you already opened before re-raising.
 
 2. `weakref.finalize()`,
    which registers a cleanup callback for an object without giving that callback a reference to the object:
@@ -335,6 +395,32 @@ The listing turns `atexit` off on `Leaky`'s finalizer,
 so the question it answers is whether the collector reclaimed the object,
 rather than whether the callback eventually ran at exit.
 
+Both `finalize()` and, as the next section shows,
+`WeakValueDictionary` need the target to support weak references at all.
+A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
+
+```python
+# slotted_no_weakref.py
+from weakref import finalize
+
+class Slotted:
+    __slots__ = ("name",)
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+try:
+    finalize(Slotted("x"), print, "closed")
+except TypeError as e:
+    print(type(e).__name__)
+#: TypeError
+```
+
+`__slots__` removes the instance `__dict__` and,
+by default, the `__weakref__` slot along with it,
+so `finalize()` has nothing to attach a reference to.
+Listing `__weakref__` among the slots opts back in.
+
 ## Watching Objects Without Holding Them
 
 The weak-reference machinery behind `finalize()` also solves a different problem:
@@ -406,6 +492,39 @@ where the `__del__()` version waited for interpreter shutdown and its unreliable
 ## The Rule
 
 Never put resource release in `__del__()`.
+The standard library bends that rule only as a diagnostic backstop:
+`io.IOBase` (so every file object) and `socket.socket` each define
+a `__del__()` that closes the resource and raises a `ResourceWarning`,
+catching a forgotten `close()` rather than replacing it:
+
+```python
+# resource_warning.py
+import gc
+import tempfile
+import warnings
+from pathlib import Path
+
+path = Path(tempfile.gettempdir()) / "leaky.txt"
+path.write_text("data")
+
+with warnings.catch_warnings(record=True) as caught:
+    warnings.simplefilter("always")
+    f = open(path)
+    f.read(1)
+    del f
+    gc.collect()
+    print(caught[0].category.__name__)
+#: ResourceWarning
+path.unlink()
+```
+
+Losing the last reference to an open file finalizes it,
+and its `__del__()` closes the file and reports the leak,
+at the same unpredictable moment as any other `__del__()`.
+That backstop exists to catch the mistake, not to be the plan:
+it still depends on the object getting collected at all,
+which a reference cycle or `gc.disable()` can defer indefinitely.
+
 Give a class that owns a resource a `close()` method and a `with` block that calls it,
 so the cleanup runs at a point in the program you can see.
 Where a callback must still run if the caller forgets,

@@ -12,3 +12,8 @@ print(a is b)  # Identical objects
 c = a[:]  # Copies the list, not its contents
 print(a is c, a == c)  # Different object, equal value
 #: False True
+nested = [[1], [2, 3]]
+shallow = nested[:]
+shallow[1].append(99)
+print(nested)  # The inner list is shared
+#: [[1], [2, 3, 99]]
