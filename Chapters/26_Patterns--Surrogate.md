@@ -56,8 +56,7 @@ p.g()
 ### What the Implementation Supplies
 
 `Implementation` need not have the same interface as `Proxy`.
-As long as code calls `Proxy` in place of the class that `Proxy` forwards method calls to,
-`Proxy` qualifies.
+`Proxy` qualifies as long as code calls it where it would otherwise call the implementation.
 That is a looser definition than in *GoF Design Patterns*,
 and relies only on intent.
 Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
@@ -154,9 +153,9 @@ The static type checker verifies signatures.
 
 ### Forwarding with `__getattr__()` {#forwarding-with-getattr}
 
-Python's built-in delegation mechanism, `__getattr__()`,
-which [Singleton](24_Patterns--Singleton.md) used to reach its inner object,
-makes `Proxy` simpler to implement:
+`__getattr__()` is Python's built-in delegation mechanism,
+which [Singleton](24_Patterns--Singleton.md) used to reach its inner object.
+Delegating through it makes `Proxy` simpler to implement:
 
 ```python
 # proxy_2.py
@@ -272,8 +271,8 @@ so the listing needs the `# type: ignore` to show the runtime failure.
 A proxy that must forward special methods defines them explicitly.
 
 `len(p)` reports the missing method because `object` defines no `__len__()`.
-`print(p)` cannot: `object` defines `__str__()`,
-so the lookup on `type(p)` finds `object`'s `__str__()` and the proxy prints as itself.
+`print(p)` reports no missing method: `object` defines `__str__()`,
+so the lookup on `type(p)` finds `object`'s `__str__()` and the proxy prints as a `Proxy` object.
 Whenever `object` defines the dunder, the bypass raises no error.
 The proxy answers with `object`'s version,
 and the call never reaches the implementation.
@@ -396,8 +395,8 @@ The guard also makes the proxy work with `copy` and `pickle`,
 which look up `__setstate__()` before `__init__()` has run.
 Both get an `AttributeError`, which those modules handle, instead of recursing.
 
-This chapter's other `__getattr__()` proxies do not include the guard.
-This way, each listing shows one idea.
+This chapter's other `__getattr__()` proxies do not include the guard,
+so each listing shows one idea.
 
 ### A Surrogate Is Not Its Implementation
 
@@ -454,7 +453,7 @@ and neither verifies anything:
 -   A `__class__` property returning the implementation's class makes `isinstance()` see that class rather than `Proxy`.
 
 Both satisfy the runtime check and neither satisfies a type checker.
-Inheritance satisfies both.
+Inheritance satisfies both checks.
 `proxy_interface.py`'s `Proxy` inherits `Service`,
 so `isinstance(p, Service)` returns `True`,
 and the type checker confirms that `Proxy`'s `f()` and `g()` match `Service`.
@@ -515,7 +514,7 @@ print(p.query())
 ```
 
 Building `Lazy` prints nothing.
-The first attribute `__getattr__()` forwards builds `Expensive`,
+`__getattr__()` builds `Expensive` on the first forwarded access,
 and every later access reuses that same instance.
 
 A *Protection proxy* decides whether a call reaches the implementation.
@@ -570,7 +569,7 @@ With `__getattr__()` you can wrap every method call, for example to count them.
 This proxy names its implementation `_impl`, with one underscore,
 and so gives up the mangling that kept `proxy_2.py`'s attribute from colliding.
 `_impl` and `calls` now share a namespace with the implementation's own attributes:
-read `calls` from the proxy and you get the counter,
+reading `calls` from the proxy gives the counter,
 even when the implementation defines a `calls` of its own.
 
 ```python
@@ -721,13 +720,14 @@ if __name__ == "__main__":
 ```
 
 `run()` never changes and neither does `b`.
-Only the implementation the surrogate forwards to does.
+Only the surrogate's current implementation changes.
 Here the client programmer calls `change_to()`,
 but in a [State Machine](31_Patterns--State_Machines.md),
 each implementation chooses its own successor,
 so the surrogate advances without the client asking.
 `change_to()` reassigns `__implementation` with no lock.
-A thread running a multi-call sequence like `run()` can have another thread's `change_to()` land between two of those calls,
+While one thread runs a multi-call sequence like `run()`,
+another thread's `change_to()` can run between two of those calls,
 splitting the sequence across both implementations;
 see [Concurrency](19_Techniques--Concurrency.md#the-gil-does-not-prevent-races)
 for what an unsynchronized swap costs.
@@ -738,8 +738,8 @@ and the two uses have different reasons.
 
 `run(b: Any)` has no alternative.
 Annotating `run(b: Behavior)` and passing it `b` is a type error,
-because `Surrogate` defines no `f()` of its own, and,
-as [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
+because `Surrogate` defines no `f()` of its own.
+As [Forwarding with `__getattr__()`](#forwarding-with-getattr) explains,
 the checker cannot verify a method that `__getattr__()` supplies.
 
 `Surrogate.__init__()` and `change_to()` are a choice.

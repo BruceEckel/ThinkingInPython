@@ -63,8 +63,9 @@ while True:
 One legacy path bypasses `__iter__()`.
 A class that defines only `__getitem__()` taking integers from zero is still iterable:
 `iter()` builds an iterator that indexes it until `IndexError`.
-Such a class works with `for` while failing both `isinstance(obj, Iterable)` and an `Iterable[T]` annotation,
-and that is the one case where the loop and the type checker disagree.
+Such a class works with `for`,
+yet `isinstance(obj, Iterable)` returns `False` and a parameter annotated `Iterable[T]` rejects it.
+That is the one case where the loop and the type checker disagree.
 Write `__iter__()` in new code.
 
 ## Generators {#generators}
@@ -73,8 +74,9 @@ You rarely write `__iter__()`/`__next__()` by hand.
 A *generator* writes them.
 A function with a `yield` statement returns an iterator that produces each yielded value in turn,
 pausing and resuming its own state.
-The generators in this chapter travel one way, so `Iterator[T]` annotates them.
-That is the short form of a three-part type that also describes what a generator receives and what it returns.
+The generators in this chapter produce values without receiving any,
+so `Iterator[T]` annotates them.
+That annotation is the short form of a three-part type that also describes what a generator receives and what it returns.
 [Generators](45_Effects--Generators.md#annotating-a-generator)
 covers the full form, which an Effect system needs.
 
@@ -206,7 +208,7 @@ A `while True` loop that yields forever, or `itertools.count()`,
 produces values on demand with no end.
 You take as many as you need
 (`itertools.islice()` in [Reusable Algorithms](#reusable-algorithms) does the taking),
-where a list must hold every value first.
+while a list must hold every value first.
 
 ## The Costs of Laziness
 
@@ -238,7 +240,7 @@ The `print` at the top fires only when something demands the first value.
 It fires once, not on every value.
 Each later `next()` resumes the body just after the `yield` instead of restarting it.
 Any validation at the top of a generator inherits this delay:
-a `raise` meant to reject a bad argument fires at first use,
+a check meant to reject a bad argument raises its exception at the first `next()`,
 far from the call that caused the problem.
 
 To validate eagerly,
@@ -280,8 +282,8 @@ yet it survives repeated passes, because each pass gets a fresh iterator.
 `range()` works the same way: one `range` object can drive loop after loop.
 The iterator runs out, not the iterable that made it.
 
-The annotation gives no warning,
-because `Iterable[T]` describes a list and a half-spent generator equally well.
+An `Iterable[T]` annotation gives no warning,
+because it describes a list and a half-spent generator equally well.
 A function that walks its argument twice therefore type-checks and then returns a wrong answer on the second pass:
 
 ```python
@@ -317,7 +319,8 @@ every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones.
-That looks like a third option, and it is rarely cheaper.
+That looks like a third way to walk data twice,
+and it rarely saves memory over collecting a list.
 The `squares()` below is the plain-function form from `eager_validation.py`,
 with the generator expression standing in for `produce()`:
 
@@ -426,7 +429,7 @@ print(list(flatten(data)))
 ```
 
 Both functions call themselves on each nested sequence,
-and both thread the recursive call's values into the outer stream.
+and both pass each value from the recursive call out to the caller.
 `flatten_loop()` does it by hand: start the recursive call,
 then re-yield each value it produces.
 `flatten()` replaces those two lines with `yield from`,
@@ -443,7 +446,7 @@ The hand-written loop drops that value.
 `yield from` also forwards `send()` and `throw()` into the inner generator,
 and the hand-written loop has no way to forward them.
 [Generators](45_Effects--Generators.md#yield-from-composes-descriptions)
-works all three channels.
+uses all three channels: the yielded values, the return value, and `send()`.
 
 This tests both a nested list and a flat one:
 
@@ -620,7 +623,8 @@ A data class that generates `__eq__()` sets `__hash__` to `None`,
 so the wrapper could no longer go in a set or serve as a dict key,
 as every other iterator in Python can.
 Field-by-field comparison is also the wrong question to ask about a cursor:
-two wrappers sharing one source compare equal even though they have consumed different numbers of items,
+two wrappers over one source compare equal as soon as their counts agree,
+though each sits at a different point in the stream,
 and two wrappers over separate iterators of the same list compare unequal.
 Turning equality off restores the identity comparison an iterator should have.
 
@@ -647,7 +651,7 @@ if __name__ == "__main__":
 
 Use the class when the wrapper needs its own state or extra methods,
 such as `accepted` above: a caller reads it mid-stream,
-a generator's local variables stay invisible outside the generator.
+while a generator's local variables stay invisible outside the generator.
 Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because every such place uses the same protocol.
@@ -775,7 +779,7 @@ The chapter has now reached that conclusion three times: here,
 in `tee`'s buffering,
 and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
-Take them away, and `advance()` must return the value it reached;
+Without them, `advance()` must return the value it reached;
 that method is `__next__()`.
 
 You can ask a GoF iterator repeatedly whether it has finished,
@@ -836,8 +840,7 @@ so an ordinary end of stream reads like a bug somewhere else.
 Only a bare `next()` hands you that exception.
 With a default it returns the default,
 and every other construct here absorbs it.
-`yield from source` ends its delegation when the source runs out,
-and that covers forwarding values untouched.
+`yield from source` ends its delegation when the source runs out.
 It passes each value through unchanged, though,
 so per-item work such as doubling needs a loop.
 That is why `doubled_ok()` uses `for`,

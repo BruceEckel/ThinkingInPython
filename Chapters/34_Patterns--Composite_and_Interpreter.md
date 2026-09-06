@@ -85,7 +85,7 @@ The same call works on the whole tree, on a subtree, and on a single file.
 
 Adding a node type is cheap:
 a plugin writes one class and touches nothing above it.
-Adding an *operation* is what exposes the weakness.
+Adding an *operation* exposes the weakness.
 `walk()` cost a method in every class,
 and counting files or finding an entry by name would each cost another.
 [Visitor](33_Patterns--Visitor.md) exists to solve this problem.
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 `Node` is a *recursive* union.
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members,
-and that self-reference is what makes the tree a tree.
+and that self-reference makes the tree a tree.
 `Directory` mentions `Node` above the `type` statement that defines it,
 which works because Python evaluates annotations and `type` aliases lazily
 (see [Naming Types: The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
@@ -298,7 +298,7 @@ An expression is a number, a variable, a sum, or a product.
 and the split is on purpose.
 Every node shares the operator methods,
 so those live on a base and arrive by inheritance.
-Each node's meaning is its own, so meaning lives in the walkers,
+Each node means something different, so meaning lives in the walkers,
 and the walkers need the union to know they have covered every case.
 `Expr` is the contract: if you annotate `evaluate()` with `Operators` instead,
 `assert_never()` stops working,
@@ -336,8 +336,8 @@ or as SQL.
 
 Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
-so an expression written with them builds nodes instead of computing,
-except for `==`.
+so an expression written with them builds nodes instead of computing.
+`==` is the exception.
 `@dataclass(frozen=True)` writes its own `__eq__()` onto every node class,
 and a class's own method always wins over one it inherits,
 so that generated `__eq__()` shadows anything `Operators` defines.
@@ -406,12 +406,13 @@ The `/` makes `e` positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)),
 which keeps the parameter name out of the variable namespace so an expression can use `e` as a variable.
 
-`**env` costs something for that call-site ergonomics.
+`**env` costs something for that convenience at the call site.
 Each recursive call packs a fresh dict from `**env`,
-so evaluating one expression allocates memory proportional to the tree's depth times the number of bound variables,
-on the same deep trees the closing section warns can run thousands of levels.
-`**env` also creates the name collision the `/` exists to close: without it,
-`e` would be an eligible keyword,
+so evaluating one expression allocates memory proportional to the tree's depth times the number of bound variables.
+The cost matters most on the deep trees this chapter warns about later,
+which can run thousands of levels.
+`**env` also creates the name collision the `/` exists to close:
+without the `/`, `e` would be an eligible keyword,
 and `test_e_is_available_as_a_variable()` below confirms the guard works.
 A `dict[str, int]` parameter would pass the same bindings by reference at every call,
 needing neither the `/` nor this explanation.
@@ -642,11 +643,11 @@ so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 Iterating a `Template` is flat:
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
 so the walk itself is a loop rather than a recursion.
-The value an interpolation holds is not restricted the same way.
-It can itself be a `Template`,
+An interpolation's value has no such limit.
+It can be a `Template`,
 built by combining `t`-strings with `+` or by nesting one `t`-string inside another,
 so a walker that only loops over the top level still needs to recurse into any value that turns out to be a `Template`.
-Everything else about it is this chapter's shape.
+Everything else about walking a `Template` is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
@@ -713,7 +714,7 @@ instead of leaving a `Template` object sitting in `values2` where no database dr
 Composing `t`-strings this way builds a nested composite,
 even though iterating any one `Template` stays flat.
 
-`to_query()` and `to_shape()` are the same relationship as `evaluate()` and `to_infix()`:
+`to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure, which knows neither of them,
 and adding a third changes nothing that already exists.
 

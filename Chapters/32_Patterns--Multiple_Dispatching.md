@@ -161,7 +161,7 @@ Follow one duel to keep the perspective straight.
 and calls `paper.eval_scissors(...)`.
 That call is the second dispatch: it resolves `paper`,
 arriving in `Paper.eval_scissors()`, the one method that knows both types.
-Whose result does it return?
+Which competitor does that result describe?
 `Paper.eval_scissors()` returns `WIN`,
 and that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running: scissors cut paper.
@@ -177,7 +177,7 @@ Those `Any` annotations give up static checking.
 `Item` declares only `__str__()`,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
 With `Any`, a class can omit one of the nine answers and the type checker stays silent.
-The gap surfaces as an `AttributeError` during whichever duel first needs it.
+Python raises an `AttributeError` at the first duel that needs the missing method.
 A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
 The table version sidesteps the problem.
@@ -250,7 +250,7 @@ the fail-fast policy that suits a table under construction.
 Adding `Lizard` in exercise 1 puts you in that situation.
 
 Exact matching surprises people.
-This listing shows it refusing a subclass.
+This listing shows the table refusing a subclass.
 `Origami` derives from `Paper` and inherits its `compete()`,
 but the table has no row for it:
 
@@ -318,7 +318,7 @@ print(compete(Origami(), Rock()))
 #: win
 ```
 
-`Origami` inherits `compete()` from `Paper` and matches the `Paper()` case,
+`Origami()` matches the `Paper()` pattern,
 the same subclass `exact_match.py` showed the table refusing.
 Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is: adding an `Item` means adding cases,
@@ -385,7 +385,7 @@ The double-dispatch version, with `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class,
 comes from languages where a table keyed by a pair of types is awkward to write.
 There, spreading the table across the classes wins.
-Python makes the table cheap,
+A Python `dict` takes a tuple of classes as a key,
 so the table is both shorter and easier to maintain.
 A table cell can hold a function, so even elaborate behavior fits the table,
 which is what exercise 9 builds.
@@ -414,9 +414,9 @@ print(DampPaper().compete(Scissors()))
 
 `DampPaper` overrides its outcome against `Rock` and inherits every other combination from `Paper`,
 unchanged, through `super().compete(item)`.
-The table version has no comparable hook:
-overriding one cell means editing the shared `OUTCOME` dictionary,
-which affects every `Item`, not just one subclass.
+The table version has no comparable override:
+changing one cell means editing the shared `OUTCOME` dictionary,
+and that edit affects every `Item` rather than one subclass.
 
 ## Testing Both Versions
 
@@ -496,7 +496,7 @@ double dispatching, built into the language.
 Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
-This fallback is how an `int` on the left can learn to add itself to a type written decades after `int` was.
+This fallback is how a type written decades after `int` can add itself to an `int` on the left.
 Do not confuse the reflected forms with the in-place forms,
 `__iadd__()` and its siblings,
 which serve `+=` and take no part in the fallback.
@@ -549,7 +549,8 @@ The first two additions resolve inside `__add__()`:
 the left operand recognizes the type.
 `4 + Meters(3)` asks `int.__add__()` first,
 and `int` has never heard of `Meters`, so it returns `NotImplemented`.
-With no error anywhere, Python then turns to `Meters.__radd__()`,
+The sentinel is a decline rather than an error,
+so Python tries `Meters.__radd__()` next,
 whose trace line shows the operands arriving swapped.
 The last case shows why the sentinel exists.
 `Meters.__add__()` runs and declines the string,
@@ -599,8 +600,7 @@ and scatter the answers across the classes.
 The table replaces both dispatches with a single lookup,
 and collects the answers in one place.
 The operators are the one case where Python performs the second dispatch itself.
-Everywhere else you choose between paying for a second dispatch in methods,
-or replacing both dispatches with one lookup in data.
+Everywhere else you choose between writing a second dispatch in methods and replacing both dispatches with one lookup in data.
 
 ## Exercises
 

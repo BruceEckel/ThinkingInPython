@@ -315,8 +315,8 @@ and the chain below turns the difference between them into a fallback.
 
 The classic form repeats the move `command_pattern.py` made, at larger scale.
 Each algorithm becomes a class deriving from a `FindRoot` interface,
-with a `find()` method, and a "Context" class holds the chosen one:
-five classes to produce the same three lines that one function argument produced.
+with a `find()` method, and a "Context" class holds the chosen one.
+Those five classes produce the same three lines that one function argument produced.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
 Until then, the `finder` parameter is the whole pattern.
@@ -364,8 +364,8 @@ The fine one agrees with the true root to six places.
 Both satisfy `RootFinder`, so `solve()` accepts either unchanged,
 and so does the chain below.
 
-When the configurable version already exists, with the setting as a parameter,
-`functools.partial` does the same job.
+When the algorithm takes the setting as an ordinary parameter,
+`functools.partial` replaces the closure.
 `partial` fills positional parameters from the left,
 so bind a trailing setting by keyword:
 
@@ -398,9 +398,10 @@ print(f"{fine(f, 0.0, 2.0):.6f}")
 `bisection_tol` takes `tolerance` as an ordinary parameter,
 so `partial` binds it by keyword, once per strategy,
 in place of `bisection_within`'s closure.
-A positional-only parameter takes no keyword, and needs a `Placeholder`
+A positional-only parameter takes no keyword,
+so binding one means passing a `Placeholder`
 ([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder))
-in the caller's position to hold it open.
+in each position the caller will fill.
 Save the strategy class for an algorithm that carries several related methods or mutable state.
 Configuration alone is a closure's job.
 
@@ -410,7 +411,7 @@ Configuration alone is a closure's job.
 *GoF Design Patterns* implements the chain as a linked structure,
 each handler holding a reference to the next and deciding whether to pass the request along.
 In Python the chain is a list of functions,
-and the loop that walks it decides in one place.
+and the loop that walks the list makes that decision in one place.
 Bisection needs the interval to bracket a root.
 The open methods do not:
 
@@ -445,13 +446,13 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 
 Each handler is a *Strategy* function, the chain is the list,
 and success is a non-`None` return.
-The second call shows the fall-through:
+The second `solve()` call shows the fall-through:
 the interval `[1.0, 1.3]` does not straddle the root,
 so bisection declines by returning `None` and the loop continues to a method that needs no bracket.
 Adding, removing, or reordering handlers means editing a list.
 
 The test is `root is not None`, not `if root`.
-A function with a root at zero returns `0.0`, which is falsy,
+A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test would discard a correct answer and call the next finder.
 Any sentinel-versus-value check on a numeric result has this hazard.
 
@@ -462,12 +463,13 @@ and reports that decision as its return value.
 That is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
-The first two tests wrap each finder so a run records its name,
-letting them assert not just the root but *which* finders ran:
-the first that converges returns the root and the rest never run,
-a later finder succeeds where an earlier one fails,
-an empty chain returns `None`,
-and a chain where every finder fails returns `None` too:
+The first two tests wrap each finder in `watched()`,
+which records the finder's name as it runs,
+so they can assert not just the root but *which* finders ran.
+The four tests check that the first finder to converge returns the root while the rest never run,
+that a later finder succeeds where an earlier one fails,
+that an empty chain returns `None`,
+and that a chain whose finders all fail returns `None` too:
 
 ```python
 # test_chain.py
@@ -605,8 +607,9 @@ would leave a stray entry behind.
 The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
 so `publish()` calls nothing, exactly as it does for `Closed`.
-Walking `type(event).__mro__` and calling every handler along it gives subclass events their parent's handlers,
-but then the handlers that run for an event come from its whole ancestry instead of from its own type alone.
+Walking `type(event).__mro__` and calling every handler along it would give a subclass event its parent's handlers.
+An event would then run every handler registered anywhere in its ancestry,
+not only the ones registered for its own type.
 
 The tests confirm that publishing calls every handler registered for a type,
 a handler receives only its own event type,

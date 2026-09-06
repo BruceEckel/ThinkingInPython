@@ -43,7 +43,7 @@ An exception is a value like any other, and the values it carries deserve names.
 such as `needs an @`.
 A handler can read `e.subject` and `e.reason` rather than parsing them from the exception text.
 
-`check()` calls `raise` explicitly, instead of `assert 1 <= stars <= 10`.
+`check()` uses an explicit `raise` instead of `assert 1 <= stars <= 10`.
 Python strips every `assert` when you run with `-O` or `-OO`,
 which would silently disable every validation this chapter builds,
 exactly the failure this chapter exists to prevent.
@@ -163,7 +163,7 @@ The order is a choice, not something mutation forces.
 and then `damaged` would stay `Stars(8)` instead of holding a corrupted `13`.
 What mutation forces is that every method must choose that order correctly,
 every time it changes the value.
-`f1()` here is what happens the one time a method doesn't.
+`f1()` here is what happens the one time a method gets that order wrong.
 
 *Design by Contract* (DbC)
 is the practice of checking arguments on the way in and results on the way out,
@@ -177,11 +177,11 @@ That is the same scattering of checks as before, but moved inside the class.
 The class encapsulates the value without constraining it to a set of legal values.
 
 That scattering is a real cost, and sometimes it's still the right one.
-A value that must change in place over its lifetime, a counter,
-a connection's open-or-closed state, a running total,
-cannot always be replaced with a fresh instance on every change.
-For those, a validating setter that checks before assigning,
-the fix `f1()` skipped above, is the accepted answer: pay DbC's scattering cost,
+Some values must change in place over their lifetime: a counter,
+a connection's open-or-closed state, a running total.
+You cannot always replace one with a fresh instance on every change.
+The accepted answer for those is a validating setter that checks before assigning,
+the fix `f1()` skipped above: pay DbC's scattering cost,
 because the value has to stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
 where a fresh, validated instance replacing the old one is cheap enough.
@@ -474,7 +474,7 @@ for k, v in D.__annotations__.items():
 `show(D)` tags both attributes `[CV]`,
 since no instance owns either of them yet.
 `show(D())` tags only one,
-and what `@dataclass` generates for each field decides which.
+and what `@dataclass` generates for each field decides which one keeps the tag.
 
 `x` is an ordinary field.
 `__init__()` takes it as a parameter and runs `self.x = x`,
@@ -551,8 +551,8 @@ Adding `slots=True` drops it, for less memory and faster attribute access.
 [Performance](18_Techniques--Performance.md#slots) measures the difference.
 
 The standard library has a second immutable record, `typing.NamedTuple`,
-which also rejects assignment and hashes under the same rule,
-every field hashable.
+which also rejects assignment and hashes under the same rule:
+every field it holds must be hashable.
 The two differ in equality.
 A frozen data class equals only another instance of its own class,
 while a `NamedTuple` equals any tuple holding the same values,
@@ -795,7 +795,7 @@ Make the type guarantee its own values.
 ## Enums Are Types Too
 
 When the set of values is small and fixed, the clearest type is an `Enum`,
-which appears here for the first time in the book.
+which this chapter is the first to use.
 As an example, a `BirthDate` contains a month, day, and year.
 A year has twelve months, so `Month` is an `Enum`.
 Each month carries its length and knows how to check a `Day` against it.
@@ -997,7 +997,7 @@ A named function like `make_months` is one.
 A type is another, which is why `field(default_factory=list)` appears throughout this book:
 calling `list` builds an empty one.
 A subscripted generic is callable too,
-so `field(default_factory=dict[str, str])` is legal and does what it looks like.
+so `field(default_factory=dict[str, str])` is legal and produces an empty dict.
 That form seems redundant,
 because the annotation on the left already names the type,
 and the subscript vanishes at runtime.
@@ -1035,7 +1035,7 @@ What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.
 A bare `list`, `dict`,
 or `set` produces a type loose enough that a type checker accepts it against any annotation,
-so it never compares the factory with the field.
+so the checker never compares the factory with the field.
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
@@ -1200,8 +1200,8 @@ print(c.host, c.name)
 
 A data class cannot know what arguments a non-data-class base constructor expects,
 so the generated `__init__` never calls that constructor.
-Its field list covers its own fields plus any inherited from data class bases,
-and it builds the body by assigning those fields.
+That `__init__` takes the class's own fields plus any inherited from data class bases,
+and its body assigns each one.
 
 Two data classes in one hierarchy must agree about `frozen`.
 Mixing the settings fails in either direction:
@@ -1349,7 +1349,7 @@ so `Stars.__post_init__()` runs on the copy.
 A validated type stays validated across a replacement,
 which makes "transform one legal value into a new legal value" a safe thing to say.
 
-The `copy` module also holds copies that skip the constructor.
+The `copy` module's other two functions copy without calling the constructor.
 Printing from `__post_init__()` shows which calls run it:
 
 ```python
@@ -1570,7 +1570,7 @@ and that boundary is the last point where a bad value is cheap to reject.
 Past that line your code holds types rather than raw data,
 and a function receiving one does its work without asking whether the value makes sense.
 
-The price also has a memory and time side, not only a boundary side.
+The price also shows up in memory and time, not only at the boundaries.
 Every value is now an object:
 a constructor call and attribute access where a bare `int` or `str` needed neither.
 `copy.replace()` re-validates the whole object on every change,

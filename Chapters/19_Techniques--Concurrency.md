@@ -47,7 +47,8 @@ The amount used out of that fixed allotment varies at runtime.
 If a chain of function calls needs more room than the maximum,
 the stack overflows instead of growing to fit.
 Code reaches a heap allocation only through a reference,
-which can point at a new, larger block instead.
+so an allocation that needs more room can move to a larger block,
+and the reference points at the new location.
 The code running on a stack addresses it directly,
 so the stack cannot move to a new location.
 
@@ -99,7 +100,8 @@ the smallest amount of data to include in the context switch.
 The programmer minimizes context switches by deciding when they happen.
 Moving that control into the program simplifies both writing the program and reasoning about it.
 
-The second big shift changed who decides to use parallelism.
+That was the first big shift.
+The second changed who schedules parallel work.
 Mapping every parallel task onto its own OS thread worked,
 but it pushed all scheduling decisions onto the OS and needed extra machinery
 (thread pools, pinning, tuning) to perform well.
@@ -139,8 +141,8 @@ which discovers the next available task to run.
 Two keywords and the `asyncio` library capture this:
 
 1. `async def` defines a *coroutine function*.
-   Calling it returns a *coroutine object*,
-   a description of work that has not started, and runs nothing.
+   Calling it runs nothing and returns a *coroutine object*,
+   a description of work that has not started.
 2. `await` starts that work and pauses the awaiting coroutine until the result is ready.
    While that coroutine waits,
    the *event loop* finds other coroutines ready to run.
@@ -338,7 +340,7 @@ and iterating through `group.exceptions` reaches every member.
 The `except*` form matters.
 A `TaskGroup` always wraps what it re-raises, even when exactly one task failed,
 so a plain `except ValueError:` around the `async with` block catches nothing,
-and the `ExceptionGroup` travels past it uncaught.
+and the `ExceptionGroup` propagates uncaught.
 
 Keeping the task objects pays off even after a partial failure.
 `a` and `b` already succeeded, and their results stay untouched:
@@ -356,13 +358,13 @@ That exception derives from `BaseException` rather than `Exception`,
 and the choice is deliberate.
 A `try`/`except Exception` written inside a task to log and continue does not catch cancellation,
 so the task still stops the way the group intended.
-The mistake runs the other way:
+The real mistake is catching too much:
 a bare `except:` or an `except BaseException:` around an `await` catches the cancellation and keeps the task running,
-and then the `TaskGroup` block waits on a task it ordered to stop.
+so the `TaskGroup` block waits on a task it ordered to stop.
 If a task must clean up as it stops, catch `asyncio.CancelledError` by name,
 do the cleanup, and re-raise it.
 
-When failure is not termination but data,
+When one task's failure should not stop the others,
 `gather(..., return_exceptions=True)` handles the situation differently:
 
 ```python
@@ -454,8 +456,8 @@ asyncio.run(main())
 ```
 
 The group holds a fast task and a slow one.
-`asyncio.timeout()`'s deadline passes well before the slow task's,
-so it cancels the task running `main()`.
+`asyncio.timeout()`'s deadline passes well before the slow task's sleep ends,
+so the timeout cancels the task running `main()`.
 The resulting `asyncio.CancelledError` reaches the `TaskGroup`,
 which cancels both children and re-raises as it exits.
 Because the cancellation traces back to its own deadline,
@@ -827,7 +829,7 @@ A `Lock` refuses a release it never granted,
 raising `RuntimeError: Lock is not acquired`.
 An over-released `Semaphore` quietly raises its own limit instead,
 so a stray `release()` turns a semaphore of one into a semaphore of two.
-Raising the count deliberately turns it into a throttle on a limited resource,
+Deliberately choosing a count above one makes the semaphore a throttle on a limited resource,
 such as a fixed number of database connections.
 [Deadlock and Livelock](#deadlock-and-livelock)
 takes up the two ways these primitives fail.
@@ -1046,9 +1048,9 @@ waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
 *Draining* a queue means reading every item out of it until it is empty.
 Draining after `join()` works here because all five results are small enough for every worker to finish writing with no reader waiting.
-Bulky data changes that:
+Bulky data changes that: once the pipe between the processes fills,
 each worker's feeder thread blocks until a reader consumes its output,
-so `join()` deadlocks.
+so the worker never exits and `join()` deadlocks.
 Drain a queue carrying bulky data before joining.
 
 `ProcessPoolExecutor` builds on `multiprocessing`.
@@ -1191,9 +1193,9 @@ The next two examples make that concrete, one for waiting and one for computing.
 Both use the same harness,
 which runs a price function sequentially and threaded, confirms they agree,
 and times each.
-Each variant is timed five times,
-alternating between the two so a stray background load spike lands on both,
-and `min` keeps each variant's best:
+`compare()` times each variant five times,
+alternating between the two so a stray background load spike slows both,
+and keeps each variant's best with `min`:
 
 ```python
 # thread_compare.py
@@ -1227,7 +1229,7 @@ def compare(
 ```
 
 Two timings of the same type come back from one call,
-so returning them as a bare `tuple[float, float]` leaves every caller remembering which float came first.
+so a bare `tuple[float, float]` would force every caller to remember which float came first.
 `Times` names them, as [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values)
 describes.
 The two callers below use the two styles a `NamedTuple` allows,
@@ -1468,8 +1470,8 @@ Free threading pays off only when every extension you load has passed an audit,
 so check compatibility before switching a project.
 
 Free threading also rewards a particular program shape.
-Threads that mostly work on data they do not share, like `threaded()` above,
-scale across cores.
+Threads that mostly work on data they do not share,
+like `thread_compare.py`'s `threaded()`, scale across cores.
 The same is true of threads that accumulate results locally and merge them once at the end,
 caches read far more often than written,
 and pipeline stages connected by queues.
@@ -1550,7 +1552,7 @@ with built-in locking.
 `queue.Queue` is first-in, first-out, while `queue.PriorityQueue`
 (the threaded form of `heapq` seen in [Performance](18_Techniques--Performance.md))
 always produces the smallest item.
-A live consumer thread calls `get()` and lets the block do the waiting,
+A live consumer thread calls `get()` and lets that blocking call do the waiting,
 rather than polling whether the queue is empty:
 
 ```python
@@ -1613,9 +1615,9 @@ A consumer parked in `get()` still needs a way to stop.
 every blocked or future `get()` raises `queue.ShutDown` instead of waiting forever.
 `consume()` catches it and returns,
 so `consumer.result()` completes instead of hanging.
-Calling `shutdown()` before every item is drained is safe too;
-items already in the queue still come out through `get()` normally,
-and only a `get()` against an empty, shut-down queue raises.
+Calling `shutdown()` while items remain in the queue is safe too;
+those items still come out through `get()` normally,
+and only a `get()` against an empty, shut-down queue raises `ShutDown`.
 A `put()` after `shutdown()` raises the same exception immediately,
 which is how a producer discovers that its consumers have already left.
 
@@ -1723,7 +1725,7 @@ report("serialized",
 #: serialized: 200 distinct, duplicates False
 ```
 
-`Tickets` hands out each number once: read, pause, write back.
+With one thread, `Tickets` hands out each number once: read, pause, write back.
 `Tickets.__next__()` is `gil_race.py` wearing a different hat.
 Read the counter, do something that releases the GIL, write the counter back.
 Eight threads read the same number and all eight receive it,
@@ -1896,8 +1898,8 @@ one set of answers.
 
 `asyncio` does not fit here.
 An `Executor` blocks a worker and hands back a result.
-A coroutine does the opposite.
-It is a suspended function that runs only when the event loop resumes it.
+A coroutine holds no worker:
+it is a suspended function that runs only when the event loop resumes it.
 
 The two models give their result-that-arrives-later the same name,
 and the shared name invites one specific mistake.
@@ -2106,10 +2108,10 @@ so they stay alive doing nothing.
 The two `tracemalloc` snapshots capture the heap they add.
 The listing reads `threading.stack_size()`, sets it, reads it again,
 then restores it, so the measurement leaves the rest of the program untouched.
-That stack figure is stipulated, not measured:
-`STACK_SIZE` is a constant this listing sets and reads back,
+The listing stipulates that stack figure instead of measuring it:
+`STACK_SIZE` is a constant the code sets and reads back,
 standing for a common one-mebibyte default,
-not a number the OS reports for a thread it actually ran.
+not a number the OS reports for a thread that actually ran.
 A single thread's reserved stack,
 paid before it runs one line of its target function,
 could instead hold hundreds of suspended tasks.

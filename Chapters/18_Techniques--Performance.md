@@ -160,11 +160,10 @@ but programmers turn out to be bad at guessing.
 A profiler tells you for sure, preventing wasted time.
 
 The standard library includes two.
-The first is a deterministic tracing profiler.
+The first is the classic `cProfile`,
+a deterministic tracing profiler that arrived in 2006 and records every function call and return.
 The second, new in Python 3.15, is a sampling profiler.
-The classic `cProfile` arrived in 2006.
-It deterministically records every function call and return.
-Its numbers are exact, but the instrumentation slows the program,
+`cProfile`'s numbers are exact, but the instrumentation slows the program,
 sometimes enough to distort the behavior you are measuring.
 Here's how you run `cProfile` on `my_program.py`:
 
@@ -208,9 +207,10 @@ they call everything, so they contain everything.
 Scan down to the first row where `tottime` is large: here, `slow()`.
 That is the function to attack, since its own loop, not anything it calls,
 burns most of the time.
-`ncalls` decides how to attack it:
-`slow()`'s one call spending most of the total needs a better algorithm,
-while `<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
+`ncalls` decides how to attack it.
+`slow()` spends most of the total in a single call,
+so it needs a better algorithm.
+`<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
 where fewer calls would help more than a faster body.
 
 Python 3.15 gathers the profilers into a single `profiling` package
@@ -254,7 +254,8 @@ and say which code the event applies to.
 Registering nothing costs nothing:
 the interpreter specializes the bytecode that has no callback attached,
 so unmonitored code runs at full speed.
-`sys.settrace()`, by contrast, imposes a per-line toll on everything:
+`sys.settrace()`, by contrast, slows every Python function in the process,
+since its trace function runs on each call and then on each line:
 
 ```python
 # monitoring_counts.py
@@ -301,7 +302,7 @@ The global form is `set_events()`,
 which fires for every Python function in the process,
 and that is where the two differ in cost.
 When one function is the question,
-monitoring the whole program to answer it pays for data you discard and slows the run you are measuring.
+`set_events()` collects data you discard and slows the run you are measuring.
 
 `set_local_events()` with `NO_EVENTS` detaches,
 and `free_tool_id()` releases the identifier.
@@ -607,8 +608,9 @@ which returns the position after any elements equal to the target,
 while `bisect_left()` returns the position before them
 (`insort()` is likewise an alias for `insort_right()`).
 Either one answers "where does this go,"
-but only `bisect_left()` points at an existing value,
-so a membership test must use it, as `search_comparison.py` does below.
+but when the target is already in the list,
+only `bisect_left()` returns its index, so a membership test must use it,
+as `search_comparison.py` does below.
 The speed is in the search alone:
 `insort()` still shifts everything after the insertion point.
 Under heavy insert traffic consider the heap below instead.
@@ -809,16 +811,16 @@ so the same 100 extractions cost roughly O(n + 100 log n),
 smaller than sorting whenever the fraction you extract stays small.
 One machine measured the heap at about 3 times faster here.
 The comparison only holds when the input order gives neither side an advantage.
-On descending data, the kind used earlier in this chapter,
+On descending data, the kind `heap_corruption.py` uses,
 Timsort detects the existing run and `sorted()` wins outright.
 A heap is not automatically the right choice.
 Measure with data shaped like production data.
 `heapq.nsmallest(100, data)`, introduced above,
 answers this exact "top-N" question directly,
 and is the tool to use before hand-rolling either comparison here.
-The heap earns its keep on a different shape of problem:
-pushes and pops interleaved over time, with nothing to presort in advance,
-where re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
+The heap fits a different shape of problem:
+pushes and pops interleaved over time, with nothing to presort in advance.
+Re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
 
 The immutable containers from [Containers](03_Foundations--Containers.md#immutability)
 are not a speed upgrade.
@@ -974,7 +976,7 @@ A smaller instance means fewer bytes for the allocator and garbage collector to 
 more instances fitting in the CPU cache at once, and,
 for `__slots__` specifically,
 attribute access through a fixed offset instead of a `__dict__` lookup.
-The byte counts below are what each tool buys.
+The byte counts below show what each tool saves.
 Multiply by a population in the millions to see why it matters.
 
 ### Slots
@@ -1135,15 +1137,15 @@ except TypeError as e:
 ```
 
 `cached_property` writes its cached value into the instance's `__dict__`,
-so a slotted class needs a `"__dict__"` entry of its own in `__slots__` before `cached_property` works,
-which gives back the per-instance dict that `slots=True` exists to remove.
+so a slotted class needs a `"__dict__"` entry of its own in `__slots__` before `cached_property` works.
+That entry gives back the per-instance dict that `slots=True` exists to remove.
 The same is true of weak references:
 add `"__weakref__"` to `__slots__` if some other object needs to hold one.
 Multiple inheritance is the sharpest edge.
 Python lays out a slotted instance as a fixed block of storage,
 and two unrelated classes that both declare non-empty `__slots__` each claim their own incompatible layout,
 so a class cannot inherit from both.
-A single slotted base with everything else contributing no new slots of its own avoids the conflict.
+A class can inherit from one slotted base as long as its other bases declare no slots of their own.
 Exercise 6 covers a fourth trap:
 a subclass that declares no `__slots__` of its own quietly grows a `__dict__` back,
 undoing the saving for every instance of that subclass.
@@ -1246,16 +1248,16 @@ except TypeError as e:
 `payload.obj` names the buffer it reads from, and that buffer is `data` itself.
 That sharing is also the trap.
 `memoryview(data)` keeps an export open on `data` for as long as `view`
-(or `payload`, sliced from it) stays alive,
-and `bytearray.append()` needs to resize the buffer,
-so it refuses while an export is open,
-which is exactly why `data.append(1)` fails here:
+(or `payload`, sliced from it) stays alive.
+`bytearray.append()` needs to resize the buffer,
+so it refuses while an export is open.
+That is why `data.append(1)` fails here:
 `view` and `payload` are both still alive at that point.
 The fix is to release every view first, explicitly (`view.release()`)
 or by letting them go out of scope, before resizing the buffer they read.
 The second trap is about direction, not lifetime:
 a `memoryview` over immutable `bytes` supports reading and slicing,
-but writing through it raises regardless of whether anything else has it open.
+but writing through it raises a `TypeError` regardless of whether anything else has it open.
 `memory_view.py` above writes through a view of a `bytearray`, which is mutable.
 Only a view of `bytes` is read-only.
 

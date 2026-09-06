@@ -60,7 +60,7 @@ except TypeError as e:
 
 When you call a method for an object, as in `x.show()`,
 Python passes the object reference automatically.
-The "1" in the error message is that reference,
+The "1" in the error message counts that reference,
 and a method defined without `self` has no parameter to receive it.
 A type checker sees the mistake before anything runs,
 so the call carries a `# type: ignore` to say the mistake is deliberate.
@@ -93,8 +93,8 @@ It records the type and nothing else.
 and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
 use it.
 
-`display_object()`, a small inspection helper built in [Metaprogramming](17_Techniques--Metaprogramming.md#building-display_object),
-shows the shape of an object by printing its attributes and methods:
+`display_object()` is a small inspection helper built in [Metaprogramming](17_Techniques--Metaprogramming.md#building-display_object).
+The helper shows the shape of an object by printing its attributes and methods:
 
 ```python
 # display_simple.py
@@ -134,7 +134,7 @@ Then inherit by listing the base class in parentheses after the name of the inhe
 Python supports multiple inheritance, so you can list several classes,
 though [Rethinking Objects](20_Patterns--Rethinking_Objects.md)
 argues against it in favor of protocols.
-`simple2.py` imports and subclasses `Simple`, from the `simple_class` module.
+`simple2.py` imports and subclasses `Simple` from the `simple_class` module.
 Ignore the `@override` decorator for now.
 [Marking Overrides with `@override`](#marking-overrides-with-override)
 explains it:
@@ -197,12 +197,13 @@ When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
 `super()` and ordinary attribute lookup both follow one list,
-the class's *method resolution order* (MRO):
-the classes Python searches for a name,
+the class's *method resolution order* (MRO).
+The MRO names the classes Python searches for a name,
 starting with the class itself and ending at `object`.
 `Simple2.__mro__` is `(Simple2, Simple, object)`.
 With a single base class the order is obvious.
-With several, the MRO decides which base supplies a name that more than one of them defines.
+When two base classes define the same name,
+the MRO decides which one supplies it.
 `A` and `B` below both define `show()`, and `C` inherits from both:
 
 ```python
@@ -232,7 +233,7 @@ The base-class constructor runs because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
-Dropping the call and then calling `show()` confirms it:
+Dropping the call and then calling `show()` produces that error:
 
 ```python
 # missing_super.py
@@ -254,11 +255,11 @@ The derived class also inherits `show_twice()` unchanged.
 
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`.
-`f()` in `demo_simple2.py` demonstrates dynamic typing:
-it requires one thing of `obj`, a `show()` it can call,
+`f()` in `demo_simple2.py` demonstrates dynamic typing.
+It requires one thing of `obj`, a `show()` it can call,
 so it accepts a `Simple2` and a `Different` alike.
 
-An `import` inside a class body binds that name like any other assignment,
+An `import` inside a class body binds the imported name like any other assignment,
 so importing a module-level function there attaches it to the class as a method,
 `self` and all.
 More than one unrelated class can pick up the same function this way,
@@ -269,8 +270,9 @@ a helper object or a plain module-level function is almost always clearer.
 
 When you override a method,
 nothing requires the name to match a method in the base class.
-A typo, or a base method that someone later renames or removes,
-silently produces a new method instead of an override,
+If you misspell the name, you define a new method instead of overriding one,
+and Python reports nothing.
+Renaming or removing the base method later has the same effect,
 and that bug is easy to miss.
 
 The `@override` decorator from the `typing` module catches it.
@@ -302,8 +304,9 @@ Derived().show()
 ```
 
 A type checker now verifies that claim.
-A decorated method that matches nothing in a base class,
-because of a misspelling or a base method that no longer exists, is an error.
+If a decorated method matches nothing in a base class,
+whether from a misspelling or from a base method that no longer exists,
+the checker reports an error.
 Uncomment the decorator on `Typo.shwo`, and the checker reports:
 
 ```text
@@ -317,7 +320,7 @@ and [Static Types](08_Foundations--Static_Types.md) sets that tool up.
 
 At run time `@override` returns the same function object it received,
 with no wrapper.
-Before returning it,
+Before returning the function,
 the decorator tries to set an `__override__` attribute on it,
 so that code can find overrides by introspection;
 some callables refuse the attribute, and the decorator lets that pass.
@@ -328,7 +331,7 @@ and dunders such as `__repr__()` and `__str__()` that replace a default inherite
 
 ## Properties
 
-With `@property`, you can expose a plain attribute and convert it to a computed one later,
+With `@property`, you can start with a plain attribute and convert it to a computed one later,
 without changing the calling code:
 
 ```python
@@ -394,7 +397,7 @@ except ValueError as e:
 #: Failed: radius cannot be negative
 ```
 
-`property_setter.py` does what the section opened with:
+`property_setter.py` completes the conversion:
 `radius` began as a plain attribute and is now a validated property.
 The two lines that read `c.radius` and `c.area` are the ones from `properties.py`,
 unchanged.
@@ -405,9 +408,10 @@ The property owns the name `radius` on the class,
 so the value goes into a separate attribute.
 A single leading underscore marks `_radius` as internal to the class,
 a convention rather than a language rule.
-The separate name matters: `self.radius` inside the getter,
-or `self.radius = value` inside the setter, calls that same method again,
-and again, until the interpreter raises a `RecursionError`.
+The separate name matters.
+Inside the getter, `self.radius` calls the getter again; inside the setter,
+`self.radius = value` calls the setter again.
+Either loop repeats until the interpreter raises a `RecursionError`.
 Naming both the property and the backing attribute `radius` reproduces it:
 
 ```python
@@ -588,8 +592,8 @@ print(type(r).__name__)
 
 `from_fahrenheit()` builds its result with `cls(...)` rather than `Temperature(...)`.
 Called on a subclass, `from_fahrenheit()` receives that subclass as `cls`,
-so the alternative constructor produces the right kind of object,
-and a subclass inherits it unchanged.
+so the alternative constructor produces the right kind of object.
+The subclass inherits the method unchanged.
 `Reading.from_fahrenheit(212)` proves it: `cls` is `Reading` there,
 not `Temperature`, so `type(r).__name__` reports `'Reading'`.
 Naming the class directly, `return Temperature(...)`,
@@ -603,10 +607,10 @@ and a subclass can replace it the way it replaces any other method.
 
 1.  Add a method `shrink(self, factor)` to `Circle` in `property_setter.py` that sets `self.radius = self.radius / factor`,
     going through the existing setter.
-    Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5.0`,
-    then confirm that calling `shrink(-2)` on that same circle,
+    Confirm `shrink(2)` on a `Circle(10)` leaves the radius at `5.0`.
+    Then call `shrink(-2)` on that same circle,
     which would divide the radius down to `-2.5`,
-    still raises the setter's `ValueError` instead of silently storing a negative radius.
+    and confirm the setter raises its `ValueError` instead of silently storing a negative radius.
 2.  In `class_methods.py`, add a second alternative constructor,
     `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
     Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,

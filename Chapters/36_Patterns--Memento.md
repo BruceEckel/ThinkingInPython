@@ -67,8 +67,9 @@ so `todo[0].append("cheese")` shows up in `shallow` too.
 so `deep`'s inner lists share nothing with `todo`'s.
 The later `todo[0].append("jam")` reaches `todo` but never `deep`.
 That walk costs time and memory proportional to the whole nested structure it rebuilds,
-not just the part that changed,
-which is the price `sketch.py` pays below for a state that nests containers inside containers.
+not just the part that changed.
+`sketch.py` below copies only one level and skips that cost;
+a state that nests containers inside containers pays it on every save.
 
 ## The Classic Memento
 
@@ -125,8 +126,8 @@ Whoever holds `checkpoint` stores it and gives it back,
 and never reaches inside to edit the strokes.
 Languages with access control enforce that restraint.
 In Python it is a convention,
-though freezing the memento means an accidental edit
-(swapping the snapshot's strokes for different ones) fails loudly.
+though freezing the memento makes an accidental edit fail loudly:
+assigning different strokes to the snapshot raises a `FrozenInstanceError`.
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
 Every call site would still type-check.
@@ -189,10 +190,11 @@ except FrozenInstanceError as e:
 `restore_tuple()` accepts either tuple without complaint,
 since both are `tuple[str, ...]`.
 `restore_memento()` accepts the checkpoint,
-and the type checker flags the plain tuple before the program runs; run anyway,
+and the type checker flags the plain tuple before the program runs.
+If you run the program anyway,
 it fails at the first line that expects `.strokes`.
-Reassigning `checkpoint.strokes` fails too, for the same reason: the attribute,
-not just the tuple inside it, is frozen.
+Reassigning `checkpoint.strokes` fails at both stages too:
+`frozen=True` freezes the attribute, not just the tuple inside it.
 
 ```python
 # test_sketch.py
@@ -295,7 +297,7 @@ and interning would make the identity check print `True` even for a copied strin
 A single `draw()` is cheap.
 A `History` that keeps every past state is not,
 once a field grows by accretion the way `strokes` does:
-edit `n` costs `n` pointers,
+the `n`-th edit builds a tuple of `n` pointers,
 so `k` edits held in `_past` cost `O(k^2)` pointers in total, not `O(k)`.
 
 ```python
@@ -356,9 +358,9 @@ def test_replace_carries_other_fields() -> None:
 The caretaker needs to know nothing about the states it holds, frozen or not:
 opacity is the pattern's whole point,
 and `History[S]` below works unchanged on the classic `Memento` from `sketch.py`.
-What immutability buys is not opacity, which the classic form always had,
-but freedom from an explicit `save()` and `restore()` at every edit,
-since a state that already cannot change is already a memento.
+Immutability does not add opacity; the classic form always had it.
+What immutability removes is the explicit `save()` and `restore()` at every edit,
+since a state that cannot change is already a memento.
 Undo and redo are two stacks of past and future states,
 generic over the state type
 (the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
@@ -425,7 +427,8 @@ Redo can no longer reach the states you undid, which is how editors behave.
 `apply()` exists because `do()` alone leaves work to the caller.
 `do()` takes a finished state,
 so every call site must remember to build that state from `history.present` and then hand the result back.
-Build a new state and keep it without handing it back, and the history omits it.
+If you build a new state and keep it without handing it back,
+the history omits it.
 Because nothing mutates,
 every other state stays valid and the gap goes unnoticed.
 `apply()` takes the edit instead of its result.
@@ -447,8 +450,8 @@ A `History` of lists is a stack of aliases, the bug that opened this chapter.
 
 `History` does not require a frozen state class either.
 The classic `Memento` from `sketch.py` is already immutable,
-so the same generic caretaker drives the mutable `Sketch` it snapshots,
-calling `save()` and `restore()` where `frozen_sketch.py`'s version needed neither:
+so the same generic caretaker holds snapshots of the mutable `Sketch`,
+with the surrounding code calling `save()` and `restore()` where `frozen_sketch.py`'s version needed neither:
 
 ```python
 # history_classic.py
@@ -586,7 +589,8 @@ For untrusted storage or other languages,
 convert the state with `dataclasses.asdict()` and write JSON,
 which exercise 3 explores.
 
-Pickle's other limitation is time.
+Pickle's other limitation is time:
+the class can change between the save and the load.
 The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,

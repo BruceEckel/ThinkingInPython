@@ -71,7 +71,7 @@ t.set_celsius(25)
 Passing `arg` is the *push* model: the subject hands observers what changed,
 so an observer needs no reference back into the subject's state.
 The *pull* model sends only `subject` and lets each observer ask for what it wants,
-which decouples the two further and costs a call back.
+which decouples the two further, at the cost of a call back into the subject.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -273,7 +273,7 @@ and the observers after it miss the change.
 Decide whether `notify()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 Subscriptions are strong references:
-an observable that outlives its observers keeps each subscribed bound method's instance alive,
+an observable that outlives its observers keeps alive the instance behind every subscribed bound method,
 the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
 or weak references (`weakref.WeakMethod`, see [Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them)),
@@ -353,7 +353,8 @@ print(seen)
 so the setter returns before it reaches `notify()` again,
 and the model still notified once.
 The alternative, a re-entry flag set before `notify()` and cleared after,
-works the same way when the write should proceed even for a value that hasn't changed.
+breaks the cycle too,
+and fits the case where the write should proceed even for a value that hasn't changed.
 
 ## Observer and I/O
 
@@ -368,8 +369,9 @@ so one state change reaches every observer at once.
 A slow observer no longer holds up the others.
 `gather()` still waits for all of them,
 so the change finishes only after every notification succeeds.
-One limitation: an assignment discards whatever the setter returns,
-so an `async` setter never runs its body and you cannot await an assignment.
+One limitation: an `async` setter returns a coroutine instead of running its body,
+and an assignment discards that coroutine,
+so the body never runs and you cannot await an assignment.
 The state change moves from `t.celsius = value` to an awaitable method.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
@@ -437,7 +439,7 @@ asyncio.run(main())
 
 The `AsyncObserver` alias makes the type checker reject a plain function as an observer:
 an observer must return an awaitable,
-which calling an `async` function produces.
+and calling an `async` function produces one.
 Its type parameter does the same job as the synchronous `Observer[T]`'s.
 The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Observable`:
@@ -541,7 +543,7 @@ asyncio.run(main())
 #: slow finished: 1
 ```
 
-`caught` prints the moment `loud()` raises.
+`caught` prints the moment `loud()` raises its `ValueError`.
 `slow` is still sleeping at that point, with nothing left awaiting it,
 and it prints only because `main()` sleeps long enough afterward to let it finish.
 A real caller rarely adds that wait, so the orphaned task's work,
@@ -552,7 +554,7 @@ which is the async form of the catch-collect-continue that exercise 3 asks for.
 but not here: it cancels its siblings when one task fails,
 so a single broken observer would stop the rest from hearing the change.
 
-Use this only when the observers are I/O-bound.
+Use the async fan-out only when the observers are I/O-bound.
 For in-memory observers the synchronous list from earlier is simpler and needs no event loop.
 The type-keyed [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 is the same fan-out, routed by event type.
@@ -688,7 +690,7 @@ if __name__ == "__main__":
 
 `draw()` clears the canvas before repainting.
 Without that line each notification adds another `size * size` rectangles on top of the last set.
-The canvas looks identical and grows without limit,
+The window looks the same while the canvas's list of items grows without limit,
 the same quiet accumulation as a lapsed listener.
 
 The model and the view share only the subscribe-and-notify contract,

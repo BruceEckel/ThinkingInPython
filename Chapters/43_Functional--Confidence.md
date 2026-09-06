@@ -42,11 +42,11 @@ print(x, y, x == y)
 Because `add(2, 3)` and `5` are interchangeable,
 an implementation may cache the call, run the two calls in either order,
 or skip the second.
-CPython leaves all three choices to you,
-because the language has no way to mark `add()` as pure.
+The language has no way to mark `add()` as pure,
+so CPython applies none of the three and leaves them to you.
 You can also reason about the code by substitution,
 the same move you make in algebra.
-This property lets you check parts of a program,
+Referential transparency lets you check parts of a program,
 and sometimes prove them correct.
 
 Substitution stops working the moment a function reads or writes outside itself.
@@ -92,13 +92,13 @@ print(cart)
 #: ['milk', 'eggs', 'eggs']
 ```
 
-Each call to `add_item()` returns the same list it was given,
-so substituting the call by that return value looks safe.
+Each call to `add_item()` returns the same list the caller passed in,
+so replacing the call with that list looks safe.
 It is not.
 The call also appends to `cart`, a change substitution cannot see,
 so calling it twice leaves `cart` different from calling it once.
 
-Referential transparency is also what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
+Referential transparency also makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
 A memoizer can hand back a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
@@ -129,8 +129,9 @@ print(f"balance: {balance}")
 ```
 
 Two withdrawals of `30` should leave `balance` at `40`.
-The second call is a cache hit, so `withdraw()` never runs a second time,
-and the missing `30` vanishes with no error.
+The second call is a cache hit,
+so `withdraw()` never runs a second time and never subtracts the second `30`,
+with no error to report the loss.
 `lru_cache` trusts every call it wraps to be referentially transparent,
 and nothing in the language checks that trust.
 
@@ -191,7 +192,7 @@ The limits above are large enough for the difference to show:
 on the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
 comfortably clearing the 30% margin the last line checks.
-Smaller limits finish too fast for spawning worker processes to pay for itself,
+Smaller limits finish before spawning the worker processes pays for itself,
 so a reader who shrinks the limits back down will watch parallel lose.
 Purity makes parallel safe.
 It says nothing about whether parallel is worth it at a given size.
@@ -396,8 +397,8 @@ sorting produces an ordered list.
 *Idempotence* states that repeating changes nothing:
 sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree:
-the simple version you can check by reading matches the fast one,
-which `parallel_pure.py`'s `assert parallel == serial` claims.
+the simple version you can check by reading matches the fast one.
+`parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 The trap to avoid is a property that restates the implementation:
 asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.

@@ -84,8 +84,8 @@ def is_palindrome(s: str) -> bool:
 
 The test written first stayed the same.
 Only the code changed to satisfy it.
-That is the design-tool benefit TDD promises:
-the test already said what "done" means before any implementation existed to argue otherwise.
+That is TDD working as a design tool:
+the test defined what "done" means before any implementation existed to shape that definition.
 
 ## pytest
 
@@ -272,9 +272,8 @@ def test_interest_compounds() -> None:
 
 Applying 5% five times produces `127.62815624999999`,
 so the same assertion written with `==` against `127.62815625` fails.
-Use `approx()` as the habit rather than as the rescue:
-the first test does not need it,
-and you cannot tell by looking which of the two you are writing.
+Use `approx()` by default rather than adding it after a comparison fails:
+the first test does not need it, and you cannot tell by looking which tests do.
 
 ## Parametrizing Tests
 
@@ -312,9 +311,10 @@ The names in the string line up, in order, with the values in each tuple.
 `parametrize` is a *mark*, and three others turn up in any existing suite.
 `@pytest.mark.skip` and `@pytest.mark.skipif` leave a test out,
 unconditionally or on a condition such as the platform.
-`@pytest.mark.xfail` records a known bug: the test still runs,
-`pytest` reports a failure as expected rather than as a break,
-and the suite stays green without anyone deleting the test that proves the bug.
+`@pytest.mark.xfail` records a known bug.
+The test still runs,
+and `pytest` counts its failure as expected rather than as a new break.
+The suite stays green, and the test that proves the bug stays in place.
 
 ## Fixtures Replace Setup and Teardown
 
@@ -366,8 +366,8 @@ A fixture marked `@pytest.fixture(autouse=True)` runs for every test in its scop
 That suits a fixture whose value is a side effect rather than an object:
 resetting a global registry, or installing a `monkeypatch` every test needs.
 Autouse runs the fixture, and only a parameter delivers its value.
-Mark `funded` autouse, leave it out of the parameter list,
-and `funded.withdraw(40)` raises an `AttributeError`:
+If you mark `funded` autouse and leave it out of the parameter list,
+`funded.withdraw(40)` raises an `AttributeError`:
 the bare name finds the fixture function, not the `Account` it returns.
 
 Fixtures eliminate duplicated setup.
@@ -427,8 +427,8 @@ def test_second_sees_leftover(
 
 Both tests pass, and that is the problem:
 `test_second_sees_leftover()` only passes because `test_first_write()` ran first and left its entry behind.
-Swap the two functions' order in the file and `test_second_sees_leftover()` fails,
-since nothing has written `"seen"` yet.
+If you swap the two functions' order in the file,
+`test_second_sees_leftover()` fails, since nothing has written `"seen"` yet.
 Keep session fixtures to values nothing modifies, like `bank_name`,
 or to a resource with its own reset,
 and leave anything a test mutates at the default per-test scope.
@@ -607,7 +607,7 @@ def test_roll_returns_known_value(
 `import random` binds the one module object every importer shares,
 so `dice.random` and `random` are the same object and the patch replaces `randint()` process-wide.
 `monkeypatch` restores the original when the test ends,
-and that restoration is what makes a process-wide patch safe.
+and that restoration makes a process-wide patch safe.
 
 Seeding the generator with `random.seed(0)` makes the sequence repeatable,
 though you must record the values it produces rather than choose them.
@@ -639,11 +639,12 @@ and its match with the stubbed value in `test_dice.py` is a coincidence:
 as with any seed, you record the value it gives you rather than pick one.
 
 Injection is not free.
-The `rng` or `now` parameter must appear on every function between the caller and the code that needs it,
-which several calls deep in a real codebase means widening a signature all the way up the call stack,
-or introducing a context object to carry it.
+The `rng` or `now` parameter must appear on every function between the caller and the code that needs it.
+When that code sits several calls deep in a real codebase,
+you widen every signature along the way,
+or introduce a context object to carry the parameter.
 `monkeypatch` skips that plumbing: it patches the name in place,
-at the cost of the global, restore-on-teardown patch shown above.
+at the cost of a process-wide patch that stands until teardown restores the name.
 Choose injection when the parameter already sits near the boundary.
 Choose `monkeypatch` when threading it through would touch more code than the test is worth.
 
@@ -699,9 +700,9 @@ Both tests check the same arithmetic.
 The injected one runs with no `monkeypatch`,
 and its signature says where the time comes from.
 
-`datetime.now()` is harder to patch,
-because `datetime` is an immutable C type that rejects attribute assignment,
-so the injection approach is worth the small effort.
+`datetime.now()` is harder to patch:
+`datetime` is an immutable C type that rejects attribute assignment.
+That makes the injection approach worth the small effort.
 
 If you cannot change the code,
 the library [`time-machine`](https://github.com/adamchainz/time-machine)
@@ -777,7 +778,7 @@ def test_current_temp(
 and that statement binds `urlopen` in `weather`'s own namespace,
 so `weather.urlopen` is the name the call site reads and the name to patch.
 Patching `urllib.request.urlopen` instead would leave `weather`'s copy untouched.
-The rule covers both cases: patch the name the calling code looks up.
+One rule covers both import forms: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
 

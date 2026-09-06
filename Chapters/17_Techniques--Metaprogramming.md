@@ -75,7 +75,7 @@ and makes a class with an unimplemented abstract method refuse instantiation.
 `enum.EnumType` builds each `Enum` subclass,
 turning every class-body assignment into a member and making `for c in Color` walk them.
 Iterating a class is behavior on the class object,
-and a metaclass is what puts behavior there; an ordinary class cannot.
+and a metaclass puts behavior there; an ordinary class cannot.
 
 You rarely need a metaclass.
 It is a fascinating tool and tempting to use,
@@ -214,7 +214,7 @@ Each generated class is a real type, not a label.
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`: they are distinct subclasses,
 and `isinstance()` tells them apart.
-The next section shows what a distinct subclass buys: behavior of its own.
+The next section shows what a distinct subclass gives you: behavior of its own.
 
 The type checker cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
@@ -330,14 +330,13 @@ LightOn 8:00
 ```
 
 The schedule names three of the seven declared event types.
-`EventMakers` builds only those three,
-which is the laziness the section promised: seven classes declared, three built.
+`EventMakers` builds only those three: seven classes declared, three built.
 
 `run_events()` puts the type distinction to work.
 It fetches the `RingBell` class through `_event_maker`,
 the same lookup `load_schedule()` uses,
-and marks every event `isinstance()` recognizes as one with a leading `* `.
-That is the behavior the earlier claim promised:
+and marks every event `isinstance()` recognizes as a `RingBell` with a leading `* `.
+That is the behavior a distinct subclass adds:
 a generated class doing something a plain string could not.
 
 Calling `Event(class_name, hour, minute)` directly would still produce the right field values,
@@ -365,7 +364,7 @@ which a caller writing `try: ... except KeyError` around a lookup expects.
 `Event._event_maker` starts out holding the seven legitimate event names,
 each paired with the `NOT_CREATED` sentinel as a placeholder.
 Populating that dict reserves the names and builds nothing yet,
-so `EventMakers.__getitem__()` has something to check a `class_name` against before building anything.
+so `EventMakers.__getitem__()` can check a `class_name` against those names before building anything.
 The dict's value type is `EventMaker | NOT_CREATED`,
 naming the sentinel value rather than the generic `sentinel` class,
 so ruling out one member with `maker is NOT_CREATED` leaves `EventMaker` in the other branch.
@@ -431,7 +430,7 @@ and seeds it with `{"Command": Command}` so the generated class can find its bas
 The type checker can't see into the string,
 so `namespace[class_name]` is just `Any` to it.
 `exec()` also drops a `__builtins__` entry into any globals mapping that lacks one,
-and that entry is the second reason the values carry no type more precise than `Any`.
+and that entry is the second reason `namespace` carries the annotation `dict[str, Any]`.
 `cast(Callable[[], Command], ...)` records the actual no-argument signature at the one place that creates the class,
 the same idiom `greenhouse.py` uses for `EventMaker`.
 Unlike `EventMakers`, `make_class()` caches nothing:
@@ -468,8 +467,8 @@ and `inspect.getsource()` raises a `TypeError`,
 because a built-in class carries no source.
 `type()`-built classes fail differently, but just as completely:
 `LightOn` gets `__module__` set to `eager_event_classes` correctly,
-but it lives only in the `makers` dict, never as a module attribute,
-so pickle looks for `eager_event_classes.LightOn` and does not find that either,
+but it lives only in the `makers` dict, never as a module attribute.
+Pickle therefore looks for `eager_event_classes.LightOn` and does not find that either,
 and `inspect.getsource()` raises an `OSError` instead.
 Neither generator's classes survive a round trip through `pickle`,
 and neither yields source to `inspect.getsource()`,
@@ -672,7 +671,7 @@ def test_runtime_non_final_base_can_be_subclassed() -> None:
 ## Where Enforcement Lives
 
 The last two sections keep circling one question:
-when a rule about a class is enforced, who enforces it, and when?
+who enforces a rule about a class, and when?
 The language devices you have met divide into four families.
 
 `@final` and `@override` are *markers*.
@@ -691,14 +690,14 @@ the synthesized signature, the frozen write-ban, the field-ordering rule.
 The typing specification mandates that model,
 so every conformant checker derives the same class,
 and some rules end up enforced twice, independently.
-Declare a field without a default after one with a default,
-and the checker reports it before anything runs,
+If you declare a field without a default after one with a default,
+the checker reports it before anything runs,
 while the interpreter raises its own `TypeError` at class creation.
 
 A third family carries *two real semantics*.
 `@abstractmethod` makes the checker report an abstract instantiation,
 and separately makes the runtime refuse one.
-`assert_never()` proves exhaustiveness statically and raises at runtime when a lying value reaches it
+`assert_never()` proves exhaustiveness statically and raises an `AssertionError` at runtime when a lying value reaches it
 ([Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) shows both).
 The fourth family runs in the other direction:
 annotations survive into the running program,
@@ -978,7 +977,7 @@ which is why `r.area()` still reports the value set before it.
 A `property` protects one attribute the same way,
 but `Rectangle` would then carry the check twice, once per attribute.
 A descriptor is the reusable form.
-The rule lives in one class, and each attribute that wants it says `Positive()`.
+The rule lives in one class, and each attribute that needs it says `Positive()`.
 
 ## Writing a Metaclass
 
@@ -1237,9 +1236,9 @@ so combining them is impossible in any context.
      proselint.Very exists to catch. -->
 <!-- vale proselint.Very = NO -->
 The `# type: ignore` comment appears because ty knows this rule statically.
-Its `instance-layout-conflict` check reports at check time the very `TypeError` this example exists to demonstrate at run time.
+At check time, its `instance-layout-conflict` check reports the very `TypeError` this example exists to demonstrate at run time.
 A type checker that predicts a crash before the program runs is static typing at its best.
-The comment suppresses the diagnostic only because raising that crash is educational.
+The comment suppresses the diagnostic only because provoking that crash is educational.
 <!-- vale proselint.Very = YES -->
 
 A metaclass can multiply inherit like any other class,
@@ -1419,7 +1418,7 @@ so an ordinary method would receive the class name as its `self` and leave `base
 producing a `TypeError` that says nothing about the real mistake.
 No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
-by which time the duplicate has already won. ruff's own report of the same mistake is the static half of the check,
+by which time the second definition has overwritten the first. ruff's own report of the same mistake is the static half of the check,
 and the `# noqa: F811` suppresses it so the listing can run.
 `__prepare__()` catches it at run time, including on names the body computes.
 
@@ -1482,14 +1481,14 @@ Python keeps type annotations (a.k.a. type hints) at runtime,
 attached to the function and evaluated on demand,
 the deferred evaluation of PEP 649,
 even though it [never checks them](08_Foundations--Static_Types.md#hints-are-not-enforced-at-run-time).
-`signature()` requests that stored data (not the original source text)
+`signature()` reads that stored data (not the original source text)
 to build the `Signature` object.
 The `ALL_DUNDERS` listing in [The Tool in Use](#the-tool-in-use)
 shows that machinery on a class:
 `__annotate_func__` is the code that computes the annotations,
 and `__annotations_cache__` holds the result after the first request.
 
-`display_object()` is built from three of these functions:
+`display_object()` combines three of these functions:
 `getmembers_static()` finds the members, `signature()` renders each method,
 and `get_annotations()` supplies the declared types.
 The next section describes what it does with them.
@@ -1524,7 +1523,7 @@ so all of them carry the tag.
 In [Comparing Ordinary Classes and Data Classes](12_Techniques--Data_Classes_as_Types.md#comparing-ordinary-classes-and-data-classes),
 `classvar_dataclass.py`'s `show(D)` tags both `D.x` and `D.s`,
 even though `D` declares them directly, because neither belongs to an instance.
-For an instance, the tag distinguishes storage borrowed from the class from storage that lives on the object,
+For an instance, the tag says whether the value lives on the class or on the object,
 the same rule `Stars.rating` demonstrates in [Class Attributes](09_Foundations--Class_Attributes.md#class-attributes-are-not-default-values).
 `class_with_defaults.py`'s `show(B())`, from that same chapter 12 comparison,
 tags `B.x` and `B.s`,
@@ -1627,7 +1626,7 @@ each time someone calls the finished class.
 The rest of `display_object()` is presentation:
 how it formats what `inspect` reports, and which members it shows.
 That belongs to the tool rather than to metaprogramming,
-so it is collected here.
+so this section collects it.
 Read it when a listing's output raises a question, and skip it otherwise.
 
 ### Building `display_object()`

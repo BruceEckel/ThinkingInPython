@@ -108,7 +108,7 @@ which advances a counter, so no static default can supply it.
 `field(init=False)` leaves `number` out of the generated `__init__`.
 The generated `__init__` calls `__post_init__` as its last step,
 when `blackboard`, `x`, and `y` already hold their values,
-so it fills in `number` and logs the rat's start.
+so `__post_init__` fills in `number` and logs the rat's start.
 
 The maze is a grid of characters.
 A `*` is a wall and a space is an opening.
@@ -453,8 +453,8 @@ the model-view split of [Observer](30_Patterns--Observer.md#a-visual-example-of-
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
-It records that order by subclassing `Blackboard` and overriding `claim()`,
-so the model itself needs no change.
+`rats_view.py` records that order by subclassing `Blackboard` and overriding `claim()`,
+so the model needs no change.
 The code is in `Examples/38_Patterns--Simulation/rats_and_mazes/rats_view.py`.
 The harness skips it, like every windowed view in this book.
 
@@ -463,7 +463,7 @@ Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
 Nothing runs at the same instant as anything else,
 and no thread or process ever overlaps another,
-so the design buys no throughput a single-threaded worklist would lack.
+so the design buys no speed over a single-threaded worklist.
 A plain stack of frontiers, popped and pushed in a loop,
 visits the same 139 cells.
 What `asyncio` buys is control flow:
@@ -780,24 +780,25 @@ Stage 3 pairs the teleports by target letter.
 The sort by target letter puts each pair of partners side by side.
 `groupby(teleports, key=target)` then walks the sorted rooms in one pass,
 handing each run of matching letters to `pair = list(group)`.
-`assert len(pair) == 2, letter` checks the maze's own promise:
+`assert len(pair) == 2, letter` checks a rule the maze layout must obey:
 every target letter marks exactly two rooms, never one, never three.
-A typo that leaves a letter unpaired, or repeats it a third time, fails here,
-at build time, naming the offending letter,
-instead of leaving a `Teleport` whose `target_room` was never set for the robot to step into later.
+A typo that leaves a letter unpaired, or repeats it a third time,
+fails here at build time, naming the offending letter.
+Without that check the builder would leave a `Teleport` whose `target_room` was never set,
+and the robot would find the mistake by stepping into it.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves that the occupant really is a `Teleport` before the code touches `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
-That is not the type switch polymorphism removes.
+That is not the type switch that polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
 and the movement code that runs afterward never asks again.
 The `Robot` branch also explains `Room(Empty())`:
 the robot is the one item that does not become an occupant.
 Its cell gets an `Empty` occupant instead,
 so when the robot moves away the room behaves like any other empty room.
-`show_maze()` draws the `R` by checking which room the robot holds rather than reading an occupant.
+`show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
 
 ### Choosing the Path
 
@@ -810,10 +811,9 @@ It expands the room reached in the fewest moves first,
 so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it never needs coordinates, only rooms and the moves between them.
-Deciding whether a door is passable is `landing()`'s job,
-and it asks the occupant, the way `Room.enter()` does:
-a `Wall` or an `Edge` blocks, a `Teleport` reports the room it throws you to,
-and anything else is the room itself:
+`landing()` decides whether a door is passable, and it asks the occupant,
+the way `Room.enter()` does: a `Wall` or an `Edge` blocks,
+a `Teleport` reports its target room, and anything else is the room itself:
 
 ```python
 # robot_explorer/solver.py
@@ -856,14 +856,14 @@ def solve(game: GameBuilder) -> str:
 `seen` holds `Room` objects.
 `Room` defines no `__eq__`,
 so it keeps `object`'s identity comparison and identity hash,
-which is what a graph search wants:
+which a graph search needs:
 two rooms holding the same kind of item are still two different places.
 Adding a room to `seen` when it enters the queue, rather than when it leaves,
 keeps a room from entering the queue twice.
 
 Searching changes nothing.
 `solve()` reads doors and occupants and never calls `enter()`,
-so no food is eaten and the robot stays where it started.
+so the robot eats no food and stays where it started.
 The path it returns is exactly the string `run()` expects:
 
 ```python
@@ -933,8 +933,8 @@ print(game.show_maze())
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
 The teleports are not shortcuts here.
-Make `landing()` refuse them the way it refuses a `Wall`,
-and `solve()` raises a `ValueError`:
+If `landing()` refuses them the way it refuses a `Wall`,
+`solve()` raises a `ValueError`:
 without the teleports no route to the `!` exists at all.
 
 ### Testing the Walk
@@ -1279,10 +1279,9 @@ The model has a limit worth naming.
 Run it longer and agitation never stops falling:
 a grain moves roughly five orders of magnitude less per step at 20,000 steps than it did at 100.
 The nodal lines keep thinning as long as the plate shakes,
-so their width in any one run is set by how many steps you ran,
-not by the plate.
+so the number of steps you ran sets their width in any one run, not the plate.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
-Telling the physics from the rule that models it is exercise 7's job:
+Exercise 7 asks you to tell the physics from the rule that models it:
 swap `amplitude()`'s formula for a membrane's,
 and watch which parts of the figure change and which do not.
 

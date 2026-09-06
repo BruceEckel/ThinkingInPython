@@ -105,8 +105,8 @@ The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
 and both the program and the type checker still work:
 `ty` reads the answer type from `Ask`'s base, `Ability[str]`.
-What the accessor buys is a name for the request and one place to state that answer type,
-at the `answer: str` binding inside `ask()`,
+The accessor adds a name for the request and one place to state that answer type:
+the `answer: str` binding inside `ask()`,
 one line above the `Depend[Ask, str]` that repeats it to callers.
 
 That annotation reads `Depend[Ask, str]`, not `Depend[Need[Ask], str]`,
@@ -138,11 +138,12 @@ That second channel in the signature is the one [Effect Management](44_Effects--
 said an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
-An Effect is a generator, so nothing stops you from driving one yourself,
-which `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
+An Effect is a generator, so you can drive one yourself,
+as `hand_driven.py` in [Nothing Runs Yet](46_Effects--Stateless.md#nothing-runs-yet)
 did.
 `next()` on `greet("Alice")` produced a `Need` object carrying the requested type,
-the way `interview()` yielded `"name"`, and `send(Console())` resumed the body,
+the way `interview()` yielded `"name"`.
+`send(Console())` then answered that request and resumed the body,
 which printed the greeting and finished.
 Every tool in the library packages those two calls.
 `handle()` is `drive()` with a type lookup in place of the dictionary,
@@ -344,7 +345,7 @@ def test_batch_due(elapsed: timedelta, due: bool) -> None:
 `at()` builds a handler from a moment,
 so each test freezes its own clock in one line.
 The parametrized case one minute short of a day is the reading a real clock cannot produce on demand.
-Getting it live means starting the test at the right minute,
+Against a real clock you would have to start the test at the right minute,
 but here the margin is a `timedelta`.
 No fixture patches `datetime`, nothing sleeps,
 and each assertion compares values the test chose.
@@ -391,7 +392,7 @@ and the window for the mistake is one second wide.
 
 Using a real clock, you wait for that window and probably miss it.
 Tests that run at nine in the morning cannot see it,
-and the bug report says the log file is occasionally short by a few lines.
+so the only evidence is a bug report saying the log file is occasionally short by a few lines.
 The Ability makes the moment reachable.
 `archive()` does not read a clock.
 It asks for a moment, and a handler decides which moment that is.
@@ -641,7 +642,7 @@ This swaps one during a run, and the consumer cannot tell.
 and its `with` block sits inside the generator body.
 Acquiring and releasing within one Effect works,
 since the block opens and closes between two `yield from` expressions in the same function.
-What you cannot write is an acquisition in one Effect released after a later one finishes,
+What you cannot write is code that acquires a resource in one Effect and releases it after a later Effect finishes,
 a gap that [Running Effects in Parallel](#running-effects-in-parallel) revisits.
 
 One thing stays outside the types.
@@ -762,7 +763,7 @@ The test asserts on the cell it built itself,
 so nothing needs resetting between tests and two tests can run in either order.
 `spree()` and `purchase()` are the same functions the run above used.
 
-For a number one function owns, a local variable is the right tool,
+When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
 The pair pays off when separate functions share the cell,
 as `purchase()` and any other spender would,
@@ -1055,7 +1056,7 @@ and a reader who prefers it is not making a mistake.
 Two differences outlast the size argument.
 The by-hand signature, `(Feed, Encyclopedia) -> str`,
 mentions none of the three failures,
-so a fourth one can arrive with nothing to tell the caller.
+so a fourth failure can arrive with nothing in the signature to tell the caller.
 And the handling interleaves with the logic:
 `research_and_report()` decides both what to do about a failure and what to say about it.
 The Effect version separates those,
@@ -1185,7 +1186,7 @@ print(type(missing).__name__)
 with the same upcasting annotations.
 Its result type is the union `report()` earned by naming all three errors,
 and this listing names none of them at the catch.
-Two failures from two different sources come back as values through one undecorated call.
+Two failures from two different sources come back as values through one `catch_all()` that names no error type.
 
 `outcome()` supplies first and catches second, the reverse of `scenarios.py`,
 and neither the runtime nor the type checker minds.
@@ -1815,7 +1816,7 @@ listing the overloads it failed to match.
 Supply first, then fork.
 
 That restriction is the only one `ty` enforces.
-It says nothing about a declared error,
+`ty` says nothing about a declared error,
 and every one of those same four overloads drops it.
 [Where the Guarantee Stops](#fork-drops-the-error-channel) covers that hole.
 
@@ -1889,8 +1890,9 @@ which is the description/execution split in table form.
 The rule has a reason, and the reason has a cost.
 `run()` is `asyncio.run(run_async(effect))`,
 building a fresh event loop for the call and tearing it down after.
-Call it from inside a loop already running, the shape of any async web handler,
-and `asyncio.run()` raises before your Effect runs at all:
+If you call it from inside a loop already running
+(the shape of any async web handler),
+`asyncio.run()` raises a `RuntimeError` before your Effect runs:
 
 ```python
 # run_cost.py
@@ -1934,7 +1936,7 @@ print(f"run() at least 50x slower: "
 
 `run_async()` reuses the loop already running and costs almost nothing beyond the Effect itself.
 `run()` pays for a loop's setup and teardown on every call,
-hundreds of times that cost, measured here.
+hundreds of times what `run_async()` costs.
 From synchronous code there is no loop to reuse,
 so `run()` is the only option and the cost is unavoidable.
 From inside one, `run_async()` is both the one that works and the one that is fast.
@@ -2061,14 +2063,14 @@ The named pair reports what the rest of the chapter has been reading:
 `half` still needs an `Ask`, and `full` needs nothing.
 The nested expression reports `Unknown`, which is `ty` declining to answer.
 `Unknown` is assignable to anything,
-so `run()` accepts a nested expression whatever is still unanswered inside it,
-and the missing handler surfaces at runtime rather than at the check.
+so `run()` accepts a nested expression no matter which Abilities remain unanswered inside it,
+and you learn about the missing handler at runtime rather than at the check.
 That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
 Keep the habit generally:
 a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
 
-Name the stages and the subtraction is checked,
+If you name the stages, the type checker verifies the subtraction,
 including where you answer only part of what an Effect declares.
 Here `supply()` answers one `Need` of two:
 
@@ -2119,7 +2121,7 @@ Nesting those calls loses this diagnostic, the way nesting lost the type above.
 
 The library's types ask the type checker a hard inference question,
 and where the type checker gives up, it gives up quietly.
-Trust a green check only where a red one has shown you it can appear.
+Trust a green check only where you have seen the same construct produce a red one.
 
 ### 3. Handlers cannot capture the continuation
 
@@ -2142,7 +2144,7 @@ Declining to invoke it makes the handled scope produce the handler's value inste
 which is how an exception behaves.
 Invoking it repeatedly gives you backtracking and search.
 Stateless offers only the first, a *tail-resumptive* handler.
-The ceiling is the substrate rather than the design.
+The ceiling comes from Python rather than from the library's design.
 A Python generator is one-shot, so a handler has nothing to resume twice.
 
 Two pieces of the library show that ceiling.
@@ -2179,7 +2181,8 @@ ZIO's `ZLayer` is a constructor that can read configuration, fail, and retry,
 and it resolves a dependency graph at compile time,
 reporting a cycle or a missing provider by name.
 Stateless has no equivalent, so you write the wiring at the edge by hand,
-and the type checker verifies a `supply()` call for completeness but not for how you assembled it.
+and the type checker verifies that a `supply()` call is complete,
+but says nothing about how you assembled the graph.
 The operator set is thin in the same way.
 The library has `retry()` and `repeat()`,
 and `Schedule` offers a fixed interval and a repeat count,

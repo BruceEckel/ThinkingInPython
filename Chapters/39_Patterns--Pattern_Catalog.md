@@ -16,7 +16,7 @@ and [State Machine](31_Patterns--State_Machines.md) are one such pair.
 State changes an object's behavior when its internal state changes.
 State Machine drives an object through a fixed set of states in response to inputs.
 A design rarely needs both at once.
-The body of this book argues that a number of them are unnecessary in Python
+The body of this book argues that a number of these patterns are unnecessary in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables follow each source's own grouping,
@@ -28,8 +28,8 @@ A few idioms below belong to no single source.
 This chapter groups them by what they share instead:
 language idioms tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
-What that grouping leaves over sits in Other Patterns and Idioms,
-the catalog's remaining grab-bag.
+What those three groups leave over sits in Other Patterns and Idioms,
+the catalog's grab-bag.
 Each table lists its rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
@@ -38,7 +38,7 @@ An unlinked name means the book has no section on that pattern.
 ## Finding a Pattern by Problem
 
 The tables below group by source.
-Use this one when you know the problem but not the name.
+Use this section's table when you know the problem but not the name.
 
 | If the problem is | Look at |
 |-------------------|---------|
@@ -202,7 +202,7 @@ Use this one when you know the problem but not the name.
 | Curiously Recurring Template Pattern (CRTP) | Parameterize a base class by the subclass that inherits from it. |
 | Marker Interface | Tag a class with an empty interface to signal a capability. |
 | Mixin | Add reusable behavior through multiple inheritance. |
-| Pointer to Implementation (Pimpl) | Hide a class's implementation behind a pointer so changing it recompiles less. |
+| Pointer to Implementation (Pimpl) | Hide a class's implementation behind a pointer so changing the implementation does not force clients to recompile. |
 | [Resource Acquisition Is Initialization (RAII)](15_Techniques--Context_Managers.md) | Acquire a resource in a constructor and release it in the destructor. |
 
 ## Functional Idioms

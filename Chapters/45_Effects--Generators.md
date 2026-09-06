@@ -175,7 +175,7 @@ the same three-part shape as a `Generator`, and the match is deliberate.
 Calling `interview()` returns a generator object but runs nothing in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
-A generator is the more useful of the two here because the driver can be yours.
+A generator is the more useful of the two here because you write the driver.
 A coroutine's requests go to the event loop.
 A generator's go to whatever code calls `send()`.
 The generator yields a value out, and the caller sends a value back in.
@@ -222,7 +222,7 @@ if __name__ == "__main__":
 
 The generator arrives by import, unchanged.
 Only the driver is new.
-The first line of output is `interview()`'s product:
+The first line of output describes what `interview()` produced:
 an ordinary `generator` object that still carries the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
 so the `# type: ignore` on that line suppresses the type checker's complaint.
@@ -239,7 +239,7 @@ belongs outside.
 
 The type checker verifies only two of those three parameters.
 `StopIteration.value`'s type is `Any`,
-so a type checker accepts `return stop.value` whatever `drive()` declares it returns.
+so a type checker accepts `return stop.value` no matter what return type `drive()` declares.
 The `Result` in `drive()`'s signature states the intent.
 Nothing verifies it.
 
@@ -254,7 +254,7 @@ That is an EMS in miniature.
 The generator declares Effects, the driver interprets them.
 
 One generator, one driver.
-Nothing states that pairing, but the runtime protects it:
+No annotation states that pairing, but the runtime enforces it:
 a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
 shows the failure and `threading.synchronized_iterator()`,
@@ -305,13 +305,14 @@ so the line delegating to `one()` contributes one value and the line delegating 
 The target decides how many values each delegation contributes.
 The `from` is what delegates.
 Without it, `yield one()` would hand the generator object itself to the driver as a single value.
-"Exhausted" describes where the delegation ends, not when.
+"Exhausted" describes where the delegation ends,
+not when the driver receives each value.
 Each value still leaves the inner generator only when the driver asks for the next one.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
 and the driver still receives one flat sequence.
-`top()`'s single `yield from` finishes only after every generator beneath it has.
+`top()`'s single `yield from` finishes only after every generator beneath it has finished.
 
 ### The Return Channel
 
@@ -398,9 +399,8 @@ The numbers travel down to the `yield` that asked for them.
 `both()` needs no forwarding code of its own,
 because `yield from` does the forwarding.
 
-`g.send(2)` supplies alpha's second value.
-That lets `collect("alpha")` finish, finishing completes the first `yield from`,
-and completing it starts the second.
+`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish.
+That finish completes the first `yield from`, so `both()` starts the second.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` runs out of delegations.
 
@@ -592,7 +592,8 @@ the `finally` block runs, and the generator ends.
 Nothing prints the `GeneratorExit` itself,
 because `close()` swallows it once the generator finishes.
 
-A generator that catches `GeneratorExit` and yields again instead of letting it end the frame breaks `close()`:
+A generator can catch `GeneratorExit` and yield again instead of letting it end the frame.
+Doing so breaks `close()`:
 
 ```python
 # throw_and_close_gotcha.py
@@ -619,16 +620,17 @@ except RuntimeError as e:
 so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
 A driver like `task_runner()`, further down,
 must call `close()` on every generator it abandons,
-so this is the failure mode to avoid in a generator meant to be driven by others.
+so a generator meant to be driven by others must let `GeneratorExit` end it.
 
-`StopIteration` splits the same way.
-Both catch it and both take `stop.value`, but they hand it to different places.
+`StopIteration` divides `drive()` and `yield from` along that same line.
+Both catch it and both take `stop.value`,
+but they hand that value to different places.
 `drive()` returns the `Result` to its own caller, ending the conversation.
 `yield from` feeds it to the enclosing generator as the value of the expression,
 after which that generator keeps running.
 
 `yield from` composes descriptions and a driver interprets them.
-A program can hold any number of the first and needs one of the second,
+A program can hold any number of descriptions and needs one driver,
 at its outermost edge.
 
 ## The Driver You Already Use

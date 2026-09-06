@@ -39,8 +39,8 @@ rewriting, and adding.
 
 I know some people don't like AI.
 Without it, this book wouldn't exist.
-The book is free, so if AI bothers you more than the resulting product might benefit you,
-please ignore this book.
+The book is free, so if AI bothers you more than the book might benefit you,
+please ignore it.
 
 Using Claude made me realize how many compromises I've made on books in the past.
 I would get a good idea about something
@@ -58,7 +58,7 @@ but have never had the capacity to flesh out in all its myriad detail.
 With Claude and my directing and rewriting, I can build my ideal book.
 
 Using Claude greatly simplified and sped the writing process.
-It did not make it trivial.
+Claude did not make that process trivial.
 Once Claude had translated and integrated my own work into the book,
 and once it had generated the first versions of new material,
 I went through line by line and concept by concept,
@@ -125,7 +125,7 @@ If you already know Python, you can skim for topics you don't know,
 or skip it altogether.
 If you skip Part I, come back for [Static Types](08_Foundations--Static_Types.md):
 every chapter after it annotates its examples,
-and it is the one Part I chapter the rest of the book assumes.
+and Static Types is the one Part I chapter the rest of the book assumes.
 
 Part II, *Techniques*,
 covers the idioms and tools that give Python its character: testing,
@@ -197,10 +197,10 @@ until then they only mark lines a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
-A run of markers shows everything the code above it printed since the previous run,
+A group of markers shows everything the code above it printed since the previous group,
 in order.
 Output from inside a loop, or from an `import`,
-therefore appears in the run of markers after the loop or the `import`,
+therefore appears in the group of markers after the loop or the `import`,
 not next to the line that produced it.
 A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build verifies these markers against a real run,
@@ -219,7 +219,7 @@ already-working example from that chapter and observe the result: add a class,
 break an invariant on purpose, extend a table, rewrite one function two ways.
 The point is to touch the code, predict what it does, then run it and check.
 A few chapters in the Patterns part keep larger exercises,
-where a pattern only shows its value in a program you build yourself.
+because a pattern shows its value only in a program you build yourself.
 
 Solutions live in the `Solutions/` directory of the source repository.
 Try the exercise yourself before reading the solution.
@@ -246,7 +246,7 @@ Other resources:
 ## Copyright
 
 © 2026 Bruce Eckel.
-This book is licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en):
-you may share it unchanged, with attribution, for noncommercial use.
+This book carries a [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en)
+license: you may share it unchanged, with attribution, for noncommercial use.
 It is freely readable online; no reproduction without permission.
 The source repository's `CONTRIBUTING.md` has the details.

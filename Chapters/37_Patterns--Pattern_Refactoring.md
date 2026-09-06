@@ -86,9 +86,10 @@ Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.m
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
-`create()` is a class method reading `cls.registry`,
-the form [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
-warns can mislead: `Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
+`create()` is a class method reading `cls.registry`.
+[Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+warns that this form can mislead:
+`Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
 The lookup is safe here because every subclass writes to `Trash.registry` and none defines a `registry` of its own,
 so `cls.registry` always resolves to that one table.
 Call it as `Trash.create()`.
@@ -253,8 +254,8 @@ so `assert_never()` has nothing to check against here.
 This `match` runs over an open set,
 which [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against.
-A sorter over an open set has to find the bin without naming any type,
-and the next section shows one that does.
+A sorter over an open set must find the bin without naming any type,
+and the next section builds one.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you do dispatch's job by hand.
 A `case _:` wildcard could catch what the named cases miss:
@@ -321,7 +322,7 @@ Nothing failed.
 The parser built two `Plastic` objects, the sorter matched neither,
 and the report totals the trash it recognized.
 Two of four pieces reached a bin,
-and the sixty pounds of plastic left no trace in any total on which the plant acts.
+and the sixty pounds of plastic never appeared in the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
 The leak is in the `match`.
@@ -379,8 +380,8 @@ The `defaultdict(list)` creates a bin the first time a material turns up.
 so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
-Point this sorter at `plastic.dat`, the file that defeated `recycle_rtti.py`,
-defining `Plastic` the same way `plastic_dropped.py` did:
+Point this sorter at `plastic.dat`, the file that defeated `recycle_rtti.py`.
+The listing defines `Plastic` the same way `plastic_dropped.py` did:
 
 ```python
 # recycle_dict_plastic.py
@@ -419,7 +420,7 @@ unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 
 So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
-and the two ordinarily pull against each other:
+and a design that makes new types cheap ordinarily makes new operations expensive:
 that trade is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
 
 Here is the requirement that makes the second axis concrete.
@@ -590,8 +591,8 @@ A third question and a fourth cost one more file each,
 where `note_methods.py` charges one edit per material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
-Python still has the expression problem.
-It makes both sides of the problem cost a line instead of an edit spread across classes.
+Python still has the expression problem,
+but both sides now cost a line instead of an edit spread across classes.
 
 `singledispatch` is for behavior that differs by type.
 The earlier `sum_value()` does the same thing for every type,
@@ -605,9 +606,9 @@ The chapter now holds two kinds of dispatch that disagree about subclasses.
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
 so that same piece answers with `Aluminum`'s note.
-Each is right for its job,
-and the difference is the one [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
-draws between a table keyed by class and dispatch that follows inheritance.
+Each is right for its job.
+[Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+draws the same distinction between a table keyed by class and dispatch that follows inheritance.
 
 ## Choosing the Lightest Construct
 

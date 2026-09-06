@@ -58,7 +58,8 @@ export_svg("Circle")
 ```
 
 Adding a `Triangle` means finding and editing `render()`, `preview()`,
-and `export_svg()`, and any call site the search misses keeps building only `Circle` and `Square`,
+and `export_svg()`.
+Any call site the search misses keeps building only `Circle` and `Square`,
 with no error to signal the gap.
 The rest of this chapter replaces call sites like these with a single place that knows about every shape.
 
@@ -167,7 +168,7 @@ To discourage direct construction of the concrete shapes,
 give them module-level names with a leading underscore:
 a convention rather than concealment
 ([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case).
-`shape_factory1.py` keeps the plain names because `shape_name_gen()` passes `cls.__name__` unchanged to `factory()`.
+`shape_factory1.py` keeps the plain names because `shape_name_gen()` passes each class's `__name__` unchanged to `factory()`.
 An underscore in the class name would have to appear in the `case` strings too.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
@@ -233,7 +234,8 @@ Typing `kind` as the closed `Literal` instead of `str` moves a bad name from a r
 the same trade [Abstract Factories](#abstract-factories)
 makes with a `Protocol`.
 `Kind` names the two members `SHAPES` already has,
-so widening the type checks that the dictionary stays in sync with it.
+and the checker rejects a key that `Kind` does not list,
+so `SHAPES` cannot gain a shape name the `Literal` lacks.
 `registry.py`, below, cannot take the same fix:
 its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
 and a closed `Literal` would need editing on every new subclass,
@@ -324,7 +326,8 @@ with no error to signal it.
 `make()` stays a module-level function for two reasons.
 A `@classmethod` reading `cls.registry` would carry that same hazard,
 and it would make `Circle.make("Square")` legal as well as misleading,
-since the lookup has nothing to do with the class you call it on.
+since the key decides what `make()` builds,
+not the class you name before the dot.
 A method of any kind would also put back the factory method this section set out to remove.
 
 Testing confirms that every subclass registers itself,
@@ -462,7 +465,7 @@ Use a separate factory class when object creation needs work beyond calling a co
 such as pooling, caching, or consulting external configuration.
 
 You could eliminate `FACTORIES` by dispatching through `eval(f"{kind}.Factory()")`.
-That is unnecessary and it makes thing worse.
+That is unnecessary and it makes things worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
 or a command line can hand it arbitrary code instead of a shape name.
@@ -529,7 +532,7 @@ and the reason the pattern is named for a method rather than for a class.
 The price is a second hierarchy.
 Each product needs a creator that produces it,
 so the two hierarchies grow together.
-That price buys something only when the creator does work of its own,
+The second hierarchy is worth having only when the creator does work of its own,
 as `render()` does here.
 When choosing the class is the creator's only job,
 the dictionary in `shape_table.py` says the same thing with no hierarchy at all.
@@ -557,7 +560,7 @@ Here's how it might look using an abstract factory:
 and each concrete factory declares one method per hierarchy.
 `KittiesAndPuzzles` always pairs a `Kitty` with a `Puzzle`,
 `WarriorsAndWeapons` always pairs a `Warrior` with a `Weapon`,
-and those two products are the matched pair `GameEnvironment.play()` relies on.
+and `GameEnvironment.play()` depends on getting such a matched pair.
 Choosing the factory chooses both halves at once:
 
 ```python
@@ -634,7 +637,7 @@ but the types of characters and obstacles depend on the kind of game you're play
 You determine the kind of game by choosing a particular `GameElementFactory`,
 and then the `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
-but the initial conditions and the state change can determine much of a game's outcome.
+but the initial conditions and the way the state changes can determine much of a game's outcome.
 `GameEnvironment` has no place to vary the rules of play,
 so a real game would add one: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
@@ -655,7 +658,7 @@ The exception appears only when `GameEnvironment.__init__()` calls the placehold
 An `@abstractmethod` reports the missing method earlier,
 when you create the instance,
 the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
-A *Protocol* names the required methods with no base class to inherit from,
+A *Protocol* names the required methods and needs no base class,
 which simplifies the Abstract Factory:
 
 ```python

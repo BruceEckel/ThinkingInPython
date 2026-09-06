@@ -1,6 +1,6 @@
 # Template Method
 
-Application frameworks build new applications by reusing existing classes and overriding methods to customize behavior.
+An application framework lets you build a new application by reusing its existing classes and overriding methods to customize behavior.
 At the heart of a framework is the *Template Method* of *GoF Design Patterns*:
 a method, defined in the base class,
 that drives the application by calling other base-class methods,
@@ -68,9 +68,9 @@ rather than your code calling into a library.
 Only the type checker enforces `@final`.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
-If the interpreter should refuse an override,
+If you want the interpreter to refuse an override,
 the `__init_subclass__()` technique from [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final)
-also works with methods, raising an exception when `"run" in cls.__dict__`.
+also works with methods, and raises an exception when `"run" in cls.__dict__`.
 
 The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
@@ -85,7 +85,8 @@ That is why every step override in these listings carries `@override`:
 the type checker then rejects a method that overrides nothing.
 
 The checker sees only the decorator.
-Leave `@override` off the misspelled method and the checker accepts it as a new method.
+If you leave `@override` off the misspelled method,
+the checker accepts it as a new method.
 No typing construct forbids a subclass from adding methods,
 so the checker cannot catch this case.
 The interpreter can.
@@ -164,10 +165,10 @@ except TypeError as e:
 
 `hooks` collects every non-dunder name the base classes define,
 including `run` itself.
-A name that matches `run` exactly is rejected outright:
+`__init_subclass__()` rejects a name that matches `run` exactly:
 `class Hijack` never finishes,
-because letting a subclass replace the anchor would defeat it,
-and `@final` only stops that replacement for the type checker.
+because a subclass that replaces the anchor moves the algorithm out of the base class,
+and `@final` stops that replacement only for the type checker.
 A name that matches a step, `customize1` or `customize2`,
 is an ordinary override, and a name that resembles none of them,
 like `report()`, is an ordinary new method.
@@ -222,8 +223,8 @@ A framework *can* call `run()` from its own constructor,
 but then a subclass with its own `__init__()` falls into a trap.
 Because `run()` calls methods the subclass supplies,
 the subclass must finish its own setup before it calls `super().__init__()`.
-Call `super().__init__()` first, in the usual style,
-and the engine runs on a half-initialized object:
+Calling `super().__init__()` first, in the usual style,
+runs the engine on a half-initialized object:
 
 ```python
 # premature_engine.py
@@ -311,7 +312,7 @@ The name, the parameters, and the return type all match the base,
 so `@override` is satisfied and `ty` reports nothing.
 The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
-Every one of these breaks corrupts the anchored algorithm.
+Each of these failures corrupts the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten".
 The Template Method works only when every subclass is a faithful substitute for its base.
@@ -356,7 +357,7 @@ passing functions is lighter and avoids a class hierarchy.
 The subclass form also gets optional steps without extra work,
 since the base supplies the `...` default.
 The function form must give each parameter a default of its own:
-omit `customize2` above and the call raises a `TypeError` instead.
+omitting `customize2` above raises a `TypeError` instead.
 
 The function version also needs no `@final`.
 That decorator stops an override only when the type checker runs.

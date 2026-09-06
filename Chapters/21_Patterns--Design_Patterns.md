@@ -53,7 +53,7 @@ and a good abstraction does more than hide those details.
 It erases them.
 Code outside the boundary cannot recover information the boundary discards,
 so a caller that turns out to need an erased detail cannot work around the interface.
-Someone must reopen it.
+Someone must reopen the interface.
 The art of design lies in guessing well about which details you can hide and which you must expose.
 
 Erased details are also where scaling limits come from.
@@ -74,7 +74,7 @@ you have the focal point around which to structure your design.
 
 You discover a vector of change.
 You do not predict it.
-Guessing at it up front often builds complexity for flexibility in a direction nobody uses.
+Guessing at it up front often adds complexity to allow flexibility in a direction nobody uses.
 The second time a requirement shifts the same part of the design,
 you have evidence.
 
@@ -116,7 +116,8 @@ meaningless outside a language that provides `with`.
 A dictionary mapping one program's shape names to its shape classes is a specific design,
 stage two.
 The same dictionary is a standard design, stage three,
-once each subclass fills it at its own definition so that adding a type never edits the factory
+once each subclass registers itself as its `class` statement runs,
+so adding a type never means editing the factory
 ([Factory](27_Patterns--Factory.md) builds both).
 [Template Method](25_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
@@ -136,7 +137,7 @@ A pattern is often a sign of something missing in a language.
 Programmers wrote the same scaffolding often enough that it acquired a name,
 and the pattern exists because the language leaves that scaffolding for them to write.
 
-A pattern meets its missing piece in two ways.
+A language can supply that missing piece in two ways.
 Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Patterns--Singleton.md)
 shows that a Python module already is one.].
 [Iterator](23_Patterns--Iterators.md#the-pattern-that-disappeared)
@@ -185,8 +186,9 @@ and how much of it becomes functions, data, and protocols?
 each named for the aspect that can vary:
 
 1.  **Creational**: how to create an object.
-    Isolate the details of object creation,
-    and your code stops depending on which object types exist and stays the same when you add one.
+    When you isolate the details of object creation,
+    your code stops depending on which object types exist,
+    and adding a type leaves that code unchanged.
     [Singleton](24_Patterns--Singleton.md) counts as a *Creational* pattern,
     and [Factory](27_Patterns--Factory.md) covers the other four:
     *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
@@ -211,7 +213,7 @@ each named for the aspect that can vary:
     [Memento](36_Patterns--Memento.md),
     [State](26_Patterns--Surrogate.md#state), and *Interpreter*,
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
-    for the reason this section ends with.
+    for the reason that closes this section.
 
 The catalog above is GoF's.
 Patterns from outside it,
@@ -270,7 +272,7 @@ and the rest are here for your own designs.
     Every inconsistency in a design is one more arbitrary rule to remember.
     The more random rules you pile onto the programmer,
     rules that have nothing to do with solving the problem at hand,
-    the slower the programmer can produce.
+    the slower the programmer works.
     The cost does not grow one rule at a time.
     The rules interact.
 -   *Liskov Substitution Principle* (LSP):

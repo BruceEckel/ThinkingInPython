@@ -65,15 +65,16 @@ print(vars(A)["x"])
 #: 100
 ```
 
-The listing subscripts `vars(A)` because a class's dictionary is a read-only `mappingproxy` carrying the compiler's own bookkeeping alongside `x`.
+The listing subscripts `vars(A)` instead of printing it whole,
+because a class's dictionary is a read-only `mappingproxy` that carries the compiler's own bookkeeping alongside `x`.
 The instance dictionary is a plain `dict` holding only what the code assigned.
 
 That instance dictionary is not guaranteed.
 A class declared with `slots=True`
 ([Classes](07_Foundations--Classes.md#properties) shows the trade-off)
 has no instance `__dict__` at all.
-Assigning to a slotted attribute of the same name as a class attribute does not shadow it:
-it raises an `AttributeError` instead,
+A class attribute in such a class cannot be shadowed:
+assigning to that name on an instance raises an `AttributeError`,
 because there is no instance dictionary to write into.
 The rest of this chapter assumes an ordinary class,
 one with an instance `__dict__`.
@@ -125,7 +126,7 @@ A reader debugging `show(b)`'s surprising `5` has to trace back through every ea
 because the shadowing happened inside `sell()`,
 a function `show()` never calls and does not import.
 
-The shadowing rule protects you only while the shared value is immutable:
+The shadowing rule confines a change to one object only while the shared value is immutable:
 
 ```python
 # shared_mutable.py
@@ -228,11 +229,11 @@ It states that instances of this class carry a `label` attribute of type `str`,
 set somewhere.
 Here that somewhere is `__init__()`,
 and its `self.label = label` produced the attribute `display_object(a)` found.
-Leave that assignment out of `__init__()`, and no attribute exists,
+If you leave that assignment out of `__init__()`, no attribute exists,
 on the instance or the class.
 The type checker trusts the annotation rather than checking that some method sets the attribute,
-so the omission passes,
-and the first code that reads the missing `label` raises an `AttributeError`.
+so the check passes.
+The first code that reads `label` raises an `AttributeError`.
 
 The annotation on `label` is optional here.
 If you delete it, `ty` still infers `label: str` correctly from `self.label = label`,
@@ -337,13 +338,12 @@ so it never sees changes made through `Base`.
 `ClassVar` leaves all of that alone:
 it tells the type checker that `shared` belongs to the class,
 and says nothing about whether subclasses share storage.
-That lookup is the shadowing rule from `class_attribute_confusion.py`,
+Attribute lookup on a subclass is the shadowing rule from `class_attribute_confusion.py`,
 one level up: `Left` reads through to `Base` until an assignment gives `Left` its own copy,
 the way `a` reads through to `Stars` until `a.rating = 1`.
 A subclass stands to its base class as an instance stands to its class.
 `Right` writes `shared = 100` without repeating the annotation.
-A subclass overriding a `ClassVar` inherits the declaration along with the name,
-but the bare override drops the type checker's guard.
+A subclass overriding a `ClassVar` inherits the name but not the type checker's guard.
 `ty` rejects `Left().shared = 5` and accepts `Right().shared = 5`,
 so restating `ClassVar[int]` on an override keeps that check.
 
@@ -351,9 +351,10 @@ so restating `ClassVar[int]` on an override keeps that check.
 
 "A subclass stands to its base class as an instance stands to its class" cuts both ways.
 `class_var.py` increments `Tally.total` through the literal class name.
-Write that same increment through `type(self)` instead,
+Writing that same increment through `type(self)`,
 a common idiom for reaching "my own class" from a method,
-and a base class with subclasses forks the counter the same way `Right` forked `shared`:
+forks the counter once the base class has subclasses,
+the same way `Right` forked `shared`:
 
 ```python
 # classvar_fork.py
@@ -473,7 +474,7 @@ covers the details.
 Every attribute question in this chapter reduces to one:
 which dictionary holds the value?
 Assignment answers it,
-and assignment through `self` and assignment through the class name give different answers.
+and the answer depends on whether you assign through `self` or through the class name.
 Decide which you want, then write the declaration that says so:
 `ClassVar` for shared,
 a constructor default or a `@dataclass` field for per-object.

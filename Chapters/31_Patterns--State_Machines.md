@@ -84,7 +84,8 @@ the construction-starts-the-engine choice that [drew a warning in that chapter](
 Two facts make it safe here, and either one is easy to lose in a later edit:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
-Give a `State` a `run()` that reads a machine attribute, and the trap is back.
+If you give a `State` a `run()` that reads a machine attribute,
+the trap is back.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
@@ -276,7 +277,8 @@ and the tables fill in at module level once every state object exists.
 Its `next()` looks the input up in that dict,
 so the `StateMachine` class from the previous example still serves.
 `TableState.__init__()` starts every state with an empty dict.
-Forget to fill one, and the machine reports `Waiting has no transition for ...` rather than an `AttributeError`.
+If you forget to fill one,
+the machine reports `Waiting has no transition for ...` rather than an `AttributeError`.
 The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
 
@@ -408,9 +410,9 @@ Version 2's table holds only the explicit transitions,
 and its `next()` raises an exception on anything else.
 Either answer can be right, so choose it on purpose.
 Staying put suits a machine fed from a noisy source that includes events meant for something else.
-Raising suits a table you are still building,
+Raising an exception suits a table you are still building,
 where a missing entry is a bug to flag,
-and the table-driven engine below raises for the same reason.
+and the table-driven engine below raises an exception for the same reason.
 
 Both listings end with one more call that puts this to the test:
 feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
@@ -446,9 +448,10 @@ A vending machine's inputs carry values: what a coin is worth,
 which digit the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
-An enum would fail here twice: you fix its members when you write it,
+An enum would fail here twice: you set its members when you write it,
 so it can carry only the values you knew about then,
-and every member of one enum arrives under the same dispatch key.
+and every member of one enum shares that enum's class,
+so they would all arrive under the same dispatch key.
 
 The names restart here.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
@@ -508,7 +511,7 @@ class StateMachine:
 
 The listing writes `StateMachine` by hand rather than as a `@dataclass` because a generated `__init__()` cannot rename its parameter,
 and this constructor renames what it stores: the caller passes `initial`,
-but the attribute is `state`, the position `handle()` updates.
+but the attribute is `state`, which `handle()` updates.
 `NoTransition` derives from `RuntimeError`,
 so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
@@ -517,7 +520,7 @@ Their conditions tell them apart.
 The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
-so it belongs last in its group, as the `else` the earlier rows fall through to.
+so it belongs last in its group, as the `else` for the rows above it.
 Without such a row, a group can match nothing:
 when every condition returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
@@ -534,8 +537,8 @@ The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parame
 and no one signature covers them all.
 That `...` costs you a check:
 nothing verifies that a row's condition and action accept the event class its key names.
-Pair a `SecondDigit` key with a method written for a `FirstDigit`,
-and the table type-checks clean and does the wrong thing at runtime.
+If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
+the table type-checks clean and does the wrong thing at runtime.
 
 ### A Vending Machine
 
@@ -721,12 +724,12 @@ Both conditions are now true, and `too_expensive` sits first in that row's list,
 so it wins: the machine reports `COLLECTING`,
 as though a dollar more would sell it,
 when the slot is empty and no amount of money would.
-Swap the row order and the same input would report `UNAVAILABLE` instead.
+If you swapped the row order, the same input would report `UNAVAILABLE` instead.
 That is the cost of the ordering rule stated above:
 a row lower in the list can never override one above it,
 even when the lower row is the one that matters.
 
-`__init__()` builds the table, rather than the class body,
+The table goes in `__init__()` rather than in the class body,
 because each entry is a bound method:
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
@@ -803,7 +806,8 @@ def test_no_transition_raises() -> None:
 ```
 
 Because the actions set `vm.message` instead of printing,
-the model draws nothing, and the same machine can drive more than one view.
+`VendingMachine` produces no output of its own,
+and the same machine can drive more than one view.
 The text demo in `vending_machine.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
 which prints its input from inside the framework.
@@ -815,13 +819,13 @@ Using `tkinter`, you can build a GUI for the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen.
 The coin and item buttons turn presses into events for `handle()`,
 and the GUI catches a click that the state machine rejects
-(a selection before any money, say) and shows it rather than crashing.
+(a selection before any money, say) and shows a message rather than crashing.
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
 the late-binding trap from [Function Objects](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
 The three fixed buttons above use lambdas safely,
 since they close over nothing that varies.
-Because it requires user interaction, the harness skips it
+Because this listing requires user interaction, the harness skips it
 (`tools/data/norun.txt`):
 
 ```python
@@ -921,7 +925,7 @@ gathered in that state, or the whole machine's, gathered in one table.
 A machine small enough to hold in your head goes either way,
 and a machine that arrived as a diagram belongs in the table.
 
-Both designs also cost you a dependency you did not take.
+Both designs also cost you what a library would supply.
 Mature libraries such as `transitions` and `python-statemachine` add guards,
 callbacks, and hierarchical states for the price of an import.
 Choose one of the two designs here when you cannot take that dependency,

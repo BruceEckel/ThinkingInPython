@@ -123,7 +123,8 @@ for item in mixed:
 Mixing types is convenient but easy to overuse.
 A `list` of mixed types usually means each element needs different handling.
 A `tuple`, a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes),
-or distinct lists, each holding a single type, express that better.
+or distinct lists, each holding a single type,
+express those differing roles better.
 
 Two list operations produce surprises.
 `*` repeats a reference rather than copying what it points at,
@@ -157,16 +158,16 @@ print(xs)
 #: [2, 4]
 ```
 
-Each `remove()` slides the next element into the vacated slot,
-and the loop's index has already moved past that slot,
-so the loop skips that element.
-No exception reports the skip.
-That is why half of `xs` survives.
+Each `remove()` slides the following elements one place to the left,
+and the loop then advances its index,
+so it steps over the element that moved into the vacated slot.
+Skipping every other element leaves half of `xs`,
+and no exception reports the skip.
 Build a new list instead, or iterate over a copy with `for x in xs[:]`.
 
-The usual way to build a list from another one is a *comprehension*,
-a single expression that builds the new list,
-rather than a loop with `append()`.
+The usual way to build a list from another one is a *comprehension*:
+a single expression that produces the new list,
+in place of a loop with `append()`.
 [Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces it,
 and [Comprehensions](16_Techniques--Comprehensions.md)
 explores every form in depth.
@@ -265,8 +266,8 @@ A tuple holding many values of one type is instead an immutable `list`.
 
 A dictionary (`dict`) maps keys to values, with fast lookup.
 Lookup computes a *hash* from each key:
-an integer derived from the key's contents,
-which Python reduces to the slot where the entry lives.
+an integer derived from the key's contents.
+Python reduces that integer to the slot where the entry lives.
 So keys must be *hashable*.
 Strings, numbers, and tuples of hashable values are hashable;
 the mutable built-in containers (`list`, `dict`, `set`) are not,
@@ -304,12 +305,13 @@ Iterating the `dict` iterates `keys()`, so `for name in ages` walks the names.
 `items()` alone yields `(key, value)` pairs,
 and leaving it off is a common slip:
 `for name, age in ages` iterates the keys and tries to unpack each one.
-Here that raises a `ValueError`, since `"Alice"` has more than two characters.
+Unpacking `"Alice"` into two names raises a `ValueError`,
+since the string has more than two characters.
 A two-character key such as `"Bo"` would unpack into its letters and the loop would run on.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable:
-each supports `&`, `|`, `-`, and `^` directly,
-against another dict's view or against any set.
+each supports `&`, `|`, `-`,
+and `^` against another dict's view or against any set.
 
 ```python
 # dict_views.py
@@ -320,7 +322,7 @@ print(ages.keys() & other.keys())  # Set algebra on a view
 #: {'Bob'}
 ```
 
-The Sets section, next, names every one of these operators.
+The next section, on sets, names every one of these operators.
 
 A `dict` iterates in insertion order, and the language guarantees that order.
 
@@ -346,15 +348,16 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 the same job `update()` does.
 The next section uses `|` for set union,
 where the order of the operands makes no difference.
-Here it does: on a key both dictionaries hold, the right operand's value wins,
-so `"y"` comes out as `20`.
+For dictionaries the order matters: on a key both dictionaries hold,
+the right operand's value wins, so `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
-and `dict()` accepts those from any source.
+and any iterable that yields such pairs will do.
 `zip()` pairs up two sequences element by element.
 [Control Flow](04_Foundations--Control_Flow.md#loops)
 covers it with the other loop tools.
 
-Mutating a `dict` while iterating it does not fail silently the way `remove_while_iterating.py`'s `list` does:
+Mutating a `dict` while iterating it raises a `RuntimeError` instead of quietly skipping elements,
+as `remove_while_iterating.py`'s `list` does:
 
 ```python
 # dict_iteration_trap.py
@@ -368,8 +371,8 @@ except RuntimeError as e:
 #: dictionary changed size during iteration
 ```
 
-A `set` raises the same way,
-with `RuntimeError: Set changed size during iteration`.
+A `set` raises the same exception,
+with the message `Set changed size during iteration`.
 Only the `list` hides the mistake; the `dict` and the `set` both shout it.
 
 ## Sets
@@ -452,10 +455,10 @@ Single elements move in and out with `add()`, `remove()`, and `discard()`.
 `discard()` stays silent.
 
 Repeated lookups run faster against a `set` than against a `list`.
-A `list` compares against every element in turn.
+A `list` compares the item you are looking for against every element in turn.
 A `set` computes one hash and looks in one place.
 `timeit()` runs a callable `number` times and returns the total elapsed seconds.
-The `lambda:` prefix wraps an expression into the callable it needs
+The `lambda:` prefix wraps an expression into the callable `timeit()` needs
 ([Functions](05_Foundations--Functions.md#lambdas) covers `lambda` fully):
 
 ```python
@@ -479,18 +482,20 @@ print(large_gap > small_gap)  # The gap widens
 ```
 
 Searching the `list` is O(n) and searching the `set` is O(1),
-so the gap widens without limit as `n` grows:
-`large_gap` comes out bigger than `small_gap`,
-not the same ratio at ten times the size.
-The probe value is missing on purpose: that is the `list`'s worst case,
-a scan of all `n` elements before it gives up.
+so the gap widens without limit as `n` grows.
+At ten times the size the ratio is bigger rather than the same,
+so `large_gap` comes out bigger than `small_gap`.
+The probe value is missing on purpose:
+searching for an absent item is the `list`'s worst case,
+since the scan compares all `n` elements before reporting `False`.
 
 A timing depends on the machine that took it,
 so every measured listing in this book prints a comparison rather than a number.
 `report()` comes from a small helper the book supplies.
-By default it prints the comparison alone; run the listing with `--numbers`
+By default the listing prints the comparison alone.
+Running it with `--numbers`
 (see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine))
-and it prints the two times it measured as well.
+adds the two numbers it compared.
 
 ## Specialized Containers
 
@@ -524,9 +529,10 @@ print(Counter("aab") - Counter("ab"))  # Multiset diff
 
 A missing key counts as zero rather than raising a `KeyError`,
 and `most_common()` returns the highest counts first.
-`+`, `-`, `&`, and `|` work between two counters too,
-the same set-algebra vocabulary the Sets section just built,
-now reading as multiset sum, difference, minimum, and maximum.
+`-`, `&`, and `|` work between two counters as well,
+the same operators the Sets section just used,
+now reading as multiset difference, minimum, and maximum.
+A fourth operator, `+`, sums the counts of both counters.
 
 ### `defaultdict`
 
@@ -566,11 +572,11 @@ so touching a missing key grows it.
 Use `in` or `dict.get()` when you only want to look.
 Here, `list` produces a fresh empty list for each new key.
 
-A plain `dict` has a second option, `setdefault()`:
-`plain.setdefault(kind, []).append(name)` returns the existing value for a present key,
-and for a missing key stores the default and returns that.
-The `[]` argument builds an empty list on every call, used or not,
-and every place that touches the dictionary must repeat the whole expression.
+A plain `dict` has a second option, `setdefault()`.
+`plain.setdefault(kind, []).append(name)` returns the list already stored under `kind`;
+when `kind` is missing, it stores the new `[]` and returns that instead.
+The `[]` argument builds an empty list on every call, used or not.
+Every place that touches the dictionary must also repeat the whole expression.
 A `defaultdict` states the default once, where you create the dictionary.
 
 ### `deque`
@@ -695,10 +701,10 @@ For a record that must be mutable, use a data class
 compares all three.
 
 The standard library has more specialized containers.
-For compact homogeneous storage (`array`),
-a zero-copy view onto another object's memory (`memoryview`),
+[Performance](18_Techniques--Performance.md) covers compact homogeneous storage
+(`array`), a zero-copy view onto another object's memory (`memoryview`),
 binary search in a sorted `list` (`bisect`), and a heap-backed priority queue
-(`heapq`), see [Performance](18_Techniques--Performance.md).
+(`heapq`).
 
 ## Immutability
 
@@ -707,9 +713,9 @@ A `tuple` is an immutable `list`, and a `frozenset` is an immutable `set`.
 Since Python 3.15, `frozendict` ([PEP 814](https://peps.python.org/pep-0814/))
 completes the trio: a built-in,
 hashable mapping that rejects changes after creation.
-The example below uses tuples and frozensets,
-plus `MappingProxyType` from the `types` module,
-a read-only *view* onto a `dict` you still hold rather than a container of its own:
+`MappingProxyType`, from the `types` module,
+is a read-only *view* onto a `dict` you still hold, not a container of its own.
+The example below uses it along with tuples and frozensets:
 
 ```python
 # immutable_containers.py
@@ -777,22 +783,23 @@ except TypeError as e:
 #: 'frozendict' object does not support item assignment
 ```
 
-Because a `frozendict` cannot change, it is hashable when its values are,
-so like a `tuple` or a `frozenset` it can be a dictionary key or a set member.
+Because a `frozendict` cannot change, it is hashable when its values are.
+Like a `tuple` or a `frozenset`,
+it can then be a dictionary key or a set member.
 A dictionary key must be hashable, though it need not be immutable.
 Immutability is how a container earns a stable hash.
 
 Use the immutable form whenever a container should not change after you build it.
-Neither you nor code you pass it to can add, remove,
+Neither you nor the code that receives it can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
 An immutable container is safe as a default argument,
 unlike the mutable default in [Functions](05_Foundations--Functions.md#default-arguments).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
-so changes to that underlying `dict` still show through,
-as in `immutable_containers.py`,
-where writing to `settings` changes what `config` reports.
+so changes to that `dict` still show through.
+In `immutable_containers.py`,
+writing to `settings` changes what `config` reports.
 
 Immutability is also shallow.
 An immutable container fixes which objects it holds,
@@ -818,8 +825,8 @@ except TypeError as e:
 ```
 
 The `tuple` holds the same `list` for its whole life,
-that `list` stays free to change,
-and a container holding an unhashable object is itself unhashable.
+and that `list` stays free to change.
+A container holding an unhashable object is unhashable too.
 Immutability pays off when it goes all the way down.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same leak inside a frozen data class.
@@ -829,7 +836,7 @@ Ordered items you walk through are a `list`.
 A fixed record whose positions mean different things is a `tuple` or a `namedtuple`.
 Lookup by key is a `dict`.
 Uniqueness and membership are a `set`.
-Go past those four only when a measurement or a specific job says to,
+Go past those four only when a measurement or a specific job calls for it,
 and freeze whichever you pick as soon as it stops changing.
 
 ## Exercises

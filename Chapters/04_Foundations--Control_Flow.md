@@ -118,7 +118,7 @@ then stops at `6` with `break`, so `6` through `9` never print.
 Both apply to the innermost enclosing loop.
 Python has no labeled `break`, so leaving two loops at once means either a flag,
 a `return` from a function that holds both loops,
-or the loop `else` technique that follows `loop_else.py`.
+or the loop `else` technique that `nested_break.py` shows below.
 
 `print()` ends with a newline by default.
 `end=" "` replaces that newline with a space, so the numbers print on one line,
@@ -170,7 +170,8 @@ This `else` is also how you leave two nested loops at once:
 put `continue` in the inner loop's `else` and a `break` right after it.
 When the inner loop `break`s,
 Python skips its `else` and the outer `break` runs.
-When it finishes clean, the `continue` moves the outer loop along instead:
+When the inner loop runs to the end,
+the `continue` moves the outer loop along instead:
 
 ```python
 # nested_break.py
@@ -195,10 +196,12 @@ locate(9)
 #: not found
 ```
 
-`locate(3)` finds `3` in the first row, `break`s the inner loop,
-so its `else` never runs and the outer `break` fires right after.
-`locate(9)` never breaks either loop,
-so both `else` clauses run and `"not found"` prints.
+`locate(3)` walks the first row to the end,
+so the inner `else` runs its `continue` and the outer loop moves on to the second row.
+There the `3` matches, the inner `break` skips the `else`,
+and the outer `break` fires right after.
+`locate(9)` breaks neither loop,
+so the inner `else` continues on each row and the outer `else` prints `"not found"`.
 
 `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
@@ -223,7 +226,8 @@ for index, name in enumerate(names):
 `enumerate()` yields `(index, item)` pairs counting from zero,
 and the loop here unpacks each pair into `index` and `name`.
 `for i in range(len(names)):` with `names[i]` inside does the same job,
-but that form names the index and looks the item up again on every line that needs it.
+but that form names the index and not the item,
+so every line that needs the item repeats the `names[i]` lookup.
 `enumerate()` hands you both.
 `zip()` walks several sequences at once:
 
@@ -286,10 +290,11 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#lists)
-hit it while removing from a list,
-and the two containers you are most likely to mutate this way behave differently.
-The fix below uses a list comprehension, [Comprehensions](#comprehensions)
-later in this chapter,
+hit it while removing from a list.
+Lists and dictionaries are the two containers you are most likely to mutate this way,
+and each one fails differently.
+The fix below uses a list comprehension,
+covered in [Comprehensions](#comprehensions) later in this chapter,
 to build the filtered list directly instead of mutating in place:
 
 ```python
@@ -365,7 +370,7 @@ Avoid the name, though: a reader must work out which meaning applies.
 
 Python signals an error by *raising* an exception.
 As in C++ and Java, an exception propagates up the call stack until it finds a handler.
-One that finds none stops the program and prints the traceback.
+An exception that finds no handler stops the program and prints the traceback.
 In Python, a handler is `except` followed by the exception type it handles.
 You can give only the type, or add an `as` to capture the exception object,
 as in `except ValueError as e`:
@@ -407,7 +412,7 @@ divide_and_report(1, 1)
 #: finally always runs
 ```
 
-`checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through,
+`checked_divide()` raises a `ValueError` rather than letting Python's own `ZeroDivisionError` through.
 Raise your own exception that way when the caller should hear about the bad argument rather than the failed arithmetic.
 
 The optional `else` runs when the `try` block raises no exception,
@@ -436,11 +441,11 @@ so the caller sees only `"swallowed"` with no trace of the exception.
 
 Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,
-including the `KeyboardInterrupt` you press to stop a runaway program,
-so a mistake in the `try` block looks like an expected failure.
+including the `KeyboardInterrupt` you press to stop a runaway program.
+It also catches a bug in the `try` block and makes it look like an expected failure.
 `except Exception:` is the broad catch you want instead:
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
-so they travel past it and still stop the program.
+so they travel past that clause and still stop the program.
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
 Python tries the `except` clauses in order and runs the first whose type matches,
@@ -448,7 +453,7 @@ so a broad clause above a narrow one makes the narrow one unreachable.
 Order them most specific first.
 To log an exception and still let it propagate, re-raise it with a bare `raise`.
 
-An exception raised while handling another one arrives with the first attached.
+Raising an exception while handling another attaches the first exception to the new one.
 Python reports both, and `from` decides how the two connect:
 
 | Form | What Python prints above the new exception |
@@ -598,7 +603,7 @@ path.unlink()  # Delete the file
 ```
 
 The exception propagates, but the `with` closes the file first.
-`f` is still in scope afterward, and that is how the listing can check it:
+`f` is still in scope afterward, so the listing can print `f.closed`:
 a `with` statement creates a guarantee about the exit, not a scope.
 
 Closing the file is cleanup that runs whether or not the block succeeds.

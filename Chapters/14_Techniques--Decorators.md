@@ -76,8 +76,9 @@ cheese()
 #: Some more work
 ```
 
-A decorator that forgets its `return wrapper` binds `cheese` to `None`,
-and the failure surfaces at the next call to `cheese()`,
+A decorator that forgets its `return wrapper` returns `None` instead,
+so Python binds `cheese` to `None`.
+The failure surfaces at the next call to `cheese()`,
 not at the decoration that caused it.
 
 The decorator runs when Python executes the `def`,
@@ -198,11 +199,11 @@ a `Callable` need not have a `__name__` attribute, though every function does.
 
 `trace` assumes `func` runs to completion inside the call that invokes it,
 which is true of an ordinary function and false of an `async def` function.
-Decorating a coroutine function raises no exception:
+Decorating a coroutine function raises no exception.
 `func(*args, **kwargs)` returns a coroutine object immediately,
-without running the coroutine's body, so `result` is that coroutine object,
-not the value it will eventually produce,
-and the trace line prints `<- add = <coroutine object add at 0x...>`.
+without running the coroutine's body,
+so `result` holds that coroutine object rather than the value the coroutine will eventually produce.
+The trace line then prints `<- add = <coroutine object add at 0x...>`.
 A wrapper over a coroutine function must itself be `async def` and `await func(*args, **kwargs)`,
 the shape covered in [`async def`, `await`, and the Event Loop](19_Techniques--Concurrency.md#asyncio-mechanics).
 
@@ -282,9 +283,9 @@ Only now does `decorate`'s own body run, including its `@wraps(func)` line.
 `@wraps(func)` is the same two-step pattern one level down:
 call `wraps(func)` to get a decorator, then apply it to `wrapper`.
 The inner decoration runs inside the outer one,
-so the two `@` lines are two separate calls rather than one recursive call,
-and the nesting stops at two levels,
-matching the two nested `def`s in the source.
+so `@repeat(times=3)` and `@wraps(func)` are two separate applications of the same two-step pattern,
+not one recursive call.
+The nesting stops at two levels, matching the two nested `def`s in the source.
 
 Forgetting the parentheses is the common mistake here.
 `@repeat` without them calls `repeat(greet)`,
@@ -401,11 +402,11 @@ so `label` returns `decorate` for Python to apply to `two`.
 The two `@overload` declarations tell the type checker the same story the runtime branch tells:
 given a function, `label` returns a function of the same signature;
 given only keyword arguments, it returns a decorator.
-The implementation's own signature satisfies both,
-so its return type widens to `Any`,
-which the overloads narrow back down at every call site.
+The implementation must satisfy both overloads,
+so it declares the widest return type, `Any`,
+and the overloads narrow that back down at every call site.
 
-This idiom assumes nothing else callable can land in that first position.
+This idiom assumes that only the decorated function can arrive in that first position.
 Where a decorator's own argument could itself be callable,
 checking `func is None` instead of `callable(func)` removes the ambiguity.
 
@@ -432,7 +433,7 @@ def test_decoration_with_arguments() -> None:
 
 ## Stacking Decorators
 
-Another decorator can wrap a wrapper that keeps the wrapped interface.
+A decorator can wrap the wrapper another decorator produced.
 Decorators stack, nesting from the bottom up:
 
 ```python
@@ -711,7 +712,8 @@ def test_repeat_rejects_times_below_one(times: int) -> None:
 ### A Limitation: Methods Need a Descriptor
 
 The class form has one limitation:
-an instance that replaces the function fails on methods.
+a method decorated this way becomes an instance rather than a function,
+and the call then fails.
 `trace` and `count_calls` above decorated bare functions on purpose:
 
 ```python
@@ -746,7 +748,8 @@ A `logged` instance has no `__get__()`,
 so `ex.method` hands back the instance unbound,
 and `ex.method(5)` really calls `logged.__call__(logged_instance, 5)`.
 `self.func` runs with `5` as its only argument,
-and the `Ex` instance never arrives.
+so `5` fills `method`'s own `self` parameter and leaves nothing for `x`.
+The `Ex` instance never arrives.
 The `TypeError` blames a missing `x`,
 with no hint that the real cause is a missing `__get__()`.
 [Metaprogramming](17_Techniques--Metaprogramming.md#learning-a-name-with-__set_name__)
@@ -922,7 +925,7 @@ if __name__ == "__main__":
 #: 63
 ```
 
-`report` requires a callable and nothing more about where `func` came from.
+`report` requires a callable; where `func` came from does not matter.
 Calling it directly, instead of through `@`, decorates the `lambda` in place.
 `@` is convenient sugar for the common case of decorating a fresh `def`,
 not a requirement.
@@ -963,9 +966,10 @@ a module-level constant computed the ordinary way reads better.
 
 Classes collapse the same way.
 [Singleton](24_Patterns--Singleton.md#singleton-by-class-decorator)
-decorates a class with a callable that stands in for it,
-constructing one instance on the first call and returning that same one afterward,
-so the name that follows `class` refers to an object, not a type.
+replaces a class with a callable object that stands in for it:
+the first call constructs one instance,
+and every later call returns that same instance.
+The name that follows `class` then refers to an object, not a type.
 
 ## The Decorator Pattern
 

@@ -151,7 +151,8 @@ In generator terms, `__enter__()` is the portion before the `yield`.
 
 `Trace` is also reusable: the same instance can appear in a second `with`,
 because `__enter__()` just runs again.
-The generator form cannot; that is the single-use caution from `trace_gen.py`.
+A generator manager cannot appear in a second `with`;
+that is the single-use caution from `trace_gen.py`.
 A class manager that stores per-`with` state stays reusable only if `__enter__()` resets that state.
 
 The generator form is usually the clearest choice.
@@ -238,12 +239,12 @@ except ValueError as error:
 ```
 
 `KeyError('original')` never reaches the `except`.
-`Careless.__exit__()` raises before `with` can propagate it,
-so the `ValueError` from cleanup is what the caller sees.
+`Careless.__exit__()` raises a `ValueError` before `with` can propagate the `KeyError`,
+so the caller sees the cleanup's failure instead of the block's.
 Python does not discard `original`: it becomes `error.__context__`,
 the same chaining a nested `except` produces.
 A broken cleanup path that hides the real failure is one of the most common context-manager bugs in practice,
-so write `__exit__()` methods that only fail for reasons worse than the exception they are cleaning up after.
+so write `__exit__()` methods that fail only for reasons worse than the original exception.
 
 ## The `__exit__()` Arguments
 
@@ -401,8 +402,8 @@ which makes `ignore()` with no argument catch everything.
 and the earlier `if exc_type is None: return False` narrowed `exc_type` to a class,
 so `issubclass(exc_type, self.types)` type-checks.
 
-`suppress` reads the same call the opposite way:
-`suppress()` with no argument suppresses nothing,
+`suppress` treats the no-argument call the opposite way:
+`suppress()` suppresses nothing,
 because a raised exception has no listed type to match.
 An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
 so name the types you expect unless you really want a block that nothing escapes.
@@ -623,9 +624,9 @@ wrap(["a", "b", "c"])
 `wrap()` finds out how many managers to enter when it runs,
 and a comma-separated `with` cannot express that.
 
-`wrap()` never has a failing entry, so `ExitStack`'s own promise,
-unwinding whatever already entered when a later one fails,
-has not actually run yet.
+`wrap()` never has a failing entry,
+so it never exercises `ExitStack`'s other guarantee: when a later entry fails,
+the stack unwinds whatever already entered.
 Fail the third manager and watch the first two unwind while the third's `__exit__()` never runs at all:
 
 ```python
@@ -659,9 +660,9 @@ except RuntimeError as error:
 ```
 
 `c` never gets a `close c` line,
-because its `__enter__()` raised before `ExitStack` could register it.
+because its `__enter__()` raised a `RuntimeError` before `ExitStack` could register it.
 `a` and `b` already entered, so both unwind in reverse,
-the same guarantee a single manager gives its own partial work.
+the same rule a comma-separated `with` follows.
 
 ## The `contextlib` Toolkit
 
@@ -680,7 +681,7 @@ Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 A function might write to a path it opens itself,
 to a stream the caller hands it, or to standard output by default.
-The function should close only the first of those when it finishes.
+When it finishes, the function should close the file it opened and leave the caller's stream and standard output open.
 `nullcontext` lets a single `with` block serve all three cases:
 
 ```python
@@ -842,8 +843,8 @@ It only tracks custody.
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and a return makes an item available.
-Hand the same pool to several threads,
-and it becomes the throttle that limits concurrent use,
+When several threads share one pool,
+the queue becomes the throttle that limits concurrent use,
 the way a real database connection pool does.
 Here it is under real contention:
 eight threads share a pool of two connections and lease and release two hundred times each.
@@ -888,8 +889,8 @@ Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` never climbs past two:
 a thread that arrives while the pool is empty blocks in `get()` instead of racing past it.
-`over capacity` staying `False` is `Queue`'s blocking doing the throttling,
-not the demo assuming it.
+`over capacity` stays `False` because `Queue`'s blocking does the throttling,
+and the demo measures that rather than assuming it.
 `available()` is a snapshot for the demo, not a synchronization primitive:
 `Queue.qsize()` is only approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
@@ -937,7 +938,7 @@ such as lazily creating items on first demand,
 validating an item before lending it out,
 and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
 
-None of those refinements guard the mirror mistake:
+None of those refinements guard against the opposite mistake:
 nothing in `Pool` stops a borrower from keeping a reference after the `with` block ends,
 then using it once the lease has moved on to someone else.
 The pool hands out the same object again, not a copy,
@@ -978,7 +979,7 @@ Not every setup and teardown pair needs a context manager at all.
 One used exactly once, in one place,
 is often clearest as a plain `try`/`finally` written inline.
 Write a manager once you want the `with` syntax at the call site,
-or once the same setup and teardown needs to be reused elsewhere.
+or once several places need the same setup and teardown.
 
 Four forms give you a context manager, once you have decided you want one.
 Try them in this order.

@@ -39,9 +39,9 @@ The range usually quoted is `-5` through `256`, but each build picks its own.
 This one caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
 The listing parses each value from a string for a reason.
-The compiler pools equal constants within one code object, so with literals,
-`low, low2 = 256, 256`, even `100000 is 100000` prints `True`,
-and that sharing comes from the pooling rather than from the integer cache.
+The compiler pools equal constants within one code object, so with literals
+(`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
+That sharing comes from the pooling, not from the integer cache.
 Parsing at runtime keeps the compiler out,
 so any sharing that remains comes from the cache.
 (That pooling is also why Python warns about `is` on a literal.)
@@ -166,8 +166,8 @@ so the untrusted boundary is `to_symbol()`,
 the one place raw text meets the checked type.
 It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
 The type checker reads that guard too.
-`SPECS` has key type `Symbol`, so past the guard `char` is a key of `SPECS`,
-the checker narrows it to `Symbol`,
+`SPECS` has key type `Symbol`, so past the guard `char` is a key of `SPECS`.
+The checker narrows it to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a `cast()` would assert
 (see [Static Types](08_Foundations--Static_Types.md#typing-decorators-and-directives)).
@@ -263,8 +263,9 @@ When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore defines no `__init__()`.
-The call still reaches `object.__init__()`,
-which accepts and ignores the three arguments because this class overrides `__new__()` and not `__init__()`.
+The call still reaches `object.__init__()`.
+`Color` overrides `__new__()` and not `__init__()`,
+so that inherited `__init__()` accepts the three arguments and ignores them.
 That rules out `@dataclass`,
 whose generated `__init__()` reintroduces the re-run.
 The damage is invisible at first,
@@ -285,7 +286,7 @@ and building a `Color` needs the three components,
 so `_pool` stays a plain dict with an explicit `get()`.
 
 `_pool` keys on the components alone, and every subclass shares the one dict,
-so a subclass and `Color` asking for the same components receive whichever object asked first.
+so a subclass and `Color` asking for the same components both receive the object the first call built.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
 The two forms differ in one guarantee.
@@ -440,9 +441,9 @@ Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
 `__new__()`, not `__init__()`, must assign `_value_`.
-The lookup table behind `Tile(".")` keys on the value `__new__()` establishes,
-so setting `_value_` later, in `__init__()`,
-leaves that table keyed by the tuples.
+Enum reads `_value_` as soon as `__new__()` returns,
+so an `__init__()` that assigns `_value_` later comes too late:
+the lookup table behind `Tile(".")` stays keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,
@@ -455,8 +456,8 @@ Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and protection against inventing a tile kind that does not exist.
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case,
-and leaving one out reports the gap at the type checker,
-before any `Tile` value reaches the code at runtime:
+and if you leave one out,
+the type checker reports the gap before any `Tile` value reaches the code at runtime:
 
 ```python
 # tile_enum_match.py
@@ -488,7 +489,7 @@ error[invalid-return-type]: Function can implicitly return
 ```
 
 The missing `Tile.ROCK` case is the gap;
-add it back and the diagnostic disappears with no other change.
+adding it back makes the diagnostic disappear with no other change.
 The cost is flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The table-driven state machine in [State Machines](31_Patterns--State_Machines.md#table-driven-state-machine)
@@ -508,8 +509,8 @@ Otherwise use a `@cache` factory, which is the least machinery for the job.
 
 These four answers read as an if/elif chain,
 but the questions behind them are independent.
-Constructor syntax and leak-safety are separate axes,
-so nothing stops `__new__()` interning from also holding its pool weakly:
+Constructor syntax and leak-safety are separate questions,
+so `__new__()` interning can hold its pool weakly too:
 key the `WeakValueDictionary` on the constructor arguments the way `interned_color.py` keys `_pool`,
 the combination Exercise 5 builds.
 Combine mechanisms when more than one requirement applies.
@@ -522,9 +523,9 @@ A column of a million country names stores small integer codes that index into a
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
 In every case the benefit is the same:
-memory proportional to the number of distinct values, not the number of uses,
-and, for a type where every instance comes from the pool,
-equality checks you can write as `is`.
+memory proportional to the number of distinct values, not the number of uses.
+When every instance of a type comes from the pool,
+you can write its equality checks as `is`.
 
 ## Exercises
 

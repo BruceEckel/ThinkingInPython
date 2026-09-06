@@ -6,8 +6,8 @@ scope and `global`, `*args`/`**kwargs`,
 positional-only and keyword-only parameters, and lambdas.
 
 The `def` keyword defines a function.
-It is followed by the function name and parameter list,
-and a colon to begin the function body:
+After `def` come the function name, the parameter list,
+and a colon that begins the function body:
 
 ```python
 # a_function.py
@@ -50,8 +50,8 @@ not for the interpreter, which ignores its value.
 [Metaprogramming](17_Techniques--Metaprogramming.md#the-inspect-module)
 reads it back with `inspect.getdoc()`.
 
-Here the function signature specifies only the function name and the parameter names,
-but no argument types or return types
+The signatures so far give only the function name and the parameter names,
+with no argument types or return types
 ([Static Types](08_Foundations--Static_Types.md#type-hints) covers these).
 Python is dynamically typed,
 so type errors surface at runtime rather than at compile time.
@@ -110,7 +110,8 @@ except TypeError as e:
 ```
 
 A function argument works as long as the function can apply its operations to it.
-The failure comes from `+`, inside the call, not from the call itself.
+The failure comes from `+` inside the function body,
+not from the call that passed the arguments.
 Nothing checks the arguments on the way in.
 
 ## Default Arguments
@@ -140,8 +141,8 @@ and the last call still names it.
 At the call site, write every keyword argument after the positional ones.
 `connect(port=80, "web.example.com")` is a `SyntaxError`:
 `positional argument follows keyword argument`.
-The grammar has corners this chapter leaves alone,
-and writing the arguments in that order stays clear of all of them.
+The grammar allows a few rarer arrangements that this chapter leaves alone,
+and keeping the keyword arguments last avoids every one of them.
 
 A parameter with a default cannot come before one without.
 `def f(a=1, b):` is a `SyntaxError`:
@@ -149,8 +150,9 @@ A parameter with a default cannot come before one without.
 [Keyword-only parameters](#positional-only-and-keyword-only-parameters)
 are exempt, because the caller names them.
 
-Python evaluates a default value once, at function definition.
-So all calls share one mutable default:
+Python evaluates a default value once, when it executes the `def`,
+so every call shares that one object.
+A mutable default therefore carries changes from one call to the next:
 
 ```python
 # mutable_default.py
@@ -221,7 +223,7 @@ Mutating an argument reaches outside the function.
 Rebinding one does not.
 
 `good_append()` builds a fresh list on every call,
-which the function must do whenever it mutates that parameter.
+and any function that mutates such a parameter must do the same.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
 Calls still share that tuple,
@@ -253,11 +255,11 @@ such a parameter reads:
 
 The `None` default in `good_append()` is a *sentinel*:
 a value chosen to mean "the caller passed nothing" rather than to serve as data.
-Test it with `is None` rather than truthiness:
+Test the parameter with `is None` rather than truthiness:
 `if not target:` also discards an empty list the caller passed on purpose.
 
-`None` works there because `None` carries no meaning for `target`.
-When `None` is itself a valid argument, you need a distinct marker.
+`None` works there because no caller would pass `None` as a real `target`.
+When `None` is a valid argument, you need a distinct marker.
 Python 3.15 ([PEP 661](https://peps.python.org/pep-0661/))
 adds a `sentinel` builtin that creates a unique self-describing value for this purpose:
 
@@ -338,9 +340,10 @@ and that is why `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
 the same idea one scope in.
 A function that rebinds a global couples every caller to that shared,
-mutable state: [Closures](40_Functional--Foundations.md#closures)
+mutable state.
+[Closures](40_Functional--Foundations.md#closures)
 and [Effect Management](44_Effects--Effect_Management.md#what-is-an-effect)
-both treat a mutable global as the anti-pattern this leads to.
+both treat a mutable global as an anti-pattern.
 
 ## Variable Argument Lists
 
@@ -412,7 +415,7 @@ and `func.__name__` reads the name of whatever function arrived
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
 Forwarding an arbitrary `**kwargs` can still collide with a name the wrapped function already receives.
-If the dictionary being unpacked has a key matching a parameter supplied another way,
+If the unpacked dictionary has a key matching a parameter supplied another way,
 Python raises a `TypeError`:
 
 ```python
@@ -435,17 +438,17 @@ except TypeError as e:
 #: report() got multiple values for argument 'label'
 ```
 
-`opts` carries a `"label"` key, and `trace()` forwards it as `label=`,
-but `report()` already receives `1`, the first of `nums`,
-as `label` positionally through `func(*args, **kwargs)`.
-The collision surfaces at the call `trace()` makes,
-not at the call into `trace()` itself,
-so the wrapper cannot check for it in advance.
+`opts` carries a `"label"` key, and `trace()` forwards it as `label=`.
+The same `func(*args, **kwargs)` call spreads `nums` positionally,
+so `report()`'s first parameter, `label`, also receives `1`,
+and no parameter can take two values.
+The error arrives one level down, when `trace()` calls `report()`,
+so the wrapper cannot check for the clash before it makes that call.
 
 ## Positional-Only and Keyword-Only Parameters
 
-Two markers in a parameter list control how callers may pass arguments,
-and that control decides how much of a signature you commit to keeping:
+Two markers in a parameter list control how callers may pass arguments.
+That control also decides how much of a signature you commit to keeping:
 a parameter a caller can name is part of the contract,
 and a parameter a caller must pass by position stays outside it.
 A `/` ends the *positional-only* parameters.
@@ -494,12 +497,12 @@ except TypeError as e:
 ```
 
 The `True` in the first `tally()` call joins `values` like any other positional argument.
-The named form, `total=True`, is what reaches `total`.
+Only the named form, `total=True`, reaches `total`.
 
 Calling `divide(a=10, b=2)` is an error,
 because `a` and `b` are positional-only.
 The full message ends by naming the offenders, `'a, b'`.
-The listing trims that tail to fit.
+The listing's two `partition()` calls trim the front and that tail to keep the printed line short.
 Calling `make_user("Sue", True)` is an error, because `admin` is keyword-only.
 The type checker catches both mistakes without running the code,
 so each line carries a `# type: ignore` saying the misuse is deliberate.
@@ -518,7 +521,7 @@ f(1, 2, 3, 4, c=5, d=6)
 ```
 
 `a` can only arrive positionally, `c` can only arrive by name,
-and `b` can do either.
+and `b` can arrive either way.
 
 In the standard library,
 many built-in functions and methods take positional-only parameters,
@@ -552,7 +555,7 @@ print(square(9))
 ```
 
 `square = lambda n: n * n` gives up the anonymity that is a lambda's point,
-and `def` would also give the function a real name for tracebacks.
+and the function's name in a traceback stays `<lambda>` where a `def` would show `square`.
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
@@ -560,7 +563,7 @@ For anything more complicated, write a separate function.
 For a key that just reads an index or an attribute,
 `operator.itemgetter`/`attrgetter` name the same operation without a lambda:
 `sorted(words, key=operator.itemgetter(-1))` replaces `key=lambda w: w[-1]` above.
-Write a lambda when the key needs an expression neither builds.
+Write a lambda when the key needs an expression that neither getter builds.
 
 ## Exercises
 

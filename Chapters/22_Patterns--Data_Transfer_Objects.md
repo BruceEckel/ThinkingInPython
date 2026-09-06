@@ -45,8 +45,8 @@ and its output shows that the attributes and the keyword arguments are one dict:
 Because `**kwargs` is the only parameter,
 `Messenger` accepts keyword arguments alone:
 `Messenger("Spam")` raises a `TypeError`,
-with no `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
-needed.
+and the `*` marker from [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
+is unnecessary here.
 Writing `def __init__(self, *, **kwargs)` anyway is a syntax error,
 since a named parameter must follow a bare `*`.
 
@@ -90,7 +90,7 @@ print(m == SimpleNamespace(info="Spam",
 ```
 
 The first `print()` shows the same instance `__dict__` the hand-rolled version has.
-`SimpleNamespace` adds the rest: a readable `repr()` and equality by contents.
+`SimpleNamespace` adds a readable `repr()` and equality by contents.
 `Messenger` prints as `<Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
 because `Messenger` inherits `object`'s identity-based equality.
@@ -129,8 +129,8 @@ A `NamedTuple` declares its fields the same way but produces an immutable record
 `typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
-so a type checker knows a `Color`'s `r` is an `int`,
-where the functional form declares none.
+so a type checker knows a `Color`'s `r` is an `int`.
+The functional form declares no field types.
 Because a `Color` is a tuple underneath,
 you can read each field by name or by position:
 
@@ -176,7 +176,7 @@ The immutability guarantee reaches the fields, not the objects they name.
 A `NamedTuple` holding a list still lets that list change,
 the same leak [`frozen=True` has](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 Such a record is also unhashable, mutated or not,
-because hashing a tuple hashes its contents.
+because hashing a tuple hashes its contents, and a list has no hash.
 An immutable record needs immutable fields.
 
 The leading underscore on `_replace()`, `_asdict()`,
@@ -207,8 +207,8 @@ print(mean, count)
 ```
 
 Without `Stats` you annotate the return as `tuple[float, int]` and return a bare tuple.
-Every caller then owns the knowledge that position 0 is the mean and position 1 is the count,
-knowledge the code no longer states anywhere.
+Every caller must then remember that position 0 is the mean and position 1 is the count,
+a fact the code states nowhere.
 `Stats` names the fields and documents itself at each call site,
 and because a `NamedTuple` is a tuple, you can unpack it.
 

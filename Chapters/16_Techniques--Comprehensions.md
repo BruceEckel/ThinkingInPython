@@ -22,7 +22,7 @@ A list comprehension consists of:
 -   An input sequence.
 -   A variable representing members of the input sequence.
 -   An optional predicate expression.
--   An output expression producing elements of the output list from members of the input sequence that satisfy the predicate.
+-   An output expression that builds one element of the output list from each member that satisfies the predicate.
 
 Several examples in this chapter use the same input list:
 
@@ -95,8 +95,8 @@ The comprehension inlines the test and the expression,
 and its brackets show at a glance that it produces a list.
 `map()` and `filter()` pay off when the function already exists,
 `map(str.strip, lines)` rather than `[line.strip() for line in lines]`.
+So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 [Functional Foundations](40_Functional--Foundations.md) returns to the choice.
-So the `lambda` is what makes `map_and_filter.py` worse, not `map()`.
 
 The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
@@ -233,8 +233,8 @@ print(name_at)
 Inverting assumes the values are unique.
 `Arthur` and `Robin` both sit at seat `1`.
 `Robin`, entered later, overwrites `Arthur` at key `1`,
-the same rule any duplicate dictionary key follows,
-and `Arthur` never appears in `name_at`.
+the same rule any duplicate dictionary key follows.
+`Arthur` never appears in `name_at`.
 
 ## Nested Comprehensions
 
@@ -275,8 +275,8 @@ Every `col` still produces one.
 An `if` after the `for`, as in `[e ** 2 for e in a_list if isinstance(e, int)]`,
 decides *whether* the comprehension produces an element at all.
 The positions are not interchangeable:
-`[x for x in xs if a else b]` is a `SyntaxError`,
-and a comprehension needing both writes them in both places,
+`[x for x in xs if a else b]` is a `SyntaxError`.
+When you need both, write each in its own position:
 `[x if a else b for x in xs if c]`.
 
 Nesting one comprehension inside another builds a list of lists.
@@ -292,7 +292,8 @@ print([x for row in rows for x in row])
 #: [1, 2, 3, 4, 5]
 ```
 
-Get that order backward and `row` is not bound yet when Python evaluates the first `for` clause:
+If you get that order backward,
+`row` is not bound yet when Python evaluates the first `for` clause:
 
 ```python
 # flatten_wrong_order.py
@@ -392,8 +393,9 @@ The assignment to `py_paths` sits inside the `with`,
 but the name is still visible afterward,
 in the `for path in sorted(py_paths):` line below it.
 The comprehension finishes building `py_paths`, as strings,
-while the directory still exists, so by the time that `for` loop runs,
-after the directory has disappeared, nothing needs the files.
+while the directory still exists.
+The `for` loop runs after the directory disappears,
+and by then nothing needs the files.
 Turning those brackets into parentheses would break the program:
 a generator expression would not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
@@ -588,11 +590,11 @@ None of these builds an intermediate collection of a million items,
 and `any()` stops when it finds a match.
 `str.join()` is the exception: it needs two passes,
 one to size the result and one to fill it,
-so it converts its argument to a list first,
-and a generator expression saves nothing over a list comprehension there.
+so it converts its argument to a list first.
+A generator expression therefore saves nothing over a list comprehension there.
 
 A generator expression needs no parentheses of its own when it is a function's only argument.
-If you add a second argument, it does:
+A second argument makes them required:
 `sum(n * n for n in nums, 0)` is a `SyntaxError`,
 and `sum((n * n for n in nums), 0)` is the fix.
 
@@ -640,8 +642,8 @@ print(list(gen))
 `source()` runs as Python builds the generator expression,
 before the line below it prints.
 The output expression waits,
-so the code reads `factor` when `list()` pulls the values rather than at the generator's creation,
-and the answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
+so the code reads `factor` when `list()` pulls the values rather than at the generator's creation.
+The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
 Its outermost iterable, `root.walk()`, would run at creation,

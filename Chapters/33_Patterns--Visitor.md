@@ -113,7 +113,7 @@ and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's typ
 In the classic pattern every element class overrides `accept()`,
 which resolves the element's type.
 Here one inherited `accept()` is enough,
-because the flower's type resolves a step later.
+because the `pollinate()` or `eat()` call resolves the flower's type a step later.
 The last line of output shows both dispatches doing visible work.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 Each registered implementation takes the name `_`.
-`nectar()` calls it through the dispatcher, not by its own name,
+A call to `nectar()` finds that implementation in the dispatch table rather than by its name,
 so the name carries no meaning.
 `_` is the conventional placeholder for a name nobody uses.
 Reusing `_` for every registration is safe:
@@ -278,7 +278,7 @@ The default reaches further than `Flower`, too:
 not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
 The type checker does not object either,
-because the dispatcher `@singledispatch` builds declares its parameters as `Any`.
+because the dispatcher that `@singledispatch` builds declares its parameters as `Any`.
 When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 A forgotten registration then fails at its first call.
@@ -374,8 +374,8 @@ if __name__ == "__main__":
 #: Ranunculus pollinated by Bee
 ```
 
-The recursive call works because `Gladiolus` and `Corsage` both define `accept()`,
-so neither has to know which one it's calling.
+The recursive call works because `Corsage` and `Flower` both define `accept()`,
+so the loop in `Corsage.accept()` calls it without knowing whether an element is a flower or another corsage.
 `flower_gen()` drove the earlier traversal from outside, one flower at a time.
 Here `accept()` drives it,
 the situation where the classic pattern still earns its keep.
@@ -387,13 +387,13 @@ The trade loses nothing.
 The second dispatch in the classic pattern exists not because two types are unknown,
 but because the operation has nowhere else to live.
 The visitor's type stands in for the operation,
-so the language must resolve it at runtime along with the element's type.
+so the language must resolve that type at runtime along with the element's type.
 Once an operation can be a function defined outside the hierarchy,
 calling `nectar()` instead of `fragrance()` selects the operation before anything runs,
 and only the flower's type is still unknown.
 One dispatch covers it.
 
-That is the intent difference the chapter opened with.
+The chapter opened with that difference in intent.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself:

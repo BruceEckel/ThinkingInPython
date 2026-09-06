@@ -16,7 +16,7 @@ The other half is telling callers that the interface they have been using is goi
 When you've got "this", and you need "that", *Adapter* solves the problem.
 The adapter only needs to produce a "that".
 A common real case: a third-party library names its methods `g()` and `h()`,
-your code was written against a `f()`-calling interface,
+you wrote your code against an `f()`-calling interface,
 and you cannot change either one, so an adapter sits between them instead.
 The smallest version puts the adaptation in an object of its own:
 
@@ -61,7 +61,7 @@ so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
 not how you declare the target interface.
-[Surrogate](26_Patterns--Surrogate.md#proxy) compares those two.
+[Surrogate](26_Patterns--Surrogate.md#proxy) compares an ABC with a `Protocol`.
 The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Patterns--Surrogate.md#proxy)":
 *GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
 
@@ -107,9 +107,10 @@ When the output cannot tell them apart, only packaging separates them.
 The three split into two families *GoF Design Patterns* names.
 `ProxyAdapter` is an *object adapter*:
 it holds the adaptee and can wrap any instance handed to it at runtime.
-`WhatIHave2` is a *class adapter*: it inherits from the adaptee,
-which fixes the adapted class at definition time and exposes the adaptee's entire surface,
-`g()` and `h()` included, to every client of the adapter.
+`WhatIHave2` is a *class adapter*: it inherits from the adaptee.
+That inheritance fixes the adapted class at definition time,
+and every client of the adapter sees the adaptee's entire surface,
+`g()` and `h()` included.
 Composition keeps the two interfaces separate.
 Inheritance merges them.
 
@@ -133,7 +134,7 @@ method `op`
 ```
 
 That is why this one parameter stays `Any` while the rest of the listing names real types.
-The `Any` is there to let an override that cannot substitute for its base pass the type checker.
+The `Any` is there so the type checker accepts an override that cannot substitute for its base.
 Approach 2 is a different operation under an inherited name.
 Code holding a `WhatIUse` cannot safely receive a `WhatIUse2`,
 and that is the price of building the adapter into the operation.
@@ -186,7 +187,7 @@ This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
-written because the type it received did not fit the function it had to call.
+written because `distance()` requires `x` and `y` while a `Pair` supplies `a` and `b`.
 The forwarding carries the limits [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
 lists for `__getattr__()`.
 [Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
@@ -196,7 +197,7 @@ as exercise 1 does with `__getitem__()`.
 applies here too.
 `copy.copy()` and `pickle` build an instance without running `__init__()`,
 so `_adaptee` does not exist yet,
-and `__getattr__()` reading `self._adaptee` calls itself until `RecursionError`.
+and `__getattr__()` reading `self._adaptee` calls itself until Python raises a `RecursionError`.
 An adapter that must survive copying or pickling guards that lookup,
 or defines `__reduce__()`,
 the hook `pickle` and `copy` consult before ordinary construction.
@@ -348,7 +349,7 @@ Façade has a failure mode too.
 An advanced caller who needs a name the façade never exposed has two bad options:
 reach past the underscore anyway,
 or wait for the façade's author to widen the façade.
-Widen it enough times and it stops simplifying anything;
+If you widen it enough times, the façade stops simplifying anything;
 it just relays every name the subsystem has.
 
 ## Telling the Wrappers Apart
@@ -421,7 +422,7 @@ print(caught[0].message)
 not a break.
 The mark works in two halves.
 The static half is a `ty` diagnostic on the deprecated call,
-which reaches a caller before they run anything;
+and the caller sees it before running anything;
 the `# type: ignore` silences it here,
 since this listing calls the deprecated method on purpose.
 The runtime half is a `DeprecationWarning`.

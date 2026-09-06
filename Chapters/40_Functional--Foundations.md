@@ -145,9 +145,10 @@ print(moved)
 #: Point(x=11, y=2)
 ```
 
-The type checker rejects the direct form `p.x = 5` before the program runs,
-so the listing writes the assignment as `setattr(p, "x", 5)`,
-which the type checker lets through, to show that the runtime rejects it too.
+The type checker rejects the direct form `p.x = 5` before the program runs.
+To show that the runtime rejects the assignment too,
+the listing writes it as `setattr(p, "x", 5)`,
+which the type checker lets through.
 The original `p` stays untouched, and `moved` is a separate value.
 When values never change underneath you,
 two parts of a program can share one without coordinating,
@@ -158,8 +159,8 @@ Python's immutable types share no structure:
 `moved = Point(p.x + 10, p.y)` above builds an entirely new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
-A two-field `Point` makes that copy free to ignore.
-A large structure changed often pays it every time,
+Copying a two-field `Point` costs so little that you can ignore it.
+A large structure that changes often pays that cost on every change,
 the price immutability charges for the coordination it removes.
 
 Type annotations can state immutability so a type checker enforces it.
@@ -229,10 +230,10 @@ with ignore(TypeError):
 #: TypeError("unhashable type: 'list'")
 ```
 
-Equality based on *contents* is what removes hashing, not mutability by itself.
+Equality based on *contents* removes hashing, not mutability by itself.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
-A `list` and an unfrozen `@dataclass` both compare that way,
+A `list` and an unfrozen `@dataclass` both compare by contents,
 so Python sets their `__hash__` to `None`:
 the dictionary that stored a key could no longer find it once its contents changed.
 `frozen=True` lets a dataclass keep contents-based equality and a hash at the same time.
@@ -302,7 +303,8 @@ with ignore(KeyError):
 ```
 
 Supporting a new operator means adding a row to the table,
-whether that row sits in the literal or lands afterward, as `%` did here.
+whether the literal holds that row or a later line adds it,
+as the `operations["%"]` line does here.
 The dispatch code itself never changes.
 A key the table has no row for raises a plain `KeyError`,
 where an `if`/`elif` chain would normally end in an `else`.
@@ -393,7 +395,7 @@ Higher-order functions separate the walking from the work.
 `map()`, `filter()`, and `sorted()` each contain the loop that walks the data,
 written once, and you supply only the part that differs from one use to the next.
 You stop rewriting the same iteration scaffold,
-along with the off-by-one and accumulator-initialization mistakes that scaffold invites.
+and you stop making the off-by-one and accumulator-initialization mistakes it invites.
 The idea runs the other direction, too.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
@@ -483,7 +485,7 @@ so `count += 1` on its own makes `count` a fresh local variable.
 The statement then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
-Forgetting it is the standard stumble when a closure first needs to write,
+Forgetting it is the standard stumble when a closure first needs to assign to a captured name,
 and the runtime message blames a local variable
 ("cannot access local variable 'count' where it is not associated with a value")
 instead of the missing declaration.
@@ -526,9 +528,9 @@ When the general function exists, as `power()` does here,
 
 Use partial application when an API expects a function of one argument and you have a function of several.
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
-through its `.func`, `.args`, and `.keywords` attributes,
-and it binds their values when you build it.
-This avoids the late-binding surprise a lambda created in a loop can produce.
+through its `.func`, `.args`, and `.keywords` attributes.
+It also binds their values when you build it,
+which avoids the late-binding surprise a lambda created in a loop can produce.
 [Function Objects](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates that surprise.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
@@ -538,7 +540,7 @@ Binding `exponent` above works because `power()` accepts it by keyword.
 so fixing the third argument used to mean fixing the first two as well.
 A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
-had to accept that.
+rules out the keyword escape `power()` allows.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The listing below carries two `# type: ignore` comments.
@@ -570,8 +572,9 @@ so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`,
 and the marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
-`ty` reads `partial(clamp, 0, Placeholder, 100)` as three arguments of the declared types,
-so the marker looks like an `int` in the wrong place and the resulting callable looks like it takes nothing.
+`ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types,
+so `Placeholder` looks like a value of the wrong type,
+and the resulting callable looks like it takes no arguments.
 The runtime behaves correctly.
 The annotations for this feature lag behind the runtime.
 

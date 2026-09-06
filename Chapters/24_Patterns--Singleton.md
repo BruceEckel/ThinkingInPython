@@ -85,7 +85,7 @@ Keep singleton state in a module you import, not in the script you run.
 
 ## When You Want a Class, Cache the Instance
 
-The goal is that every call to the constructor function returns the same object.
+The goal is that every construction returns the same object.
 The simplest approach hides construction behind a cached factory:
 `functools.cache` applied to a *constructor function*,
 an ordinary function that builds and returns an instance of a class.
@@ -119,7 +119,7 @@ print(b)
 #: Settings(data={'theme': 'dark'})
 ```
 
-Give the constructor function a parameter, and the guarantee breaks.
+Giving the constructor function a parameter breaks the guarantee.
 `functools.cache` keys its cache on the arguments,
 so each distinct argument value gets its own entry and its own instance:
 
@@ -152,8 +152,8 @@ and that marking is as far as Python goes.
 A second underscore adds no strength.
 The compiler [mangles](11_Techniques--Testing.md#white-box-and-black-box-tests)
 names only inside a class body,
-so at module level `__Settings` is the plain name it looks like,
-and inside a class body the compiler rewrites `m.__Settings` into a lookup for `_TheClass__Settings`,
+so at module level `__Settings` is the plain name it looks like.
+Inside a class body the compiler rewrites `m.__Settings` into a lookup for `_TheClass__Settings`,
 and that lookup fails.
 
 This listing keeps the bare name for a reason that outlasts the convention.
@@ -164,10 +164,10 @@ and a type outsiders must name is not private, whatever it starts with.
 `_Settings` fits a type that never leaves the module.
 
 Two stronger-looking moves fail the same way.
-Delete the name after building the instance, and the class stays reachable:
+Deleting the name after building the instance leaves the class reachable:
 `type(settings())` hands it back.
-Define the class inside `settings()`, and the module has no name for it at all,
-since `@cache` runs that body once and the class lives in its locals.
+Defining the class inside `settings()` leaves the module no name for it,
+since `@cache` runs that body once and the class lives in the function's locals.
 `type(settings())` still recovers the class.
 
 Nesting costs the return annotation as well.
@@ -201,9 +201,8 @@ Three implementation notes:
    Concurrent first calls can each run the constructor,
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
-   Eight threads calling `settings()` at once,
-   with a constructor slow enough to widen that race,
-   ran that constructor eight times and handed back eight different objects.
+   With a constructor slow enough to widen that race,
+   eight threads calling `settings()` at once ran the constructor eight times and handed back eight different objects.
    When threads can arrive before the singleton exists,
    create it eagerly instead: call `settings()` once at import time,
    or use the module form, which the import system builds exactly once.
@@ -298,8 +297,8 @@ Declare only what you rebind.
 
 One thread finds `_instance` empty and builds it.
 The rest wait on the lock, and each finds `_instance` already filled.
-The eight-thread race that produced eight objects from the cached version produces one here,
-as the printed count confirms.
+Under the same eight-thread race, the cached version produced eight objects.
+This version produces one, as the printed count confirms.
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.
 Without the sleep, the cached version showed no duplicates across twenty trials,
@@ -313,7 +312,7 @@ That is the price of laziness under threads.
 The classic escape is *double-checked locking*:
 test `_instance` before taking the lock,
 take it when the test finds the object missing, then test again inside.
-The second test is the one note 3 insists on.
+The second test is the one note 3 requires.
 The first exists to skip the lock once the object is there.
 Double-checked locking works, but both checks must be exactly right,
 and a subtle mistake reintroduces the race the lock exists to close.
@@ -420,7 +419,7 @@ The distinct `OnlyOne` instances all proxy to the same `__OnlyOne` object.
 while `__getattr__()` answers for every name Python fails to find on the wrapper,
 so its return type is whatever the inner object holds under that name,
 an open set no annotation can list.
-Delegation trades static knowledge for reach,
+Delegation gives up static knowledge to forward every name,
 the cost [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
 pays throughout.
 
@@ -430,7 +429,7 @@ you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 That removes the sentinel, the guard,
 and the first-call race the cached factory met under threads,
-and costs building the object whether or not anything uses it.
+at the cost of building the object whether or not anything uses it.
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
 since the name `OnlyOne` stays unbound until its own class body finishes running.)
@@ -522,11 +521,11 @@ The nested-class examples above used `@dataclass`; `Singleton` cannot.
 The sharing depends on `super().__init__` rebinding `self.__dict__` to `_shared_state`,
 and a dataclass generates its own `__init__` that assigns the fields and [never calls the base `__init__`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
-The class still runs; it has quietly stopped being a `Borg`.
+The code still runs; the class has quietly stopped being a `Borg`.
 A `__post_init__` that does the rebinding fails differently:
 it runs after `__init__` has assigned the fields,
 so the rebinding discards them.
-The hand-written `__init__` is what makes the sharing work,
+The hand-written `__init__` makes the sharing work,
 and silently losing the sharing is worse than failing outright.
 
 The sharing also reaches further than it looks.
@@ -695,7 +694,7 @@ Use the lightest tool that fits:
   but only when something needs those handles to be objects:
   an existing class-based interface, an `isinstance()` check, or subclassing.
   A module already shares that state with every importer and needs no class,
-  so data sharing by itself is not Borg's case to make.
+  so shared data alone is no reason to use Borg.
 - The decorator and metaclass forms work,
   but they are more machinery than the problem usually justifies.
 

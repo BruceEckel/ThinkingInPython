@@ -74,7 +74,7 @@ row here when a new agent lands.
 
 | Request shape | Agent | Model | Why |
 |---|---|---|---|
-| clarity pass, straighten, clear passives, "make X clearer" on named files | `prose-clarity` | Opus | judgment work that edits the author's voice and verifies claims against listings; both Opus and Fable did it well in the 2026-09-01 Solutions sweep, Opus's reports were the more careful about what they left alone |
+| clarity pass, straighten, clear passives, "make X clearer", "obscure/unclear sentences" on named files | `prose-clarity` | Opus | judgment work that edits the author's voice and verifies claims against listings; both Opus and Fable did it well in the 2026-09-01 Solutions sweep, Opus's reports were the more careful about what they left alone |
 | a list, a count, a location, a gate's output, what a listing prints | `repo-lookup` | Sonnet | read-only, no voice at stake, cheap |
 | `make rewrite` passes | (headless `claude -p`) | per pass, `tools/rewrite.py` `PASSES` | see `MODEL_NOTES` there |
 | verify a chapter's factual claims against its listings and against the chapters it names | a fresh agent per chapter, report-only | Opus | verification fails by under-reading, not by over-editing, so `MODEL_NOTES`' result for the rewrite passes inverts here; in the 2026-09-02 calibration Opus found three real errors Fable read past, with zero false positives from either |

@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
 Importing a module makes its *namespace* reachable in the importing file,
 under the module's name.
-Reaching them through that name keeps the imported module's names from clashing with the local ones.
+Reaching those names through the module's name keeps them from clashing with the local ones.
 To call `useful_function()`, you must *qualify* it with the name of the module:
 `module.useful_function()`.
 
@@ -228,9 +228,10 @@ print(a_package.module2.function2())
 ```
 
 `import a_package.module1` binds only the name `a_package` in this file.
-Loading `module1` also sets it as an attribute of the package,
+Loading `module1` also stores that submodule as an attribute of `a_package`,
 so `a_package.module1.function1()` resolves.
-The shorter `module1.function1()` fails here and works in `from_packages.py`,
+The shorter `module1.function1()` fails here,
+since nothing binds `module1` in this file; it works in `from_packages.py`,
 where `from` binds `module1` directly.
 
 Importing the package alone does not import what is inside it:
@@ -359,11 +360,11 @@ so a `from` import in the second finds a partially initialized module and fails 
 A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
 not to have finished running.
-That exact message assumes a package-relative cycle, `from . import ...`.
-Two plain top-level modules that import each other raise a different message,
-with no "circular import" wording at all:
+That wording appears when the cycle is inside a package.
+Two top-level modules that import each other get a different message,
+one that suspects a name collision with a library rather than a cycle:
 `ImportError: cannot import name 'f' from 'modx' (consider renaming 'modx.py' if it has the same name as a library you intended to import)`.
-The failure then surfaces later,
+With a plain `import`, the failure surfaces later,
 wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
 move the shared piece into a third module both can import.
@@ -387,9 +388,10 @@ The underscore changes one mechanical thing:
 
 `__all__` states the export list explicitly.
 You assign it at module level as a list of strings naming the public names,
-and `from module import *` imports those and no others, underscore or not.
+and `from module import *` then imports those names and no others.
+A name listed in `__all__` arrives even when it begins with an underscore.
 An `__all__` also gathers the intended surface into one readable place,
-and documentation tools read it when they ask what a module offers.
+and documentation tools read it to report what a module offers.
 
 ```python
 # exporting.py
@@ -467,8 +469,8 @@ Python's import system still matches names case-sensitively by default,
 so `import module` fails to find a file saved as `Module.py`,
 even on a filesystem that treats the two names as one.
 `PYTHONCASEOK` turns that case check off,
-letting the import resolve regardless of case,
-which reopens the ambiguity the check exists to catch.
+so `import module` finds `Module.py` again,
+bringing back the confusion the check exists to prevent.
 Keep a module's file name and its import spelled with the same case,
 rather than relying on either behavior.
 
@@ -487,9 +489,9 @@ so a local `random.py` can no longer shadow the standard library.
 What if your module or package isn't in the same directory as the Python file that imports it?
 The original solution was the `PYTHONPATH` environment variable,
 which tells Python where to look for modules and packages.
-`PYTHONPATH` takes multiple paths,
-and Python searches those paths in order until one holds your module or package,
-or reports `ModuleNotFoundError` when none does.
+`PYTHONPATH` takes multiple paths.
+Python searches them in order and uses the first one that holds your module or package,
+and raises a `ModuleNotFoundError` when none of them does.
 
 `PYTHONPATH` still works,
 but today you install your package into the environment you use,
@@ -507,8 +509,9 @@ For a large program that imports many modules but uses only some of them on any 
 that eager work slows startup.
 
 Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
-adds the `lazy` soft keyword, a keyword only in an `import` statement,
-as `match` is in [Control Flow](04_Foundations--Control_Flow.md#pattern-matching).
+adds the `lazy` soft keyword: a keyword only inside an `import` statement,
+the way `match` is a keyword only inside a `match` statement
+([Control Flow](04_Foundations--Control_Flow.md#pattern-matching)).
 A `lazy import` defers loading the module until the first time you use the imported name,
 so a run pays only for the modules it uses,
 while all imports stay at the top of the file:
@@ -537,14 +540,14 @@ tools that read imports miss it,
 and the `import` statement re-runs its `sys.modules` lookup on every call.
 `lazy import` keeps the declaration at the top where a reader and a tool can see it,
 and pays the loading cost once, at first use.
-Packages have also deferred this without `lazy import`,
+Packages deferred submodule loading before `lazy import` existed,
 by giving `__init__.py` a module-level `__getattr__`
 ([PEP 562](https://peps.python.org/pep-0562/))
-that imports and returns a submodule the first time a caller asks for it by name,
-the technique pandas and numpy use to keep import time low.
+that imports and returns a submodule the first time a caller asks for it by name.
+The pandas and numpy packages use that technique to keep import time low.
 `lazy import` needs no hand-written `__getattr__`, and defers any imported name,
-not only a package's submodules,
-but the `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
+not only a package's submodules.
+The `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
 You can watch `lazy` defer the load by importing a module whose body prints when it runs:
 
 ```python
@@ -615,8 +618,9 @@ CPython removed it before the 3.15 release.
 Don't make an import lazy when you import a module for what its body does rather than for a name it defines.
 A module that registers a plugin class
 ([Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)),
-installs a codec, or fills a table does that work as it loads,
-and a lazily imported name nobody touches never loads.
+installs a codec, or fills a table does that work as it loads.
+If nothing touches the lazily imported name,
+the module stays unloaded and its registration is missing.
 The failure is silent: no error, just a table with a row missing.
 That is also why `all` is an experiment to run rather than a setting to leave on,
 since it defers ordinary `import` statements too,

@@ -15,7 +15,7 @@ you must run a separate type-checking tool.
 Mypy is the original and most widely deployed one,
 and pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
-the same group's toolchain that already gives you `uv` and `ruff`.
+from the same group that makes `uv` and `ruff`.
 
 ## Gradual Typing
 
@@ -37,7 +37,7 @@ Both accept every value,
 but `object` guarantees nothing about the value once you have it,
 so the type checker rejects every operation beyond `object`'s own.
 `Any` permits every operation instead,
-and that permission makes it an opt-out rather than a wide type.
+so it opts out of checking rather than describing a wide set of values.
 
 ## Type Hints
 
@@ -65,7 +65,7 @@ Containers and optional types read the way you say them: `list[int]`,
 `dict[str, float]`, `tuple[int, ...]`,
 and `str | None` for "a string or nothing."
 A function that returns nothing declares `-> None`,
-and that is why every `__init__()` in this chapter's listings ends that way.
+and that is why every `__init__()` in this chapter's listings carries that annotation.
 
 ## The Type Checker: `ty`
 
@@ -125,9 +125,8 @@ pairs what the annotation expected with what the call supplied,
 and then points at the declaration that set the expectation.
 
 Listings in this book use a shorthand for a diagnostic.
-Where a line would fail the check,
-whether commented out or suppressed with `# type: ignore`,
-a neighboring `# ty:` comment summarizes what the type checker reports for it.
+A neighboring `# ty:` comment summarizes what the type checker reports for a line that would fail the check,
+whether commented out or suppressed with `# type: ignore`.
 
 ## Narrowing {#narrowing}
 
@@ -185,7 +184,7 @@ except AttributeError as e:
 `ty check` passes this file.
 The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
-so it never widens `b.val` back to `str | None`.
+so the checker never widens `b.val` back to `str | None`.
 The crash proves the narrowing was already stale by the time `.upper()` ran.
 Narrow a local variable and hold that trust;
 narrow an attribute and recheck it after any call that might touch the object.
@@ -196,8 +195,8 @@ narrow an attribute and recheck it after any call that might touch the object.
 
 The naming convention in [Tour](02_Foundations--Tour.md#naming-conventions)
 uses ALL_CAPS to signal a constant, but that is only a hint to human readers.
-At runtime, a `Final` is still a variable,
-but reassigning it produces a type-checking error:
+At runtime, a `Final` name is an ordinary variable,
+and only the type checker rejects a reassignment:
 
 ```python
 # final_constants.py
@@ -216,17 +215,17 @@ print(MAX_RETRIES, GREETING, HISTORY)
 ```
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
-`HISTORY.append("first")` checks and runs, the same as it would on a plain,
-non-`Final` list.
-The type checker refuses only an assignment to the name `HISTORY` itself.
-This is the misconception `Final` invites: it reads like immutability,
-and it isn't.
+`HISTORY.append("first")` checks and runs,
+the same as it would on a non-`Final` list.
+The type checker refuses only an assignment to the name `HISTORY`.
+This is the misconception `Final` invites: the word suggests immutability,
+but the object stays mutable.
 
 You can give the type explicitly, as in `GREETING`,
 or let the type checker infer it from the value, as with `MAX_RETRIES`.
 The rest of the book uses the explicit `Final[T]` form,
 and that form declares the intended type instead of accepting whatever the initializer produces.
-The two forms part ways when the initializer says less than you mean.
+The two forms differ when the initializer says less than you mean.
 `CACHE: Final = []` infers `list[Unknown]`,
 so the type checker ignores whatever goes into the list.
 `CACHE: Final[list[str]] = []` says what the list holds,
@@ -244,7 +243,7 @@ If it looks like a duck and quacks like a duck, treat it as a duck.
 *Structural typing* is the static counterpart.
 Instead of waiting until the program is running,
 a type checker verifies ahead of time that an object has the required *shape*.
-"Shape" means the methods and attributes that the type's consumer requires.
+"Shape" means the methods and attributes that the code using the object requires.
 Dynamic typing and structural typing are the same idea checked at different moments.
 Dynamic typing trusts the object once the code is running,
 while structural typing proves the shape beforehand.
@@ -338,7 +337,8 @@ while the builtin call `type(shape)` in the demo retrieves an object's class at 
 ## Naming Types: The `type` Statement {#the-type-statement}
 
 An annotation can grow to the point of obscurity.
-`dict[tuple[int, int], str]` is precise, but it does not say what it means.
+`dict[tuple[int, int], str]` is precise,
+but it never says what those pairs and strings stand for.
 The *type statement* gives the annotation a name:
 
 ```python
@@ -367,9 +367,9 @@ so `type(grid)` in the same file returns `dict` as it always has.
 A `type` alias is a new name, not a new type.
 `Coord` and `tuple[int, int]` are interchangeable,
 so the type checker accepts any pair of ints as a `Coord`.
-(To create a distinct type the type checker keeps separate, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
-Because an alias adds no distinctness,
-it belongs on a compound shape rather than on a bare rename:
+(For a type the type checker keeps separate from its base, use `NewType`, listed under [Aliases and distinct types](#aliases-and-distinct-types).)
+Because an alias creates no new type,
+save it for a compound shape instead of using it to rename a builtin:
 `type UserId = int` looks like a new type in a signature while behaving like `int`.
 
 `Color` names a union of literal values instead of a union of types.
@@ -417,7 +417,7 @@ except AttributeError as e:
 `ty check` passes this file with no complaint.
 `n` is `Any`, so every attribute access on it type-checks,
 including one that runs and fails.
-A type parameter closes exactly this hole.
+A type parameter closes this hole.
 
 A *type parameter* expresses the connection.
 Declare the parameter in square brackets after the function name:
@@ -495,8 +495,8 @@ A `list` accepts writes.
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
-Annotating a parameter `Sequence[T]` instead of `list[T]` says the function only reads,
-and so accepts more callers.
+Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function only reads,
+so the function accepts arguments that a `list[T]` parameter would reject.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}
@@ -531,11 +531,10 @@ Without the default,
 `words: Stack` leaves `T` unsolved and the type checker falls back to `Unknown`,
 so `words.top().upper()` goes unchecked.
 The default gives the bare form a meaning,
-and that matters most for a class whose parameter has one common answer:
-callers content with that answer write nothing,
-and the annotation stays precise.
+which matters most for a class whose type parameter is usually the same type:
+callers who want that type omit the brackets, and the annotation stays precise.
 
-Drop the default and that meaning goes with it.
+If you drop the default, that meaning goes with it.
 `Queue[T]` carries none, so a bare `Queue` annotation leaves `T` unsolved:
 
 ```python
@@ -559,7 +558,7 @@ reveal_type(line.top())  # ty: Unknown
 
 `ty` reports `Unknown`, not an error,
 so `line.top()` and everything built on it go unchecked from here.
-Exercise 5 does the same to `Stack` itself.
+Exercise 5 asks you to remove `Stack`'s default and see the same result.
 
 The same applies to a `type` alias, as `Pair` shows:
 
@@ -643,7 +642,8 @@ and that suits the edges of a program, where untrusted input enters.
 The hints are for the tools and for the reader.
 
 From here on, this book assumes the type checker runs on everything.
-When a listing says the type checker rejects a line, that is the enforcement.
+When a listing says the type checker rejects a line,
+that rejection is the only enforcement.
 The following chapters do not repeat that Python itself would run the line anyway.
 
 ## How Much to Annotate
@@ -661,8 +661,8 @@ and `count: int = 0` says no more than `count = 0` does, at greater length.
 (The `total: int = 0` in this chapter's first listing shows the syntax, not a recommendation.)
 The value of a hint is proportional to the distance between a value's creation and its use.
 A value born and consumed three lines later needs no help.
-A value that arrives from another module, through a container,
-is worth naming precisely.
+A value that arrives from another module, inside a container,
+is worth annotating precisely.
 
 ## Type Hint Summary
 

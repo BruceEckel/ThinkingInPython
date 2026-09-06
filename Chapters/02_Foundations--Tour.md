@@ -15,8 +15,8 @@ It tries to hinder you as little as possible.
 It does not impose arbitrary rules or force a particular set of features.
 
 People often call Python a scripting language,
-but scripting languages tend to be limiting,
-especially in the scope of the problems they solve.
+but scripting languages tend to limit you,
+especially in the range of problems they can solve.
 Python is a programming language that also supports scripting.
 It is marvelous for scripting, and you may replace all your batch files,
 shell scripts, and simple programs with Python scripts.
@@ -63,8 +63,9 @@ assigned inside the `if`, stays visible afterward,
 unlike a variable declared inside braces in C++ or Java.
 New scopes come from functions, classes, modules, and comprehensions,
 never from an `if` or a `for` block.
-Binding still follows execution: with any answer other than `"yes"`,
-the assignment never runs, and `print(val)` raises a `NameError`.
+Python binds a name only when the assignment runs:
+with any answer other than `"yes"`, `val = 1` never executes,
+and `print(val)` raises a `NameError`.
 
 ```python
 # unbound_val.py
@@ -80,13 +81,13 @@ except NameError as e:
 ```
 
 The `if` never ran, so `val` was never bound.
-Nothing about the block itself protected `print(val)`.
-`ty` proves `val` unbound here and refuses to check the line,
+Indentation shows where the assignment sits, not whether it runs.
+`ty` sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
 
 Indenting can nest to any level.
 Four spaces per level is the convention,
-and mixing tabs and spaces inside one block is a `TabError`.
+and mixing tabs and spaces inside one block raises a `TabError`.
 C++ and Java programmers debate where braces go.
 In Python the indentation is the structure,
 so the language settles the question and taste plays no part.
@@ -159,7 +160,7 @@ covers the general form.
 Numbers, strings, and tuples are *immutable*:
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
-Knowing which is which explains when another name sees a change,
+Mutability decides whether another name sees a change,
 as `a` and `b` did in `references.py`.
 
 ## Numbers and Arithmetic
@@ -392,8 +393,8 @@ because even there the backslash escapes the closing quote.
 ### Common String Operations
 
 Strings are immutable sequences with a large set of methods.
-[Slicing](03_Foundations--Containers.md#lists) also selects portions,
-and `in` tests membership:
+[Slicing](03_Foundations--Containers.md#lists)
+also selects a range of characters, and `in` tests membership:
 
 ```python
 # string_methods.py
@@ -458,9 +459,8 @@ F-strings replaced them, so this book uses f-strings throughout.
 
 An f-string produces a finished `str`,
 deciding how each value becomes text before anything else sees it.
-A *t-string* produces a `Template` instead:
-the literal pieces and the interpolated values, kept apart,
-for a consumer to assemble.
+A *t-string* produces a `Template` instead,
+which keeps the literal pieces and the interpolated values apart for a consumer to assemble.
 
 The reason to care is safety.
 A consumer that receives the parts separately knows which text came from the program and which came from a value,
@@ -523,18 +523,18 @@ each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.
 Collecting every `piece.expression` above uses a list comprehension,
-the same new syntax as the generator expression earlier;
+which has the same `for` clause as the generator expression in `arithmetic.py` but builds a list;
 [Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
 covers the general form.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
 A consumer cannot assume that literals and interpolations alternate.
-`shout()` uppercases the literal text and leaves the values alone.
+`shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.
 `safe()` puts that separation to work:
 it passes the literal text through unchanged,
-and it rejects an interpolated value that carries a quote character,
+and it rejects an interpolated value that contains a single quote,
 the way `trouble` does above.
 An f-string would have finished assembling the result, quote and all,
 before any code had a chance to object.
@@ -558,7 +558,8 @@ Class names are `CapWords` (Pascal cased): every word, including the first,
 begins with a capital letter, and no underscores separate them.
 For example: `ThisIsMyClass`.
 
-A class that its users call the way they call a function may use `snake_case` instead.
+When users call a class the way they call a function,
+that class may use `snake_case` instead.
 The standard library names `contextlib.suppress`, `functools.partial`,
 and the builtins `property` and `staticmethod` that way.
 Every other class is `CapWords`.
@@ -572,7 +573,7 @@ Tools such as ruff point out violations and fix many of them automatically.
 1.  In `references.py`, add a line after `c = a[:]` that appends `99` to `c`.
     Print `a` and `c` and confirm only `c` changed,
     then explain why `b.append(4)` earlier did change what `a` sees,
-    but this does not.
+    but appending to `c` does not.
 2.  In `truthiness.py`, add an empty dictionary `{}` and a dictionary with one entry to the list of test values.
     Predict what `bool()` reports for each before running it,
     then check your prediction.

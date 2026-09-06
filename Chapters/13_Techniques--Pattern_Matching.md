@@ -20,7 +20,7 @@ Pattern matching first appeared in [Control Flow](04_Foundations--Control_Flow.m
 `match` and `case` are *soft keywords*:
 they act as keywords only inside this statement,
 so existing code that uses `match` as a variable name still runs.
-Avoid writing new code that does: a local named `match` shadows nothing,
+Avoid naming a new variable `match`: the name shadows no keyword,
 but it reads like the statement.
 
 ## Matching Values
@@ -141,7 +141,7 @@ Python catches the mistake when a later `case` follows a bare-name capture,
 refusing to compile with `SyntaxError: name capture 'DEFAULT' makes remaining patterns unreachable`.
 When the capture is the last `case`, as here, Python does not warn you,
 and neither `ty` nor `ruff` catches it either:
-`DEFAULT` is a local variable rather than the constant you meant to compare against,
+the `case` binds a new local named `DEFAULT` instead of comparing against the module constant,
 and nothing in the toolchain says so.
 
 `act()` also shows why an enum is worth the trouble: `Signal` is a closed set,
@@ -288,8 +288,7 @@ a class attribute listing field names in order.
 so `Point(0, y)` means "position 0 is `x`, position 1 is `y`."
 `NamedTuple` generates it too.
 An ordinary class must assign it by hand.
-Without a `__match_args__` long enough to cover the positions you supply,
-a positional pattern raises a `TypeError`.
+A positional pattern raises a `TypeError` when `__match_args__` is too short to name every position you supply.
 For an ordinary class `R` that lacks one,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
@@ -324,8 +323,9 @@ print(describe(Point(3, 4)))
 A positional pattern can leave fields unchecked too:
 `Point(0)` supplies fewer sub-patterns than `__match_args__` names,
 so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
-Naming the attribute is clearer,
-and it survives a change to the field order that would silently redefine every position.
+Naming the attribute is clearer, and it survives a change to the field order:
+reordering the fields rewrites `__match_args__`,
+so every positional pattern silently starts matching a different field.
 `Point()` with no arguments, keyword or positional,
 matches any `Point` instance: use it as a type-only check or a final catch-all.
 
@@ -442,8 +442,8 @@ print(leaky(Point(3, 4)))
 
 The guard runs after the pattern matches,
 so it can use the names the pattern bound.
-A false guard moves on to the next `case`, but the names stay bound:
-once `case Point(x, y) if x > 0 and y > 0` has failed,
+When a guard is false, `match` moves on to the next `case`,
+but the names stay bound: once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
 `leaky()` shows why that matters: `case _:` binds nothing,
 yet `x` still holds `3`, left over from the failed guard in the case above it.
@@ -512,8 +512,8 @@ so `x` and `y` come out typed `object`,
 the same as every other value the dictionary could hold.
 `class_patterns.py`'s `Point(x, y)` binds `x` and `y` as `int`,
 because `Point` declares its fields that way.
-Matching on a mapping is inherently untyped at the value level,
-even though the shape test itself is precise.
+The shape test is precise,
+but each binding takes the dictionary's one declared value type.
 When the data has a known shape, parse it into a dataclass first,
 then match on the dataclass: you keep the shape test and gain the field types.
 
@@ -574,8 +574,8 @@ define that set as a union using the [`type` statement](08_Foundations--Static_T
 Now you can `match` on that union.
 When you end with `case _: assert_never(value)`,
 the type checker ensures the match is *exhaustive*.
-Add a type to the union without its `case`,
-and the type checker reports an error at `assert_never()` instead of letting the value fall through at runtime.
+If you add a type to the union without its `case`,
+the type checker reports an error at `assert_never()` instead of letting the value fall through at runtime.
 That is the benefit of static typing applied to control flow:
 
 ```python
@@ -620,8 +620,8 @@ A `switch` in C, JavaScript, or traditional Java has no such check:
 nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions check exhaustiveness,
-as an error in Java and Kotlin and a warning in Scala,
-as long as the matched type is a sealed hierarchy the compiler can see in full.
+as an error in Java and Kotlin and a warning in Scala.
+The check applies only when the matched type is a sealed hierarchy the compiler can see in full.
 Their versions are also expressions, producing a value you can assign.
 Python's `match` is a statement, not an expression,
 so a `match` that must produce a value goes inside a function that returns from each `case`.
@@ -685,7 +685,7 @@ so its cost grows with the number of cases.
 A dictionary lookup costs the same at any size.
 At three entries the difference is invisible.
 The dictionary wins as the table grows,
-and a dictionary is the one of the two you can build or change at runtime.
+and a dictionary is the only one of the two you can build or change at runtime.
 
 When the set of types is *open* (anyone can add a new one),
 inheritance and dynamic binding work better than `match`.

@@ -1,9 +1,8 @@
 # Effect Management
 
 A test you wrote last week starts failing about one run in five.
-The function it calls computes a total price, the math is right,
-and three calls down,
-a helper that formats currency reads a configuration service and writes to an audit log.
+The function it calls computes a total price, and the math is right.
+Three calls down, a helper that formats currency reads a configuration service and writes to an audit log.
 None of that is in any signature on the path.
 
 This book has emphasized the benefits of pure functions in numerous places:
@@ -26,7 +25,7 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
   has `simplify()` return a new tree instead of editing the one it receives.
 
-In every one of those cases you can settle the question by reading one function.
+In every one of those cases you can settle the question of purity by reading one function.
 That stops working as soon as the function calls others.
 If one or more of those other functions have side effects,
 they make the calling function impure too.
@@ -178,8 +177,8 @@ Nothing escapes through a raised exception.
 
 If you catch and handle the exception within the function,
 it never escapes to become an Effect.
-`slope()` can catch the one exception it knows about and fold the failure into an ordinary value of its existing return type,
-`float`, instead of introducing a new type:
+`slope()` can catch the one exception it names and turn the failure into an ordinary `float`,
+its existing return type, instead of introducing a new type:
 
 ```python
 # slope_catch.py
@@ -212,8 +211,8 @@ But it guards only the exceptions `slope()`'s `try` names.
 and the `try` around it catches only `ZeroDivisionError`.
 This listing puts `validate()` four lines from `slope()`,
 so the gap is easy to spot.
-A real call stack usually puts the raise many files away,
-where reading every callee to find it is the tedious,
+In a real call stack the raise usually sits many files away,
+and finding it means reading every callee: the tedious,
 error-prone work an Effect Management System replaces.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
@@ -224,7 +223,7 @@ C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
 The compiler never computed that list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
-Programmers usually escaped by widening the specification until it said nothing.
+Programmers usually escaped that work by widening the specification until it said nothing.
 The specifications leaked implementation details,
 and most people now count them a failure.
 C++ reduced its version to a single bit: whether a function throws at all.
@@ -268,8 +267,8 @@ so it needs no `try` and no `Result` to say so.
 
 All three approaches take the division failure out of `slope()`,
 but they push the cost to different places.
-A `Result` makes every caller handle failure explicitly, at every call site,
-but `@safe` catches `Exception` broadly,
+A `Result` makes every caller handle failure explicitly, at every call site.
+`@safe` catches `Exception` broadly,
 so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug,
 the same cost [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 names.
@@ -282,7 +281,7 @@ A `Result` turns it into a value, a `try` consumes it,
 and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
 
-These three are not a menu to pick one from.
+These three are not a menu from which to pick one.
 The standard practice combines the first and third:
 parse untrusted input into the restrictive type at the boundary,
 using a `Result` to report a bad value instead of raising one,
@@ -324,7 +323,7 @@ and `@safe` turns that failure into a `Result` its caller must unpack.
 Past that one `match`, `slope()` never checks anything:
 `NonZero` already guarantees `run.value` isn't 0.
 One technique handles the input a caller doesn't trust,
-the other handles everything downstream that does.
+the other lets every function downstream trust what it receives.
 
 ## A Program Can Never Be Pure
 
@@ -691,7 +690,7 @@ which is how native systems express retries and backtracking as ordinary handler
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
 [Generators](45_Effects--Generators.md) covers the full two-way form,
-and it is the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
+the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
 [Flix](https://flix.dev/) expresses the same model with different notation.
 The Effect set follows a backslash:
@@ -709,8 +708,7 @@ though it does not yet track Effects in function types.
 ### Library Effect Management
 
 Changing languages is rarely an option.
-If your team has committed to Scala or TypeScript,
-native Effects are unavailable,
+A team committed to Scala or TypeScript cannot use native Effects,
 so designers built *library* Effect systems on top of existing type systems.
 In this approach the library, rather than the compiler, does the tracking,
 by encoding Effect information into the return type of every function.
@@ -818,14 +816,14 @@ rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-Adoption skips the years a human language spends waiting for people to learn it:
-a language written for an AI can drop the conveniences that help a person read code,
-and once it works, an AI can start using it immediately.
+Adoption skips the years a human language spends waiting for people to learn it.
+A language written for an AI can drop the conveniences that help a person read code,
+and an AI can start using that language as soon as it works.
 
 Most of these provide only the first part of a full EMS, tracking.
 For their purpose the other two parts, interface separation and delayed binding,
-would be liabilities:
-a host that pins every implementation can guarantee what generated code can do.
+would be liabilities,
+because a host that pins every implementation can guarantee what generated code can do.
 
 Two go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
@@ -840,7 +838,7 @@ the second and third properties of a full EMS.
 
 ## Effect Management for Python?
 
-Python's language has no Effect Management System, but it has a start.
+The Python language has no Effect Management System, but it has a start.
 Python already tracks one Effect in function signatures,
 and enforces that tracking virally: `async`.
 
@@ -892,7 +890,7 @@ Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
 Each of these gives you the discipline of one part of an EMS.
-The guarantee is missing, because the type checker stays out of it.
+The guarantee is missing, because no type checker enforces it.
 
 One library goes the rest of the way.
 [Stateless](46_Effects--Stateless.md)

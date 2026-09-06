@@ -18,8 +18,8 @@ Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table:
 each hides an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
-Where speed matters most, in `reduce()`, `partial()`, and the two caches,
-the implementation is C.
+CPython implements the ones where speed matters most in C: `reduce()`,
+`partial()`, and the two caches.
 What follows starts with the simplest tools and works up to the ones with the most moving parts.
 
 ### `reduce`
@@ -239,7 +239,8 @@ print(greet.__name__, "-", greet.__doc__)
 
 If you delete the `@wraps(func)` line,
 that same `print()` reports `wrapper - None`,
-because `greet` now refers to the inner function and nothing copied the original's identity onto it.
+because the name `greet` refers to `wrapper` either way,
+and without `@wraps` nothing copies the original's name and docstring onto it.
 Everything that reads those attributes reads the wrapper instead: `help()`,
 `inspect.signature()`,
 and any tool that reports a function by its name or docstring.
@@ -297,8 +298,8 @@ which generates all six comparisons from the field order and makes `total_orderi
 `total_ordering` earns its keep when the class cannot be a dataclass,
 or when the ordering is not simply the fields in declaration order.
 Even then, each synthesized comparison costs more than a hand-written one:
-it wraps a call to your `__lt__` or `__eq__`,
-an extra Python-level call on every comparison that a directly generated method skips.
+it wraps a call to your `__lt__` or `__eq__`.
+A directly generated method skips that extra Python-level call.
 
 ### `singledispatch`
 
@@ -354,7 +355,8 @@ print(d.describe("hi"), "|", d.describe(5))
 ```
 
 `singledispatchmethod` dispatches on the first argument after `self`,
-never on `self`, so it selects an implementation by the type of `value` the same way the plain function above does.
+never on `self`, so the type of `value` selects the implementation,
+just as it does for the plain function above.
 
 `itertools` does the same for iteration: ready-made pieces you compose,
 instead of loops you write and test again.
@@ -742,7 +744,7 @@ print(list(islice(squares, 3)))
 
 Four stages sit on top of an infinite source,
 and none of them run until `list()` pulls.
-The second `print()` shows the source resuming at 16 rather than 13,
+The second `print()` shows the source resuming at `n` = 16 rather than 13,
 because `takewhile()` must pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeds the limit.
 A pull-based pipeline reads one value further than it keeps,
 and that one value cost three squares.
@@ -874,9 +876,8 @@ and says nothing about depth.
 
 Pair up participants for an activity across several rounds,
 and avoid repeating a pairing until every possible pairing has had a turn.
-Several of these ideas work together here,
-on one small program instead of one at a time:
-an infinite generator for the rounds,
+Several of these ideas work together here in one small program,
+instead of appearing one at a time: an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
 `combinations()` for the pairs inside a group,
 and a seeded random source that makes the whole schedule reproducible.
@@ -898,13 +899,14 @@ or any size but two.
 The circle method is a closed-form answer to one narrow question,
 "how do you 1-factorize a complete graph into perfect matchings,"
 and pairs are the only group size where that question has a tidy rotation-based answer.
-Scheduling groups of three without repeats is the far harder problem that *Kirkman's schoolgirl problem* poses,
+Scheduling groups of three without repeats is far harder:
+that problem is *Kirkman's schoolgirl problem*,
 solvable only for specific roster sizes and with no simple formula behind it.
-Rather than chase an exact answer that may not exist for a given `students` and `size`,
-a general version gives up rotation entirely and settles for a good one:
-build each group by adding, one member at a time,
-whoever the current members have met the fewest times,
-with those meeting counts kept in a running history instead of computed from a round number:
+An exact answer may not exist for a given `students` and `size`,
+so the general version below gives up rotation and settles for a good schedule rather than a perfect one.
+It builds each group one member at a time,
+adding whoever the current members have met the fewest times.
+Those meeting counts come from a running history rather than from a round number:
 
 ```python
 # student_pairs.py
@@ -1009,7 +1011,8 @@ because the alternative is a round in which nobody meets anyone.
 so it looks like the place for `@cache` from earlier in this chapter.
 Caching it would be wrong.
 `met()` reads `history`, and `history` changes at the end of every round,
-so a cached answer from round 0 would still come back in round 6 after every count it summed had moved.
+so an answer cached in round 0 would come back unchanged in round 6,
+long after the counts it summed had changed.
 The `cache` entry's rule, pure functions only, is the reason:
 a function that reads mutable state is impure, however simple its body looks.
 
@@ -1022,7 +1025,7 @@ which grouping of arbitrary size keeps every pair's meeting count lowest.
 `group_rounds()` is still deterministic in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
-since `random.Random(seed)` never reaches outside itself for randomness.
+since `random.Random(seed)` draws every number from its own seeded state.
 Computing round `100` now means generating rounds `0` through `99` first,
 where the circle method could compute round `100` directly,
 from its arithmetic alone.

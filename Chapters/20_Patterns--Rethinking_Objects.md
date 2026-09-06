@@ -66,7 +66,7 @@ It returns a result the caller can use where it expects the base's result,
 and raises no surprising exceptions.
 When subclasses obey it,
 code you write against the base class works unchanged on any of them.
-That obedience is what makes polymorphism,
+That obedience makes polymorphism,
 and patterns like the [Template Method](25_Patterns--Template_Method.md), safe.
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
@@ -120,8 +120,8 @@ except OverflowError as e:
 
 `BoundedStack.push()` takes the same argument and returns the same type,
 so `@override` holds and `ty` reports nothing.
-`fill()` targets `Stack`, which never refuses a `push()`,
-and a `BoundedStack` handed to it raises an exception on the third item.
+`fill()` takes a `Stack`, which never refuses a `push()`,
+so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches this, but a test can.
@@ -132,7 +132,7 @@ The same pattern covers substitutability:
 a test written against `Stack`'s contract, run against `BoundedStack` too,
 would have caught `fill()` failing on the third item.
 
-Substitutability is the first thing OOP promised that no tool can check.
+Substitutability is one thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
 behavior bundled into the object as methods, reuse through inheritance,
 and polymorphism.
@@ -229,7 +229,7 @@ Now the internals are safe, but at a cost: private fields, getters,
 and defensive copies, all to stop other code from changing your data.
 And these copies plug only the outbound leak.
 The constructor stores the caller's own list,
-so the caller's original reference still mutates the internals.
+so the caller can still mutate the internals through that reference.
 A fully defensive class must copy on the way in as well.
 
 A `@dataclass` version of `Plugged` trims the constructor,
@@ -267,8 +267,8 @@ That argument covers only the mutation reason for encapsulation.
 A second reason survives freezing: representation hiding,
 so the internal type can change later without breaking callers.
 A public frozen field skips that protection too.
-Swap `numbers` from a `tuple` to some other sequence later,
-and every caller that named `tuple` breaks.
+If you later swap `numbers` from a `tuple` to some other sequence,
+every caller that named `tuple` breaks.
 The fields are public, with no getters and no copies:
 
 ```python
@@ -350,8 +350,8 @@ But nothing stops that list from changing, the identical leak `Leaky` has.
 Hashing goes the same way.
 A frozen data class is hashable only when every field it holds is hashable,
 so `hash(fl)` raises a `TypeError` and a `FrozenLeaky` cannot be a dict key.
-The listing shows all three side by side: the rebinding `frozen=True` catches,
-and the mutation and the failed hash that get past it.
+The listing shows all three side by side: `frozen=True` catches the rebinding,
+while the mutation and the failed hash get past it.
 That is why `immutable.py` needs both the `tuple` and the frozen `Bob`.
 Immutability pays off only when it goes all the way down.
 
@@ -466,8 +466,8 @@ Both have `x` and `y`, and those two attributes are all `distance()` requires.
 A bare annotation in a protocol is a read-write attribute,
 so an implementer must allow assignment to it.
 Neither class here allows it: `PairCoord` computes `x` from its `Pair`,
-and the frozen `Point` rejects assignment to every field,
-so both satisfy the property form and both fail the annotation form.
+and the frozen `Point` rejects assignment to every field.
+Both satisfy the property form, and both fail the annotation form.
 Declare a protocol member read-only unless callers really do write to it.
 
 ## Prefer Composition to Inheritance
@@ -536,8 +536,8 @@ so no inherited method slips past the counter.
 `CountingBox` forwards every operation by hand.
 `CountingList` inherits dozens it didn't write, and gets one wrong.
 Composition still allows the counting bug.
-Write `extend()` as `self.items.extend(more)` instead of going through `append()`,
-and the count is wrong again.
+If you write `extend()` as `self.items.extend(more)` instead of going through `append()`,
+the count is wrong again.
 What changes is where the bug lives: in the class you read,
 rather than in `list` internals hidden behind `CountingList`.
 
@@ -590,7 +590,7 @@ The arrangement has a cost:
 changing one city means rebuilding the `Address` and then the `Contact`.
 [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 makes that rebuild routine.
-The last two lines are the payoff.
+The equality check and the dictionary lookup are the payoff.
 Two contacts built from equal parts are equal, and the whole structure hashes,
 because value equality and hashing follow from the fields rather than from a base class.
 
@@ -602,7 +602,7 @@ The fourth OOP promise is polymorphism.
 
 Polymorphism means that a function parameter accepts more than one type.
 Inheritance is only one way to get there.
-The questions are which types it accepts and what the function may do with them.
+The questions are which types the parameter accepts and what the function may do with them.
 
 Type theory defines three kinds of polymorphism.
 Christopher Strachey's 1967 lecture notes,
@@ -786,7 +786,7 @@ That independence is why this chapter emphasizes protocols.
 It has a cost: nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
-They connect pieces without requiring any piece to change.
+Protocols connect pieces without requiring any piece to change.
 
 Because membership is structural,
 one class can satisfy any number of protocols at once,
@@ -942,7 +942,7 @@ A frozen dataclass with a validating `__post_init__` enforces the distinction at
 at the cost of a constructor call instead of a bare literal.
 
 A protocol also sharpens what [the Liskov Substitution Principle](#liskov-substitution)
-does and does not get you.
+does and does not guarantee.
 Satisfying a protocol is a shape claim: the methods exist,
 with the correct signatures,
 and the type checker verifies that half of the contract.
@@ -1047,7 +1047,7 @@ if __name__ == "__main__":
 ```
 
 The type checker correctly insists on the guard.
-Without it, a `None` eventually meets `.log()` and the call fails.
+Without it, `total()` calls `.log()` on `None` and raises an `AttributeError`.
 The `None` branch does nothing.
 Doing nothing is behavior, and behavior belongs in an object.
 
@@ -1104,7 +1104,7 @@ In these cases, use `T | None`,
 or return [`Result`](42_Functional--Error_Handling.md#a-result-type),
 so the type forces callers to face the missing case.
 
-If every decision handles absence with the same neutral behavior,
+If every caller handles absence with the same neutral behavior,
 centralize that behavior in a null object.
 If any caller branches differently, then absence is information,
 and it belongs in the type.
@@ -1113,8 +1113,9 @@ and it belongs in the type.
 
 None of this means objects are a mistake.
 A class is a clean namespace with dot-completion.
-A class guarantees initialization and, as a data class, generates equality,
-representation, and, when frozen, hashing.
+A class guarantees initialization.
+As a data class it generates equality and representation,
+and hashing when frozen.
 
 OOP also normalized the idea of types,
 which [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
@@ -1148,7 +1149,7 @@ if __name__ == "__main__":
 
 Every call threads `balance` through,
 and every call site must remember to capture the return value.
-Drop one reassignment and the balance silently reverts on the next call.
+If you drop one reassignment, the next call silently uses the old balance.
 An object closes that gap:
 
 ```python

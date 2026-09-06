@@ -186,7 +186,7 @@ when the last reference to an object goes away, the object goes with it.
 A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
-Before disabling the collector, `self_link()` calls `gc.get_referrers(node)`,
+With the collector disabled, `self_link()` calls `gc.get_referrers(node)`,
 which lists every object that directly refers to `node` without collecting or destroying anything.
 The only referrer is `node` itself, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
@@ -269,9 +269,10 @@ nothing stops your own code from calling it again,
 so a real `close()` must guard itself against being called more than once,
 the way a file object's `close()` does.
 
-`Socket.__init__()` also prints "opened" before `__enter__()` ever runs,
-which hides a trap: if `__init__()` raises after acquiring the resource,
-the `with` statement's target is never bound,
+`Socket.__init__()` also prints "opened" before `__enter__()` runs.
+That ordering hides a trap:
+if `__init__()` raises an exception after acquiring the resource,
+the `with` statement never receives a context manager,
 so `__enter__()` and `__exit__()` never run and the resource leaks silently:
 
 ```python
@@ -299,8 +300,9 @@ except RuntimeError as e:
 ```
 
 `C opened` has no matching `closed`:
-`__init__()` raised before the `with` statement could bind its target,
-so `__exit__()` never ran to release what `__init__()` had already acquired.
+`__init__()` raised an exception before the `with` statement received a context manager,
+so `__enter__()` and `__exit__()` never ran,
+and nothing released what `__init__()` had already acquired.
 Acquire the resource in `__enter__()` instead of `__init__()` when construction itself can fail,
 or wrap the acquisition in its own `try`/`except` and release what you already opened before re-raising.
 
@@ -388,11 +390,11 @@ So `False True` says the interpreter reclaimed `Safe` and kept `Leaky`.
 reference counting reclaimed it there, before `gc.collect()` ran.
 `Leaky` printed nothing, because its callback never ran and nothing failed.
 The listing turns `atexit` off on `Leaky`'s finalizer,
-so the question it answers is whether the collector reclaimed the object,
-rather than whether the callback eventually ran at exit.
+so `False True` answers whether the collector reclaimed each object,
+rather than whether a callback eventually ran at exit.
 
-Both `finalize()` and, as the next section shows,
-`WeakValueDictionary` need the target to support weak references at all.
+`finalize()` needs a target that supports weak references,
+and so does the `WeakValueDictionary` in the next section.
 A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
 
 ```python
@@ -461,7 +463,8 @@ print(Counter.live_count())
 
 A `WeakSet` would do for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
-and [Flyweight](35_Patterns--Flyweight.md) does that with a pool keyed by name.
+and [Flyweight](35_Patterns--Flyweight.md)
+looks its shared objects up in a pool keyed by the values that define them.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,
 and one would then displace the other.
@@ -482,8 +485,9 @@ The weak reference lets the registry prune itself.
 CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
-This listing reads the count during normal execution,
-where the `__del__()` version waited for interpreter shutdown and its unreliable bookkeeping.
+This listing reads the count during normal execution.
+The `__del__()` version in `cleanup.py` waited for interpreter shutdown,
+when the interpreter's bookkeeping is unreliable.
 
 ## The Rule
 
@@ -518,8 +522,8 @@ Losing the last reference to an open file finalizes it,
 and its `__del__()` closes the file and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 That backstop exists to catch the mistake, not to be the plan:
-it still depends on the object getting collected at all,
-which a reference cycle or `gc.disable()` can defer indefinitely.
+it still depends on the collector reclaiming the object,
+and a reference cycle or `gc.disable()` can defer that collection indefinitely.
 
 Give a class that owns a resource a `close()` method and a `with` block that calls it,
 so the cleanup runs at a point in the program you can see.
