@@ -88,7 +88,7 @@ that name becomes a class-level attribute instead
 shows what that shared storage does when you assign to it.
 A bare annotation with no value looks most like a C++ or Java field declaration,
 yet it creates neither kind of attribute.
-It records the type and nothing else.
+It records the type.
 [Class Attributes](09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar)
 and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
 use bare annotations.
