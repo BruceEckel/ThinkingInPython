@@ -141,7 +141,7 @@ if __name__ == "__main__":
 A module's namespace is an ordinary dict you can read and write.
 `globals()` returns it as a mutable `dict`,
 the same dict Python already searches when it looks up a top-level name.
-It is also the dict behind the dotted name:
+A dotted name reads that same dict:
 `module.__dict__` from outside is the same object `globals()` returns inside `module`,
 so `module.useful_function()` and a top-level lookup inside `module.py` find the same function.
 Assigning into that dict works like writing the assignment directly:
@@ -424,9 +424,9 @@ and `undeclared`: everything not underscored.
 With it, only the listed names arrive,
 and the star import skips `_internal` either way.
 
-Neither mechanism stops `module._name`.
+Neither the underscore nor `__all__` stops `module._name`.
 Both say which names a caller should use,
-and that is enough to treat a module as a façade over its internals
+and that agreement lets a module serve as a façade over its internals
 ([Changing the Interface](29_Patterns--Changing_the_Interface.md))
 or as a shared single instance
 ([Singleton](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
@@ -458,7 +458,7 @@ This book uses `test_*.py`, e.g. `test_result.py`.
 Don't shadow standard-library modules.
 A file named `random.py`, `string.py`,
 or `weakref.py` can hide the stdlib one and break imports,
-because Python searches the directory of the script you ran before the standard library
+because Python searches the script's directory before the standard library
 (see [`PYTHONPATH`](#pythonpath) below).
 Give a shared module a distinctive name for the same reason:
 the first `config.py` imported anywhere in the process is the one every later `import config` gets.
@@ -601,7 +601,7 @@ so `sys.lazy_modules` is not a clean "what my program deferred" list.
 `noisy` leaves the set once `noisy.announce()` loads it,
 so the set tracks only names still waiting,
 not names your program ever deferred.
-Filter it for the names you marked instead of reading it directly.
+Check it for a specific name you marked lazy, rather than reading the whole set.
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,

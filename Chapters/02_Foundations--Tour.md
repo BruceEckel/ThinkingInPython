@@ -263,7 +263,7 @@ print(bin(flags))
 The `bin()` function converts an integer to a binary string for display.
 Because Python integers have no fixed width,
 `~` has no fixed number of bits to flip.
-It produces `-x - 1`,
+`~x` produces `-x - 1`,
 the value that flipping every bit gives in two's complement.
 `bin()` prints that as a sign followed by a magnitude,
 so `~0b1100` reads as `-0b1101` rather than a row of ones.
@@ -335,7 +335,7 @@ so the empty string shows as `''` and not as blank.
 not a coerced boolean.
 `x or default` is a common way to supply a fallback,
 and it replaces every falsy `x`:
-a legitimate `0` or `""` gets thrown away along with a missing value.
+a legitimate `0` or `""` gets the fallback just as a missing value does.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
 That is a conditional expression,
@@ -528,7 +528,7 @@ which has the same `for` clause as the generator expression in `arithmetic.py` b
 covers the general form.
 Iteration skips empty literal strings,
 so the leading `''` in `message.strings` does not reach the loop.
-A consumer cannot assume that literals and interpolations alternate.
+That skipping is why a consumer cannot assume that literals and interpolations alternate.
 `shout()` uppercases the literal text and leaves the interpolated values in their original case.
 No amount of work on a finished f-string could do that reliably,
 because the finished string no longer says which characters came from where.

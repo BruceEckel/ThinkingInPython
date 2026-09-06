@@ -46,7 +46,7 @@ print(greet.__doc__)
 ```
 
 A docstring documents the function for a reader or a tool,
-not for the interpreter, which ignores its value.
+not for the interpreter, which stores the text without acting on it.
 [Metaprogramming](17_Techniques--Metaprogramming.md#the-inspect-module)
 reads it back with `inspect.getdoc()`.
 
@@ -338,7 +338,7 @@ so the call raises an `UnboundLocalError`.
 `global` governs rebinding, not reading,
 and that is why `read_only()` needs no declaration.
 [Closures](40_Functional--Foundations.md#closures) covers `nonlocal`,
-the same idea one scope in.
+which rebinds a name in an enclosing function the way `global` rebinds a module-level name.
 A function that rebinds a global couples every caller to that shared,
 mutable state.
 [Closures](40_Functional--Foundations.md#closures)

@@ -9,7 +9,7 @@ and on a small program you may not miss them.
 Python 3.5 (2015) introduced *type hints*,
 which look like the type declarations of statically typed languages.
 The Python runtime never acts on a type hint.
-It stores the hint and evaluates it only when something asks.
+It stores the hint and evaluates it only when something reads the annotations.
 If you want static type checking like you get from a compiler in a typed language,
 you must run a separate type-checking tool.
 Mypy is the original and most widely deployed one,
@@ -100,7 +100,8 @@ print(area("3", 4))  # type: ignore
 
 At runtime `area("3", 4)` runs without error.
 It returns `"3333"`, because `"3" * 4` repeats the string four times.
-The bug surfaces later, often far from the line that caused it.
+The wrong value causes a failure later,
+often far from the line that produced it.
 The type checker discovers the problem immediately.
 
 The `# type: ignore` comment tells the type checker to skip this line,
@@ -186,8 +187,8 @@ The `if` narrows `b.val` to `str`,
 and nothing in the checker's model connects `reset()` to that narrowing,
 so the checker never widens `b.val` back to `str | None`.
 The crash proves the narrowing was already stale by the time `.upper()` ran.
-Narrow a local variable and hold that trust;
-narrow an attribute and recheck it after any call that might touch the object.
+A narrowing on a local variable holds; a narrowing on an attribute can go stale,
+so recheck it after any call that might touch the object.
 
 ## Constants with Final
 
@@ -459,7 +460,7 @@ print(box.get().upper())
 
 Constructing `Box("gift")` fixes `T` to `str` for that instance,
 so `get()` returns a `str` and the call to `upper()` checks.
-A bound constrains the parameter.
+A *bound* constrains the parameter:
 `class Box[T: Shape]` accepts only `Shape` and its subclasses.
 
 ### Variance {#variance}
@@ -623,8 +624,9 @@ print(t.bump().bump().report())
 and the result has `report()`.
 If `bump()` declares `-> Tally`, the type checker rejects `report()`,
 because `Tally` has no such method.
-Alternative constructors benefit the same way.
-A `@classmethod` that ends with `return cls(...)` returns `Self`.
+Alternative constructors benefit the same way:
+a `@classmethod` that ends with `return cls(...)` returns `Self`,
+so a call on a subclass produces an instance of that subclass, not of the base.
 
 ## Hints Are Not Enforced at Run Time
 

@@ -91,7 +91,7 @@ yet it creates neither kind of attribute.
 It records the type and nothing else.
 [Class Attributes](09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar)
 and [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
-use it.
+use bare annotations.
 
 `display_object()` is a small inspection helper built in [Metaprogramming](17_Techniques--Metaprogramming.md#building-display_object).
 The helper shows the shape of an object by printing its attributes and methods:
@@ -226,8 +226,7 @@ C().show()  # A comes first in the MRO
 #: A.show
 ```
 
-`C.__mro__` visits `A` before `B`, so `C().show()` runs `A`'s version,
-not `B`'s.
+`C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s version, not `B`'s.
 
 The base-class constructor runs because `Simple2`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
@@ -322,8 +321,9 @@ At run time `@override` returns the same function object it received,
 with no wrapper.
 Before returning the function,
 the decorator tries to set an `__override__` attribute on it,
-so that code can find overrides by introspection;
-some callables refuse the attribute, and the decorator lets that pass.
+so that code can find overrides by introspection.
+On some callables that assignment raises an exception,
+which the decorator catches and ignores.
 
 Apply `@override` to any method that replaces an inherited method.
 Two kinds stay undecorated by convention: constructors,
@@ -542,7 +542,7 @@ print([p])
 `print()` and `str()` use `__str__()` when it exists and fall back to `__repr__()` when it does not.
 The fallback runs in one direction: `repr()` never consults `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
-and that is why the list prints `Point(3, 4)` rather than the shorter form.
+and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
 By convention `__repr__()` returns the call that would rebuild the object,
 so it reads `Point(3, 4)`.

@@ -199,7 +199,7 @@ locate(9)
 `locate(3)` walks the first row to the end,
 so the inner `else` runs its `continue` and the outer loop moves on to the second row.
 There the `3` matches, the inner `break` skips the `else`,
-and the outer `break` fires right after.
+and the outer `break` runs right after.
 `locate(9)` breaks neither loop,
 so the inner `else` continues on each row and the outer `else` prints `"not found"`.
 
@@ -251,7 +251,7 @@ except ValueError as e:
 
 `zip()` produces one item from each sequence and stops when the shortest runs out,
 so the extra score never appears.
-That silence is convenient when the lengths differ on purpose and a bug when you expect them to match.
+Stopping without an error is convenient when the lengths differ on purpose and a bug when you expect them to match.
 `strict=True` raises a `ValueError` on the mismatch instead.
 When you need the index as well, wrap the `zip()` in `enumerate()`.
 The nesting shows up in the loop header, where the inner pair needs parentheses:
@@ -280,7 +280,7 @@ while stack and (item := stack.pop()) != "a":
 #: processing b
 ```
 
-The `while` loop is where the walrus pays off.
+The `while` loop is where the walrus helps most.
 The header pops a value, names it, and tests it,
 so the body needs no second pop and no separate copy.
 The walrus also collapses `while_true.py` into its loop header:
@@ -321,7 +321,7 @@ The list loop walks by position.
 Removing an item shifts the next one down into the slot the loop already passed,
 so the loop skips it and one of the two `2`s survives,
 with no exception to tell you.
-The dictionary refuses outright instead of skipping silently.
+The dictionary raises a `RuntimeError` instead of skipping silently.
 The fix is the same for both: build a new container with a comprehension,
 or collect what to remove first and remove it after the loop.
 
@@ -445,7 +445,7 @@ including the `KeyboardInterrupt` you press to stop a runaway program.
 It also catches a bug in the `try` block and makes it look like an expected failure.
 `except Exception:` is the broad catch you want instead:
 `KeyboardInterrupt` and `SystemExit` derive from `BaseException` rather than `Exception`,
-so they travel past that clause and still stop the program.
+so they propagate past that clause and still stop the program.
 To handle several types the same way, give a tuple:
 `except (ValueError, TypeError) as e:`.
 Python tries the `except` clauses in order and runs the first whose type matches,
@@ -565,7 +565,7 @@ print(forgiving("\N{SUPERSCRIPT TWO}"))
 `isdigit()` rejects `"-5"`, which `int()` converts fine, and it accepts `"²"`,
 which `int()` refuses.
 The `try` block asks the only question that matters: does this conversion work?
-The gap grows when the world can change between test and operation:
+The world can also change between the test and the operation:
 a file that exists at the `if` can disappear before the `open()`,
 and only the EAFP form is safe against that.
 

@@ -138,10 +138,11 @@ Many of these chapters came from presentations I've given, mostly at PyCon.
 Part III, *Patterns*, opens by stepping back to question object orientation,
 because several of the patterns that follow exist to manage problems that objects create.
 A short chapter then introduces the design-patterns movement itself,
-and the question the rest of the part keeps asking.
+and the question I keep asking through the rest of the part:
+what problem are you solving,
+and does the language already do the pattern's job?
 The part then works through the classic design patterns,
 reframing each for Python and weighing it against the language.
-I ask what problem you are solving and whether the language already does the pattern's job.
 Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
 building a simulation out of the pieces,
@@ -178,7 +179,7 @@ These files live in the `Examples/` directory of the [source repository](https:/
 one folder per chapter,
 so the code block starting with `# tracer.py` in [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 is the file `Examples/14_Techniques--Decorators/tracer.py`.
-A helper that more than one chapter uses names a `utils/` path instead,
+A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
 
@@ -197,12 +198,12 @@ until then they only mark lines a type checker would flag.
 
 Output appears inside the listings as comments beginning with `#:`,
 one line of output per marker.
+A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
 A group of markers shows everything the code above it printed since the previous group,
 in order.
 Output from inside a loop, or from an `import`,
 therefore appears in the group of markers after the loop or the `import`,
 not next to the line that produced it.
-A `print("affirmative")` above a line reading `#: affirmative` means the program prints `affirmative` at that point.
 The build verifies these markers against a real run,
 so they cannot drift from what the code prints.
 

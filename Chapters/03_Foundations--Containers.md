@@ -307,7 +307,7 @@ and leaving it off is a common slip:
 `for name, age in ages` iterates the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
-A two-character key such as `"Bo"` would unpack into its letters and the loop would run on.
+A two-character key such as `"Bo"` would unpack into its letters and the loop would finish with no error.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable:
 each supports `&`, `|`, `-`,
@@ -348,7 +348,7 @@ print(dict(zip("abc", [1, 2, 3])))  # Build from pairs
 the same job `update()` does.
 The next section uses `|` for set union,
 where the order of the operands makes no difference.
-For dictionaries the order matters: on a key both dictionaries hold,
+For dictionaries the order matters: when both dictionaries hold the same key,
 the right operand's value wins, so `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 and any iterable that yields such pairs will do.
@@ -356,7 +356,7 @@ and any iterable that yields such pairs will do.
 [Control Flow](04_Foundations--Control_Flow.md#loops)
 covers it with the other loop tools.
 
-Mutating a `dict` while iterating it raises a `RuntimeError` instead of quietly skipping elements,
+Changing a `dict`'s size while iterating it raises a `RuntimeError` instead of quietly skipping elements,
 as `remove_while_iterating.py`'s `list` does:
 
 ```python
@@ -663,7 +663,7 @@ Use a `deque` for a single-threaded queue.
 Indexing its middle is O(n), though,
 so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` also caps its length,
-discarding from the far end when a new item would overflow it.
+discarding from the other end when a new item would overflow it.
 That is a sliding window, and a `list` has no equivalent.
 For a queue shared between threads, use `queue.Queue`
 (see [Concurrency](19_Techniques--Concurrency.md)), and for a priority queue,
@@ -756,7 +756,7 @@ except TypeError as e:
 ```
 
 Modifying an immutable container is a type error as well as a runtime error,
-so each line that deliberately misbehaves carries a `# type: ignore`.
+so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
 The runtime exception is what the listing exists to show.
 
