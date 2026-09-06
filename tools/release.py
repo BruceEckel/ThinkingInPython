@@ -220,13 +220,15 @@ def publish(tag: str, version: str, branch: str,
              "(The latest changes are always readable at "
              "[ThinkingInPython.com](https://thinkinginpython.com/).)"
              "\n\n"
-             "Two EPUBs: `-color` has color syntax highlighting for "
-             "backlit readers (phone/tablet apps); `-eink` marks "
-             "code with bolding instead, for e-ink devices where "
-             "color is invisible. The `.txt` guides walk through "
-             "getting the book onto a Kindle, an iPad, an Android "
-             "phone or tablet, a computer, or a Kobo and other EPUB "
-             "e-readers, simplest way first.\n\n"
+             "Two EPUBs:\n\n"
+             "- `-color` has color syntax highlighting for backlit "
+             "readers (phone/tablet apps).\n"
+             "- `-eink` marks code with bolding instead, for e-ink "
+             "devices where color is invisible.\n\n"
+             "The `.txt` guides walk through getting the book onto a "
+             "Kindle, an iPad, an Android phone or tablet, a computer, "
+             "or a Kobo and other EPUB e-readers, simplest way "
+             "first.\n\n"
              f"Built from `{branch}` @ {head[:12]}.")
     command = ["gh", "release", "create", tag,
                "--target", branch,
