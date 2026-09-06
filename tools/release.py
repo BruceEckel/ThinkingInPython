@@ -216,7 +216,10 @@ def build_assets(version: str) -> list[Path]:
 def publish(tag: str, version: str, branch: str,
             assets: list[Path]) -> None:
     head = git("rev-parse", "HEAD")
-    notes = ("The complete book as PDF and EPUB.\n\n"
+    notes = ("The complete book as PDF and EPUB. "
+             "(The latest changes are always readable at "
+             "[ThinkingInPython.com](https://thinkinginpython.com/).)"
+             "\n\n"
              "Two EPUBs: `-color` has color syntax highlighting for "
              "backlit readers (phone/tablet apps); `-eink` marks "
              "code with bolding instead, for e-ink devices where "
