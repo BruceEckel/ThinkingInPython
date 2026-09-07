@@ -2,13 +2,13 @@
   width="32" alt=""> Thinking in Python</h1>
 <h3 align="center"><em>Fluency, Types, and Design</em></h3>
 <p align="center">
-  <img src="resources/static/cover-art.jpg" width="560"
+  <img src="resources/static/cover-art.jpg" width="600"
        alt="A python coiled into an infinity sign, swallowing its own tail">
 </p>
 <h3 align="center">Bruce Eckel</h3>
 
 An intermediate-to-advanced book for experienced programmers.
-It opens with a fast introduction for programmers coming from other languages.
+Opens with a condensed introduction for programmers coming from other languages.
 
 ## Read the Book Online
 
@@ -39,7 +39,7 @@ Every listing in the book is a real file that runs. You will find it in
 `Examples/`, in its chapter's directory, under the name the book gives it.
 The answers to the exercises are in `Solutions/`.
 
-| Directory | What is in it |
+| Directory | Contents |
 |---|---|
 | `Examples/` | The book's listings, one directory per chapter (`Examples/07_Foundations--Classes/`), each file named the way the book names it (`property_setter.py`). |
 | `Examples/utils/` | Helpers that several chapters import, such as `display.py` and `benchmark.py`. Not a chapter. |
@@ -53,7 +53,7 @@ where each listing is a fenced `python` block whose first line is a
 
 ### Reading a listing
 
-The file is byte for byte what the book prints. A `#:` comment holds the
+The file is byte for byte what the book prints. A `#:` marker comment holds the
 output of the statement above it:
 
 ```python
@@ -96,11 +96,11 @@ You'll need to do this to experiment with the examples and exercises.
 5. Run `make tools-check` to verify the essential tools.
 
 That is everything you need to run and test the examples and the solutions.
-`make doctor` diagnoses the two environment problems that bite in practice:
+`make doctor` diagnoses the two common environment problems:
 a stale `uv` stuck on an old Python prerelease, and (on Windows) a process
 holding `.venv` open.
 
-Type `make` to see every target. In a terminal it opens a picker instead:
+Type `make` to see every target; it opens a picker where
 arrow keys choose, Enter runs, and `?` shows a target's full documentation.
 
 #### Optional: Building the Book
@@ -130,7 +130,7 @@ copy.
 | `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests. |
 | `make gate` | Every check over both trees. Run this before committing. |
 
-A first run also pays for downloading the pinned Python and the dev tools.
+A first run also downloads the pinned Python and the dev tools.
 
 To run one example instead of all of them, see
 [Run one example by hand](#run-one-example-by-hand) below.
@@ -205,14 +205,12 @@ which still had a number of examples that were still in Java (!), I found this e
 In June 2026 I decided to see what the Claude AI could do with it, and in short order it had brought
 everything up to Python 3.15, with type annotations, passing standards checkers, cleaning up prose, etc.
 I began going back through my Pycon presentations and blog posts and adding those.
-At the moment it is in decent shape and you can read it online:
-https://bruceeckel.github.io/ThinkingInPython/
 
 ---
 
 ## Edit checklist
 
-This is for my own bookkeeping.
+For my own bookkeeping.
 
 | Chapter | Edit State |
 |---------|:------:|
