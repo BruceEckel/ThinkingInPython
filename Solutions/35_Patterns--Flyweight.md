@@ -63,7 +63,7 @@ print(len(cells), len({id(t) for t in cells}))
 
 Door and tree tiles need two new symbols in `SPECS`, and the same two
 in the `Symbol` literal, so the type checker still flags a `SPECS` key
-that `Symbol` does not list. That is the entire edit. `tile()` and
+that `Symbol` does not list. The edit stops there. `tile()` and
 `parse_map()` never change. Twenty-four cells collapse to five
 distinct objects, one per kind (`grass`, `water`, `rock`, `door`,
 `tree`), and that count stays at five however large the map grows,

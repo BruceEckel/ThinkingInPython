@@ -1064,7 +1064,7 @@ and the declared
 `str | Unavailable | NotInteresting | NoArticle` no longer covers it.
 `ty` reports an `invalid-return-type` on the `return run(...)` line, naming
 `TooLong` as the member that does not fit. Adding `| TooLong` to the annotation
-is the whole fix, and the third `print()` above exercises the new branch.
+fixes it, and the third `print()` above exercises the new branch.
 
 Removing `outcome()`'s return annotation makes the error disappear, and that is
 the interesting half. With no declared return type, `ty` infers one from the

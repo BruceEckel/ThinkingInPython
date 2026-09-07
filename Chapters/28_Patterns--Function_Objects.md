@@ -319,7 +319,7 @@ with a `find()` method, and a "Context" class holds the chosen one.
 Those five classes produce the same three lines that one function argument produced.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
-Until then, the `finder` parameter is the whole pattern.
+Until then, the pattern reduces to the `finder` parameter.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.

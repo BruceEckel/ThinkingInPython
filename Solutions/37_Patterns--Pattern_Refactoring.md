@@ -44,7 +44,7 @@ for kind, group in bins.items():
 #: Aluminum 3.34
 ```
 
-That is the entire change to Python code. `__init_subclass__()`
+That is the only change to the Python code. `__init_subclass__()`
 registers `Plastic` in `Trash.registry` automatically, the moment the
 `class` statement runs, so `Trash.create("Plastic", weight)` works
 with no further wiring. `recycle_dict.py`'s sorting loop needs no

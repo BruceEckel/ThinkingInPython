@@ -1785,7 +1785,7 @@ so the signature must declare that failure.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
 like `error_escapes.py` did for a single error.
-`pytest.raises(ValueError)` is the whole assertion:
+The test's one assertion is `pytest.raises(ValueError)`:
 the failure the signature declares is the one the caller sees.
 Failures never vanish.
 They only relocate.

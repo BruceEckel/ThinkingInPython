@@ -163,7 +163,7 @@ It prints `4.5` and charges the customer for a number of kilograms.
 `NewType` exists only for the type checker: `Weight(2.5)` returns the
 `float` `2.5`, and no wrapper survives to run time. The distinction is
 real in the source and absent in the process, and that split is the
-whole bargain the chapter describes.
+bargain the chapter describes.
 
 ## 4. A `Triple`, adapted by composition
 

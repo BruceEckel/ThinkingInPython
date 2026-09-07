@@ -81,7 +81,7 @@ file, before the loop starts. Its `process(text)` then checks each
 text against that list and returns a report of the words it found,
 rather than a transformed text. The word search needs no change to
 `FileFramework.run()` or `run_file_framework()`. Only the step
-changes, which is the entire point of the pattern.
+changes, as the pattern intends.
 
 ## 2. Two fixes for the premature engine
 

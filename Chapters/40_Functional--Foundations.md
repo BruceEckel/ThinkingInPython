@@ -106,7 +106,7 @@ print("ok")
 ```
 
 If you delete the second `total = 0`, the second assertion fails.
-That line is the whole fixture, and purity removes it.
+That line is the fixture the impure version needs, and purity removes it.
 `slope()` appears again later in the book:
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
 asks of this same function whether raising an exception breaks its purity.
@@ -380,7 +380,7 @@ the comprehension ([Comprehensions](16_Techniques--Comprehensions.md)).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` earn their keep when the function already exists:
-`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name is the whole story.
+`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name says what the comprehension would repeat.
 The two also return different things.
 The comprehension hands you a finished list.
 `map()` hands you an iterator you can feed into the next stage without building the list.

@@ -120,8 +120,8 @@ print(quoted(message))
 
 `quoted()` is `shout()` with the two branches swapped over: the
 `Interpolation` branch is the one that changes something, and the
-literal branch passes its text through. The `isinstance()` test is the
-whole mechanism. Each piece arrives already labelled as text the author
+literal branch passes its text through. The `isinstance()` test does
+all the work. Each piece arrives already labelled as text the author
 typed or as a value the program supplied, so deciding what to do with
 each is a two-line `if` rather than a parsing problem.
 

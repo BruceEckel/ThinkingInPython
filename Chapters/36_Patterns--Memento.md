@@ -546,8 +546,8 @@ print(history.undo())
 #: Goose: circle beak scribble
 ```
 
-`checkpoint` names a past `Drawing`,
-and naming a past state is the whole trick immutability makes possible.
+`checkpoint` names a past `Drawing`, and immutability keeps that name accurate,
+since the state it names cannot change.
 The restore takes the strokes from that past state and the title from the present one,
 producing a state that never existed before.
 It goes through `apply()` like any other action,

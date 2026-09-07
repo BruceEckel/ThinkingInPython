@@ -575,7 +575,7 @@ The model is an `Observable`.
 and `recolored()` computes the grid that results from a click: values in,
 values out.
 `BoxModel.click()` makes the next grid with `recolored()` and announces it with `notify()`.
-That is the whole model.
+`new_grid()`, `recolored()`, and `click()` make up the model.
 `tkinter` plays no part here.
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 

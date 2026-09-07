@@ -405,7 +405,7 @@ except KeyError:
 ```
 
 `print("injected code ran")` is not part of any class body. It runs at
-module level inside `exec()`, which is the whole point: a name that
+module level inside `exec()`, and that is the danger: a name that
 reaches `make_class()` unchecked becomes source code, and source code
 can do anything the program can do.
 

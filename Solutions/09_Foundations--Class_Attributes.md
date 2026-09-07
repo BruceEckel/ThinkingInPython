@@ -230,7 +230,7 @@ print(vars(c), vars(Counting)["total"])
 ```
 
 `vars(a)` holds `{'total': 1}` and the class still holds `0`, and
-those two facts are the whole explanation. `self.total += 1` expands to
+those two facts explain the output. `self.total += 1` expands to
 `self.total = self.total + 1`. The read finds nothing on the instance,
 falls back to the class, and gets `0`. The write then goes where every
 write through an instance goes: onto the instance. Each object ends up

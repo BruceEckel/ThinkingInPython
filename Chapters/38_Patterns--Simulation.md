@@ -1024,7 +1024,7 @@ Treat it as given.
 All that matters here is its shape.
 The field is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
-`step()` is the entire simulation.
+All of the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
 Grains never look at each other and remember nothing.

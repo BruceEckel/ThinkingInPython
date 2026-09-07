@@ -374,7 +374,7 @@ back. The information you want does not exist anywhere you can reach
 without changing the thing you are asking about.
 
 `Peekable` stores what a bare iterator does not: one item, pulled
-early. That is the entire difference, and that stored item buys back
+early. That one stored item is the difference, and it buys back
 the `current_item()` that *GoF* had and Python dropped. `peek()` is
 now free and repeatable, exactly as the three identical `2`s show,
 because it reads a field rather than the source.

@@ -239,9 +239,9 @@ info: No `shwo` definitions were found on any superclasses of `Derived`
 ```
 
 Remove the decorator again and the type checker goes quiet, while the
-program's behavior never changed at any point in the exercise. That is
-the whole shape of the feature: `@override` states an intention, the
-type checker verifies it, and the runtime is indifferent.
+program's behavior never changed at any point in the exercise. The
+feature has three parts: `@override` states an intention, the type
+checker verifies it, and the runtime is indifferent.
 
 The value of `@override` is in what the type checker catches later.
 The typo is easy to spot in six lines. The same failure arrives

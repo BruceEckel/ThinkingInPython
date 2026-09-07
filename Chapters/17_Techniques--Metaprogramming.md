@@ -1432,7 +1432,7 @@ It cannot change the name, the bases, or the namespace,
 and it cannot give the class object behavior of its own.
 Setting `__call__` from a decorator makes *instances* callable.
 Only a metaclass makes the class callable in a new way.
-That is the whole case for a metaclass: the class object needs behavior,
+The case for a metaclass rests on that limit: the class object needs behavior,
 and nothing that runs after the class exists can give it any.
 
 ## The `inspect` Module

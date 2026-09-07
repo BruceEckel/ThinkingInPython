@@ -133,7 +133,7 @@ the three strings a caller can assert on, write to a file, or join.
 Which shape is right depends on whether you want the list. Here the
 comprehension is correct, because `lines` is the point and the printing
 is incidental. The `for` loop at the end is the right shape for the
-original code, where printing was the whole purpose. The rule from the
+original code, where printing was the purpose. The rule from the
 chapter decides it: use a comprehension when you want the collection it
 produces, and a loop when you want the side effect.
 

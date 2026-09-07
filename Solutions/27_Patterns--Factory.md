@@ -495,7 +495,7 @@ entry. Its first assertion still holds, because `spawned.hp = 1`
 rebinds an `int` field on the copy rather than mutating a shared
 object.
 
-The split between those two assertions is the whole lesson. A shallow
+The split between those two assertions carries the lesson. A shallow
 copy duplicates the top object and shares everything it refers to, so
 the fields that break are exactly the mutable ones, and only when
 something mutates them in place. Assignment to a field is always safe.

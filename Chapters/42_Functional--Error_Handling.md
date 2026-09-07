@@ -213,7 +213,8 @@ put the meaning in the type.
 Python's humbler form of the same idea is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
 while an `Err` carries the reason for the failure.
-Use `| None` when absence is the whole story, a lookup that found nothing.
+Use `| None` when absence needs no explanation,
+as in a lookup that found nothing.
 Use `Result` when the caller may need to act on the reason,
 or when several different failures must stay distinguishable,
 as [Matching on the Error](#matching-on-the-error) shows below.
@@ -591,7 +592,7 @@ if __name__ == "__main__":
 but `@safe` has changed its return type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
-That error type is the whole exception hierarchy, not a specific failure.
+That error type is the root of the exception hierarchy, not a specific failure.
 Earlier in this chapter, `Result[int, str]` named exactly what could go wrong;
 `Result[int, Exception]` says only that something did,
 no narrower than a bare `except Exception`.

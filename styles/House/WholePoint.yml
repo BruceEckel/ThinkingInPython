@@ -1,0 +1,10 @@
+extends: existence
+message: "'%s': the 'is the whole/entire X' closer inflates the sentence before it. Say what X is, or cut the sentence."
+level: warning
+ignorecase: true
+# "the whole of" is an ordinary partitive ("the whole of the program")
+# and stays; the closer is "is the whole point/trick/story/lesson".
+# \s+ rather than a space: Vale keeps the source's line breaks inside a
+# paragraph, and Semantic Line Breaks can split the phrase across two.
+tokens:
+  - '(?:is|was|are|were)\s+the\s+(?:whole|entire)\s+(?!of\b)\w+'

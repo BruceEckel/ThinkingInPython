@@ -622,7 +622,7 @@ Four implementations, one Ability, one running program.
 and that is why the second run tells a different story from the same code.
 `battery_first` puts the battery ahead of the sun,
 so the charge drains first and the grid picks up at 19:00.
-Reordering that tuple is the whole difference between the two runs.
+The order of that tuple is the one difference between the two runs.
 Priority lives in `controller()`,
 thresholds and the outage schedule in the sources themselves,
 and `run_load()` decides when to give up on the source it holds.
@@ -1369,7 +1369,7 @@ def encounter() -> Depend[
     narrator.say(hero.approach(obstacle.blocks()))
 ```
 
-`encounter()` is the entire engine,
+`encounter()` holds all of the engine's logic,
 and the only types it mentions are the three Protocols.
 No concrete class appears in it, and it prints nothing.
 Output is an Ability like the other two:

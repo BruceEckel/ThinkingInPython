@@ -62,7 +62,7 @@ Hello, Alice!
 
 The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 `Terminal` for the reason any book listing does: a call to `input()`
-has no terminal to read from. The substitution is the whole point
+has no terminal to read from. The substitution is the point
 either way, and neither binding required a change to
 `ask_and_greet()`, which is character-for-character the same function
 under both.
@@ -575,7 +575,7 @@ calls each entry, each call builds a new generator, and each generator
 runs its body once. The stored value went from a description `run()`
 consumes once to a recipe a caller can follow as often as it likes.
 
-That difference is the whole reason `retry()`'s type is
+That difference is why `retry()`'s type is
 `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than
 `Effect[...] -> Effect[...]`. Retrying means running the same work
 more than once, and an Effect cannot supply the second run: by the
@@ -792,7 +792,8 @@ print(capture.messages)
 #: ['Hello, Bob!']
 ```
 
-Renaming `Capture.print()` to `record()` is the whole change. The two
+The fix renames `Capture.print()` to `record()` and changes nothing
+else. The two
 `Protocol`s no longer overlap, so no object satisfies both, and each
 Effect names the one it needs.
 

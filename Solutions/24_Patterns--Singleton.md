@@ -164,7 +164,7 @@ print(config.settings)
 #: {}
 ```
 
-The two prints disagree, and that is the whole lesson.
+The two prints disagree, and the exercise turns on why.
 `from config import settings` copies a binding: two names, this
 module's `settings` and `config.settings`, initially pointing at
 one dict. Mutating through either name, as the original
@@ -340,5 +340,5 @@ The trap is the general shape of a mutable `ClassVar` on a base
 class, not a quirk of *Borg*. The base declares one object, and
 every subclass inherits that same one. A subclass that assigns to
 it instead of mutating it gets a private copy, while the others
-keep sharing. *Borg* sharpens the trap: mutation is the whole
-design, so every version of the pattern carries it.
+keep sharing. *Borg* sharpens the trap: mutation is its
+design, so every version of the pattern carries the trap.

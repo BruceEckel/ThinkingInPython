@@ -427,7 +427,7 @@ The structure of `composed()` barely changed: `if a is None` replaced
 `if isinstance(a, Err)`, and the early returns stayed. What changed is
 what survives the return. `None` is a single value with no room to
 carry a reason, so every failure that reaches it becomes the same
-failure. The chapter names this trade. Use `| None` when absence is
-the whole story. Use a `Result` when the caller may need to act on
+failure. The chapter names this trade. Use `| None` when absence
+needs no explanation. Use a `Result` when the caller may need to act on
 which failure occurred, or when a person reading a bug report needs
 to know which of three steps went wrong.

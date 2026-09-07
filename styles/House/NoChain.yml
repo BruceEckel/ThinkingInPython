@@ -1,0 +1,10 @@
+extends: existence
+message: "'%s': a 'no X, no Y, no Z' chain of three or more. Two items read as prose; three or more read as a chant. Name what is there instead, or cut to two."
+level: warning
+ignorecase: true
+nonword: true
+# A chain item is "no" plus anything up to the next comma or "and".
+# Two items ("no getters and no copies") are ordinary English, so the
+# pattern requires three: one item plus at least two more.
+tokens:
+  - '\bno [^,.;:!?\n]*?(?:,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+)no [^,.;:!?\n]*?(?:,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+)no\b'
