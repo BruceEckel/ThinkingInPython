@@ -76,7 +76,8 @@ three more pairs of lines follow the last one above:
     Last Counter object deleted
 
 That was one run on one machine.
-This book's output checker, which executes every chapter in a single process,
+This book's output checker,
+which executes all of a chapter's listings in one process,
 finalizes the same three objects in the opposite order.
 
 The order in which the three `__del__()` methods run is an implementation detail.
@@ -473,7 +474,7 @@ since the dictionary holds only live objects and no two live objects share an id
 `live_count()` returns the size of that registry,
 so it reports how many `Counter` objects currently exist.
 When an instance loses its last ordinary reference,
-in this case when `pop()` removes it from the `counters` list,
+in this case when `pop()` or `clear()` removes it from the `counters` list,
 the interpreter collects it at once,
 and the dictionary drops its entry on its own.
 The count falls `3, 2, 1, 0` as the list releases the objects,
@@ -492,9 +493,9 @@ when the interpreter's bookkeeping is unreliable.
 ## The Rule
 
 Never put resource release in `__del__()`.
-The standard library bends that rule only as a diagnostic backstop: `io.IOBase`
-(so every file object)
-and `socket.socket` each define a `__del__()` that closes the resource and raises a `ResourceWarning`,
+The standard library's file and socket types bend that rule as a diagnostic backstop:
+`io.IOBase` (so every file object)
+and `socket.socket` each carry a `__del__()` that closes the resource and raises a `ResourceWarning`,
 catching a forgotten `close()` rather than replacing it:
 
 ```python
@@ -523,7 +524,8 @@ and its `__del__()` closes the file and reports the leak,
 at the same unpredictable moment as any other `__del__()`.
 That backstop exists to catch the mistake, not to be the plan:
 it still depends on the collector reclaiming the object,
-and a reference cycle or `gc.disable()` can defer that collection indefinitely.
+and a reference cycle defers that collection until the cyclic collector runs,
+or forever if `gc.disable()` has stopped it.
 
 Give a class that owns a resource a `close()` method and a `with` block that calls it,
 so the cleanup runs at a point in the program you can see.
