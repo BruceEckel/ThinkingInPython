@@ -1,8 +1,5 @@
 Implementation is Friction
 
-https://docs.python.org/3.15/whatsnew/3.15.html#upgraded-jit-compiler
-vs tail-calling interpreter: do analysis and decide whether it's worth talking about in the performance chapter
-
 How can I improve the process on this book?
 
 Check for any unresolved issues in deep_review and readability directories
