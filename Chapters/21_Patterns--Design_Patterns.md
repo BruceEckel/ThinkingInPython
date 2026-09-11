@@ -304,7 +304,7 @@ and the rest are here for your own designs.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
     builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
     moves the same declaration into a function's signature,
-    where `Need` lists what the function requires of its surroundings.
+    where `Need` names what the function requires of its surroundings.
     This gives Managed Coupling its target: not the least coupling,
     but coupling you can read.
 -   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
