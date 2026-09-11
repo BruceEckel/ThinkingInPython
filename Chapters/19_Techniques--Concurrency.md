@@ -256,17 +256,29 @@ PAIRS: Final[list[tuple[str, float]]] = [
     ("f", 0.3),
 ]
 
-async def fetch(item: str, delay: float) -> str:
+async def sleep_until(when: float) -> None:
+    loop = asyncio.get_running_loop()
+    woken: asyncio.Future[None] = loop.create_future()
+    timer = loop.call_at(when, woken.set_result, None)
+    try:
+        await woken
+    finally:
+        timer.cancel()
+
+async def fetch(item: str, delay: float, t0: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)
+    await sleep_until(t0 + delay)
     if item in ("c", "d"):
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()
 ```
 
+Each delay is an offset from `t0`,
+one reading of the event loop's clock that the caller takes before it starts any task,
+and `sleep_until()` hands that absolute time to `loop.call_at()`.
 `a` and `b` have the shortest delays and succeed.
-`c` and `d` share the same delay, so they fail together.
+`c` and `d` share one deadline, so they fail together.
 `e` and `f` are still sleeping when that happens,
 with a wide gap to their own deadlines.
 The gap gives cancellation time to arrive first on any platform's timer,
@@ -281,10 +293,11 @@ import asyncio
 from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay))
+                item: tg.create_task(fetch(item, delay, t0))
                 for item, delay in PAIRS
             }
     except* ValueError as group:
@@ -329,6 +342,15 @@ Outside one, keep the returned task in a variable or a set that outlives it.
 and the `TaskGroup` responds by cancelling `e` and `f`,
 which are still suspended with far more sleep to go,
 so neither ever reaches its `fetched` print.
+The shared deadline puts both failures in the group.
+The loop runs every timer due at one instant in the same turn,
+so `c` and `d` both raise before the group's own callback runs and starts cancelling.
+Had each called `asyncio.sleep(0.03)`,
+the two timers would have been set a few microseconds apart,
+since each call reads the clock when it runs,
+and a loop that woke between them would have run `c`'s failure,
+cancelled `d` while its timer was still pending,
+and delivered a group holding one exception.
 
 The block exits once every task has either finished or ended in cancellation.
 As it exits, it re-raises both failures wrapped in an *exception group*,
@@ -374,8 +396,9 @@ from typing import assert_never
 from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     results = await asyncio.gather(
-        *(fetch(item, delay) for item, delay in PAIRS),
+        *(fetch(item, delay, t0) for item, delay in PAIRS),
         return_exceptions=True,
     )
     for (item, _), result in zip(PAIRS, results):

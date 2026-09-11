@@ -164,11 +164,12 @@ since a tracing compiler can give different answers to the same call.
 
 The payoff is a percentage, not a multiple.
 On the `pyperformance` suite,
-3.15 measures 8-9% faster on x86-64 Linux and 12-13% faster on AArch64 macOS,
-each against that platform's fastest build without the JIT,
-which on macOS is the tail-calling interpreter.
-Those are geometric means over dozens of benchmarks.
-The individual benchmarks range from roughly 15% slower to more than twice as fast,
+3.15 measures 8-9% faster on x86-64 Linux against the standard optimized build,
+and 12-13% faster on AArch64 macOS against the tail-calling interpreter.
+Those are geometric means over dozens of benchmarks,
+and the What's New marks them as not yet final.
+The report sets aside one microbenchmark, `unpack_sequence`,
+and the rest range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
 Measuring your own program costs two runs:
 time the workload with `PYTHON_JIT` set to `1` and to `0`,

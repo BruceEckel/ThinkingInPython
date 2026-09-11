@@ -11,19 +11,29 @@ PAIRS: Final[list[tuple[str, float]]] = [
     ("f", 0.3),
 ]
 
-async def fetch(item: str, delay: float) -> str:
+async def sleep_until(when: float) -> None:
+    loop = asyncio.get_running_loop()
+    woken: asyncio.Future[None] = loop.create_future()
+    timer = loop.call_at(when, woken.set_result, None)
+    try:
+        await woken
+    finally:
+        timer.cancel()
+
+async def fetch(item: str, delay: float, t0: float) -> str:
     print(f"{item}: started")
-    await asyncio.sleep(delay)
+    await sleep_until(t0 + delay)
     if item in ("c", "d"):
         raise ValueError(f"fetch({item!r}) failed")
     print(f"{item}: fetched")
     return item.upper()
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay))
+                item: tg.create_task(fetch(item, delay, t0))
                 for item, delay in PAIRS
             }
     except* ValueError as group:

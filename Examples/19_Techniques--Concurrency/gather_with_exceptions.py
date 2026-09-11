@@ -4,8 +4,9 @@ from typing import assert_never
 from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     results = await asyncio.gather(
-        *(fetch(item, delay) for item, delay in PAIRS),
+        *(fetch(item, delay, t0) for item, delay in PAIRS),
         return_exceptions=True,
     )
     for (item, _), result in zip(PAIRS, results):

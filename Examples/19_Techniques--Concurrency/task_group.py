@@ -3,10 +3,11 @@ import asyncio
 from fetch_demo import PAIRS, fetch
 
 async def main() -> None:
+    t0 = asyncio.get_running_loop().time()
     try:
         async with asyncio.TaskGroup() as tg:
             tasks = {
-                item: tg.create_task(fetch(item, delay))
+                item: tg.create_task(fetch(item, delay, t0))
                 for item, delay in PAIRS
             }
     except* ValueError as group:
