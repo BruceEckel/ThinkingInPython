@@ -49,9 +49,9 @@ and later releases have continued that work.
 Moving a project forward two or three releases costs a test run rather than a rewrite.
 A speedup that needs neither new code nor new hardware is rare.
 
-One more speedup needs no new code:
-the experimental just-in-time compiler inside CPython,
-the subject of the next section.
+Two more speedups need no new code: the tail-calling interpreter,
+and the experimental just-in-time compiler inside CPython,
+the subjects of the next two sections.
 
 Alternative interpreters for Python exist, notably PyPy,
 which claims about a 3x speedup on average.
@@ -65,6 +65,44 @@ since it removes the lock that otherwise serializes Python bytecode across threa
 
 How much does a hardware upgrade cost compared to paying programmers to solve the performance problem?
 If it's noticeably less, buying new hardware might be a quick win.
+
+## The Tail-Calling Interpreter
+
+The first of those speedups has no switch.
+Since 3.14, CPython can be built so that each bytecode instruction is a small C function that ends by calling the function for the next instruction,
+in place of one large C `switch` that dispatches every instruction.
+The C compiler turns each of those calls into a jump,
+and the loop that runs Python bytecode gets faster.
+The tail call is in C, inside the interpreter.
+It is unrelated to tail-call optimization of Python functions,
+which CPython does not do, as [Recursion](41_Functional--Toolkits.md#recursion)
+notes.
+
+Nothing in your program changes, and nothing in your program can tell.
+No `sys` function reports it, and the documentation calls it an internal detail.
+The build decides.
+The python.org Windows 64-bit binaries for 3.15 use it,
+as do the python-build-standalone 3.15 builds that `uv` installs,
+including the interpreter that runs this book's listings.
+A source build needs `--with-tail-call-interp` and a compiler with the `preserve_none` calling convention:
+Clang 19 or newer, or Visual Studio 2026.
+
+The payoff is again a percentage, and a larger one than the JIT's.
+On Windows x86-64, 3.15 measures 15-20% faster on the `pyperformance` geometric mean than the same source built with the `switch`,
+with individual programs from 14% to 40%.
+The 3.14 figure, with Clang 19,
+is 3-5%.^[The 3.14 announcement said 10-15%. Nelson Elhage's [March 2025 analysis](https://blog.nelhage.com/post/cpython-tail-call/)
+traced most of that to the baseline:
+LLVM 19 had capped its tail-duplication pass,
+which collapsed the old interpreter's 332 dispatch jumps into 3,
+so the comparison was against a compiler regression rather than a fast interpreter.
+With LLVM fixed, the gain was 1-5%, and the What's New now says 3-5%.
+The advice under [Numbers on Your Machine](#numbers-on-your-machine)
+applies to CPython's own developers too.]
+The two speedups stack.
+The JIT compiles the hot paths,
+the tail-calling interpreter runs everything else faster,
+and the macOS figure in the next section is measured on top of this one.
 
 ## The CPython JIT
 
@@ -127,7 +165,8 @@ since a tracing compiler can give different answers to the same call.
 The payoff is a percentage, not a multiple.
 On the `pyperformance` suite,
 3.15 measures 8-9% faster on x86-64 Linux and 12-13% faster on AArch64 macOS,
-each against that platform's fastest build without the JIT.
+each against that platform's fastest build without the JIT,
+which on macOS is the tail-calling interpreter.
 Those are geometric means over dozens of benchmarks.
 The individual benchmarks range from roughly 15% slower to more than twice as fast,
 so the mean predicts your program poorly.
