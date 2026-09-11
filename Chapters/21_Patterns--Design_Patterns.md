@@ -295,6 +295,18 @@ and the rest are here for your own designs.
     Simply declaring that a design should have "low coupling" is usually too vague.
     Coupling happens, so acknowledge it and control it:
     say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
+-   *Design the communication, not the parts*.
+    Alan Kay, on what object orientation was for:
+    "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message opens with "The big idea is 'messaging'."]
+    A `Protocol` is that design made literal:
+    it names what a caller needs from the object on the other side of a call,
+    and says nothing about what that object is.
+    [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
+    builds on this, and [Stateless](46_Effects--Stateless.md#declaring-a-dependency)
+    moves the same declaration into a function's signature,
+    where `Need` lists what the function requires of its surroundings.
+    This gives Managed Coupling its target: not the least coupling,
+    but coupling you can read.
 -   *Subtraction*: a design is complete when you cannot take anything else away^[Antoine de Saint-Exupéry, *Wind, Sand and Stars*: "perfection is reached not when there's nothing left to add, but when there's nothing left to remove". The English wording varies by translation.].
 -   *Simplicity before generality*^[From an email from Kevlin Henney.].
     A common problem we find in frameworks is that they aim to be general purpose without reference to actual systems.

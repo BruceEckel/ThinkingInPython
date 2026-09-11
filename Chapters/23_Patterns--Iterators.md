@@ -4,6 +4,9 @@ An *iterator* decouples an algorithm from the container it uses.
 Code written against an iterator does not care whether the data came from a list,
 a file, a database cursor, or a computation.
 It asks only for the next item.
+That is the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+asks for: the caller states what it needs,
+and the container's type stays out of the conversation.
 
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,

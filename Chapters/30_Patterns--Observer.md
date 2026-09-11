@@ -4,6 +4,9 @@ The *Observer* pattern, a kind of callback,
 decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
 and hears from the observable whenever its state changes.
+The observable knows a list of callables and what it will pass them,
+which is all [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+asks a design to fix: how the parts communicate, not what they are.
 Of the callback patterns it is the most dynamic:
 
 - Observers attach and detach at runtime
