@@ -1672,7 +1672,8 @@ stopping when the program is fast enough:
 
 1. Run the straightforward version.
    It may be fast enough.
-2. Try a faster platform: a newer CPython, its JIT, PyPy, or better hardware.
+2. Try a faster platform: a newer CPython, a tail-calling build, its JIT, PyPy,
+   or better hardware.
 3. Write idiomatic Python and let the interpreter's C loops do the work.
 4. Fix the algorithm and the data structures.
    This can produce order-of-magnitude improvements.
