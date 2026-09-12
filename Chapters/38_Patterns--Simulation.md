@@ -455,8 +455,69 @@ no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
 `rats_view.py` records that order by subclassing `Blackboard` and overriding `claim()`,
 so the model needs no change.
-The code is in `Examples/38_Patterns--Simulation/rats_and_mazes/rats_view.py`.
 The harness skips it, like every windowed view in this book.
+
+```python
+# rats_and_mazes/rats_view.py
+import asyncio
+import tkinter as tk
+from typing import Final, override
+from blackboard import Blackboard
+from maze import Coord, Maze
+
+CELL: Final[int] = 26
+
+class RecordingBlackboard(Blackboard):
+    def __init__(self, maze: Maze) -> None:
+        super().__init__(maze)
+        self.order: list[Coord] = []
+
+    @override
+    def claim(self, x: int, y: int) -> bool:
+        claimed = super().claim(x, y)
+        if claimed:
+            self.order.append((x, y))
+        return claimed
+
+def show(layout: str = "amaze.txt",
+         step_ms: int = 60) -> None:
+    maze = Maze.from_file(layout)
+    board = RecordingBlackboard(maze)
+    asyncio.run(board.explore())
+
+    root = tk.Tk()
+    root.title("Rats and Mazes")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=maze.width * CELL,
+                       height=maze.height * CELL)
+    canvas.pack()
+
+    def box(x: int, y: int, color: str) -> None:
+        canvas.create_rectangle(
+            x * CELL, y * CELL,
+            (x + 1) * CELL, (y + 1) * CELL,
+            fill=color, outline="gray")
+
+    for y in range(maze.height):
+        for x in range(maze.width):
+            box(x, y,
+                "white" if maze.is_open(x, y)
+                else "dimgray")
+
+    cells = iter(board.order)
+
+    def step() -> None:
+        cell = next(cells, None)
+        if cell is not None:
+            box(cell[0], cell[1], "palegreen")
+            root.after(step_ms, step)
+
+    step()
+    root.mainloop()
+
+if __name__ == "__main__":
+    show()
+```
 
 Concurrency here is a shape for the code, not a source of speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
@@ -976,7 +1037,61 @@ draws each room as a colored cell,
 and steps the robot along that route on a timer.
 The view is the only part that touches the screen,
 and the model neither knows nor cares that it exists.
-The code is in `Examples/38_Patterns--Simulation/robot_explorer/maze_view.py`.
+
+```python
+# robot_explorer/maze_view.py
+import tkinter as tk
+from typing import Final
+from game import GameBuilder, string_maze
+from items import Urge
+from solver import solve
+
+CELL: Final[int] = 20
+FILL: Final[dict[str, str]] = {
+    "#": "dimgray", "!": "tomato", ".": "khaki",
+    "_": "white", "R": "royalblue"}
+MOVES: Final[dict[str, Urge]] = {
+    "n": Urge.NORTH, "s": Urge.SOUTH,
+    "e": Urge.EAST, "w": Urge.WEST}
+
+def show(maze: str = string_maze,
+         step_ms: int = 80) -> None:
+    game = GameBuilder(maze)
+    moves = solve(game)
+    rows = maze.splitlines()
+    width = max(len(row) for row in rows)
+    root = tk.Tk()
+    root.title("Robot in a Maze")
+    canvas = tk.Canvas(root, highlightthickness=0,
+                       width=width * CELL,
+                       height=len(rows) * CELL)
+    canvas.pack()
+
+    def draw() -> None:
+        canvas.delete("all")
+        for (row, col), room in game.rooms.items():
+            symbol = ("R" if room is game.robot.room
+                      else str(room.occupant))
+            canvas.create_rectangle(
+                col * CELL, row * CELL,
+                (col + 1) * CELL, (row + 1) * CELL,
+                fill=FILL.get(symbol, "palegreen"),
+                outline="gray")
+
+    queue = list("".join(moves.split()))
+
+    def step() -> None:
+        draw()
+        if queue:
+            game.robot.move(MOVES[queue.pop(0)])
+            root.after(step_ms, step)
+
+    step()
+    root.mainloop()
+
+if __name__ == "__main__":
+    show()
+```
 
 Three ideas from earlier chapters carry the design.
 [Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
