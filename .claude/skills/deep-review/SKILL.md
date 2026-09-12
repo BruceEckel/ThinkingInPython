@@ -137,6 +137,11 @@ usually beats deleting: a sentence that needed "actually" or "only"
 often had a vague subject or a buried contrast, and fixing that removes
 the word on its own.
 
+Person is part of the same standard. The book addresses the reader
+as "you", and prose you write uses "you" unless "we" clearly reads
+better in that sentence. A "we" Bruce wrote is his choice, like his
+em-dashes: leave it, and do not report it as a finding.
+
 When a chapter documents a third-party library, read that library's
 source before asserting anything about it. Its exports and docstrings
 are not enough. Reading `stateless`'s `functions.py` and `effect.py`

@@ -142,6 +142,11 @@ Small, but they are what makes a straightened sentence still feel heavy:
   Grep the book before rewording a noun that reads like jargon;
   if other chapters use it, it is a term, and changing one instance
   breaks the set.
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Splitting is not always right.**
   Two clauses joined by a real relation (because, so, but) are one
   thought and stay one sentence.

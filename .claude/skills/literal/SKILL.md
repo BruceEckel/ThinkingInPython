@@ -148,6 +148,11 @@ The exception is *expect* in its typing sense
 - **Quoted material and GoF's own vocabulary stay.**
   "Smart reference", "virtual proxy", and a quoted sentence
   keep their words.
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Do not replace an image with an abstraction.**
   "The check lands before the loop" is not fixed by
   "the check occurs prior to the loop";

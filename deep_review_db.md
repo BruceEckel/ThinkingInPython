@@ -93,6 +93,11 @@ Each was examined by a past review, judged correct as written, and recorded so
 the next pass does not raise it. They look like violations of a rule the book
 otherwise follows, which is why they keep getting flagged.
 
+**A "we" Bruce wrote stays.** The book's default is "you", and new prose
+uses "you" unless "we" clearly reads better. Bruce sometimes chooses "we"
+in his own rewrites (2026-09-12), so an existing "we" is authorial, like his
+em-dashes: leave it as "we" in every pass, and do not flag it.
+
 **Hand-written `__init__()` is deliberate in a dozen classes.** This is the most
 repeated false positive in the book. The house-style sweep greps
 `def __init__(self` across `Chapters/` and re-finds the same set every time.

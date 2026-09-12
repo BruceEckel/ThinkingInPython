@@ -135,6 +135,11 @@ if the paragraph needs its sentences reordered, leave it for `cohesion`.
   cohesion (the running topic in subject position) is what makes
   repetition read as natural rather than mechanical.
 - **Quoted material stays.**
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Headings stay** unless the section is already being edited;
   a renamed heading changes its anchor.
 - **Check the exemption records first.**

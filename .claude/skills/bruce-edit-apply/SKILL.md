@@ -72,6 +72,11 @@ sightings show Bruce making.
   edit strayed into code.
 - **Bruce's em-dashes stay.** Rewriting a sentence around one is fine;
   deleting or replacing the dash is not.
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Quoted material stays.** An epigraph, a quoted error message, a citation,
   and anything inside a block quote are not this pass's prose.
 - **Standing records outrank rules.** Check `readability_db.md` and

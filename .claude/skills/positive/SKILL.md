@@ -117,6 +117,11 @@ Let the later passage carry it.
   Leave a contrast whose second beat supplies the positive; rewrite one
   that stops at the negation ("The `Any` is not laziness." with no
   second beat became "The `Any` is there to let ...").
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Check the exemption records first.**
   `deep_review_db.md` in the repo root carries standing exemptions,
   and `bruce_edit_db.md` carries the promoted editing rules.

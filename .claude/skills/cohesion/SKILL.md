@@ -148,6 +148,11 @@ at the head of the next paragraph, whose topic it shares.
 - **Bruce's fragments and signposts stay.**
   "Two cautions." and "Brackets when you want a list." are deliberate
   paragraph openers; give them their paragraph, do not absorb them.
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Semantic Line Breaks.**
   A rewritten sentence goes on its own line,
   breaking at top-level commas when it is long;

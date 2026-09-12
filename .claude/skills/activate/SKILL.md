@@ -318,6 +318,11 @@ is a teaching addition for a deep review, not this pass.
 
 - **Bruce's em-dashes stay.** Rewriting a sentence around one is fine;
   deleting or replacing the dash is not.
+- **Bruce's "we" stays.**
+  The book addresses the reader as "you", and new prose uses "you"
+  unless "we" clearly reads better in that sentence.
+  A "we" already in the chapter is Bruce's choice, like his em-dashes:
+  do not change it to "you", however the sentence is otherwise rewritten.
 - **Check the exemption records first.**
   `readability_db.md` and `deep_review_db.md` in the repo root
   carry standing exemptions: prose that reads as a violation on purpose.
