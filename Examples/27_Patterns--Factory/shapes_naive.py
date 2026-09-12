@@ -5,18 +5,28 @@ from typing import override
 class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
+    @abstractmethod
+    def svg(self) -> str: ...
 
 class Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
+    @override
+    def svg(self) -> str: return '<circle r="1"/>'
 
 class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
+    @override
+    def svg(self) -> str:
+        return '<rect width="1" height="1"/>'
 
 class Triangle(Shape):
     @override
     def draw(self) -> None: print("Triangle.draw")
+    @override
+    def svg(self) -> str:
+        return '<polygon points="0,0 1,0 0,1"/>'
 
 def render(kind: str) -> None:
     if kind == "Circle":
@@ -27,9 +37,9 @@ def render(kind: str) -> None:
 def export_svg(kind: str) -> None:
     match kind:
         case "Circle":
-            Circle().draw()
+            print(Circle().svg())
         case "Square":
-            Square().draw()
+            print(Square().svg())
         case _:
             raise ValueError(f"Unknown shape: {kind}")
 
@@ -37,7 +47,7 @@ render("Circle")
 #: Circle.draw
 render("Triangle")  # Draws nothing, reports nothing
 export_svg("Square")
-#: Square.draw
+#: <rect width="1" height="1"/>
 try:
     export_svg("Triangle")
 except ValueError as e:
