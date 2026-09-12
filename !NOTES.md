@@ -18,6 +18,7 @@ Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapt
 
 Fatal vs recoverable errors
 
+- "itself"
 - "happens"
 - "have to", "could" -> "can"
 - which was
