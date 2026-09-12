@@ -206,7 +206,7 @@ then gain a duplicate `Circle` and `Square` on every call after that.
 is an alternative constructor,
 a method on the type that builds an instance from data the constructor does not accept
 (`Month(7)` raises a `ValueError` there).
-It is also a factory of the same kind as `factory()`.
+It is also a factory, of the same form as `factory()`.
 Both are static methods of the type: each takes data and returns an instance,
 and each raises an exception for data it does not recognize,
 here a number outside one through twelve.
