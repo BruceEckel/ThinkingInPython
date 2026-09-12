@@ -1,21 +1,20 @@
 # Factory
 
-When you discover you need to add new types to a system,
-first create a base type as a common interface to those new types.
+When a system needs new types,
+start with a base type that gives them a common interface.
 The common interface separates the rest of your code from knowledge of the specific types you add.
-You may then add new types without editing existing code ... or so it seems.
-It appears you can change such a design in only one place:
-where you inherit a new type.
-But you must still create an object of your new type,
-and at the point of creation you must name the exact constructor.
-If the code that creates objects is distributed throughout your application,
-adding a type means finding and editing every place that names a concrete type.
+Adding a type then means writing one subclass,
+with no changes to existing code ... or so it seems.
+But something must still create an object of the new type,
+and that creation code names the concrete class.
+If object creation is spread throughout your application,
+adding a type means finding and editing every place that names a concrete class.
 
 Here three call sites build shapes directly,
 each naming `Circle` or `Square` by its exact class:
 
 ```python
-# shapefact1/shapes_naive.py
+# shapes_naive.py
 from abc import ABC, abstractmethod
 from typing import override
 
@@ -83,7 +82,7 @@ As an example, revisit the `Shape` hierarchy from [Rethinking Objects](20_Patter
 The factory can be a `@staticmethod` of the base class:
 
 ```python
-# shapefact1/shape_factory1.py
+# shape_factory1.py
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -379,7 +378,7 @@ rather than passing a string to a `match` statement.
 Here, we create one factory object per `Shape` subtype:
 
 ```python
-# shapefact2/shape_factory2.py
+# shape_factory2.py
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator

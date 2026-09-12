@@ -1,4 +1,4 @@
-# shapefact1/shapes_naive.py
+# shapes_naive.py
 from abc import ABC, abstractmethod
 from typing import override
 
