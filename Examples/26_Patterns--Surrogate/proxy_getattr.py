@@ -1,4 +1,4 @@
-# proxy_2.py
+# proxy_getattr.py
 from typing import Any
 
 class Proxy:

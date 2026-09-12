@@ -31,7 +31,7 @@ A *Proxy* forwards to one implementation for its whole life.
 Here the *Proxy* drops the shared base and forwards each call by hand:
 
 ```python
-# proxy_1.py
+# proxy_forwarding.py
 
 class Proxy:
     def __init__(self, impl: Implementation) -> None:
@@ -158,7 +158,7 @@ which [Singleton](24_Patterns--Singleton.md) used to reach its inner object.
 Delegating through it makes `Proxy` simpler to implement:
 
 ```python
-# proxy_2.py
+# proxy_getattr.py
 from typing import Any
 
 class Proxy:
@@ -187,7 +187,7 @@ p.h()
 `__getattr__()` makes the forwarding generic:
 because `Proxy` names no methods in `Implementation`,
 it keeps working when you add a method to the implementation.
-`Implementation` here has an `h()` that `proxy_1.py`'s lacked,
+`Implementation` here has an `h()` that `proxy_forwarding.py`'s lacked,
 and `p.h()` forwards it without changing `Proxy`.
 
 The double underscore on `self.__implementation` matters:
@@ -211,7 +211,7 @@ the type checker verifies that whatever you provide to the proxy has the necessa
 Calls on the proxy get no such check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
 the checker cannot verify that call.
-With explicit forwarding, as in `proxy_1.py`,
+With explicit forwarding, as in `proxy_forwarding.py`,
 `p.f()` reaches a declared method with a declared return type,
 and the checker verifies the call.
 `proxy_interface.py`'s `Proxy` also passes as a `Service`:
@@ -565,7 +565,7 @@ A surrogate whose `__getattr__()` can raise something other than `AttributeError
 A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
 This proxy names its implementation `_impl`, with one underscore,
-and so gives up the mangling that kept `proxy_2.py`'s attribute from colliding.
+and so gives up the mangling that kept `proxy_getattr.py`'s attribute from colliding.
 `_impl` and `calls` now share a namespace with the implementation's own attributes:
 reading `calls` from the proxy gives the counter,
 even when the implementation defines a `calls` of its own.

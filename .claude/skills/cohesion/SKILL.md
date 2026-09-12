@@ -72,8 +72,8 @@ The sentence ends on a qualifier, a citation, or a function word,
 and the point sits mid-sentence where nothing marks it:
 
 - "`p.f()` reaches a declared method with a declared return type, with
-  explicit forwarding, as in `proxy_1.py`."
-  becomes "With explicit forwarding, as in `proxy_1.py`, `p.f()` reaches
+  explicit forwarding, as in `proxy_forwarding.py`."
+  becomes "With explicit forwarding, as in `proxy_forwarding.py`, `p.f()` reaches
   a declared method with a declared return type, and the checker
   verifies it."
 - "The two disagree, so the proxy stops consulting the implementation,

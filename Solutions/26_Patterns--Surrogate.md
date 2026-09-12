@@ -38,7 +38,7 @@ triggers `__getattr__()`, not when you construct `LazyProxy()`. Every
 attribute access checks `self._real`, and the first access that finds
 it `None` builds the real object. Every later access reuses the same
 instance. `LazyProxy` reuses the `__getattr__()` delegation from
-`proxy_2.py` and `counting_proxy.py`, just guarding the moment of
+`proxy_getattr.py` and `counting_proxy.py`, just guarding the moment of
 creation instead of forwarding to an object that already exists.
 
 ## 2. A per-method tally in the counting proxy
