@@ -34,10 +34,6 @@ def expect[**P](
         fn(*args, **kwargs)
     except types as e:
         line = f"[{type(e).__name__}] {e}"
-        if len(line) <= WIDTH:
-            print(line)
-        else:
-            print(f"[{type(e).__name__}]")
-            print(textwrap.fill(str(e), WIDTH))
+        print(textwrap.fill(line, WIDTH))
         return
     raise AssertionError("no exception raised")

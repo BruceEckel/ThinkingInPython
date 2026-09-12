@@ -29,5 +29,5 @@ except TypeError as e:
     print(str(e).partition("some ")[2].partition(":")[0])
 #: positional-only arguments passed as keyword arguments
 expect(TypeError, make_user, "Sue", True)  # type: ignore
-#: [TypeError]
-#: make_user() takes 1 positional argument but 2 were given
+#: [TypeError] make_user() takes 1 positional argument but 2
+#: were given

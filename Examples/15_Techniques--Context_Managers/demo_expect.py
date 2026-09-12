@@ -10,6 +10,5 @@ expect(ValueError, parse, "ff")
 expect((ValueError, TypeError), parse, "ff", base=1)
 #: [ValueError] int() base must be >= 2 and <= 36, or 0
 expect(json.JSONDecodeError, json.loads, "{bad")
-#: [JSONDecodeError]
-#: Expecting property name enclosed in double quotes: line 1
-#: column 2 (char 1)
+#: [JSONDecodeError] Expecting property name enclosed in
+#: double quotes: line 1 column 2 (char 1)

@@ -380,8 +380,8 @@ trap2 = MouseTrap()
 expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 #: Waiting: Broadcasting cheese smell
 #: mouse escapes
-#: [RuntimeError]
-#: Waiting has no transition for mouse escapes
+#: [RuntimeError] Waiting has no transition for mouse
+#: escapes
 ```
 
 The demonstration stops after the first nine moves,

@@ -1272,8 +1272,8 @@ print(payload.obj is data)  # No copy: same buffer
 
 # An open view blocks resizing the buffer:
 expect(BufferError, data.append, 1)
-#: [BufferError]
-#: Existing exports of data: object cannot be re-sized
+#: [BufferError] Existing exports of data: object cannot be
+#: re-sized
 
 readonly = memoryview(b"ABCDEF")
 try:

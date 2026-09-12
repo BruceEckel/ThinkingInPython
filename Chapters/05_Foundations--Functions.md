@@ -104,8 +104,8 @@ print(add(42, 47))
 print(add("spam ", "eggs"))
 #: spam eggs
 expect(TypeError, add, 42, "spam")
-#: [TypeError]
-#: unsupported operand type(s) for +: 'int' and 'str'
+#: [TypeError] unsupported operand type(s) for +: 'int' and
+#: 'str'
 ```
 
 A function argument works as long as the function can apply its operations to it.
@@ -490,8 +490,8 @@ except TypeError as e:
     print(str(e).partition("some ")[2].partition(":")[0])
 #: positional-only arguments passed as keyword arguments
 expect(TypeError, make_user, "Sue", True)  # type: ignore
-#: [TypeError]
-#: make_user() takes 1 positional argument but 2 were given
+#: [TypeError] make_user() takes 1 positional argument but 2
+#: were given
 ```
 
 The `True` in the first `tally()` call joins `values` like any other positional argument.

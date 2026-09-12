@@ -736,8 +736,8 @@ class Ex:
 
 ex = Ex()
 expect(TypeError, ex.method, 5)
-#: [TypeError]
-#: Ex.method() missing 1 required positional argument: 'x'
+#: [TypeError] Ex.method() missing 1 required positional
+#: argument: 'x'
 ```
 
 `Ex.method` is a `logged` instance, stored as a class attribute.

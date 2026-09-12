@@ -176,8 +176,8 @@ restore_memento(checkpoint)
 # ty: tuple[str, str] is not a Memento:
 expect(AttributeError, restore_memento,
        ("unrelated", "tuple"))  # type: ignore
-#: [AttributeError]
-#: 'tuple' object has no attribute 'strokes'
+#: [AttributeError] 'tuple' object has no attribute
+#: 'strokes'
 
 try:
     # ty: strokes is read-only on Memento:

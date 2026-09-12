@@ -398,11 +398,7 @@ def expect[**P](
         fn(*args, **kwargs)
     except types as e:
         line = f"[{type(e).__name__}] {e}"
-        if len(line) <= WIDTH:
-            print(line)
-        else:
-            print(f"[{type(e).__name__}]")
-            print(textwrap.fill(str(e), WIDTH))
+        print(textwrap.fill(line, WIDTH))
         return
     raise AssertionError("no exception raised")
 ```
@@ -465,9 +461,8 @@ which for `ignore()` is `None`.
 Many listings in this book call something to show the exception it raises.
 `expect()` is the function form of that demonstration.
 It names the types it expects, calls `fn` with the remaining arguments,
-and prints the exception as `[Type] message`.
-When that line is wider than `WIDTH`,
-the type goes on a line of its own and `textwrap.fill()` wraps the message beneath it.
+and prints the exception as `[Type] message`,
+wrapped by `textwrap.fill()` when it is wider than `WIDTH`.
 `WIDTH` is 57 because this book's listings are 60 columns wide and a `#:` output line spends three of them on its prefix.
 An exception of another type propagates,
 and a call that raises nothing fails with an `AssertionError`,
@@ -491,15 +486,13 @@ expect(ValueError, parse, "ff")
 expect((ValueError, TypeError), parse, "ff", base=1)
 #: [ValueError] int() base must be >= 2 and <= 36, or 0
 expect(json.JSONDecodeError, json.loads, "{bad")
-#: [JSONDecodeError]
-#: Expecting property name enclosed in double quotes: line 1
-#: column 2 (char 1)
+#: [JSONDecodeError] Expecting property name enclosed in
+#: double quotes: line 1 column 2 (char 1)
 ```
 
 The second call names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
-The third call's message is too long for one line,
-so the type and the wrapped message print separately.
+The third call's message is too long for one line, so it wraps.
 Where a demonstration needs several statements or an assignment in the guarded block,
 `ignore` remains the right tool; `expect()` covers the common case of one call.
 

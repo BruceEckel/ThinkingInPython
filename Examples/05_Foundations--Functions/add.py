@@ -9,5 +9,5 @@ print(add(42, 47))
 print(add("spam ", "eggs"))
 #: spam eggs
 expect(TypeError, add, 42, "spam")
-#: [TypeError]
-#: unsupported operand type(s) for +: 'int' and 'str'
+#: [TypeError] unsupported operand type(s) for +: 'int' and
+#: 'str'
