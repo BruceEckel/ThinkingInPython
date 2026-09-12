@@ -1,4 +1,4 @@
-# shape_factory2.py
+# shape_factory_objects.py
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator

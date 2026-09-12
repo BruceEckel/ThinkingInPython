@@ -103,7 +103,7 @@ Consider the `Shape` hierarchy from [Rethinking Objects](20_Patterns--Rethinking
 We can add a factory as a `@staticmethod` of the base class:
 
 ```python
-# shape_factory1.py
+# shape_factory_method.py
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -421,7 +421,7 @@ for contrast.
 
 ## Factory Objects
 
-Because the static `factory()` method in `shape_factory1.py` collects all the creation operations in one place,
+Because the static `factory()` method in `shape_factory_method.py` collects all the creation operations in one place,
 that method is the only code you change.
 A *factory object* defines a single `create()` method,
 so choosing what to build becomes choosing which factory object to call,
@@ -429,7 +429,7 @@ rather than passing a string to a `match` statement.
 Here, we create one factory object per `Shape` subtype:
 
 ```python
-# shape_factory2.py
+# shape_factory_objects.py
 import random
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -500,7 +500,7 @@ and `create_shape()` looks up that factory and calls its `create()`.
 A more complex design returns the factory object to the caller,
 who keeps it to construct objects later.
 Much of the time, however, a single static method in the base class
-(as in `shape_factory1.py`) is enough.
+(as in `shape_factory_method.py`) is enough.
 
 This factory-object design is not yet the *Factory Method* pattern of *GoF Design Patterns*.
 That pattern puts the creation method on a class and lets subclasses override it.
@@ -509,7 +509,7 @@ That pattern puts the creation method on a class and lets subclasses override it
 and each subclass overrides it to produce a different type.
 
 Python does not need a `Factory` class nested in every shape.
-`shape_factory2.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
+`shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
 The registry in `registry.py` does the same job with no nested classes.
 Use a separate factory class when object creation needs work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
@@ -614,7 +614,7 @@ and `GameEnvironment.play()` depends on getting such a matched pair.
 Choosing the factory chooses both halves at once:
 
 ```python
-# games.py
+# abstract_factory_abc.py
 from typing import override
 
 class Obstacle:
@@ -712,7 +712,7 @@ A *Protocol* names the required methods and needs no base class,
 which simplifies the Abstract Factory:
 
 ```python
-# games2.py
+# abstract_factory_protocol.py
 from typing import Protocol
 
 class Obstacle(Protocol):
@@ -780,7 +780,7 @@ the checker reports `protocol member make_obstacle is not defined on type Broken
 
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy),
-and much earlier than the call-time `NotImplementedError` in `games.py`.
+and much earlier than the call-time `NotImplementedError` in `abstract_factory_abc.py`.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -1105,13 +1105,14 @@ Both exist to work around languages where a class is not an object you can put i
 
 ## Exercises
 
-1.  Add a class `Triangle` to `shape_factory1.py`.
-2.  Add a class `Triangle` to `shape_factory2.py`.
+1.  Add a class `Triangle` to `shape_factory_method.py`.
+2.  Add a class `Triangle` to `shape_factory_objects.py`.
 3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
-    first to `games.py` and then to `games2.py`.
-    In `games2.py`, leave out `make_obstacle()` at first and confirm the error your type checker reports.
+    first to `abstract_factory_abc.py` and then to `abstract_factory_protocol.py`.
+    In `abstract_factory_protocol.py`,
+    leave out `make_obstacle()` at first and confirm the error your type checker reports.
     Then add it.
-4.  Modify `shape_factory2.py` to use an *Abstract Factory* to create different sets of shapes
+4.  Modify `shape_factory_objects.py` to use an *Abstract Factory* to create different sets of shapes
     (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
     In `pizza_direct.py`, enforce it with `__post_init__()`,
@@ -1129,7 +1130,7 @@ Both exist to work around languages where a class is not an object you can put i
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
     run `test_prototype.py`, and explain which assertion fails and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
-8.  Recreate the `eval()` dispatcher described after `shape_factory2.py`'s listing:
+8.  Recreate the `eval()` dispatcher described after `shape_factory_objects.py`'s listing:
     a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.
     Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
     and show that it runs the expression.

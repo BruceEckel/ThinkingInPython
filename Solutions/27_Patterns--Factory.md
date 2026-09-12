@@ -2,7 +2,7 @@
 
 ## 1 & 2. A `Triangle` in both factory styles
 
-`shape_factory1.py`'s single static `factory()` needs one new `case`:
+`shape_factory_method.py`'s single static `factory()` needs one new `case`:
 
 ```python
 # exercise_1.py
@@ -63,7 +63,7 @@ s.erase()
 #: Triangle.erase
 ```
 
-`shape_factory2.py`'s factory-object version instead needs a `Triangle`
+`shape_factory_objects.py`'s factory-object version instead needs a `Triangle`
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`. The listing below
 shows the new shape alone; in the chapter file its entry joins
@@ -169,7 +169,7 @@ GameEnvironment(GnomesAndFairies()).play()
 third concrete factory slots in beside `KittiesAndPuzzles` and
 `WarriorsAndWeapons` with no change to `GameEnvironment` at all.
 
-`games2.py` asks for the same factory without a base class. Leaving
+`abstract_factory_protocol.py` asks for the same factory without a base class. Leaving
 `make_obstacle()` out at first is the point of the second half:
 
 ```python
@@ -220,10 +220,10 @@ info: └── protocol member `make_obstacle` is not defined on type
 `GnomesAndFairies`
 ```
 
-The two halves fail differently. In `games.py` the base class is
+The two halves fail differently. In `abstract_factory_abc.py` the base class is
 declared, so an unimplemented `make_obstacle()` inherits the base's
 `raise NotImplementedError` and fails when the game runs. In
-`games2.py` nothing is declared, so the mismatch surfaces at the call
+`abstract_factory_protocol.py` nothing is declared, so the mismatch surfaces at the call
 that needs the protocol, before anything runs, and the diagnostic
 names the missing method rather than the missing base.
 
@@ -294,7 +294,7 @@ for shape in build_shapes(ThinShapeFactory()):
 #: thin Square.draw
 ```
 
-`ShapeAbstractFactory` has the same shape as `games.py`'s
+`ShapeAbstractFactory` has the same shape as `abstract_factory_abc.py`'s
 `GameElementFactory`, applied to shapes instead of game elements: one
 abstract factory with a method per product (`make_circle()`,
 `make_square()`), and concrete factories that each produce a consistent

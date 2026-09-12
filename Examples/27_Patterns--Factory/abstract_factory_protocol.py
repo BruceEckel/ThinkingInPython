@@ -1,4 +1,4 @@
-# games2.py
+# abstract_factory_protocol.py
 from typing import Protocol
 
 class Obstacle(Protocol):
