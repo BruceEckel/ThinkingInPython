@@ -10,8 +10,9 @@ and that creation code names the concrete class.
 If object creation is spread throughout your application,
 adding a type means finding and editing every place that names a concrete class.
 
-Here two call sites build shapes directly,
-each naming `Circle` or `Square` by its exact class:
+Here `Triangle` has just joined the hierarchy.
+Two call sites build shapes by naming `Circle` or `Square` directly,
+and neither has been updated:
 
 ```python
 # shapes_naive.py
@@ -30,12 +31,15 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
+class Triangle(Shape):
+    @override
+    def draw(self) -> None: print("Triangle.draw")
+
 def render(kind: str) -> None:
-    match kind:
-        case "Circle":
-            Circle().draw()
-        case "Square":
-            Square().draw()
+    if kind == "Circle":
+        Circle().draw()
+    elif kind == "Square":
+        Square().draw()
 
 def export_svg(kind: str) -> None:
     match kind:
@@ -43,17 +47,30 @@ def export_svg(kind: str) -> None:
             Circle().draw()
         case "Square":
             Square().draw()
+        case _:
+            raise ValueError(f"Unknown shape: {kind}")
 
 render("Circle")
 #: Circle.draw
+render("Triangle")  # Draws nothing, reports nothing
 export_svg("Square")
 #: Square.draw
+try:
+    export_svg("Triangle")
+except ValueError as e:
+    print(e)
+#: Unknown shape: Triangle
 ```
 
-Adding a `Triangle` means finding and editing all the call sites,
-in this case `render()` and `export_svg()`.
-Any call site the search misses keeps building only `Circle` and `Square`,
+The two call sites fail in different ways.
+`render()` accepts `"Triangle"` and draws nothing,
 with no error to signal the gap.
+`export_svg()` has a wildcard case that raises an exception,
+so it does report the gap, but only at run time,
+when someone first asks it for a triangle.
+Nothing at edit time points at the missing case:
+the type checker cannot know which strings `export_svg()` was meant to handle.
+Either way, adding a type means finding every dispatcher by hand.
 
 The solution is to encapsulate object creation.
 A common *factory* creates every object instead of spreading creational code through the system.
