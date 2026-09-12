@@ -203,20 +203,24 @@ then gain a duplicate `Circle` and `Square` on every call after that.
 ### Alternative Constructors Are Factories
 
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is a factory of the same kind as `factory()`.
-It is a `@staticmethod` on the type, it turns a month number into a `Month`,
-and it raises an exception for a number outside one through twelve.
-It needs no `match`,
+is an alternative constructor,
+a method on the type that builds an instance from data the constructor does not accept
+(`Month(7)` raises a `ValueError` there).
+It is also a factory of the same kind as `factory()`.
+Both are static methods of the type: each takes data and returns an instance,
+and each raises an exception for data it does not recognize,
+here a number outside one through twelve.
+`of()` needs no `match`,
 because the `Enum` already holds every member it could return:
-`of()` indexes `list(Month)` instead of naming a class.
+it indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products collapses to a lookup,
 the form the next section builds for an open set.
 
 `from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
-belongs to the same family.
-An alternative constructor is a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`,
-and it is the most common factory in Python code:
-`dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
+is the usual form of alternative constructor:
+a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
+That form is the most common factory in Python code,
+and `dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
 It chooses arguments rather than a class,
 so a subclass that calls it gets an instance of the subclass with no override.
 
