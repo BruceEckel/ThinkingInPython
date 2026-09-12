@@ -1,5 +1,5 @@
-# demo_simple2.py
-from simple2 import Different, Simple2
+# demo_subclass.py
+from simple_subclass import Different, Simple2
 
 x = Simple2("Simple2 constructor argument")
 #: Inside Simple2 constructor

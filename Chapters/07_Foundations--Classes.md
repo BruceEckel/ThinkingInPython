@@ -134,13 +134,13 @@ Then inherit by listing the base class in parentheses after the name of the inhe
 Python supports multiple inheritance, so you can list several classes,
 though [Rethinking Objects](20_Patterns--Rethinking_Objects.md)
 argues against it in favor of protocols.
-`simple2.py` imports and subclasses `Simple` from the `simple_class` module.
+`simple_subclass.py` imports and subclasses `Simple` from the `simple_class` module.
 Ignore the `@override` decorator for now.
 [Marking Overrides with `@override`](#marking-overrides-with-override)
 explains it:
 
 ```python
-# simple2.py
+# simple_subclass.py
 from typing import override
 from simple_class import Simple
 
@@ -164,8 +164,8 @@ class Different:
 ```
 
 ```python
-# demo_simple2.py
-from simple2 import Different, Simple2
+# demo_subclass.py
+from simple_subclass import Different, Simple2
 
 x = Simple2("Simple2 constructor argument")
 #: Inside Simple2 constructor
@@ -252,7 +252,7 @@ The derived class also inherits `show_twice()` unchanged.
 
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`.
-`f()` in `demo_simple2.py` demonstrates dynamic typing.
+`f()` in `demo_subclass.py` demonstrates dynamic typing.
 It requires one thing of `obj`, a `show()` it can call,
 so it accepts a `Simple2` and a `Different` alike.
 
@@ -611,7 +611,7 @@ and a subclass can replace it the way it replaces any other method.
     `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
     Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
     within rounding.
-3.  In `simple2.py`, add a third class, `Simple3(Simple2)`,
+3.  In `simple_subclass.py`, add a third class, `Simple3(Simple2)`,
     that overrides `show()` again,
     printing its own message before calling `super().show(msg)`.
     Predict, then confirm,

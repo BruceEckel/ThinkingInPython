@@ -116,8 +116,8 @@ Simple3("x").show_twice()
 ```
 
 This solution strips the constructor `print()` calls from
-`simple2.py`, so the trace shows only the `show()` chain. If you add
-`Simple3` to `simple2.py` itself, the two constructor lines print
+`simple_subclass.py`, so the trace shows only the `show()` chain. If you add
+`Simple3` to `simple_subclass.py` itself, the two constructor lines print
 first.
 
 `Simple3` inherits `show_twice()` unchanged from `Simple`, and

@@ -1,4 +1,4 @@
-# simple2.py
+# simple_subclass.py
 from typing import override
 from simple_class import Simple
 
