@@ -266,7 +266,7 @@ state does more than look a word up. The single-table design puts
 every rule for the whole machine in one dictionary, which is easier to
 audit and edit as a unit. The chapter's own
 [table-driven state machine](../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
-makes the same trade-off over the per-state `mouse_trap.py`.
+makes the same trade-off over the per-state `mouse_trap_states.py`.
 
 ## 5. The mood machine, on the first design
 
@@ -578,7 +578,7 @@ the last action it yielded. Each call to `next()` (one iteration of
 the consuming `for` loop) picks a legal successor and remembers it for
 the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
-`mouse_trap.py`'s `next()` methods enforce the same guarantee by hand,
+`mouse_trap_states.py`'s `next()` methods enforce the same guarantee by hand,
 one state class at a time.
 
 ## 9. A `Nickel` the table has never heard of

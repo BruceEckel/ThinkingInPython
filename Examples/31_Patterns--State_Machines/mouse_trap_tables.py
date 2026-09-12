@@ -1,4 +1,4 @@
-# mouse_trap2.py
+# mouse_trap_tables.py
 # A better mousetrap using tables
 from pathlib import Path
 from typing import ClassVar, override

@@ -1,4 +1,4 @@
-# mouse_trap.py
+# mouse_trap_states.py
 from pathlib import Path
 from typing import ClassVar, override
 from mouse_action import MouseAction

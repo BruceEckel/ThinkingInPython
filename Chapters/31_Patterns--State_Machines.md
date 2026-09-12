@@ -141,7 +141,7 @@ Each `State` subclass defines its `run()` behavior,
 and establishes its next state with a `match` statement:
 
 ```python
-# mouse_trap.py
+# mouse_trap_states.py
 from pathlib import Path
 from typing import ClassVar, override
 from mouse_action import MouseAction
@@ -283,7 +283,7 @@ The subclasses now define only their `run()` behavior.
 The transitions live in the tables filled in at the bottom of the file:
 
 ```python
-# mouse_trap2.py
+# mouse_trap_tables.py
 # A better mousetrap using tables
 from pathlib import Path
 from typing import ClassVar, override
