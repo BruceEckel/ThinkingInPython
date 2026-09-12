@@ -1083,7 +1083,9 @@ def test_the_check_cannot_move_inside() -> None:
 The first two tests are `test_stars.py` inverted.
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
-because a factory function is advice rather than a gate.
+because a factory function is advice rather than a gate,
+a limit every factory in [Factory](27_Patterns--Factory.md#simple-factory-method)
+shares.
 The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:

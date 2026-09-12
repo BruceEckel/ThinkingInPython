@@ -100,7 +100,7 @@ All five answer two questions: which object to build, and what code builds it.
 ## Simple Factory Method
 
 Consider the `Shape` hierarchy from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
-The factory can be a `@staticmethod` of the base class:
+We can add a factory as a `@staticmethod` of the base class:
 
 ```python
 # shape_factory1.py
@@ -160,13 +160,31 @@ if __name__ == "__main__":
 
 The `factory()` takes an argument that selects the type of `Shape` to create.
 Here the argument is a string, but it could be any kind of data.
-Apart from the new subclass itself,
+Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 *GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
 `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
 [Subclasses Choose the Type](#subclasses-choose-the-type)
 shows the subclass-override form.
+
+You have met this shape before.
+`Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
+is a `@staticmethod` on the type that turns a month number into a `Month`,
+and raises an exception for a number outside one through twelve.
+It needs no `match`,
+because the `Enum` already holds every member it could return:
+`of()` indexes `list(Month)` instead of naming a class.
+A factory over a closed set of products collapses to a lookup,
+the form the next section builds for an open set.
+
+`from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
+belongs to the same family.
+An alternative constructor is a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`,
+and it is the most common factory in Python code:
+`dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
+It chooses arguments rather than a class,
+so a subclass that calls it gets an instance of the subclass with no override.
 
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
@@ -206,6 +224,10 @@ A factory turns data, such as a name,
 into an object without scattering constructors through your code.
 In Python a class is a first-class object.
 You can store it in a variable and call it to construct an instance.
+You have relied on that since `defaultdict(list)` in [Containers](03_Foundations--Containers.md#defaultdict)
+and `field(default_factory=list)` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
+Both take a class where a function would do,
+and call it whenever they need a fresh value.
 
 Thus, the simplest factory is a dictionary that maps names to classes.
 No factory method and no factory class:
@@ -804,6 +826,14 @@ The last three lines are a warning, not an example to follow:
 so changing that list through one object changes it for the other,
 with no error to signal it.
 
+`deepcopy()` restores the clone's state without running the constructor,
+so a `__post_init__()` check never sees the clone
+([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace) shows which copying calls run it).
+A prototype of a validated type is safe because the prototype was valid,
+not because the clone was checked.
+When the copy also changes fields,
+`copy.replace()` rebuilds through the constructor and checks the result.
+
 `deepcopy()` copies everything it can reach,
 and it has no way to copy an open file, a socket, or a lock,
 so a prototype holding one makes `deepcopy()` raise `TypeError: cannot pickle '_thread.lock' object`.
@@ -979,7 +1009,9 @@ and `dataclasses.replace()` covers that one.
 For a frozen data class, `replace()` is Prototype and Builder in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the general form of the same operation,
-working on any object that defines `__replace__()`.
+working on any object that defines `__replace__()`,
+as [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+shows.
 A data class defines that method for you.
 A test confirms the two forms produce the same pizza,
 and another makes the single-use hazard concrete:
@@ -1044,6 +1076,9 @@ Match the machinery to what varies:
 
 - A name maps to a class: use a dictionary.
   Add `__init_subclass__()` registration when the set of classes is open-ended or spread across modules.
+- The choice is which arguments to pass, not which class:
+  write an alternative constructor,
+  a `@classmethod` that ends with `return cls(...)`.
 - Construction takes real work beyond calling a constructor
   (pooling, caching, consulting configuration): write a factory function,
   and a factory class only when that work has state of its own.
@@ -1071,10 +1106,13 @@ Both exist to work around languages where a class is not an object you can put i
 4.  Modify `shape_factory2.py` to use an *Abstract Factory* to create different sets of shapes
     (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
 5.  Add a rule to both pizza examples: a pizza may carry at most four toppings.
-    In `pizza_direct.py`, enforce it with `__post_init__()`.
+    In `pizza_direct.py`, enforce it with `__post_init__()`,
+    as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
+    does for `Stars`.
     In `pizza_builder.py`,
     decide whether it belongs in `topping()` or `build()`.
     In which version can an invalid pizza exist, even momentarily?
+    `stars_class.py` in that chapter shows the same hazard.
 6.  Move `Circle` and `Square` out of `registry.py` into a new module,
     `extra_shapes.py`.
     Confirm that `make("Circle")` now raises `KeyError` until something imports `extra_shapes`,
