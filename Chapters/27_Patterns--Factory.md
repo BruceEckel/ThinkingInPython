@@ -168,10 +168,10 @@ and a `match` where the overrides would be.
 [Subclasses Choose the Type](#subclasses-choose-the-type)
 shows the subclass-override form.
 
-You have met this shape before.
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is a `@staticmethod` on the type: it turns a month number into a `Month`,
-and raises an exception for a number outside one through twelve.
+is a factory of the same kind as `factory()`.
+It is a `@staticmethod` on the type, it turns a month number into a `Month`,
+and it raises an exception for a number outside one through twelve.
 It needs no `match`,
 because the `Enum` already holds every member it could return:
 `of()` indexes `list(Month)` instead of naming a class.
