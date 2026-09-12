@@ -53,8 +53,7 @@ where each listing is a fenced `python` block whose first line is a
 
 ### Reading a listing
 
-The file is byte for byte what the book prints. A `#:` marker comment holds the
-output of the statement above it:
+A `#:` marker comment holds the output of the statement above it:
 
 ```python
 c = Circle(10)
@@ -193,7 +192,7 @@ usually an older release, and these examples use Python 3.15 syntax.
 
 ## History
 
-I started this book in 2008 and after a few years it kind of drifted to a stop. I think part of the
+I started this book in 2008 and by 2011 it had drifted to a stop. I think part of the
 problem was that I wanted to move the design patterns work I had done in Java into Python and
 even then I was beginning to become uncertain about OOP (The material is still there, translated,
 but it is preceded by a chapter explaining my OOP misgivings).

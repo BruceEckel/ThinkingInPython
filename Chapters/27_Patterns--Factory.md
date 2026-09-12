@@ -10,7 +10,7 @@ and that creation code names the concrete class.
 If object creation is spread throughout your application,
 adding a type means finding and editing every place that names a concrete class.
 
-Here three call sites build shapes directly,
+Here two call sites build shapes directly,
 each naming `Circle` or `Square` by its exact class:
 
 ```python
@@ -36,12 +36,6 @@ def render(kind: str) -> None:
     elif kind == "Square":
         Square().draw()
 
-def preview(kind: str) -> None:
-    if kind == "Circle":
-        Circle().draw()
-    elif kind == "Square":
-        Square().draw()
-
 def export_svg(kind: str) -> None:
     if kind == "Circle":
         Circle().draw()
@@ -50,25 +44,22 @@ def export_svg(kind: str) -> None:
 
 render("Circle")
 #: Circle.draw
-preview("Square")
+export_svg("Square")
 #: Square.draw
-export_svg("Circle")
-#: Circle.draw
 ```
 
-Adding a `Triangle` means finding and editing `render()`, `preview()`,
-and `export_svg()`.
+Adding a `Triangle` means finding and editing all the call sites,
+in this case `render()` and `export_svg()`.
 Any call site the search misses keeps building only `Circle` and `Square`,
 with no error to signal the gap.
-The rest of this chapter replaces call sites like these with a single place that knows about every shape.
 
-The solution is to encapsulate object creation:
-make a common *factory* create every object instead of spreading creational code through the system.
-Your program must call this factory whenever it needs one of your objects,
-so you change only the factory when you add a new type.
+The solution is to encapsulate object creation.
+A common *factory* creates every object instead of spreading creational code through the system.
+Your program must call this factory whenever it needs an object,
+so adding a new type only changes the factory.
 
 Every object-oriented program creates objects,
-and you often extend that program by adding new types.
+and you often extend such programs by adding new types.
 Thus, *Factory* might be the most common design pattern.
 
 This chapter covers the creational patterns of *GoF Design Patterns*:

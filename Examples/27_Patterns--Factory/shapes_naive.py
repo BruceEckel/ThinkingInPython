@@ -20,12 +20,6 @@ def render(kind: str) -> None:
     elif kind == "Square":
         Square().draw()
 
-def preview(kind: str) -> None:
-    if kind == "Circle":
-        Circle().draw()
-    elif kind == "Square":
-        Square().draw()
-
 def export_svg(kind: str) -> None:
     if kind == "Circle":
         Circle().draw()
@@ -34,7 +28,5 @@ def export_svg(kind: str) -> None:
 
 render("Circle")
 #: Circle.draw
-preview("Square")
+export_svg("Square")
 #: Square.draw
-export_svg("Circle")
-#: Circle.draw
