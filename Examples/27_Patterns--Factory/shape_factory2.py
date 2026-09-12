@@ -13,25 +13,25 @@ class Shape(ABC):
     @abstractmethod
     def erase(self) -> None: ...
 
-class Circle(Shape):
+class _Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
     @override
     def erase(self) -> None: print("Circle.erase")
     class Factory:
-        def create(self) -> Circle: return Circle()
+        def create(self) -> _Circle: return _Circle()
 
-class Square(Shape):
+class _Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
     @override
     def erase(self) -> None: print("Square.erase")
     class Factory:
-        def create(self) -> Square: return Square()
+        def create(self) -> _Square: return _Square()
 
 FACTORIES: Final[dict[str, ShapeMaker]] = {
-    "Circle": Circle.Factory(),
-    "Square": Square.Factory(),
+    "Circle": _Circle.Factory(),
+    "Square": _Square.Factory(),
 }
 
 def create_shape(kind: str) -> Shape:
@@ -40,7 +40,8 @@ def create_shape(kind: str) -> Shape:
 def shape_name(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for _ in range(n):
-        yield random.choice(types).__name__
+        cls = random.choice(types)
+        yield cls.__name__.removeprefix("_")
 
 if __name__ == "__main__":
     random.seed(4)

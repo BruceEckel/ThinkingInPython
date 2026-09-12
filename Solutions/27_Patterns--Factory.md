@@ -67,7 +67,7 @@ s.erase()
 that carries its own nested `Factory`, plus one `FACTORIES` entry
 mapping the name to an instance of that `Factory`. The listing below
 shows the new shape alone; in the chapter file its entry joins
-`Circle`'s and `Square`'s:
+`_Circle`'s and `_Square`'s:
 
 ```python
 # exercise_2.py
@@ -81,17 +81,17 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-class Triangle(Shape):
+class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
 
     class Factory:
-        def create(self) -> Triangle:
-            return Triangle()
+        def create(self) -> _Triangle:
+            return _Triangle()
 
 FACTORIES: Final[dict[str, ShapeMaker]] = {
-    "Triangle": Triangle.Factory(),
+    "Triangle": _Triangle.Factory(),
 }
 
 def create_shape(kind: str) -> Shape:
@@ -546,11 +546,11 @@ class Shape:
 class ShapeMaker(Protocol):
     def create(self) -> Shape: ...
 
-class Circle(Shape):
+class _Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
     class Factory:
-        def create(self) -> Circle: return Circle()
+        def create(self) -> _Circle: return _Circle()
 
 class EvalFactory:
     factories: ClassVar[dict[str, ShapeMaker]] = {}
@@ -558,18 +558,20 @@ class EvalFactory:
     @classmethod
     def create_shape(cls, kind: str) -> Shape:
         if kind not in cls.factories:
-            cls.factories[kind] = eval(f"{kind}.Factory()")
+            cls.factories[kind] = eval(f"_{kind}.Factory()")
         return cls.factories[kind].create()
 
 # A shape "name" that is really an expression:
-ATTACK: Final[str] = "print('side effect!') or Circle"
+ATTACK: Final[str] = (
+    "Circle.Factory() if print('side effect!')"
+    " else _Circle")
 EvalFactory.create_shape(ATTACK).draw()
 #: side effect!
 #: Circle.draw
 
 class TableFactory:
     factories: ClassVar[dict[str, ShapeMaker]] = {
-        "Circle": Circle.Factory(),
+        "Circle": _Circle.Factory(),
     }
 
     @classmethod
@@ -581,16 +583,17 @@ TableFactory.create_shape("Circle").draw()
 try:
     TableFactory.create_shape(ATTACK)
 except KeyError as e:
-    print(type(e).__name__, e)
-#: KeyError "print('side effect!') or Circle"
+    print(type(e).__name__)
+#: KeyError
 ```
 
-`create_shape()` builds the string `print('side effect!') or
-Circle.Factory()` and hands it to `eval()`. Python evaluates the
-`print()` call first, which is the injected side effect. `None or
-Circle.Factory()` then produces a perfectly good factory, so
-`create_shape()` returns a working `Circle` and the caller sees no
-error at all. That string can reach anything in the module's
+`create_shape()` prepends the underscore and appends `.Factory()`, so
+the string it hands to `eval()` is `_Circle.Factory() if
+print('side effect!') else _Circle.Factory()`. Python evaluates the
+condition first, which is the injected side effect. `print()` returns
+`None`, so the `else` branch runs and produces a perfectly good
+factory, and `create_shape()` returns a working `_Circle` while the
+caller sees no error at all. That string can reach anything in the module's
 namespace, and anything `__import__()` can reach.
 
 `TableFactory` keys a dictionary on the same names. Looking up a `kind`

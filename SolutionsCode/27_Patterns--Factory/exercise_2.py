@@ -9,17 +9,17 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-class Triangle(Shape):
+class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")
 
     class Factory:
-        def create(self) -> Triangle:
-            return Triangle()
+        def create(self) -> _Triangle:
+            return _Triangle()
 
 FACTORIES: Final[dict[str, ShapeMaker]] = {
-    "Triangle": Triangle.Factory(),
+    "Triangle": _Triangle.Factory(),
 }
 
 def create_shape(kind: str) -> Shape:

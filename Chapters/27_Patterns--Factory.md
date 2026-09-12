@@ -444,25 +444,25 @@ class Shape(ABC):
     @abstractmethod
     def erase(self) -> None: ...
 
-class Circle(Shape):
+class _Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
     @override
     def erase(self) -> None: print("Circle.erase")
     class Factory:
-        def create(self) -> Circle: return Circle()
+        def create(self) -> _Circle: return _Circle()
 
-class Square(Shape):
+class _Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
     @override
     def erase(self) -> None: print("Square.erase")
     class Factory:
-        def create(self) -> Square: return Square()
+        def create(self) -> _Square: return _Square()
 
 FACTORIES: Final[dict[str, ShapeMaker]] = {
-    "Circle": Circle.Factory(),
-    "Square": Square.Factory(),
+    "Circle": _Circle.Factory(),
+    "Square": _Square.Factory(),
 }
 
 def create_shape(kind: str) -> Shape:
@@ -471,7 +471,8 @@ def create_shape(kind: str) -> Shape:
 def shape_name(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for _ in range(n):
-        yield random.choice(types).__name__
+        cls = random.choice(types)
+        yield cls.__name__.removeprefix("_")
 
 if __name__ == "__main__":
     random.seed(4)
@@ -513,7 +514,7 @@ The registry in `registry.py` does the same job with no nested classes.
 Use a separate factory class when object creation needs work beyond calling a constructor,
 such as pooling, caching, or consulting external configuration.
 
-You could eliminate `FACTORIES` by dispatching through `eval(f"{kind}.Factory()")`.
+You could eliminate `FACTORIES` by dispatching through `eval(f"_{kind}.Factory()")`.
 That is unnecessary and it makes things worse.
 `create_shape()` then compiles and runs any string it receives,
 so a configuration file, a request,
@@ -1129,7 +1130,7 @@ Both exist to work around languages where a class is not an object you can put i
     run `test_prototype.py`, and explain which assertion fails and why.
     Then restore `deepcopy()` and add a test that would have caught the bug through `parts` rather than `powers`.
 8.  Recreate the `eval()` dispatcher described after `shape_factory2.py`'s listing:
-    a `create_shape()` that builds each factory with `eval(f"{kind}.Factory()")` instead of consulting `FACTORIES`.
+    a `create_shape()` that builds each factory with `eval(f"_{kind}.Factory()")` instead of consulting `FACTORIES`.
     Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
     and show that it runs the expression.
     Then show that the `FACTORIES` version raises `KeyError` for the same string.
