@@ -12,7 +12,7 @@ adding a type means finding and editing every place that names a concrete class.
 
 Here `Triangle` has just joined the hierarchy.
 Two call sites build shapes by naming `Circle` or `Square` directly,
-and neither has been updated:
+and neither has been updated for `Triangle`:
 
 ```python
 # shapes_naive.py
@@ -74,11 +74,11 @@ The two call sites fail in different ways.
 `render()` accepts `"Triangle"` and draws nothing,
 with no error to signal the gap.
 `export_svg()` has a wildcard case that raises an exception,
-so it does report the gap, but only at run time,
+so it does report the gap, but only at runtime,
 when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
 and the type checker cannot know which strings `export_svg()` was meant to handle.
-An `Enum` for `kind` and an `assert_never()` wildcard would move that report to check time
+An `Enum` for `kind` and an `assert_never()` wildcard moves that report to check time
 ([Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching)),
 though an if-chain like `render()` still slips past it.
 Either way, adding a type means editing every call site.
@@ -99,7 +99,7 @@ All five answer two questions: which object to build, and what code builds it.
 
 ## Simple Factory Method
 
-As an example, revisit the `Shape` hierarchy from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
+Consider the `Shape` hierarchy from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 The factory can be a `@staticmethod` of the base class:
 
 ```python
