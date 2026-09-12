@@ -719,6 +719,7 @@ and the call then fails.
 ```python
 # method_decoration.py
 from collections.abc import Callable
+from exceptions import expect
 
 class logged:
     def __init__(self, func: Callable) -> None:
@@ -734,10 +735,8 @@ class Ex:
         return x
 
 ex = Ex()
-try:
-    ex.method(5)
-except TypeError as e:
-    print(e)
+expect(TypeError, ex.method, 5)
+#: [TypeError]
 #: Ex.method() missing 1 required positional argument: 'x'
 ```
 

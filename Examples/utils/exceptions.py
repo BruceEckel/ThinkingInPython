@@ -1,6 +1,9 @@
 # utils/exceptions.py
+import textwrap
 from collections.abc import Callable
+from typing import Final
 
+WIDTH: Final[int] = 57
 ALL = sentinel("ALL")
 type Types = (type[BaseException]
               | tuple[type[BaseException], ...])
@@ -30,6 +33,11 @@ def expect[**P](
     try:
         fn(*args, **kwargs)
     except types as e:
-        print(f"[{type(e).__name__}] {e}")
+        line = f"[{type(e).__name__}] {e}"
+        if len(line) <= WIDTH:
+            print(line)
+        else:
+            print(f"[{type(e).__name__}]")
+            print(textwrap.fill(str(e), WIDTH))
         return
     raise AssertionError("no exception raised")

@@ -287,6 +287,7 @@ The transitions live in the tables filled in at the bottom of the file:
 # A better mousetrap using tables
 from pathlib import Path
 from typing import ClassVar, override
+from exceptions import expect
 from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
@@ -376,12 +377,10 @@ MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
 
 # ESCAPES is not a key in Waiting.transitions:
 trap2 = MouseTrap()
-try:
-    trap2.run_all([MouseAction.ESCAPES])
-except RuntimeError as e:
-    print(e)
+expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 #: Waiting: Broadcasting cheese smell
 #: mouse escapes
+#: [RuntimeError]
 #: Waiting has no transition for mouse escapes
 ```
 

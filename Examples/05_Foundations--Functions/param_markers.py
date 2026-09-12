@@ -1,4 +1,5 @@
 # param_markers.py
+from exceptions import expect
 
 def divide(a, b, /):
     return a / b
@@ -27,8 +28,6 @@ try:
 except TypeError as e:
     print(str(e).partition("some ")[2].partition(":")[0])
 #: positional-only arguments passed as keyword arguments
-try:
-    make_user("Sue", True)  # type: ignore
-except TypeError as e:
-    print(e)
+expect(TypeError, make_user, "Sue", True)  # type: ignore
+#: [TypeError]
 #: make_user() takes 1 positional argument but 2 were given

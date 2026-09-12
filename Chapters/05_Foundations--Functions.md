@@ -94,6 +94,7 @@ Here, the same function applies the `+` operator to integers and strings:
 
 ```python
 # add.py
+from exceptions import expect
 
 def add(arg1, arg2):
     return arg1 + arg2
@@ -102,10 +103,8 @@ print(add(42, 47))
 #: 89
 print(add("spam ", "eggs"))
 #: spam eggs
-try:
-    add(42, "spam")
-except TypeError as e:
-    print(e)
+expect(TypeError, add, 42, "spam")
+#: [TypeError]
 #: unsupported operand type(s) for +: 'int' and 'str'
 ```
 
@@ -461,6 +460,7 @@ so a parameter declared after it can arrive by name alone.
 
 ```python
 # param_markers.py
+from exceptions import expect
 
 def divide(a, b, /):
     return a / b
@@ -489,10 +489,8 @@ try:
 except TypeError as e:
     print(str(e).partition("some ")[2].partition(":")[0])
 #: positional-only arguments passed as keyword arguments
-try:
-    make_user("Sue", True)  # type: ignore
-except TypeError as e:
-    print(e)
+expect(TypeError, make_user, "Sue", True)  # type: ignore
+#: [TypeError]
 #: make_user() takes 1 positional argument but 2 were given
 ```
 
