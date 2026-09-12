@@ -189,7 +189,7 @@ so a subclass that calls it gets an instance of the subclass with no override.
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
 a generator object does the opposite:
-it holds an internal algorithm and produces the next value with no argument.
+it holds an internal algorithm and needs no argument to produce the next value.
 `shape_name_gen()` takes `n` and returns a generator object,
 and that object then produces names on demand.
 Those names are the arguments to `Shape.factory()`.
