@@ -1,5 +1,6 @@
 # eager_validation.py
 from collections.abc import Iterator
+from exceptions import expect
 
 def squares(n: int) -> Iterator[int]:
     if n < 0:
@@ -9,8 +10,6 @@ def squares(n: int) -> Iterator[int]:
             yield i * i
     return produce()
 
-try:
-    squares(-1)  # Raises now, not at first next()
-except ValueError as e:
-    print(e)
-#: n must not be negative: -1
+# Raises now, not at first next():
+expect(ValueError, squares, -1)
+#: [ValueError] n must not be negative: -1

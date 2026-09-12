@@ -321,6 +321,7 @@ If you declare the field as a `list` instead, the leak reopens:
 ```python
 # frozen_leaky.py
 from dataclasses import FrozenInstanceError, dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class FrozenLeaky:
@@ -335,12 +336,9 @@ try:
 except FrozenInstanceError as e:
     print(e)
 #: cannot assign to field 'numbers'
-try:
-    # A list field makes the whole instance unhashable
-    hash(fl)
-except TypeError as e:
-    print(e)
-#: unhashable type: 'list'
+# A list field makes the whole instance unhashable
+expect(TypeError, hash, fl)
+#: [TypeError] unhashable type: 'list'
 ```
 
 Frozen guards the binding, not the object.

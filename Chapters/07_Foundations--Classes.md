@@ -236,17 +236,15 @@ Dropping the call and then calling `show()` produces that error:
 
 ```python
 # missing_super.py
+from exceptions import expect
 from simple_class import Simple
 
 class Broken(Simple):
     def __init__(self, text):
         pass  # Forgot super().__init__(text)
 
-try:
-    Broken("ignored").show()
-except AttributeError as e:
-    print(e)
-#: 'Broken' object has no attribute 's'
+expect(AttributeError, Broken("ignored").show)
+#: [AttributeError] 'Broken' object has no attribute 's'
 ```
 
 A derived class that defines no constructor of its own inherits and runs the base version.
@@ -416,6 +414,7 @@ Naming both the property and the backing attribute `radius` reproduces it:
 
 ```python
 # property_recursion.py
+from exceptions import expect
 
 class Circle:
     def __init__(self, radius):
@@ -429,11 +428,8 @@ class Circle:
     def radius(self, value):
         self.radius = value  # Calls itself again
 
-try:
-    Circle(10)
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+expect(RecursionError, Circle, 10)
+#: [RecursionError] maximum recursion depth exceeded
 ```
 
 The getter and setter are independent,

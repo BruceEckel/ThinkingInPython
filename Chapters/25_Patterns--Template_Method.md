@@ -229,6 +229,7 @@ runs the engine on a half-initialized object:
 ```python
 # premature_engine.py
 from typing import final, override
+from exceptions import expect
 
 class Framework:
     def __init__(self) -> None:
@@ -250,11 +251,8 @@ class Greeter(Framework):
     def step(self) -> None:
         print(f"Hello, {self.name}!")
 
-try:
-    Greeter("Robin")
-except AttributeError as e:
-    print(e)
-#: 'Greeter' object has no attribute 'name'
+expect(AttributeError, Greeter, "Robin")
+#: [AttributeError] 'Greeter' object has no attribute 'name'
 ```
 
 `Greeter("Robin")` never finishes.

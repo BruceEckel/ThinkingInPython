@@ -1065,6 +1065,7 @@ and hands those instances out during execution:
 ```python
 # dependency_injection.py
 from typing import Any, Final
+from exceptions import expect
 from greeter import Console
 
 class NotRegistered(Exception):
@@ -1085,11 +1086,8 @@ def greet(name: str) -> None:
     console: Console = get(Console)
     console.print(f"Hello, {name}!")
 
-try:
-    greet("Alice")
-except NotRegistered as e:
-    print(f"{type(e).__name__}: {e}")
-#: NotRegistered: Console
+expect(NotRegistered, greet, "Alice")
+#: [NotRegistered] Console
 register(Console, Console())
 greet("Alice")
 #: Hello, Alice!

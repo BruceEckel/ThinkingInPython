@@ -1,5 +1,6 @@
 # throw_and_close_gotcha.py
 from collections.abc import Generator
+from exceptions import expect
 
 def stubborn() -> Generator[str]:
     try:
@@ -10,8 +11,5 @@ def stubborn() -> Generator[str]:
 s = stubborn()
 print(next(s))
 #: go
-try:
-    s.close()
-except RuntimeError as e:
-    print(f"{type(e).__name__}: {e}")
-#: RuntimeError: generator ignored GeneratorExit
+expect(RuntimeError, s.close)
+#: [RuntimeError] generator ignored GeneratorExit

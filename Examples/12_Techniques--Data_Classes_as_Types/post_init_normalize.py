@@ -1,5 +1,6 @@
 # post_init_normalize.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Email:
@@ -8,11 +9,8 @@ class Email:
     def __post_init__(self) -> None:
         self.text = self.text.lower()  # type: ignore
 
-try:
-    Email("Grace@Example.com")
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'text'
+expect(Exception, Email, "Grace@Example.com")
+#: [FrozenInstanceError] cannot assign to field 'text'
 
 @dataclass(frozen=True)
 class Normalized:

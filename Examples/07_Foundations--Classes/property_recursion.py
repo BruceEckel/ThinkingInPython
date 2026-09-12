@@ -1,4 +1,5 @@
 # property_recursion.py
+from exceptions import expect
 
 class Circle:
     def __init__(self, radius):
@@ -12,8 +13,5 @@ class Circle:
     def radius(self, value):
         self.radius = value  # Calls itself again
 
-try:
-    Circle(10)
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+expect(RecursionError, Circle, 10)
+#: [RecursionError] maximum recursion depth exceeded

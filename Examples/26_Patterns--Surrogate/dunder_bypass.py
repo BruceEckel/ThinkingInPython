@@ -1,5 +1,6 @@
 # dunder_bypass.py
 from typing import Any
+from exceptions import expect
 
 class Proxy:
     def __init__(self, impl: Any) -> None:
@@ -18,11 +19,8 @@ class Words:
 p = Proxy(Words())
 print(p.__len__())  # The explicit call delegates
 #: 2
-try:
-    # Special-method lookup skips the instance:
-    len(p)  # type: ignore
-except TypeError as e:
-    print(e)
-#: object of type 'Proxy' has no len()
+# Special-method lookup skips the instance:
+expect(TypeError, len, p)  # type: ignore
+#: [TypeError] object of type 'Proxy' has no len()
 print("__main__.Proxy object" in str(p))
 #: True

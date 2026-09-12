@@ -509,6 +509,7 @@ so `@dataclass` generates one from the fields:
 ```python
 # frozen_messenger.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Messenger:
@@ -520,11 +521,8 @@ m = Messenger("iris", 12, 3.14)
 print(m)
 #: Messenger(name='iris', number=12, depth=3.14)
 
-try:
-    setattr(m, "name", "hermes")
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'name'
+expect(Exception, setattr, m, "name", "hermes")
+#: [FrozenInstanceError] cannot assign to field 'name'
 
 cache = {m: "Ni!"}  # Frozen instances are hashable
 print(cache[m])
@@ -625,6 +623,7 @@ so normalizing a value there raises `FrozenInstanceError`:
 ```python
 # post_init_normalize.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Email:
@@ -633,11 +632,8 @@ class Email:
     def __post_init__(self) -> None:
         self.text = self.text.lower()  # type: ignore
 
-try:
-    Email("Grace@Example.com")
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'text'
+expect(Exception, Email, "Grace@Example.com")
+#: [FrozenInstanceError] cannot assign to field 'text'
 
 @dataclass(frozen=True)
 class Normalized:
