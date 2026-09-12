@@ -200,7 +200,7 @@ failing `type(a) is type(b)` and `isinstance()` alike.
 `Shape.__subclasses__()` would be empty until the first call,
 then gain a duplicate `Circle` and `Square` on every call after that.
 
-### Two Factories from Earlier Chapters
+### Alternative Constructors Are Factories
 
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is a factory of the same kind as `factory()`.
