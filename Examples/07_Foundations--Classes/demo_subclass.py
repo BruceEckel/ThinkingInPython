@@ -1,24 +1,24 @@
 # demo_subclass.py
-from simple_subclass import Different, Simple2
+from simple_subclass import Derived, Different
 
-x = Simple2("Simple2 constructor argument")
-#: Inside Simple2 constructor
+x = Derived("Derived constructor argument")
+#: Inside Derived constructor
 #: Inside the Simple constructor
 x.display()
 #: Overridden show() method
-#: Called from display(): Simple2 constructor argument
+#: Called from display(): Derived constructor argument
 x.show()
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 x.show_twice()  # Inherited from Simple
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 def f(obj):  # Works on any obj with a show()
     obj.show()
 f(x)
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 f(Different())
 #: Not derived from Simple

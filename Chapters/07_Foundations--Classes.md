@@ -144,9 +144,9 @@ explains it:
 from typing import override
 from simple_class import Simple
 
-class Simple2(Simple):  # Simple2 inherits Simple
+class Derived(Simple):  # Derived inherits Simple
     def __init__(self, text):
-        print("Inside Simple2 constructor")
+        print("Inside Derived constructor")
         # Call the base-class constructor with super():
         super().__init__(text)
     def display(self):
@@ -165,32 +165,32 @@ class Different:
 
 ```python
 # demo_subclass.py
-from simple_subclass import Different, Simple2
+from simple_subclass import Derived, Different
 
-x = Simple2("Simple2 constructor argument")
-#: Inside Simple2 constructor
+x = Derived("Derived constructor argument")
+#: Inside Derived constructor
 #: Inside the Simple constructor
 x.display()
 #: Overridden show() method
-#: Called from display(): Simple2 constructor argument
+#: Called from display(): Derived constructor argument
 x.show()
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 x.show_twice()  # Inherited from Simple
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 def f(obj):  # Works on any obj with a show()
     obj.show()
 f(x)
 #: Overridden show() method
-#: Simple2 constructor argument
+#: Derived constructor argument
 f(Different())
 #: Not derived from Simple
 ```
 
-`Simple2` inherits from `Simple`.
+`Derived` inherits from `Simple`.
 In the constructor, `super().__init__()` calls the base-class constructor.
 In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
@@ -200,7 +200,7 @@ call it through `super()`, as the overridden `show()` does.
 the class's *method resolution order* (MRO).
 The MRO names the classes Python searches for a name,
 starting with the class itself and ending at `object`.
-`Simple2.__mro__` is `(Simple2, Simple, object)`.
+`Derived.__mro__` is `(Derived, Simple, object)`.
 With a single base class the order is obvious.
 When two base classes define the same name,
 the MRO decides which one supplies it.
@@ -228,7 +228,7 @@ C().show()  # A comes first in the MRO
 
 `C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s version, not `B`'s.
 
-The base-class constructor runs because `Simple2`'s constructor calls it.
+The base-class constructor runs because `Derived`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
 so the first method that reads it raises an `AttributeError`.
@@ -254,7 +254,7 @@ The class `Different` also has a method named `show()`,
 but does not derive from `Simple`.
 `f()` in `demo_subclass.py` demonstrates dynamic typing.
 It requires one thing of `obj`, a `show()` it can call,
-so it accepts a `Simple2` and a `Different` alike.
+so it accepts a `Derived` and a `Different` alike.
 
 An `import` inside a class body binds the imported name like any other assignment,
 so importing a module-level function there attaches it to the class as a method,
@@ -611,11 +611,11 @@ and a subclass can replace it the way it replaces any other method.
     `from_kelvin(cls, k)`, using `celsius = k - 273.15`.
     Add a call that builds a `Temperature` both ways for the same physical temperature and confirms they agree,
     within rounding.
-3.  In `simple_subclass.py`, add a third class, `Simple3(Simple2)`,
+3.  In `simple_subclass.py`, add a third class, `MoreDerived(Derived)`,
     that overrides `show()` again,
     printing its own message before calling `super().show(msg)`.
     Predict, then confirm,
-    the full chain of prints from `Simple3("x").show_twice()`.
+    the full chain of prints from `MoreDerived("x").show_twice()`.
 4.  Add a `@cached_property` called `average` to `Numbers` in `cached_property_demo.py` that returns `self.total / len(self.values)`.
     Access `n.total` and then `n.average`,
     and confirm `total` is not recomputed when `average` uses it.

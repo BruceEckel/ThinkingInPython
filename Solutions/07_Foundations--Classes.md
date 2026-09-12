@@ -74,7 +74,7 @@ the arithmetic. Both classmethods end with `return cls(...)`, so
 `Temperature.from_kelvin` builds a `Temperature` exactly like
 `from_fahrenheit` does, only with a different formula for `celsius`.
 
-## 3. A third override in the chain, `Simple3`
+## 3. A third override in the chain, `MoreDerived`
 
 ```python
 # exercise_3.py
@@ -94,38 +94,38 @@ class Simple:
         self.show()
         self.show()
 
-class Simple2(Simple):
+class Derived(Simple):
     @override
     def show(self, msg=""):
         print("Overridden show() method")
         super().show(msg)
 
-class Simple3(Simple2):
+class MoreDerived(Derived):
     @override
     def show(self, msg=""):
-        print("Simple3 show() method")
+        print("MoreDerived show() method")
         super().show(msg)
 
-Simple3("x").show_twice()
-#: Simple3 show() method
+MoreDerived("x").show_twice()
+#: MoreDerived show() method
 #: Overridden show() method
 #: x
-#: Simple3 show() method
+#: MoreDerived show() method
 #: Overridden show() method
 #: x
 ```
 
 This solution strips the constructor `print()` calls from
 `simple_subclass.py`, so the trace shows only the `show()` chain. If you add
-`Simple3` to `simple_subclass.py` itself, the two constructor lines print
+`MoreDerived` to `simple_subclass.py` itself, the two constructor lines print
 first.
 
-`Simple3` inherits `show_twice()` unchanged from `Simple`, and
+`MoreDerived` inherits `show_twice()` unchanged from `Simple`, and
 `show_twice()` calls `self.show()` twice. Because `self` is a
-`Simple3`, each call resolves to `Simple3.show()` first (Python always
-starts from the most derived class). `Simple3.show()` prints its own
-message, then calls `super().show(msg)`, which runs `Simple2.show()`.
-`Simple2.show()` prints its message and calls `super().show(msg)`
+`MoreDerived`, each call resolves to `MoreDerived.show()` first (Python always
+starts from the most derived class). `MoreDerived.show()` prints its own
+message, then calls `super().show(msg)`, which runs `Derived.show()`.
+`Derived.show()` prints its message and calls `super().show(msg)`
 again, which runs `Simple.show()`, and `Simple.show()` finally prints
 `x`. Each `super()` call hands off to the next class up the chain, so
 the messages appear in derived-to-base order, twice.

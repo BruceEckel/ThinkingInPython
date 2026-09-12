@@ -15,22 +15,22 @@ class Simple:
         self.show()
         self.show()
 
-class Simple2(Simple):
+class Derived(Simple):
     @override
     def show(self, msg=""):
         print("Overridden show() method")
         super().show(msg)
 
-class Simple3(Simple2):
+class MoreDerived(Derived):
     @override
     def show(self, msg=""):
-        print("Simple3 show() method")
+        print("MoreDerived show() method")
         super().show(msg)
 
-Simple3("x").show_twice()
-#: Simple3 show() method
+MoreDerived("x").show_twice()
+#: MoreDerived show() method
 #: Overridden show() method
 #: x
-#: Simple3 show() method
+#: MoreDerived show() method
 #: Overridden show() method
 #: x
