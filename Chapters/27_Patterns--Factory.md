@@ -170,7 +170,7 @@ shows the subclass-override form.
 
 You have met this shape before.
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is a `@staticmethod` on the type that turns a month number into a `Month`,
+is a `@staticmethod` on the type: it turns a month number into a `Month`,
 and raises an exception for a number outside one through twelve.
 It needs no `match`,
 because the `Enum` already holds every member it could return:
@@ -280,7 +280,7 @@ and the checker rejects a key that `Kind` does not list,
 so `SHAPES` cannot gain a shape name the `Literal` lacks.
 `registry.py`, below, cannot take the same fix:
 its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
-and a closed `Literal` would need editing on every new subclass,
+and a closed `Literal` would need an edit for every new subclass,
 which defeats that.
 A closed set of names suits `Literal`; an open set, growing by subclassing,
 does not.
@@ -1001,8 +1001,8 @@ if __name__ == "__main__":
 ```
 
 Every combination of settings is a single call,
-the call site names each option just as the chain does,
-and the fields declare the defaults instead of a second class.
+the call site names each option just as the chain does, and the fields,
+not a second class, declare the defaults.
 Builder chains have a second use,
 starting from an existing configuration and varying it,
 and `dataclasses.replace()` covers that one.
