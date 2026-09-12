@@ -363,6 +363,7 @@ where any chapter can import it:
 
 ```python
 # utils/exceptions.py
+from collections.abc import Callable
 
 ALL = sentinel("ALL")
 type Types = (type[BaseException]
@@ -385,6 +386,17 @@ class ignore:
                 return False
         print(f"{exc!r}")
         return True
+
+def expect[**P](
+    types: Types, fn: Callable[P, object],
+    /, *args: P.args, **kwargs: P.kwargs
+) -> None:
+    try:
+        fn(*args, **kwargs)
+    except types as e:
+        print(f"[{type(e).__name__}] {e}")
+        return
+    raise AssertionError("no exception raised")
 ```
 
 `ignore` adds two things to `ignore_one`.
@@ -441,6 +453,37 @@ and the `with` statement absorbs the error so `survived` still prints.
 
 In the last example, `x` receives the return value of `__enter__()`,
 which for `ignore()` is `None`.
+
+Many listings in this book call something to show the exception it raises.
+`expect()` is the function form of that demonstration.
+It names the types it expects, calls `fn` with the remaining arguments,
+and prints the exception as `[Type] message`.
+An exception of another type propagates,
+and a call that raises nothing fails with an `AssertionError`,
+so a demo that stops failing is reported instead of quietly printing nothing.
+The `/` makes `types` and `fn` positional-only,
+so every keyword argument goes to `fn`.
+`**P` ([Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface))
+ties `*args` and `**kwargs` to `fn`'s own signature,
+so the type checker checks the forwarded arguments as if you had called `fn` directly:
+
+```python
+# demo_expect.py
+from exceptions import expect
+
+def parse(text: str, *, base: int = 10) -> int:
+    return int(text, base)
+
+expect(ValueError, parse, "ff")
+#: [ValueError] invalid literal for int() with base 10: 'ff'
+expect((ValueError, TypeError), parse, "ff", base=1)
+#: [ValueError] int() base must be >= 2 and <= 36, or 0
+```
+
+The second call names two types in a tuple and forwards `base=1` as a keyword,
+which `parse()` passes on to `int()`.
+Where a demonstration needs several statements or an assignment in the guarded block,
+`ignore` remains the right tool; `expect()` covers the common case of one call.
 
 ## Context Manager as Decorator
 
