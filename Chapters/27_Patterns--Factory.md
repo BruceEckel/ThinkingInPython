@@ -168,24 +168,6 @@ and a `match` where the overrides would be.
 [Subclasses Choose the Type](#subclasses-choose-the-type)
 shows the subclass-override form.
 
-`Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is a factory of the same kind as `factory()`.
-It is a `@staticmethod` on the type, it turns a month number into a `Month`,
-and it raises an exception for a number outside one through twelve.
-It needs no `match`,
-because the `Enum` already holds every member it could return:
-`of()` indexes `list(Month)` instead of naming a class.
-A factory over a closed set of products collapses to a lookup,
-the form the next section builds for an open set.
-
-`from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
-belongs to the same family.
-An alternative constructor is a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`,
-and it is the most common factory in Python code:
-`dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
-It chooses arguments rather than a class,
-so a subclass that calls it gets an instance of the subclass with no override.
-
 I have also used a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
 a generator object does the opposite:
@@ -217,6 +199,26 @@ Two shapes from different calls would then share behavior but not a class,
 failing `type(a) is type(b)` and `isinstance()` alike.
 `Shape.__subclasses__()` would be empty until the first call,
 then gain a duplicate `Circle` and `Square` on every call after that.
+
+### Two Factories from Earlier Chapters
+
+`Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
+is a factory of the same kind as `factory()`.
+It is a `@staticmethod` on the type, it turns a month number into a `Month`,
+and it raises an exception for a number outside one through twelve.
+It needs no `match`,
+because the `Enum` already holds every member it could return:
+`of()` indexes `list(Month)` instead of naming a class.
+A factory over a closed set of products collapses to a lookup,
+the form the next section builds for an open set.
+
+`from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
+belongs to the same family.
+An alternative constructor is a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`,
+and it is the most common factory in Python code:
+`dict.fromkeys()` and `datetime.fromisoformat()` are two from the standard library.
+It chooses arguments rather than a class,
+so a subclass that calls it gets an instance of the subclass with no override.
 
 ## The Pythonic Factory: a Dictionary
 
