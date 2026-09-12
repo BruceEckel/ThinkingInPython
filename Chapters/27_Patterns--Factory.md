@@ -31,16 +31,18 @@ class Square(Shape):
     def draw(self) -> None: print("Square.draw")
 
 def render(kind: str) -> None:
-    if kind == "Circle":
-        Circle().draw()
-    elif kind == "Square":
-        Square().draw()
+    match kind:
+        case "Circle":
+            Circle().draw()
+        case "Square":
+            Square().draw()
 
 def export_svg(kind: str) -> None:
-    if kind == "Circle":
-        Circle().draw()
-    elif kind == "Square":
-        Square().draw()
+    match kind:
+        case "Circle":
+            Circle().draw()
+        case "Square":
+            Square().draw()
 
 render("Circle")
 #: Circle.draw
