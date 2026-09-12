@@ -119,32 +119,32 @@ class Shape(ABC):
     def factory(kind: str) -> Shape:
         match kind:
             case "Circle":
-                return Circle()
+                return _Circle()
             case "Square":
-                return Square()
+                return _Square()
             case _:
                 raise ValueError(f"Bad shape: {kind}")
 
-class Circle(Shape):
+class _Circle(Shape):
     @override
     def draw(self) -> None: print("Circle.draw")
     @override
     def erase(self) -> None: print("Circle.erase")
 
-class Square(Shape):
+class _Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
     @override
     def erase(self) -> None: print("Square.erase")
 
-def shape_name_gen(n: int) -> Iterator[str]:
+def shape_name(n: int) -> Iterator[str]:
     for _ in range(n):
-        yield random.choice(Shape.__subclasses__()).__name__
+        cls = random.choice(Shape.__subclasses__())
+        yield cls.__name__.removeprefix("_")
 
 if __name__ == "__main__":
     random.seed(4)  # Reproducible shape sequence
-    shapes = [Shape.factory(kind)
-              for kind in shape_name_gen(4)]
+    shapes = [Shape.factory(s) for s in shape_name(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()
@@ -158,38 +158,40 @@ if __name__ == "__main__":
 #: Square.erase
 ```
 
-The `factory()` takes an argument that selects the type of `Shape` to create.
-Here the argument is a string, but it could be any kind of data.
+The `factory()` argument indicates the type of `Shape` to create.
+Here that argument is a string, but it could be any kind of data.
 Apart from the new subclass,
 `factory()` is the only code that changes when you add a new type of `Shape`.
 *GoF Design Patterns* defines *Factory Method* as a creation method that subclasses override to choose the concrete type.
-`factory()` is the smallest version of that idea: one class, one method,
+This `factory()` is the smallest version of that idea: one class, one method,
 and a `match` where the overrides would be.
 [Subclasses Choose the Type](#subclasses-choose-the-type)
 shows the subclass-override form.
 
-I have also used a [*generator*](23_Patterns--Iterators.md#generators).
+`shape_name()` is a [*generator*](23_Patterns--Iterators.md#generators).
 Whereas a factory takes information telling it what to build,
 a generator object does the opposite:
 it holds an internal algorithm and needs no argument to produce the next value.
-`shape_name_gen()` takes `n` and returns a generator object,
-and that object then produces names on demand.
+`shape_name()` takes `n` (the maximum number of shapes it can produce)
+and returns a generator object.
+That object produces names on demand.
 Those names are the arguments to `Shape.factory()`.
-In a real program the initialization data comes from outside the system,
-not from random generation as here.
+Normally the initialization data comes from outside the system rather than through random generation.
 
-Inside `shape_name_gen()`,
+Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
 `__subclasses__()` covers only the first level of inheritance,
 so a class inheriting from `Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 
-To discourage direct construction of the concrete shapes,
-give them module-level names with a leading underscore:
+The concrete shapes carry a leading underscore because no caller needs their names.
+`factory()` returns `Shape`,
+so a caller annotates that and never writes `_Circle`.
+The underscore discourages direct construction:
 a convention rather than concealment
-([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case).
-`shape_factory1.py` keeps the plain names because `shape_name_gen()` passes each class's `__name__` unchanged to `factory()`.
-An underscore in the class name would have to appear in the `case` strings too.
+([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case, and keeps its bare `Settings` name because `settings()` returns that type, which callers must write).
+`shape_name()` strips the underscore,
+so the strings `factory()` accepts stay the public names.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
@@ -466,15 +468,14 @@ FACTORIES: Final[dict[str, ShapeMaker]] = {
 def create_shape(kind: str) -> Shape:
     return FACTORIES[kind].create()
 
-def shape_name_gen(n: int) -> Iterator[str]:
+def shape_name(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for _ in range(n):
         yield random.choice(types).__name__
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [create_shape(kind)
-              for kind in shape_name_gen(4)]
+    shapes = [create_shape(kind) for kind in shape_name(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()

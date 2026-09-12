@@ -37,15 +37,14 @@ FACTORIES: Final[dict[str, ShapeMaker]] = {
 def create_shape(kind: str) -> Shape:
     return FACTORIES[kind].create()
 
-def shape_name_gen(n: int) -> Iterator[str]:
+def shape_name(n: int) -> Iterator[str]:
     types = Shape.__subclasses__()
     for _ in range(n):
         yield random.choice(types).__name__
 
 if __name__ == "__main__":
     random.seed(4)
-    shapes = [create_shape(kind)
-              for kind in shape_name_gen(4)]
+    shapes = [create_shape(kind) for kind in shape_name(4)]
     for shape in shapes:
         shape.draw()
         shape.erase()

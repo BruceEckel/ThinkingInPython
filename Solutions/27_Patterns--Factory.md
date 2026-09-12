@@ -20,16 +20,16 @@ class Shape(ABC):
     def factory(kind: str) -> Shape:
         match kind:
             case "Circle":
-                return Circle()
+                return _Circle()
             case "Square":
-                return Square()
+                return _Square()
             case "Triangle":
-                return Triangle()
+                return _Triangle()
             case _:
                 raise ValueError(
                     f"Bad shape creation: {kind}")
 
-class Circle(Shape):
+class _Circle(Shape):
     @override
     def draw(self) -> None:
         print("Circle.draw")
@@ -38,7 +38,7 @@ class Circle(Shape):
     def erase(self) -> None:
         print("Circle.erase")
 
-class Square(Shape):
+class _Square(Shape):
     @override
     def draw(self) -> None:
         print("Square.draw")
@@ -47,7 +47,7 @@ class Square(Shape):
     def erase(self) -> None:
         print("Square.erase")
 
-class Triangle(Shape):
+class _Triangle(Shape):
     @override
     def draw(self) -> None:
         print("Triangle.draw")

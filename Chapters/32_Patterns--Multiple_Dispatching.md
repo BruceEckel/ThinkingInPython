@@ -78,7 +78,7 @@ def duel(item1: Any, item2: Any) -> None:
 
 `item_pair_gen()` is generic over whichever base class it receives,
 and `__subclasses__()` lists that base's direct subclasses,
-as `shape_name_gen()` in [Factory](27_Patterns--Factory.md#simple-factory-method)
+as `shape_name()` in [Factory](27_Patterns--Factory.md#simple-factory-method)
 did.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
