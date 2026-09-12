@@ -1,6 +1,7 @@
 # shapes_naive.py
 from abc import ABC, abstractmethod
 from typing import override
+from exceptions import expect
 
 class Shape(ABC):
     @abstractmethod
@@ -48,8 +49,5 @@ render("Circle")
 render("Triangle")  # Draws nothing, reports nothing
 export_svg("Square")
 #: <rect width="1" height="1"/>
-try:
-    export_svg("Triangle")
-except ValueError as e:
-    print(e)
-#: Unknown shape: Triangle
+expect(ValueError, export_svg, "Triangle")
+#: [ValueError] Unknown shape: Triangle
