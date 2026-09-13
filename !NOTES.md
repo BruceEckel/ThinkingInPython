@@ -1,3 +1,15 @@
+A standalone tool whose only job is to generate command line commands.
+When invoked, it reads a config file (local, if there is one, global otherwise) and displays a text UI containing all possible commands as specified by the config file.
+
+Each command has a help string and argument specifications. The config file tells the tool how to fill in the arguments or prompt the user to do so.
+
+Using '?' or by just typing, the user can search command names and help strings, then select that command which is then placed on the command line and in the command history, so the user can later use command history to repeat the command.
+
+The tool can add new commands to its local config file. It can start a local config file using one of the commands in the global config file, which handles setup of local config files. The user can also add commands to the global file for things they always want available.
+
+The goal of the tool is to keep track of commands so the user doesn't have to remember everything.
+
+
 Implementation is Friction
 
 How can I improve the process on this book?

@@ -67,8 +67,10 @@ destructured
 destructures
 destructuring
 desynchronize
+desynchronizes
 dict
 dicts
+discoverability
 docstring
 doorless
 dunder
@@ -76,6 +78,7 @@ dunders
 eckel
 effectful
 effekt
+elif
 enum
 enums
 erlang
@@ -87,6 +90,7 @@ falsy
 façade
 filename
 filesystem
+filesystems
 finalizer
 finalizers
 flix
@@ -99,6 +103,7 @@ genericity
 getters
 globals
 goroutines
+grep
 guido
 hardcodes
 hashability
@@ -117,14 +122,18 @@ initializer
 inlines
 inlining
 inspectable
+int
 interoperates
 ints
+isinstance
 iterable
 iterables
 json
 koka
 kotlin
 kyo
+linearization
+linearize
 lints
 liskov
 livelock
@@ -137,6 +146,7 @@ matchings
 matchups
 maturin
 mebibyte
+memoize
 memoized
 memoizer
 memoizes
@@ -146,6 +156,7 @@ metadata
 metamethod
 metamethods
 metaprogramming
+microbenchmark
 microgrid
 mixin
 mixins
@@ -156,6 +167,7 @@ monkeypatching
 mul
 multi
 multiplayer
+multiset
 multiton
 mypy
 nailers
@@ -168,9 +180,11 @@ nondeterminism
 nonmatching
 noopener
 numba
+numpy
 n²
 op
 optionals
+org
 overdrafting
 parallelizable
 parameterization
@@ -187,6 +201,7 @@ polymorphically
 postcondition
 pre
 precompute
+prepends
 profiler
 profilers
 programmatically
@@ -213,6 +228,7 @@ reimplementing
 rel
 repr
 requeued
+resize
 resizes
 rocq
 rossum
@@ -228,6 +244,7 @@ stdin
 stdlib
 stdout
 stepanov
+strawman
 stringified
 subclassed
 subclassing
@@ -238,6 +255,7 @@ sublists
 submodule
 submodules
 subproblems
+subprocess
 subrange
 subscripted
 subscripting
@@ -251,8 +269,10 @@ swappable
 teardown
 tee'd
 teleport
+teleporter
 teleports
 thinkinginpython
+timsort
 tkinter
 toolchain
 toolkits
@@ -277,14 +297,17 @@ unfindable
 unflattened
 unhashable
 uninterruptible
+unlifted
 unnormalized
 unpickle
+unprefixed
 unprint
 unrepresentable
 unrun
 unshadows
 unstarred
 unsupplied
+unsynchronized
 untracked
 untrusted
 untyped
@@ -310,3 +333,4 @@ whitespace
 wildcard
 workaround
 workarounds
+worklist
