@@ -211,17 +211,18 @@ then gain a duplicate `Circle` and `Square` on every call after that.
 ### Alternative Constructors Are Factories
 
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is an alternative constructor:
+is an alternative constructor,
 a method on the type that builds an instance from data the constructor rejects.
 There, `Month(7)` raises a `ValueError` because no member has the value `7`,
 while `Month.of(7)` returns `JULY`.
 It is also a factory, of the same form as `factory()`.
-Both are static methods of the type: each takes data and returns an instance,
+Both are static methods within the type.
+Each takes data and returns an instance,
 and each raises an exception for data it does not recognize,
 here a number outside one through twelve.
-`of()` needs no `match`,
-because the `Enum` already holds every member it could return:
-it indexes `list(Month)` instead of naming a class.
+`of()` needs no `match`.
+The `Enum` already holds every member it could return,
+so `of()` indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products collapses to a lookup,
 the form the next section builds for an open set.
 
@@ -922,13 +923,13 @@ def test_prototype_untouched() -> None:
 
 ## Builder
 
-*Builder* is the last of the creational patterns:
-build a complex object in steps,
+*Builder* is the last of the creational patterns.
+It builds a complex object in steps,
 keeping the step-by-step assembly separate from the finished object.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
 That pile of constructors is the *telescoping constructor*,
-and Builder is the workaround:
+and Builder is the workaround,
 a companion class that collects settings one method call at a time.
 Translated into Python with its structure intact, it looks like this:
 
