@@ -177,13 +177,17 @@ reading.
 - **Run `ty`/`ruff`/`pytest` against `build/examples/`** (via `uv run`), never a
   loose scratch file, or config/imports resolve differently.
 - **Bare `python`/`ty`/`pytest` on PATH can be a different, older tool than
-  `uv run`'s.** On this machine bare `python` is 3.14.6 while `uv run python`
-  is the pinned 3.15, and bare `ty` is 0.0.46 against
-  `uv run ty`'s 0.0.56. Running `validate_output.py` with bare `python`
-  produced false failures on 3.15-only syntax (`sentinel`, `lazy import`,
-  the PEP 798 comprehension-unpacking chapter) that vanished once invoked
-  via `uv run`. Always go through `uv run` for anything that executes
-  example code; never assume bare `python`/`ty`/`pytest` matches it.
+  `uv run`'s.** They matched on 2026-09-13 (both `python` 3.15.0rc2, both
+  `ty` 0.0.78), but they have diverged before: bare `python` was 3.14.6
+  while `uv run python` was the pinned 3.15, and bare `ty` was 0.0.46
+  against `uv run ty`'s 0.0.56. Running `validate_output.py` with the
+  older bare `python` produced false failures on 3.15-only syntax
+  (`sentinel`, `lazy import`, the PEP 798 comprehension-unpacking
+  chapter) that vanished once invoked via `uv run`. Always go through
+  `uv run` for anything that executes example code; never assume bare
+  `python`/`ty`/`pytest` matches it. `python3` on PATH is not a Python
+  at all: it is the Microsoft Store app-execution stub, which prints
+  "Python was not found" and exits 9009.
 - **CPython's small-int cache is wider on the pinned 3.15 beta than the
   textbook `-5..256` range.** Confirmed cached up to at least 1024 on this
   build. An example meant to show an "uncached" int needs a value safely
