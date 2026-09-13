@@ -185,9 +185,10 @@ reading.
   (`sentinel`, `lazy import`, the PEP 798 comprehension-unpacking
   chapter) that vanished once invoked via `uv run`. Always go through
   `uv run` for anything that executes example code; never assume bare
-  `python`/`ty`/`pytest` matches it. `python3` on PATH is not a Python
-  at all: it is the Microsoft Store app-execution stub, which prints
-  "Python was not found" and exits 9009.
+  `python`/`ty`/`pytest` matches it. There is no `python3` on PATH:
+  the Microsoft Store app-execution stub that answered to that name
+  (printing "Python was not found" and exiting 9009) was disabled on
+  2026-09-13, so a `python3` command now fails as "not recognized".
 - **CPython's small-int cache is wider on the pinned 3.15 beta than the
   textbook `-5..256` range.** Confirmed cached up to at least 1024 on this
   build. An example meant to show an "uncached" int needs a value safely
