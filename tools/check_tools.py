@@ -20,12 +20,12 @@ Exit status is 0 only if every non-assumed tool for the requested
 tier is present.
 
 Usage:
-    python tools/check_tools.py         # basic tier
-    python tools/check_tools.py --full  # basic + site/prose tools
+    python -m tools.check_tools         # basic tier
+    python -m tools.check_tools --full  # basic + site/prose tools
 """
 import argparse
 
-from tools_repo import run_capture
+from tools.repo import run_capture
 
 # (name, command, install hint, tier, assumed)
 TOOLS: list[tuple[str, list[str], str, str, bool]] = [

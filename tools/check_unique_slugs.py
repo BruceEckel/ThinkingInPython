@@ -31,7 +31,7 @@ Three kinds of reuse are legitimate and are not reported:
   and pytest never collects those names.
 
 Usage:
-    python tools/check_unique_slugs.py
+    python -m tools.check_unique_slugs
 """
 
 import re
@@ -39,9 +39,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from tools_config import ROOT
-from tools_markdown import Document
-from tools_report import Finding, report
+from tools.config import ROOT
+from tools.markdown import Document
+from tools.report import Finding, report
 
 CHAPTERS_DIR = ROOT / "Chapters"
 SOLUTIONS_DIR = ROOT / "Solutions"

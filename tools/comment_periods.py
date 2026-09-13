@@ -18,10 +18,10 @@ to remove the periods.
 import argparse
 from collections.abc import Iterator
 
-from tools_markdown import Document
-from tools_pycode import scan_line
-from tools_report import Check, Finding, report
-from tools_repo import add_paths_arg, md_files, write_text_lf
+from tools.markdown import Document
+from tools.pycode import scan_line
+from tools.report import Check, Finding, report
+from tools.repo import add_paths_arg, md_files, write_text_lf
 
 
 def _comment_starts(block: list[str]) -> list[int]:
@@ -86,7 +86,7 @@ CHECK = Check(
     run=find,
     clean="Comment periods OK.",
     problem="{n} one-line comment(s) end with a period. "
-            "Fix with: python tools/comment_periods.py --fix",
+            "Fix with: python -m tools.comment_periods --fix",
     fixer=fixed,
 )
 

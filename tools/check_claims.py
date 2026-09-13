@@ -35,9 +35,9 @@ stripped, ignoring short function words. `--threshold` tunes how much
 overlap counts as quoting the heading; the default of 0.5 was chosen by
 running the book and reading the boundary cases.
 
-    uv run python tools/check_claims.py              # every chapter
-    uv run python tools/check_claims.py 33 27        # two chapters
-    uv run python tools/check_claims.py --all        # every link, classified
+    uv run python -m tools.check_claims              # every chapter
+    uv run python -m tools.check_claims 33 27        # two chapters
+    uv run python -m tools.check_claims --all        # every link, classified
 """
 
 import argparse
@@ -45,8 +45,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR
-from tools_repo import add_paths_arg, md_files
+from tools.config import CHAPTERS_DIR
+from tools.repo import add_paths_arg, md_files
 
 LINK_RE = re.compile(
     r"\[([^\]]+)\]\((\d{2}_[A-Za-z_]+\.md)(?:#([a-z0-9._-]+))?\)")

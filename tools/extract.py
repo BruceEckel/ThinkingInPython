@@ -22,17 +22,16 @@ rust/ holds real, hand-maintained project files (Cargo.toml and friends)
 that no book block generates, so a generic "delete what the book does not
 produce" would be a foot-gun there.
 
-Named tools_extract for the same reason as the other tools_* modules: it
-must never collide with a book listing's filename through Python's
-sys.modules cache. See tools_repo.py's docstring.
+Imported as ``tools.extract``, so no book listing's filename can shadow
+it; tools/repo.py's docstring has the history.
 """
 
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tools_markdown import Block, Document
-from tools_repo import write_text_lf
+from tools.markdown import Block, Document
+from tools.repo import write_text_lf
 
 Router = Callable[[Document, Block], str | None]
 """Where a block extracts to, relative to the tool's root, or None to pass."""

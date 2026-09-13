@@ -71,10 +71,10 @@ keep each edited paragraph at its neighbors' width, and never touch a
 
 Baseline with `git show HEAD:<path> > <scratchpad>/base.md` and `vale`
 on that copy; never `git stash`. After editing run the checks the
-prompt names, and at minimum: `uv run python tools/check_all.py`,
-`uv run python tools/heading_links.py`,
-`uv run python tools/banned_phrases.py`,
-`uv run python tools/check_self_reference.py` (a reworded claim about
+prompt names, and at minimum: `uv run python -m tools.check_all`,
+`uv run python -m tools.heading_links`,
+`uv run python -m tools.banned_phrases`,
+`uv run python -m tools.check_self_reference` (a reworded claim about
 another chapter is the shape it gates), and `vale` on the file; for
 Solutions also `tools/extract_solutions.py` and
 `tools/check_solutions.py`; for Chapters also `tools/extract_examples.py`

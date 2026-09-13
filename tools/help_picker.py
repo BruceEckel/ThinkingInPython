@@ -85,8 +85,8 @@ from prompt_toolkit.output import Output
 from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.styles import Style
 
-from make_help import MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc
-from tools_config import ROOT
+from tools.make_help import MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc
+from tools.config import ROOT
 
 if TYPE_CHECKING:
     # A type alias prompt_toolkit defines only for checkers.

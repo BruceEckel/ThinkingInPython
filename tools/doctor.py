@@ -23,7 +23,7 @@ Checks:
   where a process can hold a file open after it's been unlinked.
 
 Usage:
-    python tools/doctor.py
+    python -m tools.doctor
 """
 
 import argparse
@@ -31,8 +31,8 @@ import os
 import platform
 import re
 
-from tools_config import PYVER, ROOT
-from tools_repo import run_capture
+from tools.config import PYVER, ROOT
+from tools.repo import run_capture
 
 VENV = ROOT / ".venv"
 

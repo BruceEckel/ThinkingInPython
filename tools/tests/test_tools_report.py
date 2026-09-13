@@ -1,9 +1,9 @@
-"""Tests for tools/tools_report.py (Finding formatting and the reporter)."""
+"""Tests for tools/report.py (Finding formatting and the reporter)."""
 from pathlib import Path
 
 import pytest
 
-from tools_report import Finding, report
+from tools.report import Finding, report
 
 # ── Finding.format ────────────────────────────────────────────────────────────
 

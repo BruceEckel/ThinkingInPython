@@ -61,12 +61,12 @@ functions take a Palette and default to the plain one, so wrapping is
 measured on uncolored text and the tests see no escape codes.
 
 Usage:
-    python tools/make_help.py                    # every section
-    python tools/make_help.py style              # one section
-    python tools/make_help.py --width 72         # wrap to a fixed width
-    python tools/make_help.py --color never      # plain text on a terminal
-    python tools/make_help.py --pick never       # the static listing, no picker
-    python tools/make_help.py --makefile PATH    # read another Makefile
+    python -m tools.make_help                    # every section
+    python -m tools.make_help style              # one section
+    python -m tools.make_help --width 72         # wrap to a fixed width
+    python -m tools.make_help --color never      # plain text on a terminal
+    python -m tools.make_help --pick never       # the static listing, no picker
+    python -m tools.make_help --makefile PATH    # read another Makefile
 """
 import argparse
 import os
@@ -79,7 +79,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import IO
 
-from tools_config import ROOT
+from tools.config import ROOT
 
 MAKEFILE = ROOT / "Makefile"
 
@@ -406,7 +406,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if want_picker(args.pick):
         try:
-            import help_picker
+            from tools import help_picker
         except ImportError:
             print("(interactive picker unavailable: `uv sync` installs "
                   "prompt_toolkit)", file=sys.stderr)

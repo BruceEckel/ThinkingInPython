@@ -78,7 +78,7 @@ other Rust project, scaffolded once by `maturin new --bindings pyo3
 otherwise touches those files.
 
 If you edit the Rust or demo code directly in `Chapters/18_Techniques--Performance.md`,
-run `make sync` (or `cd .. && python tools/extract_rust.py --write`) to
+run `make sync` (or `cd .. && python -m tools.extract_rust --write`) to
 pull the change into this tree before rebuilding.
 
 ## Adding another crate

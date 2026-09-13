@@ -18,9 +18,9 @@ behind a wrapper.
 
 The argument is a path, or just the file's name:
 
-    python tools/run_one_example.py deque_timing
-    python tools/run_one_example.py Examples/03_Foundations--Containers/deque_timing.py
-    python tools/run_one_example.py Containers/deque      # any substring
+    python -m tools.run_one_example deque_timing
+    python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
+    python -m tools.run_one_example Containers/deque      # any substring
 
 A name matching several files lists them and exits 2. Anything after the
 name is passed to the example as its own arguments.
@@ -31,7 +31,7 @@ there matches. No argument prints this help and exits 0: this is a reader's
 helper, not a gate, so running it bare should teach rather than fail.
 
 Usage:
-    python tools/run_one_example.py <name-or-path> [args...]
+    python -m tools.run_one_example <name-or-path> [args...]
 """
 
 import fnmatch
@@ -40,8 +40,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tools_config import EXAMPLES_TREE, INLINE_NORUN_MARKER, NORUN_FILE, ROOT
-from tools_repo import load_glob_list
+from tools.config import EXAMPLES_TREE, INLINE_NORUN_MARKER, NORUN_FILE, ROOT
+from tools.repo import load_glob_list
 
 COMMITTED_TREE = ROOT / "Examples"
 SEARCH_TREES = (COMMITTED_TREE, EXAMPLES_TREE)

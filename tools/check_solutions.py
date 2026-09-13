@@ -33,8 +33,8 @@ Seventeen links were wrong this way before anything looked. Write `./` on
 the front for a deliberate link to a neighboring solution.
 
 Usage:
-    python tools/check_solutions.py           # every chapter
-    python tools/check_solutions.py 19 45     # only these chapters
+    python -m tools.check_solutions           # every chapter
+    python -m tools.check_solutions 19 45     # only these chapters
 """
 
 import argparse
@@ -42,9 +42,9 @@ import re
 from collections.abc import Iterator
 from pathlib import Path
 
-from tools_config import ROOT
-from tools_markdown import Document
-from tools_report import Finding, report
+from tools.config import ROOT
+from tools.markdown import Document
+from tools.report import Finding, report
 
 CHAPTERS_DIR = ROOT / "Chapters"
 SOLUTIONS_DIR = ROOT / "Solutions"

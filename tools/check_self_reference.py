@@ -58,11 +58,11 @@ Waivers live in `tools/data/self_reference_ok.txt`, one `file:term`,
 rule is wrong and the prose is right. It is empty today.
 
 Usage:
-    python tools/check_self_reference.py              # the gating rules
-    python tools/check_self_reference.py --advisory   # plus grounding
-    python tools/check_self_reference.py --rule grounding
-    python tools/check_self_reference.py Chapters/07_Foundations--Classes.md
-    python tools/check_self_reference.py --list       # the rules
+    python -m tools.check_self_reference              # the gating rules
+    python -m tools.check_self_reference --advisory   # plus grounding
+    python -m tools.check_self_reference --rule grounding
+    python -m tools.check_self_reference Chapters/07_Foundations--Classes.md
+    python -m tools.check_self_reference --list       # the rules
 """
 
 import argparse
@@ -72,10 +72,10 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, DATA_DIR
-from tools_markdown import Document
-from tools_repo import add_paths_arg, md_files
-from tools_report import Check, Finding, report
+from tools.config import CHAPTERS_DIR, DATA_DIR
+from tools.markdown import Document
+from tools.repo import add_paths_arg, md_files
+from tools.report import Check, Finding, report
 
 WAIVERS_FILE = DATA_DIR / "self_reference_ok.txt"
 

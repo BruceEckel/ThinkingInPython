@@ -1,7 +1,7 @@
-"""Tests for tools/tools_markdown.py (the parsed-Markdown Document)."""
+"""Tests for tools/markdown.py (the parsed-Markdown Document)."""
 from pathlib import Path
 
-from tools_markdown import Block, Document
+from tools.markdown import Block, Document
 
 # ── parsing ───────────────────────────────────────────────────────────────────
 

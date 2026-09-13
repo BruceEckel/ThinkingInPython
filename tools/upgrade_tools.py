@@ -40,12 +40,12 @@ instead; this script only touches package versions, not the
 interpreter.
 
 Usage:
-    python tools/upgrade_tools.py
+    python -m tools.upgrade_tools
 """
 import shutil
 import subprocess
 
-from tools_repo import run_echoed
+from tools.repo import run_echoed
 
 # name -> (winget package id, Homebrew formula, fallback install link)
 EXTERNAL: dict[str, tuple[str, str, str]] = {

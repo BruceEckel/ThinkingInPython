@@ -47,9 +47,9 @@ tab-separated row per line (code location, Markdown location, width,
 line) for `cut -f` or a spreadsheet. Exits 0 whatever it finds.
 
 Usage:
-    python tools/code_width.py --width 50
-    python tools/code_width.py --width 55 Chapters Solutions
-    python tools/code_width.py --tsv > wide.tsv
+    python -m tools.code_width --width 50
+    python -m tools.code_width --width 55 Chapters Solutions
+    python -m tools.code_width --tsv > wide.tsv
     make code-width WIDTH=50
 """
 import argparse
@@ -68,12 +68,12 @@ from itertools import groupby
 from pathlib import Path
 from typing import Final, NamedTuple
 
-from extract_examples import route
-from listing_width import WIDTH_LIMIT, _effective_width, _triple_states
-from tools_config import BUILD_DIR, ROOT
-from tools_markdown import Document
-from tools_pycode import scan_line
-from tools_repo import add_paths_arg, md_files, write_text_lf
+from tools.extract_examples import route
+from tools.listing_width import WIDTH_LIMIT, _effective_width, _triple_states
+from tools.config import BUILD_DIR, ROOT
+from tools.markdown import Document
+from tools.pycode import scan_line
+from tools.repo import add_paths_arg, md_files, write_text_lf
 
 DEFAULT_WIDTH = 60
 # The slider's range. Every line wider than SLIDER_MIN is embedded in

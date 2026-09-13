@@ -43,12 +43,12 @@ cannot do either. Use -j 1 to go back to one process for everything,
 which is the right setting when debugging a block that misbehaves.
 
 Usage:
-    python tools/validate_output.py file.py        # check one file
-    python tools/validate_output.py Examples/      # check directory
-    python tools/validate_output.py chapter.md     # check Markdown listings
-    python tools/validate_output.py --update file.py   # rewrite markers
-    python tools/validate_output.py --update Chapters/ # rewrite the book
-    python tools/validate_output.py -j 1 Chapters/     # serial, one process
+    python -m tools.validate_output file.py        # check one file
+    python -m tools.validate_output Examples/      # check directory
+    python -m tools.validate_output chapter.md     # check Markdown listings
+    python -m tools.validate_output --update file.py   # rewrite markers
+    python -m tools.validate_output --update Chapters/ # rewrite the book
+    python -m tools.validate_output -j 1 Chapters/     # serial, one process
 """
 
 import argparse
@@ -63,10 +63,10 @@ import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
-from tools_pycode import walk_fenced
-from tools_repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
+from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
+from tools.pycode import walk_fenced
+from tools.repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
 
 # Matches #: or #: <content> at column 0 only.
 MARKER_RE = re.compile(r'^#:(?: (.*))?$')

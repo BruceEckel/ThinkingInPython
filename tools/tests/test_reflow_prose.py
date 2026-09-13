@@ -1,6 +1,6 @@
 """Tests for tools/reflow_prose.py (Semantic Line Breaks for prose)."""
 
-from reflow_prose import _DEFAULT_WIDTH, reflow, split_sentences
+from tools.reflow_prose import _DEFAULT_WIDTH, reflow, split_sentences
 
 # ── sentence splitting ────────────────────────────────────────────────────────
 

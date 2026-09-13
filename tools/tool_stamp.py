@@ -27,9 +27,9 @@ toolchain is as new as the resolve that produced it, so a fresh clone
 gets no nag.
 
 Usage:
-    python tools/tool_stamp.py --write   # record an upgrade
-    python tools/tool_stamp.py           # report, always
-    python tools/tool_stamp.py --nag     # report only when stale
+    python -m tools.tool_stamp --write   # record an upgrade
+    python -m tools.tool_stamp           # report, always
+    python -m tools.tool_stamp --nag     # report only when stale
 """
 
 import argparse
@@ -37,9 +37,9 @@ import json
 from datetime import datetime
 from typing import Any
 
-from gate_stamp import ago
-from tools_config import BUILD_DIR, ROOT
-from tools_repo import run_capture
+from tools.gate_stamp import ago
+from tools.config import BUILD_DIR, ROOT
+from tools.repo import run_capture
 
 STAMP = BUILD_DIR / "tool-stamp.json"
 LOCK = ROOT / "uv.lock"

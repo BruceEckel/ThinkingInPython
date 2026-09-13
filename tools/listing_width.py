@@ -25,10 +25,10 @@ import argparse
 from collections.abc import Iterator
 from typing import Final
 
-from tools_markdown import Document
-from tools_pycode import scan_line
-from tools_report import Check, Finding, report
-from tools_repo import add_paths_arg, md_files
+from tools.markdown import Document
+from tools.pycode import scan_line
+from tools.report import Check, Finding, report
+from tools.repo import add_paths_arg, md_files
 
 WIDTH_LIMIT: Final[int] = 60
 PRAGMA: Final[str] = "# type: ignore"

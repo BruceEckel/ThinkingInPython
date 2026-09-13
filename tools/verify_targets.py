@@ -32,9 +32,9 @@ Every target's combined stdout/stderr is saved to
 build/target_test_logs/<target>.log for inspection after the run.
 
 Usage:
-    python tools/verify_targets.py                  # every target
-    python tools/verify_targets.py --only gate ci    # just these targets
-    python tools/verify_targets.py --timeout 60      # per-target timeout
+    python -m tools.verify_targets                  # every target
+    python -m tools.verify_targets --only gate ci    # just these targets
+    python -m tools.verify_targets --timeout 60      # per-target timeout
 """
 
 import argparse
@@ -48,8 +48,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from make_help import MAKEFILE, entries
-from tools_config import ROOT
+from tools.make_help import MAKEFILE, entries
+from tools.config import ROOT
 
 LOG_DIR = ROOT / "build" / "target_test_logs"
 DEFAULT_TIMEOUT = 300.0

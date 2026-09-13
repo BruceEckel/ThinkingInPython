@@ -12,15 +12,15 @@ not be it. ruff infers its target from ``requires-python``, so there
 is no separate version to bump.
 
 Usage:
-    python tools/upgrade_python.py        # latest patch of the minor
-    python tools/upgrade_python.py 3.15   # move to the 3.15 minor
+    python -m tools.upgrade_python        # latest patch of the minor
+    python -m tools.upgrade_python 3.15   # move to the 3.15 minor
 """
 
 import re
 import sys
 
-from tools_config import PYVER, ROOT
-from tools_repo import run_echoed, write_text_lf
+from tools.config import PYVER, ROOT
+from tools.repo import run_echoed, write_text_lf
 
 PYPROJECT = ROOT / "pyproject.toml"
 MINOR_RE = re.compile(r"(\d+\.\d+)(.*)")

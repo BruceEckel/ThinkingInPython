@@ -22,8 +22,8 @@ subdirectories and leave it alone; a full ``rm -rf build`` drops it, which
 is correct, since a rebuilt-from-nothing tree deserves a fresh gate.
 
 Usage:
-    python tools/gate_stamp.py --write gate   # record a pass
-    python tools/gate_stamp.py                # report
+    python -m tools.gate_stamp --write gate   # record a pass
+    python -m tools.gate_stamp                # report
 """
 
 import argparse
@@ -33,7 +33,7 @@ import subprocess
 from datetime import datetime
 from typing import Any
 
-from tools_config import BUILD_DIR, ROOT
+from tools.config import BUILD_DIR, ROOT
 
 STAMP = BUILD_DIR / "gate-stamp.json"
 SOURCES = ("Chapters", "Solutions")

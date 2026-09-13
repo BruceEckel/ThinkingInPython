@@ -11,14 +11,14 @@ drifted (an editor writing CRLF on Windows, say) before it becomes confusing.
 Pass --fix to rewrite the offenders to LF in place.
 
 Usage:
-    python tools/check_line_endings.py          # check, exit 1 on CRLF
-    python tools/check_line_endings.py --fix     # convert offenders to LF
+    python -m tools.check_line_endings          # check, exit 1 on CRLF
+    python -m tools.check_line_endings --fix     # convert offenders to LF
 """
 
 import argparse
 import subprocess
 
-from tools_config import ROOT
+from tools.config import ROOT
 
 
 def offenders() -> list[str]:
@@ -72,7 +72,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"{len(bad)} tracked text file(s) have CRLF or mixed line endings:")
     for p in bad:
         print(f"  {p}")
-    print("\nFix with: python tools/check_line_endings.py --fix")
+    print("\nFix with: python -m tools.check_line_endings --fix")
     return 1
 
 

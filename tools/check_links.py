@@ -14,9 +14,9 @@ update what it reports. Internal cross-references are the job of
 ``heading_links.py``, not this script.
 
 Usage:
-    python tools/check_links.py                # scan Chapters/
-    python tools/check_links.py path ...       # scan specific files/dirs
-    python tools/check_links.py --timeout 20   # slow-site tolerance
+    python -m tools.check_links                # scan Chapters/
+    python -m tools.check_links path ...       # scan specific files/dirs
+    python -m tools.check_links --timeout 20   # slow-site tolerance
 """
 
 import argparse
@@ -26,7 +26,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from tools_repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, md_files
 
 URL_RE = re.compile(r"https?://[^\s)\]>\"'`]+")
 # Some hosts refuse requests without a browser-ish User-Agent.

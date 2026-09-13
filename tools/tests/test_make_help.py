@@ -8,7 +8,7 @@ import re
 
 import pytest
 
-from make_help import (
+from tools.make_help import (
     ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, can_colorize, check, entries,
     parse, render_all, render_section, terminal_width, want_picker, wrap_doc)
 
@@ -207,13 +207,13 @@ NOTED = """\
 #
 # A second paragraph.
 build:  ## Build it
-\t$(PY) tools/build.py
+\t$(PY) -m tools.build
 \t@echo done
 
 # This comment is separated by a blank line, so it is not notes.
 
 check: build  ## Check it
-\t$(PY) tools/check.py
+\t$(PY) -m tools.check
 
 ##@ Style
 # The heading above ends the walk back, not this comment.
@@ -226,10 +226,10 @@ def test_parse_captures_the_comment_block_above_a_target():
     build, check = parse(NOTED)[0].targets
     assert build.notes == ("What build does,\nin two lines.\n\n"
                            "A second paragraph.")
-    assert build.recipe == ("$(PY) tools/build.py", "@echo done")
+    assert build.recipe == ("$(PY) -m tools.build", "@echo done")
     assert build.prereqs == ()
     assert check.notes == ""
-    assert check.recipe == ("$(PY) tools/check.py",)
+    assert check.recipe == ("$(PY) -m tools.check",)
     assert check.prereqs == ("build",)
 
 

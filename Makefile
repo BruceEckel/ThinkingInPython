@@ -63,7 +63,7 @@ ifeq ($(firstword $(MAKECMDGOALS)),help)
 endif
 
 help:  ## Pick a target to run, or list them all when piped (`make help style` narrows to one section)
-	@$(PY) tools/make_help.py $(HELP_TOPIC)
+	@$(PY) -m tools.make_help $(HELP_TOPIC)
 
 ##@ Setup
 
@@ -74,19 +74,19 @@ help:  ## Pick a target to run, or list them all when piped (`make help style` n
 # uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
 # assumed present, since you needed both to get this far.
 tools-check:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
-	$(PY) tools/check_tools.py
+	$(PY) -m tools.check_tools
 
 # Adds the tools a book maintainer needs for the rest of `make help`:
 # pandoc (site/local/epub/pdf), typst (pdf), and the standalone vale
 # binary (prose).
 tools-check-full:  ## Check every tool, including pandoc, typst, and vale (site/pdf/prose)
-	$(PY) tools/check_tools.py --full
+	$(PY) -m tools.check_tools --full
 
 # Read-only: catches a stale uv silently stuck on an old Python prerelease,
 # and (Windows) a process running from .venv that would lock it on upgrade.
 # Prints the exact fix command instead of applying anything itself.
 doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
-	$(PY) tools/doctor.py
+	$(PY) -m tools.doctor
 
 # Runs every other target here and reports which ones fail. Read-only/idempotent
 # targets run directly; a target that bakes --fix/--write/--add into its recipe
@@ -97,7 +97,7 @@ doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 # blocks forever); see tools/verify_targets.py's docstring. Logs land in
 # build/target_test_logs/.
 verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
-	$(PY) tools/verify_targets.py
+	$(PY) -m tools.verify_targets
 
 # The harness's own unit tests (tools/tests/), covering the shared library
 # modules and the pure logic inside the entry points. Distinct from `test`,
@@ -122,9 +122,9 @@ tools-test:  ## Run the harness's own unit tests (tools/tests/)
 # and the book needs fixing, not that the upgrade failed; the stamp is
 # written first for that reason.
 tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/typst/vale
-	$(PY) tools/upgrade_tools.py
+	$(PY) -m tools.upgrade_tools
 	$(MAKE) tools-check-full
-	$(PY) tools/tool_stamp.py --write
+	$(PY) -m tools.tool_stamp --write
 	$(MAKE) sweep
 
 ##@ Everyday
@@ -142,7 +142,7 @@ tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global
 # tools/run_all.py (ALL_TARGETS) -- add a target there to include it,
 # nothing else needs to change.
 all:  ## Run every everyday fixer plus sync and gate; ARGS=--help lists them without running
-	$(PY) tools/run_all.py $(ARGS)
+	$(PY) -m tools.run_all $(ARGS)
 
 # Fix any CRLF in the working tree, refresh the #: output markers, sync
 # Examples/ and SolutionsCode/ from the Markdown, then run every gate except
@@ -198,28 +198,28 @@ GATE_DOCS = tools/README.md Solutions
 # rewritten, and that failure still exits nonzero and stops the gate.
 gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, output, ty, ruff, run, pytest, solutions-gate)
 	$(PYTEST) $(PYTEST_N) tools/tests
-	$(PY) tools/check_line_endings.py
-	$(PY) tools/check_all.py $(GATE_CHECKS)
-	$(PY) tools/check_all.py anchors --paths $(GATE_DOCS)
-	$(PY) tools/check_all.py widths --paths Solutions
-	$(PY) tools/reflow_prose.py --write
-	$(PY) tools/check_unique_slugs.py
-	$(PY) tools/extract_examples.py
-	$(PY) tools/extract_examples.py --write
-	$(PY) tools/validate_output.py --update Chapters
+	$(PY) -m tools.check_line_endings
+	$(PY) -m tools.check_all $(GATE_CHECKS)
+	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
+	$(PY) -m tools.check_all widths --paths Solutions
+	$(PY) -m tools.reflow_prose --write
+	$(PY) -m tools.check_unique_slugs
+	$(PY) -m tools.extract_examples
+	$(PY) -m tools.extract_examples --write
+	$(PY) -m tools.validate_output --update Chapters
 	$(TY) check build/examples
 	$(RUFF) check build/examples
-	$(PY) tools/run_examples.py
+	$(PY) -m tools.run_examples
 	$(PYTEST) $(PYTEST_N) build/examples
-	$(PY) tools/gate_stamp.py --write gate
-	$(PY) tools/tool_stamp.py --nag
+	$(PY) -m tools.gate_stamp --write gate
+	$(PY) -m tools.tool_stamp --nag
 
 # When did the book last pass the gate, and has anything changed since?
 # The stamp records a hash per Chapters/ and Solutions/ file, so this
 # answers the second half too. `gate` writes it; `verify`, `ci`, and `all`
 # inherit it, since each runs `gate`.
 gate-status:  ## Report when the gate last passed and what changed since
-	$(PY) tools/gate_stamp.py
+	$(PY) -m tools.gate_stamp
 
 # When were the dev tools last upgraded, and to what? `tools-upgrade`
 # writes this stamp; `gate` reads it and prints one line (nothing more,
@@ -227,7 +227,7 @@ gate-status:  ## Report when the gate last passed and what changed since
 # With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
 # correctly treated as current.
 tools-status:  ## Report when the dev tools were last upgraded, and to what
-	$(PY) tools/tool_stamp.py
+	$(PY) -m tools.tool_stamp
 
 # `gate` stops at its first failure, and since `solutions-gate` is one of
 # its prerequisites, that half runs first and can hide every Chapters/
@@ -238,7 +238,7 @@ tools-status:  ## Report when the dev tools were last upgraded, and to what
 # unlikely to be the only one. The #: markers are excluded on purpose
 # (see the script docstring).
 sweep:  ## Run every check over both trees, reporting all failures instead of the first
-	$(PY) tools/sweep_checks.py
+	$(PY) -m tools.sweep_checks
 
 # Mirrors the GitHub Actions gates plus a site build, all run locally. The
 # default GitHub Actions path only builds and publishes the site; these gates
@@ -258,7 +258,7 @@ reset: clean-examples extract  ## Regenerate build/examples/ from the Markdown (
 # venv and run the gate. Run through `uv run --no-project` so the orchestrating
 # interpreter is not the venv that `uv sync` rebuilds.
 python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify
-	uv run --no-project python tools/upgrade_python.py $(TO)
+	uv run --no-project python -m tools.upgrade_python $(TO)
 	$(MAKE) verify
 
 ##@ Build and site
@@ -268,20 +268,20 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
 sync:  ## Update the committed Examples/ tree from the Markdown
-	$(PY) tools/extract_examples.py --write -o Examples
+	$(PY) -m tools.extract_examples --write -o Examples
 
 check:  ## Verify book examples match the committed Examples/ tree
-	$(PY) tools/extract_examples.py
+	$(PY) -m tools.extract_examples
 
 # `check`/`gate` already fail on an orphaned stray (a file under Examples/
 # with no matching block and no mention anywhere in the book, typically left
 # behind by a rename). This deletes exactly those; a stray whose filename is
 # still mentioned somewhere in the book is left alone for a human to review.
 prune:  ## Delete orphaned stray files under Examples/ (see `check`)
-	$(PY) tools/extract_examples.py --prune
+	$(PY) -m tools.extract_examples --prune
 
 site:  ## Render Chapters/ into build/site/ with pandoc
-	$(PY) tools/build_site.py
+	$(PY) -m tools.build_site
 
 # The cover images and favicon are generated files under
 # resources/static/, committed so the builds never depend on the
@@ -289,7 +289,7 @@ site:  ## Render Chapters/ into build/site/ with pandoc
 # the image at resources/cover-source.jpg and rerun this; with no
 # source image the script falls back to its own drawn serpent.
 cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
-	$(PY) tools/make_cover.py
+	$(PY) -m tools.make_cover
 
 # Two EPUBs from the same Chapters/, for e-readers: -color (syntax
 # highlighting in color, for backlit readers) and -eink (bolding
@@ -300,7 +300,7 @@ cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
 # ending in `## Exercises` and the nine other repeated headings would collide
 # and pandoc would quietly retarget those links. Needs pandoc, like `site`.
 epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub with pandoc
-	$(PY) tools/build_epub.py
+	$(PY) -m tools.build_epub
 
 # Hands the built EPUB to Amazon's Send to Kindle desktop app, which
 # opens its dialog with the file queued, and opens an Explorer window
@@ -310,7 +310,7 @@ epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub wi
 # fresh build is sent as-is. Excluded from verify-targets' smoke
 # test: it opens a GUI.
 kindle:  ## Send the e-ink EPUB to a Kindle via the Send to Kindle app, rebuilding it first if stale (VARIANT=color for the other)
-	$(PY) tools/send_to_kindle.py $(VARIANT)
+	$(PY) -m tools.send_to_kindle $(VARIANT)
 
 # One PDF from the same merged, anchor-namespaced Markdown stream the
 # EPUB uses (build_pdf.py reuses build_epub.py's assembly), rendered by
@@ -318,7 +318,7 @@ kindle:  ## Send the e-ink EPUB to a Kindle via the Send to Kindle app, rebuildi
 # highlights the listings itself, so this build needs no rasterizer.
 # Needs pandoc and the typst binary (`make tools-check-full` verifies).
 pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and typst
-	$(PY) tools/build_pdf.py
+	$(PY) -m tools.build_pdf
 
 # Publish a GitHub release whose uploaded assets are exactly the
 # freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
@@ -328,21 +328,21 @@ pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and ty
 # `gh release create v$(VERSION)`. Deliberately excluded from
 # verify-targets' smoke test: it tags the repo and publishes to GitHub.
 release:  ## Verify, rebuild the PDF and EPUBs, publish them with the reader guides as a GitHub release, then prune releases older than the newest two (VERSION=1.0)
-	$(PY) tools/release.py $(VERSION)
+	$(PY) -m tools.release $(VERSION)
 
 # The prune step of `release` on its own. Tags stay, so history and the
 # menu's next-version guess are untouched. Excluded from verify-targets'
 # smoke test: it deletes from GitHub.
 release-prune:  ## Delete GitHub releases older than the newest two (their tags stay)
-	$(PY) tools/release.py --prune
+	$(PY) -m tools.release --prune
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.
 local: site  ## Build the site, serve it with live reload, open a browser
-	$(PY) tools/serve.py --open --watch
+	$(PY) -m tools.serve --open --watch
 
 serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
-	$(PY) tools/serve.py
+	$(PY) -m tools.serve
 
 # Headed "Code examples" rather than "Examples" so its slug is `code`: a
 # section slug must not equal a target name (make_help.py enforces this),
@@ -358,7 +358,7 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 # one chapter, in about a second. It is not a substitute for `gate`, which
 # also catches cross-chapter breakage: run that before committing.
 check-ch:  ## Run the code checks for one chapter only (CH=12), ~1s
-	$(PY) tools/check_chapter.py $(CH)
+	$(PY) -m tools.check_chapter $(CH)
 
 # An alias for `run`, kept because older notes name it: `run` already
 # depends on `extract`, so both build the same two targets in the same order.
@@ -370,7 +370,7 @@ examples: extract run  ##- Extract then run (an alias for `run`)
 # gitignored build/examples/ left over from an older Markdown) from being
 # checked. Use `make reset` to force a clean regeneration.
 run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
-	$(PY) tools/run_examples.py
+	$(PY) -m tools.run_examples
 
 # Run one example the way the book assumes: from inside its own chapter
 # directory, with the tree's utils/ on PYTHONPATH, so its sibling imports
@@ -380,17 +380,17 @@ run: extract  ## Run every extracted .py and report failures (`make examples` is
 # the equivalent cd + PYTHONPATH commands before running: that is what you
 # type when this target is not at hand.
 run-one:  ## Run one example and show its output (F=deque_timing)
-	$(PY) tools/run_one_example.py $(F)
+	$(PY) -m tools.run_one_example $(F)
 
 # Rewrite the #: output markers inside the Markdown's ```python listings to the
 # stdout each listing actually produces. Depends on extract so each listing runs
 # from build/examples/<chapter>/, where its sibling imports and data files live.
 output: extract  ## Update the #: output markers in the book's listings
-	$(PY) tools/validate_output.py --update Chapters
+	$(PY) -m tools.validate_output --update Chapters
 
 # Same, but report mismatches instead of rewriting (a gate-friendly check).
 output-check: extract  ## Verify the #: output markers without rewriting
-	$(PY) tools/validate_output.py Chapters
+	$(PY) -m tools.validate_output Chapters
 
 test: extract  ## Run the book's pytest examples (test_*.py)
 	$(PYTEST) $(PYTEST_N) build/examples
@@ -405,10 +405,10 @@ lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
 # result back into the Markdown. Depends on extract so ruff sees each listing's
 # siblings and classifies imports the way the lint gate does.
 fix-imports: extract  ## Sort imports and drop unused ones in the listings (ruff I,F401), in the Markdown
-	$(PY) tools/fix_imports.py --fix
+	$(PY) -m tools.fix_imports --fix
 
 extract:  ## Write build/examples/ from the Markdown
-	$(PY) tools/extract_examples.py --write
+	$(PY) -m tools.extract_examples --write
 
 ##@ Solutions (Solutions/, build/solutions/)
 
@@ -421,29 +421,29 @@ extract:  ## Write build/examples/ from the Markdown
 # redeclares whatever book context it needs) rather than importing from
 # Examples/, so this tree never breaks when a book example changes.
 solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md
-	$(PY) tools/extract_solutions.py --write -o SolutionsCode
+	$(PY) -m tools.extract_solutions --write -o SolutionsCode
 
 solutions-check:  ## Verify Solutions/*.md matches the committed SolutionsCode/ tree
-	$(PY) tools/extract_solutions.py
+	$(PY) -m tools.extract_solutions
 
 # The solutions counterpart of `prune`. A renumbered exercise is the
 # usual source: the block moves from exercise_2 to exercise_1 and the old
 # file stays, with nothing generating it and nothing importing it.
 solutions-prune:  ## Delete orphaned stray files under SolutionsCode/ (see `solutions-check`)
-	$(PY) tools/extract_solutions.py --prune
+	$(PY) -m tools.extract_solutions --prune
 
 solutions-extract:  ## Write build/solutions/ from Solutions/*.md
-	$(PY) tools/extract_solutions.py --write
+	$(PY) -m tools.extract_solutions --write
 
 # validate_output.py needs an absolute --tree: Solutions/*.md's blocks run
 # with cwd inside build/solutions/<chapter>, and a relative tree argument
 # stops resolving once cwd changes (the same gotcha run_examples.py's
 # --tree has; see tools/README.md).
 solutions-output: solutions-extract  ## Update the #: output markers in Solutions/*.md
-	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions
+	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
 
 solutions-output-check: solutions-extract  ## Verify the #: output markers in Solutions/*.md, no rewrite
-	$(PY) tools/validate_output.py --tree "$(CURDIR)/build/solutions" Solutions
+	$(PY) -m tools.validate_output --tree "$(CURDIR)/build/solutions" Solutions
 
 solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
 	$(TY) check build/solutions
@@ -459,7 +459,7 @@ solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must
 # --tree is required, not stylistic: it goes on PYTHONPATH, and a relative
 # path stops resolving the moment an example changes directory.
 solutions-run: solutions-extract  ## Run every extracted solution and report failures
-	$(PY) tools/run_examples.py --tree "$(CURDIR)/build/solutions"
+	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
 
 solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
 	$(PYTEST) $(PYTEST_N) build/solutions
@@ -470,7 +470,7 @@ solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
 # (anchors) both look straight past it. Takes chapter numbers to check
 # one, e.g. `make solutions-numbering ARGS=19`.
 solutions-numbering:  ## Verify each chapter's exercises have matching solutions
-	$(PY) tools/check_solutions.py $(ARGS)
+	$(PY) -m tools.check_solutions $(ARGS)
 
 # Mirrors `gate`, but for Solutions/: numbering, drift check, output
 # markers, ty, ruff, run, pytest. This skipped the run step until
@@ -483,13 +483,13 @@ solutions-numbering:  ## Verify each chapter's exercises have matching solutions
 # notice. extract_solutions.py also fails on an orphaned stray under
 # SolutionsCode/; `make solutions-prune` deletes exactly those.
 solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run, pytest
-	$(PY) tools/check_solutions.py
-	$(PY) tools/extract_solutions.py
-	$(PY) tools/extract_solutions.py --write
-	$(PY) tools/validate_output.py --update --tree "$(CURDIR)/build/solutions" Solutions
+	$(PY) -m tools.check_solutions
+	$(PY) -m tools.extract_solutions
+	$(PY) -m tools.extract_solutions --write
+	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
 	$(TY) check build/solutions
 	$(RUFF) check build/solutions
-	$(PY) tools/run_examples.py --tree "$(CURDIR)/build/solutions"
+	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
 	$(PYTEST) $(PYTEST_N) build/solutions
 
 # Headed "Writing" rather than "Prose" for the same reason as "Code
@@ -503,10 +503,10 @@ solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run,
 # headings are left untouched; a file is rewritten only if it round-trips).
 # Target one chapter with CH=, e.g. `make reflow CH=02` or `make reflow CH=Tour`.
 reflow:  ## Rewrite prose to one sentence per line (CH=02 for one chapter)
-	$(PY) tools/reflow_prose.py --write $(CH)
+	$(PY) -m tools.reflow_prose --write $(CH)
 
 reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
-	$(PY) tools/reflow_prose.py $(CH)
+	$(PY) -m tools.reflow_prose $(CH)
 
 # AI editing passes over one chapter's prose, edited in place. Each pass
 # is one headless `claude -p "/<skill> <chapter>"` run. Reflow and the
@@ -557,7 +557,7 @@ reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
 # model it used.
 MODEL ?=
 rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--list)
-	$(PY) tools/rewrite.py $(CH) $(if $(MODEL),--model $(MODEL)) $(ARGS)
+	$(PY) -m tools.rewrite $(CH) $(if $(MODEL),--model $(MODEL)) $(ARGS)
 
 # Spell-check the book and lint it for small mechanical slips. codespell
 # catches known misspellings (prose and code comments); prose_lint catches
@@ -566,15 +566,15 @@ rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--
 # CH= (e.g. `make spell CH=29`) or a path with DOCS=.
 spell:  ## codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)
 	$(SPELL) $(PROSE_FILES)
-	$(PY) tools/prose_lint.py $(PROSE_FILES)
-	$(PY) tools/spellcheck.py $(PROSE_FILES)
+	$(PY) -m tools.prose_lint $(PROSE_FILES)
+	$(PY) -m tools.spellcheck $(PROSE_FILES)
 
 # Accept every word spellcheck.py doesn't recognize into tools/data/wordlist.txt
 # (sorted, deduplicated) instead of failing. It cannot tell a real term from
 # a typo, so always review the diff before committing; a real typo belongs
 # in the prose, not the wordlist.
 spell-add:  ## Accept every spellcheck-unknown word into wordlist.txt, sorted (review the diff!)
-	$(PY) tools/spellcheck.py $(PROSE_FILES) --add
+	$(PY) -m tools.spellcheck $(PROSE_FILES) --add
 
 # House-style lint with Vale: no em-dashes and no filler phrases. Run one
 # chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.
@@ -586,7 +586,7 @@ prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
 # is flaky and a dead external site should never block a build. Run it now
 # and then to catch link rot; heading_links.py covers internal links.
 links:  ## Check the book's external URLs for link rot (advisory, needs network)
-	$(PY) tools/check_links.py
+	$(PY) -m tools.check_links
 
 # Advisory only, like `links` above: lists `TODO(tag): ...` HTML-comment
 # markers left in the Markdown (see tools/list_todos.py), each one an
@@ -594,7 +594,7 @@ links:  ## Check the book's external URLs for link rot (advisory, needs network)
 # control changes (a dependency ships a wheel, a build becomes the
 # default). Never fails, and is not part of `verify`/`gate`/`ci`.
 todos:  ## List TODO(tag): ... markers left in the book (advisory)
-	$(PY) tools/list_todos.py
+	$(PY) -m tools.list_todos
 
 # Advisory. heading_links.py proves a cross-chapter link resolves; this
 # asks the question it cannot, whether the target says what the link text
@@ -602,14 +602,14 @@ todos:  ## List TODO(tag): ... markers left in the book (advisory)
 # and neither can drift; what is left is the handful of author-written
 # phrases describing what is over there. Run one chapter with ARGS=33.
 claims:  ## List cross-chapter links whose text makes an unchecked claim
-	$(PY) tools/check_claims.py $(ARGS)
+	$(PY) -m tools.check_claims $(ARGS)
 
 # Advisory. Which `##` sections no exercise practices, per chapter. A
 # worklist rather than a gate: a conclusion or a table wants no exercise,
 # and the matching is literal, so it under-reports coverage. Confirm a
 # reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
 exercise-coverage:  ## List chapter sections that no exercise practices
-	$(PY) tools/exercise_coverage.py $(ARGS)
+	$(PY) -m tools.exercise_coverage $(ARGS)
 
 ##@ Style gates
 
@@ -622,24 +622,24 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 # Fail if any tracked text file has CRLF in the working tree. .gitattributes
 # keeps the committed blobs LF; this catches a drifted working copy. Run
-# `$(PY) tools/check_line_endings.py --fix` to convert offenders.
+# `$(PY) -m tools.check_line_endings --fix` to convert offenders.
 eol:  ## Check tracked text files for CRLF; `make fix-eol` converts them
-	$(PY) tools/check_line_endings.py
+	$(PY) -m tools.check_line_endings
 
 fix-eol:  ##- Convert any CRLF in tracked text files to LF
-	$(PY) tools/check_line_endings.py --fix
+	$(PY) -m tools.check_line_endings --fix
 
 # Fail if any ```python listing has more than one blank line in a row or a
 # blank line between import groups. Run `make fix-listings` to remove them.
 listings:  ## Check listings keep blank lines minimal; `make fix-listings` strips them
-	$(PY) tools/listing_format.py
+	$(PY) -m tools.listing_format
 
 # Fail if any listing line in Chapters/ or Solutions/ is wider than 60
 # characters (a trailing `# type: ignore` pragma is the one exemption).
 # There is no fixer: wrap the statement, move the comment, or shorten
 # the printed output.
 widths:  ## Fail if a listing line exceeds the 60-character width
-	$(PY) tools/listing_width.py Chapters Solutions
+	$(PY) -m tools.listing_width Chapters Solutions
 
 # A survey, not a gate: every listing line wider than WIDTH (raw width,
 # no pragma exemption), with its Examples/ or SolutionsCode/ path and
@@ -652,43 +652,43 @@ widths:  ## Fail if a listing line exceeds the 60-character width
 # ARGS=--no-open only writes the page.
 WIDTH ?= 60
 code-width:  ## Show every listing line wider than WIDTH=nn (default 60) in the browser (ARGS=--tsv for rows)
-	$(PY) tools/code_width.py --width $(WIDTH) $(ARGS) Chapters Solutions
+	$(PY) -m tools.code_width --width $(WIDTH) $(ARGS) Chapters Solutions
 
 fix-listings:  ##- Remove the offending blank lines from listings
-	$(PY) tools/listing_format.py --fix
+	$(PY) -m tools.listing_format --fix
 
 # Fail if any phrase in tools/data/banned_phrases.txt appears anywhere in the book.
 banned:  ## Fail if any tools/data/banned_phrases.txt phrase is in the book
-	$(PY) tools/banned_phrases.py
+	$(PY) -m tools.banned_phrases
 
 # A one-line listing comment ends without a period; only multiline comments use
 # periods. Run `make fix-comment-periods` to strip the offenders.
 comment-periods:  ## Fail if a one-line comment ends with a period; `make fix-comment-periods` strips them
-	$(PY) tools/comment_periods.py
+	$(PY) -m tools.comment_periods
 
 fix-comment-periods:  ##- Remove those trailing periods
-	$(PY) tools/comment_periods.py --fix
+	$(PY) -m tools.comment_periods --fix
 
 # A prose comment starts with a capital. Heuristic, so false positives are
 # listed in tools/data/comment_caps_allow.txt. Run `make fix-comment-caps` to apply.
 comment-caps:  ## Fail if a prose comment is not capitalized; `make fix-comment-caps` applies it
-	$(PY) tools/capitalize_comments.py
+	$(PY) -m tools.capitalize_comments
 
 fix-comment-caps:  ##- Capitalize them
-	$(PY) tools/capitalize_comments.py --write
+	$(PY) -m tools.capitalize_comments --write
 
 # An inline comment (code precedes it on the line) must start exactly two
 # spaces after the code; a full-line comment or a #: output marker is left
 # alone. Run `make fix-comment-spacing` to collapse the gap to two spaces.
 comment-spacing:  ## Fail if an inline comment isn't two spaces after code; `make fix-comment-spacing` collapses the gap
-	$(PY) tools/comment_spacing.py
+	$(PY) -m tools.comment_spacing
 
 fix-comment-spacing:  ##- Collapse inline-comment gaps to two spaces
-	$(PY) tools/comment_spacing.py --fix
+	$(PY) -m tools.comment_spacing --fix
 
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
-	$(PY) tools/heading_links.py Chapters $(GATE_DOCS)
+	$(PY) -m tools.heading_links Chapters $(GATE_DOCS)
 
 # Fail if the book says something about its own chapters that those
 # chapters disprove: an "appears nowhere else" that does appear, or an
@@ -696,14 +696,14 @@ anchors:  ## Fail if a heading-anchor link points at no real heading
 # search, which is why they gate. The third rule in the tool, grounding,
 # is advisory and lives in `self-reference-report` below.
 self-reference:  ## Fail if a claim the book makes about its own chapters is false
-	$(PY) tools/check_self_reference.py
+	$(PY) -m tools.check_self_reference
 
 # Advisory, like `claims`. Adds the grounding rule: a sentence linking to
 # a chapter that contains none of the code terms the sentence names. It
 # catches real misattributions and also fires on sentences whose terms
 # belong to the linking chapter, so it reports rather than gates.
 self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
-	$(PY) tools/check_self_reference.py --advisory $(ARGS)
+	$(PY) -m tools.check_self_reference --advisory $(ARGS)
 
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,
@@ -712,7 +712,7 @@ self-reference-report:  ## List sentences attributing terms to a chapter that la
 # it too, so a new collision fails the build; this target is the standalone
 # way to ask the same question while editing.
 unique-slugs:  ## Fail if two chapters name two listings the same
-	$(PY) tools/check_unique_slugs.py
+	$(PY) -m tools.check_unique_slugs
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.
@@ -724,18 +724,18 @@ unique-slugs:  ## Fail if two chapters name two listings the same
 # `make tools-check-full` reports whether it is. `gate` and `ci` do not run
 # Vale, and still pass without it.
 checks:  ## Run every Markdown check plus the Vale prose lint (ARGS=--list lists the checks); `make fix-checks` applies them
-	$(PY) tools/check_all.py $(ARGS)
+	$(PY) -m tools.check_all $(ARGS)
 	$(if $(ARGS),,$(VALE) $(PROSE_FILES))
 
 fix-checks:  ##- Apply every fix those checks can make
-	$(PY) tools/check_all.py --fix
+	$(PY) -m tools.check_all --fix
 
 # The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
 # registry). `checks` is the one to run while editing, since it adds the Vale
 # pass; this one answers the narrower "will the gate pass?" and is what `sweep`
 # runs, so the sweep's verdict matches the gate's.
 gate-checks:  ## Run just the Markdown checks the gate enforces
-	$(PY) tools/check_all.py $(GATE_CHECKS)
+	$(PY) -m tools.check_all $(GATE_CHECKS)
 
 ##@ Cleanup
 

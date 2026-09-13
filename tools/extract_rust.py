@@ -36,15 +36,15 @@ committed ``rust/`` tree is reported, and a non-zero exit signals
 trouble. Pass ``--write`` to update the tracked files.
 
 Usage:
-    python tools/extract_rust.py            # check vs rust/
-    python tools/extract_rust.py --write     # update rust/
+    python -m tools.extract_rust            # check vs rust/
+    python -m tools.extract_rust --write     # update rust/
 """
 
 import argparse
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, ROOT
-from tools_extract import (
+from tools.config import CHAPTERS_DIR, ROOT
+from tools.extract import (
     ExtractResult,
     check_against,
     extract as extract_blocks,
@@ -52,8 +52,8 @@ from tools_extract import (
     report_drift,
     write_tree,
 )
-from tools_markdown import Block, Document
-from tools_repo import md_files
+from tools.markdown import Block, Document
+from tools.repo import md_files
 
 RUST_DIR = ROOT / "rust"
 

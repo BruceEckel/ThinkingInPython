@@ -21,10 +21,8 @@ The one output format covers what the existing checkers already print:
     path:line:col: message                (when `col` is set)
     path:line:col: CODE message           (when `code` is set too)
 
-Named tools_report rather than the shorter "report" for the same reason
-as tools_config/tools_repo/tools_pycode: it must never collide with a
-book listing's own filename through Python's sys.modules cache. See
-tools_repo.py's docstring for the failure that caused those renames.
+Imported as ``tools.report``, so no book listing's filename can shadow
+it; tools/repo.py's docstring has the history.
 """
 
 from collections.abc import Callable, Iterable, Iterator
@@ -33,7 +31,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
 
 if TYPE_CHECKING:
-    from tools_markdown import Document
+    from tools.markdown import Document
 
 
 class Finding(NamedTuple):

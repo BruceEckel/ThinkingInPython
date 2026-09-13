@@ -36,8 +36,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, EXAMPLES_TREE, ROOT
-from tools_repo import run_capture
+from tools.config import CHAPTERS_DIR, EXAMPLES_TREE, ROOT
+from tools.repo import run_capture
 
 PY = [sys.executable]
 NO_TESTS_COLLECTED = 5  # pytest's exit code for an empty directory
@@ -86,7 +86,7 @@ def run_markers(md: Path) -> bool:
     """
     before = md.read_bytes()
     result = run_capture(
-        [*PY, "tools/validate_output.py", "--update", str(md)],
+        [*PY, "-m", "tools.validate_output", "--update", str(md)],
         timeout=MARKER_TIMEOUT)
     if result is None:
         print("FAIL  output markers (validate_output.py would not start)")
@@ -112,23 +112,23 @@ def main(argv: list[str] | None = None) -> int:
     chapter_dir = EXAMPLES_TREE / md.stem
     print(f"Checking {md.name}\n")
 
-    if not run("extract", [*PY, "tools/extract_examples.py", "--write"]):
+    if not run("extract", [*PY, "-m", "tools.extract_examples", "--write"]):
         return 1
     # Also refresh the committed Examples/ tree. Without this an editing
     # session leaves it behind the Markdown, and the drift shows up much
     # later as a `gate` failure about a file you no longer remember.
     if not run("sync",
-               [*PY, "tools/extract_examples.py", "--write", "-o",
+               [*PY, "-m", "tools.extract_examples", "--write", "-o",
                 "Examples"]):
         return 1
 
     results = [
         True, True,  # extract and sync, already known to have passed
         run_markers(md),
-        run("listing format", [*PY, "tools/listing_format.py", str(md)]),
-        run("comment periods", [*PY, "tools/comment_periods.py", str(md)]),
-        run("comment spacing", [*PY, "tools/comment_spacing.py", str(md)]),
-        run("comment caps", [*PY, "tools/capitalize_comments.py"]),
+        run("listing format", [*PY, "-m", "tools.listing_format", str(md)]),
+        run("comment periods", [*PY, "-m", "tools.comment_periods", str(md)]),
+        run("comment spacing", [*PY, "-m", "tools.comment_spacing", str(md)]),
+        run("comment caps", [*PY, "-m", "tools.capitalize_comments"]),
     ]
 
     if chapter_dir.is_dir():

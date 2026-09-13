@@ -12,9 +12,9 @@ are resolved against `resources/images`, and intra-book `.md` links are
 rewritten to `.html` so cross-references resolve in the site.
 
 Usage:
-    python tools/build_site.py            # build into build/site/
-    python tools/build_site.py -o DIR     # build somewhere else
-    python tools/build_site.py --chapter-toc   # add a per-chapter TOC
+    python -m tools.build_site            # build into build/site/
+    python -m tools.build_site -o DIR     # build somewhere else
+    python -m tools.build_site --chapter-toc   # add a per-chapter TOC
 
 Set CHAPTER_TOC below (or pass --chapter-toc / --no-chapter-toc) to give each
 chapter page its own table of contents listing that chapter's sections. The
@@ -30,10 +30,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-import search_index
-from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
-from tools_config import ROOT
-from tools_repo import md_files
+from tools import search_index
+from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
+from tools.config import ROOT
+from tools.repo import md_files
 
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"

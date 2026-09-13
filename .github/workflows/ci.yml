@@ -52,7 +52,7 @@ jobs:
         run: uv sync --locked
 
       - name: Build the static site
-        run: uv run python tools/build_site.py
+        run: uv run python -m tools.build_site
 
       # On master only, hand the built site to the deploy job below.
       - name: Upload Pages artifact
@@ -88,16 +88,16 @@ jobs:
       # Hard gate: the book's code blocks must match the committed Examples/
       # tree (no drift, no conflicting duplicates).
       - name: Check examples match the Markdown
-        run: uv run python tools/extract_examples.py
+        run: uv run python -m tools.extract_examples
 
       - name: Extract examples for running
-        run: uv run python tools/extract_examples.py --write
+        run: uv run python -m tools.extract_examples --write
 
       # Hard gate: every extracted example must run cleanly (the book is fully
       # modernized, so the baseline is empty; use --baseline to gate only
       # regressions during future bulk work).
       - name: Run examples
-        run: uv run python tools/run_examples.py
+        run: uv run python -m tools.run_examples
 
       # Hard gate: the book's pytest examples (test_*.py) must pass.
       - name: Run the book's pytest examples
@@ -117,13 +117,13 @@ jobs:
       # answers), which go through a parallel extract/validate/ty/ruff/pytest
       # pipeline (tools/extract_solutions.py). See tools/README.md.
       - name: Check solutions match Solutions/*.md
-        run: uv run python tools/extract_solutions.py
+        run: uv run python -m tools.extract_solutions
 
       - name: Extract solutions for running
-        run: uv run python tools/extract_solutions.py --write
+        run: uv run python -m tools.extract_solutions --write
 
       - name: Verify solutions #: output markers
-        run: uv run python tools/validate_output.py --tree "$GITHUB_WORKSPACE/build/solutions" Solutions
+        run: uv run python -m tools.validate_output --tree "$GITHUB_WORKSPACE/build/solutions" Solutions
 
       - name: Type-check solutions with ty
         run: uv run ty check build/solutions

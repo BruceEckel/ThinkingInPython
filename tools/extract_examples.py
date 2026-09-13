@@ -55,10 +55,10 @@ human to confirm it is truly unused. Pass ``--prune`` to delete the orphaned
 files (never the referenced ones).
 
 Usage:
-    python tools/extract_examples.py                # check vs Examples/
-    python tools/extract_examples.py --prune        # also delete orphaned strays
-    python tools/extract_examples.py --write        # write build/examples/
-    python tools/extract_examples.py --write -o DIR  # write somewhere else
+    python -m tools.extract_examples                # check vs Examples/
+    python -m tools.extract_examples --prune        # also delete orphaned strays
+    python -m tools.extract_examples --write        # write build/examples/
+    python -m tools.extract_examples --write -o DIR  # write somewhere else
 """
 
 import argparse
@@ -66,8 +66,8 @@ import re
 import shutil
 from pathlib import Path
 
-from tools_config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, ROOT
-from tools_extract import (
+from tools.config import BUILD_DIR, CHAPTERS_DIR, EXAMPLES_TREE, ROOT
+from tools.extract import (
     ExtractResult,
     check_against,
     extract as extract_blocks,
@@ -75,8 +75,8 @@ from tools_extract import (
     report_drift,
     write_tree,
 )
-from tools_markdown import Block, Document
-from tools_repo import md_files
+from tools.markdown import Block, Document
+from tools.repo import md_files
 
 COMMITTED_DIR = ROOT / "Examples"
 DEFAULT_OUT = EXAMPLES_TREE

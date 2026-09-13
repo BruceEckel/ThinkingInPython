@@ -10,11 +10,10 @@ directory instead of a chapter dir, so any chapter can import it.
 Centralizing them here means a rename or convention change happens in one
 place instead of N.
 
-Behavior lives in tools_repo.py; this module holds only constants. Named
-tools_config rather than the shorter "config" so it can never collide with
-a book listing of the same name (chapter 24's Singleton demo has one) via
-Python's sys.modules cache; see tools_repo.py's docstring for the failure
-that would cause.
+Behavior lives in tools/repo.py; this module holds only constants. Imported
+as ``tools.config``, so a book listing's own ``config.py`` (chapter 24's
+Singleton demo has one) cannot resolve to it; tools/repo.py's docstring
+has the history.
 """
 
 import re

@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from check_all import CHECKS, apply_fixes, by_name, main, run, select
-from tools_config import ROOT
-from tools_markdown import Document
+from tools.check_all import CHECKS, apply_fixes, by_name, main, run, select
+from tools.config import ROOT
+from tools.markdown import Document
 
 # A listing that trips four checks at once: two blank lines between
 # imports, a trailing period, a one-space inline comment gap, and an

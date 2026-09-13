@@ -24,8 +24,8 @@ inputs are compared, since here a stale file would go to a device
 and pass for the current book.
 
 Usage:
-    uv run python tools/send_to_kindle.py            # eink
-    uv run python tools/send_to_kindle.py color
+    uv run python -m tools.send_to_kindle            # eink
+    uv run python -m tools.send_to_kindle color
 """
 
 import os
@@ -35,8 +35,8 @@ import sys
 import time
 from pathlib import Path
 
-import build_epub
-from tools_config import BUILD_EPUB_DIR, CHAPTERS_DIR, ROOT, TOOLS_DIR
+from tools import build_epub
+from tools.config import BUILD_EPUB_DIR, CHAPTERS_DIR, ROOT, TOOLS_DIR
 
 EPUB_DIR = BUILD_EPUB_DIR
 VARIANTS = ("eink", "color")
@@ -44,7 +44,7 @@ VARIANTS = ("eink", "color")
 # the built file stale.
 INPUTS = (CHAPTERS_DIR, ROOT / "resources",
           TOOLS_DIR / "build_epub.py", TOOLS_DIR / "build_site.py",
-          TOOLS_DIR / "tools_config.py")
+          TOOLS_DIR / "tools/config.py")
 
 WINDOWS_APP = Path(
     os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")

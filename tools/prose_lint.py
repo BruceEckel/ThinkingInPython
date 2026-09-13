@@ -18,7 +18,7 @@ already writes with the mark outside: a quote holding an inline code span, and
 a single-token quote such as "overdraft". Quote a literal that is neither, like
 a multi-word message, as an inline code span instead of prose.
 
-Code is skipped through the shared classifier in `tools_prose`: fenced code,
+Code is skipped through the shared classifier in `tools.prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
 spans and footnotes are ignored within a prose line. Headings and list-item text
 are checked, but their markers are not. That classifier is stateless, so it sees
@@ -29,22 +29,22 @@ Exit status is non-zero if any issue is found, so it works as a gate. It is run
 as part of `make spell`.
 
 Usage:
-    python tools/prose_lint.py                 # all of Chapters/
-    python tools/prose_lint.py Chapters/07_Foundations--Classes.md
-    python tools/prose_lint.py Chapters        # a directory: every *.md in it
+    python -m tools.prose_lint                 # all of Chapters/
+    python -m tools.prose_lint Chapters/07_Foundations--Classes.md
+    python -m tools.prose_lint Chapters        # a directory: every *.md in it
 """
 
 import argparse
 import re
 from collections.abc import Iterator
 
-from tools_markdown import Document
-from tools_prose import (
+from tools.markdown import Document
+from tools.prose import (
     FENCE, HEADING, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN, LIST_ITEM,
     code_spans, is_prose_line,
 )
-from tools_repo import add_paths_arg, md_files
-from tools_report import Check, Finding, report
+from tools.repo import add_paths_arg, md_files
+from tools.report import Check, Finding, report
 
 _MULTI_SPACE = re.compile(r"(?<=\S) {2,}(?=\S)")
 _SPACE_BEFORE = re.compile(r" +([.,;!?])")

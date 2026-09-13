@@ -21,10 +21,10 @@ them (run by `make fix-listings`).
 import argparse
 from collections.abc import Iterator
 
-from tools_markdown import Document
-from tools_pycode import scan_line
-from tools_report import Check, Finding, report
-from tools_repo import add_paths_arg, md_files, write_text_lf
+from tools.markdown import Document
+from tools.pycode import scan_line
+from tools.report import Check, Finding, report
+from tools.repo import add_paths_arg, md_files, write_text_lf
 
 
 def _in_string(lines: list[str]) -> list[bool]:
@@ -100,7 +100,7 @@ CHECK = Check(
     run=find,
     clean="Listings OK: blank lines are minimal.",
     problem="{n} blank-line issue(s). Fix with: "
-            "python tools/listing_format.py --fix",
+            "python -m tools.listing_format --fix",
     fixer=fixed,
 )
 

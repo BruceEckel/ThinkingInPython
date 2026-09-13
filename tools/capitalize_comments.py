@@ -19,7 +19,7 @@ checker is wrong; capitalize the comment when it is right.
 Default is a check that lists comments needing capitalization and exits non-zero
 (it is part of the `make ci` gate). Pass --write to apply the changes. After
 applying, regenerate the Examples/ mirror:
-    python tools/extract_examples.py --write -o Examples
+    python -m tools.extract_examples --write -o Examples
 """
 
 import argparse
@@ -28,12 +28,12 @@ from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
 
-from tools_config import DATA_DIR
-from tools_config import FENCE_RE as FENCE
-from tools_markdown import Document
-from tools_pycode import scan_line as find_comment_hash
-from tools_repo import md_files, write_text_lf
-from tools_report import Check, Finding, report
+from tools.config import DATA_DIR
+from tools.config import FENCE_RE as FENCE
+from tools.markdown import Document
+from tools.pycode import scan_line as find_comment_hash
+from tools.repo import md_files, write_text_lf
+from tools.report import Check, Finding, report
 
 ALLOWLIST = DATA_DIR / "comment_caps_allow.txt"
 

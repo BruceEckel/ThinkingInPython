@@ -14,10 +14,10 @@ everything. Each served page carries a small script that polls
 becomes a refreshed browser page with nothing to press.
 
 Usage:
-    python tools/serve.py             # serve build/site/ at :8000
-    python tools/serve.py --open      # serve and open a browser
-    python tools/serve.py --watch     # rebuild and reload on edits
-    python tools/serve.py --port 9000 # serve on another port
+    python -m tools.serve             # serve build/site/ at :8000
+    python -m tools.serve --open      # serve and open a browser
+    python -m tools.serve --watch     # rebuild and reload on edits
+    python -m tools.serve --port 9000 # serve on another port
 """
 
 import argparse
@@ -30,10 +30,10 @@ import time
 import webbrowser
 from pathlib import Path
 
-import build_site
-from tools_config import BUILD_SITE_DIR as SITE
-from tools_config import ROOT
-from tools_repo import md_files
+from tools import build_site
+from tools.config import BUILD_SITE_DIR as SITE
+from tools.config import ROOT
+from tools.repo import md_files
 
 POLL_SECONDS = 1.0
 RELOAD_PATH = "/__reload"
@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
     if not SITE.exists():
         raise SystemExit(
             f"error: {SITE} not found. Build the site first "
-            "(make site, or python tools/build_site.py).")
+            "(make site, or python -m tools.build_site).")
 
     if args.watch:
         build_site.check_pandoc()

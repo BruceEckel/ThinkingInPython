@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """Small behaviors shared by the tools/*.py scripts.
 
-Complements tools_config.py's constants: where that module holds *what* the
+Complements tools/config.py's constants: where that module holds *what* the
 repo's layout and conventions are, this module holds the small pieces of
 behavior that read them the same way in more than one script (walking
 Chapters/, reading a norun.txt-style glob list, naming a block's extracted
 path, running a subprocess and reporting whether it succeeded).
 
-Named tools_* rather than the shorter config/repo so it can never collide
-with a book listing of the same name: a chapter's own example file can be
-"config.py" or "repo.py" (chapter 24's Singleton demo has one), and Python's
-sys.modules cache would silently resolve that chapter's ``import config`` to
-this module instead once this module had already been imported once in the
-process, which is exactly what validate_output.py does while running every
-block in a single process.
+The shared modules carry short names (config, repo, markdown, ...) and
+are imported as ``tools.config`` and so on, not by bare name. That
+matters because validate_output.py execs every book listing in this
+same process, and a chapter's own example file can be "config.py" or
+"repo.py" (chapter 24's Singleton demo has one). When these modules were
+bare siblings on sys.path they carried a ``tools_`` prefix, because a
+listing's ``import config`` silently resolved to the tool's module
+through the sys.modules cache once a tool had imported it. Inside the
+package they are cached as ``tools.config``, a key no listing's
+filename can collide with.
 """
 
 import argparse
@@ -22,7 +25,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, PATH_LINE_RE
+from tools.config import CHAPTERS_DIR, PATH_LINE_RE
 
 
 def md_files(paths: list[str | Path] | None = None) -> list[Path]:

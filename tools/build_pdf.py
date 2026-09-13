@@ -26,9 +26,9 @@ preamble also sets a running footer (chapter name, page number, and on
 a release build the release stamp); see FOOTER_TYPST.
 
 Usage:
-    python tools/build_pdf.py               # build/pdf/ThinkingInPython.pdf
-    python tools/build_pdf.py -o DIR        # build somewhere else
-    python tools/build_pdf.py --keep-source # leave build/pdf/src/ in place
+    python -m tools.build_pdf               # build/pdf/ThinkingInPython.pdf
+    python -m tools.build_pdf -o DIR        # build somewhere else
+    python -m tools.build_pdf --keep-source # leave build/pdf/src/ in place
 
 Requires `pandoc` and `typst` on PATH (`make tools-check-full`
 verifies both).
@@ -41,11 +41,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-import build_epub
-import build_site
-import make_cover
-from tools_config import BUILD_PDF_DIR as DEFAULT_OUT
-from tools_config import ROOT
+from tools import build_epub
+from tools import build_site
+from tools import make_cover
+from tools.config import BUILD_PDF_DIR as DEFAULT_OUT
+from tools.config import ROOT
 
 PDF_NAME = "ThinkingInPython.pdf"
 PDF_ENGINE = "typst"

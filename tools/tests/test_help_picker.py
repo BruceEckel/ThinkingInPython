@@ -10,14 +10,14 @@ from prompt_toolkit.output import DummyOutput
 
 from unittest import mock
 
-import help_picker
-from help_picker import (
+from tools import help_picker
+from tools.help_picker import (
     RECORD_VAR, Picker, all_rows, ask_return_or_esc, filter_rows,
     history_files, make_command, record_command, record_history,
     INTERRUPTED, next_version, notes_lines, run_target, section_rows,
     session,
     split_match, variable_default, variables)
-from make_help import MAKEFILE, Target, parse
+from tools.make_help import MAKEFILE, Target, parse
 
 UP, DOWN = "\x1b[A", "\x1b[B"
 ENTER, ESC, BACKSPACE = "\r", "\x1b", "\x7f"
@@ -272,7 +272,7 @@ def test_prompt_hint_names_the_makefile_default():
         seen.append(message)
         return ""
 
-    with mock.patch("help_picker.prompt", side_effect=fake_prompt):
+    with mock.patch("tools.help_picker.prompt", side_effect=fake_prompt):
         help_picker.ask_variables(_target("rewrite"))
     hints = {m.split("=")[0]: m for m in seen}
     assert "Enter to skip" in hints["MODEL"]  # each pass names its own
@@ -306,9 +306,9 @@ def test_next_version_guesses_from_the_highest_release_tag(tags, expected):
 
 def test_ctrl_c_during_the_run_is_a_note_not_a_traceback(capsys):
     target = _target("test")
-    with mock.patch("help_picker.subprocess.call",
+    with mock.patch("tools.help_picker.subprocess.call",
                     side_effect=KeyboardInterrupt), \
-            mock.patch("help_picker.record_command", return_value=[]):
+            mock.patch("tools.help_picker.record_command", return_value=[]):
         assert run_target(target) == INTERRUPTED
     out = capsys.readouterr().out
     assert "$ make test" in out
@@ -318,9 +318,9 @@ def test_ctrl_c_during_the_run_is_a_note_not_a_traceback(capsys):
 
 def test_ctrl_c_at_a_variable_prompt_cancels_the_run(capsys):
     target = _target("check-ch")
-    with mock.patch("help_picker.ask_variables",
+    with mock.patch("tools.help_picker.ask_variables",
                     side_effect=KeyboardInterrupt), \
-            mock.patch("help_picker.subprocess.call") as call:
+            mock.patch("tools.help_picker.subprocess.call") as call:
         assert run_target(target) == INTERRUPTED
     call.assert_not_called()
     assert "(cancelled)" in capsys.readouterr().out
@@ -328,9 +328,9 @@ def test_ctrl_c_at_a_variable_prompt_cancels_the_run(capsys):
 
 def test_a_failing_target_reports_its_status(capsys):
     target = _target("test")
-    with mock.patch("help_picker.subprocess.call", return_value=2), \
-            mock.patch("help_picker.record_command", return_value=[]), \
-            mock.patch("help_picker.ask_variables", return_value={}):
+    with mock.patch("tools.help_picker.subprocess.call", return_value=2), \
+            mock.patch("tools.help_picker.record_command", return_value=[]), \
+            mock.patch("tools.help_picker.ask_variables", return_value={}):
         assert run_target(target) == 2
     assert "(make test exited with status 2)" in capsys.readouterr().out
 
@@ -415,7 +415,7 @@ def test_notes_lines_show_the_doc_the_comment_block_and_the_recipe():
     assert texts[1].startswith("  Run every check")
     assert any("first failure" in t for t in texts)      # the comment
     assert "Runs:" in texts
-    assert texts[-1] == "    $(PY) tools/sweep_checks.py"
+    assert texts[-1] == "    $(PY) -m tools.sweep_checks"
     assert all(len(t) <= 72 for t in texts)
 
 

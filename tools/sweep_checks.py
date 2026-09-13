@@ -40,15 +40,15 @@ A tool upgrade that changes program output is a `make verify` question,
 not a sweep question.
 
 Usage:
-    python tools/sweep_checks.py          # run every check
-    python tools/sweep_checks.py --help   # list them, without running
+    python -m tools.sweep_checks          # run every check
+    python -m tools.sweep_checks --help   # list them, without running
 """
 
 import argparse
 import subprocess
 
-from make_help import MAKEFILE, entries
-from tools_config import ROOT
+from tools.make_help import MAKEFILE, entries
+from tools.config import ROOT
 
 # Every check a tool upgrade can break, in run order. Cheapest and most
 # likely to move first: ty and ruff are what a checker or linter release

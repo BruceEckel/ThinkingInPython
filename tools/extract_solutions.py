@@ -28,19 +28,19 @@ it, and the chapter's own copy lives under ``Examples/``. Pass ``--prune``
 to delete the orphaned files (never the referenced ones).
 
 Usage:
-    python tools/extract_solutions.py                # check vs SolutionsCode/
-    python tools/extract_solutions.py --prune         # also delete orphaned strays
-    python tools/extract_solutions.py --write         # write build/solutions/
-    python tools/extract_solutions.py --write -o DIR  # write somewhere else
+    python -m tools.extract_solutions                # check vs SolutionsCode/
+    python -m tools.extract_solutions --prune         # also delete orphaned strays
+    python -m tools.extract_solutions --write         # write build/solutions/
+    python -m tools.extract_solutions --write -o DIR  # write somewhere else
 """
 
 import argparse
 import shutil
 from pathlib import Path
 
-from extract_examples import extract, find_strays, is_derived, report_strays
-from tools_config import BUILD_DIR, ROOT
-from tools_extract import check_against, report_conflicts, write_tree
+from tools.extract_examples import extract, find_strays, is_derived, report_strays
+from tools.config import BUILD_DIR, ROOT
+from tools.extract import check_against, report_conflicts, write_tree
 
 SOLUTIONS_DIR = ROOT / "Solutions"
 COMMITTED_DIR = ROOT / "SolutionsCode"

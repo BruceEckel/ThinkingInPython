@@ -8,7 +8,7 @@ unindented continuation lines of a multi-line HTML comment.
 
 from pathlib import Path
 
-from spellcheck import collect, prose_text, tokens
+from tools.spellcheck import collect, prose_text, tokens
 
 
 def words(line: str) -> list[str]:

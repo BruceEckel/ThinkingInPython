@@ -4,7 +4,7 @@
 #
 # Common commands:
 #   uv sync                                  # create .venv with the dev tools
-#   uv run python tools/run_examples.py      # run any harness script
+#   uv run python -m tools.run_examples      # run any harness script
 #   uv run ty check build/examples           # type-check
 #   make ci                                  # the full local gate (uses uv)
 #

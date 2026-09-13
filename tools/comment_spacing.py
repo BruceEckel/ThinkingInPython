@@ -18,10 +18,10 @@ Default mode reports `path:line` and exits non-zero, so it is a gate. Pass
 import argparse
 from collections.abc import Iterator
 
-from tools_markdown import Document
-from tools_pycode import scan_line
-from tools_report import Check, Finding, report
-from tools_repo import add_paths_arg, md_files, write_text_lf
+from tools.markdown import Document
+from tools.pycode import scan_line
+from tools.report import Check, Finding, report
+from tools.repo import add_paths_arg, md_files, write_text_lf
 
 
 def _spacing_targets(block: list[str]) -> dict[int, str]:
@@ -70,7 +70,7 @@ CHECK = Check(
     run=find,
     clean="Comment spacing OK.",
     problem="{n} inline comment(s) misaligned. "
-            "Fix with: python tools/comment_spacing.py --fix",
+            "Fix with: python -m tools.comment_spacing --fix",
     fixer=fixed,
 )
 

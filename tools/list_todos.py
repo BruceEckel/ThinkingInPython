@@ -16,15 +16,15 @@ way `make links` is, to see what is still waiting on something outside
 the book's control.
 
 Usage:
-    python tools/list_todos.py            # every marker in Chapters/
-    python tools/list_todos.py Chapters/18_Techniques--Performance.md
+    python -m tools.list_todos            # every marker in Chapters/
+    python -m tools.list_todos Chapters/18_Techniques--Performance.md
 """
 
 import argparse
 import re
 from pathlib import Path
 
-from tools_repo import add_paths_arg, md_files
+from tools.repo import add_paths_arg, md_files
 
 TODO_RE = re.compile(r"<!--\s*TODO\(([^)]+)\):\s*(.*?)-->", re.DOTALL)
 

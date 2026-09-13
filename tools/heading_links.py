@@ -22,9 +22,9 @@ from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
 
-from tools_markdown import Document
-from tools_repo import add_paths_arg, md_files
-from tools_report import Check, Finding, report
+from tools.markdown import Document
+from tools.repo import add_paths_arg, md_files
+from tools.report import Check, Finding, report
 
 EXPLICIT_ID = re.compile(r"\{#([\w-]+)[^}]*\}\s*$")
 ATTR_BLOCK = re.compile(r"\s*\{[^}]*\}\s*$")

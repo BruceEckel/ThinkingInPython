@@ -7,17 +7,15 @@ line's real (non-string) '#', and walking a Markdown file's fenced blocks.
 Both were reimplemented per file with the same core algorithm; this module
 gives them one home.
 
-Named tools_pycode (not the shorter "pycode") for the same reason as
-tools_config/tools_repo: it must never collide with a book listing's own
-filename via Python's sys.modules cache. See tools_repo.py's docstring for
-the failure that caused those two renames.
+Imported as ``tools.pycode``, so no book listing's filename can shadow
+it; tools/repo.py's docstring has the history.
 """
 
 import re
 from collections.abc import Callable, Iterator
 from typing import NamedTuple
 
-from tools_config import FENCE_ANY_RE, FENCE_RE, PY_FENCE_RE
+from tools.config import FENCE_ANY_RE, FENCE_RE, PY_FENCE_RE
 
 
 def scan_line(line: str, triple: str | None) -> tuple[int, str | None]:

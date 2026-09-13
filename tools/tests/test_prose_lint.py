@@ -4,7 +4,7 @@ The other four checks are single regexes; QUOTE-PUNCT is the one that has
 to tell quoted prose from a quoted literal, so it carries the cases.
 """
 
-from prose_lint import lint_text
+from tools.prose_lint import lint_text
 
 
 def codes(text: str) -> list[str]:

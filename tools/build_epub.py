@@ -61,10 +61,10 @@ string, comment, number, tokenized by the pinned CPython's own
   screen.
 
 Usage:
-    python tools/build_epub.py              # build/epub/ThinkingInPython-{color,eink}.epub
-    python tools/build_epub.py -o DIR       # build somewhere else
-    python tools/build_epub.py --keep-source  # leave build/epub/src/ in place
-    python tools/build_epub.py --keep-svg     # skip the PNG conversion
+    python -m tools.build_epub              # build/epub/ThinkingInPython-{color,eink}.epub
+    python -m tools.build_epub -o DIR       # build somewhere else
+    python -m tools.build_epub --keep-source  # leave build/epub/src/ in place
+    python -m tools.build_epub --keep-svg     # skip the PNG conversion
 
 Requires `pandoc` on PATH (`make tools-check-full` verifies it).
 """
@@ -84,12 +84,12 @@ import zipfile
 from html import escape
 from pathlib import Path
 
-import build_site
-from build_site import Chapter
-from heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
-from tools_config import BUILD_EPUB_DIR as DEFAULT_OUT
-from tools_config import ROOT
-from tools_markdown import Document
+from tools import build_site
+from tools.build_site import Chapter
+from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
+from tools.config import BUILD_EPUB_DIR as DEFAULT_OUT
+from tools.config import ROOT
+from tools.markdown import Document
 
 # The cover comes from tools/make_cover.py, one rendering per
 # variant: color at 1600x2560 (the Kindle store's cover ratio),

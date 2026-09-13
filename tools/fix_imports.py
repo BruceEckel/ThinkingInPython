@@ -16,9 +16,9 @@ deliberately-unused ones that per-file-ignores exempt), then splices each fixed
 file back into the block it came from.
 
 Usage:
-    python tools/fix_imports.py          # report listings to organize (exit 1)
-    python tools/fix_imports.py --fix     # rewrite them in place
-    python tools/fix_imports.py --fix \
+    python -m tools.fix_imports          # report listings to organize (exit 1)
+    python -m tools.fix_imports --fix     # rewrite them in place
+    python -m tools.fix_imports --fix \
         Chapters/06_Foundations--Modules_and_Packages.md
 """
 
@@ -26,10 +26,10 @@ import argparse
 import subprocess
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR, PATH_LINE_RE, ROOT
-from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_pycode import walk_fenced
-from tools_repo import write_text_lf
+from tools.config import CHAPTERS_DIR, PATH_LINE_RE, ROOT
+from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.pycode import walk_fenced
+from tools.repo import write_text_lf
 
 
 def block_slug(block: list[str]) -> str | None:
@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.tree.exists():
         print(
             f"No extracted tree at {args.tree}. "
-            "Run `python tools/extract_examples.py --write` first."
+            "Run `python -m tools.extract_examples --write` first."
         )
         return 1
 

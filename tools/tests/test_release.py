@@ -5,7 +5,7 @@ here: it shells out to make and GitHub, and verify_targets.py excludes
 the target for the same reason. What is testable is the naming: a bad
 tag or title publishes a public release under the wrong name.
 """
-from release import VERSION_RE, tag_for, title_for, to_prune, version_key
+from tools.release import VERSION_RE, tag_for, title_for, to_prune, version_key
 
 
 def test_version_gets_v_prefixed_tag() -> None:

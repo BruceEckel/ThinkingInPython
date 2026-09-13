@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from validate_output import (
+from tools.validate_output import (
     block_slug,
     collect_files,
     decode_output,

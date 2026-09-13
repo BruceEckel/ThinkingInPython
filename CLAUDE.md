@@ -12,7 +12,7 @@ from the Markdown** by `tools/extract_examples.py`, so:
 
 - Edit the code **in the Markdown block**, never in `Examples/` directly.
 - After editing, sync the committed tree: `make sync`
-  (= `uv run python tools/extract_examples.py --write -o Examples`).
+  (= `uv run python -m tools.extract_examples --write -o Examples`).
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
   `.idea/`, `__pycache__`). `tools/extract_examples.py`'s check mode (part of
   `make check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
@@ -112,14 +112,14 @@ so a marker that needed fixing would otherwise stay one sync behind until
 the next run caught it up. When iterating on one chapter, the manual
 sequence is:
 
-1. `uv run python tools/extract_examples.py --write -o Examples`  # sync committed tree
-2. `uv run python tools/extract_examples.py`                      # drift check ("In sync")
-3. `uv run python tools/extract_examples.py --write`              # (re)build build/examples/
-4. `uv run python tools/validate_output.py Chapters/NN_*.md`      # `#:` markers match stdout
+1. `uv run python -m tools.extract_examples --write -o Examples`  # sync committed tree
+2. `uv run python -m tools.extract_examples`                      # drift check ("In sync")
+3. `uv run python -m tools.extract_examples --write`              # (re)build build/examples/
+4. `uv run python -m tools.validate_output Chapters/NN_*.md`      # `#:` markers match stdout
 5. `(cd build/examples && uv run ty check NN_Chapter)`            # types
 6. `uv run ruff check build/examples/NN_Chapter`                 # lint
 7. `uv run pytest build/examples/NN_Chapter`                      # tests
-8. `uv run python tools/run_examples.py NN_Chapter`               # runs scripts, honors norun.txt
+8. `uv run python -m tools.run_examples NN_Chapter`               # runs scripts, honors norun.txt
 
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
@@ -517,8 +517,8 @@ reading.
   `SolutionsCode/` stale behind a green sweep, and a stale marker
   survives too. `make verify` covers both, through `solutions-sync` and
   `solutions-output`. When iterating with `sweep`, run
-  `uv run python tools/extract_solutions.py` and
-  `uv run python tools/validate_output.py --tree "$(pwd)/build/solutions" Solutions`
+  `uv run python -m tools.extract_solutions` and
+  `uv run python -m tools.validate_output --tree "$(pwd)/build/solutions" Solutions`
   before believing the tree is clean.
 - **A `#:` marker that measures memory or time is a claim about the
   process the gate runs it in, not about a standalone run.** Chapter
@@ -567,6 +567,11 @@ reading.
 
 ## Pointers
 
+- `tools/` is a package: run a tool as `uv run python -m tools.<name>`
+  from the repo root, not as `python tools/<name>.py` (a bare script
+  cannot import its siblings, which are `tools.config`, `tools.repo`,
+  and so on). The `tools_` prefix the shared modules used to carry is
+  gone; the package namespace does that job. `tools/README.md` explains.
 - `tools/*.py` all have thorough module docstrings; read them before guessing.
 - The `Makefile` documents every gate and target (`make help`).
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).

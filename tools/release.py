@@ -43,7 +43,7 @@ first so a doomed run dies before the expensive gate:
    public repo count against no GitHub quota; this is tidiness, since
    the README's `releases/latest/download/` links never point at an
    old release anyway. A failed prune is a warning, not an error: the
-   release itself has already succeeded. `python tools/release.py
+   release itself has already succeeded. `python -m tools.release
    --prune` runs just this step.
 
 The tag is the VERSION prefixed with "v" (a bare "v1.0" is accepted
@@ -51,8 +51,8 @@ as-is), the conventional GitHub form. Deleting a bad release is a
 manual, deliberate act: `gh release delete v1.0 --cleanup-tag`.
 
 Usage:
-    python tools/release.py 1.0     # normally via `make release VERSION=1.0`
-    python tools/release.py --prune # only delete the old releases
+    python -m tools.release 1.0     # normally via `make release VERSION=1.0`
+    python -m tools.release --prune # only delete the old releases
 
 Requires `git` and an authenticated `gh` on PATH, plus everything
 `make verify`, `make pdf`, and `make epub` need.
@@ -66,10 +66,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-import build_epub
-import build_pdf
-from tools_config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
-from tools_repo import run_echoed
+from tools import build_epub
+from tools import build_pdf
+from tools.config import BUILD_EPUB_DIR, BUILD_PDF_DIR, ROOT
+from tools.repo import run_echoed
 
 # How many releases stay on GitHub after a publish: the new one and
 # the one before it. Older ones are deleted, their tags kept.

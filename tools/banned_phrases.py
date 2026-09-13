@@ -11,19 +11,19 @@ In the phrases file, blank lines and lines starting with `#` are ignored, so you
 can group and explain the entries.
 
 Usage:
-    python tools/banned_phrases.py                 # scan Chapters/
-    python tools/banned_phrases.py path ...        # scan specific files/dirs
-    python tools/banned_phrases.py --phrases FILE  # use another phrases file
+    python -m tools.banned_phrases                 # scan Chapters/
+    python -m tools.banned_phrases path ...        # scan specific files/dirs
+    python -m tools.banned_phrases --phrases FILE  # use another phrases file
 """
 import argparse
 from collections.abc import Iterable, Iterator
 from functools import cache
 from pathlib import Path
 
-from tools_config import DATA_DIR
-from tools_markdown import Document
-from tools_repo import add_paths_arg, md_files
-from tools_report import Check, Finding, report
+from tools.config import DATA_DIR
+from tools.markdown import Document
+from tools.repo import add_paths_arg, md_files
+from tools.report import Check, Finding, report
 
 PHRASES_FILE = DATA_DIR / "banned_phrases.txt"
 

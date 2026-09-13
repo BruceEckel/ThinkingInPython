@@ -19,19 +19,19 @@ fenced code, indented code, tables, headings, list items, blockquotes, HTML
 blocks, horizontal rules, and YAML front matter. Inline code spans and footnotes
 are masked before splitting so their internal punctuation never causes a break.
 The line and inline classification used to tell prose from the rest lives in
-`tools_prose.py`, shared with the prose linter.
+`tools/prose.py`, shared with the prose linter.
 
 Safety: a file is rewritten only if its whitespace-normalized text is unchanged.
 The tool only moves newlines; it never adds, drops, or alters a word. If that
 invariant ever fails the file is left untouched and reported.
 
 Usage:
-    uv run python tools/reflow_prose.py                  # check all Chapters/, no write
-    uv run python tools/reflow_prose.py --write           # rewrite all Chapters/
-    uv run python tools/reflow_prose.py --write 02        # rewrite one chapter by number
-    uv run python tools/reflow_prose.py --diff Tour       # diff a chapter by name part
-    uv run python tools/reflow_prose.py --write FILE...   # rewrite specific files
-    uv run python tools/reflow_prose.py --width 100       # change the wrap width
+    uv run python -m tools.reflow_prose                  # check all Chapters/, no write
+    uv run python -m tools.reflow_prose --write           # rewrite all Chapters/
+    uv run python -m tools.reflow_prose --write 02        # rewrite one chapter by number
+    uv run python -m tools.reflow_prose --diff Tour       # diff a chapter by name part
+    uv run python -m tools.reflow_prose --write FILE...   # rewrite specific files
+    uv run python -m tools.reflow_prose --width 100       # change the wrap width
 
 A positional argument may be a file path or a chapter selector matched against
 Chapters/: a number or stem prefix ("02", "02_Foundations--Tour") or a
@@ -44,8 +44,8 @@ import re
 import sys
 from pathlib import Path
 
-from tools_config import CHAPTERS_DIR
-from tools_prose import (
+from tools.config import CHAPTERS_DIR
+from tools.prose import (
     BLOCKQUOTE,
     FENCE,
     HEADING,
@@ -60,7 +60,7 @@ from tools_prose import (
     mask,
     unmask,
 )
-from tools_repo import md_files, write_text_lf
+from tools.repo import md_files, write_text_lf
 
 # Sentences wider than this are broken at clause punctuation. Roughly the
 # column at which an editor would otherwise soft-wrap the line.

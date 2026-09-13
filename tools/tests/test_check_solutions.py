@@ -1,15 +1,15 @@
 """Tests for tools/check_solutions.py (exercise/solution correspondence)."""
 from pathlib import Path
 
-from check_solutions import (
+from tools.check_solutions import (
     BARE_CHAPTER_LINK,
     answer_numbers,
     exercise_numbers,
     out_of_order,
     selected,
 )
-from tools_config import ROOT
-from tools_markdown import Document
+from tools.config import ROOT
+from tools.markdown import Document
 
 CHAPTER = (
     "# A Chapter\n"

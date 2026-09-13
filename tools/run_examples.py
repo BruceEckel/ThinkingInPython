@@ -30,13 +30,13 @@ That makes CI green today and red the moment a change breaks something that
 currently works.
 
 Usage:
-    python tools/run_examples.py                 # run everything (all cores)
-    python tools/run_examples.py StateMachine    # only that subtree
-    python tools/run_examples.py --timeout 20
-    python tools/run_examples.py -j 1            # run serially
-    python tools/run_examples.py -j 8            # run 8 examples at once
-    python tools/run_examples.py --baseline      # fail only on regressions
-    python tools/run_examples.py --write-baseline
+    python -m tools.run_examples                 # run everything (all cores)
+    python -m tools.run_examples StateMachine    # only that subtree
+    python -m tools.run_examples --timeout 20
+    python -m tools.run_examples -j 1            # run serially
+    python -m tools.run_examples -j 8            # run 8 examples at once
+    python -m tools.run_examples --baseline      # fail only on regressions
+    python -m tools.run_examples --write-baseline
 """
 
 import argparse
@@ -47,9 +47,9 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from tools_config import DATA_DIR, INLINE_NORUN_MARKER, NORUN_FILE
-from tools_config import EXAMPLES_TREE as DEFAULT_TREE
-from tools_repo import jobs_arg, load_glob_list, write_text_lf
+from tools.config import DATA_DIR, INLINE_NORUN_MARKER, NORUN_FILE
+from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.repo import jobs_arg, load_glob_list, write_text_lf
 
 BASELINE_FILE = DATA_DIR / "examples_baseline.txt"
 
@@ -73,7 +73,7 @@ def load_baseline() -> set[str]:
 def write_baseline(failing: list[str]) -> None:
     header = (
         "# Examples known to fail or time out right now (Phase 2 backlog).\n"
-        "# Regenerate with: python tools/run_examples.py --write-baseline\n"
+        "# Regenerate with: python -m tools.run_examples --write-baseline\n"
         "# CI uses this with --baseline to fail only on NEW breakage.\n"
         "# One forward-slash relative path per line.\n\n"
     )
@@ -135,7 +135,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.tree.exists():
         print(f"No example tree at {args.tree}. "
-              "Run: python tools/extract_examples.py --write")
+              "Run: python -m tools.extract_examples --write")
         return 2
 
     skips = load_glob_list(NORUN_FILE)

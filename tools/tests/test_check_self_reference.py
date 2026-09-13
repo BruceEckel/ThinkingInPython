@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from check_self_reference import (
+from tools.check_self_reference import (
     GATE_CODES,
     Chapter,
     load,
@@ -18,7 +18,7 @@ from check_self_reference import (
     searchable,
     sentences,
 )
-from tools_markdown import Document
+from tools.markdown import Document
 
 NO_WAIVERS: frozenset[str] = frozenset()
 
@@ -41,7 +41,7 @@ def book(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
             path.write_text(text, encoding="utf-8")
             written[name] = load(path)
         monkeypatch.setattr(
-            "check_self_reference.corpus", lambda: written)
+            "tools.check_self_reference.corpus", lambda: written)
         return written
     return make
 

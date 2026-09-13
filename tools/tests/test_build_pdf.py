@@ -5,7 +5,7 @@ here is the preamble the builder writes: a malformed footer fails the
 whole book build with a typst error, and a stamp that leaks into an
 unstamped build mislabels a casual PDF as a numbered release.
 """
-from build_pdf import header_typst
+from tools.build_pdf import header_typst
 
 
 def test_release_stamp_lands_in_the_footer() -> None:

@@ -28,9 +28,9 @@ emphasis, link URLs, heading marks) is stripped so it cannot match or clutter a
 result snippet.
 
 Usage:
-    python tools/search_index.py            # write to build/site/
-    python tools/search_index.py -o DIR     # write somewhere else
-    python tools/search_index.py --stats    # report size, write nothing
+    python -m tools.search_index            # write to build/site/
+    python -m tools.search_index -o DIR     # write somewhere else
+    python -m tools.search_index --stats    # report size, write nothing
 """
 
 import argparse
@@ -39,10 +39,10 @@ import re
 from pathlib import Path
 from typing import NamedTuple
 
-from heading_links import ATTR_BLOCK, EXPLICIT_ID, pandoc_anchor
-from tools_config import BUILD_SITE_DIR as DEFAULT_OUT
-from tools_config import FENCE_ANY_RE as FENCE
-from tools_repo import md_files
+from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, pandoc_anchor
+from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
+from tools.config import FENCE_ANY_RE as FENCE
+from tools.repo import md_files
 
 INDEX_NAME = "search-index.json"
 

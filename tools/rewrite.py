@@ -43,16 +43,16 @@ voice off a chapter. Rerun `make rewrite` by hand for a second lap, and
 review the diff before committing.
 
 Usage:
-    python tools/rewrite.py 25                # default passes on chapter 25
-    python tools/rewrite.py 25 28 30          # three chapters, in parallel
-    python tools/rewrite.py 30-40             # a range, inclusive
-    python tools/rewrite.py 25 28 --serial    # the same, one at a time
-    python tools/rewrite.py --list            # show the passes, run nothing
-    python tools/rewrite.py 25 --dry-run      # print the commands only
-    python tools/rewrite.py 25 --also activate    # defaults + activate
-    python tools/rewrite.py 25 --passes activate  # activate only
-    python tools/rewrite.py 25 --model claude-sonnet-5
-    python tools/rewrite.py Chapters/25_Patterns--Template_Method.md --all
+    python -m tools.rewrite 25                # default passes on chapter 25
+    python -m tools.rewrite 25 28 30          # three chapters, in parallel
+    python -m tools.rewrite 30-40             # a range, inclusive
+    python -m tools.rewrite 25 28 --serial    # the same, one at a time
+    python -m tools.rewrite --list            # show the passes, run nothing
+    python -m tools.rewrite 25 --dry-run      # print the commands only
+    python -m tools.rewrite 25 --also activate    # defaults + activate
+    python -m tools.rewrite 25 --passes activate  # activate only
+    python -m tools.rewrite 25 --model claude-sonnet-5
+    python -m tools.rewrite Chapters/25_Patterns--Template_Method.md --all
 """
 
 import argparse
@@ -65,8 +65,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
-from reflow_prose import _resolve
-from tools_config import ROOT
+from tools.reflow_prose import _resolve
+from tools.config import ROOT
 
 
 @dataclass(frozen=True)
@@ -225,10 +225,10 @@ SCOPE_NOTE = (
 # gates see settled lines. A scoped check gets the chapter path
 # appended, so parallel chains never read each other's chapter.
 CHECKS: tuple[tuple[str, tuple[str, ...], bool], ...] = (
-    ("reflow", ("tools/reflow_prose.py", "--write"), True),
-    ("banned phrases", ("tools/banned_phrases.py",), True),
-    ("heading links", ("tools/heading_links.py",), True),
-    ("examples in sync", ("tools/extract_examples.py",), False),
+    ("reflow", ("-m", "tools.reflow_prose", "--write"), True),
+    ("banned phrases", ("-m", "tools.banned_phrases",), True),
+    ("heading links", ("-m", "tools.heading_links",), True),
+    ("examples in sync", ("-m", "tools.extract_examples",), False),
 )
 
 DRIFT_NOTE = (

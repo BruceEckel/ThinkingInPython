@@ -33,8 +33,8 @@ Text is set in Palatino Linotype, which ships with Windows and
 macOS; regenerate on a machine that has it.
 
 Usage:
-    uv run python tools/make_cover.py            # everything
-    uv run python tools/make_cover.py --preview  # small PNG only
+    uv run python -m tools.make_cover            # everything
+    uv run python -m tools.make_cover --preview  # small PNG only
 """
 
 import argparse
@@ -45,7 +45,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import build_site
+from tools import build_site
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "resources" / "static"

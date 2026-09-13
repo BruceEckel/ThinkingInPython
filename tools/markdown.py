@@ -10,7 +10,7 @@ block" had several near-copies that could drift apart.
 text, its lines, and its fenced `Block`s; a `Block` knows its language,
 where it sits in the file, its content lines, and the slug naming the
 file it extracts to. A check is then a function from a `Document` to
-`Finding`s (see tools_report.py), which makes it callable from a test
+`Finding`s (see tools/report.py), which makes it callable from a test
 with no filesystem at all.
 
 Line convention: `lines` comes from ``text.split("\\n")``, not
@@ -22,10 +22,8 @@ is a trailing empty string for a file ending in a newline, which is
 normal for this convention and is what comment_periods.py,
 comment_spacing.py and listing_format.py already assumed.
 
-Named tools_markdown for the same reason as tools_config/tools_repo/
-tools_pycode/tools_report/tools_prose: it must never collide with a
-book listing's own filename through Python's sys.modules cache. See
-tools_repo.py's docstring for the failure that caused those renames.
+Imported as ``tools.markdown``, so no book listing's filename can shadow
+it; tools/repo.py's docstring has the history.
 """
 
 import re
@@ -33,8 +31,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools_config import PATH_LINE_RE, RUST_PATH_LINE_RE
-from tools_prose import is_prose_line
+from tools.config import PATH_LINE_RE, RUST_PATH_LINE_RE
+from tools.prose import is_prose_line
 
 # A fence opening or closing at any indent, capturing the language word.
 # Indent-tolerant because the book has one (chapter 17's indented ```cpp).
@@ -194,7 +192,7 @@ class Document:
     def prose_lines(self) -> Iterator[tuple[int, str]]:
         """(1-based line number, line) for each ordinary prose line.
 
-        Skips fenced blocks entirely, then applies tools_prose's rule, so
+        Skips fenced blocks entirely, then applies tools.prose's rule, so
         headings, lists, tables, block quotes and indented code are left
         out along with the code.
         """

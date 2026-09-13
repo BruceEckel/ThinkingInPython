@@ -1,13 +1,13 @@
-"""Tests for tools/tools_extract.py (routing, conflicts, write, check)."""
+"""Tests for tools/extract.py (routing, conflicts, write, check)."""
 from pathlib import Path
 
-from tools_extract import (
+from tools.extract import (
     block_content,
     check_against,
     extract,
     write_tree,
 )
-from tools_markdown import Block, Document
+from tools.markdown import Block, Document
 
 
 def doc_of(text: str, name: str = "14_Techniques--Decorators.md") -> Document:

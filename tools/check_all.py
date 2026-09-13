@@ -8,7 +8,7 @@ the same 45 chapters, and it means N summaries to read instead of one
 answer to "is the book clean?".
 
 This runs them together. Every file is parsed once into a `Document`
-(tools_markdown.py) and handed to each selected check, and all findings
+(tools/markdown.py) and handed to each selected check, and all findings
 land in one list, sorted by file and line, so the report reads top to
 bottom through the book rather than grouped by which tool noticed.
 
@@ -19,7 +19,7 @@ list, and it then appears in --list, in the default run, and as a
 selectable name. Deliberately not a discovery mechanism that scans the
 directory: an explicit list is greppable, is obvious to a human adding
 one by hand, and cannot surprise the interpreter that also exec()s book
-listings (see tools_repo.py on the sys.modules collision hazard).
+listings (see tools/repo.py on the sys.modules collision hazard).
 
 There is no --jobs here on purpose. The whole sweep is well under a
 second, nearly all of it interpreter startup, so a process pool would
@@ -27,28 +27,28 @@ cost more than it saves. validate_output.py is the tool that needed
 parallelism, because it *runs* the book rather than reading it.
 
 Usage:
-    python tools/check_all.py                    # every check, Chapters/
-    python tools/check_all.py --list             # names and descriptions
-    python tools/check_all.py listings banned    # only these
-    python tools/check_all.py --fix              # apply what can be fixed
-    python tools/check_all.py Solutions/         # a different tree
+    python -m tools.check_all                    # every check, Chapters/
+    python -m tools.check_all --list             # names and descriptions
+    python -m tools.check_all listings banned    # only these
+    python -m tools.check_all --fix              # apply what can be fixed
+    python -m tools.check_all Solutions/         # a different tree
 """
 
 import argparse
 from collections.abc import Iterable
 
-import banned_phrases
-import capitalize_comments
-import check_self_reference
-import comment_periods
-import comment_spacing
-import heading_links
-import listing_format
-import listing_width
-import prose_lint
-from tools_markdown import Document
-from tools_repo import md_files, write_text_lf
-from tools_report import Check, Finding
+from tools import banned_phrases
+from tools import capitalize_comments
+from tools import check_self_reference
+from tools import comment_periods
+from tools import comment_spacing
+from tools import heading_links
+from tools import listing_format
+from tools import listing_width
+from tools import prose_lint
+from tools.markdown import Document
+from tools.repo import md_files, write_text_lf
+from tools.report import Check, Finding
 
 # The registry. Add a Check here and it joins every mode below.
 CHECKS: list[Check] = [

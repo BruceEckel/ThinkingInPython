@@ -42,15 +42,20 @@ break a Solutions file.
 
 `tools/` holds four kinds of thing, told apart by name:
 
-* **Entry points** (`extract_examples.py`, `validate_output.py`, ...) are run
-  as scripts, almost always through a `make` target. Each one's module
-  docstring is its reference, and `--help` prints it.
-* **Shared libraries** are exactly the `tools_*.py` files. They define no
-  command and are only imported. The `tools_` prefix is not decoration: an
-  entry point imports its siblings by bare name, and `validate_output.py`
-  execs every book listing in that same process, so a library named `config`
-  or `repo` would be found by a chapter's own `import config` through
-  Python's `sys.modules` cache. See `tools_repo.py`'s docstring.
+* **Entry points** (`extract_examples.py`, `validate_output.py`, ...) run
+  as `uv run python -m tools.<name>` from the repository root, almost
+  always through a `make` target. Each one's module docstring is its
+  reference, and `--help` prints it. `tools/` is a package, so `-m` is
+  the only form that works: run as a bare script, a module cannot find
+  its siblings.
+* **Shared libraries** (`config.py`, `repo.py`, `markdown.py`, ...) define
+  no command and are only imported, as `tools.config` and so on. The
+  package is what keeps them apart from the book: `validate_output.py`
+  execs every book listing in its own process, and chapter 24 has a
+  listing called `config.py`, so a bare `config` module on `sys.path`
+  would be found by that chapter's `import config` through the
+  `sys.modules` cache. `tools.config` is a key no listing can collide
+  with. See `tools/repo.py`'s docstring.
 * **`data/`** holds the word lists, allowlists, and glob lists the checks
   read (`wordlist.txt`, `norun.txt`, `banned_phrases.txt`, ...), so this
   directory lists code and nothing else.
@@ -63,13 +68,13 @@ together they are why a check is usually thirty lines:
 
 | Module | What it provides |
 | --- | --- |
-| `tools_config.py` | Paths and the convention regexes. Constants only, no behavior. |
-| `tools_repo.py` | Small shared behaviors: walking `Chapters/`, reading a glob list, running a subprocess. |
-| `tools_markdown.py` | `Document.parse()`: one parse of a Markdown file into lines, fenced `Block`s, and headings. |
-| `tools_prose.py` | Which lines are prose, and which inline spans (code, footnotes) to ignore within one. |
-| `tools_pycode.py` | Walking fenced Python and finding a real `#` comment in a line, string-aware. |
-| `tools_report.py` | `Finding` and `Check`, the shape every check produces and the reporter that prints them. |
-| `tools_extract.py` | Routing blocks to paths, conflict detection, and writing or checking a tree. |
+| `config.py` | Paths and the convention regexes. Constants only, no behavior. |
+| `repo.py` | Small shared behaviors: walking `Chapters/`, reading a glob list, running a subprocess. |
+| `markdown.py` | `Document.parse()`: one parse of a Markdown file into lines, fenced `Block`s, and headings. |
+| `prose.py` | Which lines are prose, and which inline spans (code, footnotes) to ignore within one. |
+| `pycode.py` | Walking fenced Python and finding a real `#` comment in a line, string-aware. |
+| `report.py` | `Finding` and `Check`, the shape every check produces and the reporter that prints them. |
+| `extract.py` | Routing blocks to paths, conflict detection, and writing or checking a tree. |
 
 A check is a function from a `Document` to `Finding`s, which is what lets
 `check_all.py` run all of them over one parse, and what lets a test build a
@@ -158,8 +163,8 @@ hyphenated target name both wrap as one unit.
 make              # every section's targets (so does `make help`)
 make help style   # one section's targets
 
-uv run python tools/make_help.py --width 72   # wrap to a fixed width
-uv run python tools/make_help.py --pick never # static text in a terminal
+uv run python -m tools.make_help --width 72   # wrap to a fixed width
+uv run python -m tools.make_help --pick never # static text in a terminal
 ```
 
 ## help_picker.py
@@ -422,8 +427,8 @@ done by the main build; see `rust/README.md` and `rust/Makefile` (run
 `make` from inside `rust/`).
 
 ```
-python tools/extract_rust.py            # check vs rust/
-python tools/extract_rust.py --write     # update rust/
+python -m tools.extract_rust            # check vs rust/
+python -m tools.extract_rust --write     # update rust/
 ```
 
 ## run_examples.py
@@ -436,7 +441,7 @@ failed and exits non-zero if anything fails or times out.
 `make test` (`uv run pytest build/examples`), not as standalone scripts. See
 the Testing chapter.
 
-* Narrow the run: `python tools/run_examples.py 31_Patterns--State_Machines`
+* Narrow the run: `python -m tools.run_examples 31_Patterns--State_Machines`
 * Adjust the kill timeout: `--timeout 20` (default 60s)
 * Parallelism: runs on all cores by default (`-j auto`); each example is its
   own subprocess, so this is safe. Use `-j 1` for serial, or `-j N` for a fixed
@@ -451,7 +456,7 @@ and streams its output:
 
 ```
 make run-one F=deque_timing
-python tools/run_one_example.py Examples/03_Foundations--Containers/deque_timing.py
+python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
 ```
 
 The argument is a path, a bare file name, or any substring of the path; a
@@ -486,8 +491,8 @@ red on every one of them would have gated nothing.
 modes use it:
 
 ```
-python tools/run_examples.py --baseline        # fail only on NEW breakage
-python tools/run_examples.py --write-baseline   # regenerate the baseline
+python -m tools.run_examples --baseline        # fail only on NEW breakage
+python -m tools.run_examples --write-baseline   # regenerate the baseline
 ```
 
 The book is now fully modernized, so the baseline is **empty** and CI runs a
@@ -665,7 +670,7 @@ make reflow-check        # report which chapters would change, no write
 make reflow              # rewrite the whole book
 make reflow CH=02        # rewrite one chapter (by number, name part, or path)
 make reflow-check CH=02  # preview one chapter, no write
-uv run python tools/reflow_prose.py --diff Tour   # diff a chapter by name part
+uv run python -m tools.reflow_prose --diff Tour   # diff a chapter by name part
 ```
 
 A positional argument (or `CH=`) may be a file path or a chapter selector
@@ -724,7 +729,7 @@ foreign-language quotes, deliberate code strings) are listed in
 knows only a curated list, `tools/spellcheck.py` (using the uv-managed
 `pyspellchecker`) checks every prose word against a real English dictionary, so
 a novel typo is caught. It checks prose only: code blocks, inline code,
-footnotes, and link URLs are stripped via `tools_prose`, so identifiers do not
+footnotes, and link URLs are stripped via `tools.prose`, so identifiers do not
 flood it. Two more things are not prose either, and both once produced findings
 that looked like typos: a heading's explicit `{#anchor}`, whose slug splits into
 words that are not (`sys-monitoring` gives "sys", `dont-start-the-engine` gives
@@ -733,7 +738,7 @@ stateless classifier cannot see past its opening line. Accepted terms
 (technical words, names, coined words) live in
 `tools/data/wordlist.txt`, one lowercase word per line. When it flags a real term,
 add it there; when it flags a typo, fix the prose. Use
-`uv run python tools/spellcheck.py --summary` to see the unique unknowns by
+`uv run python -m tools.spellcheck --summary` to see the unique unknowns by
 count, which makes seeding the word list quick. `make spell-add` automates the
 "add it there" step: it accepts every unknown word into the wordlist, sorted
 and deduplicated. It cannot tell a real term from a typo, so always review
@@ -744,11 +749,11 @@ alongside codespell and catches small mechanical slips a spell checker ignores:
 more than one space between words, a space before `.`/`,`/`;`/`!`/`?`, more than
 one blank line in a row, a period or comma left outside a closing quote, and
 trailing whitespace (a two-space hard break is allowed). It shares the
-`tools_prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
+`tools/prose.py` classifier with `reflow_prose.py`, so fenced and indented code,
 tables, blockquotes, and HTML are skipped, and inline code spans and footnotes
 are ignored inside a prose line; headings and list-item text are checked but
 their markers are not. It is report-only and exits non-zero on any finding. Run
-it directly with `uv run python tools/prose_lint.py Markdown` (or a single file).
+it directly with `uv run python -m tools.prose_lint Markdown` (or a single file).
 
 The quote check reads a quoted *literal* differently from quoted prose. The book
 puts the mark inside a quoted phrase (`"easier to ask forgiveness than
@@ -998,7 +1003,7 @@ These render correctly on GitHub; the builder rewrites intra-book `.md` links to
 `.html` so they also resolve in the site. External links (which carry a scheme)
 are left alone.
 
-Requires `pandoc` on PATH. Run `python tools/build_site.py` (or `make site`);
+Requires `pandoc` on PATH. Run `python -m tools.build_site` (or `make site`);
 use `-o DIR` to build elsewhere. `make serve` builds nothing and serves the
 existing `build/site/` at <http://localhost:8000>; `make local` builds, serves,
 watches for edits, and opens a browser at the site.

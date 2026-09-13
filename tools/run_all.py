@@ -31,15 +31,15 @@ target, matching how a single Makefile recipe's own sequential lines
 already behave.
 
 Usage:
-    python tools/run_all.py            # run every target in ALL_TARGETS
-    python tools/run_all.py --help     # list the targets, without running
+    python -m tools.run_all            # run every target in ALL_TARGETS
+    python -m tools.run_all --help     # list the targets, without running
 """
 
 import argparse
 import subprocess
 
-from make_help import MAKEFILE, entries
-from tools_config import ROOT
+from tools.make_help import MAKEFILE, entries
+from tools.config import ROOT
 
 # The everyday loop, in run order. Add a make target name here to include
 # it; its --help text is read from the Makefile automatically.

@@ -7,7 +7,7 @@ dictionary (pyspellchecker) plus a project word list, so anything not a known
 word or an accepted term is reported.
 
 It checks prose only. Fenced and indented code, tables, blockquotes, and HTML
-are skipped via the tools_prose classifier; inline code spans, footnotes, and link
+are skipped via the tools.prose classifier; inline code spans, footnotes, and link
 URLs are stripped from each line so identifiers and paths are not flagged.
 Headings and list-item text are checked; their markers are not, and neither is
 a heading's explicit `{#anchor}`, whose slug splits into non-words ("sys" out of
@@ -31,10 +31,10 @@ the diff (`git diff tools/data/wordlist.txt`) before committing, and revert any
 line that is actually a typo rather than a fix in the prose.
 
 Usage:
-    python tools/spellcheck.py               # check all of Chapters/
-    python tools/spellcheck.py --summary     # unique unknowns, by count
-    python tools/spellcheck.py --add         # accept every unknown word
-    python tools/spellcheck.py Chapters/11_Techniques--Testing.md
+    python -m tools.spellcheck               # check all of Chapters/
+    python -m tools.spellcheck --summary     # unique unknowns, by count
+    python -m tools.spellcheck --add         # accept every unknown word
+    python -m tools.spellcheck Chapters/11_Techniques--Testing.md
 """
 import argparse
 import re
@@ -43,12 +43,12 @@ from pathlib import Path
 
 from spellchecker import SpellChecker
 
-from tools_config import DATA_DIR
-from tools_prose import (
+from tools.config import DATA_DIR
+from tools.prose import (
     FENCE, HEADING, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN, LIST_ITEM,
     is_prose_line, mask,
 )
-from tools_repo import add_paths_arg, md_files, write_text_lf
+from tools.repo import add_paths_arg, md_files, write_text_lf
 
 WORDLIST = DATA_DIR / "wordlist.txt"
 

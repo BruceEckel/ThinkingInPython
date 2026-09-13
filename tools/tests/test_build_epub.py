@@ -9,7 +9,7 @@ left to a reader to notice.
 import datetime
 from pathlib import Path
 
-from build_epub import (
+from tools.build_epub import (
     CODE_FONT_SCALE,
     MAX_HANG_INDENT,
     VARIANTS,
@@ -32,8 +32,8 @@ from build_epub import (
     release_line,
     title_anchor,
 )
-from build_site import Chapter
-from tools_markdown import Document
+from tools.build_site import Chapter
+from tools.markdown import Document
 
 # ── namespacing one chapter's headings ────────────────────────────────────────
 

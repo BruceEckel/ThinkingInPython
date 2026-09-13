@@ -1,5 +1,5 @@
 # Examples known to fail or time out right now (Phase 2 backlog).
-# Regenerate with: python tools/run_examples.py --write-baseline
+# Regenerate with: python -m tools.run_examples --write-baseline
 # CI uses this with --baseline to fail only on NEW breakage.
 # One forward-slash relative path per line.
 

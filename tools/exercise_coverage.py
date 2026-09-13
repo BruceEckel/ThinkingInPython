@@ -34,9 +34,9 @@ and forcing one onto each would be worse than the gap. The output is a
 worklist for an author, so it prints and always exits 0 unless asked to
 fail with --strict.
 
-    uv run python tools/exercise_coverage.py            # every chapter
-    uv run python tools/exercise_coverage.py 19 31      # two chapters
-    uv run python tools/exercise_coverage.py --covered  # show both halves
+    uv run python -m tools.exercise_coverage            # every chapter
+    uv run python -m tools.exercise_coverage 19 31      # two chapters
+    uv run python -m tools.exercise_coverage --covered  # show both halves
 """
 
 import argparse
@@ -44,7 +44,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tools_repo import add_paths_arg, block_slug, md_files
+from tools.repo import add_paths_arg, block_slug, md_files
 
 HEADING_RE = re.compile(r"^(#{2,3})\s+(.*?)\s*(?:\{#([^}]+)\})?\s*$")
 FENCE_RE = re.compile(r"^```")

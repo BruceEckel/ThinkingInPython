@@ -1,7 +1,7 @@
 """Tests for tools/fix_imports.py (the pure splicing logic)."""
 from pathlib import Path
 
-from fix_imports import block_slug, collect_markdown, splice_markdown
+from tools.fix_imports import block_slug, collect_markdown, splice_markdown
 
 
 # ── block_slug ────────────────────────────────────────────────────────────────
