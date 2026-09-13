@@ -189,11 +189,15 @@ Exercise 9 writes that recursion.
 The concrete shapes carry a leading underscore because no caller needs their names.
 `factory()` returns `Shape`,
 so a caller only works with `Shape`s and never writes `_Circle`.
-The underscore discourages direct construction:
-a convention rather than concealment
-([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case, and keeps its bare `Settings` name because `settings()` returns that type, which callers must write).
+The underscore discourages direct construction,
+but this is a convention rather than concealment.
+[Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
+makes the same case,
+and keeps its bare `Settings` name because `settings()` returns that type,
+which callers must write.
 `shape_name()` strips the underscore,
-so the strings `factory()` accepts stay the public names.
+so the name a caller passes to `factory()` is the public `"Circle"`,
+not the private `_Circle`.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
