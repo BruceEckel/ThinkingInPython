@@ -12,6 +12,8 @@ list to keep in sync. A handful of targets never run, regardless of tier:
     nothing for a subprocess call to wait on.
   * verify-targets -- the target that runs this script; testing it would
     recurse.
+  * check-ch -- takes a CH= chapter selector and exits with a usage error
+    without one; there is no chapter this script could pick for it.
 
 Most targets are read-only or safely idempotent (extract, sync, and the
 various check-* targets rewrite a tracked file only if it is genuinely out
@@ -66,6 +68,7 @@ EXCLUDED: dict[str, str] = {
     "kindle": "opens the Send to Kindle desktop app (a GUI)",
     "verify-targets": "this is the target that runs this script",
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
+    "check-ch": "needs a CH= chapter selector this smoke test cannot supply",
 }
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in
