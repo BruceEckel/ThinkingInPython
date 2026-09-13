@@ -91,7 +91,8 @@ doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
 # Runs every other target here and reports which ones fail. Read-only/idempotent
 # targets run directly; a target that bakes --fix/--write/--add into its recipe
 # (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
-# fix-comment-caps, fix-comment-spacing) runs in a disposable git worktree
+# fix-comment-caps, fix-comment-spacing, and the clean-* targets, which
+# would otherwise wipe the logs below) runs in a disposable git worktree
 # instead, so this working tree is never touched. tools-upgrade, python-upgrade,
 # serve, and local never run (network/environment mutation, or a server that
 # blocks forever); see tools/verify_targets.py's docstring. Logs land in

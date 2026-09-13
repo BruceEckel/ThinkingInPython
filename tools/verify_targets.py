@@ -24,7 +24,8 @@ fix-comment-caps, fix-comment-spacing, output, solutions-output, and all,
 which chains most of the others): reflow alone would reformat most of
 the book's prose on every run, since it is not covered by any gate. Those
 run inside a disposable `git worktree` checked out at HEAD instead, so
-this working tree is never touched. That worktree reflects the last
+this working tree is never touched. The clean-* targets run there too,
+since they remove build/, which holds this script's own logs. That worktree reflects the last
 commit, not any uncommitted changes, so it tests each target's own wiring
 rather than whether running it right now would leave your draft clean.
 
@@ -69,10 +70,17 @@ EXCLUDED: dict[str, str] = {
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in
 # a disposable worktree rather than this working tree.
+# The clean-* targets belong here too: they rmtree build/, and this
+# script's own logs live under build/, so run in this tree they wiped
+# every log written before them (make clean was added 2026-08-29, after
+# this script) and the final failure report then crashed reading a log
+# that no longer existed.
 WORKTREE_TARGETS: frozenset[str] = frozenset({
     "all", "reflow", "spell-add", "fix-imports", "fix-listings",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
     "output", "solutions-output",
+    "clean", "clean-examples", "clean-solutions", "clean-site",
+    "clean-epub", "clean-pdf",
 })
 
 
@@ -200,16 +208,6 @@ def main(argv: list[str] | None = None) -> int:
                 results.append(result)
                 print("ok" if result.ok else f"FAILED ({result.summary})",
                       f"[{result.seconds:.1f}s]")
-
-    if {"clean", "clean-examples", "clean-solutions", "clean-site",
-            "clean-epub", "clean-pdf"} & set(direct):
-        # Those targets are real, tested rmtree calls; leaving build/ empty
-        # afterward would be a surprising side effect of running this sweep,
-        # so put back what a normal `make ci` run leaves behind.
-        print("\nRestoring build/ artifacts wiped by the clean-* targets...")
-        subprocess.run(
-            ["make", "extract", "solutions-extract", "site", "epub", "pdf"],
-            cwd=ROOT, check=False)
 
     if skipped:
         print("\nNever run (see the module docstring for why):")
