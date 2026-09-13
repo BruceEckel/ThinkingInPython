@@ -294,11 +294,11 @@ makes with a `Protocol`.
 and the checker rejects a key that `Kind` does not list,
 so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
-The next example, `registry.py`, cannot take the same fix.
-Its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
-and a closed `Literal` would need an edit for every new subclass.
-A closed set of names suits `Literal`; an open set, growing by subclassing,
-does not:
+### Self Registration
+
+It would be even nicer if a new `Shape` subclass would register itself with no edit to existing code.
+In this case, a closed `Literal` would complicate things by requiring an edit for every new subclass.
+A closed set of names suits `Literal`, while an open set does not:
 
 ```python
 # registry.py
