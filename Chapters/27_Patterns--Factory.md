@@ -172,7 +172,8 @@ shows the subclass-override form.
 Whereas a factory takes information telling it what to build,
 a generator object does the opposite:
 it holds an internal algorithm and needs no argument to produce the next value.
-`shape_name()` takes `n` (the maximum number of shapes it can produce)
+`shape_name()` takes `n`
+(the maximum number of shapes the generator can produce)
 and returns a generator object.
 That object produces names on demand.
 Those names are the arguments to `Shape.factory()`.
@@ -183,10 +184,11 @@ Inside `shape_name()`,
 `__subclasses__()` covers only the first level of inheritance,
 so a class inheriting from `Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
+Exercise 9 writes that recursion.
 
 The concrete shapes carry a leading underscore because no caller needs their names.
 `factory()` returns `Shape`,
-so a caller annotates that and never writes `_Circle`.
+so a caller only works with `Shape`s and never writes `_Circle`.
 The underscore discourages direct construction:
 a convention rather than concealment
 ([Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private) makes the same case, and keeps its bare `Settings` name because `settings()` returns that type, which callers must write).
@@ -1135,3 +1137,10 @@ Both exist to work around languages where a class is not an object you can put i
     Call it with a `kind` string that is not a shape name but a Python expression with a side effect,
     and show that it runs the expression.
     Then show that the `FACTORIES` version raises `KeyError` for the same string.
+9.  Derive `_Oval` from `_Circle` in `shape_factory_method.py`,
+    give it its own `draw()`, and add a `case "Oval"` to `factory()`.
+    Run the program and confirm that `shape_name()` never yields `"Oval"`,
+    then explain why.
+    Write a recursive generator `all_subclasses()` that yields a class's direct subclasses and,
+    through each one's own `__subclasses__()`, every class below them.
+    Use it in `shape_name()` and confirm that `Oval` now appears.

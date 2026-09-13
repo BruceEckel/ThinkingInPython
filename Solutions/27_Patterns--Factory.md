@@ -603,3 +603,95 @@ needs no `Factory` lookup by name, and lets a type checker see that
 every value is a `ShapeMaker`. Whenever `kind` can come from a
 configuration file, a request, or a command line, `TableFactory` is the
 only acceptable version of the two.
+
+## 9. Recursing through `__subclasses__()`
+
+```python
+# exercise_9.py
+import random
+from abc import ABC, abstractmethod
+from collections.abc import Iterable, Iterator
+from typing import override
+
+class Shape(ABC):
+    @abstractmethod
+    def draw(self) -> None: ...
+    @abstractmethod
+    def erase(self) -> None: ...
+    @staticmethod
+    def factory(kind: str) -> Shape:
+        match kind:
+            case "Circle":
+                return _Circle()
+            case "Square":
+                return _Square()
+            case "Oval":
+                return _Oval()
+            case _:
+                raise ValueError(f"Bad shape: {kind}")
+
+class _Circle(Shape):
+    @override
+    def draw(self) -> None: print("Circle.draw")
+    @override
+    def erase(self) -> None: print("Circle.erase")
+
+class _Square(Shape):
+    @override
+    def draw(self) -> None: print("Square.draw")
+    @override
+    def erase(self) -> None: print("Square.erase")
+
+class _Oval(_Circle):
+    @override
+    def draw(self) -> None: print("Oval.draw")
+
+def all_subclasses[T](cls: type[T]) -> Iterator[type[T]]:
+    for sub in cls.__subclasses__():
+        yield sub
+        yield from all_subclasses(sub)
+
+def names(classes: Iterable[type[Shape]]) -> list[str]:
+    return [c.__name__.removeprefix("_") for c in classes]
+
+print(names(Shape.__subclasses__()))
+#: ['Circle', 'Square']
+print(names(all_subclasses(Shape)))
+#: ['Circle', 'Oval', 'Square']
+
+def shape_name(n: int) -> Iterator[str]:
+    for _ in range(n):
+        cls = random.choice(list(all_subclasses(Shape)))
+        yield cls.__name__.removeprefix("_")
+
+random.seed(4)
+for shape in [Shape.factory(s) for s in shape_name(6)]:
+    shape.draw()
+#: Circle.draw
+#: Oval.draw
+#: Circle.draw
+#: Square.draw
+#: Oval.draw
+#: Oval.draw
+```
+
+`_Oval` is a subclass of `_Circle`, not of `Shape`, so
+`Shape.__subclasses__()` lists `_Circle` and `_Square` and stops. The
+original `shape_name()` draws only from that list, so no seed
+produces `"Oval"`, and the new `case` in `factory()` is unreachable
+from the demo even though it works when called directly.
+
+`all_subclasses()` yields each direct subclass and then, before moving
+to the next one, recurses into that subclass: depth first, so `Oval`
+comes out between `Circle` and `Square`. The generic `T` keeps the
+result typed as `type[Shape]` when the argument is `Shape`, which is
+what `names()` and `factory()` need. `random.choice()` takes a
+sequence, so `shape_name()` materializes the generator with `list()`.
+With the same seed the sequence differs from the chapter's, because
+`choice()` now picks from three classes instead of two.
+
+`_Oval` overrides only `draw()`, so an `Oval` still erases as a
+`Circle`. That is also why `Circle` stays in the list: recursion adds
+the deeper classes without removing the intermediate ones, and a
+factory that should build only leaf classes needs a further filter,
+`not cls.__subclasses__()`.
