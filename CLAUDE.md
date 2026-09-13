@@ -179,10 +179,7 @@ reading.
 - **Bare `python`/`ty`/`pytest` on PATH can be a different, older tool than
   `uv run`'s.** On this machine bare `python` is 3.14.6 while `uv run python`
   is the pinned 3.15, and bare `ty` is 0.0.46 against
-  `uv run ty`'s 0.0.56. Bare `python3` used to be a Rye shim that read
-  `.python-version`; Rye was removed on 2026-09-13, and `python3` is now
-  the Windows Store alias for the Python install manager, so it is not
-  the project interpreter either. Running `validate_output.py` with bare `python`
+  `uv run ty`'s 0.0.56. Running `validate_output.py` with bare `python`
   produced false failures on 3.15-only syntax (`sentinel`, `lazy import`,
   the PEP 798 comprehension-unpacking chapter) that vanished once invoked
   via `uv run`. Always go through `uv run` for anything that executes
