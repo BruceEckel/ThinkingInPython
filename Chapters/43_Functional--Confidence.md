@@ -399,12 +399,12 @@ sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
-The trap to avoid is a property that restates the implementation:
-asserting `encode(text) == text.encode().hex()` tests nothing,
+The trap to avoid is a property that restates the implementation.
+Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
-All of these lean on purity:
+All of these lean on purity.
 Hypothesis can rerun and shrink freely because each call is independent of every other.
 
 ## Affordable Proof

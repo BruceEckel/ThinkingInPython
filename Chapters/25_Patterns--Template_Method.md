@@ -76,13 +76,14 @@ The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
 This kind of optional step is a *hook*.
-The `setUp()` and `tearDown()` in the opening example are hooks:
+The `setUp()` and `tearDown()` in the opening example are hooks.
 `TestCase` supplies do-nothing versions,
 so a test class that needs no setup skips them.
-This silence hides a misspelling: `def customise1()` ('s' instead of 'z')
+This silence hides a misspelling.
+`def customise1()` ('s' instead of 'z')
 adds a new method and leaves the base's do-nothing version in place.
-That is why every step override in these listings carries `@override`:
-the type checker then rejects a method that overrides nothing.
+That is why every step override in these listings carries `@override`.
+The type checker then rejects a method that overrides nothing.
 
 The checker sees only the decorator.
 If you leave `@override` off the misspelled method,

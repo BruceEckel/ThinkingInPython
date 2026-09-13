@@ -159,12 +159,13 @@ if __name__ == "__main__":
 Follow one duel to keep the perspective straight.
 `scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,
 and calls `paper.eval_scissors(...)`.
-That call is the second dispatch: it resolves `paper`,
-arriving in `Paper.eval_scissors()`, the one method that knows both types.
+That call is the second dispatch.
+It resolves `paper`, arriving in `Paper.eval_scissors()`,
+the one method that knows both types.
 Which competitor does that result describe?
 `Paper.eval_scissors()` returns `WIN`,
 and that is the outcome for the scissors that started the duel,
-not for the `Paper` whose code is running: scissors cut paper.
+not for the `Paper` whose code is running, since scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
 If you misread that convention, every result in the class appears backward.
@@ -491,8 +492,8 @@ which answers the `Number + Number` question that opened this chapter.
 If that returns the special value `NotImplemented`,
 Python turns around and tries `type(b).__radd__(b, a)`,
 the *reflected* form of `__add__()`.
-The first call dispatches on `a`'s type, the fallback on `b`'s:
-double dispatching, built into the language.
+The first call dispatches on `a`'s type, the fallback on `b`'s,
+and that is double dispatching, built into the language.
 Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.

@@ -520,14 +520,14 @@ The engine tries them top to bottom,
 which is how a single input can lead to different states depending on a test.
 A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` for the rows above it.
-Without such a row, a group can match nothing:
-when every condition returns `False`,
+Without such a row, a group can match nothing.
+When every condition returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
-The lookup keys on `type(event)` exactly: a dictionary probe,
-not an `isinstance()` walk.
+The lookup keys on `type(event)` exactly,
+a dictionary probe rather than an `isinstance()` walk.
 That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`.
-It cuts the other way too:
-a further subclass of an event type matches none of its parent's rows,
+It cuts the other way too.
+A further subclass of an event type matches none of its parent's rows,
 because the table must name an event's exact class.
 
 The engine passes the event to both callables, whether they need it or not,
@@ -713,15 +713,15 @@ if __name__ == "__main__":
 #: col 0: Cleared: costs 25, quantity 0 [COLLECTING]
 ```
 
-The two `Cleared` lines read alike and end in different states:
-too expensive returns to `COLLECTING` with the money still inserted,
+The two `Cleared` lines read alike and end in different states.
+Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
 The last two events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true, and `too_expensive` sits first in that row's list,
-so it wins: the machine reports `COLLECTING`,
-as though a dollar more would sell it,
+so it wins.
+The machine reports `COLLECTING`, as though a dollar more would sell it,
 when the slot is empty and no amount of money would.
 If you swapped the row order, the same input would report `UNAVAILABLE` instead.
 That is the cost of the ordering rule stated above:

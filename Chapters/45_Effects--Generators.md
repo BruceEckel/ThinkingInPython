@@ -544,8 +544,8 @@ and that is why the example ends with a `drive()` call.
 However deep you stack delegations, the number of drivers stays at one.
 
 `drive()` and `yield from` differ in how they respond to a request.
-`drive()` answers it: a `Question` comes out, the driver looks it up,
-and the request stops there.
+`drive()` answers it.
+A `Question` comes out, the driver looks it up, and the request stops there.
 `yield from` answers nothing.
 It relays the request upward and passes the reply back down untouched,
 so `survey()` has no idea what a `Question` means.

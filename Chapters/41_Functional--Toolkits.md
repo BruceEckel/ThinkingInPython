@@ -200,12 +200,13 @@ print(x.squared)
 #: 25
 ```
 
-Be careful with caching:
-changing an attribute the property read doesn't recalculate the cached result.
-The escape hatch is `del x.squared`:
-deleting the cached attribute discards the stored value,
+Be careful with caching.
+Changing an attribute the property read doesn't recalculate the cached result.
+The escape hatch is `del x.squared`.
+Deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
-First access isn't thread-safe either: `cached_property` no longer locks,
+First access isn't thread-safe either.
+`cached_property` no longer locks,
 so two threads racing on the first read can both find the value missing and both run the property's code.
 
 ### `wraps`

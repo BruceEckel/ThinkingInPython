@@ -647,14 +647,14 @@ The `yield from` inside `greet_all()` does real work.
 If you write that loop body as a bare `greet(name)`,
 `ty` objects with an `invalid-return-type`:
 "Function always implicitly returns `None`."
-That looks like protection, but it is an accident:
-that `yield from` is the only `yield` in `greet_all()`,
+That looks like protection, but it is an accident.
+That `yield from` is the only `yield` in `greet_all()`,
 so deleting it turns `greet_all()` into an ordinary function,
 and the type checker catches the changed shape rather than the discarded Effect.
 A function with a second `yield` keeps its shape, so every check stays silent.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
-If you write its first line as a bare `greet(name)`, every check passes:
+If you write its first line as a bare `greet(name)`, every check passes.
 `ty` and `ruff` report nothing, the program runs, the log gains both entries,
 and no greeting prints.
 The call still builds a description, and the body discards it unrun.
@@ -1339,15 +1339,15 @@ Freezing prevents rebinding `waited`, not appending to the list it holds.
 
 ## Where to Call `run()`
 
-`run()` starts an event loop and drives the Effect inside it:
-its entire body is `return asyncio.run(run_async(effect))`.
+`run()` starts an event loop and drives the Effect inside it.
+Its entire body is `return asyncio.run(run_async(effect))`.
 Building and tearing down that loop costs something,
 even for an Effect with no `Async` in it.
 One machine measured `run(success(42))` at about 650 microseconds,
 against a few hundredths of a microsecond for the equivalent plain function call,
 roughly four orders of magnitude apart.
 That is the cost behind "a synchronous program calls it once,
-at the outermost edge" ([The Simplest Effect](#the-simplest-effect)):
+at the outermost edge" ([The Simplest Effect](#the-simplest-effect)).
 `test_nailer.py` pays it once per parametrized case,
 which is fine for four rows and worth remembering for a much longer parametrized list.
 The event loop has a second consequence when you incorporate Stateless into an existing application.

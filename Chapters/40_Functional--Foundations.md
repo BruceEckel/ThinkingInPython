@@ -375,11 +375,11 @@ it must see every element before it can order any of them,
 so it always returns a list.
 
 The lambdas above exist to show the machinery,
-and for these cases Python offers a lookalike you should usually prefer:
+and for these cases Python offers a lookalike you should usually prefer,
 the comprehension ([Comprehensions](16_Techniques--Comprehensions.md)).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
-`map()` and `filter()` earn their keep when the function already exists:
+`map()` and `filter()` earn their keep when the function already exists.
 `map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name says what the comprehension would repeat.
 The two also return different things.
 The comprehension hands you a finished list.

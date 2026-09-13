@@ -219,15 +219,16 @@ Use `Result` when the caller may need to act on the reason,
 or when several different failures must stay distinguishable,
 as [Matching on the Error](#matching-on-the-error) shows below.
 
-A function like this is a *Total Function*:
-its return type accounts for every outcome it can produce, success or failure.
+A function like this is a *Total Function*,
+one whose return type accounts for every outcome it can produce,
+success or failure.
 If the function raises an exception instead,
 the signature hides that outcome from a caller reading the return type.
 Totality is a discipline the function's author keeps,
 since Python lets a `Result`-returning function raise an exception as well,
 and the type checker cannot report it.
-The caller has a matching gap:
-a statement that calls the function and discards the `Result` passes the checker.
+The caller has a matching gap.
+A statement that calls the function and discards the `Result` passes the checker.
 The type checker stops you from misreading a `Result`;
 ignoring one is still up to you.
 Both gaps type-check clean:

@@ -166,8 +166,8 @@ as `a` and `b` did in `references.py`.
 ## Numbers and Arithmetic
 
 Integers have unlimited precision, so they cannot overflow.
-Underscores group digits for readability:
-`10_000_000` is the same literal as `10000000`.
+Underscores group digits for readability,
+so `10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
 `/` always produces a `float`, and `//` is floor division
@@ -175,7 +175,7 @@ The operators are what you expect, with two worth noting:
 The result's type follows the operands, so `7.0 // 2` is `3.0`.
 Floor division rounds toward negative infinity, not toward zero,
 so `-7 // 2` is `-4` where C and Java give `-3`.
-The remainder follows from that: `-7 % 2` is `1` in Python and `-1` in C.
+The remainder follows from that, so `-7 % 2` is `1` in Python and `-1` in C.
 The sign of `%` matches the divisor.
 
 ```python

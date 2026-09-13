@@ -270,13 +270,13 @@ That rules out `@dataclass`,
 whose generated `__init__()` reintroduces the re-run.
 The damage is invisible at first,
 since re-assigning the same components changes nothing.
-It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect:
-both run again on an object that was already finished.
+It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect,
+because both run again on an object that was already finished.
 `Tile`'s `@dataclass` generated its `__repr__()` and `__eq__()`;
 `Color` has only `object`'s versions,
 so printing a `Color` shows the default `object.__repr__()`.
-The missing `__eq__()` costs less than it appears:
-for a perfectly interned type, equal values are the same object,
+The missing `__eq__()` costs less than it appears.
+For a perfectly interned type, equal values are the same object,
 so the default identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods, at a price:
 the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,

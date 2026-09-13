@@ -214,12 +214,13 @@ Both `label` and `total` appear:
 `label: str = 'a'` and `total: typing.ClassVar[int] = 1`.
 Constructing `a` runs `self.label = label`,
 which creates a real `label` attribute on `a`, not on `Tally`.
-`total` shows up too, by fallback:
-reading an attribute checks the instance first, then the class,
+`total` shows up too, by fallback.
+Reading an attribute checks the instance first, then the class,
 the rule `Stars` demonstrated in `class_attribute_confusion.py`.
 `a` holds no copy of its own.
-The tags agree: `label`, stored on `a`, carries no `[CV]`, while `total`,
-found by fallback, keeps it.
+The tags agree.
+`label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
+keeps it.
 
 ### A Bare Annotation Declares, It Does Not Create
 

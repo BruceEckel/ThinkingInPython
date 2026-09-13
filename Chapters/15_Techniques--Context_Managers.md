@@ -87,12 +87,12 @@ so the code after the `yield`, `exit A` included, never runs.
 Nothing warns you: the generator silently skips the cleanup on the one path where it matters most.
 Wrap the `yield` in `try`/`finally` in every `@contextmanager` generator.
 
-One caution: the manager object `trace("A")` returns is single-use.
+The manager object `trace("A")` returns is single-use.
 Its generator runs once,
 so reusing the same object in a second `with` fails with a message that names nothing useful:
 `AttributeError: '_GeneratorContextManager' object has no attribute 'args'`.
 Construct a fresh manager for each `with` statement.
-Nor does a loop around the `yield` make the manager reusable:
+Nor does a loop around the `yield` make the manager reusable.
 `@contextmanager` allows one `yield`,
 and a generator that reaches a second one makes the manager raise `RuntimeError: generator didn't stop` when the block ends.
 
@@ -498,11 +498,12 @@ Where a demonstration needs several statements or an assignment in the guarded b
 
 ## Context Manager as Decorator
 
-A context manager brackets a block of statements: setup before, cleanup after.
+A context manager brackets a block of statements,
+with setup before and cleanup after.
 A typical decorator from [Decorators](14_Techniques--Decorators.md)
 brackets a function call the same way.
-`contextlib.ContextDecorator` connects the two:
-a subclass works both as a context manager and as a decorator.
+`contextlib.ContextDecorator` connects the two.
+A subclass works both as a context manager and as a decorator.
 Every manager `@contextmanager` produces already inherits from `ContextDecorator`,
 so `banner` works as a decorator,
 even though `ContextDecorator` never appears in it:

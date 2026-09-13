@@ -313,8 +313,8 @@ against code the type checker never saw.
 
 Two quiet changes in the listing do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
-`frozen=True` is shallow:
-it stops assignment to the fields of `Immutable` itself,
+`frozen=True` is shallow.
+It stops assignment to the fields of `Immutable` itself,
 but it cannot stop mutation inside a field that is itself mutable.
 If you declare the field as a `list` instead, the leak reopens:
 
@@ -774,14 +774,16 @@ A structural type describes the required shape,
 and the type checker verifies it ahead of time.
 Dynamic typing and protocols are the same idea, checked at different times.
 
-An abstract base class is *nominal* (named): a type joins by inheriting from it.
+An abstract base class is *nominal* (named),
+so a type joins by inheriting from it.
 The subclass's own source declares membership,
 and the base can carry shared implementation for its children.
-A protocol is *structural*: it works with any type that has matching members,
+A protocol is *structural*, so it works with any type that has matching members,
 including types in libraries you cannot edit.
 The type's author need not hear that your protocol exists.
 That independence is why this chapter emphasizes protocols.
-It has a cost: nothing in a class's own source names the protocols it satisfies,
+It has a cost.
+Nothing in a class's own source names the protocols it satisfies,
 so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
 Protocols connect pieces without requiring any piece to change.

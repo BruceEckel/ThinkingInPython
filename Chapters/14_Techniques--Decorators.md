@@ -268,12 +268,12 @@ if __name__ == "__main__":
 Take the return type apart: `Callable[[Callable[P, R]], Callable[P, R]]`.
 `Callable[[A, B], X]` reads as "a callable that takes `A` and `B` and returns `X`"
 (see the summary in [Static Types](08_Foundations--Static_Types.md#containers)).
-The first bracket group is a list: it holds the parameter types,
+The first bracket group is a list holding the parameter types,
 so `[Callable[P, R]]` is a parameter list of length one,
 not a list of callables.
 That single parameter type is `Callable[P, R]`, the wrapped function's type.
 So the whole annotation reads as "a callable that takes a `Callable[P, R]` and returns a `Callable[P, R]`."
-That describes `decorate`: it takes `func` and returns `wrapper`,
+That describes `decorate`, which takes `func` and returns `wrapper`,
 both typed `Callable[P, R]`.
 
 `@repeat(times=3)` first evaluates `repeat(times=3)`.

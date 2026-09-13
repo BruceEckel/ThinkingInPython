@@ -206,10 +206,12 @@ A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
 even though a string is a sequence in every other context.
 Iterating a string a character at a time is rarely what a pattern means,
 so the language rules it out.
-A tuple does match: `case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
+A tuple does match.
+`case [a, b, c]` accepts `(1, 2, 3)` as readily as `[1, 2, 3]`,
 because the pattern describes a shape, not a concrete type.
-Parentheses group a pattern rather than build a tuple: `case (x)` is `case x`,
-an unconditional capture, and `case (x,)` is a one-element sequence pattern.
+Parentheses group a pattern rather than build a tuple.
+`case (x)` is `case x`, an unconditional capture,
+and `case (x,)` is a one-element sequence pattern.
 The subject must be a sequence, though, not merely iterable:
 `case [a, b]` matches a `range` but not a generator and not a `set`.
 
@@ -323,11 +325,12 @@ print(describe(Point(3, 4)))
 A positional pattern can leave fields unchecked too:
 `Point(0)` supplies fewer sub-patterns than `__match_args__` names,
 so it ignores `y`, and `Point(_, 0)` uses the wildcard to skip `x`.
-Naming the attribute is clearer, and it survives a change to the field order:
-reordering the fields rewrites `__match_args__`,
+Naming the attribute is clearer, and it survives a change to the field order.
+Reordering the fields rewrites `__match_args__`,
 so every positional pattern silently starts matching a different field.
 `Point()` with no arguments, keyword or positional,
-matches any `Point` instance: use it as a type-only check or a final catch-all.
+matches any `Point` instance.
+Use it as a type-only check or a final catch-all.
 
 The type test is `isinstance()`, so a subclass matches its base's pattern:
 
@@ -443,17 +446,19 @@ print(leaky(Point(3, 4)))
 The guard runs after the pattern matches,
 so it can use the names the pattern bound.
 When a guard is false, `match` moves on to the next `case`,
-but the names stay bound: once `case Point(x, y) if x > 0 and y > 0` has failed,
+but the names stay bound.
+Once `case Point(x, y) if x > 0 and y > 0` has failed,
 `x` and `y` still hold the values it captured.
-`leaky()` shows why that matters: `case _:` binds nothing,
-yet `x` still holds `3`, left over from the failed guard in the case above it.
+`leaky()` shows why that matters.
+`case _:` binds nothing, yet `x` still holds `3`,
+left over from the failed guard in the case above it.
 A case that does not rebind a name inherits whatever an earlier,
 failed case left behind.
 A pattern tests shape and equality,
 so everything beyond that belongs in the guard: an ordering test like `x > 0`,
 a relation between two captures like `x == y`,
 or any call like `len(items) > 3`.
-Repeating a name does not express equality:
+Repeating a name does not express equality.
 `case [x, x]:` fails with `SyntaxError: multiple assignments to name 'x' in pattern`,
 so an equal-elements test is also a guard, `case [x, y] if x == y:`.
 A guard that merely compares one capture to a constant is a literal pattern written the long way.

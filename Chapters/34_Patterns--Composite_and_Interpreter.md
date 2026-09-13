@@ -622,8 +622,8 @@ Composite is the data: a union of node types, some holding others.
 Interpreter is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into frozen data classes, a union,
 operator methods that build nodes, and `match` functions that walk them.
-One practical limit applies:
-every function here recurses once per level of tree,
+One practical limit applies.
+Every function here recurses once per level of tree,
 and Python's recursion limit (roughly a thousand frames)
 caps how deep a tree they can walk.
 Realistic expressions never approach it.

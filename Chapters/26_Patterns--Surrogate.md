@@ -744,12 +744,12 @@ the checker cannot verify a method that `__getattr__()` supplies.
 `state_surrogate.py` successfully type-checks when both parameters carry `Behavior`.
 The checker then verifies every implementation that reaches either method.
 That annotation also ties the surrogate to one Protocol,
-and that tie is what the generic surrogate exists to avoid:
+and that tie is what the generic surrogate exists to avoid.
 `test_state.py` below passes the same `Surrogate` a two-state stand-in that has a `name()` and none of `Behavior`'s three methods.
 With `Behavior` on those parameters, `ty` rejects that test:
 `type StateA is not assignable to protocol Behavior`.
-Declaring the implementations as `first: Behavior` and `second: Behavior` puts the check where it does not restrict the surrogate:
-the type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
+Declaring the implementations as `first: Behavior` and `second: Behavior` puts the check where it does not restrict the surrogate.
+The type checker verifies that `Implementation1` and `Implementation2` supply everything the Protocol declares,
 and reports a missing method.
 That declaration covers the implementations, not the surrogate.
 

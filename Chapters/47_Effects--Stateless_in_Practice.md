@@ -96,15 +96,15 @@ The Ability produces nothing on its own.
 so the answer to an `Ask` is whatever `scripted()` returns.
 A `Tell` needs no answer,
 which is why `Tell` is `Ability[None]` and `capture()` returns `None`.
-`ask()` and `tell()` are *accessors*:
+`ask()` and `tell()` are *accessors*,
 small functions that each wrap one Ability and declare its answer type.
 `need()` has the same shape,
 and the ZIO listing in [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 had an accessor object doing the same job.
 The declared `Depend[Ask, str]` types `name` as `str` inside `greet()`.
 You can skip the accessor and yield the Ability directly,
-and both the program and the type checker still work:
-`ty` reads the answer type from `Ask`'s base, `Ability[str]`.
+and both the program and the type checker still work,
+because `ty` reads the answer type from `Ask`'s base, `Ability[str]`.
 The accessor adds a name for the request and one place to state that answer type:
 the `answer: str` binding inside `ask()`,
 one line above the `Depend[Ask, str]` that repeats it to callers.
@@ -658,8 +658,8 @@ A handler sits outside the channel it feeds.
 ## State as an Ability
 
 Each Ability so far moves information in one direction.
-`Flip` and `Now` read from outside: side causes.
-`Tell` writes outward: a side effect.
+`Flip` and `Now` read from outside, so they are side causes.
+`Tell` writes outward, so it is a side effect.
 Shared mutable state is both at once,
 because whoever holds it must read it and write it back.
 An Ability declares one answer type,
@@ -731,7 +731,7 @@ print(f"remaining: {cell.amount}")
 `purchase()` is where the pair earns its keep.
 It reads, decides, and writes, and the decision sits between the two requests,
 in code that mentions no cell.
-Its signature announces the shared state:
+Its signature announces the shared state.
 `Depend[Get | Put, bool]` tells a caller this function touches something that outlives it.
 `spree()` composes purchases, and the union travels up unchanged.
 
