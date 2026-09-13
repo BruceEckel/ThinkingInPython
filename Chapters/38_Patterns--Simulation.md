@@ -673,7 +673,7 @@ If you define the subclass with its symbol, the factory finds it.
 This is the registry idea from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses
-(that chapter's [Simple Factory Method](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies),
+(that chapter's [Simple Factory Method](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and its exercise 9 writes it),
 so a new item must inherit from `Item` itself.
 Deriving from `Food` to borrow its behavior hides the class from the factory,
 which falls through to the last line and builds a `Teleport` instead.
