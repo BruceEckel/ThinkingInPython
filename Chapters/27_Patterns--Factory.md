@@ -196,13 +196,12 @@ makes the same case,
 and keeps its bare `Settings` name because `settings()` returns that type,
 which callers must write.
 `shape_name()` strips the underscore,
-so the name a caller passes to `factory()` is the public `"Circle"`,
-not the private `_Circle`.
+so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
 Because a `class` statement is executable code,
-every call would define fresh `Circle` and `Square` classes.
+every `factory()` call would define fresh `Circle` and `Square` classes.
 Two shapes from different calls would then share behavior but not a class,
 failing `type(a) is type(b)` and `isinstance()` alike.
 `Shape.__subclasses__()` would be empty until the first call,
@@ -215,11 +214,11 @@ is an alternative constructor,
 a method on the type that builds an instance from data the constructor rejects.
 There, `Month(7)` raises a `ValueError` because no member has the value `7`,
 while `Month.of(7)` returns `JULY`.
-It is also a factory, of the same form as `factory()`.
+This is also a factory, of the same form as `factory()`.
 Both are static methods within the type.
 Each takes data and returns an instance,
-and each raises an exception for data it does not recognize,
-here a number outside one through twelve.
+and each raises an exception for data it does not recognize; for `Month`,
+a number outside one through twelve.
 `of()` needs no `match`.
 The `Enum` already holds every member it could return,
 so `of()` indexes `list(Month)` instead of naming a class.
@@ -240,13 +239,13 @@ A factory turns data, such as a name,
 into an object without scattering constructors through your code.
 In Python a class is a first-class object.
 You can store it in a variable and call it to construct an instance.
-You have relied on that since `defaultdict(list)` in [Containers](03_Foundations--Containers.md#defaultdict)
+You saw this in `defaultdict(list)` in [Containers](03_Foundations--Containers.md#defaultdict)
 and `field(default_factory=list)` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 Both take a class where a function would do,
 and call it whenever they need a fresh value.
 
-Thus, the simplest factory is a dictionary that maps names to classes.
-No factory method and no factory class:
+Thus, the simplest factory is a dictionary that maps names to classes,
+without a factory method or factory class:
 
 ```python
 # shape_table.py
@@ -293,19 +292,13 @@ the same trade [Abstract Factories](#abstract-factories)
 makes with a `Protocol`.
 `Kind` names the two members `SHAPES` already has,
 and the checker rejects a key that `Kind` does not list,
-so `SHAPES` cannot gain a shape name the `Literal` lacks.
-`registry.py`, below, cannot take the same fix:
-its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
-and a closed `Literal` would need an edit for every new subclass,
-which defeats that.
-A closed set of names suits `Literal`; an open set, growing by subclassing,
-does not.
+so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
-`__init_subclass__()`
-(see [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses))
-lets each subclass register itself.
-That removes the `SHAPES` line too,
-so the factory never needs editing when you add a type:
+The next example, `registry.py`, cannot take the same fix.
+Its whole point is that a new `Shape` subclass registers itself with no edit to existing code,
+and a closed `Literal` would need an edit for every new subclass.
+A closed set of names suits `Literal`; an open set, growing by subclassing,
+does not:
 
 ```python
 # registry.py
@@ -343,11 +336,14 @@ if __name__ == "__main__":
 #: Circle.draw
 ```
 
+`__init_subclass__()`
+(see [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses))
+lets each subclass register itself.
 Nothing in the listing calls a register function.
 As the printed key list shows,
 the two `class` statements fill `Shape.registry` on their own.
-Adding a `Triangle` is now a single class definition.
-`Triangle` registers itself,
+That removes the `SHAPES` line too.
+Adding a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` could have built the table instead,
 but it lists only direct subclasses,
