@@ -8,7 +8,7 @@ unindented continuation lines of a multi-line HTML comment.
 
 from pathlib import Path
 
-from tools.spellcheck import collect, prose_text, tokens
+from tools.spellcheck import collect, parse_codespell, prose_text, tokens
 
 
 def words(line: str) -> list[str]:
@@ -57,3 +57,18 @@ def test_one_line_comment_does_not_swallow_what_follows(tmp_path: Path) -> None:
 def test_fenced_code_is_still_skipped(tmp_path: Path) -> None:
     md = write(tmp_path, "Prose.\n\n```python\nzzzq = 1\n```\n")
     assert "zzzq" not in [word for _, word in collect(md)]
+
+
+# ── codespell output ──────────────────────────────────────────────────────────
+
+def test_parse_codespell_lowercases_each_flagged_word() -> None:
+    out = ("Chapters\\25_Patterns--Template_Method.md:296: OnlyOnce ==> only once\n"
+           "Chapters\\25_Patterns--Template_Method.md:305: OnlyOnce ==> only once\n"
+           "Solutions/03_Foundations--Containers.md:12: teh ==> the\n")
+    assert parse_codespell(out) == {"onlyonce", "teh"}
+
+def test_parse_codespell_survives_a_drive_letter_and_skips_other_lines() -> None:
+    out = ("C:\\git\\book\\Chapters\\02_Intro.md:7: recieve ==> receive\n"
+           "WARNING: some codespell notice\n"
+           "\n")
+    assert parse_codespell(out) == {"recieve"}

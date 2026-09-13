@@ -740,9 +740,14 @@ stateless classifier cannot see past its opening line. Accepted terms
 add it there; when it flags a typo, fix the prose. Use
 `uv run python -m tools.spellcheck --summary` to see the unique unknowns by
 count, which makes seeding the word list quick. `make spell-add` automates the
-"add it there" step: it accepts every unknown word into the wordlist, sorted
-and deduplicated. It cannot tell a real term from a typo, so always review
-`git diff tools/data/wordlist.txt` before committing.
+"add it there" step for both checkers: it accepts every unknown word into
+the wordlist, and every word codespell flags into
+`tools/data/codespell-ignore.txt`, each sorted and deduplicated. The second
+half matters because the two checkers keep separate lists and read
+different text: codespell reads code too, so a class name it dislikes
+(`OnlyOnce`) fails `make spell` while never reaching `spellcheck.py`. It
+cannot tell a real term from a typo, so always review
+`git diff tools/data/` before committing.
 
 **Mechanical prose: prose_lint (`make spell`).** `tools/prose_lint.py` runs
 alongside codespell and catches small mechanical slips a spell checker ignores:

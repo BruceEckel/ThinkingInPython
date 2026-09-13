@@ -571,10 +571,13 @@ spell:  ## codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)
 	$(PY) -m tools.spellcheck $(PROSE_FILES)
 
 # Accept every word spellcheck.py doesn't recognize into tools/data/wordlist.txt
-# (sorted, deduplicated) instead of failing. It cannot tell a real term from
-# a typo, so always review the diff before committing; a real typo belongs
-# in the prose, not the wordlist.
-spell-add:  ## Accept every spellcheck-unknown word into wordlist.txt, sorted (review the diff!)
+# and every word codespell flags into tools/data/codespell-ignore.txt (both
+# sorted, deduplicated) instead of failing. The two checkers keep separate
+# lists, and codespell reads code where spellcheck.py reads prose only, so
+# a class name codespell dislikes needs the second list. It cannot tell a
+# real term from a typo, so always review the diff before committing; a
+# real typo belongs in the prose, not in either list.
+spell-add:  ## Accept every unknown word: spellcheck's into wordlist.txt, codespell's into codespell-ignore.txt (review the diff!)
 	$(PY) -m tools.spellcheck $(PROSE_FILES) --add
 
 # House-style lint with Vale: no em-dashes and no filler phrases. Run one

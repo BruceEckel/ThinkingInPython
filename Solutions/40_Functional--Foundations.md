@@ -271,7 +271,7 @@ Deleting the `nonlocal` line draws two complaints, in order. `ty`
 reports `Name 'count' used when not defined` on the `count += step`
 line before the program runs. Running anyway raises an
 `UnboundLocalError` at the first `tally()` call: "cannot access local
-variable 'count' where it is not associated with a value". The type
+variable 'count' where it is not associated with a value." The type
 checker points at the assignment that went wrong. The runtime message
 complains about a local variable the code never meant to create.
 

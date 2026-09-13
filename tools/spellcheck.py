@@ -25,10 +25,16 @@ for real typos.
 
 --add skips that paste step and writes the words into the wordlist file
 directly (merged with what's already there, deduplicated, resorted). It
-still exits 0 either way, since after --add the wordlist is caught up by
-definition. It does not distinguish a genuine term from a typo, so review
-the diff (`git diff tools/data/wordlist.txt`) before committing, and revert any
-line that is actually a typo rather than a fix in the prose.
+also runs codespell over the same paths, the way `make spell` does, and
+writes every word codespell flags into its own list,
+tools/data/codespell-ignore.txt, since the two checkers keep separate
+lists and a word only codespell objects to (a class name such as
+`OnlyOnce`, which codespell reads in code and this checker skips) would
+otherwise still fail `make spell` after an --add. It exits 0 either way,
+since after --add both lists are caught up by definition. It does not
+distinguish a genuine term from a typo, so review both diffs
+(`git diff tools/data/`) before committing, and revert any line that is
+a typo rather than a term.
 
 Usage:
     python -m tools.spellcheck               # check all of Chapters/
@@ -38,12 +44,14 @@ Usage:
 """
 import argparse
 import re
+import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 
 from spellchecker import SpellChecker
 
-from tools.config import DATA_DIR
+from tools.config import CHAPTERS_DIR, DATA_DIR, ROOT
 from tools.prose import (
     FENCE, HEADING, HTML_COMMENT_CLOSE, HTML_COMMENT_OPEN, LIST_ITEM,
     is_prose_line, mask,
@@ -51,6 +59,10 @@ from tools.prose import (
 from tools.repo import add_paths_arg, md_files, write_text_lf
 
 WORDLIST = DATA_DIR / "wordlist.txt"
+CODESPELL_IGNORE = DATA_DIR / "codespell-ignore.txt"
+# One codespell finding: `path:line: word ==> suggestion`. The path is
+# non-greedy so a Windows drive letter's colon does not end it early.
+_CODESPELL_HIT = re.compile(r"^.+?:\d+: (?P<word>\S+) ==> ")
 
 _ANCHOR = re.compile(r"\{#[^}]*\}")              # a heading's explicit id
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")   # [text](url) -> text
@@ -83,7 +95,34 @@ def rewrite_wordlist(path: Path, words: set[str]) -> None:
     while header and not header[-1].strip():   # exactly one blank separator
         header.pop()
     body = sorted({w.strip().lower() for w in words if w.strip()})
-    write_text_lf(path, "\n".join(header + [""] + body) + "\n")
+    # No comment header (codespell-ignore.txt has none) means no blank
+    # separator either, so the file starts at its first word.
+    separator = [""] if header else []
+    write_text_lf(path, "\n".join(header + separator + body) + "\n")
+
+
+def parse_codespell(output: str) -> set[str]:
+    """The words codespell flagged in its output, lowercased.
+
+    codespell matches case-insensitively and reads its ignore file the
+    same way, so the lowercase form is the one to store.
+    """
+    return {m["word"].lower()
+            for line in output.splitlines()
+            if (m := _CODESPELL_HIT.match(line))}
+
+
+def codespell_unknown(paths: list[Path]) -> set[str]:
+    """Run codespell over `paths` as `make spell` does and return the
+    words it flags. Same interpreter, same working directory, so it
+    reads the same [tool.codespell] config and ignore file."""
+    proc = subprocess.run(
+        [sys.executable, "-m", "codespell_lib", *map(str, paths)],
+        cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+    if proc.returncode not in (0, 65):   # 65: findings; anything else broke
+        sys.stderr.write(proc.stderr)
+        raise SystemExit(f"codespell exited {proc.returncode}")
+    return parse_codespell(proc.stdout)
 
 
 def prose_text(line: str) -> str | None:
@@ -164,9 +203,13 @@ def main(argv: list[str] | None = None) -> int:
                     help=f"accepted-words file (default: {WORDLIST.name})")
     ap.add_argument("--summary", action="store_true",
                     help="list unique unknown words with counts, not locations")
+    ap.add_argument("--codespell-ignore", type=Path, default=CODESPELL_IGNORE,
+                    help="codespell's ignore-words file, which --add also "
+                         f"extends (default: {CODESPELL_IGNORE.name})")
     ap.add_argument("--add", action="store_true",
-                    help="write every unknown word into --wordlist "
-                         "(sorted, deduplicated) instead of reporting them")
+                    help="write every unknown word into --wordlist, and "
+                         "every word codespell flags into --codespell-ignore "
+                         "(both sorted, deduplicated) instead of reporting")
     args = ap.parse_args(argv)
 
     spell = SpellChecker()
@@ -179,16 +222,26 @@ def main(argv: list[str] | None = None) -> int:
     unknown = spell.unknown(every_word) - accepted
 
     if args.add:
-        if not unknown:
+        if unknown:
+            rewrite_wordlist(args.wordlist, accepted | unknown)
+            print(f"Added {len(unknown)} word(s) to {args.wordlist}:")
+            for word in sorted(unknown):
+                print(f"  {word}")
+        else:
             print("No unknown words; wordlist unchanged.")
-            return 0
-        rewrite_wordlist(args.wordlist, accepted | unknown)
-        print(f"Added {len(unknown)} word(s) to {args.wordlist}:")
-        for word in sorted(unknown):
-            print(f"  {word}")
-        print("\nReview the diff before committing "
-              f"(git diff {args.wordlist}) -- a real typo belongs in the "
-              "prose, not the wordlist.")
+        flagged = codespell_unknown(args.paths or [CHAPTERS_DIR])
+        if flagged:
+            ignored = load_wordlist(args.codespell_ignore)
+            rewrite_wordlist(args.codespell_ignore, ignored | flagged)
+            print(f"Added {len(flagged)} word(s) to {args.codespell_ignore}:")
+            for word in sorted(flagged):
+                print(f"  {word}")
+        else:
+            print("Nothing flagged by codespell; its ignore list unchanged.")
+        if unknown or flagged:
+            print("\nReview the diff before committing "
+                  f"(git diff {DATA_DIR}) -- a real typo belongs in the "
+                  "prose, not in either list.")
         return 0
 
     if args.summary:
