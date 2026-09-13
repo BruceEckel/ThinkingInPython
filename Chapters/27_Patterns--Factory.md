@@ -211,9 +211,10 @@ then gain a duplicate `Circle` and `Square` on every call after that.
 ### Alternative Constructors Are Factories
 
 `Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-is an alternative constructor,
-a method on the type that builds an instance from data the constructor does not accept
-(`Month(7)` raises a `ValueError` there).
+is an alternative constructor:
+a method on the type that builds an instance from data the constructor rejects.
+There, `Month(7)` raises a `ValueError` because no member has the value `7`,
+while `Month.of(7)` returns `JULY`.
 It is also a factory, of the same form as `factory()`.
 Both are static methods of the type: each takes data and returns an instance,
 and each raises an exception for data it does not recognize,
