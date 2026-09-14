@@ -1102,8 +1102,8 @@ Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
 
-Even without that ambiguity, the class solves a problem Python does not have.
-Keyword arguments with defaults are the built-in builder:
+Even without that ambiguity, the builder class solves a problem Python does not have.
+Keyword arguments with defaults are Python's built-in builder:
 
 ```python
 # pizza_direct.py
