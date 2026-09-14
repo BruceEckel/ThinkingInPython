@@ -115,9 +115,9 @@ print(list(walk(tree)))
 
 Adding `Symlink` to the union makes every `match` whose `case _` calls
 `assert_never()` fail type checking, exactly as the chapter predicts.
-In both `disk_usage()` and `walk()`, `ty` reports that `entry` (or
-`e`) could be a `Symlink` that no case handles, until you add the case
-shown here. Deciding what a link should do is a judgment call, not
+In both `disk_usage()` and `walk()`, `ty` reports that `entry` could
+be a `Symlink` that no case handles, until you add the case shown
+here. Deciding what a link should do is a judgment call, not
 something the type checker picks for you: `disk_usage()` counts a link
 as free, since the bytes it references already get counted wherever
 the real file lives. Adding the target's size again double-counts it.

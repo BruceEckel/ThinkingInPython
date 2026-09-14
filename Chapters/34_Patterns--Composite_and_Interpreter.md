@@ -153,9 +153,10 @@ if __name__ == "__main__":
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members,
 and that self-reference makes the tree a tree.
-`Directory` mentions `Node` above the `type` statement that defines it,
-which works because Python evaluates annotations and `type` aliases lazily
+`Directory` mentions `Node` above the `type` statement that defines it
 (see [Naming Types: The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
+That works because Python evaluates annotations and `type` aliases lazily,
+the deferred evaluation described in [Self and forward references](08_Foundations--Static_Types.md#self-and-forward-references).
 The alias can therefore sit below the classes it unites,
 where it reads as a summary of them rather than as a forward declaration.
 The recursion in the type predicts the recursion everywhere else:
@@ -169,7 +170,7 @@ What changed from `filesystem_classic.py` is only where the operations live.
 so a new operation is a new function, and the nodes never change.
 The classic version made the opposite trade, and the pairing has a name:
 the *expression problem*
-(see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching)).
+(see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching)).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works the same split out with shapes,
 including the `assert_never()` in each `case _`:
@@ -412,7 +413,7 @@ which keeps the parameter name out of the variable namespace so an expression ca
 
 `**env` costs something for that convenience at the call site.
 Each recursive call packs a fresh dict from `**env`,
-so evaluating one expression allocates memory proportional to the tree's depth times the number of bound variables.
+so the live dicts at any moment total the tree's depth times the number of bound variables.
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
 `**env` also creates the name collision the `/` exists to close:
@@ -639,7 +640,7 @@ and the escape is an iterative walk driving an explicit stack of pending nodes.
 Python has a composite of its own and supplies no walker for it,
 which invites you to write one.
 A `t`-string, which [Tour](02_Foundations--Tour.md#t-strings) introduced,
-evaluates to a `Template`: a sequence of two node kinds,
+evaluates to a `Template`: a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iteration skips the empty literal pieces,
 so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
@@ -648,9 +649,11 @@ Iterating a `Template` is flat:
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
 so the walk itself is a loop rather than a recursion.
 An interpolation's value has no such limit.
-It can be a `Template`,
-built by combining `t`-strings with `+` or by nesting one `t`-string inside another,
-so a walker that only loops over the top level still needs to recurse into any value that turns out to be a `Template`.
+It can be a `Template`, built by nesting one `t`-string inside another.
+Combining `t`-strings with `+`, as the `query` in the listing below does,
+concatenates them into one flat `Template` instead,
+so only nesting produces a `Template`-valued interpolation,
+and a walker that loops over the top level still needs to recurse into any value that turns out to be a `Template`.
 Everything else about walking a `Template` is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
