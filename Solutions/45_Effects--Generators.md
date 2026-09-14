@@ -222,7 +222,9 @@ send that supplies a collector's second value produces two: the
 completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses all
-the way down.
+the way down. The second line of `send(6)`'s pair is the exception: no
+collector is left to prompt, so `gamma` finishes, `both()` raises
+`StopIteration`, and the `except` prints `both() is exhausted`.
 
 `both()` takes no part in that alternation. It contains three
 `yield from` statements and no code that forwards a value. `yield from`
@@ -312,9 +314,9 @@ print(list(summarize(["red", "green", "blue"])))
 
 `report()`'s annotation changes from `Iterator[str]` to
 `Generator[str, None, int]`, because a generator that returns something
-needs the long form. `Iterator` names only the `YieldType`, so a type
-checker reading it would reject the `yield from` assignment in
-`summarize()`.
+needs the long form. `Iterator` fixes the `ReturnType` at `None`, so
+`ty` rejects `report()`'s own `return size` with expected `None`, found
+`int`.
 
 The strings and the count travel by different channels, and the listing
 shows both at once. Every string that `emit()` or `report()` yields
@@ -335,11 +337,12 @@ driver, a returned value goes to the delegating generator.
 `next(g)` and `g.send(None)` do the same thing at runtime, and the
 `SendType` is where they stop being interchangeable.
 
-`send()`'s signature is `send(self, value: _SendT_contra) -> _YieldT_co`,
-so its parameter type is whatever the generator's `SendType` is. For
-`interview()` that is `Answer`, and `None` is not an `Answer`, so the
-priming call is a type error. `send_none_is_next.py` carries a
-`# type: ignore` to suppress it. Removing that comment draws:
+`send()`'s signature is
+`send(self, value: _SendT_contra, /) -> _YieldT_co`, so its parameter
+type is whatever the generator's `SendType` is. For `interview()` that
+is `Answer`, and `None` is not an `Answer`, so the priming call is a
+type error. `send_none_is_next.py` carries a `# type: ignore` to
+suppress it. Removing that comment draws:
 
 ```text
 error[invalid-argument-type]: Argument to bound method
@@ -450,15 +453,15 @@ no question, it delivers an event. A generator's type describes the
 traffic, not who is in charge. Both arrangements fit the same
 annotation.
 
-For a sixth state, take the table. The generator's compactness comes
+For another state, take the table. The generator's compactness comes
 from the states forming a line, so control flow can express the
 sequence. The two states here that break the line already cost
 something: an `if` chain reaches `UNAVAILABLE` and `WANT_MORE`, and
 each one returns by looping back to the top, a `goto` written as a
-`while True`. Now add a sixth state reachable from three others, the
-way the table handles `Quit` from every state. No position in the body
-corresponds to it. The sixth state becomes a flag, or a check repeated
-at several `yield`s, and either one breaks the correspondence between
+`while True`. Now add a state reachable from three others, the way the
+table handles `Quit` from every state. No position in the body
+corresponds to it. The new state becomes a flag, or a check repeated at
+several `yield`s, and either one breaks the correspondence between
 position and state, the one thing that makes this version readable.
 
 The table pays a fixed cost instead. Adding a state means one new

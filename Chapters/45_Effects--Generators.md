@@ -586,7 +586,8 @@ g.close()
 inside `worker()`'s frame, the same way the `with` block's exception did.
 `worker()` catches it, prints, and yields again,
 so the generator survives a `throw()` its `except` clause handles.
-`g.close()` raises `GeneratorExit` at the same suspended point.
+`g.close()` raises `GeneratorExit` at the `yield` the generator now waits on,
+`yield "recovered"`.
 `worker()` has no matching `except`, so `GeneratorExit` passes through,
 the `finally` block runs, and the generator ends.
 Nothing prints the `GeneratorExit` itself,
@@ -616,8 +617,7 @@ expect(RuntimeError, s.close)
 `close()` expects the generator to stop.
 `stubborn()` instead answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
-A driver like `task_runner()`, further down,
-must call `close()` on every generator it abandons,
+A driver that abandons a live generator shuts it down with `close()`,
 so a generator meant to be driven by others must let `GeneratorExit` end it.
 
 `StopIteration` divides `drive()` and `yield from` along that same line.
@@ -756,7 +756,7 @@ and delivers the runner's answer on every later turn.
 so the priming call needs the `# type: ignore` from `send_none_is_next.py` again:
 the type checker cannot see that `to_send.pop(job)` is `None` only on a generator's first turn.
 `download()` reads what it receives, into `reply`.
-`index()`'s bare `yield` statements discard theirs;
+`index()`'s `yield` statements ignore what they receive;
 a task that only takes turns is free to ignore the send channel.
 The queue still rotates task to task,
 and now the runner also plays `drive()`'s part,
@@ -803,7 +803,7 @@ That is the question the next chapter puts into the type system.
 5.  `report()` in `yield_from_return.py` yields but does not return.
     Rewrite it to also return the character count,
     and give it the full annotation.
-    Then write a caller that delegates to it with `yield from` and prints that count,
+    Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,
     and say which type parameter each of the two values traveled through.
 6.  Explain why a driver must prime with `next()` rather than `send(None)`,
     given that the two are equivalent at runtime.
@@ -817,5 +817,5 @@ That is the question the next chapter puts into the type system.
     so the position in the generator's body carries the state.
     This generator's `yield` reports the state the machine reached rather than requesting something the machine needs,
     the opposite direction from `interview()`.
-    Say which of the two versions you would rather extend with a sixth state,
+    Say which of the two versions you would rather extend with another state,
     and why.
