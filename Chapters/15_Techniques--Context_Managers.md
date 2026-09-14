@@ -142,7 +142,8 @@ if __name__ == "__main__":
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
 (introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
-declares an instance of the enclosing class.
+declares an instance of the class on which the method was called,
+so it adapts to subclasses.
 `__exit__()` takes three arguments describing any exception;
 [The `__exit__()` Arguments](#the-__exit__-arguments) covers them.
 
@@ -596,10 +597,13 @@ and that wrapper always calls the function once, unchanged,
 with setup before it and cleanup after.
 So `banner` sees neither the arguments nor the return value of `report()`,
 and it can never skip the call.
-A decorator like [`repeat`](14_Techniques--Decorators.md#decorators-that-take-arguments)
-or [`hijack`](14_Techniques--Decorators.md) can do all three,
-because it defines its own wrapper function, with full access to `*args`,
-`**kwargs`, and the return value.
+A hand-written decorator can do all three,
+because it defines its own wrapper function:
+[`repeat`](14_Techniques--Decorators.md#decorators-that-take-arguments)
+forwards `*args` and `**kwargs` and returns the wrapped function's result,
+while [`hijack`](14_Techniques--Decorators.md)
+returns a replacement that runs instead of the original function,
+skipping its call.
 What `banner` offers instead is one definition,
 usable both as a `with` block and as a `@` decorator.
 Use it when setup and cleanup should be identical on every call.
@@ -725,7 +729,8 @@ The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions,
-  replacing the `ignore` class above.
+  covering the case the `ignore` class above handles,
+  without `ignore`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
 - `ExitStack` manages a dynamic or conditional set of managers, as shown above.
@@ -939,7 +944,9 @@ print("pool size after:", pool.available())
 #: pool size after: 2
 ```
 
-`held` counts how many threads currently hold a leased connection.
+`held` counts the threads inside the counted window of a lease,
+incremented once the lease begins and decremented right after the check,
+so `over_capacity` turns `True` when three of those windows overlap.
 Across sixteen hundred lease-and-release cycles,
 spread over eight threads competing for two connections,
 `held` never climbs past two:
@@ -1024,8 +1031,8 @@ one more refinement the skeleton above leaves out.
 
 Each of those refinements is a change inside `lease()`,
 invisible to every `with pool.lease()` in the codebase.
-That is the protocol's payoff:
-the borrower's contract is two lines long and impossible to get wrong,
+That is the protocol's payoff: the borrower's contract is two lines long,
+the return is impossible to forget,
 and everything hard about custody lives on the other side of the `yield`.
 
 ## Choosing a Form

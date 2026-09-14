@@ -77,13 +77,16 @@ print("survived")
 ```
 
 The class is the chapter's `ignore` with the `ALL` default left out,
-since the exercise always passes an argument. Everything the
-exercise asks for happens at the call site: `ignore` takes one `types`
-argument that is either an exception class or a tuple of them, and
+since the exercise always passes an argument. With no `ALL` to test
+for, the two guards in `__exit__()` merge into one `or` test, and the
+union the chapter names with its `Types` alias is written out in the
+`__init__()` annotation. Everything the exercise asks for happens at
+the call site: `ignore` takes one `types` argument that is either an
+exception class or a tuple of them, and
 `issubclass(exc_type, self.types)` accepts either shape. Passing
 `(ZeroDivisionError, TypeError)` therefore suppresses both, and the
-`TypeError` block prints the same `repr()` line the `ZeroDivisionError`
-block printed before the change.
+`TypeError` block prints a `repr()` line in the same form the
+`ZeroDivisionError` block printed before the change.
 
 Note the double parentheses. `ignore((ZeroDivisionError, TypeError))`
 passes one argument, a tuple. `ignore(ZeroDivisionError, TypeError)`
@@ -270,7 +273,8 @@ The class uses a lowercase name because you use it like a function.
 
 ## 7. `exit_stack.py` driven from the command line
 
-The rewrite is one line. `wrap(["a", "b"])` becomes:
+Both calls to `wrap()` go, replaced by one call that reads the names
+from the command line:
 
 ```python
 import sys
