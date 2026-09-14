@@ -1875,7 +1875,8 @@ The type checker covers both, and forgetting either is a type error.
     Change the values to functions that build the Effect when called,
     and run both passes again.
     Explain which of the two shapes `retry()` requires,
-    and why its type is `Callable[P, Effect[...]] -> Callable[P, Effect[...]]` rather than an operation on an Effect.
+    and why it takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`,
+    rather than being an operation on an Effect.
 9.  Write `report_all()`,
     which calls `stateless_coroutine.py`'s `report()` for three URLs with `yield from` and returns the three results.
     Importing that module runs its own unguarded `print(run(...))`,
