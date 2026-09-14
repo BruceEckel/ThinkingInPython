@@ -546,7 +546,8 @@ neither is hashable, and neither is safe from a change made through that list.
 
 A frozen data class still carries a per-instance `__dict__`.
 Adding `slots=True` drops it, for less memory and faster attribute access.
-[Performance](18_Techniques--Performance.md#slots) measures the difference.
+[Performance](18_Techniques--Performance.md#slots)
+measures the memory difference.
 
 The standard library has a second immutable record, `typing.NamedTuple`,
 which also rejects assignment and hashes under the same rule:
@@ -670,8 +671,8 @@ Parsing once into a precise type is one aspect of functional programming
 (see [Functional Foundations](40_Functional--Foundations.md#immutability)).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
-[Static Types](08_Foundations--Static_Types.md#type-hints)
-argues for letting the type carry the meaning.
+[Static Types](08_Foundations--Static_Types.md#how-much-to-annotate)
+argues for annotating the values that cross a boundary.
 Here the type carries a guarantee.
 
 Testing demonstrates that illegal values cannot exist.
@@ -1101,7 +1102,8 @@ That gets past the prohibition and moves the hole rather than closing it.
 so `copy.replace()` on a validated instance quietly produces an unvalidated one.
 
 A frozen data class runs `__post_init__()` on every construction,
-including the ones you did not anticipate, and it has no such back door:
+including the ones you did not anticipate,
+and replacement has no such back door:
 `copy.replace()` goes through the constructor,
 as [The General Form of `replace()`](#the-general-form-of-replace) shows.
 That is the deciding difference whenever a type must guarantee its own values.
@@ -1603,7 +1605,8 @@ that cost is worth measuring before you pay it everywhere.
 6.  Add a `ClassVar[int]` counter to `Stars` that counts every `Stars` created.
     Predict whether it appears in the generated `__init__()`'s parameter list before you run it,
     then check by printing `inspect.signature(Stars.__init__)`.
-    Incrementing the counter from `__post_init__()` works on a frozen class.
+    Incrementing the counter as `Stars.built += 1` from `__post_init__()` works on a frozen class,
+    while `self.built += 1` does not.
     Explain why.
 7.  Give `Months` a second field,
     a `dict[str, Month]` index written with a `= {}` default,

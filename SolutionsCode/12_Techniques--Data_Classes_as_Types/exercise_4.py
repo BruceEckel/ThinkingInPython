@@ -1,6 +1,7 @@
 # exercise_4.py
 import json
 from dataclasses import dataclass
+from typing import Any
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -40,12 +41,15 @@ class Person:
     email: EmailAddress
 
 def from_json(text: str) -> Person:
-    data = json.loads(text)
-    return Person(FullName(data["name"]),
-                  EmailAddress(data["email"]))
+    data: dict[str, Any] = json.loads(text)
+    return Person(
+        FullName(data["name"]["text"]),
+        EmailAddress(data["email"]["text"]),
+    )
 
 bad_json = json.dumps(
-    {"name": "Grace Hopper", "email": "no-at-sign"})
+    {"name": {"text": "Grace Hopper"},
+     "email": {"text": "no-at-sign"}})
 try:
     from_json(bad_json)
 except TypeFailure as e:
