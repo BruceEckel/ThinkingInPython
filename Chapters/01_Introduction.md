@@ -145,7 +145,7 @@ The part then works through the classic design patterns,
 reframing each for Python and weighing it against the language.
 Learning to ask those questions is one of the most useful things this book can give you.
 The part ends by refactoring one problem through several designs,
-building a simulation out of the pieces,
+building simulations out of the pieces,
 and cataloging the classic patterns together with the ones the literature added later.
 
 Part IV, *Functional*, covers pure functions,
@@ -159,8 +159,8 @@ and asks what Python could adopt.
 Another develops the full generator protocol on which such tracking depends.
 The last two put that idea to work with `stateless`,
 a library that brings Effect tracking to Python today.
-Read these four chapters in order.
-Each depends on the one before it.
+Read these four chapters in order:
+the last two build on the chapters before them.
 
 ## The Examples
 
@@ -182,6 +182,9 @@ is the file `Examples/14_Techniques--Decorators/tracer.py`.
 A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
+A filename comment that starts with `rust/`,
+like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
+names a file in the repository's `rust/` directory, outside the Python build.
 
 `uv` and other tools make setup short.
 The repository's [README](https://github.com/BruceEckel/ThinkingInPython#setup)
