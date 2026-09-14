@@ -311,6 +311,10 @@ Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)
 Left implicit, `self` would mean "some subclass of `Operators`,"
 and the type checker cannot know that every such subclass is in the `Expr` union.
 The `Expr` annotation tells it so.
+`ty` accepts a `self` annotation narrower than the class.
+Pyright and mypy reject one,
+since both require the declared type of `self` to be a supertype of its class,
+and under either of them the portable form leaves `self` unannotated and writes `cast(Expr, self)` at each construction.
 Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,

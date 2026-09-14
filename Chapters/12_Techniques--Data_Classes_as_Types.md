@@ -1025,13 +1025,15 @@ print(Checked().data)
 ```
 
 Nothing objects to `Unchecked`.
-The type checker accepts it, the linter (`ruff`) accepts it,
+`ty` accepts it, the linter (`ruff`) accepts it,
 and the declaration says `dict[str, str]`, so every reader expects a dict.
 What arrives is a `set`, and the mistake surfaces at the first item assignment,
 which can be far from the declaration that caused it.
 A bare `list`, `dict`,
-or `set` produces a type loose enough that a type checker accepts it against any annotation,
-so the checker never compares the factory with the field.
+or `set` produces a type loose enough that `ty` accepts it against any annotation,
+so `ty` never compares the factory with the field.
+Checkers differ here:
+Pyright infers `set[Unknown]` for this factory and rejects it against `dict[str, str]`.
 Subscripting makes the factory's return type concrete,
 and `field(default_factory=dict[int, int])` on this field then draws a type error.
 Use the bare form when the factory and the annotation agree,
