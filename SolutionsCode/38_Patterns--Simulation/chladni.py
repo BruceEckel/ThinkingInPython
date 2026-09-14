@@ -57,7 +57,7 @@ class Plate:
             self.field(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60,
+    def render(self, width: int = 57,
                height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]

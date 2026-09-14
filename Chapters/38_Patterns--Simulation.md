@@ -7,7 +7,8 @@ A pack of rats coordinates through a shared blackboard,
 a single robot walks a maze where each object it meets decides what happens,
 and a plate of vibrating sand runs on grains that know nothing.
 The first two confirm a design you can predict from the code.
-The third produces a pattern nobody wrote down.
+The third produces a pattern no one wrote down as a picture:
+the formula fixes its shape, and the grains find it.
 
 The chapter works the first example, the pack of rats, from end to end.
 It puts asyncio tasks, a shared coordination object,
@@ -330,10 +331,11 @@ asyncio.run(main())
 
 `amaze.txt` has no loop:
 every open cell connects to the rest of the maze by exactly one path.
-Every rejected `claim()` in the run above is a rat looking back at the cell it just left,
+Every `claim()` the run above rejects on an open cell is a rat looking back at the cell it came from,
 never two rats reaching for the same open cell.
-On this maze, `claim()`'s atomicity is never tested against two rats,
-only against one rat's own trail.
+On this maze, `claim()`'s atomicity is never tested against two rats competing for new ground,
+only against cells the rats have walked: one rat's own trail,
+or the cell a parent still occupies when its new rat looks back.
 
 ### Contention on a Loop
 
@@ -386,8 +388,9 @@ asyncio.run(main())
 #: 9 rejections, 7 from backtracking alone.
 ```
 
-The entry's two open neighbors spawn two rats at once, one per arm of the ring.
-`CountingBlackboard` tallies every rejected `claim()`.
+The entry has two open neighbors,
+so rat 1 keeps one arm and spawns rat 2 down the other.
+`CountingBlackboard` tallies every `claim()` rejected on an open cell.
 Seven of the nine rejections are backtracking, `len(blackboard.visited) - 1`,
 one per non-entry cell looking back at the cell it came from.
 The other two belong to the loop's closing edge, examined from both ends:
@@ -649,7 +652,7 @@ def item_factory(symbol: str) -> Item:
     return Teleport(symbol)
 ```
 
-`world.py` imports `Item`, `Robot`, and `Urge` from `items.py`,
+`world.py` imports `Edge`, `Item`, `Robot`, and `Urge` from `items.py`,
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
 so that import never runs and no cycle forms.
@@ -872,9 +875,10 @@ It expands the room reached in the fewest moves first,
 so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it never needs coordinates, only rooms and the moves between them.
-`landing()` decides whether a door is passable, and it asks the occupant,
-the way `Room.enter()` does: a `Wall` or an `Edge` blocks,
-a `Teleport` reports its target room, and anything else is the room itself:
+`landing()` decides whether a door is passable by inspecting the occupant's type,
+reproducing what `Room.enter()` gets from `interact()`:
+a `Wall` or an `Edge` blocks, a `Teleport` reports its target room,
+and anything else is the room itself:
 
 ```python
 # robot_explorer/solver.py
@@ -1398,7 +1402,7 @@ so the number of steps you ran sets their width in any one run, not the plate.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it:
 swap `amplitude()`'s formula for a membrane's,
-and watch which parts of the figure change and which do not.
+and watch every figure change while nothing else in the program does.
 
 When behavior emerges, reading the code is not enough.
 Run it.
@@ -1441,7 +1445,8 @@ Run it.
     which is the one goal it can express.
     Replace that test with a `Callable[[Room], bool]` parameter,
     so the caller says what counts as arriving,
-    and keep `solve()` itself unchanged otherwise.
+    and change nothing else in the search,
+    beyond letting `solve()` return `None` when no room matches.
     Then use the new parameter to feed the robot:
     search for the nearest room holding a `Food`, walk there,
     and repeat until no `Food` remains, then search for the `!` and walk that.

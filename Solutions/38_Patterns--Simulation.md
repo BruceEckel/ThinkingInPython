@@ -582,10 +582,9 @@ the search order rather than the inheritance. `item_factory()` walks
 treats any unrecognized symbol as a teleport target. So
 `item_factory("$")` returns `Teleport("$")`. The robot then walks into a
 teleporter where a coin was meant to be, the topology of the maze
-changes underneath the hard-coded route, and `game.robot.finished`
-never becomes `True`. A one-word change to a class header moves a
-character out of the factory's search and silently substitutes a
-different `Item`.
+changes underneath the hard-coded route, and `game.robot.coins` stays
+`0`. A one-word change to a class header moves a character out of
+the factory's search and silently substitutes a different `Item`.
 
 ## 5. Sending the robot somewhere other than the `!`
 
@@ -780,7 +779,7 @@ class Plate:
             self.field(g.x, g.y, self.mode)
             for g in self.grains) / len(self.grains)
 
-    def render(self, width: int = 60,
+    def render(self, width: int = 57,
                height: int = 30) -> str:
         counts: list[list[int]] = [
             [0] * width for _ in range(height)]
@@ -929,7 +928,7 @@ for kick in (0.005, 0.05, 0.5):
 ```
 
 `kick=0.005` produces order too slowly. Each step displaces a grain by
-at most half a percent of the plate, so a grain starting in the middle
+at most one percent of the plate, so a grain starting in the middle
 of a bright region needs hundreds of steps to walk anywhere near a
 nodal line. After 1200 steps agitation has fallen from `0.585` to
 `0.380`, roughly a third of the way, while the default kick was
