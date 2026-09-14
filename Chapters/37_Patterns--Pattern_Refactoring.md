@@ -78,9 +78,10 @@ def sum_value(items: list[Trash]) -> float:
 
 `Bins` names the shape the sorting sections use,
 a dictionary from a material's class to the pieces made of that material.
+[The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)
+introduces this alias form.
 A `type` statement's right side evaluates lazily,
-so the alias can name `Trash` several lines before the `class` statement that defines it
-(see [The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
+so the alias can name `Trash` several lines before the `class` statement that defines it.
 
 Python implicitly makes [`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 a classmethod, so it needs no `@classmethod` decorator and its first parameter is the new subclass.
@@ -99,7 +100,8 @@ the two `ClassVar` attributes belong to the class, so they stay out of it
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)).
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
-The subclasses omit the annotation because a subclass inherits the declaration along with the name
+The subclasses omit the annotation because the name and its type carry over from the base declaration;
+restating `ClassVar[float]` would also keep the type checker's guard on the override
 ([Class Attributes](09_Foundations--Class_Attributes.md#classvar-and-inheritance)).
 
 Adding a new recyclable type is a single class definition.
@@ -109,8 +111,8 @@ It reads `t.value` and `t.weight` polymorphically,
 and never asks what type a piece is.
 
 The tests confirm that each subclass registers itself,
-`create()` builds one by name, the per-pound values are correct,
-and `sum_value()` totals weight times value:
+`create()` builds one by name,
+and `sum_value()` totals weight times the per-pound value:
 
 ```python
 # test_trash.py
@@ -380,7 +382,8 @@ The `defaultdict(list)` creates a bin the first time a material turns up.
 so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
-Point this sorter at `plastic.dat`, the file that defeated `recycle_rtti.py`.
+Point this sorter at `plastic.dat`,
+the file that defeated the `match` in `plastic_dropped.py`.
 The listing defines `Plastic` the same way `plastic_dropped.py` did:
 
 ```python
@@ -412,7 +415,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 ```
 
 Every piece reaches a bin, plastic included: `parsed 4, binned 4`.
-Defining `Plastic` is the only change here.
+Defining `Plastic` and naming the new data file are the only changes to the program's logic.
 The sorting loop needed no edit,
 unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 
@@ -421,7 +424,7 @@ unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
 and a design that makes new types cheap ordinarily makes new operations expensive:
-that trade is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
+that trade is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 
 Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.
@@ -488,9 +491,12 @@ print(f"classes edited for one operation: {len(edited)}")
 Both operations answer correctly, and the cost is the last line.
 One new question cost an edit to all three material classes,
 and the question after it costs three more edits.
-Those edits must happen inside `trash.py`,
-because a method can only be written in its own class body.
-A plant that buys its material classes from a supplier cannot write them at all.
+Those edits sit in each class body, as `note_methods.py` shows;
+in the real program they would go in `trash.py`.
+A method belongs in the body of its own class by design:
+you can assign a function onto a class from outside,
+but behavior scattered that way is unmaintainable.
+A plant that buys its material classes from a supplier has no class body to edit.
 
 The method form is not a strawman.
 This hierarchy is small and the book owns every subclass,
