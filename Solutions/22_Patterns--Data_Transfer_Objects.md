@@ -208,8 +208,8 @@ grows with every three-integer `NamedTuple` in the program. The field names
 are for you, not for `==`.
 
 `FrozenColor(1, 2, 3) == (1, 2, 3)` is `False`. A frozen dataclass's
-generated `__eq__()` first checks `other.__class__ is
-self.__class__`, and returns `NotImplemented` for a plain tuple.
+generated `__eq__()` checks `other.__class__ is self.__class__` before
+comparing fields, and returns `NotImplemented` for a plain tuple.
 Python then tries the tuple's own comparison, which also returns
 `NotImplemented`. With both sides declining, `==` falls back to
 identity, which is `False` for two distinct objects. A dataclass is
@@ -234,13 +234,12 @@ catch a typo in a key name.
 
 **The grid coordinate is a `NamedTuple`.** It must work as a `dict`
 key, so it must hash, and a `NamedTuple` hashes as long as its fields
-do. A `@dataclass` also hashes, but only frozen and with `eq=True`
-(the default), so a plain mutable `@dataclass` is disqualified outright.
-Between a frozen dataclass and a `NamedTuple` here, the tuple form
-wins on convenience: unpacking a coordinate as `x, y = point` and
-using it wherever a plain tuple is expected (a `dict` key is one such
-place) are both things the scenario wants and a frozen dataclass would
-refuse.
+do. A `@dataclass` also hashes by value, but only when frozen
+(with the default `eq=True`), so a plain mutable `@dataclass` is
+disqualified outright. Between a frozen dataclass and a `NamedTuple`
+here, the tuple form wins on convenience: unpacking a coordinate as
+`x, y = point` and using it wherever a plain tuple is expected are
+both things the scenario wants and a frozen dataclass would refuse.
 
 **The JSON record is a `@dataclass`.** JSON's own encoding already
 loses field names when the shape is a `NamedTuple`

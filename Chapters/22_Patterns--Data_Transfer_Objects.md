@@ -91,7 +91,7 @@ print(m == SimpleNamespace(info="Spam",
 
 The first `print()` shows the same instance `__dict__` the hand-rolled version has.
 `SimpleNamespace` adds a readable `repr()` and equality by contents.
-`Messenger` prints as `<Messenger object at 0x...>`,
+`Messenger` prints as `<__main__.Messenger object at 0x...>`,
 and two `Messenger`s with identical attributes compare unequal,
 because `Messenger` inherits `object`'s identity-based equality.
 
