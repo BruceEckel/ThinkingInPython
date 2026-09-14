@@ -444,6 +444,39 @@ importing the plugin package explicitly at startup, by walking a
 directory with `importlib`, or by declaring entry points that the
 packaging system imports for them.
 
+`registry_demo.py` is the same program in miniature. It imports
+`Shape` and `make` from `registry`, which no longer defines a single
+subclass, so without a change it prints `[]` and the first `make()`
+call raises a `KeyError`. One added import restores the output
+(the chapter's `expect()` line becomes a `try`, as in `exercise_6.py`):
+
+```python
+# registry_demo.py
+import extra_shapes  # noqa: F401
+from registry import Shape, make
+
+print(sorted(Shape.registry))
+#: ['Circle', 'Square']
+for kind in ["Circle", "Square", "Circle"]:
+    make(kind).draw()
+#: Circle.draw
+#: Square.draw
+#: Circle.draw
+try:
+    make("Triangle")
+except KeyError as e:
+    print("KeyError:", e)
+#: KeyError: 'Triangle'
+```
+
+The demo never uses the name `extra_shapes`, so ruff reports the
+import as unused and the `noqa` comment is the only sign that it is
+deliberate. That is the shape the chapter warns about: an import that
+exists for its side effect. It must stay an ordinary import, since a
+`lazy import` would defer the module body, and with it the two
+`class` statements, until the first use of a name the demo never
+uses.
+
 ## 7. What `copy.copy()` costs a prototype registry
 
 ```python

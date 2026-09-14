@@ -1163,6 +1163,7 @@ Both exist to work around languages where a class is not an object you can put i
     `extra_shapes.py`.
     Confirm that `make("Circle")` now raises `KeyError` until something imports `extra_shapes`,
     and explain which line of which file registers the class, and when it runs.
+    Then make `registry_demo.py` print the same key list it printed before the move.
 7.  Give `Monster` in `prototype_registry.py` a `parts: dict[str, int]` field and add a prototype that uses it.
     Change `spawn()` to use `copy.copy()` instead of `copy.deepcopy()`,
     run `test_prototype.py`, and explain which assertion fails and why.
