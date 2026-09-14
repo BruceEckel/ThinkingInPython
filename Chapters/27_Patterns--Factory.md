@@ -630,15 +630,16 @@ Choosing the factory chooses both halves at once:
 
 ```python
 # abstract_factory_abc.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Obstacle:
-    def description(self) -> str:
-        raise NotImplementedError
+class Obstacle(ABC):
+    @abstractmethod
+    def description(self) -> str: ...
 
-class Character:
-    def interact_with(self, obstacle: Obstacle) -> None:
-        raise NotImplementedError
+class Character(ABC):
+    @abstractmethod
+    def interact_with(self, obstacle: Obstacle) -> None: ...
 
 class Kitty(Character):
     @override
@@ -663,11 +664,11 @@ class Weapon(Obstacle):
         return "Weapon"
 
 # The Abstract Factory:
-class GameElementFactory:
-    def make_character(self) -> Character:
-        raise NotImplementedError
-    def make_obstacle(self) -> Obstacle:
-        raise NotImplementedError
+class GameElementFactory(ABC):
+    @abstractmethod
+    def make_character(self) -> Character: ...
+    @abstractmethod
+    def make_obstacle(self) -> Obstacle: ...
 
 # Concrete factories:
 class KittiesAndPuzzles(GameElementFactory):

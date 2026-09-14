@@ -31,11 +31,9 @@ and a `notify()` that broadcasts to each observer in turn:
 
 ```python
 # classic_observer.py
-from abc import ABC, abstractmethod
-from typing import override
+from typing import Protocol
 
-class Observer(ABC):
-    @abstractmethod
+class Observer(Protocol):
     def update(
         self, subject: Subject, arg: object
     ) -> None: ...
@@ -54,8 +52,7 @@ class Subject:
         for observer in list(self._observers):
             observer.update(self, arg)
 
-class Display(Observer):
-    @override
+class Display:
     def update(
         self, subject: Subject, arg: object
     ) -> None:

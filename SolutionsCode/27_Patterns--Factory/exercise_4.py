@@ -1,6 +1,6 @@
 # exercise_4.py
 from abc import ABC, abstractmethod
-from typing import override
+from typing import Protocol, override
 
 class Shape(ABC):
     @abstractmethod
@@ -22,34 +22,25 @@ class Square(Shape):
     def draw(self) -> None:
         print(f"{self.thickness} Square.draw")
 
-class ShapeAbstractFactory:
-    def make_circle(self) -> Shape:
-        raise NotImplementedError
+class ShapeFactory(Protocol):
+    def make_circle(self) -> Shape: ...
+    def make_square(self) -> Shape: ...
 
-    def make_square(self) -> Shape:
-        raise NotImplementedError
-
-class ThickShapeFactory(ShapeAbstractFactory):
-    @override
+class ThickShapeFactory:
     def make_circle(self) -> Shape:
         return Circle("thick")
 
-    @override
     def make_square(self) -> Shape:
         return Square("thick")
 
-class ThinShapeFactory(ShapeAbstractFactory):
-    @override
+class ThinShapeFactory:
     def make_circle(self) -> Shape:
         return Circle("thin")
 
-    @override
     def make_square(self) -> Shape:
         return Square("thin")
 
-def build_shapes(
-    factory: ShapeAbstractFactory
-) -> list[Shape]:
+def build_shapes(factory: ShapeFactory) -> list[Shape]:
     return [factory.make_circle(), factory.make_square()]
 
 for shape in build_shapes(ThickShapeFactory()):

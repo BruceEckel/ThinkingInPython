@@ -115,21 +115,23 @@ disappears.
 
 ```python
 # exercise_3.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Obstacle:
-    def description(self) -> str:
-        raise NotImplementedError
+class Obstacle(ABC):
+    @abstractmethod
+    def description(self) -> str: ...
 
-class Character:
+class Character(ABC):
+    @abstractmethod
     def interact_with(self, obstacle: Obstacle) -> None: ...
 
-class GameElementFactory:
-    def make_character(self) -> Character:
-        raise NotImplementedError
+class GameElementFactory(ABC):
+    @abstractmethod
+    def make_character(self) -> Character: ...
 
-    def make_obstacle(self) -> Obstacle:
-        raise NotImplementedError
+    @abstractmethod
+    def make_obstacle(self) -> Obstacle: ...
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
@@ -232,7 +234,7 @@ names the missing method rather than the missing base.
 ```python
 # exercise_4.py
 from abc import ABC, abstractmethod
-from typing import override
+from typing import Protocol, override
 
 class Shape(ABC):
     @abstractmethod
@@ -254,34 +256,25 @@ class Square(Shape):
     def draw(self) -> None:
         print(f"{self.thickness} Square.draw")
 
-class ShapeAbstractFactory:
-    def make_circle(self) -> Shape:
-        raise NotImplementedError
+class ShapeFactory(Protocol):
+    def make_circle(self) -> Shape: ...
+    def make_square(self) -> Shape: ...
 
-    def make_square(self) -> Shape:
-        raise NotImplementedError
-
-class ThickShapeFactory(ShapeAbstractFactory):
-    @override
+class ThickShapeFactory:
     def make_circle(self) -> Shape:
         return Circle("thick")
 
-    @override
     def make_square(self) -> Shape:
         return Square("thick")
 
-class ThinShapeFactory(ShapeAbstractFactory):
-    @override
+class ThinShapeFactory:
     def make_circle(self) -> Shape:
         return Circle("thin")
 
-    @override
     def make_square(self) -> Shape:
         return Square("thin")
 
-def build_shapes(
-    factory: ShapeAbstractFactory
-) -> list[Shape]:
+def build_shapes(factory: ShapeFactory) -> list[Shape]:
     return [factory.make_circle(), factory.make_square()]
 
 for shape in build_shapes(ThickShapeFactory()):
@@ -294,14 +287,14 @@ for shape in build_shapes(ThinShapeFactory()):
 #: thin Square.draw
 ```
 
-`ShapeAbstractFactory` has the same shape as `abstract_factory_abc.py`'s
-`GameElementFactory`, applied to shapes instead of game elements: one
-abstract factory with a method per product (`make_circle()`,
-`make_square()`), and concrete factories that each produce a consistent
-*family* of products, here "all thick" or "all thin."
-`build_shapes()` works with any `ShapeAbstractFactory`, so switching a
-whole family of shapes from thick to thin is choosing a different
-factory object, not editing every call site that creates a shape.
+`ShapeFactory` is `abstract_factory_protocol.py`'s form applied to
+shapes instead of game elements: a `Protocol` with a method per
+product (`make_circle()`, `make_square()`), and concrete factories
+that each produce a consistent *family* of products, here "all
+thick" or "all thin," without inheriting anything. `build_shapes()`
+accepts any object with those two methods, so switching a whole
+family of shapes from thick to thin is choosing a different factory
+object, not editing every call site that creates a shape.
 
 ## 5. A four-topping limit, in both pizza styles
 

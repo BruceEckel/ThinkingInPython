@@ -4,14 +4,13 @@
 
 ```python
 # exercise_1.py
-class UndoableCommand:
-    def execute(self) -> None:
-        raise NotImplementedError
+from typing import Protocol
 
-    def undo(self) -> None:
-        raise NotImplementedError
+class UndoableCommand(Protocol):
+    def execute(self) -> None: ...
+    def undo(self) -> None: ...
 
-class Deposit(UndoableCommand):
+class Deposit:
     def __init__(self, account: dict, amount: int) -> None:
         self.account = account
         self.amount = amount
@@ -63,12 +62,12 @@ function cannot know what a previous call changed.
 The second operation costs a type rather than a hierarchy.
 `Callable[[], None]` has room for one call, so a list of undoable
 commands needs a name for "callable, plus `undo()`", and in Python
-that name is a `Protocol` declaring both members. `Macro` would then
-annotate `self.commands` against that `Protocol` and `Deposit` would
-inherit nothing. `UndoableCommand` above is the *GoF Design Patterns*
-shape, and its two `raise NotImplementedError` bodies show what that
-shape costs. A base class pays for itself when the commands share
-implementation, and these commands share none.
+that name is a `Protocol` declaring both members. `UndoableCommand`
+above is that `Protocol`: `Macro` annotates `self.commands` against
+it and `Deposit` inherits nothing. The *GoF Design Patterns* shape is
+a base class with two `raise NotImplementedError` bodies, and those
+bodies are what the shape costs. A base class pays for itself when
+the commands share implementation, and these commands share none.
 
 ## 2. `chain.py`, reporting every attempt
 

@@ -1,17 +1,18 @@
 # exercise_1.py
-class Mood:
-    def hello(self) -> str:
-        raise NotImplementedError
+from typing import Protocol
 
-class Happy(Mood):
+class Mood(Protocol):
+    def hello(self) -> str: ...
+
+class Happy:
     def hello(self) -> str:
         return "Great to see you!"
 
-class Grumpy(Mood):
+class Grumpy:
     def hello(self) -> str:
         return "What do you want?"
 
-class Prozac(Mood):
+class Prozac:
     def hello(self) -> str:
         return "Everything is wonderful. Just wonderful."
 

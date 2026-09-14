@@ -1,19 +1,21 @@
 # exercise_3.py
+from abc import ABC, abstractmethod
 from typing import override
 
-class Obstacle:
-    def description(self) -> str:
-        raise NotImplementedError
+class Obstacle(ABC):
+    @abstractmethod
+    def description(self) -> str: ...
 
-class Character:
+class Character(ABC):
+    @abstractmethod
     def interact_with(self, obstacle: Obstacle) -> None: ...
 
-class GameElementFactory:
-    def make_character(self) -> Character:
-        raise NotImplementedError
+class GameElementFactory(ABC):
+    @abstractmethod
+    def make_character(self) -> Character: ...
 
-    def make_obstacle(self) -> Obstacle:
-        raise NotImplementedError
+    @abstractmethod
+    def make_obstacle(self) -> Obstacle: ...
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:

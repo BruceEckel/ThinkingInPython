@@ -1,12 +1,11 @@
 # exercise_1.py
-class UndoableCommand:
-    def execute(self) -> None:
-        raise NotImplementedError
+from typing import Protocol
 
-    def undo(self) -> None:
-        raise NotImplementedError
+class UndoableCommand(Protocol):
+    def execute(self) -> None: ...
+    def undo(self) -> None: ...
 
-class Deposit(UndoableCommand):
+class Deposit:
     def __init__(self, account: dict, amount: int) -> None:
         self.account = account
         self.amount = amount
