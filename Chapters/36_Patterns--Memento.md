@@ -16,7 +16,7 @@ and immutable state removes the need.
 
 ## A Snapshot Is Not a Reference
 
-Aliasing and copying return from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution),
+Aliasing and copying return from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks),
 because Memento lives or dies by them.
 The beginner's memento is an assignment, and it does not work:
 
@@ -64,7 +64,7 @@ so `shallow` and `todo` are different objects.
 But their elements are the same inner lists,
 so `todo[0].append("cheese")` shows up in `shallow` too.
 `copy.deepcopy()` walks the whole structure and rebuilds every nested container from scratch,
-so `deep`'s inner lists share nothing with `todo`'s.
+so `deep`'s inner lists are new objects `todo` cannot reach.
 The later `todo[0].append("jam")` reaches `todo` but never `deep`.
 That walk costs time and memory proportional to the whole nested structure it rebuilds,
 not just the part that changed.
@@ -323,7 +323,7 @@ use a persistent structure that shares more than a flat tuple can,
 or fall back to Command-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
-makes this argument about sharing.
+argues that freezing removes what encapsulation protected.
 That section also explains why `strokes` is a tuple rather than a list:
 `frozen=True` guards the binding, not the object,
 so a frozen data class holding a list still lets that list change underneath it,
