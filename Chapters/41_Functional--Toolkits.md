@@ -269,7 +269,7 @@ print(sorted(words, key=cmp_to_key(by_length_desc)))
 
 Fills in the rest of the comparison methods from `__eq__` and one of `__lt__`,
 `__le__`, `__gt__`, or `__ge__`,
-so a class needs two methods instead of six to sort and compare correctly.
+so a class needs two methods instead of five to sort and compare correctly.
 
 ```python
 # functools_total_ordering.py
@@ -295,7 +295,7 @@ print(light < heavy, light <= heavy, light > heavy)
 
 The plain class exists to show the tool.
 In real code this `Weight` would be `@dataclass(frozen=True, order=True)`,
-which generates all six comparisons from the field order and makes `total_ordering` unnecessary.
+which generates all five comparison methods from the field order and makes `total_ordering` unnecessary.
 `total_ordering` earns its keep when the class cannot be a dataclass,
 or when the ordering is not simply the fields in declaration order.
 Even then, each synthesized comparison costs more than a hand-written one:
@@ -671,7 +671,7 @@ stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
-[Iterators](23_Patterns--Iterators.md#generators)
+[Iterators](23_Patterns--Iterators.md#the-costs-of-laziness)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
 so handing them to separate threads corrupts it.

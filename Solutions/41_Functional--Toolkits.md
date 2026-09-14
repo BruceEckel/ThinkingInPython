@@ -140,10 +140,16 @@ type Nested = int | list[Nested]
 
 @cache
 def deep_sum(items: list[Nested]) -> int:
-    return 0
+    total = 0
+    for item in items:
+        if isinstance(item, list):
+            total += deep_sum(item)  # type: ignore
+        else:
+            total += item
+    return total
 
 try:
-    deep_sum([1, [2, 3]])  # type: ignore
+    deep_sum([1, [2, [3, 4], 5], 6])  # type: ignore
 except TypeError as e:
     print(f"{type(e).__name__}: {e}")
 #: TypeError: unhashable type: 'list'
@@ -159,10 +165,11 @@ For caching to be possible, `Nested` would have to describe an
 immutable structure: `type Nested = int | tuple[Nested, ...]`, with
 the parameter annotated `tuple[Nested, ...]` rather than
 `list[Nested]`. Tuples hash by contents, and their contents cannot
-change, so a tuple meets both conditions a cache key needs. That is
-the same requirement the chapter's `cache` entry states as "`@cache`
-works correctly only for pure functions," seen from the key's side
-rather than the function's.
+change, so a tuple meets both conditions a cache key needs. Purity
+is a second, separate requirement: the chapter's `cache` entry states
+that "`@cache` works correctly only for pure functions." Hashability
+constrains the key, purity constrains the function, and a function can
+meet one without the other.
 
 Note that the exception says nothing about purity. `deep_sum()` is
 already pure, and caching it would be correct. The obstacle is the
@@ -244,6 +251,7 @@ on every run.
 Passing the `rng` is dependency injection applied to a source of
 nondeterminism, the same move
 [Random Numbers](../Chapters/11_Techniques--Testing.md#random-numbers)
-makes for testing. The function stays pure either way: it was always
-a pure function of its arguments, and the argument it depends on
-simply became explicit.
+makes for testing. The `rng` version is deterministic per `Random`
+object: two callers who each build `random.Random(0)` get identical
+schedules, while two calls sharing one `Random` do not, because
+`shuffle()` advances that object's state.
