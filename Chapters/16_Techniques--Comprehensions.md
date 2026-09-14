@@ -647,7 +647,7 @@ so the code reads `factor` when `list()` pulls the values rather than at the gen
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
-Its outermost iterable, `root.walk()`, would run at creation,
+Its outermost iterable, `root.walk()`, would be called at creation,
 but the walking and the filtering would wait for a consumer that arrives after the directory disappears.
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
 and [Generators](45_Effects--Generators.md)
@@ -725,7 +725,7 @@ and pays it only for the values the consumer pulls.
     write a list comprehension that finds the string elements made only of digits
     (`e.isdigit()`), converts each to `int` with `int(e)`, and squares it.
     The predicate must reject `"a"` so `int()` never sees it.
-    Only `str` has `isdigit()`,
+    Of the types in `a_list`, only `str` has `isdigit()`,
     so the predicate must test `isinstance(e, str)` before calling it.
 2.  In `identity_matrix.py`,
     change the comprehension to put `2` on the diagonal instead of `1`,
