@@ -85,9 +85,9 @@ Indentation shows where the assignment sits, not whether it runs.
 `ty` sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
 
-Indenting can nest to any level.
+Indenting can nest as deeply as you like.
 Four spaces per level is the convention,
-and mixing tabs and spaces inside one block raises a `TabError`.
+and mixing tabs and spaces inconsistently inside one block raises a `TabError`.
 C++ and Java programmers debate where braces go.
 In Python the indentation is the structure,
 so the language settles the question and taste plays no part.
@@ -170,7 +170,7 @@ Underscores group digits for readability,
 so `10_000_000` is the same literal as `10000000`.
 Floating point is the usual IEEE double.
 The operators are what you expect, with two worth noting:
-`/` always produces a `float`, and `//` is floor division
+`/` on integers always produces a `float`, and `//` is floor division
 (divide, then round down to a whole number).
 The result's type follows the operands, so `7.0 // 2` is `3.0`.
 Floor division rounds toward negative infinity, not toward zero,
@@ -328,7 +328,7 @@ print(count or 10)  # 0 is falsy, so the fallback wins
 
 `repr()` returns a value's unambiguous representation,
 so the empty string shows as `''` and not as blank.
-`Bucket` defines only `__len__()`, so `bool()` falls back to it:
+`Bucket` defines no `__bool__()`, so `bool()` falls back to its `__len__()`:
 `Bucket(0)` is false and `Bucket(3)` is true.
 
 `and` and `or` short-circuit and return one of their operands,
@@ -523,7 +523,7 @@ each either a `str` the author typed or an `Interpolation` carrying a value.
 An `Interpolation` also remembers the source text of the expression that produced it,
 and `piece.expression` reports that text.
 Collecting every `piece.expression` above uses a list comprehension,
-which has the same `for` clause as the generator expression in `arithmetic.py` but builds a list;
+which has the same kind of `for` clause as the generator expression in `arithmetic.py` but builds a list;
 [Comprehensions](16_Techniques--Comprehensions.md#list-comprehensions)
 covers the general form.
 Iteration skips empty literal strings,
@@ -562,7 +562,7 @@ When users call a class the way they call a function,
 that class may use `snake_case` instead.
 The standard library names `contextlib.suppress`, `functools.partial`,
 and the builtins `property` and `staticmethod` that way.
-Every other class is `CapWords`.
+Name every other class `CapWords`.
 
 [PEP 8](https://www.python.org/dev/peps/pep-0008/#naming-conventions)
 covers style issues.
