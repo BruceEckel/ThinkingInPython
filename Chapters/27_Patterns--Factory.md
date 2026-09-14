@@ -1197,7 +1197,11 @@ keyword arguments and a data class are the builder.
 Match the machinery to what varies:
 
 - A name maps to a class: use a dictionary.
-  Add registration when the set of classes is open-ended or spread across modules:
+  When the set of classes is closed,
+  write the table by hand and key it by a `Literal`, as in `shape_table.py`,
+  so a bad name fails at the check.
+  When the set is open-ended or spread across modules,
+  let the classes fill the table:
   `__init_subclass__()` on an ABC if a subclass must register by existing,
   a bounded `@register` decorator on a Protocol if the checker should reject an incomplete class.
 - The choice is which arguments to pass, not which class:
