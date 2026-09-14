@@ -2,29 +2,27 @@
 import sys
 import tracemalloc
 from collections.abc import Iterator
-from itertools import tee
+from itertools import islice, tee
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
 
 N = 100_000
 
-first, second = tee(squares(N))
-tracemalloc.start()
-for _ in zip(first, second, strict=True):  # Lockstep
-    pass
-lockstep, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
+def peak_at_gap(k: int) -> int:
+    ahead, behind = tee(squares(N))
+    tracemalloc.start()
+    for _ in islice(ahead, k):  # Open the gap
+        pass
+    for _ in zip(ahead, behind, strict=False):
+        pass  # Both advance, the gap stays k
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return peak
 
-ahead, behind = tee(squares(N))
-tracemalloc.start()
-for _ in ahead:  # One branch first, as tee.py does
-    pass
-drained, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-
-if "--numbers" in sys.argv:  # Exact sizes on your machine
-    print(f"lockstep {lockstep:,}, drained {drained:,}")
-print(f"lockstep under 1% of draining one: "
-      f"{lockstep * 100 < drained}")
-#: lockstep under 1% of draining one: True
+near = peak_at_gap(100)
+far = peak_at_gap(10_000)
+if "--numbers" in sys.argv:  # Sizes on your machine
+    print(f"k=100 {near:,}, k=10,000 {far:,}")
+print(f"the wider gap buffers more: {far > near}")
+#: the wider gap buffers more: True

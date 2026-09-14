@@ -146,52 +146,58 @@ merely costs time, in proportion. The list wins only when a pass is
 expensive and you know the data is small, or when nothing can replay
 the source, as with a network response.
 
-## 5. `tee` consumed in lockstep
+## 5. `tee` with the branches `k` items apart
 
 ```python
 # exercise_5.py
 import sys
 import tracemalloc
 from collections.abc import Iterator
-from itertools import tee
+from itertools import islice, tee
 
 def squares(n: int) -> Iterator[int]:
     return (i * i for i in range(n))
 
 N = 100_000
 
-first, second = tee(squares(N))
-tracemalloc.start()
-for _ in zip(first, second, strict=True):  # Lockstep
-    pass
-lockstep, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
+def peak_at_gap(k: int) -> int:
+    ahead, behind = tee(squares(N))
+    tracemalloc.start()
+    for _ in islice(ahead, k):  # Open the gap
+        pass
+    for _ in zip(ahead, behind, strict=False):
+        pass  # Both advance, the gap stays k
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return peak
 
-ahead, behind = tee(squares(N))
-tracemalloc.start()
-for _ in ahead:  # One branch first, as tee.py does
-    pass
-drained, _ = tracemalloc.get_traced_memory()
-tracemalloc.stop()
-
-if "--numbers" in sys.argv:  # Exact sizes on your machine
-    print(f"lockstep {lockstep:,}, drained {drained:,}")
-print(f"lockstep under 1% of draining one: "
-      f"{lockstep * 100 < drained}")
-#: lockstep under 1% of draining one: True
+near = peak_at_gap(100)
+far = peak_at_gap(10_000)
+if "--numbers" in sys.argv:  # Sizes on your machine
+    print(f"k=100 {near:,}, k=10,000 {far:,}")
+print(f"the wider gap buffers more: {far > near}")
+#: the wider gap buffers more: True
 ```
 
-The buffer nearly disappears. One machine measured 2,176 bytes for the
-lockstep loop against 4,095,200 for draining a branch, about 1,900 to
-one.
+The buffer grows in proportion to `k`. `tee` holds what the leading
+branch has consumed and the trailing one has not, so a gap of `k` items
+is a buffer of `k` items, whatever the length of the stream. The two
+measurements in `tee.py` are this rule at its limits: draining one
+branch first stretches the gap to the whole stream, and lockstep
+consumption shrinks it to a single item.
 
-`tee` buffers what the leading branch has consumed and the trailing one
-has not. Draining `ahead` completely makes that gap the whole stream.
-Advancing both together keeps the gap at one item, so the buffer never
-grows. The measurement confirms the rule the chapter gives: `tee` is
-cheap when consumers move together and costs a full copy when they do
-not. Nothing about the call changes, only how the loops consume the
-results.
+`islice(ahead, k)` opens the gap, and the `zip()` loop holds it there.
+Each step takes one item from each branch, so the buffer neither grows
+nor shrinks through the rest of the run. One machine measured about
+9,400 bytes at `k` of 100 and about 416,000 at `k` of 10,000. A
+hundredfold wider gap costs roughly forty times the memory rather than
+a hundred, because the smaller figure is mostly the fixed cost of the
+two branches. The difference between the two, about 41 bytes per
+buffered item, is the part that tracks `k`.
+
+The script prints a boolean rather than the byte counts, since the
+sizes shift between machines and Python builds while their ordering
+does not. Pass `--numbers` to see the figures your machine reports.
 
 ## 6. A test for `filter()`
 

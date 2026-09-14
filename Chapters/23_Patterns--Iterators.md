@@ -379,7 +379,7 @@ The second half of the listing shows the price.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
 so when `first` drains while `second` waits, the buffer holds the whole stream.
 That is the memory a list would use, and the comparison confirms it
-(one machine measured 4,096,544 bytes buffered against 3,999,992 for the list).
+(one machine measured 4,096,992 bytes buffered against 3,999,992 for the list).
 The last block advances `first2` and `second2` together instead,
 one `zip()` step at a time,
 so `tee` never buffers more than the gap between them.
@@ -653,7 +653,7 @@ if __name__ == "__main__":
 
 Use the class when the wrapper needs its own state or extra methods,
 such as `accepted` above: a caller reads it mid-stream,
-while a generator's local variables stay invisible outside the generator.
+while a generator's local variables have no name a caller can use.
 Use the generator when it does not.
 Either way, the result plugs into every place that accepts an iterator,
 because every such place uses the same protocol.
@@ -871,10 +871,14 @@ The protocol costs you nothing, and tells you nothing.
     Fix the caller two ways: collect into a list once and reuse it,
     then instead convert `squares` into a `Countdown`-style iterable class whose `__iter__()` builds a fresh generator.
     Which fix would you choose for a stream of a million items, and why?
-5.  In `tee.py`, consume both branches in lockstep instead of draining one first,
-    by looping over `zip(first, second, strict=True)`.
-    Predict what happens to `buffered` before you measure it,
-    then explain the result using the rule that closes that section.
+5.  `tee.py` measures two extremes: one branch drained before the other starts,
+    and both branches in lockstep.
+    Measure what lies between them.
+    Advance one branch `k` items ahead of the other,
+    then walk both together so the leading branch stays `k` items ahead.
+    Predict how the buffer grows with `k` before you measure it,
+    then measure it for two values of `k` with `tee.py`'s `tracemalloc` approach,
+    and explain the result using the rule that closes that section.
 6.  The prose pairs the generator expression's `if` clause with `filter()`,
     but no test covers `filter()`.
     Add one to `test_endless.py`,
