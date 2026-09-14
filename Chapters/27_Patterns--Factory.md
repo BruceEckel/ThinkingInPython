@@ -1044,7 +1044,7 @@ because those languages have no keyword arguments.
 That pile of constructors is the *telescoping constructor*,
 and Builder is the workaround,
 a companion class that collects settings one method call at a time.
-Translated into Python with its structure intact, it looks like this:
+The *GoF Design Patterns* structure looks like this:
 
 ```python
 # pizza_builder.py
@@ -1089,9 +1089,7 @@ if __name__ == "__main__":
 #: Pizza(size=16, cheese=True, toppings=('basil', 'olives'))
 ```
 
-Because each setter returns `self`,
-annotated with `Self` from [Static Types](08_Foundations--Static_Types.md#the-self-type),
-the calls chain.
+Calls can be chained because each setter returns `self`.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 
 The builder is single-use, and nothing in it says so.
@@ -1275,8 +1273,9 @@ Both exist to work around languages where a class is not an object you can put i
     and show what `make("Hexagon")` does.
     Then write a check that reports every class in the module that satisfies `Shape` and is missing from `REGISTRY`,
     so the forgotten decorator is found before any `make()` call.
-    `@runtime_checkable` (see [Surrogate](26_Patterns--Surrogate.md#proxy))
-    lets `issubclass()` test a class against the Protocol.
+    `@runtime_checkable`, which [Surrogate](26_Patterns--Surrogate.md#proxy)
+    shows with `isinstance()`,
+    also lets `issubclass()` test a class against a Protocol whose members are all methods.
 11. Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
     Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
     so that each decorated function's result is stored under `name`.
