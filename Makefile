@@ -351,7 +351,7 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 # and `examples` is a target below.
 ##@ Code examples (build/examples/)
 
-.PHONY: check-ch examples run run-one output output-check test ty pyright lint \
+.PHONY: check-ch examples run run-one output output-check test ty pyright pyright-review pyright-accept lint \
         fix-imports extract
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
@@ -400,10 +400,19 @@ test: extract  ## Run the book's pytest examples (test_*.py)
 ty: extract  ## Type-check the extracted examples (must be clean)
 	$(TY) check build/examples
 
-# A second checker over the same tree. Independent of `ty`: each has its
-# own suppression comment (`# ty: ignore[rule]`, `# pyright: ignore[rule]`)
-# and ignores the other's, so a listing can satisfy both. Not in the gate.
-pyright: extract  ## Type-check the extracted examples with pyright (advisory)
+# Pyright is a second opinion, not a gate. The listings carry no pyright
+# suppressions; every disagreement with `ty` is an entry in
+# tools/data/pyright_baseline.txt, and the review prints only the delta:
+# NEW (a fresh disagreement) and GONE (pyright caught up, or the listing
+# changed). Read it after editing listings or after `make tools-upgrade`
+# moves pyright. `pyright` and `solutions-pyright` are the raw runs.
+pyright-review: extract solutions-extract  ## Diff pyright over both trees against the baseline (advisory; accept with `make pyright-accept`)
+	$(PY) -m tools.pyright_review
+
+pyright-accept: extract solutions-extract  ##- Rewrite tools/data/pyright_baseline.txt from the current pyright run
+	$(PY) -m tools.pyright_review --accept
+
+pyright: extract  ##- Run pyright raw over the extracted examples
 	$(PYRIGHT) build/examples
 
 lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
@@ -456,7 +465,7 @@ solutions-output-check: solutions-extract  ## Verify the #: output markers in So
 solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
 	$(TY) check build/solutions
 
-solutions-pyright: solutions-extract  ## Type-check build/solutions/ with pyright (advisory)
+solutions-pyright: solutions-extract  ##- Run pyright raw over build/solutions/
 	$(PYRIGHT) build/solutions
 
 solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must be clean)

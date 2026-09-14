@@ -150,8 +150,10 @@ pythonpath = ["build/examples/utils"]
 [tool.ty.environment]
 extra-paths = ["build/examples/utils", "build/examples/06_Foundations--Modules_and_Packages"]
 
-# Pyright, run beside ty over the same extracted trees (make pyright,
-# make solutions-pyright). extraPaths mirrors [tool.ty.environment].
+# Pyright, run beside ty over the same extracted trees as a periodic
+# review (make pyright-review), never as a gate. extraPaths mirrors
+# [tool.ty.environment]. Listings pyright cannot parse (PEP 798) and
+# every other disagreement live in tools/data/pyright_baseline.txt.
 # stateless re-exports its API from __init__ without __all__, which
 # pyright's py.typed rules read as private; ty does not, so that rule
 # is off rather than the listings rewritten around it.
@@ -165,21 +167,6 @@ reportPrivateImportUsage = false
 reportUnusedExpression = false
 reportPossiblyUnboundVariable = false
 reportSelfClsParameterName = false
-# PEP 798 (3.15) comprehension unpacking: pyright 1.1.414 cannot parse
-# it, so these listings are checked by ty alone. Remove entries as
-# pyright catches up.
-exclude = [
-    "**/node_modules", "**/__pycache__",
-    "build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py",
-    "build/examples/19_Techniques--Concurrency/shared_iterator.py",
-    "build/examples/35_Patterns--Flyweight/tile_map.py",
-    "build/examples/utils/display.py",
-    "build/solutions/16_Techniques--Comprehensions/exercise_6.py",
-    "build/solutions/19_Techniques--Concurrency/ch19_body_lock.py",
-    "build/solutions/35_Patterns--Flyweight/exercise_1.py",
-    "build/solutions/35_Patterns--Flyweight/exercise_7.py",
-    "build/solutions/43_Functional--Confidence/test_group_rounds.py",
-]
 
 # Solutions ch06 has its own a_package; a second entry on extraPaths would
 # shadow the examples' copy, so it gets a per-root environment instead.

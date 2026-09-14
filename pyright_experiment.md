@@ -13,26 +13,35 @@ together or separately, and what that costs.
   `pythonVersion`, an `extraPaths` mirroring ty's,
   a per-root environment for Solutions ch06's own `a_package`,
   three rules off that ty also leaves off,
-  `reportPrivateImportUsage` off for `stateless`'s re-exports,
-  and an `exclude` list of nine listings pyright cannot parse.
-- `make pyright` and `make solutions-pyright`, advisory, not in any gate.
+  and `reportPrivateImportUsage` off for `stateless`'s re-exports.
+- `tools/data/pyright_baseline.txt`:
+  every diagnostic pyright reports over both trees today,
+  one line per occurrence as `path<TAB>rule<TAB>message`, line numbers dropped.
+  The nine listings pyright cannot parse are entries here, not an exclude list.
+- `tools/pyright_review.py`, behind `make pyright-review`:
+  runs pyright over both trees and prints only the delta against the baseline,
+  NEW for a disagreement the baseline lacks and GONE for one that no longer fires.
+  `make pyright-accept` rewrites the baseline after you have read the delta.
+  `make pyright` and `make solutions-pyright` are the raw runs.
+- None of it is in `verify`, `gate`, `sweep`, or `ci`,
+  and no listing carries a pyright suppression comment.
   `make ty` and `make solutions-ty` are untouched.
 
 ## Together or separately
 
-Separately, as two targets.
-The two checkers can share a tree because their suppressions do not collide:
+Separately, and pyright only as a diff.
+The two checkers could share a tree line by line,
+because their suppressions do not collide:
 `# ty: ignore[rule]` silences ty alone, `# pyright: ignore[rule]` silences pyright alone,
 and each ignores the other's comment.
 A shared `# type: ignore` silences both,
 which is the trap: one that pyright needs and ty does not
 draws ty's `unused-type-ignore-comment` and fails the ty gate.
-So any listing that must satisfy both uses the checker-specific forms.
-A file-level `# pyright: reportGeneralTypeIssues=false` on line 2 also works,
-fits the 60-column width, and ty and ruff both ignore it.
+The book does not take that route.
+A pyright comment in a listing explains nothing to a reader using ty,
+so every accepted disagreement lives in the baseline file instead
+and the listings stay ty's alone.
 
-Running both inside one target (`make ty pyright`) works today,
-since neither reads the other's output.
 Time per run: ty 0.2 s, pyright 3.7 s over `build/examples`;
 ty 0.1 s, pyright 2.7 s over `build/solutions`.
 
@@ -52,12 +61,11 @@ Both are configuration, not listings.
 
 Pyright 1.1.414, the newest release, does not parse PEP 798 comprehension unpacking
 (`[*x for x in ...]`, `{**d for d in ...}`).
-Nine listings use it and are excluded from pyright:
-four in `build/examples`
+Nine listings use it, four in `build/examples`
 (`unpacking_comprehensions.py`, `shared_iterator.py`, `tile_map.py`, `utils/display.py`)
 and five in `build/solutions`.
-An excluded file is still analyzed when another listing imports it,
-so `display.py`'s eleven importers check normally.
+Their thirteen parse errors are baseline entries, checked by ty alone,
+and they will show up as GONE the day pyright parses the syntax.
 The other 3.15 syntax the book uses (`sentinel`, `lazy import`, t-strings) parses.
 
 ## The residue, by cause
@@ -119,16 +127,31 @@ Solutions ch31 `exercise_9.py`'s transition table, where pyright keeps literal t
 - A decision on chapter 34's idiom, since the chapter teaches it
   and two of the three major checkers reject it.
 - Prose that says "the type checker" audited for claims that hold only for ty;
-  chapter 12's factory paragraph is one, and nothing gates the rest.
+  the sweep found fourteen, and nothing gates the rest.
 - Roughly 6 s per `make verify`, against ty's 0.3 s.
 
 ## Recommendation
 
-Keep the two advisory targets and stay out of the gate.
+Keep pyright as a periodic review, out of the gate and out of the listings.
 The value of the second checker is the list above,
 not a second green light:
 it names eight demos where pyright is stricter than ty,
-one prose claim that is checker-specific,
-and one taught idiom that pyright and mypy both refuse.
-Re-run `make pyright` after each pyright release
-and drop `exclude` entries as the parser catches up.
+one taught idiom that pyright and mypy both refuse,
+and, through the 2026-09-14 sweep it prompted,
+fourteen prose claims about "the type checker" that hold for ty alone.
+That list only matters when it changes, and the baseline diff shows the change.
+
+Read `make pyright-review` at three moments:
+
+- After editing a chapter's listings.
+  A NEW entry is a fresh disagreement,
+  and the nearest sentence saying "the type checker" is the one to reread.
+- After `make tools-upgrade` moves pyright.
+  GONE entries mean pyright caught up (the PEP 798 files leave this way);
+  NEW ones mean a new strictness.
+- After a `ty` upgrade.
+  A disagreement that disappears because ty now reports it
+  is a listing that may need an ignore;
+  a new one may be a claim that has gone ty-specific.
+
+Then `make pyright-accept` once every line in the delta has an explanation.
