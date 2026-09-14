@@ -342,6 +342,17 @@ lets each subclass register itself.
 Nothing in the listing calls a register function.
 As the printed key list shows,
 the two `class` statements fill `Shape.registry` on their own.
+This is why `Shape` is an abstract base class rather than a `Protocol`.
+`__init_subclass__()` runs only for classes that inherit from `Shape`,
+so a class that merely matches a Protocol's shape never registers:
+the inheritance is the mechanism.
+`ABC` adds one guard on top of that.
+A subclass that forgets `draw()` still registers,
+since registration runs as its `class` statement executes,
+but `make()` then fails at construction with a `TypeError` rather than at the first `draw()` call.
+No type checker reports that case,
+because `Shape.registry[kind]()` calls a `type[Shape]`,
+and any of those may be a concrete subclass.
 That removes the `SHAPES` line too.
 Adding a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
