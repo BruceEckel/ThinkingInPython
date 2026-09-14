@@ -351,7 +351,7 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 # and `examples` is a target below.
 ##@ Code examples (build/examples/)
 
-.PHONY: check-ch examples run run-one output output-check test ty lint \
+.PHONY: check-ch examples run run-one output output-check test ty pyright lint \
         fix-imports extract
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
@@ -421,7 +421,7 @@ extract:  ## Write build/examples/ from the Markdown
 ##@ Solutions (Solutions/, build/solutions/)
 
 .PHONY: solutions-sync solutions-check solutions-prune solutions-extract \
-        solutions-output solutions-output-check solutions-ty solutions-lint \
+        solutions-output solutions-output-check solutions-ty solutions-pyright solutions-lint \
         solutions-run solutions-test solutions-numbering solutions-gate
 
 # Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
