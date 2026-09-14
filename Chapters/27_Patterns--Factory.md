@@ -371,7 +371,7 @@ An open registry cannot do that,
 since a name becomes valid the moment some module defines the class,
 so the check moves to runtime.
 
-Adding a `Triangle` is a single class definition,
+To add a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` could have built the table instead,
 but it lists only direct subclasses,
@@ -407,8 +407,10 @@ so a subclass that defines its own `registry` would create a second table that `
 with no error to signal it.
 
 `make()` stays a module-level function for two reasons.
-A `@classmethod` reading `cls.registry` would carry that same hazard,
-and it would make `Circle.make("Square")` legal as well as misleading,
+A `@classmethod` would look up `cls.registry`,
+so a subclass with its own `registry` would send `Triangle.make()` to that second table,
+the one `__init_subclass__()` avoids by naming `Shape.registry`.
+And `Circle.make("Square")` would be legal as well as misleading,
 since the key decides what `make()` builds,
 not the class you name before the dot.
 A method of any kind would also put back the factory method this section set out to remove.
