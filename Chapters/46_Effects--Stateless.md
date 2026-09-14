@@ -484,7 +484,7 @@ A ZIO or Effect-TS value is an immutable description that you can interpret as o
 so their combinators are operations on that value:
 ZIO writes `action repeat policy`, repeating the effect the value describes.
 Stateless has `repeat()` and `retry()` too,
-but their type is `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
+but each takes a schedule and returns a decorator of type `Callable[P, Effect[...]] -> Callable[P, Effect[...]]`.
 They decorate the function,
 because the function can produce a second description.
 `catch()`, `throws()`, and `supply()` take functions for the same reason.
@@ -869,7 +869,7 @@ def test_greet_all(console: Console) -> None:
 Two rows, two `Console` implementations,
 and neither `greet_all()` nor `greet_logged()` gained a parameter.
 The parameter-passed version would add a `console` argument to both,
-even though only `greet_logged()` uses it.
+even though only `greet()`, one level further down, uses it.
 
 ## Supplying an Interface
 
@@ -1328,7 +1328,7 @@ def test_delayed_sum() -> None:
 
 `Instant.sleep()` records the request and returns.
 The same three sleeps take at least 30 milliseconds in `real_clock.py`,
-and under a millisecond here.
+and under a few milliseconds here.
 
 `delayed_sum()` stays unchanged and cannot tell the two clocks apart.
 The subclass goes through `as_type(Time)`,
@@ -1673,13 +1673,13 @@ and the type checker objects:
 
 ```text
 error[unsupported-operator]: Unsupported `+` operation
- --> catch_score.py:9:30
-  |
-9 |     console.print(f"{name}: {value + 1}")
-  |                              -----^^^-
-  |                              |       |
-  |                              |       Has type `Literal[1]`
-  |                              Has type `int | KeyError`
+  --> catch_score.py:13:30
+   |
+13 |     console.print(f"{name}: {value + 1}")
+   |                              -----^^^-
+   |                              |       |
+   |                              |       Has type `Literal[1]`
+   |                              Has type `int | KeyError`
 ```
 
 This is the same guarantee the `Result` type gives in [Error Handling](42_Functional--Error_Handling.md#a-result-type),
