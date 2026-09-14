@@ -238,7 +238,8 @@ path.unlink()
 
 `read_text()` opens the file, reads all of it, and closes it, so the
 one-liner is shorter and has no block. For a small file read in one
-go, it is the better choice, and the chapter says so.
+go, it is the better choice, and the chapter names `read_text()` and
+`write_text()` for that case.
 
 The `with` form gives you control over what happens between the open
 and the close. Two things follow from that control. The `with` form

@@ -438,6 +438,8 @@ print(risky())
 `risky()` raises a `ValueError`,
 but the `return` in `finally` discards it before it reaches the caller,
 so the caller sees only `"swallowed"` with no trace of the exception.
+Python also flags this at compile time:
+running the listing prints `SyntaxWarning: 'return' in a 'finally' block` to standard error before `swallowed`.
 
 Catch an exception only when you can do something about it.
 A bare `except:` with no type catches everything,
