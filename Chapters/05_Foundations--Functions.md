@@ -441,8 +441,9 @@ except TypeError as e:
 The same `func(*args, **kwargs)` call spreads `nums` positionally,
 so `report()`'s first parameter, `label`, also receives `1`,
 and no parameter can take two values.
-The error arrives one level down, when `trace()` calls `report()`,
-so the wrapper cannot check for the clash before it makes that call.
+The error arrives one level down, when `trace()` calls `report()`, so `trace()`,
+which knows nothing about the signature of the function it calls,
+has no way to see the clash coming.
 
 ## Positional-Only and Keyword-Only Parameters
 
