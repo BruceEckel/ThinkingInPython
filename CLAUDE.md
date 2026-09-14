@@ -123,7 +123,14 @@ sequence is:
 
 Prose-only edits still need `heading_links.py` (cross-references),
 `banned_phrases.py`, and `check_self_reference.py` (claims the book makes
-about its own chapters); all three are in `make verify`. `make verify`'s gate also
+about its own chapters); all three are in `make verify`. So is
+`check_quoted_diagnostics.py`: every quoted `ty` diagnostic's gutter
+lines are compared with the extracted listing, and the dozen quotes
+the book deliberately makes against an edited copy of a listing live
+in `tools/data/quoted_diagnostics_baseline.txt`. A NEW entry after a
+listing edit is a stale quote to requote, or a fresh deliberate edit
+to accept with `make quoted-diagnostics-accept`; `--all` lists every
+hit. `make verify`'s gate also
 runs `validate_output.py --update` over all of `Chapters/` now, so a stale
 `#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
 the build, the same way `fix-eol`/`sync` already self-heal other drift.

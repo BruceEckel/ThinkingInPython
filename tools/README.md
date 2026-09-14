@@ -977,13 +977,19 @@ own build directory, then (for a Solutions file) the chapter's, then
 file's line, or equals it with a trailing `# type: ignore` removed,
 or equals the file's line with its leading `# ` removed (the book's
 commented-out probe convention); ty's multi-line span bar and
-indentation are ignored. It reports rather than gates because about
-a dozen quotes are deliberately against an edited copy of the
+indentation are ignored.
+
+About a dozen quotes are deliberately against an edited copy of the
 listing (a `match` block removed, a `ValueError` deleted from an
 annotation, a line added), and the shifted line numbers are right for
-that copy. Read each hit against its prose: a quote against a
-described edit is expected, a stale line number is not. `--strict`
-exits 1 on any hit.
+that copy. Those live in `tools/data/quoted_diagnostics_baseline.txt`,
+in the style of `pyright_review.py`, as `markdown path<TAB>message`
+with the Markdown line number dropped so prose edits above a quote do
+not churn the file. The default run prints only the delta, NEW and
+GONE, and exits nonzero on NEW, which is why it is part of `gate`: a
+NEW hit is either a stale quote to fix or a fresh deliberate edit to
+accept with `make quoted-diagnostics-accept`. `--all` lists every hit
+regardless of the baseline.
 
 ## Advisory checks: check_links.py and list_todos.py
 

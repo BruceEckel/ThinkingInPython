@@ -1,0 +1,18 @@
+# Quoted ty diagnostics the book deliberately makes against an
+# edited copy of a listing, so their gutter lines differ from the
+# extracted file. markdown path<TAB>message, one per hit, sorted.
+# Rewritten by `make quoted-diagnostics-accept`; read the delta
+# with `make quoted-diagnostics` before accepting.
+# See tools/check_quoted_diagnostics.py.
+Chapters/46_Effects--Stateless.md	catch_score.py:13 reads 'match value:', quote shows 'console.print(f"{name}: {value + 1}")'
+Chapters/47_Effects--Stateless_in_Practice.md	bakery.py:32 reads 'Need[Dough] | Need[Oven] | Need[Toaster], str', quote shows '|     Need[Toaster], str'
+Solutions/08_Foundations--Static_Types.md	type_aliases.py:12 reads 'paint(grid, (2, 3), "red")', quote shows 'paint(grid, (2, 3), "purple")'
+Solutions/13_Techniques--Pattern_Matching.md	exhaustive.py:28 reads '#: 4.0', quote shows 'assert_never(shape)'
+Solutions/13_Techniques--Pattern_Matching.md	notifications_match.py:32 reads 'case Email():', quote shows 'assert_never(note)'
+Solutions/27_Patterns--Factory.md	exercise_3_protocol.py:28 reads '', quote shows 'play(GnomesAndFairies())'
+Solutions/40_Functional--Foundations.md	immutable_types.py:7 reads '', quote shows 'MAX_SIZE = 200'
+Solutions/45_Effects--Generators.md	yield_from_nested.py:8 reads 'profile: Result = yield from interview()', quote shows 'profile: Result = interview()'
+Solutions/46_Effects--Stateless.md	exercise_10.py:26 reads ') -> Effect[Need[Console], KeyError | ValueError, None]:', quote shows ') -> Effect[Need[Console], KeyError, None]:'
+Solutions/46_Effects--Stateless.md	exercise_11.py:40 reads '', quote shows 'run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))'
+Solutions/47_Effects--Stateless_in_Practice.md	exercise_13.py:13 reads 'def buttered() -> Depend[', quote shows 'def buttered() -> Depend[Need[Butter], str]:'
+Solutions/47_Effects--Stateless_in_Practice.md	exercise_13.py:14 reads 'Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter],', quote shows 'slice_ = yield from toast()'

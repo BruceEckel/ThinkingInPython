@@ -23,25 +23,51 @@ commented-out probe line). Anything else is reported, and so is a
 location naming a file the tree does not hold, which usually means a
 scratch name the prose explains.
 
-Report-only: the exit code is 0 unless `--strict` is given, because
-some quotes are deliberately against an edited copy of the listing
-(a `match` block removed, a line uncommented) and the shifted line
-numbers are right for that copy. Read each hit against its prose.
+Some quotes are deliberately against an edited copy of the listing
+(a `match` block removed, a line uncommented), and the shifted line
+numbers are right for that copy, so a plain list of hits would be the
+same dozen lines on every run. The accepted ones therefore live in
+`tools/data/quoted_diagnostics_baseline.txt`, in the style of
+`pyright_review.py`, and the default run prints only the delta:
+
+    NEW   a hit the baseline lacks: a listing edit moved a quoted
+          line, or a new quote does not match its listing.
+    GONE  a baseline entry that no longer fires: the quote or the
+          listing changed.
+
+An entry is `markdown path<TAB>message`, with the Markdown line number
+dropped so prose edits above a quote do not churn the baseline. Exit
+status is nonzero only when NEW is non-empty, which is what lets the
+gate run it: a fresh hit is either a stale quote to fix or a new
+deliberate edit to accept. `--accept` rewrites the baseline from the
+current run; `--all` lists every hit, baseline or not.
 
 Usage:
-    python -m tools.check_quoted_diagnostics            # Chapters/ and Solutions/
-    python -m tools.check_quoted_diagnostics Chapters/46_*.md
-    python -m tools.check_quoted_diagnostics --strict   # exit 1 on any hit
+    python -m tools.check_quoted_diagnostics            # the delta
+    python -m tools.check_quoted_diagnostics --all      # every hit
+    python -m tools.check_quoted_diagnostics --accept   # rewrite the baseline
+    python -m tools.check_quoted_diagnostics Chapters/46_*.md --all
 """
 import argparse
 import re
 import sys
+from collections import Counter
 from collections.abc import Iterator
 from pathlib import Path
 
-from tools.config import BUILD_DIR, ROOT
+from tools.config import BUILD_DIR, DATA_DIR, ROOT
 from tools.markdown import Block, Document
 from tools.report import Finding, report
+
+BASELINE = DATA_DIR / "quoted_diagnostics_baseline.txt"
+HEADER = (
+    "# Quoted ty diagnostics the book deliberately makes against an\n"
+    "# edited copy of a listing, so their gutter lines differ from the\n"
+    "# extracted file. markdown path<TAB>message, one per hit, sorted.\n"
+    "# Rewritten by `make quoted-diagnostics-accept`; read the delta\n"
+    "# with `make quoted-diagnostics` before accepting.\n"
+    "# See tools/check_quoted_diagnostics.py.\n"
+)
 
 DIAGNOSTIC_START = re.compile(r"^(error|warning)\[[\w-]+\]")
 LOCATION = re.compile(r"^\s*-->\s*(\S+?):(\d+):(\d+)\s*$")
@@ -150,6 +176,42 @@ def find(doc: Document) -> Iterator[Finding]:
                 )
 
 
+def entry(finding: Finding) -> str:
+    """The baseline line for a finding: path and message, no line number."""
+    path = finding.path.resolve()
+    if path.is_relative_to(ROOT):
+        path = path.relative_to(ROOT)
+    return f"{path.as_posix()}\t{finding.message}"
+
+
+def load_baseline(path: Path = BASELINE) -> Counter[str]:
+    if not path.exists():
+        return Counter()
+    text = path.read_text(encoding="utf-8")
+    return Counter(
+        line for line in text.splitlines()
+        if line and not line.startswith("#")
+    )
+
+
+def write_baseline(entries: Counter[str], path: Path = BASELINE) -> None:
+    body = "".join(f"{line}\n" for line in sorted(entries.elements()))
+    path.write_text(HEADER + body, encoding="utf-8", newline="\n")
+
+
+def delta(findings: list[Finding], before: Counter[str],
+          ) -> tuple[Counter[str], Counter[str], Counter[str]]:
+    """(now, new, gone) for the current findings against a baseline."""
+    now = Counter(entry(f) for f in findings)
+    return now, now - before, before - now
+
+
+def show(label: str, entries: Counter[str]) -> None:
+    for line in sorted(entries.elements()):
+        path, message = line.split("\t", 1)
+        print(f"{label}  {path}  {message}")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -157,21 +219,42 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("paths", nargs="*",
                     help="Markdown files to check (default: Chapters/ and "
                          "Solutions/)")
-    ap.add_argument("--strict", action="store_true",
-                    help="exit 1 when anything is reported")
+    ap.add_argument("--all", action="store_true",
+                    help="list every hit, ignoring the baseline")
+    ap.add_argument("--accept", action="store_true",
+                    help="rewrite the baseline from the current run")
     args = ap.parse_args(argv)
     paths = [Path(p) for p in args.paths] or sorted(
         list((ROOT / "Chapters").glob("*.md"))
         + list((ROOT / "Solutions").glob("*.md")))
     findings = [f for p in paths for f in find(Document.parse(p))]
-    code = report(
-        findings,
-        clean="Quoted diagnostics match their listings.",
-        problem="{n} quoted diagnostic line(s) disagree with the extracted "
-                "listing. Read each against its prose: a quote against an "
-                "edited copy is expected, a stale line number is not.",
+    if args.all:
+        return report(
+            findings,
+            clean="Quoted diagnostics match their listings.",
+            problem="{n} quoted diagnostic line(s) disagree with the "
+                    "extracted listing. Read each against its prose: a "
+                    "quote against an edited copy is expected, a stale "
+                    "line number is not.",
+        )
+    if args.paths and args.accept:
+        ap.error("--accept rewrites the whole baseline; give no paths")
+    now, new, gone = delta(findings, load_baseline())
+    if args.accept:
+        write_baseline(now)
+        print(f"Baseline written: {sum(now.values())} entries in {BASELINE}")
+        return 0
+    show("NEW ", new)
+    show("GONE", gone)
+    print(
+        f"quoted diagnostics: {sum(now.values())} hit(s), "
+        f"{sum(new.values())} new, {sum(gone.values())} gone, "
+        f"baseline {sum(load_baseline().values())}"
     )
-    return code if args.strict else 0
+    if new:
+        print("Read each NEW line against its prose: fix a stale quote, "
+              "or `make quoted-diagnostics-accept` a deliberate edit.")
+    return 1 if new else 0
 
 
 if __name__ == "__main__":

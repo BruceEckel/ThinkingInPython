@@ -204,6 +204,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.check_all $(GATE_CHECKS)
 	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
 	$(PY) -m tools.check_all widths --paths Solutions
+	$(PY) -m tools.check_quoted_diagnostics
 	$(PY) -m tools.reflow_prose --write
 	$(PY) -m tools.check_unique_slugs
 	$(PY) -m tools.extract_examples
@@ -638,7 +639,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors self-reference self-reference-report unique-slugs checks fix-checks gate-checks
+        fix-comment-spacing anchors self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -728,14 +729,19 @@ self-reference:  ## Fail if a claim the book makes about its own chapters is fal
 self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
 	$(PY) -m tools.check_self_reference --advisory $(ARGS)
 
-# Advisory. A quoted ty diagnostic is prose, so a listing edit that
-# shifts a quoted line, or a ty upgrade that rewords a message, leaves
-# the quote stale with every gate green. This compares each quote's
-# gutter lines with the extracted listing it points at. Some quotes are
-# deliberately against an edited copy (a line removed, a line added),
-# so it reports rather than gates; read each hit against its prose.
-quoted-diagnostics:  ## List quoted ty diagnostics whose gutter lines disagree with the listing (advisory)
+# A quoted ty diagnostic is prose, so a listing edit that shifts a
+# quoted line, or a ty upgrade that rewords a message, leaves the quote
+# stale with every other gate green. This compares each quote's gutter
+# lines with the extracted listing it points at. The dozen quotes the
+# book deliberately makes against an edited copy (a line removed, a
+# line added) live in tools/data/quoted_diagnostics_baseline.txt, and
+# the run prints the delta: NEW fails the gate until the quote is fixed
+# or, for a new deliberate edit, accepted. Part of `gate`.
+quoted-diagnostics: extract solutions-extract  ## Diff quoted ty diagnostics against their listings and the baseline (accept with `make quoted-diagnostics-accept`)
 	$(PY) -m tools.check_quoted_diagnostics $(ARGS)
+
+quoted-diagnostics-accept: extract solutions-extract  ##- Rewrite tools/data/quoted_diagnostics_baseline.txt from the current run
+	$(PY) -m tools.check_quoted_diagnostics --accept
 
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,
