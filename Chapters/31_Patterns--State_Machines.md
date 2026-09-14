@@ -710,7 +710,8 @@ if __name__ == "__main__":
 The sold-out and too-expensive clears both print `Cleared` and end in different states.
 Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
-Only the state shows which condition fired.
+The state names the condition;
+the message alone leaves you inferring it from the quantity.
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true, and `too_expensive` sits first in that row's list,
