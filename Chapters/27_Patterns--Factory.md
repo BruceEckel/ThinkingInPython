@@ -304,6 +304,7 @@ A closed set of names suits `Literal`, while an open set does not:
 # registry.py
 from abc import ABC, abstractmethod
 from typing import ClassVar, override
+from exceptions import expect
 
 class Shape(ABC):
     registry: ClassVar[dict[str, type[Shape]]] = {}
@@ -330,10 +331,12 @@ if __name__ == "__main__":
     print(sorted(Shape.registry))
     for kind in ["Circle", "Square", "Circle"]:
         make(kind).draw()
+    expect(KeyError, make, "Triangle")
 #: ['Circle', 'Square']
 #: Circle.draw
 #: Square.draw
 #: Circle.draw
+#: [KeyError] 'Triangle'
 ```
 
 `__init_subclass__()`
@@ -342,6 +345,12 @@ lets each subclass register itself.
 Nothing in the listing calls a register function.
 As the printed key list shows,
 the two `class` statements fill `Shape.registry` on their own.
+`make("Triangle")` fails with a `KeyError` naming the missing key,
+because no class has registered under that name.
+The closed `Literal` in `shape_table.py` rejected `"Hexagon"` before the program ran.
+An open registry cannot do that,
+since a name becomes valid the moment some module defines the class,
+so the check moves to runtime.
 This is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that merely matches a Protocol's shape never registers.
