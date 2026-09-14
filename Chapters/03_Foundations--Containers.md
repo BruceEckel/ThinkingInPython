@@ -101,7 +101,9 @@ print(sorted(words, reverse=True))
 `sorted(x)` returns the result while `x.sort()` returns `None`,
 so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
-[Functions](05_Foundations--Functions.md#lambdas) shows how `key=` changes that.
+[Functions](05_Foundations--Functions.md#lambdas)
+shows how a `key=` function changes the ordering;
+`key=str.lower` would fold the case here.
 
 Each slot of a `list` holds a reference to whatever object you put there,
 so the same `list` can mix strings, numbers, `None`, and other containers:
