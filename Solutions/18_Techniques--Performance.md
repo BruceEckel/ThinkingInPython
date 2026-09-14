@@ -300,8 +300,9 @@ print(outer() > 0)
 
 Run `python -m cProfile -s cumulative exercise_8.py`. The largest
 `cumtime` belongs to `exec`, then `<module>`, then `outer`. The
-largest `tottime` belongs to the generator expression inside
-`inner()`, where the arithmetic happens.
+largest `tottime` belongs to `{built-in method builtins.sum}`, with
+the generator expression inside `inner()` second: the largest of the
+script's own Python frames, where the arithmetic happens.
 
 They differ because the two columns measure different things.
 `cumtime` is the time from entering a function to leaving it,
