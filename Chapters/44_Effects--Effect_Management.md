@@ -437,9 +437,10 @@ which is how programs grow large.
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
-the EMS adds that Effect to your function's type.
+that Effect belongs in your function's type: a native system adds it for you,
+while a library like Stateless has you declare it and verifies the declaration.
 If another function then calls yours,
-the EMS carries the Effect into that function's type as well,
+the same Effect belongs in that function's type,
 and so on out to the edge of the program.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it names the kinds of impurity.
@@ -598,7 +599,9 @@ and a `greet()` that reads two `ContextVar`s states nothing.
 Setting the wrong one, or forgetting to set one,
 surfaces as a failure at the moment of the read, in whatever frame needs it.
 The bookkeeping stays, and moves out of the type checker's sight.
-An EMS moves the bookkeeping into the type system, where it maintains itself.
+An EMS moves the bookkeeping into the type system,
+where a native system maintains it for you,
+and a library like Stateless verifies every declaration you write.
 That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
 
@@ -996,10 +999,9 @@ puts it to work.
     Confirm `greet()` itself required no change,
     which is the delayed-binding payoff.
 2.  Feel the bookkeeping the chapter describes.
-    Wrap `greet()` in three callers, `session()`, `menu()`, and `main()`,
-    each calling the next and none of them using `Ask` or `Tell`.
-    Now add a `Log` Effect (a protocol with `log(message)`)
-    used by a new helper that `greet()` calls, and log from `greet()` too.
+    Starting from `bookkeeping_scales.py`, add a `Log` Effect
+    (a protocol with `log(message)`) used by a new helper that `greet()` calls,
+    and log from `greet()` too.
     Count the signatures that end up naming `Log`,
     and note how many of them mention an Effect they never use.
     Then say what an EMS would do instead.

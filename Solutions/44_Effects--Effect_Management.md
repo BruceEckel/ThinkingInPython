@@ -138,16 +138,17 @@ module-level logger, removes the parameter by removing the choice: the
 function no longer says it logs, and a test can no longer bind it
 differently.
 
-An Effect Management System collapses that bookkeeping to one edit.
-`format_greeting()` declares in its return type that it needs a `Log`.
-That requirement then propagates outward through the type system rather
-than through hand-edited parameter lists: any function calling
-`format_greeting()` inherits the requirement without naming it, and the
-intermediate functions keep the signatures they already had. You still
-supply the binding, but at one place near the top, where the program
-decides what a `Log` means. [Stateless](../Chapters/46_Effects--Stateless.md)
-shows that propagation with a real library, where the `Depend`
-annotation carries the requirement in the type.
+An Effect Management System collapses the parameter lists and the call
+sites, not the signatures. `format_greeting()` declares in its return
+type that it needs a `Log`, and so does every function on the path to
+it, but none of them gains a parameter it never uses, no call site
+changes, and the type checker names each declaration you miss. You
+still supply the binding, but at one place near the top, where the
+program decides what a `Log` means.
+[Stateless](../Chapters/46_Effects--Stateless.md) shows that shape with
+a real library: in its `audit_log.py`, `greet_logged()` and its caller
+`greet_all()` both carry a `Need[Log]` in the `Depend` return type,
+while `greet()` stays unchanged.
 
 ## 3. Classifying three Effects
 
@@ -176,7 +177,9 @@ something no caller passed, and the call changes something no caller
 can see. Reading and rewriting the global is why `withdraw(30)` twice
 returns `70` then `40`, the demonstration the
 [Foundations](../Chapters/40_Functional--Foundations.md#pure-functions)
-chapter uses to show referential transparency failing. The three
+chapter uses to show purity failing;
+[Confidence](../Chapters/43_Functional--Confidence.md#referential-transparency)
+reuses `withdraw()` to show referential transparency failing. The three
 conversions in [Converting Effectful to Pure](../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
 all manage the exception Effect, so none of them applies here. The
 by-hand technique for a side cause and a side effect is the other one:
@@ -193,9 +196,8 @@ for the same reason `withdraw()` reading `balance` is one: the value
 can change between calls, so the answer depends on history rather than
 arguments. The functional conversion returns each reading as a value
 from the temperature source, and the caller folds new readings into
-whatever state it keeps. That is what
-[Functional Foundations](../Chapters/40_Functional--Foundations.md)
-means by pushing effects to the edges.
+whatever state it keeps. That is what the chapter calls
+[pushing the Effects to the edges](../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
 Notice one thing across all three: the classification is not a property
 of the language feature used. A global, an instance attribute, and an
