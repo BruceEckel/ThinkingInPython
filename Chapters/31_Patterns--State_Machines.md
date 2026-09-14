@@ -38,7 +38,8 @@ A base class could do the first job as well:
     class State: pass
 
 Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
-and a base whose methods `raise NotImplementedError` improves that to an exception naming the missing method.
+and a base whose methods `raise NotImplementedError` moves the failure into the base,
+with whatever message you write there.
 [Surrogate](26_Patterns--Surrogate.md#proxy) shows the other option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
 and constructing an incomplete subclass fails outright.
@@ -447,7 +448,7 @@ so they would all arrive under the same dispatch key.
 
 The names restart here.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
-and `State` is now an `Enum` of names rather than a base class with behavior.
+and `State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
 The file's name differs from the first engine's `state_machine.py` on purpose.
 Python caches a module in `sys.modules` under its import name
 ([Modules and Packages](06_Foundations--Modules_and_Packages.md) shows the cache),
@@ -706,11 +707,11 @@ if __name__ == "__main__":
 #: col 0: Cleared: costs 25, quantity 0 [COLLECTING]
 ```
 
-The two `Cleared` lines read alike and end in different states.
+The sold-out and too-expensive clears both print `Cleared` and end in different states.
 Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 Only the state shows which condition fired.
-The last two events insert a dime and pick the same sold-out slot again,
+The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true, and `too_expensive` sits first in that row's list,
 so it wins.
@@ -896,7 +897,7 @@ The two designs answer the same question and put the answer in different places.
 
 Each-state-decides suits a machine whose states do something and have few transitions apiece.
 The state class owns both halves,
-so reading `Luring` tells you what luring does and where it can go next,
+so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and where it can go next,
 and adding a state is one class.
 It reads best when the transitions are obvious from the state's own name.
 An action that must run on every entry into one state,
