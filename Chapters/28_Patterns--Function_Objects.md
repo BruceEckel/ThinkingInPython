@@ -142,7 +142,7 @@ the state the bound method carries with it.
 
 An object can be callable too.
 A class with `__call__()`
-([Decorators](14_Techniques--Decorators.md#a-stateless-class-decorator))
+([Decorators](14_Techniques--Decorators.md#a-class-decorator-with-state))
 produces instances that carry state and still satisfy `Callable[[], None]`.
 `Repeat` below is a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
 so its configuration cannot change after construction:
@@ -171,7 +171,7 @@ for command in macro:
 #: Say no more.
 ```
 
-`Repeat` holds configuration and fits the same list as `loony`,
+`Repeat` holds configuration and fits the same `list[Callable[[], None]]` that held `loony`,
 with no `Command` base class above it.
 The classic form skips this middle step:
 it goes from a plain function straight to a base class.
@@ -616,7 +616,8 @@ not only the ones registered for its own type.
 
 The tests confirm that publishing calls every handler registered for a type,
 a handler receives only its own event type,
-and an event with no handler calls nothing:
+an event with no handler calls nothing,
+and publishing an unhandled event leaves no stray entry behind:
 
 ```python
 # test_event_bus.py

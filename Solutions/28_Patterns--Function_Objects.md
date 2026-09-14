@@ -155,13 +155,13 @@ bookkeeping to say *which* handler just ran.
 
 That report is why `chain` needs a `Protocol` here instead of the
 chapter's `RootFinder` alias. `Callable[...]` describes only what a
-handler accepts and returns, and says nothing about a name, so a type
-checker rejects `finder.__name__` on a handler annotated that way.
-`Finder` declares `__name__` alongside `__call__()`, and a plain
-function satisfies both. The finders themselves need no change, and
-the annotation stops lying. The listing copies them from
-`algorithms.py` rather than importing them, because each solution
-runs on its own.
+handler accepts and returns, and says nothing about a name, so `ty`
+rejects `finder.__name__` on a handler annotated that way (pyright
+allows it, inferring the attributes of a function object). `Finder`
+declares `__name__` alongside `__call__()`, and a plain function
+satisfies both. The finders themselves need no change, and the
+annotation stops lying. The listing copies them from `algorithms.py`
+rather than importing them, because each solution runs on its own.
 
 ## 3. `sorted()` with a compound key, and why `key` is *Strategy*
 
