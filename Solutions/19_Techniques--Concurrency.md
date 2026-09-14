@@ -135,11 +135,11 @@ CPU-heavy loop, so all five coroutines suspend at that `await` and let
 their siblings start before any of them begins computing. All five are
 in flight, waiting, at once.
 
-If you move the loop above the `await`, the peak drops back to `1`. Each
-coroutine then runs its full million iterations before yielding, so
-the event loop never gets a chance to overlap them. Overlap depends on
-where the `await` sits relative to the computation, not on whether the
-function contains one somewhere.
+The peak stays `5` wherever the loop sits, because the `await` is inside
+the `with meter:` block: a task suspended there is still counted as
+active. If you remove the `await`, as `cpu_price()` does, the peak falls
+to `1`. Overlap depends on whether an `await` sits inside the measured
+span, not on where it sits relative to the computation.
 
 ## 4. Blocking inside a coroutine
 

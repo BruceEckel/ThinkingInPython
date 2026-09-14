@@ -186,9 +186,9 @@ asyncio.run(main())
 The first printed line proves that calling a coroutine runs nothing.
 `main()`'s first line calls `fetch("a", 0.03)`, yet no "started" line appears,
 only the type of object the call built: `coroutine`.
-The work begins when `gather()` receives that object.
-If you forget `await gather()`, nothing runs.
-Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims the forgotten object.
+The work is scheduled when `gather()` receives that object.
+If you never hand that coroutine object to `gather()` (or `create_task()`),
+nothing runs, and Python points this out with a `RuntimeWarning: coroutine 'fetch' was never awaited` when the garbage collector reclaims it.
 
 The trace shows the event loop's schedule.
 `gather()` wraps each coroutine in a *task*,
@@ -449,7 +449,7 @@ You can also stop a `TaskGroup` deliberately.
 `tg.cancel()` (3.15) cancels every task in the group,
 for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
 
-### Bounding a Wait with `asyncio.timeout()`
+### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
 
 Every delay in this chapter so far is a fixed `asyncio.sleep()`,
 so nothing has needed a time limit.
@@ -1015,7 +1015,7 @@ and all three surface in this short listing:
    tries to build a pool of its own,
    and dies with `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase`.
    The parent sees the worker's death as `BrokenProcessPool`,
-   with the worker's `RuntimeError` nested in the traceback above it.
+   with the worker's own `RuntimeError` traceback printed above it by the failing child process.
    This used to be a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
    Since 3.14 no platform forks by default,
@@ -1442,7 +1442,9 @@ print(f"lock preserves every update: "
 #: lock preserves every update: True
 ```
 
-The only change from `gil_race.py` is the `with lock:` block wrapped around the read-modify-write.
+The change from `gil_race.py` is the `with lock:` block wrapped around the read-modify-write,
+plus the `threading` import, the module-level `lock`,
+and a final line that reports every update preserved rather than updates lost.
 Eight threads still take turns,
 but now no two of them ever read the same value before either writes,
 so `counter` reaches 400 every time,
@@ -1994,11 +1996,13 @@ it schedules awaitables, whatever runs underneath, a coroutine, a thread,
 or a process.
 
 `main()` receives an already-built `pool` instead of creating one itself.
-`ProcessPoolExecutor.__enter__` can spawn worker processes,
-and `__exit__` joins them: both are ordinary blocking calls.
-Running either on the thread driving the event loop would freeze every task on it,
+Creating a `ProcessPoolExecutor` sets up its queues and pipes,
+its first `submit()` spawns the workers,
+and `__exit__` joins them through `shutdown(wait=True)`.
+That join is an ordinary blocking call,
+and running it on the thread driving the event loop would freeze every task on that loop,
 the same failure `blocking_the_loop.py` demonstrated with `time.sleep()`.
-Building the pool before `asyncio.run()` and tearing it down after keeps that cost off the loop entirely.
+Building the pool before `asyncio.run()` and tearing it down after keeps the shutdown off the loop.
 
 Each of these two interfaces unifies one small piece of the backends,
 not the whole.
@@ -2199,7 +2203,7 @@ On one well-provisioned machine,
 60,000 threads parked on a never-set `threading.Event` started in about four seconds with room to spare.
 A laptop with far less memory can fail at a fraction of that.
 To find your own machine's number,
-raise `COUNT` in `thread_vs_task_speed.py` until thread creation raises an exception.
+start threads that park on a never-set `threading.Event` and raise the count until `start()` raises an exception.
 Tasks have no equivalent ceiling,
 because a task consumes none of the OS resources that limit threads.
 
@@ -2477,7 +2481,7 @@ Here are a few of the topics beyond it:
     Then add one stray `semaphore.release()` before the `gather()` call and explain the result.
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     so its body runs unconditionally, and run it.
-    Read the error, whose useful part is the nested `RuntimeError` rather than the `BrokenProcessPool` at the bottom,
+    Read the error, whose useful part is the `RuntimeError` traceback each failing child process printed above the `BrokenProcessPool` at the bottom,
     then explain it with the import mechanics described in [Parallelism](#parallelism):
     what did each worker process do when it imported the module?
 7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
