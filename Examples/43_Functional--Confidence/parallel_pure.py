@@ -22,7 +22,7 @@ if __name__ == "__main__":
     assert parallel == serial
     report(serial=serial_time, parallel=parallel_time)
     print(parallel)
-    #: [17984, 33860, 49098, 63951]
+    # Sample run: [17984, 33860, 49098, 63951]
     faster = serial_time > 1.3 * parallel_time
     print(f"serial at least 1.3x parallel time: {faster}")
-    #: serial at least 1.3x parallel time: True
+    # Sample run: serial at least 1.3x parallel time: True
