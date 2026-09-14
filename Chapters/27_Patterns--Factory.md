@@ -1092,7 +1092,7 @@ if __name__ == "__main__":
 Calls can be chained because each setter returns `self`.
 `build()` freezes the accumulated settings into an immutable `Pizza`.
 
-The builder is single-use, and nothing in it says so.
+The builder is quietly single-use.
 `build()` reads `self._toppings` without clearing it,
 so a second `build()` on the same builder returns a pizza carrying the first one's toppings,
 and every `.topping()` call in between adds to that same list.
@@ -1101,9 +1101,6 @@ because it keeps no reference to the builder after `build()` returns.
 Making the builder reusable means resetting the fields in `build()`,
 and that reset removes the other reasonable use:
 configuring a builder once and building from it twice.
-A Java or C++ Builder carries the same ambiguity.
-The pattern does not settle it,
-and each implementation chooses one behavior or the other.
 
 Even without that ambiguity, the class solves a problem Python does not have.
 Keyword arguments with defaults are the built-in builder:
@@ -1130,18 +1127,18 @@ if __name__ == "__main__":
 Every combination of settings is a single call,
 the call site names each option just as the chain does, and the fields,
 not a second class, declare the defaults.
+
 Builder chains have a second use,
 starting from an existing configuration and varying it,
-and `dataclasses.replace()` covers that one.
+covered by `dataclasses.replace()`.
 For a frozen data class, `replace()` is Prototype and Builder in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the general form of the same operation,
 working on any object that defines `__replace__()`,
-as [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
-shows.
+shown in [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace).
 A data class defines that method for you.
 A test confirms the two forms produce the same pizza,
-and another makes the single-use hazard concrete:
+and another shows the single-use hazard:
 
 ```python
 # test_pizza.py
@@ -1176,10 +1173,10 @@ modeling toppings as wrapper objects instead of builder-collected fields,
 to illustrate the unrelated Decorator pattern.
 
 Builder remains useful in Python when construction is genuinely a process.
-The steps must come in an order, later steps depend on earlier ones,
+Here, the steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
-qualifies.
+takes this approach.
 It assembles a maze in three stages: creating rooms, connecting doors,
 then pairing the teleports that share a target letter.
 Each stage relies on what the previous stage established.
@@ -1190,12 +1187,13 @@ and `parse_args()` is the `build()`.
 
 The smallest builder in Python is easy to overlook.
 Appending parts to a list and finishing with `"".join(parts)` builds an immutable string through a mutable intermediate.
-That is the Builder structure, and `PizzaBuilder` has the same one,
-collecting toppings in a list and freezing them into a tuple at `build()`.
-The structure is everywhere.
-Reserve the name for construction that is a process with intermediate state and rules of its own.
+`PizzaBuilder` has the same shape:
+it collects toppings in a list and freezes them into a tuple at `build()`.
+The structure is everywhere,
+so save the name Builder for construction that is a process in its own right,
+with intermediate state and rules that span the steps.
 When the "steps" are optional values,
-keyword arguments and a data class are the builder.
+a data class with keyword arguments already does the job.
 
 ## Which Factory to Use
 
