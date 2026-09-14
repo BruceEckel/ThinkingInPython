@@ -33,6 +33,11 @@ of these spellings, finds the cached module and skips running its
 top-level code again. It only binds a name to the module already in
 the cache.
 
+These markers come from an `a_package` with no `__init__.py`, which
+makes it a namespace package. The chapter's `a_package` carries one
+that prints `initializing a_package`, so that line arrives first when
+you add `module5.py` to the package you built there.
+
 ## 2. A nested module, and a badly named package
 
 ```python
@@ -62,6 +67,11 @@ The import crosses a package boundary, from `b_package` up to
 `a_package`, so the absolute form is the right choice here. The
 relative equivalent, `from ..module5 import function5`, works too.
 Prefer that form only for siblings within one package.
+
+These markers again come from packages with no `__init__.py`. Against
+the chapter's packages, the `initializing a_package` and
+`initializing b_package` lines print ahead of the two loading
+messages.
 
 After you rename the directory to `bPackage` and update the import to
 `a_package.bPackage.module6`, the script still runs. Python accepts
@@ -120,10 +130,12 @@ first.
 
 ## 4. Renaming `module.py` to `Module.py`
 
-`import Module` works, because the name and the file agree. Changing
-the import back to `import module` while the file is still `Module.py`
-raises `ModuleNotFoundError: No module named 'module'`, and it does so
-on every platform, Windows and macOS included.
+The `import Module` statement resolves, because the name and the file
+agree, and the call in the body becomes `Module.useful_function()` to
+match; left as `module.useful_function()`, it raises a `NameError`.
+Changing the import back to `import module` while the file is still
+`Module.py` raises `ModuleNotFoundError: No module named 'module'`,
+and it does so on every platform, Windows and macOS included.
 
 The failure on Windows and macOS is the surprising part. Windows's
 NTFS and macOS's default filesystem both open `module.py` and
@@ -174,14 +186,15 @@ belongs to no package. The single dot has no parent to name.
 With the absolute import, the same command reports:
 
 ```text
-ModuleNotFoundError: No module named 'a_package'
+ModuleNotFoundError: No module named 'a_package'. Did you mean: 'b_package'?
 ```
 
 The name is now fully qualified, so the parent question does not
 arise. But `sys.path[0]` is the directory of the script you ran,
 `a_package/` itself. The project root is nowhere on the path, so the
 search for a top-level package called `a_package` fails: Python is
-inside the package, looking for it.
+inside the package, looking for it. The suggestion names `b_package`,
+the one package Python does find on that path.
 
 `python -m a_package.module4` works with either form, and fixes both
 problems at once. `-m` sets `sys.path[0]` to the current directory

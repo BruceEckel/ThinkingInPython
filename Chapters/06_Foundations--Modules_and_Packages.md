@@ -33,8 +33,9 @@ The code at the end of `use_module.py` starts with an `if` clause that checks wh
 In Python, any identifier that begins and ends with double underscores
 (commonly called a "dunder") is special in some way.
 Dunder methods, for example,
-connect your class to the language's operators and built-in functions
-(see [Classes](07_Foundations--Classes.md)).
+connect your class to the language's operators and built-in functions;
+[Classes](07_Foundations--Classes.md)
+shows how `print()` and `str()` reach a class's `__str__()`.
 
 The `if` exists because you can also use any file as a library module within another program.
 In that case, you want its definitions and none of the code at the bottom of the file.
@@ -161,8 +162,9 @@ The two directives on the `print(y)` line silence the type checker and the linte
 neither of which can see a name that appears only as a dict key.
 That is the cost of creating names this way, and a reason to keep it rare.
 Assigning into `globals()` matters whenever code needs to define a module-level name known only at runtime,
-such as a class built dynamically and registered under a computed name
-(see [Metaprogramming](17_Techniques--Metaprogramming.md)).
+such as a class built dynamically under a computed name.
+[Metaprogramming](17_Techniques--Metaprogramming.md) builds classes that way,
+though it collects them in a dictionary instead of in the module's namespace.
 
 ## Packages
 
@@ -174,8 +176,9 @@ To make a directory a package, you put a special file named `__init__.py` in it.
 `__init__.py` runs once, before any module inside the package loads.
 An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
-One with content usually re-exports the package's public names,
-so that `from a_package import function1` works and callers never learn which submodule defines `function1`.
+One with content usually re-exports the package's public names:
+if `a_package/__init__.py` re-exported `function1`,
+`from a_package import function1` would work and callers would never learn which submodule defines `function1`.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
@@ -360,10 +363,12 @@ so a `from` import in the second finds a partially initialized module and fails 
 A plain `import` of that same module succeeds at this point,
 since it only needs the module to exist in `sys.modules`,
 not to have finished running.
-That wording appears when the cycle is inside a package.
-Two top-level modules that import each other get a different message,
-one that suspects a name collision with a library rather than a cycle:
-`ImportError: cannot import name 'f' from 'modx' (consider renaming 'modx.py' if it has the same name as a library you intended to import)`.
+That wording appears when the module's file comes from anywhere but the directory of the script you ran.
+When the file sits in that directory (`sys.path[0]`),
+the usual case for two modules beside your script,
+Python suspects a name collision with a library instead of a cycle:
+`ImportError: cannot import name 'f' from 'modx' (consider renaming '.../modx.py' if it has the same name as a library you intended to import)`.
+Python names the offending file by its full path, abbreviated here as `...`.
 With a plain `import`, the failure surfaces later,
 wherever the code first uses a name the module has not defined yet.
 A cycle is a design signal:
@@ -629,7 +634,7 @@ including the ones whose only purpose is to run the module.
 ## Exercises
 
 1.  Add a third module, `a_package/module5.py`,
-    with its own `function5()` that prints a message when the module loads.
+    with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
     Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,
     and `from a_package.module5 import function5`,
@@ -645,7 +650,9 @@ including the ones whose only purpose is to run the module.
     then use `noisy2` before `noisy`.
     Confirm the two loading messages print in the order you used the modules,
     not the order you wrote the `lazy import` lines.
-4.  Rename `module.py` to `Module.py` and change `use_module.py` to `import Module`.
+4.  Rename `module.py` to `Module.py`,
+    change `use_module.py` to `import Module`,
+    and update its call to `Module.useful_function()`.
     Run it.
     Then change the import back to `import module`,
     leaving the file named `Module.py`, and run it again.
