@@ -1,9 +1,8 @@
 # state.py
 # A State has an operation, and can be moved
 # into the next State given an Input:
+from typing import Protocol
 
-class State:
-    def run(self) -> None:
-        raise NotImplementedError("run not implemented")
-    def next(self, event: object) -> State:
-        raise NotImplementedError("next not implemented")
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...

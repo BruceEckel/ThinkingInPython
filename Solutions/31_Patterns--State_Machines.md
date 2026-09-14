@@ -274,13 +274,12 @@ makes the same trade-off over the per-state `mouse_trap_states.py`.
 ```python
 # exercise_5.py
 from collections.abc import Iterable
+from typing import Protocol
 
 # The chapter's state.py and state_machine.py, inlined:
-class State:
-    def run(self) -> None:
-        raise NotImplementedError("run not implemented")
-    def next(self, event: object) -> State:
-        raise NotImplementedError("next not implemented")
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...
 
 class StateMachine:
     def __init__(self, initial_state: State) -> None:
@@ -305,7 +304,7 @@ class Calm:
     def __repr__(self) -> str:
         return "Calm"
 
-class Happy(State):
+class Happy:
     def run(self) -> None:
         print("Great to see you!")
     def next(self, event: object) -> State:
@@ -315,7 +314,7 @@ class Happy(State):
             return Prozac()
         return self
 
-class Grumpy(State):
+class Grumpy:
     def run(self) -> None:
         print("What do you want?")
     def next(self, event: object) -> State:
@@ -325,7 +324,7 @@ class Grumpy(State):
             return Prozac()
         return self
 
-class Prozac(State):
+class Prozac:
     def run(self) -> None:
         print("Everything is wonderful.")
     def next(self, event: object) -> State:

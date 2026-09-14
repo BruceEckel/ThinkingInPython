@@ -22,30 +22,27 @@ a single table holds every transition.
 # state.py
 # A State has an operation, and can be moved
 # into the next State given an Input:
+from typing import Protocol
 
-class State:
-    def run(self) -> None:
-        raise NotImplementedError("run not implemented")
-    def next(self, event: object) -> State:
-        raise NotImplementedError("next not implemented")
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...
 ```
 
-Python does not require this class.
+Python does not require this Protocol.
 It earns its few lines twice over: annotations can name `State` as a type,
-and a derived class that leaves a method out gets a better error message.
-You could get nearly the same effect by saying:
+and a state class that leaves a method out fails the type check wherever the program uses it as a `State`,
+before anything runs.
+A base class could do the first job as well:
 
     class State: pass
 
-because calling `run()` or `next()` on a derived type that lacks them still raises an exception.
-Without the base, that exception is an `AttributeError`.
-With it, a `NotImplementedError` that names the missing method.
-[Surrogate](26_Patterns--Surrogate.md#proxy) shows the third option:
+Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
+and a base whose methods `raise NotImplementedError` improves that to an exception naming the missing method.
+[Surrogate](26_Patterns--Surrogate.md#proxy) shows the other option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
 and constructing an incomplete subclass fails outright.
-The version here fails later than that, at the call rather than at construction,
-which is enough for a design where every state comes into existence once,
-as a class attribute.
+Both fail later than the check, at the call or at construction.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -137,23 +134,21 @@ mouse removed
 ### One State Class per Behavior
 
 Here's the first version of the mousetrap program.
-Each `State` subclass defines its `run()` behavior,
+Each state class defines its `run()` behavior,
 and establishes its next state with a `match` statement:
 
 ```python
 # mouse_trap_states.py
 from pathlib import Path
-from typing import ClassVar, override
+from typing import ClassVar
 from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class Waiting(State):
-    @override
+class Waiting:
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.APPEARS:
@@ -161,12 +156,10 @@ class Waiting(State):
             case _:
                 return MouseTrap.waiting
 
-class Luring(State):
-    @override
+class Luring:
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.RUNS_AWAY:
@@ -176,12 +169,10 @@ class Luring(State):
             case _:
                 return MouseTrap.luring
 
-class Trapping(State):
-    @override
+class Trapping:
     def run(self) -> None:
         print("Trapping: Closing door")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.ESCAPES:
@@ -191,12 +182,10 @@ class Trapping(State):
             case _:
                 return MouseTrap.trapping
 
-class Holding(State):
-    @override
+class Holding:
     def run(self) -> None:
         print("Holding: Mouse caught")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.REMOVED:
@@ -273,7 +262,8 @@ and those states exist only after every class definition has run.
 So the classes come first,
 and the tables fill in at module level once every state object exists.
 
-`TableState` implements `State` and adds a `transitions` dict that maps each input to its next state.
+`TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
+and leaves `run()` abstract for its subclasses.
 Its `next()` looks the input up in that dict,
 so the `StateMachine` class from the previous example still serves.
 `TableState.__init__()` starts every state with an empty dict.
@@ -285,6 +275,7 @@ The transitions live in the tables filled in at the bottom of the file:
 ```python
 # mouse_trap_tables.py
 # A better mousetrap using tables
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import ClassVar, override
 from exceptions import expect
@@ -292,11 +283,13 @@ from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class TableState(State):
+class TableState(ABC):
     def __init__(self) -> None:
         self.transitions: dict[object, State] = {}
 
-    @override
+    @abstractmethod
+    def run(self) -> None: ...
+
     def next(self, event: object) -> State:
         try:
             return self.transitions[event]

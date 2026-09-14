@@ -1,16 +1,14 @@
 # mouse_trap_states.py
 from pathlib import Path
-from typing import ClassVar, override
+from typing import ClassVar
 from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class Waiting(State):
-    @override
+class Waiting:
     def run(self) -> None:
         print("Waiting: Broadcasting cheese smell")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.APPEARS:
@@ -18,12 +16,10 @@ class Waiting(State):
             case _:
                 return MouseTrap.waiting
 
-class Luring(State):
-    @override
+class Luring:
     def run(self) -> None:
         print("Luring: Presenting Cheese, door open")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.RUNS_AWAY:
@@ -33,12 +29,10 @@ class Luring(State):
             case _:
                 return MouseTrap.luring
 
-class Trapping(State):
-    @override
+class Trapping:
     def run(self) -> None:
         print("Trapping: Closing door")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.ESCAPES:
@@ -48,12 +42,10 @@ class Trapping(State):
             case _:
                 return MouseTrap.trapping
 
-class Holding(State):
-    @override
+class Holding:
     def run(self) -> None:
         print("Holding: Mouse caught")
 
-    @override
     def next(self, event: object) -> State:
         match event:
             case MouseAction.REMOVED:

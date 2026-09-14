@@ -1,5 +1,6 @@
 # mouse_trap_tables.py
 # A better mousetrap using tables
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import ClassVar, override
 from exceptions import expect
@@ -7,11 +8,13 @@ from mouse_action import MouseAction
 from state import State
 from state_machine import StateMachine
 
-class TableState(State):
+class TableState(ABC):
     def __init__(self) -> None:
         self.transitions: dict[object, State] = {}
 
-    @override
+    @abstractmethod
+    def run(self) -> None: ...
+
     def next(self, event: object) -> State:
         try:
             return self.transitions[event]
