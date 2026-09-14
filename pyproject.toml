@@ -39,6 +39,7 @@ dev = [
     # and `make help` open in a terminal. Pure Python, so it installs on
     # the pinned Python; without it `make help` prints the static listing.
     "prompt-toolkit>=3.0.53",
+    "pyright>=1.1.414",
 ]
 
 [tool.uv]
@@ -148,3 +149,40 @@ pythonpath = ["build/examples/utils"]
 # module4's parent package without being handed the directory.
 [tool.ty.environment]
 extra-paths = ["build/examples/utils", "build/examples/06_Foundations--Modules_and_Packages"]
+
+# Pyright, run beside ty over the same extracted trees (make pyright,
+# make solutions-pyright). extraPaths mirrors [tool.ty.environment].
+# stateless re-exports its API from __init__ without __all__, which
+# pyright's py.typed rules read as private; ty does not, so that rule
+# is off rather than the listings rewritten around it.
+[tool.pyright]
+pythonVersion = "3.15"
+extraPaths = ["build/examples/utils", "build/examples/06_Foundations--Modules_and_Packages"]
+reportPrivateImportUsage = false
+# Rules ty leaves off by default, so the listings were not written to
+# satisfy them: bare expressions used to raise (`1 / 0`), a name bound
+# in one branch, a deliberate forgot-self demo (ch07).
+reportUnusedExpression = false
+reportPossiblyUnboundVariable = false
+reportSelfClsParameterName = false
+# PEP 798 (3.15) comprehension unpacking: pyright 1.1.414 cannot parse
+# it, so these listings are checked by ty alone. Remove entries as
+# pyright catches up.
+exclude = [
+    "**/node_modules", "**/__pycache__",
+    "build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py",
+    "build/examples/19_Techniques--Concurrency/shared_iterator.py",
+    "build/examples/35_Patterns--Flyweight/tile_map.py",
+    "build/examples/utils/display.py",
+    "build/solutions/16_Techniques--Comprehensions/exercise_6.py",
+    "build/solutions/19_Techniques--Concurrency/ch19_body_lock.py",
+    "build/solutions/35_Patterns--Flyweight/exercise_1.py",
+    "build/solutions/35_Patterns--Flyweight/exercise_7.py",
+    "build/solutions/43_Functional--Confidence/test_group_rounds.py",
+]
+
+# Solutions ch06 has its own a_package; a second entry on extraPaths would
+# shadow the examples' copy, so it gets a per-root environment instead.
+[[tool.pyright.executionEnvironments]]
+root = "build/solutions/06_Foundations--Modules_and_Packages"
+extraPaths = ["build/solutions/06_Foundations--Modules_and_Packages"]

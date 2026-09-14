@@ -7,6 +7,7 @@
 
 PY ?= uv run python
 TY ?= uv run ty
+PYRIGHT ?= uv run pyright
 PYTEST ?= uv run pytest
 RUFF ?= uv run ruff
 # Extra pytest args. The suite is tiny, so serial is fastest today; enable
@@ -399,6 +400,12 @@ test: extract  ## Run the book's pytest examples (test_*.py)
 ty: extract  ## Type-check the extracted examples (must be clean)
 	$(TY) check build/examples
 
+# A second checker over the same tree. Independent of `ty`: each has its
+# own suppression comment (`# ty: ignore[rule]`, `# pyright: ignore[rule]`)
+# and ignores the other's, so a listing can satisfy both. Not in the gate.
+pyright: extract  ## Type-check the extracted examples with pyright (advisory)
+	$(PYRIGHT) build/examples
+
 lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
 	$(RUFF) check build/examples
 
@@ -448,6 +455,9 @@ solutions-output-check: solutions-extract  ## Verify the #: output markers in So
 
 solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
 	$(TY) check build/solutions
+
+solutions-pyright: solutions-extract  ## Type-check build/solutions/ with pyright (advisory)
+	$(PYRIGHT) build/solutions
 
 solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must be clean)
 	$(RUFF) check build/solutions
