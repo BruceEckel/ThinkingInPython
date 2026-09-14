@@ -297,7 +297,7 @@ and the rest are here for your own designs.
     say "coupling can cause problems" and compensate for those problems with a well-considered design or pattern.
 -   *Design the communication, not the parts*.
     Alan Kay, on what object orientation was for:
-    "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message opens with "The big idea is 'messaging'."]
+    "The key in making great and growable systems is much more to design how its modules communicate rather than what their internal properties and behaviors should be."^[Alan Kay, squeak-dev mailing list, 10 October 1998, "prototypes vs classes was: Re: Sun's HotSpot". The same message's second paragraph begins "The big idea is 'messaging'."]
     A `Protocol` is that design made literal:
     it names what a caller needs from the object on the other side of a call,
     and says nothing about what that object is.
@@ -338,8 +338,8 @@ You can hold this handful of fundamental ideas in your head while analyzing a de
 
 ## Reading the Chapters Ahead
 
-Each chapter ahead takes a pattern,
-or a family of patterns that share a structure, and asks three questions of it.
+Most of the chapters ahead take a pattern,
+or a family of patterns that share a structure, and ask three questions of it.
 What varies and what stays the same?
 That names the problem the pattern exists to solve.
 How much of the answer does Python supply on its own?
