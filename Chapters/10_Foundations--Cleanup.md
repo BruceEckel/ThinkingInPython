@@ -188,7 +188,7 @@ A reference cycle defeats that count.
 `self_link()` returns and its local `node` disappears,
 but the object still refers to itself, so its count never reaches zero.
 With the collector disabled, `self_link()` calls `gc.get_referrers(node)`,
-which lists every object that directly refers to `node` without collecting or destroying anything.
+which lists the objects the collector tracks that directly refer to `node` without collecting or destroying anything.
 The only referrer is `node` itself, which confirms the self-reference.
 When a real object won't disappear and you don't know why,
 `gc.get_referrers()` is how you find what still holds it,
@@ -493,7 +493,7 @@ when the interpreter's bookkeeping is unreliable.
 Never put resource release in `__del__()`.
 The standard library's file and socket types bend that rule as a diagnostic backstop:
 `io.IOBase` (so every file object)
-and `socket.socket` each carry a `__del__()` that closes the resource and raises a `ResourceWarning`,
+and `socket.socket` each carry a `__del__()` that closes the resource and reports a `ResourceWarning`,
 catching a forgotten `close()` rather than replacing it:
 
 ```python
@@ -556,4 +556,5 @@ so the registry cannot become the leak it exists to catch.
 6.  In `cycle.py`, change `self_link()` to build a two-object cycle
     (`a.peer = b` and `b.peer = a`) instead of a self-reference.
     Confirm both finalizers run at `gc.collect()`,
-    then remove the `gc.disable()`/`gc.enable()` pair and explain why the output is no longer predictable.
+    then remove the `gc.disable()`/`gc.enable()` pair and explain why the language no longer guarantees when the two `finalized` lines appear,
+    even though this small program still prints them in the same place every run.

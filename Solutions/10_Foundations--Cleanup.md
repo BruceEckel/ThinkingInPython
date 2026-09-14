@@ -294,14 +294,16 @@ reclaims both together when it runs. A cycle through two objects
 behaves exactly like a cycle through one. The self-reference in
 `cycle.py` is only the smallest case.
 
-Removing the `gc.disable()`/`gc.enable()` pair makes the output
-unpredictable. The collector then runs on its own schedule, triggered
-by allocation counts rather than by your call. The two `finalized`
-lines can therefore appear anywhere after `self_link()` returns:
-between the two `print()` calls, after both, or not until the
-interpreter shuts down. Whether they land before `after collect`
-depends on how many objects the program has allocated by then, and
-nothing in the listing's source fixes that number.
+Removing the `gc.disable()`/`gc.enable()` pair takes away the
+guarantee about when the finalizers run. The collector is then free to
+run on its own schedule, triggered by allocation counts rather than by
+your call, so an automatic pass could in principle reclaim the cycle at
+any allocation after `self_link()` returns. This small program still
+prints the same transcript every run, because the explicit
+`gc.collect()` stays in the listing and fixes the moment of collection.
+While that call is there, the two `finalized` lines cannot drift past
+it or wait until the interpreter shuts down. The loss is in the
+guarantee, not in what this run prints.
 
 `gc.disable()` is in the chapter's listing only to keep the output
 predictable. It is not advice. It buys a deterministic transcript for
