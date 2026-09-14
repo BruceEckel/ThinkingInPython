@@ -16,6 +16,12 @@ Mypy is the original and most widely deployed one,
 and pyright is the one most editors run.
 This book uses [Astral's `ty`](https://docs.astral.sh/ty/) instead,
 from the same group that makes `uv` and `ruff`.
+Every listing passes `ty` before it reaches the page,
+and "the type checker" in this book means `ty` unless a sentence says otherwise.
+Pyright runs over the same listings as a second opinion, outside that gate.
+Where it or mypy disagrees with `ty` on a listing,
+the text says so and names the checker,
+because a verdict on a hard case is a fact about one checker, not about Python.
 
 ## Gradual Typing
 
