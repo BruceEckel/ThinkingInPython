@@ -133,6 +133,9 @@ and the checker reports:
 ```text
 error[invalid-method-override]: Invalid override of
 method `op`
+info: parameter `what_i_want` has an incompatible type:
+`WhatIWant` is not assignable to `WhatIHave`
+info: This violates the Liskov Substitution Principle
 ```
 
 That is why this one parameter stays `Any` while the rest of the listing names real types.
@@ -448,8 +451,9 @@ so a function that used to take a string and now takes a `Path` can warn only th
 That form is static only.
 Python discards the overload declarations at runtime,
 so the `DeprecationWarning` half never fires.
-Type-checker support for it lags the whole-function form,
-so verify your type checker reports it before relying on it.
+`ty`, Pyright, and mypy all report a deprecated overload.
+Pyright and mypy need their deprecation rule switched on,
+as they do for the whole-function form.
 
 An Adapter and a Façade both add an interface without disturbing what is already there,
 which is why they are safe moves.

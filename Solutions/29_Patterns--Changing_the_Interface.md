@@ -96,46 +96,63 @@ library.
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class _A:
-    x: object
+class _Engine:
+    def start(self) -> None:
+        print("_Engine.start()")
 
 @dataclass(frozen=True)
-class _B:
-    x: object
+class _FuelPump:
+    engine: _Engine
 
-def make_a(x: object) -> _A:
-    return _A(x)
+    def prime(self) -> None:
+        print("_FuelPump.prime()")
+        self.engine.start()
 
-def make_b(x: object) -> _B:
-    return _B(x)
+@dataclass(frozen=True)
+class _Ignition:
+    pump: _FuelPump
+
+    def turn_key(self) -> None:
+        print("_Ignition.turn_key()")
+        self.pump.prime()
+
+def start_car() -> _Ignition:
+    ignition = _Ignition(_FuelPump(_Engine()))
+    ignition.turn_key()
+    return ignition
 ```
 
 ```python
 # exercise_3.py
 import shop
-from shop import make_a, make_b
+from shop import start_car
 
-print(make_a(1), make_b(2))
-#: _A(x=1) _B(x=2)
+start_car()
+#: _Ignition.turn_key()
+#: _FuelPump.prime()
+#: _Engine.start()
 print([name for name in vars(shop)
        if not name.startswith("_")])
-#: ['dataclass', 'make_a', 'make_b']
+#: ['dataclass', 'start_car']
 ```
 
-The caller sees two functions. `shop._A` and `shop._B` still reach
-the classes, because Python enforces nothing. The underscore marks
-them as private, and `from shop import *` skips them. The listing
-prints the module's public names to make that concrete. `dataclass`
-appears because an import binds a name in the module too. A real
-module therefore either sets
+The caller sees one function, and `start_car()` keeps the assembly
+order, `_Ignition(_FuelPump(_Engine()))`, inside the module.
+`shop._Engine` and `shop._FuelPump` still reach the classes, because
+Python enforces nothing. The underscore marks them as private, and
+`from shop import *` skips them. The listing prints the module's
+public names to make that concrete. `dataclass` appears because an
+import binds a name in the module too. A real module therefore
+either sets
 [`__all__`](../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
 or imports as `import dataclasses` and writes `@dataclasses.dataclass`.
 
 The class version differs in one way that matters. `Facade` is a
-namespace the language does not treat as one: `Facade.make_a` and
-`shop.make_a` read identically at the call site, but you must define
-the class, import it, and carry it around. `@staticmethod` exists
-only to stop Python passing `self` to functions that never wanted it.
+namespace the language does not treat as one: `Facade.start_car` and
+`shop.start_car` read identically at the call site, but you must
+define the class, import it, and carry it around. `@staticmethod`
+exists only to stop Python passing `self` to functions that never
+wanted it.
 The module was already a namespace before anyone asked, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
