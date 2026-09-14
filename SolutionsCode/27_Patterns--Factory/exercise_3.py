@@ -19,12 +19,11 @@ class GameElementFactory(ABC):
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
-        self.factory = factory
-        self.p = factory.make_character()
-        self.ob = factory.make_obstacle()
+        self.character = factory.make_character()
+        self.obstacle = factory.make_obstacle()
 
     def play(self) -> None:
-        self.p.interact_with(self.ob)
+        self.character.interact_with(self.obstacle)
 
 class Gnome(Character):
     @override

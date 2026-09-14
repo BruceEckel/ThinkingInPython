@@ -135,12 +135,11 @@ class GameElementFactory(ABC):
 
 class GameEnvironment:
     def __init__(self, factory: GameElementFactory) -> None:
-        self.factory = factory
-        self.p = factory.make_character()
-        self.ob = factory.make_obstacle()
+        self.character = factory.make_character()
+        self.obstacle = factory.make_obstacle()
 
     def play(self) -> None:
-        self.p.interact_with(self.ob)
+        self.character.interact_with(self.obstacle)
 
 class Gnome(Character):
     @override
@@ -222,12 +221,14 @@ info: └── protocol member `make_obstacle` is not defined on type
 `GnomesAndFairies`
 ```
 
-The two halves fail differently. In `abstract_factory_abc.py` the base class is
-declared, so an unimplemented `make_obstacle()` inherits the base's
-`raise NotImplementedError` and fails when the game runs. In
-`abstract_factory_protocol.py` nothing is declared, so the mismatch surfaces at the call
-that needs the protocol, before anything runs, and the diagnostic
-names the missing method rather than the missing base.
+The two halves fail differently. In `abstract_factory_abc.py` the base
+class declares `make_obstacle()` as an `@abstractmethod`, so a factory
+that omits it defines without complaint and raises a `TypeError` the
+moment you instantiate it, before the game runs. In
+`abstract_factory_protocol.py` nothing is declared, so the mismatch
+surfaces at the call that needs the protocol, before anything runs at
+all, and the diagnostic names the missing method rather than the
+missing base.
 
 ## 4. An Abstract Factory for "thick" and "thin" shapes
 

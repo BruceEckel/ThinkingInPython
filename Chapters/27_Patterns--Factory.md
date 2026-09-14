@@ -99,7 +99,8 @@ All five answer two questions: which object to build, and what code builds it.
 
 ## Simple Factory Method
 
-Consider the `Shape` hierarchy from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
+Consider a `Shape` hierarchy in the style of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes),
+here with `draw()` and `erase()`.
 We can add a factory as a `@staticmethod` of the base class:
 
 ```python
@@ -182,7 +183,7 @@ Normally the initialization data comes from outside the system rather than throu
 Inside `shape_name()`,
 `Shape.__subclasses__()` produces a list of `Shape`'s direct subclasses.
 `__subclasses__()` covers only the first level of inheritance,
-so a class inheriting from `Circle` is not in the list.
+so a class inheriting from `_Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 Exercise 9 writes that recursion.
 
@@ -223,7 +224,8 @@ a number outside one through twelve.
 The `Enum` already holds every member it could return,
 so `of()` indexes `list(Month)` instead of naming a class.
 A factory over a closed set of products collapses to a lookup,
-the form the next section builds for an open set.
+the form the next section builds by hand,
+and then lets the classes fill for an open set.
 
 `from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
 is the usual form of alternative constructor:
@@ -1222,8 +1224,9 @@ Both exist to work around languages where a class is not an object you can put i
 2.  Add a class `Triangle` to `shape_factory_objects.py`.
 3.  Add a new type of `GameElementFactory` called `GnomesAndFairies`,
     first to `abstract_factory_abc.py` and then to `abstract_factory_protocol.py`.
-    In `abstract_factory_protocol.py`,
-    leave out `make_obstacle()` at first and confirm the error your type checker reports.
+    In `abstract_factory_protocol.py`, leave out `make_obstacle()` at first,
+    pass the factory to `GameEnvironment`,
+    and confirm the error your type checker reports.
     Then add it.
 4.  Modify `shape_factory_objects.py` to use an *Abstract Factory* to create different sets of shapes
     (for example, one type of factory object creates "thick shapes," another creates "thin shapes," but each factory object can create all the shapes: circles, squares, triangles, etc.).
