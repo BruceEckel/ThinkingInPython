@@ -24,5 +24,5 @@ if __name__ == "__main__":
     print(parallel)
     #: [17984, 33860, 49098, 63951]
     faster = serial_time > 1.3 * parallel_time
-    print(f"parallel at least 30% faster: {faster}")
-    #: parallel at least 30% faster: True
+    print(f"serial at least 1.3x parallel time: {faster}")
+    #: serial at least 1.3x parallel time: True

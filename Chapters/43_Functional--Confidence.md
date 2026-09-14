@@ -178,8 +178,8 @@ if __name__ == "__main__":
     print(parallel)
     #: [17984, 33860, 49098, 63951]
     faster = serial_time > 1.3 * parallel_time
-    print(f"parallel at least 30% faster: {faster}")
-    #: parallel at least 30% faster: True
+    print(f"serial at least 1.3x parallel time: {faster}")
+    #: serial at least 1.3x parallel time: True
 ```
 
 `list(map(...))` runs the four calls one at a time, on one core.
@@ -191,7 +191,7 @@ or when.
 The limits above are large enough for the difference to show:
 on the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
-comfortably clearing the 30% margin the last line checks.
+comfortably clearing the 1.3x margin the last line checks.
 Smaller limits finish before spawning the worker processes pays for itself,
 so a reader who shrinks the limits back down will watch parallel lose.
 Purity makes parallel safe.
@@ -211,7 +211,8 @@ because it pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
 and without the guard every worker would build a pool of its own.
-[Concurrency](19_Techniques--Concurrency.md#parallelism) covers all of this,
+[Concurrency](19_Techniques--Concurrency.md#parallelism)
+covers the pickling boundary and the guard,
 along with the reasons Python parallelism uses processes rather than threads.
 
 ## A Confidence Spectrum
@@ -381,7 +382,8 @@ and shrinks its failure down to the smallest code point outside that agreement,
 Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip breaks.
 This is the unusual Unicode the hand loop's alphabet could never draw,
-found because Hypothesis searches a wider space, not a smarter one.
+found because Hypothesis draws from a wider alphabet,
+not because it guessed the bug.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.

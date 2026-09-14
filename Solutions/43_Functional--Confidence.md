@@ -15,11 +15,14 @@ def count_primes(limit: int) -> tuple[int, int]:
 
 def main() -> None:
     limits = [10_000, 20_000, 30_000, 40_000]
+    serial = list(map(count_primes, limits))
     with ProcessPoolExecutor() as pool:
-        results = list(pool.map(count_primes, limits))
-    print([count for count, _ in results])
+        parallel = list(pool.map(count_primes, limits))
+    counts = [count for count, _ in parallel]
+    assert counts == [count for count, _ in serial]
+    print(counts)
     print("distinct process IDs:",
-          len({pid for _, pid in results}))
+          len({pid for _, pid in parallel}))
     print("cores:", os.process_cpu_count())
 
 if __name__ == "__main__":
@@ -30,6 +33,8 @@ if __name__ == "__main__":
 from `__main__` in a worker process. Only a real script file meets
 that requirement, not a fenced block executed in place.
 
+The assertion compares the counts alone, since the serial run carries
+the parent's process ID and the parallel run carries the workers'.
 The counts stay the same, `[1229, 2262, 3245, 4203]`: the same pure
 function gives the same answers wherever it ran, which is the point
 of the original listing. The interesting number is the second line.
@@ -284,11 +289,12 @@ see it.
 
 The two lines guarding an empty `groups` are the interesting part,
 because the property test found the need for them. Against the
-version without them, Hypothesis reports `names=['a', 'aa'], size=3`
-and a `ValueError: min() iterable argument is empty`. With fewer
-students than the group size, the `while len(pool) >= size` loop
-never runs and `groups` stays empty. The leftover loop then asks
-`min()` for the smallest of nothing.
+version without them, Hypothesis reports a two-name roster with
+`size=3`, such as `names=['a', 'b']`, and a
+`ValueError: min() iterable argument is empty`. With fewer students
+than the group size, the `while len(pool) >= size` loop never runs
+and `groups` stays empty. The leftover loop then asks `min()` for the
+smallest of nothing.
 
 The crash is a real defect rather than an unstated precondition, and
 the distinction is worth drawing. `group_rounds()` already keeps
@@ -318,18 +324,23 @@ Delete the loop that places leftovers:
 group, and the property reports the loss at once:
 
 ```text
-E           AssertionError: assert ['a', 'b'] == ['a', 'b', 'c']
-E             Right contains one more item: 'c'
+E           AssertionError: assert ['a', 'b'] == ['a', 'aa', 'b']
+E             At index 1 diff: 'b' != 'aa'
+E             Right contains one more item: 'b'
 E           Failing test case: test_every_student_appears_once_per_round(
-E               names=['a', 'b', 'c'],
+E               names=['a', 'b', 'aa'],
 E               size=2,
 E           )
 ```
 
-Three students in groups of two is the smallest roster that leaves
-anyone over, and `['a', 'b', 'c']` is the simplest such roster the
-alphabet allows. The report therefore shows the shrunk case, not
-whatever wide random roster failed first.
+Three students in groups of two leaves one student over, and the
+report shows that shrunk case rather than whatever wide random roster
+failed first. The names vary from run to run: Hypothesis shrinks a
+generated string toward a longer run of `a` before it reaches a third
+letter, so `'aa'` arrives as readily as `'c'` would. Some runs shrink
+to a different shape, a roster too small to fill one group:
+`names=['a', 'aa'], size=3`, where the empty group the guard adds
+collects nobody and the left side of the assertion is `[]`.
 
 A second run reports the identical counterexample, and reports it
 noticeably faster. Hypothesis writes each failing case into
@@ -442,10 +453,12 @@ for sample in ("4", "0", "OOPS"):
 #: OOPS: Not a number
 ```
 
-The two versions produce identical output, and the `match` is the
-shorter of the two by a few lines, but length is not what separates
-them. The `match` reads as one description of four shapes while the
-`isinstance()` version reads as four separate questions.
+The two versions produce identical output. Counting lines favors the
+`isinstance()` version: its `describe()` is three lines shorter than
+the `match` version's, and the two listings come out the same length.
+Length is not what separates them. The `match` reads as one
+description of four shapes while the `isinstance()` version reads as
+four separate questions.
 The difference shows in what each version repeats: `result.error`
 appears three times in `describe_isinstance.py` and never in the
 `match`, because each `case` matches on the error directly instead of
@@ -458,16 +471,18 @@ has to reconstruct that `result` must be an `Err` by ruling out the
 `ty` reports the same thing about both. Inside the `Ok` it knows
 `float` either way, and in the error branches it knows `Exception`
 narrowed to `ValueError` or `ZeroDivisionError`. That agreement is
-recent, and it rests on one decorator: both `Ok` and `Err` carry
-`@final`, in the listing above and in `utils/result.py`. Without that
-decorator `ty` 0.0.80 allows for a class inheriting from both, so a
-positive `isinstance()` leaves the intersection of the two alive and
-`result.answer` comes back as `float | Unknown` rather than plain
-`float`. Pyright and mypy do not build that intersection and report
-`float` with or without the decorator. The measurement the
-exercise asks for therefore has two answers depending on one
-decorator, and that is a more useful finding than either version
-winning.
+recent, and the precision behind it rests on one decorator: both `Ok`
+and `Err` carry `@final`, in the listing above and in
+`utils/result.py`. Without that decorator `ty` 0.0.80 allows for a
+class inheriting from both, so the intersection of the two stays
+alive and the value in the `Ok` comes back as `float | Unknown`
+rather than plain `float`. Both forms lose that precision together:
+`result.answer` after a positive `isinstance()` and `answer` in
+`case Ok(answer)` read `float | Unknown` alike. Pyright and mypy do
+not build that intersection and report `float` with or without the
+decorator. The measurement the exercise asks for therefore comes out
+even at either precision, and what the decorator changes is a more
+useful finding than either version winning.
 
 The choice is about reading, not about proving. Neither form tells
 the type checker anything the other cannot, so pick the one that
