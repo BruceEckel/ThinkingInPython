@@ -344,16 +344,15 @@ As the printed key list shows,
 the two `class` statements fill `Shape.registry` on their own.
 This is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
-so a class that merely matches a Protocol's shape never registers:
-the inheritance is the mechanism.
-`ABC` adds one guard on top of that.
-A subclass that forgets `draw()` still registers,
-since registration runs as its `class` statement executes,
-but `make()` then fails at construction with a `TypeError` rather than at the first `draw()` call.
+so a class that merely matches a Protocol's shape never registers.
+Inheritance is the mechanism, and `ABC` adds one guard on top of that.
+Registration runs as its `class` statement executes,
+so a subclass that forgets `draw()` still registers.
+`make()` then fails at construction with a `TypeError` rather than at the first `draw()` call.
 No type checker reports that case,
 because `Shape.registry[kind]()` calls a `type[Shape]`,
 and any of those may be a concrete subclass.
-That removes the `SHAPES` line too.
+
 Adding a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` could have built the table instead,
@@ -363,7 +362,8 @@ while `__init_subclass__()` runs for every class anywhere below `Shape`.
 uses this same self-registration.
 
 `__init_subclass__()` runs as the subclass's `class` statement executes.
-In one file the registration runs before anything calls `make()`,
+When the subclasses sit in the same file as `make()`, as in `registry.py`,
+the registration runs before anything calls `make()`,
 but a subclass defined in another module registers itself only when something imports that module.
 The classic failure is a plugin that "never registered": the class is fine,
 the registry is fine, and nothing imported the module that defines the class.
