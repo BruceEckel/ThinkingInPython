@@ -254,10 +254,10 @@ Renaming `urlopen` to `fetch` in `ch11_weather.py` separates the two
 tests.
 `test_injected()` still passes, because it never named the dependency.
 It passes one in, and `current_temp_with()` calls whatever it
-receives. `test_patched()` fails with
-`AttributeError: <module 'ch11_weather'> has no attribute 'urlopen'`,
-because `monkeypatch.setattr()` looks the name up by string and the
-string is now wrong.
+receives. `test_patched()` fails with `AttributeError: <module
+'ch11_weather' from '...'> has no attribute 'urlopen'`, because
+`monkeypatch.setattr()` looks the name up by string and the string is
+now wrong.
 
 That separation is the same lesson exercise 4 draws from the environment
 variable, applied to a different kind of dependency. A patched test

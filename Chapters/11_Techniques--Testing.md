@@ -101,7 +101,7 @@ No base class needs inheriting,
 and no special assertion methods need memorizing.
 `pytest` rewrites `assert` so that a failure still shows you both sides of the comparison.
 
-The tests in this chapter check the following `Account` class, a `@dataclass`
+Most of this chapter's tests check the following `Account` class, a `@dataclass`
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md) explains the decorator):
 
 ```python
@@ -213,7 +213,7 @@ The `where` line is the rewriting at work:
 which a bare `assert` statement would discard.
 `Account` is a `@dataclass`,
 so its generated `__repr__()` names the field values.
-A hand-written class with no `__repr__()` would print `<account.Account object>` there instead.
+A hand-written class with no `__repr__()` would print `<account.Account object at 0x...>` there instead.
 
 ## Testing for Exceptions
 
@@ -368,7 +368,8 @@ resetting a global registry, or installing a `monkeypatch` every test needs.
 Autouse runs the fixture, and only a parameter delivers its value.
 If you mark `funded` autouse and leave it out of the parameter list,
 `funded.withdraw(40)` raises an `AttributeError`:
-the bare name finds the fixture function, not the `Account` it returns.
+the bare name finds the fixture object the decorator left behind,
+not the `Account` it returns.
 
 Fixtures eliminate duplicated setup.
 A test that names `funded` states what it needs and nothing about how to build it.
@@ -829,7 +830,7 @@ The tests in this chapter check specific examples:
 this input produces that output.
 A *property-based* test instead states a law the code must always obey,
 and lets a tool generate the inputs that try to break it.
-[Confidence](43_Functional--Confidence.md#a-confidence-spectrum)
+[Confidence](43_Functional--Confidence.md#property-based-testing)
 shows the technique,
 including the [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
 library that automates it.
