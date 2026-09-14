@@ -92,7 +92,7 @@ for r in outputs:
 #: answer = 4
 ```
 
-`match` (see [Pattern Matching](13_Techniques--Pattern_Matching.md#matching-values))
+`match` (see [Pattern Matching](13_Techniques--Pattern_Matching.md#class-patterns))
 tells the two cases apart.
 But the distinction rests on the types `int` and `str`,
 and that dependence is fragile.
@@ -111,7 +111,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `Ok` parameterized over the answer type and `Err` over the error type.
 `@final` states that neither can have subclasses.
 The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
-`A`, `B`, and `E` are type parameters
+`A`, `B`, `E`, and `F` are type parameters
 (introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
@@ -593,7 +593,8 @@ if __name__ == "__main__":
 but `@safe` has changed its return type to `Result[int, Exception]`.
 The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
-That error type is the root of the exception hierarchy, not a specific failure.
+That error type is the base of the ordinary exception hierarchy,
+not a specific failure.
 Earlier in this chapter, `Result[int, str]` named exactly what could go wrong;
 `Result[int, Exception]` says only that something did,
 no narrower than a bare `except Exception`.
@@ -609,7 +610,7 @@ That chapter explains how to write decorators like `@safe`,
 including `functools.wraps`.
 
 `@safe` catches `Exception`,
-which is every failure the wrapped function can produce,
+which is every ordinary failure the wrapped function can produce,
 including the ones that are defects rather than expected outcomes.
 If you misspell a name inside the wrapped function,
 the resulting `NameError` arrives as an ordinary `Err`,

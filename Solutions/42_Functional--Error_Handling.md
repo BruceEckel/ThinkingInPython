@@ -7,7 +7,9 @@
 from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import final
 
+@final
 @dataclass(frozen=True)
 class Ok[A]:
     answer: A
@@ -20,6 +22,7 @@ class Ok[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
+@final
 @dataclass(frozen=True)
 class Err[E]:
     error: E
@@ -51,10 +54,10 @@ def func_c(i: int) -> Result[int, str]:
 def func_e(i: int) -> Result[int, str]:
     if i == 4:
         return Err(f"func_e({i})")
-    return Ok(i * 10)
+    return Ok(i)
 
 def composed(i: int) -> Result[int, str]:
-    return func_a(i).bind(func_b).bind(func_c).bind(func_e)
+    return func_a(i).bind(func_b).bind(func_e).bind(func_c)
 
 for i in range(5):
     print(i, composed(i))
@@ -66,13 +69,16 @@ for i in range(5):
 ```
 
 Adding a fourth `.bind(func_e)` needed no change to `Result`, `Ok`,
-or `Err`. `4` reaches `func_e()` because it survives `func_a`,
-`func_b`, and `func_c`, while `1`, `2`, and `3` fail earlier and
-stop the chain before `func_e` sees them. `func_e(4)` then returns
-an `Err`, and `func_e` is the last step, so that `Err` travels no
-further. Inputs `1` through `4` each fail at a different step,
-which shows that a chain of any length short-circuits at its first
-failure, wherever that falls.
+or `Err`. `func_e()` sits before `func_c()` in the chain, so an
+`Err` from it has a later step to skip. `4` reaches `func_e()`
+because it survives `func_a()` and `func_b()`, and the `Err` that
+comes back travels to the end of the chain untouched: `Err.bind()`
+returns `self` without calling `func_c()`. `1` and `2` fail earlier
+and stop the chain before `func_e()` sees them, and `3` passes
+through `func_e()` unchanged to fail in `func_c()`, so each of the
+four inputs still fails at a different step. A chain short-circuits
+at its first failure, wherever that falls, and the order of the
+steps decides where the chain stops.
 
 ## 2. `Err.map_error()`
 
@@ -81,7 +87,9 @@ failure, wherever that falls.
 from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import final
 
+@final
 @dataclass(frozen=True)
 class Ok[A]:
     answer: A
@@ -99,6 +107,7 @@ class Ok[A]:
     ) -> Ok[A]:
         return self  # An Ok has no error to transform
 
+@final
 @dataclass(frozen=True)
 class Err[E]:
     error: E

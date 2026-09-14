@@ -2,7 +2,9 @@
 from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import final
 
+@final
 @dataclass(frozen=True)
 class Ok[A]:
     answer: A
@@ -20,6 +22,7 @@ class Ok[A]:
     ) -> Ok[A]:
         return self  # An Ok has no error to transform
 
+@final
 @dataclass(frozen=True)
 class Err[E]:
     error: E

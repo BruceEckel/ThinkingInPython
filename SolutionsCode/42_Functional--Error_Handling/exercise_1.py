@@ -2,7 +2,9 @@
 from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import final
 
+@final
 @dataclass(frozen=True)
 class Ok[A]:
     answer: A
@@ -15,6 +17,7 @@ class Ok[A]:
     ) -> Result[B, E]:
         return func(self.answer)
 
+@final
 @dataclass(frozen=True)
 class Err[E]:
     error: E
@@ -46,10 +49,10 @@ def func_c(i: int) -> Result[int, str]:
 def func_e(i: int) -> Result[int, str]:
     if i == 4:
         return Err(f"func_e({i})")
-    return Ok(i * 10)
+    return Ok(i)
 
 def composed(i: int) -> Result[int, str]:
-    return func_a(i).bind(func_b).bind(func_c).bind(func_e)
+    return func_a(i).bind(func_b).bind(func_e).bind(func_c)
 
 for i in range(5):
     print(i, composed(i))
