@@ -728,6 +728,15 @@ self-reference:  ## Fail if a claim the book makes about its own chapters is fal
 self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
 	$(PY) -m tools.check_self_reference --advisory $(ARGS)
 
+# Advisory. A quoted ty diagnostic is prose, so a listing edit that
+# shifts a quoted line, or a ty upgrade that rewords a message, leaves
+# the quote stale with every gate green. This compares each quote's
+# gutter lines with the extracted listing it points at. Some quotes are
+# deliberately against an edited copy (a line removed, a line added),
+# so it reports rather than gates; read each hit against its prose.
+quoted-diagnostics:  ## List quoted ty diagnostics whose gutter lines disagree with the listing (advisory)
+	$(PY) -m tools.check_quoted_diagnostics $(ARGS)
+
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,
 # so the drift check passes, while a repo search for the name returns two

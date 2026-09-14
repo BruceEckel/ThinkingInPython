@@ -958,6 +958,33 @@ would fire on the worked example in
 [banned_phrases.py](#banned_phrases.py) above, which names a banned phrase
 in order to explain the tool.
 
+## check_quoted_diagnostics.py
+
+Advisory. The book quotes `ty` output in fenced blocks that begin
+`error[...]` or `warning[...]`, each with a ` --> file.py:LINE:COL`
+location and gutter lines reproducing the listing's source. Nothing
+gates those: `#:` markers are validated against a run, but a quoted
+diagnostic is prose, so a listing edit that shifts a line, or a `ty`
+upgrade that rewords a message, leaves the quote stale with every
+gate green. The 2026-09-14 claims sweep found such quotes in four
+chapters and several Solutions files.
+
+`make quoted-diagnostics` reads every quoted block in `Chapters/` and
+`Solutions/`, follows each location line, and compares every gutter
+line with that line of the extracted listing, searching the file's
+own build directory, then (for a Solutions file) the chapter's, then
+`build/examples/utils`. A gutter line matches when it equals the
+file's line, or equals it with a trailing `# type: ignore` removed,
+or equals the file's line with its leading `# ` removed (the book's
+commented-out probe convention); ty's multi-line span bar and
+indentation are ignored. It reports rather than gates because about
+a dozen quotes are deliberately against an edited copy of the
+listing (a `match` block removed, a `ValueError` deleted from an
+annotation, a line added), and the shifted line numbers are right for
+that copy. Read each hit against its prose: a quote against a
+described edit is expected, a stale line number is not. `--strict`
+exits 1 on any hit.
+
 ## Advisory checks: check_links.py and list_todos.py
 
 Neither is part of `verify`/`gate`/`ci`. Run them now and then.
