@@ -39,6 +39,11 @@ from tools.repo import md_files
 IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
+# Copied beside the pages, and linked from template.html by the
+# `search-css`, `search-js`, and `listing-js` variables. listing-preview.js
+# is the hover panel and Preview/Jump switch for the links
+# listing_links.py writes.
+STATIC_FILES = ("search.css", "search.js", "listing-preview.js")
 
 # Experimental: give each chapter page its own table of contents (its own
 # sections). Flip this default, or override per-build with --chapter-toc /
@@ -199,6 +204,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
         f"--variable=search-css:search.css{static_tag('search.css')}",
         f"--variable=search-js:search.js{static_tag('search.js')}",
+        "--variable=listing-js:listing-preview.js"
+        f"{static_tag('listing-preview.js')}",
     ]
     if prev is not None:
         variables += [f"--variable=prev-url:{prev.out_name}",
@@ -297,10 +304,6 @@ body {{ background: var(--paper); color: var(--ink);
   font-family: Georgia, serif; line-height: 1.75; padding: 0 1.5rem; }}
 .page {{ max-width: var(--max-width); margin: 0 auto; padding: 4rem 0 6rem; }}
 figure {{ margin: 2.5rem 0; text-align: center; }}
-.listing-link {{ color: inherit; text-decoration: none;
-  border-bottom: 1px dotted var(--muted); }}
-.listing-link:hover {{ color: var(--accent);
-  border-bottom-color: var(--accent); }}
 figure img {{ max-width: 100%; height: auto; }}
 figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   font-size: 0.85rem; color: var(--ink); margin-top: 0.75rem; }}
@@ -444,7 +447,7 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
     sections = write_shared(chapters, out_dir)
-    for name in ("search.css", "search.js"):
+    for name in STATIC_FILES:
         shutil.copy2(STATIC_SRC / name, out_dir / name)
 
     copied = 0

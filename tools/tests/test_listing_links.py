@@ -10,7 +10,7 @@ here, and one end-to-end assembly through build_epub.book_markdown().
 from pathlib import Path
 
 from tools.build_epub import book_markdown, hang_listings, listing_html
-from tools.build_site import Chapter
+from tools.build_site import STATIC_FILES, STATIC_SRC, TEMPLATE, Chapter
 from tools.listing_links import (
     epub_href,
     fence_ids,
@@ -130,6 +130,22 @@ def test_site_rewrite_links_and_ids_in_the_order_that_works() -> None:
     # line after a listing counts as code and stays unlinked.
     assert "listing-link" not in link_mentions(
         fence_ids(text), INDEX, site_href("27_Patterns--Factory"))
+
+
+# ── the site's hover previews ────────────────────────────────────────────────
+
+def test_preview_script_is_shipped_and_linked_from_the_template() -> None:
+    # build_site copies STATIC_FILES beside the pages and the template
+    # loads the script through the listing-js variable; a missing file
+    # would fail the copy, a missing variable would load nothing.
+    assert "listing-preview.js" in STATIC_FILES
+    for name in STATIC_FILES:
+        assert (STATIC_SRC / name).is_file(), name
+    template = TEMPLATE.read_text(encoding="utf-8")
+    assert "$listing-js$" in template
+    assert ".listing-link" in template
+    assert ".listing-preview" in template
+    assert ".listing-mode" in template
 
 
 # ── the EPUB's <pre> ─────────────────────────────────────────────────────────
