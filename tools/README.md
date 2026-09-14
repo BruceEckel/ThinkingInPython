@@ -1080,6 +1080,31 @@ Tests live in `tools/tests/test_build_epub.py`. They are worth keeping green:
 a namespacing bug produces a valid EPUB whose links open the wrong chapter,
 with nothing in the build to show for it.
 
+## listing_links.py
+
+Turns a listing's name in the prose into a link to the listing. The
+chapters name their listings in backticks (`the dictionary in
+`shape_table.py``), and `check_unique_slugs.py` keeps every basename
+unique, so each mention has one target. `build_site.py` and
+`build_epub.py` call this at build time: every slugged block gets an id
+derived from its path comment (`listing-registry.py`,
+`listing-mouse-MouseAction.py`), and every `name.py` code span outside
+a fence and outside an existing link becomes a link to it, same page or
+cross-chapter on the site, in-document in the EPUB, carrying the class
+`listing-link` for the stylesheet. Only a code span holding the bare
+name is a mention; `from registry import make` stays code, and so does
+a name two chapters both define. Nothing changes in `Chapters/`, so do
+not write these links by hand.
+
+Both builders take `--no-listing-links`. `build_pdf.py` passes the
+option off itself: with `hang_code=False` nothing writes the ids, and
+typst rejects a link to a missing label. On the site the two rewrites
+must run links first, then fence ids: the attribute-form fence opener
+(```` ``` {#id .python} ````) is not one `tools.markdown` reads as a
+fence, so the reverse order sees every prose line after a listing as
+code. `site_rewrite()` fixes the order and
+`tools/tests/test_listing_links.py` pins it.
+
 ## make_cover.py
 
 Generates the covers and favicon. Two modes, chosen by whether

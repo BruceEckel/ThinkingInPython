@@ -86,6 +86,7 @@ from pathlib import Path
 
 from tools import build_site
 from tools.build_site import Chapter
+from tools import listing_links
 from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
 from tools.config import BUILD_EPUB_DIR as DEFAULT_OUT
 from tools.config import ROOT
@@ -521,8 +522,12 @@ def part_markdown(roman: str, title: str) -> str:
             f"![]({art}){{.part-art width=4.5in}}\\\n")
 
 
-def listing_html(lines: list[str], python: bool = False) -> str:
+def listing_html(lines: list[str], python: bool = False,
+                 id: str | None = None) -> str:
     """One fenced listing as a `<pre>` whose every line is its own block.
+
+    `id` goes on the `<pre>`, so a prose mention of the listing can link
+    to it (see listing_links.py).
 
     With `python=True` the lines carry the token spans from
     `highlight_ranges()`, the markup both EPUB variants share; a
@@ -550,7 +555,7 @@ def listing_html(lines: list[str], python: bool = False) -> str:
     would be a second line break, double-spacing every listing.
     """
     ranges = highlight_ranges(lines) if python else {}
-    out = ["<pre>"]
+    out = [f'<pre id="{id}">' if id else "<pre>"]
     for index, raw in enumerate(lines):
         line = raw.rstrip()
         if not line.strip():
@@ -574,8 +579,10 @@ def listing_html(lines: list[str], python: bool = False) -> str:
     return "".join(out)
 
 
-def hang_listings(text: str) -> str:
+def hang_listings(text: str, ids: bool = True) -> str:
     """Rewrite every fenced block in `text` as a hanging-indent `<pre>`.
+
+    With `ids`, a block naming a file carries that listing's id.
 
     Pandoc passes a raw HTML block through to EPUB's XHTML untouched, so
     this runs on the Markdown stream rather than on pandoc's output. The
@@ -592,7 +599,11 @@ def hang_listings(text: str) -> str:
     index = 0
     for block in doc.blocks:
         out.extend(doc.lines[index:block.open_at])
-        out.append(listing_html(block.lines, python=block.is_python))
+        slug = block.slug
+        anchor = (listing_links.listing_id(slug)
+                  if ids and slug is not None else None)
+        out.append(listing_html(block.lines, python=block.is_python,
+                                id=anchor))
         index = block.end + 1
     out.extend(doc.lines[index:])
     return "\n".join(out)
@@ -602,8 +613,14 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
                   unresolved: set[str],
                   img_map: dict[str, str] | None = None,
                   hang_code: bool = True,
-                  ornament: bool = True) -> str:
+                  ornament: bool = True,
+                  listing_links_on: bool = True) -> str:
     """Every chapter as one Markdown stream, ids namespaced and links rewritten.
+
+    `listing_links_on` also turns each `name.py` mention in the prose
+    into a link to that listing's `<pre>` (see listing_links.py). It
+    needs `hang_code`, which is where the id is written; build_pdf.py
+    turns both off.
 
     Two passes: the first namespaces the headings and so learns every id
     the book has, which the second needs before it can tell a link that
@@ -638,6 +655,9 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         if anchor and f"{prefix}-{anchor}" not in known:
             aliases[f"{prefix}-{anchor}"] = prefix
     ids = Ids(prefixes, known, aliases)
+    targets = (listing_links.listing_index(
+        (ch.md.stem, doc) for ch, doc, _ in prepared)
+        if listing_links_on and hang_code else None)
 
     parts: list[str] = []
     for ch, doc, lines in prepared:
@@ -648,10 +668,14 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
         fenced = doc.in_fence()
         for index, line in enumerate(lines):
             if not fenced[index]:
-                lines[index] = relink(line, prefix, ids, unresolved)
+                line = relink(line, prefix, ids, unresolved)
+                if targets is not None:
+                    line = listing_links.link_line(
+                        line, targets, listing_links.epub_href)
+                lines[index] = line
         text = rewrite_images("\n".join(lines), img_map, missing)
         if hang_code:
-            text = hang_listings(text)
+            text = hang_listings(text, ids=targets is not None)
         heading = chapter_heading(ch)
         if ornament:
             # The EPUB mirrors the PDF's chapter opening: the
@@ -960,7 +984,8 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
 
 
 def build(out_dir: Path, keep_source: bool = False,
-          keep_svg: bool = False, release: str | None = None) -> int:
+          keep_svg: bool = False, release: str | None = None,
+          listing_links_on: bool = True) -> int:
     build_site.check_pandoc()
     chapters = build_site.discover()
     if not chapters:
@@ -980,7 +1005,8 @@ def build(out_dir: Path, keep_source: bool = False,
 
     missing: set[str] = set()
     unresolved: set[str] = set()
-    text = book_markdown(chapters, missing, unresolved, img_map)
+    text = book_markdown(chapters, missing, unresolved, img_map,
+                         listing_links_on=listing_links_on)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"
@@ -1045,8 +1071,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--release", metavar="VERSION",
                     help="stamp the title page with this release number "
                          "and today's date (used by `make release`)")
+    ap.add_argument("--listing-links",
+                    action=argparse.BooleanOptionalAction, default=True,
+                    help="link each `name.py` mention in the prose to "
+                         "that listing (default: on)")
     args = ap.parse_args(argv)
-    return build(args.out, args.keep_source, args.keep_svg, args.release)
+    return build(args.out, args.keep_source, args.keep_svg, args.release,
+                 args.listing_links)
 
 
 if __name__ == "__main__":

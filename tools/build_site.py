@@ -30,9 +30,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools import search_index
+from tools import listing_links, search_index
 from tools.config import BUILD_SITE_DIR as DEFAULT_OUT
 from tools.config import ROOT
+from tools.markdown import Document
 from tools.repo import md_files
 
 IMAGES_SRC = ROOT / "resources" / "images"
@@ -296,6 +297,10 @@ body {{ background: var(--paper); color: var(--ink);
   font-family: Georgia, serif; line-height: 1.75; padding: 0 1.5rem; }}
 .page {{ max-width: var(--max-width); margin: 0 auto; padding: 4rem 0 6rem; }}
 figure {{ margin: 2.5rem 0; text-align: center; }}
+.listing-link {{ color: inherit; text-decoration: none;
+  border-bottom: 1px dotted var(--muted); }}
+.listing-link:hover {{ color: var(--accent);
+  border-bottom-color: var(--accent); }}
 figure img {{ max-width: 100%; height: auto; }}
 figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   font-size: 0.85rem; color: var(--ink); margin-top: 0.75rem; }}
@@ -341,10 +346,24 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
 # --------------------------------------------------------------------------- #
 # Driver
 # --------------------------------------------------------------------------- #
+def listing_targets(chapters: list[Chapter]
+                    ) -> dict[str, listing_links.Target]:
+    """Every listing name the book's prose can link to, by chapter."""
+    return listing_links.listing_index(
+        (ch.md.stem, Document.parse(ch.md)) for ch in chapters)
+
+
 def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
                img_map: dict[str, str], missing: set[str],
-               chapter_toc: bool) -> set[str]:
-    """Render one chapter into out_dir; return the images it references."""
+               chapter_toc: bool,
+               targets: dict[str, listing_links.Target] | None = None
+               ) -> set[str]:
+    """Render one chapter into out_dir; return the images it references.
+
+    With `targets` (see `listing_targets()`), each listing's block gets
+    an id and each `name.py` mention in the prose becomes a link to it,
+    on this page or another chapter's.
+    """
     i = chapters.index(ch)
     prev = chapters[i - 1] if i > 0 else None
     nxt = chapters[i + 1] if i + 1 < len(chapters) else None
@@ -352,6 +371,8 @@ def write_page(ch: Chapter, chapters: list[Chapter], out_dir: Path,
     used = {m.group(2) for m in IMG_REF.finditer(body)}
     body = rewrite_images(body, img_map, missing)
     body = rewrite_md_links(body)
+    if targets is not None:
+        body = listing_links.site_rewrite(body, targets, ch.md.stem)
     page = render_chapter(body, ch, prev, nxt, chapter_toc)
     (out_dir / ch.out_name).write_text(page, encoding="utf-8")
     return used
@@ -366,7 +387,8 @@ def write_shared(chapters: list[Chapter], out_dir: Path) -> int:
 
 
 def rebuild_chapter(md: Path, out_dir: Path,
-                    chapter_toc: bool = CHAPTER_TOC) -> bool:
+                    chapter_toc: bool = CHAPTER_TOC,
+                    listing_links_on: bool = True) -> bool:
     """Re-render one chapter page, plus the index and search index.
 
     This is the incremental path `serve.py --watch` takes: one pandoc run
@@ -385,7 +407,9 @@ def rebuild_chapter(md: Path, out_dir: Path,
     if ch is None:
         return False
     img_map = build_image_map()
-    used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc)
+    targets = listing_targets(chapters) if listing_links_on else None
+    used = write_page(ch, chapters, out_dir, img_map, set(), chapter_toc,
+                      targets)
     images_out = out_dir / "images"
     for name in sorted(used):
         filename = img_map.get(name)
@@ -396,12 +420,14 @@ def rebuild_chapter(md: Path, out_dir: Path,
     return True
 
 
-def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
+def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
+          listing_links_on: bool = True) -> int:
     check_pandoc()
     if not TEMPLATE.exists():
         sys.exit(f"error: template not found at {TEMPLATE}")
     chapters = discover()
     img_map = build_image_map()
+    targets = listing_targets(chapters) if listing_links_on else None
 
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -413,7 +439,7 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC) -> int:
 
     for ch in chapters:
         used_images |= write_page(ch, chapters, out_dir, img_map, missing,
-                                  chapter_toc)
+                                  chapter_toc, targets)
 
     (out_dir / "style.css").write_text(render_css(), encoding="utf-8")
 
@@ -455,8 +481,12 @@ def main(argv: list[str] | None = None) -> int:
                     default=CHAPTER_TOC,
                     help="add a per-chapter table of contents to each page "
                          f"(default: {CHAPTER_TOC})")
+    ap.add_argument("--listing-links",
+                    action=argparse.BooleanOptionalAction, default=True,
+                    help="link each `name.py` mention in the prose to "
+                         "that listing (default: on)")
     args = ap.parse_args(argv)
-    return build(args.out, args.chapter_toc)
+    return build(args.out, args.chapter_toc, args.listing_links)
 
 
 if __name__ == "__main__":

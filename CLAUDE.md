@@ -648,6 +648,10 @@ reading.
   and so on). The `tools_` prefix the shared modules used to carry is
   gone; the package namespace does that job. `tools/README.md` explains.
 - `tools/*.py` all have thorough module docstrings; read them before guessing.
+- A listing name in backticks in the prose (`registry.py`) becomes a link
+  to that listing in the site and the EPUB at build time
+  (`tools/listing_links.py`). Never write those links by hand in
+  `Chapters/`; a plain code span is the source form.
 - The `Makefile` documents every gate and target (`make help`).
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).
 - `thinking-in-python-skill.md` (repo root) and

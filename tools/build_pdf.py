@@ -250,9 +250,12 @@ def build(out_dir: Path, keep_source: bool = False,
 
     missing: set[str] = set()
     unresolved: set[str] = set()
+    # No listing links: with hang_code=False nothing writes the ids
+    # they point at, and typst rejects a link to a missing label.
     text = build_epub.book_markdown(chapters, missing, unresolved,
                                     hang_code=False,
-                                    ornament=False)
+                                    ornament=False,
+                                    listing_links_on=False)
 
     src = src_dir / "book.md"
     meta = src_dir / "metadata.yaml"
