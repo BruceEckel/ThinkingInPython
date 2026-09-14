@@ -183,7 +183,7 @@ A `Protocol` listing the four methods would restore the checking,
 at the price of a declaration that repeats every class's method names.
 The table version sidesteps the problem.
 Its answers are data rather than methods, so a class has nothing to forget,
-and its `Item` declares its one method, `compete()`,
+and its `Item` declares the one method the dispatch needs, `compete()`,
 so the opponent parameter takes `Item` rather than `Any`.
 
 Each `Item` type encodes the answers for its own combinations.
@@ -295,7 +295,7 @@ Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
 A `match` statement with class patterns is a third option for a two-type decision.
-Like `singledispatch`, it tests with `isinstance()`,
+Like `singledispatch`, it tolerates subclasses: it tests with `isinstance()`,
 so a subclass matches the pattern its base would:
 
 ```python

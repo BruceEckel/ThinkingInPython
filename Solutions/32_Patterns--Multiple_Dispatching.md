@@ -498,7 +498,7 @@ for a, b in zip(team, team[1:]):
 ```
 
 Exercise 7 uses single dispatch, not double: `a.interact(b)` resolves
-on `a`'s type only, and `interact()` prints `other` generically
+on `a`'s type only, and `interact()` interpolates `other` generically
 instead of inspecting its type. The design becomes genuinely *double*
 dispatch once `interact()`'s behavior must vary by `other`'s type too,
 and exercise 8 adds that dependence.
@@ -687,7 +687,7 @@ for item1, item2 in [
 cell with a single probe keyed on both types, and now calls what it
 finds instead of returning it. The call site never learns any of
 this: `item1.compete(item2)` reads exactly as it does in
-`paper_scissors_rock.py`, where three method definitions per class
+`paper_scissors_rock.py`, where four method definitions per class
 stand behind it. That answers the part of the question about keeping
 the syntax of a method call over a table.
 
