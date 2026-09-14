@@ -342,6 +342,8 @@ so a subclass that forgets `draw()` still registers.
 No type checker reports that case,
 because `Shape.registry[kind]()` calls a `type[Shape]`,
 and any of those may be a concrete subclass.
+[Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
+moves that report to the check.
 
 Importing `registry` runs its two `class` statements,
 and the key list shows the table they left behind:
@@ -447,8 +449,85 @@ because the `Triangle` defined in the previous test is still in the registry.
 A `make("Triangle")` here would succeed,
 because the registry keeps every entry it has taken.
 
+### Explicit Registration with a Protocol
+
+The ABC in `registry.py` exists so that `__init_subclass__()` has a class to run from.
+If registration is explicit instead, `Shape` can be a Protocol,
+with the class decorator from [Decorators](14_Techniques--Decorators.md#decorating-classes)
+doing the registering:
+
+```python
+# protocol_registry.py
+from typing import Final, Protocol
+
+class Shape(Protocol):
+    def draw(self) -> None: ...
+
+REGISTRY: Final[dict[str, type[Shape]]] = {}
+
+def register[S: Shape](cls: type[S]) -> type[S]:
+    REGISTRY[cls.__name__] = cls
+    return cls
+
+@register
+class Circle:
+    def draw(self) -> None: print("Circle.draw")
+
+@register
+class Square:
+    def draw(self) -> None: print("Square.draw")
+
+def make(kind: str) -> Shape:
+    return REGISTRY[kind]()
+
+print(sorted(REGISTRY))
+#: ['Circle', 'Square']
+make("Circle").draw()
+#: Circle.draw
+# ty: Argument type `Blob` does not satisfy
+# upper bound `Shape` of type variable `S`:
+# @register
+# class Blob:
+#     pass
+```
+
+`register()` is the decorator from Decorators with one change:
+its type parameter is bounded to `Shape`.
+The bound turns the decorator into a check.
+A decorated class must satisfy the Protocol, so a class without `draw()`,
+or with a `draw()` that takes an extra parameter,
+draws `invalid-argument-type` at its `@register` line before the program runs.
+That is the case the previous section left to runtime,
+where a subclass that forgot `draw()` registered, failed at construction,
+and no checker saw it.
+`REGISTRY` holds `type[Shape]` values and `ty` accepts calling one,
+so `make()` needs no change.
+
+Two hazards from the previous section disappear with the class attribute.
+There is no `cls.registry` to resolve through the MRO,
+and no class for a `@classmethod` to sit on,
+since the table is a module-level name that `make()` reads directly.
+An intermediate class also stays out of the table unless something decorates it.
+Under `__init_subclass__()`,
+an abstract `Polygon` between `Shape` and `Triangle` registers as well,
+and `make("Polygon")` fails with a `TypeError`.
+
+The cost is the mirror failure.
+Registration is opt-in,
+so a class that satisfies `Shape` but lacks `@register` is absent from the table,
+and `make()` fails with a `KeyError` that points at nothing.
+Inheriting from the ABC cannot be forgotten that way,
+because the subclass line is the registration.
+The runtime guard is weaker too.
+A class that ignores the checker's report still registers,
+and fails with an `AttributeError` at its first `draw()` call rather than a `TypeError` at construction.
+Choose by which failure you would rather have:
+the ABC catches the incomplete class when it is built,
+the Protocol when it is checked.
+
 The ordinary Python factory is a dictionary of classes,
-whether you fill it by hand or the classes fill it themselves.
+whether you fill it by hand, the classes fill it themselves,
+or a decorator fills it for them.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes: the pattern remains,
 but no longer needs a class hierarchy to express it.
@@ -1120,7 +1199,9 @@ keyword arguments and a data class are the builder.
 Match the machinery to what varies:
 
 - A name maps to a class: use a dictionary.
-  Add `__init_subclass__()` registration when the set of classes is open-ended or spread across modules.
+  Add registration when the set of classes is open-ended or spread across modules:
+  `__init_subclass__()` on an ABC if a subclass must register by existing,
+  a bounded `@register` decorator on a Protocol if the checker should reject an incomplete class.
 - The choice is which arguments to pass, not which class:
   write an alternative constructor,
   a `@classmethod` that ends with `return cls(...)`.
