@@ -27,8 +27,9 @@ class History[S]:
         self._future.clear()
 
     def undo(self) -> S:
+        previous = self._past.pop()
         self._future.append(self._present)
-        self._present = self._past.pop()
+        self._present = previous
         return self._present
 
 def restore_field(

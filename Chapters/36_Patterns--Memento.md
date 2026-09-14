@@ -391,13 +391,15 @@ class History[S]:
         return self._present
 
     def undo(self) -> S:
+        previous = self._past.pop()
         self._future.append(self._present)
-        self._present = self._past.pop()
+        self._present = previous
         return self._present
 
     def redo(self) -> S:
+        following = self._future.pop()
         self._past.append(self._present)
-        self._present = self._future.pop()
+        self._present = following
         return self._present
 
     def can_undo(self) -> bool:
@@ -438,7 +440,8 @@ so no call site can forget either half.
 as `history_classic.py` shows below.
 
 `undo()` and `redo()` check no precondition of their own:
-undoing with no past raises `IndexError` from `pop()`.
+undoing with no past raises `IndexError` from `pop()`,
+and that `pop()` comes first, so a refused undo leaves the history as it was.
 `can_undo()` and `can_redo()` exist so callers ask first,
 which is how an editor knows to gray out the menu item.
 `History` stores whole states, not descriptions of changes,

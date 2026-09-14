@@ -189,8 +189,9 @@ class History[S]:
         self._future.clear()
 
     def undo(self) -> S:
+        previous = self._past.pop()
         self._future.append(self._present)
-        self._present = self._past.pop()
+        self._present = previous
         return self._present
 
     def can_undo(self) -> bool:
@@ -320,13 +321,15 @@ class History[S]:
         self._future.clear()
 
     def undo(self) -> S:
+        previous = self._past.pop()
         self._future.append(self._present)
-        self._present = self._past.pop()
+        self._present = previous
         return self._present
 
     def redo(self) -> S:
+        following = self._future.pop()
         self._past.append(self._present)
-        self._present = self._future.pop()
+        self._present = following
         return self._present
 
     def goto(self, steps_back: int) -> S:
@@ -384,8 +387,9 @@ class History[S]:
         self._future.clear()
 
     def undo(self) -> S:
+        previous = self._past.pop()
         self._future.append(self._present)
-        self._present = self._past.pop()
+        self._present = previous
         return self._present
 
 def restore_field(
