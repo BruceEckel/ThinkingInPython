@@ -304,7 +304,6 @@ A closed set of names suits `Literal`, while an open set does not:
 # registry.py
 from abc import ABC, abstractmethod
 from typing import ClassVar, override
-from exceptions import expect
 
 class Shape(ABC):
     registry: ClassVar[dict[str, type[Shape]]] = {}
@@ -326,31 +325,13 @@ class Square(Shape):
 
 def make(kind: str) -> Shape:
     return Shape.registry[kind]()
-
-if __name__ == "__main__":
-    print(sorted(Shape.registry))
-    for kind in ["Circle", "Square", "Circle"]:
-        make(kind).draw()
-    expect(KeyError, make, "Triangle")
-#: ['Circle', 'Square']
-#: Circle.draw
-#: Square.draw
-#: Circle.draw
-#: [KeyError] 'Triangle'
 ```
 
 `__init_subclass__()`
 (see [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses))
 lets each subclass register itself.
-Nothing in the listing calls a register function.
-As the printed key list shows,
+Nothing in the listing calls a register function;
 the two `class` statements fill `Shape.registry` on their own.
-`make("Triangle")` fails with a `KeyError` naming the missing key,
-because no class has registered under that name.
-The closed `Literal` in `shape_table.py` rejected `"Hexagon"` before the program ran.
-An open registry cannot do that,
-since a name becomes valid the moment some module defines the class,
-so the check moves to runtime.
 This is why `Shape` is an abstract base class rather than a `Protocol`.
 `__init_subclass__()` runs only for classes that inherit from `Shape`,
 so a class that merely matches a Protocol's shape never registers.
@@ -361,6 +342,32 @@ so a subclass that forgets `draw()` still registers.
 No type checker reports that case,
 because `Shape.registry[kind]()` calls a `type[Shape]`,
 and any of those may be a concrete subclass.
+
+Importing `registry` runs its two `class` statements,
+and the key list shows the table they left behind:
+
+```python
+# registry_demo.py
+from exceptions import expect
+from registry import Shape, make
+
+print(sorted(Shape.registry))
+#: ['Circle', 'Square']
+for kind in ["Circle", "Square", "Circle"]:
+    make(kind).draw()
+#: Circle.draw
+#: Square.draw
+#: Circle.draw
+expect(KeyError, make, "Triangle")
+#: [KeyError] 'Triangle'
+```
+
+`make("Triangle")` fails with a `KeyError` naming the missing key,
+because no class has registered under that name.
+The closed `Literal` in `shape_table.py` rejected `"Hexagon"` before the program ran.
+An open registry cannot do that,
+since a name becomes valid the moment some module defines the class,
+so the check moves to runtime.
 
 Adding a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
@@ -435,7 +442,7 @@ def test_unknown_name_raises() -> None:
         make("Hexagon")
 ```
 
-The last test asks for `"Hexagon"` rather than the `"Triangle"` that `registry.py` used,
+The last test asks for `"Hexagon"` rather than the `"Triangle"` that `registry_demo.py` used,
 because the `Triangle` defined in the previous test is still in the registry.
 A `make("Triangle")` here would succeed,
 because the registry keeps every entry it has taken.

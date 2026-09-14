@@ -1,7 +1,6 @@
 # registry.py
 from abc import ABC, abstractmethod
 from typing import ClassVar, override
-from exceptions import expect
 
 class Shape(ABC):
     registry: ClassVar[dict[str, type[Shape]]] = {}
@@ -23,14 +22,3 @@ class Square(Shape):
 
 def make(kind: str) -> Shape:
     return Shape.registry[kind]()
-
-if __name__ == "__main__":
-    print(sorted(Shape.registry))
-    for kind in ["Circle", "Square", "Circle"]:
-        make(kind).draw()
-    expect(KeyError, make, "Triangle")
-#: ['Circle', 'Square']
-#: Circle.draw
-#: Square.draw
-#: Circle.draw
-#: [KeyError] 'Triangle'
