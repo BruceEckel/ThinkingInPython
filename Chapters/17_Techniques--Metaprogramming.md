@@ -214,7 +214,8 @@ Each generated class is a real type, not a label.
 so `isinstance(light, Event)` is `True`,
 but `type(light) is type(water)` is `False`: they are distinct subclasses,
 and `isinstance()` tells them apart.
-The next section shows what a distinct subclass gives you: behavior of its own.
+The greenhouse listing below shows what a distinct subclass gives you:
+behavior of its own.
 
 `ty` cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
@@ -602,7 +603,7 @@ from typing import final
 class B:
     pass
 
-# ty: cannot inherit from final class "B":
+# ty: Class `C` cannot inherit from final class `B`:
 # class C(B): pass
 b = B()
 print(type(b).__name__)
@@ -785,7 +786,7 @@ that descriptor takes over access to the attribute.
 Instead of going to the instance's `__dict__`,
 a read calls `__get__()` and a write calls `__set__()`.
 [Decorators](14_Techniques--Decorators.md#a-limitation-methods-need-a-descriptor)
-already relied on this without naming it.
+already depended on this, naming the descriptor without showing the protocol.
 A function is an object like any other, and its class defines `__get__()`,
 so every function is a descriptor:
 
@@ -1377,7 +1378,8 @@ for c in Color:
 `IterableMeta.__iter__()` fires when you write `for c in Color`,
 iterating the class object itself, not an instance of it.
 It walks `vars(cls)`, the class's own namespace,
-skipping the dunder entries every class carries,
+skipping every underscore-prefixed name,
+which for `Color` is the dunder bookkeeping every class carries,
 so it yields the three names the body assigned: `red`, `green`, `blue`.
 A class decorator cannot do this.
 It can only add methods that instances see,
