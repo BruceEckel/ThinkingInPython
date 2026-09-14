@@ -899,7 +899,7 @@ without the coupling a shared base class imposes.
 
 The factories so far build each object from a class and some arguments.
 *Prototype* instead keeps one fully configured instance and makes new objects by copying it.
-Use Prototype when a ready-made instance is easier to clone than to construct again from its class and arguments,
+Use Prototype when a ready-made instance is easier to clone than to construct,
 or when construction is slow and the instances share most of the setup.
 
 The `copy` module does the cloning.
@@ -934,12 +934,18 @@ shallow = copy.copy(goblin)
 shallow.powers.append("shared")
 print(goblin.powers)  # The original changed too
 #: ['bite', 'shared']
+# Rebuild through the constructor with new field values:
+knight = copy.replace(goblin, name="Knight", hp=30)
+print(knight)
+#: Monster(name='Knight', hp=30, powers=['bite', 'shared'])
+print(knight.powers is goblin.powers)
+#: True
 ```
 
 Because the `clone()` method wraps `copy.deepcopy()`,
 `captain` gets its own `powers` list,
 and appending to it leaves `goblin.powers` unchanged.
-The last three lines are a warning, not an example to follow:
+The `shallow` lines are a warning, not an example to follow:
 `copy.copy()` duplicates the `Monster` and shares its `powers` list,
 so changing that list through one object changes it for the other,
 with no error to signal it.
@@ -949,8 +955,13 @@ so a `__post_init__()` check never sees the clone
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace) shows which copying calls run it).
 A prototype of a validated type is safe because the prototype was valid,
 not because the clone was checked.
-When the copy also changes fields,
-`copy.replace()` rebuilds through the constructor and checks the result.
+When the variant differs only in field values,
+`copy.replace()` builds it through the constructor, as `knight` shows,
+so a `__post_init__()` check runs on the result.
+Every field you do not name is passed by reference,
+which is why `knight` shares `goblin`'s `powers` list,
+the same sharing `shallow` showed.
+Pass a fresh list for that field when the variant must own one.
 
 `deepcopy()` copies everything it can reach,
 and it has no way to copy an open file, a socket, or a lock,

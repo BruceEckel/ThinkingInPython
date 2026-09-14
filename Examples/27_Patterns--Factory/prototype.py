@@ -25,3 +25,9 @@ shallow = copy.copy(goblin)
 shallow.powers.append("shared")
 print(goblin.powers)  # The original changed too
 #: ['bite', 'shared']
+# Rebuild through the constructor with new field values:
+knight = copy.replace(goblin, name="Knight", hp=30)
+print(knight)
+#: Monster(name='Knight', hp=30, powers=['bite', 'shared'])
+print(knight.powers is goblin.powers)
+#: True
