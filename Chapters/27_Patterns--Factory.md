@@ -516,6 +516,7 @@ The cost is the mirror failure.
 Registration is opt-in,
 so a class that satisfies `Shape` but lacks `@register` is absent from the table,
 and `make()` fails with a `KeyError` that points at nothing.
+Exercise 10 writes a check that finds the missing decorator.
 Inheriting from the ABC cannot be forgotten that way,
 because the subclass line is the registration.
 The runtime guard is weaker too.
@@ -1261,3 +1262,9 @@ Both exist to work around languages where a class is not an object you can put i
     Write a recursive generator `all_subclasses()` that yields a class's direct subclasses and,
     through each one's own `__subclasses__()`, every class below them.
     Use it in `shape_name()` and confirm that `Oval` now appears.
+10. Add a `Hexagon` to `protocol_registry.py` that satisfies `Shape` but carries no `@register`,
+    and show what `make("Hexagon")` does.
+    Then write a check that reports every class in the module that satisfies `Shape` and is missing from `REGISTRY`,
+    so the forgotten decorator is found before any `make()` call.
+    `@runtime_checkable` (see [Surrogate](26_Patterns--Surrogate.md#proxy))
+    lets `issubclass()` test a class against the Protocol.

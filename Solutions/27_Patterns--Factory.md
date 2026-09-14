@@ -721,3 +721,81 @@ With the same seed the sequence differs from the chapter's, because
 the deeper classes without removing the intermediate ones, and a
 factory that should build only leaf classes needs a further filter,
 `not cls.__subclasses__()`.
+
+## 10. Finding the class that forgot `@register`
+
+```python
+# exercise_10.py
+from typing import Final, Protocol, runtime_checkable
+
+@runtime_checkable
+class Shape(Protocol):
+    def draw(self) -> None: ...
+
+REGISTRY: Final[dict[str, type[Shape]]] = {}
+
+def register[S: Shape](cls: type[S]) -> type[S]:
+    REGISTRY[cls.__name__] = cls
+    return cls
+
+@register
+class Circle:
+    def draw(self) -> None: print("Circle.draw")
+
+@register
+class Square:
+    def draw(self) -> None: print("Square.draw")
+
+class Hexagon:
+    def draw(self) -> None: print("Hexagon.draw")
+
+def make(kind: str) -> Shape:
+    return REGISTRY[kind]()
+
+def unregistered(namespace: dict[str, object]) -> list[str]:
+    return sorted(
+        name
+        for name, obj in namespace.items()
+        if isinstance(obj, type)
+        and obj is not Shape
+        and issubclass(obj, Shape)
+        and obj not in REGISTRY.values()
+    )
+
+Hexagon().draw()
+#: Hexagon.draw
+try:
+    make("Hexagon")
+except KeyError as e:
+    print("KeyError:", e)
+#: KeyError: 'Hexagon'
+print(unregistered(globals()))
+#: ['Hexagon']
+```
+
+`Hexagon` is a complete `Shape`: `ty` accepts it wherever a `Shape`
+is expected, and `Hexagon().draw()` works. `make("Hexagon")` fails
+with a `KeyError`, because the table never heard of it, and the
+error names the key rather than the class or the missing line. No
+checker reports the omission, since a class that nothing decorates
+is an ordinary class.
+
+`unregistered()` walks a namespace and keeps every class that
+`issubclass()` accepts as a `Shape` and that `REGISTRY` lacks.
+`@runtime_checkable` is what allows the `issubclass()` call; without
+it, testing a class against a Protocol raises a `TypeError`. The
+`obj is not Shape` guard drops the Protocol, which passes its own
+test. Calling `unregistered(globals())` at the end of the module, or
+from a test, turns a silent absence into a printed name.
+
+The runtime test is weaker than the checker's. `issubclass()` looks
+for an attribute named `draw` and nothing about its signature, so a
+class whose `draw()` takes an extra parameter passes here and fails
+at `@register`. The two checks cover each other: the checker
+rejects a decorated class that does not fit, and `unregistered()`
+reports a fitting class that was not decorated. `issubclass()`
+against a Protocol also works only when every member is a method;
+a Protocol with a data attribute raises a `TypeError` from
+`issubclass()`, and `isinstance()` on an instance is the fallback.
+The check also sees one namespace at a time, so a plugin module
+must run it over its own `globals()`.
