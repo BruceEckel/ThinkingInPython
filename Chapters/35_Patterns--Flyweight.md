@@ -544,8 +544,9 @@ you can write its equality checks as `is`.
     A full opening position holds thirty-two piece references.
     How many `Piece` objects exist?
     How do you capture and promote?
-5.  Rewrite `interned_color.py` to use the weak pool technique from `weak_pool.py`,
+5.  Rewrite `interned_color.py` to hold its pool weakly, as `weak_pool.py` does,
     and show that building and dropping a palette of colors leaves the pool empty.
+    Say what the rewrite gave up to get there.
 6.  Constrain `red`, `green`, and `blue` to `0`-`255` in `interned_color.py`.
     Raise `ValueError` from `__new__()` for an out-of-range component,
     and write a test for it.
