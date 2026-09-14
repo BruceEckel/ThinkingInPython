@@ -153,7 +153,7 @@ One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method:
 declaring that parameter as `Visitor` instead fails the type checker.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base.
-A `Protocol` removes the `Any` at the cost of two new lines and an import:
+A `Protocol` removes the `Any` at the cost of two new lines:
 
     class Visits(Protocol):
         def visit(self, flower: Flower) -> None: ...
@@ -280,7 +280,7 @@ so `nectar(42)` returns `42: no nectar`.
 `ty` and Pyright do not object either,
 because the dispatcher that `@singledispatch` builds declares its parameters as `Any`.
 Only mypy rejects `nectar(42)`,
-since its stubs keep the original signature on the dispatcher.
+since mypy's built-in `singledispatch` plugin checks the call against the base function's signature.
 When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 A forgotten registration then fails at its first call.
@@ -351,7 +351,7 @@ But in Python that is rare.
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 A minimal example shows the traversal case.
-`Corsage.accept()` decides which elements to visit and recurses into any nested `Corsage`,
+`Corsage.accept()` visits each of its elements and recurses into any nested `Corsage`,
 so nothing outside the object drives the walk:
 
 ```python

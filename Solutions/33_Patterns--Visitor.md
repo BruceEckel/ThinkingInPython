@@ -52,7 +52,7 @@ function, the call site names it: `pollinate(flower, "Bee")` says what
 
 You lose one thing: holding a visitor in a variable and passing it
 around as an object. When that matters, the function is still a value.
-`op = eat` works, and a `dict[str, Callable[[Flower], str]]` keyed by
+`op = eat` works, and a `dict[str, Callable[..., str]]` keyed by
 operation name recovers the "choose an operation at runtime" half of
 what the `Visitor` hierarchy provided, without the classes.
 
@@ -80,12 +80,24 @@ def nectar(flower: Flower) -> str:
     return f"{flower}: no nectar"
 
 @nectar.register
+def _(flower: Gladiolus) -> str:
+    return f"{flower}: abundant nectar"
+
+@nectar.register
+def _(flower: Chrysanthemum) -> str:
+    return f"{flower}: a little nectar"
+
+@nectar.register
 def _(flower: Rose) -> str:  # 3 lines
     return f"{flower}: abundant nectar"
 
 @singledispatch
 def fragrance(flower: Flower) -> str:
     return "faint"
+
+@fragrance.register
+def _(flower: Ranunculus) -> str:
+    return "strong"
 
 @fragrance.register
 def _(flower: Rose) -> str:  # 3 lines
@@ -113,11 +125,11 @@ for the flower that differs, and again no existing line changed.
 
 `@singledispatch` makes adding an *operation* cheaper than adding a
 type, because an operation is a whole function and lives in one place.
-Adding a type is cheap here only because most flowers accept the
-default. A type that needs a distinct answer from every operation
-costs one registration per operation, scattered across the file. That
-is the expression problem from
-[Pattern Matching](../Chapters/13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching):
+Adding `thorns()` was cheap because three of the four flowers accept
+its default. `Rose` needs a distinct answer from every operation, so
+it costs one registration per operation, scattered across the file.
+That is the expression problem from
+[Pattern Matching](../Chapters/13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching):
 methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
 once.

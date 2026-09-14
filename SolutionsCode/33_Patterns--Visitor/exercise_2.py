@@ -19,12 +19,24 @@ def nectar(flower: Flower) -> str:
     return f"{flower}: no nectar"
 
 @nectar.register
+def _(flower: Gladiolus) -> str:
+    return f"{flower}: abundant nectar"
+
+@nectar.register
+def _(flower: Chrysanthemum) -> str:
+    return f"{flower}: a little nectar"
+
+@nectar.register
 def _(flower: Rose) -> str:  # 3 lines
     return f"{flower}: abundant nectar"
 
 @singledispatch
 def fragrance(flower: Flower) -> str:
     return "faint"
+
+@fragrance.register
+def _(flower: Ranunculus) -> str:
+    return "strong"
 
 @fragrance.register
 def _(flower: Rose) -> str:  # 3 lines
