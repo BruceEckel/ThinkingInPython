@@ -402,7 +402,8 @@ An [Enum](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is a flyweight pool the language maintains.
 Python constructs each member once, at class creation,
 and any reference produces that one object.
-Here is `tile_map.py`'s `Tile` again, with the pool moved into the language:
+Here is `tile_map.py`'s `Tile` recast as an enum,
+with the pool moved into the language and the member name replacing the `name` field:
 
 ```python
 # tile_enum.py
@@ -511,8 +512,7 @@ These four answers read as an if/elif chain,
 but the questions behind them are independent.
 Constructor syntax and leak-safety are separate questions,
 so `__new__()` interning can hold its pool weakly too:
-key the `WeakValueDictionary` on the constructor arguments the way `interned_color.py` keys `_pool`,
-the combination Exercise 5 builds.
+key the `WeakValueDictionary` on the constructor arguments the way `interned_color.py` keys `_pool`.
 Combine mechanisms when more than one requirement applies.
 
 ## Flyweights in the Wild

@@ -490,13 +490,11 @@ are the spec table, and `Tile(s)` is the pool lookup. The
 value-to-member table the metaclass builds performs the runtime
 membership check `to_symbol()` did by hand.
 
-The `Literal` version catches a character `SPECS` does not cover, and
-the enum catches the same class of mistake, since a symbol with no
-member has no way into the map. The enum adds one thing: the *set
-itself* is a single declaration rather than two kept in step. The
-`Literal` version could drift, with `Symbol` and `SPECS` disagreeing,
-and only the annotation tying the two together catches that drift. The
-enum leaves nothing to disagree with.
+The type checker catches nothing new. An unknown symbol is still a
+runtime failure, a `ValueError` from `Tile(s)`. The gain is in the
+declaration: the `Literal` version declares the set twice, in `Symbol`
+and in `SPECS`, with an annotation tying the two together, while the
+enum declares it once and rules out that drift.
 
 The enum gives up the moment of failure. `to_symbol()` raises a
 `KeyError` at a named boundary the chapter can point at. `Tile("?")`
