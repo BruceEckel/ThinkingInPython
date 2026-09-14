@@ -33,6 +33,13 @@ INLINE_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 HTML_TAG = re.compile(r"<[^>]+>")
 LINK = re.compile(r"\]\(([^)]+)\)")
 ANCHOR_TARGET = re.compile(r"^(?:([\w./-]+)\.md)?#([\w-]+)$")
+# Any #-anchor link at all, so one whose anchor carries a character
+# outside [\w-] (pandoc keeps a heading's period in its auto-slug) is
+# reported rather than skipped: build_site.MD_LINK and
+# build_epub.ANCHOR_TARGET cannot rewrite such a link, so the site
+# serves a raw .md href. Give the heading an explicit {#id} instead.
+ANY_ANCHOR = re.compile(r"^(?:([\w./-]+)\.md)?#(\S+)$")
+BUILT_DIRS = frozenset({"Chapters", "Solutions"})
 
 
 def pandoc_anchor(text: str) -> str:
@@ -74,7 +81,7 @@ def anchor_links(doc: Document) -> Iterator[tuple[int, str | None, str]]:
     for lineno, line in doc.outside_fences():
         masked = INLINE_CODE.sub("", line)
         for target in LINK.findall(masked):
-            m = ANCHOR_TARGET.match(target.strip())
+            m = ANY_ANCHOR.match(target.strip())
             if m:
                 yield lineno, m.group(1), m.group(2)
 
@@ -102,7 +109,17 @@ def find(doc: Document) -> Iterator[Finding]:
     links go to disk, through the cache.
     """
     own = frozenset(heading_anchors(doc))
+    # Only the book's files pass through build_site and build_epub;
+    # tools/README.md is rendered by GitHub, where such anchors work.
+    built = doc.path.parent.name in BUILT_DIRS
     for lineno, stem, anchor in anchor_links(doc):
+        if built and not ANCHOR_TARGET.match(f"#{anchor}"):
+            yield Finding(
+                doc.path, lineno,
+                f'anchor "#{anchor}" has a character the site build '
+                "cannot rewrite; give the heading an explicit {#id}",
+            )
+            continue
         if stem is None:
             where, valid = "this file", own
         else:
