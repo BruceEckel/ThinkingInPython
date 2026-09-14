@@ -619,12 +619,6 @@ who keeps it to construct objects later.
 Much of the time, however, a single static method in the base class
 (as in `shape_factory_method.py`) is enough.
 
-This factory-object design is not yet the *Factory Method* pattern of *GoF Design Patterns*.
-That pattern puts the creation method on a class and lets subclasses override it.
-`Sketch` in the next section is that form.
-`new_shape()` is a factory method,
-and each subclass overrides it to produce a different type.
-
 Python does not need a `Factory` class nested in every shape.
 `shape_factory_objects.py` includes one because a language that cannot store a class in a dictionary must wrap each constructor in an object.
 The registry in `registry.py` does the same job with no nested classes.
