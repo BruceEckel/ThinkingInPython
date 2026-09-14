@@ -696,7 +696,9 @@ so the two hierarchies grow together.
 The second hierarchy is worth having only when the creator does work of its own,
 as `render()` does here.
 When choosing the class is the creator's only job,
-the dictionary in `shape_table.py` says the same thing with no hierarchy at all.
+a dictionary of classes says the same thing with no second hierarchy:
+`shape_table.py` when the set of shapes is closed,
+`protocol_registry.py` when it is open.
 
 ## Abstract Factories
 
