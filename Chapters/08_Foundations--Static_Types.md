@@ -687,12 +687,15 @@ Annotations go in three places: a parameter (`x: int`), a return value
 Most of the names below come from the `typing` module.
 The abstract container types come from `collections.abc`.
 
-<!-- Section headers link out to docs.python.org in a new tab.
-     CHAPTER_TOC_DEPTH (build_site.py) is 3, so the in-page TOC
-     includes the "###" headings below, and each heading whose text is
-     a link nests an <a> inside the TOC's own <a> for that entry. -->
+<!-- Each group links out to docs.python.org, in a new tab, on the
+     line under its heading rather than in the heading: CHAPTER_TOC_DEPTH
+     (build_site.py) is 3, so the in-page TOC includes these "###"
+     headings, and a link inside one would nest an <a> inside the TOC's
+     own <a> for that entry. -->
 
-### <a href="https://docs.python.org/3/library/stdtypes.html#built-in-types" target="_blank" rel="noopener">Basic types</a>
+### Basic types
+
+<a href="https://docs.python.org/3/library/stdtypes.html#built-in-types" target="_blank" rel="noopener">Python documentation: basic types</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -703,7 +706,9 @@ The abstract container types come from `collections.abc`.
 | `Never`, `NoReturn` | The "impossible" type, which no value has; `NoReturn` marks a function that never returns (it always raises an exception or exits), and `Never` is the same type under a name that also suits other positions |
 | `LiteralString` | A `str` built only from literals, for injection-sensitive APIs |
 
-### <a href="https://docs.python.org/3/library/stdtypes.html#generic-alias-type" target="_blank" rel="noopener">Containers</a>
+### Containers
+
+<a href="https://docs.python.org/3/library/stdtypes.html#generic-alias-type" target="_blank" rel="noopener">Python documentation: containers</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -717,7 +722,9 @@ The abstract container types come from `collections.abc`.
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
 
-### <a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Unions, optionals, and literals</a>
+### Unions, optionals, and literals
+
+<a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Python documentation: unions, optionals, and literals</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -725,7 +732,9 @@ The abstract container types come from `collections.abc`.
 | `X` \| `None` | Optional: `X` or `None`, see [Type Hints](#type-hints) |
 | `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
-### <a href="https://docs.python.org/3/library/typing.html#type-aliases" target="_blank" rel="noopener">Aliases and distinct types</a>
+### Aliases and distinct types
+
+<a href="https://docs.python.org/3/library/typing.html#type-aliases" target="_blank" rel="noopener">Python documentation: aliases and distinct types</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -733,14 +742,18 @@ The abstract container types come from `collections.abc`.
 | `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
-### <a href="https://docs.python.org/3/library/typing.html#typing.Final" target="_blank" rel="noopener">Constants and class variables</a>
+### Constants and class variables
+
+<a href="https://docs.python.org/3/library/typing.html#typing.Final" target="_blank" rel="noopener">Python documentation: constants and class variables</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Final`, `Final[T]` | A name the type checker does not let you reassign, see [Constants with Final](#constants-with-final) |
 | `ClassVar[T]` | A class-level attribute, not one per instance, see [Class Attributes](09_Foundations--Class_Attributes.md#declaring-shared-state-with-classvar) |
 
-### <a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Generics</a>
+### Generics
+
+<a href="https://docs.python.org/3/library/typing.html#generics" target="_blank" rel="noopener">Python documentation: generics</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -752,14 +765,18 @@ The abstract container types come from `collections.abc`.
 | `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
-### <a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Structural typing</a>
+### Structural typing
+
+<a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Python documentation: structural typing</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
 | `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [Surrogate](26_Patterns--Surrogate.md#proxy) |
 
-### <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict" target="_blank" rel="noopener">Dictionary and record shapes</a>
+### Dictionary and record shapes
+
+<a href="https://docs.python.org/3/library/typing.html#typing.TypedDict" target="_blank" rel="noopener">Python documentation: dictionary and record shapes</a>
 
 | Construct | Meaning |
 |-----------|---------|
@@ -767,20 +784,26 @@ The abstract container types come from `collections.abc`.
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
 | `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions) |
 
-### <a href="https://docs.python.org/3/library/typing.html#typing.TypeGuard" target="_blank" rel="noopener">Type narrowing</a>
+### Type narrowing
+
+<a href="https://docs.python.org/3/library/typing.html#typing.TypeGuard" target="_blank" rel="noopener">Python documentation: type narrowing</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `TypeGuard[T]`, `TypeIs[T]` | A boolean predicate that narrows a type: `TypeGuard` narrows only where it returns `True`, `TypeIs` narrows both branches |
 
-### <a href="https://docs.python.org/3/library/typing.html#typing.Self" target="_blank" rel="noopener">Self and forward references</a>
+### Self and forward references
+
+<a href="https://docs.python.org/3/library/typing.html#typing.Self" target="_blank" rel="noopener">Python documentation: self and forward references</a>
 
 | Construct | Meaning |
 |-----------|---------|
 | `Self` | The enclosing class type; useful for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
 | `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) |
 
-### <a href="https://docs.python.org/3/library/typing.html#functions-and-decorators" target="_blank" rel="noopener">Typing decorators and directives</a>
+### Typing decorators and directives
+
+<a href="https://docs.python.org/3/library/typing.html#functions-and-decorators" target="_blank" rel="noopener">Python documentation: typing decorators and directives</a>
 
 | Construct | Meaning |
 |-----------|---------|
