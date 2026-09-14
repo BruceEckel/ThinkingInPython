@@ -248,7 +248,7 @@ expect(AttributeError, Broken("ignored").show)
 ```
 
 A derived class that defines no constructor of its own inherits and runs the base version.
-The derived class also inherits `show_twice()` unchanged.
+`Derived` also inherits `show_twice()` unchanged.
 
 The class `Different` also has a method named `show()`,
 but does not derive from `Simple`.

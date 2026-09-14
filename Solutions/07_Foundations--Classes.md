@@ -244,8 +244,8 @@ feature has three parts: `@override` states an intention, the type
 checker verifies it, and the runtime is indifferent.
 
 The value of `@override` is in what the type checker catches later.
-The typo is easy to spot in six lines. The same failure arrives
-silently when someone renames or deletes `Base.show` a year from now.
-With `@override` on every overriding method in the codebase, that
-rename becomes a list of exact locations to fix. A decorator that does
-nothing at runtime is worth writing when a tool reads it.
+The typo is easy to spot in a listing this short. The same failure
+arrives silently when someone renames or deletes `Base.show` a year
+from now. With `@override` on every overriding method in the codebase,
+that rename becomes a list of exact locations to fix. A decorator that
+does nothing at runtime is worth writing when a tool reads it.
