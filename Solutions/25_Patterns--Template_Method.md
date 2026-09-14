@@ -294,9 +294,11 @@ and only one of those things exists.
 optional, and that is the base class's decision: it declares that a
 subclass may skip this step. Declare instead that a subclass may not,
 by inheriting from `ABC` and marking `customize2()` with
-`@abstractmethod`, and both tools object. `ty` reports the
-instantiation of an abstract class, and Python refuses to construct
-`HalfDone` at all. The type checker could not catch the omission
+`@abstractmethod`, and Python refuses to construct `HalfDone` at
+all. `ty` 0.0.80 has no rule for instantiating an abstract class, so
+under `ty` the refusal comes from the runtime alone. Pyright and mypy
+both report it before the program runs. No checker could catch the
+omission
 before, because "deliberately empty" and "forgotten" were the same
 code, and only the base class could have recorded that difference.
 

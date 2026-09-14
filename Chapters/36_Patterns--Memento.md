@@ -641,8 +641,9 @@ except AttributeError as e:
 The dump that builds `blob` runs while `sketch_v1.SketchV1` still means the one-field class.
 `sketch_v1.SketchV1 = SketchV2` stands in for an edit and reload of that module,
 with a field added between the save and the load.
-The type checker flags that reassignment as unsound,
+`ty` and mypy flag that reassignment as unsound,
 so it carries a `# type: ignore`.
+Pyright lets the reassignment pass.
 No practical annotation declares that `SketchV1` can become a different class.
 `pickle.loads()` looks up the class by the name pickle recorded,
 `sketch_v1.SketchV1`.

@@ -654,8 +654,10 @@ def test_subclassing_the_decorated_name_fails() -> None:
             pass
 ```
 
-The type checker rejects `Sub` statically: its base has type `singleton`,
+`ty` and Pyright reject `Sub` statically: its base has type `singleton`,
 not a class.
+Under mypy, which does not apply a class decorator's return type,
+`Registry` is still a class and `Sub` passes.
 At runtime the `class` statement raises a `TypeError`.
 `singleton.__init__()` takes two positional arguments and receives four,
 because a class statement hands the name, bases, and namespace to its metaclass,

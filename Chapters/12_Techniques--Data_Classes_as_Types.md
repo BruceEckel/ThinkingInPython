@@ -1092,8 +1092,8 @@ The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
 and the class never comes into existence:
 the error arrives while Python is still executing the `class` statement.
-A type checker reports it as `invalid-named-tuple`,
-which the `# type: ignore` silences.
+`ty` reports it as `invalid-named-tuple`, which the `# type: ignore` silences.
+Pyright accepts the `__new__()` without comment.
 
 A subclass of the `NamedTuple` may define `__new__()`.
 That gets past the prohibition and moves the hole rather than closing it.

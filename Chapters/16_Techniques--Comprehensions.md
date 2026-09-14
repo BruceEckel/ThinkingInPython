@@ -100,7 +100,8 @@ So the `lambda` makes `map_and_filter.py` worse, not `map()`.
 
 The `# type: ignore` comments mark a cost beyond readability.
 `filter()` with a `lambda` predicate does not narrow the element type,
-so the type checker still sees `int | str` coming out and rejects `e ** 2`.
+so `ty` still sees `int | str` coming out and rejects `e ** 2`.
+Pyright infers the mixed list literal as `list[Unknown]` and checks nothing there.
 The comprehension's `if isinstance(e, int)` does narrow,
 so `list_comprehension.py` needs no such comment.
 `filter()` can narrow,

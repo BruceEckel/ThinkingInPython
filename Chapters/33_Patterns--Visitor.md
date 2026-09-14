@@ -277,8 +277,10 @@ The default reaches further than `Flower`, too:
 `@singledispatch` registers the base implementation under `object`,
 not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
-The type checker does not object either,
+`ty` and Pyright do not object either,
 because the dispatcher that `@singledispatch` builds declares its parameters as `Any`.
+Only mypy rejects `nectar(42)`,
+since its stubs keep the original signature on the dispatcher.
 When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 A forgotten registration then fails at its first call.

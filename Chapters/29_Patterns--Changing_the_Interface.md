@@ -117,13 +117,15 @@ Inheritance merges them.
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
 `WhatIUse2.op()` renames that parameter to `what_i_have`.
 A caller passing it by keyword would break on the rename,
-so the type checker rejects a renamed keyword-capable parameter in an override.
+so `ty` and Pyright reject a renamed keyword-capable parameter in an override.
+The rename passes under mypy,
+which does not compare parameter names in an override.
 Positional-only, the name is invisible to callers and the rename is legal.
 The rename is the smaller half of that story.
 `WhatIUse2.op()` also changes the parameter's type.
 The base version accepts a `WhatIWant`, and the override accepts a `WhatIHave`.
 If you annotate both precisely, a type checker rejects the override outright,
-reporting `invalid-method-override`,
+which `ty` reports as `invalid-method-override`,
 because narrowing what a method accepts breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 Uncomment the commented-out signature above, `what_i_have: WhatIHave`,
 and the checker reports:

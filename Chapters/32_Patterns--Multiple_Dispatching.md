@@ -576,8 +576,10 @@ Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
 It can do that because it gives `NotImplemented` a type that inherits from `Any`,
 so returning the sentinel satisfies any declared return type.
 Writing the union out, `Meters | NotImplementedType`,
-makes a type checker reject `(Meters(1) + Meters(2)).n`,
+makes `ty` reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
+Pyright and mypy accept the access,
+because that inheritance from `Any` lets the sentinel branch claim any attribute.
 The sentinel signals the interpreter and never reaches a caller,
 so an annotation that names it describes the wrong thing.
 Widening the return to `Any` describes nothing and turns off checking for every caller.

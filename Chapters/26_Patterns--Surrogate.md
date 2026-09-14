@@ -264,8 +264,10 @@ The two calls look interchangeable and are not.
 so the failed instance lookup falls through to `__getattr__()`, which delegates.
 `len(p)` looks up `__len__()` on `type(p)`, skips the instance, finds none,
 and reports that `Proxy` has no `len()`.
-The type checker rejects `len(p)` statically for the same reason,
+`ty` and Pyright reject `len(p)` statically for the same reason,
 so the listing needs the `# type: ignore` to show the runtime failure.
+Under mypy, `__getattr__()` also satisfies the lookup for `__len__()`,
+so `len(p)` passes the check and fails only at runtime.
 A proxy that must forward special methods defines them explicitly.
 
 `len(p)` reports the missing method because `object` defines no `__len__()`.

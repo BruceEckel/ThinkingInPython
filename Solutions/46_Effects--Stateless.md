@@ -700,12 +700,12 @@ for who in ("Alice", "Cyd", "Dana"):
 `@throws(ValueError)` turns `format_score()` from a function that
 raises an exception into an Effect that declares one, so its failure
 travels as a value in the yield channel instead of unwinding the stack.
-Following `ty` until the program builds means two edits: widening
+Following `ty` until the program builds means one edit: widening
 `announce()`'s error parameter from `KeyError` to
-`KeyError | ValueError`, and annotating `line: str`. `value: int`
-carries an annotation for the same reason: `yield from` on a
-`@throws` function produces the declared success type, and naming
-that type keeps the type checker's inference pinned.
+`KeyError | ValueError`. `line: str` and `value: int` carry
+annotations by choice, not by demand: `yield from` on a `@throws`
+function produces the declared success type, and naming that type
+keeps the type checker's inference pinned.
 
 Each failure surfaced at `run()`, and nowhere earlier. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails. `Dana` has

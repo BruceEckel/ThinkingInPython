@@ -194,8 +194,9 @@ Without `**P` you fall back to `*args: Any, **kwargs: Any`,
 and the wrapper swallows any arguments,
 discarding the signature the decorator should preserve.
 
-The `# type: ignore` comments mark where the type checker cannot follow:
+The `# type: ignore` comments mark where `ty` cannot follow:
 a `Callable` need not have a `__name__` attribute, though every function does.
+Pyright and mypy both accept the attribute here.
 
 `trace` assumes `func` runs to completion inside the call that invokes it,
 which is true of an ordinary function and false of an `async def` function.
@@ -863,7 +864,7 @@ if __name__ == "__main__":
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
 If `register`'s annotation were `(cls: type) -> type`,
 it would hand back a bare `type`,
-and the type checker would see `Espresso()` as an `Any`.
+and `ty` and Pyright would see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 

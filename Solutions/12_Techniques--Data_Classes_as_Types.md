@@ -453,11 +453,12 @@ a `ValueError` naming the fix. The full message is `mutable
 default <class 'dict'> for field index is not allowed: use
 default_factory`.
 
-`Bare` and `Subscripted` both work, and they differ in what a type checker
-can see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
-loose enough to satisfy any `dict` annotation, so a type checker never
-compares the factory against the field. `dict[str, Month]` is callable
-too, and its return type is concrete, so
+`Bare` and `Subscripted` both work, and they differ in what `ty` can
+see. `dict` is a class whose call returns `dict[Unknown, Unknown]`,
+loose enough to satisfy any `dict` annotation, so `ty` never compares
+the factory against the field. Checkers differ here: Pyright and mypy
+both compare the bare factory and reject a mismatched one.
+`dict[str, Month]` is callable too, and its return type is concrete, so
 `field(default_factory=dict[int, int])` on this field draws a type
 error before the program runs. The bare form is fine where a reader
 can see that the factory and the annotation agree. Subscript the

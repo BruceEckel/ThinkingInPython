@@ -216,8 +216,10 @@ but `type(light) is type(water)` is `False`: they are distinct subclasses,
 and `isinstance()` tells them apart.
 The next section shows what a distinct subclass gives you: behavior of its own.
 
-The type checker cannot follow a class built by `type()`.
+`ty` cannot follow a class built by `type()`.
 It models `new_cls` as unknown, so it checks nothing about the generated class.
+Pyright synthesizes the class and checks its constructor,
+and mypy models it as `ty` does.
 `EventMaker` names the two-argument signature the generated classes really have,
 and the `cast()` records it at the one place that creates a class.
 
@@ -1178,13 +1180,16 @@ The second `ASingleton()` never reaches `__new__()` or `__init__()`:
 Each class gets its own entry in the `_instances` dictionary,
 so the singletons are independent.
 The `[T]` on `__call__()` ties its return type to `cls`,
-so a type checker sees `ASingleton()` as an `ASingleton` instead of `Any`.
-Without it, every singleton comes back as `Any`,
-and a misspelled attribute access on the result passes the type checker.
+so `ty` sees `ASingleton()` as an `ASingleton` instead of `Any`.
+Without it, every singleton comes back as `Any` under `ty` and Pyright,
+and a misspelled attribute access on the result passes the check.
+Under mypy the `[T]` changes nothing:
+it ignores a metaclass `__call__()` return type and keeps `ASingleton` either way.
 
 That same `[T]` is why the body calls `type.__call__(cls, ...)` instead of the more usual `super().__call__(...)`.
 Annotating the first parameter as `type[T]` hides that `cls` is a `Singleton`,
-and a type checker must confirm that before it accepts a zero-argument `super()`.
+and `ty` and mypy must confirm that before they accept a zero-argument `super()`.
+Pyright accepts it without the check.
 Both forms do the same work at run time.
 
 You might expect to parameterize[^parametrize] the class,
