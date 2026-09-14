@@ -435,6 +435,11 @@ def test_unknown_name_raises() -> None:
         make("Hexagon")
 ```
 
+The last test asks for `"Hexagon"` rather than the `"Triangle"` that `registry.py` used,
+because the `Triangle` defined in the previous test is still in the registry.
+A `make("Triangle")` here would succeed,
+because the registry keeps every entry it has taken.
+
 The ordinary Python factory is a dictionary of classes,
 whether you fill it by hand or the classes fill it themselves.
 That is the dissolution [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
