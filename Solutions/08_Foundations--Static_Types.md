@@ -51,15 +51,14 @@ reports:
 
 ```
 error[invalid-argument-type]: Argument to function `area` is incorrect
- --> area.py:4:12
+ --> area.py:6:12
   |
-4 | print(area("3", 4))
+6 | print(area("3", 4))
   |            ^^^ Expected `int`, found `Literal["3"]`
-  |
 info: Function defined here
- --> area.py:1:5
+ --> area.py:2:5
   |
-1 | def area(width: int, height: int) -> int:
+2 | def area(width: int, height: int) -> int:
   |     ^^^^ ---------- Parameter declared here
 ```
 

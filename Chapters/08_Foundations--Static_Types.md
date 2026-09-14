@@ -132,8 +132,10 @@ pairs what the annotation expected with what the call supplied,
 and then points at the declaration that set the expectation.
 
 Listings in this book use a shorthand for a diagnostic.
-A neighboring `# ty:` comment summarizes what the type checker reports for a line that would fail the check,
-whether commented out or suppressed with `# type: ignore`.
+A neighboring `# ty:` comment summarizes what the type checker reports for a line:
+the diagnostic for a line that would fail the check,
+whether commented out or suppressed with `# type: ignore`,
+or the type a `reveal_type()` call produces.
 
 ## Narrowing {#narrowing}
 
@@ -300,7 +302,7 @@ so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
 at the cost of a weaker check: see [Surrogate](26_Patterns--Surrogate.md#proxy).
 
-`Drawable` appears only in `render()`'s definition.
+`Drawable` annotates `render()`'s parameter alone.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
 `Blob` is the case worth watching: it draws, in the everyday sense,
 but the method's name is `paint()`,
@@ -390,7 +392,8 @@ A `Literal` union is the lightest way to close a set of values.
 Once those values need behavior or an identity of their own,
 an `Enum` is the better fit.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
-compares the two.
+makes the case for an `Enum` whenever the set of values is small and fixed,
+then shows when an `Enum` beats a data class.
 
 An alias can also name a union of types.
 [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching)
@@ -684,10 +687,10 @@ Annotations go in three places: a parameter (`x: int`), a return value
 Most of the names below come from the `typing` module.
 The abstract container types come from `collections.abc`.
 
-<!-- Section headers link out to docs.python.org in a new tab. Safe only
-     because CHAPTER_TOC_DEPTH (build_site.py) stops the in-page TOC at
-     "##"; raising it to 3 would nest an <a> inside the TOC's own <a>
-     for every "###" heading below and break those TOC entries. -->
+<!-- Section headers link out to docs.python.org in a new tab.
+     CHAPTER_TOC_DEPTH (build_site.py) is 3, so the in-page TOC
+     includes the "###" headings below, and each heading whose text is
+     a link nests an <a> inside the TOC's own <a> for that entry. -->
 
 ### <a href="https://docs.python.org/3/library/stdtypes.html#built-in-types" target="_blank" rel="noopener">Basic types</a>
 
@@ -704,7 +707,8 @@ The abstract container types come from `collections.abc`.
 
 | Construct | Meaning |
 |-----------|---------|
-| `list[T]`, `set[T]`, `frozenset[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
+| `list[T]`, `set[T]` | A homogeneous collection of `T`; *invariant*, so `list[Circle]` is not a `list[Shape]`, see [Variance](#variance) |
+| `frozenset[T]` | An immutable homogeneous set of `T`; *covariant*, because nothing can be written into it, so a `frozenset[Circle]` satisfies `frozenset[Shape]`, see [Variance](#variance) |
 | `dict[K, V]` | A dictionary with keys `K` and values `V`, see [Type Hints](#type-hints) |
 | `tuple[A, B]` | A fixed-length tuple (here a pair), see [Type Hints](#type-hints) |
 | `tuple[T, ...]` | A variable-length tuple of `T`, see [Type Hints](#type-hints) |
