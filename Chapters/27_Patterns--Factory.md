@@ -1277,3 +1277,9 @@ Both exist to work around languages where a class is not an object you can put i
     so the forgotten decorator is found before any `make()` call.
     `@runtime_checkable` (see [Surrogate](26_Patterns--Surrogate.md#proxy))
     lets `issubclass()` test a class against the Protocol.
+11. Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
+    Write a `@prototype(name)` decorator for a function that builds and returns the `Monster`,
+    so that each decorated function's result is stored under `name`.
+    Explain why the decorator takes the name as an argument rather than reading the function's `__name__`:
+    write that version and read what `ty` reports.
+    Then say what the decorated form gains over the table and what it costs.

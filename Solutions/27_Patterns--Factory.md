@@ -800,3 +800,87 @@ a Protocol with a data attribute raises a `TypeError` from
 `issubclass()`, and `isinstance()` on an instance is the fallback.
 The check also sees one namespace at a time, so a plugin module
 must run it over its own `globals()`.
+
+## 11. Prototypes registered by decoration
+
+```python
+# exercise_11.py
+import copy
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Final
+
+@dataclass
+class Monster:
+    name: str
+    hp: int
+    powers: list[str] = field(default_factory=list)
+
+type Builder = Callable[[], Monster]
+
+PROTOTYPES: Final[dict[str, Monster]] = {}
+
+def prototype(name: str) -> Callable[[Builder], Builder]:
+    def register(build: Builder) -> Builder:
+        PROTOTYPES[name] = build()
+        return build
+    return register
+
+@prototype("goblin")
+def goblin() -> Monster:
+    return Monster("Goblin", hp=10, powers=["bite"])
+
+@prototype("troll")
+def troll() -> Monster:
+    return Monster("Troll", hp=40,
+                   powers=["smash", "regen"])
+
+def spawn(name: str) -> Monster:
+    return copy.deepcopy(PROTOTYPES[name])
+
+print(sorted(PROTOTYPES))
+#: ['goblin', 'troll']
+a = spawn("goblin")
+b = spawn("goblin")
+b.hp = 5
+print(a.hp, b.hp)
+#: 10 5
+print(spawn("troll"))
+#: Monster(name='Troll', hp=40, powers=['smash', 'regen'])
+```
+
+`prototype()` is a decorator factory, the shape [Decorators](../Chapters/14_Techniques--Decorators.md#decorators-that-take-arguments)
+introduces: the outer call takes the name and returns `register()`,
+which runs the builder once, stores the result, and hands the builder
+back unchanged. The table is empty at its declaration and full by the
+time `spawn()` runs, because each `@prototype` line executes as the
+module loads, the same timing the chapter's `registry.py` relies on.
+
+The name is an argument because the builder's own name is not
+available to the type checker. `Builder` is a `Callable`, and a
+`Callable` declares only how it is called, not that it carries a
+`__name__`. Writing `PROTOTYPES[build.__name__] = build()` draws:
+
+```text
+error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__`
+```
+
+The chapter's `register()` in `protocol_registry.py` had no such
+problem because it received a class, and `type[S]` has a `__name__`.
+Pyright accepts `build.__name__`, since it gives every function
+object's attributes to a `Callable`; `ty` does not, and the book
+checks with `ty`. Passing the name also frees the key from the
+function's spelling, so the builder can be called `make_goblin()`
+while the key stays `"goblin"`.
+
+What the decorated form gains is the same openness the registries
+gained: a prototype can be defined in any module, with its name beside
+its definition, and `PROTOTYPES` needs no edit. The builder is also a
+function, so `goblin()` still produces a fresh prototype on demand
+when a test wants one that nothing has touched. The costs are the
+table's four lines becoming eleven, the name repeated at every
+definition, and the two failures the chapter attached to
+registration: a builder nothing decorates is absent from the table,
+with a `KeyError` from `spawn()` that points at nothing, and a
+builder in a module nothing imports never runs. For two monsters in
+one file, the table literal says the same thing in fewer lines.
