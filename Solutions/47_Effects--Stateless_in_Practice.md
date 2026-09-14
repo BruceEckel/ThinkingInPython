@@ -1238,12 +1238,12 @@ half:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
-  --> exercise_13.py:13:25
+  --> exercise_13.py:14:25
    |
-12 | def buttered() -> Depend[Need[Butter], str]:
+13 | def buttered() -> Depend[Need[Butter], str]:
    |                   ------------------------- Function annotated with yield
    |                   type `Need[Butter]` here
-13 |     slice_ = yield from toast()
+14 |     slice_ = yield from toast()
    |                         ^^^^^^^ expression of type
    |                         `Need[Dough] | Need[Oven] | Need[Toaster]`,
    |                         expected `Need[Butter]`

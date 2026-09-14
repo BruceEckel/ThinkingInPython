@@ -125,9 +125,9 @@ If you leave the annotation off,
 since nothing names the type a request must match.
 Each `handle()` subtracts one Ability,
 so `half` still needs an `Ask` and `full` needs nothing.
-Naming the two stages also matters to the type checker,
-for a reason [The type checker can give up quietly](#the-type-checker-can-give-up-quietly)
-gives.
+Naming the two stages also gives the type checker a place to report what remains,
+as [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
+shows.
 
 Now compare this listing to `ask_tell.py` again.
 The by-hand version puts two objects in every signature.
@@ -1192,14 +1192,14 @@ Two failures from two different sources come back as values through one `catch_a
 and neither the runtime nor the type checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.77 both orders infer the same result type.
-What both orders need is the intermediate name.
-In one nested expression the inference collapses:
-`supply(feed, book)(catch_all(research))` fails with an `invalid-argument-type`,
-and `catch_all(supply(feed, book)(research))` fails with a `no-matching-overload` and infers `Unknown`.
-That is why `bound` has a name,
-and it is the gap [The type checker can give up quietly](#the-type-checker-can-give-up-quietly)
-takes apart.
+and under `ty` 0.0.80 both orders infer the same result type.
+The Ability channel is where the orders differ.
+`supply(feed, book)(catch_all(research))` comes back with `Never` there,
+and `catch_all(supply(feed, book)(research))` with `Unknown`: the same object,
+read two ways.
+`bound` has a name so that its revealed type can be read on its own,
+and [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
+takes the difference apart.
 
 The choice between `catch()` and `catch_all()` decides what happens when a new failure appears.
 When `research()` gains a fourth error,
@@ -2014,10 +2014,9 @@ where `sandbox()` can recover it and the runtime logs it as a dying fiber.
 Stateless has no defect channel,
 so the exception leaves `run()` as an ordinary Python exception.
 
-### 2. The type checker can give up quietly
+### 2. The type checker decides what survives handling
 
 How much of a type survives handling depends on your type checker rather than on the library.
-Applying two handlers in one expression defeats `ty` 0.0.77.
 `nested` and `full` below are the same object,
 built by the same two calls in the same order:
 
@@ -2037,14 +2036,14 @@ if __name__ == "__main__":
     reveal_type(full)
 ```
 
-`ty check nested_handle.py` reads the two spellings differently:
+Under `ty` 0.0.80, `ty check nested_handle.py` reads the two spellings the same way:
 
 ```text
 info[revealed-type]: Revealed type
   --> nested_handle.py:11:17
    |
 11 |     reveal_type(nested)
-   |                 ^^^^^^ `Unknown`
+   |                 ^^^^^^ `() -> Generator[Never, Any, None]`
 
 info[revealed-type]: Revealed type
   --> nested_handle.py:12:17
@@ -2059,18 +2058,28 @@ info[revealed-type]: Revealed type
    |                 ^^^^ `() -> Generator[Never, Any, None]`
 ```
 
-The named pair reports what the rest of the chapter has been reading:
-`half` still needs an `Ask`, and `full` needs nothing.
-The nested expression reports `Unknown`, which is `ty` declining to answer.
-`Unknown` is assignable to anything,
-so `run()` accepts a nested expression no matter which Abilities remain unanswered inside it,
-and you learn about the missing handler at runtime rather than at the check.
-That is why `ask_tell_stateless.py` binds `half` and `full` instead of nesting the calls.
-Keep the habit generally:
-a named intermediate is where you read the Ability that remains,
+All three report what the rest of the chapter has been reading:
+`half` still needs an `Ask`, and `full` and `nested` need nothing,
+so a handler left out of either spelling is reported at `run()`.
+`ask_tell_stateless.py` still binds `half` and `full` instead of nesting the calls,
+because a named intermediate is where you read the Ability that remains,
 which is the information this library exists to give you.
 
-If you name the stages, the type checker verifies the subtraction,
+The order of the handlers changes what the checker reports.
+`catch_everything.py` supplies first and catches second,
+and its `catch_all(bound)` comes back as `() -> Generator[Unknown, Any, ...]`:
+with every Ability supplied and every error caught,
+the channel that should read `Never` reads `Unknown` instead.
+Catching first and supplying second, `supply(feed, book)(catch_all(research))`,
+reads `Never`.
+Nothing hides in that `Unknown`.
+A `Need` left unsupplied stays named through `catch_all()`,
+`run()` rejects the Effect with an `invalid-argument-type`,
+and running it anyway raises a `MissingAbilityError` naming the same `Need`.
+`Unknown` in a revealed type is still `ty` declining to finish the subtraction,
+and `reveal_type()` on the intermediate shows which channel it declined to finish.
+
+The type checker verifies the subtraction,
 including where you answer only part of what an Effect declares.
 Here `supply()` answers one `Need` of two:
 
@@ -2117,10 +2126,10 @@ since the listing provokes the matching runtime failure on purpose,
 and the `MissingAbilityError` it prints names the `Log` nobody supplied.
 `catch()` behaves the same way.
 If you catch one of two declared errors, the other stays in the error channel.
-Nesting those calls loses this diagnostic, the way nesting lost the type above.
+Nesting the `supply()` inside the `run()` call keeps this diagnostic.
 
 The library's types ask the type checker a hard inference question,
-and where the type checker gives up, it gives up quietly.
+and the answer changes from one release of the checker to the next.
 Trust a green check only where you have seen the same construct produce a red one.
 
 ### 3. Handlers cannot capture the continuation
@@ -2253,7 +2262,7 @@ with no `try`/`except` around that call,
 so a raised failure crosses the thread boundary as an ordinary exception and surfaces at `wait()`,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(fork(bad))` under `ty` 0.0.77 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(fork(bad))` under `ty` 0.0.80 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.

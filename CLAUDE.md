@@ -457,6 +457,25 @@ reading.
   on both trees, no marker or reflow drift, and all four version-pinned
   claims below re-probed unchanged. Record the quiet ones too, so the
   next upgrade knows what a clean one looks like.
+  The 0.0.78 to 0.0.80 upgrade (2026-09-14) had one gate failure and one
+  prose casualty. The gate: typeshed's `weakref.finalize` no longer
+  draws `missing-slot`, so ch10 `finalize_trap.py`'s `# type: ignore`
+  became an `unused-type-ignore-comment` warning and was removed. The
+  prose: nested handler expressions now infer precisely
+  (`handle(scripted)(handle(capture)(greet))` reveals
+  `() -> Generator[Never, Any, None]`, the same as the named form, and
+  a `Need` left unsupplied stays named through `catch_all()` so `run()`
+  rejects it), which emptied ch47's "The type checker can give up
+  quietly" section; it was rewritten in present tense as "The type
+  checker decides what survives handling" around the one asymmetry
+  left (below). All 32 quoted diagnostics re-verified; one pre-existing
+  off-by-one in Solutions ch40 was fixed. Two probes were wrong before
+  they were right: a module-level `feed: Feed = Wire()` is narrowed to
+  `Wire`, so `supply(feed, ...)` subtracts `Need[Wire]`, not
+  `Need[Feed]`, and the "lost subtraction" that showed was an artifact.
+  Probe `supply()` inside a function whose parameters carry the
+  Protocol types, as the chapter's `outcome()` does, or through
+  `as_type()`.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -465,22 +484,31 @@ reading.
   `exercise_review.md` Part 2.1). Earlier upgrade sweeps went through
   `Chapters/` and stopped. Nothing gates this: `solutions-output-check`
   validates `#:` markers, and a diagnostic quoted in prose is not a
-  marker. `grep -rn "error\[" Chapters/ Solutions/` finds all 31 in the
-  book, so the sweep is small once you remember it.
-  Chapters 46-47 also pin four behavior claims to a ty version
-  ("under `ty` 0.0.77"): the `type`-alias probe (46), the
-  accessor-`Unknown`, chained-`supply()` order, and partial-handling
-  claims (47). Re-probe on each upgrade and update those version
-  strings; the alias probe is a scratch generator annotated with a
-  `type X = Depend[...]` alias whose `yield from need(Undeclared)`
-  must still draw `invalid-yield`. The other three probe against
-  `build/examples/47_*/`: both `supply`/`catch_all` orders must reveal
-  the same union while the two nested forms give `invalid-argument-type`
-  and `no-matching-overload`+`Unknown`; `partial_handling.py` with its
-  `# type: ignore` stripped must still report `Generator[Need[Log], Any,
-  None]` against `run()`; and `handle(scripted)(handle(capture)(greet))`
-  must still reveal `Unknown` where the named intermediates reveal
-  `() -> Generator[Ask, Any, None]` and `() -> Generator[Never, Any, None]`.
+  marker. `grep -rn "^error\[\|^warning\[" Chapters/ Solutions/` finds
+  all 32 in the book, so the sweep is small once you remember it.
+  Chapters 46-47 and Solutions 43 pin five behavior claims to a ty
+  version ("under `ty` 0.0.80"): the `type`-alias probe (46), the
+  chained-`supply()` order and the `Never`/`Unknown` asymmetry, the
+  `nested_handle.py` reveal, and the `fork(bad)` reveal (47), and the
+  `float | Unknown` without `@final` (Solutions 43). Re-probe on each
+  upgrade and update those version strings; the alias probe is a
+  scratch generator annotated with a `type X = Depend[...]` alias whose
+  `yield from need(Undeclared)` must still draw `invalid-yield`. The
+  ch47 probes run against `build/examples/47_*/`, inside a function
+  with `feed: Feed, book: Encyclopedia` parameters: both
+  `supply`/`catch_all` orders must reveal the same result union, with
+  `supply(feed, book)(catch_all(research))` reading `Never` in the
+  Ability channel and `catch_all(supply(feed, book)(research))` reading
+  `Unknown`; `supply(feed)(research)` followed by `catch_all()` must
+  keep `Need[Encyclopedia]` named and fail `run()`;
+  `partial_handling.py` with its `# type: ignore` stripped must still
+  report `Generator[Need[Log], Any, None]` against `run()`, nested or
+  named; and `handle(scripted)(handle(capture)(greet))` must reveal
+  `() -> Generator[Never, Any, None]`, the same as the named `full`,
+  with `half` still `() -> Generator[Ask, Any, None]`. Solutions 43:
+  strip both `@final` from `describe_isinstance.py` and
+  `reveal_type(result.answer)` in the `Ok` branch must read
+  `float | Unknown`.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed

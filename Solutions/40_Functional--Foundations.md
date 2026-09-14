@@ -159,11 +159,11 @@ assignment:
 
 ```
 error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allowed
- --> immutable_types.py:6:1
+ --> immutable_types.py:7:1
   |
-5 | MAX_SIZE: Final[int] = 100
+6 | MAX_SIZE: Final[int] = 100
   |           ---------- Symbol declared as `Final` here
-6 | MAX_SIZE = 200
+7 | MAX_SIZE = 200
   | ^^^^^^^^^^^^^^ Symbol later reassigned here
 ```
 
