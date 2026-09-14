@@ -712,7 +712,8 @@ The example in *GoF Design Patterns* makes one program work across several graph
 You create a factory object for the GUI you're working with,
 and from then on when you ask that factory for a menu, button, or slider,
 it creates the version of that item suited to that GUI.
-The change from one GUI to another then touches one place in your code.
+The change from one GUI to another then touches only a single place in the code,
+most likely via startup configuration.
 
 As another example, suppose you are creating a general-purpose gaming environment that supports different types of games.
 Here's how it might look using an abstract factory:
@@ -742,14 +743,12 @@ class Character(ABC):
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-              obstacle.description())
+        print("Kitty encounters a", obstacle.description())
 
 class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a",
-              obstacle.description())
+        print("Warrior battles a", obstacle.description())
 
 class Puzzle(Obstacle):
     @override
@@ -791,37 +790,33 @@ class GameEnvironment:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
-#: Kitty has encountered a Puzzle
+#: Kitty encounters a Puzzle
 g2.play()
-#: Warrior now battles a Weapon
+#: Warrior battles a Weapon
 ```
 
 `Character` objects interact with `Obstacle` objects,
-but the types of characters and obstacles depend on the kind of game you're playing.
-You determine the kind of game by choosing a particular `GameElementFactory`,
-and then the `GameEnvironment` controls the setup and play of the game.
+but the types of characters and obstacles depend on the game you're playing.
+You determine the game by choosing a particular `GameElementFactory`.
+The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
 but the initial conditions and the way the state changes can determine much of a game's outcome.
 `GameEnvironment` has no place to vary the rules of play,
 so a real game would add one: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
 
-Because `interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's,
-the pair of calls chooses behavior from both types.
+`interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's.
+Thus, the pair of calls chooses behavior from both types.
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
-`Obstacle`, `Character`, and `GameElementFactory` are base classes.
+`Obstacle`, `Character`, and `GameElementFactory` are abstract base classes.
 Each one lists the methods its subclasses must supply,
-and each method body is `raise NotImplementedError`,
-a placeholder for the real method a subclass writes.
-A placeholder raises an exception only when something calls it.
+as `@abstractmethod`s with no body.
 Suppose you write a factory subclass and forget `make_obstacle()`.
-Python defines the class and creates instances of it.
-The exception appears only when `GameEnvironment.__init__()` calls the placeholder.
-An `@abstractmethod` reports the missing method earlier,
-when you create the instance,
-the way `Shape` does in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
+Python defines the class, and the `TypeError` comes when you create an instance,
+before `GameEnvironment.__init__()` calls anything,
+the way `Shape` fails in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
 A *Protocol* names the required methods and needs no base class,
 which simplifies the Abstract Factory:
 
@@ -841,13 +836,11 @@ class GameElementFactory(Protocol):
 
 class Kitty:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-              obstacle.description())
+        print("Kitty encounters a", obstacle.description())
 
 class Warrior:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a",
-              obstacle.description())
+        print("Warrior battles a", obstacle.description())
 
 class Puzzle:
     def description(self) -> str: return "Puzzle"
@@ -879,9 +872,9 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 # ty: expected "GameElementFactory", found "BrokenFactory":
 # GameEnvironment(BrokenFactory())
 g1.play()
-#: Kitty has encountered a Puzzle
+#: Kitty encounters a Puzzle
 g2.play()
-#: Warrior now battles a Weapon
+#: Warrior battles a Weapon
 ```
 
 The type checker verifies that each concrete class satisfies the appropriate `Protocol`:
@@ -893,8 +886,8 @@ If you uncomment the line that passes a `BrokenFactory` to `GameEnvironment`,
 the checker reports `protocol member make_obstacle is not defined on type BrokenFactory`.
 
 With the Protocol, the checker reports the omission before the program runs.
-That is earlier than the construction-time `TypeError` from the abstract base class in [Surrogate](26_Patterns--Surrogate.md#proxy),
-and much earlier than the call-time `NotImplementedError` in `abstract_factory_abc.py`.
+That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`,
+the same failure [Surrogate](26_Patterns--Surrogate.md#proxy) showed.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.

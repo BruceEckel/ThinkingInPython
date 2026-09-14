@@ -13,13 +13,11 @@ class GameElementFactory(Protocol):
 
 class Kitty:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-              obstacle.description())
+        print("Kitty encounters a", obstacle.description())
 
 class Warrior:
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a",
-              obstacle.description())
+        print("Warrior battles a", obstacle.description())
 
 class Puzzle:
     def description(self) -> str: return "Puzzle"
@@ -51,6 +49,6 @@ g2 = GameEnvironment(WarriorsAndWeapons())
 # ty: expected "GameElementFactory", found "BrokenFactory":
 # GameEnvironment(BrokenFactory())
 g1.play()
-#: Kitty has encountered a Puzzle
+#: Kitty encounters a Puzzle
 g2.play()
-#: Warrior now battles a Weapon
+#: Warrior battles a Weapon

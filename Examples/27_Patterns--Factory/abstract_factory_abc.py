@@ -13,14 +13,12 @@ class Character(ABC):
 class Kitty(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Kitty has encountered a",
-              obstacle.description())
+        print("Kitty encounters a", obstacle.description())
 
 class Warrior(Character):
     @override
     def interact_with(self, obstacle: Obstacle) -> None:
-        print("Warrior now battles a",
-              obstacle.description())
+        print("Warrior battles a", obstacle.description())
 
 class Puzzle(Obstacle):
     @override
@@ -62,6 +60,6 @@ class GameEnvironment:
 g1 = GameEnvironment(KittiesAndPuzzles())
 g2 = GameEnvironment(WarriorsAndWeapons())
 g1.play()
-#: Kitty has encountered a Puzzle
+#: Kitty encounters a Puzzle
 g2.play()
-#: Warrior now battles a Weapon
+#: Warrior battles a Weapon
