@@ -455,8 +455,7 @@ because the registry keeps every entry it has taken.
 
 The ABC in `registry.py` exists so that `__init_subclass__()` has a class to run from.
 If registration is explicit instead, `Shape` can be a Protocol,
-with the class decorator from [Decorators](14_Techniques--Decorators.md#decorating-classes)
-doing the registering:
+with a class decorator doing the registering:
 
 ```python
 # protocol_registry.py
@@ -493,8 +492,8 @@ make("Circle").draw()
 #     pass
 ```
 
-`register()` is the decorator from that chapter's `register.py` with one change:
-its type parameter is bounded to `Shape`.
+`register()` is the decorator from [Decorators](14_Techniques--Decorators.md#decorating-classes)
+with one change: its type parameter is bounded to `Shape`.
 The bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
