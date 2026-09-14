@@ -523,7 +523,7 @@ because the subclass line is the registration.
 The runtime guard is weaker too.
 A class that ignores the checker's report still registers,
 and fails with an `AttributeError` at its first `draw()` call rather than a `TypeError` at construction.
-Choose by which failure you would rather have:
+Choose the failure you prefer:
 the ABC catches the incomplete class when it is built,
 the Protocol when it is checked.
 
