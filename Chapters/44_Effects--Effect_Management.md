@@ -1002,9 +1002,9 @@ puts it to work.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
     and log from `greet()` too.
-    Count the signatures that end up naming `Log`,
-    and note how many of them mention an Effect they never use.
-    Then say what an EMS would do instead.
+    The chapter counted five signatures for that version;
+    say how many of the five use the `Log` they name,
+    and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
     and the `Thermometer` that keeps a `_celsius` from [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables):
