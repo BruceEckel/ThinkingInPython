@@ -816,9 +816,10 @@ develops that pair of calls into a technique.
 Each one lists the methods its subclasses must supply,
 as `@abstractmethod`s with no body.
 Suppose you write a factory subclass and forget `make_obstacle()`.
-Python defines the class, and the `TypeError` comes when you create an instance,
+Python defines the class,
+and the `TypeError` appears when you create an instance,
 before `GameEnvironment.__init__()` calls anything,
-the way `Shape` fails in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
+the same way `Shape` fails in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
 A *Protocol* names the required methods and needs no base class,
 which simplifies the Abstract Factory:
 
@@ -898,7 +899,7 @@ without the coupling a shared base class imposes.
 
 The factories so far build each object from a class and some arguments.
 *Prototype* instead keeps one fully configured instance and makes new objects by copying it.
-Use Prototype when a ready-made instance is easier to clone than to rebuild,
+Use Prototype when a ready-made instance is easier to clone than to construct again from its class and arguments,
 or when construction is slow and the instances share most of the setup.
 
 The `copy` module does the cloning.
@@ -920,7 +921,7 @@ class Monster:
         return copy.deepcopy(self)
 
 goblin = Monster("Goblin", hp=10, powers=["bite"])
-# Build a variant by cloning and adjusting, not rebuilding:
+# Build a variant by cloning and adjusting:
 captain = goblin.clone()
 captain.name = "Captain"
 captain.hp = 20

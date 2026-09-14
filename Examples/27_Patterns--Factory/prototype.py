@@ -12,7 +12,7 @@ class Monster:
         return copy.deepcopy(self)
 
 goblin = Monster("Goblin", hp=10, powers=["bite"])
-# Build a variant by cloning and adjusting, not rebuilding:
+# Build a variant by cloning and adjusting:
 captain = goblin.clone()
 captain.name = "Captain"
 captain.hp = 20
