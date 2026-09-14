@@ -1,4 +1,4 @@
-# 20_Patterns--Rethinking_Objects/balance_functions.py
+# balance_functions.py
 def deposit(balance: float, amount: float) -> float:
     return balance + amount
 

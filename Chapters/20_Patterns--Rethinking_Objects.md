@@ -1134,7 +1134,7 @@ or bundling behavior with state.
 Compare the two on a running balance:
 
 ```python
-# 20_Patterns--Rethinking_Objects/balance_functions.py
+# balance_functions.py
 def deposit(balance: float, amount: float) -> float:
     return balance + amount
 
@@ -1157,7 +1157,7 @@ If you drop one reassignment, the next call silently uses the old balance.
 An object closes that gap:
 
 ```python
-# 20_Patterns--Rethinking_Objects/balance_object.py
+# balance_object.py
 from dataclasses import dataclass
 
 @dataclass

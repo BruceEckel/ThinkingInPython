@@ -1,4 +1,4 @@
-# 20_Patterns--Rethinking_Objects/balance_object.py
+# balance_object.py
 from dataclasses import dataclass
 
 @dataclass
