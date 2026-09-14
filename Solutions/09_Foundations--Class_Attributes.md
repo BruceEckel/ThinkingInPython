@@ -243,11 +243,12 @@ writes the same class dictionary, so both instances report `2`.
 and `c.total` is the read falling back to that shared value.
 
 With the `# type: ignore` removed, `ty` reports
-`invalid-attribute-access`: "Cannot assign to ClassVar `total` from an
-instance." The augmented form expands to an assignment through `self`,
-and the type checker treats that assignment the way it treats
-`a.total = 99`: a write to a `ClassVar` through an instance. The
-`ClassVar` declaration catches the mistake at check time. The listing
+`invalid-attribute-access`, naming the type of `self`. The augmented
+form expands to an assignment through `self`, and the type checker
+treats that assignment the way it treats `a.total = 99`, which reads
+"Cannot assign to ClassVar `total` from an instance of type `Tally`":
+a write to a `ClassVar` through an instance. The `ClassVar`
+declaration catches the mistake at check time. The listing
 suppresses the report so it can demonstrate
 what the write does when it runs.
 

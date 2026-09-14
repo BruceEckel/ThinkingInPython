@@ -71,7 +71,7 @@ The instance dictionary is a plain `dict` holding only what the code assigned.
 
 That instance dictionary is not guaranteed.
 A class declared with `slots=True`
-([Classes](07_Foundations--Classes.md#properties) shows the trade-off)
+([Performance](18_Techniques--Performance.md#slots) shows the trade-off)
 has no instance `__dict__` at all.
 A class attribute in such a class cannot be shadowed:
 assigning to that name on an instance raises an `AttributeError`,
@@ -83,7 +83,7 @@ A method is a class attribute like any other.
 `def show(self):` in a class body stores a function object in the class dictionary,
 and `a.show()` finds it by the same fallback that finds `a.x`:
 nothing on the instance, so look at the class.
-`display_object()`, the inspection helper from [Classes](07_Foundations--Classes.md),
+`display_object()`, the inspection helper first used in [Classes](07_Foundations--Classes.md),
 reports attributes and methods separately,
 but both live in the same class dictionary.
 That is why assigning `a.show = something` would shadow the method for `a` alone.
@@ -157,7 +157,7 @@ A type checker accepts the line too:
 [Real Per-Object Defaults](#real-per-object-defaults),
 at the end of this chapter, gives each object its own value instead.
 A mutable default belongs in a `@dataclass` field with a `default_factory`,
-covered in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes).
+covered in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 
 ## Declaring Shared State with ClassVar
 
@@ -282,7 +282,8 @@ That is why `class_var.py` increments through the class name,
 `Tally.total += 1`.
 `ClassVar` does save you here, at check time:
 `ty` rejects the augmented form as it rejects a direct `self.total = 5`,
-reporting "Cannot assign to ClassVar `total` from an instance".
+reporting "Cannot assign to ClassVar `total` from an instance of type `Tally`" for a write like `a.total = 99`,
+and naming the type of `self` where the write sits inside `__init__()`.
 The `# type: ignore` suppresses that report so the listing can show what the line does when it runs.
 
 Shared storage is right when you intend the sharing.
@@ -501,7 +502,7 @@ a constructor default or a `@dataclass` field for per-object.
     explain what that assignment creates, and where.
 5.  Rewrite `Cart` from `shared_mutable.py` as a `@dataclass` with `items: list[str] = field(default_factory=list)`,
     importing `field` from `dataclasses`.
-    [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)
+    [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared)
     covers `default_factory`;
     this exercise needs only the one expression given here.
     Repeat the `append` and confirm `b.items` stays empty.
