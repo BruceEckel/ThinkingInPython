@@ -18,8 +18,8 @@ class Circle:
 class Square:
     def draw(self) -> None: print("Square.draw")
 
-def make(kind: str) -> Shape:
-    return REGISTRY[kind]()
+def make(name: str) -> Shape:
+    return REGISTRY[name]()
 
 print(sorted(REGISTRY))
 #: ['Circle', 'Square']

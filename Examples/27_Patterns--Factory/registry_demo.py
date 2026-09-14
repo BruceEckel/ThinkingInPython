@@ -4,8 +4,8 @@ from registry import Shape, make
 
 print(sorted(Shape.registry))
 #: ['Circle', 'Square']
-for kind in ["Circle", "Square", "Circle"]:
-    make(kind).draw()
+for name in ["Circle", "Square", "Circle"]:
+    make(name).draw()
 #: Circle.draw
 #: Square.draw
 #: Circle.draw

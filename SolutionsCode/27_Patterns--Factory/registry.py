@@ -12,5 +12,5 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-def make(kind: str) -> Shape:
-    return Shape.registry[kind]()
+def make(name: str) -> Shape:
+    return Shape.registry[name]()

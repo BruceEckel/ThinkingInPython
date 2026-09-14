@@ -323,8 +323,8 @@ class Square(Shape):
     @override
     def draw(self) -> None: print("Square.draw")
 
-def make(kind: str) -> Shape:
-    return Shape.registry[kind]()
+def make(name: str) -> Shape:
+    return Shape.registry[name]()
 ```
 
 `__init_subclass__()`
@@ -340,7 +340,7 @@ Registration runs as its `class` statement executes,
 so a subclass that forgets `draw()` still registers.
 `make()` then fails at construction with a `TypeError` rather than at the first `draw()` call.
 No type checker reports that case,
-because `Shape.registry[kind]()` calls a `type[Shape]`,
+because `Shape.registry[name]()` calls a `type[Shape]`,
 and any of those may be a concrete subclass.
 [Explicit Registration with a Protocol](#explicit-registration-with-a-protocol)
 moves that report to the check.
@@ -355,8 +355,8 @@ from registry import Shape, make
 
 print(sorted(Shape.registry))
 #: ['Circle', 'Square']
-for kind in ["Circle", "Square", "Circle"]:
-    make(kind).draw()
+for name in ["Circle", "Square", "Circle"]:
+    make(name).draw()
 #: Circle.draw
 #: Square.draw
 #: Circle.draw
@@ -479,8 +479,8 @@ class Circle:
 class Square:
     def draw(self) -> None: print("Square.draw")
 
-def make(kind: str) -> Shape:
-    return REGISTRY[kind]()
+def make(name: str) -> Shape:
+    return REGISTRY[name]()
 
 print(sorted(REGISTRY))
 #: ['Circle', 'Square']

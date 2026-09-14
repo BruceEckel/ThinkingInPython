@@ -22,8 +22,8 @@ class Square:
 class Hexagon:
     def draw(self) -> None: print("Hexagon.draw")
 
-def make(kind: str) -> Shape:
-    return REGISTRY[kind]()
+def make(name: str) -> Shape:
+    return REGISTRY[name]()
 
 def unregistered(namespace: dict[str, object]) -> list[str]:
     return sorted(

@@ -388,8 +388,8 @@ class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
-def make(kind: str) -> Shape:
-    return Shape.registry[kind]()
+def make(name: str) -> Shape:
+    return Shape.registry[name]()
 ```
 
 ```python
@@ -457,8 +457,8 @@ from registry import Shape, make
 
 print(sorted(Shape.registry))
 #: ['Circle', 'Square']
-for kind in ["Circle", "Square", "Circle"]:
-    make(kind).draw()
+for name in ["Circle", "Square", "Circle"]:
+    make(name).draw()
 #: Circle.draw
 #: Square.draw
 #: Circle.draw
@@ -749,8 +749,8 @@ class Square:
 class Hexagon:
     def draw(self) -> None: print("Hexagon.draw")
 
-def make(kind: str) -> Shape:
-    return REGISTRY[kind]()
+def make(name: str) -> Shape:
+    return REGISTRY[name]()
 
 def unregistered(namespace: dict[str, object]) -> list[str]:
     return sorted(
