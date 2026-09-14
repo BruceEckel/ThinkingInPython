@@ -36,7 +36,7 @@ print(classify("hi"))
 #: other
 ```
 
-`[]` matches only the empty list. `[_]` matches a list with exactly
+`[]` matches only an empty sequence. `[_]` matches a list with exactly
 one element (the `_` throws the value away without a name). `[_, *_]`
 matches one or more elements: the first `_` matches the first element,
 and `*_` collects the rest, even when the rest is empty. So
@@ -75,7 +75,6 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
    |             ^^^^^^^^^^^^^-----^
    |                          |
    |                          Inferred type of argument is `Rectangle & ~Circle & ~Square`
-   |
 info: `Never` and `Rectangle & ~Circle & ~Square` are not equivalent types
 ```
 

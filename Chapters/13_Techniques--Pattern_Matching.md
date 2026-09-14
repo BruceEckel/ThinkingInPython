@@ -626,7 +626,8 @@ nothing forces you to add a case, and an unhandled value falls through silently.
 Scala's `match`, Kotlin's `when`,
 and Java's newer switch expressions check exhaustiveness,
 as an error in Java and Kotlin and a warning in Scala.
-The check applies only when the matched type is a sealed hierarchy the compiler can see in full.
+The check applies only when the matched type is a closed set the compiler can see in full:
+a sealed hierarchy or an enum.
 Their versions are also expressions, producing a value you can assign.
 Python's `match` is a statement, not an expression,
 so a `match` that must produce a value goes inside a function that returns from each `case`.
@@ -638,7 +639,7 @@ but only if you remember to end it with `assert_never()`.
 A `match` makes the shape of the dispatch explicit.
 
 `Shape` turns the classic OOP "shapes" example into a closed type union instead of a class hierarchy.
-[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs.-pattern-matching)
+[Dynamic Binding vs. Pattern Matching](#dynamic-binding-vs-pattern-matching)
 compares the two approaches directly.
 
 The second test below exercises that runtime backstop.
@@ -703,8 +704,7 @@ make it an `Enum` and `match` on its members, as `value_patterns.py` did.
 The enum hands the type checker the closed set,
 so `assert_never()` works without a `type` union.
 
-## Dynamic Binding vs. Pattern Matching
-
+## Dynamic Binding vs. Pattern Matching {#dynamic-binding-vs-pattern-matching}
 An alerting system sends a notification through one of three channels: email,
 SMS, or push.
 Every channel renders the notification into a message string for a recipient.
