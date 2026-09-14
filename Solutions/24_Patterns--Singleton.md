@@ -149,6 +149,7 @@ that already does the job.
 
 ```python
 # config.py
+print("config body runs")
 settings: dict[str, str] = {}
 ```
 
@@ -157,6 +158,7 @@ settings: dict[str, str] = {}
 import config
 from config import settings
 
+#: config body runs
 settings = {"theme": "dark"}  # noqa: F811
 print(settings)
 #: {'theme': 'dark'}

@@ -357,8 +357,8 @@ To address languages like C++ and Java,
 Each variation shown here does more work than the module or the cached factory above.
 
 The first controls creation by delegating to a single instance of a private nested class.
-The rest reach the same guarantee by other means: a class variable,
-a shared `__dict__`, and a decorator.
+The rest reach it by other means: a class variable and a decorator,
+while *Borg* trades one object for one shared set of state.
 
 ### Lazy Creation
 
@@ -517,7 +517,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
 
-The nested-class examples above used `@dataclass`; `Singleton` cannot.
+The nested class above was a `@dataclass`; `Singleton` cannot be one.
 The sharing depends on `super().__init__` rebinding `self.__dict__` to `_shared_state`,
 and a dataclass generates its own `__init__` that assigns the fields and [never calls the base `__init__`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.
