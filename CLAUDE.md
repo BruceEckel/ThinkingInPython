@@ -133,6 +133,48 @@ raised where none is expected still fails the gate; only marker text is
 auto-corrected. A lone bare `#: ` with nothing after it is always treated
 as a not-yet-filled-in placeholder and filled in, even without `--update`.
 
+## Pyright: a periodic review, never a gate
+
+`ty` is the only checker the gates run. Pyright is a pinned dev
+dependency with its config in `pyproject.toml` (`[tool.pyright]`), and
+its value is the list of places where it disagrees with `ty`, kept in
+`tools/data/pyright_baseline.txt`. `make pyright-review` runs it over
+both extracted trees and prints only the delta: NEW for a diagnostic
+the baseline lacks, GONE for one that no longer fires. It exits
+nonzero on NEW. `make pyright-accept` rewrites the baseline once every
+line in the delta has an explanation. `tools/pyright_review.py` has
+the details; `pyright_experiment.md` has the 2026-09-14 measurement
+that led here.
+
+Three rules, all deliberate:
+
+- **Nothing pyright-related joins `verify`, `gate`, `sweep`, or `ci`.**
+  A green pyright run is not the goal; the changed delta is the
+  information.
+- **No listing carries a pyright suppression.** A `# pyright: ignore`
+  in a book listing explains nothing to a reader using `ty`, so every
+  accepted disagreement is a baseline entry instead. (The two checkers'
+  comments do coexist, `# ty: ignore[rule]` and `# pyright: ignore[rule]`
+  each invisible to the other, but the book does not use that.) The nine
+  listings pyright cannot parse (PEP 798 comprehension unpacking) are
+  baseline entries too, not an exclude list.
+- **"The type checker" in prose means `ty`.** The review's first
+  catch was chapter 12 claiming "a type checker" never compares a bare
+  `default_factory` with its field, which Pyright does. The 2026-09-14
+  sweep of 195 such sentences found fourteen that hold for `ty` alone;
+  each now names `ty` and says what the other checkers do. When a NEW
+  entry names a listing, reread the nearest "the type checker" sentence
+  next to it. mypy is not a candidate for the book: it cannot parse the
+  PEP 798 or PEP 661 helpers and rejects a dozen committed Stateless
+  listings on its own limitations.
+
+Read the delta at three moments: after editing a chapter's listings
+(a NEW entry is a fresh disagreement worth a sentence), after `make
+tools-upgrade` moves pyright (GONE means pyright caught up, NEW means a
+new strictness), and after a `ty` upgrade (a disagreement that
+disappears because `ty` now reports it too is a listing that may need
+an ignore).
+
 ## What the book says about itself
 
 `check_self_reference.py` gates the shape that produced the most errors
