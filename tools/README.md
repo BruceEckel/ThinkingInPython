@@ -1109,11 +1109,9 @@ On the site, `resources/static/listing-preview.js` (copied beside the
 pages, loaded by `template.html`) adds a hover panel: resting the
 pointer on a listing link shows the listing in a floating box, cloned
 from the page or, for a cross-chapter link, fetched once from the other
-page. A small "Listings: Preview · Jump" switch under the Contents link
-turns the panel off and leaves the anchors as ordinary links; the
-choice is kept in `localStorage`, and Preview is the default. A device
-with no hover gets neither the switch nor the panel. The EPUB has no
-script, so its links only jump.
+page. Clicking the link still jumps to the listing, so the panel needs
+no switch to turn it off. A device with no hover gets no panel. The
+EPUB has no script, so its links only jump.
 
 ## make_cover.py
 

@@ -145,7 +145,7 @@ def test_preview_script_is_shipped_and_linked_from_the_template() -> None:
     assert "$listing-js$" in template
     assert ".listing-link" in template
     assert ".listing-preview" in template
-    assert ".listing-mode" in template
+    assert ".listing-mode" not in template  # the switch was removed
 
 
 # ── the EPUB's <pre> ─────────────────────────────────────────────────────────

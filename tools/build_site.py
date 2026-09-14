@@ -41,8 +41,7 @@ STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
 # Copied beside the pages, and linked from template.html by the
 # `search-css`, `search-js`, and `listing-js` variables. listing-preview.js
-# is the hover panel and Preview/Jump switch for the links
-# listing_links.py writes.
+# is the hover panel for the links listing_links.py writes.
 STATIC_FILES = ("search.css", "search.js", "listing-preview.js")
 
 # Experimental: give each chapter page its own table of contents (its own

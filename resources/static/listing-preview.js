@@ -1,23 +1,19 @@
 // Hover previews for listing links on the static site. A chapter's prose
 // names its listings in code spans that build_site.py (via
-// tools/listing_links.py) turns into a.listing-link anchors. In "preview"
-// mode, resting the pointer on one shows the listing in a floating panel
-// beside the link; in "jump" mode the anchor is an ordinary link. The mode
-// is a small switch under the Contents link, remembered in localStorage,
-// and preview is the default.
+// tools/listing_links.py) turns into a.listing-link anchors. Resting the
+// pointer on one shows the listing in a floating panel beside the link;
+// clicking it still jumps to the listing, as any link would.
 //
 // A same-page target is cloned from the document. A cross-chapter target
 // is fetched from its page (once per page, then cached) and cloned from
 // that; if the fetch fails, the link still works as a link. Devices with
-// no hover get no switch and no previews.
+// no hover get no previews.
 (function () {
   "use strict";
 
-  var KEY = "listing-links-mode";   // "preview" | "jump"
   var SHOW_DELAY = 150;             // ms the pointer must rest first
   var HIDE_DELAY = 250;             // ms allowed to move into the panel
 
-  var mode = "preview";
   var panel = null;
   var current = null;               // the link the panel belongs to
   var showTimer = null;
@@ -33,51 +29,6 @@
 
   function canHover() {
     return !(window.matchMedia && window.matchMedia("(hover: none)").matches);
-  }
-
-  function loadMode() {
-    try {
-      var saved = window.localStorage.getItem(KEY);
-      if (saved === "preview" || saved === "jump") mode = saved;
-    } catch (e) { /* storage unavailable: keep the default */ }
-  }
-
-  function saveMode() {
-    try { window.localStorage.setItem(KEY, mode); } catch (e) { /* ignore */ }
-  }
-
-  // ── the switch ──────────────────────────────────────────────────────────
-
-  function buildSwitch() {
-    var box = h("div", "listing-mode");
-    box.setAttribute("role", "group");
-    box.setAttribute("aria-label", "Listing links");
-    box.appendChild(h("span", "listing-mode-label", "Listings"));
-    var preview = option(box, "preview", "Preview");
-    box.appendChild(h("span", "sep", "·"));
-    var jump = option(box, "jump", "Jump");
-    function paint() {
-      preview.setAttribute("aria-pressed", String(mode === "preview"));
-      jump.setAttribute("aria-pressed", String(mode === "jump"));
-    }
-    box.addEventListener("click", function (ev) {
-      var choice = ev.target && ev.target.getAttribute("data-mode");
-      if (!choice) return;
-      mode = choice;
-      saveMode();
-      paint();
-      hide();
-    });
-    paint();
-    document.body.appendChild(box);
-  }
-
-  function option(box, value, label) {
-    var b = h("button", "", label);
-    b.type = "button";
-    b.setAttribute("data-mode", value);
-    box.appendChild(b);
-    return b;
   }
 
   // ── finding the listing ─────────────────────────────────────────────────
@@ -179,7 +130,6 @@
   }
 
   function onOver(ev) {
-    if (mode !== "preview") return;
     var link = linkFrom(ev);
     if (!link) return;
     if (link === current) { cancelHide(); return; }
@@ -203,8 +153,6 @@
   function init() {
     if (!document.querySelector("a.listing-link")) return;
     if (!canHover()) return;
-    loadMode();
-    buildSwitch();
     document.addEventListener("mouseover", onOver);
     document.addEventListener("mouseout", onOut);
     document.addEventListener("keydown", function (ev) {
