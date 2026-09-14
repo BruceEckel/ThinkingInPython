@@ -1,0 +1,75 @@
+# Pyright diagnostics the book accepts as disagreements with
+# ty. path<TAB>rule<TAB>message, one per occurrence, sorted.
+# Rewritten by `make pyright-accept`; read the delta with
+# `make pyright-review` before accepting.
+# See tools/pyright_review.py.
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "theme"
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "theme"
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "theme"
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "zoom"
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "zoom"
+build/examples/03_Foundations--Containers/frozendict_demo.py	reportCallIssue	No parameter named "zoom"
+build/examples/04_Foundations--Control_Flow/finally_swallows.py	syntax	A "return" cannot be used to exit a "finally" block
+build/examples/12_Techniques--Data_Classes_as_Types/factory_checking.py	reportAssignmentType	Type "set[Unknown]" is not assignable to declared type "dict[str, str]" "set[Unknown]" is not assignable to "dict[str, str]"
+build/examples/12_Techniques--Data_Classes_as_Types/frozen_inheritance.py	reportGeneralTypeIssues	A frozen class cannot inherit from a class that is not frozen
+build/examples/12_Techniques--Data_Classes_as_Types/frozen_inheritance.py	reportGeneralTypeIssues	A non-frozen class cannot inherit from a class that is frozen
+build/examples/14_Techniques--Decorators/repeat.py	reportReturnType	Type "Unbound | R@repeat" is not assignable to return type "R@repeat" Type "Unbound | R@repeat" is not assignable to type "R@repeat"
+build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py	syntax	Dictionary expansion not allowed in comprehension
+build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py	syntax	Unpack operation not allowed in comprehension
+build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py	syntax	Unpack operation not allowed in comprehension
+build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py	syntax	Unpack operation not allowed in comprehension
+build/examples/16_Techniques--Comprehensions/unpacking_comprehensions.py	syntax	Unpack operation not allowed in comprehension
+build/examples/17_Techniques--Metaprogramming/my_list.py	reportAttributeAccessIssue	Cannot access attribute "howdy" for class "MyList" Attribute "howdy" is unknown
+build/examples/17_Techniques--Metaprogramming/my_list.py	reportAttributeAccessIssue	Cannot access attribute "x" for class "MyList" Attribute "x" is unknown
+build/examples/17_Techniques--Metaprogramming/prepare_namespace.py	reportRedeclaration	Method declaration "on_open" is obscured by a declaration of the same name
+build/examples/19_Techniques--Concurrency/shared_iterator.py	syntax	Unpack operation not allowed in comprehension
+build/examples/22_Patterns--Data_Transfer_Objects/fetch_stats.py	reportIncompatibleMethodOverride	"count" overrides method of same name in class "tuple" with incompatible type "int"
+build/examples/23_Patterns--Iterators/gof_iterator.py	reportArgumentType	Argument of type "object* | DONE" cannot be assigned to parameter "object" of type "T@OverStream" in function "append" Type "object* | DONE" is not assignable to type "T@OverStream"
+build/examples/26_Patterns--Surrogate/proxy_interface.py	reportAbstractUsage	Cannot instantiate abstract class "Partial" "Service.g" is not implemented
+build/examples/34_Patterns--Composite_and_Interpreter/expr.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/examples/34_Patterns--Composite_and_Interpreter/expr.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/examples/34_Patterns--Composite_and_Interpreter/expr.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/examples/34_Patterns--Composite_and_Interpreter/expr.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/examples/35_Patterns--Flyweight/tile_map.py	syntax	Unpack operation not allowed in comprehension
+build/examples/utils/display.py	syntax	Dictionary expansion not allowed in comprehension
+build/solutions/03_Foundations--Containers/exercise_10.py	reportCallIssue	Expected 0 positional arguments
+build/solutions/03_Foundations--Containers/exercise_10.py	reportCallIssue	No parameter named "host"
+build/solutions/03_Foundations--Containers/exercise_10.py	reportCallIssue	No parameter named "port"
+build/solutions/03_Foundations--Containers/exercise_10.py	reportCallIssue	No parameter named "tags"
+build/solutions/03_Foundations--Containers/exercise_4.py	reportArgumentType	Argument of type "list[int]" cannot be assigned to parameter "element" of type "frozenset[int]" in function "add" "list[int]" is not assignable to "frozenset[int]"
+build/solutions/16_Techniques--Comprehensions/exercise_6.py	syntax	Dictionary expansion not allowed in comprehension
+build/solutions/17_Techniques--Metaprogramming/ch17_keep_first.py	reportRedeclaration	Method declaration "on_open" is obscured by a declaration of the same name
+build/solutions/17_Techniques--Metaprogramming/exercise_7.py	reportAttributeAccessIssue	Cannot access attribute "describe" for class "Celsius" Attribute "describe" is unknown
+build/solutions/19_Techniques--Concurrency/ch19_body_lock.py	syntax	Unpack operation not allowed in comprehension
+build/solutions/23_Patterns--Iterators/exercise_7.py	reportArgumentType	Argument of type "object* | DONE" cannot be assigned to parameter "object" of type "T@OverStream" in function "append" Type "object* | DONE" is not assignable to type "T@OverStream"
+build/solutions/23_Patterns--Iterators/exercise_9.py	reportArgumentType	Argument of type "list[int | list[str | list[int]]]" cannot be assigned to parameter "nested" of type "Sequence[Nested]" in function "flatten_str" Type "Literal['ab']" is not assignable to type "Nested" "Literal['ab']" is not assignable to "int" "Literal['ab']" is not assignable to "Sequence[Nested]" Type parameter "_T_co@Sequence" is covariant, but "str" is not a subtype of "Nested" Type "str" is not assignable to type "Nested" "str" is not assignable to "int" "str" is not assignable to "Sequence[Nested]"
+build/solutions/23_Patterns--Iterators/exercise_9.py	reportAssignmentType	Type "list[int | str]" is not assignable to declared type "Sequence[Nested]" Type "Literal['ab']" is not assignable to type "Nested" "Literal['ab']" is not assignable to "int" "Literal['ab']" is not assignable to "Sequence[Nested]" Type parameter "_T_co@Sequence" is covariant, but "str" is not a subtype of "Nested" Type "str" is not assignable to type "Nested" "str" is not assignable to "int" "str" is not assignable to "Sequence[Nested]"
+build/solutions/31_Patterns--State_Machines/exercise_9.py	reportArgumentType	Argument of type "list[tuple[None, (event: Money) -> None, State]]" cannot be assigned to parameter "value" of type "list[Transition]" in function "__setitem__" "list[tuple[None, (event: Money) -> None, State]]" is not assignable to "list[Transition]" Type parameter "_T@list" is invariant, but "tuple[None, (event: Money) -> None, State]" is not the same as "Transition" Consider switching from "list" to "Sequence" which is covariant
+build/solutions/31_Patterns--State_Machines/exercise_9.py	reportArgumentType	Argument of type "list[tuple[None, (event: Money) -> None, State]]" cannot be assigned to parameter "value" of type "list[Transition]" in function "__setitem__" "list[tuple[None, (event: Money) -> None, State]]" is not assignable to "list[Transition]" Type parameter "_T@list" is invariant, but "tuple[None, (event: Money) -> None, State]" is not the same as "Transition" Consider switching from "list" to "Sequence" which is covariant
+build/solutions/31_Patterns--State_Machines/exercise_9.py	reportAssignmentType	Type "dict[tuple[Literal[State.QUIESCENT], type[Money]] | tuple[Literal[State.COLLECTING], type[Money]], list[tuple[None, (event: Money) -> None, State]]]" is not assignable to declared type "Table" "list[tuple[None, (event: Money) -> None, State]]" is not assignable to "list[Transition]" Type parameter "_T@list" is invariant, but "tuple[None, (event: Money) -> None, State]" is not the same as "Transition" Consider switching from "list" to "Sequence" which is covariant "list[tuple[None, (event: Money) -> None, State]]" is not assignable to "list[Transition]" Type parameter "_T@list" is invariant, but "tuple[None, (event: Money) -> None, State]" is not the same as "Transition" Consider switching from "list" to "Sequence" which is covariant
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_3.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_4.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_4.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_4.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_4.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_5.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_5.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_5.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_5.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_6.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_6.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_6.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_6.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_8.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_8.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_8.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/34_Patterns--Composite_and_Interpreter/exercise_8.py	reportGeneralTypeIssues	Type of parameter "self" must be a supertype of its class "Operators"
+build/solutions/35_Patterns--Flyweight/exercise_1.py	syntax	Unpack operation not allowed in comprehension
+build/solutions/35_Patterns--Flyweight/exercise_7.py	syntax	Unpack operation not allowed in comprehension
+build/solutions/43_Functional--Confidence/test_group_rounds.py	syntax	Unpack operation not allowed in comprehension
