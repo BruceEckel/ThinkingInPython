@@ -580,7 +580,7 @@ def research() -> Effect[
     return checked
 ```
 
-Four edits, and the type checker names three of them.
+Four edits, and the type checker names one of them.
 
 1. A new exception class, `TooLong`.
 2. A new `@throws(TooLong)` function, `within_limit()`, since a failure has to be
@@ -905,9 +905,11 @@ The scripted balances are the four the `Cell` version would have produced:
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 `spree()` attempts all four prices, and the test proves it from both sides.
-A fifth attempt would raise a `StopIteration` from `read()`. Stopping early
-would leave a balance unread, and the final assertion catches that by checking
-that the iterator has nothing left.
+A fifth price would exhaust the script, and `handle()` would read the
+`StopIteration` from `read()` as the end of the Effect, the silent trap the
+chapter describes: `run()` returns `None` and the first assertion fails on
+`None == 2`. Stopping early would leave a balance unread, and the final
+assertion catches that by checking that the iterator has nothing left.
 `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tried every price and wrote only the
 affordable ones.
@@ -1145,8 +1147,10 @@ Deleting the annotation on the handler's parameter fails much louder, and
 earlier:
 
 ```text
-ValueError: Handler function <function scripted_from.<locals>.scripted
-at 0x...> was not annotated.
+ValueError: Not enough annotated arguments to handler function
+'<function scripted_from.<locals>.scripted at 0x...>'. Expected 1,
+got 0. 'handle' uses type annotations to match handlers with
+abilities, so the argument to '<function ...>' must be annotated.
 ```
 
 `handle()` raises that `ValueError` as soon as you call it, before any Effect
@@ -1261,6 +1265,7 @@ a different shape:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
+  --> exercise_13.py:22:11
   |
   | print(run(kitchen(buttered)()))
   |           ^^^^^^^^^^^^^^^^^^^ Expected `Generator[Async | Exception, Any, Unknown]`,

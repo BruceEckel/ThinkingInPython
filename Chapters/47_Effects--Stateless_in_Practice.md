@@ -967,7 +967,7 @@ because the pipeline holds no output of its own.
 The second run also stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
 and that failure ends `research()` where it stands,
-so the `need(Encyclopedia)` two lines below it does not run and no one consults a library.
+so the `need(Encyclopedia)` on the next line does not run and no one consults a library.
 `catch()` receives that failure and `report()` matches on it as a value,
 which is why the run still prints a message.
 A failure ends the remaining steps the way a raised exception would,
@@ -1508,7 +1508,7 @@ The call still runs correctly, since the implementation is variadic,
 but the checking on which this chapter relies disappears.
 Two chained handlers keep the checking: `supply()` some of the actors,
 apply that to the Effect, then `supply()` the rest to what remains,
-the layered supply of [Dependency Injection](46_Effects--Stateless.md#dependency-injection).
+the layered supply of [Layering Handlers](46_Effects--Stateless.md#layering-handlers).
 Nine is also a fair warning about the design.
 An Effect that asks for ten separate things is usually two Effects.
 
@@ -1816,8 +1816,8 @@ listing the overloads it failed to match.
 Supply first, then fork.
 
 That restriction is the only one `ty` enforces.
-`ty` says nothing about a declared error,
-and every one of those same four overloads drops it.
+`ty` says nothing about a declared error, and of those same four overloads,
+the two that accept one return a `Task` with no error type on it.
 [Where the Guarantee Stops](#fork-drops-the-error-channel) covers that hole.
 
 Notice who manages the pool's lifetime.
@@ -2216,8 +2216,8 @@ and that is different from a platform for building distributed systems.
 named the one restriction `ty` enforces on a forked function:
 nothing left to supply.
 It enforces nothing on what that function can fail with.
-Every one of `fork()`'s four overloads accepts an Effect that still declares an error,
-and every one returns a `Task` with no error type on it:
+Two of `fork()`'s four overloads accept an Effect that still declares an error,
+and every one of the four returns a `Task` with no error type on it:
 
 ```python
 # fork_leak.py
@@ -2262,7 +2262,7 @@ with no `try`/`except` around that call,
 so a raised failure crosses the thread boundary as an ordinary exception and surfaces at `wait()`,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(fork(bad))` under `ty` 0.0.80 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(bad)` under `ty` 0.0.80 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.
