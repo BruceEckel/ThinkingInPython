@@ -119,10 +119,13 @@ def find(doc: Document) -> Iterator[Finding]:
                 found = locate(name, dirs)
                 if found is None:
                     lines = None
+                    where = dirs[0]
+                    if where.is_relative_to(ROOT):
+                        where = where.relative_to(ROOT)
                     yield Finding(
                         doc.path, block.line_number(index),
                         f"quoted location names {name}, which "
-                        f"{dirs[0].relative_to(ROOT)} does not hold",
+                        f"{where} does not hold",
                     )
                 else:
                     lines = found.read_text(encoding="utf-8").split("\n")
