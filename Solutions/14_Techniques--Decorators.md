@@ -181,7 +181,13 @@ class trace_counting[**P, R]:
                  **kwargs: P.kwargs) -> R:
         self.count += 1
         trace_counting.total_calls += 1
-        return self.func(*args, **kwargs)
+        positional = [repr(a) for a in args]
+        named = [f"{k}={v!r}" for k, v in kwargs.items()]
+        arglist = ", ".join(positional + named)
+        print(f"-> {self.func.__name__}({arglist})")  # type: ignore
+        result = self.func(*args, **kwargs)
+        print(f"<- {self.func.__name__} = {result!r}")  # type: ignore
+        return result
 
 @trace_counting
 def f(x: int) -> int:
@@ -192,11 +198,20 @@ def g(x: int) -> int:
     return x * 2
 
 f(1)
+#: -> f(1)
+#: <- f = 2
 f(2)
+#: -> f(2)
+#: <- f = 3
 g(3)
+#: -> g(3)
+#: <- g = 6
 print(f.count, g.count, trace_counting.total_calls)
 #: 2 1 3
 ```
+
+`__call__()` prints the chapter's arrow lines around the forwarded
+call, so every call is traced as well as counted.
 
 Each decorated function gets its own instance of `trace_counting`
 (the same as `count_calls`), so `f.count` and `g.count` track only

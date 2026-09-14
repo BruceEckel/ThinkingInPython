@@ -932,6 +932,10 @@ not a requirement.
 The same call decorates a `functools.partial`, a bound method,
 or an instance of a class with `__call__()`,
 since all a decorator receives is a callable.
+Calling the result is another matter: `report`'s wrapper reads `func.__name__`,
+which a `partial` and a callable instance lack,
+so those two raise an `AttributeError` at the call,
+while the function and the bound method run.
 
 The return side is equally unconstrained.
 This chapter opened by saying a decorator "returns a result,
@@ -1161,7 +1165,7 @@ and stacking decorators multiplies both by the number of layers.
     so `@memo` and `@memo(maxsize=10)` both decorate a function.
     Cache each result in a dictionary keyed by the arguments,
     and drop the oldest entry once the cache holds more than `maxsize` of them.
-    Distinguish the two forms by checking whether the decorator's first argument is callable.
+    Distinguish the two forms by checking whether the first argument arrived at all.
 6.  Write a `retry(times)` decorator in the function form that calls the wrapped function again when it raises an exception,
     up to `times` attempts, and re-raises the last exception when they all fail.
     Check that `__name__` survives.
