@@ -414,7 +414,8 @@ so do not write code, or a test, that depends on it.
 Every set-algebra operator in `sets.py` has a named method.
 The methods are more flexible:
 they accept any iterable where the operators need a set on both sides,
-and they take several arguments at once.
+and `union()`, `intersection()`,
+and `difference()` take several arguments at once.
 `isdisjoint()` adds one more test, with no operator form:
 
 ```python
@@ -841,8 +842,9 @@ and freeze whichever you pick as soon as it stops changing.
 
 ## Exercises
 
-1.  In `deque_timing.py`,
-    change `n` from `20_000` to `2_000` and run the timing again.
+1.  In `deque_timing.py`, change `n` from `20_000` to `2_000`,
+    change the printed comparison to `deque_time < list_time`,
+    and run the timing again.
     Does `deque_time < list_time` still hold?
     Change `n` to `200_000` and try again.
     The list version takes several seconds at that size,

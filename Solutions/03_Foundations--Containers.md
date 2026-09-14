@@ -35,10 +35,15 @@ print(deque_time < list_time)
 `deque_time < list_time` holds at `n = 2_000`, `20_000`, and `200_000`.
 But the *margin* grows with `n`: each `list.insert(0, x)` or
 `list.pop(0)` shifts every remaining element, so the whole loop costs
-O(n²). Each `deque` operation is O(1), so its loop costs O(n). At small
-`n` the constant-factor overhead of a `deque` can nearly close the
-gap. At large `n` the quadratic cost of the list dominates and the
-`deque` wins by a wide and growing margin.
+O(n²). Each `deque` operation is O(1), so its loop costs O(n). At a few
+dozen items the constant-factor overhead of a `deque` nearly closes the
+gap, though by `n = 2_000` the `deque` finishes several times faster.
+At large `n` the quadratic cost of the list dominates and the `deque`
+wins by a wide and growing margin.
+
+This script differs from the chapter's `deque_timing.py` in how it
+shows the numbers: it prints the two times under `--numbers` instead of
+calling the book's `report()` helper.
 
 ## 2. `defaultdict(int)` for counting
 
@@ -126,16 +131,16 @@ excluded stop, so the element at index `0` never appears.
 # exercise_6.py
 from collections import defaultdict
 
-words = "the cat sat on the mat the cat".split()
+words = "a cat sat on a mat a cat".split()
 counts: defaultdict[str, int] = defaultdict(int)
 for word in words:
     counts[word] += 1
 print(dict(counts))
-#: {'the': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}
+#: {'a': 3, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1}
 print(counts["dog"])  # Missing keys still read as zero
 #: 0
 print(sorted(counts.items(), key=lambda kv: -kv[1])[:2])
-#: [('the', 3), ('cat', 2)]
+#: [('a', 3), ('cat', 2)]
 ```
 
 The tally loop is the same length either way, since `defaultdict(int)`
@@ -239,7 +244,8 @@ rest, however many that is.
 count, two, and `row` holds five. Python raises a `ValueError` rather
 than dropping the extras, since silently discarding data is never the
 intent. The same error appears in the other direction, as
-`too few values to unpack`, when the list is shorter than the target.
+`not enough values to unpack`, when the list is shorter than the
+target.
 
 `a, *b = row` states a minimum instead: at least one item for `a`, and
 the rest, possibly none, for `b`. So the assignment accepts a
