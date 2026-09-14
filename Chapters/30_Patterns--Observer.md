@@ -276,8 +276,8 @@ Subscriptions are strong references:
 an observable that outlives its observers keeps alive the instance behind every subscribed bound method,
 the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
-or weak references (`weakref.WeakMethod`, see [Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them)),
-which forget automatically.
+or weak references, which forget automatically
+(the idea [Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them) shows with `WeakValueDictionary`; `weakref.WeakMethod` is the bound-method form).
 
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
 Two-way bindings are the usual source: the view edits the model,
@@ -358,7 +358,8 @@ and fits the case where the write should proceed even for a value that hasn't ch
 
 ## Observer and I/O
 
-Until now, an observer only prints or appends to a list, then returns.
+Until now, no observer has waited on anything: it prints, appends,
+or writes back, then returns.
 If an observer calls a network service or writes to a database,
 notifying observers one at a time blocks on each.
 The list of callbacks becomes a line of waits.
@@ -609,8 +610,8 @@ class BoxModel(Observable[Grid]):
 ```
 
 Because the model carries no display code, a test drives it without a GUI.
-Build a model, click a cell,
-and check that only that cell changed and that observers received the new grid:
+Call `recolored()` and check that only the clicked cell changed; build a model,
+click a cell, and check that observers received the new grid:
 
 ```python
 # test_box_observer.py

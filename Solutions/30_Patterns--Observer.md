@@ -119,8 +119,11 @@ method, alternating whose turn supplies the next color, and after a
 fixed number of rounds whoever owns the larger patch wins. `FloodGame`
 can also inherit from `Observable[Grid]`, as `BoxModel` does, and call
 `self.notify(self.grid)` at the end of a successful `click()`.
-`box_view.py`'s existing view then repaints after every move, with no
-changes to the view itself.
+`box_view.py`'s existing view then repaints after every move. The
+drawing code needs no change, but `show()`'s parameter annotation does:
+it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
+Protocol (or to `Observable[Grid]` plus `size`, `grid`, and `click()`)
+lets the same view draw either model.
 
 ## 3. A `notify()` that survives a failing observer
 
