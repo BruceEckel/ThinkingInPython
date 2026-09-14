@@ -30,7 +30,7 @@ language idioms tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
 What those three groups leave over sits in Other Patterns and Idioms,
 the catalog's grab-bag.
-Each table lists its rows alphabetically,
+The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
 An unlinked name means the book has no section on that pattern.
@@ -55,7 +55,7 @@ Use this section's table when you know the problem but not the name.
 | Driving an object through a fixed set of states | State Machine |
 | Adding an operation without changing the classes it visits | Visitor |
 | Resolving behavior from the runtime types of two objects | Double Dispatch |
-| Structuring recursive or tree-shaped data | Composite, Interpreter, Visitor, Blackboard |
+| Structuring recursive or tree-shaped data | Composite, Interpreter, Visitor |
 | Keeping the number of objects down | Flyweight, Multiton, Object Pool, Singleton |
 | Saving and restoring state | Memento, Event Sourcing, Unit of Work, Identity Map |
 | Reacting to change | Observer, Publish-Subscribe Channel, Model-View-Controller |
@@ -124,7 +124,7 @@ Use this section's table when you know the problem but not the name.
 | Reactor | Dispatch incoming requests to handlers synchronously as they arrive. |
 | Read-Write Lock | Allow concurrent readers but exclusive writers. |
 | [Thread Pool](19_Techniques--Concurrency.md#one-task-many-backends) | Reuse a fixed set of worker threads across many tasks. |
-| [Thread-Specific Storage](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value. |
+| [Thread-Specific Storage](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
 ## Architectural (POSA)
 
@@ -193,7 +193,7 @@ Use this section's table when you know the problem but not the name.
 | Service Discovery | Locate service instances dynamically. |
 | Sidecar | Attach helper functionality to a service as a separate process. |
 | Strangler Fig | Replace a legacy system incrementally by routing around it. |
-| Timeout | Bound how long to wait for a response. |
+| [Timeout](19_Techniques--Concurrency.md#bounding-a-wait-with-asynciotimeout) | Bound how long to wait for a response. |
 
 ## Language and Implementation Idioms
 
@@ -249,7 +249,7 @@ Python includes the piece their inventors set out to supply.
 | [Iterator](23_Patterns--Iterators.md#the-pattern-that-disappeared) | The iteration protocol, called for you by `for` |
 | [Singleton](24_Patterns--Singleton.md#a-module-is-already-a-singleton) | A module, imported once and cached |
 | [Factory Method](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary) | A dictionary of classes, since a class is an object |
-| [Prototype](27_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `dataclasses.replace()` |
+| [Prototype](27_Patterns--Factory.md#prototype) | `copy.deepcopy()` and `copy.replace()` |
 | [Strategy](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime) | A function passed as an argument |
 | [Command](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime) | A function stored in a list |
 | [Chain of Responsibility](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime) | A list of functions, tried in order |
