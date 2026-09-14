@@ -174,7 +174,7 @@ A name that matches a step, `customize1` or `customize2`,
 is an ordinary override, and a name that resembles none of them,
 like `report()`, is an ordinary new method.
 Both of those pass.
-Only a near miss produces a `TypeError`,
+Among the remaining names, only a near miss produces a `TypeError`,
 and the message names the method the author probably meant.
 The `class Typo` statement raises a `TypeError` instead of finishing too,
 so the misspelling fails at import time,

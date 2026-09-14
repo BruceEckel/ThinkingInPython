@@ -79,9 +79,11 @@ listed in the first, fits the same shape with a different `process()`
 step. That version reads the word list once from the first input
 file, before the loop starts. Its `process(text)` then checks each
 text against that list and returns a report of the words it found,
-rather than a transformed text. The word search needs no change to
-`FileFramework.run()` or `run_file_framework()`. Only the step
-changes, as the pattern intends.
+rather than a transformed text. `run()` feeds every input to
+`process()`, including the word-list file, so the step must skip its
+first call, or the word list must be split off from `filenames`
+before `run()` sees it. The anchored algorithm in `run()` and
+`run_file_framework()` stays unchanged, as the pattern intends.
 
 ## 2. Two fixes for the premature engine
 
@@ -224,8 +226,8 @@ tool you have to actually invoke.
 checker, and protects nothing in a codebase that does not. When the
 interpreter itself must refuse the override, use the
 `__init_subclass__()` technique the chapter points at, which raises a
-`TypeError` while the subclass's own class body is executing, long
-before anyone constructs an instance.
+`TypeError` at the subclass's `class` statement, as soon as the class
+body has run, long before anyone constructs an instance.
 
 ## 4. Two faithless substitutes the type checker accepts
 
