@@ -145,8 +145,8 @@ print(isinstance(Partial(), Service))
 ```
 
 With inheritance, the abstract base class rejects an incomplete implementation at construction.
-A `Protocol` instead reports the mismatch where code uses an object as a `Service`,
-and needs no common base.
+A `Protocol` instead reports the mismatch statically,
+at a parameter annotated `Service`, and needs no common base.
 One caveat: `isinstance()` against a `@runtime_checkable` Protocol checks only that the methods exist,
 not that their signatures match.
 The static type checker verifies signatures.
@@ -206,8 +206,11 @@ so the naive version calls itself forever.
 Writing a `__getattribute__()` means calling `object.__getattribute__()` for every internal access,
 machinery a surrogate rarely needs.
 
-The abstract base class in `proxy_interface.py` and the `Protocol` in `proxy_protocol.py` still guard the implementation side:
-the type checker verifies that whatever you provide to the proxy has the necessary methods.
+`proxy_interface.py`'s abstract base class still guards the implementation side:
+its `Proxy` takes a `Service` parameter,
+so the type checker verifies that whatever you provide has the necessary methods.
+A `Protocol` on that parameter guards it structurally,
+and `proxy_protocol.py`'s `isinstance()` is the runtime half of that check.
 Calls on the proxy get no such check.
 Because `__getattr__()` resolves `p.f()` and returns `Any`,
 the checker cannot verify that call.
@@ -219,10 +222,11 @@ because it inherits `Service`, code typed against `Service` accepts it.
 `__getattr__()` gives up that check so it can forward every method,
 including ones added later.
 
-The lost static check is the first of four limits on `__getattr__()` delegation.
-The next three sections cover the rest:
+The lost static check is the first of five limits on `__getattr__()` delegation.
+The next four sections cover the rest:
 Python never calls `__getattr__()` for a special-method lookup or for an assignment,
-and `__getattr__()` calls itself when the name it reads is also missing.
+`__getattr__()` calls itself when the name it reads is also missing,
+and a surrogate that supplies its methods through `__getattr__()` fails an `isinstance()` check.
 
 ### Special Methods Bypass `__getattr__()` {#special-methods-bypass-getattr}
 
@@ -482,8 +486,9 @@ and code that checks with `isinstance()` should check for the method instead.
 The standard library's own `weakref.proxy()` is a transparent forwarding wrapper too,
 but it solves none of these four:
 it forwards to a weakly referenced object and raises `ReferenceError` once nothing else holds a strong reference to that object.
-[Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them)
-uses `weakref.ref()` and `WeakValueDictionary` from the same module without needing this one.
+[Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
+uses `weakref.ref()`, and a `WeakValueDictionary` in the section that follows,
+both from the same module and neither needing this one.
 
 A *Virtual proxy* delays building an expensive object until something asks for it:
 
@@ -562,7 +567,11 @@ Guarded(Document(), admin=True).erase()
 `guest.__getattr__()` raises `PermissionError` instead,
 so `hasattr(guest, "erase")` does not return `False`,
 it raises `PermissionError` too.
-A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()` the same way it breaks `isinstance()`.
+A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
+It fails `isinstance()` for a different reason:
+as [A Surrogate Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
+explains, the Protocol check uses `inspect.getattr_static()`,
+which never calls `__getattr__()`.
 
 A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
