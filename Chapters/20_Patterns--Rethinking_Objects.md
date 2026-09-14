@@ -125,7 +125,8 @@ so a `BoundedStack` handed to it raises an exception on the third item.
 The subclass matches the signature and breaks the contract behind it.
 
 No tool catches this, but a test can.
-This chapter already writes such tests for guarantees no type checker sees:
+This chapter writes such tests twice later on,
+for guarantees no type checker sees:
 `test_plugged.py` pins down that a getter's copy holds,
 and `test_immutable.py` pins down that a frozen field refuses assignment.
 The same pattern covers substitutability:
@@ -611,7 +612,10 @@ in 1985^[*On Understanding Types, Data Abstraction, and Polymorphism*, where sub
 
 *Subtype polymorphism* is what the four subsections below demonstrate.
 One function accepts any type that fits a shape,
-whether that shape comes from inheriting an `ABC` or matching a `Protocol`.
+and each subsection defines that shape differently: an `ABC` the type inherits,
+a method an `Any` parameter calls at runtime,
+a `Protocol` the type matches structurally,
+or a union the `match` statement covers.
 You write one function.
 The type varies underneath it.
 
@@ -1007,7 +1011,7 @@ and `assert_never()` turns each one into a type checker error naming the shape y
 
 The OOP approach assumes you add types more often than operations,
 and that assumption often fails.
-This trade-off is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs.-pattern-matching).
+This trade-off is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 and [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explore it further.
@@ -1204,7 +1208,8 @@ or whether immutable data, a function, and a protocol already solve the problem.
     exposed through a `@property` the same way `numbers` is,
     and demonstrate the same leak by mutating the list you get back.
     Then plug the leak the way `plugged.py` plugs `numbers` and `bob`.
-2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]`.
+2.  In `immutable.py`, change `numbers: tuple[int, ...]` to `list[int]`,
+    and the construction to `Immutable([1, 2], Bob())`.
     Show that `ty check` still passes, that `append()` works,
     and that `hash(immutable)` now raises a `TypeError`,
     so the frozen instance can no longer be a dict key.

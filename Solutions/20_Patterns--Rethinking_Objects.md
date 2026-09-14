@@ -144,7 +144,7 @@ print(charge(package))  # type: ignore
 
 ```
 error[invalid-argument-type]: Argument to function `charge` is incorrect
-  --> protocol_collision.py:25:14
+  --> exercise_3.py:25:14
    |
 25 | print(charge(package))
    |              ^^^^^^^ Expected `Priced`, found `Package`
@@ -355,13 +355,13 @@ The subclass counts one append out of three and misses `insert()`
 entirely. `extend()` and `insert()` both add elements through `list`'s
 own C implementation, which never calls the Python-level `append()` or
 `__setitem__()` you overrode. Other routes past the counters include
-`+=`, slice assignment, and `list.__init__` with an iterable. A future
-CPython could add another.
+`+=` and `list.__init__` with an iterable. A future CPython could add
+another.
 
-`CountingBox` reports `3 3 1` because no other route into the list
-exists. The class holds a list rather than being one, so every mutation
-goes through a method this class wrote. Nothing inherited can bypass a
-counter that nothing inherited knows about.
+`CountingBox` reports `3 3 1` because no inherited route into the
+list exists. The class holds a list rather than being one, so every
+mutation goes through a method this class wrote. Nothing inherited can
+bypass a counter that nothing inherited knows about.
 
 The trade is explicit. `CountingList` got `sort()`, `index()`,
 `__len__()`, slicing, and everything else `list` offers, and got the
