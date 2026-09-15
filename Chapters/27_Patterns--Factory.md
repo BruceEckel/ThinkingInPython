@@ -1125,21 +1125,18 @@ if __name__ == "__main__":
 #: Pizza(size=20, cheese=True, toppings=('basil', 'olives'))
 ```
 
-Every combination of settings is a single call,
-the call site names each option just as the chain does, and the fields,
+Every combination of settings is a single call.
+The call site names each option just as the chain does, and the fields,
 not a second class, declare the defaults.
 
-Builder chains have a second use,
-starting from an existing configuration and varying it,
-covered by `dataclasses.replace()`.
+A second use for builder chains is to vary an existing configuration.
 For a frozen data class, `replace()` is Prototype and Builder in one function,
 copying the configured state and changing the chosen fields in the copy.
-`copy.replace()` is the general form of the same operation,
-working on any object that defines `__replace__()`,
-shown in [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace).
-A data class defines that method for you.
-A test confirms the two forms produce the same pizza,
-and another shows the single-use hazard:
+`copy.replace()` is the [general form of the operation](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace),
+and works on any object that defines `__replace__()`.
+
+Testing confirms that the two forms produce the same pizza,
+and the single-use hazard:
 
 ```python
 # test_pizza.py
@@ -1168,19 +1165,18 @@ def test_second_build_reuses_toppings() -> None:
     assert second.toppings == ("basil", "olives")
 ```
 
-[Decorators](14_Techniques--Decorators.md#the-decorator-pattern)
+The (unrelated) [Decorator pattern](14_Techniques--Decorators.md#the-decorator-pattern)
 has its own `Pizza`,
-modeling toppings as wrapper objects instead of builder-collected fields,
-to illustrate the unrelated Decorator pattern.
+modeling toppings as wrapper objects instead of builder-collected fields.
 
 Builder remains useful in Python when construction is genuinely a process.
-Here, the steps must come in order, later steps depend on earlier ones,
+The steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
-takes this approach.
+shows this approach.
 It assembles a maze in three stages: creating rooms, connecting doors,
 then pairing the teleports that share a target letter.
-Each stage relies on what the previous stage established.
+Each stage relies on the previous stage.
 No single constructor call can express that.
 The standard library's `argparse.ArgumentParser` has the same shape.
 `add_argument()` calls accumulate a specification,
@@ -1200,7 +1196,7 @@ a data class with keyword arguments already does the job.
 
 Match the machinery to what varies:
 
-- A name maps to a class: use a dictionary.
+- When a name maps to a class: use a dictionary.
   When the set of classes is closed,
   write the table by hand and key it by a `Literal`, as in `shape_table.py`,
   so a bad name fails at the check.
@@ -1208,18 +1204,18 @@ Match the machinery to what varies:
   let the classes fill the table:
   `__init_subclass__()` on an ABC if a subclass must register by existing,
   a bounded `@register` decorator on a Protocol if the checker should reject an incomplete class.
-- The choice is which arguments to pass, not which class:
+- When the choice is which arguments to pass, not which class,
   write an alternative constructor,
   a `@classmethod` that ends with `return cls(...)`.
-- Construction takes real work beyond calling a constructor
-  (pooling, caching, consulting configuration): write a factory function,
+- When construction takes real work beyond calling a constructor
+  (pooling, caching, consulting configuration), write a factory function,
   and a factory class only when that work has state of its own.
-- You must choose several products together as a matched set:
+- When you must choose several products together as a matched set,
   use Abstract Factory, expressed as a `Protocol` rather than a base class.
-- The interesting part of an object is its configured state rather than its type:
+- When the interesting part of an object is its configured state rather than its type,
   keep a prototype and copy it.
   For a frozen data class, `replace()` is that copy.
-- Construction is a genuine process with ordered steps and rules spanning them:
+- When construction is a genuine process with ordered steps and rules spanning them,
   use Builder.
   When the "steps" are optional values, keyword arguments are the builder.
 
