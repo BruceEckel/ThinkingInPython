@@ -85,6 +85,24 @@ run. A fresh agent costs roughly 70-150k tokens on a chapter-sized
 file; a `fork` carries the whole conversation and costs several times
 that, so forks are for work that needs the session's history.
 
+## Editing passes: /edit-start and /edit-done
+
+When Bruce says he is starting to edit a chapter, run `/edit-start NN`
+(`.claude/skills/edit-start/SKILL.md`). It places a local annotated git
+tag `edit-start-NN` on `HEAD`, records the chapter's baseline (`make
+check-ch`, `make reflow-check`, `validate_output`), and reports; it
+writes nothing under `Chapters/`. When he says he is done, run
+`/edit-done NN` (`.claude/skills/edit-done/SKILL.md`): it diffs from the
+tag to the working tree (so commits he made along the way and
+uncommitted edits are one pass), hands that diff to
+`/bruce-edit-capture`, runs `make verify`, commits what verify changed,
+and deletes the tag. The tag is the only state: local, never pushed,
+`git tag -l 'edit-start-*'` lists the open passes. A `SessionStart`
+hook in `.claude/settings.json` prints the open passes into every new
+session's context, so a request that names no file ("fix that sentence
+about closures") is looked up in the chapter in progress first, and
+its Solutions file second, before asking which chapter he means.
+
 ## Learning from Bruce's own edits
 
 `/bruce-edit-capture` (`.claude/skills/bruce-edit-capture/SKILL.md`) reads a

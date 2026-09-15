@@ -9,6 +9,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "for t in $(git tag -l 'edit-start-*' 2>/dev/null); do n=${t#edit-start-}; f=$(ls Chapters/${n}_*.md 2>/dev/null | head -1); echo \"Editing pass open on chapter $n (${f:-file not found}), tag $t. A fix Bruce asks for without naming a file refers to this chapter first. Close the pass with /edit-done $n.\"; done; true",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
