@@ -22,14 +22,6 @@ Where *GoF Design Patterns* builds a hierarchy, Python uses a function,
 the dissolution that [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes.
 
-*Command* appears first as a function, then as the classic class-based form.
-*Strategy*'s function form gets the same fuller listing.
-Its classic form appears only in prose, at the larger scale it needs.
-*Chain of Responsibility* needs only the function form:
-its class version is the same idea with the list written as a linked chain.
-A closing section keys the chain's handlers by event type instead of by position,
-and the list becomes an *event bus*.
-
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
@@ -320,7 +312,8 @@ the algorithm changes and the caller stays the same.
 The algorithms differ, though,
 and the chain in `chain.py` turns that difference into a fallback.
 
-The classic form repeats the move `command_pattern.py` made, at larger scale.
+The classic form repeats the move `command_pattern.py` made, at larger scale,
+and this section describes it rather than listing it.
 Each algorithm becomes a class deriving from a `FindRoot` interface,
 with a `find()` method, and a "Context" class holds the chosen one.
 Those five classes produce the same three lines that one function argument produced.
@@ -420,6 +413,8 @@ Configuration alone is a closure's job.
 each handler holding a reference to the next and deciding whether to pass the request along.
 In Python the chain is a list of functions,
 and the loop that walks the list makes that decision in one place.
+The linked version is the same idea with the list written as a chain of references,
+so the list is the only form here.
 
 Bisection needs the interval to bracket a root.
 The open methods do not:
