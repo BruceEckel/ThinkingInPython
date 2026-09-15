@@ -130,10 +130,14 @@ the same section. Choose a synonym for the prose sense ("executes",
 **Keep when.** The prose word names the identifier itself ("`run()` runs
 the steps" is about `run()`).
 
-**Sightings.** 3 (additive), 2 chapters
+**Sightings.** 4 (additive), 2 chapters
 - `27_Patterns--Factory` 2026-09-01 (`40323f50`), was Claude-written, in
   a chapter whose class is `Shape`: "the shape a factory-object design
   takes" -> "the form a factory-object design takes"
+- `27_Patterns--Factory` 2026-09-12 (`4ab635e2`), was Claude-written, in
+  a chapter where `kind` is the selector parameter of six listings: "a
+  factory of the same kind as `factory()`" -> "a factory, of the same
+  form as `factory()`"
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "an override of `run()` is reported before the program runs" ->
   "Discovers an overridden `run()` before the program executes"
@@ -235,17 +239,29 @@ call (2026-08-29).
 **Test.** A sentence whose only content is a pointer to an adjacent
 listing or example ("The example below shows why.", "The following
 listing demonstrates this.") with no claim of its own. Delete it; the
-listing follows anyway.
+listing follows anyway. The same holds for a forward pointer to the next
+example or to the rest of the chapter ("The rest of this chapter
+replaces call sites like these with ...", "The next example,
+`registry.py`, cannot take the same fix. Its whole point is that ...")
+where the paragraph that follows makes the claim on its own.
 
 **Keep when.** The pointer carries a claim the listing does not make on
 its own ("The next listing shows the same trap in a generator").
 
-**Sightings.** 3 (removal), 2 chapters
+**Sightings.** 5 (removal), 2 chapters
 - `27_Patterns--Factory` 2026-09-01 (`0b7ff81d`), was Claude-written:
   "The next step gives each of those operations its own object." ->
   deleted, ahead of "A *factory object* defines a single `create()`
   method"; "No factory method and no factory class. The `dict` is the
   factory:" -> "No factory method and no factory class:"
+- `27_Patterns--Factory` 2026-09-12 (`a03658af`), was Claude-written:
+  "The rest of this chapter replaces call sites like these with a
+  single place that knows about every shape." -> deleted; the next
+  paragraph opens "The solution is to encapsulate object creation."
+- `27_Patterns--Factory` 2026-09-12 (`a9731125`), was Claude-written:
+  "The next example, `registry.py`, cannot take the same fix. Its whole
+  point is that a new `Shape` subclass registers itself" -> "It would
+  be even nicer if a new `Shape` subclass would register itself"
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The example below shows why." -> deleted
 
@@ -273,19 +289,26 @@ Promoted at Bruce's call (2026-08-29).
 
 ### R9. Name the concrete thing instead of a vague adverb or a negation
 
-**Test.** "directly", "potentially", "possibly", or a description by what
-does not happen ("an attribute nothing reads") where the concrete means,
-frequency, or kind can be named ("as arguments", "sometimes", "a
-type-checking attribute").
+**Test.** "directly", "potentially", "possibly", a description by what
+does not happen ("an attribute nothing reads"), or a vague "other" /
+"the only other" whose excluded item can be named, where the concrete
+means, frequency, kind, or item can be named ("as arguments",
+"sometimes", "a type-checking attribute", "apart from the new
+subclass").
 
 **Keep when.** The concrete word is unknown or would be wrong; a hedge
 that is the claim ("potentially unbounded") stays.
 
-**Sightings.** 5 (additive), 2 chapters
+**Sightings.** 7 (additive), 2 chapters
 - `27_Patterns--Factory` 2026-09-01 (`2b18eed8`), was Bruce-written
   (older draft): "you will likely extend your program" -> "you often
   extend that program"; "first use polymorphism to create a common
   interface" -> "first create a base type as a common interface"
+- `27_Patterns--Factory` 2026-08-31 (`2b18eed8`), was Bruce-written
+  (older draft): "`factory()` is now the only other code that changes"
+  -> "Apart from the new subclass itself, `factory()` is the only code
+  that changes"; and, Claude-written, "and rules span the steps" ->
+  "and some rules apply across several steps"
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "pass the steps in directly" -> "pass the steps as arguments"
 - "an attribute nothing reads" -> "a type-checking attribute"
@@ -304,7 +327,7 @@ Ask what the reader would observe; if the phrase does not say, replace it.
 **Keep when.** The judgment is the claim being made and the mechanism is
 already stated nearby, as in a summary sentence that closes a section.
 
-**Sightings.** 8 (2 chapters)
+**Sightings.** 13 (2 chapters)
 - `26_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
 - "puts the check where it costs nothing" -> "puts the check where it
   does not restrict the surrogate"
@@ -323,6 +346,15 @@ already stated nearby, as in a summary sentence that closes a section.
   "never shows the problem, because it keeps no reference to the
   builder after `build()` returns"; "each implementation picks a side"
   -> "chooses one behavior or the other"
+- `27_Patterns--Factory` 2026-08-31 (`40323f50`, `2b18eed8`), five
+  more, logged 2026-09-15: "hands `cls.__name__` straight to
+  `factory()`" -> "passes `cls.__name__` unchanged to `factory()`"; "A
+  *factory object* carries a single `create()` method" -> "defines a
+  single `create()` method"; "choosing which object to ask" ->
+  "choosing which factory object to call"; "calls it right away" ->
+  "calls its `create()` immediately"; and, in Bruce's own older draft,
+  "the most sensible first step is to use polymorphism" -> "first use
+  polymorphism"
 
 **Home.** literal (Accrued patterns), the pass that owns figures.
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
@@ -350,6 +382,106 @@ written.
 
 **Home.** CLAUDE.md watch list (global, Writing Style). Promoted
 2026-09-01 (C5 -> R11, widened from "In Python" to the family).
+
+### R12. Name a pointer's antecedent only where a competitor exists
+
+**Test.** A pronoun, a clause-level "which", a "there", or a bare "the
+class" with a competing candidate in reach gets its noun; one whose
+subject just appeared unopposed keeps the pronoun. A refinement of the
+`/antecedents` pass rather than a new sweep: that pass fires on
+ambiguity, not on pronouns.
+
+**Keep when.** This *is* the keep-when for `/antecedents`. The reverse
+sighting from chapter 26 below is the point of the entry: a sweep that
+reads the others as "prefer the noun" will overshoot.
+
+**Sightings.** 18 (2 chapters)
+- `27_Patterns--Factory` 2026-08-31 (`40323f50`), was Claude-written,
+  six: "It covers only the first level of inheritance" ->
+  "`__subclasses__()` covers only the first level of inheritance"; "It
+  registers itself" -> "`Triangle` registers itself"; "They fail at
+  call time" -> "Those bodies fail at call time"; "There the table
+  holds classes" -> "In `registry.py` the table holds classes"; "which
+  puts the creation method on a class" -> ": that pattern puts the
+  creation method on a class"; "which is worse than unnecessary" ->
+  "and that dispatch is worse than unnecessary"
+- `27_Patterns--Factory` 2026-09-14 (`7ec15c2e`), was Claude-written:
+  "the class solves a problem Python does not have" -> "the builder
+  class solves a problem Python does not have" (competitor: `Pizza`)
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written, eleven. Ten
+  resolved a pointer that had a competitor:
+  - "it calls that method in the implementing class" -> "the surrogate
+    calls that method in the implementing class"
+  - "the class it forwards method calls to" -> "the class that `Proxy`
+    forwards method calls to"
+  - "constructing it raises a `TypeError`" -> "constructing a `Partial`
+    raises a `TypeError`"
+  - "the type checker verifies its `f()` and `g()`" -> "the type checker
+    verifies the `Proxy`'s `f()` and `g()`"
+  - "the lookup on `type(p)` finds that one" -> "the lookup on `type(p)`
+    finds `object`'s `__str__()`"
+  - "For example, it can count the references" -> "For example, a smart
+    reference can count the references"
+  - "Give it a `__len__()` that forwards" -> "Give that `Proxy` a
+    `__len__()` that forwards"
+  - "instead of running attribute lookup, and never calls
+    `__getattr__()`" -> "instead of running attribute lookup. That
+    function never calls `__getattr__()`"
+  - "It also ties this surrogate to one Protocol" -> "That annotation
+    also ties the surrogate to one Protocol"
+  - "which is what the generic surrogate exists to avoid" -> "and that
+    tie is what the generic surrogate exists to avoid"
+
+  One went the other way, where the subject had just appeared unopposed:
+  - "because `Proxy` names no methods in `Implementation`, the proxy
+    keeps working" -> "because `Proxy` names no methods in
+    `Implementation`, it keeps working"
+
+**Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
+pointers, not zero pronouns" line). Not a separate sweep. Promoted
+2026-09-15 on chapter 27's sightings (C6 -> R12).
+
+### R13. Next to a cross-reference link, cut the sentence that restates the target's content
+
+**Test.** A sentence or trailing clause beside a link whose claim the
+linked section states (read the target to confirm), where the
+paragraph's argument stands without it. Delete the sentence, keep the
+link.
+
+**Keep when.** The paragraph's next step needs the fact and the reader
+should not have to follow the link to get it. The contrast reading C4
+started with ("how this differs from the previous section's subject")
+is not the rule; the chapter that owns a comparison carries it.
+
+**Sightings.** 4 (removal), 2 chapters
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written: "That refusal
+  separates a *Proxy* from a *Decorator*: a decorator adds behavior
+  around a call it always makes. This proxy decides whether to forward
+  the call." -> "`Guarded` requires `admin` privileges to call
+  `erase()`." The Proxy/Decorator comparison lives in
+  `29_Patterns--Changing_the_Interface`'s table.
+- `26_Patterns--Surrogate` 2026-08-31, was Claude-written: "A *Smart
+  reference* proxy adds behavior around each access without refusing
+  any." -> "A *Smart reference* proxy adds behavior around each
+  access." A contrast cut with no link beside it; the narrowing sets
+  this sighting aside rather than claiming it.
+- `27_Patterns--Factory` 2026-08-31 (`d6144479`), was Claude-written:
+  "a convention rather than concealment, and the convention is all
+  Python provides ([Singleton](...) makes the same case)" -> "a
+  convention rather than concealment ([Singleton](...) makes the same
+  case)". Chapter 24's linked section says "Privacy in Python is advice,
+  not enforcement."
+- `27_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
+  "`copy.replace()` is the general form of the same operation, working
+  on any object that defines `__replace__()`, shown in [The General
+  Form of `replace()`](...). A data class defines that method for you."
+  -> "`copy.replace()` is the [general form of the operation](...), and
+  works on any object that defines `__replace__()`." Chapter 12's
+  linked section says `copy.replace()` works on a frozen data class and
+  anything else that defines `__replace__()`.
+
+**Home.** this file only. Promoted 2026-09-15, narrowed from C4's
+contrast reading (C4 -> R13).
 
 ---
 
@@ -398,74 +530,6 @@ Claude-written (same chapter, so not yet independent):
   instance" -> "`len(p)` looks up `__len__()` on `type(p)`, skips the
   instance"
 
-### C4. Cut the clause that defines this thing by contrast with the one just discussed
-
-**Test.** A sentence or trailing clause whose work is to say how the
-current subject differs from the previous section's subject, where the
-current subject's own description already stands without it.
-
-**Keep when.** The contrast is the section's point, or the two are a
-lookalike pair the chapter exists to separate.
-
-**Note.** Both sightings are deletions. The first removed a
-Proxy/Decorator contrast that `29_Patterns--Changing_the_Interface`
-already carries in its comparison table, so the underlying rule may be
-narrower: leave cross-pattern comparison to the chapter that owns it. Two
-sightings in one chapter cannot decide between the two readings.
-
-**Sightings.** 2, both `26_Patterns--Surrogate` 2026-08-31, was
-Claude-written (same chapter, so not yet independent):
-- "That refusal separates a *Proxy* from a *Decorator*: a decorator adds
-  behavior around a call it always makes. This proxy decides whether to
-  forward the call." -> "`Guarded` requires `admin` privileges to call
-  `erase()`."
-- "A *Smart reference* proxy adds behavior around each access without
-  refusing any." -> "A *Smart reference* proxy adds behavior around each
-  access."
-
-### C6. Name a pointer's antecedent only where a competitor exists
-
-**Test.** A refinement of the `/antecedents` pass rather than a new sweep.
-A pronoun or demonstrative with a competing candidate in reach gets its
-noun; one whose subject just appeared unopposed keeps the pronoun.
-`/antecedents` fires on ambiguity, not on pronouns.
-
-**Keep when.** This *is* the keep-when for `/antecedents`. The reverse
-sighting below is the whole point of the entry: a sweep that reads the
-other ten as "prefer the noun" will overshoot.
-
-**Sightings.** 11, all `26_Patterns--Surrogate` 2026-08-31, was
-Claude-written (same chapter, so not yet independent). Ten resolved a
-pointer that had a competitor:
-- "it calls that method in the implementing class" -> "the surrogate
-  calls that method in the implementing class"
-- "the class it forwards method calls to" -> "the class that `Proxy`
-  forwards method calls to"
-- "constructing it raises a `TypeError`" -> "constructing a `Partial`
-  raises a `TypeError`"
-- "the type checker verifies its `f()` and `g()`" -> "the type checker
-  verifies the `Proxy`'s `f()` and `g()`"
-- "the lookup on `type(p)` finds that one" -> "the lookup on `type(p)`
-  finds `object`'s `__str__()`"
-- "For example, it can count the references" -> "For example, a smart
-  reference can count the references"
-- "Give it a `__len__()` that forwards" -> "Give that `Proxy` a
-  `__len__()` that forwards"
-- "instead of running attribute lookup, and never calls `__getattr__()`"
-  -> "instead of running attribute lookup. That function never calls
-  `__getattr__()`"
-- "It also ties this surrogate to one Protocol" -> "That annotation also
-  ties the surrogate to one Protocol"
-- "which is what the generic surrogate exists to avoid" -> "and that tie
-  is what the generic surrogate exists to avoid"
-
-One went the other way, where the subject had just appeared unopposed:
-- "because `Proxy` names no methods in `Implementation`, the proxy keeps
-  working" -> "because `Proxy` names no methods in `Implementation`, it
-  keeps working"
-
-**Home.** the `antecedents` skill, as a keep-when. Not a separate sweep.
-
 ### C7. Give a bare comparative its noun
 
 **Test.** "looks/seems/is [comparative]" ("looks stronger", "is
@@ -489,8 +553,14 @@ after its example). Keep the concrete one.
 **Keep when.** The second sentence adds a consequence or a mechanism
 the first did not state.
 
-**Sightings.** 3, all `27_Patterns--Factory` 2026-09-01, was
-Claude-written (same chapter, so not yet independent):
+**Sightings.** 5, all `27_Patterns--Factory`, was Claude-written (same
+chapter, so not yet independent):
+- 2026-09-15 (`a9ca27eb`): "Builder chains have a second use, starting
+  from an existing configuration and varying it, covered by
+  `dataclasses.replace()`." -> "A second use for builder chains is to
+  vary an existing configuration." (the next sentence names
+  `replace()`); "Each stage relies on what the previous stage
+  established." -> "Each stage relies on the previous stage."
 - "You must still find and edit every place that names a concrete type.
   Creation names the type. Use does not, because polymorphism handles
   use. The effect is the same: adding a new type means edits scattered
@@ -521,19 +591,33 @@ Claude-written (same chapter, so not yet independent):
   stop there: creating an instance of it still succeeds" flagged as
   "still hard to follow"; rewritten with Python as the actor
 
-### C10. Join a two-sentence contrast with "Whereas"
+### C10. Join a two-part contrast with "Whereas" or "while"
 
-**Test.** Two adjacent sentences with the same frame and opposite
-predicates and no connective ("A factory takes information telling it
-what to build. A generator object does the opposite:"). Join them:
-"Whereas a factory ..., a generator object does the opposite:".
+**Test.** Two adjacent sentences, or two halves of a semicolon, with
+the same frame and opposite predicates and no connective ("A factory
+takes information telling it what to build. A generator object does the
+opposite:"; "In `registry.py` the table holds classes. In
+`prototype_registry.py` the table holds instances."). Join them:
+"Whereas a factory ..., a generator object does the opposite:"; "that
+table holds classes ..., while `prototype_registry.py`'s holds
+instances".
 
 **Keep when.** The two sentences are a deliberate two-beat ("Failures
 never vanish. They only relocate.").
 
-**Sightings.** 1 (additive), `27_Patterns--Factory` 2026-09-01, was
-Claude-written; "Where" in `40323f50`, corrected to "Whereas" in
-`d6144479`.
+**Sightings.** 3 (additive), all `27_Patterns--Factory`, was
+Claude-written (same chapter, so not yet independent):
+- 2026-08-31: "Where" in `40323f50`, corrected to "Whereas" in
+  `d6144479`
+- 2026-08-31 (`2b18eed8`): "Compare `spawn()` with `make()` in
+  `registry.py`. In `registry.py` the table holds classes and calls a
+  constructor. In `prototype_registry.py` the table holds instances and
+  copies them." -> "Compare `spawn()` with `make()` in `registry.py`:
+  that table holds classes and calls a constructor, while
+  `prototype_registry.py`'s holds instances and copies them."
+- 2026-09-12 (`a9731125`): "A closed set of names suits `Literal`; an
+  open set, growing by subclassing, does not:" -> "A closed set of names
+  suits `Literal`, while an open set does not:"
 
 ### C11. Cut "need(s) to" where the sentence describes rather than obliges
 
@@ -550,19 +634,181 @@ was Bruce-written (older draft) and Claude-written respectively:
 - "that's the only place you need to change the code" -> "that method
   is the only code you change"
 
-### C12. Link the term instead of appending "(see Chapter)"
+### C12. Carry the cross-reference on the term, not in a citation after it
 
-**Test.** A term followed by a parenthetical citation "(see [Chapter](
-...#anchor))" where the term itself could carry the link.
+**Test.** A term followed by a parenthetical "(see [Chapter](...#anchor))"
+or a trailing ", shown in [Section](...)", where the term or phrase
+could carry the link; or a bare term with a defining section elsewhere
+in the book ("the MRO") that could be linked on first use in the
+chapter.
 
 **Keep when.** The citation points somewhere other than the term's
 definition, or the term is already a link to something else.
 
-**Sightings.** 1, `27_Patterns--Factory` 2026-09-01 (`d6144479`), was
-Claude-written:
-- "I have also used a *generator* (see
+**Sightings.** 3, all `27_Patterns--Factory`, was Claude-written (same
+chapter, so not yet independent):
+- 2026-08-31 (`d6144479`): "I have also used a *generator* (see
   [Iterators](23_Patterns--Iterators.md#generators))." -> "I have also
   used a [*generator*](23_Patterns--Iterators.md#generators)."
+- 2026-08-31 (`0b7ff81d`): "`cls.registry` resolves through the MRO" ->
+  "resolves through the [MRO](07_Foundations--Classes.md#inheritance)"
+- 2026-09-15 (`a9ca27eb`): "`copy.replace()` is the general form of the
+  same operation, working on any object that defines `__replace__()`,
+  shown in [The General Form of `replace()`](...)." -> "`copy.replace()`
+  is the [general form of the operation](...), and works on any object
+  that defines `__replace__()`."
+
+### C13. Name a listing by its filename, not "the listing" or "this listing"
+
+**Test.** "the listing" / "this listing" / "the example" as the subject
+of a claim about a listing that has a `# name.py` header, where another
+listing sits in the same section. Write the filename in code font.
+
+**Keep when.** The filename was the previous sentence's subject, so
+repeating it would be padding.
+
+**Sightings.** 2, both `27_Patterns--Factory` 2026-08-31, was
+Claude-written (same chapter, so not yet independent):
+- (`d6144479`) "The listing keeps the plain names because" ->
+  "`shape_factory1.py` keeps the plain names because"
+- (`0b7ff81d`) "This listing keeps it because that is the form a
+  factory-object design takes" -> "`shape_factory2.py` uses it to show
+  the form a factory-object design takes"
+
+### C14. Introduce a test listing with "Testing confirms that ..."
+
+**Test.** A sentence introducing a test listing whose subject is "The
+tests", "The test", "A test", or "another" ("A test confirms X, and
+another shows Y:"). Write "Testing confirms that X, and Y:".
+
+**Keep when.** The sentence names a specific test function.
+
+**Note.** As of 2026-09-15 the book has three "Testing confirms" (17,
+26, 27), three "The tests confirm" (28, 37, 42), two "The test confirms"
+(20, 24), and one "Tests confirm" (17); promotion would touch six sites
+in five chapters.
+
+**Sightings.** 2, both `27_Patterns--Factory`, was Claude-written (same
+chapter, so not yet independent):
+- 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
+  registers itself" -> "Testing confirms that every subclass registers
+  itself"
+- 2026-09-15 (`a9ca27eb`): "A test confirms the two forms produce the
+  same pizza, and another shows the single-use hazard:" -> "Testing
+  confirms that the two forms produce the same pizza, and the
+  single-use hazard:"
+
+### C15. Make the mechanism the subject where the sentence describes how a design behaves
+
+**Test.** An imperative ("make a common factory create every object")
+or a "you can VERB" ("you can remove that line by letting each subclass
+register itself") whose content is how the design works rather than
+advice to the reader. Put the mechanism in subject position with an
+indicative verb: "A common factory creates every object"; "Letting each
+subclass register itself removes that line".
+
+**Keep when.** The sentence is advice or an exercise instruction ("Use a
+`set` for membership tests"), or "you can" where the option's existence
+is the news (the `activate` skill's existing keep, "You can supply a
+different `Console` in a test").
+
+**Sightings.** 4 (additive), all `27_Patterns--Factory` (same chapter,
+so not yet independent):
+- 2026-08-31 (`40323f50`), was Claude-written: "You can remove that
+  line too, so the factory never needs editing when you add a type, by
+  letting each subclass register itself through `__init_subclass__()`"
+  -> "Letting each subclass register itself through
+  `__init_subclass__()` removes that line too, so the factory never
+  needs editing when you add a type"
+- 2026-08-31 (`2b18eed8`), was Bruce-written (older draft): "Thus you
+  can isolate, in one place, the effect of changing from one GUI to
+  another." -> "The change from one GUI to another then touches one
+  place in your code."
+- 2026-09-12 (`a03658af`), was Bruce-written (older draft): "The
+  solution is to encapsulate object creation: make a common *factory*
+  create every object" -> "The solution is to encapsulate object
+  creation. A common *factory* creates every object"; "so you change
+  only the factory when you add a new type" -> "so adding a new type
+  only changes the factory"
+
+**Home.** activate (Accrued patterns), beside its "you can" keep.
+
+### C16. Cut a sentence-opening locator on a sentence stating a general property
+
+**Test.** "Here,", "In this example,", "As an example," opening a
+sentence whose claim is about the pattern or design in general, not
+about the adjacent listing ("Here, the steps must come in order, later
+steps depend on earlier ones" is a claim about Builder). Delete the
+locator, or move "here" to the end when the sentence does describe the
+listing.
+
+**Keep when.** The locator points at a fact of the adjacent listing.
+Bruce kept four such openers in the same chapter ("Here `Triangle` has
+just joined the hierarchy", "Here that argument is a string", "Here it
+is a `Protocol`", "Here the table holds instances") and wrote a fifth
+("Here, we create one factory object per `Shape` subtype:"). The
+keep-when is the larger set; a sweep reads the sentence, not the word.
+
+**Sightings.** 3, all `27_Patterns--Factory` (same chapter, so not yet
+independent):
+- 2026-08-31 (`2b18eed8`), was Bruce-written (older draft): "In this
+  example, the setup and play are simple, but" -> "Setup and play are
+  simple here, but"
+- 2026-09-12 (`3e631333`), was Claude-written: "As an example, revisit
+  the `Shape` hierarchy" -> "Consider the `Shape` hierarchy"
+- 2026-09-15 (`a9ca27eb`), was Claude-written: "Here, the steps must
+  come in order" -> "The steps must come in order"
+
+### C17. In a decision list, state each condition as "When ..., action"
+
+**Test.** A bulleted list whose items are shaped "condition: action"
+with the condition a bare clause ("The choice is which arguments to
+pass, not which class: write an alternative constructor"). Write "When
+the choice is which arguments to pass, not which class, write an
+alternative constructor."
+
+**Keep when.** The item's lead is a label naming a thing rather than a
+condition; R5 governs those.
+
+**Sightings.** 1 (one list of six items), `27_Patterns--Factory`
+2026-09-15 (`a9ca27eb`), was Claude-written:
+- "A name maps to a class: use a dictionary." -> "When a name maps to a
+  class: use a dictionary." (the colon survived on this item alone)
+- "The choice is which arguments to pass, not which class: write an
+  alternative constructor" -> "When the choice is which arguments to
+  pass, not which class, write an alternative constructor"
+- "You must choose several products together as a matched set: use
+  Abstract Factory" -> "When you must choose several products together
+  as a matched set, use Abstract Factory"
+- likewise "Construction takes real work", "The interesting part of an
+  object", "Construction is a genuine process"
+
+### C18. A premise that is new information stands as its own statement, then "so" or "Thus"
+
+**Test.** "If X, Y", "Since X, Y", or "Because X, Y" where X is the
+first time the reader meets the fact. Write X as a statement and attach
+Y with "so", or as its own sentence followed by "Thus, Y". The mirror of
+R4, which fronts an already-established X with "Because".
+
+**Keep when.** X was established earlier, so R4 applies.
+
+**Sightings.** 3, all `27_Patterns--Factory` 2026-08-31 (same chapter,
+so not yet independent):
+- (`2b18eed8`), was Bruce-written (older draft): "If your program must
+  call this factory whenever it needs one of your objects, then you
+  change only the factory" -> "Your program must call this factory
+  whenever it needs one of your objects, so you change only the
+  factory"
+- (`2b18eed8`), was Bruce-written (older draft): "Since every
+  object-oriented program creates objects, and since you will likely
+  extend your program by adding new types, Factory might be the most
+  common design pattern." -> "Every object-oriented program creates
+  objects, and you often extend that program by adding new types. Thus,
+  *Factory* might be the most common design pattern."
+- (`40323f50`), was Claude-written, R4's recorded keep-when: "Because
+  the registry keys on `cls.__name__` alone, two classes that share a
+  name ... overwrite each other" -> "The registry keys on `cls.__name__`
+  alone, so two classes that share a name ... overwrite each other"
 
 ---
 
