@@ -182,6 +182,13 @@ is the file `Examples/14_Techniques--Decorators/tracer.py`.
 A helper that more than one chapter uses carries a `utils/` path in its filename comment instead,
 like `# utils/result.py`,
 and lives in `Examples/utils/` rather than in a chapter folder.
+A listing imports such a helper by its bare module name,
+`from result import Err, Ok`,
+because the example tooling puts `Examples/utils/` on the import path.
+A file run straight from the repository root lacks that path,
+so `make run-one F=<name>` (`tools/run_one_example.py`)
+runs one example with the working directory and import path the book assumes,
+and prints the equivalent by-hand commands first.
 A filename comment that starts with `rust/`,
 like the `# rust/fastcount/demo.py` listing in [Performance](18_Techniques--Performance.md),
 names a file in the repository's `rust/` directory, outside the Python build.
