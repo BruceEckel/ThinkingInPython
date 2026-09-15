@@ -69,6 +69,7 @@ EXCLUDED: dict[str, str] = {
     "verify-targets": "this is the target that runs this script",
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
     "check-ch": "needs a CH= chapter selector this smoke test cannot supply",
+    "verify-ch": "needs a CH= chapter selector this smoke test cannot supply",
 }
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in

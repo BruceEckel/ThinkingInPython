@@ -131,7 +131,7 @@ tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global
 
 ##@ Everyday
 
-.PHONY: all verify sync-ci gate gate-status tools-status sweep ci reset \
+.PHONY: all verify verify-ch sync-ci gate gate-status tools-status sweep ci reset \
         python-upgrade
 
 # The edit-and-check loop to repeat after touching a chapter: every
@@ -156,6 +156,17 @@ all:  ## Run every everyday fixer plus sync and gate; ARGS=--help lists them wit
 # corrected-in-place Markdown -- reversing that leaves Examples/
 # SolutionsCode one run behind whenever a marker needed fixing.
 verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line endings, refresh #: markers, sync Examples/ and SolutionsCode/, then run every gate except the site build
+
+# The same loop scoped to one chapter and its Solutions file, in a few
+# seconds instead of tens: fix-eol, reflow, both extracts, this chapter's
+# #: markers (chapter and Solutions), both syncs and drift checks, the
+# Markdown gates on these two files, then ty/ruff/run/pytest over the
+# chapter's directory in each build tree. GATE_CHECKS is passed through so
+# the Markdown checks are the gate's by construction. It writes no gate
+# stamp: a change that can reach other chapters (a renamed listing, a
+# utils/ helper, a heading others link to) still needs `make verify`.
+verify-ch:  ## The verify loop for one chapter and its Solutions file (CH=28), a few seconds
+	$(PY) -m tools.verify_chapter $(CH) --checks $(GATE_CHECKS)
 
 # Same as verify, plus the site build at the end.
 sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)

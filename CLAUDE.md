@@ -95,7 +95,8 @@ writes nothing under `Chapters/`. When he says he is done, run
 `/edit-done NN` (`.claude/skills/edit-done/SKILL.md`): it diffs from the
 tag to the working tree (so commits he made along the way and
 uncommitted edits are one pass), hands that diff to
-`/bruce-edit-capture`, runs `make verify`, commits what verify changed,
+`/bruce-edit-capture`, runs `make verify-ch CH=NN` (or `make verify`
+when the pass reached other chapters), commits what the loop changed,
 and deletes the tag. The tag is the only state: local, never pushed,
 `git tag -l 'edit-start-*'` lists the open passes. A `SessionStart`
 hook in `.claude/settings.json` prints the open passes into every new
@@ -118,8 +119,14 @@ are never re-proposed.
 
 ## The verify loop after editing a chapter
 
-Fastest path is `make verify` (fix line endings, refresh `#:` output markers,
-sync, then every gate but the site build). `make all` is the heavier version:
+Fastest path for one chapter is `make verify-ch CH=NN`
+(`tools/verify_chapter.py`): the same fixers and gates as `verify`,
+scoped to that chapter and its Solutions file, in a few seconds. It
+reflows the chapter only, since the gate never reflows `Solutions/`,
+and it writes no gate stamp; a change that other chapters depend on
+(a renamed listing, a `utils/` helper, a linked heading) still needs
+the whole-book run. That run is `make verify` (fix line endings,
+refresh `#:` output markers, sync, then every gate but the site build). `make all` is the heavier version:
 it also runs every mutating fixer (`reflow`, the comment-style fixers, import
 sorting, blank-line cleanup) before the marker refresh and sync; its ordered
 target list lives in `tools/run_all.py` (`ALL_TARGETS`), and `make all

@@ -59,14 +59,24 @@ Bruce approves. Do not shortcut its report.
 ## Step 4: verify and commit
 
 Bruce's edits can leave a stale `#:` marker, a paragraph that needs
-reflow, or a listing that no longer checks. Run the loop the project
-CLAUDE.md prescribes:
+reflow, or a listing that no longer checks. Run the chapter-scoped
+loop, which is the same fixers and gates as `make verify` narrowed to
+this chapter and its Solutions file, in a few seconds:
 
 ```
-make verify
+make verify-ch CH=NN
 ```
 
-Then read `git diff --stat`. If `verify` changed files (a reflow, a
+Use the whole-book loop instead, `make verify`, when the pass reached
+outside the chapter. Two signs, both read from the diff in Step 2 with
+its path filter removed (`git diff --stat edit-start-NN`): a changed
+file under `Chapters/` or `Solutions/` that is not this chapter's, or
+a change inside this chapter that other chapters depend on, such as a
+renamed listing, a heading another chapter links to, or a `utils/`
+helper. `verify-ch` says so itself when it fails, and it never writes
+the gate stamp.
+
+Then read `git diff --stat`. If the loop changed files (a reflow, a
 marker refresh, a synced `Examples/` copy), commit them together with
 any of Bruce's uncommitted edits to the same files, in one commit,
 with the attribution trailer. His uncommitted edits are not split out

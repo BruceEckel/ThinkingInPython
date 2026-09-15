@@ -68,7 +68,8 @@ def run(label: str, command: list[str], ok: tuple[int, ...] = (0,)) -> bool:
     return passed
 
 
-def run_markers(md: Path) -> bool:
+def run_markers(md: Path, tree: Path | None = None,
+                label: str = "output markers") -> bool:
     """Refresh this chapter's `#:` markers, the way `gate` does.
 
     `gate` runs validate_output.py with --update, so a stale marker
@@ -83,17 +84,23 @@ def run_markers(md: Path) -> bool:
     counts every file it processed as "updated" whether or not it
     rewrote anything, so trusting that word would print the warning on
     every run and teach you to ignore it.
+
+    `tree` is the extracted tree the listings run from, for a
+    Solutions file (`build/solutions/`); the chapter tree is the
+    default. It must be absolute (see tools/README.md on --tree).
     """
     before = md.read_bytes()
+    tree_args = ["--tree", str(tree.resolve())] if tree else []
     result = run_capture(
-        [*PY, "-m", "tools.validate_output", "--update", str(md)],
+        [*PY, "-m", "tools.validate_output", "--update", *tree_args,
+         str(md)],
         timeout=MARKER_TIMEOUT)
     if result is None:
-        print("FAIL  output markers (validate_output.py would not start)")
+        print(f"FAIL  {label} (validate_output.py would not start)")
         return False
     report, code = result
     passed = code == 0
-    print(f"{'ok  ' if passed else 'FAIL'}  output markers")
+    print(f"{'ok  ' if passed else 'FAIL'}  {label}")
     if not passed:
         print(report.strip())
     elif md.read_bytes() != before:
