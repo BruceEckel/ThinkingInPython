@@ -352,8 +352,9 @@ release-prune:  ## Delete GitHub releases older than the newest two (their tags 
 
 # --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
 # not a full site build), then the open page reloads itself.
-# --copy-on-select makes a mouse selection copy itself to the clipboard,
-# for lifting passages out of the rendered book. Both scripts are added
+# --copy-on-select makes a mouse selection copy itself to the clipboard
+# as «text» (Chapter › Section), for lifting passages out of the
+# rendered book. Both scripts are added
 # to pages as they are served; build/site/ and the published site never
 # carry them, and `make serve` gets neither.
 local: site  ## Build the site, serve it with live reload and copy-on-select, open a browser

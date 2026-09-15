@@ -15,8 +15,11 @@ becomes a refreshed browser page with nothing to press.
 
 With `--copy-on-select`, each served page also carries a script that
 copies a mouse selection to the clipboard as soon as the button is
-released, for pulling passages out of the rendered book. `make local`
-passes it. Both scripts are added to the response as it is served, so
+released, for pulling passages out of the rendered book. The copied
+text is wrapped in guillemets and followed by its source, so a pasted
+passage reads `«...» (Function Objects › Strategy: Choosing the
+Algorithm at Runtime)`; neither « nor » occurs in the book, so the
+marks cannot be mistaken for quoted text. `make local` passes it. Both scripts are added to the response as it is served, so
 the files in `build/site/`, the ones the published site is built from,
 never contain either.
 
@@ -75,8 +78,11 @@ RELOAD_SCRIPT = """
 
 # Copies the selection when the mouse button comes up. mouseup is the
 # user gesture the clipboard API requires; selectionchange alone is not
-# one. The execCommand fallback covers a page served over plain http on
-# a LAN address, where navigator.clipboard is absent. The toast makes
+# one. The text goes out as «text» (Chapter › Section): the chapter is
+# the page's <h1>, the section the last <h2>/<h3> before the selection
+# starts. The execCommand fallback covers a page served over plain http
+# on a LAN address, where navigator.clipboard is absent; it copies the
+# bare selection, since it cannot see the wrapped text. The toast makes
 # the copy visible, since every drag-select overwrites the clipboard.
 COPY_SCRIPT = """
 <script>
@@ -93,14 +99,28 @@ COPY_SCRIPT = """
     clearTimeout(hide);
     hide = setTimeout(() => { toast.style.opacity = "0"; }, 700);
   };
+  const source = (range) => {
+    const h1 = document.querySelector("h1");
+    const parts = [h1 ? h1.textContent.trim() : document.title];
+    let section = null;
+    for (const h of document.querySelectorAll("h2, h3")) {
+      if (range.comparePoint(h, 0) > 0) break;
+      section = h.textContent.trim();
+    }
+    if (section) parts.push(section);
+    return parts.join(" › ");
+  };
   document.addEventListener("mouseup", (event) => {
     const tag = event.target.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") return;
-    const text = document.getSelection().toString();
-    if (text.trim() === "") return;
+    const selection = document.getSelection();
+    const text = selection.toString();
+    if (text.trim() === "" || selection.rangeCount === 0) return;
+    const wrapped = "«" + text + "» ("
+      + source(selection.getRangeAt(0)) + ")";
     const fallback = () => { if (document.execCommand("copy")) show(); };
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(show, fallback);
+      navigator.clipboard.writeText(wrapped).then(show, fallback);
     } else {
       fallback();
     }
