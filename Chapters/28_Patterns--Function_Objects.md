@@ -3,9 +3,9 @@
 A *function object* decouples the choice of function to call from the place that calls it.
 That decoupling is the goal of three patterns: *Command*, *Strategy*,
 and *Chain of Responsibility*.
-The call site declares a callable of a given signature and nothing about where it came from,
-the communication-first design [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
-describes.
+The call site names the signature it will call and says nothing about where the callable came from.
+[Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+states that principle as "design the communication, not the parts."
 The three differ in what they defer.
 *Command* defers *what* to do, so you can store the action and run it later.
 *Strategy* defers *how* to do a job the caller already has.
