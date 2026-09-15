@@ -6,11 +6,14 @@ and *Chain of Responsibility*.
 The call site names the signature it will call and says nothing about where the callable came from.
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
-The three differ in what they defer.
-*Command* defers *what* to do, so you can store the action and run it later.
-*Strategy* defers *how* to do a job the caller already has.
-*Chain of Responsibility* defers *which* handler takes the job,
-trying candidates until one accepts.
+
+Each pattern defers something:
+
+- *Command* defers *what* to do, so you can store the action and run it later.
+- *Strategy* defers *how*: the job is fixed,
+  and the caller picks the algorithm that does it.
+- *Chain of Responsibility* defers *which* handler takes the job,
+  trying candidates until one accepts.
 
 In Python a function is already an object.
 You can name it, store it in a list, pass it as an argument, and return it.
