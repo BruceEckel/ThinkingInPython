@@ -647,7 +647,7 @@ and the version that does run at `B`'s creation is the one `B` inherits from `A`
 which is `object`'s do-nothing default.
 Use the runtime version when `@final` is not enough, a rare case.
 
-Tests confirm the `@final` marker is present,
+Testing confirms that the `@final` marker is present,
 the runtime-final class refuses subclassing,
 and its non-final base still allows it:
 

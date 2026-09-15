@@ -430,7 +430,7 @@ def test_bind_short_circuits_a_failure() -> None:
     assert failure.bind(lambda x: Ok(x + 1)) is failure
 ```
 
-The tests confirm that the hand-written and `bind()` versions agree on every input:
+Testing confirms that the hand-written and `bind()` versions agree on every input:
 
 ```python
 # test_composing.py
@@ -518,7 +518,7 @@ and the shape gets worse with each one you add.
 [The returns Library](#the-returns-library), covered at the end of this chapter,
 offers do-notation as a flatter alternative to this nesting.
 
-The tests confirm that `combined()` returns the correct value,
+Testing confirms that `combined()` returns the correct value,
 or the first failure in the chain:
 
 ```python

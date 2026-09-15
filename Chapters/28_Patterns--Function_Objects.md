@@ -614,7 +614,7 @@ Walking `type(event).__mro__` and calling every handler along it would give a su
 An event would then run every handler registered anywhere in its ancestry,
 not only the ones registered for its own type.
 
-The tests confirm that publishing calls every handler registered for a type,
+Testing confirms that publishing calls every handler registered for a type,
 a handler receives only its own event type,
 an event with no handler calls nothing,
 and publishing an unhandled event leaves no stray entry behind:

@@ -110,7 +110,7 @@ It registers itself, and `create()` builds it.
 It reads `t.value` and `t.weight` polymorphically,
 and never asks what type a piece is.
 
-The tests confirm that each subclass registers itself,
+Testing confirms that each subclass registers itself,
 `create()` builds one by name,
 and `sum_value()` totals weight times the per-pound value:
 

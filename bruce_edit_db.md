@@ -483,6 +483,34 @@ is not the rule; the chapter that owns a comparison carries it.
 **Home.** this file only. Promoted 2026-09-15, narrowed from C4's
 contrast reading (C4 -> R13).
 
+### R14. Introduce a test listing with "Testing confirms that ..."
+
+**Test.** A sentence introducing a test listing whose subject is "The
+tests", "The test", "Tests", "A test", or "another" ("A test confirms
+X, and another shows Y:"). Write "Testing confirms that X, and Y:".
+
+**Keep when.** The sentence names a specific test function.
+
+**Sightings.** 2, both `27_Patterns--Factory`, was Claude-written; plus
+the 2026-09-15 sweep
+- 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
+  registers itself" -> "Testing confirms that every subclass registers
+  itself"
+- 2026-09-15 (`a9ca27eb`): "A test confirms the two forms produce the
+  same pizza, and another shows the single-use hazard:" -> "Testing
+  confirms that the two forms produce the same pizza, and the
+  single-use hazard:"
+- 2026-09-15 sweep after promotion, seven sites in six chapters, all
+  Claude-written: `17` "Tests confirm the `@final` marker is present,"
+  ; `20` "The test confirms the defensive copy holds."; `24` "The test
+  confirms the objects differ but share one set of state."; `28`, `37`,
+  and `42` (twice) "The tests confirm that ..." -> each "Testing
+  confirms that ...". Before the sweep the book had three "Testing
+  confirms" (17, 26, 27) against those seven.
+
+**Home.** this file only. Promoted at Bruce's call on one chapter's
+evidence (2026-09-15, C14 -> R14).
+
 ---
 
 ## Candidates
@@ -674,29 +702,6 @@ Claude-written (same chapter, so not yet independent):
 - (`0b7ff81d`) "This listing keeps it because that is the form a
   factory-object design takes" -> "`shape_factory2.py` uses it to show
   the form a factory-object design takes"
-
-### C14. Introduce a test listing with "Testing confirms that ..."
-
-**Test.** A sentence introducing a test listing whose subject is "The
-tests", "The test", "A test", or "another" ("A test confirms X, and
-another shows Y:"). Write "Testing confirms that X, and Y:".
-
-**Keep when.** The sentence names a specific test function.
-
-**Note.** As of 2026-09-15 the book has three "Testing confirms" (17,
-26, 27), three "The tests confirm" (28, 37, 42), two "The test confirms"
-(20, 24), and one "Tests confirm" (17); promotion would touch six sites
-in five chapters.
-
-**Sightings.** 2, both `27_Patterns--Factory`, was Claude-written (same
-chapter, so not yet independent):
-- 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
-  registers itself" -> "Testing confirms that every subclass registers
-  itself"
-- 2026-09-15 (`a9ca27eb`): "A test confirms the two forms produce the
-  same pizza, and another shows the single-use hazard:" -> "Testing
-  confirms that the two forms produce the same pizza, and the
-  single-use hazard:"
 
 ### C15. Make the mechanism the subject where the sentence describes how a design behaves
 

@@ -536,7 +536,7 @@ so constructing one of each leaves both objects reading the value set last.
 A subclass that needs storage of its own declares it:
 `class Singleton(Borg): _shared_state: ClassVar[dict[str, Any]] = {}`.
 
-The test confirms the objects differ but share one set of state.
+Testing confirms that the objects differ but share one set of state.
 Borg has no `cache_clear()`:
 whatever one test leaves in `_shared_state` is still there for the next.
 A pytest fixture closes that gap by clearing the dict before each test:

@@ -246,7 +246,7 @@ the conservative choice when a field's own fields might be mutable.
 A shallow copy of a list of `Bob`s plugs nothing:
 the caller's copy of the list still holds your actual `Bob`s.
 
-The test confirms the defensive copy holds.
+Testing confirms that the defensive copy holds.
 Mutating the returned list leaves the original untouched:
 
 ```python
