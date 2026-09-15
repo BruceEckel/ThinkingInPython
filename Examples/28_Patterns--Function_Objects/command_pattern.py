@@ -5,20 +5,20 @@ class Command:
     def execute(self) -> None:
         raise NotImplementedError
 
-class Loony(Command):
+class NoMore(Command):
     @override
     def execute(self) -> None:
-        print("You're a loony.")
+        print("This parrot is no more.")
 
-class NewBrain(Command):
+class Ceased(Command):
     @override
     def execute(self) -> None:
-        print("You might even need a new brain.")
+        print("It has ceased to be.")
 
-class Afford(Command):
+class Fjords(Command):
     @override
     def execute(self) -> None:
-        print("I couldn't afford a whole new brain.")
+        print("It's pining for the fjords.")
 
 # An object that holds commands:
 class Macro:
@@ -31,10 +31,10 @@ class Macro:
             c.execute()
 
 macro = Macro()
-macro.add(Loony())
-macro.add(NewBrain())
-macro.add(Afford())
+macro.add(NoMore())
+macro.add(Ceased())
+macro.add(Fjords())
 macro.run()
-#: You're a loony.
-#: You might even need a new brain.
-#: I couldn't afford a whole new brain.
+#: This parrot is no more.
+#: It has ceased to be.
+#: It's pining for the fjords.

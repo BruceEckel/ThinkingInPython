@@ -11,11 +11,12 @@ class Repeat:
             print(self.text)
 
 macro: list[Callable[[], None]] = [
-    Repeat("You're a loony.", 1),
-    Repeat("Say no more.", 2),
+    Repeat("Ni!", 3),
+    Repeat("Say no more.", 1),
 ]
 for command in macro:
     command()
-#: You're a loony.
-#: Say no more.
+#: Ni!
+#: Ni!
+#: Ni!
 #: Say no more.

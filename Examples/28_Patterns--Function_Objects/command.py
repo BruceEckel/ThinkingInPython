@@ -1,18 +1,18 @@
 # command.py
 from collections.abc import Callable
 
-def loony() -> None:
-    print("You're a loony.")
+def no_more() -> None:
+    print("This parrot is no more.")
 
-def new_brain() -> None:
-    print("You might even need a new brain.")
+def ceased() -> None:
+    print("It has ceased to be.")
 
-def afford() -> None:
-    print("I couldn't afford a whole new brain.")
+def fjords() -> None:
+    print("It's pining for the fjords.")
 
-macro: list[Callable[[], None]] = [loony, new_brain, afford]
+macro: list[Callable[[], None]] = [no_more, ceased, fjords]
 for command in macro:
     command()
-#: You're a loony.
-#: You might even need a new brain.
-#: I couldn't afford a whole new brain.
+#: This parrot is no more.
+#: It has ceased to be.
+#: It's pining for the fjords.

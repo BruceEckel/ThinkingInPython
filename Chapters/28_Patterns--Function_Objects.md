@@ -25,27 +25,28 @@ describes.
 ## Command: Choosing the Operation at Runtime
 
 A *Command* wraps an action so you can pass it around and run it later.
-In Python the action is a function, and a "macro" is a list of actions:
+In Python the action is a function.
+In this example, a "macro" is a list of actions:
 
 ```python
 # command.py
 from collections.abc import Callable
 
-def loony() -> None:
-    print("You're a loony.")
+def no_more() -> None:
+    print("This parrot is no more.")
 
-def new_brain() -> None:
-    print("You might even need a new brain.")
+def ceased() -> None:
+    print("It has ceased to be.")
 
-def afford() -> None:
-    print("I couldn't afford a whole new brain.")
+def fjords() -> None:
+    print("It's pining for the fjords.")
 
-macro: list[Callable[[], None]] = [loony, new_brain, afford]
+macro: list[Callable[[], None]] = [no_more, ceased, fjords]
 for command in macro:
     command()
-#: You're a loony.
-#: You might even need a new brain.
-#: I couldn't afford a whole new brain.
+#: This parrot is no more.
+#: It has ceased to be.
+#: It's pining for the fjords.
 ```
 
 The classic object form wraps each action in a `Command` subclass with an `execute()` method:
@@ -58,20 +59,20 @@ class Command:
     def execute(self) -> None:
         raise NotImplementedError
 
-class Loony(Command):
+class NoMore(Command):
     @override
     def execute(self) -> None:
-        print("You're a loony.")
+        print("This parrot is no more.")
 
-class NewBrain(Command):
+class Ceased(Command):
     @override
     def execute(self) -> None:
-        print("You might even need a new brain.")
+        print("It has ceased to be.")
 
-class Afford(Command):
+class Fjords(Command):
     @override
     def execute(self) -> None:
-        print("I couldn't afford a whole new brain.")
+        print("It's pining for the fjords.")
 
 # An object that holds commands:
 class Macro:
@@ -84,13 +85,13 @@ class Macro:
             c.execute()
 
 macro = Macro()
-macro.add(Loony())
-macro.add(NewBrain())
-macro.add(Afford())
+macro.add(NoMore())
+macro.add(Ceased())
+macro.add(Fjords())
 macro.run()
-#: You're a loony.
-#: You might even need a new brain.
-#: I couldn't afford a whole new brain.
+#: This parrot is no more.
+#: It has ceased to be.
+#: It's pining for the fjords.
 ```
 
 Both forms do the same thing.
@@ -156,17 +157,18 @@ class Repeat:
             print(self.text)
 
 macro: list[Callable[[], None]] = [
-    Repeat("You're a loony.", 1),
-    Repeat("Say no more.", 2),
+    Repeat("Ni!", 3),
+    Repeat("Say no more.", 1),
 ]
 for command in macro:
     command()
-#: You're a loony.
-#: Say no more.
+#: Ni!
+#: Ni!
+#: Ni!
 #: Say no more.
 ```
 
-`Repeat` holds configuration and fits the same `list[Callable[[], None]]` that held `loony`,
+`Repeat` holds configuration and fits the same `list[Callable[[], None]]` that held `no_more`,
 with no `Command` base class above it.
 The classic form skips this middle step:
 it goes from a plain function straight to a base class.
