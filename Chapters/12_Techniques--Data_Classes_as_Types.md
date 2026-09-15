@@ -1386,7 +1386,7 @@ None of the three runs `__init__()` or `__post_init__()`,
 so each can produce a `Stars` holding a number that no check saw.
 That is harmless while the copy comes from a legal original,
 and dangerous when the state comes from a file written by an older version of the class,
-the case [Memento](36_Patterns--Memento.md) revisits.
+the case [*Memento*](36_Patterns--Memento.md) revisits.
 `copy.replace()` is the one that keeps the guarantee,
 because rebuilding through the constructor is the only way to get the check back.
 

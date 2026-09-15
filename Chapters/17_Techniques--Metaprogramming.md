@@ -1135,7 +1135,7 @@ That `__call__()` runs first when you create an instance of the class.
 `__new__()` and `__init__()` normally run only because the default `type.__call__()` calls them.
 A metaclass that overrides `__call__()` sits above that step and decides whether to call them,
 so it can skip building a new instance and return one it already cached.
-Caching there is one way to build a [Singleton](24_Patterns--Singleton.md):
+Caching there is one way to build a [*Singleton*](24_Patterns--Singleton.md):
 
 ```python
 # singleton.py
@@ -1206,7 +1206,7 @@ and that call happens after `ASingleton` exists.
 
 The metaclass version works,
 but it is heavier than the problem usually requires.
-[Singleton](24_Patterns--Singleton.md) covers the lighter alternatives,
+[*Singleton*](24_Patterns--Singleton.md) covers the lighter alternatives,
 from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 

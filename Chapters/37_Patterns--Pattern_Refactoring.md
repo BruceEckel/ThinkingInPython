@@ -248,7 +248,7 @@ It tests for every type in the system.
 When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
-Readers of [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md)
+Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker catch the missed case.
 Exhaustiveness checking works on a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
@@ -367,7 +367,7 @@ including ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class.
 That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
-and [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md),
+and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md),
 and it first appeared in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
@@ -507,7 +507,7 @@ with no separate table to keep in step with the class list.
 It loses once you do not own the hierarchy,
 or once operations start to outnumber materials.
 
-[Visitor](33_Patterns--Visitor.md) is the classic escape, and it is elaborate:
+[*Visitor*](33_Patterns--Visitor.md) is the classic escape, and it is elaborate:
 a visitor class, an `accept()` method on every element,
 and double dispatch to reach the right overload,
 all to work around a language that cannot add a method to a class from outside.
@@ -546,7 +546,7 @@ for cls in Trash.registry.values():
 ```
 
 Each implementation above takes the name `_`.
-[Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+[*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explains that placeholder.
 `recycling_note()` is a new operation that lives outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function.
@@ -555,7 +555,7 @@ a material nobody registers gets the default answer,
 with no exception at runtime and no complaint from the type checker.
 Here "no special handling" is a genuine answer, so the fallback earns its keep.
 When no default makes sense,
-the Visitor chapter advises making the base function raise `NotImplementedError`,
+the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 
 Now give the safety officer's question the same treatment.
@@ -613,7 +613,7 @@ so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
 so that same piece answers with `Aluminum`'s note.
 Each is right for its job.
-[Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 draws the same distinction between a table keyed by class and dispatch that follows inheritance.
 
 ## Choosing the Lightest Construct

@@ -56,7 +56,7 @@ so without that annotation the type checker rejects both `m.more = 11` and `m.in
 `Any` switches the type checker off for `m`.
 You can move that `Any` into the class instead of repeating it at every use site,
 by declaring a `__getattr__()` that returns `Any` and a `__setattr__()` that accepts one
-([Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
+([*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr) explains the `__getattr__()` fallback hook).
 With `__getattr__()` alone, the type checker still rejects the write,
 `m.more = 11`.
 The standard library's stub for `SimpleNamespace` declares such a pair

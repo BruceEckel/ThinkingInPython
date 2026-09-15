@@ -85,7 +85,7 @@ the branching and the repeated subproblem are what matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
 so the cache holds a strong reference to each instance forever,
-the lapsed-listener leak of [The Pythonic Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables)
+the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables)
 in cache form.
 For the usual case, one expensive value per instance,
 use `@cached_property` below,
@@ -306,8 +306,8 @@ A directly generated method skips that extra Python-level call.
 
 Turns a plain function into one that dispatches on the type of its first argument,
 with per-type implementations you register separately.
-[Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
-uses `singledispatch()` as an alternative to the Visitor pattern,
+[*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+uses `singledispatch()` as an alternative to the *Visitor* pattern,
 including why the registered function below takes the name `_`.
 
 ```python
@@ -327,14 +327,14 @@ print(describe("hi"), "|", describe(5))
 ```
 
 `singledispatch()` examines only the first argument,
-so a rule that depends on two types needs [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md),
+so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md),
 and a keyword-only argument cannot drive the dispatch.
 
 ### `singledispatchmethod`
 
 The same dispatch, written as a method so it reads as `self.op(x)` instead of a bare function call.
 The registered method below again takes the name `_`,
-which [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+which [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explains.
 
 ```python

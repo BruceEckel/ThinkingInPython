@@ -586,7 +586,7 @@ the second, once both operands have declined.
 
 Each method declares the type it really returns, `Add` or `Mul`,
 even though it can also return `NotImplemented`.
-[Multiple Dispatching](../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
+[*Multiple Dispatching*](../Chapters/32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice)
 explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.

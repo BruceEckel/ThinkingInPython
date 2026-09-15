@@ -300,7 +300,8 @@ or that requires an argument, does not match.
 A `Protocol` is a checking-time construct,
 so `isinstance(Circle(), Drawable)` raises a `TypeError` instead of answering.
 Decorating the Protocol with `@runtime_checkable` allows the call,
-at the cost of a weaker check: see [Surrogate](26_Patterns--Surrogate.md#proxy).
+at the cost of a weaker check:
+see [*Surrogate*](26_Patterns--Surrogate.md#proxy).
 
 `Drawable` annotates `render()`'s parameter alone.
 If you pass an object without a `draw()` to `render()`, `ty` rejects it.
@@ -772,7 +773,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
-| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [Surrogate](26_Patterns--Surrogate.md#proxy) |
+| `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#proxy) |
 
 ### Dictionary and record shapes
 
@@ -810,7 +811,7 @@ The abstract container types come from `collections.abc`.
 | `@overload` | Several typed signatures for one function name |
 | `@override` | Declares that a method overrides a base-class method, see [Classes](07_Foundations--Classes.md#marking-overrides-with-override) |
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Techniques--Metaprogramming.md#making-a-class-final) |
-| `cast(T, x)` | Tells the type checker to treat `x` as `T`; [Flyweight](35_Patterns--Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
+| `cast(T, x)` | Tells the type checker to treat `x` as `T`; [*Flyweight*](35_Patterns--Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
 | `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) |
 

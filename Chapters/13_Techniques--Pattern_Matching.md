@@ -375,7 +375,7 @@ and Python catches it the same way, by refusing to compile any `case` after it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
-[Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 relies on that dispatch, and there a subclass finds no entry at all.
 
 ```python
@@ -568,7 +568,7 @@ fails with `SyntaxError: alternative patterns bind different names`.
 
 A pattern can also nest inside a copy of its own case,
 matching a self-referential type such as a tree.
-[Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
+[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#evaluation-is-a-tree-walk)
 walks an expression tree this way:
 each `case` matches one node type and recurses into that node's own children.
 
@@ -884,8 +884,8 @@ worked out concretely.
 It also has a name: the *expression problem*.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works through the same split with shapes,
-and [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
-and [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explore it further.
 
 ## Exercises

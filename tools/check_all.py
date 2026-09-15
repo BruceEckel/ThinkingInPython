@@ -45,6 +45,7 @@ from tools import comment_spacing
 from tools import heading_links
 from tools import listing_format
 from tools import listing_width
+from tools import pattern_names
 from tools import prose_lint
 from tools.markdown import Document
 from tools.repo import md_files, write_text_lf
@@ -61,6 +62,7 @@ CHECKS: list[Check] = [
     heading_links.CHECK,
     check_self_reference.CHECK,
     prose_lint.CHECK,
+    pattern_names.CHECK,
 ]
 
 

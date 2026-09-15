@@ -582,7 +582,7 @@ Nothing in the toolchain discovers problems like this.
 
 ## A Type-Checking Iterator
 
-The [Decorator Pattern](14_Techniques--Decorators.md#the-decorator-pattern)
+The [*Decorator* Pattern](14_Techniques--Decorators.md#the-decorator-pattern)
 wraps an existing iterator,
 producing a new one with the same interface and added behavior.
 Here, you force every item to match an expected type:
@@ -687,7 +687,7 @@ def test_typed_iterator_passes_and_rejects() -> None:
 
 ## The Pattern That Disappeared
 
-*GoF Design Patterns* gives Iterator a class of its own,
+*GoF Design Patterns* gives *Iterator* a class of its own,
 with separate methods to start a traversal, advance it,
 test whether it has finished, and read the current item.
 Nothing in this chapter looks like that.
@@ -696,7 +696,7 @@ The language calls both on your behalf.
 [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes this dissolution.
 
-Written in Python, the four GoF Iterator methods show what `first()` and `current_item()` ask of a source.
+Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
 Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
 and `current_item()` reads without consuming.
@@ -791,7 +791,7 @@ so the only way to ask is to take.
 The answer arrives as a `StopIteration` exception that the `for` loop swallows on your behalf.
 You can catch that exception yourself,
 or hand `next()` a default and compare against it,
-but neither restores the free query of the GoF Iterator:
+but neither restores the free query of the GoF *Iterator*:
 
 ```python
 # asking_costs.py

@@ -281,7 +281,7 @@ print(len({id(s) for s in built}))
 ```
 
 `settings()` declares `global` for `_instance` and leaves `_lock` undeclared.
-The mutate-versus-rebind distinction from [A Module Is Already a Singleton](#a-module-is-already-a-singleton)
+The mutate-versus-rebind distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton)
 reappears here, from inside a function.
 `global` governs rebinding, not use.
 `with _lock:` reads the name,
@@ -420,7 +420,7 @@ while `__getattr__()` answers for every name Python fails to find on the wrapper
 so its return type is whatever the inner object holds under that name,
 an open set no annotation can list.
 Delegation gives up static knowledge to forward every name,
-the cost [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
+the cost [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
 pays throughout.
 
 The laziness is a choice.
@@ -620,7 +620,7 @@ print(first is second, second.name,
 The name `Registry` now refers to the decorated instance rather than to the class.
 Why does `__call__()` intercept the constructor for a `Registry`?
 To evaluate `obj(...)`, Python looks up `__call__()` on the *type* of `obj`
-([Surrogate](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).
+([*Surrogate*](26_Patterns--Surrogate.md#special-methods-bypass-getattr) examines this type-based lookup in full).
 For an ordinary class `C`, `type(C)` is `type`,
 and the parentheses run `type.__call__()`,
 the machinery that invokes `__new__()` and then `__init__()`.
@@ -723,7 +723,7 @@ In Python, most of the ceremony falls away.
     `settings = {"theme": "dark"}`,
     and add `import config` plus `print(config.settings)` at the end.
     Predict both printed values before running it,
-    and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a Singleton](#a-module-is-already-a-singleton).
+    and explain the difference using the binding-versus-mutation distinction from [A Module Is Already a *Singleton*](#a-module-is-already-a-singleton).
 5.  Add a `threading.Lock` *inside* `settings()` in `singleton_cached_race.py`,
     wrapping only the body of the cached function, and run it.
     Explain why the object count does not drop to one,

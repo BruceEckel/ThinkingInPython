@@ -969,7 +969,7 @@ For anything simpler,
 a module-level constant computed the ordinary way reads better.
 
 Classes collapse the same way.
-[Singleton](24_Patterns--Singleton.md#singleton-by-class-decorator)
+[*Singleton*](24_Patterns--Singleton.md#singleton-by-class-decorator)
 replaces a class with a callable object that stands in for it:
 the first call constructs one instance,
 and every later call returns that same instance.
@@ -982,7 +982,7 @@ so every call or every instance gets the wrapping.
 Sometimes you want to choose later:
 add responsibilities to individual objects at runtime,
 and let each caller decide which responsibilities to add.
-That is the object-oriented Decorator pattern.
+That is the object-oriented *Decorator* pattern.
 
 Consider a pizza shop.
 A class for every pizza-and-topping combination explodes: Margherita,
@@ -1076,7 +1076,7 @@ summing each topping's `add_cost` and joining its name,
 solves the same combinatorial problem, with no wrapping and no `Protocol`.
 Here, where a topping only contributes a number and a name,
 that list is the simpler design.
-The Decorator pattern earns its structure when a topping needs behavior,
+The *Decorator* pattern earns its structure when a topping needs behavior,
 not just data: one that changes how `cost` rounds,
 adds a description only under some condition,
 or must itself be handed elsewhere as a `Pizza`.
@@ -1085,11 +1085,11 @@ each layer still satisfying the same interface the plain pizzas do.
 
 [Factory](27_Patterns--Factory.md#builder) has its own `Pizza`,
 a frozen data class that a `PizzaBuilder` assembles,
-to illustrate the unrelated Builder pattern.
+to illustrate the unrelated *Builder* pattern.
 The two examples share a topic, not a type.
 
-A Decorator keeps the wrapped object's interface and adds behavior.
-Proxy, Adapter, and Façade wrap the same way and differ in intent.
+A *Decorator* keeps the wrapped object's interface and adds behavior.
+*Proxy*, *Adapter*, and *Façade* wrap the same way and differ in intent.
 [Telling the Wrappers Apart](29_Patterns--Changing_the_Interface.md#telling-the-wrappers-apart)
 sorts the four.
 
@@ -1153,7 +1153,7 @@ and stacking decorators multiplies both by the number of layers.
 2.  Write a `timing` decorator that prints how long the wrapped function took,
     using `time.perf_counter()`.
     Apply it together with `@trace` and predict the order of the output.
-3.  Implement the object-oriented Decorator pattern for a coffee shop:
+3.  Implement the object-oriented *Decorator* pattern for a coffee shop:
     plain drinks (Espresso, Cappuccino) and extra decorators
     (Whipped cream, Decaf, Extra shot).
     Build an espresso decorated with an extra shot and whipped cream,

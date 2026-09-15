@@ -40,7 +40,7 @@ A base class could do the first job as well:
 Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
 and a base whose methods `raise NotImplementedError` moves the failure into the base,
 with whatever message you write there.
-[Surrogate](26_Patterns--Surrogate.md#proxy) shows the other option:
+[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows the other option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
 and constructing an incomplete subclass fails outright.
 Both fail later than the check, at the call or at construction.
@@ -74,7 +74,7 @@ class StateMachine:
 `run_all()` is the template method: it fixes the flow
 (report the input, transition, run the new state),
 while the varying behavior lives in each `State`'s `run()` and `next()`.
-[Template Method](25_Patterns--Template_Method.md)
+[*Template Method*](25_Patterns--Template_Method.md)
 puts the varying steps in a subclass.
 Here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
@@ -928,7 +928,7 @@ Choose a library once the machine outgrows what a page of code should carry.
 
 ## Exercises
 
-1.  Using [State](26_Patterns--Surrogate.md#state),
+1.  Using [*State*](26_Patterns--Surrogate.md#state),
     make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add another kind of `Mood` called `Prozac`.
 2.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.

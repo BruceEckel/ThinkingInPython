@@ -587,7 +587,7 @@ Nothing here is a `@cache` defect. A cache that held a lock across the
 call would serialize every miss in the program, a worse default than
 occasionally building a value twice. For an ordinary memoized
 computation, a duplicate build costs time but not correctness.
-Flyweight raises the stakes, because its whole point is that
+*Flyweight* raises the stakes, because its whole point is that
 `tile("^") is tile("^")`.
 
 The eager fix builds every value before any thread exists, so no miss

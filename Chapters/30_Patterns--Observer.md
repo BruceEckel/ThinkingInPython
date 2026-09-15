@@ -170,7 +170,7 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 An observer returns `None`.
 Notification runs one way, from observable to observers, and nothing comes back.
 Getting a value back is a different pattern,
-such as [Chain of Responsibility](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+such as [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 for the first handler that answers.
 
 The tests check that every subscriber receives the new value in subscription order,
@@ -706,11 +706,11 @@ Nothing in the pattern required an interface, a flag, or a class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 already took the last step:
 one list becomes a dictionary of lists keyed by event type,
-and the Observer is an event bus.
+and the *Observer* is an event bus.
 
 ## Exercises
 
-1.  Create a minimal Observer-Observable design of your own,
+1.  Create a minimal *Observer* design of your own,
     without looking at `observers.py`:
     the smallest `Observable` that lets callables subscribe, then notifies them.
     Demonstrate it by subscribing several observers and causing one change that updates them all.

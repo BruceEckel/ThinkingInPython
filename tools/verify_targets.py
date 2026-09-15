@@ -82,6 +82,7 @@ EXCLUDED: dict[str, str] = {
 WORKTREE_TARGETS: frozenset[str] = frozenset({
     "all", "reflow", "spell-add", "fix-imports", "fix-listings",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
+    "fix-pattern-names",
     "output", "solutions-output",
     "clean", "clean-examples", "clean-solutions", "clean-site",
     "clean-epub", "clean-pdf",

@@ -539,7 +539,7 @@ the way `trouble` does above.
 An f-string would have finished assembling the result, quote and all,
 before any code had a chance to object.
 Uppercasing and rejecting are small demonstrations;
-[Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
+[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
 builds a full query from the parts the same way.
 
 Keep using f-strings for ordinary output.

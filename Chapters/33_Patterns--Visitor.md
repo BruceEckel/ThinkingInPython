@@ -166,7 +166,7 @@ The chapter keeps `Any` because the empty `Visitor` base is what the classic pat
 and seeing the price is part of the point.
 The price is that nothing checks the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
-That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md).
+That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
 This `Any` is a choice,
 unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md),
 where a bag of attributes named at runtime leaves no precise type to write.
@@ -286,7 +286,7 @@ give the base function a `raise NotImplementedError(f"no nectar rule for {type(f
 A forgotten registration then fails at its first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
 goes further and lets the type checker catch the omission instead
-([Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)),
+([*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)),
 at the price of a set of types no one else can extend.
 Adding a new operation is a new function.
 Adding a new flower is a class,
@@ -404,7 +404,7 @@ as in `paper_scissors_rock.py`.
 `singledispatch` dispatches on the first argument only,
 so it does nothing for that second problem.
 When two types must genuinely resolve together,
-use the table keyed by a tuple of types from [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many).
+use the table keyed by a tuple of types from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many).
 
 ## Exercises
 

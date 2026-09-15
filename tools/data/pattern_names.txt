@@ -1,0 +1,52 @@
+# Design pattern names the book writes capitalized and italic on every
+# mention: *Strategy*, *Chain of Responsibility*. tools/pattern_names.py
+# checks it (`make pattern-names`) and rewrites the unambiguous cases
+# (`make fix-pattern-names`). One name per line; a longer name is matched
+# before a shorter one it contains, so "Factory Method" wins over
+# "Factory". Add a name here when the book starts treating it as a
+# pattern; the lowercase word keeps its ordinary sense either way.
+
+# GoF: creational
+Abstract Factory
+Builder
+Factory Method
+Prototype
+Singleton
+
+# GoF: structural
+Adapter
+Bridge
+Composite
+Decorator
+Façade
+Facade
+Flyweight
+Proxy
+
+# GoF: behavioral
+Chain of Responsibility
+Command
+Interpreter
+Iterator
+Mediator
+Memento
+Observer
+State
+Strategy
+Template Method
+Visitor
+
+# The book's own
+Null Object
+Surrogate
+Data Transfer Object
+Multiple Dispatching
+Event Bus
+State Machine
+
+# Phrases that contain a name without naming the pattern (chapter and
+# section titles quoted as link text, mostly). Skipped wherever found.
+!State Machines
+!State as an Ability
+!Sharing an Iterator Between Threads
+!Command Query Responsibility Segregation

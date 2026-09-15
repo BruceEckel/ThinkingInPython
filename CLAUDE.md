@@ -236,6 +236,24 @@ The rules are literal and under-report by design: a claim with no code
 term in it is invisible to them. They are a floor, not a substitute for
 reading.
 
+## Pattern names: *Capitalized* and italic, every mention
+
+Every naming of a design pattern is written capitalized and in italics,
+on every mention, in prose and in link text: *State*, *Chain of
+Responsibility*, `[*Template Method*](25_...)`. Names like State, Command,
+Bridge, and Proxy are ordinary words otherwise, so this is the exception
+to the global "italics only to introduce a term" rule. Headings stay
+plain, and the lowercase word keeps its ordinary sense ("an observer
+registers"). `tools/pattern_names.py` checks it (`make pattern-names`)
+and `make fix-pattern-names` rewrites the unambiguous cases; the names
+and the excluded phrases (`!State Machines`) are in
+`tools/data/pattern_names.txt`. State/Command/Bridge at a line start
+are listed only with `--sentence-start`, for a human to judge. The
+check is in `check_all`'s registry but not yet in `GATE_CHECKS`: the
+2026-09-15 sweep skipped chapter 28, then under an editing pass. After
+`/edit-done 28`, fix 28 and promote it (project memory
+`pattern-names-gate-pending` has the steps).
+
 ## Traps (learned the hard way)
 
 - **Listing line length is 60** (ruff `line-length` plus the `widths` check

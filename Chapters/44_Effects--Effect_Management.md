@@ -16,13 +16,13 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [Observer](30_Patterns--Observer.md#a-visual-example-of-observers)
+- [*Observer*](30_Patterns--Observer.md#a-visual-example-of-observers)
   has `recolored()` return a new grid instead of mutating the one it received,
   so a test checks the change with no GUI in sight.
-- [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+- [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
   reduces competition between items to pure logic,
   a dictionary lookup with nothing to mock.
-- [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
+- [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
   has `simplify()` return a new tree instead of editing the one it receives.
 
 In every one of those cases you can settle the question of purity by reading one function.
@@ -1007,7 +1007,7 @@ puts it to work.
     and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,
     `withdraw()` from [Foundations](40_Functional--Foundations.md#pure-functions),
-    and the `Thermometer` that keeps a `_celsius` from [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables):
+    and the `Thermometer` that keeps a `_celsius` from [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables):
     side effect, side cause, or exception.
     Which of the three conversions from [Converting Effectful to Pure](#converting-effectful-to-pure)
     applies to the exceptions,

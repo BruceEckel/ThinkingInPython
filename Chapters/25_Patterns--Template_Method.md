@@ -16,7 +16,7 @@ The test runner calls `run()` on the finished object.
 
 ## The Anchored Algorithm
 
-A Template Method anchors the shape of the algorithm in the base class.
+A *Template Method* anchors the shape of the algorithm in the base class.
 Subclasses provide the individual steps.
 The `typing.final` decorator,
 used on a class in [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final),
@@ -314,7 +314,7 @@ each pass calls the step, so each pass must perform it.
 Each of these failures corrupts the anchored algorithm.
 The `...` defaults make a step optional,
 and nothing distinguishes "deliberately empty" from "forgotten".
-The Template Method works only when every subclass is a faithful substitute for its base.
+The *Template Method* works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions
 
@@ -348,7 +348,7 @@ except TypeError as e:
 #: TypeError: missing customize2
 ```
 
-Both the Template Method and the function version have an anchored algorithm and varying steps.
+Both the *Template Method* and the function version have an anchored algorithm and varying steps.
 If the steps share state, build on each other, or come as a coherent group,
 the subclass is clearer.
 If each step is independent,
@@ -367,7 +367,7 @@ with no help from a decorator the runtime ignores.
 
 Passing functions is not the *Strategy* pattern,
 although the two look alike at the call site.
-A Strategy swaps out a whole algorithm behind a single interface.
+A *Strategy* swaps out a whole algorithm behind a single interface.
 Here the algorithm stays put, and only its steps come from outside.
 The choice between a class and a function is the same trade-off as in [Function Objects](28_Patterns--Function_Objects.md#strategy-choosing-the-algorithm-at-runtime).
 A stateless hook is usually better as a function than as an overridden method.

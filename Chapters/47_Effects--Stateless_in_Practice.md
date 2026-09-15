@@ -1477,7 +1477,7 @@ One engine, four runs, and the only difference is what you supply.
 The third mixes the casts, and nothing objects.
 A `Kitty` bats at a `Weapon`.
 It type-checks, and it runs.
-That is a real loss against the Abstract Factory,
+That is a real loss against the *Abstract Factory*,
 whose purpose is families of matched products:
 `KittiesAndPuzzles.make_obstacle()` cannot return a `Weapon`,
 because the pairing lives inside the class.
@@ -2414,6 +2414,6 @@ It is a language that does the encoding for you.
 14. `play()` in `casts.py` accepts any three actors, matched or not.
     `kitties_and_puzzles()` and `warriors_and_weapons()` already share a signature;
     give that shape a name so a caller can pass either one where a cast belongs,
-    and say what that recovers of the Abstract Factory and what it does not.
+    and say what that recovers of the *Abstract Factory* and what it does not.
     Then add a fourth actor to `encounter()` and count the lines you edit in `quest.py`,
     `casts.py`, and `two_games.py`.

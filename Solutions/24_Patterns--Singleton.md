@@ -137,7 +137,7 @@ the single shared object Python caches in `sys.modules`.
 
 For real code, prefer the module. It is less code, has no
 indirection to read through, and gets the same guarantee.
-[A Module Is Already a Singleton](../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
+[A Module Is Already a *Singleton*](../Chapters/24_Patterns--Singleton.md#a-module-is-already-a-singleton)
 makes that argument at the top of the chapter. The class-based
 versions only earn their complexity when something genuinely needs
 the shape of a class, such as participating in an interface other

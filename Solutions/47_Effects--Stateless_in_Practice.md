@@ -1355,7 +1355,7 @@ play(Loud(), Kitty(), Weapon())
 #: Kitty meets the nasty weapon
 ```
 
-What the shared signature recovers is the Abstract Factory's *interface*.
+What the shared signature recovers is the *Abstract Factory*'s *interface*.
 `run_season()` accepts anything that can stage a scene and stays ignorant of
 which family it gets, and that ignorance is the property the pattern exists to
 provide. Python gives it away, because a function is already an object with a
@@ -1366,7 +1366,7 @@ What it does not recover is the guarantee that made the pattern worth naming.
 about the actors inside agreeing with each other. The last line is the proof,
 and the chapter runs the same line in `two_games.py`: `play()` accepts a
 `Kitty` facing a `Weapon`, both satisfy their `Protocol`s, and nothing
-objects. An Abstract Factory in a language with a family type expresses "these
+objects. An *Abstract Factory* in a language with a family type expresses "these
 come from one world" in the type itself. Here the matching lives inside
 `kitties()`'s body, a fact about how someone wrote that function, and nothing
 checks it.

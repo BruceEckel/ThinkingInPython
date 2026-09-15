@@ -452,7 +452,7 @@ and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
 Each of this chapter's three views is a separate file holding all the display code,
-the model-view split of [Observer](30_Patterns--Observer.md#a-visual-example-of-observers).
+the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-of-observers).
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
@@ -676,7 +676,7 @@ If you define the subclass with its symbol, the factory finds it.
 This is the registry idea from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses
-(that chapter's [Simple Factory Method](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and its exercise 9 writes it),
+(that chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and its exercise 9 writes it),
 so a new item must inherit from `Item` itself.
 Deriving from `Food` to borrow its behavior hides the class from the factory,
 which falls through to the last line and builds a `Teleport` instead.
@@ -685,7 +685,7 @@ A `Room` holds one item and connects to its neighbors through a `Doors` object.
 Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case.
-`EDGE` is a [Null Object](20_Patterns--Rethinking_Objects.md#null-object):
+`EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object):
 it answers like any other room and sends the robot back where it started:
 
 ![A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room](_images/maze_graph)
@@ -749,7 +749,7 @@ then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
 so splitting them into labeled passes keeps the construction readable instead of tangling it into one loop.
 [Factory](27_Patterns--Factory.md#builder)
-counts this as one of the cases where Builder survives in Python,
+counts this as one of the cases where *Builder* survives in Python,
 because construction here is genuinely a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
@@ -1102,7 +1102,7 @@ Three ideas from earlier chapters carry the design.
 replaces a type switch,
 a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 builds objects from data,
-and a [Null Object](20_Patterns--Rethinking_Objects.md#null-object)
+and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
 removes the check for a missing door.
 None of them needs concurrency.
 

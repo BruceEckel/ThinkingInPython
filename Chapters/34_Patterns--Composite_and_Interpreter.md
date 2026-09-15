@@ -88,7 +88,7 @@ a plugin writes one class and touches nothing above it.
 Adding an *operation* exposes the weakness.
 `walk()` cost a method in every class,
 and counting files or finding an entry by name would each cost another.
-[Visitor](33_Patterns--Visitor.md) exists to solve this problem.
+[*Visitor*](33_Patterns--Visitor.md) exists to solve this problem.
 
 ## A Composite of Data Classes
 
@@ -234,8 +234,8 @@ Match over a closed set, use polymorphism for an open one.
 
 A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
 Python's own compiler builds one of these for every source file,
-and `ast.parse()` hands it to you as node objects that `ast.NodeVisitor` walks in the style of [Visitor](33_Patterns--Visitor.md).
-Interpreter is Composite applied to language.
+and `ast.parse()` hands it to you as node objects that `ast.NodeVisitor` walks in the style of [*Visitor*](33_Patterns--Visitor.md).
+*Interpreter* is *Composite* applied to language.
 Representing each construct as a node type turns evaluation into a tree walk.
 
 In most languages the pattern has a reputation for heaviness,
@@ -244,7 +244,7 @@ Python removes both costs, for one specific case:
 sentences written as Python source, with operands that are already nodes.
 Data classes make the node declarations nearly free,
 and operator overloading lets Python's own parser build the trees.
-A GoF Interpreter more often parses a rules file, a configuration value,
+A GoF *Interpreter* more often parses a rules file, a configuration value,
 or a query a user types at runtime, and none of those arrive as Python source,
 so this technique does not reach them.
 They still need a real parser.
@@ -323,7 +323,7 @@ The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
 and so `2 * x + 1` is a valid sentence in the little language.
 Python has parsed it, honoring precedence, before the interpreter runs.
 
-The reflected methods depend on the operator dispatch from [Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice):
+The reflected methods depend on the operator dispatch from [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice):
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods trust their operand completely.
@@ -485,7 +485,7 @@ if __name__ == "__main__":
 #: ((x + 1) * (x + 2))
 ```
 
-This is the ability [Visitor](33_Patterns--Visitor.md) fights to provide:
+This is the ability [*Visitor*](33_Patterns--Visitor.md) fights to provide:
 new operations over a fixed hierarchy, defined outside it.
 The `match` version needs no `accept()` method and no visitor classes,
 and unlike `singledispatch` it looks inside the nodes,
@@ -623,8 +623,8 @@ def test_unchanged_subtrees_are_shared() -> None:
 ```
 
 Three walkers over one set of nodes is the pattern pair in full.
-Composite is the data: a union of node types, some holding others.
-Interpreter is the behavior: recursive functions that give the tree meaning.
+*Composite* is the data: a union of node types, some holding others.
+*Interpreter* is the behavior: recursive functions that give the tree meaning.
 Python compresses the pair into frozen data classes, a union,
 operator methods that build nodes, and `match` functions that walk them.
 One practical limit applies.
@@ -737,7 +737,7 @@ and the only remaining defense would be inspecting the result to guess which cha
 
 That is the general argument for handing a consumer the structure instead of the answer.
 A finished string has thrown away the distinction on which the safety decision depends.
-Textbooks usually present the Interpreter pattern as a way to add operations to a language.
+Textbooks usually present the *Interpreter* pattern as a way to add operations to a language.
 Here it keeps a decision available to whoever should make it.
 
 ## Exercises
@@ -763,7 +763,7 @@ Here it keeps a decision available to whoever should make it.
 6.  At runtime, `"a" + x` silently builds `Add(Num("a"), x)`,
     an ill-typed tree the type checker rejects in source it can see.
     Rewrite all four operator methods to return `NotImplemented` for an operand they cannot use
-    ([Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
+    ([*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#operators-dispatch-twice) shows the idiom),
     and confirm that `"a" + x` and `x + "a"` both now raise a `TypeError`.
 7.  Write a third walker over `Template` in `template_query.py`, `to_html()`,
     that emits the literal pieces unchanged and replaces `<`, `>`,

@@ -462,7 +462,7 @@ print(Counter.live_count())
 
 A `WeakSet` would do for counting alone.
 You need the dictionary as soon as you look instances up rather than count them,
-and [Flyweight](35_Patterns--Flyweight.md)
+and [*Flyweight*](35_Patterns--Flyweight.md)
 looks its shared objects up in a pool keyed by the values that define them.
 `id(self)` is the key here because the registry needs one entry per object,
 not per name: two counters could share a name,

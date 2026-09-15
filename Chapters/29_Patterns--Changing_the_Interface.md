@@ -6,7 +6,7 @@ Two of the patterns in *GoF Design Patterns* solve this problem.
 *Façade* creates an interface to a set of classes.
 That interface makes a library or bundle of resources more comfortable to use.
 Both wrap something that already exists,
-which puts them next to Proxy and Decorator,
+which puts them next to *Proxy* and *Decorator*,
 and a later section sorts the four apart.
 Adding an interface is the safe half of the job.
 The other half is telling callers that the interface they have been using is going away.
@@ -61,9 +61,10 @@ so `ProxyAdapter` supplies one and builds it out of the methods the adaptee does
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
 not how you declare the target interface.
-[Surrogate](26_Patterns--Surrogate.md#proxy) compares an ABC with a `Protocol`.
-The name `ProxyAdapter` takes a liberty with the term "[Proxy](26_Patterns--Surrogate.md#proxy)":
-*GoF Design Patterns* requires a Proxy to have the same interface as the object it speaks for.
+[*Surrogate*](26_Patterns--Surrogate.md#proxy)
+compares an ABC with a `Protocol`.
+The name `ProxyAdapter` takes a liberty with the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)":
+*GoF Design Patterns* requires a *Proxy* to have the same interface as the object it speaks for.
 
 The adaptation can live in two other places: the call site,
 or the adaptee's own class.
@@ -153,7 +154,7 @@ so any object with an `f()` works and no shared base class takes part.
 A type checker still holds you to the annotation,
 so name the requirement with a [`Protocol`](08_Foundations--Static_Types.md#structural-typing-with-protocols)
 listing `f()` instead of a base class to inherit,
-the same substitution [Surrogate](26_Patterns--Surrogate.md#proxy)
+the same substitution [*Surrogate*](26_Patterns--Surrogate.md#proxy)
 makes for a proxy's implementation.
 The common adapter need is "forward most calls unchanged,
 and add or change a few."
@@ -193,7 +194,7 @@ This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a frozen dataclass with two properties,
 written because `distance()` requires `x` and `y` while a `Pair` supplies `a` and `b`.
-The forwarding carries the limits [Surrogate](26_Patterns--Surrogate.md#forwarding-with-getattr)
+The forwarding carries the limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
 lists for `__getattr__()`.
 [Special methods bypass it](26_Patterns--Surrogate.md#special-methods-bypass-getattr),
 so an adapter that must support `adapter[key]` or `len(adapter)` defines those dunders,
@@ -239,8 +240,8 @@ That is *Façade*.
 If you have a confusing collection of classes and interactions the client programmer doesn't need to see,
 create an interface that presents only what's necessary.
 
-A Façade is often a [Singleton](24_Patterns--Singleton.md)
-[Abstract Factory](27_Patterns--Factory.md#abstract-factories).
+A *Façade* is often a [*Singleton*](24_Patterns--Singleton.md)
+[*Abstract Factory*](27_Patterns--Factory.md#abstract-factories).
 A class containing static factory methods gets that effect:
 
 ```python
@@ -288,12 +289,12 @@ That is the "confusing collection of classes and interactions,"
 small enough to read in one glance here; in real code,
 wiring three or thirty classes together in the right order is exactly the mess a caller should never have to know.
 `Facade.start_car()` hides the wiring and the order behind one call that also builds the object,
-the "static factory method" GoF pairs with Façade.
+the "static factory method" GoF pairs with *Façade*.
 
 The cleaner Python façade is a *module*.
 A module already presents a curated set of names over whatever tangle of classes lives behind it.
-As [Singleton](24_Patterns--Singleton.md#a-module-is-already-a-singleton) notes,
-it loads once, and every importer shares the same module.
+As [*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)
+notes, it loads once, and every importer shares the same module.
 At module level, put the friendly functions and the few classes to expose.
 If you keep the messy internals private
 (using a leading underscore, by convention), the `import` is the façade:
@@ -350,7 +351,7 @@ the same underscore convention, applied to modules instead of classes.
 That is the idiomatic place for a façade that fronts a whole subsystem,
 several modules deep, GoF's usual case for the pattern.
 
-Façade has a failure mode too.
+*Façade* has a failure mode too.
 An advanced caller who needs a name the façade never exposed has two bad options:
 reach past the underscore anyway,
 or wait for the façade's author to widen the façade.
@@ -359,7 +360,7 @@ it just relays every name the subsystem has.
 
 ## Telling the Wrappers Apart
 
-Adapter and Façade complete a family of wrappers that share one structure,
+*Adapter* and *Façade* complete a family of wrappers that share one structure,
 a front object forwarding to something behind it,
 often through the same few lines of `__getattr__()`.
 Intent separates them,
@@ -370,19 +371,19 @@ ask what breaks if you remove it:
 
 | Wrapper | Interface | What it adds | Remove it and you lose |
 | --- | --- | --- | --- |
-| [Proxy](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call gets through |
-| [Decorator](14_Techniques--Decorators.md#the-decorator-pattern) | same | behavior | the added behavior |
-| Adapter | changed | nothing | the fit between caller and callee |
-| Façade | many narrowed to a few | nothing | the simplicity |
+| [*Proxy*](26_Patterns--Surrogate.md#proxy) | same, by GoF's definition | access control | control over when and whether the call gets through |
+| [*Decorator*](14_Techniques--Decorators.md#the-decorator-pattern) | same | behavior | the added behavior |
+| *Adapter* | changed | nothing | the fit between caller and callee |
+| *Façade* | many narrowed to a few | nothing | the simplicity |
 
-[Surrogate](26_Patterns--Surrogate.md#proxy)
+[*Surrogate*](26_Patterns--Surrogate.md#proxy)
 takes the looser view of the first row:
-a surrogate speaking for its implementation is a Proxy whether or not the interfaces match.
-Under that reading the same-interface rule no longer separates a Proxy from an Adapter,
+a surrogate speaking for its implementation is a *Proxy* whether or not the interfaces match.
+Under that reading the same-interface rule no longer separates a *Proxy* from an *Adapter*,
 which is why the `ProxyAdapter` above answers to both names.
 That leaves the "What it adds" column to separate them:
-a Proxy controls access to one implementation,
-an Adapter makes one type fit a caller that expects another.
+a *Proxy* controls access to one implementation,
+an *Adapter* makes one type fit a caller that expects another.
 Name a wrapper for why it is there, not for its shape.
 
 ## Retiring the Old Interface {#retiring-the-old-interface}
@@ -455,7 +456,7 @@ so the `DeprecationWarning` half never fires.
 Pyright and mypy need their deprecation rule switched on,
 as they do for the whole-function form.
 
-An Adapter and a Façade both add an interface without disturbing what is already there,
+An *Adapter* and a *Façade* both add an interface without disturbing what is already there,
 which is why they are safe moves.
 Retiring an interface is the unsafe move,
 and marking the old interface is how you make the risk visible on a schedule instead of discovering it when you delete something.
@@ -477,6 +478,6 @@ and marking the old interface is how you make the risk visible on a schedule ins
 4.  Here are three wrappers: one logs each call and forwards it unchanged,
     one exposes a `read()` over an object that only has `next_chunk()`,
     and one refuses calls unless you set a flag.
-    Classify each as Proxy, Decorator, Adapter,
-    or Façade using the "remove it and you lose" test from the table,
+    Classify each as *Proxy*, *Decorator*, *Adapter*,
+    or *Façade* using the "remove it and you lose" test from the table,
     and say what you would lose in each case.

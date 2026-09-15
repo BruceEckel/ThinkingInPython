@@ -89,7 +89,7 @@ also qualifies as a pattern, since it lets you change,
 dynamically or statically, the objects that implement your class,
 and thus the way that class works.
 
-Another pattern that appears in *GoF Design Patterns* is the [Iterator](23_Patterns--Iterators.md).
+Another pattern that appears in *GoF Design Patterns* is the [*Iterator*](23_Patterns--Iterators.md).
 An iterator lets you hide the particular implementation of the container as you step through it.
 You can write generic code that operates on all the elements in a sequence without regard to how that sequence stores them.
 The code works with any object that produces an iterator.
@@ -119,7 +119,7 @@ The same dictionary is a standard design, stage three,
 once each subclass registers itself as its `class` statement runs,
 so adding a type never means editing the factory
 ([Factory](27_Patterns--Factory.md) builds both).
-[Template Method](25_Patterns--Template_Method.md) is a design pattern,
+[*Template Method*](25_Patterns--Template_Method.md) is a design pattern,
 stage four: a shape of solution you could build in any language with polymorphism.
 
 The stages are a history, not a ranking.
@@ -138,9 +138,9 @@ Programmers wrote the same scaffolding often enough that it acquired a name,
 and the pattern exists because the language leaves that scaffolding for them to write.
 
 A language can supply that missing piece in two ways.
-Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. Singleton is one of the seven he leaves standing, but [Singleton](24_Patterns--Singleton.md)
+Sometimes a language grows the feature and the pattern dissolves into it^[Peter Norvig observed this in his 1996 talk "Design Patterns in Dynamic Programming": 16 of the 23 GoF patterns become invisible or simpler in a dynamic language. He counted for Lisp and Dylan, and Python's line falls in a different place. *Singleton* is one of the seven he leaves standing, but [*Singleton*](24_Patterns--Singleton.md)
 shows that a Python module already is one.].
-[Iterator](23_Patterns--Iterators.md#the-pattern-that-disappeared)
+[*Iterator*](23_Patterns--Iterators.md#the-pattern-that-disappeared)
 is the clear case.
 It was implicit in the `for` loop from the start,
 and Python 2.2 made it a protocol the language calls on your behalf.
@@ -151,7 +151,7 @@ because a Python function is an object
 ([Function Objects](28_Patterns--Function_Objects.md) shows both).
 A [Factory](27_Patterns--Factory.md) becomes a dictionary,
 because a class is an object too.
-[Singleton](24_Patterns--Singleton.md) becomes a module,
+[*Singleton*](24_Patterns--Singleton.md) becomes a module,
 because Python imports each module once and caches it.
 
 Here is the whole of a *Strategy* in Python:
@@ -189,29 +189,29 @@ each named for the aspect that can vary:
     When you isolate the details of object creation,
     your code stops depending on which object types exist,
     and adding a type leaves that code unchanged.
-    [Singleton](24_Patterns--Singleton.md) counts as a *Creational* pattern,
+    [*Singleton*](24_Patterns--Singleton.md) counts as a *Creational* pattern,
     and [Factory](27_Patterns--Factory.md) covers the other four:
     *Factory Method*, *Abstract Factory*, *Prototype*, and *Builder*.
 2.  **Structural**: how objects connect to other objects,
     arranged so that changes in the system leave those connections alone.
-    [Surrogate](26_Patterns--Surrogate.md),
+    [*Surrogate*](26_Patterns--Surrogate.md),
     [Changing the Interface](29_Patterns--Changing_the_Interface.md),
-    [Flyweight](35_Patterns--Flyweight.md),
+    [*Flyweight*](35_Patterns--Flyweight.md),
     [Decorators](14_Techniques--Decorators.md#the-decorator-pattern),
-    and the *Composite* half of [Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md)
+    and the *Composite* half of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
     cover the structural patterns in this book.
 3.  **Behavioral**: objects that handle particular types of actions within a program.
     These encapsulate processes such as interpreting a language,
     fulfilling a request, moving through a sequence (as in an iterator),
     or implementing an algorithm.
     Most of the patterns in this book are behavioral:
-    [Iterator](23_Patterns--Iterators.md),
-    [Template Method](25_Patterns--Template_Method.md),
+    [*Iterator*](23_Patterns--Iterators.md),
+    [*Template Method*](25_Patterns--Template_Method.md),
     [Function Objects](28_Patterns--Function_Objects.md)
     (*Command*, *Strategy*, and *Chain of Responsibility*),
-    [Observer](30_Patterns--Observer.md), [Visitor](33_Patterns--Visitor.md),
-    [Memento](36_Patterns--Memento.md),
-    [State](26_Patterns--Surrogate.md#state), and *Interpreter*,
+    [*Observer*](30_Patterns--Observer.md),
+    [*Visitor*](33_Patterns--Visitor.md), [*Memento*](36_Patterns--Memento.md),
+    [*State*](26_Patterns--Surrogate.md#state), and *Interpreter*,
     though *State* appears beside *Proxy* and *Interpreter* beside *Composite*,
     for the reason that closes this section.
 
@@ -238,11 +238,11 @@ so that classification doesn't lead me to a solution
 
 Patterns often resemble each other more in their implementations than the *GoF Design Patterns* categories suggest,
 and this book groups them by that resemblance.
-[Surrogate](26_Patterns--Surrogate.md)
+[*Surrogate*](26_Patterns--Surrogate.md)
 treats *Proxy* and *State* as one front-object structure.
 [Function Objects](28_Patterns--Function_Objects.md) treats *Command*,
 *Strategy*, and *Chain of Responsibility* as one function-passing structure.
-[Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md)
+[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 treats both of its patterns as one recursive-data structure.
 When two patterns share a structure, learning one teaches you most of the other,
 and the remaining difference is intent.

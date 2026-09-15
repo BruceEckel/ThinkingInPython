@@ -82,7 +82,7 @@ The tile's position is extrinsic.
 It is the cell's coordinates in the grid, so the `Tile` object never stores it.
 
 The factory pairs `functools.cache` with a constructor function,
-the same building block behind [Singleton](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
+the same building block behind [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
 There the function takes no arguments,
 so caching produces one shared instance overall.
 Here `tile()` takes a symbol,
@@ -219,7 +219,7 @@ A factory function like `tile()` has a visibly different name and call syntax,
 which warns callers of something unusual.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__()` instead.
-Hiding the pool in `__new__()` is the maneuver [Singleton](24_Patterns--Singleton.md#the-classic-implementations)
+Hiding the pool in `__new__()` is the maneuver [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 uses.
 Here the cache keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*:
@@ -299,7 +299,7 @@ That guarantee, or the constructor syntax, is what the bookkeeping buys.
 When you need neither,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
-One more property carries over from [Singleton](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
+One more property carries over from [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object,
 one wins the pool, and identity between their two results fails.
@@ -370,7 +370,7 @@ equal to any surviving original but not the same one.
 The weak pool never produces such a pair:
 its entry lives exactly as long as someone holds the object.
 
-Flyweight cuts the number of objects, and `slots=True`
+*Flyweight* cuts the number of objects, and `slots=True`
 ([Performance](18_Techniques--Performance.md#slots)) cuts the size of each one,
 so the two are worth combining once memory is the point.
 They collide at one spot.

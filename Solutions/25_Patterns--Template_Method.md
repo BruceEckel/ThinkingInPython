@@ -162,7 +162,7 @@ site, `greeter.run()`, moves the decision about *when* the algorithm
 starts out of the base class and into the hands of the code that
 knows the object is ready. The same reasoning drives eager versus
 lazy construction in
-[Singleton](../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance),
+[*Singleton*](../Chapters/24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance),
 where the timing of a hidden step makes the difference.
 
 ## 3. Who objects to a replaced `run()`

@@ -83,7 +83,7 @@ did.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
 
-Here is Multiple Dispatching in action:
+Here is *Multiple Dispatching* in action:
 
 ```python
 # paper_scissors_rock.py
@@ -280,7 +280,7 @@ on the way to the answer.
 ## One Type or Many
 
 For dispatch on one argument's type, `functools.singledispatch`
-(see [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch))
+(see [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch))
 gives you open, per-type functions.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
@@ -584,7 +584,7 @@ The sentinel signals the interpreter and never reaches a caller,
 so an annotation that names it describes the wrong thing.
 Widening the return to `Any` describes nothing and turns off checking for every caller.
 
-[Composite and Interpreter](34_Patterns--Composite_and_Interpreter.md#interpreter)
+[*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
 builds the expression system that opened this chapter,
 using these two methods to let Python's own parser assemble the tree.
 

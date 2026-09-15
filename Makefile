@@ -173,7 +173,8 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
 # process with one parse per file, rather than as separate scripts. Names
-# come from `make checks ARGS=--list`. This is check_all's whole registry:
+# come from `make checks ARGS=--list`. This is check_all's registry minus
+# pattern-names (see that target for when it joins):
 # prose-lint joined once its last findings were cleared, and widths joined
 # when the book moved to 60-character listings, so a new violation of
 # either now fails the gate rather than sitting in a backlog. widths also
@@ -655,7 +656,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs checks fix-checks gate-checks
+        fix-comment-spacing anchors self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -788,6 +789,18 @@ fix-checks:  ##- Apply every fix those checks can make
 # registry). `checks` is the one to run while editing, since it adds the Vale
 # pass; this one answers the narrower "will the gate pass?" and is what `sweep`
 # runs, so the sweep's verdict matches the gate's.
+# Every naming of a design pattern is *Capitalized* and italic, on every
+# mention, since names like State, Command, and Proxy are ordinary words
+# otherwise. The names live in tools/data/pattern_names.txt. Not yet in
+# GATE_CHECKS: chapter 28 is under an editing pass (edit-start-28), and
+# the sweep skipped it so the pass's capture stays Bruce's own edits;
+# promote it once that pass closes and 28 is fixed.
+pattern-names:  ## Check every design pattern name is written *Capitalized*; `make fix-pattern-names` rewrites the unambiguous ones
+	$(PY) -m tools.pattern_names $(PROSE_FILES)
+
+fix-pattern-names:  ##- Wrap plain pattern names in italics (sentence-start ambiguities are reported, not rewritten)
+	$(PY) -m tools.pattern_names --fix $(PROSE_FILES)
+
 gate-checks:  ## Run just the Markdown checks the gate enforces
 	$(PY) -m tools.check_all $(GATE_CHECKS)
 

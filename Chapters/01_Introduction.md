@@ -12,8 +12,8 @@ Programmers who come to Python from C++ or Java arrive with patterns,
 ceremonies, and defensive structures that those languages make necessary.
 Python needs far fewer of these.
 Instead of a class that exists only to hold one method, Python has functions.
-A [Singleton](24_Patterns--Singleton.md) is a module.
-A [Visitor](33_Patterns--Visitor.md) is a function that dispatches on type.
+A [*Singleton*](24_Patterns--Singleton.md) is a module.
+A [*Visitor*](33_Patterns--Visitor.md) is a function that dispatches on type.
 Before using an idiom or pattern,
 this book asks whether the language already solves the problem,
 and adds the complexity only when the answer is no.

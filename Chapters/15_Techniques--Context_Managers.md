@@ -957,7 +957,7 @@ and the demo measures that rather than assuming it.
 `Queue.qsize()` is only approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
-An object pool differs from [Flyweight](35_Patterns--Flyweight.md),
+An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
 its nearest neighbor.
 A flyweight is immutable and shared by everyone at once.
 A pooled object is usually mutable or stateful,

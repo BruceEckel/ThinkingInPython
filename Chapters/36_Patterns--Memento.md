@@ -17,7 +17,7 @@ and immutable state removes the need.
 ## A Snapshot Is Not a Reference
 
 Aliasing and copying return from [Rethinking Objects](20_Patterns--Rethinking_Objects.md#encapsulation-leaks),
-because Memento lives or dies by them.
+because *Memento* lives or dies by them.
 The beginner's memento is an assignment, and it does not work:
 
 ```python
@@ -320,7 +320,7 @@ never reaches this cost.
 For one that grows without bound, bound the history's depth
 (exercise 2 asks for exactly this), coalesce edits before they reach `History`,
 use a persistent structure that shares more than a flat tuple can,
-or fall back to Command-based undo, which stores an edit instead of a state.
+or fall back to *Command*-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 argues that freezing removes what encapsulation protected.
@@ -328,8 +328,8 @@ That section also explains why `strokes` is a tuple rather than a list:
 `frozen=True` guards the binding, not the object,
 so a frozen data class holding a list still lets that list change underneath it,
 as `frozen_leaky.py` shows there.
-[Flyweight](35_Patterns--Flyweight.md) shares immutable values across space,
-and Memento shares them across time.
+[*Flyweight*](35_Patterns--Flyweight.md) shares immutable values across space,
+and *Memento* shares them across time.
 
 The classic form has not disappeared.
 It has narrowed.
@@ -509,13 +509,13 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the Command variation that [Function Objects](28_Patterns--Function_Objects.md)
+the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md)
 mentions.
-Command-based undo saves memory when a snapshot is large,
+*Command*-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
 Try snapshot-based undo first: immutable states make one edit inexpensive,
 as `sharing.py` showed,
-and switch to Command once `growth_cost.py`'s `O(k^2)` starts to matter.
+and switch to *Command* once `growth_cost.py`'s `O(k^2)` starts to matter.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
@@ -722,7 +722,7 @@ so none carry pickle's security risk either.
 
 ## Snapshots in the Wild
 
-Version control is the Memento pattern at industrial scale.
+Version control is the *Memento* pattern at industrial scale.
 A git commit is an immutable snapshot of your whole tree,
 checkout is `restore()`,
 and git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.

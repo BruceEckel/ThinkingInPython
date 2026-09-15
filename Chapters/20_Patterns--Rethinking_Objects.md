@@ -67,7 +67,8 @@ and raises no surprising exceptions.
 When subclasses obey it,
 code you write against the base class works unchanged on any of them.
 That obedience makes polymorphism,
-and patterns like the [Template Method](25_Patterns--Template_Method.md), safe.
+and patterns like the [*Template Method*](25_Patterns--Template_Method.md),
+safe.
 A statically typed compiler can check that an override's signature stays compatible.
 It cannot check whether the override behaves the way the base class declares.
 The base class calls a method and trusts every subclass to stand in for the base.
@@ -1012,8 +1013,8 @@ and `assert_never()` turns each one into a type checker error naming the shape y
 The OOP approach assumes you add types more often than operations,
 and that assumption often fails.
 This trade-off is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
-[Multiple Dispatching](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
-and [Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explore it further.
 
 ## Null Object

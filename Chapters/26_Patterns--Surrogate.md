@@ -8,7 +8,7 @@ The two patterns are so similar that *Proxy* is a special case of *State*.
 
 From a base class, derive the surrogate along with the class or classes that provide the implementation:
 
-![Surrogate and each Implementation realize the same Interface](_images/surrogate)
+![*Surrogate* and each Implementation realize the same Interface](_images/surrogate)
 
 This is the shape in *GoF Design Patterns*.
 Python does not need the shared base,
@@ -154,7 +154,7 @@ The static type checker verifies signatures.
 ### Forwarding with `__getattr__()` {#forwarding-with-getattr}
 
 `__getattr__()` is Python's built-in delegation mechanism,
-which [Singleton](24_Patterns--Singleton.md) used to reach its inner object.
+which [*Singleton*](24_Patterns--Singleton.md) used to reach its inner object.
 Delegating through it makes `Proxy` simpler to implement:
 
 ```python
@@ -569,7 +569,7 @@ so `hasattr(guest, "erase")` does not return `False`,
 it raises `PermissionError` too.
 A surrogate whose `__getattr__()` can raise something other than `AttributeError` breaks `hasattr()`.
 It fails `isinstance()` for a different reason:
-as [A Surrogate Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
+as [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
 explains, the Protocol check uses `inspect.getattr_static()`,
 which never calls `__getattr__()`.
 
@@ -731,7 +731,7 @@ if __name__ == "__main__":
 `run()` never changes and neither does `b`.
 Only the surrogate's current implementation changes.
 Here the client programmer calls `change_to()`,
-but in a [State Machine](31_Patterns--State_Machines.md),
+but in a [*State Machine*](31_Patterns--State_Machines.md),
 each implementation chooses its own successor,
 so the surrogate advances without the client asking.
 `change_to()` reassigns `__implementation` with no lock.
@@ -764,7 +764,7 @@ The type checker verifies that `Implementation1` and `Implementation2` supply ev
 and reports a missing method.
 That declaration covers the implementations, not the surrogate.
 
-The test passes the State surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
+The test passes the *State* surrogate a small stand-in and confirms that calls reach the current implementation and that `change_to()` swaps it:
 
 ```python
 # test_state.py
@@ -810,7 +810,7 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
     Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
     Implement this with a singleton-like system
-    ([Singleton](24_Patterns--Singleton.md))
+    ([*Singleton*](24_Patterns--Singleton.md))
     that controls the number of "connection" objects it creates.
     When a user finishes with a connection,
     the system must check that connection back in for reuse.

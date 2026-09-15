@@ -720,7 +720,7 @@ the same shape of result `asyncio.sleep()` gave the loop directly.
 [Simulation](38_Patterns--Simulation.md)
 builds a full program on these mechanics:
 a pack of rats exploring a maze as cooperating tasks,
-and [Observer](30_Patterns--Observer.md#observer-and-io)
+and [*Observer*](30_Patterns--Observer.md#observer-and-io)
 uses `gather()` to notify slow observers together instead of one at a time.
 
 ## A Single Thread Still Races
@@ -2563,7 +2563,8 @@ Here are a few of the topics beyond it:
     - [BOCPY](https://microsoft.github.io/bocpy/):
       Behavior-Oriented Concurrency.
     - [Trio](https://trio.readthedocs.io/): Origin of structured concurrency.
-    - [AnyIO](https://pypi.org/project/anyio/): Bridge between Trio and asyncio.
+    - [AnyIO](https://pypi.org/project/anyio/):
+      a bridge between Trio and asyncio.
     - [uvloop](https://github.com/MagicStack/uvloop):
       Fast drop-in replacement for the standard event loop.
       See also [rsloop](https://github.com/RustedBytes/rsloop).

@@ -164,23 +164,23 @@ and the module version pays none.
 
 ## 4. Classifying three wrappers
 
-**The logging wrapper is a Decorator.** Its interface is the wrapped
+**The logging wrapper is a *Decorator*.** Its interface is the wrapped
 object's, unchanged, and it adds behavior on the way through. Remove
 it and every call still reaches the same method with the same
 arguments and returns the same result. What you lose is the log. That
-is the Decorator row: same interface, added behavior, and the behavior
+is the *Decorator* row: same interface, added behavior, and the behavior
 is what disappears.
 
-**The `read()` wrapper is an Adapter.** Its interface is not the
+**The `read()` wrapper is an *Adapter*.** Its interface is not the
 wrapped object's. The caller asks for `read()`, and the wrapped
 object offers only `next_chunk()`, so the wrapper exists to make one
 type fit a caller that expects another. Remove it and you lose only
-the fit, which is enough: the call no longer resolves. An Adapter
-adds no behavior, and that is the test that separates the Adapter
-from the Decorator. Both wrappers forward, and only this one changes
+the fit, which is enough: the call no longer resolves. An *Adapter*
+adds no behavior, and that is the test that separates the *Adapter*
+from the *Decorator*. Both wrappers forward, and only this one changes
 the name the caller uses.
 
-**The flag-checking wrapper is a Proxy.** Its interface is the wrapped
+**The flag-checking wrapper is a *Proxy*.** Its interface is the wrapped
 object's, and it adds no behavior to a call that goes through. What it
 adds is a decision about whether the call goes through at all. Remove
 it and every call reaches the implementation, including the ones the
@@ -188,7 +188,7 @@ proxy should have refused, so what you lose is control over when and
 whether the call happens. This wrapper is the
 [protection proxy](../Chapters/26_Patterns--Surrogate.md#what-proxy-solves).
 
-None of the three is a Façade, because a Façade narrows many objects
+None of the three is a *Façade*, because a *Façade* narrows many objects
 to a few names and each of these wraps one object. The lesson is that
 the classification never turns on the code: all three could be the
 same `__getattr__()` forwarder. What separates them is the answer to

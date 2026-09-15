@@ -81,7 +81,7 @@ print(person.hello())
 `hello()` method. `UnpredictablePerson` never mentions any specific
 mood by name, so a third mood changes only which `Mood` object
 `change_to()` swaps in. `UnpredictablePerson` is the *State*
-surrogate from [Surrogate](../Chapters/26_Patterns--Surrogate.md#state),
+surrogate from [*Surrogate*](../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
 ## 2. A washing machine, table-driven

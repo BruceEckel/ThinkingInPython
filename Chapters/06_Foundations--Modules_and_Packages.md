@@ -434,7 +434,7 @@ Both say which names a caller should use,
 and that agreement lets a module serve as a façade over its internals
 ([Changing the Interface](29_Patterns--Changing_the_Interface.md))
 or as a shared single instance
-([Singleton](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
+([*Singleton*](24_Patterns--Singleton.md#a-module-is-already-a-singleton)).
 
 ## File Names
 

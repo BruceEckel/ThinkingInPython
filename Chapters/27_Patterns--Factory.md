@@ -192,7 +192,7 @@ The concrete shapes carry a leading underscore because no caller needs their nam
 so a caller only works with `Shape`s and never writes `_Circle`.
 The underscore discourages direct construction,
 but this is a convention rather than concealment.
-[Singleton](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
+[*Singleton*](24_Patterns--Singleton.md#nothing-keeps-the-class-private)
 makes the same case,
 and keeps its bare `Settings` name because `settings()` returns that type,
 which callers must write.
@@ -809,7 +809,7 @@ or a rules object passed alongside the factory.
 
 `interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's.
 Thus, the pair of calls chooses behavior from both types.
-[Multiple Dispatching](32_Patterns--Multiple_Dispatching.md)
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md)
 develops that pair of calls into a technique.
 
 `Obstacle`, `Character`, and `GameElementFactory` are abstract base classes.
@@ -819,9 +819,9 @@ Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class,
 and the `TypeError` appears when you create an instance,
 before `GameEnvironment.__init__()` calls anything,
-the same way `Shape` fails in this chapter's earlier listings and `Partial()` did in [Surrogate](26_Patterns--Surrogate.md).
+the same way `Shape` fails in this chapter's earlier listings and `Partial()` did in [*Surrogate*](26_Patterns--Surrogate.md).
 A *Protocol* names the required methods and needs no base class,
-which simplifies the Abstract Factory:
+which simplifies the *Abstract Factory*:
 
 ```python
 # abstract_factory_protocol.py
@@ -890,7 +890,7 @@ the checker reports `protocol member make_obstacle is not defined on type Broken
 
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`,
-the same failure [Surrogate](26_Patterns--Surrogate.md#proxy) showed.
+the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) showed.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -899,7 +899,7 @@ without the coupling a shared base class imposes.
 
 The factories so far build each object from a class and some arguments.
 *Prototype* instead keeps one fully configured instance and makes new objects by copying it.
-Use Prototype when a ready-made instance is easier to clone than to construct,
+Use *Prototype* when a ready-made instance is easier to clone than to construct,
 or when construction is slow and the instances share most of the setup.
 
 The `copy` module does the cloning.
@@ -969,7 +969,7 @@ so a prototype holding one makes `deepcopy()` raise `TypeError: cannot pickle '_
 Give such a class a `__deepcopy__()` that says what the copy holds instead:
 a fresh connection, or an empty slot the clone fills when it first needs one.
 
-You can combine Prototype with a registry.
+You can combine *Prototype* with a registry.
 Instead of a registry of classes,
 keep a registry of prototypical instances and clone the chosen one:
 
@@ -1042,7 +1042,7 @@ keeping the step-by-step assembly separate from the finished object.
 In Java and C++, a class with many optional settings needs a constructor for every useful combination,
 because those languages have no keyword arguments.
 That pile of constructors is the *telescoping constructor*,
-and Builder is the workaround,
+and *Builder* is the workaround,
 a companion class that collects settings one method call at a time.
 The *GoF Design Patterns* structure looks like this:
 
@@ -1130,7 +1130,8 @@ The call site names each option just as the chain does, and the fields,
 not a second class, declare the defaults.
 
 A second use for builder chains is to vary an existing configuration.
-For a frozen data class, `replace()` is Prototype and Builder in one function,
+For a frozen data class,
+`replace()` is *Prototype* and *Builder* in one function,
 copying the configured state and changing the chosen fields in the copy.
 `copy.replace()` is the [general form of the operation](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace),
 and works on any object that defines `__replace__()`.
@@ -1165,11 +1166,11 @@ def test_second_build_reuses_toppings() -> None:
     assert second.toppings == ("basil", "olives")
 ```
 
-The (unrelated) [Decorator pattern](14_Techniques--Decorators.md#the-decorator-pattern)
+The (unrelated) [*Decorator* pattern](14_Techniques--Decorators.md#the-decorator-pattern)
 has its own `Pizza`,
 modeling toppings as wrapper objects instead of builder-collected fields.
 
-Builder remains useful in Python when construction is genuinely a process.
+*Builder* remains useful in Python when construction is genuinely a process.
 The steps must come in order, later steps depend on earlier ones,
 and some rules apply across several steps.
 `GameBuilder` in [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
@@ -1187,7 +1188,7 @@ Appending parts to a list and finishing with `"".join(parts)` builds an immutabl
 `PizzaBuilder` has the same shape:
 it collects toppings in a list and freezes them into a tuple at `build()`.
 The structure is everywhere,
-so save the name Builder for construction that is a process in its own right,
+so save the name *Builder* for construction that is a process in its own right,
 with intermediate state and rules that span the steps.
 When the "steps" are optional values,
 a data class with keyword arguments already does the job.
@@ -1211,12 +1212,12 @@ Match the machinery to what varies:
   (pooling, caching, consulting configuration), write a factory function,
   and a factory class only when that work has state of its own.
 - When you must choose several products together as a matched set,
-  use Abstract Factory, expressed as a `Protocol` rather than a base class.
+  use *Abstract Factory*, expressed as a `Protocol` rather than a base class.
 - When the interesting part of an object is its configured state rather than its type,
   keep a prototype and copy it.
   For a frozen data class, `replace()` is that copy.
 - When construction is a genuine process with ordered steps and rules spanning them,
-  use Builder.
+  use *Builder*.
   When the "steps" are optional values, keyword arguments are the builder.
 
 The static `factory()` method and the nested-`Factory`-class dispatcher are here because the object-oriented tradition writes factories that way,
@@ -1268,7 +1269,7 @@ Both exist to work around languages where a class is not an object you can put i
     and show what `make("Hexagon")` does.
     Then write a check that reports every class in the module that satisfies `Shape` and is missing from `REGISTRY`,
     so the forgotten decorator is found before any `make()` call.
-    `@runtime_checkable`, which [Surrogate](26_Patterns--Surrogate.md#proxy)
+    `@runtime_checkable`, which [*Surrogate*](26_Patterns--Surrogate.md#proxy)
     shows with `isinstance()`,
     also lets `issubclass()` test a class against a Protocol whose members are all methods.
 11. Fill `PROTOTYPES` in `prototype_registry.py` by decoration instead of a table literal.
