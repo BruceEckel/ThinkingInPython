@@ -13,10 +13,18 @@ everything. Each served page carries a small script that polls
 `/__reload` and reloads once the rebuild lands, so an edit in the editor
 becomes a refreshed browser page with nothing to press.
 
+With `--copy-on-select`, each served page also carries a script that
+copies a mouse selection to the clipboard as soon as the button is
+released, for pulling passages out of the rendered book. `make local`
+passes it. Both scripts are added to the response as it is served, so
+the files in `build/site/`, the ones the published site is built from,
+never contain either.
+
 Usage:
     python -m tools.serve             # serve build/site/ at :8000
     python -m tools.serve --open      # serve and open a browser
     python -m tools.serve --watch     # rebuild and reload on edits
+    python -m tools.serve --copy-on-select  # selection copies itself
     python -m tools.serve --port 9000 # serve on another port
 """
 
@@ -64,6 +72,42 @@ RELOAD_SCRIPT = """
 })();
 </script>
 """ % (RELOAD_PATH, int(POLL_SECONDS * 1000))
+
+# Copies the selection when the mouse button comes up. mouseup is the
+# user gesture the clipboard API requires; selectionchange alone is not
+# one. The execCommand fallback covers a page served over plain http on
+# a LAN address, where navigator.clipboard is absent. The toast makes
+# the copy visible, since every drag-select overwrites the clipboard.
+COPY_SCRIPT = """
+<script>
+(() => {
+  const toast = document.createElement("div");
+  toast.textContent = "copied";
+  toast.style.cssText = "position:fixed;bottom:1rem;right:1rem;padding:0.3rem 0.7rem;"
+    + "background:#333;color:#fff;font:0.8rem sans-serif;border-radius:4px;"
+    + "opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:9999";
+  document.body.appendChild(toast);
+  let hide = null;
+  const show = () => {
+    toast.style.opacity = "1";
+    clearTimeout(hide);
+    hide = setTimeout(() => { toast.style.opacity = "0"; }, 700);
+  };
+  document.addEventListener("mouseup", (event) => {
+    const tag = event.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    const text = document.getSelection().toString();
+    if (text.trim() === "") return;
+    const fallback = () => { if (document.execCommand("copy")) show(); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(show, fallback);
+    } else {
+      fallback();
+    }
+  });
+})();
+</script>
+"""
 
 
 def snapshot() -> dict[Path, float]:
@@ -127,19 +171,24 @@ class Watcher:
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    """Serves the site, answering /__reload and injecting the poll script."""
+    """Serves the site, answering /__reload and injecting the scripts."""
 
     watcher: Watcher | None = None
+    # The scripts every served page gets before </body>: RELOAD_SCRIPT
+    # under --watch, COPY_SCRIPT under --copy-on-select, both, or none.
+    inject: str = ""
 
     def do_GET(self) -> None:  # noqa: N802 (BaseHTTPRequestHandler's name)
         if self.path.split("?")[0] == RELOAD_PATH:
             self.reply_token()
             return
-        watcher = type(self).watcher
-        if watcher is None:
+        if not type(self).inject:
             super().do_GET()
             return
-        with watcher.lock:
+        watcher = type(self).watcher
+        # Under --watch, hold the lock so a page is never read mid-rebuild.
+        lock = watcher.lock if watcher else contextlib.nullcontext()
+        with lock:
             path = self.translate_path(self.path)
             if os.path.isdir(path):
                 path = os.path.join(path, "index.html")
@@ -160,12 +209,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def reply_page(self, path: str) -> None:
         html = Path(path).read_text(encoding="utf-8")
+        inject = type(self).inject
         marker = "</body>"
         if marker in html:
             head, _, tail = html.rpartition(marker)
-            html = f"{head}{RELOAD_SCRIPT}{marker}{tail}"
+            html = f"{head}{inject}{marker}{tail}"
         else:
-            html += RELOAD_SCRIPT
+            html += inject
         body = html.encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -190,6 +240,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="open a browser at the served site")
     ap.add_argument("--watch", action="store_true",
                     help="rebuild on edits to Chapters/ and reload the page")
+    ap.add_argument("--copy-on-select", action="store_true",
+                    help="copy a mouse selection to the clipboard on release "
+                         "(served pages only; build/site/ is untouched)")
     ap.add_argument("--chapter-toc", action=argparse.BooleanOptionalAction,
                     default=build_site.CHAPTER_TOC,
                     help="per-chapter table of contents on a --watch rebuild "
@@ -205,6 +258,9 @@ def main(argv: list[str] | None = None) -> int:
         build_site.check_pandoc()
         Handler.watcher = Watcher(SITE, args.chapter_toc)
         Handler.watcher.start()
+        Handler.inject += RELOAD_SCRIPT
+    if args.copy_on_select:
+        Handler.inject += COPY_SCRIPT
 
     handler = functools.partial(Handler, directory=str(SITE))
     server = http.server.ThreadingHTTPServer(("", args.port), handler)
@@ -212,6 +268,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Serving {SITE} at {url}  (Ctrl+C to stop)")
     if args.watch:
         print("Watching Chapters/ for edits; pages reload after a rebuild.")
+    if args.copy_on_select:
+        print("Selecting text with the mouse copies it to the clipboard.")
     if args.open:
         # The server socket is already bound, so the browser will
         # connect even if it loads before serve_forever() runs.
