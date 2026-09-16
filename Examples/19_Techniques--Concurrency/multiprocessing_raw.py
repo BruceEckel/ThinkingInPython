@@ -1,8 +1,10 @@
 # multiprocessing_raw.py
 import multiprocessing as mp
 
+type Priced = tuple[int, int]  # (order, price)
+
 def cpu_price(
-    order: int, results: mp.Queue[tuple[int, int]]
+    order: int, results: mp.Queue[Priced]
 ) -> None:
     total = 0
     for _ in range(1_000_000):  # Processor work
@@ -11,7 +13,7 @@ def cpu_price(
 
 if __name__ == "__main__":
     orders = [1, 2, 3, 4, 5]
-    results: mp.Queue[tuple[int, int]] = mp.Queue()
+    results: mp.Queue[Priced] = mp.Queue()
     workers = [
         mp.Process(target=cpu_price, args=(order, results))
         for order in orders
