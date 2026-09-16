@@ -462,9 +462,8 @@ To add, remove, or reorder the handlers you edit the `chain` list.
 The test is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test would discard a correct answer and call the next finder.
-The hazard is the truthiness test, not the choice of failure value:
-a numeric result must be compared against that value with `is`,
-whatever the value is.
+The hazard is the truthiness test, not the choice of failure value.
+Whichever value marks failure, compare the result against it with `is`.
 `None` is the right failure value here because a root is never `None`,
 so `float | None` says which result is which.
 A `sentinel()` ([Sentinel Values](05_Foundations--Functions.md#sentinel-values))
