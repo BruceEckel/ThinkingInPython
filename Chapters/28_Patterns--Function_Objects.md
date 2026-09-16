@@ -187,7 +187,7 @@ so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol`.
 Exercise 1 builds that `Protocol`.
 
-Building commands in a loop can produce Python's best-known closure mistake:
+Building commands in a loop produces Python's best-known closure mistake:
 
 ```python
 # late_binding.py
@@ -215,19 +215,16 @@ for command in fixed:
 #: step 2
 ```
 
-The two comprehensions look alike and differ in when they read `n`.
-A lambda's body runs when you call the command, not when you create it.
-All three lambdas close over the one loop variable,
+The two comprehensions differ in one thing: when they read `n`.
+A lambda's body runs when you call the command, not when you create it,
+and all three lambdas close over the same loop variable,
 which holds 2 by the time anything calls them.
 The argument to `functools.partial`
 ([Functional Foundations](40_Functional--Foundations.md#partial-application))
-is an ordinary expression.
-Python evaluates it where you write it,
-so each command stores the string built from that iteration's `n`.
-Nothing remains to look up later.
-The older form `lambda n=n: ...` does the same job with a default argument.
+is an ordinary expression that Python evaluates where you write it,
+so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
 When commands built in a loop all behave like the last one,
-the shared loop variable is why.
+the shared loop variable is the cause.
 
 ## Strategy: Choosing the Algorithm at Runtime
 
