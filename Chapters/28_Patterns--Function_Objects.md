@@ -292,8 +292,13 @@ def newton(f: Fn, a: float, b: float) -> float | None:
     return None
 ```
 
+`solve()` is the part of the procedure that does not change.
+It runs whichever finder it is given,
+then does the work no finder does for itself:
+it checks the answer against `f` and turns a missing or inaccurate root into an exception.
 Because each finder is a function with the same signature,
-passing one to `solve()` chooses the strategy:
+passing one to `solve()` chooses the strategy,
+and the check applies to every algorithm's answer alike:
 
 ```python
 # strategy.py
@@ -301,23 +306,24 @@ from algorithms import (Fn, RootFinder, bisection,
                         newton, secant)
 
 def solve(f: Fn, a: float, b: float,
-          finder: RootFinder) -> float | None:
-    return finder(f, a, b)
+          finder: RootFinder) -> float:
+    root = finder(f, a, b)
+    if root is None or abs(f(root)) > 1e-6:
+        raise ValueError(f"no root in [{a}, {b}]")
+    return root
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
 
 for finder in (bisection, newton, secant):
-    root = solve(f, 0.0, 2.0, finder)
-    assert root is not None
-    print(f"{root:.6f}")
+    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
 #: 1.414214
 #: 1.414214
 #: 1.414214
 ```
 
-Three identical lines are the point:
-the algorithm changes and the caller stays the same.
+Three identical lines are the point: the algorithm changes,
+and the caller and the check stay the same.
 The algorithms differ, though,
 and the chain in `chain.py` turns that difference into a fallback.
 
