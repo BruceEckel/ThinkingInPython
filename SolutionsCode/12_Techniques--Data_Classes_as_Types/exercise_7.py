@@ -1,5 +1,6 @@
 # exercise_7.py
 from dataclasses import dataclass, field
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Month:
@@ -9,15 +10,14 @@ class Month:
 def make_months() -> list[Month]:
     return [Month("January", 1), Month("February", 2)]
 
-try:
+with ignore(ValueError):
     @dataclass(frozen=True)
     class Broken:
         months: list[Month] = field(
             default_factory=make_months)
         index: dict[str, Month] = {}
-except ValueError as e:
-    print(f"{type(e).__name__}: {str(e).split(': ')[-1]}")
-#: ValueError: use default_factory
+#: ValueError("mutable default <class 'dict'> for field
+#: index is not allowed: use default_factory")
 
 @dataclass(frozen=True)
 class Bare:

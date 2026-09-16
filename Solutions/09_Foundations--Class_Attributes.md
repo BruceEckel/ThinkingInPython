@@ -146,17 +146,14 @@ appear:
 ```python
 # exercise_5_rejected.py
 from dataclasses import dataclass
+from exceptions import ignore
 
-try:
+with ignore(ValueError):
     @dataclass
     class Cart:
         items: list[str] = []
-
-except ValueError as e:
-    print(str(e).partition(" is not")[0])
-    print(str(e).partition(" for ")[0])
-#: mutable default <class 'list'> for field items
-#: mutable default <class 'list'>
+#: ValueError("mutable default <class 'list'> for field
+#: items is not allowed: use default_factory")
 ```
 
 The error arrives at class-definition time, not at first use, and

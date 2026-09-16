@@ -73,6 +73,7 @@ so you cannot instantiate an implementation that omits one:
 # proxy_interface.py
 from abc import ABC, abstractmethod
 from typing import override
+from exceptions import ignore
 
 class Service(ABC):
     @abstractmethod
@@ -103,11 +104,10 @@ p.f()
 #: Complete.f()
 p.g()
 #: Complete.g()
-try:
+with ignore(TypeError):
     Proxy(Partial())
-except TypeError as e:
-    print(str(e).partition(" without")[0])
-#: Can't instantiate abstract class Partial
+#: TypeError("Can't instantiate abstract class Partial
+#: without an implementation for abstract method 'g'")
 ```
 
 Because `Proxy` accepts any `Service` and `Complete` implements both methods,

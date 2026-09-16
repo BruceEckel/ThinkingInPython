@@ -1,6 +1,7 @@
 # near_miss.py
 from difflib import get_close_matches
 from typing import final, override
+from exceptions import ignore
 
 class ApplicationFramework:
     @final
@@ -43,25 +44,20 @@ class MyApp(ApplicationFramework):
 
     def report(self) -> None: ...
 
-try:
+with ignore(TypeError):
     class Typo(ApplicationFramework):
         def customise1(self) -> None:
             print("never runs")
-except TypeError as e:
-    print(e)
-#: Typo.customise1: did you mean customize1?
+#: TypeError('Typo.customise1: did you mean customize1?')
 
-try:
+with ignore(TypeError):
     class Hijack(ApplicationFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
-except TypeError as e:
-    print(e)
-#: Hijack.run overrides the anchor
+#: TypeError('Hijack.run overrides the anchor')
 
-try:
+with ignore(TypeError):
     class Weird(ApplicationFramework):
         def customized_report(self) -> None: ...
-except TypeError as e:
-    print(e)
-#: Weird.customized_report: did you mean customize2?
+#: TypeError('Weird.customized_report: did you mean
+#: customize2?')

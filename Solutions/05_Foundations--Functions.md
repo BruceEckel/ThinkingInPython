@@ -195,6 +195,8 @@ it.
 
 ```python
 # exercise_8.py
+from exceptions import expect
+
 count = 0
 
 def writes_global():
@@ -205,21 +207,17 @@ def rebinds():
     count = 99
     print(count)
 
-try:
-    writes_global()
-except UnboundLocalError as e:
-    print(str(e).partition(" where")[0])
-#: cannot access local variable 'count'
-try:
-    rebinds()
-except UnboundLocalError as e:
-    print(str(e).partition(" where")[0])
-#: cannot access local variable 'count'
+expect(UnboundLocalError, writes_global)
+#: [UnboundLocalError] cannot access local variable 'count'
+#: where it is not associated with a value
+expect(UnboundLocalError, rebinds)
+#: [UnboundLocalError] cannot access local variable 'count'
+#: where it is not associated with a value
 ```
 
 Both calls raise `UnboundLocalError: cannot access local variable
 'count' where it is not associated with a value`,
-which the listing trims after the variable name. Without `global`,
+which the listing prints in full. Without `global`,
 the assignment in `count += 1` makes `count` local to
 `writes_global()`, so the read half of `+=` looks for a local that
 has no value yet. `rebinds()` fails for the same reason even though

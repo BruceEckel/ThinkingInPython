@@ -1222,13 +1222,13 @@ and CPython allows multiple inheritance only when at most one base carries a non
 ```python
 # metaclass_layout_conflict.py
 from typing import Any
+from exceptions import ignore
 
-try:
+with ignore(TypeError):
     class Singleton(type, dict[type, Any]):  # type: ignore
         pass
-except TypeError as e:
-    print(e)
-#: multiple bases have instance lay-out conflict
+#: TypeError('multiple bases have instance lay-out
+#: conflict')
 ```
 
 The failure has nothing to do with metaclasses.
@@ -1288,7 +1288,7 @@ so inheriting from two classes built by different metaclasses has no answer:
 
 ```python
 # multiple_metaclass_inheritance.py
-import textwrap
+from exceptions import ignore
 
 class MetaA(type):
     pass
@@ -1302,14 +1302,12 @@ class A(metaclass=MetaA):
 class B(metaclass=MetaB):
     pass
 
-try:
+with ignore(TypeError):
     class C(A, B):  # type: ignore
         pass
-except TypeError as error:
-    print(textwrap.fill(str(error), 56))
-#: metaclass conflict: the metaclass of a derived class
-#: must be a (non-strict) subclass of the metaclasses of
-#: all its bases
+#: TypeError('metaclass conflict: the metaclass of a derived
+#: class must be a (non-strict) subclass of the metaclasses
+#: of all its bases')
 
 class MetaC(MetaA, MetaB):
     pass
@@ -1325,8 +1323,9 @@ The result is a metaclass conflict.
 As with the layout conflict just shown,
 ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
-`textwrap.fill()` wraps `str(error)` so the message fits the page;
-the message itself is Python's, unwrapped.
+`ignore` prints the exception's `repr()`,
+wrapped by the helper so it fits the page; the message inside is Python's,
+unwrapped.
 It names the fix: `D`'s metaclass, `MetaC`,
 must be a subclass of every base's metaclass, `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.

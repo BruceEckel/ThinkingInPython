@@ -1,5 +1,6 @@
 # exercise_5.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Meters:
@@ -22,8 +23,7 @@ print(Meters(10) - Meters(3), Meters(10) - 3)
 #: Meters(n=7) Meters(n=7)
 print(10 - Meters(3))
 #: Meters(n=7)
-try:
+with ignore(TypeError):
     "ten" - Meters(3)
-except TypeError as e:
-    print(e)
-#: unsupported operand type(s) for -: 'str' and 'Meters'
+#: TypeError("unsupported operand type(s) for -: 'str' and
+#: 'Meters'")

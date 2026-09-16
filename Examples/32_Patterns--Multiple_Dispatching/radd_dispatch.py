@@ -1,5 +1,6 @@
 # radd_dispatch.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 @dataclass(frozen=True)
 class Meters:
@@ -29,9 +30,8 @@ print(Meters(3) + 4)  # The left operand handles it
 print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)
-try:
+with ignore(TypeError):
     Meters(3) + "four"  # Both sides decline
-except TypeError as e:
-    print(e)
 #: __add__(Meters(n=3), 'four')
-#: unsupported operand type(s) for +: 'Meters' and 'str'
+#: TypeError("unsupported operand type(s) for +: 'Meters'
+#: and 'str'")

@@ -1,4 +1,5 @@
 # slots.py
+from exceptions import ignore
 
 class Point:
     __slots__ = ("x", "y")  # No per-instance __dict__
@@ -9,9 +10,8 @@ class Point:
 p = Point(1, 2)
 print(p.x, p.y)
 #: 1 2
-try:
+with ignore(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
-except AttributeError as e:
-    print(str(e).partition(" for")[0])
-#: 'Point' object has no attribute 'z' and no __dict__
+#: AttributeError("'Point' object has no attribute 'z' and
+#: no __dict__ for setting new attributes")

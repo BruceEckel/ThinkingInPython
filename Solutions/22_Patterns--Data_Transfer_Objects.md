@@ -58,6 +58,7 @@ with no other code to update.
 ```python
 # exercise_3.py
 from typing import NamedTuple
+from exceptions import ignore
 
 class Recipe(NamedTuple):
     name: str
@@ -67,11 +68,10 @@ toast = Recipe("Toast", ["slice", "heat"])
 toast.steps.append("butter")
 print(toast)
 #: Recipe(name='Toast', steps=['slice', 'heat', 'butter'])
-try:
+with ignore(TypeError):
     key = {toast: "breakfast"}
-except TypeError as e:
-    print(str(e).partition(" (")[0])
-#: cannot use 'Recipe' as a dict key
+#: TypeError("cannot use 'Recipe' as a dict key (unhashable
+#: type: 'list')")
 ```
 
 The record changed, and nothing objected. `NamedTuple` refuses to
@@ -80,7 +80,7 @@ already refers to, so `append()` edits that list through the record.
 Both `ty` and Python stay silent, because `append()` mutates the
 list instead of assigning to a field.
 
-Using the record as a `dict` key raises a `TypeError`, whose full message
+Using the record as a `dict` key raises a `TypeError`, whose message
 names the cause: `cannot use 'Recipe' as a dict key (unhashable type:
 'list')`. Hashing a tuple hashes each element, so a `Recipe` is
 hashable only when every field is. The `list` has no hash, so the

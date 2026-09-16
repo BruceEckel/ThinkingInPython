@@ -236,15 +236,15 @@ except TypeError as e:
 ```text
 error[instance-layout-conflict]: Class will raise `TypeError` at runtime
 due to incompatible bases
- --> metaclass_layout_conflict.py:5:11
+ --> metaclass_layout_conflict.py:6:11
   |
-5 |     class Singleton(type, dict[type, Any]):
+6 |     class Singleton(type, dict[type, Any]):
   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Bases `type` and `dict`
   |           cannot be combined in multiple inheritance
 info: Two classes cannot coexist in a class's MRO if their instances
 have incompatible memory layouts
   |
-5 |     class Singleton(type, dict[type, Any]):
+6 |     class Singleton(type, dict[type, Any]):
   |                     ----  --------------- `dict` instances have a
   |                     |                     distinct memory layout
   |                     |                     because of the way `dict`

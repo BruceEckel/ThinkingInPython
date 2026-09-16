@@ -1,6 +1,7 @@
 # still_a_tuple.py
 from dataclasses import dataclass
 from typing import NamedTuple
+from exceptions import ignore
 
 class Color(NamedTuple):
     r: int
@@ -33,11 +34,10 @@ class FrozenDimensions:
 
 print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
-try:
+with ignore(TypeError):
     FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
-except TypeError as e:
-    print(str(e).partition(" and")[0])
-#: '<' not supported between instances of 'FrozenColor'
+#: TypeError("'<' not supported between instances of
+#: 'FrozenColor' and 'FrozenColor'")
 
 @dataclass(frozen=True, order=True)
 class OrderedColor:
@@ -51,8 +51,7 @@ class OrderedDimensions:
     height: int
     depth: int
 
-try:
+with ignore(TypeError):
     OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
-except TypeError as e:
-    print(str(e).partition(" and")[0])
-#: '<' not supported between instances of 'OrderedColor'
+#: TypeError("'<' not supported between instances of
+#: 'OrderedColor' and 'OrderedDimensions'")
