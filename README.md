@@ -126,15 +126,6 @@ holding `.venv` open.
 Type `make` to see every target; it opens a picker where
 arrow keys choose, Enter runs, and `?` shows a target's full documentation.
 
-#### Optional: Building the Book
-
-Building the book itself needs more. `make site`, `make local`, and
-`make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
-`make prose` needs the standalone `vale` binary. `make tools-check-full`
-checks for all of them. See
-[tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
-for details and install links.
-
 ### Run and test everything
 
 The commands below rebuild `build/examples/` and `build/solutions/` from
@@ -211,6 +202,15 @@ In PowerShell the `PYTHONPATH` line is `$env:PYTHONPATH = "../utils"`;
 
 Use `uv run python`, not a bare `python`. A `python` already on your PATH is
 usually an older release, and these examples use Python 3.15 syntax.
+
+### Optional: Building the Book
+
+Building the book itself needs more. `make site`, `make local`, and
+`make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
+`make prose` needs the standalone `vale` binary. `make tools-check-full`
+checks for all of them. See
+[tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
+for details and install links.
 
 ---
 
