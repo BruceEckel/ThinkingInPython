@@ -365,7 +365,7 @@ where any chapter can import it:
 ```python
 # utils/exceptions.py
 import textwrap
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Final
 
 WIDTH: Final[int] = 57
@@ -388,8 +388,12 @@ class ignore:
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print(f"{exc!r}")
+        print(textwrap.fill(f"{exc!r}", WIDTH))
         return True
+
+def report(e: BaseException) -> None:
+    line = f"[{type(e).__name__}] {e}"
+    print(textwrap.fill(line, WIDTH))
 
 def expect[**P](
     types: Types, fn: Callable[P, object],
@@ -398,8 +402,18 @@ def expect[**P](
     try:
         fn(*args, **kwargs)
     except types as e:
-        line = f"[{type(e).__name__}] {e}"
-        print(textwrap.fill(line, WIDTH))
+        report(e)
+        return
+    raise AssertionError("no exception raised")
+
+async def aexpect[**P](
+    types: Types, fn: Callable[P, Awaitable[object]],
+    /, *args: P.args, **kwargs: P.kwargs
+) -> None:
+    try:
+        await fn(*args, **kwargs)
+    except types as e:
+        report(e)
         return
     raise AssertionError("no exception raised")
 ```
@@ -418,6 +432,9 @@ which makes `ignore()` with no argument catch everything.
 `self.types` from `Types | ALL` down to `Types`,
 and the earlier `if exc_type is None: return False` narrowed `exc_type` to a class,
 so `issubclass(exc_type, self.types)` type-checks.
+`__exit__()` also prints through `textwrap.fill()` at `WIDTH`,
+as `expect()` below does,
+so a long message wraps instead of overrunning the listing width.
 
 `suppress` treats the no-argument call the opposite way:
 `suppress()` suppresses nothing,
@@ -494,6 +511,8 @@ expect(json.JSONDecodeError, json.loads, "{bad")
 The second call names two types in a tuple and forwards `base=1` as a keyword,
 which `parse()` passes on to `int()`.
 The third call's message is too long for one line, so it wraps.
+`aexpect()` is the `async` form: it awaits the call instead of making it,
+for a coroutine function whose failure is the demonstration.
 Where a demonstration needs several statements or an assignment in the guarded block,
 `ignore` remains the right tool; `expect()` covers the common case of one call.
 
