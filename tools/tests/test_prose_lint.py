@@ -28,8 +28,19 @@ def test_mark_inside_a_quotation_is_clean() -> None:
 
 # ── QUOTE-PUNCT: a quoted literal keeps the mark outside ──────────────────────
 
-def test_single_token_quote_is_a_literal() -> None:
-    assert codes('Names that contain "overdraft", and no others, run.') == []
+def test_single_token_quote_named_in_a_code_span_is_a_literal() -> None:
+    assert codes('`pytest -k overdraft` runs names that contain "overdraft", '
+                 'and no others.') == []
+
+def test_single_token_quote_with_no_code_span_is_prose() -> None:
+    text = 'When you have "this", and you need "that", it applies.'
+    assert codes(text) == ["QUOTE-PUNCT", "QUOTE-PUNCT"]
+    text = 'nothing distinguishes "deliberately empty" from "forgotten".'
+    assert codes(text) == ["QUOTE-PUNCT"]
+
+def test_single_token_quote_needs_the_span_on_its_own_line() -> None:
+    text = 'A `label` is set.\nThe display reads "label", then clears.'
+    assert codes(text) == ["QUOTE-PUNCT"]
 
 def test_quote_holding_a_code_span_is_a_literal() -> None:
     assert codes('It needs a name for "callable, plus `undo()`".') == []
@@ -39,7 +50,7 @@ def test_multi_word_quote_without_code_is_still_prose() -> None:
         == ["QUOTE-PUNCT"]
 
 def test_literal_exception_does_not_leak_to_the_next_quote() -> None:
-    text = 'Given "this", the docs say "a shape of solution".'
+    text = 'Given `-k this` and "this", the docs say "a shape of solution".'
     assert codes(text) == ["QUOTE-PUNCT"]
 
 def test_unpaired_quote_falls_back_to_reporting() -> None:

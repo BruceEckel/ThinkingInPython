@@ -309,7 +309,7 @@ The base states its algorithm in the loop, not in any type:
 each pass calls the step, so each pass must perform it.
 Each of these failures corrupts the anchored algorithm.
 The `...` defaults make a step optional,
-and nothing distinguishes "deliberately empty" from "forgotten".
+and nothing distinguishes "deliberately empty" from "forgotten."
 The *Template Method* works only when every subclass is a faithful substitute for its base.
 
 ## Passing the Steps as Functions

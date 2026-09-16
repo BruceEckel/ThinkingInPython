@@ -15,8 +15,11 @@ opposite case: moving the mark inside would put a comma into a `pytest -k`
 substring or a period into an error message the reader is meant to match
 against. Two shapes count as literal and are skipped, both of which the book
 already writes with the mark outside: a quote holding an inline code span, and
-a single-token quote such as "overdraft". Quote a literal that is neither, like
-a multi-word message, as an inline code span instead of prose.
+a single-token quote whose token also appears in a code span on the same line,
+as "overdraft" does next to `pytest -k overdraft`. A single quoted word with
+no such code span nearby is prose ("this", "forgotten") and is reported.
+Quote a literal that is neither, like a multi-word message, as an inline code
+span instead of prose.
 
 Code is skipped through the shared classifier in `tools.prose`: fenced code,
 indented code, tables, blockquotes, HTML, and rules are ignored, and inline code
@@ -83,11 +86,15 @@ def _is_literal(text: str, opened: int, closed: int,
     """Whether the quote spanning `opened`..`closed` quotes a literal.
 
     See this module's docstring: a quote holding an inline code span, or
-    one holding a single token, keeps its punctuation outside.
+    one holding a single token that a code span on the same line also
+    contains, keeps its punctuation outside.
     """
     if any(opened < start < closed for start, _ in spans):
         return True
-    return len(text[opened + 1:closed].split()) == 1
+    tokens = text[opened + 1:closed].split()
+    if len(tokens) != 1:
+        return False
+    return any(tokens[0] in text[start:end] for start, end in spans)
 
 
 def _prose_text(line: str) -> tuple[str, int] | None:
