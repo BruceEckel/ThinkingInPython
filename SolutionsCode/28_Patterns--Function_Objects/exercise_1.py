@@ -2,7 +2,7 @@
 from typing import Protocol
 
 class UndoableCommand(Protocol):
-    def execute(self) -> None: ...
+    def __call__(self) -> None: ...
     def undo(self) -> None: ...
 
 class Deposit:
@@ -10,7 +10,7 @@ class Deposit:
         self.account = account
         self.amount = amount
 
-    def execute(self) -> None:
+    def __call__(self) -> None:
         self.account["balance"] += self.amount
 
     def undo(self) -> None:
@@ -25,7 +25,7 @@ class Macro:
 
     def run(self) -> None:
         for c in self.commands:
-            c.execute()
+            c()
 
     def undo_all(self) -> None:
         # Reverse order to undo

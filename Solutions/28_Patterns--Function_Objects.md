@@ -7,7 +7,7 @@
 from typing import Protocol
 
 class UndoableCommand(Protocol):
-    def execute(self) -> None: ...
+    def __call__(self) -> None: ...
     def undo(self) -> None: ...
 
 class Deposit:
@@ -15,7 +15,7 @@ class Deposit:
         self.account = account
         self.amount = amount
 
-    def execute(self) -> None:
+    def __call__(self) -> None:
         self.account["balance"] += self.amount
 
     def undo(self) -> None:
@@ -30,7 +30,7 @@ class Macro:
 
     def run(self) -> None:
         for c in self.commands:
-            c.execute()
+            c()
 
     def undo_all(self) -> None:
         # Reverse order to undo
@@ -53,18 +53,19 @@ A bare function is no longer enough, though not because of state.
 `callable_command.py`'s `Repeat` already carries its configuration and
 is still called with `()`, so state alone would not force a class.
 Undo forces one, because a command now answers two requests,
-`execute()` and `undo()`, and a callable has only one call.
+`__call__()` and `undo()`, and a callable has only one call.
 
 `Deposit` also has to remember what it did, here the account and the
 amount, so it can reverse that action later: a fresh call to the same
 function cannot know what a previous call changed.
 
 The second operation costs a type rather than a hierarchy.
-`Command`, the chapter's `Callable[[], None]`, has room for one call, so a list of undoable
-commands needs a name for "callable, plus `undo()`", and in Python
-that name is a `Protocol` declaring both members. `UndoableCommand`
-above is that `Protocol`: `Macro` annotates `self.commands` against
-it and `Deposit` inherits nothing. The *GoF Design Patterns* shape is
+`Command`, the chapter's `Callable[[], None]`, has room for one call,
+so a list of undoable commands needs a type with two members,
+`__call__()` and `undo()`, and in Python that type is a `Protocol`.
+`UndoableCommand` above is that `Protocol`: `Macro` annotates
+`self.commands` against it, `Deposit` inherits nothing, and a `Deposit`
+is still called with `()`, so the function form's habit survives. The *GoF Design Patterns* shape is
 a base class with two `raise NotImplementedError` bodies, and those
 bodies are what the shape costs. A base class pays for itself when
 the commands share implementation, and these commands share none.

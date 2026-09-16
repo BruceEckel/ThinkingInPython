@@ -181,9 +181,10 @@ for command in macro:
 
 A callable alone cannot express a second operation, `undo()`.
 `Command` describes one call,
-so a list of commands that can also undo needs a type with two members,
+so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol`.
-A `Command` base class becomes worth writing when the commands also share implementation.
+Exercise 1 builds that `Protocol`.
+A `Command` base class is worthwhile when the commands also share implementation.
 
 Building commands in a loop can produce Python's best-known closure mistake:
 
