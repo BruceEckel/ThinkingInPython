@@ -193,7 +193,7 @@ def header_typst(release: str | None) -> str:
 # note sits under the release line on the title page (pandoc places
 # include-before right after the title block), and the page break
 # then opens the table of contents on its own page. The same sentence
-# as the site footer, the README, and the EPUB's closing page.
+# as the site footer, the README, and the EPUB's title page.
 BEFORE_TYPST = """\
 #v(3em)
 #align(center, block(width: 72%, text(size: 9.5pt, fill: rgb("<<ink>>"))[

@@ -511,24 +511,6 @@ def part_art() -> str | None:
     return None
 
 
-def support_markdown() -> str:
-    """The back-matter page that says supporting the book is optional.
-
-    The same sentence as the site footer and the README, on its own
-    level-1 page at the end of the EPUB and the PDF, where a reader of
-    the downloaded book can still reach the two links. A plain level-1
-    heading, so build_pdf.py's chapter rule leaves it unnumbered.
-    """
-    return f"""# Supporting the Book {{#support}}
-
-Thinking in Python is free.
-If it has helped you and you'd like to support the work,
-you can do that on [GitHub Sponsors]({build_site.SPONSORS_URL})
-or [Ko-fi]({build_site.KOFI_URL}).
-No obligation, and no difference in what you get.
-"""
-
-
 def part_markdown(roman: str, title: str) -> str:
     head = f"# Part {roman} · {title} {{#part-{roman.lower()}}}"
     art = part_art()
@@ -718,7 +700,6 @@ def book_markdown(chapters: list[Chapter], missing: set[str],
             orn = ("\n\n![](chapter-ornament.png)"
                    "{.chapter-ornament width=1.6in}\\")
         parts.append(f"{head}{orn}\n\n{text.strip()}\n")
-    parts.append(support_markdown())
     return "\n".join(parts)
 
 
@@ -762,6 +743,16 @@ def metadata_yaml(release: str | None = None) -> str:
                    f"({build_site.LICENSE_URL}). Freely readable online. "
                    "No reproduction without permission."),
         "identifier": build_site.REPO_URL,
+        # Rendered under the date on the EPUB's title page by the
+        # `support` block in resources/static/epub3.template; the
+        # typst template ignores it, and build_pdf.py places the same
+        # sentence itself.
+        "support": (
+            "Thinking in Python is free. If it has helped you and "
+            "you'd like to support the work, you can do that on "
+            f"[GitHub Sponsors]({build_site.SPONSORS_URL}) or "
+            f"[Ko-fi]({build_site.KOFI_URL}). No obligation, and no "
+            "difference in what you get."),
     }
     lines = [f"{k}: {json.dumps(v)}" for k, v in fields.items()]
     return "---\n" + "\n".join(lines) + "\n---\n"
@@ -889,6 +880,7 @@ table {{ border-collapse: collapse; }}
 th, td {{ border: 1px solid currentColor; padding: 0.3em 0.5em; }}
 #toc ol {{ list-style: none; padding-left: 1em; }}
 #toc ol ol {{ font-size: 0.85em; }}
+.support {{ margin-top: 2em; font-size: 0.85em; }}
 #toc a {{ text-decoration: none; }}
 #toc .toc-chapter {{ margin-top: 0.4em; }}
 #toc .toc-part {{ margin-top: 1.2em; font-weight: bold;
@@ -976,6 +968,9 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
         "--output", str(epub),
         "--metadata-file", str(meta),
         "--css", str(css),
+        # Pandoc's own epub3 template plus a `support` block under the
+        # date on the title page (see the `support` metadata field).
+        "--template", str(STATIC / "epub3.template"),
         "--resource-path", os.pathsep.join(resources),
         # Pandoc's own highlighting stays off; the listings are already
         # raw `<pre>` HTML carrying this build's token spans, styled per
