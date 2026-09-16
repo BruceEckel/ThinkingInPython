@@ -1,5 +1,7 @@
 # exercise_4.py
-TRANSITIONS: dict[tuple[str, str], str] = {
+type Transitions = dict[tuple[str, str], str]
+
+TRANSITIONS: Transitions = {
     ("locked", "coin"): "unlocked",
     ("locked", "push"): "locked",
     ("unlocked", "push"): "locked",
@@ -8,7 +10,7 @@ TRANSITIONS: dict[tuple[str, str], str] = {
 
 class TableController:
     def __init__(self, initial: str,
-                 table: dict[tuple[str, str], str]) -> None:
+                 table: Transitions) -> None:
         self.current = initial
         self.table = table
 
