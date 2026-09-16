@@ -102,7 +102,9 @@ Both forms do the same thing.
 The class version is four classes and a wrapper to say what one list of functions says directly.
 *GoF Design Patterns* calls commands "an object-oriented replacement for callbacks."
 Because in Python a callback is a function, the replacement is unnecessary.
-Use the object form when a command must support extra operations such as undo.
+A `Command` base class is worthwhile when the commands share implementation.
+A second operation alone does not call for one;
+the undo discussion below needs only a type.
 
 Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
@@ -184,7 +186,6 @@ A callable alone cannot express a second operation, `undo()`.
 so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol`.
 Exercise 1 builds that `Protocol`.
-A `Command` base class is worthwhile when the commands also share implementation.
 
 Building commands in a loop can produce Python's best-known closure mistake:
 
