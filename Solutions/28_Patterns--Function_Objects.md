@@ -60,7 +60,7 @@ amount, so it can reverse that action later: a fresh call to the same
 function cannot know what a previous call changed.
 
 The second operation costs a type rather than a hierarchy.
-`Callable[[], None]` has room for one call, so a list of undoable
+`Command`, the chapter's `Callable[[], None]`, has room for one call, so a list of undoable
 commands needs a name for "callable, plus `undo()`", and in Python
 that name is a `Protocol` declaring both members. `UndoableCommand`
 above is that `Protocol`: `Macro` annotates `self.commands` against
@@ -183,7 +183,7 @@ comparison-based sort), and the caller supplies the interchangeable
 *policy* that decides what "in order" means for this particular call.
 `sorted()` itself knows nothing about tuples, scores, or names.
 Passing a different `key` swaps the
-ordering strategy the same way the chapter's classic Strategy form
+ordering strategy the same way the chapter's classic *Strategy* form
 swaps the algorithm its Context holds, except here the "context"
 holding the current strategy is just the call to `sorted()` itself.
 
@@ -355,7 +355,9 @@ unmatched event pass without complaint.
 from collections.abc import Callable
 from functools import partial
 
-broken: list[Callable[[], None]] = []
+type Command = Callable[[], None]
+
+broken: list[Command] = []
 for n in range(3):
     broken.append(lambda: print(n))
 for command in broken:
@@ -364,18 +366,18 @@ for command in broken:
 #: 2
 #: 2
 
-by_default: list[Callable[[], None]] = []
+by_default: list[Command] = []
 for n in range(3):
     by_default.append(lambda n=n: print(n))
 
-by_partial: list[Callable[[], None]] = []
+by_partial: list[Command] = []
 for n in range(3):
     by_partial.append(partial(print, n))
 
-def make(n: int) -> Callable[[], None]:
+def make(n: int) -> Command:
     return lambda: print(n)
 
-by_factory: list[Callable[[], None]] = [
+by_factory: list[Command] = [
     make(n) for n in range(3)
 ]
 

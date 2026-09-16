@@ -32,6 +32,8 @@ In this example, a "macro" is a list of actions:
 # command.py
 from collections.abc import Callable
 
+type Command = Callable[[], None]
+
 def no_more() -> None:
     print("This parrot is no more.")
 
@@ -41,7 +43,7 @@ def ceased() -> None:
 def fjords() -> None:
     print("It's pining for the fjords.")
 
-macro: list[Callable[[], None]] = [no_more, ceased, fjords]
+macro: list[Command] = [no_more, ceased, fjords]
 for command in macro:
     command()
 #: This parrot is no more.
@@ -49,7 +51,9 @@ for command in macro:
 #: It's pining for the fjords.
 ```
 
-The classic object form wraps each action in a `Command` subclass with an `execute()` method:
+`Command` names the signature every entry must have: no arguments,
+nothing returned.
+The classic object form turns that name into a base class and wraps each action in a `Command` subclass with an `execute()` method:
 
 ```python
 # command_pattern.py
@@ -110,6 +114,8 @@ The method keeps its state without any `Command` class:
 # bound_method.py
 from collections.abc import Callable
 
+type Command = Callable[[], None]
+
 class Account:
     def __init__(self, balance: int) -> None:
         self.balance = balance
@@ -121,7 +127,7 @@ def alert() -> None:
     print("audit: checking balance")
 
 account = Account(100)
-macro: list[Callable[[], None]] = [
+macro: list[Command] = [
     account.deposit, alert, account.deposit,
 ]
 for command in macro:
@@ -139,7 +145,7 @@ the state the bound method carries with it.
 An object can be callable too.
 When a class defines `__call__()`
 ([Decorators](14_Techniques--Decorators.md#a-class-decorator-with-state)),
-its instances carry state and still satisfy `Callable[[], None]`.
+its instances carry state and still satisfy `Command`.
 Here, `Repeat` is a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
 so its configuration cannot change after construction:
 
@@ -147,6 +153,8 @@ so its configuration cannot change after construction:
 # callable_command.py
 from collections.abc import Callable
 from dataclasses import dataclass
+
+type Command = Callable[[], None]
 
 @dataclass(frozen=True)
 class Repeat:
@@ -157,29 +165,29 @@ class Repeat:
             print(self.text)
 
 def spam() -> None:
-    print("Spam, spam, spam, spam.")
+    print("Spam, eggs, sausage, spam.")
 
-macro: list[Callable[[], None]] = [
+macro: list[Command] = [
     spam,
     Repeat("Ni!", 3),
 ]
 for command in macro:
     command()
-#: Spam, spam, spam, spam.
+#: Spam, eggs, sausage, spam.
 #: Ni!
 #: Ni!
 #: Ni!
 ```
 
-`Repeat` holds configuration and sits in a `list[Callable[[], None]]` beside a plain function,
-with no `Command` base class above it.
+`Repeat` holds configuration and sits in a `list[Command]` beside a plain function,
+with no base class above it.
 The annotation lets the two share a list:
 `list[Repeat]` would describe the instances and shut out `spam`.
 The classic form skips this middle step:
 it goes from a plain function straight to a base class.
 
 A callable alone cannot express a second operation, `undo()`.
-Because `Callable[[], None]` describes only the call,
+Because `Command` describes only the call,
 a list of commands that also undo needs a name for "callable, plus `undo()`".
 That name is a `Protocol` with both members.
 A `Command` base class becomes worth writing when the commands also share implementation.
@@ -191,7 +199,9 @@ Building commands in a loop can produce Python's best-known closure mistake:
 from collections.abc import Callable
 from functools import partial
 
-commands: list[Callable[[], None]] = [
+type Command = Callable[[], None]
+
+commands: list[Command] = [
     lambda: print(f"step {n}") for n in range(3)
 ]
 for command in commands:
@@ -200,7 +210,7 @@ for command in commands:
 #: step 2
 #: step 2
 
-fixed: list[Callable[[], None]] = [
+fixed: list[Command] = [
     partial(print, f"step {n}") for n in range(3)
 ]
 for command in fixed:

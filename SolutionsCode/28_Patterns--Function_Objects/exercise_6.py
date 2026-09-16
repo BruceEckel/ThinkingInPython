@@ -2,7 +2,9 @@
 from collections.abc import Callable
 from functools import partial
 
-broken: list[Callable[[], None]] = []
+type Command = Callable[[], None]
+
+broken: list[Command] = []
 for n in range(3):
     broken.append(lambda: print(n))
 for command in broken:
@@ -11,18 +13,18 @@ for command in broken:
 #: 2
 #: 2
 
-by_default: list[Callable[[], None]] = []
+by_default: list[Command] = []
 for n in range(3):
     by_default.append(lambda n=n: print(n))
 
-by_partial: list[Callable[[], None]] = []
+by_partial: list[Command] = []
 for n in range(3):
     by_partial.append(partial(print, n))
 
-def make(n: int) -> Callable[[], None]:
+def make(n: int) -> Command:
     return lambda: print(n)
 
-by_factory: list[Callable[[], None]] = [
+by_factory: list[Command] = [
     make(n) for n in range(3)
 ]
 

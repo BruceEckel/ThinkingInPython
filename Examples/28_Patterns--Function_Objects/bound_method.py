@@ -1,6 +1,8 @@
 # bound_method.py
 from collections.abc import Callable
 
+type Command = Callable[[], None]
+
 class Account:
     def __init__(self, balance: int) -> None:
         self.balance = balance
@@ -12,7 +14,7 @@ def alert() -> None:
     print("audit: checking balance")
 
 account = Account(100)
-macro: list[Callable[[], None]] = [
+macro: list[Command] = [
     account.deposit, alert, account.deposit,
 ]
 for command in macro:

@@ -2,6 +2,8 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
+type Command = Callable[[], None]
+
 @dataclass(frozen=True)
 class Repeat:
     text: str
@@ -11,15 +13,15 @@ class Repeat:
             print(self.text)
 
 def spam() -> None:
-    print("Spam, spam, spam, spam.")
+    print("Spam, eggs, sausage, spam.")
 
-macro: list[Callable[[], None]] = [
+macro: list[Command] = [
     spam,
     Repeat("Ni!", 3),
 ]
 for command in macro:
     command()
-#: Spam, spam, spam, spam.
+#: Spam, eggs, sausage, spam.
 #: Ni!
 #: Ni!
 #: Ni!

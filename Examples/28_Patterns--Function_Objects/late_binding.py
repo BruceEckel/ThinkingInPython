@@ -2,7 +2,9 @@
 from collections.abc import Callable
 from functools import partial
 
-commands: list[Callable[[], None]] = [
+type Command = Callable[[], None]
+
+commands: list[Command] = [
     lambda: print(f"step {n}") for n in range(3)
 ]
 for command in commands:
@@ -11,7 +13,7 @@ for command in commands:
 #: step 2
 #: step 2
 
-fixed: list[Callable[[], None]] = [
+fixed: list[Command] = [
     partial(print, f"step {n}") for n in range(3)
 ]
 for command in fixed:
