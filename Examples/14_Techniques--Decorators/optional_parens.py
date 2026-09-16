@@ -3,6 +3,9 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, overload
 
+type Decorator[**P, R] = Callable[
+    [Callable[P, R]], Callable[P, R]]
+
 @overload
 def label[**P, R](
         func: Callable[P, R],
@@ -10,7 +13,7 @@ def label[**P, R](
 @overload
 def label[**P, R](
         func: None = None, *, prefix: str = "LOG"
-) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+) -> Decorator[P, R]: ...
 
 def label[**P, R](
         func: Callable[P, R] | None = None,

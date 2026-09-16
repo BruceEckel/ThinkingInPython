@@ -357,6 +357,9 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, overload
 
+type Decorator[**P, R] = Callable[
+    [Callable[P, R]], Callable[P, R]]
+
 @overload
 def label[**P, R](
         func: Callable[P, R],
@@ -364,7 +367,7 @@ def label[**P, R](
 @overload
 def label[**P, R](
         func: None = None, *, prefix: str = "LOG"
-) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+) -> Decorator[P, R]: ...
 
 def label[**P, R](
         func: Callable[P, R] | None = None,
@@ -395,6 +398,9 @@ if __name__ == "__main__":
 #: [TAG] two
 ```
 
+The second overload returns the shape `repeat.py` took apart,
+now under the name `Decorator[P, R]`:
+a generic alias whose parameters are the wrapped function's.
 `func` defaults to `None`, and the body branches on `callable(func)`.
 Called bare, `func` is `one` itself, `callable(func)` is `True`,
 so `label` decorates it immediately by calling `decorate(func)`.
