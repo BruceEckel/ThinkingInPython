@@ -8,6 +8,10 @@ ALL = sentinel("ALL")
 type Types = (type[BaseException]
               | tuple[type[BaseException], ...])
 
+def report(e: BaseException) -> None:
+    line = f"[{type(e).__name__}] {e}"
+    print(textwrap.fill(line, WIDTH))
+
 class ignore:
     def __init__(self, types: Types | ALL = ALL) -> None:
         self.types = types
@@ -18,17 +22,13 @@ class ignore:
     def __exit__(self, exc_type: type[BaseException] | None,
                  exc: BaseException | None,
                  tb: object) -> bool:
-        if exc_type is None:
+        if exc_type is None or exc is None:
             return False
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print(textwrap.fill(f"{exc!r}", WIDTH))
+        report(exc)
         return True
-
-def report(e: BaseException) -> None:
-    line = f"[{type(e).__name__}] {e}"
-    print(textwrap.fill(line, WIDTH))
 
 def expect[**P](
     types: Types, fn: Callable[P, object],

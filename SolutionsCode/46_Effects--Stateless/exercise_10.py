@@ -35,5 +35,5 @@ for who in ("Alice", "Cyd", "Dana"):
     with ignore((KeyError, ValueError)):
         run(bound(who))
 #: Alice: 42
-#: ValueError('negative score for Cyd: -3')
-#: KeyError('Dana')
+#: [ValueError] negative score for Cyd: -3
+#: [KeyError] 'Dana'

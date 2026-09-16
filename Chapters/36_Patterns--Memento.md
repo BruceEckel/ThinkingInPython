@@ -182,7 +182,7 @@ expect(AttributeError, restore_memento,
 with ignore(FrozenInstanceError):
     # ty: strokes is read-only on Memento:
     checkpoint.strokes = ("forged",)  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'strokes'")
+#: [FrozenInstanceError] cannot assign to field 'strokes'
 ```
 
 `restore_tuple()` accepts either tuple without complaint,
@@ -635,8 +635,8 @@ print(restored.strokes)
 #: ('circle', 'beak')
 with ignore(AttributeError):
     print(restored.title)
-#: AttributeError("'SketchV2' object has no attribute
-#: 'title'")
+#: [AttributeError] 'SketchV2' object has no attribute
+#: 'title'
 ```
 
 The dump that builds `blob` runs while `sketch_v1.SketchV1` still means the one-field class.

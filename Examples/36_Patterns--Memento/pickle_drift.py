@@ -12,5 +12,5 @@ print(restored.strokes)
 #: ('circle', 'beak')
 with ignore(AttributeError):
     print(restored.title)
-#: AttributeError("'SketchV2' object has no attribute
-#: 'title'")
+#: [AttributeError] 'SketchV2' object has no attribute
+#: 'title'

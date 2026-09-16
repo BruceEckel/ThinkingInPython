@@ -6,5 +6,5 @@ with ignore(ValueError):
     @dataclass
     class Cart:
         items: list[str] = []
-#: ValueError("mutable default <class 'list'> for field
-#: items is not allowed: use default_factory")
+#: [ValueError] mutable default <class 'list'> for field
+#: items is not allowed: use default_factory

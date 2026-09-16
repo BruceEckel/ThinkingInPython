@@ -55,7 +55,7 @@ print(operations["+"](6, 4), operations["-"](6, 4),
 #: 10 2 24 1 2
 with ignore(KeyError):
     operations["^"](6, 4)
-#: KeyError('^')
+#: [KeyError] '^'
 ```
 
 You call `operations["*"](6, 4)` exactly the way you call the other

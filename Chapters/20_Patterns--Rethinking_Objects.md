@@ -333,7 +333,7 @@ print(fl.numbers)
 #: [1, 2, 999]
 with ignore(FrozenInstanceError):
     fl.numbers = []  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'numbers'")
+#: [FrozenInstanceError] cannot assign to field 'numbers'
 # A list field makes the whole instance unhashable
 expect(TypeError, hash, fl)
 #: [TypeError] unhashable type: 'list'

@@ -14,12 +14,12 @@ with ignore(TypeError):
     @dataclass
     class Thawed(Frozen):  # type: ignore
         b: int
-#: TypeError('cannot inherit non-frozen dataclass from a
-#: frozen one')
+#: [TypeError] cannot inherit non-frozen dataclass from a
+#: frozen one
 
 with ignore(TypeError):
     @dataclass(frozen=True)
     class Chilled(Plain):  # type: ignore
         b: int
-#: TypeError('cannot inherit frozen dataclass from a non-
-#: frozen one')
+#: [TypeError] cannot inherit frozen dataclass from a non-
+#: frozen one

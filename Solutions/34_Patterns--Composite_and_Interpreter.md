@@ -555,11 +555,11 @@ print(type(2 * x + 1).__name__, (2 * x + 1).right)
 #: Add Num(value=1)
 with ignore(TypeError):
     "a" + x  # type: ignore
-#: TypeError('can only concatenate str (not "Var") to str')
+#: [TypeError] can only concatenate str (not "Var") to str
 with ignore(TypeError):
     x + "a"  # type: ignore
-#: TypeError("unsupported operand type(s) for +: 'Var' and
-#: 'str'")
+#: [TypeError] unsupported operand type(s) for +: 'Var' and
+#: 'str'
 ```
 
 Before the change, `"a" + x` produced `Add(Num("a"), Var("x"))`: a

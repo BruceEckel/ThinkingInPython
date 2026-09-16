@@ -16,9 +16,9 @@ class B(metaclass=MetaB):
 with ignore(TypeError):
     class C(A, B):  # type: ignore
         pass
-#: TypeError('metaclass conflict: the metaclass of a derived
-#: class must be a (non-strict) subclass of the metaclasses
-#: of all its bases')
+#: [TypeError] metaclass conflict: the metaclass of a
+#: derived class must be a (non-strict) subclass of the
+#: metaclasses of all its bases
 
 class MetaC(MetaA, MetaB):
     pass

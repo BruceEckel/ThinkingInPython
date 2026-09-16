@@ -15,4 +15,4 @@ class Implementation:
 
 with ignore(AttributeError):
     Proxy(Implementation()).f()
-#: AttributeError('_imp')
+#: [AttributeError] _imp

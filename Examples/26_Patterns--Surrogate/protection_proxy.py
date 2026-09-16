@@ -23,7 +23,7 @@ print(guest.read())
 #: contents
 with ignore(PermissionError):
     guest.erase()
-#: PermissionError('erase')
+#: [PermissionError] erase
 expect(PermissionError, hasattr, guest, "erase")
 #: [PermissionError] erase
 Guarded(Document(), admin=True).erase()

@@ -145,19 +145,19 @@ with ignore(TypeError):
     class Typo(ApplicationFramework):
         def customise1(self) -> None:
             print("never runs")
-#: TypeError('Typo.customise1: did you mean customize1?')
+#: [TypeError] Typo.customise1: did you mean customize1?
 
 with ignore(TypeError):
     class Hijack(ApplicationFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
-#: TypeError('Hijack.run overrides the anchor')
+#: [TypeError] Hijack.run overrides the anchor
 
 with ignore(TypeError):
     class Weird(ApplicationFramework):
         def customized_report(self) -> None: ...
-#: TypeError('Weird.customized_report: did you mean
-#: customize2?')
+#: [TypeError] Weird.customized_report: did you mean
+#: customize2?
 ```
 
 `hooks` collects every non-dunder name the base classes define,

@@ -24,4 +24,4 @@ print(operations["+"](6, 4), operations["-"](6, 4),
 # A missing key is a plain KeyError, no else branch:
 with ignore(KeyError):
     operations["^"](6, 4)
-#: KeyError('^')
+#: [KeyError] '^'

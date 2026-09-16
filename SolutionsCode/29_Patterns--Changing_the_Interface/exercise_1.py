@@ -31,4 +31,4 @@ print(len(pairs))  # The wrapped list itself grew
 #: 3
 with ignore(KeyError):
     adapter["missing"]
-#: KeyError('missing')
+#: [KeyError] 'missing'

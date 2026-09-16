@@ -16,4 +16,4 @@ print(Sub.helper())
 
 with ignore(AttributeError):  # A metamethod: class only
     Sub().helper()  # type: ignore
-#: AttributeError("'Sub' object has no attribute 'helper'")
+#: [AttributeError] 'Sub' object has no attribute 'helper'

@@ -1017,8 +1017,7 @@ print(type(Unchecked().data).__name__)
 #: set
 with ignore(TypeError):
     Unchecked().data["theme"] = "dark"
-#: TypeError("'set' object does not support item
-#: assignment")
+#: [TypeError] 'set' object does not support item assignment
 print(Checked().data)
 #: {}
 ```
@@ -1223,15 +1222,15 @@ with ignore(TypeError):
     @dataclass
     class Thawed(Frozen):  # type: ignore
         b: int
-#: TypeError('cannot inherit non-frozen dataclass from a
-#: frozen one')
+#: [TypeError] cannot inherit non-frozen dataclass from a
+#: frozen one
 
 with ignore(TypeError):
     @dataclass(frozen=True)
     class Chilled(Plain):  # type: ignore
         b: int
-#: TypeError('cannot inherit frozen dataclass from a non-
-#: frozen one')
+#: [TypeError] cannot inherit frozen dataclass from a non-
+#: frozen one
 ```
 
 Both defenses fire again.

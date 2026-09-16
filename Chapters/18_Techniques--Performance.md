@@ -1041,8 +1041,8 @@ print(p.x, p.y)
 with ignore(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
-#: AttributeError("'Point' object has no attribute 'z' and
-#: no __dict__ for setting new attributes")
+#: [AttributeError] 'Point' object has no attribute 'z' and
+#: no __dict__ for setting new attributes
 ```
 
 A data class can generate the slots.
@@ -1067,8 +1067,8 @@ print(p)
 with ignore(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
-#: AttributeError("'Point' object has no attribute 'z' and
-#: no __dict__ for setting new attributes")
+#: [AttributeError] 'Point' object has no attribute 'z' and
+#: no __dict__ for setting new attributes
 
 @dataclass(frozen=True)
 class FrozenPoint:
@@ -1084,7 +1084,7 @@ fp = FrozenPoint(1, 2)
 with ignore(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'z'")
+#: [FrozenInstanceError] cannot assign to field 'z'
 
 frozen_bytes = (sys.getsizeof(fp)
                 + sys.getsizeof(fp.__dict__))
@@ -1144,8 +1144,8 @@ node = Node(3)
 with ignore(TypeError):
     # cached_property needs a __dict__ to write into:
     print(node.doubled)
-#: TypeError("No '__dict__' attribute on 'Node' instance to
-#: cache 'doubled' property.")
+#: [TypeError] No '__dict__' attribute on 'Node' instance to
+#: cache 'doubled' property.
 
 @dataclass(slots=True)
 class Slotted:
@@ -1166,8 +1166,7 @@ with ignore(TypeError):
         Slotted, OtherSlotted
     ):
         pass
-#: TypeError('multiple bases have instance lay-out
-#: conflict')
+#: [TypeError] multiple bases have instance lay-out conflict
 ```
 
 `cached_property` writes its cached value into the instance's `__dict__`,
@@ -1205,7 +1204,7 @@ print(a[1], a.typecode, a.itemsize)
 with ignore(TypeError):
     # The value must match the type code:
     a.append("x")  # type: ignore
-#: TypeError('must be real number, not str')
+#: [TypeError] must be real number, not str
 
 nums = [float(i) for i in range(10_000)]
 list_bytes = sys.getsizeof(nums) + sum(
@@ -1273,7 +1272,7 @@ readonly = memoryview(b"ABCDEF")
 with ignore(TypeError):
     # bytes is immutable, so a view over it stays read-only:
     readonly[0] = ord("z")
-#: TypeError('cannot modify read-only memory')
+#: [TypeError] cannot modify read-only memory
 ```
 
 `payload` is a second `memoryview`, not a copy of `data`.

@@ -33,7 +33,7 @@ print(r.area())
 
 with ignore(ValueError):
     r.width = -1.0
-#: ValueError('-1.0 is not positive')
+#: [ValueError] -1.0 is not positive
 
 print(r.area())
 #: 12.0

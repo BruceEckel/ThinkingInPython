@@ -106,8 +106,8 @@ p.g()
 #: Complete.g()
 with ignore(TypeError):
     Proxy(Partial())
-#: TypeError("Can't instantiate abstract class Partial
-#: without an implementation for abstract method 'g'")
+#: [TypeError] Can't instantiate abstract class Partial
+#: without an implementation for abstract method 'g'
 ```
 
 Because `Proxy` accepts any `Service` and `Complete` implements both methods,
@@ -389,7 +389,7 @@ class Implementation:
 
 with ignore(AttributeError):
     Proxy(Implementation()).f()
-#: AttributeError('_imp')
+#: [AttributeError] _imp
 ```
 
 Without the guard, the misspelled `self._imp` produces a `RecursionError` that names nothing.
@@ -550,7 +550,7 @@ print(guest.read())
 #: contents
 with ignore(PermissionError):
     guest.erase()
-#: PermissionError('erase')
+#: [PermissionError] erase
 expect(PermissionError, hasattr, guest, "erase")
 #: [PermissionError] erase
 Guarded(Document(), admin=True).erase()

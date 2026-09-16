@@ -168,7 +168,7 @@ class BrokenProxy:
 p = BrokenProxy(Implementation())
 with ignore(RecursionError):
     p.f()
-#: RecursionError('maximum recursion depth exceeded')
+#: [RecursionError] maximum recursion depth exceeded
 ```
 
 Python finds no `f` on the instance or on `BrokenProxy`, so it calls

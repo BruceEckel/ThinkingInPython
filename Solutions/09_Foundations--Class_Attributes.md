@@ -152,8 +152,8 @@ with ignore(ValueError):
     @dataclass
     class Cart:
         items: list[str] = []
-#: ValueError("mutable default <class 'list'> for field
-#: items is not allowed: use default_factory")
+#: [ValueError] mutable default <class 'list'> for field
+#: items is not allowed: use default_factory
 ```
 
 The error arrives at class-definition time, not at first use, and
@@ -180,7 +180,7 @@ print(vars(a), a.x)
 #: {} 100
 with ignore(AttributeError):
     del a.x
-#: AttributeError("'A' object has no attribute 'x'")
+#: [AttributeError] 'A' object has no attribute 'x'
 ```
 
 `del a.x` removes the entry from the instance dictionary, which is

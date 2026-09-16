@@ -18,4 +18,4 @@ readonly = memoryview(b"ABCDEF")
 with ignore(TypeError):
     # bytes is immutable, so a view over it stays read-only:
     readonly[0] = ord("z")
-#: TypeError('cannot modify read-only memory')
+#: [TypeError] cannot modify read-only memory

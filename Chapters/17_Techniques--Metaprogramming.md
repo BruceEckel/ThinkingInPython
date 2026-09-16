@@ -424,7 +424,7 @@ if __name__ == "__main__":
 #: Running Start
 #: Running Stop
 #: Running Pause
-#: ValueError("Unknown command: 'Reset'")
+#: [ValueError] Unknown command: 'Reset'
 ```
 
 `make_class()` execs `klass` into a private `namespace` dict,
@@ -636,7 +636,7 @@ class B(A):
 with ignore(TypeError):
     class C(B):
         pass
-#: TypeError('B is final; you cannot subclass it')
+#: [TypeError] B is final; you cannot subclass it
 ```
 
 The check runs at class-creation time.
@@ -964,7 +964,7 @@ print(r.area())
 
 with ignore(ValueError):
     r.width = -1.0
-#: ValueError('-1.0 is not positive')
+#: [ValueError] -1.0 is not positive
 
 print(r.area())
 #: 12.0
@@ -1227,8 +1227,7 @@ from exceptions import ignore
 with ignore(TypeError):
     class Singleton(type, dict[type, Any]):  # type: ignore
         pass
-#: TypeError('multiple bases have instance lay-out
-#: conflict')
+#: [TypeError] multiple bases have instance lay-out conflict
 ```
 
 The failure has nothing to do with metaclasses.
@@ -1267,7 +1266,7 @@ print(Sub.helper())
 
 with ignore(AttributeError):  # A metamethod: class only
     Sub().helper()  # type: ignore
-#: AttributeError("'Sub' object has no attribute 'helper'")
+#: [AttributeError] 'Sub' object has no attribute 'helper'
 ```
 
 `helper()` arrives through the metaclass,
@@ -1305,9 +1304,9 @@ class B(metaclass=MetaB):
 with ignore(TypeError):
     class C(A, B):  # type: ignore
         pass
-#: TypeError('metaclass conflict: the metaclass of a derived
-#: class must be a (non-strict) subclass of the metaclasses
-#: of all its bases')
+#: [TypeError] metaclass conflict: the metaclass of a
+#: derived class must be a (non-strict) subclass of the
+#: metaclasses of all its bases
 
 class MetaC(MetaA, MetaB):
     pass
@@ -1323,9 +1322,8 @@ The result is a metaclass conflict.
 As with the layout conflict just shown,
 ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
-`ignore` prints the exception's `repr()`,
-wrapped by the helper so it fits the page; the message inside is Python's,
-unwrapped.
+`ignore` prints the exception through the helper, wrapped so it fits the page;
+the message is Python's, unwrapped.
 It names the fix: `D`'s metaclass, `MetaC`,
 must be a subclass of every base's metaclass, `MetaA` and `MetaB` both.
 Once `MetaC` exists, `class D(A, B, metaclass=MetaC)` builds cleanly.
@@ -1408,7 +1406,7 @@ with ignore(TypeError):
         def on_open(self) -> None: ...
         def on_close(self) -> None: ...
         def on_open(self) -> None: ...  # noqa: F811
-#: TypeError('on_open defined twice')
+#: [TypeError] on_open defined twice
 ```
 
 `__prepare__()` runs before the class body does,

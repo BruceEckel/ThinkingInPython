@@ -323,8 +323,8 @@ print(10 - Meters(3))
 #: Meters(n=7)
 with ignore(TypeError):
     "ten" - Meters(3)
-#: TypeError("unsupported operand type(s) for -: 'str' and
-#: 'Meters'")
+#: [TypeError] unsupported operand type(s) for -: 'str' and
+#: 'Meters'
 ```
 
 `__sub__()` is `__add__()` with the sign changed, and the three cases

@@ -151,7 +151,7 @@ print(red.r, red[0])
 #: 255 255
 with ignore(AttributeError):
     red.r = 9  # type: ignore
-#: AttributeError("can't set attribute")
+#: [AttributeError] can't set attribute
 print(red._replace(g=128))
 #: Color(r=255, g=128, b=0)
 print(red._asdict(), Color._fields)
@@ -263,8 +263,8 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
 with ignore(TypeError):
     FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
-#: TypeError("'<' not supported between instances of
-#: 'FrozenColor' and 'FrozenColor'")
+#: [TypeError] '<' not supported between instances of
+#: 'FrozenColor' and 'FrozenColor'
 
 @dataclass(frozen=True, order=True)
 class OrderedColor:
@@ -280,8 +280,8 @@ class OrderedDimensions:
 
 with ignore(TypeError):
     OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
-#: TypeError("'<' not supported between instances of
-#: 'OrderedColor' and 'OrderedDimensions'")
+#: [TypeError] '<' not supported between instances of
+#: 'OrderedColor' and 'OrderedDimensions'
 ```
 
 `Color` and `Dimensions` mean different things,

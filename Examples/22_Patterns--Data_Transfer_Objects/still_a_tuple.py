@@ -36,8 +36,8 @@ print(FrozenColor(1, 2, 3) == FrozenDimensions(1, 2, 3))
 #: False
 with ignore(TypeError):
     FrozenColor(1, 2, 3) < FrozenColor(1, 2, 4)  # type: ignore
-#: TypeError("'<' not supported between instances of
-#: 'FrozenColor' and 'FrozenColor'")
+#: [TypeError] '<' not supported between instances of
+#: 'FrozenColor' and 'FrozenColor'
 
 @dataclass(frozen=True, order=True)
 class OrderedColor:
@@ -53,5 +53,5 @@ class OrderedDimensions:
 
 with ignore(TypeError):
     OrderedColor(1, 2, 3) < OrderedDimensions(1, 2, 4)  # type: ignore
-#: TypeError("'<' not supported between instances of
-#: 'OrderedColor' and 'OrderedDimensions'")
+#: [TypeError] '<' not supported between instances of
+#: 'OrderedColor' and 'OrderedDimensions'

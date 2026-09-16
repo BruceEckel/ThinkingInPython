@@ -8,5 +8,5 @@ def first_any(items: list) -> Any:
 n = first_any([10, 20, 30])
 with ignore(AttributeError):
     n.nonexistent_method()
-#: AttributeError("'int' object has no attribute
-#: 'nonexistent_method'")
+#: [AttributeError] 'int' object has no attribute
+#: 'nonexistent_method'

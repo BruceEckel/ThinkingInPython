@@ -16,7 +16,6 @@ print(type(Unchecked().data).__name__)
 #: set
 with ignore(TypeError):
     Unchecked().data["theme"] = "dark"
-#: TypeError("'set' object does not support item
-#: assignment")
+#: [TypeError] 'set' object does not support item assignment
 print(Checked().data)
 #: {}

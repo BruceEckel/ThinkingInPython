@@ -13,4 +13,4 @@ print(vars(a), a.x)
 #: {} 100
 with ignore(AttributeError):
     del a.x
-#: AttributeError("'A' object has no attribute 'x'")
+#: [AttributeError] 'A' object has no attribute 'x'

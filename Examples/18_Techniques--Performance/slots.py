@@ -13,5 +13,5 @@ print(p.x, p.y)
 with ignore(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
-#: AttributeError("'Point' object has no attribute 'z' and
-#: no __dict__ for setting new attributes")
+#: [AttributeError] 'Point' object has no attribute 'z' and
+#: no __dict__ for setting new attributes

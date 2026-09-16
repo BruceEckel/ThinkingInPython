@@ -425,8 +425,8 @@ with ignore(ValueError):
         months: list[Month] = field(
             default_factory=make_months)
         index: dict[str, Month] = {}
-#: ValueError("mutable default <class 'dict'> for field
-#: index is not allowed: use default_factory")
+#: [ValueError] mutable default <class 'dict'> for field
+#: index is not allowed: use default_factory
 
 @dataclass(frozen=True)
 class Bare:

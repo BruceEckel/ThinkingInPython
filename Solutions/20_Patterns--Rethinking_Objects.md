@@ -77,7 +77,7 @@ print(data)
 #: Immutable(numbers=[1, 2, 999])
 with ignore(FrozenInstanceError):
     data.numbers = [3]  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'numbers'")
+#: [FrozenInstanceError] cannot assign to field 'numbers'
 # The list field makes the instance unhashable
 expect(TypeError, hash, data)
 #: [TypeError] unhashable type: 'list'

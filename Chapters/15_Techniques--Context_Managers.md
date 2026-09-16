@@ -373,6 +373,10 @@ ALL = sentinel("ALL")
 type Types = (type[BaseException]
               | tuple[type[BaseException], ...])
 
+def report(e: BaseException) -> None:
+    line = f"[{type(e).__name__}] {e}"
+    print(textwrap.fill(line, WIDTH))
+
 class ignore:
     def __init__(self, types: Types | ALL = ALL) -> None:
         self.types = types
@@ -383,17 +387,13 @@ class ignore:
     def __exit__(self, exc_type: type[BaseException] | None,
                  exc: BaseException | None,
                  tb: object) -> bool:
-        if exc_type is None:
+        if exc_type is None or exc is None:
             return False
         if self.types is not ALL:
             if not issubclass(exc_type, self.types):
                 return False
-        print(textwrap.fill(f"{exc!r}", WIDTH))
+        report(exc)
         return True
-
-def report(e: BaseException) -> None:
-    line = f"[{type(e).__name__}] {e}"
-    print(textwrap.fill(line, WIDTH))
 
 def expect[**P](
     types: Types, fn: Callable[P, object],
@@ -430,11 +430,13 @@ The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Foundati
 which makes `ignore()` with no argument catch everything.
 `self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,
-and the earlier `if exc_type is None: return False` narrowed `exc_type` to a class,
+and the earlier `if exc_type is None or exc is None: return False` narrowed `exc_type` to a class and `exc` to an exception,
 so `issubclass(exc_type, self.types)` type-checks.
-`__exit__()` also prints through `textwrap.fill()` at `WIDTH`,
-as `expect()` below does,
+`__exit__()` also hands the exception to `report()`,
+which prints it as `[Type] message` through `textwrap.fill()` at `WIDTH`,
 so a long message wraps instead of overrunning the listing width.
+`expect()` below prints through the same function,
+so every demonstrated exception in the book has one form.
 
 `suppress` treats the no-argument call the opposite way:
 `suppress()` suppresses nothing,
@@ -453,7 +455,7 @@ with ignore(ZeroDivisionError):
     print("after")
 print("survived")
 #: before
-#: ZeroDivisionError('division by zero')
+#: [ZeroDivisionError] division by zero
 #: survived
 
 with ignore():  # No argument means ALL
@@ -461,7 +463,7 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: KeyError('anything')
+#: [KeyError] 'anything'
 #: survived
 
 with ignore() as x:
@@ -733,7 +735,7 @@ with ignore(RuntimeError):
 #: open c
 #: close b
 #: close a
-#: RuntimeError('c failed to open')
+#: [RuntimeError] c failed to open
 ```
 
 `c` never gets a `close c` line,

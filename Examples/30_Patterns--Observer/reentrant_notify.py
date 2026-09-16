@@ -21,4 +21,4 @@ model.subscribe(
     lambda v: setattr(model, "value", v))
 with ignore(RecursionError):
     model.value = 1
-#: RecursionError('maximum recursion depth exceeded')
+#: [RecursionError] maximum recursion depth exceeded

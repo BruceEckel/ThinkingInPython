@@ -16,8 +16,8 @@ node = Node(3)
 with ignore(TypeError):
     # cached_property needs a __dict__ to write into:
     print(node.doubled)
-#: TypeError("No '__dict__' attribute on 'Node' instance to
-#: cache 'doubled' property.")
+#: [TypeError] No '__dict__' attribute on 'Node' instance to
+#: cache 'doubled' property.
 
 @dataclass(slots=True)
 class Slotted:
@@ -38,5 +38,4 @@ with ignore(TypeError):
         Slotted, OtherSlotted
     ):
         pass
-#: TypeError('multiple bases have instance lay-out
-#: conflict')
+#: [TypeError] multiple bases have instance lay-out conflict

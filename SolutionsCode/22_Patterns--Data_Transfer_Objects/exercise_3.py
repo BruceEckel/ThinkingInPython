@@ -12,5 +12,5 @@ print(toast)
 #: Recipe(name='Toast', steps=['slice', 'heat', 'butter'])
 with ignore(TypeError):
     key = {toast: "breakfast"}
-#: TypeError("cannot use 'Recipe' as a dict key (unhashable
-#: type: 'list')")
+#: [TypeError] cannot use 'Recipe' as a dict key (unhashable
+#: type: 'list')

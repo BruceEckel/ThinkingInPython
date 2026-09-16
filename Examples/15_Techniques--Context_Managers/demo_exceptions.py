@@ -8,7 +8,7 @@ with ignore(ZeroDivisionError):
     print("after")
 print("survived")
 #: before
-#: ZeroDivisionError('division by zero')
+#: [ZeroDivisionError] division by zero
 #: survived
 
 with ignore():  # No argument means ALL
@@ -16,7 +16,7 @@ with ignore():  # No argument means ALL
     raise KeyError("anything")
 print("survived")
 #: before
-#: KeyError('anything')
+#: [KeyError] 'anything'
 #: survived
 
 with ignore() as x:

@@ -22,4 +22,4 @@ class BrokenProxy:
 p = BrokenProxy(Implementation())
 with ignore(RecursionError):
     p.f()
-#: RecursionError('maximum recursion depth exceeded')
+#: [RecursionError] maximum recursion depth exceeded

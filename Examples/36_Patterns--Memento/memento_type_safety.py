@@ -29,4 +29,4 @@ expect(AttributeError, restore_memento,
 with ignore(FrozenInstanceError):
     # ty: strokes is read-only on Memento:
     checkpoint.strokes = ("forged",)  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'strokes'")
+#: [FrozenInstanceError] cannot assign to field 'strokes'

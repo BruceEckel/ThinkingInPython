@@ -138,7 +138,7 @@ p = Point(1, 2)
 with ignore(AttributeError):
     # A frozen instance rejects assignment
     setattr(p, "x", 5)
-#: FrozenInstanceError("cannot assign to field 'x'")
+#: [FrozenInstanceError] cannot assign to field 'x'
 # Produce a new value instead of mutating:
 moved = Point(p.x + 10, p.y)
 print(moved)
@@ -227,7 +227,7 @@ print(distances[Point(3, 4)])
 # A list has no stable hash, so it cannot be a key:
 with ignore(TypeError):
     hash([3, 4])
-#: TypeError("unhashable type: 'list'")
+#: [TypeError] unhashable type: 'list'
 ```
 
 Equality based on *contents* removes hashing, not mutability by itself.
@@ -299,7 +299,7 @@ print(operations["+"](6, 4), operations["-"](6, 4),
 # A missing key is a plain KeyError, no else branch:
 with ignore(KeyError):
     operations["^"](6, 4)
-#: KeyError('^')
+#: [KeyError] '^'
 ```
 
 Supporting a new operator means adding a row to the table,

@@ -13,4 +13,4 @@ class B(A):
 with ignore(TypeError):
     class C(B):
         pass
-#: TypeError('B is final; you cannot subclass it')
+#: [TypeError] B is final; you cannot subclass it

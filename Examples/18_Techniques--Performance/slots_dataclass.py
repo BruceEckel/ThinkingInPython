@@ -15,8 +15,8 @@ print(p)
 with ignore(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
-#: AttributeError("'Point' object has no attribute 'z' and
-#: no __dict__ for setting new attributes")
+#: [AttributeError] 'Point' object has no attribute 'z' and
+#: no __dict__ for setting new attributes
 
 @dataclass(frozen=True)
 class FrozenPoint:
@@ -32,7 +32,7 @@ fp = FrozenPoint(1, 2)
 with ignore(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
-#: FrozenInstanceError("cannot assign to field 'z'")
+#: [FrozenInstanceError] cannot assign to field 'z'
 
 frozen_bytes = (sys.getsizeof(fp)
                 + sys.getsizeof(fp.__dict__))

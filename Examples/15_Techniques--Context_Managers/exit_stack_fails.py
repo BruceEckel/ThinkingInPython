@@ -23,4 +23,4 @@ with ignore(RuntimeError):
 #: open c
 #: close b
 #: close a
-#: RuntimeError('c failed to open')
+#: [RuntimeError] c failed to open
