@@ -140,7 +140,7 @@ An object can be callable too.
 When a class defines `__call__()`
 ([Decorators](14_Techniques--Decorators.md#a-class-decorator-with-state)),
 its instances carry state and still satisfy `Callable[[], None]`.
-`Repeat` below is a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
+Here, `Repeat` is a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
 so its configuration cannot change after construction:
 
 ```python
@@ -156,20 +156,25 @@ class Repeat:
         for _ in range(self.times):
             print(self.text)
 
+def spam() -> None:
+    print("Spam, spam, spam, spam.")
+
 macro: list[Callable[[], None]] = [
+    spam,
     Repeat("Ni!", 3),
-    Repeat("Say no more.", 1),
 ]
 for command in macro:
     command()
+#: Spam, spam, spam, spam.
 #: Ni!
 #: Ni!
 #: Ni!
-#: Say no more.
 ```
 
-`Repeat` holds configuration and fits the same `list[Callable[[], None]]` that held `no_more`,
+`Repeat` holds configuration and sits in a `list[Callable[[], None]]` beside a plain function,
 with no `Command` base class above it.
+The annotation lets the two share a list:
+`list[Repeat]` would describe the instances and shut out `spam`.
 The classic form skips this middle step:
 it goes from a plain function straight to a base class.
 

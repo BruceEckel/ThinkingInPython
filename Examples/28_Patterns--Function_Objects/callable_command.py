@@ -10,13 +10,16 @@ class Repeat:
         for _ in range(self.times):
             print(self.text)
 
+def spam() -> None:
+    print("Spam, spam, spam, spam.")
+
 macro: list[Callable[[], None]] = [
+    spam,
     Repeat("Ni!", 3),
-    Repeat("Say no more.", 1),
 ]
 for command in macro:
     command()
+#: Spam, spam, spam, spam.
 #: Ni!
 #: Ni!
 #: Ni!
-#: Say no more.
