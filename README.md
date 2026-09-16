@@ -33,6 +33,14 @@ The latest release, rebuilt from the current book source:
 All versions are on the
 [releases page](https://github.com/BruceEckel/ThinkingInPython/releases).
 
+## Support the Book
+
+Thinking in Python is free. If it has helped you and you'd like to
+support the work, you can do that on
+[GitHub Sponsors](https://github.com/sponsors/BruceEckel) or
+[Ko-fi](https://ko-fi.com/bruceeckel). No obligation, and no
+difference in what you get.
+
 ## Examples and Solutions
 
 Every listing in the book is a real file that runs. You will find it in

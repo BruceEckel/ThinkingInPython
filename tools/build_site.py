@@ -66,6 +66,8 @@ RELEASE_URL = f"{REPO_URL}/releases/latest"
 # test them. Renaming that heading breaks this anchor, and nothing
 # checks it: GitHub serves the page either way, just unscrolled.
 EXAMPLES_URL = f"{REPO_URL}#examples-and-solutions"
+SPONSORS_URL = "https://github.com/sponsors/BruceEckel"
+KOFI_URL = "https://ko-fi.com/bruceeckel"
 HEADING_FONT = "Lexend Deca"
 HEADING_FONT_GOOGLE = "Lexend+Deca:wght@400;600;700"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en"
@@ -285,6 +287,12 @@ def render_index(chapters: list[Chapter]) -> str:
     <ul class="toc-list">
 {rows}
     </ul>
+    <p class="support">Thinking in Python is free.
+      If it has helped you and you'd like to support the work,
+      you can do that on
+      <a href="{SPONSORS_URL}" target="_blank" rel="noopener">GitHub Sponsors</a>
+      or <a href="{KOFI_URL}" target="_blank" rel="noopener">Ko-fi</a>.
+      No obligation, and no difference in what you get.</p>
     <p class="copyright">{COPYRIGHT}</p>
   </div>
 </body>
@@ -332,7 +340,11 @@ figcaption {{ font-family: '{HEADING_FONT}', sans-serif;
   padding: 0.4rem 0; font-family: 'Cormorant SC', serif; font-size: 1.7rem;
   letter-spacing: 0.15em; color: var(--accent); }}
 .toc-list li.toc-part:first-child {{ border-top: none; }}
-.copyright {{ margin-top: 5rem; font-size: 0.78rem; color: var(--muted);
+.support {{ margin-top: 4rem; font-size: 0.85rem; color: var(--muted);
+  line-height: 1.6; }}
+.support a {{ color: var(--ink); text-decoration: none; }}
+.support a:hover {{ color: var(--accent); }}
+.copyright {{ margin-top: 1.5rem; font-size: 0.78rem; color: var(--muted);
   font-family: 'Cormorant SC', serif; letter-spacing: 0.05em; }}
 .copyright a {{ color: var(--muted); text-decoration: none; }}
 .copyright a:hover {{ color: var(--accent); }}
