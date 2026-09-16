@@ -301,8 +301,7 @@ def solve(f: Fn, a: float, b: float,
 ```
 
 `solve()` is the part of the procedure that does not change.
-It runs the finder it is given and does the work no finder does for itself:
-it turns a failed search into an exception,
+It runs a finder and turns a failed search into an exception,
 so a caller receives a root or an exception and never handles `None`.
 Because each finder is a function with the same signature,
 passing one to `solve()` chooses the strategy:
@@ -321,28 +320,18 @@ for finder in (bisection, newton, secant):
 #: 1.414214
 ```
 
-Three identical lines are the point:
-the algorithm changes and the caller stays the same.
-The algorithms differ, though,
-and the chain in `chain.py` turns that difference into a fallback.
-
-The classic form repeats the move `command_pattern.py` made, at larger scale,
-and this section describes it rather than listing it.
-Each algorithm becomes a class deriving from a `FindRoot` interface,
-with a `find()` method, and a "Context" class holds the chosen one.
-Those five classes produce the same three lines that one function argument produced.
+In the classic form, each algorithm becomes a class derived from a `FindRoot` interface,
+with a `find()` method. A "Context" class holds the chosen algorithm.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
-Until then, the pattern reduces to the `finder` parameter.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
-The `key` argument to `sorted()`, `min()`, and `max()` is a strategy.
-You provide a function that decides how to compare.
+The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
+That argument determines how comparison works.
 
-When a strategy needs configuration, the next step is not yet a class.
-It is a *closure* ([Functional Foundations](40_Functional--Foundations.md#closures)):
-an outer function takes the settings and returns the strategy,
-and the strategy keeps reading those settings after the outer function returns:
+When a strategy needs configuration, use a [*closure*](40_Functional--Foundations.md#closures).
+An outer function takes the settings and returns the strategy,
+and those settings stay available to the strategy after the outer function returns:
 
 ```python
 # configured_strategy.py
