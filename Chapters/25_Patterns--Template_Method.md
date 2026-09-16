@@ -326,8 +326,10 @@ you can also pass the steps as arguments:
 # template_function.py
 from collections.abc import Callable
 
-def run_framework(customize1: Callable[[], None],
-                  customize2: Callable[[], None]) -> None:
+type Step = Callable[[], None]
+
+def run_framework(customize1: Step,
+                  customize2: Step) -> None:
     for _ in range(2):  # The anchored algorithm
         customize1()
         customize2()
