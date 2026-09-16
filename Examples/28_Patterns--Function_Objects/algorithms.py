@@ -46,3 +46,10 @@ def newton(f: Fn, a: float, b: float) -> float | None:
         if abs(step) < TOLERANCE:
             return x
     return None
+
+def solve(f: Fn, a: float, b: float,
+          finder: RootFinder) -> float:
+    root = finder(f, a, b)
+    if root is None:
+        raise ValueError(f"no root in [{a}, {b}]")
+    return root

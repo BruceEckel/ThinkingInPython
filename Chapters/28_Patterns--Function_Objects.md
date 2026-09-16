@@ -239,7 +239,8 @@ The secant method reads them as two starting points,
 and Newton's method averages them into one.
 The secant and Newton methods are *open*: they need somewhere to start,
 not a bracket, so the chain in `chain.py` can fall back on them.
-All three share one signature, so they are interchangeable:
+All three share one signature, so they are interchangeable,
+and `solve()` runs whichever one it is given:
 
 ```python
 # algorithms.py
@@ -290,27 +291,25 @@ def newton(f: Fn, a: float, b: float) -> float | None:
         if abs(step) < TOLERANCE:
             return x
     return None
-```
-
-`solve()` is the part of the procedure that does not change.
-It runs whichever finder it is given,
-then does the work no finder does for itself:
-it checks the answer against `f` and turns a missing or inaccurate root into an exception.
-Because each finder is a function with the same signature,
-passing one to `solve()` chooses the strategy,
-and the check applies to every algorithm's answer alike:
-
-```python
-# strategy.py
-from algorithms import (Fn, RootFinder, bisection,
-                        newton, secant)
 
 def solve(f: Fn, a: float, b: float,
           finder: RootFinder) -> float:
     root = finder(f, a, b)
-    if root is None or abs(f(root)) > 1e-6:
+    if root is None:
         raise ValueError(f"no root in [{a}, {b}]")
     return root
+```
+
+`solve()` is the part of the procedure that does not change.
+It runs the finder it is given and does the work no finder does for itself:
+it turns a failed search into an exception,
+so a caller receives a root or an exception and never handles `None`.
+Because each finder is a function with the same signature,
+passing one to `solve()` chooses the strategy:
+
+```python
+# strategy.py
+from algorithms import bisection, newton, secant, solve
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2
@@ -322,8 +321,8 @@ for finder in (bisection, newton, secant):
 #: 1.414214
 ```
 
-Three identical lines are the point: the algorithm changes,
-and the caller and the check stay the same.
+Three identical lines are the point:
+the algorithm changes and the caller stays the same.
 The algorithms differ, though,
 and the chain in `chain.py` turns that difference into a fallback.
 
@@ -347,7 +346,7 @@ and the strategy keeps reading those settings after the outer function returns:
 
 ```python
 # configured_strategy.py
-from algorithms import Fn, RootFinder
+from algorithms import Fn, RootFinder, solve
 
 def bisection_within(tolerance: float) -> RootFinder:
     def finder(f: Fn, a: float, b: float) -> float | None:
@@ -367,10 +366,10 @@ def f(x: float) -> float:
 
 coarse = bisection_within(0.1)
 fine = bisection_within(1e-9)
-r1, r2 = coarse(f, 0.0, 2.0), fine(f, 0.0, 2.0)
-assert r1 is not None and r2 is not None
-print(f"{r1:.6f} {r2:.6f}")
-#: 1.406250 1.414214
+for finder in (coarse, fine):
+    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
+#: 1.406250
+#: 1.414214
 ```
 
 Each call to `bisection_within()` returns a new finder whose closure holds that call's tolerance.

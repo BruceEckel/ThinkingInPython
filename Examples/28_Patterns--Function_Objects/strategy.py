@@ -1,13 +1,5 @@
 # strategy.py
-from algorithms import (Fn, RootFinder, bisection,
-                        newton, secant)
-
-def solve(f: Fn, a: float, b: float,
-          finder: RootFinder) -> float:
-    root = finder(f, a, b)
-    if root is None or abs(f(root)) > 1e-6:
-        raise ValueError(f"no root in [{a}, {b}]")
-    return root
+from algorithms import bisection, newton, secant, solve
 
 def f(x: float) -> float:
     return x * x - 2  # Root at the square root of 2

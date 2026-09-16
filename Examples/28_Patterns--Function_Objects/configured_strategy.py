@@ -1,5 +1,5 @@
 # configured_strategy.py
-from algorithms import Fn, RootFinder
+from algorithms import Fn, RootFinder, solve
 
 def bisection_within(tolerance: float) -> RootFinder:
     def finder(f: Fn, a: float, b: float) -> float | None:
@@ -19,7 +19,7 @@ def f(x: float) -> float:
 
 coarse = bisection_within(0.1)
 fine = bisection_within(1e-9)
-r1, r2 = coarse(f, 0.0, 2.0), fine(f, 0.0, 2.0)
-assert r1 is not None and r2 is not None
-print(f"{r1:.6f} {r2:.6f}")
-#: 1.406250 1.414214
+for finder in (coarse, fine):
+    print(f"{solve(f, 0.0, 2.0, finder):.6f}")
+#: 1.406250
+#: 1.414214
