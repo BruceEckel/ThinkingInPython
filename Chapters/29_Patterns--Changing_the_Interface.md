@@ -12,7 +12,7 @@ which puts them next to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
 callers keep using the old one until you mark it deprecated.
-[Retiring the Old Interface](#retiring-the-old-interface) shows that mark.
+[Deprecating the Old Interface](#deprecating-the-old-interface) shows that mark.
 
 ## Adapter
 
@@ -396,9 +396,9 @@ a *Proxy* controls access to one implementation,
 an *Adapter* makes one type fit a caller that expects another.
 Name a wrapper for why it is there, not for its shape.
 
-## Retiring the Old Interface {#retiring-the-old-interface}
+## Deprecating the Old Interface {#deprecating-the-old-interface}
 
-Every interface change has a second half.
+An interface that replaces one you own has a second half.
 Once the better interface exists, the old one is still there,
 and callers keep using it until something tells them not to.
 Deleting it breaks them.
@@ -451,7 +451,7 @@ so the listing records the warnings and prints the record.
 
 `warnings.deprecated()` requires the message,
 and that message should say what to use instead.
-"Deprecated" tells a reader that someone decided to retire this.
+"Deprecated" tells a reader that someone decided this should no longer be called.
 "replaced by `render()`" tells them what to do about it.
 
 The decorator also applies to a class,
@@ -467,9 +467,10 @@ as they do for the whole-function form.
 
 An *Adapter* and a *Façade* both add an interface and leave what is already there in place,
 which is why they are safe moves.
-Retiring an interface is the unsafe move.
-Marking the old interface makes the risk visible on a schedule;
-without the mark, the risk surfaces when you delete something.
+Replacing an interface you own is the unsafe move,
+because every caller was written against the old one.
+Marking it deprecated keeps it working while it tells each caller what to use instead;
+without the mark, nothing tells them.
 
 ## Exercises
 
