@@ -187,7 +187,7 @@ so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol`.
 Exercise 1 builds that `Protocol`.
 
-Building commands in a loop produces Python's best-known closure mistake:
+Building commands in a loop can produce Python's best-known closure mistake:
 
 ```python
 # late_binding.py
@@ -215,7 +215,7 @@ for command in fixed:
 #: step 2
 ```
 
-The two comprehensions differ in one thing: when they read `n`.
+The two comprehensions differ in when they read `n`.
 A lambda's body runs when you call the command, not when you create it,
 and all three lambdas close over the same loop variable,
 which holds 2 by the time anything calls them.
@@ -381,7 +381,7 @@ from functools import partial
 from algorithms import Fn
 
 def bisection_tol(f: Fn, a: float, b: float,
-                   tolerance: float) -> float | None:
+                  tolerance: float) -> float | None:
     while abs(b - a) > tolerance:
         mid = (a + b) / 2
         if f(a) * f(mid) <= 0:
@@ -453,6 +453,9 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 
 Each handler is a *Strategy* function, `chain` is the list of strategies,
 and success is a non-`None` return.
+This `solve()` reuses the name from `algorithms.py` with the opposite failure contract:
+an exhausted chain returns `None` rather than raising,
+and the caller decides what an empty result means.
 The second `solve()` call shows the fall-through:
 because the interval `[1.0, 1.3]` does not straddle the root,
 bisection fails by returning `None`.
@@ -860,10 +863,12 @@ Stop at the first form that supports what you need:
     or the several related methods and mutable state the *Strategy* section describes.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
-and *Chain of Responsibility* all start at the last entry.
+and *Chain of Responsibility* all start at number 5.
 The C++ of that book had no lighter form that could carry state:
 a function pointer carried none, and closures did not exist yet,
-so a class was the only solution available.
+so a class was the only form available.
+The GoF form then gives that class a named operation, `execute()`,
+rather than a call, which is entry 5 rather than entry 4.
 
 ## Exercises
 

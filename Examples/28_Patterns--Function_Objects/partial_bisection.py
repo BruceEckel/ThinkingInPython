@@ -3,7 +3,7 @@ from functools import partial
 from algorithms import Fn
 
 def bisection_tol(f: Fn, a: float, b: float,
-                   tolerance: float) -> float | None:
+                  tolerance: float) -> float | None:
     while abs(b - a) > tolerance:
         mid = (a + b) / 2
         if f(a) * f(mid) <= 0:
