@@ -189,10 +189,30 @@ def header_typst(release: str | None) -> str:
               .replace("<<gold>>", make_cover.GOLD.lstrip("#")))
     return cover + breaks + footer
 
-# Inserted after the title block and before the outline, so the table
-# of contents opens on its own page instead of running on from the
-# title.
-BEFORE_TYPST = "#pagebreak(weak: true)\n"
+# Inserted after the title block and before the outline: the support
+# note sits under the release line on the title page (pandoc places
+# include-before right after the title block), and the page break
+# then opens the table of contents on its own page. The same sentence
+# as the site footer, the README, and the EPUB's closing page.
+BEFORE_TYPST = """\
+#v(3em)
+#align(center, block(width: 72%, text(size: 9.5pt, fill: rgb("<<ink>>"))[
+  Thinking in Python is free.
+  If it has helped you and you'd like to support the work,
+  you can do that on
+  #link("<<sponsors>>")[GitHub Sponsors] or #link("<<kofi>>")[Ko-fi].
+  No obligation, and no difference in what you get.
+]))
+#pagebreak(weak: true)
+"""
+
+
+def before_typst() -> str:
+    """`BEFORE_TYPST` with the support links filled in."""
+    return (BEFORE_TYPST
+            .replace("<<ink>>", "555555")
+            .replace("<<sponsors>>", build_site.SPONSORS_URL)
+            .replace("<<kofi>>", build_site.KOFI_URL))
 
 
 def check_typst() -> None:
@@ -264,7 +284,7 @@ def build(out_dir: Path, keep_source: bool = False,
     src.write_text(text, encoding="utf-8")
     meta.write_text(build_epub.metadata_yaml(release), encoding="utf-8")
     header.write_text(header_typst(release), encoding="utf-8")
-    before.write_text(BEFORE_TYPST, encoding="utf-8")
+    before.write_text(before_typst(), encoding="utf-8")
 
     pdf = out_dir / PDF_NAME
     run_pandoc(src, meta, header, before, pdf)
