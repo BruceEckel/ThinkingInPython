@@ -46,9 +46,11 @@ Usage:
 
 import argparse
 import subprocess
+import time
 
 from tools.make_help import MAKEFILE, entries
 from tools.config import ROOT
+from tools.timed_make import format_seconds
 
 # Every check a tool upgrade can break, in run order. Cheapest and most
 # likely to move first: ty and ruff are what a checker or linter release
@@ -93,9 +95,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.parse_args(argv)
 
     failed: list[str] = []
+    took: dict[str, float] = {}
     for name in SWEEP_TARGETS:
         print(f"-> {name}")
+        start = time.monotonic()
         proc = subprocess.run(["make", name], cwd=ROOT)
+        took[name] = time.monotonic() - start
         if proc.returncode != 0:
             failed.append(name)
             print(f"\n{name} FAILED (exit {proc.returncode}); continuing.\n")
@@ -104,7 +109,10 @@ def main(argv: list[str] | None = None) -> int:
     print("\nSweep results:")
     for name in SWEEP_TARGETS:
         status = "FAIL" if name in failed else "ok"
-        print(f"  {name:<{width}}  {status}")
+        print(f"  {name:<{width}}  {status:<4}  "
+              f"{format_seconds(took[name]):>8}")
+    print(f"  {'total':<{width}}  {'':<4}  "
+          f"{format_seconds(sum(took.values())):>8}")
 
     if not failed:
         print(f"\nAll {len(SWEEP_TARGETS)} checks passed.")

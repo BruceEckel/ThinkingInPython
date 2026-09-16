@@ -66,6 +66,28 @@ endif
 help:  ## Pick a target to run, or list them all when piped (`make help style` narrows to one section)
 	@$(PY) -m tools.make_help $(HELP_TOPIC)
 
+# Every goal named on the command line runs in a child make under
+# tools/timed_make.py, which prints `make <goal>: 12.3s` (or the exit
+# code and the time, on failure) after the goal's own output. The child
+# runs with TIMED=1, which selects the real rules below, and GNU Make
+# hands a command-line variable on to every make the child starts, so a
+# nested `$(MAKE)` or a per-target subprocess in run_all.py and
+# sweep_checks.py prints no line of its own (those two time each step
+# themselves). `make TIMED=0 verify` runs the rules directly with no
+# timing. `make -n` still shows the real recipe: GNU Make runs a recipe
+# line that names $(MAKE) even under -n, and the child inherits -n.
+# `help` is never timed. The matching `endif` is the last line of this
+# file.
+TIMED ?=
+ifeq ($(TIMED),)
+TIMED_GOALS := $(filter-out help $(HELP_TOPIC),$(MAKECMDGOALS))
+ifneq ($(TIMED_GOALS),)
+.PHONY: $(TIMED_GOALS)
+$(TIMED_GOALS):
+	@$(PY) -m tools.timed_make "$(MAKE)" $@
+endif
+else
+
 ##@ Setup
 
 .PHONY: tools-check tools-check-full doctor verify-targets tools-test \
@@ -828,3 +850,5 @@ clean-epub:  ##- Remove build/epub/
 
 clean-pdf:  ##- Remove build/pdf/
 	$(PY) -c "import shutil; shutil.rmtree('build/pdf', ignore_errors=True)"
+
+endif  # TIMED

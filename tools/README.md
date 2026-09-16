@@ -110,7 +110,10 @@ Restart the terminal to refresh the PATH, then run `make --version` to confirm.
 
 Run targets with `make` (they go through `uv run`); `make help` prints the
 complete, categorized list, generated from the Makefile itself so it never
-drifts out of date (see [make_help.py](#make_help.py) below). The everyday ones:
+drifts out of date (see [make_help.py](#make_help.py) below). Every target
+prints its wall-clock time when it finishes (`make verify: 1m 32s`);
+`make TIMED=0 verify` skips that, and [timed_make.py](#timed_make.py)
+explains the mechanism. The everyday ones:
 
 ```
 make all        # every everyday fixer, refresh markers, sync, then the full gate but the site
@@ -264,6 +267,30 @@ would then require. The `#:` markers
 are deliberately not swept: `make verify` rewrites a stale marker instead
 of failing on it, so a nondeterministic listing would report a difference
 here every run.
+
+## timed_make.py
+
+GNU Make cannot time a target on its own, so the Makefile's top level
+hands every goal named on the command line to this script, which runs
+the goal in a child make and prints its wall-clock time when it ends:
+
+```
+make verify
+...
+make verify: 1m 32s
+```
+
+A failing goal reports its exit code and the time instead, and the exit
+code still reaches the shell. The child runs with `TIMED=1`, which
+selects the real rules (they sit inside an `ifeq ($(TIMED),)` block
+that ends on the Makefile's last line), and make passes that variable on
+to every make the child starts, so nested runs print no line of their
+own. `run_all.py` and `sweep_checks.py` start one make per step from
+Python and time each step themselves, so `make all` and `make sweep`
+show a seconds column in their summary tables. `make TIMED=0 verify`
+skips the wrapper; `make -n` needs no such bypass, since make runs a
+recipe line that names `$(MAKE)` even under `-n` and the child inherits
+the flag, so the dry run prints the real recipe.
 
 ## verify_targets.py
 

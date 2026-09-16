@@ -37,9 +37,11 @@ Usage:
 
 import argparse
 import subprocess
+import time
 
 from tools.make_help import MAKEFILE, entries
 from tools.config import ROOT
+from tools.timed_make import format_seconds
 
 # The everyday loop, in run order. Add a make target name here to include
 # it; its --help text is read from the Makefile automatically.
@@ -64,10 +66,18 @@ def _docs() -> dict[str, str]:
     return {name: doc for name, doc in entries(text) if name is not None}
 
 
-def _listing(heading: str, names: list[str]) -> str:
+def _listing(heading: str, names: list[str],
+             took: dict[str, float] | None = None) -> str:
+    """One line per target: its doc, and its seconds when `took` has them."""
     docs = _docs()
     width = max(len(name) for name in names)
-    lines = [f"  {name:<{width}}  {docs.get(name, '')}" for name in names]
+    lines = [f"  {name:<{width}}  "
+             + (f"{format_seconds(took[name]):>8}  " if took else "")
+             + docs.get(name, '')
+             for name in names]
+    if took:
+        lines.append(f"  {'total':<{width}}  "
+                     f"{format_seconds(sum(took.values())):>8}")
     return f"{heading}\n" + "\n".join(lines)
 
 
@@ -79,16 +89,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.parse_args(argv)
 
     ran: list[str] = []
+    took: dict[str, float] = {}
     for name in ALL_TARGETS:
         print(f"-> {name}")
+        start = time.monotonic()
         proc = subprocess.run(["make", name], cwd=ROOT)
+        took[name] = time.monotonic() - start
         ran.append(name)
         if proc.returncode != 0:
             print(f"\n{name} failed (exit {proc.returncode}); stopping.\n")
-            print(_listing("Ran:", ran))
+            print(_listing("Ran:", ran, took))
             return proc.returncode
     print("\nmake all: every target passed.\n")
-    print(_listing("Ran:", ran))
+    print(_listing("Ran:", ran, took))
     return 0
 
 

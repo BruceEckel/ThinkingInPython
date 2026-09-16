@@ -702,6 +702,13 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   (`tools/listing_links.py`). Never write those links by hand in
   `Chapters/`; a plain code span is the source form.
 - The `Makefile` documents every gate and target (`make help`).
+  Every goal named on the command line runs in a child make under
+  `tools/timed_make.py` and ends with `make <goal>: 12.3s`; the
+  real rules sit inside `ifeq ($(TIMED),)`/`else`/`endif`, so a
+  new target goes inside that block, and `TIMED=0` bypasses the
+  wrapper. A tool that runs `make` from Python inherits `TIMED=1`
+  through `MAKEFLAGS` when it was itself started by make, so
+  `run_all.py` and `sweep_checks.py` time their own steps.
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).
 - `thinking-in-python-skill.md` (repo root) and
   `.claude/skills/thinking-in-python/SKILL.md` are duplicate copies of the
