@@ -93,7 +93,10 @@ You'll need to do this to experiment with the examples and exercises.
 
 ### Install
 
-1. Clone this repository.
+1. Clone this repository onto your local machine:
+   - `git clone https://github.com/BruceEckel/ThinkingInPython.git`
+   - or, with the [GitHub CLI](https://cli.github.com/):
+     `gh repo clone BruceEckel/ThinkingInPython`
 2. You need a `make` command. Check with `make --version`.
    - Linux and WSL: `sudo apt install make` (Debian/Ubuntu) or
      `sudo dnf install make` (Fedora). Minimal images, including
