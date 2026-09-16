@@ -1,10 +1,10 @@
 # Changing the Interface
 
-Sometimes the problem you're solving is as simple as "I don't have the interface that I want."
+Sometimes the problem you're solving is as simple as "I don't have the interface I need."
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-That interface makes a library or bundle of resources more comfortable to use.
+A façade makes a library or bundle of resources more comfortable to use.
 Both wrap something that already exists,
 which puts them next to *Proxy* and *Decorator*.
 [Telling the Wrappers Apart](#telling-the-wrappers-apart) sorts the four apart.
