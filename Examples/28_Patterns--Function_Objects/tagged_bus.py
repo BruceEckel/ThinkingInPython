@@ -3,6 +3,7 @@ import inspect
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Final, Protocol, dataclass_transform
+from exceptions import expect
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -89,8 +90,5 @@ bus.publish(Deposit(10))
 bus.publish(Withdraw(30))
 #: - withdraw 30
 bus.publish(Closed("inactivity"))  # An event, no handler
-try:
-    bus.publish("Deposit")
-except TypeError as e:
-    print(e)
-#: str is not an @event
+expect(TypeError, bus.publish, "Deposit")
+#: [TypeError] str is not an @event

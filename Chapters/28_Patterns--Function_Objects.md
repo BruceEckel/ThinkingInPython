@@ -535,7 +535,7 @@ The tests can then assert not just the root but *which* finders ran.
 If you key that structure by type instead of by position,
 you have an *event bus*.
 The bus is a `dict` keyed by event type.
-Each key holds a list of handlers,
+Each key maps to a list of handlers,
 and `subscribe()` appends a handler to the list under the event type it handles.
 The events are values,
 written as [frozen data classes](12_Techniques--Data_Classes_as_Types.md#immutability).
@@ -611,7 +611,7 @@ The check runs once, at registration.
 The stored `defaultdict`, though,
 mixes handlers for every event type in one structure.
 Its lists cannot name a single event class,
-so their element type is `Handler[Any]`, the parameter erased.
+so their element type is `Handler[Any]`.
 
 `subscribe` indexes `self._handlers` directly,
 letting the `defaultdict` build each event type's list on first use.
@@ -667,13 +667,12 @@ def test_get_leaves_no_stray_handler_list() -> None:
     assert Closed not in bus._handlers
 ```
 
-`event_bus.py` shows the structure with nothing added:
-the events are frozen data classes, the handlers are functions,
-and the bus is a `dict`.
-A second version gives each side a decorator.
-`@event` makes a class a frozen data class and records it in `EVENTS`.
-`@handler` makes a class a frozen data class too,
-a function object whose fields are its configuration,
+In `event_bus.py`, the events are frozen data classes,
+the handlers are functions, and the bus is a `dict`.
+A second version gives each side a decorator,
+both producing frozen data classes.
+`@event` records its class in `EVENTS`.
+`@handler` makes a function object whose fields are its configuration,
 and records in `HANDLES` which event its `__call__` accepts.
 `subscribe()` then takes one argument, since the handler says what it handles,
 and `publish()` refuses an object that no `@event` class produced:
@@ -684,6 +683,7 @@ import inspect
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Final, Protocol, dataclass_transform
+from exceptions import expect
 
 EVENTS: Final[set[type]] = set()
 HANDLES: Final[dict[type, type]] = {}
@@ -770,11 +770,8 @@ bus.publish(Deposit(10))
 bus.publish(Withdraw(30))
 #: - withdraw 30
 bus.publish(Closed("inactivity"))  # An event, no handler
-try:
-    bus.publish("Deposit")
-except TypeError as e:
-    print(e)
-#: str is not an @event
+expect(TypeError, bus.publish, "Deposit")
+#: [TypeError] str is not an @event
 ```
 
 `dataclass_transform`
