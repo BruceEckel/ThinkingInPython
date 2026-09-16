@@ -9,8 +9,10 @@ so the wiring can change without touching any caller.
 Both wrap something that already exists,
 which puts them next to *Proxy* and *Decorator*.
 [Telling the Wrappers Apart](#telling-the-wrappers-apart) sorts the four apart.
-Adding an interface is the safe half of the job.
-The other half is telling callers that you will remove the interface they have been using.
+Adding an interface leaves the existing one in place, so nothing breaks.
+When the new interface is meant to replace one you own,
+callers keep using the old one until you mark it deprecated.
+[Retiring the Old Interface](#retiring-the-old-interface) shows that mark.
 
 ## Adapter
 
