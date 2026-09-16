@@ -839,15 +839,14 @@ one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
 When each type needs exactly one,
 and a new type must add its own without editing a central function,
-`functools.singledispatch` is the tool.
+`functools.singledispatch` is the solution.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)
 both use it.
 
 ## Choosing the Lightest Callable
 
-The alternatives this chapter showed form one list.
-Go down it and stop at the first form that supports what you need:
+Stop at the first form that supports what you need:
 
 1.  A plain function, when the behavior needs no state of its own
     (`command.py`, `strategy.py`).
@@ -861,8 +860,10 @@ Go down it and stop at the first form that supports what you need:
     or the several related methods and mutable state the *Strategy* section describes.
 
 The *GoF Design Patterns* forms of *Command*, *Strategy*,
-and *Chain of Responsibility* all start at the last entry,
-because the languages behind those forms have no entries above it.
+and *Chain of Responsibility* all start at the last entry.
+The C++ of that book had no lighter form that could carry state:
+a function pointer carried none, and closures did not exist yet,
+so a class was the first entry available.
 
 ## Exercises
 
