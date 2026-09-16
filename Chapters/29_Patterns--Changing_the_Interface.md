@@ -16,8 +16,8 @@ callers keep using the old one until you mark it deprecated.
 
 ## Adapter
 
-When you've got "this", and you need "that", *Adapter* solves the problem.
-The adapter needs only to produce a "that".
+*Adapter* applies when the interface you have is not the interface your code needs.
+The adapter's only job is to produce the needed interface from the existing one.
 A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
