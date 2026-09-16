@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 from tools.rewrite import Pass, missing_skills
 
-
 def repo_with_skill(tmp_path: Path, name: str) -> Path:
     root = tmp_path / "repo"
     (root / ".claude" / "skills" / name).mkdir(parents=True)
