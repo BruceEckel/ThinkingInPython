@@ -243,12 +243,13 @@ listing follows anyway. The same holds for a forward pointer to the next
 example or to the rest of the chapter ("The rest of this chapter
 replaces call sites like these with ...", "The next example,
 `registry.py`, cannot take the same fix. Its whole point is that ...")
-where the paragraph that follows makes the claim on its own.
+where the paragraph that follows makes the claim on its own. The same
+holds for a sentence that only announces a list that follows.
 
 **Keep when.** The pointer carries a claim the listing does not make on
 its own ("The next listing shows the same trap in a generator").
 
-**Sightings.** 5 (removal), 2 chapters
+**Sightings.** 6 (removal), 3 chapters
 - `27_Patterns--Factory` 2026-09-01 (`0b7ff81d`), was Claude-written:
   "The next step gives each of those operations its own object." ->
   deleted, ahead of "A *factory object* defines a single `create()`
@@ -264,6 +265,10 @@ its own ("The next listing shows the same trap in a generator").
   be even nicer if a new `Shape` subclass would register itself"
 - `25_Patterns--Template_Method` 2026-08-29, was Claude-written:
   "The example below shows why." -> deleted
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, a list rather than a
+  listing: "The alternatives this chapter showed form one list. Go down
+  it and stop at the first form that supports what you need:" -> "Stop
+  at the first form that supports what you need:"
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -327,7 +332,7 @@ Ask what the reader would observe; if the phrase does not say, replace it.
 **Keep when.** The judgment is the claim being made and the mechanism is
 already stated nearby, as in a summary sentence that closes a section.
 
-**Sightings.** 13 (2 chapters)
+**Sightings.** 17 (3 chapters)
 - `26_Patterns--Surrogate` 2026-08-31, was Claude-written, five:
 - "puts the check where it costs nothing" -> "puts the check where it
   does not restrict the surrogate"
@@ -355,6 +360,18 @@ already stated nearby, as in a summary sentence that closes a section.
   "calls its `create()` immediately"; and, in Bruce's own older draft,
   "the most sensible first step is to use polymorphism" -> "first use
   polymorphism"
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, four, three of
+  them flagged by Bruce as a pasted phrase: "bisection declines by
+  returning `None`" -> "bisection fails by returning `None`"; "the
+  strategy keeps reading those settings after the outer function
+  returns" -> "those settings stay available to the strategy after the
+  outer function returns"; "because the languages behind those forms
+  have no entries above it" -> "The C++ of that book had no lighter
+  form that could carry state: a function pointer carried none, and
+  closures did not exist yet"; "a `dict` from each event type to the
+  functions subscribed to that type" -> "a `dict` keyed by event type.
+  Each key maps to a list of handlers, and `subscribe()` appends a
+  handler to the list under the event type it handles"
 
 **Home.** literal (Accrued patterns), the pass that owns figures.
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
@@ -491,8 +508,12 @@ X, and another shows Y:"). Write "Testing confirms that X, and Y:".
 
 **Keep when.** The sentence names a specific test function.
 
-**Sightings.** 2, both `27_Patterns--Factory`, was Claude-written; plus
-the 2026-09-15 sweep
+The lead-in is the only prose before the listing. A paragraph that
+explains how the tests work (a helper they share, what they assert)
+goes after the listing, not before it.
+
+**Sightings.** 3, `27_Patterns--Factory` and `28_Patterns--Function_Objects`,
+was Claude-written; plus the 2026-09-15 sweep
 - 2026-08-31 (`0b7ff81d`): "The tests confirm that every subclass
   registers itself" -> "Testing confirms that every subclass registers
   itself"
@@ -507,9 +528,83 @@ the 2026-09-15 sweep
   and `42` (twice) "The tests confirm that ..." -> each "Testing
   confirms that ...". Before the sweep the book had three "Testing
   confirms" (17, 26, 27) against those seven.
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written, the ordering
+  note: "The first two tests wrap each finder in `watched()`, which
+  records the finder's name as it runs. The tests can then assert not
+  just the root but *which* finders ran." moved from before
+  `test_chain.py` to after it, leaving "Testing confirms that ..." as
+  the only sentence before the listing
 
 **Home.** this file only. Promoted at Bruce's call on one chapter's
 evidence (2026-09-15, C14 -> R14).
+
+### R15. Make the mechanism the subject where the sentence describes how a design behaves
+
+**Test.** An imperative ("make a common factory create every object")
+or a "you can VERB" ("you can remove that line by letting each subclass
+register itself") whose content is how the design works rather than
+advice to the reader. Put the mechanism in subject position with an
+indicative verb: "A common factory creates every object"; "Letting each
+subclass register itself removes that line".
+
+**Keep when.** The sentence is advice or an exercise instruction ("Use a
+`set` for membership tests"), or "you can" where the option's existence
+is the news (the `activate` skill's existing keep, "You can supply a
+different `Console` in a test").
+
+**Sightings.** 5 (additive), 2 chapters:
+- 2026-08-31 (`40323f50`), was Claude-written: "You can remove that
+  line too, so the factory never needs editing when you add a type, by
+  letting each subclass register itself through `__init_subclass__()`"
+  -> "Letting each subclass register itself through
+  `__init_subclass__()` removes that line too, so the factory never
+  needs editing when you add a type"
+- 2026-08-31 (`2b18eed8`), was Bruce-written (older draft): "Thus you
+  can isolate, in one place, the effect of changing from one GUI to
+  another." -> "The change from one GUI to another then touches one
+  place in your code."
+- 2026-09-12 (`a03658af`), was Bruce-written (older draft): "The
+  solution is to encapsulate object creation: make a common *factory*
+  create every object" -> "The solution is to encapsulate object
+  creation. A common *factory* creates every object"; "so you change
+  only the factory when you add a new type" -> "so adding a new type
+  only changes the factory"
+
+- `28_Patterns--Function_Objects` 2026-09-16, was Claude-written: "You provide a
+  function that decides how to compare." -> "That argument determines
+  how comparison works."
+
+**Home.** activate (Accrued patterns), beside its "you can" keep.
+Promoted 2026-09-16 on the second chapter's sighting (C15 -> R15).
+
+### R16. Carry the cross-reference on the term, not in a citation after it
+
+**Test.** A term followed by a parenthetical "(see [Chapter](...#anchor))"
+or a trailing ", shown in [Section](...)", where the term or phrase
+could carry the link; or a bare term with a defining section elsewhere
+in the book ("the MRO") that could be linked on first use in the
+chapter.
+
+**Keep when.** The citation points somewhere other than the term's
+definition, or the term is already a link to something else.
+
+**Sightings.** 4, 2 chapters, was Claude-written:
+- 2026-08-31 (`d6144479`): "I have also used a *generator* (see
+  [Iterators](23_Patterns--Iterators.md#generators))." -> "I have also
+  used a [*generator*](23_Patterns--Iterators.md#generators)."
+- 2026-08-31 (`0b7ff81d`): "`cls.registry` resolves through the MRO" ->
+  "resolves through the [MRO](07_Foundations--Classes.md#inheritance)"
+- 2026-09-15 (`a9ca27eb`): "`copy.replace()` is the general form of the
+  same operation, working on any object that defines `__replace__()`,
+  shown in [The General Form of `replace()`](...)." -> "`copy.replace()`
+  is the [general form of the operation](...), and works on any object
+  that defines `__replace__()`."
+- `28_Patterns--Function_Objects` 2026-09-16: "It is a *closure* ([Functional
+  Foundations](40_Functional--Foundations.md#closures)):" -> "use a
+  [*closure*](40_Functional--Foundations.md#closures)."
+
+**Home.** this file only: a linking convention rather than a prose
+register. Promoted 2026-09-16 on the second chapter's sighting (C12 -> R16).
 
 ---
 
@@ -662,30 +757,6 @@ was Bruce-written (older draft) and Claude-written respectively:
 - "that's the only place you need to change the code" -> "that method
   is the only code you change"
 
-### C12. Carry the cross-reference on the term, not in a citation after it
-
-**Test.** A term followed by a parenthetical "(see [Chapter](...#anchor))"
-or a trailing ", shown in [Section](...)", where the term or phrase
-could carry the link; or a bare term with a defining section elsewhere
-in the book ("the MRO") that could be linked on first use in the
-chapter.
-
-**Keep when.** The citation points somewhere other than the term's
-definition, or the term is already a link to something else.
-
-**Sightings.** 3, all `27_Patterns--Factory`, was Claude-written (same
-chapter, so not yet independent):
-- 2026-08-31 (`d6144479`): "I have also used a *generator* (see
-  [Iterators](23_Patterns--Iterators.md#generators))." -> "I have also
-  used a [*generator*](23_Patterns--Iterators.md#generators)."
-- 2026-08-31 (`0b7ff81d`): "`cls.registry` resolves through the MRO" ->
-  "resolves through the [MRO](07_Foundations--Classes.md#inheritance)"
-- 2026-09-15 (`a9ca27eb`): "`copy.replace()` is the general form of the
-  same operation, working on any object that defines `__replace__()`,
-  shown in [The General Form of `replace()`](...)." -> "`copy.replace()`
-  is the [general form of the operation](...), and works on any object
-  that defines `__replace__()`."
-
 ### C13. Name a listing by its filename, not "the listing" or "this listing"
 
 **Test.** "the listing" / "this listing" / "the example" as the subject
@@ -703,41 +774,6 @@ Claude-written (same chapter, so not yet independent):
   factory-object design takes" -> "`shape_factory2.py` uses it to show
   the form a factory-object design takes"
 
-### C15. Make the mechanism the subject where the sentence describes how a design behaves
-
-**Test.** An imperative ("make a common factory create every object")
-or a "you can VERB" ("you can remove that line by letting each subclass
-register itself") whose content is how the design works rather than
-advice to the reader. Put the mechanism in subject position with an
-indicative verb: "A common factory creates every object"; "Letting each
-subclass register itself removes that line".
-
-**Keep when.** The sentence is advice or an exercise instruction ("Use a
-`set` for membership tests"), or "you can" where the option's existence
-is the news (the `activate` skill's existing keep, "You can supply a
-different `Console` in a test").
-
-**Sightings.** 4 (additive), all `27_Patterns--Factory` (same chapter,
-so not yet independent):
-- 2026-08-31 (`40323f50`), was Claude-written: "You can remove that
-  line too, so the factory never needs editing when you add a type, by
-  letting each subclass register itself through `__init_subclass__()`"
-  -> "Letting each subclass register itself through
-  `__init_subclass__()` removes that line too, so the factory never
-  needs editing when you add a type"
-- 2026-08-31 (`2b18eed8`), was Bruce-written (older draft): "Thus you
-  can isolate, in one place, the effect of changing from one GUI to
-  another." -> "The change from one GUI to another then touches one
-  place in your code."
-- 2026-09-12 (`a03658af`), was Bruce-written (older draft): "The
-  solution is to encapsulate object creation: make a common *factory*
-  create every object" -> "The solution is to encapsulate object
-  creation. A common *factory* creates every object"; "so you change
-  only the factory when you add a new type" -> "so adding a new type
-  only changes the factory"
-
-**Home.** activate (Accrued patterns), beside its "you can" keep.
-
 ### C16. Cut a sentence-opening locator on a sentence stating a general property
 
 **Test.** "Here,", "In this example,", "As an example," opening a
@@ -753,6 +789,10 @@ just joined the hierarchy", "Here that argument is a string", "Here it
 is a `Protocol`", "Here the table holds instances") and wrote a fifth
 ("Here, we create one factory object per `Shape` subtype:"). The
 keep-when is the larger set; a sweep reads the sentence, not the word.
+`28_Patterns--Function_Objects` 2026-09-16 adds one more keep: Bruce split "In
+Python the action is a function, and a 'macro' is a list of actions"
+into "In Python the action is a function. In this example, a 'macro'
+is a list of actions:", a locator on the listing-specific claim only.
 
 **Sightings.** 3, all `27_Patterns--Factory` (same chapter, so not yet
 independent):
@@ -814,6 +854,107 @@ so not yet independent):
   the registry keys on `cls.__name__` alone, two classes that share a
   name ... overwrite each other" -> "The registry keys on `cls.__name__`
   alone, so two classes that share a name ... overwrite each other"
+
+### C19. Name a type's members instead of a coined phrase for its shape
+
+**Test.** A quoted paraphrase standing in for a type or structure ("a
+name for 'callable, plus `undo()`'"). Write the members the type has.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 2 (additive), both `28_Patterns--Function_Objects` 2026-09-16,
+was Claude-written (chapter and Solutions, so not yet independent):
+- "a list of commands that also undo needs a name for "callable, plus
+  `undo()`". That name is a `Protocol` with both members." -> "an
+  undoable list of commands needs a type with two members,
+  `__call__()` and `undo()`, and that type is a `Protocol`."
+- Solutions: "needs a name for "callable, plus `undo()`", and in Python
+  that name is a `Protocol` declaring both members." -> "needs a type
+  with two members, `__call__()` and `undo()`, and in Python that type
+  is a `Protocol`."
+
+### C20. Cut the sentence that says what the output demonstrates when the output is on the page
+
+**Test.** A sentence after a listing whose subject is the output and
+whose predicate is a verdict on it ("is the point", "produce the same
+three lines"). Cut it; the markers show the output.
+
+**Keep when.** The sentence states a consequence the output does not
+show on its own (why the lines match, what a difference would mean).
+
+**Sightings.** 2 (removal), both `28_Patterns--Function_Objects` 2026-09-16,
+was Claude-written (same chapter, so not yet independent):
+- "Three identical lines are the point: the algorithm changes and the
+  caller stays the same." -> deleted
+- "Those five classes produce the same three lines that one function
+  argument produced." -> deleted
+
+### C21. Cut the chapter roadmap paragraph; each sentence goes where its content is
+
+**Test.** An opening paragraph whose sentences each say what a later
+section will show ("*Command* appears first as a function, then as the
+classic class-based form. ... A closing section keys the chain's
+handlers by event type"). Delete it, and make sure each section states
+the claim itself.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 1 (removal), `28_Patterns--Function_Objects` 2026-09-16, was
+Claude-written:
+- the seven-sentence roadmap after the opening ("*Command* appears
+  first as a function, then as the classic class-based form.
+  *Strategy*'s function form gets the same fuller listing. ... and the
+  list becomes an *event bus*.") -> deleted
+
+### C22. Point at the adjacent listing with a leading "Here," rather than a trailing "below"
+
+**Test.** "X below is ..." or "X below names ..." where X is defined in
+the listing that follows. Write "Here, X is ...".
+
+**Keep when.** None seen yet. Runs beside C16: "Here," belongs on a
+claim about the adjacent listing, not on a general one.
+
+**Sightings.** 2 (additive), both `28_Patterns--Function_Objects` 2026-09-16,
+was Claude-written (same chapter, so not yet independent):
+- "`Repeat` below is a frozen data class" -> "Here, `Repeat` is a
+  frozen data class"
+- "`Handler` below names their signature, not an interface:" -> "Here,
+  `Handler` names their signature, not an interface:"
+
+### C23. Factor a property shared by two parallel sentences into one clause before them
+
+**Test.** Consecutive sentences about parallel items that each restate
+the same property ("`@event` makes a class a frozen data class and
+...", "`@handler` makes a class a frozen data class too, ..."). State
+the shared property once, in a clause introducing the pair, and let
+each sentence carry only what differs.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 1 (structural), `28_Patterns--Function_Objects` 2026-09-16, was
+Claude-written:
+- "A second version gives each side a decorator. `@event` makes a class
+  a frozen data class and records it in `EVENTS`. `@handler` makes a
+  class a frozen data class too, a function object whose fields are its
+  configuration, and records in `HANDLES` ..." -> "A second version
+  gives each side a decorator, both producing frozen data classes.
+  `@event` records its class in `EVENTS`. `@handler` makes a function
+  object whose fields are its configuration, and records in `HANDLES`
+  ..."
+
+### C24. A reader's action reads "To X, you Y", not "X-ing means Y-ing"
+
+**Test.** A gerund subject with "means" and a second gerund, where the
+subject is something the reader does ("Adding, removing, or reordering
+handlers means editing a list."). Write "To add, remove, or reorder
+the handlers you edit the `chain` list." The mirror of R15, which
+takes "you" off a sentence about how the design behaves.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 1, `28_Patterns--Function_Objects` 2026-09-16, was Claude-written:
+- "Adding, removing, or reordering handlers means editing a list." ->
+  "To add, remove, or reorder the handlers you edit the `chain` list."
 
 ---
 
