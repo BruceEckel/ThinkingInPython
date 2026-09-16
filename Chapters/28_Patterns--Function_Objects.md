@@ -476,9 +476,6 @@ and reports that decision as its return value.
 A step below the tolerance is not quite the same as reaching a root,
 so a chain is no more reliable than its handlers.
 
-The first two tests wrap each finder in `watched()`,
-which records the finder's name as it runs.
-The tests can then assert not just the root but *which* finders ran.
 Testing confirms that the first finder to converge returns the root while the rest never run,
 that a later finder succeeds where an earlier one fails,
 that an empty chain returns `None`,
@@ -528,9 +525,13 @@ def test_all_fail_returns_none() -> None:
     assert solve(g, 0.0, 2.0, [bisection]) is None
 ```
 
+The first two tests wrap each finder in `watched()`,
+which records the finder's name as it runs.
+The tests can then assert not just the root but *which* finders ran.
+
 ## An Event Bus: Handlers Keyed by Type
 
-Chain of Responsibility keeps its handlers in a list and tries them in order.
+*Chain of Responsibility* keeps its handlers in a list and tries them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
 The bus is a `dict` from each event type to the functions subscribed to that type.
@@ -664,14 +665,14 @@ def test_get_leaves_no_stray_handler_list() -> None:
     assert Closed not in bus._handlers
 ```
 
-The bus is the [Observer](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables)
+The bus is the [*Observer*](30_Patterns--Observer.md#the-pythonic-observer-a-list-of-callables)
 with one shared subject: instead of every observable holding its own list,
 one bus holds every list and the event type selects the handlers.
 Here a type may have many handlers.
 When each type needs exactly one,
 and a new type must add its own without editing a central function,
 `functools.singledispatch` is the tool.
-[Visitor](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+[*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)
 both use it.
 
@@ -691,8 +692,8 @@ Go down it and stop at the first form that supports what you need:
 5.  A class, when one call is not enough: a second operation such as `undo()`,
     or the several related methods and mutable state the *Strategy* section describes.
 
-The *GoF Design Patterns* forms of Command, Strategy,
-and Chain of Responsibility all start at the last entry,
+The *GoF Design Patterns* forms of *Command*, *Strategy*,
+and *Chain of Responsibility* all start at the last entry,
 because the languages behind those forms have no entries above it.
 
 ## Exercises

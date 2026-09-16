@@ -248,11 +248,10 @@ registers"). `tools/pattern_names.py` checks it (`make pattern-names`)
 and `make fix-pattern-names` rewrites the unambiguous cases; the names
 and the excluded phrases (`!State Machines`) are in
 `tools/data/pattern_names.txt`. State/Command/Bridge at a line start
-are listed only with `--sentence-start`, for a human to judge. The
-check is in `check_all`'s registry but not yet in `GATE_CHECKS`: the
-2026-09-15 sweep skipped chapter 28, then under an editing pass. After
-`/edit-done 28`, fix 28 and promote it (project memory
-`pattern-names-gate-pending` has the steps).
+are listed only with `--sentence-start`, for a human to judge; the
+three in the book ("State the rule...") are the verb. The check has
+been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
+`verify-ch` fail on a plain name.
 
 ## Traps (learned the hard way)
 
