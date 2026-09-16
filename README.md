@@ -97,7 +97,10 @@ You'll need to do this to experiment with the examples and exercises.
 2. You need a `make` command. This is preinstalled on Linux and macOS
    (macOS: install Xcode Command Line Tools if it's missing).
    For Windows: `winget install ezwinports.make`
-3. Install [uv](https://docs.astral.sh/uv/).
+3. Install [uv](https://docs.astral.sh/uv/):
+   - Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+   - macOS: `brew install uv`, or the same `curl` command as Linux
+   - Windows: `winget install --id=astral-sh.uv -e`
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
    Python (3.15+) and the dev tools automatically.
 5. Run `make tools-check` to verify the essential tools.
