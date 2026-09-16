@@ -320,8 +320,10 @@ for finder in (bisection, newton, secant):
 #: 1.414214
 ```
 
-In the classic form, each algorithm becomes a class derived from a `FindRoot` interface,
-with a `find()` method. A "Context" class holds the chosen algorithm.
+In the classic form,
+each algorithm becomes a class derived from a `FindRoot` interface,
+with a `find()` method.
+A "Context" class holds the chosen algorithm.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
 
@@ -329,7 +331,8 @@ Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
 That argument determines how comparison works.
 
-When a strategy needs configuration, use a [*closure*](40_Functional--Foundations.md#closures).
+When a strategy needs configuration,
+use a [*closure*](40_Functional--Foundations.md#closures).
 An outer function takes the settings and returns the strategy,
 and those settings stay available to the strategy after the outer function returns:
 
@@ -414,10 +417,7 @@ Configuration alone is a closure's job.
 *Chain of Responsibility* tries a sequence of handlers until one succeeds.
 *GoF Design Patterns* implements the chain as a linked structure,
 each handler holding a reference to the next and deciding whether to pass the request along.
-In Python the chain is a list of functions,
-and the loop that walks the list makes that decision in one place.
-The linked version is the same idea with the list written as a chain of references,
-so the list is the only form here.
+In Python that chain is simply a list of functions.
 
 Bisection needs the interval to bracket a root.
 The open methods do not:
@@ -451,18 +451,24 @@ print(f"{r2:.6f}" if r2 is not None else "no root")
 #: 1.414214
 ```
 
-Each handler is a *Strategy* function, the chain is the list,
+Each handler is a *Strategy* function, `chain` is the list of strategies,
 and success is a non-`None` return.
 The second `solve()` call shows the fall-through:
 because the interval `[1.0, 1.3]` does not straddle the root,
-bisection declines by returning `None`.
-The loop then continues to a method that needs no bracket.
-Adding, removing, or reordering handlers means editing a list.
+bisection fails by returning `None`.
+The loop continues to a method that needs no bracket.
+To add, remove, or reorder the handlers you edit the `chain` list.
 
 The test is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
 so a truthiness test would discard a correct answer and call the next finder.
-Any sentinel-versus-value check on a numeric result has this hazard.
+The hazard is the truthiness test, not the choice of failure value:
+a numeric result must be compared against that value with `is`,
+whatever the value is.
+`None` is the right failure value here because a root is never `None`,
+so `float | None` says which result is which.
+A `sentinel()` ([Sentinel Values](05_Foundations--Functions.md#sentinel-values))
+is for the case where `None` is a possible result and cannot double as the failure mark.
 
 The chain has no check of its own:
 each handler decides for itself whether it failed,
