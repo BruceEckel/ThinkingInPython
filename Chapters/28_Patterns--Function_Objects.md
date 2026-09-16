@@ -534,7 +534,9 @@ The tests can then assert not just the root but *which* finders ran.
 *Chain of Responsibility* keeps its handlers in a list and tries them in order.
 If you key that structure by type instead of by position,
 you have an *event bus*.
-The bus is a `dict` from each event type to the functions subscribed to that type.
+The bus is a `dict` keyed by event type.
+Each key holds a list of handlers,
+and `subscribe()` appends a handler to the list under the event type it handles.
 The events are values,
 written as [frozen data classes](12_Techniques--Data_Classes_as_Types.md#immutability).
 Publishing an event looks up its type and calls every handler registered for that type.
