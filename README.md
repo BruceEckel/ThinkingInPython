@@ -103,6 +103,13 @@ You'll need to do this to experiment with the examples and exercises.
    - Windows: `winget install --id=astral-sh.uv -e`
 4. Run `uv sync` once. This creates `.venv` and installs the pinned
    Python (3.15+) and the dev tools automatically.
+   On WSL, clone into the Linux filesystem (under `~`), not into a
+   Windows checkout under `/mnt/c`. A `.venv` cannot be shared between
+   Windows and Linux: each side's `uv sync` tries to rebuild it for
+   itself and fails when the other side has it open. A clone under
+   `/mnt/c` also runs every command through the Windows filesystem
+   bridge, which turns a three-second install into a minute and slows
+   `make verify` the same way.
 5. Run `make tools-check` to verify the essential tools.
 
 That is everything you need to run and test the examples and the solutions.
