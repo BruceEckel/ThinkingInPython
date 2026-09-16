@@ -4,7 +4,8 @@ Sometimes the problem you're solving is as simple as "I don't have the interface
 Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
-A façade makes a library or bundle of resources more comfortable to use.
+The caller sees one entry point and never learns how those classes are built and wired together,
+so the wiring can change without touching any caller.
 Both wrap something that already exists,
 which puts them next to *Proxy* and *Decorator*.
 [Telling the Wrappers Apart](#telling-the-wrappers-apart) sorts the four apart.
