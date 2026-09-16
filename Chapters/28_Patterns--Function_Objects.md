@@ -179,17 +179,10 @@ for command in macro:
 #: Ni!
 ```
 
-`Repeat` holds configuration and sits in a `list[Command]` beside a plain function,
-with no base class above it.
-The annotation lets the two share a list:
-`list[Repeat]` would describe the instances and shut out `spam`.
-The classic form skips this middle step:
-it goes from a plain function straight to a base class.
-
 A callable alone cannot express a second operation, `undo()`.
-Because `Command` describes only the call,
-a list of commands that also undo needs a name for "callable, plus `undo()`".
-That name is a `Protocol` with both members.
+`Command` describes one call,
+so a list of commands that can also undo needs a type with two members,
+`__call__()` and `undo()`, and that type is a `Protocol`.
 A `Command` base class becomes worth writing when the commands also share implementation.
 
 Building commands in a loop can produce Python's best-known closure mistake:
