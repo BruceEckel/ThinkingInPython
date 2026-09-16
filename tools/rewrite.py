@@ -16,6 +16,14 @@ touched a listing, broke a link, or added a banned phrase fails right
 there, not at the next `make verify`. A chapter's chain stops at its
 first failure.
 
+Before anything runs, every selected pass's skill is looked up:
+a repo skill must have `.claude/skills/<name>/SKILL.md`, and a plugin
+skill (`plugin:skill`) must come from a plugin that is installed and
+not disabled in `~/.claude/settings.json`. A missing one fails the run
+at once with the install command, instead of every chapter's chain
+stopping at the same "Unknown command" after a headless session has
+already started.
+
 Several chapters run in parallel by default (`CH="25 28 30"`), one
 pass chain per chapter, up to `--jobs` at once. Each chain writes only
 its own chapter, and its banned-phrase and link checks read only that
@@ -56,6 +64,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -235,6 +244,69 @@ DRIFT_NOTE = (
     "a fenced listing somewhere in Chapters/ no longer matches Examples/; "
     "if another rewrite is running, its chapter may be the one that changed"
 )
+
+
+def plugin_skill_available(
+    plugin: str, skill: str, home: Path
+) -> bool:
+    """Whether an installed, enabled plugin named `plugin` provides `skill`.
+
+    Reads Claude Code's registry, `~/.claude/plugins/installed_plugins.json`
+    (keys `name@marketplace`, each with an `installPath`), and the
+    `enabledPlugins` map in `~/.claude/settings.json`, where `false`
+    disables a plugin that is still installed. The skill is present when
+    the install has `skills/<skill>/SKILL.md` or `commands/<skill>.md`.
+    """
+    registry = home / ".claude" / "plugins" / "installed_plugins.json"
+    settings = home / ".claude" / "settings.json"
+    try:
+        plugins = json.loads(registry.read_text(encoding="utf-8"))
+        plugins = plugins.get("plugins", {})
+    except (OSError, ValueError):
+        return False
+    try:
+        enabled = json.loads(settings.read_text(encoding="utf-8"))
+        enabled = enabled.get("enabledPlugins", {})
+    except (OSError, ValueError):
+        enabled = {}
+    for key, installs in plugins.items():
+        if key.partition("@")[0] != plugin or enabled.get(key) is False:
+            continue
+        for install in installs:
+            root = Path(install.get("installPath", ""))
+            if (root / "skills" / skill / "SKILL.md").is_file():
+                return True
+            if (root / "commands" / f"{skill}.md").is_file():
+                return True
+    return False
+
+
+def missing_skills(
+    passes: list[Pass], root: Path = ROOT, home: Path | None = None
+) -> list[str]:
+    """One line per selected pass whose skill cannot be found.
+
+    Empty means every pass can start. Checked before any headless session
+    runs, so `make rewrite` fails fast on an uninstalled plugin instead of
+    each chapter's chain stopping at "Unknown command".
+    """
+    home = Path.home() if home is None else home
+    problems: list[str] = []
+    for p in passes:
+        plugin, sep, skill = p.skill.partition(":")
+        if sep:
+            if not plugin_skill_available(plugin, skill, home):
+                problems.append(
+                    f"pass `{p.name}` needs `/{p.skill}`, and no installed, "
+                    f"enabled plugin named `{plugin}` provides it: "
+                    f"`claude plugin install {plugin}@<marketplace>`, "
+                    f"or leave it out with --passes")
+        elif not (root / ".claude" / "skills" / p.skill
+                  / "SKILL.md").is_file():
+            problems.append(
+                f"pass `{p.name}` needs `/{p.skill}`, and "
+                f".claude/skills/{p.skill}/SKILL.md does not exist")
+    return problems
 
 
 def claude_argv(
@@ -442,6 +514,13 @@ def main() -> int:
         selected = list(PASSES)
     else:
         selected = [p for p in PASSES if p.default]
+
+    problems = missing_skills(selected)
+    if problems:
+        for line in problems:
+            print(f"rewrite: {line}")
+        print("rewrite: nothing run")
+        return 2
 
     claude = shutil.which("claude")
     if claude is None and not args.dry_run:
