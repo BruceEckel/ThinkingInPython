@@ -223,6 +223,9 @@ The argument to `functools.partial`
 ([Functional Foundations](40_Functional--Foundations.md#partial-application))
 is an ordinary expression that Python evaluates where you write it,
 so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
+The older fix, `lambda n=n: print(f"step {n}")`,
+does the same job with a default argument, which Python evaluates once,
+when the lambda is created.
 When commands built in a loop all behave like the last one,
 the shared loop variable is the cause.
 
@@ -677,6 +680,9 @@ both producing frozen data classes.
 `@event` records its class in `EVENTS`.
 `@handler` makes a function object whose fields are its configuration,
 and records in `HANDLES` which event its `__call__` accepts.
+`Handler` becomes a `Protocol` whose one method is `__call__()`,
+because the handlers are now objects rather than functions;
+it still names their signature and nothing more.
 `subscribe()` then takes one argument, since the handler says what it handles,
 and `publish()` refuses an object that no `@event` class produced:
 
