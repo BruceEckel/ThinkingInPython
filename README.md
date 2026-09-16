@@ -95,11 +95,11 @@ You'll need to do this to experiment with the examples and exercises.
 
 1. Clone this repository.
 2. You need a `make` command. Check with `make --version`.
-   Linux and WSL: `sudo apt install make` (Debian/Ubuntu) or
-   `sudo dnf install make` (Fedora); minimal images, including
-   Ubuntu on WSL, do not include it.
-   macOS: install Xcode Command Line Tools if it's missing.
-   Windows: `winget install ezwinports.make`
+   - Linux and WSL: `sudo apt install make` (Debian/Ubuntu) or
+     `sudo dnf install make` (Fedora). Minimal images, including
+     Ubuntu on WSL, do not include it.
+   - macOS: install Xcode Command Line Tools if it's missing.
+   - Windows: `winget install ezwinports.make`
 3. Install [uv](https://docs.astral.sh/uv/):
    - Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
    - macOS: `brew install uv`, or the same `curl` command as Linux
