@@ -595,6 +595,7 @@ function, and apply the arguments where you need the Effect.
 ```python
 # exercise_9.py
 import asyncio
+from exceptions import expect
 from stateless import Async, Depend, run, run_async, wait
 
 async def fetch(url: str) -> str:
@@ -612,16 +613,14 @@ def report_all(urls: list[str]) -> Depend[Async, list[str]]:
     return reports
 
 async def main() -> None:
-    try:
-        run(report_all(["a"]))
-    except RuntimeError as e:
-        print(e)
+    expect(RuntimeError, run, report_all(["a"]))
     for line in await run_async(
             report_all(["a", "b", "c"])):
         print(line)
 
 asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
+#: [RuntimeError] asyncio.run() cannot be called from a
+#: running event loop
 #: body = 'fetched a', len(body) = 9
 #: body = 'fetched b', len(body) = 9
 #: body = 'fetched c', len(body) = 9
@@ -657,6 +656,7 @@ type-based: `run()` at the outermost edge of a synchronous program,
 ```python
 # exercise_10.py
 from typing import Final
+from exceptions import ignore
 from stateless import (Effect, Need, need, run, supply,
                        throws)
 
@@ -688,13 +688,11 @@ def announce(
 
 bound = supply(Console())(announce)
 for who in ("Alice", "Cyd", "Dana"):
-    try:
+    with ignore((KeyError, ValueError)):
         run(bound(who))
-    except (KeyError, ValueError) as e:
-        print(f"{type(e).__name__}: {e}")
 #: Alice: 42
-#: ValueError: negative score for Cyd: -3
-#: KeyError: 'Dana'
+#: ValueError('negative score for Cyd: -3')
+#: KeyError('Dana')
 ```
 
 `@throws(ValueError)` turns `format_score()` from a function that
@@ -721,13 +719,13 @@ Deleting `ValueError` from the annotation gives:
 
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
-  --> exercise_10.py:28:28
+  --> exercise_10.py:29:28
    |
-26 | ) -> Effect[Need[Console], KeyError, None]:
+27 | ) -> Effect[Need[Console], KeyError, None]:
    |      ------------------------------------- Function annotated with
    |      yield type `Need[Console] | KeyError` here
-27 |     value: int = yield from score(name)
-28 |     line: str = yield from format_score(name, value)
+28 |     value: int = yield from score(name)
+29 |     line: str = yield from format_score(name, value)
    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^
    |                            expression of type `ValueError`,
    |                            expected `Need[Console] | KeyError`

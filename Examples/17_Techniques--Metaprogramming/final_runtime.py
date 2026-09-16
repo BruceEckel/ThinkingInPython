@@ -1,4 +1,5 @@
 # final_runtime.py
+from exceptions import ignore
 
 class A:
     pass
@@ -9,9 +10,7 @@ class B(A):
             f"{B.__name__} is final; "
             f"you cannot subclass it")
 
-try:
+with ignore(TypeError):
     class C(B):
         pass
-except TypeError as error:
-    print(error)
-#: B is final; you cannot subclass it
+#: TypeError('B is final; you cannot subclass it')

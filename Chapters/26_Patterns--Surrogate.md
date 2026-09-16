@@ -374,6 +374,7 @@ The fix is a guard at the top of `__getattr__()` that raises `AttributeError` fo
 ```python
 # getattr_guard.py
 from typing import Any
+from exceptions import ignore
 
 class Proxy:
     def __init__(self, impl: Any) -> None:
@@ -386,11 +387,9 @@ class Proxy:
 class Implementation:
     def f(self) -> None: print("Implementation.f()")
 
-try:
+with ignore(AttributeError):
     Proxy(Implementation()).f()
-except AttributeError as e:
-    print(type(e).__name__, e)
-#: AttributeError _imp
+#: AttributeError('_imp')
 ```
 
 Without the guard, the misspelled `self._imp` produces a `RecursionError` that names nothing.
@@ -528,6 +527,7 @@ Because `__getattr__()` receives the requested name, the check is one condition:
 ```python
 # protection_proxy.py
 from typing import Any, Final
+from exceptions import expect, ignore
 
 READ_ONLY: Final[frozenset[str]] = frozenset({"read"})
 
@@ -548,16 +548,11 @@ class Document:
 guest = Guarded(Document(), admin=False)
 print(guest.read())
 #: contents
-try:
+with ignore(PermissionError):
     guest.erase()
-except PermissionError as e:
-    print(type(e).__name__, e)
-#: PermissionError erase
-try:
-    hasattr(guest, "erase")
-except PermissionError as e:
-    print(type(e).__name__, e)
-#: PermissionError erase
+#: PermissionError('erase')
+expect(PermissionError, hasattr, guest, "erase")
+#: [PermissionError] erase
 Guarded(Document(), admin=True).erase()
 #: erased
 ```

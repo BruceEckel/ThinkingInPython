@@ -1,4 +1,5 @@
 # narrowing_attribute.py
+from exceptions import expect
 
 class Box:
     def __init__(self, val: str | None) -> None:
@@ -13,8 +14,6 @@ def show(b: Box) -> str:
         return b.val.upper()
     return "(nothing)"
 
-try:
-    show(Box("hi"))
-except AttributeError as e:
-    print(e)
-#: 'NoneType' object has no attribute 'upper'
+expect(AttributeError, show, Box("hi"))
+#: [AttributeError] 'NoneType' object has no attribute
+#: 'upper'

@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import assert_never
+from exceptions import expect
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -89,11 +90,8 @@ deep: Expr = Num(0)
 for n in range(1, 2001):
     deep = deep + Num(n)
 
-try:
-    evaluate(deep)
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+expect(RecursionError, evaluate, deep)
+#: [RecursionError] maximum recursion depth exceeded
 print(evaluate_iterative(deep))
 #: 2001000
 

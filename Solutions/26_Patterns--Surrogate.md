@@ -146,6 +146,7 @@ what "copy-on-write" means.
 ```python
 # exercise_4.py
 from typing import Any
+from exceptions import ignore
 
 class Implementation:
     def f(self) -> None: print("f()")
@@ -165,11 +166,9 @@ class BrokenProxy:
         return attr
 
 p = BrokenProxy(Implementation())
-try:
+with ignore(RecursionError):
     p.f()
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+#: RecursionError('maximum recursion depth exceeded')
 ```
 
 Python finds no `f` on the instance or on `BrokenProxy`, so it calls
@@ -321,6 +320,7 @@ assign them onto the class.
 ```python
 # exercise_7.py
 from typing import Any
+from exceptions import expect
 
 def methods(obj: object) -> set[str]:
     return {
@@ -354,11 +354,8 @@ class Lacking:
 s = Surrogate(Full())
 s.f()
 #: Full.f()
-try:
-    s.change_to(Lacking())
-except TypeError as e:
-    print(type(e).__name__, e)
-#: TypeError missing: ['g']
+expect(TypeError, s.change_to, Lacking())
+#: [TypeError] missing: ['g']
 s.g()  # The old implementation is still in place
 #: Full.g()
 ```

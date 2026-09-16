@@ -1,5 +1,6 @@
 # exercise_2.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -29,15 +30,14 @@ class EmailAddress:
               "needs text on both sides")
 
 for bad in ["grace", "b@@x.com", "@x.com", "b@", ""]:
-    try:
-        EmailAddress(bad)
-    except TypeFailure as e:
-        print("rejected:", e)
-#: rejected: EmailAddress('grace') needs exactly one @
-#: rejected: EmailAddress('b@@x.com') needs exactly one @
-#: rejected: EmailAddress('@x.com') needs text on both sides
-#: rejected: EmailAddress('b@') needs text on both sides
-#: rejected: EmailAddress('') needs exactly one @
+    expect(TypeFailure, EmailAddress, bad)
+#: [TypeFailure] EmailAddress('grace') needs exactly one @
+#: [TypeFailure] EmailAddress('b@@x.com') needs exactly one
+#: @
+#: [TypeFailure] EmailAddress('@x.com') needs text on both
+#: sides
+#: [TypeFailure] EmailAddress('b@') needs text on both sides
+#: [TypeFailure] EmailAddress('') needs exactly one @
 
 print(EmailAddress("grace@example.com"))
 #: EmailAddress(text='grace@example.com')

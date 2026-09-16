@@ -1,5 +1,6 @@
 # exercise_2.py
 from typing import Final
+from exceptions import expect
 from stateless import Success, catch, run, success, throws
 
 RAW: Final[dict[str, int]] = {"Alice": 42}
@@ -12,11 +13,8 @@ def caller() -> Success[int | KeyError]:
         yield from catch(KeyError)(size)("Bob"))
     return out
 
-try:
-    run(caller())
-except KeyError as e:
-    print(f"escaped: {type(e).__name__}: {e}")
-#: escaped: KeyError: 'Bob'
+expect(KeyError, run, caller())
+#: [KeyError] 'Bob'
 
 @throws(KeyError)
 def declared_size(name: str) -> int:

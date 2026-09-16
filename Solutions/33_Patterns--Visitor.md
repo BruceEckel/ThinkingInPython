@@ -139,6 +139,7 @@ once.
 ```python
 # exercise_3.py
 from typing import Protocol
+from exceptions import expect
 
 class Visits(Protocol):
     def visit(self, flower: Flower) -> None: ...
@@ -174,11 +175,8 @@ class Beetle(Bug):  # Inherits no visit()
 Gladiolus().accept(Bee())
 #: Gladiolus pollinated by Bee
 
-try:
-    Gladiolus().accept(Beetle())  # type: ignore
-except AttributeError as e:
-    print(type(e).__name__, e)
-#: AttributeError 'Beetle' object has no attribute 'visit'
+expect(AttributeError, Gladiolus().accept, Beetle())  # type: ignore
+#: [AttributeError] 'Beetle' object has no attribute 'visit'
 ```
 
 `Visits` names the one method `accept()` calls, so the parameter

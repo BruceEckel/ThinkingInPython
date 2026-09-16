@@ -122,6 +122,7 @@ The error side has the same hole:
 ```python
 # exercise_2.py
 from typing import Final
+from exceptions import expect
 from stateless import Success, catch, run, success, throws
 
 RAW: Final[dict[str, int]] = {"Alice": 42}
@@ -134,11 +135,8 @@ def caller() -> Success[int | KeyError]:
         yield from catch(KeyError)(size)("Bob"))
     return out
 
-try:
-    run(caller())
-except KeyError as e:
-    print(f"escaped: {type(e).__name__}: {e}")
-#: escaped: KeyError: 'Bob'
+expect(KeyError, run, caller())
+#: [KeyError] 'Bob'
 
 @throws(KeyError)
 def declared_size(name: str) -> int:
@@ -288,6 +286,7 @@ depleting nothing, since wind costs no fuel.
 
 ```python
 # exercise_3.py
+from exceptions import expect
 from grid import (
     Backup,
     Battery,
@@ -320,10 +319,7 @@ run(handle(full)(run_load)(17, 6))
 short = controller((Solar(), Turbine(range(19, 20)),
                     Battery(0), Grid(range(0, 24)),
                     Backup(0)))
-try:
-    run(handle(short)(run_load)(17, 6))
-except Blackout as e:
-    print(f"Blackout at hour {e.args[0]}, out of run()")
+expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: Solar online
 #:   17:00
 #:   18:00
@@ -331,7 +327,7 @@ except Blackout as e:
 #: Turbine online
 #:   19:00
 #: Turbine offline
-#: Blackout at hour 20, out of run()
+#: [Blackout] 20
 ```
 
 The turbine takes the evening hours the battery used to cover, and the battery

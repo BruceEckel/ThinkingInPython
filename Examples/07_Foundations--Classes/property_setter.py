@@ -1,4 +1,5 @@
 # property_setter.py
+from exceptions import expect
 
 class Circle:
     def __init__(self, radius):
@@ -27,8 +28,5 @@ print(c.area)
 c.radius = 5  # Now the setter validates, then stores
 print(c.radius)
 #: 5
-try:
-    Circle(-1)
-except ValueError as e:
-    print(f"Failed: {e}")
-#: Failed: radius cannot be negative
+expect(ValueError, Circle, -1)
+#: [ValueError] radius cannot be negative

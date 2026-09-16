@@ -110,6 +110,7 @@ and a method can leave the object in an illegal state between steps:
 
 ```python
 # stars_class.py
+from exceptions import expect
 from validation import TypeFailure, check
 
 class Stars:
@@ -139,14 +140,11 @@ if __name__ == "__main__":
     print(rating)
     print(rating.f1())
     damaged = Stars(8)
-    try:
-        damaged.f1()
-    except TypeFailure as e:
-        print(f"TypeFailure: {e}")
+    expect(TypeFailure, damaged.f1)
     print(damaged)
 #: Stars(4)
 #: 9
-#: TypeFailure: Stars(13)
+#: [TypeFailure] Stars(13)
 #: Stars(13)
 ```
 
@@ -1326,6 +1324,7 @@ and anything else that defines `__replace__()`:
 import copy
 from datetime import date
 from typing import NamedTuple
+from exceptions import expect
 from stars import Stars
 
 class Size(NamedTuple):
@@ -1339,11 +1338,8 @@ print(copy.replace(Size(4, 3), height=9))
 print(copy.replace(date(2026, 8, 4), day=1))
 #: 2026-08-01
 
-try:
-    copy.replace(Stars(4), number=99)
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeFailure: Stars(99)
+expect(Exception, copy.replace, Stars(4), number=99)
+#: [TypeFailure] Stars(99)
 ```
 
 `copy.replace()` builds the new object through the constructor,

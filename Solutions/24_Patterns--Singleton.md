@@ -50,6 +50,7 @@ import builds the object, leaving no first call to race.
 # exercise_2.py
 from dataclasses import dataclass
 from functools import cache
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Connection:
@@ -85,11 +86,8 @@ c1 = p1.acquire()
 c2 = p1.acquire()
 print(c1 != c2)
 #: True
-try:
-    p1.acquire()
-except RuntimeError as e:
-    print("caught:", e)
-#: caught: pool exhausted
+expect(RuntimeError, p1.acquire)
+#: [RuntimeError] pool exhausted
 p1.release(c1)
 c3 = p1.acquire()
 print(c3 == c1)

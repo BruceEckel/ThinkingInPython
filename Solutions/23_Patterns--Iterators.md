@@ -397,6 +397,7 @@ pay: answering a question about the future means fetching the future.
 ```python
 # exercise_9.py
 from collections.abc import Iterator, Sequence
+from exceptions import expect
 
 type Nested = int | Sequence[Nested]
 
@@ -417,11 +418,8 @@ def flatten_str(
             yield from flatten_str(item)
 
 mixed: Sequence[Nested] = [1, "ab", 2]
-try:
-    list(flatten(mixed))
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+expect(RecursionError, list, flatten(mixed))
+#: [RecursionError] maximum recursion depth exceeded
 print(list(flatten_str(mixed)))
 #: [1, 'ab', 2]
 print(list(flatten_str([1, ["ab", [2]], 3])))
@@ -465,6 +463,7 @@ error at the call.
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import override
+from exceptions import expect
 
 def typed[T](
     it: Iterable[object], expected: type[T]
@@ -496,11 +495,8 @@ class SkippingIterator[T](Iterator[T]):
         raise StopIteration
 
 items: list[object] = [1, "two", 3, None, 4]
-try:
-    print(list(typed(items, int)))
-except TypeError as e:
-    print(e)
-#: expected <class 'int'>, got str
+expect(TypeError, list, typed(items, int))
+#: [TypeError] expected <class 'int'>, got str
 print(list(typed_skipping(items, int)))
 #: [1, 3, 4]
 print(list(SkippingIterator(iter(items), int)))

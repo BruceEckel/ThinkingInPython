@@ -325,6 +325,7 @@ you can also pass the steps as arguments:
 ```python
 # template_function.py
 from collections.abc import Callable
+from exceptions import expect
 
 type Step = Callable[[], None]
 
@@ -343,11 +344,9 @@ run_framework(
 #: Nudge, nudge, wink, wink!
 #: Say no more, say no more!
 
-try:
-    run_framework(lambda: print("one"))  # type: ignore
-except TypeError as e:
-    print(f"{type(e).__name__}: missing customize2")
-#: TypeError: missing customize2
+expect(TypeError, run_framework, lambda: print("one"))  # type: ignore
+#: [TypeError] run_framework() missing 1 required positional
+#: argument: 'customize2'
 ```
 
 Both the *Template Method* and the function version have an anchored algorithm and varying steps.

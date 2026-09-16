@@ -1,6 +1,7 @@
 # exercise_5.py
 from dataclasses import dataclass
 from typing import Self
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Pizza:
@@ -13,11 +14,9 @@ class Pizza:
             raise ValueError(
                 "a pizza may carry at most four toppings")
 
-try:
-    Pizza(toppings=("a", "b", "c", "d", "e"))
-except ValueError as e:
-    print("direct rejected:", e)
-#: direct rejected: a pizza may carry at most four toppings
+expect(ValueError, Pizza,
+       toppings=("a", "b", "c", "d", "e"))
+#: [ValueError] a pizza may carry at most four toppings
 
 class PizzaBuilder:
     def __init__(self) -> None:
@@ -39,10 +38,7 @@ pb = (
     PizzaBuilder().topping("a").topping("b")
     .topping("c").topping("d")
 )
-try:
-    pb.topping("e")
-except ValueError as e:
-    print("builder rejected:", e)
-#: builder rejected: a pizza may carry at most four toppings
+expect(ValueError, pb.topping, "e")
+#: [ValueError] a pizza may carry at most four toppings
 print(pb.build())
 #: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))

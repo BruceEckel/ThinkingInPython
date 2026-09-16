@@ -455,6 +455,7 @@ import pickle
 from dataclasses import dataclass
 import drawing_v1
 from drawing_v1 import Drawing
+from exceptions import expect
 
 blob = pickle.dumps(Drawing("Duck", ("circle",)))
 blank = pickle.dumps(Drawing("", ("circle",)))
@@ -480,11 +481,8 @@ print("layer" in restored.__dict__)
 empty = pickle.loads(blank)
 print(repr(empty.title))
 #: ''
-try:
-    copy.replace(empty, strokes=())
-except ValueError as e:
-    print(type(e).__name__, e)
-#: ValueError title must not be empty
+expect(ValueError, copy.replace, empty, strokes=())
+#: [ValueError] title must not be empty
 ```
 
 The default appears, and not because pickle supplied it. A dataclass

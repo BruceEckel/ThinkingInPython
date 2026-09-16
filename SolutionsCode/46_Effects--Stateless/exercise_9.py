@@ -1,5 +1,6 @@
 # exercise_9.py
 import asyncio
+from exceptions import expect
 from stateless import Async, Depend, run, run_async, wait
 
 async def fetch(url: str) -> str:
@@ -17,16 +18,14 @@ def report_all(urls: list[str]) -> Depend[Async, list[str]]:
     return reports
 
 async def main() -> None:
-    try:
-        run(report_all(["a"]))
-    except RuntimeError as e:
-        print(e)
+    expect(RuntimeError, run, report_all(["a"]))
     for line in await run_async(
             report_all(["a", "b", "c"])):
         print(line)
 
 asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
+#: [RuntimeError] asyncio.run() cannot be called from a
+#: running event loop
 #: body = 'fetched a', len(body) = 9
 #: body = 'fetched b', len(body) = 9
 #: body = 'fetched c', len(body) = 9

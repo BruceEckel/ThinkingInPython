@@ -1,4 +1,5 @@
 # handler_blocks_except.py
+from exceptions import expect
 from greeter import Console
 from scores import score
 from stateless import Effect, Need, need, run, supply
@@ -14,8 +15,5 @@ def guarded(
     console.print(f"{name}: {value}")
     return f"{name}: {value}"
 
-try:
-    run(supply(Console())(guarded)("Carol"))
-except KeyError as e:
-    print("escaped:", type(e).__name__, e)
-#: escaped: KeyError 'Carol'
+expect(KeyError, run, supply(Console())(guarded)("Carol"))
+#: [KeyError] 'Carol'

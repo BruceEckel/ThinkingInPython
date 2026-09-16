@@ -1,5 +1,6 @@
 # exercise_8.py
 from typing import ClassVar, Final, Protocol, override
+from exceptions import expect
 
 class Shape:
     def draw(self) -> None: ...
@@ -41,8 +42,6 @@ class TableFactory:
 
 TableFactory.create_shape("Circle").draw()
 #: Circle.draw
-try:
-    TableFactory.create_shape(ATTACK)
-except KeyError as e:
-    print(type(e).__name__)
-#: KeyError
+expect(KeyError, TableFactory.create_shape, ATTACK)
+#: [KeyError] "Circle.Factory() if print('side effect!')
+#: else _Circle"

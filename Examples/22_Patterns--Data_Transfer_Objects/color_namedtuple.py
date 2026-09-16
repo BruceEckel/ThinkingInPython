@@ -1,5 +1,6 @@
 # color_namedtuple.py
 from typing import NamedTuple
+from exceptions import ignore
 
 class Color(NamedTuple):
     r: int
@@ -11,11 +12,9 @@ print(red)
 #: Color(r=255, g=0, b=0)
 print(red.r, red[0])
 #: 255 255
-try:
+with ignore(AttributeError):
     red.r = 9  # type: ignore
-except AttributeError as e:
-    print(e)
-#: can't set attribute
+#: AttributeError("can't set attribute")
 print(red._replace(g=128))
 #: Color(r=255, g=128, b=0)
 print(red._asdict(), Color._fields)

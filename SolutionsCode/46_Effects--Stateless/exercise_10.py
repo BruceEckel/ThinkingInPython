@@ -1,5 +1,6 @@
 # exercise_10.py
 from typing import Final
+from exceptions import ignore
 from stateless import (Effect, Need, need, run, supply,
                        throws)
 
@@ -31,10 +32,8 @@ def announce(
 
 bound = supply(Console())(announce)
 for who in ("Alice", "Cyd", "Dana"):
-    try:
+    with ignore((KeyError, ValueError)):
         run(bound(who))
-    except (KeyError, ValueError) as e:
-        print(f"{type(e).__name__}: {e}")
 #: Alice: 42
-#: ValueError: negative score for Cyd: -3
-#: KeyError: 'Dana'
+#: ValueError('negative score for Cyd: -3')
+#: KeyError('Dana')

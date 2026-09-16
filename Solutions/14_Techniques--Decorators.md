@@ -324,6 +324,7 @@ implementation would have to reconsider that trade.
 # exercise_6.py
 from collections.abc import Callable
 from functools import wraps
+from exceptions import expect
 
 def retry[**P, R](
     times: int
@@ -361,12 +362,9 @@ print(flaky.__name__)
 def always_fails() -> str:
     raise RuntimeError("no luck")
 
-try:
-    always_fails()
-except RuntimeError as e:
-    print("escaped:", e)
+expect(RuntimeError, always_fails)
 #: attempt 1 failed: no luck
-#: escaped: no luck
+#: [RuntimeError] no luck
 ```
 
 The loop runs `times - 1` attempts inside a `try`, and the final

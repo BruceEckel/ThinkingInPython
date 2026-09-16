@@ -1,6 +1,7 @@
 # exercise_9.py
 from dataclasses import dataclass
 from enum import Enum, auto
+from exceptions import expect
 from table_machine import NoTransition, StateMachine, Table
 
 class State(Enum):
@@ -37,11 +38,9 @@ m = Machine()
 m.handle(Money("quarter", 25))
 print(m.state, m.amount)
 #: State.COLLECTING 25
-try:
-    m.handle(Nickel("nickel", 5))
-except NoTransition as e:
-    print(e)
-#: no transition from <State.COLLECTING: 2> on Nickel
+expect(NoTransition, m.handle, Nickel("nickel", 5))
+#: [NoTransition] no transition from <State.COLLECTING: 2>
+#: on Nickel
 
 # Fix 1: the table names Nickel too
 m1 = Machine(accept_nickels=True)

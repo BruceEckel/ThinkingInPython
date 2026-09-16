@@ -2,6 +2,7 @@
 import weakref
 from dataclasses import dataclass
 from functools import cached_property
+from exceptions import expect
 
 @dataclass(slots=True)
 class Node:
@@ -23,12 +24,10 @@ except TypeError as e:
 class Slotted:
     x: int
 
-try:
-    weakref.ref(Slotted(1))
-except TypeError as e:
-    # No __weakref__ slot unless you declare one:
-    print(str(e))
-#: cannot create weak reference to 'Slotted' object
+# No __weakref__ slot unless you declare one:
+expect(TypeError, weakref.ref, Slotted(1))
+#: [TypeError] cannot create weak reference to 'Slotted'
+#: object
 
 @dataclass(slots=True)
 class OtherSlotted:

@@ -2,6 +2,7 @@
 import copy
 from dataclasses import dataclass
 from typing import NamedTuple
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -27,11 +28,8 @@ class Stars(_Stars):
 
 print(Stars(5))
 #: Stars(number=5)
-try:
-    Stars(11)
-except TypeFailure as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeFailure: Stars(11)
+expect(TypeFailure, Stars, 11)
+#: [TypeFailure] Stars(11)
 
 print(Stars(5)._replace(number=99))
 #: Stars(number=99)

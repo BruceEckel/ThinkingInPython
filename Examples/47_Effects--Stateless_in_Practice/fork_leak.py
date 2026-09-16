@@ -1,5 +1,6 @@
 # fork_leak.py
 from concurrent.futures import Executor, ThreadPoolExecutor
+from exceptions import expect
 from stateless import (
     Async,
     Depend,
@@ -28,8 +29,5 @@ def go() -> Depend[Need[Executor] | Async, int]:
 
 with ThreadPoolExecutor(max_workers=1) as pool:
     supplied = supply(as_type(Executor)(pool))(go)
-    try:
-        run(supplied())
-    except Boom as e:
-        print(f"escaped: {e}")
-#: escaped: 1
+    expect(Boom, run, supplied())
+#: [Boom] 1

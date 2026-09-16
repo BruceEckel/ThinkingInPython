@@ -1,5 +1,6 @@
 # exercise_7.py
 from typing import Any
+from exceptions import expect
 
 def methods(obj: object) -> set[str]:
     return {
@@ -33,10 +34,7 @@ class Lacking:
 s = Surrogate(Full())
 s.f()
 #: Full.f()
-try:
-    s.change_to(Lacking())
-except TypeError as e:
-    print(type(e).__name__, e)
-#: TypeError missing: ['g']
+expect(TypeError, s.change_to, Lacking())
+#: [TypeError] missing: ['g']
 s.g()  # The old implementation is still in place
 #: Full.g()

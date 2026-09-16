@@ -1,5 +1,6 @@
 # exercise_4.py
 from typing import Any
+from exceptions import ignore
 
 class Implementation:
     def f(self) -> None: print("f()")
@@ -19,8 +20,6 @@ class BrokenProxy:
         return attr
 
 p = BrokenProxy(Implementation())
-try:
+with ignore(RecursionError):
     p.f()
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+#: RecursionError('maximum recursion depth exceeded')

@@ -12,7 +12,7 @@ Solutions/13_Techniques--Pattern_Matching.md	notifications_match.py:32 reads 'ca
 Solutions/27_Patterns--Factory.md	exercise_3_protocol.py:28 reads '', quote shows 'play(GnomesAndFairies())'
 Solutions/40_Functional--Foundations.md	immutable_types.py:7 reads '', quote shows 'MAX_SIZE = 200'
 Solutions/45_Effects--Generators.md	yield_from_nested.py:8 reads 'profile: Result = yield from interview()', quote shows 'profile: Result = interview()'
-Solutions/46_Effects--Stateless.md	exercise_10.py:26 reads ') -> Effect[Need[Console], KeyError | ValueError, None]:', quote shows ') -> Effect[Need[Console], KeyError, None]:'
+Solutions/46_Effects--Stateless.md	exercise_10.py:27 reads ') -> Effect[Need[Console], KeyError | ValueError, None]:', quote shows ') -> Effect[Need[Console], KeyError, None]:'
 Solutions/46_Effects--Stateless.md	exercise_11.py:40 reads '', quote shows 'run(supply(as_type(Recorder)(Terminal()))(to_log)("Carol"))'
 Solutions/47_Effects--Stateless_in_Practice.md	exercise_13.py:13 reads 'def buttered() -> Depend[', quote shows 'def buttered() -> Depend[Need[Butter], str]:'
 Solutions/47_Effects--Stateless_in_Practice.md	exercise_13.py:14 reads 'Need[Dough] | Need[Oven] | Need[Toaster] | Need[Butter],', quote shows 'slice_ = yield from toast()'

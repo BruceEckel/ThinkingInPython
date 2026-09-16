@@ -209,6 +209,7 @@ outside the call participates in the result.
 ```python
 # exercise_4.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(frozen=True)
 class PositiveInt:
@@ -226,12 +227,9 @@ def slope(rise: int, run: PositiveInt) -> float:
 print(slope(10, PositiveInt(2)))
 #: 5.0
 for bad in (0, -1):
-    try:
-        PositiveInt(bad)
-    except ValueError as e:
-        print(e)
-#: PositiveInt needs a positive value: 0
-#: PositiveInt needs a positive value: -1
+    expect(ValueError, PositiveInt, bad)
+#: [ValueError] PositiveInt needs a positive value: 0
+#: [ValueError] PositiveInt needs a positive value: -1
 ```
 
 Both checks disappear from `slope()`, and so does everything they

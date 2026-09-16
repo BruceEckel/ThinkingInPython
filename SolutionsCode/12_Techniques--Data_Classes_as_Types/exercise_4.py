@@ -2,6 +2,7 @@
 import json
 from dataclasses import dataclass
 from typing import Any
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -50,8 +51,5 @@ def from_json(text: str) -> Person:
 bad_json = json.dumps(
     {"name": {"text": "Grace Hopper"},
      "email": {"text": "no-at-sign"}})
-try:
-    from_json(bad_json)
-except TypeFailure as e:
-    print("from_json rejected:", e)
-#: from_json rejected: EmailAddress('no-at-sign') needs an @
+expect(TypeFailure, from_json, bad_json)
+#: [TypeFailure] EmailAddress('no-at-sign') needs an @

@@ -31,6 +31,11 @@ DATA_DIR = TOOLS_DIR / "data"
 
 BUILD_DIR = ROOT / "build"
 EXAMPLES_TREE = BUILD_DIR / "examples"
+# The shared helpers every listing may import (utils/exceptions.py and
+# friends). pyproject names this same directory for pytest's pythonpath
+# and ty's extra-paths, so both build trees resolve it; utils_dir() below
+# gives the two runners the same view.
+SHARED_UTILS = EXAMPLES_TREE / "utils"
 BUILD_SITE_DIR = BUILD_DIR / "site"
 BUILD_EPUB_DIR = BUILD_DIR / "epub"
 BUILD_PDF_DIR = BUILD_DIR / "pdf"
@@ -72,3 +77,17 @@ RUST_FENCE_RE = re.compile(r"^\s*```rust\s*$")
 # relative to rust/, e.g. "// fastcount/src/lib.rs". The Rust-comment
 # analog of PATH_LINE_RE above.
 RUST_PATH_LINE_RE = re.compile(r"^//\s*([\w./\\-]+\.\w+)\s*$")
+
+
+def utils_dir(tree: Path) -> Path:
+    """Where ``tree``'s listings import shared helpers from.
+
+    The tree's own ``utils/`` when it has one, otherwise the book's
+    ``SHARED_UTILS`` (``build/examples/utils``), which pyproject already
+    names for pytest and ty. ``build/solutions`` has no ``utils/`` of
+    its own, so a Solutions listing's ``from exceptions import expect``
+    resolves through the fallback under ``validate_output`` and
+    ``run_examples`` just as it does under ``ty`` and ``pytest``.
+    """
+    own = tree / "utils"
+    return own if own.is_dir() else SHARED_UTILS

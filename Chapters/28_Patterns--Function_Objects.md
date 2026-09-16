@@ -863,7 +863,7 @@ The *GoF Design Patterns* forms of *Command*, *Strategy*,
 and *Chain of Responsibility* all start at the last entry.
 The C++ of that book had no lighter form that could carry state:
 a function pointer carried none, and closures did not exist yet,
-so a class was the first entry available.
+so a class was the only solution available.
 
 ## Exercises
 

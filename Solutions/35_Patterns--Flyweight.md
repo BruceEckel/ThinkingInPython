@@ -364,6 +364,7 @@ cleanup.
 ```python
 # exercise_6.py
 from typing import ClassVar
+from exceptions import expect
 
 type RGB = tuple[int, int, int]
 
@@ -391,11 +392,8 @@ class Color:
         cls._pool[key] = self
         return self
 
-try:
-    Color(300, 0, 0)
-except ValueError as e:
-    print("caught:", e)
-#: caught: red=300 out of range 0-255
+expect(ValueError, Color, 300, 0, 0)
+#: [ValueError] red=300 out of range 0-255
 ```
 
 ```python
@@ -449,6 +447,7 @@ instead, because interning must intercept construction.
 ```python
 # exercise_7.py
 from enum import Enum
+from exceptions import expect
 
 class Tile(Enum):
     GRASS = (".", True)
@@ -478,11 +477,8 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 3
 print(field[0][2] is field[3][5], field[0][2].walkable)
 #: True False
-try:
-    parse_map("?")
-except ValueError as e:
-    print(type(e).__name__, e)
-#: ValueError '?' is not a valid Tile
+expect(ValueError, parse_map, "?")
+#: [ValueError] '?' is not a valid Tile
 ```
 
 `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples

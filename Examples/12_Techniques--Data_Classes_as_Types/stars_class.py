@@ -1,4 +1,5 @@
 # stars_class.py
+from exceptions import expect
 from validation import TypeFailure, check
 
 class Stars:
@@ -28,12 +29,9 @@ if __name__ == "__main__":
     print(rating)
     print(rating.f1())
     damaged = Stars(8)
-    try:
-        damaged.f1()
-    except TypeFailure as e:
-        print(f"TypeFailure: {e}")
+    expect(TypeFailure, damaged.f1)
     print(damaged)
 #: Stars(4)
 #: 9
-#: TypeFailure: Stars(13)
+#: [TypeFailure] Stars(13)
 #: Stars(13)

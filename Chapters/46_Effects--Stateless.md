@@ -1357,20 +1357,19 @@ so you cannot call `run()` from any `async def`:
 ```python
 # inside_a_loop.py
 import asyncio
+from exceptions import expect
 from greeter import Console, greet
 from stateless import run, run_async, supply
 
 bound = supply(Console())(greet)
 
 async def main() -> None:
-    try:
-        run(bound("Alice"))
-    except RuntimeError as e:
-        print(e)
+    expect(RuntimeError, run, bound("Alice"))
     await run_async(bound("Bob"))
 
 asyncio.run(main())
-#: asyncio.run() cannot be called from a running event loop
+#: [RuntimeError] asyncio.run() cannot be called from a
+#: running event loop
 #: Hello, Bob!
 ```
 
@@ -1503,14 +1502,12 @@ and with no `catch()` in the way it propagates out of `run()` as an ordinary exc
 ```python
 # error_escapes.py
 from announce import announce
+from exceptions import expect
 from greeter import Console
 from stateless import run, supply
 
-try:
-    run(supply(Console())(announce)("Carol"))
-except KeyError as e:
-    print(type(e).__name__, e)
-#: KeyError 'Carol'
+expect(KeyError, run, supply(Console())(announce)("Carol"))
+#: [KeyError] 'Carol'
 ```
 
 The error channel records the failures that can occur,
@@ -1582,6 +1579,7 @@ and the error escapes before the inner `except` runs:
 
 ```python
 # handler_blocks_except.py
+from exceptions import expect
 from greeter import Console
 from scores import score
 from stateless import Effect, Need, need, run, supply
@@ -1597,11 +1595,8 @@ def guarded(
     console.print(f"{name}: {value}")
     return f"{name}: {value}"
 
-try:
-    run(supply(Console())(guarded)("Carol"))
-except KeyError as e:
-    print("escaped:", type(e).__name__, e)
-#: escaped: KeyError 'Carol'
+expect(KeyError, run, supply(Console())(guarded)("Carol"))
+#: [KeyError] 'Carol'
 ```
 
 `guarded()` here is the same function as before,

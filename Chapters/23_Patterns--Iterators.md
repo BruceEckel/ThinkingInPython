@@ -796,6 +796,7 @@ but neither restores the free query of the GoF *Iterator*:
 ```python
 # asking_costs.py
 from collections.abc import Iterator
+from exceptions import expect
 
 DONE = sentinel("DONE")
 
@@ -816,11 +817,8 @@ print(next(numbers, DONE) is DONE)  # Asking consumes the 2
 print(next(numbers, DONE) is DONE)  # No more left
 #: True
 
-try:
-    print(list(doubled(iter([1, 2]))))
-except RuntimeError as e:
-    print(f"{type(e).__name__}: {e}")
-#: RuntimeError: generator raised StopIteration
+expect(RuntimeError, list, doubled(iter([1, 2])))
+#: [RuntimeError] generator raised StopIteration
 print(list(doubled_ok(iter([1, 2]))))
 #: [2, 4]
 ```

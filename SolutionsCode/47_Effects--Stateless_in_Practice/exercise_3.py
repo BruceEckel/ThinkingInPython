@@ -1,4 +1,5 @@
 # exercise_3.py
+from exceptions import expect
 from grid import (
     Backup,
     Battery,
@@ -31,10 +32,7 @@ run(handle(full)(run_load)(17, 6))
 short = controller((Solar(), Turbine(range(19, 20)),
                     Battery(0), Grid(range(0, 24)),
                     Backup(0)))
-try:
-    run(handle(short)(run_load)(17, 6))
-except Blackout as e:
-    print(f"Blackout at hour {e.args[0]}, out of run()")
+expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: Solar online
 #:   17:00
 #:   18:00
@@ -42,4 +40,4 @@ except Blackout as e:
 #: Turbine online
 #:   19:00
 #: Turbine offline
-#: Blackout at hour 20, out of run()
+#: [Blackout] 20

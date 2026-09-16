@@ -1,5 +1,6 @@
 # exercise_4.py
 from typing import final, override
+from exceptions import expect
 
 class ApplicationFramework:
     @final
@@ -25,11 +26,8 @@ class HalfDone(ApplicationFramework):
         self.pending.append("work")
     # The `...` default on customize2() drains nothing
 
-try:
-    Exploder().run()
-except RuntimeError as e:
-    print(e)
-#: step 1 refuses
+expect(RuntimeError, Exploder().run)
+#: [RuntimeError] step 1 refuses
 
 app = HalfDone()
 app.run()

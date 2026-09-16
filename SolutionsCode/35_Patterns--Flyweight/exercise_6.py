@@ -1,5 +1,6 @@
 # exercise_6.py
 from typing import ClassVar
+from exceptions import expect
 
 type RGB = tuple[int, int, int]
 
@@ -27,8 +28,5 @@ class Color:
         cls._pool[key] = self
         return self
 
-try:
-    Color(300, 0, 0)
-except ValueError as e:
-    print("caught:", e)
-#: caught: red=300 out of range 0-255
+expect(ValueError, Color, 300, 0, 0)
+#: [ValueError] red=300 out of range 0-255

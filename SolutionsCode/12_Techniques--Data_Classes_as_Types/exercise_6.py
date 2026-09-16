@@ -2,6 +2,7 @@
 import inspect
 from dataclasses import dataclass, fields
 from typing import ClassVar
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -45,8 +46,5 @@ class Wrong:
     def __post_init__(self) -> None:
         self.built += 1  # type: ignore
 
-try:
-    Wrong(1)
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'built'
+expect(Exception, Wrong, 1)
+#: [FrozenInstanceError] cannot assign to field 'built'

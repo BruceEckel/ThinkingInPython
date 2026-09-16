@@ -399,6 +399,7 @@ A class with `__slots__` that omits `__weakref__` cannot be weakly referenced:
 ```python
 # slotted_no_weakref.py
 from weakref import finalize
+from exceptions import expect
 
 class Slotted:
     __slots__ = ("name",)
@@ -406,11 +407,9 @@ class Slotted:
     def __init__(self, name: str) -> None:
         self.name = name
 
-try:
-    finalize(Slotted("x"), print, "closed")
-except TypeError as e:
-    print(type(e).__name__)
-#: TypeError
+expect(TypeError, finalize, Slotted("x"), print, "closed")
+#: [TypeError] cannot create weak reference to 'Slotted'
+#: object
 ```
 
 `__slots__` removes the instance `__dict__` and, by default,

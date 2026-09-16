@@ -2,6 +2,7 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import override
+from exceptions import expect
 
 def typed[T](
     it: Iterable[object], expected: type[T]
@@ -33,11 +34,8 @@ class SkippingIterator[T](Iterator[T]):
         raise StopIteration
 
 items: list[object] = [1, "two", 3, None, 4]
-try:
-    print(list(typed(items, int)))
-except TypeError as e:
-    print(e)
-#: expected <class 'int'>, got str
+expect(TypeError, list, typed(items, int))
+#: [TypeError] expected <class 'int'>, got str
 print(list(typed_skipping(items, int)))
 #: [1, 3, 4]
 print(list(SkippingIterator(iter(items), int)))

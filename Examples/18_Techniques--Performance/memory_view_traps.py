@@ -1,5 +1,5 @@
 # memory_view_traps.py
-from exceptions import expect
+from exceptions import expect, ignore
 
 data = bytearray(b"\x01\x02XYZ")
 view = memoryview(data)
@@ -15,9 +15,7 @@ expect(BufferError, data.append, 1)
 #: re-sized
 
 readonly = memoryview(b"ABCDEF")
-try:
+with ignore(TypeError):
     # bytes is immutable, so a view over it stays read-only:
     readonly[0] = ord("z")
-except TypeError as e:
-    print(str(e))
-#: cannot modify read-only memory
+#: TypeError('cannot modify read-only memory')

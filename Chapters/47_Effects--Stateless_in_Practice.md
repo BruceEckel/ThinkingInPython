@@ -1976,6 +1976,7 @@ Here `Success[float]` claims that `ratio()` cannot fail:
 
 ```python
 # undeclared_failure.py
+from exceptions import expect
 from stateless import Success, catch, run, success
 
 def ratio(a: int, b: int) -> Success[float]:
@@ -1986,11 +1987,8 @@ def caller() -> Success[float | ZeroDivisionError]:
     out = yield from catch(ZeroDivisionError)(ratio)(1, 0)
     return out
 
-try:
-    run(caller())
-except ZeroDivisionError as e:
-    print(e)
-#: division by zero
+expect(ZeroDivisionError, run, caller())
+#: [ZeroDivisionError] division by zero
 ```
 
 `@throws` lifts only the exception types it names, and `ratio()` names none,
@@ -2222,6 +2220,7 @@ and every one of the four returns a `Task` with no error type on it:
 ```python
 # fork_leak.py
 from concurrent.futures import Executor, ThreadPoolExecutor
+from exceptions import expect
 from stateless import (
     Async,
     Depend,
@@ -2250,11 +2249,8 @@ def go() -> Depend[Need[Executor] | Async, int]:
 
 with ThreadPoolExecutor(max_workers=1) as pool:
     supplied = supply(as_type(Executor)(pool))(go)
-    try:
-        run(supplied())
-    except Boom as e:
-        print(f"escaped: {e}")
-#: escaped: 1
+    expect(Boom, run, supplied())
+#: [Boom] 1
 ```
 
 `fork()` runs the wrapped Effect with `run()` inside the worker thread,

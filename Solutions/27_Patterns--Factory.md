@@ -303,6 +303,7 @@ object, not editing every call site that creates a shape.
 # exercise_5.py
 from dataclasses import dataclass
 from typing import Self
+from exceptions import expect
 
 @dataclass(frozen=True)
 class Pizza:
@@ -315,11 +316,9 @@ class Pizza:
             raise ValueError(
                 "a pizza may carry at most four toppings")
 
-try:
-    Pizza(toppings=("a", "b", "c", "d", "e"))
-except ValueError as e:
-    print("direct rejected:", e)
-#: direct rejected: a pizza may carry at most four toppings
+expect(ValueError, Pizza,
+       toppings=("a", "b", "c", "d", "e"))
+#: [ValueError] a pizza may carry at most four toppings
 
 class PizzaBuilder:
     def __init__(self) -> None:
@@ -341,11 +340,8 @@ pb = (
     PizzaBuilder().topping("a").topping("b")
     .topping("c").topping("d")
 )
-try:
-    pb.topping("e")
-except ValueError as e:
-    print("builder rejected:", e)
-#: builder rejected: a pizza may carry at most four toppings
+expect(ValueError, pb.topping, "e")
+#: [ValueError] a pizza may carry at most four toppings
 print(pb.build())
 #: Pizza(size=9, cheese=True, toppings=('a', 'b', 'c', 'd'))
 ```
@@ -410,14 +406,12 @@ class Square(Shape):
 ```python
 # exercise_6.py
 import registry
+from exceptions import expect
 
 print(registry.Shape.registry)
 #: {}
-try:
-    registry.make("Circle")
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'Circle'
+expect(KeyError, registry.make, "Circle")
+#: [KeyError] 'Circle'
 
 import extra_shapes  # noqa: E402  (the import is the point)
 
@@ -448,12 +442,12 @@ packaging system imports for them.
 `registry_demo.py` is the same program in miniature. It imports
 `Shape` and `make` from `registry`, which no longer defines a single
 subclass, so without a change it prints `[]` and the first `make()`
-call raises a `KeyError`. One added import restores the output
-(the chapter's `expect()` line becomes a `try`, as in `exercise_6.py`):
+call raises a `KeyError`. One added import restores the output:
 
 ```python
 # registry_demo.py
 import extra_shapes  # noqa: F401
+from exceptions import expect
 from registry import Shape, make
 
 print(sorted(Shape.registry))
@@ -463,11 +457,8 @@ for name in ["Circle", "Square", "Circle"]:
 #: Circle.draw
 #: Square.draw
 #: Circle.draw
-try:
-    make("Triangle")
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'Triangle'
+expect(KeyError, make, "Triangle")
+#: [KeyError] 'Triangle'
 ```
 
 The demo never uses the name `extra_shapes`, so ruff reports the
@@ -566,6 +557,7 @@ assertion fails loudly under `copy.copy()`.
 ```python
 # exercise_8.py
 from typing import ClassVar, Final, Protocol, override
+from exceptions import expect
 
 class Shape:
     def draw(self) -> None: ...
@@ -607,11 +599,9 @@ class TableFactory:
 
 TableFactory.create_shape("Circle").draw()
 #: Circle.draw
-try:
-    TableFactory.create_shape(ATTACK)
-except KeyError as e:
-    print(type(e).__name__)
-#: KeyError
+expect(KeyError, TableFactory.create_shape, ATTACK)
+#: [KeyError] "Circle.Factory() if print('side effect!')
+#: else _Circle"
 ```
 
 `create_shape()` prepends the underscore and appends `.Factory()`, so
@@ -728,6 +718,7 @@ factory that should build only leaf classes needs a further filter,
 ```python
 # exercise_10.py
 from typing import Final, Protocol, runtime_checkable
+from exceptions import expect
 
 @runtime_checkable
 class Shape(Protocol):
@@ -765,11 +756,8 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
 
 Hexagon().draw()
 #: Hexagon.draw
-try:
-    make("Hexagon")
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'Hexagon'
+expect(KeyError, make, "Hexagon")
+#: [KeyError] 'Hexagon'
 print(unregistered(globals()))
 #: ['Hexagon']
 ```

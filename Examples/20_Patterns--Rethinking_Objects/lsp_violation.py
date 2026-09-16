@@ -1,6 +1,7 @@
 # lsp_violation.py
 from dataclasses import dataclass, field
 from typing import ClassVar, override
+from exceptions import expect
 
 @dataclass
 class Stack:
@@ -26,8 +27,5 @@ def fill(stack: Stack, count: int) -> int:
 
 print(fill(Stack(), 5))
 #: 5
-try:
-    fill(BoundedStack(), 5)
-except OverflowError as e:
-    print(e)
-#: Stack is full
+expect(OverflowError, fill, BoundedStack(), 5)
+#: [OverflowError] Stack is full

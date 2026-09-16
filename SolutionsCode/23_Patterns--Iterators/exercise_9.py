@@ -1,5 +1,6 @@
 # exercise_9.py
 from collections.abc import Iterator, Sequence
+from exceptions import expect
 
 type Nested = int | Sequence[Nested]
 
@@ -20,11 +21,8 @@ def flatten_str(
             yield from flatten_str(item)
 
 mixed: Sequence[Nested] = [1, "ab", 2]
-try:
-    list(flatten(mixed))
-except RecursionError as e:
-    print(type(e).__name__)
-#: RecursionError
+expect(RecursionError, list, flatten(mixed))
+#: [RecursionError] maximum recursion depth exceeded
 print(list(flatten_str(mixed)))
 #: [1, 'ab', 2]
 print(list(flatten_str([1, ["ab", [2]], 3])))

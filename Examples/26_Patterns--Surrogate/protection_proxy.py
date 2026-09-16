@@ -1,5 +1,6 @@
 # protection_proxy.py
 from typing import Any, Final
+from exceptions import expect, ignore
 
 READ_ONLY: Final[frozenset[str]] = frozenset({"read"})
 
@@ -20,15 +21,10 @@ class Document:
 guest = Guarded(Document(), admin=False)
 print(guest.read())
 #: contents
-try:
+with ignore(PermissionError):
     guest.erase()
-except PermissionError as e:
-    print(type(e).__name__, e)
-#: PermissionError erase
-try:
-    hasattr(guest, "erase")
-except PermissionError as e:
-    print(type(e).__name__, e)
-#: PermissionError erase
+#: PermissionError('erase')
+expect(PermissionError, hasattr, guest, "erase")
+#: [PermissionError] erase
 Guarded(Document(), admin=True).erase()
 #: erased

@@ -2,6 +2,7 @@
 import copy
 from dataclasses import dataclass
 from typing import Self
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -32,8 +33,5 @@ class Stars:
 s = Stars(4)
 print(copy.replace(s, number=9))
 #: Stars(9)
-try:
-    copy.replace(s, number=99)
-except TypeFailure as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeFailure: Stars(99)
+expect(TypeFailure, copy.replace, s, number=99)
+#: [TypeFailure] Stars(99)

@@ -87,6 +87,7 @@ and it may or may not fail at runtime:
 # lsp_violation.py
 from dataclasses import dataclass, field
 from typing import ClassVar, override
+from exceptions import expect
 
 @dataclass
 class Stack:
@@ -112,11 +113,8 @@ def fill(stack: Stack, count: int) -> int:
 
 print(fill(Stack(), 5))
 #: 5
-try:
-    fill(BoundedStack(), 5)
-except OverflowError as e:
-    print(e)
-#: Stack is full
+expect(OverflowError, fill, BoundedStack(), 5)
+#: [OverflowError] Stack is full
 ```
 
 `BoundedStack.push()` takes the same argument and returns the same type,
@@ -323,7 +321,7 @@ If you declare the field as a `list` instead, the leak reopens:
 ```python
 # frozen_leaky.py
 from dataclasses import FrozenInstanceError, dataclass
-from exceptions import expect
+from exceptions import expect, ignore
 
 @dataclass(frozen=True)
 class FrozenLeaky:
@@ -333,11 +331,9 @@ fl = FrozenLeaky([1, 2])
 fl.numbers.append(999)  # frozen=True does not stop this
 print(fl.numbers)
 #: [1, 2, 999]
-try:
+with ignore(FrozenInstanceError):
     fl.numbers = []  # type: ignore
-except FrozenInstanceError as e:
-    print(e)
-#: cannot assign to field 'numbers'
+#: FrozenInstanceError("cannot assign to field 'numbers'")
 # A list field makes the whole instance unhashable
 expect(TypeError, hash, fl)
 #: [TypeError] unhashable type: 'list'

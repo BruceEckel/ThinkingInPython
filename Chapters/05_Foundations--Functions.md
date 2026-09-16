@@ -419,6 +419,7 @@ Python raises a `TypeError`:
 
 ```python
 # forwarding_collision.py
+from exceptions import expect
 
 def report(label, *values, **options):
     print(label, values, options)
@@ -429,12 +430,10 @@ def trace(func, *args, **kwargs):
 
 nums = (1, 2, 3)
 opts = {"label": "oops", "color": "red"}
-try:
-    trace(report, *nums, **opts)
-except TypeError as e:
-    print(e)
+expect(TypeError, trace, report, *nums, **opts)
 #: calling report
-#: report() got multiple values for argument 'label'
+#: [TypeError] report() got multiple values for argument
+#: 'label'
 ```
 
 `opts` carries a `"label"` key, and `trace()` forwards it as `label=`.

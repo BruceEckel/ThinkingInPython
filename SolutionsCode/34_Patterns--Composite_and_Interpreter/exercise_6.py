@@ -1,5 +1,6 @@
 # exercise_6.py
 from dataclasses import dataclass
+from exceptions import ignore
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -48,11 +49,9 @@ def wrap(value: Expr | int) -> Expr:
 x = Var("x")
 print(type(2 * x + 1).__name__, (2 * x + 1).right)
 #: Add Num(value=1)
-try:
+with ignore(TypeError):
     "a" + x  # type: ignore
-except TypeError as e:
-    print(type(e).__name__, e)
-#: TypeError can only concatenate str (not "Var") to str
+#: TypeError('can only concatenate str (not "Var") to str')
 try:
     x + "a"  # type: ignore
 except TypeError as e:

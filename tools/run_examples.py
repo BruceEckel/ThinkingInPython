@@ -48,7 +48,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from tools.config import DATA_DIR, INLINE_NORUN_MARKER, NORUN_FILE
-from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
 from tools.repo import jobs_arg, load_glob_list, write_text_lf
 
 BASELINE_FILE = DATA_DIR / "examples_baseline.txt"
@@ -165,14 +165,14 @@ def main(argv: list[str] | None = None) -> int:
     # Each example is its own subprocess, so threads parallelize cleanly: the
     # work happens in child processes, not under the GIL.
     jobs = max(1, args.jobs)
-    utils_dir = args.tree / "utils"
+    helpers = utils_dir(args.tree)
     if jobs == 1:
-        results = [run_one(f, rel, args.timeout, utils_dir)
+        results = [run_one(f, rel, args.timeout, helpers)
                    for f, rel in to_run]
     else:
         with ThreadPoolExecutor(max_workers=jobs) as pool:
             results = list(pool.map(
-                lambda fr: run_one(fr[0], fr[1], args.timeout, utils_dir),
+                lambda fr: run_one(fr[0], fr[1], args.timeout, helpers),
                 to_run))
 
     for status, rel, tail in results:

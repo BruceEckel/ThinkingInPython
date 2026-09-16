@@ -153,7 +153,7 @@ a caretaker that mixes up a `Memento` with some other tuple:
 ```python
 # memento_type_safety.py
 from dataclasses import FrozenInstanceError
-from exceptions import expect
+from exceptions import expect, ignore
 from sketch import Memento, Sketch
 
 def restore_tuple(strokes: tuple[str, ...]) -> None:
@@ -179,12 +179,10 @@ expect(AttributeError, restore_memento,
 #: [AttributeError] 'tuple' object has no attribute
 #: 'strokes'
 
-try:
+with ignore(FrozenInstanceError):
     # ty: strokes is read-only on Memento:
     checkpoint.strokes = ("forged",)  # type: ignore
-except FrozenInstanceError as e:
-    print(type(e).__name__)
-#: FrozenInstanceError
+#: FrozenInstanceError("cannot assign to field 'strokes'")
 ```
 
 `restore_tuple()` accepts either tuple without complaint,

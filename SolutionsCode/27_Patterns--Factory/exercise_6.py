@@ -1,13 +1,11 @@
 # exercise_6.py
 import registry
+from exceptions import expect
 
 print(registry.Shape.registry)
 #: {}
-try:
-    registry.make("Circle")
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'Circle'
+expect(KeyError, registry.make, "Circle")
+#: [KeyError] 'Circle'
 
 import extra_shapes  # noqa: E402  (the import is the point)
 

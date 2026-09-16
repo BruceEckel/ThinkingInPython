@@ -1133,6 +1133,7 @@ It removes everything that dict would have held:
 import weakref
 from dataclasses import dataclass
 from functools import cached_property
+from exceptions import expect
 
 @dataclass(slots=True)
 class Node:
@@ -1154,12 +1155,10 @@ except TypeError as e:
 class Slotted:
     x: int
 
-try:
-    weakref.ref(Slotted(1))
-except TypeError as e:
-    # No __weakref__ slot unless you declare one:
-    print(str(e))
-#: cannot create weak reference to 'Slotted' object
+# No __weakref__ slot unless you declare one:
+expect(TypeError, weakref.ref, Slotted(1))
+#: [TypeError] cannot create weak reference to 'Slotted'
+#: object
 
 @dataclass(slots=True)
 class OtherSlotted:
@@ -1260,7 +1259,7 @@ the way a real protocol parser reads a header:
 
 ```python
 # memory_view_traps.py
-from exceptions import expect
+from exceptions import expect, ignore
 
 data = bytearray(b"\x01\x02XYZ")
 view = memoryview(data)
@@ -1276,12 +1275,10 @@ expect(BufferError, data.append, 1)
 #: re-sized
 
 readonly = memoryview(b"ABCDEF")
-try:
+with ignore(TypeError):
     # bytes is immutable, so a view over it stays read-only:
     readonly[0] = ord("z")
-except TypeError as e:
-    print(str(e))
-#: cannot modify read-only memory
+#: TypeError('cannot modify read-only memory')
 ```
 
 `payload` is a second `memoryview`, not a copy of `data`.

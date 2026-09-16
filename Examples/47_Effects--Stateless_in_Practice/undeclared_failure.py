@@ -1,4 +1,5 @@
 # undeclared_failure.py
+from exceptions import expect
 from stateless import Success, catch, run, success
 
 def ratio(a: int, b: int) -> Success[float]:
@@ -9,8 +10,5 @@ def caller() -> Success[float | ZeroDivisionError]:
     out = yield from catch(ZeroDivisionError)(ratio)(1, 0)
     return out
 
-try:
-    run(caller())
-except ZeroDivisionError as e:
-    print(e)
-#: division by zero
+expect(ZeroDivisionError, run, caller())
+#: [ZeroDivisionError] division by zero

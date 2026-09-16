@@ -1,5 +1,6 @@
 # exercise_10.py
 from typing import Final, Protocol, runtime_checkable
+from exceptions import expect
 
 @runtime_checkable
 class Shape(Protocol):
@@ -37,10 +38,7 @@ def unregistered(namespace: dict[str, object]) -> list[str]:
 
 Hexagon().draw()
 #: Hexagon.draw
-try:
-    make("Hexagon")
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'Hexagon'
+expect(KeyError, make, "Hexagon")
+#: [KeyError] 'Hexagon'
 print(unregistered(globals()))
 #: ['Hexagon']

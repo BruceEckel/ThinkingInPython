@@ -5,6 +5,7 @@
 ```python
 # exercise_1.py
 from typing import Any
+from exceptions import ignore
 
 class PairsAdapter:
     ("Gives a list of (key, value) pairs"
@@ -33,11 +34,9 @@ print(adapter["city"])
 #: Crested Butte
 print(len(pairs))  # The wrapped list itself grew
 #: 3
-try:
+with ignore(KeyError):
     adapter["missing"]
-except KeyError as e:
-    print("KeyError:", e)
-#: KeyError: 'missing'
+#: KeyError('missing')
 ```
 
 The adapter adds the one method the caller wants, `__getitem__()`,

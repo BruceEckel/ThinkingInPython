@@ -1,4 +1,5 @@
 # reentrant_notify.py
+from exceptions import ignore
 from observers import Observable
 
 class TwoWay(Observable[int]):
@@ -18,8 +19,6 @@ class TwoWay(Observable[int]):
 model = TwoWay()
 model.subscribe(
     lambda v: setattr(model, "value", v))
-try:
+with ignore(RecursionError):
     model.value = 1
-except RecursionError:
-    print("RecursionError")
-#: RecursionError
+#: RecursionError('maximum recursion depth exceeded')

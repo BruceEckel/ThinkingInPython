@@ -112,6 +112,7 @@ leap year.
 ```python
 # exercise_2.py
 from dataclasses import dataclass
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -141,15 +142,14 @@ class EmailAddress:
               "needs text on both sides")
 
 for bad in ["grace", "b@@x.com", "@x.com", "b@", ""]:
-    try:
-        EmailAddress(bad)
-    except TypeFailure as e:
-        print("rejected:", e)
-#: rejected: EmailAddress('grace') needs exactly one @
-#: rejected: EmailAddress('b@@x.com') needs exactly one @
-#: rejected: EmailAddress('@x.com') needs text on both sides
-#: rejected: EmailAddress('b@') needs text on both sides
-#: rejected: EmailAddress('') needs exactly one @
+    expect(TypeFailure, EmailAddress, bad)
+#: [TypeFailure] EmailAddress('grace') needs exactly one @
+#: [TypeFailure] EmailAddress('b@@x.com') needs exactly one
+#: @
+#: [TypeFailure] EmailAddress('@x.com') needs text on both
+#: sides
+#: [TypeFailure] EmailAddress('b@') needs text on both sides
+#: [TypeFailure] EmailAddress('') needs exactly one @
 
 print(EmailAddress("grace@example.com"))
 #: EmailAddress(text='grace@example.com')
@@ -167,6 +167,7 @@ sides, so it rejects `"@x.com"` and `"b@"`.
 import copy
 from dataclasses import dataclass
 from typing import NamedTuple
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -192,11 +193,8 @@ class Stars(_Stars):
 
 print(Stars(5))
 #: Stars(number=5)
-try:
-    Stars(11)
-except TypeFailure as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeFailure: Stars(11)
+expect(TypeFailure, Stars, 11)
+#: [TypeFailure] Stars(11)
 
 print(Stars(5)._replace(number=99))
 #: Stars(number=99)
@@ -226,6 +224,7 @@ constructor calls `__post_init__()`, and the check runs.
 import json
 from dataclasses import dataclass
 from typing import Any
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -274,11 +273,8 @@ def from_json(text: str) -> Person:
 bad_json = json.dumps(
     {"name": {"text": "Grace Hopper"},
      "email": {"text": "no-at-sign"}})
-try:
-    from_json(bad_json)
-except TypeFailure as e:
-    print("from_json rejected:", e)
-#: from_json rejected: EmailAddress('no-at-sign') needs an @
+expect(TypeFailure, from_json, bad_json)
+#: [TypeFailure] EmailAddress('no-at-sign') needs an @
 ```
 
 `from_json()` never validates the email string itself. It hands the
@@ -295,6 +291,7 @@ those, with no additional code in `from_json()` itself.
 import copy
 from dataclasses import dataclass
 from typing import Self
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -325,11 +322,8 @@ class Stars:
 s = Stars(4)
 print(copy.replace(s, number=9))
 #: Stars(9)
-try:
-    copy.replace(s, number=99)
-except TypeFailure as e:
-    print(f"{type(e).__name__}: {e}")
-#: TypeFailure: Stars(99)
+expect(TypeFailure, copy.replace, s, number=99)
+#: [TypeFailure] Stars(99)
 ```
 
 `copy.replace()` looks for `__replace__()` and calls it with the
@@ -348,6 +342,7 @@ stays validated across a replacement for the same reason. Any
 import inspect
 from dataclasses import dataclass, fields
 from typing import ClassVar
+from exceptions import expect
 
 @dataclass(eq=False)
 class TypeFailure(ValueError):
@@ -391,11 +386,8 @@ class Wrong:
     def __post_init__(self) -> None:
         self.built += 1  # type: ignore
 
-try:
-    Wrong(1)
-except Exception as e:
-    print(f"{type(e).__name__}: {e}")
-#: FrozenInstanceError: cannot assign to field 'built'
+expect(Exception, Wrong, 1)
+#: [FrozenInstanceError] cannot assign to field 'built'
 ```
 
 `@dataclass` reads the annotation, sees `ClassVar`, and leaves `built`

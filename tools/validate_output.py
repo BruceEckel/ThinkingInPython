@@ -63,7 +63,7 @@ import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-from tools.config import EXAMPLES_TREE as DEFAULT_TREE
+from tools.config import EXAMPLES_TREE as DEFAULT_TREE, utils_dir
 from tools.config import INLINE_NORUN_MARKER, NORUN_FILE, TIMING_FILE
 from tools.pycode import walk_fenced
 from tools.repo import add_jobs_arg, block_slug, load_glob_list, write_text_lf
@@ -432,7 +432,7 @@ def process_md_block(
             '__name__': '__main__',
             '__file__': str(filepath) if filepath else str(path),
         }
-        with run_location(rundir, tree / 'utils'):
+        with run_location(rundir, utils_dir(tree)):
             new_lines, ok, changed = process_block(
                 block, label,
                 update=update and attempts == 1,

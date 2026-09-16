@@ -31,6 +31,7 @@ tracking is the problem the chapter raises for `withdraw()`.
 # exercise_2.py
 from collections.abc import Callable
 from operator import mod
+from exceptions import ignore
 
 def add(a: int, b: int) -> int:
     return a + b
@@ -52,20 +53,17 @@ print(operations["+"](6, 4), operations["-"](6, 4),
       operations["*"](6, 4), operations["//"](6, 4),
       operations["%"](6, 4))
 #: 10 2 24 1 2
-try:
+with ignore(KeyError):
     operations["^"](6, 4)
-except KeyError as e:
-    print(repr(e))
 #: KeyError('^')
 ```
 
 You call `operations["*"](6, 4)` exactly the way you call the other
 four entries, and the calling code stays as it was. Supporting a new
 operator really was just adding one row to the table, as the chapter
-claims. The chapter's `dispatch.py` catches the missing-key `KeyError`
-with `ignore()` from the shared `exceptions` helper, which this tree
-cannot import, so the solution uses an equivalent `try`/`except` that
-prints the same line.
+claims. The missing-key `KeyError` is caught with `ignore()` from the
+shared `exceptions` helper, the same way the chapter's `dispatch.py`
+catches it.
 
 ## 3. A fourth independent closure
 
@@ -123,8 +121,8 @@ a third stage: wrapping one composed function inside another
 
 ```python
 # exercise_5.py
-import textwrap
 from functools import partial
+from exceptions import expect
 
 def clamp(low: int, value: int, high: int, /) -> int:
     return max(low, min(value, high))
@@ -132,13 +130,9 @@ def clamp(low: int, value: int, high: int, /) -> int:
 at_least_ten = partial(clamp, 10)
 print(at_least_ten(3, 100), at_least_ten(50, 100))
 #: 10 50
-try:
-    partial(clamp, high=100)(0, 5)  # type: ignore
-except TypeError as e:
-    for line in textwrap.wrap(str(e), 57):
-        print(line)
-#: clamp() got some positional-only arguments passed as
-#: keyword arguments: 'high'
+expect(TypeError, partial(clamp, high=100), 0, 5)  # type: ignore
+#: [TypeError] clamp() got some positional-only arguments
+#: passed as keyword arguments: 'high'
 ```
 
 `at_least_ten` needs no `Placeholder`. `low` is the first parameter,

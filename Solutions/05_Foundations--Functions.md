@@ -59,17 +59,17 @@ different situations, and the sentinel exists to tell them apart.
 
 ```python
 # exercise_3.py
+from exceptions import expect
+
 def divide(a, b, /, *, label="result"):
     return f"{label}: {a / b}"
 
 print(divide(10, 2, label="half"))
 #: half: 5.0
 
-try:
-    divide(10, 2, "half")  # type: ignore
-except TypeError as e:
-    print(e)
-#: divide() takes 2 positional arguments but 3 were given
+expect(TypeError, divide, 10, 2, "half")  # type: ignore
+#: [TypeError] divide() takes 2 positional arguments but 3
+#: were given
 ```
 
 `a` and `b` stay positional-only (from the original `/`), and the new
@@ -143,6 +143,7 @@ only because of where it sits in the sequence.
 
 ```python
 # exercise_7.py
+from exceptions import expect
 
 def describe(name, /, **facts):
     print(name)
@@ -153,11 +154,9 @@ describe("Bob", role="editor", years=12)
 #: Bob
 #: role=editor
 #: years=12
-try:
-    describe(name="Bob")  # type: ignore
-except TypeError as e:
-    print(e)
-#: describe() missing 1 required positional argument: 'name'
+expect(TypeError, describe, name="Bob")  # type: ignore
+#: [TypeError] describe() missing 1 required positional
+#: argument: 'name'
 ```
 
 The `/` causes the `TypeError`. `name` is positional-only, so

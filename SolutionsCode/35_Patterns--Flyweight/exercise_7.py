@@ -1,5 +1,6 @@
 # exercise_7.py
 from enum import Enum
+from exceptions import expect
 
 class Tile(Enum):
     GRASS = (".", True)
@@ -29,8 +30,5 @@ print(len(cells), len({id(t) for t in cells}))
 #: 24 3
 print(field[0][2] is field[3][5], field[0][2].walkable)
 #: True False
-try:
-    parse_map("?")
-except ValueError as e:
-    print(type(e).__name__, e)
-#: ValueError '?' is not a valid Tile
+expect(ValueError, parse_map, "?")
+#: [ValueError] '?' is not a valid Tile

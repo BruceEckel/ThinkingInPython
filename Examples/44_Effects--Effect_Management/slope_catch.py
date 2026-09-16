@@ -1,4 +1,5 @@
 # slope_catch.py
+from exceptions import expect
 
 def validate(run: int) -> int:
     if run < 0:
@@ -15,8 +16,5 @@ print(slope(10, 2))
 #: 5.0
 print(slope(10, 0))
 #: inf
-try:
-    slope(10, -1)
-except ValueError as e:
-    print(f"escaped: {type(e).__name__}: {e}")
-#: escaped: ValueError: run cannot be negative: -1
+expect(ValueError, slope, 10, -1)
+#: [ValueError] run cannot be negative: -1
