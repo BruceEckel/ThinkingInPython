@@ -212,8 +212,9 @@ class Scissors(Item):
 class Rock(Item):
     pass
 
-OUTCOME: Final[
-    dict[tuple[type[Item], type[Item]], Outcome]] = {
+type Table = dict[tuple[type[Item], type[Item]], Outcome]
+
+OUTCOME: Final[Table] = {
     (Paper, Rock): Outcome.WIN,
     (Paper, Scissors): Outcome.LOSE,
     (Paper, Paper): Outcome.DRAW,

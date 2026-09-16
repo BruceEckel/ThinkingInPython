@@ -18,8 +18,9 @@ class Paper(Item):
 class Rock(Item):
     pass
 
-OUTCOME: Final[
-    dict[tuple[type[Item], type[Item]], Outcome]] = {
+type Table = dict[tuple[type[Item], type[Item]], Outcome]
+
+OUTCOME: Final[Table] = {
     (Paper, Rock): Outcome.WIN,
     (Rock, Paper): Outcome.LOSE,
 }
