@@ -85,6 +85,7 @@ class Pass:
     what: str
     default: bool = False
     model: str = ""  # "" means DEFAULT_MODEL; --model overrides every pass
+    install: str = ""  # for a plugin skill: the commands that install it
 
 
 # Ordered: general rules first, the most specific (Bruce's own captured
@@ -105,6 +106,9 @@ PASSES: tuple[Pass, ...] = (
         "elements-of-style:writing-clearly-and-concisely",
         "Strunk: active voice, positive form, omit needless words",
         default=True,
+        install=("claude plugin marketplace add "
+                 "obra/superpowers-marketplace && claude plugin install "
+                 "elements-of-style@superpowers-marketplace"),
     ),
     Pass(
         "activate",
@@ -296,11 +300,13 @@ def missing_skills(
         plugin, sep, skill = p.skill.partition(":")
         if sep:
             if not plugin_skill_available(plugin, skill, home):
+                install = p.install or (
+                    f"claude plugin install {plugin}@<marketplace>")
                 problems.append(
                     f"pass `{p.name}` needs `/{p.skill}`, and no installed, "
-                    f"enabled plugin named `{plugin}` provides it: "
-                    f"`claude plugin install {plugin}@<marketplace>`, "
-                    f"or leave it out with --passes")
+                    f"enabled plugin named `{plugin}` provides it. "
+                    f"Install it: `{install}`, or leave the pass out "
+                    f"with --passes")
         elif not (root / ".claude" / "skills" / p.skill
                   / "SKILL.md").is_file():
             problems.append(
