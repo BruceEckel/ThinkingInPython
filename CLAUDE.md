@@ -710,6 +710,28 @@ and how it was measured.
   no timeout, no `race`, no fallback combinator). Finish by
   updating project memory `stateless-api-surface` with what the release
   added or removed, and run `make pyright-review`.
+- **A decorator that registers a class must register what a slotted
+  `dataclass()` returns, and under `ty` it cannot build that class by
+  calling `record(cls)`.** `slots=True` makes `dataclass()` create and
+  return a new class, since a class's slots are fixed at creation, so
+  `EVENTS.add(cls)` before the call files a class that no instance
+  belongs to. Chapter 28's `tagged_bus.py` builds first and registers
+  `built`; the one-word swap to `slots=True` without that died at import
+  with "Announce: not an @event". The same goes for any registering
+  decorator stacked *under* `@record`: it would see the pre-slots
+  class. None exists in the book, and `make records` would not catch
+  one. Separately, `ty` 0.0.81 types a direct call to a
+  `dataclass_transform` function as `<decorator produced by
+  dataclass-like function>`, not as `type[T]`, so `built = record(cls)`
+  inside `event()` draws `invalid-argument-type` on `EVENTS.add(built)`
+  and `invalid-return-type` on `return built`. Pyright reveals
+  `type[E@event]` for the same call and accepts it. Hence
+  `tagged_bus.py` calls `dataclass(frozen=True, slots=True)(cls)`
+  directly. No sentence in the book states this, so there is no version
+  string to bump; re-probe on a `ty` upgrade anyway (a scratch
+  `event()` in `build/examples` whose body is `built = record(cls)`,
+  `EVENTS.add(built)`, `return built`), and the day it passes,
+  `tagged_bus.py` can use `record(cls)`.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
