@@ -41,8 +41,7 @@ class ProxyAdapter(WhatIWant):
 
     @override
     def f(self) -> None:
-        # Implement behavior using
-        # methods in WhatIHave:
+        # Implement behavior using WhatIHave:
         self.what_i_have.g()
         self.what_i_have.h()
 
@@ -164,22 +163,23 @@ and add or change a few."
 
 ```python
 # getattr_adapter.py
+from dataclasses import dataclass
 from typing import Any
 
 class WhatIHave:
     def g(self) -> str: return "g"
     def h(self) -> str: return "h"
 
+@dataclass(frozen=True)
 class Adapter:
-    def __init__(self, adaptee: WhatIHave) -> None:
-        self._adaptee = adaptee
+    adaptee: WhatIHave
 
     def f(self) -> str:  # The new interface
-        return self._adaptee.g() + self._adaptee.h()
+        return self.adaptee.g() + self.adaptee.h()
 
     # Forwards the rest
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._adaptee, name)
+        return getattr(self.adaptee, name)
 
 if __name__ == "__main__":
     a = Adapter(WhatIHave())
@@ -206,8 +206,8 @@ as exercise 1 does with `__getitem__()`.
 [The recursion trap](26_Patterns--Surrogate.md#the-recursion-trap)
 applies here too.
 Because `copy.copy()` and `pickle` build an instance without running `__init__()`,
-`_adaptee` does not exist yet.
-`__getattr__()` reading `self._adaptee` then calls itself until Python raises a `RecursionError`.
+`adaptee` does not exist yet.
+`__getattr__()` reading `self.adaptee` then calls itself until Python raises a `RecursionError`.
 An adapter that must survive copying or pickling guards that lookup,
 or defines `__reduce__()`,
 the hook `pickle` and `copy` consult before ordinary construction.
