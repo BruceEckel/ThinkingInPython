@@ -237,7 +237,7 @@ An adapter that must survive copying or pickling guards that lookup,
 or defines `__reduce__()`,
 the hook `pickle` and `copy` consult before ordinary construction.
 
-Testing confirms that the new `f()` combines the adaptee's methods,
+Testing confirms that the new `f()` puts its own output in front of the adaptee's `g()` and `h()` results,
 and every other call forwards to the wrapped object:
 
 ```python
