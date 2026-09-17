@@ -6,8 +6,8 @@ The *Interpreter* pattern represents sentences in a small language as trees,
 then evaluates them.
 *GoF Design Patterns* presents them as separate patterns,
 but the second is the first with meaning attached.
-In Python both reduce to one technique:
-a union of frozen data classes for the nodes,
+In Python both reduce to one technique: a union of frozen data classes
+([records](18_Techniques--Performance.md#record)) for the nodes,
 and recursive functions that `match` on them.
 This chapter builds each pattern with [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 
@@ -26,8 +26,8 @@ under an abstract method on a shared base:
 # filesystem_classic.py
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Node(ABC):
     name: str
@@ -38,7 +38,7 @@ class Node(ABC):
     @abstractmethod
     def walk(self, prefix: str = "") -> Iterator[str]: ...
 
-@dataclass(frozen=True)
+@record
 class File(Node):
     name: str
     size: int
@@ -51,7 +51,7 @@ class File(Node):
     def walk(self, prefix: str = "") -> Iterator[str]:
         yield prefix + self.name
 
-@dataclass(frozen=True)
+@record
 class Directory(Node):
     name: str
     entries: tuple[Node, ...]
@@ -99,15 +99,15 @@ and each operation becomes a recursive function that matches on that union:
 ```python
 # filesystem.py
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
-@dataclass(frozen=True)
+@record
 class File:
     name: str
     size: int
 
-@dataclass(frozen=True)
+@record
 class Directory:
     name: str
     entries: tuple[Node, ...]
@@ -184,7 +184,7 @@ and any consumer of that stream stays decoupled from the tree structure
 (see [Iterators](23_Patterns--Iterators.md#delegating-with-yield-from)).
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
-A `list` there would not do: `frozen=True` stops rebinding of the field,
+A `list` there would not do: a record stops rebinding of the field,
 not mutation of the object it holds,
 which [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
@@ -252,7 +252,7 @@ Here is the complete grammar for a small arithmetic language:
 
 ```python
 # expr.py
-from dataclasses import dataclass
+from record import record
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -267,20 +267,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -343,8 +343,9 @@ Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
 `==` is the exception.
-`@dataclass(frozen=True)` writes its own `__eq__()` onto every node class,
-and a class's own method always wins over one it inherits,
+`@record` makes each node a data class,
+and a data class gets a generated `__eq__()` of its own.
+A class's own method always wins over one it inherits,
 so that generated `__eq__()` shadows anything `Operators` defines.
 `expr.py` never overloads `==`; the nodes compare by value instead,
 which is what the demo below and its tests rely on.
@@ -575,8 +576,7 @@ the left child is a `Mul` and only becomes a `Num` once something simplifies it.
 Simplifying both children first and matching the results catches the identity the recursion just exposed,
 which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
-`frozen=True` blocks every field assignment,
-so `simplify()` never edits the input.
+A record blocks every field assignment, so `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
 the `is` guard in each `case _` hands back the node it received when neither child simplified to anything different.
 

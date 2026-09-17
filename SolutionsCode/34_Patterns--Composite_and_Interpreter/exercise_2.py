@@ -1,19 +1,19 @@
 # exercise_2.py
 from collections.abc import Iterator
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
-@dataclass(frozen=True)
+@record
 class File:
     name: str
     size: int
 
-@dataclass(frozen=True)
+@record
 class Directory:
     name: str
     entries: tuple[Node, ...]
 
-@dataclass(frozen=True)
+@record
 class Symlink:
     name: str
     target: str

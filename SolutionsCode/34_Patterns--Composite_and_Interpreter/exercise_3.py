@@ -1,7 +1,7 @@
 # exercise_3.py
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -25,29 +25,29 @@ class Operators:
     def __rtruediv__(self: Expr, other: int) -> Div:
         return Div(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Neg(Operators):
     operand: Expr
 
-@dataclass(frozen=True)
+@record
 class Div(Operators):
     left: Expr
     right: Expr

@@ -1,7 +1,7 @@
 # exercise_5.py
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -16,20 +16,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@dataclass(frozen=True)
+@record
 class Num(Operators):
     value: int
 
-@dataclass(frozen=True)
+@record
 class Var(Operators):
     name: str
 
-@dataclass(frozen=True)
+@record
 class Add(Operators):
     left: Expr
     right: Expr
 
-@dataclass(frozen=True)
+@record
 class Mul(Operators):
     left: Expr
     right: Expr
