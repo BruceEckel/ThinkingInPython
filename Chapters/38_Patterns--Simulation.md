@@ -751,12 +751,11 @@ so splitting them into labeled passes keeps the construction readable instead of
 [Factory](27_Patterns--Factory.md#builder)
 counts this as one of the cases where *Builder* survives in Python,
 because construction here is genuinely a process rather than a single call.
+`GameBuilder` assembles the maze in three stages.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
 # robot_explorer/game.py
-# Build the maze in three stages, then run it.
-
 from itertools import groupby
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room, RoomMap

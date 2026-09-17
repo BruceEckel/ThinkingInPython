@@ -1,5 +1,4 @@
 # tabledriven/table_machine.py
-# A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
 

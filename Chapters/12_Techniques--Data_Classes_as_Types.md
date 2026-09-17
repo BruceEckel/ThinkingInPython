@@ -65,7 +65,6 @@ To prevent that, every function that takes a rating must check it:
 
 ```python
 # stars_unchecked.py
-# An int as a 1-10 rating must be re-checked everywhere
 from validation import check
 
 def f1(stars: int) -> int:

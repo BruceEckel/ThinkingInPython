@@ -8,11 +8,9 @@ The caller sees one entry point and never learns how those classes are built and
 so the wiring can change without touching any caller.
 Both wrap something that already exists,
 which puts them next to *Proxy* and *Decorator*.
-[Telling the Wrappers Apart](#telling-the-wrappers-apart) sorts the four apart.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
 callers keep using the old one until you mark it deprecated.
-[Deprecating the Old Interface](#deprecating-the-old-interface) shows that mark.
 
 ## Adapter
 
@@ -21,12 +19,11 @@ The adapter's only job is to produce the needed interface from the existing one.
 A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
-An adapter sits between them instead.
+An adapter sits between them and fixes the problem.
 The smallest version puts the adaptation in an object of its own:
 
 ```python
 # adapter.py
-# The object adapter.
 from typing import override
 
 class WhatIHave:
@@ -75,7 +72,6 @@ or the adaptee's own class.
 
 ```python
 # adapter_variations.py
-# Two more places to put the adaptation.
 from typing import Any, override
 from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
                      WhatIWant)

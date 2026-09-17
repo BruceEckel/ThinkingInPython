@@ -48,7 +48,6 @@ so each member is its string value and prints as `win`, `lose`, or `draw`:
 
 ```python
 # outcome.py
-# The result of one Item competing with another.
 from enum import StrEnum
 
 class Outcome(StrEnum):

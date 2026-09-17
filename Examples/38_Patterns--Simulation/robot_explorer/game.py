@@ -1,6 +1,4 @@
 # robot_explorer/game.py
-# Build the maze in three stages, then run it.
-
 from itertools import groupby
 from items import Empty, Robot, Teleport, Urge, item_factory
 from world import Room, RoomMap

@@ -18,10 +18,10 @@ a single table holds every transition.
 
 ## Each State Decides
 
+A `State` runs its operation and, given an event, names the next `State`:
+
 ```python
 # state.py
-# A State has an operation, and can be moved
-# into the next State given an Input:
 from typing import Protocol
 
 class State(Protocol):
@@ -275,7 +275,6 @@ The transitions live in the tables filled in at the bottom of the file:
 
 ```python
 # mouse_trap_tables.py
-# A better mousetrap using tables
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import ClassVar, override
@@ -468,7 +467,6 @@ runs that transition's action, and moves to the next state:
 
 ```python
 # tabledriven/table_machine.py
-# A generic table-driven state machine.
 from collections.abc import Callable
 from enum import Enum
 

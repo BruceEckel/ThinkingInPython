@@ -1,5 +1,4 @@
 # mouse_trap_tables.py
-# A better mousetrap using tables
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import ClassVar, override

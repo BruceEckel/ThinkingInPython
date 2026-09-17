@@ -1,5 +1,4 @@
 # adapter.py
-# The object adapter.
 from typing import override
 
 class WhatIHave:
