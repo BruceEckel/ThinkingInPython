@@ -71,17 +71,21 @@ or the adaptee's own class.
 
 ```python
 # adapter_variations.py
-from typing import Any, override
+from typing import override
 from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
                      WhatIWant)
 
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
     @override
-    # With WhatIHave here, ty rejects the override:
-    # def op(self, what_i_have: WhatIHave) -> None:
-    def op(self, what_i_have: Any) -> None:
-        ProxyAdapter(what_i_have).f()
+    # With WhatIHave alone, ty rejects the override:
+    # def op(self, item: WhatIHave) -> None:
+    def op(self, item: WhatIWant | WhatIHave) -> None:
+        match item:
+            case WhatIWant():
+                super().op(item)
+            case WhatIHave():
+                ProxyAdapter(item).f()
 
 # Approach 3: build adapter into WhatIHave:
 class WhatIHave2(WhatIHave, WhatIWant):
@@ -91,6 +95,9 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.h()
 
 WhatIUse2().op(WhatIHave())  # Approach 2
+#: WhatIHave.g()
+#: WhatIHave.h()
+WhatIUse2().op(ProxyAdapter(WhatIHave()))
 #: WhatIHave.g()
 #: WhatIHave.h()
 WhatIUse().op(WhatIHave2())  # Approach 3
@@ -116,7 +123,7 @@ Composition keeps the two interfaces separate.
 Inheritance merges them.
 
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
-`WhatIUse2.op()` renames that parameter to `what_i_have`.
+`WhatIUse2.op()` renames that parameter to `item`.
 The rename is legal because callers cannot use a positional-only parameter name.
 Renaming a keyword-capable parameter would break any caller passing it by keyword,
 so `ty` rejects a renamed keyword-capable parameter in an override.
@@ -124,12 +131,21 @@ A checker that accepts such a rename compares the types in an override and skips
 
 The rename is the smaller of the two changes.
 `WhatIUse2.op()` also changes the parameter's type.
-The base version accepts a `WhatIWant`, and the override accepts a `WhatIHave`.
-If you annotate both precisely, a type checker rejects the override outright,
-because narrowing what a method accepts breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
-`ty` reports the rejection as `invalid-method-override`.
-Uncomment the commented-out signature in `adapter_variations.py`,
-`what_i_have: WhatIHave`, and the checker reports:
+The base version accepts a `WhatIWant`,
+and the override accepts a `WhatIWant` or a `WhatIHave`.
+An override may widen what it accepts.
+Every call that is legal on a `WhatIUse` is still legal on a `WhatIUse2`,
+so code holding a `WhatIUse` can safely receive a `WhatIUse2`.
+The `match` passes a `WhatIWant` to the inherited `op()` and adapts a `WhatIHave`.
+
+An override cannot narrow what it accepts.
+The commented-out signature in `adapter_variations.py` takes a `WhatIHave` alone,
+which is all Approach 2 needs for its own callers.
+If you use that signature in place of the union,
+a type checker rejects the override:
+a `WhatIUse2` would refuse the `WhatIWant` that every `WhatIUse` accepts,
+and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
+`ty` reports the rejection as `invalid-method-override`:
 
 ```text
 error[invalid-method-override]: Invalid override of
@@ -139,11 +155,12 @@ info: parameter `what_i_want` has an incompatible type:
 info: This violates the Liskov Substitution Principle
 ```
 
-That is why this one parameter stays `Any` while the rest of the listing names real types.
-The `Any` lets the type checker accept an override that cannot substitute for its base.
+`ty` reports a second error at the listing's second call,
+which passes a `ProxyAdapter` where the narrow signature takes a `WhatIHave`.
+With the narrow signature,
 Approach 2 is a different operation under an inherited name.
-Code holding a `WhatIUse` cannot safely receive a `WhatIUse2`:
-building the adapter into the operation gives up substitutability.
+The union keeps it the same operation:
+building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatIWant` case in place.
 
 ### Adapter in Python
 
