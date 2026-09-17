@@ -1,14 +1,3 @@
-In Chapter 20:
-@record
-class Contact:  # A Contact has a Name and an Address
-    name: Name
-    address: Address
-
-The comment is unnecessary; it says exactly what the code says. Go through the book looking for comments like this and remove them.
-
-Add the pop-up behavior that we've added for code links, for the other links as well
-
-
 Implementation is Friction
 
 How can I improve the process on this book?
