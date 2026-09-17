@@ -5,9 +5,9 @@ Two of the patterns in *GoF Design Patterns* solve this problem.
 *Adapter* takes one type and produces an interface to some other type.
 *Façade* creates an interface to a set of classes.
 The caller sees one entry point and never learns how those classes are built and wired together,
-so the wiring can change without touching any caller.
+so the wiring can change without affecting the caller.
 Both wrap something that already exists,
-which puts them next to *Proxy* and *Decorator*.
+which puts them adjacent to *Proxy* and *Decorator*.
 Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
 callers keep using the old one until you mark it deprecated.
@@ -19,7 +19,7 @@ A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter sits between them and fixes the problem.
-The smallest version puts the adaptation in an object of its own:
+The first version puts the adaptation in an object of its own:
 
 ```python
 # adapter.py
