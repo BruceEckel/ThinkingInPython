@@ -26,6 +26,12 @@ git sets it to checkout time. That is the honest answer there: the
 toolchain is as new as the resolve that produced it, so a fresh clone
 gets no nag.
 
+The full report also lists the libraries the listings import
+(`libs_check.LIBRARIES`: Stateless, numpy, and so on), read live from
+uv.lock, and says when one has moved since the stamp. A library can
+move without a stamp, through `uv lock --upgrade-package`, and a
+Stateless release is as much a book-wide event as a `ty` one.
+
 Usage:
     python -m tools.tool_stamp --write   # record an upgrade
     python -m tools.tool_stamp           # report, always
@@ -37,6 +43,7 @@ import json
 from datetime import datetime
 from typing import Any
 
+from tools import libs_check
 from tools.gate_stamp import ago
 from tools.config import BUILD_DIR, ROOT
 from tools.repo import run_capture
@@ -76,20 +83,44 @@ def write() -> None:
     STAMP.write_text(json.dumps({
         "when": datetime.now().isoformat(timespec="seconds"),
         "versions": versions(),
+        "libraries": libs_check.current(),
     }), encoding="utf-8")
+
+
+def read_stamp() -> dict[str, Any]:
+    if not STAMP.is_file():
+        return {}
+    return json.loads(STAMP.read_text(encoding="utf-8"))
 
 
 def last_upgrade() -> tuple[datetime, dict[str, str], str] | None:
     """When the toolchain last moved, from the stamp or else uv.lock."""
-    if STAMP.is_file():
-        stamp: dict[str, Any] = json.loads(
-            STAMP.read_text(encoding="utf-8"))
+    stamp = read_stamp()
+    if stamp:
         return (datetime.fromisoformat(stamp["when"]),
                 stamp.get("versions", {}), "tools-upgrade")
     if LOCK.is_file():
         when = datetime.fromtimestamp(LOCK.stat().st_mtime)
         return when, {}, "uv.lock"
     return None
+
+
+def library_lines(locked: dict[str, str],
+                  stamped: dict[str, str]) -> list[str]:
+    """The libraries as locked now, noting any that moved since the stamp.
+
+    The tools' versions come from the stamp, since asking each tool costs
+    a subprocess. A library's version is one read of uv.lock, so it is
+    reported live, and a move the stamp missed (an
+    `uv lock --upgrade-package`, which writes no stamp) shows up here.
+    """
+    lines: list[str] = []
+    for name, version in locked.items():
+        was = stamped.get(name)
+        moved = f" (was {was} at the last tools-upgrade)" \
+            if was and was != version else ""
+        lines.append(f"  {name}: {version}{moved}")
+    return lines
 
 
 def report(*, nag_only: bool, days: int) -> int:
@@ -110,6 +141,13 @@ def report(*, nag_only: bool, days: int) -> int:
     if recorded and not nag_only:
         for name, version in recorded.items():
             print(f"  {name}: {version}")
+    if not nag_only:
+        libraries = library_lines(
+            libs_check.current(), read_stamp().get("libraries", {}))
+        if libraries:
+            print("libraries, as locked in uv.lock "
+                  "(`make libs-check` compares them with PyPI):")
+            print("\n".join(libraries))
     if stale:
         print(f"That is over {days} days. Consider `make tools-upgrade`, "
               "then `make sweep` to see what moved.")

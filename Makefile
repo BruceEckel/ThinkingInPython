@@ -153,7 +153,7 @@ tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global
 
 ##@ Everyday
 
-.PHONY: all verify verify-ch sync-ci gate gate-status tools-status sweep ci reset \
+.PHONY: all verify verify-ch sync-ci gate gate-status tools-status libs-check sweep ci reset \
         python-upgrade
 
 # The edit-and-check loop to repeat after touching a chapter: every
@@ -264,6 +264,17 @@ gate-status:  ## Report when the gate last passed and what changed since
 # correctly treated as current.
 tools-status:  ## Report when the dev tools were last upgraded, and to what
 	$(PY) -m tools.tool_stamp
+
+# Is a release waiting for a library the listings import (Stateless,
+# numpy, hypothesis, time-machine)? Reads uv.lock, asks PyPI for each
+# one's latest version, and prints the ones that are behind. It changes
+# nothing and always exits 0, offline included, and it joins no gate: a
+# gate that reaches the network fails for reasons the book did not
+# cause. Upgrade one library alone with `uv lock --upgrade-package NAME`
+# and `uv sync`; CLAUDE.md's Stateless-upgrade entry says what to
+# re-check afterward.
+libs-check:  ## Compare the locked library versions (Stateless, numpy, ...) with the latest on PyPI
+	$(PY) -m tools.libs_check
 
 # `gate` stops at its first failure, and since `solutions-gate` is one of
 # its prerequisites, that half runs first and can hide every Chapters/
