@@ -107,16 +107,21 @@ You'll need to do this to experiment with the examples and exercises.
    - Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
    - macOS: `brew install uv`, or the same `curl` command as Linux
    - Windows: `winget install --id=astral-sh.uv -e`
-4. Run `uv sync` once. This creates `.venv` and installs the pinned
-   Python (3.15+) and the dev tools automatically.
+4. Run `make tools-check` to verify the essential tools.
+   There is no separate install step.
+   Every `make` target goes through `uv run`,
+   and the first one you run creates `.venv` and installs the pinned
+   Python (3.15+) and the dev tools before it does anything else.
+   `uv sync` builds the same environment explicitly,
+   for when you need `.venv` before running a target,
+   such as pointing an editor at its interpreter.
    On WSL, clone into the Linux filesystem (under `~`), not into a
    Windows checkout under `/mnt/c`. A `.venv` cannot be shared between
-   Windows and Linux: each side's `uv sync` tries to rebuild it for
+   Windows and Linux: each side's `uv` tries to rebuild it for
    itself and fails when the other side has it open. A clone under
    `/mnt/c` also runs every command through the Windows filesystem
    bridge, which turns a three-second install into a minute and slows
    `make verify` the same way.
-5. Run `make tools-check` to verify the essential tools.
 
 That is everything you need to run and test the examples and the solutions.
 `make doctor` diagnoses the two common environment problems:
