@@ -288,6 +288,20 @@ frozen data class in a listing is written `@record` with
   moves when a class becomes a record. Solutions 35 `exercise_2.py`
   went from a ratio near ten to near six.
 
+`tools/record_check.py` gates both directions (`make records`, in
+`GATE_CHECKS` and in the Solutions checks since 2026-09-17): a
+`@dataclass(frozen=True)` whose bases are all slotted fails unless
+`tools/data/record_exceptions.txt` lists it, and a `@record` under a
+base with no `__slots__` fails. A base it cannot see (imported from
+another listing) draws no finding, so it under-reports by design. The
+exceptions file is keyed by chapter *name* (`Rethinking_Objects`), not
+number, so a renumbering leaves it alone and a chapter rename does not.
+Run alone, `make records` also fails on an entry that matches nothing.
+Its `UNSLOTTED_LIBRARY` names Stateless's `Ability` and `Time`, and
+chapter 47 says in prose that `Ability` declares no `__slots__`; recheck
+both against `.venv/Lib/site-packages/stateless/` on a Stateless
+upgrade.
+
 Project memory `record-sweep-classification` has the per-class survey
 and how it was measured.
 
@@ -459,7 +473,9 @@ and how it was measured.
 - **Renumbering or renaming a chapter** touches, in all four trees
   (`Chapters/`, `Solutions/`, `Examples/`, `SolutionsCode/`): the filenames, every
   `NN_*.md` cross-reference and its link text, `build_site.py` `PARTS`,
-  `tools/data/norun.txt`, `tools/data/timing.txt`, the `README.md` tracking table,
+  `tools/data/norun.txt`, `tools/data/timing.txt`,
+  `tools/data/record_exceptions.txt` (keyed by chapter name, so a rename
+  only), the `README.md` tracking table,
   `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any
   `tools/tests/` fixture naming a chapter. Appendices use letter prefixes
   (`A_...`); build_site labels them "Appendix X".

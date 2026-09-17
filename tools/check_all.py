@@ -48,6 +48,7 @@ from tools import listing_format
 from tools import listing_width
 from tools import pattern_names
 from tools import prose_lint
+from tools import record_check
 from tools.markdown import Document
 from tools.repo import md_files, write_text_lf
 from tools.report import Check, Finding
@@ -65,6 +66,7 @@ CHECKS: list[Check] = [
     check_self_reference.CHECK,
     prose_lint.CHECK,
     pattern_names.CHECK,
+    record_check.CHECK,
 ]
 
 

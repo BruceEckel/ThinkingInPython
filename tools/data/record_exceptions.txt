@@ -1,0 +1,35 @@
+# Listings that keep @dataclass(frozen=True) although every base is
+# slotted, so tools/record_check.py (`make records`, in GATE_CHECKS)
+# would otherwise ask for @record. One per line:
+#
+#     <Chapter_Name> <listing> <Class>    # why
+#
+# Chapter_Name is the chapter file's stem after its `NN_Part--` prefix,
+# so an entry survives a renumbering and covers the Solutions file too.
+# Class may be an fnmatch pattern. `make records` fails on an entry that
+# matches nothing. A class with an unslotted base needs no entry: the
+# check leaves it alone. CLAUDE.md's @record section has the rules.
+
+# Chapter 18's slots_dataclass.py needs no entry: it precedes the
+# utils/record.py listing, where the rule starts.
+
+# frozen=True is the subject of the section and of the exercise.
+Rethinking_Objects immutable.py *
+Rethinking_Objects frozen_leaky.py FrozenLeaky
+Rethinking_Objects exercise_2.py Immutable
+
+# Frozen* sit beside order=True twins; the one added option is the
+# comparison.
+Data_Transfer_Objects still_a_tuple.py Frozen*
+Data_Transfer_Objects exercise_6.py FrozenColor
+
+# A slotted class cannot be weakly referenced, and record() has no
+# weakref_slot.
+Flyweight weak_pool.py Name
+Flyweight exercise_5.py Color
+
+# The version-skew demos read the instance __dict__ and pickle it.
+Memento sketch_v1.py SketchV1
+Memento sketch_v2.py SketchV2
+Memento drawing_v1.py Drawing
+Memento exercise_7.py DrawingV2

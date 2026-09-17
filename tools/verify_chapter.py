@@ -52,7 +52,7 @@ SOLUTIONS_DIR = ROOT / "Solutions"
 SOLUTIONS_TREE = BUILD_DIR / "solutions"
 # The Solutions checks the gate runs through check_all (its `banned` and
 # listing checks stay off Solutions/ for the reasons the Makefile gives).
-SOLUTIONS_CHECKS = ["anchors", "widths"]
+SOLUTIONS_CHECKS = ["anchors", "widths", "records"]
 
 
 def code_checks(label: str, chapter_dir: Path, tree: Path) -> list[bool]:

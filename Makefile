@@ -200,8 +200,9 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 # when the book moved to 60-character listings, so a new violation of
 # either now fails the gate rather than sitting in a backlog. widths also
 # runs over Solutions/ (a separate recipe line below), since Solutions
-# listings render on the same small screens.
-GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors footnotes self-reference prose-lint pattern-names
+# listings render on the same small screens. records runs there too:
+# most of the book's frozen data classes are in Solutions/.
+GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors footnotes self-reference prose-lint pattern-names records
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -236,7 +237,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.check_line_endings
 	$(PY) -m tools.check_all $(GATE_CHECKS)
 	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
-	$(PY) -m tools.check_all widths --paths Solutions
+	$(PY) -m tools.check_all widths records --paths Solutions
 	$(PY) -m tools.check_quoted_diagnostics
 	$(PY) -m tools.reflow_prose --write
 	$(PY) -m tools.check_unique_slugs
@@ -688,7 +689,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -833,6 +834,15 @@ pattern-names:  ## Check every design pattern name is written *Capitalized*; `ma
 
 fix-pattern-names:  ##- Wrap plain pattern names in italics (sentence-start ambiguities are reported, not rewritten)
 	$(PY) -m tools.pattern_names --fix $(PROSE_FILES)
+
+# From chapter 18's utils/record.py on, a frozen data class is written
+# @record. Fails on @dataclass(frozen=True) where every base is slotted,
+# and on @record under a base with no __slots__. The deliberate long-form
+# listings are in tools/data/record_exceptions.txt; run alone, this also
+# fails on an entry there that matches nothing. Covers Chapters/ and
+# Solutions/.
+records:  ## Fail if a frozen data class after chapter 18 could be @record, or a @record has an unslotted base
+	$(PY) -m tools.record_check
 
 # The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
 # registry). `checks` is the one to run while editing, since it adds the Vale
