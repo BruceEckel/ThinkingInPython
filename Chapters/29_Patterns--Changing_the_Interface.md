@@ -19,10 +19,11 @@ A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter sits between them and fixes the problem.
-The first version puts the adaptation in a separate class:
+The first version uses a class to perform adaptation:
 
 ```python
 # adapter.py
+from dataclasses import dataclass
 from typing import override
 
 class WhatIHave:
@@ -34,9 +35,9 @@ class WhatIHave:
 class WhatIWant:
     def f(self) -> None: ...
 
+@dataclass(frozen=True)
 class ProxyAdapter(WhatIWant):
-    def __init__(self, what_i_have: WhatIHave) -> None:
-        self.what_i_have = what_i_have
+    what_i_have: WhatIHave
 
     @override
     def f(self) -> None:

@@ -1,4 +1,5 @@
 # adapter.py
+from dataclasses import dataclass
 from typing import override
 
 class WhatIHave:
@@ -10,9 +11,9 @@ class WhatIHave:
 class WhatIWant:
     def f(self) -> None: ...
 
+@dataclass(frozen=True)
 class ProxyAdapter(WhatIWant):
-    def __init__(self, what_i_have: WhatIHave) -> None:
-        self.what_i_have = what_i_have
+    what_i_have: WhatIHave
 
     @override
     def f(self) -> None:
