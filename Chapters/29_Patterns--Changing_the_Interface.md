@@ -188,26 +188,29 @@ from typing import Any
 from record import record
 
 class WhatIHave:
-    def g(self) -> str: return "g"
-    def h(self) -> str: return "h"
+    def g(self, n: int) -> str: return "g" * n
+    def h(self, n: int) -> str: return "h" * n
 
 @record
 class Adapter:
     adaptee: WhatIHave
 
-    def f(self) -> str:  # The new interface
-        return self.adaptee.g() + self.adaptee.h()
+    def f(self, n: int) -> str:  # The new interface
+        return ("f" * n +
+            self.adaptee.g(n) + self.adaptee.h(n))
 
-    # Forwards the rest
+    # Forward the rest
     def __getattr__(self, name: str) -> Any:
         return getattr(self.adaptee, name)
 
 if __name__ == "__main__":
     a = Adapter(WhatIHave())
-    print(a.f())  # Adapted method
-    print(a.g())  # Forwarded to the adaptee unchanged
-#: gh
-#: g
+    print(a.f(3))  # Adapted method
+    print(a.g(5))  # Forwarded to the adaptee unchanged
+    print(a.h(7))
+#: fffggghhh
+#: ggggg
+#: hhhhhhh
 ```
 
 Because `__getattr__()` runs only for attributes Python does not find normally,
@@ -242,13 +245,13 @@ and every other call forwards to the wrapped object:
 from getattr_adapter import Adapter, WhatIHave
 
 def test_new_interface_combines_methods() -> None:
-    assert Adapter(WhatIHave()).f() == "gh"
+    assert Adapter(WhatIHave()).f(2) == "ffgghh"
 
 def test_getattr_forwards_existing_methods_unchanged(
 ) -> None:
     a = Adapter(WhatIHave())
-    assert a.g() == "g"
-    assert a.h() == "h"
+    assert a.g(2) == "gg"
+    assert a.h(3) == "hhh"
 
 def test_forwarding_targets_the_wrapped_object() -> None:
     have = WhatIHave()
