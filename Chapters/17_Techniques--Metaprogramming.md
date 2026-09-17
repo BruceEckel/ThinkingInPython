@@ -1192,7 +1192,7 @@ and `ty` and mypy must confirm that before they accept a zero-argument `super()`
 Pyright accepts it without the check.
 Both forms do the same work at run time.
 
-You might expect to parameterize[^parametrize] the class,
+You might expect to parameterize[^parameterize-spelling] the class,
 with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That fails twice.
 A `ClassVar` means one shared value for the whole class,
@@ -2048,6 +2048,6 @@ The rest is the bookkeeping every class carries.
     before it binds the name `ASingleton`,
     and offers no equivalent incomplete-type stage to exploit.
 
-[^parametrize]: pytest's own spelling for `@pytest.mark.parametrize`,
+[^parameterize-spelling]: pytest's own spelling for `@pytest.mark.parametrize`,
     and "parameterize" everywhere else;
     [Testing](11_Techniques--Testing.md) explains the four possible spellings.
