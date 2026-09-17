@@ -680,6 +680,8 @@ def greet_all(names: list[str]) -> Success[None]:
         yield from greet(name)  # type: ignore
 ```
 
+If you remove the `# type: ignore`, `ty` reports:
+
 ```text
 error[invalid-yield]: Yield expression type does not match annotation
  --> undeclared_need.py:7:20

@@ -122,3 +122,58 @@ def test_baseline_round_trips_through_the_file(tmp_path: Path) -> None:
     assert text.startswith("# Quoted ty diagnostics")
     assert cqd.load_baseline(path) == entries
     assert cqd.load_baseline(tmp_path / "absent.txt") == Counter()
+
+
+def pragma_hits(tmp_path: Path, before: str, after: str = "") -> list[str]:
+    """The `--pragmas` report for one quote made without the pragma."""
+    md, tree = chapter_tree(tmp_path)
+    listing = tree / "area.py"
+    listing.write_text(
+        listing.read_text(encoding="utf-8").replace(
+            'print(area("3"))', 'print(area("3"))  # type: ignore'),
+        encoding="utf-8")
+    md.write_text(before + BLOCK.format(n=5).removeprefix("# text\n\n")
+                  + after, encoding="utf-8")
+    cqd.TREES[md.parent.name] = tree.parent
+    try:
+        return [f.message
+                for f in cqd.find_unmentioned_pragmas(Document.parse(md))]
+    finally:
+        del cqd.TREES[md.parent.name]
+
+
+def test_quote_without_the_pragma_needs_the_prose_to_say_so(
+        tmp_path: Path) -> None:
+    hits = pragma_hits(tmp_path, "`ty` now rejects the call:\n\n")
+    assert len(hits) == 1
+    assert "area.py:5 carries a `# type: ignore`" in hits[0]
+
+
+def test_a_mention_above_the_quote_is_enough(tmp_path: Path) -> None:
+    assert pragma_hits(
+        tmp_path, "Without the `# type: ignore`, `ty` rejects it:\n\n") == []
+
+
+def test_a_mention_below_the_quote_is_enough(tmp_path: Path) -> None:
+    assert pragma_hits(
+        tmp_path, "`ty` rejects it:\n\n",
+        "\nThe `# type: ignore` silences that diagnostic.\n") == []
+
+
+def test_a_heading_ends_the_prose_a_quote_can_claim(tmp_path: Path) -> None:
+    hits = pragma_hits(
+        tmp_path,
+        "If you remove the `# type: ignore`, nothing changes.\n\n"
+        "## 2. Another exercise\n\n`ty` rejects it:\n\n")
+    assert len(hits) == 1
+
+
+def test_a_listing_with_no_pragma_is_not_a_pragma_hit(
+        tmp_path: Path) -> None:
+    md, tree = chapter_tree(tmp_path)
+    md.write_text(BLOCK.format(n=5), encoding="utf-8")
+    cqd.TREES[md.parent.name] = tree.parent
+    try:
+        assert list(cqd.find_unmentioned_pragmas(Document.parse(md))) == []
+    finally:
+        del cqd.TREES[md.parent.name]

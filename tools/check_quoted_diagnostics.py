@@ -42,10 +42,24 @@ gate run it: a fresh hit is either a stale quote to fix or a new
 deliberate edit to accept. `--accept` rewrites the baseline from the
 current run; `--all` lists every hit, baseline or not.
 
+A second rule, `--pragmas`, reports and never gates. A gutter line
+that matches only with the listing's `# type: ignore` removed is a
+quote the printed listing cannot produce: `ty` reports nothing until
+the reader strips the comment. The 2026-09-16 sweep of the prose around
+every Solutions quote found three solutions that said "`ty` rejects the
+call" under such a listing and never mentioned the comment. The rule
+reads the prose on both sides of the quote, up to `PRAGMA_WINDOW`
+non-blank lines each way and stopping at a heading, and reports the
+quote when the word "ignore" appears nowhere in it. Both sides count
+because the book sometimes explains the comment after the quote
+("The `# type: ignore` silences that diagnostic"). It has no baseline;
+do not add it to the gate without first getting its count to zero.
+
 Usage:
     python -m tools.check_quoted_diagnostics            # the delta
     python -m tools.check_quoted_diagnostics --all      # every hit
     python -m tools.check_quoted_diagnostics --accept   # rewrite the baseline
+    python -m tools.check_quoted_diagnostics --pragmas  # unmentioned ignores
     python -m tools.check_quoted_diagnostics Chapters/46_*.md --all
 """
 import argparse
@@ -75,6 +89,11 @@ GUTTER = re.compile(r"^\s*(\d+)\s\|(?: (.*))?$")
 TYPE_IGNORE = re.compile(r"\s*#\s*type:\s*ignore(\[[\w,-]+\])?\s*$")
 # The bar ty prints at the left of a multi-line span's continuation lines.
 SPAN_BAR = re.compile(r"^\s*\|\s")
+# How the prose names the comment a quote was made without.
+PRAGMA_MENTION = re.compile(r"\bignore\b", re.IGNORECASE)
+# Non-blank prose lines read on each side of a quote for that mention.
+PRAGMA_WINDOW = 10
+HEADING = re.compile(r"^#{1,6}\s")
 
 TREES = {"Chapters": BUILD_DIR / "examples", "Solutions": BUILD_DIR / "solutions"}
 
@@ -176,6 +195,67 @@ def find(doc: Document) -> Iterator[Finding]:
                 )
 
 
+def stripped_pragma(quoted: str, actual: str) -> bool:
+    """Whether the quote matches only with the listing's pragma removed."""
+    quoted = SPAN_BAR.sub("", quoted).strip()
+    actual = actual.strip()
+    return quoted != actual and TYPE_IGNORE.sub("", actual) == quoted
+
+
+def nearby_prose(doc: Document, block: Block) -> list[str]:
+    """The prose around a block: `PRAGMA_WINDOW` non-blank lines each way.
+
+    Fenced lines are skipped, not counted, so the listing a quote sits
+    under does not use up the window. A heading ends the walk, since it
+    starts another exercise or section.
+    """
+    fenced = doc.in_fence()
+    found: list[str] = []
+    for indexes in (range(block.open_at - 1, -1, -1),
+                    range(doc.end_of(block), len(doc.lines))):
+        taken = 0
+        for k in indexes:
+            if fenced[k] or not doc.lines[k].strip():
+                continue
+            if HEADING.match(doc.lines[k]) or taken == PRAGMA_WINDOW:
+                break
+            found.append(doc.lines[k])
+            taken += 1
+    return found
+
+
+def find_unmentioned_pragmas(doc: Document) -> Iterator[Finding]:
+    """Quotes the printed listing cannot produce, with no word of why."""
+    dirs = listing_dirs(doc.path)
+    for block in quoted_blocks(doc):
+        name = ""
+        lines: list[str] | None = None
+        for index, raw in enumerate(block.lines):
+            line = raw.rstrip("\n\r")
+            loc = LOCATION.match(line)
+            if loc:
+                name = loc.group(1).replace("\\", "/")
+                found = locate(name, dirs)
+                lines = (found.read_text(encoding="utf-8").split("\n")
+                         if found else None)
+                continue
+            gut = GUTTER.match(line)
+            if not gut or lines is None:
+                continue
+            n = int(gut.group(1))
+            if not (0 < n <= len(lines)):
+                continue
+            if not stripped_pragma(gut.group(2) or "", lines[n - 1]):
+                continue
+            if any(PRAGMA_MENTION.search(p) for p in nearby_prose(doc, block)):
+                continue
+            yield Finding(
+                doc.path, block.line_number(index),
+                f"{name}:{n} carries a `# type: ignore` the quote drops, "
+                f"and the prose around the quote does not mention it",
+            )
+
+
 def entry(finding: Finding) -> str:
     """The baseline line for a finding: path and message, no line number."""
     path = finding.path.resolve()
@@ -223,10 +303,24 @@ def main(argv: list[str] | None = None) -> int:
                     help="list every hit, ignoring the baseline")
     ap.add_argument("--accept", action="store_true",
                     help="rewrite the baseline from the current run")
+    ap.add_argument("--pragmas", action="store_true",
+                    help="list quotes made without the listing's "
+                         "`# type: ignore` that the prose never mentions "
+                         "(report-only, no baseline)")
     args = ap.parse_args(argv)
     paths = [Path(p) for p in args.paths] or sorted(
         list((ROOT / "Chapters").glob("*.md"))
         + list((ROOT / "Solutions").glob("*.md")))
+    if args.pragmas:
+        return report(
+            [f for p in paths
+             for f in find_unmentioned_pragmas(Document.parse(p))],
+            clean="Every quote made without a `# type: ignore` says so.",
+            problem="{n} quoted diagnostic(s) need the listing's "
+                    "`# type: ignore` removed, and the prose does not "
+                    "say so. On the listing as printed, ty reports "
+                    "nothing.",
+        )
     findings = [f for p in paths for f in find(Document.parse(p))]
     if args.all:
         return report(
