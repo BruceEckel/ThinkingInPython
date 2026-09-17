@@ -42,6 +42,7 @@ from tools import capitalize_comments
 from tools import check_self_reference
 from tools import comment_periods
 from tools import comment_spacing
+from tools import footnote_labels
 from tools import heading_links
 from tools import listing_format
 from tools import listing_width
@@ -60,6 +61,7 @@ CHECKS: list[Check] = [
     capitalize_comments.CHECK,
     banned_phrases.CHECK,
     heading_links.CHECK,
+    footnote_labels.CHECK,
     check_self_reference.CHECK,
     prose_lint.CHECK,
     pattern_names.CHECK,

@@ -92,7 +92,7 @@ def test_main_reports_and_exits_one(
     assert main(["--paths", str(tmp_path)]) == 1
     out = capsys.readouterr().out
     # The count tracks CHECKS; bump it when the registry grows.
-    assert "4 issue(s) in 1 file(s) from 10 check(s)." in out
+    assert "4 issue(s) in 1 file(s) from 11 check(s)." in out
 
 def test_main_clean_exits_zero(
     tmp_path: Path, capsys: pytest.CaptureFixture[str],

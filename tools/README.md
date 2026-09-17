@@ -985,6 +985,27 @@ would fire on the worked example in
 [banned_phrases.py](#banned_phrases.py) above, which names a banned phrase
 in order to explain the tool.
 
+## footnote_labels.py
+
+Fails if two chapters define the same reference footnote, `[^label]:`.
+A label only has to be unique within one Markdown document, and the
+site renders each chapter as its own page, so two chapters can share a
+label and the site is fine. The EPUB and PDF concatenate every chapter
+into one document first, and there pandoc keeps the first definition
+and drops the rest with one warning in the build output, so the second
+chapter's reference silently shows the first chapter's note. Chapter 17
+carried chapter 11's `parametrize` note through release 0.5.9 that way.
+
+```
+make footnotes    # check (part of the gate through GATE_CHECKS)
+```
+
+Definitions inside fenced code are ignored, and references are not
+checked: one note may be cited many times, and a reference to a label
+with no definition is a pandoc warning on every build, site included.
+The fix is to rename one label at both its reference and its
+definition.
+
 ## check_quoted_diagnostics.py
 
 Advisory. The book quotes `ty` output in fenced blocks that begin

@@ -473,6 +473,13 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   quietly misleading a reader. Where three references cluster in one section,
   resolve the later ones with "that chapter" against a nearby link rather than
   repeating the same hyperlink.
+- **Footnote labels are book-wide.** The EPUB and PDF concatenate every
+  chapter, and pandoc keeps a `[^label]:` definition's first occurrence,
+  so two chapters sharing a label show the first chapter's note in the
+  second; the site, one page per chapter, hides it. `footnotes` in
+  `GATE_CHECKS` (`tools/footnote_labels.py`) fails on it since
+  2026-09-16, after release 0.5.9 went out with chapter 17 showing
+  chapter 11's `parametrize` note.
 - **Anchors:** pandoc auto-slugs a heading (backticks/punctuation dropped, but `.`
   is kept). Give headings an explicit `{#id}` when the auto-slug would be ugly
   (e.g. anything containing `type[...]` or `__init__`). `heading_links.py` gates it.

@@ -201,7 +201,7 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
 # either now fails the gate rather than sitting in a backlog. widths also
 # runs over Solutions/ (a separate recipe line below), since Solutions
 # listings render on the same small screens.
-GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors self-reference prose-lint pattern-names
+GATE_CHECKS = listings widths banned comment-periods comment-caps comment-spacing anchors footnotes self-reference prose-lint pattern-names
 
 # Markdown outside Chapters/ that still carries intra-document links worth
 # gating. Only `anchors` runs over it: `banned` would fire on the tooling
@@ -677,7 +677,7 @@ exercise-coverage:  ## List chapter sections that no exercise practices
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -751,6 +751,13 @@ fix-comment-spacing:  ##- Collapse inline-comment gaps to two spaces
 # Fail if a heading-anchor link (file.md#id or #id) points at no real heading.
 anchors:  ## Fail if a heading-anchor link points at no real heading
 	$(PY) -m tools.heading_links Chapters $(GATE_DOCS)
+
+# Fail if two chapters define the same [^label] footnote. The EPUB and
+# PDF concatenate every chapter before pandoc sees them, and pandoc
+# keeps a label's first definition, so the second chapter's note is
+# silently replaced; the site, one page per chapter, never shows it.
+footnotes:  ## Fail if a footnote label is defined in more than one chapter
+	$(PY) -m tools.footnote_labels
 
 # Fail if the book says something about its own chapters that those
 # chapters disprove: an "appears nowhere else" that does appear, or an
