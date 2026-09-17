@@ -19,7 +19,7 @@ A common real case: a third-party library names its methods `g()` and `h()`,
 you wrote your code against an `f()`-calling interface,
 and you cannot change either one.
 An adapter sits between them and fixes the problem.
-The first version puts the adaptation in an object of its own:
+The first version puts the adaptation in a separate class:
 
 ```python
 # adapter.py
