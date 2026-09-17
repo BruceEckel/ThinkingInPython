@@ -1,12 +1,12 @@
 # shop.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class _Engine:
     def start(self) -> None:
         print("_Engine.start()")
 
-@dataclass(frozen=True)
+@record
 class _FuelPump:
     engine: _Engine
 
@@ -14,7 +14,7 @@ class _FuelPump:
         print("_FuelPump.prime()")
         self.engine.start()
 
-@dataclass(frozen=True)
+@record
 class _Ignition:
     pump: _FuelPump
 

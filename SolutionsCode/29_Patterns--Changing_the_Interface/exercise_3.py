@@ -8,4 +8,4 @@ start_car()
 #: _Engine.start()
 print([name for name in vars(shop)
        if not name.startswith("_")])
-#: ['dataclass', 'start_car']
+#: ['record', 'start_car']

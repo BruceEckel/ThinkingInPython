@@ -180,14 +180,14 @@ and add or change a few."
 
 ```python
 # getattr_adapter.py
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
 class WhatIHave:
     def g(self) -> str: return "g"
     def h(self) -> str: return "h"
 
-@dataclass(frozen=True)
+@record
 class Adapter:
     adaptee: WhatIHave
 
@@ -211,7 +211,7 @@ Because `__getattr__()` runs only for attributes Python does not find normally,
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
-It is a frozen dataclass with two properties,
+It is a [record](18_Techniques--Performance.md#record) with two properties,
 written because `distance()` requires `x` and `y` but a `Pair` supplies `a` and `b`.
 
 The limits [*Surrogate*](26_Patterns--Surrogate.md#forwarding-with-getattr)
@@ -266,14 +266,14 @@ A class containing static factory methods gets that effect:
 
 ```python
 # facade.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Engine:
     def start(self) -> None:
         print("Engine.start()")
 
-@dataclass(frozen=True)
+@record
 class FuelPump:
     engine: Engine
 
@@ -281,7 +281,7 @@ class FuelPump:
         print("FuelPump.prime()")
         self.engine.start()
 
-@dataclass(frozen=True)
+@record
 class Ignition:
     pump: FuelPump
 
@@ -321,17 +321,17 @@ If you keep the messy internals private
 
 ```python
 # checkout.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class _TaxRule:
     rate: float
 
-@dataclass(frozen=True)
+@record
 class _Discount:
     fraction: float
 
-@dataclass(frozen=True)
+@record
 class _PriceEngine:
     tax: _TaxRule
     cut: _Discount

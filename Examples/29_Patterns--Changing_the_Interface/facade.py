@@ -1,12 +1,12 @@
 # facade.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Engine:
     def start(self) -> None:
         print("Engine.start()")
 
-@dataclass(frozen=True)
+@record
 class FuelPump:
     engine: Engine
 
@@ -14,7 +14,7 @@ class FuelPump:
         print("FuelPump.prime()")
         self.engine.start()
 
-@dataclass(frozen=True)
+@record
 class Ignition:
     pump: FuelPump
 

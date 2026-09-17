@@ -1,15 +1,15 @@
 # checkout.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class _TaxRule:
     rate: float
 
-@dataclass(frozen=True)
+@record
 class _Discount:
     fraction: float
 
-@dataclass(frozen=True)
+@record
 class _PriceEngine:
     tax: _TaxRule
     cut: _Discount

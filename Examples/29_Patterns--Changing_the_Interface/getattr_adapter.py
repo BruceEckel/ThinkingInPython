@@ -1,12 +1,12 @@
 # getattr_adapter.py
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
 class WhatIHave:
     def g(self) -> str: return "g"
     def h(self) -> str: return "h"
 
-@dataclass(frozen=True)
+@record
 class Adapter:
     adaptee: WhatIHave
 

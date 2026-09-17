@@ -92,14 +92,14 @@ library.
 
 ```python
 # shop.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class _Engine:
     def start(self) -> None:
         print("_Engine.start()")
 
-@dataclass(frozen=True)
+@record
 class _FuelPump:
     engine: _Engine
 
@@ -107,7 +107,7 @@ class _FuelPump:
         print("_FuelPump.prime()")
         self.engine.start()
 
-@dataclass(frozen=True)
+@record
 class _Ignition:
     pump: _FuelPump
 
@@ -132,7 +132,7 @@ start_car()
 #: _Engine.start()
 print([name for name in vars(shop)
        if not name.startswith("_")])
-#: ['dataclass', 'start_car']
+#: ['record', 'start_car']
 ```
 
 The caller sees one function, and `start_car()` keeps the assembly
@@ -140,11 +140,11 @@ order, `_Ignition(_FuelPump(_Engine()))`, inside the module.
 `shop._Engine` and `shop._FuelPump` still reach the classes, because
 Python enforces nothing. The underscore marks them as private, and
 `from shop import *` skips them. The listing prints the module's
-public names to make that concrete. `dataclass` appears because an
+public names to make that concrete. `record` appears because an
 import binds a name in the module too. A real module therefore
 either sets
 [`__all__`](../Chapters/06_Foundations--Modules_and_Packages.md#what-a-module-exports)
-or imports as `import dataclasses` and writes `@dataclasses.dataclass`.
+or imports as `import record` and writes `@record.record`.
 
 The class version differs in one way that matters. `Facade` is a
 namespace the language does not treat as one: `Facade.start_car` and
