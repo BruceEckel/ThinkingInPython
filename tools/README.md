@@ -1187,7 +1187,8 @@ code. `site_rewrite()` fixes the order and
 `tools/tests/test_listing_links.py` pins it.
 
 On the site, `resources/static/link-preview.js` (copied beside the
-pages, loaded by `template.html`) adds a hover panel: resting the
+pages with its stylesheet `link-preview.css`, and loaded by
+`template.html`) adds a hover panel: resting the
 pointer on a listing link shows the listing in a floating box, cloned
 from the page or, for a cross-chapter link, fetched once from the other
 page. Clicking the link still jumps to the listing, so the panel needs
@@ -1204,6 +1205,34 @@ get no panel: one to another site (a browser will not let the page
 read it), the page's navigation (Contents, the chapter's table of
 contents, previous/next, a footnote's back-link), and any link inside
 a panel.
+
+The contents page loads the script too (`render_index()` names the two
+files, since it does not go through the template), so a chapter title
+there shows that chapter's opening. The stylesheet repeats the few
+prose rules an excerpt needs, because `style.css` styles a table of
+contents and no prose, and it reads `--heading-font`, which the
+template and `render_css()` both set in `:root`.
+
+A finger cannot hover, so a tap stands in: the first tap on a link
+shows the panel, whose caption carries a "Go there" link, a second tap
+on the same link follows it, and a tap anywhere else closes the panel.
+The script decides per interaction, from the `pointerType` of the last
+`pointerdown`, so a laptop with a touch screen gets hover from its
+mouse and taps from its screen. The caption is sticky, which keeps
+"Go there" in view while a long excerpt scrolls.
+
+`make preview-check` (`tools/site_preview_check.js`) builds the site
+and then uses the previews under jsdom: it hovers every link on every
+page, taps the first link of each kind on each page, and fails on a
+link into the book with no panel, a navigation link with one, or a
+panel with an id, a back-link, or a stray `#place` link in it. It
+needs node, which no gate does, and its first run installs jsdom under
+`build/node/` from the network, so it is in no gate and
+`verify-targets` skips it. It reads the script from `resources/static`
+and the pages from `build/site`, so after an edit to the script alone,
+`node tools/site_preview_check.js 29 index` reruns it on a few pages
+in a couple of seconds. jsdom lays nothing out: check where the panel
+sits and how it looks in a browser.
 
 ## make_cover.py
 

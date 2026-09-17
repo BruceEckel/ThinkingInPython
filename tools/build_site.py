@@ -40,10 +40,12 @@ IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
 # Copied beside the pages, and linked from template.html by the
-# `search-css`, `search-js`, and `preview-js` variables. link-preview.js
-# is the hover panel for a chapter's links: the ones listing_links.py
-# writes, and the cross-references, chapter links, and footnotes.
-STATIC_FILES = ("search.css", "search.js", "link-preview.js")
+# `search-css`, `search-js`, `preview-css`, and `preview-js` variables.
+# link-preview.js is the hover panel for a chapter's links: the ones
+# listing_links.py writes, and the cross-references, chapter links, and
+# footnotes. The contents page loads it too, for its chapter titles.
+STATIC_FILES = ("search.css", "search.js",
+                "link-preview.css", "link-preview.js")
 
 # Experimental: give each chapter page its own table of contents (its own
 # sections). Flip this default, or override per-build with --chapter-toc /
@@ -206,6 +208,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
         f"--variable=search-css:search.css{static_tag('search.css')}",
         f"--variable=search-js:search.js{static_tag('search.js')}",
+        "--variable=preview-css:link-preview.css"
+        f"{static_tag('link-preview.css')}",
         "--variable=preview-js:link-preview.js"
         f"{static_tag('link-preview.js')}",
     ]
@@ -260,6 +264,8 @@ def render_index(chapters: list[Chapter]) -> str:
     css_tag = asset_tag(render_css())
     search_css_tag = static_tag("search.css")
     search_js_tag = static_tag("search.js")
+    preview_css_tag = static_tag("link-preview.css")
+    preview_js_tag = static_tag("link-preview.js")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -272,6 +278,8 @@ def render_index(chapters: list[Chapter]) -> str:
   <link rel="stylesheet" href="style.css{css_tag}">
   <link rel="stylesheet" href="search.css{search_css_tag}">
   <script src="search.js{search_js_tag}" defer></script>
+  <link rel="stylesheet" href="link-preview.css{preview_css_tag}">
+  <script src="link-preview.js{preview_js_tag}" defer></script>
 </head>
 <body>
   <div class="page">
@@ -305,6 +313,7 @@ def render_css() -> str:
     return f""":root {{
   --ink: #1a1612; --paper: #f5f0e8; --muted: #7a6e62;
   --accent: #8b1a1a; --rule: #c8bfb0; --max-width: 680px;
+  --heading-font: '{HEADING_FONT}', sans-serif;
 }}
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 html {{ font-size: 18px; }}

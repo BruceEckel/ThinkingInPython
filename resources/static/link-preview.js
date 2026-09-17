@@ -16,7 +16,15 @@
 // another site gets no panel, since a browser will not let this page read
 // that one. Neither do the page's own navigation links (Contents, the
 // chapter's table of contents, previous/next, a footnote's way back).
-// Devices with no hover get no previews.
+// On the contents page the chapter titles are the links, so each shows its
+// chapter's opening. The panel's styles are in link-preview.css.
+//
+// A finger cannot rest on a link, so a tap stands in for the hover: the
+// first tap on a link shows the panel, whose caption carries a "Go there"
+// link, and a second tap on the same link follows it. A tap anywhere else
+// closes the panel. Which of the two a reader gets is decided per
+// interaction, from the pointer that was last pressed, so a laptop with a
+// touch screen gets both.
 (function () {
   "use strict";
 
@@ -29,16 +37,13 @@
   var showTimer = null;
   var hideTimer = null;
   var pages = {};                   // href path -> Promise<Document>
+  var touching = false;             // the last pointer pressed was a finger
 
   function h(tag, className, text) {
     var el = document.createElement(tag);
     if (className) el.className = className;
     if (text) el.textContent = text;
     return el;
-  }
-
-  function canHover() {
-    return !(window.matchMedia && window.matchMedia("(hover: none)").matches);
   }
 
   // ── which links get a panel ─────────────────────────────────────────────
@@ -182,18 +187,25 @@
 
   // ── the panel ───────────────────────────────────────────────────────────
 
-  function show(link, found) {
+  function show(link, found, tapped) {
     hide();
     var content = excerpt(found);
     panel = h("div", "link-preview");
-    var title = caption(link, found);
-    if (title) panel.appendChild(h("div", "link-preview-title", title));
+    var title = h("div", "link-preview-title", caption(link, found));
+    if (tapped) {
+      var go = h("a", "link-preview-go", "Go there →");
+      go.setAttribute("href", link.getAttribute("href"));
+      go.addEventListener("click", function () { setTimeout(hide, 0); });
+      title.appendChild(go);
+    }
+    if (title.textContent) panel.appendChild(title);
     content.nodes.forEach(function (node) {
       panel.appendChild(copyOf(node, found.page));
     });
     if (content.more) {
-      panel.appendChild(h("p", "link-preview-more",
-                          "Continues: click the link to read on."));
+      panel.appendChild(h("p", "link-preview-more", tapped
+        ? "Continues: tap “Go there” to read on."
+        : "Continues: click the link to read on."));
     }
     panel.addEventListener("mouseenter", cancelHide);
     panel.addEventListener("mouseleave", scheduleHide);
@@ -251,6 +263,8 @@
   }
 
   function onOver(ev) {
+    // A tap sends a mouseover of its own, ahead of its click.
+    if (touching) return;
     var link = linkFrom(ev);
     if (!link) return;
     if (link === current) { cancelHide(); return; }
@@ -271,10 +285,30 @@
     if (link === current) scheduleHide();
   }
 
+  function follow(link) { location.href = link.href; }
+
+  function onTap(ev) {
+    if (!touching) return;          // a mouse click follows the link
+    if (panel && panel.contains(ev.target)) return; // so do the panel's links
+    var link = linkFrom(ev);
+    if (!link || link === current) { hide(); return; } // second tap follows
+    var found = targetOf(link);
+    if (!found) return;
+    ev.preventDefault();
+    found.then(function (target) {
+      if (target) show(link, target, true); else follow(link);
+    }, function () { follow(link); });
+  }
+
   function init() {
-    if (!canHover()) return;
+    document.addEventListener("pointerdown", function (ev) {
+      touching = ev.pointerType === "touch";
+    }, true);
     document.addEventListener("mouseover", onOver);
     document.addEventListener("mouseout", onOut);
+    document.addEventListener("click", onTap);
+    // A link to a place on this page leaves the page, and the panel, up.
+    window.addEventListener("hashchange", hide);
     document.addEventListener("keydown", function (ev) {
       if (ev.key === "Escape") hide();
     });

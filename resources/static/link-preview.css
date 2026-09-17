@@ -1,0 +1,105 @@
+/* The panel link-preview.js builds beside a hovered or tapped link.
+   Loaded by template.html (the chapter pages) and by the contents page.
+   Both set --heading-font in :root. */
+.link-preview {
+  position: absolute;
+  z-index: 90;
+  width: min(var(--max-width), calc(100vw - 2rem));
+  max-height: 60vh;
+  overflow: auto;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.14);
+  padding: 0.6rem 1rem 0.2rem;
+  text-align: left;
+}
+/* The caption stays at the top while a long excerpt scrolls under it,
+   so a tapped panel's "Go there" is always within reach. The negative
+   margins carry its background across the panel's padding. */
+.link-preview-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: -0.6rem -1rem 0;
+  padding: 0.6rem 1rem 0.3rem;
+  background: var(--paper);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: 'Cormorant SC', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* A tapped panel's way through to the target; a hovered one has the
+   link under the pointer for that. */
+.link-preview a.link-preview-go {
+  margin-left: auto;
+  white-space: nowrap;
+  color: var(--accent);
+  border-bottom: 1px solid var(--rule);
+}
+.link-preview-more {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* An excerpt's headings, at a size that suits the panel. */
+.link-preview h1, .link-preview h2 {
+  font-family: var(--heading-font, sans-serif);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.link-preview h1 { font-size: 1.5rem; margin: 0.4rem 0 0.6rem; }
+.link-preview h2 { font-size: 1.2rem; margin: 0.4rem 0 0.5rem; }
+.link-preview h3, .link-preview h4 { margin: 0.8rem 0 0.4rem; }
+.link-preview div.sourceCode, .link-preview pre { margin: 0.5rem 0; }
+
+/* The chapter template styles the rest of an excerpt. The contents page
+   styles a table of contents and no prose, so the rules an excerpt needs
+   are repeated here, with the template's values. */
+.link-preview p { margin-bottom: 1.2rem; }
+.link-preview p + p { margin-top: 0.6rem; }
+.link-preview ul, .link-preview ol { margin-bottom: 1.2rem; padding-left: 1.5rem; }
+.link-preview li { margin-bottom: 0.3rem; }
+.link-preview a:not(.listing-link) {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+.link-preview .listing-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--muted);
+}
+.link-preview code {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+  font-size: 0.82em;
+  background: rgba(0,0,0,0.04);
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+}
+.link-preview pre {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.link-preview pre code { background: none; padding: 0; font-size: inherit; }
+.link-preview div.sourceCode { border: 1px solid var(--rule); border-radius: 3px; }
+.link-preview div.sourceCode pre { border: none; margin: 0; }
+.link-preview blockquote {
+  border-left: 2px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.5rem 1.5rem;
+  color: var(--muted);
+  font-style: italic;
+}

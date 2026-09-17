@@ -311,7 +311,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site cover epub pdf release release-prune local serve
+.PHONY: sync check prune site preview-check cover epub pdf release release-prune local serve
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -330,6 +330,15 @@ prune:  ## Delete orphaned stray files under Examples/ (see `check`)
 
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) -m tools.build_site
+
+# Hovers and taps every link on every built page under jsdom and fails on
+# a link into the book that shows no panel, a navigation link that shows
+# one, or a panel with something wrong in it. In no gate: it needs node,
+# and its first run installs jsdom under build/node/ from the network.
+# After an edit to resources/static/link-preview.js alone, `node
+# tools/site_preview_check.js` reruns it against the site already built.
+preview-check: site  ## Build the site, then test its link previews under jsdom (needs node)
+	node tools/site_preview_check.js
 
 # The cover images and favicon are generated files under
 # resources/static/, committed so the builds never depend on the

@@ -10,7 +10,14 @@ here, and one end-to-end assembly through build_epub.book_markdown().
 from pathlib import Path
 
 from tools.build_epub import book_markdown, hang_listings, listing_html
-from tools.build_site import STATIC_FILES, STATIC_SRC, TEMPLATE, Chapter
+from tools.build_site import (
+    STATIC_FILES,
+    STATIC_SRC,
+    TEMPLATE,
+    Chapter,
+    render_css,
+    render_index,
+)
 from tools.listing_links import (
     epub_href,
     fence_ids,
@@ -136,26 +143,44 @@ def test_site_rewrite_links_and_ids_in_the_order_that_works() -> None:
 
 def test_preview_script_is_shipped_and_linked_from_the_template() -> None:
     # build_site copies STATIC_FILES beside the pages and the template
-    # loads the script through the preview-js variable; a missing file
-    # would fail the copy, a missing variable would load nothing.
+    # loads the script and its stylesheet through the preview-js and
+    # preview-css variables; a missing file would fail the copy, a
+    # missing variable would load nothing.
     assert "link-preview.js" in STATIC_FILES
+    assert "link-preview.css" in STATIC_FILES
     for name in STATIC_FILES:
         assert (STATIC_SRC / name).is_file(), name
     template = TEMPLATE.read_text(encoding="utf-8")
     assert "$preview-js$" in template
+    assert "$preview-css$" in template
     assert ".listing-link" in template
-    assert ".link-preview" in template
     assert ".listing-mode" not in template  # the switch was removed
+
+
+def test_contents_page_loads_the_preview_too(tmp_path: Path) -> None:
+    # The contents page is written by render_index(), not the template,
+    # so it names the two files itself. The stylesheet's headings read
+    # --heading-font, which both pages must set.
+    index = render_index(chapters_in(tmp_path, {"14_Decorators": "# D\n"}))
+    assert '<script src="link-preview.js?v=' in index
+    assert '<link rel="stylesheet" href="link-preview.css?v=' in index
+    assert "--heading-font:" in render_css()
+    assert "--heading-font:" in TEMPLATE.read_text(encoding="utf-8")
 
 
 def test_preview_script_and_template_agree_on_class_names() -> None:
     # The script finds the page's parts, and styles its own panel, by
     # class name. A class renamed on one side leaves the panel unstyled
-    # or previews the navigation links, and no build step would notice.
+    # or previews the navigation links. `make preview-check` would
+    # notice, but it needs node and no gate runs it.
     script = (STATIC_SRC / "link-preview.js").read_text(encoding="utf-8")
+    styles = (STATIC_SRC / "link-preview.css").read_text(encoding="utf-8")
     template = TEMPLATE.read_text(encoding="utf-8")
     for name in ("link-preview", "link-preview-title", "link-preview-more",
-                 "chapter-toc", "chapter-nav", "chapter-label",
+                 "link-preview-go"):
+        assert name in script, name
+        assert f".{name}" in styles, name
+    for name in ("chapter-toc", "chapter-nav", "chapter-label",
                  "chapter-ornament", "page"):
         assert name in script, name
         assert f".{name}" in template or f'class="{name}"' in template, name
