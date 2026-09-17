@@ -40,9 +40,10 @@ IMAGES_SRC = ROOT / "resources" / "images"
 STATIC_SRC = ROOT / "resources" / "static"
 TEMPLATE = ROOT / "template.html"
 # Copied beside the pages, and linked from template.html by the
-# `search-css`, `search-js`, and `listing-js` variables. listing-preview.js
-# is the hover panel for the links listing_links.py writes.
-STATIC_FILES = ("search.css", "search.js", "listing-preview.js")
+# `search-css`, `search-js`, and `preview-js` variables. link-preview.js
+# is the hover panel for a chapter's links: the ones listing_links.py
+# writes, and the cross-references, chapter links, and footnotes.
+STATIC_FILES = ("search.css", "search.js", "link-preview.js")
 
 # Experimental: give each chapter page its own table of contents (its own
 # sections). Flip this default, or override per-build with --chapter-toc /
@@ -205,8 +206,8 @@ def render_chapter(body: str, ch: Chapter,
         f"--variable=heading-font-google:{HEADING_FONT_GOOGLE}",
         f"--variable=search-css:search.css{static_tag('search.css')}",
         f"--variable=search-js:search.js{static_tag('search.js')}",
-        "--variable=listing-js:listing-preview.js"
-        f"{static_tag('listing-preview.js')}",
+        "--variable=preview-js:link-preview.js"
+        f"{static_tag('link-preview.js')}",
     ]
     if prev is not None:
         variables += [f"--variable=prev-url:{prev.out_name}",

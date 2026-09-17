@@ -1186,13 +1186,24 @@ fence, so the reverse order sees every prose line after a listing as
 code. `site_rewrite()` fixes the order and
 `tools/tests/test_listing_links.py` pins it.
 
-On the site, `resources/static/listing-preview.js` (copied beside the
+On the site, `resources/static/link-preview.js` (copied beside the
 pages, loaded by `template.html`) adds a hover panel: resting the
 pointer on a listing link shows the listing in a floating box, cloned
 from the page or, for a cross-chapter link, fetched once from the other
 page. Clicking the link still jumps to the listing, so the panel needs
 no switch to turn it off. A device with no hover gets no panel. The
 EPUB has no script, so its links only jump.
+
+The same panel serves every other link into the book, with no class
+and no build step: the script reads the `href`. A link to a heading
+shows the heading and the text under it, up to the next heading of
+that level or `MAX_BLOCKS` blocks, and then says the text continues.
+A link naming a chapter and no anchor shows the chapter's title and
+opening text. A footnote reference shows the note. Three kinds of link
+get no panel: one to another site (a browser will not let the page
+read it), the page's navigation (Contents, the chapter's table of
+contents, previous/next, a footnote's back-link), and any link inside
+a panel.
 
 ## make_cover.py
 

@@ -136,16 +136,29 @@ def test_site_rewrite_links_and_ids_in_the_order_that_works() -> None:
 
 def test_preview_script_is_shipped_and_linked_from_the_template() -> None:
     # build_site copies STATIC_FILES beside the pages and the template
-    # loads the script through the listing-js variable; a missing file
+    # loads the script through the preview-js variable; a missing file
     # would fail the copy, a missing variable would load nothing.
-    assert "listing-preview.js" in STATIC_FILES
+    assert "link-preview.js" in STATIC_FILES
     for name in STATIC_FILES:
         assert (STATIC_SRC / name).is_file(), name
     template = TEMPLATE.read_text(encoding="utf-8")
-    assert "$listing-js$" in template
+    assert "$preview-js$" in template
     assert ".listing-link" in template
-    assert ".listing-preview" in template
+    assert ".link-preview" in template
     assert ".listing-mode" not in template  # the switch was removed
+
+
+def test_preview_script_and_template_agree_on_class_names() -> None:
+    # The script finds the page's parts, and styles its own panel, by
+    # class name. A class renamed on one side leaves the panel unstyled
+    # or previews the navigation links, and no build step would notice.
+    script = (STATIC_SRC / "link-preview.js").read_text(encoding="utf-8")
+    template = TEMPLATE.read_text(encoding="utf-8")
+    for name in ("link-preview", "link-preview-title", "link-preview-more",
+                 "chapter-toc", "chapter-nav", "chapter-label",
+                 "chapter-ornament", "page"):
+        assert name in script, name
+        assert f".{name}" in template or f'class="{name}"' in template, name
 
 
 # ── the EPUB's <pre> ─────────────────────────────────────────────────────────
