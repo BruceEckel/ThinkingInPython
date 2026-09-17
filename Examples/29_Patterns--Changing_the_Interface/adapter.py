@@ -17,8 +17,7 @@ class ProxyAdapter(WhatIWant):
 
     @override
     def f(self) -> None:
-        # Implement behavior using
-        # methods in WhatIHave:
+        # Implement behavior using WhatIHave:
         self.what_i_have.g()
         self.what_i_have.h()
 

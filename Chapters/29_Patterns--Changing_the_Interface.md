@@ -56,7 +56,7 @@ if __name__ == "__main__":
 #: WhatIHave.h()
 ```
 
-Because `WhatIUse` calls `f()` and `WhatIHave` has none,
+Because `WhatIUse` calls `f()` and `WhatIHave` has no `f()`,
 `ProxyAdapter` supplies one and builds it out of the methods the adaptee does have.
 `WhatIWant` is a bare placeholder rather than an ABC or a `Protocol`,
 because this listing is about *where* the adaptation lives,
@@ -78,6 +78,7 @@ from adapter import (ProxyAdapter, WhatIHave, WhatIUse,
 # Approach 2: build adapter use into op():
 class WhatIUse2(WhatIUse):
     @override
+    # With WhatIHave here, ty rejects the override:
     # def op(self, what_i_have: WhatIHave) -> None:
     def op(self, what_i_have: Any) -> None:
         ProxyAdapter(what_i_have).f()
