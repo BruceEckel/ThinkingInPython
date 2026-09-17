@@ -731,7 +731,7 @@ error[invalid-yield]: Yield expression type does not match annotation
    |                            expected `Need[Console] | KeyError`
 ```
 
-The error appears on line 28, the `yield from` that would introduce the
+The error appears on line 29, the `yield from` that would introduce the
 undeclared failure, not on the signature and not at the call site. That
 is the useful place for it. The diagnostic names both the failure that
 escaped and the delegation it escaped through, so the fix is either to

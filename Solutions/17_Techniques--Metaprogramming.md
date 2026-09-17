@@ -221,14 +221,13 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 ## 6. The static diagnostic beside the runtime `TypeError`
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
-the class header unsuppressed, inside the `try` the listing already has:
+the class header unsuppressed, inside the `with ignore(TypeError):` the
+listing already has:
 
 ```python
-try:
+with ignore(TypeError):
     class Singleton(type, dict[type, Any]):
         pass
-except TypeError as e:
-    print(e)
 ```
 
 `uv run ty check metaclass_layout_conflict.py` then reports:
@@ -256,7 +255,7 @@ have incompatible memory layouts
 ```
 
 Running the same file prints
-`multiple bases have instance lay-out conflict`.
+`[TypeError] multiple bases have instance lay-out conflict`.
 
 The diagnostic and the exception describe one collision. `ty`'s summary
 line even names the consequence, "Class will raise `TypeError` at
