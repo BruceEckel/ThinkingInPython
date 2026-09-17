@@ -390,7 +390,7 @@ or wait for the façade's author to expose the name.
 If you expose enough names, the façade stops simplifying anything;
 it relays every name the subsystem has.
 
-## Telling the Wrappers Apart
+## Distinguishing the Wrappers
 
 *Adapter* and *Façade* complete a family of wrappers that share one structure,
 a front object forwarding to something behind it,
@@ -479,7 +479,7 @@ The decorator also applies to a class,
 where it warns on construction and on subclassing.
 Applied to a single `@overload`,
 the mark deprecates one call signature while the rest stay current.
-A function that used to take a string and now takes a `Path` can then warn only the string callers.
+A function that now takes a `Path` in place of a string can then warn only the callers still passing a string.
 That form is static only.
 Python discards the overload declarations at runtime and never issues the `DeprecationWarning`.
 `ty`, Pyright, and mypy all report a deprecated overload.

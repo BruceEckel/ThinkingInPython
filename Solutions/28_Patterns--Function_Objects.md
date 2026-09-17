@@ -335,8 +335,8 @@ class in every published event's MRO, `object` included.
 Adding `unsubscribe()` cannot break an existing caller, since code that
 never calls it behaves exactly as before. The MRO walk can.
 A handler subscribed to `Deposit` starts receiving every subclass of
-`Deposit`, including subclasses written after the handler, so a bus
-where `BigDeposit` used to reach only `on_big` now reaches
+`Deposit`, including subclasses written after the handler, so a
+`BigDeposit` that reached only `on_big` before the change now reaches
 `on_deposit` too. That wider reach is the intended feature, and it is
 still a behavior change to existing code. Any handler that assumed
 `type(event) is Deposit`, or that counts events, now sees more than it

@@ -60,7 +60,7 @@ p.g()
 That is a looser definition than in *GoF Design Patterns*,
 and relies only on intent.
 Under GoF's stricter definition, the interface separates *Proxy* from *Adapter*.
-[Telling the Wrappers Apart](29_Patterns--Changing_the_Interface.md#telling-the-wrappers-apart)
+[Distinguishing the Wrappers](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers)
 clarifies both readings.
 
 A common interface helps, though:
@@ -156,7 +156,7 @@ The static type checker verifies signatures.
 ### Forwarding with `__getattr__()` {#forwarding-with-getattr}
 
 `__getattr__()` is Python's built-in delegation mechanism,
-which [*Singleton*](24_Patterns--Singleton.md) used to reach its inner object.
+which [*Singleton*](24_Patterns--Singleton.md) uses to reach its inner object.
 Delegating through it makes `Proxy` simpler to implement:
 
 ```python

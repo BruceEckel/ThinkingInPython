@@ -330,7 +330,7 @@ expect(Blackout, run, handle(short)(run_load)(17, 6))
 #: [Blackout] 20
 ```
 
-The turbine takes the evening hours the battery used to cover, and the battery
+The turbine takes the evening hours the battery covered before it was added, and the battery
 drops back to one hour at 22:00 once the wind stops.
 `run_load()` needs no change, and could not have needed one: it asks for a
 `Source` at an hour and uses whatever the handler hands back.

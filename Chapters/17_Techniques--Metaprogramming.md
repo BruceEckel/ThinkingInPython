@@ -79,7 +79,7 @@ and a metaclass puts behavior there; an ordinary class cannot.
 
 You rarely need a metaclass.
 It is a fascinating tool and tempting to use,
-but simpler hooks cover almost every case a metaclass used to handle:
+but simpler hooks cover almost every case a metaclass handled before those hooks existed:
 
 - `__init_subclass__()` runs at subclass creation.
   It replaces most "do something at each class definition" metaclasses.

@@ -795,7 +795,7 @@ own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
 Effect per `Protocol`. The two `Protocol`s no longer overlap, so no
 object satisfies both, and each Effect names the one it needs.
 
-That change buys a diagnostic where a coin flip used to be. Add one
+That change turns the coin flip into a diagnostic. Add one
 more line to the end of the listing, handing `to_log` the object that
 prints instead of the one that records, and `ty` rejects it before the
 program runs:

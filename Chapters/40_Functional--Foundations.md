@@ -538,8 +538,8 @@ which avoids the late-binding surprise a lambda created in a loop can produce.
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
 Binding `exponent` above works because `power()` accepts it by keyword.
-`partial()` fills positional arguments from the left,
-so fixing the third argument used to mean fixing the first two as well.
+`partial()` fills positional arguments from the left, so before 3.14,
+fixing the third argument meant fixing the first two as well.
 A function whose parameters are positional-only
 (see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
 rules out the keyword escape `power()` allows.

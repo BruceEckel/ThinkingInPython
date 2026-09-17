@@ -1016,7 +1016,7 @@ and all three surface in this short listing:
    and dies with `RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase`.
    The parent sees the worker's death as `BrokenProcessPool`,
    with the worker's own `RuntimeError` traceback printed above it by the failing child process.
-   This used to be a Windows and macOS concern only,
+   Before 3.14 this was a Windows and macOS concern only,
    because Linux forked the parent process instead of importing anything.
    Since 3.14 no platform forks by default,
    so every platform requires the guard.

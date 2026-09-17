@@ -1096,7 +1096,7 @@ The two examples share a topic, not a type.
 
 A *Decorator* keeps the wrapped object's interface and adds behavior.
 *Proxy*, *Adapter*, and *Façade* wrap the same way and differ in intent.
-[Telling the Wrappers Apart](29_Patterns--Changing_the_Interface.md#telling-the-wrappers-apart)
+[Distinguishing the Wrappers](29_Patterns--Changing_the_Interface.md#distinguishing-the-wrappers)
 sorts the four.
 
 ```python
