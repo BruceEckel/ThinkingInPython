@@ -295,12 +295,10 @@ optional, and that is the base class's decision: it declares that a
 subclass may skip this step. Declare instead that a subclass may not,
 by inheriting from `ABC` and marking `customize2()` with
 `@abstractmethod`, and Python refuses to construct `HalfDone` at
-all. `ty` 0.0.81 has no rule for instantiating an abstract class, so
-under `ty` the refusal comes from the runtime alone. Pyright and mypy
-both report it before the program runs. No checker could catch the
-omission
-before, because "deliberately empty" and "forgotten" were the same
-code, and only the base class could have recorded that difference.
+all. The type checker reports the construction too, before the
+program runs. No checker could catch the omission before, because
+"deliberately empty" and "forgotten" were the same code, and only
+the base class could have recorded that difference.
 
 `Exploder`'s exception is not repairable this way. Catching it would
 require the base class to state which exceptions a step may raise, and

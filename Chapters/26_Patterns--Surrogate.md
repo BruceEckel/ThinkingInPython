@@ -105,7 +105,7 @@ p.f()
 p.g()
 #: Complete.g()
 with ignore(TypeError):
-    Proxy(Partial())
+    Proxy(Partial())  # type: ignore
 #: [TypeError] Can't instantiate abstract class Partial
 #: without an implementation for abstract method 'g'
 ```
@@ -114,6 +114,8 @@ Because `Proxy` accepts any `Service` and `Complete` implements both methods,
 the proxy can forward either call.
 Because `Partial` omits `g()`,
 constructing a `Partial` raises a `TypeError` before the first call.
+The type checker reports that construction before the program runs,
+so the line has a `# type: ignore` and the listing can show the runtime refusal.
 The inheritance makes a `Proxy` acceptable wherever code expects a `Service`,
 and the type checker verifies the `Proxy`'s `f()` and `g()` against the base.
 

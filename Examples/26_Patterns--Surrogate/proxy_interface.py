@@ -33,6 +33,6 @@ p.f()
 p.g()
 #: Complete.g()
 with ignore(TypeError):
-    Proxy(Partial())
+    Proxy(Partial())  # type: ignore
 #: [TypeError] Can't instantiate abstract class Partial
 #: without an implementation for abstract method 'g'

@@ -647,6 +647,21 @@ and how it was measured.
   upgrade caused: Solutions 46 naming line 28 under a quote that points
   at line 29, and Solutions 17 showing a `try`/`except` the listing had
   long since replaced with `with ignore(TypeError):`.
+  The 0.0.81 to 0.0.82 upgrade (2026-09-17) had one gate failure, and
+  it retired a claim. 0.0.82 reports instantiating an abstract class
+  (`error[call-non-callable]: Cannot instantiate abstract class`),
+  directly or through a subclass that leaves an abstract method out.
+  The gate: ch26 `proxy_interface.py`'s `Proxy(Partial())` now carries
+  a `# type: ignore`, with a sentence saying the checker reports it
+  before the runtime refuses it. The claim: Solutions 25 exercise 4
+  said `ty` had no such rule and named Pyright and mypy as the
+  checkers that report it; it now says the type checker reports the
+  construction. Chapter 17's "`@abstractmethod` makes the checker
+  report an abstract instantiation" became true of `ty` that day. The
+  pyright delta was one GONE, the same line, because pyright honors
+  the `# type: ignore` too. The five remaining pinned claims and the
+  `record(cls)` gap re-probed unchanged, and all 40 quoted diagnostics
+  matched (two `verify-claims` agents, about 80k and 130k tokens).
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -658,14 +673,12 @@ and how it was measured.
   marker. `grep -rn "^error\[\|^warning\[\|^info\[" Chapters/ Solutions/`
   finds all 40 in the book (33 errors, 7 `reveal_type` quotes), so the
   sweep is small once you remember it.
-  Chapters 46-47 and Solutions 25 and 43 pin six behavior claims to a
-  ty version ("under `ty` 0.0.81"; `grep -rn '0\.0\.[0-9]' Chapters
+  Chapters 46-47 and Solutions 43 pin five behavior claims to a
+  ty version ("under `ty` 0.0.82"; `grep -rn '0\.0\.[0-9]' Chapters
   Solutions` finds them): the `type`-alias probe (46), the
   chained-`supply()` order and the `Never`/`Unknown` asymmetry, the
-  `nested_handle.py` reveal, and the `fork(bad)` reveal (47), the
-  `float | Unknown` without `@final` (Solutions 43), and `ty` having
-  no rule for instantiating an abstract class (Solutions 25, which
-  also says Pyright and mypy both report it). Re-probe on each
+  `nested_handle.py` reveal, and the `fork(bad)` reveal (47), and the
+  `float | Unknown` without `@final` (Solutions 43). Re-probe on each
   upgrade and update those version strings; the alias probe is a
   scratch generator annotated with a `type X = Depend[...]` alias whose
   `yield from need(Undeclared)` must still draw `invalid-yield`. The
@@ -683,10 +696,9 @@ and how it was measured.
   with `half` still `() -> Generator[Ask, Any, None]`. Solutions 43:
   strip both `@final` from `describe_isinstance.py` and
   `reveal_type(result.answer)` in the `Ok` branch must read
-  `float | Unknown`. Solutions 25: a scratch ABC with one
-  `@abstractmethod`, instantiated directly and through a subclass that
-  leaves the method out, must still pass `ty check` clean; the day it
-  does not, exercise 4's prose needs rewriting, not a version bump.
+  `float | Unknown`. A sixth claim, Solutions 25 saying `ty` had no
+  rule for instantiating an abstract class, was retired by 0.0.82,
+  which added the rule.
 - **A Stateless upgrade is a book-wide event too.** The libraries the
   listings import (`libs_check.LIBRARIES`: Stateless, numpy, hypothesis,
   time-machine) sit in the same dev group as the tools, so
@@ -700,7 +712,7 @@ and how it was measured.
   reader installs the PyPI release.
   Take a Stateless release alone, never alongside a `ty` bump, so a
   failure has one cause: `uv lock --upgrade-package stateless`, then
-  `uv sync`. Then, in this order: `make sweep`; the six version-pinned
+  `uv sync`. Then, in this order: `make sweep`; the five version-pinned
   probes above, since the revealed types come from Stateless's
   annotations as much as from `ty`'s inference; the two quotes that
   list the library's overloads verbatim (nine for `supply()` in
@@ -730,7 +742,7 @@ and how it was measured.
   with "Announce: not an @event". The same goes for any registering
   decorator stacked *under* `@record`: it would see the pre-slots
   class. None exists in the book, and `make records` would not catch
-  one. Separately, `ty` 0.0.81 mistypes a direct call to a
+  one. Separately, `ty` 0.0.82 mistypes a direct call to a
   `dataclass_transform` function whenever the argument is typed
   `type[...]` rather than being a class literal: `record(Point)` reveals
   `<class 'Point'>`, but `record(cls)` with `cls: type[E]`,
