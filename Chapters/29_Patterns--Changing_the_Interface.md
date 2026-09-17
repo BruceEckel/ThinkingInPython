@@ -164,7 +164,8 @@ building the adapter into `op()` adds the `WhatIHave` case and leaves the `WhatI
 
 ### Adapter in Python
 
-The variations above are Java habits.
+All three approaches carry one Java habit:
+the adapter inherits from `WhatIWant` so that `op()` accepts it.
 Because at runtime `WhatIUse.op()` calls only `f()`,
 any object with an `f()` works and no shared base class takes part.
 A type checker still enforces the annotation,
