@@ -824,8 +824,8 @@ info:            -> ((**P) -> Generator[Need[Executor], Any, Task[R]])
 ```
 
 Every overload accepts an Effect whose yield channel holds errors, `Async`, or
-nothing, and none accepts one holding an Ability. The forked work leaves the
-driver: it runs in a worker with no access to the handler stack that would
+nothing, and none accepts one that still holds a `Need`. The forked work leaves
+the driver: it runs in a worker with no access to the handler stack that would
 answer a request. So you must remove the requirement before the fork: supply it
 first and fork the bound function. The type system enforces a rule about where a
 handler can answer a request, and that is the same guarantee running through
@@ -1261,11 +1261,11 @@ a different shape:
 
 ```text
 error[invalid-argument-type]: Argument to function `run` is incorrect
-  --> exercise_13.py:22:11
-  |
-  | print(run(kitchen(buttered)()))
-  |           ^^^^^^^^^^^^^^^^^^^ Expected `Generator[Async | Exception, Any, Unknown]`,
-  |                               found `Generator[Need[Toaster], Any, str]`
+  --> exercise_13.py:23:11
+   |
+23 | print(run(kitchen(buttered)()))
+   |           ^^^^^^^^^^^^^^^^^^^ Expected `Generator[Async | Exception, Any, Unknown]`,
+   |                               found `Generator[Need[Toaster], Any, str]`
 ```
 
 This one tells you about the dependency two levels down. `supply()` failed to

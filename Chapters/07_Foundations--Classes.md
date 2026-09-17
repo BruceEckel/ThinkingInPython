@@ -623,7 +623,7 @@ and a subclass can replace it the way it replaces any other method.
     Then add a `__str__()` returning `21.0C` and confirm which of the two `print()` uses for each case.
 6.  In `override_intro.py`, misspell `Derived`'s method as `shwo()`,
     keeping the `@override` decorator.
-    Run the program and confirm it still prints `Base.show`,
+    Run the program and confirm it now prints `Base.show`,
     then run the type checker
     ([Static Types](08_Foundations--Static_Types.md) sets one up)
     and read what it says.

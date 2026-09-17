@@ -198,6 +198,9 @@ error[type-assertion-failure]: Argument does not have asserted type `Never`
 info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 ```
 
+The fence shows the first, in `render()`. The second is identical, at
+line 43 in `cost()`.
+
 `assert_never()` declares its parameter as `Never`, the type no value
 has, so the call checks only when the cases above it have already
 eliminated every member of the union. The inferred type spells out

@@ -235,7 +235,6 @@ down to whichever `yield` is currently suspended, two frames below.
 
 ```python
 def survey() -> Generator[Question, Answer, Result]:
-    # Was: yield from interview()
     profile: Result = interview()
     color: Answer = yield from ask(Question("color"))
     return Result(f"{profile}, color {color}")

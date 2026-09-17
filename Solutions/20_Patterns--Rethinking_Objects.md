@@ -136,7 +136,7 @@ print(charge(package))  # type: ignore
 #: 4.5
 ```
 
-`ty` now rejects the call:
+Without the `# type: ignore` on the last line, `ty` rejects the call:
 
 ```
 error[invalid-argument-type]: Argument to function `charge` is incorrect
@@ -148,6 +148,9 @@ info: type `Package` is not assignable to protocol `Priced`
 info: └── protocol member `total` is incompatible
 info:     └── incompatible return types: `Weight` is not assignable to `Price`
 ```
+
+The comment lets the listing pass the book's type check while the call
+still runs and prints `4.5`.
 
 The structural match still holds: `Package.total()` still takes no
 arguments and still returns a float at runtime. The two `NewType`

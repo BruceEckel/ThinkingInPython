@@ -790,10 +790,10 @@ print(capture.messages)
 #: ['Hello, Bob!']
 ```
 
-The fix renames `Capture.print()` to `record()` and changes nothing
-else. The two
-`Protocol`s no longer overlap, so no object satisfies both, and each
-Effect names the one it needs.
+The fix renames `Capture.print()` to `record()`, gives each method its
+own `Protocol`, `Screen` and `Recorder`, and splits `greet()` into one
+Effect per `Protocol`. The two `Protocol`s no longer overlap, so no
+object satisfies both, and each Effect names the one it needs.
 
 That change buys a diagnostic where a coin flip used to be. Add one
 more line to the end of the listing, handing `to_log` the object that

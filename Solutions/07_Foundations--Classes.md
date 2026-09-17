@@ -224,7 +224,7 @@ The program prints `Base.show`. Nothing overrode anything: `shwo()` is
 a new method that happens to sit in a subclass, and `show()` resolves
 up the chain to `Base` as it always would. Python has no opinion about
 whether you meant a subclass method to replace a base-class method, so
-the misspelling is not an error, it is a third method nobody calls.
+the misspelling is not an error, it is a second method nobody calls.
 
 Add `from typing import override`, uncomment the decorator,
 and the program still prints `Base.show`,

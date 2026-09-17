@@ -162,12 +162,13 @@ print(CONFIG, MAX_SIZE)
 #: [1, 2, 3] 200
 ```
 
-`ty` reports one error here, not two, and the one it reports is the
-assignment:
+The reassignment carries a `# type: ignore` so the listing passes the
+book's build. With that comment removed, `ty` reports one error here,
+not two, and the one it reports is the assignment:
 
 ```
 error[invalid-assignment]: Reassignment of `Final` symbol `MAX_SIZE` is not allowed
- --> immutable_types.py:7:1
+ --> exercise_6.py:7:1
   |
 6 | MAX_SIZE: Final[int] = 100
   |           ---------- Symbol declared as `Final` here

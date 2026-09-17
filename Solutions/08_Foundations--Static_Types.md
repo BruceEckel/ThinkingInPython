@@ -46,8 +46,9 @@ def area(width: int, height: int) -> int:
 print(area("3", 4))
 ```
 
-Running `ty check` on this without the `# type: ignore` comment
-reports:
+That is the function and the call from the chapter's `area.py`,
+without its comments. Running `ty check` on that file with the
+`# type: ignore` comment removed reports:
 
 ```
 error[invalid-argument-type]: Argument to function `area` is incorrect
