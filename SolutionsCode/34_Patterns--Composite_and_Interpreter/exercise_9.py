@@ -1,7 +1,7 @@
 # exercise_9.py
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import override
-from record import record
 
 class Entry(ABC):
     name: str
@@ -9,7 +9,7 @@ class Entry(ABC):
     @abstractmethod
     def disk_usage(self) -> int: ...
 
-@record
+@dataclass(frozen=True)
 class File(Entry):
     name: str
     size: int
@@ -18,7 +18,7 @@ class File(Entry):
     def disk_usage(self) -> int:
         return self.size
 
-@record
+@dataclass(frozen=True)
 class Directory(Entry):
     name: str
     entries: tuple[Entry, ...]
@@ -28,7 +28,7 @@ class Directory(Entry):
         return sum(e.disk_usage() for e in self.entries)
 
 # A plugin package adds a node type, editing nothing above:
-@record
+@dataclass(frozen=True)
 class Symlink(Entry):
     name: str
     target: str

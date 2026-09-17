@@ -1,9 +1,9 @@
 # exercise_13.py
-from dataclasses import dataclass
 from kitchen import Dough, Oven, Toaster, toast
+from record import record
 from stateless import Depend, Need, need, run, supply
 
-@dataclass(frozen=True)
+@record
 class Butter:
     grams: int
     def spread(self, slice_: str) -> str:

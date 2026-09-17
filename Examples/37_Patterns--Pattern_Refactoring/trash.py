@@ -1,10 +1,10 @@
 # trash.py
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
 type Bins = dict[type[Trash], list[Trash]]
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     # Dollars per pound (per subclass)

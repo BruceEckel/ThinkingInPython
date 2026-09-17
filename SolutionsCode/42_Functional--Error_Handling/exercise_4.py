@@ -1,16 +1,16 @@
 # exercise_4.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from functools import wraps
 from typing import Protocol, final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 

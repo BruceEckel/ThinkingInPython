@@ -1,7 +1,7 @@
 # exercise_4.py
-from dataclasses import dataclass
 from enum import Enum
 from functools import cache
+from record import record
 
 class Color(Enum):
     WHITE = "white"
@@ -15,7 +15,7 @@ class Kind(Enum):
     QUEEN = "Q"
     KING = "K"
 
-@dataclass(frozen=True)
+@record
 class Piece:
     color: Color
     kind: Kind

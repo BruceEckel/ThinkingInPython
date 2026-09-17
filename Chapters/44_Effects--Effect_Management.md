@@ -236,10 +236,10 @@ If you give `run` a type that cannot hold zero,
 
 ```python
 # slope_nonzero.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class NonZero:
     value: int
 
@@ -287,11 +287,11 @@ and let every function past that boundary take `NonZero` and stay total:
 
 ```python
 # slope_edge.py
-from dataclasses import dataclass
+from record import record
 from result import Err, Ok
 from safe import safe
 
-@dataclass(frozen=True)
+@record
 class NonZero:
     value: int
 

@@ -9,7 +9,7 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
     "#": ("rock", False),
 }
 
-@dataclass  # No frozen=True
+@dataclass  # Not a record
 class MutableTile:
     symbol: str
     name: str

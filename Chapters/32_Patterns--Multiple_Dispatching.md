@@ -508,10 +508,10 @@ Here is the machinery, with each dispatch traced:
 
 ```python
 # radd_dispatch.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Meters:
     n: float
 

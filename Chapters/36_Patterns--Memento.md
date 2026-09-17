@@ -86,9 +86,9 @@ at the cost the previous section showed:
 
 ```python
 # sketch.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Memento:
     strokes: tuple[str, ...]
 
@@ -143,7 +143,8 @@ whatever built it.
 A parameter typed `Memento` does not:
 only code that already imports `Memento` and constructs one correctly can satisfy it,
 so the type checker catches a caretaker that passes the wrong tuple by mistake.
-`frozen=True` makes reassigning `checkpoint.strokes` fail at runtime instead of silently succeeding.
+`Memento` is a [record](18_Techniques--Performance.md#record),
+so reassigning `checkpoint.strokes` fails at runtime instead of silently succeeding.
 Neither guarantee stops code holding a `Memento` from reading `.strokes`,
 unpacking it, or building one by hand; that boundary is still a convention,
 the one the classic pattern always relied on.
@@ -192,7 +193,7 @@ and the type checker flags the plain tuple before the program runs.
 If you run the program anyway,
 it fails at the first line that expects `.strokes`.
 Reassigning `checkpoint.strokes` fails at both stages too:
-`frozen=True` freezes the attribute, not just the tuple inside it.
+a record freezes the attribute, not just the tuple inside it.
 
 ```python
 # test_sketch.py
@@ -231,13 +232,14 @@ Both `save()` and `restore()` must copy.
 
 All of that copying defends against mutation.
 If you remove the mutation, nothing remains to prevent.
-Once the state is a frozen data class, every state is a memento:
+Once the state is a record, every state is a memento:
 
 ```python
 # frozen_sketch.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
@@ -323,8 +325,8 @@ or fall back to *Command*-based undo, which stores an edit instead of a state.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 argues that freezing removes what encapsulation protected.
 That section also explains why `strokes` is a tuple rather than a list:
-`frozen=True` guards the binding, not the object,
-so a frozen data class holding a list still lets that list change underneath it,
+freezing guards the binding, not the object,
+so a record holding a list still lets that list change underneath it,
 as `frozen_leaky.py` shows there.
 [*Flyweight*](35_Patterns--Flyweight.md) shares immutable values across space,
 and *Memento* shares them across time.

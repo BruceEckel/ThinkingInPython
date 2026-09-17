@@ -1,8 +1,8 @@
 # exercise_1b.py
 from collections.abc import Callable
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Row:
     name: str
     amount: int

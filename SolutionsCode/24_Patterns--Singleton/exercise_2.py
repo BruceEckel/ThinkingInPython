@@ -1,9 +1,9 @@
 # exercise_2.py
-from dataclasses import dataclass
 from functools import cache
 from exceptions import expect
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Connection:
     number: int
 

@@ -1,7 +1,8 @@
 # frozen_sketch.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()

@@ -126,10 +126,10 @@ Instead of modifying an object, you build a new one from the old:
 
 ```python
 # immutability.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: int
     y: int
@@ -212,10 +212,10 @@ A `list` offers neither:
 
 ```python
 # hashable.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: int
     y: int
@@ -236,9 +236,11 @@ so it works as a dictionary key.
 A `list` and an unfrozen `@dataclass` both compare by contents,
 so Python sets their `__hash__` to `None`:
 the dictionary that stored a key could no longer find it once its contents changed.
-`frozen=True` lets a dataclass keep contents-based equality and a hash at the same time.
+Freezing a dataclass lets it keep contents-based equality and a hash at the same time,
+and `@record` ([Performance](18_Techniques--Performance.md#record))
+freezes `Point`.
 That combination is why a value that must be a dictionary key, a cache entry,
-or a shared read across threads is normally a tuple or a frozen dataclass.
+or a shared read across threads is normally a tuple or a record.
 
 ## Functions as First-Class Objects
 
@@ -635,10 +637,10 @@ Here they work together:
 ```python
 # pipeline.py
 from collections.abc import Sequence
-from dataclasses import dataclass
 from functools import partial
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Reading:
     sensor: str
     celsius: float

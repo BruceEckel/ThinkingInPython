@@ -6,8 +6,8 @@ The *Interpreter* pattern represents sentences in a small language as trees,
 then evaluates them.
 *GoF Design Patterns* presents them as separate patterns,
 but the second is the first with meaning attached.
-In Python both reduce to one technique: a union of frozen data classes
-([records](18_Techniques--Performance.md#record)) for the nodes,
+In Python both reduce to one technique:
+a union of frozen data classes for the nodes,
 and recursive functions that `match` on them.
 This chapter builds each pattern with [exhaustive matching](13_Techniques--Pattern_Matching.md#exhaustive-matching).
 
@@ -26,8 +26,8 @@ under an abstract method on a shared base:
 # filesystem_classic.py
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import override
-from record import record
 
 class Node(ABC):
     name: str
@@ -38,7 +38,7 @@ class Node(ABC):
     @abstractmethod
     def walk(self, prefix: str = "") -> Iterator[str]: ...
 
-@record
+@dataclass(frozen=True)
 class File(Node):
     name: str
     size: int
@@ -51,7 +51,7 @@ class File(Node):
     def walk(self, prefix: str = "") -> Iterator[str]:
         yield prefix + self.name
 
-@record
+@dataclass(frozen=True)
 class Directory(Node):
     name: str
     entries: tuple[Node, ...]
@@ -92,9 +92,11 @@ and counting files or finding an entry by name would each cost another.
 
 ## A Composite of Data Classes
 
-Now move the operations out of the classes and change nothing else.
+Now move the operations out of the classes.
 The nodes keep their fields, a union names the closed set of alternatives,
-and each operation becomes a recursive function that matches on that union:
+and each operation becomes a recursive function that matches on that union.
+With no unslotted base class above them,
+the nodes become [records](18_Techniques--Performance.md#record):
 
 ```python
 # filesystem.py
@@ -252,7 +254,7 @@ Here is the complete grammar for a small arithmetic language:
 
 ```python
 # expr.py
-from record import record
+from dataclasses import dataclass
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -267,20 +269,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@record
+@dataclass(frozen=True)
 class Num(Operators):
     value: int
 
-@record
+@dataclass(frozen=True)
 class Var(Operators):
     name: str
 
-@record
+@dataclass(frozen=True)
 class Add(Operators):
     left: Expr
     right: Expr
 
-@record
+@dataclass(frozen=True)
 class Mul(Operators):
     left: Expr
     right: Expr
@@ -304,6 +306,11 @@ and the walkers need the union to know they have covered every case.
 `Expr` is the contract: if you annotate `evaluate()` with `Operators` instead,
 `assert_never()` stops working,
 because a base class is an open set and any new subclass silently belongs to it.
+
+`Operators` declares no `__slots__`,
+so the nodes are declared with `@dataclass(frozen=True)` and not `@record`:
+an unslotted base gives each instance its `__dict__` back
+([Performance](18_Techniques--Performance.md#record)).
 
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
@@ -343,9 +350,8 @@ Python's grammar sets the limit of the technique.
 You can overload the arithmetic, bitwise, and comparison operators this way,
 so an expression written with them builds nodes instead of computing.
 `==` is the exception.
-`@record` makes each node a data class,
-and a data class gets a generated `__eq__()` of its own.
-A class's own method always wins over one it inherits,
+`@dataclass` writes its own `__eq__()` onto every node class,
+and a class's own method always wins over one it inherits,
 so that generated `__eq__()` shadows anything `Operators` defines.
 `expr.py` never overloads `==`; the nodes compare by value instead,
 which is what the demo below and its tests rely on.
@@ -576,7 +582,8 @@ the left child is a `Mul` and only becomes a `Num` once something simplifies it.
 Simplifying both children first and matching the results catches the identity the recursion just exposed,
 which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
-A record blocks every field assignment, so `simplify()` never edits the input.
+`frozen=True` blocks every field assignment,
+so `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
 the `is` guard in each `case _` hands back the node it received when neither child simplified to anything different.
 

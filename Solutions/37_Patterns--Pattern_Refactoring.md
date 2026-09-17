@@ -5,12 +5,12 @@
 ```python
 # exercise_1.py
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
 type Bins = dict[type[Trash], list[Trash]]
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0
@@ -80,10 +80,10 @@ guard.
 
 ```python
 # exercise_2.py
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0
@@ -133,11 +133,11 @@ only in the numbers each type carries, write a plain function.
 
 ```python
 # exercise_3.py
-from dataclasses import dataclass
 from functools import singledispatchmethod
 from typing import ClassVar
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0
@@ -207,11 +207,11 @@ once the operation needs a home on an object.
 ```python
 # exercise_4.py
 from collections import defaultdict
-from dataclasses import dataclass
 from functools import singledispatch
 from typing import ClassVar
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0

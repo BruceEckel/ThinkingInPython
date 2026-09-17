@@ -1,8 +1,8 @@
 # note_methods.py
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0

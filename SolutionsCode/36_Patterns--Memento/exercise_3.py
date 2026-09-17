@@ -1,8 +1,9 @@
 # exercise_3.py
 import json
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()

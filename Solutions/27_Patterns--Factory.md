@@ -301,11 +301,11 @@ object, not editing every call site that creates a shape.
 
 ```python
 # exercise_5.py
-from dataclasses import dataclass
 from typing import Self
 from exceptions import expect
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Pizza:
     size: int = 9
     cheese: bool = True

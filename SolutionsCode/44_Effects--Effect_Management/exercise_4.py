@@ -1,8 +1,8 @@
 # exercise_4.py
-from dataclasses import dataclass
 from exceptions import expect
+from record import record
 
-@dataclass(frozen=True)
+@record
 class PositiveInt:
     value: int
 

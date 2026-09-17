@@ -121,11 +121,11 @@ so it lives in `utils/` and any chapter can import it:
 ```python
 # utils/result.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
@@ -138,7 +138,7 @@ class Ok[A]:
         return func(self.answer)
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 

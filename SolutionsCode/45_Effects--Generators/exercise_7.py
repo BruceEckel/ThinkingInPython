@@ -1,13 +1,13 @@
 # exercise_7.py
 from collections.abc import Generator
-from dataclasses import dataclass
 from typing import Final
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Coin:
     cents: int
 
-@dataclass(frozen=True)
+@record
 class Digit:
     value: str
 

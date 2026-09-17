@@ -1,6 +1,6 @@
 # exercise_6.py
+from dataclasses import dataclass
 from exceptions import ignore
-from record import record
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -23,20 +23,20 @@ class Operators:
             return Mul(Num(other), self)
         return NotImplemented
 
-@record
+@dataclass(frozen=True)
 class Num(Operators):
     value: int
 
-@record
+@dataclass(frozen=True)
 class Var(Operators):
     name: str
 
-@record
+@dataclass(frozen=True)
 class Add(Operators):
     left: Expr
     right: Expr
 
-@record
+@dataclass(frozen=True)
 class Mul(Operators):
     left: Expr
     right: Expr

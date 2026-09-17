@@ -787,14 +787,14 @@ varying the environment means varying data:
 
 ```python
 # nailer.py
-from dataclasses import dataclass
+from record import record
 from stateless import Depend, Need, need
 
-@dataclass(frozen=True)
+@record
 class Material:
     strength: int
 
-@dataclass(frozen=True)
+@record
 class Nailer:
     force: int
 

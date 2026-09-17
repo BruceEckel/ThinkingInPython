@@ -76,7 +76,7 @@ A map can hold millions of cells, but only a handful of tile kinds.
 Here, the handful is grass, water, and rock.
 
 The tile's symbol, name, and walkability are intrinsic,
-so they go in a frozen data class.
+so they go in a [record](18_Techniques--Performance.md#record).
 
 The tile's position is extrinsic.
 It is the cell's coordinates in the grid, so the `Tile` object never stores it.
@@ -92,14 +92,14 @@ so caching produces one shared instance per distinct symbol instead.
 
 ```python
 # tile_map.py
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str
@@ -143,8 +143,7 @@ Twenty-four cells, three objects.
 `[*row for row in field]` flattens the grid into one list of cells,
 the comprehension unpacking from [Comprehensions](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
-`Tile` is a frozen data class,
-so its generated `__eq__()` compares field values,
+`Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells would collapse to three with or without sharing.
 Only identity proves sharing.
 The grid can grow to any size and the object count stays at the number of tile kinds,
@@ -204,11 +203,11 @@ Freezing `Tile` hides the sharing from clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile.
 
-If you remove `frozen=True`, the pattern fails.
+If you replace `@record` with `@dataclass`, the pattern fails.
 Mutating the grass tile in one cell changes every grass cell in the map.
 
-`frozen=True` must hold all the way down.
-It blocks assignment to a field, not mutation inside one,
+The freezing must hold all the way down.
+A record blocks assignment to a field, not mutation inside one,
 so a `Tile` holding a `list` would leak that list to every cell that shares the tile
 (the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
 Every field here is immutable, which makes the sharing safe.
@@ -372,11 +371,13 @@ its entry lives exactly as long as someone holds the object.
 
 *Flyweight* cuts the number of objects, and `slots=True`
 ([Performance](18_Techniques--Performance.md#slots)) cuts the size of each one,
-so the two are worth combining once memory is the point.
+so the two are worth combining once memory is the point,
+as `Tile` does by being a record.
 They collide at one spot.
 A slotted class drops the `__weakref__` slot a weak reference needs,
 so slotting `Name` makes `_pool[text] = found` raise a `TypeError`.
 `weakref_slot=True` puts that slot back.
+`record()` has no such option, so `Name` keeps `@dataclass(frozen=True)`.
 
 ```python
 # test_weak_pool.py
@@ -537,8 +538,8 @@ you can write its equality checks as `is`.
     however large the map.
 2.  Use `tracemalloc` to compare `parse_map()` on a large map against a version whose `tile()` has no `@cache`.
     How does the ratio change as the map grows?
-3.  Remove `frozen=True` from `Tile` and set `field[0][0].walkable = False` on a parsed map.
-    Write a test that exposes the resulting bug, then restore `frozen=True`.
+3.  Replace `@record` on `Tile` with `@dataclass` and set `field[0][0].walkable = False` on a parsed map.
+    Write a test that exposes the resulting bug, then restore `@record`.
 4.  Model chess: a frozen `Piece` (color, kind)
     and a board that is a `dict` mapping squares to pieces.
     A full opening position holds thirty-two piece references.

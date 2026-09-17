@@ -1,22 +1,22 @@
 # bakery.py
-from dataclasses import dataclass
+from record import record
 from stateless import Depend, Need, need, run, supply
 
-@dataclass(frozen=True)
+@record
 class Dough:
     flour: str
     def risen(self) -> str:
         print("dough: risen")
         return f"{self.flour} dough"
 
-@dataclass(frozen=True)
+@record
 class Oven:
     celsius: int
     def bake(self, dough: str) -> str:
         print(f"oven: baking at {self.celsius}")
         return f"loaf of {dough}"
 
-@dataclass(frozen=True)
+@record
 class Toaster:
     setting: int
     def brown(self, loaf: str) -> str:

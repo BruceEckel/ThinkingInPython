@@ -1,7 +1,8 @@
 # pizza_direct.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Pizza:
     size: int = 12
     cheese: bool = True

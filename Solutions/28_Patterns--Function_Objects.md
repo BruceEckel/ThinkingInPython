@@ -271,16 +271,16 @@ at all, the way `bisection_within()` writes the tolerance into its
 # exercise_5.py
 from collections import defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
 type Handler[E] = Callable[[E], None]
 
-@dataclass(frozen=True)
+@record
 class Deposit:
     amount: int
 
-@dataclass(frozen=True)
+@record
 class BigDeposit(Deposit):
     pass
 

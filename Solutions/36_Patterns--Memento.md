@@ -4,9 +4,9 @@
 
 ```python
 # exercise_1_mutable.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Memento:
     strokes: tuple[str, ...]
 
@@ -38,9 +38,9 @@ print(sketch.strokes, checkpoint.strokes)
 
 ```python
 # test_ch36_erase_mutable.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Memento:
     strokes: tuple[str, ...]
 
@@ -101,9 +101,10 @@ stores are mementos, and mementos never change, so erasing after a
 
 ```python
 # exercise_1_frozen.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
@@ -123,9 +124,10 @@ print(before.strokes, after.strokes)
 
 ```python
 # test_ch36_erase_frozen.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
@@ -223,9 +225,10 @@ there is the honest answer, not a bug.
 ```python
 # exercise_3.py
 import json
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()
@@ -264,7 +267,7 @@ frozen dataclass otherwise supplies (`hash()` raises a `TypeError`,
 ## 4. `Memento` holding the list itself
 
 ```python
-@dataclass(frozen=True)
+@record
 class Memento:
     strokes: list[str]  # Bug: a list, not a tuple copy
 
@@ -294,8 +297,8 @@ calls `sketch.restore(checkpoint)`, `checkpoint` has already silently
 absorbed the `"b"` stroke that the copy in `save()` exists to keep
 out. `sketch.strokes == ["a"]` then fails immediately, before the
 test reaches the scenario
-`test_drawing_after_restore_spares_memento` catches. Freezing the
-`Memento` class itself (`@dataclass(frozen=True)`) prevents
+`test_drawing_after_restore_spares_memento` catches. Making
+`Memento` a record prevents
 reassigning `strokes` after construction, but the list *inside* stays
 mutable, and every later `draw()` changes it. That is why `save()`
 must copy into a `tuple`, an immutable container, instead of wrapping
@@ -360,9 +363,10 @@ stay in the same consistent state either way.
 ```python
 # exercise_6.py
 import copy
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Drawing:
     title: str
     strokes: tuple[str, ...] = ()

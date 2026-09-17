@@ -38,12 +38,12 @@ the dictionary factory from [Factory](27_Patterns--Factory.md#the-pythonic-facto
 
 ```python
 # trash.py
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
 type Bins = dict[type[Trash], list[Trash]]
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     # Dollars per pound (per subclass)
@@ -434,10 +434,10 @@ and the obvious home for it is a method on each material class:
 
 ```python
 # note_methods.py
-from dataclasses import dataclass
 from typing import ClassVar
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Trash:
     weight: float
     value: ClassVar[float] = 0.0

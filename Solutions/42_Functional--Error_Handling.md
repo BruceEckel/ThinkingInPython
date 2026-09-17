@@ -6,11 +6,11 @@
 # exercise_1.py
 from __future__ import annotations
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
@@ -23,7 +23,7 @@ class Ok[A]:
         return func(self.answer)
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 
@@ -86,11 +86,11 @@ steps decides where the chain stops.
 # exercise_2.py
 from __future__ import annotations
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
@@ -108,7 +108,7 @@ class Ok[A]:
         return self  # An Ok has no error to transform
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 
@@ -147,18 +147,18 @@ function that might produce one.
 
 ```python
 # test_ch42_combined.py
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 # The chapter's Result, reduced to what this answer uses:
 # the generic pair and the alias, without bind().
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 
@@ -236,17 +236,17 @@ cannot see that an empty error list means all three succeeded.
 ```python
 # exercise_4.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from functools import wraps
 from typing import Protocol, final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 
@@ -312,11 +312,11 @@ that, so `parse` keeps the signature
 ```python
 # exercise_5.py
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
@@ -326,7 +326,7 @@ class Ok[A]:
         return func(self.answer)
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 

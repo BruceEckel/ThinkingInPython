@@ -1,5 +1,5 @@
 # expr.py
-from record import record
+from dataclasses import dataclass
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -14,20 +14,20 @@ class Operators:
     def __rmul__(self: Expr, other: int) -> Mul:
         return Mul(Num(other), self)
 
-@record
+@dataclass(frozen=True)
 class Num(Operators):
     value: int
 
-@record
+@dataclass(frozen=True)
 class Var(Operators):
     name: str
 
-@record
+@dataclass(frozen=True)
 class Add(Operators):
     left: Expr
     right: Expr
 
-@record
+@dataclass(frozen=True)
 class Mul(Operators):
     left: Expr
     right: Expr

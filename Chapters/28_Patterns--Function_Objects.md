@@ -154,11 +154,11 @@ so its configuration cannot change after construction:
 ```python
 # callable_command.py
 from collections.abc import Callable
-from dataclasses import dataclass
+from record import record
 
 type Command = Callable[[], None]
 
-@dataclass(frozen=True)
+@record
 class Repeat:
     text: str
     times: int
@@ -554,20 +554,20 @@ Here, `Handler` names their signature, not an interface:
 # event_bus.py
 from collections import defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
 type Handler[E] = Callable[[E], None]
 
-@dataclass(frozen=True)
+@record
 class Deposit:
     amount: int
 
-@dataclass(frozen=True)
+@record
 class Withdraw:
     amount: int
 
-@dataclass(frozen=True)
+@record
 class Closed:
     reason: str
 

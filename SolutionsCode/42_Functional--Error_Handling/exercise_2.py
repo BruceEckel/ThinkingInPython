@@ -1,11 +1,11 @@
 # exercise_2.py
 from __future__ import annotations
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
@@ -23,7 +23,7 @@ class Ok[A]:
         return self  # An Ok has no error to transform
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 

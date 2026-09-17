@@ -1048,10 +1048,10 @@ The *GoF Design Patterns* structure looks like this:
 
 ```python
 # pizza_builder.py
-from dataclasses import dataclass
 from typing import Self
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Pizza:
     size: int
     cheese: bool
@@ -1108,9 +1108,10 @@ Keyword arguments with defaults are Python's built-in builder:
 
 ```python
 # pizza_direct.py
-from dataclasses import dataclass, replace
+from dataclasses import replace
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Pizza:
     size: int = 12
     cheese: bool = True

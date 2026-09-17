@@ -1,12 +1,12 @@
 # tile_map.py
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str

@@ -1,10 +1,10 @@
 # callable_command.py
 from collections.abc import Callable
-from dataclasses import dataclass
+from record import record
 
 type Command = Callable[[], None]
 
-@dataclass(frozen=True)
+@record
 class Repeat:
     text: str
     times: int

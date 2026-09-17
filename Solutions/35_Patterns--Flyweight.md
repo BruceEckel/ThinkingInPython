@@ -4,14 +4,14 @@
 
 ```python
 # exercise_1.py
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#", "+", "T"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str
@@ -74,14 +74,14 @@ because `@cache` keys on the symbol alone.
 ```python
 # exercise_2.py
 import tracemalloc
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str
@@ -129,21 +129,25 @@ for size in (50, 100, 200):
 
     ratio = round(uncached_peak / cached_peak, 1)
     print(size, "ratio uncached/cached:", ratio)
-#: 50 ratio uncached/cached: 9.9
-#: 100 ratio uncached/cached: 9.9
-#: 200 ratio uncached/cached: 11.1
+#: 50 ratio uncached/cached: 6.2
+#: 100 ratio uncached/cached: 6.2
+#: 200 ratio uncached/cached: 6.9
 ```
 
-The ratio holds near ten at every size: roughly 10x at a 50x50 map,
-a little over 11x at 200x200. Both peaks grow with the number of
+The ratio holds near six at every size: about 6x at a 50x50 map,
+close to 7x at 200x200. Both peaks grow with the number of
 cells, because both versions build the same nested list of references.
 The two differ in what one cell costs. A cell in the cached field
 costs one reference into a pool of three `Tile` objects, while a cell
-in the uncached field costs a brand-new `Tile`, roughly ten times as
+in the uncached field costs a brand-new `Tile`, roughly six times as
 much memory. The flyweight's saving is therefore per cell: the
-multiplier stays near ten, and the bytes saved grow with the map.
+multiplier stays near six, and the bytes saved grow with the map.
+`Tile` is a record, so each uncached `Tile` is a slotted instance
+with no `__dict__`. With `@dataclass(frozen=True)` in its place the
+same run reports a ratio near ten, because every uncached `Tile`
+then carries a dictionary too.
 
-## 3. Removing `frozen=True` exposes the sharing bug
+## 3. Replacing `@record` with `@dataclass` exposes the sharing bug
 
 ```python
 # exercise_3.py
@@ -157,7 +161,7 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
     "#": ("rock", False),
 }
 
-@dataclass  # No frozen=True
+@dataclass  # Not a record
 class MutableTile:
     symbol: str
     name: str
@@ -194,7 +198,7 @@ SPECS: Final[dict[str, tuple[str, bool]]] = {
     "#": ("rock", False),
 }
 
-@dataclass  # No frozen=True
+@dataclass  # Not a record
 class MutableTile:
     symbol: str
     name: str
@@ -213,9 +217,9 @@ def test_mutation_without_frozen_leaks_across_cells(
     assert field[1][1].walkable is False  # Bug: cell leaked
 ```
 
-Restoring `frozen=True` turns this same test into a demonstration of
+Restoring `@record` turns this same test into a demonstration of
 the fix. `field[0][0].walkable = False` now raises a
-`FrozenInstanceError` immediately, because a frozen dataclass rejects
+`FrozenInstanceError` immediately, because a record rejects
 assignment to every field. That refusal makes sharing one object
 safe.
 
@@ -223,9 +227,9 @@ safe.
 
 ```python
 # exercise_4.py
-from dataclasses import dataclass
 from enum import Enum
 from functools import cache
+from record import record
 
 class Color(Enum):
     WHITE = "white"
@@ -239,7 +243,7 @@ class Kind(Enum):
     QUEEN = "Q"
     KING = "K"
 
-@dataclass(frozen=True)
+@record
 class Piece:
     color: Color
     kind: Kind
@@ -505,11 +509,11 @@ If the boundary matters, keep a `to_tile()` wrapper that catches the
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
 from functools import cache
 from typing import Final
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: str
     name: str

@@ -1,14 +1,14 @@
 # test_ch46_nailer.py
-from dataclasses import dataclass
 from typing import Final
 import pytest
+from record import record
 from stateless import Depend, Need, need, run, supply
 
-@dataclass(frozen=True)
+@record
 class Material:
     strength: int
 
-@dataclass(frozen=True)
+@record
 class Nailer:
     force: int
 

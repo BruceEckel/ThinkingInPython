@@ -415,16 +415,16 @@ makes the same move for a random source.
 
 ```python
 # describe_isinstance.py
-from dataclasses import dataclass
 from typing import final
+from record import record
 
 @final
-@dataclass(frozen=True)
+@record
 class Ok[A]:
     answer: A
 
 @final
-@dataclass(frozen=True)
+@record
 class Err[E]:
     error: E
 

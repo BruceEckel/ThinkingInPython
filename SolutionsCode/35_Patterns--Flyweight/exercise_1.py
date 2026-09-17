@@ -1,12 +1,12 @@
 # exercise_1.py
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#", "+", "T"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str

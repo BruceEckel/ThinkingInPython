@@ -297,10 +297,10 @@ produces, one increment per item, so the caller can read
 
 ```python
 # exercise_5.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Meters:
     n: float
 

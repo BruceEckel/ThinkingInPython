@@ -1,13 +1,13 @@
 # exercise_2.py
 import tracemalloc
-from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal
+from record import record
 
 type Symbol = Literal[".", "~", "#"]
 type TileSpec = tuple[str, bool]
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: Symbol
     name: str
@@ -55,6 +55,6 @@ for size in (50, 100, 200):
 
     ratio = round(uncached_peak / cached_peak, 1)
     print(size, "ratio uncached/cached:", ratio)
-#: 50 ratio uncached/cached: 9.9
-#: 100 ratio uncached/cached: 9.9
-#: 200 ratio uncached/cached: 11.1
+#: 50 ratio uncached/cached: 6.2
+#: 100 ratio uncached/cached: 6.2
+#: 200 ratio uncached/cached: 6.9

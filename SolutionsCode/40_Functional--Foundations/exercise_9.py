@@ -1,9 +1,9 @@
 # exercise_9.py
 from collections.abc import Sequence
-from dataclasses import dataclass
 from functools import partial
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Reading:
     sensor: str
     celsius: float

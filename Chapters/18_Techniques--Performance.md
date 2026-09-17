@@ -1177,6 +1177,12 @@ The listings from here on use `@record` for a frozen data class.
 A class that needs what `record()` omits keeps `@dataclass` written out:
 `order=True`, a weak reference, or a `cached_property`.
 The next section shows how slots break the last two.
+A class whose base has no `__slots__` keeps `@dataclass(frozen=True)` as well:
+the base gives every instance its `__dict__` back, so the slots remove nothing.
+When the base is yours to change,
+an empty `__slots__ = ()` on it keeps the record slotted,
+as `shapes_oo.py` in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+does.
 
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 

@@ -1,8 +1,8 @@
 # pizza_builder.py
-from dataclasses import dataclass
 from typing import Self
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Pizza:
     size: int
     cheese: bool

@@ -1,9 +1,9 @@
 # slope_edge.py
-from dataclasses import dataclass
+from record import record
 from result import Err, Ok
 from safe import safe
 
-@dataclass(frozen=True)
+@record
 class NonZero:
     value: int
 

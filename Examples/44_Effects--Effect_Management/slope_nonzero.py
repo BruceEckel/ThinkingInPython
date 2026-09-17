@@ -1,8 +1,8 @@
 # slope_nonzero.py
-from dataclasses import dataclass
 from exceptions import ignore
+from record import record
 
-@dataclass(frozen=True)
+@record
 class NonZero:
     value: int
 

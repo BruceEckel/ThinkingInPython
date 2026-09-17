@@ -5,6 +5,8 @@ from typing import override
 from record import record
 
 class Shape(ABC):
+    __slots__ = ()
+
     @abstractmethod
     def area(self) -> float: ...
 

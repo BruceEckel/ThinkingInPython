@@ -2,11 +2,11 @@
 import threading
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
 from functools import cache
 from typing import Final
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Tile:
     symbol: str
     name: str

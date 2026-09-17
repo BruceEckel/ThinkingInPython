@@ -676,6 +676,8 @@ from typing import override
 from record import record
 
 class Shape(ABC):
+    __slots__ = ()
+
     @abstractmethod
     def area(self) -> float: ...
 
@@ -706,6 +708,16 @@ if __name__ == "__main__":
 Inheriting from `ABC` makes `Shape` abstract.
 You cannot instantiate it,
 and `@abstractmethod` forces every subclass to define `area()`.
+
+The empty `__slots__` on `Shape` is there for the records below it.
+A base class with no `__slots__` gives every instance of its subclasses a `__dict__`,
+the per-instance dictionary that `@record` exists to remove
+([Performance](18_Techniques--Performance.md#when-slots-does-not-fit)).
+`ABC` declares an empty `__slots__` too,
+so the chain stays slotted from `Circle` up to `object`.
+This is the book's one listing that slots a base class for its records.
+Elsewhere, a class with an unslotted base uses `@dataclass(frozen=True)`,
+which makes no claim about slots.
 
 ### Dynamic Typing
 

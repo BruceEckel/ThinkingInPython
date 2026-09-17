@@ -1,7 +1,7 @@
 # exercise_1_mutable.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Memento:
     strokes: tuple[str, ...]
 

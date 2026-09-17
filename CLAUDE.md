@@ -253,6 +253,44 @@ three in the book ("State the rule...") are the verb. The check has
 been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
 `verify-ch` fail on a plain name.
 
+## `@record`: the book's frozen data class, from chapter 18 on
+
+`utils/record.py` (chapter 18, `#record`) is
+`dataclass(frozen=True, slots=True)` under
+`dataclass_transform(frozen_default=True)`. From that section on, a
+frozen data class in a listing is written `@record` with
+`from record import record`, and the prose noun is "record". Chapters
+12, 13, and 15 come before the definition and keep
+`@dataclass(frozen=True)`. Bruce's rulings from 2026-09-17:
+
+- **A class keeps `@dataclass(frozen=True)` when `@record`'s slots
+  would not hold or would break it.** That means `order=True` or any
+  other option `record()` lacks, a weak reference (`weak_pool.py`), a
+  `cached_property`, a listing that reads an instance `__dict__` or
+  pickles across versions (chapter 36's `sketch_v1.py`/`sketch_v2.py`),
+  and any class whose base has no `__slots__` (the `Ability` and `Time`
+  subclasses in chapters 46-47, chapter 34's `expr.py` nodes under
+  `Operators`). Do not put `@record` on a class and then let a base
+  take the slots back.
+- **One listing slots a base for its records, as the teaching
+  example:** chapter 20's `shapes_oo.py` gives `Shape(ABC)` an empty
+  `__slots__ = ()`. Do not add a second.
+- **Reword a sentence before keeping a listing long-form for its
+  sake.** A sentence that names `frozen=True` about a converted class
+  says "record" instead. The exceptions are listings whose subject is
+  `frozen=True`: chapter 20's `immutable.py` and `frozen_leaky.py`,
+  Solutions 20 exercise 2, chapter 18's `slots_dataclass.py`. Chapter
+  22's `still_a_tuple.py` (and Solutions 22 exercise 6) stays long-form
+  too: its `Frozen*` classes sit beside `order=True` twins, and the one
+  added option is the point of the comparison.
+- **A Solutions copy of a chapter class follows its chapter listing.**
+- Slots make an instance smaller, so a marker that measures memory
+  moves when a class becomes a record. Solutions 35 `exercise_2.py`
+  went from a ratio near ten to near six.
+
+Project memory `record-sweep-classification` has the per-class survey
+and how it was measured.
+
 ## Traps (learned the hard way)
 
 - **Listing line length is 60** (ruff `line-length` plus the `widths` check
@@ -702,9 +740,12 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   before believing the tree is clean.
 - **A `#:` marker that measures memory or time is a claim about the
   process the gate runs it in, not about a standalone run.** Chapter
-  35's `exercise_2.py` prints a `tracemalloc` peak ratio; standalone it
-  reports 9.8 every time, and under `validate_output.py`, which execs
-  the block alongside everything else, it reports the committed 9.9.
+  35's `exercise_2.py` prints a `tracemalloc` peak ratio; standalone its
+  first line reports 6.1 every time, and under `validate_output.py`,
+  which execs the block alongside everything else, it reports the
+  committed 6.2. (Before `Tile` became a `@record` on 2026-09-17 the
+  pair was 9.8 and 9.9; the slotted `Tile` is smaller, so the ratio
+  fell.)
   The gate's context is the authoritative one. Before "fixing" such a
   marker, reproduce it the way the gate does, or you will correct a
   value that was already right.

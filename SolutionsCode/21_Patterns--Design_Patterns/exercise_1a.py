@@ -1,7 +1,7 @@
 # exercise_1a.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Row:
     name: str
     amount: int
