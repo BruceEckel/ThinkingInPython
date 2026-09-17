@@ -1229,9 +1229,12 @@ and then uses the previews under jsdom: it hovers every link on every
 page, taps the first link of each kind on each page, and fails on a
 link into the book with no panel, a navigation link with one, or a
 panel with an id, a back-link, or a stray `#place` link in it. It
-needs node, which no gate does, and its first run installs jsdom under
-`build/node/` from the network, so it is in no gate and
-`verify-targets` skips it. It reads the script from `resources/static`
+needs node, which no gate does, and its first run installs jsdom
+(major version pinned in the script) under `build/node/` from the
+network, so it is in no local gate and `verify-targets` skips it. The
+`site` job in `.github/workflows/ci.yml` does run it, between the
+build and the Pages upload: the runner's pandoc is not the local one,
+and the previews depend on the HTML it writes. It reads the script from `resources/static`
 and the pages from `build/site`, so after an edit to the script alone,
 `node tools/site_preview_check.js 29 index` reruns it on a few pages
 in a couple of seconds. jsdom lays nothing out: check where the panel

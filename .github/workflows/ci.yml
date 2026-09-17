@@ -1,9 +1,10 @@
 name: CI
 
 # Default behavior, on every push to master and every pull request: build the
-# static site, and (on master) publish it to GitHub Pages. That is all that runs
-# by default, because the full example/test/type/lint suite is already run on the
-# local machine before pushing, and GitHub Actions can be slow.
+# static site, test its link previews, and (on master) publish it to GitHub
+# Pages. That is all that runs by default, because the full
+# example/test/type/lint suite is already run on the local machine before
+# pushing, and GitHub Actions can be slow.
 #
 # The full gates (examples match the Markdown, every example runs clean, pytest
 # passes, ty-clean, ruff-clean) are opt-in, as are the prose checks (codespell
@@ -31,9 +32,9 @@ permissions:
   contents: read
 
 jobs:
-  # Default work: build the static site. Fast, because it skips running the
-  # examples, type-checking, and linting. On a push to master it hands the
-  # built site to the deploy job below.
+  # Default work: build the static site and test its link previews. Fast,
+  # because it skips running the examples, type-checking, and linting. On a
+  # push to master it hands the built site to the deploy job below.
   site:
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +54,16 @@ jobs:
 
       - name: Build the static site
         run: uv run python -m tools.build_site
+
+      # Hovers and taps the built pages' links under jsdom (`make
+      # preview-check` locally). The previews depend on the HTML this
+      # runner's pandoc writes, which is not the pandoc that built the site
+      # locally, so this is the one check that has to run here: a link into
+      # the book with no panel fails the job, and the deploy with it. Node
+      # is on the runner image; the script installs its pinned jsdom under
+      # build/node/, outside the build/site that gets uploaded.
+      - name: Test the link previews
+        run: node tools/site_preview_check.js
 
       # On master only, hand the built site to the deploy job below.
       - name: Upload Pages artifact
