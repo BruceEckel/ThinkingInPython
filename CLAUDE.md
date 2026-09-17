@@ -623,6 +623,39 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   `@abstractmethod`, instantiated directly and through a subclass that
   leaves the method out, must still pass `ty check` clean; the day it
   does not, exercise 4's prose needs rewriting, not a version bump.
+- **A Stateless upgrade is a book-wide event too.** The libraries the
+  listings import (`libs_check.LIBRARIES`: Stateless, numpy, hypothesis,
+  time-machine) sit in the same dev group as the tools, so
+  `make tools-upgrade` moves them along with `ty` (`uv lock --upgrade`
+  upgrades everything), and their constraints are floors. `make
+  libs-check` (read-only, no gate) says when a release is waiting;
+  `make tools-status` lists the locked versions and notes one that
+  moved since the last stamp. Stateless was 0.6.1 on 2026-09-17, the
+  newest on PyPI since 2025-11-11; work on its repository that has no
+  release is invisible to uv, and the book does not track it, because a
+  reader installs the PyPI release.
+  Take a Stateless release alone, never alongside a `ty` bump, so a
+  failure has one cause: `uv lock --upgrade-package stateless`, then
+  `uv sync`. Then, in this order: `make sweep`; the six version-pinned
+  probes above, since the revealed types come from Stateless's
+  annotations as much as from `ty`'s inference; the two quotes that
+  list the library's overloads verbatim (nine for `supply()` in
+  Chapters 47, four for `fork()` in Solutions 47), which a new overload
+  makes stale with no gate reading message text; and one
+  `verify-claims` agent each over Chapters 46 and 47 and their
+  Solutions files, told to check every sentence about the library's
+  behavior against the installed source in
+  `.venv/Lib/site-packages/stateless/`. Those sentences carry no
+  version string, so no grep finds them: `fork()` running `run()` in
+  the worker with no `try`/`except`, `supply()` answering a `Need` with
+  the first matching instance, `Async` being one more Ability, no
+  defect channel. The absence claims are the exception, and a release
+  falsifies one by adding the thing: `grep -n "Stateless has no\|Stateless
+  provides no" Chapters/4[67]*` finds them (nine on 2026-09-17: no
+  registration, no container, no scoping mechanism, no defect channel,
+  no timeout, no `race`, no fallback combinator). Finish by
+  updating project memory `stateless-api-surface` with what the release
+  added or removed, and run `make pyright-review`.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed
