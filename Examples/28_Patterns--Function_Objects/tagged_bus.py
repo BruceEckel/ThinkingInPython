@@ -10,8 +10,9 @@ HANDLES: Final[dict[type, type]] = {}
 
 @dataclass_transform(frozen_default=True)
 def event[E](cls: type[E]) -> type[E]:
-    EVENTS.add(cls)
-    return dataclass(frozen=True)(cls)
+    built = dataclass(frozen=True, slots=True)(cls)
+    EVENTS.add(built)
+    return built
 
 class Handler[E](Protocol):
     def __call__(self, event: E, /) -> None: ...
@@ -25,8 +26,9 @@ def handler[H](cls: type[H]) -> type[H]:
     handled = list(sig.parameters.values())[1].annotation
     if handled not in EVENTS:
         raise TypeError(f"{cls.__name__}: not an @event")
-    HANDLES[cls] = handled
-    return dataclass(frozen=True)(cls)
+    built = dataclass(frozen=True, slots=True)(cls)
+    HANDLES[built] = handled
+    return built
 
 class EventBus:
     def __init__(self) -> None:

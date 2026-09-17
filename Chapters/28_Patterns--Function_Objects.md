@@ -148,7 +148,7 @@ An object can be callable too.
 When a class defines `__call__()`
 ([Decorators](14_Techniques--Decorators.md#a-class-decorator-with-state)),
 its instances carry state and still satisfy `Command`.
-Here, `Repeat` is a [frozen data class](12_Techniques--Data_Classes_as_Types.md#immutability),
+Here, `Repeat` is a [record](18_Techniques--Performance.md#record),
 so its configuration cannot change after construction:
 
 ```python
@@ -543,8 +543,7 @@ you have an *event bus*.
 The bus is a `dict` keyed by event type.
 Each key maps to a list of handlers,
 and `subscribe()` appends a handler to the list under the event type it handles.
-The events are values,
-written as [frozen data classes](12_Techniques--Data_Classes_as_Types.md#immutability).
+The events are values, written as records.
 Publishing an event looks up its type and calls every handler registered for that type.
 The handlers are ordinary functions, so they need no base class.
 Registering one is a single `subscribe()` call.
@@ -673,10 +672,9 @@ def test_get_leaves_no_stray_handler_list() -> None:
     assert Closed not in bus._handlers
 ```
 
-In `event_bus.py`, the events are frozen data classes,
-the handlers are functions, and the bus is a `dict`.
-A second version gives each side a decorator,
-both producing frozen data classes.
+In `event_bus.py`, the events are records, the handlers are functions,
+and the bus is a `dict`.
+A second version gives each side a decorator, both producing records.
 `@event` records its class in `EVENTS`.
 `@handler` makes a function object whose fields are its configuration,
 and records in `HANDLES` which event its `__call__` accepts.
@@ -699,8 +697,9 @@ HANDLES: Final[dict[type, type]] = {}
 
 @dataclass_transform(frozen_default=True)
 def event[E](cls: type[E]) -> type[E]:
-    EVENTS.add(cls)
-    return dataclass(frozen=True)(cls)
+    built = dataclass(frozen=True, slots=True)(cls)
+    EVENTS.add(built)
+    return built
 
 class Handler[E](Protocol):
     def __call__(self, event: E, /) -> None: ...
@@ -714,8 +713,9 @@ def handler[H](cls: type[H]) -> type[H]:
     handled = list(sig.parameters.values())[1].annotation
     if handled not in EVENTS:
         raise TypeError(f"{cls.__name__}: not an @event")
-    HANDLES[cls] = handled
-    return dataclass(frozen=True)(cls)
+    built = dataclass(frozen=True, slots=True)(cls)
+    HANDLES[built] = handled
+    return built
 
 class EventBus:
     def __init__(self) -> None:
@@ -795,6 +795,13 @@ the same annotation the type checker checks, so a handler names its event once.
 `publish()` keeps its `object` parameter,
 because no static type means "a class `@event` decorated",
 so a stray string reaches the bus and `EVENTS` rejects it there.
+
+Each decorator registers `built`, the class that `dataclass()` returns,
+and not the `cls` it received.
+A class's slots are fixed when the class is created,
+so `slots=True` makes `dataclass()` build a new class and return it.
+Registering `cls` would put a class in `EVENTS` that no event is an instance of,
+and `@handler` would reject `Announce` because its `Deposit` is not an `@event`.
 
 The price is the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under `ty` because no `E` fits both arguments.
