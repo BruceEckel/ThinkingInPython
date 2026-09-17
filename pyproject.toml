@@ -44,6 +44,13 @@ dev = [
 
 [tool.uv]
 package = false
+# Every clone builds its venv on uv's own CPython, never one found on
+# PATH. On the author's machine C:/Python (the python.org installer) is
+# first on PATH, and uv's default preference picks it for a fresh
+# `uv sync`. That build differs from the managed one where the book can
+# see it: the JIT is compiled in, so sys._jit.is_available() is True.
+# A marker validated on one build can then disagree on the other.
+python-preference = "only-managed"
 
 # Spell checking for the book prose (and code comments). codespell uses a
 # curated misspelling dictionary, so it is low-noise even over code. Words it
