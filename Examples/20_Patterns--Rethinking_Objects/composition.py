@@ -12,7 +12,7 @@ class Address:
     postal: str
 
 @record
-class Contact:  # A Contact has a Name and an Address
+class Contact:
     name: Name
     address: Address
 

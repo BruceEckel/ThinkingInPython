@@ -197,7 +197,7 @@ from dataclasses import dataclass
 class Messenger:
     name: str
     number: int
-    depth: float = 0.0  # Default value
+    depth: float = 0.0
 ```
 
 `display_object()`, the inspection helper built in [Metaprogramming](17_Techniques--Metaprogramming.md#building-display_object),
@@ -1157,7 +1157,6 @@ class Logged(Connection):
     name: str
 
     def __post_init__(self) -> None:
-        # Run the base initializer
         super().__init__(self.host)
 
 c = Logged("localhost", "db")

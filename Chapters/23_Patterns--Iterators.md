@@ -90,7 +90,6 @@ Writing `__iter__()` as a generator makes a class iterable:
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 
-# Generator function
 def fibonacci(n: int) -> Iterator[int]:
     a, b = 0, 1
     for _ in range(n):

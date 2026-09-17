@@ -127,7 +127,6 @@ class Thermometer(Observable[float]):
     @celsius.setter
     def celsius(self, value: float) -> None:
         self._celsius = value
-        # State changed; tell the observers
         self.notify(value)
 ```
 
@@ -640,7 +639,6 @@ def test_model_notifies_with_the_new_grid() -> None:
     # The observer is a callable
     model.subscribe(seen.append)
     model.click((1, 1))
-    # Observer got the new grid
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before
 ```

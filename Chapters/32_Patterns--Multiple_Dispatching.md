@@ -199,7 +199,6 @@ from outcome import Outcome
 
 class Item:
     def compete(self, item: Item) -> Outcome:
-        # Use a tuple of types to index into the table:
         return OUTCOME[type(self), type(item)]
     def __str__(self) -> str:
         return type(self).__name__

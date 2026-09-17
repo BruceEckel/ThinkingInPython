@@ -15,7 +15,7 @@ class Fraggle:
     def h(self, s: str) -> str:
         return f"h({s})"
 
-display_object(Fraggle)  # Display the class
+display_object(Fraggle)
 #: [Attributes]
 #:   • y: float = 1.14659 [CV]
 #:   • z: str = 'blivet' [CV]
@@ -24,7 +24,6 @@ display_object(Fraggle)  # Display the class
 #:   • g(self, x: int) -> float
 #:   • h(self, s: str) -> str
 
-# Display a specific instance:
 display_object(Fraggle(9, 2.3))
 #: [Attributes]
 #:   • x: int = 9

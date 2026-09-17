@@ -78,7 +78,6 @@ class Fjords(Command):
     def execute(self) -> None:
         print("It's pining for the fjords.")
 
-# An object that holds commands:
 class Macro:
     def __init__(self) -> None:
         self.commands: list[Command] = []

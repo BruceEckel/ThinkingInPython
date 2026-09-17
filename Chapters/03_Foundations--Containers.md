@@ -185,7 +185,7 @@ Tuples are the natural way to return several values from a function and to group
 
 point = (3, 4)
 point = 3, 4  # Also a tuple; the comma matters
-empty = ()  # Empty tuple
+empty = ()
 x, y = point  # Unpacking
 print(x, y)
 #: 3 4
@@ -193,7 +193,7 @@ print(x, y)
 single = (42,)
 print(len(single))
 #: 1
-print(tuple([1, 2, 3]))  # Converts a list to a tuple
+print(tuple([1, 2, 3]))
 #: (1, 2, 3)
 print(tuple("abc"))
 #: ('a', 'b', 'c')

@@ -11,14 +11,13 @@ class Simple:
     def __init__(self, text):
         print("Inside the Simple constructor")
         self.s = text
-    # Two methods:
     def show(self, msg=""):
         if msg:
             print(f"{msg}:", self.s)
         else:
             print(self.s)
     def show_twice(self):
-        self.show()  # Calling another method
+        self.show()
         self.show()
 ```
 
@@ -26,7 +25,7 @@ class Simple:
 # demo_simple_class.py
 from simple_class import Simple
 
-x = Simple("Constructor argument")  # Create an object
+x = Simple("Constructor argument")
 #: Inside the Simple constructor
 x.show()
 #: Constructor argument
@@ -144,7 +143,7 @@ explains it:
 from typing import override
 from simple_class import Simple
 
-class Derived(Simple):  # Derived inherits Simple
+class Derived(Simple):
     def __init__(self, text):
         print("Inside Derived constructor")
         # Call the base-class constructor with super():

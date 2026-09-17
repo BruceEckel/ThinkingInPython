@@ -10,7 +10,6 @@ class Outcome(StrEnum):
 
 class Item:
     def compete(self, item: Item) -> Outcome:
-        # Look the cell up, then call it:
         return OUTCOME[type(self), type(item)](self, item)
     def __str__(self) -> str:
         return type(self).__name__

@@ -28,7 +28,6 @@ class Macro:
             c()
 
     def undo_all(self) -> None:
-        # Reverse order to undo
         for c in reversed(self.commands):
             c.undo()
 

@@ -5,4 +5,4 @@ from dataclasses import dataclass
 class Messenger:
     name: str
     number: int
-    depth: float = 0.0  # Default value
+    depth: float = 0.0

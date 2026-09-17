@@ -36,7 +36,6 @@ async def bytes_per_task() -> float:
 default_stack = threading.stack_size()
 threading.stack_size(STACK_SIZE)  # A real, settable cost
 configured_stack = threading.stack_size()
-# Restore the previous setting
 threading.stack_size(default_stack)
 
 task_cost = asyncio.run(bytes_per_task())

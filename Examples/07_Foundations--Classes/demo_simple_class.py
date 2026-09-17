@@ -1,7 +1,7 @@
 # demo_simple_class.py
 from simple_class import Simple
 
-x = Simple("Constructor argument")  # Create an object
+x = Simple("Constructor argument")
 #: Inside the Simple constructor
 x.show()
 #: Constructor argument

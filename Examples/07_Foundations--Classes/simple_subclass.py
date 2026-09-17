@@ -2,7 +2,7 @@
 from typing import override
 from simple_class import Simple
 
-class Derived(Simple):  # Derived inherits Simple
+class Derived(Simple):
     def __init__(self, text):
         print("Inside Derived constructor")
         # Call the base-class constructor with super():
