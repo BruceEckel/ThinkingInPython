@@ -90,15 +90,14 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.g()
         self.h()
 
-WhatIUse2().op(WhatIHave())  # Approach 2: adapting op()
+WhatIUse2().op(WhatIHave())  # Approach 2
 #: WhatIHave.g()
 #: WhatIHave.h()
-WhatIUse().op(WhatIHave2())  # Approach 3: adapter built in
+WhatIUse().op(WhatIHave2())  # Approach 3
 #: WhatIHave.g()
 #: WhatIHave.h()
 ```
 
-The output is deliberately monotonous.
 Counting the object adapter in `adapter.py`,
 three structures produce one behavior:
 each approach calls the same two methods on a `WhatIHave`.
@@ -106,7 +105,7 @@ The approaches differ only in where the adaptation lives.
 When the output is the same for every approach, only packaging separates them.
 (GoF varies the same forwarding two further ways: a *pluggable adapter* takes the adapting operation as a delegate the client supplies, and a *two-way adapter* presents both interfaces at once.)
 
-The three approaches split into two families *GoF Design Patterns* names.
+*GoF Design Patterns* splits the three approaches into two families.
 `ProxyAdapter` is an *object adapter*:
 it holds the adaptee and can wrap any instance passed to it at runtime.
 `WhatIHave2` is a *class adapter*: it inherits from the adaptee.
@@ -118,11 +117,10 @@ Inheritance merges them.
 
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
 `WhatIUse2.op()` renames that parameter to `what_i_have`.
-The rename is legal because callers cannot use a positional-only parameter's name.
+The rename is legal because callers cannot use a positional-only parameter name.
 Renaming a keyword-capable parameter would break any caller passing it by keyword,
-so `ty` and Pyright reject a renamed keyword-capable parameter in an override.
-Such a rename passes under mypy,
-which does not compare parameter names in an override.
+so `ty` rejects a renamed keyword-capable parameter in an override.
+A checker that accepts such a rename compares the types in an override and skips the parameter names.
 
 The rename is the smaller of the two changes.
 `WhatIUse2.op()` also changes the parameter's type.

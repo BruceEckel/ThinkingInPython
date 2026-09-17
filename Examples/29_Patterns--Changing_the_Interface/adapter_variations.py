@@ -18,9 +18,9 @@ class WhatIHave2(WhatIHave, WhatIWant):
         self.g()
         self.h()
 
-WhatIUse2().op(WhatIHave())  # Approach 2: adapting op()
+WhatIUse2().op(WhatIHave())  # Approach 2
 #: WhatIHave.g()
 #: WhatIHave.h()
-WhatIUse().op(WhatIHave2())  # Approach 3: adapter built in
+WhatIUse().op(WhatIHave2())  # Approach 3
 #: WhatIHave.g()
 #: WhatIHave.h()
