@@ -712,7 +712,7 @@ and how it was measured.
   added or removed, and run `make pyright-review`.
 - **A decorator that registers a class must register what a slotted
   `dataclass()` returns, and under `ty` it cannot build that class by
-  calling `record(cls)`.** `slots=True` makes `dataclass()` create and
+  calling `record(cls)` on its `type[E]` parameter.** `slots=True` makes `dataclass()` create and
   return a new class, since a class's slots are fixed at creation, so
   `EVENTS.add(cls)` before the call files a class that no instance
   belongs to. Chapter 28's `tagged_bus.py` builds first and registers
@@ -720,12 +720,19 @@ and how it was measured.
   with "Announce: not an @event". The same goes for any registering
   decorator stacked *under* `@record`: it would see the pre-slots
   class. None exists in the book, and `make records` would not catch
-  one. Separately, `ty` 0.0.81 types a direct call to a
-  `dataclass_transform` function as `<decorator produced by
-  dataclass-like function>`, not as `type[T]`, so `built = record(cls)`
-  inside `event()` draws `invalid-argument-type` on `EVENTS.add(built)`
-  and `invalid-return-type` on `return built`. Pyright reveals
-  `type[E@event]` for the same call and accepts it. Hence
+  one. Separately, `ty` 0.0.81 mistypes a direct call to a
+  `dataclass_transform` function whenever the argument is typed
+  `type[...]` rather than being a class literal: `record(Point)` reveals
+  `<class 'Point'>`, but `record(cls)` with `cls: type[E]`,
+  `type[Point]`, or bare `type` reveals `<decorator produced by
+  dataclass-like function>`, not the declared `type[T]`. The same
+  signature without `@dataclass_transform` reveals `type[E]`, so the
+  marker is the cause. Inside `event()`, `built = record(cls)` therefore
+  draws `invalid-argument-type` on `EVENTS.add(built)` and
+  `invalid-return-type` on `return built`. Pyright reveals
+  `type[E@event]` for the same call and accepts it. ty's
+  `dataclass_transform` tracking issue (astral-sh/ty#1327) did not list
+  this on 2026-09-17. Hence
   `tagged_bus.py` calls `dataclass(frozen=True, slots=True)(cls)`
   directly. No sentence in the book states this, so there is no version
   string to bump; re-probe on a `ty` upgrade anyway (a scratch
