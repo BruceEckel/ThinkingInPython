@@ -1,0 +1,19 @@
+extends: existence
+message: "Past-habitual '%s': say when the earlier state held ('before 3.14', 'before the change') or state the present."
+level: warning
+ignorecase: true
+tokens:
+  - 'used to'
+# The purpose sense ("the lock is used to preserve order") is a different
+# phrase; House.WeakVerb reports the is/are forms on its own terms.
+exceptions:
+  - 'is used to'
+  - 'are used to'
+  - 'was used to'
+  - 'were used to'
+  - 'be used to'
+  - 'been used to'
+  - 'being used to'
+  - 'get used to'
+  - 'got used to'
+  - ', used to'
