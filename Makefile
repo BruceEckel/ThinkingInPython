@@ -568,7 +568,7 @@ solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run,
 ##@ Writing and spelling
 
 .PHONY: reflow reflow-check rewrite spell spell-add prose links todos \
-        claims exercise-coverage
+        claims exercise-coverage comment-report
 
 # Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
 # headings are left untouched; a file is rewritten only if it round-trips).
@@ -684,6 +684,16 @@ claims:  ## List cross-chapter links whose text makes an unchecked claim
 # reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
 exercise-coverage:  ## List chapter sections that no exercise practices
 	$(PY) -m tools.exercise_coverage $(ARGS)
+
+# Advisory. Lists the comments in listings that are new since a git
+# ref, for a human to judge: a comment that says what its own line says
+# (`class Contact:  # A Contact has a Name and an Address`) comes out,
+# and no rule can tell that one from a comment that teaches. Directives,
+# `#:` markers, and the file-name line are skipped. SINCE=v0.5.9 for a
+# tag or commit (default HEAD, the uncommitted edits); ARGS=--all lists
+# every comment in the book.
+comment-report:  ## List listing comments added since a git ref (SINCE=ref, default HEAD; advisory)
+	$(PY) -m tools.comment_report --since $(or $(SINCE),HEAD) $(ARGS)
 
 ##@ Style gates
 
