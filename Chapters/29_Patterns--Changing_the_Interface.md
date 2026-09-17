@@ -63,6 +63,10 @@ because this listing is about *where* the adaptation lives,
 not how you declare the target interface.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy)
 compares an ABC with a `Protocol`.
+`WhatIWant` declares no `__slots__`,
+so `ProxyAdapter` is declared with `@dataclass(frozen=True)` and not `@record`:
+an unslotted base gives each instance its `__dict__` back
+([Performance](18_Techniques--Performance.md#record)).
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object it forwards to.
 
@@ -209,6 +213,7 @@ if __name__ == "__main__":
 Because `__getattr__()` runs only for attributes Python does not find normally,
 `f()` uses the adapter's own version while everything else falls through to the adaptee.
 This is the idiomatic Python adapter: a thin wrapper, not a hierarchy.
+With no base class above it, `Adapter` is a record.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#protocols-generalize-composition-adapts)
 has a real one: `PairCoord` adapts a `Pair` to the `Coord` protocol.
 It is a [record](18_Techniques--Performance.md#record) with two properties,
