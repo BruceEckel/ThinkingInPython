@@ -574,6 +574,15 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   Probe `supply()` inside a function whose parameters carry the
   Protocol types, as the chapter's `outcome()` does, or through
   `as_type()`.
+  The 0.0.80 to 0.0.81 upgrade (2026-09-16, with ruff 0.16.7 to
+  0.16.8) was a quiet one: `make sweep` green on both trees, the
+  pyright delta empty, all six version-pinned claims re-probed
+  unchanged, and all 40 quoted diagnostics matching. The quote recheck
+  ran as one `verify-claims` agent (about 130k tokens, seven minutes),
+  and reading that closely it found two stale Solutions passages no
+  upgrade caused: Solutions 46 naming line 28 under a quote that points
+  at line 29, and Solutions 17 showing a `try`/`except` the listing had
+  long since replaced with `with ignore(TypeError):`.
   **Sweep `Solutions/` for quoted diagnostics too, not just `Chapters/`.**
   The 2026-09-02 exercise pass found ten stale `ty` quotes, every one of
   them in `Solutions/` and not one in `Chapters/`: wrong line numbers,
@@ -582,13 +591,17 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   `exercise_review.md` Part 2.1). Earlier upgrade sweeps went through
   `Chapters/` and stopped. Nothing gates this: `solutions-output-check`
   validates `#:` markers, and a diagnostic quoted in prose is not a
-  marker. `grep -rn "^error\[\|^warning\[" Chapters/ Solutions/` finds
-  all 32 in the book, so the sweep is small once you remember it.
-  Chapters 46-47 and Solutions 43 pin five behavior claims to a ty
-  version ("under `ty` 0.0.80"): the `type`-alias probe (46), the
+  marker. `grep -rn "^error\[\|^warning\[\|^info\[" Chapters/ Solutions/`
+  finds all 40 in the book (33 errors, 7 `reveal_type` quotes), so the
+  sweep is small once you remember it.
+  Chapters 46-47 and Solutions 25 and 43 pin six behavior claims to a
+  ty version ("under `ty` 0.0.81"; `grep -rn '0\.0\.[0-9]' Chapters
+  Solutions` finds them): the `type`-alias probe (46), the
   chained-`supply()` order and the `Never`/`Unknown` asymmetry, the
-  `nested_handle.py` reveal, and the `fork(bad)` reveal (47), and the
-  `float | Unknown` without `@final` (Solutions 43). Re-probe on each
+  `nested_handle.py` reveal, and the `fork(bad)` reveal (47), the
+  `float | Unknown` without `@final` (Solutions 43), and `ty` having
+  no rule for instantiating an abstract class (Solutions 25, which
+  also says Pyright and mypy both report it). Re-probe on each
   upgrade and update those version strings; the alias probe is a
   scratch generator annotated with a `type X = Depend[...]` alias whose
   `yield from need(Undeclared)` must still draw `invalid-yield`. The
@@ -606,7 +619,10 @@ been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
   with `half` still `() -> Generator[Ask, Any, None]`. Solutions 43:
   strip both `@final` from `describe_isinstance.py` and
   `reveal_type(result.answer)` in the `Ok` branch must read
-  `float | Unknown`.
+  `float | Unknown`. Solutions 25: a scratch ABC with one
+  `@abstractmethod`, instantiated directly and through a subclass that
+  leaves the method out, must still pass `ty check` clean; the day it
+  does not, exercise 4's prose needs rewriting, not a version bump.
 - **A `type X = ...` alias's right side is lazily evaluated (PEP 695),** so it
   can name a class defined later in the same file with no string quotes, e.g.
   `type Bins = dict[type[Trash], list[Trash]]` above `class Trash:`. Confirmed

@@ -473,7 +473,7 @@ has to reconstruct that `result` must be an `Err` by ruling out the
 narrowed to `ValueError` or `ZeroDivisionError`. That agreement is
 recent, and the precision behind it rests on one decorator: both `Ok`
 and `Err` carry `@final`, in the listing above and in
-`utils/result.py`. Without that decorator `ty` 0.0.80 allows for a
+`utils/result.py`. Without that decorator `ty` 0.0.81 allows for a
 class inheriting from both, so the intersection of the two stays
 alive and the value in the `Ok` comes back as `float | Unknown`
 rather than plain `float`. Both forms lose that precision together:

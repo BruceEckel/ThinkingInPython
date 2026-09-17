@@ -1192,7 +1192,7 @@ Two failures from two different sources come back as values through one `catch_a
 and neither the runtime nor the type checker minds.
 A handler passes error values upward untouched,
 so the failures travel through `supply()`'s driver to the catch either way,
-and under `ty` 0.0.80 both orders infer the same result type.
+and under `ty` 0.0.81 both orders infer the same result type.
 The Ability channel is where the orders differ.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`: the same object,
@@ -2034,7 +2034,7 @@ if __name__ == "__main__":
     reveal_type(full)
 ```
 
-Under `ty` 0.0.80, `ty check nested_handle.py` reads the two spellings the same way:
+Under `ty` 0.0.81, `ty check nested_handle.py` reads the two spellings the same way:
 
 ```text
 info[revealed-type]: Revealed type
@@ -2258,7 +2258,7 @@ with no `try`/`except` around that call,
 so a raised failure crosses the thread boundary as an ordinary exception and surfaces at `wait()`,
 past any `catch()` the caller wraps around the result.
 The type agrees with the runtime.
-`reveal_type(bad)` under `ty` 0.0.80 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
+`reveal_type(bad)` under `ty` 0.0.81 reports `(n: int) -> Generator[Need[Executor], Any, Task[int]]`,
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.

@@ -295,7 +295,7 @@ optional, and that is the base class's decision: it declares that a
 subclass may skip this step. Declare instead that a subclass may not,
 by inheriting from `ABC` and marking `customize2()` with
 `@abstractmethod`, and Python refuses to construct `HalfDone` at
-all. `ty` 0.0.80 has no rule for instantiating an abstract class, so
+all. `ty` 0.0.81 has no rule for instantiating an abstract class, so
 under `ty` the refusal comes from the runtime alone. Pyright and mypy
 both report it before the program runs. No checker could catch the
 omission
