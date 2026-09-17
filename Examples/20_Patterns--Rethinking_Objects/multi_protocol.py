@@ -1,7 +1,8 @@
 # multi_protocol.py
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from typing import Protocol
+from record import record
 
 class Priced(Protocol):
     def total(self) -> float: ...
@@ -12,7 +13,7 @@ class Serializable(Protocol):
 class Describable(Protocol):
     def describe(self) -> str: ...
 
-@dataclass(frozen=True)
+@record
 class Invoice:
     amount: float
     customer: str

@@ -1,7 +1,7 @@
 # distance_protocol.py
-from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
+from record import record
 
 class Coord(Protocol):
     @property
@@ -12,17 +12,17 @@ class Coord(Protocol):
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: float
     y: float
 
-@dataclass(frozen=True)
+@record
 class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
-@dataclass(frozen=True)
+@record
 # Adapter: uses composition, not inheritance
 class PairCoord:
     pair: Pair

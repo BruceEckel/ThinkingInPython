@@ -109,8 +109,8 @@ you.
 
 ```python
 # exercise_3.py
-from dataclasses import dataclass
 from typing import NewType, Protocol
+from record import record
 
 Price = NewType("Price", float)
 Weight = NewType("Weight", float)
@@ -121,7 +121,7 @@ class Priced(Protocol):
 class Weighted(Protocol):
     def total(self) -> Weight: ...
 
-@dataclass(frozen=True)
+@record
 class Package:
     weight_kg: float
 
@@ -168,9 +168,9 @@ bargain the chapter describes.
 
 ```python
 # exercise_4.py
-from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
+from record import record
 
 class Coord(Protocol):
     @property
@@ -181,13 +181,13 @@ class Coord(Protocol):
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-@dataclass(frozen=True)
+@record
 class Triple:
     a: float
     b: float
     c: float
 
-@dataclass(frozen=True)
+@record
 class TripleCoord:
     triple: Triple
 
@@ -216,19 +216,19 @@ entirely. `distance()` itself never changes: it only ever asks for
 ```python
 # exercise_5.py
 import math
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Rectangle:
     length: float
     width: float
 
-@dataclass(frozen=True)
+@record
 class Circle:
     radius: float
 
-@dataclass(frozen=True)
+@record
 class Square:
     side: float
 

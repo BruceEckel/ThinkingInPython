@@ -1120,6 +1120,64 @@ giving you the same immutability in a fraction of the space
 The exact byte counts vary by platform and Python build,
 so the listing prints a comparison that holds anywhere rather than numbers that hold only here.
 
+### A Decorator for the Default {#record}
+
+`@dataclass(frozen=True, slots=True)` is a long line to repeat on every value class,
+and `slots=True` is the half that gets dropped,
+because the class works without it.
+A decorator of your own can apply both.
+`@dataclass_transform`
+([Metaprogramming](17_Techniques--Metaprogramming.md#where-enforcement-lives))
+tells the type checker that the result is a frozen data class:
+
+```python
+# utils/record.py
+from dataclasses import dataclass
+from typing import dataclass_transform
+
+@dataclass_transform(frozen_default=True)
+def record[T](cls: type[T]) -> type[T]:
+    return dataclass(frozen=True, slots=True)(cls)
+```
+
+`record()` is `model()` from `kept_transform.py` with `slots=True` added.
+The name follows Java and C#,
+where a *record* is an immutable class defined by its fields.
+A class decorated with `@record` behaves like any frozen data class,
+and its instances carry no `__dict__`:
+
+```python
+# point_record.py
+from exceptions import ignore
+from record import record
+
+@record
+class Point:
+    x: int
+    y: int
+
+p = Point(1, 2)
+print(p)
+#: Point(x=1, y=2)
+print(p == Point(1, 2), hasattr(p, "__dict__"))
+#: True False
+with ignore(AttributeError):
+    p.x = 3  # type: ignore
+#: [FrozenInstanceError] cannot assign to field 'x'
+```
+
+`frozen_default=True` is the reason the assignment carries a `# type: ignore`:
+the checker knows `Point` is frozen and reports `p.x = 3` before the program runs.
+`@dataclass_transform` has no parameter that describes slots,
+so the checker does not know `Point` is slotted.
+On a frozen class that gap has no effect,
+because the checker rejects every assignment to an instance.
+
+The listings from here on use `@record` for a frozen data class.
+A class that needs what `record()` omits keeps `@dataclass` written out:
+`order=True`, a weak reference, or a `cached_property`.
+The next section shows how slots break the last two.
+
 ### When Slots Does Not Fit {#when-slots-does-not-fit}
 
 `__slots__` removes more than `__dict__`.

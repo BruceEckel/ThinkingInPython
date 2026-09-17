@@ -1,7 +1,7 @@
 # exercise_4.py
-from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
+from record import record
 
 class Coord(Protocol):
     @property
@@ -12,13 +12,13 @@ class Coord(Protocol):
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-@dataclass(frozen=True)
+@record
 class Triple:
     a: float
     b: float
     c: float
 
-@dataclass(frozen=True)
+@record
 class TripleCoord:
     triple: Triple
 

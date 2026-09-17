@@ -1,8 +1,8 @@
 # point_distance.py
-from dataclasses import dataclass
 from math import sqrt
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: float
     y: float

@@ -1,6 +1,6 @@
 # exercise_3.py
-from dataclasses import dataclass
 from typing import NewType, Protocol
+from record import record
 
 Price = NewType("Price", float)
 Weight = NewType("Weight", float)
@@ -11,7 +11,7 @@ class Priced(Protocol):
 class Weighted(Protocol):
     def total(self) -> Weight: ...
 
-@dataclass(frozen=True)
+@record
 class Package:
     weight_kg: float
 

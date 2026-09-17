@@ -1,14 +1,14 @@
 # shapes_oo.py
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float: ...
 
-@dataclass(frozen=True)
+@record
 class Rectangle(Shape):
     length: float
     width: float
@@ -17,7 +17,7 @@ class Rectangle(Shape):
     def area(self) -> float:
         return self.length * self.width
 
-@dataclass(frozen=True)
+@record
 class Circle(Shape):
     radius: float
 

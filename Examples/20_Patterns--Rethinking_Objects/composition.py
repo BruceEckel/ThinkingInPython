@@ -1,17 +1,17 @@
 # composition.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Name:
     first: str
     last: str
 
-@dataclass(frozen=True)
+@record
 class Address:
     city: str
     postal: str
 
-@dataclass(frozen=True)
+@record
 class Contact:  # A Contact has a Name and an Address
     name: Name
     address: Address

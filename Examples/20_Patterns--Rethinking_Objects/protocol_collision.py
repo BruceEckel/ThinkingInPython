@@ -1,6 +1,6 @@
 # protocol_collision.py
-from dataclasses import dataclass
 from typing import Protocol
+from record import record
 
 class Priced(Protocol):
     def total(self) -> float: ...
@@ -8,7 +8,7 @@ class Priced(Protocol):
 class Weighted(Protocol):
     def total(self) -> float: ...
 
-@dataclass(frozen=True)
+@record
 class Package:
     weight_kg: float
 

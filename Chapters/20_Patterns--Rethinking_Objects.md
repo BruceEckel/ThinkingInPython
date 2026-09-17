@@ -353,6 +353,9 @@ Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
 makes the fuller case for frozen data classes.
+The rest of this chapter's listings declare their frozen classes with `@record`
+([Performance](18_Techniques--Performance.md#record)),
+which applies `@dataclass(frozen=True, slots=True)` under one name.
 
 ## Methods or Functions?
 
@@ -362,10 +365,10 @@ Compare a method `distance_to()` to a function `distance()` that does the same t
 
 ```python
 # point_distance.py
-from dataclasses import dataclass
 from math import sqrt
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: float
     y: float
@@ -412,9 +415,9 @@ not inheritance:
 
 ```python
 # distance_protocol.py
-from dataclasses import dataclass
 from math import sqrt
 from typing import Protocol
+from record import record
 
 class Coord(Protocol):
     @property
@@ -425,17 +428,17 @@ class Coord(Protocol):
 def distance(a: Coord, b: Coord) -> float:
     return sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2)
 
-@dataclass(frozen=True)
+@record
 class Point:
     x: float
     y: float
 
-@dataclass(frozen=True)
+@record
 class Pair:  # Suppose you are handed this, with no x or y
     a: float
     b: float
 
-@dataclass(frozen=True)
+@record
 # Adapter: uses composition, not inheritance
 class PairCoord:
     pair: Pair
@@ -543,19 +546,19 @@ and frozen instances compare by value and work as keys:
 
 ```python
 # composition.py
-from dataclasses import dataclass
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Name:
     first: str
     last: str
 
-@dataclass(frozen=True)
+@record
 class Address:
     city: str
     postal: str
 
-@dataclass(frozen=True)
+@record
 class Contact:  # A Contact has a Name and an Address
     name: Name
     address: Address
@@ -669,14 +672,14 @@ The classic object-oriented example uses an abstract base class:
 # shapes_oo.py
 import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import override
+from record import record
 
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float: ...
 
-@dataclass(frozen=True)
+@record
 class Rectangle(Shape):
     length: float
     width: float
@@ -685,7 +688,7 @@ class Rectangle(Shape):
     def area(self) -> float:
         return self.length * self.width
 
-@dataclass(frozen=True)
+@record
 class Circle(Shape):
     radius: float
 
@@ -712,17 +715,17 @@ and the only validity check comes at runtime, when the call runs:
 
 ```python
 # dynamic_typing.py
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Bicycle:
     id: str
 
     def display(self) -> str:
         return f"Bicycle {self.id}"
 
-@dataclass(frozen=True)
+@record
 class Glider:
     size: int
 
@@ -809,8 +812,9 @@ Satisfying three of them costs nothing more than having the three methods:
 ```python
 # multi_protocol.py
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from typing import Protocol
+from record import record
 
 class Priced(Protocol):
     def total(self) -> float: ...
@@ -821,7 +825,7 @@ class Serializable(Protocol):
 class Describable(Protocol):
     def describe(self) -> str: ...
 
-@dataclass(frozen=True)
+@record
 class Invoice:
     amount: float
     customer: str
@@ -865,8 +869,8 @@ and nothing distinguishes them:
 
 ```python
 # protocol_collision.py
-from dataclasses import dataclass
 from typing import Protocol
+from record import record
 
 class Priced(Protocol):
     def total(self) -> float: ...
@@ -874,7 +878,7 @@ class Priced(Protocol):
 class Weighted(Protocol):
     def total(self) -> float: ...
 
-@dataclass(frozen=True)
+@record
 class Package:
     weight_kg: float
 
@@ -967,15 +971,15 @@ Here is `shapes_oo.py` modified to use pattern matching:
 ```python
 # shapes_match.py
 import math
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Rectangle:
     length: float
     width: float
 
-@dataclass(frozen=True)
+@record
 class Circle:
     radius: float
 

@@ -1,15 +1,15 @@
 # dynamic_typing.py
-from dataclasses import dataclass
 from typing import Any
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Bicycle:
     id: str
 
     def display(self) -> str:
         return f"Bicycle {self.id}"
 
-@dataclass(frozen=True)
+@record
 class Glider:
     size: int
 

@@ -1,18 +1,18 @@
 # exercise_5.py
 import math
-from dataclasses import dataclass
 from typing import assert_never
+from record import record
 
-@dataclass(frozen=True)
+@record
 class Rectangle:
     length: float
     width: float
 
-@dataclass(frozen=True)
+@record
 class Circle:
     radius: float
 
-@dataclass(frozen=True)
+@record
 class Square:
     side: float
 
