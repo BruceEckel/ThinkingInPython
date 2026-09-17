@@ -8,5 +8,6 @@ def jit_state() -> str:
         return "JIT built in, switched off"
     return "JIT enabled"
 
+print(sys._jit.is_available() or not sys._jit.is_enabled())
+#: True
 print(jit_state())
-#: no JIT in this build

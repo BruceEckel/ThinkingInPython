@@ -145,17 +145,25 @@ def jit_state() -> str:
         return "JIT built in, switched off"
     return "JIT enabled"
 
+print(sys._jit.is_available() or not sys._jit.is_enabled())
+#: True
 print(jit_state())
-#: no JIT in this build
 ```
 
 `is_enabled()` implies `is_available()`,
 so testing `is_available()` first and `is_enabled()` second names the three states a build can be in.
+The first `print()` tests that implication, and it shows `True` on every build.
 
 Most listings in this book print the same line on every machine.
-This one changes with your interpreter.
-The book's build has no JIT compiled in, so it prints the first line.
-A python.org binary prints the second until you set `PYTHON_JIT=1`.
+The second `print()` here changes with your interpreter,
+so it carries no `#:` line.
+The book's build has no JIT compiled in, and a run on it shows the first state:
+
+    $ uv run python jit_status.py
+    True
+    no JIT in this build
+
+A python.org binary prints `JIT built in, switched off` until you set `PYTHON_JIT=1`.
 
 A third function, `sys._jit.is_active()`,
 reports whether the frame that called it is running compiled code.

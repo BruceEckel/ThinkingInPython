@@ -459,9 +459,10 @@ raise. `xs[left:right]` is the run of equal values, and
 import sys
 
 print(sys._jit.is_available(), sys._jit.is_enabled())
-#: False False
 ```
 
+The listing carries no `#:` line, because its output depends on the
+interpreter. The book's build prints `False False`.
 The two flags name the state directly. `False False` means the build
 has no JIT compiled in, so `PYTHON_JIT` does nothing. `True False` is
 the python.org Windows and macOS shape, built with
