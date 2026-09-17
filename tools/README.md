@@ -86,13 +86,16 @@ lists every target, and each script's `--help` prints its own docstring.
 
 ## Commands
 
-Tooling is managed by [uv](https://docs.astral.sh/uv/). One-time setup:
+Tooling is managed by [uv](https://docs.astral.sh/uv/). There is no setup
+step: the first `make` target you run creates `.venv` with the dev tools
+pinned by `uv.lock`, since every target goes through `uv run`. To build
+the environment without running a target:
 
 ```
-uv sync          # create .venv with the dev tools (ty) pinned by uv.lock
+uv sync          # optional: the first `uv run` or make target does the same
 ```
 
-Run `make tools-check` afterward to confirm everything resolved (`uv`, `ty`,
+Run `make tools-check` to confirm everything resolved (`uv`, `ty`,
 `ruff`, `pytest`); `make tools-check-full` also checks `pandoc` and `vale`,
 needed only for `make site`/`make local` and `make prose`. See
 [check_tools.py](#check_tools.py) below. If something you expect to work
