@@ -154,7 +154,7 @@ a caretaker that mixes up a `Memento` with some other tuple:
 ```python
 # memento_type_safety.py
 from dataclasses import FrozenInstanceError
-from exceptions import expect, ignore
+from exceptions import expect, expected
 from sketch import Memento, Sketch
 
 def restore_tuple(strokes: tuple[str, ...]) -> None:
@@ -180,7 +180,7 @@ expect(AttributeError, restore_memento,
 #: [AttributeError] 'tuple' object has no attribute
 #: 'strokes'
 
-with ignore(FrozenInstanceError):
+with expected(FrozenInstanceError):
     # ty: strokes is read-only on Memento:
     checkpoint.strokes = ("forged",)  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'strokes'
@@ -626,7 +626,7 @@ class SketchV2:
 # pickle_drift.py
 import pickle
 import sketch_v1
-from exceptions import ignore
+from exceptions import expected
 from sketch_v1 import SketchV1
 from sketch_v2 import SketchV2
 
@@ -635,7 +635,7 @@ sketch_v1.SketchV1 = SketchV2  # type: ignore
 restored = pickle.loads(blob)
 print(restored.strokes)
 #: ('circle', 'beak')
-with ignore(AttributeError):
+with expected(AttributeError):
     print(restored.title)
 #: [AttributeError] 'SketchV2' object has no attribute
 #: 'title'

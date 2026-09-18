@@ -126,7 +126,7 @@ Instead of modifying an object, you build a new one from the old:
 
 ```python
 # immutability.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -135,7 +135,7 @@ class Point:
     y: int
 
 p = Point(1, 2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # A frozen instance rejects assignment
     setattr(p, "x", 5)
 #: [FrozenInstanceError] cannot assign to field 'x'
@@ -212,7 +212,7 @@ A `list` offers neither:
 
 ```python
 # hashable.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -225,7 +225,7 @@ distances = {Point(0, 0): 0.0, Point(3, 4): 5.0}
 print(distances[Point(3, 4)])
 #: 5.0
 # A list has no stable hash, so it cannot be a key:
-with ignore(TypeError):
+with expected(TypeError):
     hash([3, 4])
 #: [TypeError] unhashable type: 'list'
 ```
@@ -278,7 +278,7 @@ because you select the behavior by looking it up:
 # dispatch.py
 from collections.abc import Callable
 from operator import mod
-from exceptions import ignore
+from exceptions import expected
 
 def add(a: int, b: int) -> int:
     return a + b
@@ -299,7 +299,7 @@ print(operations["+"](6, 4), operations["-"](6, 4),
       operations["//"](6, 4), operations["%"](6, 4))
 #: 10 2 1 2
 # A missing key is a plain KeyError, no else branch:
-with ignore(KeyError):
+with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
 ```

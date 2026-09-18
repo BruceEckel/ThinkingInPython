@@ -161,7 +161,7 @@ what "copy-on-write" means.
 ```python
 # exercise_4.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 class Implementation:
     def f(self) -> None: print("f()")
@@ -181,7 +181,7 @@ class BrokenProxy:
         return attr
 
 p = BrokenProxy(Implementation())
-with ignore(RecursionError):
+with expected(RecursionError):
     p.f()
 #: [RecursionError] maximum recursion depth exceeded
 ```

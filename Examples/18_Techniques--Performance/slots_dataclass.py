@@ -2,7 +2,7 @@
 import sys
 from dataclasses import dataclass
 from benchmark import report
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass(slots=True)
 class Point:
@@ -12,7 +12,7 @@ class Point:
 p = Point(1, 2)
 print(p)
 #: Point(x=1, y=2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
 #: [AttributeError] 'Point' object has no attribute 'z' and
@@ -29,7 +29,7 @@ class FrozenSlottedPoint:
     y: int
 
 fp = FrozenPoint(1, 2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'z'

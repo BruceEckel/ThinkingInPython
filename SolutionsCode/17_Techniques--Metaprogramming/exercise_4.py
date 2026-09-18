@@ -1,6 +1,6 @@
 # exercise_4.py
 from typing import ClassVar
-from exceptions import ignore
+from exceptions import expected
 
 class A:
     _final: ClassVar[set[type]] = set()
@@ -27,7 +27,7 @@ class Sub(Open):
 print(issubclass(Sub, A))
 #: True
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(B):
         pass
 #: [TypeError] B is final; you cannot subclass it

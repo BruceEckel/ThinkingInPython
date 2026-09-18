@@ -1035,7 +1035,7 @@ which shrinks each instance:
 
 ```python
 # slots.py
-from exceptions import ignore
+from exceptions import expected
 
 class Point:
     __slots__ = ("x", "y")  # No per-instance __dict__
@@ -1046,7 +1046,7 @@ class Point:
 p = Point(1, 2)
 print(p.x, p.y)
 #: 1 2
-with ignore(AttributeError):
+with expected(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
 #: [AttributeError] 'Point' object has no attribute 'z' and
@@ -1062,7 +1062,7 @@ A data class can generate the slots.
 import sys
 from dataclasses import dataclass
 from benchmark import report
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass(slots=True)
 class Point:
@@ -1072,7 +1072,7 @@ class Point:
 p = Point(1, 2)
 print(p)
 #: Point(x=1, y=2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # z is not one of the declared slots:
     p.z = 3  # type: ignore
 #: [AttributeError] 'Point' object has no attribute 'z' and
@@ -1089,7 +1089,7 @@ class FrozenSlottedPoint:
     y: int
 
 fp = FrozenPoint(1, 2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # Frozen prevents new attributes, not just reassignment:
     fp.z = 3  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'z'
@@ -1104,9 +1104,9 @@ print(f"slots at least 5x smaller: "
 #: slots at least 5x smaller: True
 ```
 
-Both failed assignments print through `ignore()`,
+Both failed assignments print through `expected()`,
 which wraps the longer slotted message onto a second line.
-`ignore(AttributeError)` catches the frozen error because `FrozenInstanceError` subclasses `AttributeError`.
+`expected(AttributeError)` catches the frozen error because `FrozenInstanceError` subclasses `AttributeError`.
 
 If a class can be a data class,
 prefer `slots=True` over a hand-written class with `__slots__`.
@@ -1156,7 +1156,7 @@ and its instances carry no `__dict__`:
 
 ```python
 # point_record.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -1169,7 +1169,7 @@ print(p)
 #: Point(x=1, y=2)
 print(p == Point(1, 2), hasattr(p, "__dict__"))
 #: True False
-with ignore(AttributeError):
+with expected(AttributeError):
     p.x = 3  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'x'
 ```
@@ -1202,7 +1202,7 @@ It removes everything that dict would have held:
 import weakref
 from dataclasses import dataclass
 from functools import cached_property
-from exceptions import expect, ignore
+from exceptions import expect, expected
 
 @dataclass(slots=True)
 class Node:
@@ -1213,7 +1213,7 @@ class Node:
         return self.value * 2
 
 node = Node(3)
-with ignore(TypeError):
+with expected(TypeError):
     # cached_property needs a __dict__ to write into:
     print(node.doubled)
 #: [TypeError] No '__dict__' attribute on 'Node' instance to
@@ -1232,7 +1232,7 @@ expect(TypeError, weakref.ref, Slotted(1))
 class OtherSlotted:
     y: int
 
-with ignore(TypeError):
+with expected(TypeError):
     # Two nonempty slot layouts cannot combine:
     class Both(  # type: ignore
         Slotted, OtherSlotted
@@ -1265,7 +1265,7 @@ The `array` module packs numbers into a single block of C values instead:
 import sys
 from array import array
 from benchmark import report
-from exceptions import ignore
+from exceptions import expected
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
 a.append(4.0)
@@ -1273,7 +1273,7 @@ print(a)
 #: array('d', [1.0, 2.0, 3.0, 4.0])
 print(a[1], a.typecode, a.itemsize)
 #: 2.0 d 8
-with ignore(TypeError):
+with expected(TypeError):
     # The value must match the type code:
     a.append("x")  # type: ignore
 #: [TypeError] must be real number, not str
@@ -1325,7 +1325,7 @@ the way a real protocol parser reads a header:
 
 ```python
 # memory_view_traps.py
-from exceptions import expect, ignore
+from exceptions import expect, expected
 
 data = bytearray(b"\x01\x02XYZ")
 view = memoryview(data)
@@ -1341,7 +1341,7 @@ expect(BufferError, data.append, 1)
 #: re-sized
 
 readonly = memoryview(b"ABCDEF")
-with ignore(TypeError):
+with expected(TypeError):
     # bytes is immutable, so a view over it stays read-only:
     readonly[0] = ord("z")
 #: [TypeError] cannot modify read-only memory

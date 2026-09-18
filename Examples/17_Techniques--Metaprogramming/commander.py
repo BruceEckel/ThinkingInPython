@@ -2,7 +2,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, ClassVar, cast
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass
 class Command:
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
         command_class = Command.make_class(name)
         print(command_class().run())
-    with ignore(ValueError):
+    with expected(ValueError):
         Command.make_class("Reset")
 #: Running Start
 #: Running Stop

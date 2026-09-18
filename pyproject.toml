@@ -103,8 +103,8 @@ lines-after-imports = 1
 # them like one, matching contextlib.suppress's own naming.
 "**/exceptions.py" = ["N801"]
 "**/ignore_missing.py" = ["N801"]
-"**/ignore_one.py" = ["N801"]
-"**/ch15_ignore_types.py" = ["N801"]
+"**/expected_one.py" = ["N801"]
+"**/ch15_expected_types.py" = ["N801"]
 # This example exists to show that importing a module runs its top-level
 # code; the imported name is intentionally unused.
 "**/import_module.py" = ["F401"]

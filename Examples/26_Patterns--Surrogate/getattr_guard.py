@@ -1,6 +1,6 @@
 # getattr_guard.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 class Proxy:
     def __init__(self, impl: Any) -> None:
@@ -13,6 +13,6 @@ class Proxy:
 class Implementation:
     def f(self) -> None: print("Implementation.f()")
 
-with ignore(AttributeError):
+with expected(AttributeError):
     Proxy(Implementation()).f()
 #: [AttributeError] _imp

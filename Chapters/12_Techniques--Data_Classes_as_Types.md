@@ -1000,7 +1000,7 @@ It gains one thing:
 ```python
 # factory_checking.py
 from dataclasses import dataclass, field
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass
 class Unchecked:
@@ -1014,7 +1014,7 @@ class Checked:
 
 print(type(Unchecked().data).__name__)
 #: set
-with ignore(TypeError):
+with expected(TypeError):
     Unchecked().data["theme"] = "dark"
 #: [TypeError] 'set' object does not support item assignment
 print(Checked().data)
@@ -1206,7 +1206,7 @@ Mixing the settings fails in either direction:
 ```python
 # frozen_inheritance.py
 from dataclasses import dataclass
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass(frozen=True)
 class Frozen:
@@ -1216,14 +1216,14 @@ class Frozen:
 class Plain:
     a: int
 
-with ignore(TypeError):
+with expected(TypeError):
     @dataclass
     class Thawed(Frozen):  # type: ignore
         b: int
 #: [TypeError] cannot inherit non-frozen dataclass from a
 #: frozen one
 
-with ignore(TypeError):
+with expected(TypeError):
     @dataclass(frozen=True)
     class Chilled(Plain):  # type: ignore
         b: int

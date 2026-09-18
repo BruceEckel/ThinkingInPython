@@ -412,13 +412,13 @@ and the return type then says nothing about what the list holds:
 ```python
 # first_any.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 def first_any(items: list) -> Any:
     return items[0]
 
 n = first_any([10, 20, 30])
-with ignore(AttributeError):
+with expected(AttributeError):
     n.nonexistent_method()
 #: [AttributeError] 'int' object has no attribute
 #: 'nonexistent_method'

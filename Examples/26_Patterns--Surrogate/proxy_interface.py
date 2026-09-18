@@ -1,7 +1,7 @@
 # proxy_interface.py
 from abc import ABC, abstractmethod
 from typing import override
-from exceptions import ignore
+from exceptions import expected
 
 class Service(ABC):
     @abstractmethod
@@ -32,7 +32,7 @@ p.f()
 #: Complete.f()
 p.g()
 #: Complete.g()
-with ignore(TypeError):
+with expected(TypeError):
     Proxy(Partial())  # type: ignore
 #: [TypeError] Can't instantiate abstract class Partial
 #: without an implementation for abstract method 'g'

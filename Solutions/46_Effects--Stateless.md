@@ -656,7 +656,7 @@ type-based: `run()` at the outermost edge of a synchronous program,
 ```python
 # exercise_10.py
 from typing import Final
-from exceptions import ignore
+from exceptions import expected
 from stateless import (Effect, Need, need, run, supply,
                        throws)
 
@@ -688,7 +688,7 @@ def announce(
 
 bound = supply(Console())(announce)
 for who in ("Alice", "Cyd", "Dana"):
-    with ignore((KeyError, ValueError)):
+    with expected((KeyError, ValueError)):
         run(bound(who))
 #: Alice: 42
 #: [ValueError] negative score for Cyd: -3

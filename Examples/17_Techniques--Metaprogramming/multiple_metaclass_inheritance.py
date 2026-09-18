@@ -1,5 +1,5 @@
 # multiple_metaclass_inheritance.py
-from exceptions import ignore
+from exceptions import expected
 
 class MetaA(type):
     pass
@@ -13,7 +13,7 @@ class A(metaclass=MetaA):
 class B(metaclass=MetaB):
     pass
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(A, B):  # type: ignore
         pass
 #: [TypeError] metaclass conflict: the metaclass of a

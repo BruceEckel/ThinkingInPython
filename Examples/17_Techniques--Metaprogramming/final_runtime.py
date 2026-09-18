@@ -1,5 +1,5 @@
 # final_runtime.py
-from exceptions import ignore
+from exceptions import expected
 
 class A:
     pass
@@ -10,7 +10,7 @@ class B(A):
             f"{B.__name__} is final; "
             f"you cannot subclass it")
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(B):
         pass
 #: [TypeError] B is final; you cannot subclass it

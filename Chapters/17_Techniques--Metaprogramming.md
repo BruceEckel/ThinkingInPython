@@ -388,7 +388,7 @@ is easier to read and modify than a namespace dict:
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, ClassVar, cast
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass
 class Command:
@@ -419,7 +419,7 @@ if __name__ == "__main__":
     for name in ("Start", "Stop", "Pause"):
         command_class = Command.make_class(name)
         print(command_class().run())
-    with ignore(ValueError):
+    with expected(ValueError):
         Command.make_class("Reset")
 #: Running Start
 #: Running Stop
@@ -622,7 +622,7 @@ Older literature claims that making the interpreter refuse subclassing requires 
 
 ```python
 # final_runtime.py
-from exceptions import ignore
+from exceptions import expected
 
 class A:
     pass
@@ -633,7 +633,7 @@ class B(A):
             f"{B.__name__} is final; "
             f"you cannot subclass it")
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(B):
         pass
 #: [TypeError] B is final; you cannot subclass it
@@ -930,7 +930,7 @@ so every attribute declared with one enforces the same rule:
 
 ```python
 # validating_descriptor.py
-from exceptions import ignore
+from exceptions import expected
 
 class Positive:
     def __set_name__(self, owner: type, name: str) -> None:
@@ -962,7 +962,7 @@ r = Rectangle(3.0, 4.0)
 print(r.area())
 #: 12.0
 
-with ignore(ValueError):
+with expected(ValueError):
     r.width = -1.0
 #: [ValueError] -1.0 is not positive
 
@@ -1222,9 +1222,9 @@ and CPython allows multiple inheritance only when at most one base carries a non
 ```python
 # metaclass_layout_conflict.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
-with ignore(TypeError):
+with expected(TypeError):
     class Singleton(type, dict[type, Any]):  # type: ignore
         pass
 #: [TypeError] multiple bases have instance lay-out conflict
@@ -1249,7 +1249,7 @@ as long as the extra class is a mixin with no competing layout:
 
 ```python
 # mixin.py
-from exceptions import ignore
+from exceptions import expected
 
 class Mixin:
     def helper(self) -> str:
@@ -1264,7 +1264,7 @@ class Sub(metaclass=Base):
 print(Sub.helper())
 #: hi
 
-with ignore(AttributeError):  # A metamethod: class only
+with expected(AttributeError):  # A metamethod: class only
     Sub().helper()  # type: ignore
 #: [AttributeError] 'Sub' object has no attribute 'helper'
 ```
@@ -1287,7 +1287,7 @@ so inheriting from two classes built by different metaclasses has no answer:
 
 ```python
 # multiple_metaclass_inheritance.py
-from exceptions import ignore
+from exceptions import expected
 
 class MetaA(type):
     pass
@@ -1301,7 +1301,7 @@ class A(metaclass=MetaA):
 class B(metaclass=MetaB):
     pass
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(A, B):  # type: ignore
         pass
 #: [TypeError] metaclass conflict: the metaclass of a
@@ -1322,7 +1322,7 @@ The result is a metaclass conflict.
 As with the layout conflict just shown,
 ty reports `conflicting-metaclass` and names both `MetaA` and `MetaB`,
 so the line carries a `# type: ignore`.
-`ignore` prints the exception through the helper, wrapped so it fits the page;
+`expected` prints the exception through the helper, wrapped so it fits the page;
 the message is Python's, unwrapped.
 It names the fix: `D`'s metaclass, `MetaC`,
 must be a subclass of every base's metaclass, `MetaA` and `MetaB` both.
@@ -1387,7 +1387,7 @@ which is why `Color` needed a metaclass, not a decorator.
 ```python
 # prepare_namespace.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 class NoDuplicates(dict[str, Any]):
     def __setitem__(self, key: str, value: Any) -> None:
@@ -1401,7 +1401,7 @@ class Strict(type):
                     **kwargs: Any) -> NoDuplicates:
         return NoDuplicates()
 
-with ignore(TypeError):
+with expected(TypeError):
     class Handlers(metaclass=Strict):
         def on_open(self) -> None: ...
         def on_close(self) -> None: ...

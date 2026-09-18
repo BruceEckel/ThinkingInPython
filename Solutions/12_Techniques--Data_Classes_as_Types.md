@@ -409,7 +409,7 @@ carries a `# type: ignore` to demonstrate the runtime failure.
 ```python
 # exercise_7.py
 from dataclasses import dataclass, field
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass(frozen=True)
 class Month:
@@ -419,7 +419,7 @@ class Month:
 def make_months() -> list[Month]:
     return [Month("January", 1), Month("February", 2)]
 
-with ignore(ValueError):
+with expected(ValueError):
     @dataclass(frozen=True)
     class Broken:
         months: list[Month] = field(

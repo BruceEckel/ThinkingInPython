@@ -2,7 +2,7 @@
 import weakref
 from dataclasses import dataclass
 from functools import cached_property
-from exceptions import expect, ignore
+from exceptions import expect, expected
 
 @dataclass(slots=True)
 class Node:
@@ -13,7 +13,7 @@ class Node:
         return self.value * 2
 
 node = Node(3)
-with ignore(TypeError):
+with expected(TypeError):
     # cached_property needs a __dict__ to write into:
     print(node.doubled)
 #: [TypeError] No '__dict__' attribute on 'Node' instance to
@@ -32,7 +32,7 @@ expect(TypeError, weakref.ref, Slotted(1))
 class OtherSlotted:
     y: int
 
-with ignore(TypeError):
+with expected(TypeError):
     # Two nonempty slot layouts cannot combine:
     class Both(  # type: ignore
         Slotted, OtherSlotted

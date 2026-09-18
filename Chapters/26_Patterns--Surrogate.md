@@ -73,7 +73,7 @@ so you cannot instantiate an implementation that omits one:
 # proxy_interface.py
 from abc import ABC, abstractmethod
 from typing import override
-from exceptions import ignore
+from exceptions import expected
 
 class Service(ABC):
     @abstractmethod
@@ -104,7 +104,7 @@ p.f()
 #: Complete.f()
 p.g()
 #: Complete.g()
-with ignore(TypeError):
+with expected(TypeError):
     Proxy(Partial())  # type: ignore
 #: [TypeError] Can't instantiate abstract class Partial
 #: without an implementation for abstract method 'g'
@@ -376,7 +376,7 @@ The fix is a guard at the top of `__getattr__()` that raises `AttributeError` fo
 ```python
 # getattr_guard.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 class Proxy:
     def __init__(self, impl: Any) -> None:
@@ -389,7 +389,7 @@ class Proxy:
 class Implementation:
     def f(self) -> None: print("Implementation.f()")
 
-with ignore(AttributeError):
+with expected(AttributeError):
     Proxy(Implementation()).f()
 #: [AttributeError] _imp
 ```
@@ -529,7 +529,7 @@ Because `__getattr__()` receives the requested name, the check is one condition:
 ```python
 # protection_proxy.py
 from typing import Any, Final
-from exceptions import expect, ignore
+from exceptions import expect, expected
 
 READ_ONLY: Final[frozenset[str]] = frozenset({"read"})
 
@@ -550,7 +550,7 @@ class Document:
 guest = Guarded(Document(), admin=False)
 print(guest.read())
 #: contents
-with ignore(PermissionError):
+with expected(PermissionError):
     guest.erase()
 #: [PermissionError] erase
 expect(PermissionError, hasattr, guest, "erase")

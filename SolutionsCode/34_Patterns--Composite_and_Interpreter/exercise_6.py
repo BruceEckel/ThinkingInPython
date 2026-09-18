@@ -1,6 +1,6 @@
 # exercise_6.py
 from dataclasses import dataclass
-from exceptions import ignore
+from exceptions import expected
 
 class Operators:
     def __add__(self: Expr, other: Expr | int) -> Add:
@@ -49,10 +49,10 @@ def wrap(value: Expr | int) -> Expr:
 x = Var("x")
 print(type(2 * x + 1).__name__, (2 * x + 1).right)
 #: Add Num(value=1)
-with ignore(TypeError):
+with expected(TypeError):
     "a" + x  # type: ignore
 #: [TypeError] can only concatenate str (not "Var") to str
-with ignore(TypeError):
+with expected(TypeError):
     x + "a"  # type: ignore
 #: [TypeError] unsupported operand type(s) for +: 'Var' and
 #: 'str'

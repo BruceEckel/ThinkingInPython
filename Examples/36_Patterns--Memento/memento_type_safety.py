@@ -1,6 +1,6 @@
 # memento_type_safety.py
 from dataclasses import FrozenInstanceError
-from exceptions import expect, ignore
+from exceptions import expect, expected
 from sketch import Memento, Sketch
 
 def restore_tuple(strokes: tuple[str, ...]) -> None:
@@ -26,7 +26,7 @@ expect(AttributeError, restore_memento,
 #: [AttributeError] 'tuple' object has no attribute
 #: 'strokes'
 
-with ignore(FrozenInstanceError):
+with expected(FrozenInstanceError):
     # ty: strokes is read-only on Memento:
     checkpoint.strokes = ("forged",)  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'strokes'

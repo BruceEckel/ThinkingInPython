@@ -1,7 +1,7 @@
 # dispatch.py
 from collections.abc import Callable
 from operator import mod
-from exceptions import ignore
+from exceptions import expected
 
 def add(a: int, b: int) -> int:
     return a + b
@@ -22,6 +22,6 @@ print(operations["+"](6, 4), operations["-"](6, 4),
       operations["//"](6, 4), operations["%"](6, 4))
 #: 10 2 1 2
 # A missing key is a plain KeyError, no else branch:
-with ignore(KeyError):
+with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'

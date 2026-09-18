@@ -1,6 +1,6 @@
-# ch15_ignore_types.py
+# ch15_expected_types.py
 
-class ignore:
+class expected:
     def __init__(self, types: type[BaseException] |
                  tuple[type[BaseException], ...]) -> None:
         self.types = types
@@ -17,7 +17,7 @@ class ignore:
         print(f"{exc!r}")
         return True
 
-with ignore((ZeroDivisionError, TypeError)):
+with expected((ZeroDivisionError, TypeError)):
     print("before")
     raise TypeError("not a number")
 print("survived")
@@ -25,7 +25,7 @@ print("survived")
 #: TypeError('not a number')
 #: survived
 
-with ignore((ZeroDivisionError, TypeError)):
+with expected((ZeroDivisionError, TypeError)):
     print("before")
     1 / 0
 print("survived")

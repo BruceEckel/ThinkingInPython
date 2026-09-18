@@ -1,5 +1,5 @@
 # slope_nonzero.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -15,6 +15,6 @@ def slope(rise: int, run: NonZero) -> float:
 
 print(slope(10, NonZero(2)))
 #: 5.0
-with ignore(ValueError):
+with expected(ValueError):
     NonZero(0)
 #: [ValueError] NonZero cannot hold 0

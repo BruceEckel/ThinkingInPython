@@ -1,5 +1,5 @@
 # validating_descriptor.py
-from exceptions import ignore
+from exceptions import expected
 
 class Positive:
     def __set_name__(self, owner: type, name: str) -> None:
@@ -31,7 +31,7 @@ r = Rectangle(3.0, 4.0)
 print(r.area())
 #: 12.0
 
-with ignore(ValueError):
+with expected(ValueError):
     r.width = -1.0
 #: [ValueError] -1.0 is not positive
 

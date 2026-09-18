@@ -297,7 +297,7 @@ produces, one increment per item, so the caller can read
 
 ```python
 # exercise_5.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -321,7 +321,7 @@ print(Meters(10) - Meters(3), Meters(10) - 3)
 #: Meters(n=7) Meters(n=7)
 print(10 - Meters(3))
 #: Meters(n=7)
-with ignore(TypeError):
+with expected(TypeError):
     "ten" - Meters(3)
 #: [TypeError] unsupported operand type(s) for -: 'str' and
 #: 'Meters'

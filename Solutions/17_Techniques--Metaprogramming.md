@@ -138,7 +138,7 @@ reason the body reads the cache through the class name,
 ```python
 # exercise_4.py
 from typing import ClassVar
-from exceptions import ignore
+from exceptions import expected
 
 class A:
     _final: ClassVar[set[type]] = set()
@@ -165,7 +165,7 @@ class Sub(Open):
 print(issubclass(Sub, A))
 #: True
 
-with ignore(TypeError):
+with expected(TypeError):
     class C(B):
         pass
 #: [TypeError] B is final; you cannot subclass it
@@ -221,11 +221,11 @@ printing `None`. A `lambda` always has a name, `"<lambda>"`, so
 ## 6. The static diagnostic beside the runtime `TypeError`
 
 Removing the `# type: ignore` from `metaclass_layout_conflict.py` leaves
-the class header unsuppressed, inside the `with ignore(TypeError):` the
+the class header unsuppressed, inside the `with expected(TypeError):` the
 listing already has:
 
 ```python
-with ignore(TypeError):
+with expected(TypeError):
     class Singleton(type, dict[type, Any]):
         pass
 ```

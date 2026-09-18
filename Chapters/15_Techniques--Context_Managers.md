@@ -317,9 +317,9 @@ Writing your own version as a class shows the suppression directly,
 in the two lines that decide the return value:
 
 ```python
-# ignore_one.py
+# expected_one.py
 
-class ignore_one:
+class expected_one:
     def __init__(self, kind: type[BaseException]) -> None:
         self.kind = kind
 
@@ -335,7 +335,7 @@ class ignore_one:
             return True
         return False
 
-with ignore_one(ZeroDivisionError):
+with expected_one(ZeroDivisionError):
     print("before")
     1 / 0
     # Never runs: the error jumps to __exit__
@@ -351,14 +351,16 @@ or `None` when the block finishes cleanly.
 [`type[...]`](08_Foundations--Static_Types.md#classes-as-values-type)
 means the class, such as `ZeroDivisionError`, not an instance of it.
 `issubclass(cls, classinfo)` returns `True` if `cls` is `classinfo` or a subclass of it,
-so a `ZeroDivisionError` still matches `ignore_one(ArithmeticError)`.
+so a `ZeroDivisionError` still matches `expected_one(ArithmeticError)`.
 `exc!r` prints the exception's `repr()`,
 which includes both its type and its arguments, not just `exc_type.__name__`.
 `__enter__()` returns `None` because this manager has nothing to hand to `as`.
 You can still write `as`, but it binds `None`.
 
 A fuller version of the same idea takes several types at once,
-and with no argument ignores everything.
+and with no argument catches everything.
+Its name says how the book uses it: the block is expected to raise,
+and the manager shows what it raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
 where any chapter can import it:
 
@@ -377,7 +379,7 @@ def report(e: BaseException) -> None:
     line = f"[{type(e).__name__}] {e}"
     print(textwrap.fill(line, WIDTH))
 
-class ignore:
+class expected:
     def __init__(self, types: Types | ALL = ALL) -> None:
         self.types = types
 
@@ -418,16 +420,16 @@ async def aexpect[**P](
     raise AssertionError("no exception raised")
 ```
 
-`ignore` adds two things to `ignore_one`.
+`expected` adds two things to `expected_one`.
 The first is the tuple form:
 `issubclass()` accepts a tuple of classes as its second argument,
 matching if `cls` is a subclass of any one of them,
-so `ignore((ZeroDivisionError, TypeError))` covers several types in one manager.
+so `expected((ZeroDivisionError, TypeError))` covers several types in one manager.
 The `Types` alias names that "one class or a tuple of classes" shape once instead of writing it out at every use.
 
 The second is the default.
 The constructor's `types` parameter defaults to the `ALL` [sentinel](05_Foundations--Functions.md#sentinel-values),
-which makes `ignore()` with no argument catch everything.
+which makes `expected()` with no argument catch everything.
 `self.types is not ALL` [narrows](08_Foundations--Static_Types.md#narrowing)
 `self.types` from `Types | ALL` down to `Types`,
 and the earlier `if exc_type is None or exc is None: return False` narrowed `exc_type` to a class and `exc` to an exception,
@@ -441,14 +443,14 @@ so every demonstrated exception in the book has one form.
 `suppress` treats the no-argument call the opposite way:
 `suppress()` suppresses nothing,
 because a raised exception has no listed type to match.
-An `ignore()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
+An `expected()` that catches everything also catches `KeyboardInterrupt` and `SystemExit`,
 so name the types you expect unless you really want a block that nothing escapes.
 
 ```python
 # demo_exceptions.py
-from exceptions import ignore
+from exceptions import expected
 
-with ignore(ZeroDivisionError):
+with expected(ZeroDivisionError):
     print("before")
     1 / 0
     # Never runs: the error jumps to __exit__
@@ -458,7 +460,7 @@ print("survived")
 #: [ZeroDivisionError] division by zero
 #: survived
 
-with ignore():  # No argument means ALL
+with expected():  # No argument means ALL
     print("before")
     raise KeyError("anything")
 print("survived")
@@ -466,7 +468,7 @@ print("survived")
 #: [KeyError] 'anything'
 #: survived
 
-with ignore() as x:
+with expected() as x:
     print(f"{x = }")
 #: x = None
 ```
@@ -476,7 +478,7 @@ then returns `True`,
 and the `with` statement absorbs the error so `survived` still prints.
 
 In the last example, `x` receives the return value of `__enter__()`,
-which for `ignore()` is `None`.
+which for `expected()` is `None`.
 
 Many listings in this book call something to show the exception it raises.
 `expect()` is the function form of that demonstration.
@@ -516,7 +518,8 @@ The third call's message is too long for one line, so it wraps.
 `aexpect()` is the `async` form: it awaits the call instead of making it,
 for a coroutine function whose failure is the demonstration.
 Where a demonstration needs several statements or an assignment in the guarded block,
-`ignore` remains the right tool; `expect()` covers the common case of one call.
+`expected` remains the right tool;
+`expect()` covers the common case of one call.
 
 ## Context Manager as Decorator
 
@@ -604,7 +607,7 @@ if __name__ == "__main__":
 #: === meeting ends ===
 ```
 
-Like `suppress` and `ignore`,
+Like `suppress` and `expected`,
 the class version of `banner` uses a lowercase name because you use it like a function.
 `__exit__(self, *exc: object)` collects the three arguments into a tuple the method never reads,
 the shorter form for a cleanup that ignores why the block ended.
@@ -713,7 +716,7 @@ Fail the third manager and watch the first two unwind while the third's `__exit_
 # exit_stack_fails.py
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
-from exceptions import ignore
+from exceptions import expected
 
 @contextmanager
 def tag(name: str, fail: bool = False) -> Iterator[str]:
@@ -725,7 +728,7 @@ def tag(name: str, fail: bool = False) -> Iterator[str]:
     finally:
         print(f"close {name}")
 
-with ignore(RuntimeError):
+with expected(RuntimeError):
     with ExitStack() as stack:
         stack.enter_context(tag("a"))
         stack.enter_context(tag("b"))
@@ -749,8 +752,8 @@ The `contextlib` module provides ready-made managers.
 Choose these before writing `__enter__()` and `__exit__()` by hand.
 
 - `suppress(*exceptions)` ignores the listed exceptions,
-  covering the case the `ignore` class above handles,
-  without `ignore`'s printing or its catch-everything default.
+  covering the case the `expected` class above handles,
+  without `expected`'s printing or its catch-everything default.
 - `closing(obj)` calls `obj.close()` on exit,
   for objects that have `close()` but are not context managers themselves.
 - `ExitStack` manages a dynamic or conditional set of managers, as shown above.
@@ -1084,9 +1087,9 @@ and every change you make later goes inside the manager.
     with its own `print(f"inside {u.name}")`.
     Before running it, predict the order in which the six "enter"/"inside"/"exit" lines appear.
 2.  In `demo_exceptions.py`,
-    change `ignore(ZeroDivisionError)` to `ignore((ZeroDivisionError, TypeError))`,
+    change `expected(ZeroDivisionError)` to `expected((ZeroDivisionError, TypeError))`,
     then raise a `TypeError` instead of dividing by zero,
-    and confirm that `ignore` suppresses it too.
+    and confirm that `expected` catches and prints it too.
 3.  Add a third manager to the `with` statement in `multiple.py`,
     `tag("li")` again for a second item,
     and confirm the exit order still reverses the entry order.

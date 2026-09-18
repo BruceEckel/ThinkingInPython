@@ -321,7 +321,7 @@ If you declare the field as a `list` instead, the leak reopens:
 ```python
 # frozen_leaky.py
 from dataclasses import FrozenInstanceError, dataclass
-from exceptions import expect, ignore
+from exceptions import expect, expected
 
 @dataclass(frozen=True)
 class FrozenLeaky:
@@ -331,7 +331,7 @@ fl = FrozenLeaky([1, 2])
 fl.numbers.append(999)  # frozen=True does not stop this
 print(fl.numbers)
 #: [1, 2, 999]
-with ignore(FrozenInstanceError):
+with expected(FrozenInstanceError):
     fl.numbers = []  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'numbers'
 # A list field makes the whole instance unhashable

@@ -1,5 +1,5 @@
 # mixin.py
-from exceptions import ignore
+from exceptions import expected
 
 class Mixin:
     def helper(self) -> str:
@@ -14,6 +14,6 @@ class Sub(metaclass=Base):
 print(Sub.helper())
 #: hi
 
-with ignore(AttributeError):  # A metamethod: class only
+with expected(AttributeError):  # A metamethod: class only
     Sub().helper()  # type: ignore
 #: [AttributeError] 'Sub' object has no attribute 'helper'

@@ -31,7 +31,7 @@ tracking is the problem the chapter raises for `withdraw()`.
 # exercise_2.py
 from collections.abc import Callable
 from operator import mod
-from exceptions import ignore
+from exceptions import expected
 
 def add(a: int, b: int) -> int:
     return a + b
@@ -53,7 +53,7 @@ print(operations["+"](6, 4), operations["-"](6, 4),
       operations["*"](6, 4), operations["//"](6, 4),
       operations["%"](6, 4))
 #: 10 2 24 1 2
-with ignore(KeyError):
+with expected(KeyError):
     operations["^"](6, 4)
 #: [KeyError] '^'
 ```
@@ -61,7 +61,7 @@ with ignore(KeyError):
 You call `operations["*"](6, 4)` exactly the way you call the other
 four entries, and the calling code stays as it was. Supporting a new
 operator really was just adding one row to the table, as the chapter
-claims. The missing-key `KeyError` is caught with `ignore()` from the
+claims. The missing-key `KeyError` is caught with `expected()` from the
 shared `exceptions` helper, the same way the chapter's `dispatch.py`
 catches it.
 

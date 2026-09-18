@@ -1,6 +1,6 @@
 # factory_checking.py
 from dataclasses import dataclass, field
-from exceptions import ignore
+from exceptions import expected
 
 @dataclass
 class Unchecked:
@@ -14,7 +14,7 @@ class Checked:
 
 print(type(Unchecked().data).__name__)
 #: set
-with ignore(TypeError):
+with expected(TypeError):
     Unchecked().data["theme"] = "dark"
 #: [TypeError] 'set' object does not support item assignment
 print(Checked().data)

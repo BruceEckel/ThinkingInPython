@@ -1,7 +1,7 @@
 # demo_exceptions.py
-from exceptions import ignore
+from exceptions import expected
 
-with ignore(ZeroDivisionError):
+with expected(ZeroDivisionError):
     print("before")
     1 / 0
     # Never runs: the error jumps to __exit__
@@ -11,7 +11,7 @@ print("survived")
 #: [ZeroDivisionError] division by zero
 #: survived
 
-with ignore():  # No argument means ALL
+with expected():  # No argument means ALL
     print("before")
     raise KeyError("anything")
 print("survived")
@@ -19,6 +19,6 @@ print("survived")
 #: [KeyError] 'anything'
 #: survived
 
-with ignore() as x:
+with expected() as x:
     print(f"{x = }")
 #: x = None

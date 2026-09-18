@@ -146,9 +146,9 @@ appear:
 ```python
 # exercise_5_rejected.py
 from dataclasses import dataclass
-from exceptions import ignore
+from exceptions import expected
 
-with ignore(ValueError):
+with expected(ValueError):
     @dataclass
     class Cart:
         items: list[str] = []
@@ -166,7 +166,7 @@ which is why `shared_mutable.py`'s `Cart` built without complaint.
 
 ```python
 # exercise_6.py
-from exceptions import ignore
+from exceptions import expected
 
 class A:
     x = 100
@@ -178,7 +178,7 @@ print(vars(a), a.x)
 del a.x
 print(vars(a), a.x)
 #: {} 100
-with ignore(AttributeError):
+with expected(AttributeError):
     del a.x
 #: [AttributeError] 'A' object has no attribute 'x'
 ```

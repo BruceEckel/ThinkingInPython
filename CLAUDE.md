@@ -646,7 +646,7 @@ and how it was measured.
   and reading that closely it found two stale Solutions passages no
   upgrade caused: Solutions 46 naming line 28 under a quote that points
   at line 29, and Solutions 17 showing a `try`/`except` the listing had
-  long since replaced with `with ignore(TypeError):`.
+  long since replaced with `with expected(TypeError):` (then named `ignore`).
   The 0.0.81 to 0.0.82 upgrade (2026-09-17) had one gate failure, and
   it retired a claim. 0.0.82 reports instantiating an abstract class
   (`error[call-non-callable]: Cannot instantiate abstract class`),

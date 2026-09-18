@@ -2,7 +2,7 @@
 import sys
 from array import array
 from benchmark import report
-from exceptions import ignore
+from exceptions import expected
 
 a = array("d", [1.0, 2.0, 3.0])  # "d" means C double
 a.append(4.0)
@@ -10,7 +10,7 @@ print(a)
 #: array('d', [1.0, 2.0, 3.0, 4.0])
 print(a[1], a.typecode, a.itemsize)
 #: 2.0 d 8
-with ignore(TypeError):
+with expected(TypeError):
     # The value must match the type code:
     a.append("x")  # type: ignore
 #: [TypeError] must be real number, not str

@@ -98,7 +98,7 @@ and the standard library's `difflib` finds names that nearly match:
 # near_miss.py
 from difflib import get_close_matches
 from typing import final, override
-from exceptions import ignore
+from exceptions import expected
 
 class ApplicationFramework:
     @final
@@ -141,19 +141,19 @@ class MyApp(ApplicationFramework):
 
     def report(self) -> None: ...
 
-with ignore(TypeError):
+with expected(TypeError):
     class Typo(ApplicationFramework):
         def customise1(self) -> None:
             print("never runs")
 #: [TypeError] Typo.customise1: did you mean customize1?
 
-with ignore(TypeError):
+with expected(TypeError):
     class Hijack(ApplicationFramework):
         def run(self) -> None:  # type: ignore
             print("never runs")
 #: [TypeError] Hijack.run overrides the anchor
 
-with ignore(TypeError):
+with expected(TypeError):
     class Weird(ApplicationFramework):
         def customized_report(self) -> None: ...
 #: [TypeError] Weird.customized_report: did you mean

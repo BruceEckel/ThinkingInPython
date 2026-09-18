@@ -1,5 +1,5 @@
 # hashable.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -12,6 +12,6 @@ distances = {Point(0, 0): 0.0, Point(3, 4): 5.0}
 print(distances[Point(3, 4)])
 #: 5.0
 # A list has no stable hash, so it cannot be a key:
-with ignore(TypeError):
+with expected(TypeError):
     hash([3, 4])
 #: [TypeError] unhashable type: 'list'

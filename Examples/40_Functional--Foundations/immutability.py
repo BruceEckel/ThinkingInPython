@@ -1,5 +1,5 @@
 # immutability.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -8,7 +8,7 @@ class Point:
     y: int
 
 p = Point(1, 2)
-with ignore(AttributeError):
+with expected(AttributeError):
     # A frozen instance rejects assignment
     setattr(p, "x", 5)
 #: [FrozenInstanceError] cannot assign to field 'x'

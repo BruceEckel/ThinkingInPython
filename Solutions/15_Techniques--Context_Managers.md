@@ -40,9 +40,9 @@ comma-separated line.
 ## 2. Suppressing a second exception type
 
 ```python
-# ch15_ignore_types.py
+# ch15_expected_types.py
 
-class ignore:
+class expected:
     def __init__(self, types: type[BaseException] |
                  tuple[type[BaseException], ...]) -> None:
         self.types = types
@@ -59,7 +59,7 @@ class ignore:
         print(f"{exc!r}")
         return True
 
-with ignore((ZeroDivisionError, TypeError)):
+with expected((ZeroDivisionError, TypeError)):
     print("before")
     raise TypeError("not a number")
 print("survived")
@@ -67,7 +67,7 @@ print("survived")
 #: TypeError('not a number')
 #: survived
 
-with ignore((ZeroDivisionError, TypeError)):
+with expected((ZeroDivisionError, TypeError)):
     print("before")
     1 / 0
 print("survived")
@@ -76,22 +76,22 @@ print("survived")
 #: survived
 ```
 
-The class is the chapter's `ignore` with the `ALL` default left out,
+The class is the chapter's `expected` with the `ALL` default left out,
 since the exercise always passes an argument. With no `ALL` to test
 for, the two guards in `__exit__()` merge into one `or` test, and the
 union the chapter names with its `Types` alias is written out in the
 `__init__()` annotation. Everything the exercise asks for happens at
-the call site: `ignore` takes one `types` argument that is either an
+the call site: `expected` takes one `types` argument that is either an
 exception class or a tuple of them, and
 `issubclass(exc_type, self.types)` accepts either shape. Passing
 `(ZeroDivisionError, TypeError)` therefore suppresses both, and the
 `TypeError` block prints a `repr()` line in the same form the
 `ZeroDivisionError` block printed before the change.
 
-Note the double parentheses. `ignore((ZeroDivisionError, TypeError))`
-passes one argument, a tuple. `ignore(ZeroDivisionError, TypeError)`
+Note the double parentheses. `expected((ZeroDivisionError, TypeError))`
+passes one argument, a tuple. `expected(ZeroDivisionError, TypeError)`
 passes two, and Python raises a `TypeError` at the call itself, since
-`ignore` declares a single parameter. A version taking `*types` would
+`expected` declares a single parameter. A version taking `*types` would
 accept the second spelling, and that is the design
 `contextlib.suppress` chose.
 

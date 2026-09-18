@@ -12,7 +12,7 @@ def report(e: BaseException) -> None:
     line = f"[{type(e).__name__}] {e}"
     print(textwrap.fill(line, WIDTH))
 
-class ignore:
+class expected:
     def __init__(self, types: Types | ALL = ALL) -> None:
         self.types = types
 

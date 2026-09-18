@@ -1,7 +1,7 @@
 # exit_stack_fails.py
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
-from exceptions import ignore
+from exceptions import expected
 
 @contextmanager
 def tag(name: str, fail: bool = False) -> Iterator[str]:
@@ -13,7 +13,7 @@ def tag(name: str, fail: bool = False) -> Iterator[str]:
     finally:
         print(f"close {name}")
 
-with ignore(RuntimeError):
+with expected(RuntimeError):
     with ExitStack() as stack:
         stack.enter_context(tag("a"))
         stack.enter_context(tag("b"))

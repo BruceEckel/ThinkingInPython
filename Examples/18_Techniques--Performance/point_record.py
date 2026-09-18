@@ -1,5 +1,5 @@
 # point_record.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -12,6 +12,6 @@ print(p)
 #: Point(x=1, y=2)
 print(p == Point(1, 2), hasattr(p, "__dict__"))
 #: True False
-with ignore(AttributeError):
+with expected(AttributeError):
     p.x = 3  # type: ignore
 #: [FrozenInstanceError] cannot assign to field 'x'

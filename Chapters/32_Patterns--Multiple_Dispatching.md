@@ -507,7 +507,7 @@ Here is the machinery, with each dispatch traced:
 
 ```python
 # radd_dispatch.py
-from exceptions import ignore
+from exceptions import expected
 from record import record
 
 @record
@@ -538,7 +538,7 @@ print(Meters(3) + 4)  # The left operand handles it
 print(4 + Meters(3))
 #: __radd__(Meters(n=3), 4)
 #: Meters(n=7)
-with ignore(TypeError):
+with expected(TypeError):
     Meters(3) + "four"  # Both sides decline
 #: __add__(Meters(n=3), 'four')
 #: [TypeError] unsupported operand type(s) for +: 'Meters'

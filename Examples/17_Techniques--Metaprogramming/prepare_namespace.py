@@ -1,6 +1,6 @@
 # prepare_namespace.py
 from typing import Any
-from exceptions import ignore
+from exceptions import expected
 
 class NoDuplicates(dict[str, Any]):
     def __setitem__(self, key: str, value: Any) -> None:
@@ -14,7 +14,7 @@ class Strict(type):
                     **kwargs: Any) -> NoDuplicates:
         return NoDuplicates()
 
-with ignore(TypeError):
+with expected(TypeError):
     class Handlers(metaclass=Strict):
         def on_open(self) -> None: ...
         def on_close(self) -> None: ...

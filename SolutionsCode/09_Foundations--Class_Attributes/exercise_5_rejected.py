@@ -1,8 +1,8 @@
 # exercise_5_rejected.py
 from dataclasses import dataclass
-from exceptions import ignore
+from exceptions import expected
 
-with ignore(ValueError):
+with expected(ValueError):
     @dataclass
     class Cart:
         items: list[str] = []
