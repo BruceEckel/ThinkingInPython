@@ -110,8 +110,8 @@ PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
 The arguments after it are *metadata*, and they are values, not types.
 Each one is an ordinary expression,
 and `Annotated` keeps whatever it evaluates to.
-`Annotated[int, "meters", Limit(0, 100)]` carries a string and an instance of `Limit`,
-a class you would write.
+`Annotated[int, "meters", range(0, 100)]` carries two pieces of metadata,
+a string and a `range` object.
 One piece of metadata is required, and any number can follow it.
 The PEP gives tools one rule:
 a tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
