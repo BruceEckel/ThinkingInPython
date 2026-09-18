@@ -291,3 +291,4 @@ For my own bookkeeping.
 | 45_Effects--Generators.md                 | |
 | 46_Effects--Stateless.md                  | |
 | 47_Effects--Stateless_in_Practice.md      | |
+| A_Effect_Tracking.md                      | |

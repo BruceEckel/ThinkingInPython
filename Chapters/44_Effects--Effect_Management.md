@@ -453,6 +453,20 @@ A full EMS does three things:
    Some caller or context supplies the implementation,
    at a point after the function's definition.
 
+The first item can stand alone,
+and the difference between it and the whole list matters in the chapters that follow.
+*Effect tracking* tells you which Effects a function can perform.
+A system that stops at tracking still tells you whether a function is pure,
+and names the kinds of impurity a caller takes on.
+Effect management is tracking plus the second and third items.
+Once an Effect is an interface and a caller binds the implementation later,
+you can replace what the Effect does without editing the function that performs it.
+Tracking reports a function's Effects, and management lets you control them.
+Tracking without management appears twice later in this chapter:
+in most of the languages in [Custom AI Languages with Effects](#custom-ai-languages-with-effects),
+and in Python's `async`,
+which [Effect Management for Python?](#effect-management-for-python) examines.
+
 The third item names *delayed binding*.
 Delayed binding exists so that one fixed codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
@@ -821,7 +835,9 @@ Adoption skips the years a human language spends waiting for people to learn it.
 A language written for an AI can drop the conveniences that help a person read code,
 and an AI can start using that language as soon as it works.
 
-Most of these provide only the first part of a full EMS, tracking.
+Most of these are tracking systems,
+in the sense [Effect Management Systems](#effect-management-systems)
+gave the term: they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
 would be liabilities,
 because a host that pins every implementation can guarantee what generated code can do.
@@ -924,6 +940,9 @@ An Effect row must spread through an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, it will contain the ideas in this chapter.
+[Effect Tracking](A_Effect_Tracking.md) works through one candidate design:
+an Effect row carried in `typing.Annotated` metadata,
+and an analysis of the tool that would propagate and check it.
 
 ## Effects Are the Next Barrier
 

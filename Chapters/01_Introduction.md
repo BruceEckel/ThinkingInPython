@@ -161,6 +161,8 @@ The last two put that idea to work with `stateless`,
 a library that brings Effect tracking to Python today.
 Read these four chapters in order:
 the last two build on the chapters before them.
+An appendix, [Effect Tracking](A_Effect_Tracking.md),
+asks how far Python's `Annotated` type could carry Effect tracking without a library.
 
 ## The Examples
 

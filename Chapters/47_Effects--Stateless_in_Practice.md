@@ -2277,6 +2277,9 @@ and that the tracking will eventually move into the language.
 Stateless shows what that looks like inside Python today,
 and that is the value of studying the library,
 whether or not you use it in production.
+[Effect Tracking](A_Effect_Tracking.md) looks at the other route Python offers,
+a row written in `typing.Annotated`,
+and at what a tool would need in order to check it.
 
 Consider the signatures once more:
 
