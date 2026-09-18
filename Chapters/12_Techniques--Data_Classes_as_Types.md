@@ -1388,22 +1388,23 @@ so a class that is not a data class can join by defining it:
 ```python
 # copy_replace_protocol.py
 import copy
-from typing import Final, Self
+from typing import Final, Literal, Self
 
-SHIFTS: Final[dict[str, int]] = {
+type Channel = Literal["red", "green", "blue"]
+SHIFTS: Final[dict[Channel, int]] = {
     "red": 16, "green": 8, "blue": 0}
 MASK: Final[int] = 0xFF
 
 class Color:
     def __init__(self, red: int, green: int,
                  blue: int) -> None:
-        channels = {"red": red, "green": green,
-                    "blue": blue}
+        channels: dict[Channel, int] = {
+            "red": red, "green": green, "blue": blue}
         self.packed = sum(v << SHIFTS[k]
                           for k, v in channels.items())
 
     @property
-    def channels(self) -> dict[str, int]:
+    def channels(self) -> dict[Channel, int]:
         return {n: self.packed >> s & MASK
                 for n, s in SHIFTS.items()}
 

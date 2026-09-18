@@ -1,13 +1,15 @@
 # exercise_4.py
 from abc import ABC, abstractmethod
-from typing import Protocol, override
+from typing import Literal, Protocol, override
+
+type Thickness = Literal["thick", "thin"]
 
 class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
-    def __init__(self, thickness: str) -> None:
+    def __init__(self, thickness: Thickness) -> None:
         self.thickness = thickness
 
     @override
@@ -15,7 +17,7 @@ class Circle(Shape):
         print(f"{self.thickness} Circle.draw")
 
 class Square(Shape):
-    def __init__(self, thickness: str) -> None:
+    def __init__(self, thickness: Thickness) -> None:
         self.thickness = thickness
 
     @override

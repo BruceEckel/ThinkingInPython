@@ -378,7 +378,7 @@ the one function that cannot pass one.
 ```python
 # exercise_7.py
 from collections.abc import Generator
-from typing import Final
+from typing import Final, Literal
 from record import record
 
 @record
@@ -390,11 +390,14 @@ class Digit:
     value: str
 
 type Event = Coin | Digit
+type Report = Literal[
+    "QUIESCENT", "COLLECTING", "SELECTING",
+    "UNAVAILABLE", "WANT_MORE", "DISPENSED"]
 
 PRICES: Final[dict[str, int]] = {"11": 25, "12": 75}
 STOCK: Final[dict[str, int]] = {"11": 0, "12": 3}
 
-def machine() -> Generator[str, Event]:
+def machine() -> Generator[Report, Event]:
     stock = dict(STOCK)
     amount = 0
     event: Event = yield "QUIESCENT"

@@ -26,7 +26,7 @@ class FloodGame:
         self.clicks = 0
         self.owned = self._flood(self.grid[origin])
 
-    def _flood(self, color: str) -> set[Coord]:
+    def _flood(self, color: Color) -> set[Coord]:
         ("Every cell reachable from origin "
          "through same-colored cells.")
         seen: set[Coord] = set()

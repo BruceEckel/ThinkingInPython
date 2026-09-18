@@ -977,7 +977,7 @@ keep a registry of prototypical instances and clone the chosen one:
 # prototype_registry.py
 import copy
 from dataclasses import dataclass, field
-from typing import Final
+from typing import Final, Literal
 
 @dataclass
 class Monster:
@@ -985,13 +985,15 @@ class Monster:
     hp: int
     powers: list[str] = field(default_factory=list)
 
-PROTOTYPES: Final[dict[str, Monster]] = {
+Kind = Literal["goblin", "troll"]
+
+PROTOTYPES: Final[dict[Kind, Monster]] = {
     "goblin": Monster("Goblin", hp=10, powers=["bite"]),
     "troll": Monster("Troll", hp=40,
                      powers=["smash", "regen"]),
 }
 
-def spawn(kind: str) -> Monster:
+def spawn(kind: Kind) -> Monster:
     return copy.deepcopy(PROTOTYPES[kind])
 
 if __name__ == "__main__":

@@ -235,14 +235,16 @@ missing base.
 ```python
 # exercise_4.py
 from abc import ABC, abstractmethod
-from typing import Protocol, override
+from typing import Literal, Protocol, override
+
+type Thickness = Literal["thick", "thin"]
 
 class Shape(ABC):
     @abstractmethod
     def draw(self) -> None: ...
 
 class Circle(Shape):
-    def __init__(self, thickness: str) -> None:
+    def __init__(self, thickness: Thickness) -> None:
         self.thickness = thickness
 
     @override
@@ -250,7 +252,7 @@ class Circle(Shape):
         print(f"{self.thickness} Circle.draw")
 
 class Square(Shape):
-    def __init__(self, thickness: str) -> None:
+    def __init__(self, thickness: Thickness) -> None:
         self.thickness = thickness
 
     @override
@@ -863,7 +865,9 @@ while the key stays `"goblin"`.
 
 What the decorated form gains is the same openness the registries
 gained: a prototype can be defined in any module, with its name beside
-its definition, and `PROTOTYPES` needs no edit. The builder is also a
+its definition, and `PROTOTYPES` needs no edit. The key type widens
+from the chapter's `Kind` to `str` for the same reason: an open table
+cannot list its names in advance. The builder is also a
 function, so `goblin()` still produces a fresh prototype on demand
 when a test wants one that nothing has touched. The costs are the
 table literal becoming a decorator plus a function for each monster,
