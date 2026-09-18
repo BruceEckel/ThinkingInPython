@@ -1,23 +1,27 @@
 # exercise_5.py
-from typing import Final, Literal
+from enum import StrEnum
 
-type Color = Literal["skyblue", "palegreen", "khaki"]
-COLORS: Final[tuple[Color, Color, Color]] = (
-    "skyblue", "palegreen", "khaki")
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    def next(self) -> Color:
+        colors = list(Color)
+        nxt = colors.index(self) + 1
+        return colors[nxt % len(colors)]
+
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    return {(x, y): COLORS[(x + y) % len(COLORS)]
+    colors = list(Color)
+    return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
-
-def next_color(color: Color) -> Color:
-    nxt = COLORS.index(color) + 1
-    return COLORS[nxt % len(COLORS)]
 
 def recolored(grid: Grid, clicked: Coord) -> Grid:
     x, y = clicked
-    return grid | {cell: next_color(color)
+    return grid | {cell: color.next()
                    for cell, color in grid.items()
                    if cell[0] == x or cell[1] == y}
 

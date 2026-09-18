@@ -576,28 +576,32 @@ The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python
 # box_observer.py
-from typing import Final, Literal
+from enum import StrEnum
 from observers import Observable
 
-type Color = Literal["skyblue", "palegreen", "khaki"]
-COLORS: Final[tuple[Color, Color, Color]] = (
-    "skyblue", "palegreen", "khaki")
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    def next(self) -> Color:
+        colors = list(Color)
+        nxt = colors.index(self) + 1
+        return colors[nxt % len(colors)]
+
 type Coord = tuple[int, int]  # (column, row)
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    return {(x, y): COLORS[(x + y) % len(COLORS)]
+    colors = list(Color)
+    return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
-
-def next_color(color: Color) -> Color:
-    nxt = COLORS.index(color) + 1
-    return COLORS[nxt % len(COLORS)]
 
 def recolored(grid: Grid, clicked: Coord) -> Grid:
     x, y = clicked
     cross = [(x, y), (x - 1, y), (x + 1, y),
              (x, y - 1), (x, y + 1)]
-    return grid | {cell: next_color(grid[cell])
+    return grid | {cell: grid[cell].next()
                    for cell in cross if cell in grid}
 
 class BoxModel(Observable[Grid]):
@@ -611,15 +615,22 @@ class BoxModel(Observable[Grid]):
         self.notify(self.grid)
 ```
 
+`Color` is a `StrEnum`, an `Enum`
+([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too))
+whose members are also strings.
+`Color.KHAKI` compares equal to `"khaki"` and goes wherever a `str` goes,
+so the view can pass a `Color` to `tkinter` as a color name.
+Iterating over an enum produces its members in definition order,
+so `list(Color)` is the cycle of colors.
+`next()` finds the member's position in that list with `index()` and adds one.
+`nxt` is the position of the next color,
+and `nxt % len(colors)` wraps it around,
+so `Color.KHAKI.next()` is `Color.SKYBLUE`.
+
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
 `new_grid()` builds a size x size grid banded into three colors.
-A cell's color is `COLORS[(x + y) % len(COLORS)]`,
+A cell's color is `colors[(x + y) % len(colors)]`,
 so the cells along a diagonal, where `x + y` is constant, share one color.
-
-`next_color()` finds a color's position in `COLORS` with `index()` and adds one.
-`nxt` is the position of the next color,
-and `nxt % len(COLORS)` wraps it around, so the last color, `"khaki"`,
-produces the first, `"skyblue"`.
 
 `recolored()` computes the grid that results from a click: values in,
 values out.
@@ -629,20 +640,20 @@ so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
 so `if cell in grid` drops those coordinates with a membership test,
 and `recolored()` needs no grid size.
-The comprehension maps each remaining cell to its next color.
+The comprehension maps each remaining cell to its color's `next()`.
 The dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries)
 builds the new grid: `|` produces a new dictionary,
 and when both operands hold the same key, the right operand's value wins.
 The result is a copy of `grid` that differs in the cells of the cross,
 and `grid` is unchanged.
 
-None of the three functions needs a `BoxModel`,
-so they are defined at module level and not inside the class.
+Neither function needs a `BoxModel`,
+so both are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
 `BoxModel` is an `Observable[Grid]`.
 `BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
-Three functions and one class make up the model:
-the functions compute colors and grids,
+An enum, two functions, and one class make up the model:
+`Color` holds the colors and their order, the functions compute grids,
 and `BoxModel` holds the current grid and notifies its observers.
 The file does not import `tkinter`.
 
@@ -653,26 +664,25 @@ and that observers receive the new grid after a click:
 
 ```python
 # test_box_observer.py
-from box_observer import (BoxModel, Grid, new_grid,
-                          next_color, recolored)
+from box_observer import (BoxModel, Color, Grid,
+                          new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
     assert len(grid) == 9
-    assert grid[(0, 0)] == "skyblue"  # COLORS[0]
+    assert grid[(0, 0)] == Color.SKYBLUE
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_next_color_wraps() -> None:
-    assert next_color("skyblue") == "palegreen"
-    assert next_color("khaki") == "skyblue"
+def test_next_wraps() -> None:
+    assert Color.SKYBLUE.next() == Color.PALEGREEN
+    assert Color.KHAKI.next() == Color.SKYBLUE
 
 def test_recolored_changes_the_cross() -> None:
     grid = new_grid(3)
     out = recolored(grid, (1, 1))
     cross = {(1, 1), (0, 1), (2, 1), (1, 0), (1, 2)}
-    assert all(out[c] == next_color(grid[c])
-               for c in cross)
+    assert all(out[c] == grid[c].next() for c in cross)
     assert all(out[c] == grid[c]
                for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid

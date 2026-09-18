@@ -1,24 +1,23 @@
 # test_box_observer.py
-from box_observer import (BoxModel, Grid, new_grid,
-                          next_color, recolored)
+from box_observer import (BoxModel, Color, Grid,
+                          new_grid, recolored)
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
     assert len(grid) == 9
-    assert grid[(0, 0)] == "skyblue"  # COLORS[0]
+    assert grid[(0, 0)] == Color.SKYBLUE
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_next_color_wraps() -> None:
-    assert next_color("skyblue") == "palegreen"
-    assert next_color("khaki") == "skyblue"
+def test_next_wraps() -> None:
+    assert Color.SKYBLUE.next() == Color.PALEGREEN
+    assert Color.KHAKI.next() == Color.SKYBLUE
 
 def test_recolored_changes_the_cross() -> None:
     grid = new_grid(3)
     out = recolored(grid, (1, 1))
     cross = {(1, 1), (0, 1), (2, 1), (1, 0), (1, 2)}
-    assert all(out[c] == next_color(grid[c])
-               for c in cross)
+    assert all(out[c] == grid[c].next() for c in cross)
     assert all(out[c] == grid[c]
                for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid

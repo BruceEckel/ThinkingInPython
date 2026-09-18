@@ -1,14 +1,17 @@
 # exercise_2.py
-from typing import Final, Literal
+from enum import StrEnum
 
-type Color = Literal["skyblue", "palegreen", "khaki"]
-COLORS: Final[tuple[Color, Color, Color]] = (
-    "skyblue", "palegreen", "khaki")
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
-    return {(x, y): COLORS[(x + y) % len(COLORS)]
+    colors = list(Color)
+    return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
 def adjacent(a: Coord, b: Coord) -> bool:
