@@ -759,6 +759,61 @@ mushy") on chapter 29's sentence:
 2026-09-17) and the CLAUDE.md watch list (global, "Consider rewriting"
 tier). Promoted at Bruce's call (2026-09-17, "accept all").
 
+### R21. A colon that joins a claim to its explanation becomes a sentence break
+
+**Test.** A prose colon whose right side is a full clause explaining,
+justifying, or expanding the claim on its left ("Subscriptions are
+strong references: an observable that outlives its observers keeps
+alive ..."). End the claim with a period and let the explanation stand
+as its own sentence, capitalized; where the right side is the cause of
+the left, reorder so the cause comes first and join with a comma or
+"so". Two such colons in adjacent sentences ("X is one use: ... Y is
+another: ...") are the strongest signal; recast both ("In X, ... In Y,
+..."). Adjacent to a code span containing a colon (`always: 1`), the
+prose colon goes even when it is the only one.
+
+**Keep when.** The colon introduces a listing, a bulleted or numbered
+list, or a run of parts ("has three parts: an `Observer` interface, a
+`Subject` base class, and a `notify()`"); defines a term ("defines only
+the communication: a list of callables and the argument it passes
+them"); or supplies a direct answer to what the left side sets up ("GoF
+leaves one choice open: who calls `notify()`"). R5 covers the colon
+after a bullet's label.
+
+**Sightings.** 3 rounds, 21 chapters. Bruce named the rule on chapter
+30 (2026-09-17, "There are colons that could be removed in favor of
+separate sentences"):
+- `30_Patterns--Observer` 2026-09-17 (`15f58a2d`), twelve colons, all
+  Claude-written: "Subscriptions are strong references: an observable
+  that outlives its observers keeps alive the instance" -> "Subscriptions
+  are strong references. An observable that outlives its observers keeps
+  alive the instance"; "Event handling is one use: a widget keeps a list
+  of handlers ... The model-view split is another: the data keeps a list
+  of views" -> "In event handling, a widget keeps a list of handlers ...
+  In the model-view split, the data keeps a list of views"; "Without the
+  copy, `always: 1` would be missing: `once`'s self-removal would skip
+  `always`." -> "Without the copy, `once`'s self-removal would skip
+  `always`, and `always: 1` would be missing."; "but not here: it cancels
+  a failing task's siblings" -> "but not here. A `TaskGroup` cancels a
+  failing task's siblings"
+- `27_Patterns--Factory` 2026-09-12 (`571d9ec2`): "Both are static
+  methods of the type: each takes data and returns an instance" -> "Both
+  are static methods within the type. Each takes data and returns an
+  instance"; "`of()` needs no `match`, because the `Enum` already holds
+  every member it could return: it indexes `list(Month)`" -> "`of()`
+  needs no `match`. The `Enum` already holds every member it could
+  return, so `of()` indexes `list(Month)`"
+- 19 chapters 2026-09-12 (`19f80f40`, "Fewer colons in 26 prose
+  paragraphs"), the per-paragraph density sweep (three or more colons
+  in one paragraph): `34_Patterns--Composite_and_Interpreter`: "One
+  practical limit applies: every function here recurses once per level
+  of tree" -> "One practical limit applies. Every function here recurses
+  once per level of tree"
+
+**Home.** this file only; the 2026-09-12 sweep is recorded in project
+memory `colon-splice-audit-completed`. Promoted at Bruce's call
+(2026-09-17).
+
 ---
 
 ## Candidates
