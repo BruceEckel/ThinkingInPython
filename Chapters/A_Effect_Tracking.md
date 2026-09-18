@@ -9,9 +9,9 @@ It states the tracking problem apart from any one language,
 says why a language that tracks Effects natively solves the problem best,
 and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
-The last part analyzes the tool that would check those annotations.
+The last part analyzes the tool that would check those annotations,
+showing how much of a type checker the tool would contain.
 The appendix stops short of building that tool.
-The analysis shows how much of a type checker the tool would contain.
 
 ## The Tracking Problem
 
@@ -24,8 +24,8 @@ This appendix concerns tracking.
 A function's Effects come from two sources.
 The body performs some of them directly, as a call to `print()` does.
 The function inherits the rest from the functions it calls.
-Handling removes Effects:
-a function that runs `greet()` inside a handler for `Ask` passes no `Ask` to its own callers.
+Handling removes Effects.
+A function that runs `greet()` inside a handler for `Ask` passes no `Ask` to its own callers.
 The *Effect row* of a function `f` therefore follows one rule:
 
 ```text
@@ -56,7 +56,7 @@ Every approach in the Effects chapters fills those three roles:
 | Stateless | The generator's yield type | You | The type checker, at every `yield from` |
 | Koka | The Effect row | The compiler | The compiler |
 
-Reading down the table, the work moves from you to the compiler.
+As you read down the table, the work moves from you to the compiler.
 The rest of this appendix asks how far `Annotated` can move it.
 
 ## Why a Native System Tracks Best
@@ -66,7 +66,7 @@ and each later section finds one of them missing from the `Annotated` design.
 
 **The compiler infers the row.**
 Koka computes a function's row from its body,
-so the declarations write themselves.
+so most functions need no written row.
 You write a row when you want a constraint,
 such as requiring that a function stay pure.
 [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand)
@@ -84,10 +84,10 @@ The `e` is an *Effect variable*.
 It says `map()` performs whatever `f` performs, for any `f`.
 That property is *Effect polymorphism*,
 and a tracking system without it must either forbid effectful callbacks or exempt them from tracking.
-Java's standard functional interfaces chose to forbid them.
+Java's standard functional interfaces forbid them.
 `Function.apply()` declares no exception,
-so a lambda passed to `Stream.map()` cannot throw a checked one,
-and programmers wrap the exception in an unchecked one to get past the compiler.
+so a lambda passed to `Stream.map()` cannot throw a checked one.
+Programmers wrap the exception in an unchecked one, which the compiler accepts.
 
 **Handling subtracts.**
 In the Koka greeting program of [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management),
@@ -98,18 +98,26 @@ so they cannot disagree.
 **Every function has a row.**
 Koka's `println()` carries `console` in its type,
 as does every function that calls it, in your code and in the standard library.
-An Effect has no untracked code in which to hide.
+The compiler tracks all code, so every Effect appears in some function's row.
 
 All four follow from one fact: the three roles belong to one compiler,
-and that compiler sees every function in the program.
+and that compiler analyzes every function in the program.
 
 ## A Row Inside `Annotated` {#a-row-inside-annotated}
 
-PEP 593 added `Annotated[T, x]` to `typing` in Python 3.9.
-`T` is a type, and `x` is any object you like, called *metadata*.
+PEP 593 added `Annotated[T, x, y, ...]` to `typing` in Python 3.9.
+`T` is a type.
+The arguments after it are *metadata*, and they are values, not types.
+Each one is an ordinary expression,
+and `Annotated` keeps whatever it evaluates to.
+`Annotated[int, "meters", Limit(0, 100)]` carries a string and an instance of `Limit`,
+a class you would write.
+One piece of metadata is required, and any number can follow it.
 The PEP gives tools one rule:
-a tool with no logic for `x` ignores it and treats the annotation as `T`.
-So metadata costs nothing in a type checker,
+a tool with no logic for a piece of metadata ignores that piece and treats the annotation as `T`.
+Each tool can therefore put its own object in the list,
+and every other tool reads past it.
+So metadata changes nothing for a type checker,
 and the runtime can read it back with `get_type_hints()`.
 That makes `Annotated` a candidate for the first role, a place to write the row:
 
@@ -139,11 +147,11 @@ def row(f: Callable[..., object]) -> list[str]:
 
 `Performs` wraps the row because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`,
-and the PEP asks every consumer to skip the objects it does not recognize.
+and the PEP directs every consumer to act only on the objects it recognizes.
 The `isinstance()` test in `row()` does that.
 `include_extras=True` keeps the metadata,
-which `get_type_hints()` otherwise strips,
-and `__metadata__` is the tuple where `Annotated` stores it.
+which `get_type_hints()` otherwise strips.
+`__metadata__` is the tuple where `Annotated` stores it.
 
 An annotation belongs to a parameter or to the return value,
 and no annotation belongs to the function as a whole.
@@ -185,23 +193,22 @@ for f in ask, tell, greet, shout:
 The bodies are ordinary eager code, with no generators and no `yield from`.
 `ty` follows the PEP's rule:
 `reveal_type(ask)` reports `def ask(prompt: str) -> str`,
-and `name: str = ask(...)` checks as if the metadata were absent.
+and `name: str = ask(...)` checks against that `str`.
 Existing callers need no change,
 so a codebase could adopt rows one function at a time.
 
 That same rule is the design's weakness.
 `shout()` calls `tell()` and declares nothing.
 Its row reads as empty, and `ty` reports nothing,
-because the PEP tells `ty` to ignore the one fact that matters here.
+because the PEP instructs `ty` to ignore the one fact that matters here.
 Compare `undeclared_need.py` in [Stateless](46_Effects--Stateless.md#effects-propagate-and-the-type-checker-verifies-it),
 where the same mistake draws an `invalid-yield` error.
-Until a tool reads it, a row inside `Annotated` is a structured comment:
+Until a tool reads it, a row inside `Annotated` is a structured comment.
 `greet()`'s row is right because I typed it correctly.
 
 Notice also that `ask()` calls `input()` directly.
 `Ask` is a label here.
 It has no methods, and nothing can substitute another implementation for it.
-[Tracking Is Not Management](#tracking-is-not-management) returns to that.
 
 ## What a Checker for the Row Must Do
 
@@ -219,14 +226,15 @@ and the name `tell` resolves in the module's scope.
 A method call is the ordinary case, and it is hard.
 For `console.print(message)` the tool needs the type of `console`.
 That type may come from a parameter annotation, an assignment,
-a narrowing `isinstance()`, a generic, or an overload,
-and the method may be overridden in a subclass.
+a narrowing `isinstance()`, a generic, or an overload.
+A subclass may also override the method.
 An override needs its own rule:
 the overriding method's row must fit inside the row of the method it replaces,
 or a caller holding the base type performs Effects the base row omits.
 
 Working all of that out is type inference, which `ty` performs on every run.
-The natural home for the tool is therefore inside the type checker. mypy has a plugin interface;
+The tool therefore belongs inside the type checker.
+Of the three checkers, mypy has a plugin interface;
 `ty` and Pyright have none at this writing.
 A tool that runs outside the checker has two choices.
 It can repeat the checker's inference,
@@ -244,19 +252,19 @@ def each[T](
         action(item)
 ```
 
-The row of `each()` is the row of `action`, which differs at every call.
+The row of `each()` is the row of `action`, and that row differs at every call.
 Koka writes that with the Effect variable `e`.
 Python's type variables cannot help,
 because a type variable placed inside metadata is one more object the checker ignores.
-The tool would need its own notation,
+The tool would require its own notation,
 something like `performs(RowOf("action"))`,
 and its own solver for that notation.
 At each call of `each()` the solver must find the argument and then the argument's row.
-The argument may be a lambda, which has no annotations, or a `partial()`,
-a bound method, or a callable pulled from a dictionary.
-Effect variables amount to a second type system running beside the first.
+The argument may be a `partial()`, a bound method,
+a callable pulled from a dictionary, or a lambda, which has no annotations.
+Effect variables amount to a second type system beside the first.
 
-Stateless has Effect variables without building one,
+Stateless has Effect variables without building a second type system,
 because its row is an ordinary type:
 
 ```python
@@ -295,7 +303,7 @@ run(supply(Console())(hello_twice)())
 ```
 
 `A` stands for whatever row the argument carries.
-`reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`:
+`reveal_type(twice(hello))` reports `Generator[Need[Console], Any, None]`.
 `ty` solved `A` as `Need[Console]`,
 with the solver it uses for every other generic.
 `hello_twice()` must then declare that row, or `ty` rejects its `yield from`.
@@ -314,31 +322,34 @@ with handling(Ask, Scripted()):
 
 Inside that block the tool would remove `Ask` from the row.
 The subtraction is sound if the handler intercepts the Effect,
-which requires `ask()` to consult the installed handler instead of calling `input()`.
+and that interception requires `ask()` to consult the installed handler instead of calling `input()`.
 That takes a runtime mechanism,
 such as the `ContextVar` in [Effects by Hand](44_Effects--Effect_Management.md#effects-by-hand).
 Now the design has two halves, a static tool and a runtime library,
-and the tool must trust that the library does what the metadata says.
+and the tool cannot check that the library does what the metadata says.
 In Koka one construct installs the handler and subtracts from the row.
-In Stateless the `Handler` that `supply()` returns does the subtracting:
-its type removes the `Need` from the row of the function it wraps,
+In Stateless the `Handler` that `supply()` returns does the subtracting.
+Its type removes the `Need` from the row of the function it wraps,
 and `ty` verifies the result.
 
 ### Decide What Untracked Code Performs
 
 `print()`, `open()`, and nearly every function on PyPI carry no row.
-The tool must assume something about them, and each assumption has a cost:
+The tool must assume something about them,
+and each assumption creates its own problem:
 
 - **Undeclared means pure.**
-  The row becomes a floor: it lists the Effects someone wrote down.
-  The `print()` hole that [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-  found in Stateless stays open.
+  The row becomes a lower bound.
+  It lists the Effects someone wrote down.
+  A direct call to `print()` stays invisible to the tool,
+  the limit [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
+  found in Stateless.
 - **Undeclared means `Unknown`.**
   An unknown Effect spreads into every caller the way `Any` spreads through types,
-  so nearly every row reads `Unknown` until someone declares the libraries below it.
+  so nearly every row reads `Unknown` until someone declares the libraries below your code.
 - **Declare the libraries separately.**
-  Gradual typing took this route with stub files and typeshed,
-  and the C functions under `print()` and `open()` need it regardless,
+  Gradual typing took this route with stub files and typeshed.
+  The C functions under `print()` and `open()` need it regardless,
   since they have no Python body to analyze.
   [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
   says how long that took: a decade.
@@ -346,14 +357,14 @@ The tool must assume something about them, and each assumption has a cost:
 Dynamic code adds to the unknowns: `getattr(obj, name)()`,
 a decorator that returns a wrapper with a different row,
 a module-level `__getattr__()`, a function replaced at runtime by a test.
-A type checker meets the same constructs and answers `Any` or `Unknown`.
+A type checker meets the same constructs and infers `Any` or `Unknown`.
 The Effect tool would give the same answer, with the same loss.
 
 ### Find a Place to Run
 
-Three homes are possible.
+The tool could run in three places.
 The first is inside the type checker,
-which [Resolve Every Call](#resolve-every-call) ruled out for `ty`.
+a place [Resolve Every Call](#resolve-every-call) ruled out for `ty`.
 
 The second is a separate static tool, run beside `ty` and `ruff`.
 Every problem above applies to it in full.
@@ -362,11 +373,11 @@ The third is the runtime.
 A decorator reads each function's row once with `row()`,
 and a `ContextVar` holds the row of the function now running.
 On each decorated call,
-the decorator compares the callee's row with the caller's and raises an exception when the callee's is not a subset.
+the decorator compares the two rows and raises an exception when the callee's is not a subset of the caller's.
 Call resolution disappears as a problem, because running a call resolves it.
-The cost is coverage.
-A runtime check sees the paths a run executes,
-so it verifies what your tests exercise and says nothing about the rest.
+The loss is coverage.
+A runtime check covers the paths a run executes,
+so it verifies what your tests exercise and reports nothing about the rest.
 It stands to the static tool as `isinstance()` assertions stand to `ty`.
 
 ## Tracking Is Not Management
@@ -377,13 +388,13 @@ It would fill all three roles, and you would have Effect tracking.
 No test could replace that call,
 because the row names an Effect without separating its interface from its implementation,
 and nothing binds an implementation later.
-Those are the second and third properties of a full EMS,
+Interface separation and delayed binding are the second and third properties of a full EMS,
 and the tool supplies neither.
 
 Metadata is data, and its reader decides what it means.
 A static reader can treat it as a row.
-A runtime reader can treat it as a binding: FastAPI's `Depends`,
-from [Dependency Injection](46_Effects--Stateless.md#dependency-injection),
+A runtime reader can treat it as a binding.
+FastAPI's `Depends` from [Dependency Injection](46_Effects--Stateless.md#dependency-injection)
 goes in `Annotated` metadata in the form FastAPI recommends,
 and the framework supplies the dependency when a request arrives.
 Nothing connects the two readers.
@@ -402,18 +413,18 @@ What PEP 593 could give Python is Effect tracking.
 Calling it algebraic effects would claim the half it cannot deliver.
 
 Stateless gets tracking, interface separation,
-and delayed binding with no new tool, and the reason is where it puts the row.
-The generator's yield type is a place the type checker examines on every run.
-You declare the row there, and `ty` holds every `yield from` in the body to it,
-which verifies the propagation.
+and delayed binding with no new tool.
+The reason is where it puts the row:
+the generator's yield type is a place the type checker examines on every run.
+You declare the row there,
+and `ty` verifies the propagation by checking every `yield from` in the body against it.
 The `Handler` that `supply()` returns subtracts.
 A type variable gives Effect polymorphism, as `effect_variable.py` shows.
-The price is the generator syntax and the description/execution split that [Library Effect Management](44_Effects--Effect_Management.md#library-effect-management)
+Stateless requires the generator syntax and the description/execution split that [Library Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 describes.
 
-`Annotated` makes the opposite trade.
-The code stays ordinary and eager, and nothing verifies the row.
-A native system charges neither price,
+`Annotated` keeps the code ordinary and eager, and nothing verifies the row.
+A native system keeps ordinary code and a verified row,
 because the compiler that runs the code is the one that tracks it.
 That is the case for putting Effect tracking in the language,
 and it is why [Effects Are the Next Barrier](44_Effects--Effect_Management.md#effects-are-the-next-barrier)
