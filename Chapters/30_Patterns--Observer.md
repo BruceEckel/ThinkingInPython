@@ -667,10 +667,6 @@ def test_model_notifies_with_the_new_grid() -> None:
 
 The view lives in its own file.
 It is the only code that draws to the screen.
-`draw()` paints the grid, and the view subscribes `draw()`,
-so every change repaints.
-A click on the canvas becomes a model `click()`,
-and the resulting notification repaints the view.
 Run `box_view.py` to play.
 It opens a window, so the example harness skips it
 (`tools/data/norun.txt` lists it).
@@ -708,10 +704,35 @@ if __name__ == "__main__":
     show(BoxModel(8))
 ```
 
+`show()` makes a square canvas, `model.size` cells on a side,
+each cell `cell_px` pixels wide.
+`draw()` paints the grid, and the view subscribes `draw()`,
+so every change repaints.
+`draw()` is defined inside `show()`,
+so it is a closure that reads `canvas` and `cell_px`.
+It paints one rectangle per cell,
+multiplying the cell's column and row by `cell_px` to get the rectangle's corners in pixels.
+It takes a `Grid` and returns `None`,
+the shape `subscribe()` requires of an observer.
+No notification has arrived when the window opens,
+so `show()` calls `draw(model.grid)` once to paint the starting grid.
+
 `draw()` clears the canvas before repainting.
 Without that line each notification adds another `size * size` rectangles on top of the last set.
 The window looks the same while the canvas's list of items grows without limit,
 the same quiet accumulation as a lapsed listener.
+
+`canvas.bind()` registers the lambda as the handler for `"<Button-1>"`,
+a press of the left mouse button.
+`tkinter` calls the handler with an event `e`,
+and `e.x` and `e.y` give the click's position in pixels,
+measured from the canvas's top-left corner.
+Floor division by `cell_px` converts that position to a cell:
+with 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
+which is `2`.
+A click on the canvas becomes a model `click()`,
+and the resulting notification repaints the view.
+The handler calls the model and draws nothing.
 
 The model and the view share only the subscribe-and-notify contract,
 so you can attach a second view to the same model and keep both views in step.
