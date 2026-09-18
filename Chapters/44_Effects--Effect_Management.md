@@ -701,6 +701,8 @@ which behaves like a normal function return.
 It can discard the continuation, which behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
+This design, operations declared as an interface plus handlers that receive the continuation,
+is called *algebraic effects*.
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.

@@ -38,7 +38,9 @@ The second line makes the rule recursive,
 and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 describes.
 
-Koka and the other native systems follow this rule because they implement *algebraic effects*.
+Koka and the other native systems follow this rule because they implement algebraic effects,
+the design [Native Effect Management](44_Effects--Effect_Management.md#native-effect-management)
+names.
 An algebraic effect is a set of operations declared as an interface.
 A handler gives those operations their meaning,
 and handling removes the effect from the row.
