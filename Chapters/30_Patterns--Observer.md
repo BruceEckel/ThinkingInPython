@@ -12,8 +12,11 @@ and it makes *Observer* the most dynamic of the callback patterns:
 observers attach and detach at runtime,
 and the observable does not name their concrete types.
 
-The pattern underlies event handling,
-and the model-view split that keeps a display in step with the data behind it.
+Event handling is one use:
+a widget keeps a list of handlers and calls each one when its event arrives.
+The model-view split is another:
+the data keeps a list of views and notifies each one when it changes,
+so the display stays current.
 
 Use *Observer* if a group of objects must update themselves when some other object changes state.
 The classic example is Smalltalk's MVC (model-view-controller),
