@@ -1,28 +1,25 @@
 # exercise_8.py
 import random
-from enum import StrEnum
+from enum import Enum, StrEnum, auto
+from typing import ClassVar
 
 class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
 
-WEAPON_ORDER = ["Jargon", "Play", "InventFeature",
-                "SellImaginaryProduct", "Edict", "Schedule"]
-WEAPON_INDEX = {
-    name: i for i, name in enumerate(WEAPON_ORDER)}
+class Weapon(Enum):
+    # Definition order is the ranking cycle
+    JARGON = auto()
+    PLAY = auto()
+    INVENT_FEATURE = auto()
+    SELL_IMAGINARY_PRODUCT = auto()
+    EDICT = auto()
+    SCHEDULE = auto()
 
-WEAPONS_BY_KIND = {
-    "Dwarf": ["Jargon", "Play"],
-    "Elf": ["InventFeature", "SellImaginaryProduct"],
-    "Troll": ["Edict", "Schedule"],
-}
-
-def weapon_outcome(a: str, b: str) -> Outcome:
-    ("A weapon beats the previous two "
-     "in WEAPON_ORDER (cyclically).")
-    ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
-    diff = (ia - ib) % 6
+def weapon_outcome(a: Weapon, b: Weapon) -> Outcome:
+    "A weapon beats the previous two in the cycle."
+    diff = (a.value - b.value) % len(Weapon)
     if diff == 0:
         return Outcome.DRAW
     if diff in (1, 2):
@@ -32,20 +29,21 @@ def weapon_outcome(a: str, b: str) -> Outcome:
     return Outcome.LOSE
 
 class Inhabitant2:
-    KIND: str = ""
+    WEAPONS: ClassVar[tuple[Weapon, ...]]
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
 
-    def get_weapon(self) -> str:
-        return self.rng.choice(WEAPONS_BY_KIND[self.KIND])
+    def get_weapon(self) -> Weapon:
+        return self.rng.choice(self.WEAPONS)
 
 class Dwarf2(Inhabitant2):
-    KIND = "Dwarf"
+    WEAPONS = (Weapon.JARGON, Weapon.PLAY)
 class Elf2(Inhabitant2):
-    KIND = "Elf"
+    WEAPONS = (Weapon.INVENT_FEATURE,
+               Weapon.SELL_IMAGINARY_PRODUCT)
 class Troll2(Inhabitant2):
-    KIND = "Troll"
+    WEAPONS = (Weapon.EDICT, Weapon.SCHEDULE)
 
 class Project2:
     def __init__(self, seed: int = 0) -> None:

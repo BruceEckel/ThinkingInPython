@@ -521,29 +521,26 @@ to define.
 ```python
 # exercise_8.py
 import random
-from enum import StrEnum
+from enum import Enum, StrEnum, auto
+from typing import ClassVar
 
 class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
 
-WEAPON_ORDER = ["Jargon", "Play", "InventFeature",
-                "SellImaginaryProduct", "Edict", "Schedule"]
-WEAPON_INDEX = {
-    name: i for i, name in enumerate(WEAPON_ORDER)}
+class Weapon(Enum):
+    # Definition order is the ranking cycle
+    JARGON = auto()
+    PLAY = auto()
+    INVENT_FEATURE = auto()
+    SELL_IMAGINARY_PRODUCT = auto()
+    EDICT = auto()
+    SCHEDULE = auto()
 
-WEAPONS_BY_KIND = {
-    "Dwarf": ["Jargon", "Play"],
-    "Elf": ["InventFeature", "SellImaginaryProduct"],
-    "Troll": ["Edict", "Schedule"],
-}
-
-def weapon_outcome(a: str, b: str) -> Outcome:
-    ("A weapon beats the previous two "
-     "in WEAPON_ORDER (cyclically).")
-    ia, ib = WEAPON_INDEX[a], WEAPON_INDEX[b]
-    diff = (ia - ib) % 6
+def weapon_outcome(a: Weapon, b: Weapon) -> Outcome:
+    "A weapon beats the previous two in the cycle."
+    diff = (a.value - b.value) % len(Weapon)
     if diff == 0:
         return Outcome.DRAW
     if diff in (1, 2):
@@ -553,20 +550,21 @@ def weapon_outcome(a: str, b: str) -> Outcome:
     return Outcome.LOSE
 
 class Inhabitant2:
-    KIND: str = ""
+    WEAPONS: ClassVar[tuple[Weapon, ...]]
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
 
-    def get_weapon(self) -> str:
-        return self.rng.choice(WEAPONS_BY_KIND[self.KIND])
+    def get_weapon(self) -> Weapon:
+        return self.rng.choice(self.WEAPONS)
 
 class Dwarf2(Inhabitant2):
-    KIND = "Dwarf"
+    WEAPONS = (Weapon.JARGON, Weapon.PLAY)
 class Elf2(Inhabitant2):
-    KIND = "Elf"
+    WEAPONS = (Weapon.INVENT_FEATURE,
+               Weapon.SELL_IMAGINARY_PRODUCT)
 class Troll2(Inhabitant2):
-    KIND = "Troll"
+    WEAPONS = (Weapon.EDICT, Weapon.SCHEDULE)
 
 class Project2:
     def __init__(self, seed: int = 0) -> None:
@@ -727,47 +725,48 @@ you write once and a test every new `Item` forces you to edit.
 ```python
 # exercise_10.py
 import random
-from enum import StrEnum
+from enum import Enum, StrEnum, auto
+from typing import ClassVar
 
 class Outcome(StrEnum):
     WIN = "win"
     LOSE = "lose"
     DRAW = "draw"
 
-WEAPON_ORDER = ["Jargon", "Play", "InventFeature",
-                "SellImaginaryProduct", "Edict", "Schedule"]
+class Weapon(Enum):
+    # Definition order is the ranking cycle
+    JARGON = auto()
+    PLAY = auto()
+    INVENT_FEATURE = auto()
+    SELL_IMAGINARY_PRODUCT = auto()
+    EDICT = auto()
+    SCHEDULE = auto()
 
-WEAPONS_BY_KIND = {
-    "Dwarf": ["Jargon", "Play"],
-    "Elf": ["InventFeature", "SellImaginaryProduct"],
-    "Troll": ["Edict", "Schedule"],
-}
-
-def weapon_outcome(a: str, b: str) -> Outcome:
-    order = WEAPON_ORDER
-    diff = (order.index(a) - order.index(b)) % 6
+def weapon_outcome(a: Weapon, b: Weapon) -> Outcome:
+    diff = (a.value - b.value) % len(Weapon)
     if diff in (0, 3):  # Same or opposite: no winner
         return Outcome.DRAW
     return Outcome.WIN if diff in (1, 2) else Outcome.LOSE
 
-OUTCOME_TABLE: dict[tuple[str, str], Outcome] = {
+OUTCOME_TABLE: dict[tuple[Weapon, Weapon], Outcome] = {
     (wa, wb): weapon_outcome(wa, wb)
-    for wa in WEAPON_ORDER for wb in WEAPON_ORDER
+    for wa in Weapon for wb in Weapon
 }
 
 class Inhabitant2:
-    KIND: str = ""
+    WEAPONS: ClassVar[tuple[Weapon, ...]]
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
 
-    def get_weapon(self) -> str:
-        return self.rng.choice(WEAPONS_BY_KIND[self.KIND])
+    def get_weapon(self) -> Weapon:
+        return self.rng.choice(self.WEAPONS)
 
 class Dwarf2(Inhabitant2):
-    KIND = "Dwarf"
+    WEAPONS = (Weapon.JARGON, Weapon.PLAY)
 class Elf2(Inhabitant2):
-    KIND = "Elf"
+    WEAPONS = (Weapon.INVENT_FEATURE,
+               Weapon.SELL_IMAGINARY_PRODUCT)
 
 def battle_table(
     a: Inhabitant2, b: Inhabitant2
@@ -781,7 +780,7 @@ def battle_table(
 
 # Confirm table and formula agree on every combination:
 mismatches = [
-    (wa, wb) for wa in WEAPON_ORDER for wb in WEAPON_ORDER
+    (wa, wb) for wa in Weapon for wb in Weapon
     if OUTCOME_TABLE[wa, wb] != weapon_outcome(wa, wb)
 ]
 print(len(OUTCOME_TABLE), "entries, agrees with formula:",
@@ -795,7 +794,7 @@ print(isinstance(winner, (Inhabitant2, type(None))))
 ```
 
 `OUTCOME_TABLE` holds the same 36 answers `weapon_outcome()` computes
-on the fly, one entry per ordered pair of the six weapon names.
+on the fly, one entry per ordered pair of the six `Weapon` members.
 Generating the table from the formula, rather than writing all 36
 entries by hand, makes the two agree by construction while keeping the
 lookup itself trivial: `battle_table()` no longer calls any per-weapon
