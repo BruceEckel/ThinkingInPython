@@ -4,13 +4,13 @@ The *Observer* pattern, a kind of callback,
 decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
 and the observable notifies it at every state change.
-The observable defines a list of callables and the argument it will pass them.
-That is all [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
-asks a design to fix: how the parts communicate, not what they are.
-Of the callback patterns *Observer* is the most dynamic:
-
-- Observers attach and detach at runtime
-- The observable need not name their concrete types
+The observable defines only the communication:
+a list of callables and the argument it passes them.
+That is the [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+principle of designing the communication rather than the parts,
+and it makes *Observer* the most dynamic of the callback patterns:
+observers attach and detach at runtime,
+and the observable does not name their concrete types.
 
 The pattern underlies event handling,
 and the model-view split that keeps a display in step with the data behind it.
