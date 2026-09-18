@@ -507,8 +507,7 @@ without the mark, nothing tells them.
     Put its classes behind leading-underscore names in one module,
     expose functions that build them, and import only those from a second file.
     Compare what a caller can see in each version.
-4.  Consider three wrappers, described in words rather than code:
-    one logs each call and forwards it unchanged,
+4.  Consider three wrappers: one logs each call and forwards it unchanged,
     one exposes a `read()` over an object that has only `next_chunk()`,
     and one refuses calls unless you set a flag.
     Classify each as *Proxy*, *Decorator*, *Adapter*,
