@@ -1063,7 +1063,23 @@ Each change is small, and two of them improved the code.
 All four are the tool's cost: you write for it as you write for a type checker,
 with types where it needs them.
 
-## What the Checker Cannot See
+## What the Checker Resolves, and What It Cannot See
+
+The resolution rules are spread over three listings.
+Collected in one place, the checker resolves:
+
+- A bare name, through the module's imports, then its own definitions,
+  then `builtins`.
+- A dotted name whose head is an import, such as `time.sleep` or `requests.get`.
+- A method on a receiver whose type is written: an annotated parameter,
+  an annotated assignment, the first parameter of a method,
+  a module-level constant (through `Final[...]`),
+  or a `type` alias defined in the same module.
+- A method on a receiver whose type is evident: a string, an f-string, a list,
+  dictionary, set, or tuple literal, a list, dictionary, or set comprehension,
+  or a local assigned from a call, which takes the callee's name as its type.
+- A method called on a class, such as `dict.fromkeys()`.
+- A class call, which costs what the class's `__init__()` costs when it defines one.
 
 Every limit below produces `Unknown`,
 so each one shows up in a row instead of hiding:
@@ -1076,11 +1092,13 @@ so each one shows up in a row instead of hiding:
   or with a `type` alias imported from another module.
 - An inherited method, because the checker reads no class hierarchy.
 
-Three limits are silent, and a production tool would have to close them.
+Four limits are silent, and a production tool would need to close them.
 The checker finds `Annotated` and `performs` by those names,
-so an `as` alias hides a declaration.
+so `typing.Annotated` or an `as` alias hides a declaration.
 A decorator that wraps a function changes what calling it performs,
 and the checker reads the undecorated body.
+The first parameter of every method gets the class as its type,
+which is wrong for a `staticmethod`.
 The checker trusts `hides()` without evidence.
 
 Cleverness closes none of these, because each one is a piece of type inference,
