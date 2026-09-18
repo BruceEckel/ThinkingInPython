@@ -817,6 +817,24 @@ and how it was measured.
   The gate's context is the authoritative one. Before "fixing" such a
   marker, reproduce it the way the gate does, or you will correct a
   value that was already right.
+- **Appendix B's `check_files.py` marker is a self-check, and the gate
+  will rewrite it without complaint.** The listing runs the Effect
+  checker on six of its own files and on `utils/result.py`, and its
+  `#:` lines show rows for the three edge functions, their module, and
+  `result.Ok.bind ['Unknown']`. The prose says every core function is
+  absent from that output, which is the appendix's claim that the core
+  is pure. An edit to any checker listing (`effect_table.py`,
+  `call_names.py`, `function_facts.py`, `infer_rows.py`,
+  `row_check.py`) or to chapter 42's `utils/result.py` can add an
+  unresolvable call: a method on a loop variable, on a record's field,
+  or on an imported constant. `validate_output.py --update` then adds
+  the new `Unknown` rows to the marker and the gate stays green while
+  the prose turns false. Treat any `git diff` on that marker as a
+  finding. The fix is to give the checker a written type (an annotated
+  parameter, a small helper), as the appendix's "four changes"
+  paragraph describes, and never to accept the changed marker.
+  `greeting_check.py` and `third_party_stub.py` carry findings in their
+  markers too, with prose tied to each line.
 - **Prose in `Chapters/*.md` follows Semantic Line Breaks** (one sentence per
   line; a sentence still too wide breaks further at a top-level `,`/`;`/`:`).
   `gate` (so `verify`/`all`/`ci`) runs `reflow_prose.py --write`, so
