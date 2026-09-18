@@ -432,7 +432,7 @@ helper) is *referenced* and only reported, since deleting it needs a human.
 ```
 make sync    # write Examples/ from the Markdown
 make check   # verify the Markdown matches Examples/
-make prune   # delete the orphaned strays check flags
+make prune   # delete the orphaned strays check flags (and solutions-check's)
 ```
 
 A block whose slug starts with `rust/` (e.g. `# rust/fastcount/demo.py`)
@@ -597,7 +597,7 @@ and the chapter's own copy lives under `Examples/`.
 ```
 make solutions-sync           # write SolutionsCode/ from Solutions/*.md
 make solutions-check          # verify Solutions/*.md matches SolutionsCode/
-make solutions-prune          # delete the orphaned strays solutions-check flags
+make solutions-prune          # the SolutionsCode/ half of `make prune`
 make solutions-extract        # write build/solutions/ (for the checks below)
 make solutions-output-check   # verify #: markers in Solutions/*.md, no rewrite
 make solutions-output         # rewrite them

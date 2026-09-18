@@ -19,8 +19,9 @@ from the Markdown** by `tools/extract_examples.py`, so:
   whose name appears nowhere in `Chapters/` is *orphaned* and fails the gate;
   one still mentioned somewhere (a real hand-written helper) is *referenced*
   and only reported, since deleting it needs a human call. `make prune`
-  deletes exactly the orphaned ones. A rename or deletion of a book example is
-  the usual cause, so run this after either.
+  deletes exactly the orphaned ones, under `Examples/` and `SolutionsCode/`
+  both (a `utils/` helper rename orphans a file in each). A rename or
+  deletion of a book example is the usual cause, so run this after either.
 
 ## Rust examples: rust/, isolated from the main build
 

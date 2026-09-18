@@ -225,7 +225,7 @@ GATE_DOCS = tools/README.md Solutions
 # also fails on an orphaned stray under Examples/ (a file no block generates
 # and no chapter mentions); run `make prune` to delete those.
 # solutions-gate applies the same stray check to SolutionsCode/ against
-# Solutions/*.md, with `make solutions-prune` as its counterpart.
+# Solutions/*.md; `prune` covers that tree too (`solutions-prune` alone).
 # reflow_prose.py runs here with --write, so prose that drifts out of
 # Semantic Line Breaks self-heals (rewriting Chapters/) the same way
 # fix-eol and validate_output's marker --update do, instead of failing the
@@ -325,8 +325,12 @@ check:  ## Verify book examples match the committed Examples/ tree
 # with no matching block and no mention anywhere in the book, typically left
 # behind by a rename). This deletes exactly those; a stray whose filename is
 # still mentioned somewhere in the book is left alone for a human to review.
-prune:  ## Delete orphaned stray files under Examples/ (see `check`)
+# It prunes SolutionsCode/ in the same run, since a renamed listing that
+# both trees copy (a utils/ helper) otherwise fails solutions-gate after
+# the Examples/ prune looked complete; `solutions-prune` is that half alone.
+prune:  ## Delete orphaned stray files under Examples/ and SolutionsCode/ (see `check`; `solutions-prune` for the second tree alone)
 	$(PY) -m tools.extract_examples --prune
+	$(PY) -m tools.extract_solutions --prune
 
 site:  ## Render Chapters/ into build/site/ with pandoc
 	$(PY) -m tools.build_site
@@ -503,10 +507,10 @@ solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md
 solutions-check:  ## Verify Solutions/*.md matches the committed SolutionsCode/ tree
 	$(PY) -m tools.extract_solutions
 
-# The solutions counterpart of `prune`. A renumbered exercise is the
-# usual source: the block moves from exercise_2 to exercise_1 and the old
-# file stays, with nothing generating it and nothing importing it.
-solutions-prune:  ## Delete orphaned stray files under SolutionsCode/ (see `solutions-check`)
+# The solutions half of `prune`, which runs both. A renumbered exercise is
+# the usual source: the block moves from exercise_2 to exercise_1 and the
+# old file stays, with nothing generating it and nothing importing it.
+solutions-prune:  ##- Delete orphaned stray files under SolutionsCode/ only (see `solutions-check`)
 	$(PY) -m tools.extract_solutions --prune
 
 solutions-extract:  ## Write build/solutions/ from Solutions/*.md
@@ -561,7 +565,7 @@ solutions-numbering:  ## Verify each chapter's exercises have matching solutions
 # about six seconds. The numbering check runs first because it is the
 # cheapest and reports a missing answer, which no later step here would
 # notice. extract_solutions.py also fails on an orphaned stray under
-# SolutionsCode/; `make solutions-prune` deletes exactly those.
+# SolutionsCode/; `make prune` (or `make solutions-prune`) deletes exactly those.
 solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run, pytest
 	$(PY) -m tools.check_solutions
 	$(PY) -m tools.extract_solutions
