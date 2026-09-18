@@ -3,7 +3,7 @@
 [Effect Tracking](A_Effect_Tracking.md#what-a-checker-for-the-row-must-do)
 lists five problems a checker for `Annotated` rows must solve,
 and concludes that solving them all means rebuilding a type checker.
-This appendix builds the part that is cheap.
+This appendix builds the part that needs no type inference.
 The checker here reads source text, resolves the calls it can,
 infers a row for every function, and reports each declared row the body exceeds.
 It is about 450 lines, and most of its pieces come from earlier chapters:
@@ -18,9 +18,9 @@ The checker resolves a call by its name and by the written type of its receiver.
 A call it cannot resolve contributes an Effect named `Unknown` to the caller's row.
 The checker treats no unresolved call as pure.
 With that rule the tool's reports stay true while the tool stays small:
-a row that reads `Unknown` tells you the checker lost track, and where.
+a row that reads `Unknown` says the checker could not resolve a call, and where.
 
-Name resolution reaches further than you might expect.
+Name resolution covers more calls than you might expect.
 Of the 6,442 calls in this book's chapter listings,
 four in five resolve by name alone: a builtin, an imported name,
 or a function or class defined in the same file.
@@ -136,7 +136,7 @@ The table lists pure modules explicitly,
 so leaving a module out can add an `Unknown` and can never hide an Effect.
 
 The key is the name as a programmer imports it,
-because a function's own account of its name is unreliable.
+because a function's own attributes report its name unreliably.
 `os.remove.__module__` is `nt` on Windows and `posix` elsewhere,
 `open.__module__` is `_io`,
 and `random.random` reports `None` for its module and `Random.random` for its qualified name.
@@ -302,14 +302,14 @@ so `match` does the same work with no class to subclass.
 It is recursive, as the tree is:
 `os.path.join` is an `Attribute` whose value is an `Attribute` whose value is a `Name`.
 
-A `Scope` holds what the checker knows at one point in a file.
+A `Scope` holds the names the checker has collected at one point in a file.
 `names` maps a local name to its full one, so `rm` becomes `os.remove`.
 `defined` holds the functions and classes the module defines.
 `types` maps a variable to the name of its type.
 `name()` tries those in the order Python does, then `builtins`.
 A name found in `types` is a variable,
-and calling a variable is calling a value the checker cannot see,
-so `name()` answers `UNRESOLVED`.
+and calling a variable calls whatever value it holds at runtime,
+which the source does not name, so `name()` answers `UNRESOLVED`.
 
 `callee()` handles the two shapes a resolvable call takes.
 A bare name goes to `name()`.
@@ -320,7 +320,8 @@ a string constant, one of the literals in `LITERALS`,
 a variable the scope has a type for, or a call,
 which takes its callee's name as its type.
 `p = Path(name)` therefore gives `p` the type `pathlib.Path`,
-and `p.read_text()` becomes `pathlib.Path.read_text`, which the table knows.
+and `p.read_text()` becomes `pathlib.Path.read_text`,
+which a pattern in the table matches.
 
 `annotation()` reads a written type.
 It drops the subscript from `list[str]` and looks through `Final[...]` to the type inside.
@@ -396,7 +397,7 @@ def hides(*effects: type) -> Hides:
 
 `ask()` in Appendix A declares `Ask` and calls `input()`,
 which performs `Console`.
-Both are true, and [The Check](#the-check) shows the checker objecting.
+Both are true, and [The Check](#the-check) shows the checker reporting each.
 `Annotated[str, performs(Ask), hides(Console)]` states that `ask()` is the boundary where `Console` becomes `Ask`.
 The checker removes `Console` from the body's row and checks nothing about the claim,
 as `ty` trusts a `cast()`.
@@ -584,14 +585,14 @@ and also reads each `type` statement,
 so a parameter annotated `Table` resolves to `builtins.dict`.
 `is_function()` and `is_def()` return `TypeIs`,
 from the [narrowing summary](08_Foundations--Static_Types.md#type-narrowing)
-in Static Types, so a comprehension filtered by one yields nodes `ty` knows have a `name`.
+in Static Types, so a comprehension filtered by one yields nodes whose narrowed type has a `name`.
 
 `facts_of()` records every function, every method under `module.Class.method`,
 and each class under its own name with a call to its `__init__()` when it defines one,
-so `Log()` costs what `Log.__init__()` costs.
+so `Log()` performs what `Log.__init__()` performs.
 The module's top-level statements become a function named `module.<module>`.
 It is never checked, because it is the program's edge,
-and its inferred row says what running the file touches.
+and its inferred row says what running the file performs.
 
 `read_module()` is the one operation here that can fail.
 It returns a `Result` from [Error Handling](42_Functional--Error_Handling.md#a-result-type),
@@ -771,7 +772,7 @@ def test_a_declared_row_is_trusted_by_callers() -> None:
 ```
 
 The tests build `Facts` by hand.
-Nothing in `infer_rows.py` knows that facts come from source text,
+Nothing in `infer_rows.py` reads source text,
 so testing it requires no source text.
 
 ## The Check
@@ -981,7 +982,7 @@ With it, `requests.get` is a declared function like any other.
 The stub needs no code in the checker.
 Callers trust a declared row.
 The stub's body is `...`, which calls nothing,
-so its body row is empty and fits inside any declaration.
+so its body row is empty and exceeds no declaration.
 Type checkers solved the same problem the same way,
 with stub files that declare the types of code they cannot read.
 
@@ -989,7 +990,7 @@ with stub files that declare the types of code they cannot read.
 
 Every function in the checker so far is pure.
 This listing is the edge,
-the one place the checker touches a file or the console,
+the one place the checker reads a file or writes to the console,
 and each of its functions declares the row it performs:
 
 ```python
@@ -1061,7 +1062,8 @@ and now tests `name in self.types` in a pattern's guard.
 `load()` called `path.read_text()` inside a comprehension,
 and now calls `read(path)`.
 Each change is small, and two of them improved the code.
-All four are the tool's cost: you write for it as you write for a type checker,
+All four are what the tool requires:
+you write for it as you write for a type checker,
 with types where it needs them.
 
 ## What the Checker Resolves, and What It Cannot See
@@ -1080,10 +1082,10 @@ Here, in one place, is what the checker resolves:
   dictionary, set, or tuple literal, a list, dictionary, or set comprehension,
   or a local assigned from a call, which takes the callee's name as its type.
 - A method called on a class, such as `dict.fromkeys()`.
-- A class call, which costs what the class's `__init__()` costs when it defines one.
+- A class call, which performs what the class's `__init__()` performs when it defines one.
 
 Every limit below produces `Unknown`,
-so each one shows up in a row instead of hiding:
+so each one appears in a row instead of going unreported:
 
 - A call of a parameter, or of a local that holds a function.
 - A call of a call's result, as in `dataclass(frozen=True)(cls)`.
@@ -1093,16 +1095,17 @@ so each one shows up in a row instead of hiding:
   or with a `type` alias imported from another module.
 - An inherited method, because the checker reads no class hierarchy.
 
-Four limits are silent, and a production tool would need to close them.
+Four limits produce no `Unknown`,
+and a production tool would need to remove them.
 The checker finds `Annotated` and `performs` by those names,
-so `typing.Annotated` or an `as` alias hides a declaration.
+so a declaration written with `typing.Annotated` or an `as` alias goes unread.
 A decorator that wraps a function changes what calling it performs,
 and the checker reads the undecorated body.
 The first parameter of every method gets the class as its type,
 which is wrong for a `staticmethod`.
 The checker trusts `hides()` without evidence.
 
-Cleverness closes none of these, because each one is a piece of type inference,
+Cleverness removes none of these, because each one is a piece of type inference,
 and Appendix A's argument holds: past this point you are writing a type checker.
 This appendix shows how much tracking needs no type inference.
 Name resolution, a table of the standard library,

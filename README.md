@@ -10,8 +10,8 @@
 An intermediate-to-advanced book for experienced programmers.
 Opens with a condensed introduction for programmers coming from other languages.
 
-> Although you will find the book useful in its current form,
-> be aware that it is under development.
+> ***Although you will find the book useful in its current form,
+> be aware that it is under development.***
 
 ## Read the Book Online
 
