@@ -176,13 +176,15 @@ Only `make gate` catches breakage across chapters.
 ### Run one example by hand
 
 `make run-one` runs any single example from the repo root and shows its
-output. `F` takes the file's name, or as much of its path as you care to
+output. Give it the file's name, or as much of its path as you care to
 type:
 
 ```bash
-make run-one F=deque_timing
-make run-one F=Examples/07_Foundations--Classes/property_setter.py
+make run-one deque_timing
+make run-one Examples/07_Foundations--Classes/property_setter.py
 ```
+
+`make run-one F=deque_timing` is the same command in its older form.
 
 It sets up what the example expects, and prints the commands it stood in
 for, because those are what you type when `make` is not at hand:

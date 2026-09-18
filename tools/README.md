@@ -485,7 +485,7 @@ wants and not what a reader wants. `run_one_example.py` runs a single example
 and streams its output:
 
 ```
-make run-one F=deque_timing
+make run-one deque_timing
 python -m tools.run_one_example Examples/03_Foundations--Containers/deque_timing.py
 ```
 

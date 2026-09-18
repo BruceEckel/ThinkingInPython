@@ -66,6 +66,24 @@ endif
 help:  ## Pick a target to run, or list them all when piped (`make help style` narrows to one section)
 	@$(PY) -m tools.make_help $(HELP_TOPIC)
 
+# `make run-one box_view` names the listing as a second word, the same
+# way `make help style` names a section: the word after `run-one`
+# becomes a do-nothing target and is exported as F, which the child
+# make that runs the real `run-one` rule reads from its environment.
+# `make run-one F=box_view` still works, and an F= on the command line
+# takes precedence over the word. Only the first word after `run-one`
+# gets this treatment, so a third word fails loudly. Under `TIMED=0`
+# the real rules share this make's namespace, so a listing whose name
+# is also a target (`make TIMED=0 run-one test`) needs the F= form.
+ifeq ($(firstword $(MAKECMDGOALS)),run-one)
+  RUN_ONE_ARG := $(word 2,$(MAKECMDGOALS))
+  ifneq ($(RUN_ONE_ARG),)
+    export F ?= $(RUN_ONE_ARG)
+    .PHONY: $(RUN_ONE_ARG)
+    $(eval $(RUN_ONE_ARG):;@:)
+  endif
+endif
+
 # Every goal named on the command line runs in a child make under
 # tools/timed_make.py, which prints `make <goal>: 12.3s` (or the exit
 # code and the time, on failure) after the goal's own output. The child
@@ -80,7 +98,7 @@ help:  ## Pick a target to run, or list them all when piped (`make help style` n
 # file.
 TIMED ?=
 ifeq ($(TIMED),)
-TIMED_GOALS := $(filter-out help $(HELP_TOPIC),$(MAKECMDGOALS))
+TIMED_GOALS := $(filter-out help $(HELP_TOPIC) $(RUN_ONE_ARG),$(MAKECMDGOALS))
 ifneq ($(TIMED_GOALS),)
 .PHONY: $(TIMED_GOALS)
 $(TIMED_GOALS):
@@ -444,8 +462,9 @@ run: extract  ## Run every extracted .py and report failures (`make examples` is
 # helper. F takes a path or just the file's name (F=deque_timing). It reads
 # Examples/, the committed tree, so it needs no extract step, and it prints
 # the equivalent cd + PYTHONPATH commands before running: that is what you
-# type when this target is not at hand.
-run-one:  ## Run one example and show its output (F=deque_timing)
+# type when this target is not at hand. `make run-one deque_timing` is the
+# same as F=deque_timing (the block under `help` turns the word into F).
+run-one:  ## Run one example and show its output (`make run-one deque_timing`, or F=)
 	$(PY) -m tools.run_one_example $(F)
 
 # Rewrite the #: output markers inside the Markdown's ```python listings to the
