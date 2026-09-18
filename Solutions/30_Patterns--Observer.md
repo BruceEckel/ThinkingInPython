@@ -290,9 +290,10 @@ one keyword does what the synchronous version needed a `try` inside a
 loop to do, because `gather()` is already the loop.
 
 The results come back in argument order, so the list is a record of
-which observer produced what. This version only needs the failures, so
-it filters with `isinstance(r, Exception)` and drops the `None`s that
-successful observers returned.
+which observer produced what. This version needs the failures alone,
+so its comprehension keeps each result for which
+`isinstance(r, Exception)` is true. A successful observer returned
+`None`, which fails that test and stays out of `failures`.
 
 The exception filter uses `Exception`, not `BaseException`, for the
 reason exercise 3 gives, and for a second reason here.
