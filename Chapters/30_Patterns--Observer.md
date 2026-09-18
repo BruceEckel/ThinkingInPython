@@ -34,32 +34,32 @@ and a `notify()` that broadcasts to each observer in turn:
 # classic_observer.py
 from typing import Protocol
 
-class Observer(Protocol):
+class Observer[T](Protocol):
     def update(
-        self, subject: Subject, arg: object
+        self, subject: Subject[T], arg: T
     ) -> None: ...
 
-class Subject:
+class Subject[T]:
     def __init__(self) -> None:
-        self._observers: list[Observer] = []
+        self._observers: list[Observer[T]] = []
 
-    def attach(self, observer: Observer) -> None:
+    def attach(self, observer: Observer[T]) -> None:
         self._observers.append(observer)
 
-    def detach(self, observer: Observer) -> None:
+    def detach(self, observer: Observer[T]) -> None:
         self._observers.remove(observer)
 
-    def notify(self, arg: object = None) -> None:
+    def notify(self, arg: T) -> None:
         for observer in list(self._observers):
             observer.update(self, arg)
 
 class Display:
     def update(
-        self, subject: Subject, arg: object
+        self, subject: Subject[float], arg: float
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Subject):
+class Thermometer(Subject[float]):
     def set_celsius(self, value: float) -> None:
         self.notify(value)
 
@@ -156,7 +156,8 @@ An observer that needs the changed object takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.
 
-The type parameter carries the notification's type through to the observers,
+The type parameter is the one part of the classic version that stays.
+It carries the notification's type through to the observers,
 so subscribing a `list[str]`'s `append` to a `Thermometer` fails the type checker instead of quietly collecting floats in a list of strings.
 
 `Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
