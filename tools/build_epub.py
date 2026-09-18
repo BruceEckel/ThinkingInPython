@@ -512,7 +512,8 @@ def part_art() -> str | None:
 
 
 def part_markdown(roman: str, title: str) -> str:
-    head = f"# Part {roman} · {title} {{#part-{roman.lower()}}}"
+    head = (f"# {build_site.part_label(roman, title)} "
+            f"{{#{build_site.part_anchor(roman, title)}}}")
     art = part_art()
     if art is None:
         return head + "\n"

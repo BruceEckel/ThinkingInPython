@@ -204,6 +204,21 @@ def test_part_divider_is_emitted_before_its_chapter(tmp_path: Path) -> None:
     assert (text.index("Introduction {#ch01}")
             < text.index("# Part I"))
 
+def test_appendices_divider_has_no_roman_numeral(tmp_path: Path) -> None:
+    # build_site.PARTS keys the divider by the first appendix's letter.
+    chapters = chapters_in(tmp_path, {
+        "47_Effects--Practice": "# Practice\n\nbody\n",
+        "A_Extras": "# Extras\n\nbody\n",
+        "B_More": "# More\n\nbody\n",
+    })
+    text = book_markdown(chapters, set(), set())
+    assert text.count("# Appendices {#part-appendices}") == 1
+    assert "# Part  " not in text
+    assert (text.index("Practice {#ch47}")
+            < text.index("# Appendices {#part-appendices}")
+            < text.index("Extras {#chA}")
+            < text.index("More {#chB}"))
+
 def test_hang_code_false_keeps_listings_fenced(tmp_path: Path) -> None:
     # build_pdf.py passes hang_code=False: pandoc's typst writer drops
     # raw HTML, so the EPUB's <pre> rewrite would erase every listing
@@ -414,6 +429,12 @@ def test_nav_appendix_and_part_entries() -> None:
     assert '<li id="toc-li-1" class="toc-part"><a' in out
     assert '<li id="toc-li-2" class="toc-chapter">' in out
     assert ">Appendix A. Glossary</a>" in out
+
+def test_nav_appendices_divider_is_a_part_entry() -> None:
+    nav = ('<li id="toc-li-9"><a href="text/ch090.xhtml#part-appendices">'
+           'Appendices</a></li>')
+    assert ('<li id="toc-li-9" class="toc-part"><a'
+            in polish_nav(nav))
 
 def test_ncx_labels_match_the_nav() -> None:
     ncx = ("<text>Chapter 4 Control Flow</text>"

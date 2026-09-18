@@ -168,6 +168,19 @@ def test_contents_page_loads_the_preview_too(tmp_path: Path) -> None:
     assert "--heading-font:" in TEMPLATE.read_text(encoding="utf-8")
 
 
+def test_contents_page_sets_the_appendices_apart(tmp_path: Path) -> None:
+    # build_site.PARTS gives the appendices a divider with no "Part N".
+    index = render_index(chapters_in(tmp_path, {
+        "44_Effects--Management": "# M\n",
+        "A_Extras": "# E\n",
+    }))
+    assert '<li class="toc-part">Part V &middot; Effects</li>' in index
+    assert '<li class="toc-part">Appendices</li>' in index
+    assert (index.index("Part V &middot;")
+            < index.index(">Appendices<")
+            < index.index("A_Extras.html"))
+
+
 def test_preview_script_and_template_agree_on_class_names() -> None:
     # The script finds the page's parts, and styles its own panel, by
     # class name. A class renamed on one side leaves the panel unstyled

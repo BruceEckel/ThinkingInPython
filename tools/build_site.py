@@ -234,14 +234,27 @@ def render_chapter(body: str, ch: Chapter,
 # Index page and shared CSS (the table of contents)
 # --------------------------------------------------------------------------- #
 # A Part heading is emitted before the chapter whose number starts it.
-# Introduction (01) stands alone above Part I.
+# Introduction (01) stands alone above Part I. The appendices are not a
+# Part: their divider has no roman numeral, and its key is the first
+# appendix's letter, so it appears once any appendix exists.
 PARTS = {
     "02": ("I", "Foundations"),
     "11": ("II", "Techniques"),
     "20": ("III", "Patterns"),
     "40": ("IV", "Functional"),
     "44": ("V", "Effects"),
+    "A": ("", "Appendices"),
 }
+
+
+def part_label(roman: str, title: str, dot: str = "·") -> str:
+    """A divider's text: "Part V · Effects", or a bare "Appendices"."""
+    return f"Part {roman} {dot} {title}" if roman else title
+
+
+def part_anchor(roman: str, title: str) -> str:
+    """A divider's id: `part-v`, or `part-appendices`."""
+    return f"part-{(roman or title).lower()}"
 
 
 def render_index(chapters: list[Chapter]) -> str:
@@ -252,7 +265,7 @@ def render_index(chapters: list[Chapter]) -> str:
             roman, title = part
             items.append(
                 '    <li class="toc-part">'
-                f'Part {roman} &middot; {title}</li>')
+                f'{part_label(roman, title, "&middot;")}</li>')
         items.append(
             f'    <li><span class="toc-num">{ch.number}</span>'
             f'<a href="{ch.out_name}">{ch.title}</a></li>')
