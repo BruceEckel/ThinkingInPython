@@ -81,7 +81,8 @@ The alternative leaves that call to the client,
 so several changes can coalesce into one broadcast,
 but a caller can forget to make the call.
 
-`notify()` walks a copy of the list,
+`list(self._observers)` builds a new list from the existing one,
+and `notify()` walks that copy,
 so an observer that detaches itself mid-broadcast cannot make the loop skip an observer.
 
 Python expresses the pattern with far less machinery.
