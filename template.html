@@ -83,6 +83,24 @@
       margin-bottom: 0.3rem;
     }
 
+    /* The cover's serpent, to the left of the chapter title
+       (chapter-snake.png, from tools/make_cover.py; its ratio is
+       320:148). A background and not an <img>, so the title's text
+       and the link preview's copy of this heading stay as they
+       were; the child selector keeps it off that copy. On a narrow
+       screen it sits above the title, where it takes no width from
+       a long word such as "Metaprogramming". */
+    .page > h1 {
+      background: url(chapter-snake.png) no-repeat left 0.08em / 2.16em 1em;
+      padding-left: 2.5em;
+    }
+    @media (max-width: 600px) {
+      .page > h1 {
+        background-position: left top;
+        padding: 1.2em 0 0;
+      }
+    }
+
     .chapter-ornament {
       display: block;
       height: 11px;

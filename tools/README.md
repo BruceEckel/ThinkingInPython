@@ -1267,7 +1267,14 @@ both light and dark browser chrome). And `chapter-ornament.{svg,png}`:
 a band of diamond scales that sits under every chapter title, the SVG
 on the site (template.html) and the PNG in the PDF and EPUBs
 (injected by build_epub.py's shared assembly, which also places the
-cover art on each Part divider page). `--preview` writes a small `cover-preview.png` for quick
+cover art on each Part divider page). And `chapter-snake.png`: the
+serpent alone on a transparent ground, 320 px wide, which
+template.html sets to the left of each chapter title on the site (and
+above it on a narrow screen). In art mode `snake_cutout()` makes it
+from `cover-source.jpg` with Pillow alone: the paper around the
+serpent and inside each loop becomes transparent, and the image is
+cropped to what remains. The index page, the PDF, and the EPUBs do
+not use it. `--preview` writes a small `cover-preview.png` for quick
 iteration.
 
 ## build_pdf.py

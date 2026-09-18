@@ -478,6 +478,7 @@ def build(out_dir: Path, chapter_toc: bool = CHAPTER_TOC,
             shutil.copy2(IMAGES_SRC / filename, images_out / filename)
             copied += 1
     for asset in ("favicon.svg", "chapter-ornament.svg",
+                  "chapter-snake.png",
                   "cover-art.svg", "cover-art.jpg"):
         if (STATIC_SRC / asset).exists():
             shutil.copy2(STATIC_SRC / asset, out_dir / asset)
