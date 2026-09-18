@@ -40,7 +40,9 @@ dropped so prose edits above a quote do not churn the baseline. Exit
 status is nonzero only when NEW is non-empty, which is what lets the
 gate run it: a fresh hit is either a stale quote to fix or a new
 deliberate edit to accept. `--accept` rewrites the baseline from the
-current run; `--all` lists every hit, baseline or not.
+current run; `--all` lists every hit, baseline or not. A run given
+paths compares against those files' baseline entries alone, since an
+entry for a file the run never read cannot fire.
 
 A second rule, `--pragmas`, reports and never gates. A gutter line
 that matches only with the listing's `# type: ignore` removed is a
@@ -256,12 +258,29 @@ def find_unmentioned_pragmas(doc: Document) -> Iterator[Finding]:
             )
 
 
-def entry(finding: Finding) -> str:
-    """The baseline line for a finding: path and message, no line number."""
-    path = finding.path.resolve()
+def entry_path(path: Path) -> str:
+    """A Markdown file as the baseline names it: repo-relative, posix."""
+    path = path.resolve()
     if path.is_relative_to(ROOT):
         path = path.relative_to(ROOT)
-    return f"{path.as_posix()}\t{finding.message}"
+    return path.as_posix()
+
+
+def entry(finding: Finding) -> str:
+    """The baseline line for a finding: path and message, no line number."""
+    return f"{entry_path(finding.path)}\t{finding.message}"
+
+
+def scoped(baseline: Counter[str], paths: list[Path]) -> Counter[str]:
+    """The baseline entries that belong to `paths`.
+
+    A run over one chapter (`verify-ch`) reads none of the other files,
+    so their entries cannot fire, and comparing against them would
+    report every one as GONE.
+    """
+    names = {entry_path(p) for p in paths}
+    return Counter({line: count for line, count in baseline.items()
+                    if line.split("\t", 1)[0] in names})
 
 
 def load_baseline(path: Path = BASELINE) -> Counter[str]:
@@ -333,7 +352,8 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.paths and args.accept:
         ap.error("--accept rewrites the whole baseline; give no paths")
-    now, new, gone = delta(findings, load_baseline())
+    baseline = scoped(load_baseline(), paths)
+    now, new, gone = delta(findings, baseline)
     if args.accept:
         write_baseline(now)
         print(f"Baseline written: {sum(now.values())} entries in {BASELINE}")
@@ -343,7 +363,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"quoted diagnostics: {sum(now.values())} hit(s), "
         f"{sum(new.values())} new, {sum(gone.values())} gone, "
-        f"baseline {sum(load_baseline().values())}"
+        f"baseline {sum(baseline.values())}"
     )
     if new:
         print("Read each NEW line against its prose: fix a stale quote, "

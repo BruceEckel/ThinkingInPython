@@ -177,3 +177,15 @@ def test_a_listing_with_no_pragma_is_not_a_pragma_hit(
         assert list(cqd.find_unmentioned_pragmas(Document.parse(md))) == []
     finally:
         del cqd.TREES[md.parent.name]
+
+
+def test_a_scoped_run_ignores_other_files_baseline_entries() -> None:
+    here = cqd.ROOT / "Chapters" / "30_Patterns--Observer.md"
+    mine = "Chapters/30_Patterns--Observer.md\ta.py:1 reads 'x'"
+    other = "Solutions/46_Effects--Stateless.md\tb.py:2 reads 'y'"
+    accepted = Counter([mine, other])
+    assert cqd.scoped(accepted, [here]) == Counter([mine])
+    # Without the scoping, `other` would come back as GONE
+    now, new, gone = cqd.delta([], cqd.scoped(accepted, [here]))
+    assert gone == Counter([mine])
+    assert not new
