@@ -3,18 +3,17 @@
 The *Observer* pattern, a kind of callback,
 decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
-and the observable notifies it at every state change.
+and the observable notifies the observer at every state change.
 The observable defines only the communication:
 a list of callables and the argument it passes them.
-That is the [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
+That choice follows the [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 principle of designing the communication rather than the parts,
-and it makes *Observer* the most dynamic of the callback patterns:
-observers attach and detach at runtime,
+and makes *Observer* the most dynamic of the callback patterns.
+Observers attach and detach at runtime,
 and the observable does not name their concrete types.
 
-Event handling is one use:
-a widget keeps a list of handlers and calls each one when its event arrives.
-The model-view split is another:
+In event handling, a widget keeps a list of handlers and calls each one when its event arrives.
+In the model-view split,
 the data keeps a list of views and notifies each one when it changes,
 so the display stays current.
 
@@ -70,7 +69,8 @@ t.set_celsius(25)
 #: display: 25C
 ```
 
-Passing `arg` is the *push* model: the subject supplies what changed,
+Passing `arg` is the *push* model.
+The subject supplies what changed,
 so an observer needs no reference back into the subject's state.
 The *pull* model sends only `subject` and lets each observer read what it needs,
 decoupling observer and subject further at the cost of a call back into the subject.
@@ -266,16 +266,16 @@ print(seen)
 
 `once` receives the first change and detaches.
 `always` receives both.
-Without the copy, `always: 1` would be missing:
-`once`'s self-removal would skip `always`.
+Without the copy, `once`'s self-removal would skip `always`,
+and `always: 1` would be missing.
 
 An observer that raises an exception stops the loop,
 and the observers after it are not called.
 Decide whether `notify()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 
-Subscriptions are strong references:
-an observable that outlives its observers keeps alive the instance behind every subscribed bound method,
+Subscriptions are strong references.
+An observable that outlives its observers keeps alive the instance behind every subscribed bound method,
 the classic *lapsed listener* leak.
 Long-lived observables need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
@@ -283,8 +283,8 @@ which do not keep the observer alive
 (`weakref.WeakMethod` is the bound-method form).
 
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
-Two-way bindings are the usual source: the view edits the model,
-the model notifies the view, the view edits the model.
+Two-way bindings are the usual source.
+The view edits the model, the model notifies the view, the view edits the model.
 Without a guard, an observer that always writes back recurses until Python raises a `RecursionError`:
 
 ```python
@@ -355,13 +355,13 @@ Because `echo`'s write-back matches the value the setter already holds,
 the setter returns before it reaches `notify()` again.
 The model still notifies once.
 The alternative is a re-entry flag set before `notify()` and cleared after.
-It breaks the cycle too,
+The flag breaks the cycle too,
 and fits the case where a write of an unchanged value should still proceed.
 
 ## Observer and I/O
 
-Until now, no observer has waited on anything: it prints, appends,
-or writes back, then returns.
+Until now, no observer has waited on anything.
+Each prints, appends, or writes back, then returns.
 If an observer calls a network service or writes to a database,
 notifying observers one at a time blocks on each.
 Each observer's wait delays every observer after it.
@@ -374,7 +374,7 @@ A slow observer no longer delays the others.
 so the change finishes only after every notification succeeds.
 
 One limitation: an `async` setter returns a coroutine instead of running its body,
-and an assignment offers no place for the `await` that would run it.
+and an assignment offers no place for the `await` that would run the coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
 The state change becomes an awaitable method rather than the assignment `t.celsius = value`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
@@ -441,17 +441,17 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-The `AsyncObserver` alias makes the type checker reject a plain function as an observer:
-an observer must return an awaitable,
+The `AsyncObserver` alias makes the type checker reject a plain function as an observer.
+An observer must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
-an `async` function subscribed to the synchronous `Observable`:
-calling that function returns a coroutine rather than `None`,
+an `async` function subscribed to the synchronous `Observable`.
+Calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
 The alias's type parameter does the same job as the synchronous `Observer[T]`'s.
 
-`notify()` needs no `list()` copy here:
-`*` unpacks the generator into a tuple of coroutines before `gather()` runs,
+`notify()` needs no `list()` copy here.
+The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so a detach during the fan-out cannot skip an observer.
 The tuple also means an observer that unsubscribes mid-notification still receives this change,
 an async counterpart to `self_removing_observer.py`:
@@ -518,8 +518,8 @@ so the faster observer prints first.
 The results `gather()` returns stay in argument order regardless.
 Only the side effects interleave.
 
-An observer need not act on every notification: below its threshold,
-the alarm returns at once.
+An observer need not act on every notification.
+Below its threshold, the alarm returns at once.
 
 A failing observer behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
@@ -550,13 +550,14 @@ asyncio.run(main())
 The failure prints the moment `loud()` raises its `ValueError`.
 `slow` is still sleeping at that point, with nothing left awaiting it,
 and it prints only because `main()` sleeps long enough afterward to let it finish.
-A real caller rarely adds that wait:
-the program moves on before the orphan finishes,
+A real caller rarely adds that wait.
+The program moves on before the orphan finishes,
 and an exception the orphan later raises is never retrieved.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
-but not here: it cancels a failing task's siblings,
+but not here.
+A `TaskGroup` cancels a failing task's siblings,
 so a single broken observer would cancel the others mid-notification.
 
 Use the async fan-out only when the observers are I/O-bound.
@@ -708,8 +709,8 @@ a fan-out awaiting network calls, and a GUI repainting a grid.
 In every case the observer was a callable and the observable was a list of them.
 Nothing in the pattern required an interface, a flag, or a class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-already took the last step:
-one list becomes a dictionary of lists keyed by event type,
+already took the last step.
+One list becomes a dictionary of lists keyed by event type,
 and the *Observer* is an event bus.
 
 ## Exercises
