@@ -10,7 +10,7 @@ It is about 450 lines, and most of its pieces come from earlier chapters:
 a `match` over syntax-tree nodes, records for the data,
 a `Result` for the one operation that can fail,
 and a pure core with its Effects at the edge.
-The last listing runs the checker on its own source to confirm that last point.
+The final listing runs the checker on its own source to confirm that last point.
 
 ## The Restriction
 
@@ -21,8 +21,8 @@ With that rule the tool's reports stay true while the tool stays small:
 a row that reads `Unknown` tells you the checker lost track, and where.
 
 Name resolution reaches further than you might expect.
-While writing this appendix I surveyed the 6,442 calls in this book's chapter listings.
-Four in five resolve by name alone: a builtin, an imported name,
+Of the 6,442 calls in this book's chapter listings,
+four in five resolve by name alone: a builtin, an imported name,
 or a function or class defined in the same file.
 The largest group that does not is a method called on a local variable with no annotation,
 and [From a Call to a Name](#from-a-call-to-a-name) recovers part of that group.
@@ -51,7 +51,7 @@ class Process: ...
 class Unknown: ...
 ```
 
-One test decides whether something deserves a name: would a test replace it?
+One question decides whether something deserves a name: would a test replace it?
 A test replaces the clock, the network, and the file system.
 No test replaces `len()`.
 A finer vocabulary would make the rows unreadable and the table below unmaintainable.
@@ -570,7 +570,8 @@ binds everything after `T` to `extras`,
 and returns the argument names of the first call to `marker`.
 The guard, `if found == marker`, compares a captured name with a parameter,
 which a pattern alone cannot do.
-A function with no such annotation returns `None`, which means "inferred."
+For a function with no such annotation, `marked()` returns `None`,
+which means "inferred."
 An empty row means "pure," so the two must differ,
 and `Row | None` is an ordinary optional,
 with no assertion anywhere to unwrap it.
@@ -977,7 +978,7 @@ print(problems({"app": APP, "requests": STUB}))
 Without the stub, `requests.get` matches nothing in the table, reads `Unknown`,
 and `fetch()` draws a finding.
 With it, `requests.get` is a declared function like any other.
-The stub needed no code in the checker.
+The stub needs no code in the checker.
 Callers trust a declared row.
 The stub's body is `...`, which calls nothing,
 so its body row is empty and fits inside any declaration.
@@ -1065,8 +1066,8 @@ with types where it needs them.
 
 ## What the Checker Resolves, and What It Cannot See
 
-The resolution rules are spread over three listings.
-Collected in one place, the checker resolves:
+The resolution rules span three listings.
+Here, in one place, is what the checker resolves:
 
 - A bare name, through the module's imports, then its own definitions,
   then `builtins`.
@@ -1103,7 +1104,7 @@ The checker trusts `hides()` without evidence.
 
 Cleverness closes none of these, because each one is a piece of type inference,
 and Appendix A's argument holds: past this point you are writing a type checker.
-What this appendix shows is how much tracking needs no type inference.
+This appendix shows how much tracking needs no type inference.
 Name resolution, a table of the standard library,
 and a fixed point give every function in a program a row,
 and they verified the architecture of the program that computes them.

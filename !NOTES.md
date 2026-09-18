@@ -15,8 +15,6 @@ EMDR tool
 analog computer
 things floating upward
 
-Should we introduce https://peps.python.org/pep-0593/, perhaps in the last chapter?
-
 Fatal vs recoverable errors
 
 - "itself"
