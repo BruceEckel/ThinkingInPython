@@ -256,7 +256,14 @@ To run one example instead of all of them, see
 A few examples cannot run unattended because they open a window, wait for
 input, or loop forever. `make run` reports those as "Can't run unattended"
 rather than as failures. `tools/data/norun.txt` lists them. Run one by hand
-to watch it work.
+to watch it work, or open all the windowed ones at once:
+
+```sh
+make by-hand
+```
+
+Try each window and close it. The command prints a line as each one
+closes, and the traceback of any that failed.
 
 `make gate` runs the solutions checks first, as a prerequisite, so a
 failure there hides every `Chapters/` failure behind it. `make sweep` runs

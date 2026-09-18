@@ -433,7 +433,7 @@ serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 # and `examples` is a target below.
 ##@ Code examples (build/examples/)
 
-.PHONY: check-ch examples run run-one output output-check test ty pyright pyright-review pyright-accept lint \
+.PHONY: check-ch examples run run-one by-hand output output-check test ty pyright pyright-review pyright-accept lint \
         fix-imports extract
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
@@ -466,6 +466,16 @@ run: extract  ## Run every extracted .py and report failures (`make examples` is
 # same as F=deque_timing (the block under `help` turns the word into F).
 run-one:  ## Run one example and show its output (`make run-one deque_timing`, or F=)
 	$(PY) -m tools.run_one_example $(F)
+
+# Start every example listed under `# [by-hand]` in tools/data/norun.txt,
+# all at once, each from its own chapter directory with utils/ on
+# PYTHONPATH. Today that is the five Tkinter views, which no gate executes.
+# Try each window and close it; the tool prints a line as each one ends,
+# then the traceback of any that exited nonzero, and exits 1 if one did.
+# ARGS=--list prints what would start and opens nothing. Excluded from
+# verify-targets' smoke test: it opens windows and waits for a human.
+by-hand:  ## Open every example that needs a human, all at once, and report how each one exits (ARGS=--list to only list them)
+	$(PY) -m tools.by_hand $(ARGS)
 
 # Rewrite the #: output markers inside the Markdown's ```python listings to the
 # stdout each listing actually produces. Depends on extract so each listing runs
