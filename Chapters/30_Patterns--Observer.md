@@ -576,7 +576,8 @@ Neither function needs a `BoxModel`,
 so both are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
 `BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
-`new_grid()`, `recolored()`, and `click()` make up the model.
+Two functions and one class make up the model: the functions compute grids,
+and `BoxModel` holds the current grid and notifies its observers.
 The file does not import `tkinter`.
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
