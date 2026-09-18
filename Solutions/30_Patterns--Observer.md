@@ -37,12 +37,13 @@ in subscription order.
 
 ```python
 # exercise_2.py
-from typing import Final
+from typing import Final, Literal
 
-COLORS: Final[tuple[str, str, str]] = (
+type Color = Literal["skyblue", "palegreen", "khaki"]
+COLORS: Final[tuple[Color, Color, Color]] = (
     "skyblue", "palegreen", "khaki")
 type Coord = tuple[int, int]
-type Grid = dict[Coord, str]
+type Grid = dict[Coord, Color]
 
 def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
