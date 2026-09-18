@@ -10,19 +10,31 @@ class ExpensiveResource:
         return self.data
 
 class LazyProxy:
-    def __init__(self) -> None:
+    def __init__(self, description: str) -> None:
+        self._description = description
+        self._answered = 0
         self._real: ExpensiveResource | None = None
+
+    @property
+    def description(self) -> str:
+        self._answered += 1
+        return self._description
 
     def __getattr__(self, name: str) -> Any:
         if self._real is None:
+            print(f"{self._answered} answered before build")
             self._real = ExpensiveResource()
         return getattr(self._real, name)
 
-print("proxy created, nothing built yet")
-p = LazyProxy()
-print("about to query")
+p = LazyProxy("three small integers")
+for _ in range(3):
+    print(p.description)
+#: three small integers
+#: three small integers
+#: three small integers
 print(p.query())
-#: proxy created, nothing built yet
-#: about to query
+#: 3 answered before build
 #: creating ExpensiveResource (slow!)
+#: [1, 2, 3]
+print(p.query())
 #: [1, 2, 3]

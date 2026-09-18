@@ -1,6 +1,6 @@
 # Surrogate: Solutions
 
-## 1. A virtual proxy: lazy creation of an expensive object
+## 1. A virtual proxy that answers the cheap requests itself
 
 ```python
 # exercise_1.py
@@ -15,31 +15,46 @@ class ExpensiveResource:
         return self.data
 
 class LazyProxy:
-    def __init__(self) -> None:
+    def __init__(self, description: str) -> None:
+        self._description = description
+        self._answered = 0
         self._real: ExpensiveResource | None = None
+
+    @property
+    def description(self) -> str:
+        self._answered += 1
+        return self._description
 
     def __getattr__(self, name: str) -> Any:
         if self._real is None:
+            print(f"{self._answered} answered before build")
             self._real = ExpensiveResource()
         return getattr(self._real, name)
 
-print("proxy created, nothing built yet")
-p = LazyProxy()
-print("about to query")
+p = LazyProxy("three small integers")
+for _ in range(3):
+    print(p.description)
+#: three small integers
+#: three small integers
+#: three small integers
 print(p.query())
-#: proxy created, nothing built yet
-#: about to query
+#: 3 answered before build
 #: creating ExpensiveResource (slow!)
+#: [1, 2, 3]
+print(p.query())
 #: [1, 2, 3]
 ```
 
-`"creating ExpensiveResource"` prints only when `p.query()` first
-triggers `__getattr__()`, not when you construct `LazyProxy()`. Every
-attribute access checks `self._real`, and the first access that finds
-it `None` builds the real object. Every later access reuses the same
-instance. `LazyProxy` reuses the `__getattr__()` delegation from
-`proxy_getattr.py` and `counting_proxy.py`, just guarding the moment of
-creation instead of forwarding to an object that already exists.
+`description` is a property on the proxy, so Python finds it without
+calling `__getattr__()`, and the three reads build nothing. Each one
+increments `_answered`. The first `query()` is the first name the proxy
+lacks, so `__getattr__()` runs, reports the count, and builds the real
+object; the second `query()` finds `_real` set and forwards without
+either. The counter records how much work the proxy saved: three
+requests served from a string the proxy held from the start, with the
+slow construction pushed past all of them. GoF's image proxy is the
+same design, answering an image's size from stored numbers while the
+pixels stay unloaded until something draws them.
 
 ## 2. A per-method tally in the counting proxy
 

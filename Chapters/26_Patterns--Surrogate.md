@@ -798,7 +798,12 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
 
 ## Exercises
 
-1.  Create an example of the "virtual proxy."
+1.  Extend `virtual_proxy.py`'s `Lazy` so it answers one cheap attribute itself,
+    a `description` string given at construction, without building `Expensive`.
+    Count the accesses it answers that way,
+    and report the count at the moment `Expensive` is built.
+    Confirm that reading `description` several times builds nothing,
+    and that the first `query()` reports the count.
 2.  Change `CountingProxy` in `counting_proxy.py` to keep a per-method tally in a `collections.Counter` instead of a single total.
     Confirm the tally reports `f` called twice and `g` called once.
 3.  Create a simple copy-on-write implementation.
