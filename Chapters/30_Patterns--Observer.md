@@ -647,9 +647,10 @@ values out.
 A cell on the border has fewer neighbors,
 so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
-so `if cell in grid` drops those coordinates with a membership test,
-and `recolored()` needs no grid size.
-The comprehension maps each remaining cell to its color's `next()`.
+so `cell in grid` is `True` for a coordinate inside the grid and `False` for one outside it.
+The comprehension's `if` clause applies that test and skips the outside coordinates,
+so `recolored()` needs no grid size.
+The comprehension maps each cell that passes the test to its color's `next()`.
 The dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries)
 builds the new grid: `|` produces a new dictionary,
 and when both operands hold the same key, the right operand's value wins.
