@@ -37,6 +37,16 @@ row(f) = the Effects f performs directly
 The second line makes the rule recursive,
 and that recursion is the propagation [Effect Management](44_Effects--Effect_Management.md#native-effect-management)
 describes.
+
+Koka and the other native systems follow this rule because they implement *algebraic effects*.
+An algebraic effect is a set of operations declared as an interface.
+A handler gives those operations their meaning,
+and handling removes the effect from the row.
+The design has two halves, the row and the handlers.
+*Algebraic effect tracking* is the row half: the rule above,
+computed and checked for every function.
+That half is this appendix's subject, and "tracking" means it from here on.
+
 A system that tracks Effects needs three things:
 
 1. **A place to write the row.**
@@ -61,7 +71,7 @@ The rest of this appendix asks how far `Annotated` can move it.
 
 ## Why a Native System Tracks Best
 
-A native system has four properties,
+Native algebraic effect tracking has four properties,
 and each later section finds one of them missing from the `Annotated` design.
 
 **The compiler infers the row.**
@@ -400,17 +410,15 @@ and the framework supplies the dependency when a request arrives.
 Nothing connects the two readers.
 No check confirms that the row one tool verified is the set of dependencies the other one binds.
 
-The term *algebraic effects* needs the same care.
-It names more than a row.
-An algebraic Effect is a set of operations declared as an interface,
-plus handlers that receive the continuation and decide what to do with it.
-The row is the type-and-effect half of that design.
+[The Tracking Problem](#the-tracking-problem)
+divided algebraic effects into a row half and a handler half.
 `Annotated` can carry the row, and no metadata can supply a handler.
+A native handler receives the continuation and decides what to do with it.
 [Stateless in Practice](47_Effects--Stateless_in_Practice.md#handlers-cannot-capture-the-continuation)
-shows the ceiling on the handler half: a Python generator is one-shot,
+shows the ceiling Python puts on that half: a Python generator is one-shot,
 so a handler can resume a computation once.
-What PEP 593 could give Python is Effect tracking.
-Calling it algebraic effects would claim the half it cannot deliver.
+What PEP 593 could give Python is algebraic effect tracking, the row half.
+The handler half would still come from a library, under that ceiling.
 
 Stateless gets tracking, interface separation,
 and delayed binding with no new tool.
