@@ -145,9 +145,9 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
-Three things from the classic version disappear: the `Observer` interface,
-the `update()` method it required, and a class per reaction.
-The `subject` argument goes too.
+Four things from the classic version disappear: the `Observer` interface,
+the `update()` method the interface required, a class per reaction,
+and the `subject` argument.
 An observer that needs the changed object takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.
