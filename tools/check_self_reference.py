@@ -83,7 +83,9 @@ WAIVERS_FILE = DATA_DIR / "self_reference_ok.txt"
 # class must allow "-", which is what the `--` part-name separator needs;
 # a regex that forgot it silently matched nothing for a while (CLAUDE.md
 # records that failure under "A regex that matches chapter filenames").
-LINK = re.compile(r"\[([^\]]+)\]\((\d{2}_[\w.-]+\.md)(?:#([\w.-]+))?\)")
+# A chapter file is `NN_...md`; an appendix is `A_...md`.
+LINK = re.compile(
+    r"\[([^\]]+)\]\(((?:\d{2}|[A-Z])_[\w.-]+\.md)(?:#([\w.-]+))?\)")
 CODE_SPAN = re.compile(r"`([^`]+)`")
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*(?:\{#([^}]+)\})?\s*$")
 
@@ -228,8 +230,25 @@ def load(path: Path) -> Chapter:
         for s in CODE_SPAN.findall(line)
     ]
     code = "\n".join(["\n".join(b.lines) for b in doc.blocks] + spans)
-    return Chapter(path, int(path.stem.split("_", 1)[0]), doc.text, code,
-                   sections)
+    return Chapter(path, reading_order(path), doc.text, code, sections)
+
+
+APPENDIX_BASE = 1000
+
+
+def reading_order(path: Path) -> int:
+    """A chapter's number, or for an appendix (`A_...`) a number past
+    every chapter's, since the appendices follow the last chapter."""
+    head = path.stem.split("_", 1)[0]
+    if head.isdigit():
+        return int(head)
+    return APPENDIX_BASE + ord(head[0]) - ord("A")
+
+
+def place(chapter: Chapter) -> str:
+    """How a finding names a target: "chapter 7" or "appendix A"."""
+    head = chapter.path.stem.split("_", 1)[0]
+    return f"chapter {int(head)}" if head.isdigit() else f"appendix {head}"
 
 
 def slugify(text: str) -> str:
@@ -346,7 +365,7 @@ def scan(doc: Document, waivers: frozenset[str]) -> Iterator[Finding]:
                         yield Finding(
                             doc.path, line, code="SR003",
                             message=(f'"{hit}" points {way}: [{label}] is '
-                                     f"chapter {target.number}"))
+                                     f"{place(target)}"))
 
             # Grounding fires only when the target shares NONE of the
             # sentence's code vocabulary. Reporting each absent term

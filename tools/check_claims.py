@@ -49,7 +49,7 @@ from tools.config import CHAPTERS_DIR
 from tools.repo import add_paths_arg, md_files
 
 LINK_RE = re.compile(
-    r"\[([^\]]+)\]\((\d{2}_[A-Za-z_]+\.md)(?:#([a-z0-9._-]+))?\)")
+    r"\[([^\]]+)\]\(((?:\d{2}|[A-Z])_[\w.-]+\.md)(?:#([a-z0-9._-]+))?\)")
 HEADING_RE = re.compile(r"^#{1,6}\s+(.*?)\s*(?:\{#([^}]+)\})?\s*$")
 STOP = {
     "a", "an", "and", "as", "at", "by", "for", "from", "in", "is", "it",
