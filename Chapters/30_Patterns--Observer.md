@@ -5,7 +5,7 @@ decouples the code that changes state from the code that reacts to the change.
 One object, the *observer*, registers interest in another, the *observable*,
 and the observable notifies the observer at every state change.
 The observable defines only the communication:
-a list of callables and the argument it passes them.
+a list of callables and the arguments it passes them.
 That choice follows the [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 principle of designing the communication rather than the parts,
 and makes *Observer* the most dynamic of the callback patterns.
