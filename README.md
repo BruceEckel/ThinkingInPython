@@ -188,17 +188,65 @@ The commands below rebuild `build/examples/` and `build/solutions/` from
 the Markdown chapters, so they always test the current book, never a stale
 copy.
 
-| Command | What it does |
-|---|---|
-| `make run` | Executes every example file and reports failures. |
-| `make test` | Runs the book's `pytest` examples, the `test_*.py` files. |
-| `make ty` | Type-checks every example. Must come out clean. |
-| `make lint` | PEP8-lints every example with `ruff`. Must come out clean. |
-| `make solutions-run` | Executes every extracted solution and reports failures. |
-| `make solutions-test` | Runs the solutions' `pytest` examples. |
-| `make solutions-ty`, `make solutions-lint` | The same two checks over `build/solutions/`. |
-| `make solutions-gate` | Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests. |
-| `make gate` | Every check over both trees. Run this before committing. |
+- Executes every example file and reports failures.
+
+  ```sh
+  make run
+  ```
+
+- Runs the book's `pytest` examples, the `test_*.py` files.
+
+  ```sh
+  make test
+  ```
+
+- Type-checks every example. Must come out clean.
+
+  ```sh
+  make ty
+  ```
+
+- PEP8-lints every example with `ruff`. Must come out clean.
+
+  ```sh
+  make lint
+  ```
+
+- Executes every extracted solution and reports failures.
+
+  ```sh
+  make solutions-run
+  ```
+
+- Runs the solutions' `pytest` examples.
+
+  ```sh
+  make solutions-test
+  ```
+
+- Type-checks every solution, over `build/solutions/`.
+
+  ```sh
+  make solutions-ty
+  ```
+
+- Lints every solution the same way.
+
+  ```sh
+  make solutions-lint
+  ```
+
+- Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests.
+
+  ```sh
+  make solutions-gate
+  ```
+
+- Every check over both trees. Run this before committing.
+
+  ```sh
+  make gate
+  ```
 
 A first run also downloads the pinned Python and the dev tools.
 
