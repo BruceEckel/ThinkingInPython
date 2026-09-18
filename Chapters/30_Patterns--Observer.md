@@ -81,9 +81,18 @@ The alternative leaves that call to the client,
 so several changes can coalesce into one broadcast,
 but a caller can forget to make the call.
 
-`list(self._observers)` builds a new list from the existing one,
-and `notify()` walks that copy,
-so an observer that detaches itself mid-broadcast cannot make the loop skip an observer.
+The `list(self._observers)` copy inside `notify()` looks redundant,
+since `_observers` is already a list.
+It is not.
+An observer may react to a notification by detaching.
+A one-shot listener detaches after its first call,
+and the detach mutates `self._observers` in the middle of the loop walking it.
+If you iterate the list directly,
+removing the current observer shifts every later one left,
+so the loop skips the next observer.
+No exception reports the skip.
+Walking a copy makes detaching during notification safe,
+and a newcomer attaching mid-notification receives its first notification at the next change.
 
 ## The Pythonic Observer: a List of Callables
 
@@ -151,10 +160,6 @@ and the `subject` argument.
 An observer that needs the changed object takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.
-
-The type parameter is the one part of the classic version that stays.
-It carries the notification's type through to the observers,
-so subscribing a `list[str]`'s `append` to a `Thermometer` fails the type checker instead of quietly collecting floats in a list of strings.
 
 `Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
 not because the pattern requires a base class.
@@ -229,17 +234,7 @@ because they share an instance and a function.
 so detaching an observer that never subscribed raises a `ValueError`.
 Subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
 
-The `list()` copy inside `notify()` looks redundant.
-It is not.
-An observer may react to a notification by unsubscribing.
-A one-shot listener detaches after its first call,
-and the detach mutates `self._observers` in the middle of the loop walking it.
-If you iterate the list directly,
-removing the current observer shifts every later one left,
-so the loop skips the next observer.
-No exception reports the skip.
-The copy makes detaching during notification safe,
-and a newcomer subscribing mid-notification receives its first notification at the next change:
+The copy in `notify()` shows its value when an observer unsubscribes mid-notification:
 
 ```python
 # self_removing_observer.py
