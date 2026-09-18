@@ -565,8 +565,11 @@ and split across two files.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
 It holds no display code.
-The *view*, `box_view.py`, is the only file that draws.
-Clicking a box advances that box to the next color.
+The *view*, `box_view.py`, displays the boxes using `tkinter`.
+Clicking a box advances it to the next color, along with the boxes above, below,
+left, and right of it.
+A click changes up to five boxes at once, so the window is a puzzle:
+try to turn every box `palegreen`.
 
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
@@ -585,9 +588,16 @@ def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
+def next_color(color: Color) -> Color:
+    nxt = COLORS.index(color) + 1
+    return COLORS[nxt % len(COLORS)]
+
 def recolored(grid: Grid, clicked: Coord) -> Grid:
-    nxt = COLORS.index(grid[clicked]) + 1
-    return grid | {clicked: COLORS[nxt % len(COLORS)]}
+    x, y = clicked
+    cross = [(x, y), (x - 1, y), (x + 1, y),
+             (x, y - 1), (x, y + 1)]
+    return grid | {cell: next_color(grid[cell])
+                   for cell in cross if cell in grid}
 
 class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:
@@ -605,37 +615,45 @@ A `Grid` maps each `(column, row)` coordinate to a `Color`.
 A cell's color is `COLORS[(x + y) % len(COLORS)]`,
 so the cells along a diagonal, where `x + y` is constant, share one color.
 
+`next_color()` finds a color's position in `COLORS` with `index()` and adds one.
+`nxt` is the position of the next color,
+and `nxt % len(COLORS)` wraps it around, so the last color, `"khaki"`,
+produces the first, `"skyblue"`.
+
 `recolored()` computes the grid that results from a click: values in,
 values out.
-Its first line looks up the clicked cell's color,
-finds that color's position in `COLORS` with `index()`, and adds one.
-`nxt` is the position of the next color,
-and `nxt % len(COLORS)` wraps it around, so a click on the last color,
-`"khaki"`, produces the first, `"skyblue"`.
-The second line builds the new grid with the dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries):
-`|` produces a new dictionary, and when both operands hold the same key,
-the right operand's value wins.
-The right operand here holds one entry, the clicked cell with its next color.
-The result is a copy of `grid` that differs in that one cell,
+`cross` lists the clicked cell and the four cells that share an edge with it.
+A cell on the border has fewer neighbors,
+so some of the coordinates in `cross` lie outside the grid.
+A `Grid` is keyed by coordinate,
+so `if cell in grid` drops those coordinates with a membership test,
+and `recolored()` needs no grid size.
+The comprehension maps each remaining cell to its next color.
+The dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries)
+builds the new grid: `|` produces a new dictionary,
+and when both operands hold the same key, the right operand's value wins.
+The result is a copy of `grid` that differs in the cells of the cross,
 and `grid` is unchanged.
 
-Neither function needs a `BoxModel`,
-so both are defined at module level and not inside the class.
+None of the three functions needs a `BoxModel`,
+so they are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
 `BoxModel` is an `Observable[Grid]`.
 `BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
-Two functions and one class make up the model: the functions compute grids,
+Three functions and one class make up the model:
+the functions compute colors and grids,
 and `BoxModel` holds the current grid and notifies its observers.
 The file does not import `tkinter`.
 
 Because the model contains no display code, its tests need no GUI.
-Testing confirms that `recolored()` changes only the clicked cell,
+Testing confirms that `recolored()` changes the cross and no other cell,
+that a click in a corner stays on the grid,
 and that observers receive the new grid after a click:
 
 ```python
 # test_box_observer.py
-from box_observer import (COLORS, BoxModel, Grid,
-                          new_grid, recolored)
+from box_observer import (BoxModel, Grid, new_grid,
+                          next_color, recolored)
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
@@ -644,15 +662,26 @@ def test_new_grid_size_and_banding() -> None:
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_recolored_changes_one_cell() -> None:
+def test_next_color_wraps() -> None:
+    assert next_color("skyblue") == "palegreen"
+    assert next_color("khaki") == "skyblue"
+
+def test_recolored_changes_the_cross() -> None:
     grid = new_grid(3)
     out = recolored(grid, (1, 1))
-    # The clicked cell takes the next color
-    was = COLORS.index(grid[(1, 1)])
-    assert out[(1, 1)] == COLORS[(was + 1) % 3]
+    cross = {(1, 1), (0, 1), (2, 1), (1, 0), (1, 2)}
+    assert all(out[c] == next_color(grid[c])
+               for c in cross)
     assert all(out[c] == grid[c]
-               for c in grid if c != (1, 1))
+               for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid
+
+def test_corner_click_stays_on_the_grid() -> None:
+    grid = new_grid(3)
+    out = recolored(grid, (0, 0))
+    changed = {c for c in grid if out[c] != grid[c]}
+    assert changed == {(0, 0), (1, 0), (0, 1)}
+    assert out.keys() == grid.keys()
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(3)

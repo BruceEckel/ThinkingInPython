@@ -1,6 +1,6 @@
 # test_box_observer.py
-from box_observer import (COLORS, BoxModel, Grid,
-                          new_grid, recolored)
+from box_observer import (BoxModel, Grid, new_grid,
+                          next_color, recolored)
 
 def test_new_grid_size_and_banding() -> None:
     grid = new_grid(3)
@@ -9,15 +9,26 @@ def test_new_grid_size_and_banding() -> None:
     # Same (x + y) color band
     assert grid[(0, 1)] == grid[(1, 0)]
 
-def test_recolored_changes_one_cell() -> None:
+def test_next_color_wraps() -> None:
+    assert next_color("skyblue") == "palegreen"
+    assert next_color("khaki") == "skyblue"
+
+def test_recolored_changes_the_cross() -> None:
     grid = new_grid(3)
     out = recolored(grid, (1, 1))
-    # The clicked cell takes the next color
-    was = COLORS.index(grid[(1, 1)])
-    assert out[(1, 1)] == COLORS[(was + 1) % 3]
+    cross = {(1, 1), (0, 1), (2, 1), (1, 0), (1, 2)}
+    assert all(out[c] == next_color(grid[c])
+               for c in cross)
     assert all(out[c] == grid[c]
-               for c in grid if c != (1, 1))
+               for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid
+
+def test_corner_click_stays_on_the_grid() -> None:
+    grid = new_grid(3)
+    out = recolored(grid, (0, 0))
+    changed = {c for c in grid if out[c] != grid[c]}
+    assert changed == {(0, 0), (1, 0), (0, 1)}
+    assert out.keys() == grid.keys()
 
 def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(3)

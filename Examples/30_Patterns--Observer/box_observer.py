@@ -12,9 +12,16 @@ def new_grid(size: int) -> Grid:
     return {(x, y): COLORS[(x + y) % len(COLORS)]
             for x in range(size) for y in range(size)}
 
+def next_color(color: Color) -> Color:
+    nxt = COLORS.index(color) + 1
+    return COLORS[nxt % len(COLORS)]
+
 def recolored(grid: Grid, clicked: Coord) -> Grid:
-    nxt = COLORS.index(grid[clicked]) + 1
-    return grid | {clicked: COLORS[nxt % len(COLORS)]}
+    x, y = clicked
+    cross = [(x, y), (x - 1, y), (x + 1, y),
+             (x, y - 1), (x, y + 1)]
+    return grid | {cell: next_color(grid[cell])
+                   for cell in cross if cell in grid}
 
 class BoxModel(Observable[Grid]):
     def __init__(self, size: int) -> None:
