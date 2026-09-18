@@ -188,61 +188,61 @@ The commands below rebuild `build/examples/` and `build/solutions/` from
 the Markdown chapters, so they always test the current book, never a stale
 copy.
 
-- Executes every example file and reports failures.
+- Execute every example file and report failures:
 
   ```sh
   make run
   ```
 
-- Runs the book's `pytest` examples, the `test_*.py` files.
+- Run the book's `pytest` examples, the `test_*.py` files:
 
   ```sh
   make test
   ```
 
-- Type-checks every example. Must come out clean.
+- Type-check every example (must come out clean):
 
   ```sh
   make ty
   ```
 
-- PEP8-lints every example with `ruff`. Must come out clean.
+- PEP8-lint every example with `ruff` (must come out clean):
 
   ```sh
   make lint
   ```
 
-- Executes every extracted solution and reports failures.
+- Execute every extracted solution and report failures:
 
   ```sh
   make solutions-run
   ```
 
-- Runs the solutions' `pytest` examples.
+- Run the solutions' `pytest` examples:
 
   ```sh
   make solutions-test
   ```
 
-- Type-checks every solution, over `build/solutions/`.
+- Type-check every solution, over `build/solutions/`:
 
   ```sh
   make solutions-ty
   ```
 
-- Lints every solution the same way.
+- Lint every solution the same way:
 
   ```sh
   make solutions-lint
   ```
 
-- Every solutions check at once: exercise numbering, drift, output markers, types, lint, runs, tests.
+- Run every solutions check at once (exercise numbering, drift, output markers, types, lint, runs, tests):
 
   ```sh
   make solutions-gate
   ```
 
-- Every check over both trees. Run this before committing.
+- Run every check over both trees, before you commit:
 
   ```sh
   make gate
@@ -328,7 +328,7 @@ usually an older release, and these examples use Python 3.15 syntax.
 Building the book itself needs more. `make site`, `make local`, and
 `make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
 `make prose` needs the standalone `vale` binary.
-This checks for all of them:
+Check for all of them:
 
 ```sh
 make tools-check-full
