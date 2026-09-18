@@ -647,7 +647,7 @@ values out.
 A cell on the border has fewer neighbors,
 so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
-so `cell in grid` is `True` for a coordinate inside the grid and `False` for one outside it.
+so `cell in grid` is only `True` for a coordinate inside the grid.
 The comprehension's `if` clause applies that test and skips the outside coordinates,
 so `recolored()` needs no grid size.
 The comprehension maps each cell that passes the test to its color's `next()`.
@@ -667,9 +667,8 @@ which calls `Observable.__init__()` and then builds `grid` from `size`.
 An enum, two functions, and one class make up the model:
 `Color` holds the colors and their order, the functions compute grids,
 and `BoxModel` holds the current grid and notifies its observers.
-The file does not import `tkinter`.
 
-Because the model contains no display code, its tests need no GUI.
+The model contains no display code so it can be tested without the challenges of a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a click in a corner stays on the grid,
 and that observers receive the new grid after a click:
