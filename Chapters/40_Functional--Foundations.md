@@ -694,7 +694,9 @@ and the chapters ahead build on that single property.
     Then try to fix only `high` without a `Placeholder` and explain why that is impossible.
 6.  In `immutable_types.py`,
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
-    Run `ty`, and explain why it reports nothing when `MAX_SIZE = 200` on the next line is an error.
+    Run `ty`, which reports nothing.
+    Then add `MAX_SIZE = 200`, run `ty` again,
+    and explain why the rebinding is an error while the append was not.
     Then change the annotation so appending *is* rejected.
 7.  In `higher_order.py`,
     replace the `map()` and `filter()` calls with comprehensions,

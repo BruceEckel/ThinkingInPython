@@ -817,7 +817,7 @@ reuses this `Result` machinery to convert Effects.
 
 ## Exercises
 
-1.  Add a `func_e()` that returns a `Result[int, str]`,
+1.  Add a `func_d()` that returns a `Result[int, str]`,
     and extend the `bind()` chain in `composing_with_bind.py` to include it.
     Put it in the middle of the chain rather than at the end,
     so an `Err` from it has a later step to skip,

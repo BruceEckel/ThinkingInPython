@@ -587,7 +587,7 @@ Tools such as ruff point out violations and fix many of them automatically.
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
     and which of the three a linter would flag.
-5.  In `tstrings.py`, write a second consumer, `quoted(template)`,
+5.  In `tstrings.py`, write a third consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.
     Explain why you cannot post-process an f-string the same way.

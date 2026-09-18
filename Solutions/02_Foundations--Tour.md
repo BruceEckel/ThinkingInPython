@@ -94,7 +94,7 @@ is the only one a linter objects to: ruff's PEP 8 checks report `N816`
 for a mixed-case global. The uppercase form is legal style, merely a
 false claim about the value. CapWords stays reserved for class names.
 
-## 5. A second `Template` consumer
+## 5. A third `Template` consumer
 
 ```python
 # exercise_5.py

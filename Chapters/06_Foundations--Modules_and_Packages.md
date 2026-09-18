@@ -633,7 +633,7 @@ including the ones whose only purpose is to run the module.
 
 ## Exercises
 
-1.  Add a third module, `a_package/module5.py`,
+1.  Add a fourth module, `a_package/module5.py`,
     with its own `function5()` and a top-level `print()` so the module announces itself when it loads.
     Import it three ways, using `import a_package.module5`,
     `from a_package import module5`,

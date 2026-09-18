@@ -1,6 +1,6 @@
 # Error Handling: Solutions
 
-## 1. A fourth step, `func_e()`, added to the `bind()` chain
+## 1. A fourth step, `func_d()`, added to the `bind()` chain
 
 ```python
 # exercise_1.py
@@ -51,13 +51,13 @@ def func_c(i: int) -> Result[int, str]:
         return Err(f"func_c({i}): {e}")
     return Ok(i)
 
-def func_e(i: int) -> Result[int, str]:
+def func_d(i: int) -> Result[int, str]:
     if i == 4:
-        return Err(f"func_e({i})")
+        return Err(f"func_d({i})")
     return Ok(i)
 
 def composed(i: int) -> Result[int, str]:
-    return func_a(i).bind(func_b).bind(func_e).bind(func_c)
+    return func_a(i).bind(func_b).bind(func_d).bind(func_c)
 
 for i in range(5):
     print(i, composed(i))
@@ -65,17 +65,17 @@ for i in range(5):
 #: 1 Err(error='func_a(1)')
 #: 2 Err(error='func_b(2)')
 #: 3 Err(error='func_c(3): division by zero')
-#: 4 Err(error='func_e(4)')
+#: 4 Err(error='func_d(4)')
 ```
 
-Adding a fourth `.bind(func_e)` needed no change to `Result`, `Ok`,
-or `Err`. `func_e()` sits before `func_c()` in the chain, so an
-`Err` from it has a later step to skip. `4` reaches `func_e()`
+Adding a fourth `.bind(func_d)` needed no change to `Result`, `Ok`,
+or `Err`. `func_d()` sits before `func_c()` in the chain, so an
+`Err` from it has a later step to skip. `4` reaches `func_d()`
 because it survives `func_a()` and `func_b()`, and the `Err` that
 comes back travels to the end of the chain untouched: `Err.bind()`
 returns `self` without calling `func_c()`. `1` and `2` fail earlier
-and stop the chain before `func_e()` sees them, and `3` passes
-through `func_e()` unchanged to fail in `func_c()`, so each of the
+and stop the chain before `func_d()` sees them, and `3` passes
+through `func_d()` unchanged to fail in `func_c()`, so each of the
 four inputs still fails at a different step. A chain short-circuits
 at its first failure, wherever that falls, and the order of the
 steps decides where the chain stops.

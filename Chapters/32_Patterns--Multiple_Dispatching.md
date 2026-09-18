@@ -641,7 +641,7 @@ Everywhere else you choose between writing a second dispatch in methods and repl
     Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
     Single dispatch is enough here.
     The next exercise adds the second dispatch.
-8.  Modify the above example to make the interactions more detailed.
+8.  Modify the previous exercise's `Project` to make the interactions more detailed.
     Each `Inhabitant` can randomly produce a `Weapon` using `get_weapon()`:
     a `Dwarf` uses `Jargon` or `Play`,
     an `Elf` uses `InventFeature` or `SellImaginaryProduct`,

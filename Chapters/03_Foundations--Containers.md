@@ -857,7 +857,7 @@ and freeze whichever you pick as soon as it stops changing.
     change the loop to count occurrences of each `kind` instead of collecting names,
     and print the result.
 3.  In `set_methods.py`,
-    add a third set `c = {1, 5, 9}` and print `a.union(b, c)` and `a.intersection(b, c)`.
+    add a set `d = {1, 5, 9}` and print `a.union(b, d)` and `a.intersection(b, d)`.
 4.  In `immutable_containers.py`, add a line that tries `groups.add([1, 2])`
     (a plain list, not a `frozenset`) and catch the exception it raises.
     Explain, in terms of hashability,

@@ -46,13 +46,13 @@ def func_c(i: int) -> Result[int, str]:
         return Err(f"func_c({i}): {e}")
     return Ok(i)
 
-def func_e(i: int) -> Result[int, str]:
+def func_d(i: int) -> Result[int, str]:
     if i == 4:
-        return Err(f"func_e({i})")
+        return Err(f"func_d({i})")
     return Ok(i)
 
 def composed(i: int) -> Result[int, str]:
-    return func_a(i).bind(func_b).bind(func_e).bind(func_c)
+    return func_a(i).bind(func_b).bind(func_d).bind(func_c)
 
 for i in range(5):
     print(i, composed(i))
@@ -60,4 +60,4 @@ for i in range(5):
 #: 1 Err(error='func_a(1)')
 #: 2 Err(error='func_b(2)')
 #: 3 Err(error='func_c(3): division by zero')
-#: 4 Err(error='func_e(4)')
+#: 4 Err(error='func_d(4)')

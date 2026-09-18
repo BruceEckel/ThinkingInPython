@@ -1,6 +1,6 @@
 # Modules and Packages: Solutions
 
-## 1. A third module, imported three ways
+## 1. A fourth module, imported three ways
 
 ```python
 # a_package/module5.py
