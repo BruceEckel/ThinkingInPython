@@ -559,17 +559,18 @@ is the same fan-out, routed by event type.
 
 ## A Visual Example of Observers
 
-The last example is the model-view split from the chapter's opening,
-made visible with `tkinter` (in the standard library, so you install nothing),
-and split across two files.
+The last example is the model-view split made visible.
 The *model*, `box_observer.py`,
 is a grid of colored boxes and the rule for a click.
-It holds no display code.
-The *view*, `box_view.py`, displays the boxes using `tkinter`.
+It only manipulates `Grid`s and doesn't know anything about displaying them.
+The *view*, `box_view.py`,
+displays the boxes using the standard library's `tkinter`.
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
 A click changes up to five boxes at once, so the window is a puzzle:
 try to turn every box `palegreen`.
+From this starting grid, `palegreen` is the one color all the boxes can share.
+No sequence of clicks turns the grid all `skyblue` or all `khaki`.
 
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
@@ -801,3 +802,7 @@ and the *Observer* is an event bus.
     separate the returned exceptions from the successes,
     and raise them together as an `ExceptionGroup`.
     Write a test in which the first observer raises an exception and the second still records its notification.
+5.  Change the rule for a click in `box_observer.py`:
+    make `recolored()` advance every box in the clicked box's row and column.
+    Run `box_view.py` without editing it,
+    and explain why the view needed no change.

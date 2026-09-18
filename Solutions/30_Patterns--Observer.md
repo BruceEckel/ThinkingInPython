@@ -302,3 +302,67 @@ The synchronous and asynchronous versions now answer the same
 question, and both end in an `ExceptionGroup`. The difference is only
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
+
+## 5. A new click rule, and the same view
+
+```python
+# exercise_5.py
+from typing import Final, Literal
+
+type Color = Literal["skyblue", "palegreen", "khaki"]
+COLORS: Final[tuple[Color, Color, Color]] = (
+    "skyblue", "palegreen", "khaki")
+type Coord = tuple[int, int]
+type Grid = dict[Coord, Color]
+
+def new_grid(size: int) -> Grid:
+    return {(x, y): COLORS[(x + y) % len(COLORS)]
+            for x in range(size) for y in range(size)}
+
+def next_color(color: Color) -> Color:
+    nxt = COLORS.index(color) + 1
+    return COLORS[nxt % len(COLORS)]
+
+def recolored(grid: Grid, clicked: Coord) -> Grid:
+    x, y = clicked
+    return grid | {cell: next_color(color)
+                   for cell, color in grid.items()
+                   if cell[0] == x or cell[1] == y}
+
+def initials(grid: Grid, size: int) -> str:
+    return "\n".join(
+        " ".join(grid[(x, y)][0] for x in range(size))
+        for y in range(size))
+
+grid = new_grid(4)
+print(initials(grid, 4))
+#: s p k s
+#: p k s p
+#: k s p k
+#: s p k s
+print(initials(recolored(grid, (1, 2)), 4))
+#: s k k s
+#: p s s p
+#: s p k s
+#: s k k s
+```
+
+`new_grid()` and `next_color()` are copied from `box_observer.py`
+unchanged, and `recolored()` is the one function that differs. It
+keeps every cell whose column matches the click's `x` or whose row
+matches its `y`, and advances each one. The cells come from `grid`,
+so none lies outside it and the `in grid` test goes away.
+`initials()` prints each cell's first letter, one row per line. After
+the click on column 1, row 2, that column and that row have moved one
+color along, and the other nine cells are as they were.
+
+Pasting this `recolored()` over the one in `box_observer.py` changes
+what the window does, and `box_view.py` runs as it stands. The view
+has two connections to the model. Its click handler calls
+`model.click()` with a coordinate, and its `draw()` receives a whole
+`Grid` and paints every cell. Neither one says which cells a click
+changes, so the view holds nothing that a new rule could make wrong.
+The rule sits in `recolored()`, `BoxModel.click()` calls it, and
+`notify()` delivers the result. `initials()` makes the same point from
+the other side: it is a second view of a `Grid`, written without
+knowing the rule.
