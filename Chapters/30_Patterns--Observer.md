@@ -12,18 +12,18 @@ and makes *Observer* the most dynamic of the callback patterns.
 Observers attach and detach at runtime,
 and the observable does not name their concrete types.
 
-In event handling, a widget keeps a list of handlers and calls each one when its event arrives.
-In the model-view split,
-the data keeps a list of views and notifies each one when it changes,
-so the display stays current.
+Event handling is the everyday use.
+A widget keeps a list of handlers and calls each one when its event arrives.
 
-Use *Observer* if a group of objects must update themselves when some other object changes state.
+More generally, use *Observer* if a group of objects must update themselves when some other object changes state.
 The classic example is Smalltalk's MVC (model-view-controller),
 or the almost-equivalent Document-View architecture.
 You have some data, the *document*, and more than one view of it,
 say a plot and a table.
 When the data changes, every view must refresh.
-The *Observer* pattern arranges that, and the data's code names no view.
+The *Observer* pattern arranges that model-view split.
+The data keeps a list of views and notifies each one when it changes,
+and the data's code names no view.
 
 The classic design from *GoF Design Patterns* has three parts:
 an `Observer` interface every observer implements,
