@@ -572,6 +572,9 @@ The model is an `Observable`.
 `new_grid()` builds a size x size grid banded into three colors,
 and `recolored()` computes the grid that results from a click: values in,
 values out.
+Neither function needs a `BoxModel`,
+so both are defined at module level and not inside the class.
+A test calls them directly, and a second model can reuse them.
 `BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
 `new_grid()`, `recolored()`, and `click()` make up the model.
 The file does not import `tkinter`.
