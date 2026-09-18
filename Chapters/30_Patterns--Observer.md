@@ -568,17 +568,6 @@ It holds no display code.
 The *view*, `box_view.py`, is the only file that draws.
 Clicking a box advances that box to the next color.
 
-The model is an `Observable`.
-`new_grid()` builds a size x size grid banded into three colors,
-and `recolored()` computes the grid that results from a click: values in,
-values out.
-Neither function needs a `BoxModel`,
-so both are defined at module level and not inside the class.
-A test calls them directly, and a second model can reuse them.
-`BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
-Two functions and one class make up the model: the functions compute grids,
-and `BoxModel` holds the current grid and notifies its observers.
-The file does not import `tkinter`.
 The model reuses the same `Observable` as the thermometer, from `observers.py`:
 
 ```python
@@ -610,6 +599,34 @@ class BoxModel(Observable[Grid]):
         self.grid = recolored(self.grid, cell)
         self.notify(self.grid)
 ```
+
+A `Grid` maps each `(column, row)` coordinate to a `Color`.
+`new_grid()` builds a size x size grid banded into three colors.
+A cell's color is `COLORS[(x + y) % len(COLORS)]`,
+so the cells along a diagonal, where `x + y` is constant, share one color.
+
+`recolored()` computes the grid that results from a click: values in,
+values out.
+Its first line looks up the clicked cell's color,
+finds that color's position in `COLORS` with `index()`, and adds one.
+`nxt` is the position of the next color,
+and `nxt % len(COLORS)` wraps it around, so a click on the last color,
+`"khaki"`, produces the first, `"skyblue"`.
+The second line builds the new grid with the dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries):
+`|` produces a new dictionary, and when both operands hold the same key,
+the right operand's value wins.
+The right operand here holds one entry, the clicked cell with its next color.
+The result is a copy of `grid` that differs in that one cell,
+and `grid` is unchanged.
+
+Neither function needs a `BoxModel`,
+so both are defined at module level and not inside the class.
+A test calls them directly, and a second model can reuse them.
+`BoxModel` is an `Observable[Grid]`.
+`BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
+Two functions and one class make up the model: the functions compute grids,
+and `BoxModel` holds the current grid and notifies its observers.
+The file does not import `tkinter`.
 
 Because the model contains no display code, its tests need no GUI.
 Testing confirms that `recolored()` changes only the clicked cell,
