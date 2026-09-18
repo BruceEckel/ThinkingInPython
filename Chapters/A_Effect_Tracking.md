@@ -11,7 +11,9 @@ and then builds the carrier Python has today,
 the `Annotated` type from [PEP 593](https://peps.python.org/pep-0593/).
 The last part analyzes the tool that would check those annotations,
 showing how much of a type checker the tool would contain.
-The appendix stops short of building that tool.
+This appendix stops short of building that tool.
+[An Effect Checker](B_An_Effect_Checker.md)
+builds the part of it that needs no type inference.
 
 ## The Tracking Problem
 
@@ -134,7 +136,7 @@ and the runtime can read it back with `get_type_hints()`.
 That makes `Annotated` a candidate for the first role, a place to write the row:
 
 ```python
-# effect_rows.py
+# utils/effect_rows.py
 from collections.abc import Callable
 from typing import get_type_hints
 from record import record
@@ -157,6 +159,8 @@ def row(f: Callable[..., object]) -> list[str]:
     )
 ```
 
+The listing lives in `utils/` because [An Effect Checker](B_An_Effect_Checker.md)
+imports it too.
 `Performs` wraps the row because every tool shares the metadata.
 A validation library may put its own objects in the same `Annotated`,
 and the PEP directs every consumer to act only on the objects it recognizes.
@@ -380,6 +384,8 @@ a place [Resolve Every Call](#resolve-every-call) ruled out for `ty`.
 
 The second is a separate static tool, run beside `ty` and `ruff`.
 Every problem above applies to it in full.
+[An Effect Checker](B_An_Effect_Checker.md) builds a small one,
+and reports `Unknown` wherever one of those problems stops it.
 
 The third is the runtime.
 A decorator reads each function's row once with `row()`,

@@ -1,4 +1,4 @@
-# effect_rows.py
+# utils/effect_rows.py
 from collections.abc import Callable
 from typing import get_type_hints
 from record import record

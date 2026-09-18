@@ -2279,8 +2279,7 @@ and that is the value of studying the library,
 whether or not you use it in production.
 [Effect Tracking](A_Effect_Tracking.md)
 looks at the other route Python offers toward algebraic effect tracking:
-a row written in `typing.Annotated`,
-and what a tool would need in order to check it.
+a row written in `typing.Annotated`, and what a tool would need to check it.
 
 Consider the signatures once more:
 
