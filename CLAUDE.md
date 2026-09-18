@@ -188,7 +188,7 @@ Three rules, all deliberate:
   in a book listing explains nothing to a reader using `ty`, so every
   accepted disagreement is a baseline entry instead. (The two checkers'
   comments do coexist, `# ty: ignore[rule]` and `# pyright: ignore[rule]`
-  each invisible to the other, but the book does not use that.) The nine
+  each invisible to the other, but the book does not use that.) The ten
   listings pyright cannot parse (PEP 798 comprehension unpacking) are
   baseline entries too, not an exclude list.
 - **"The type checker" in prose means `ty`.** The review's first

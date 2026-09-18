@@ -53,8 +53,8 @@ for i, grouping in enumerate(rounds[:3]):
 #: 1 [('Di', 'Bo', 'Eve'), ('Cy', 'Ana'), ('Gia', 'Fi')]
 #: 2 [('Eve', 'Fi', 'Ana'), ('Bo', 'Gia'), ('Cy', 'Di')]
 
-meetings = [frozenset(pair) for r in rounds for group in r
-            for pair in combinations(group, 2)]
+meetings = [*map(frozenset, combinations(group, 2))
+            for r in rounds for group in r]
 possible = set(map(frozenset, combinations(students, 2)))
 distinct = set(meetings)
 print(len(distinct), "of", len(possible),
