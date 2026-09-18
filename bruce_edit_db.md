@@ -269,6 +269,10 @@ its own ("The next listing shows the same trap in a generator").
   listing: "The alternatives this chapter showed form one list. Go down
   it and stop at the first form that supports what you need:" -> "Stop
   at the first form that supports what you need:"
+- `29_Patterns--Changing_the_Interface` 2026-09-16 (`8f94e3f7`), was
+  Claude-written, a pointer to a later section: "[Telling the Wrappers
+  Apart](#telling-the-wrappers-apart) sorts the four apart." -> deleted
+  from the chapter opening
 
 **Home.** activate (Accrued patterns), which already cuts metadiscourse;
 this sighting is the concrete pair for it. Promoted at Bruce's call
@@ -319,6 +323,10 @@ that is the claim ("potentially unbounded") stays.
 - "an attribute nothing reads" -> "a type-checking attribute"
 - "code written later, potentially years later" -> "code written later,
   sometimes years later"
+- `29_Patterns--Changing_the_Interface` 2026-09-16 (`144c546f`), was
+  Claude-written: "The variations above are Java habits." -> "All three
+  approaches carry one Java habit: the adapter inherits from `WhatIWant`
+  so that `op()` accepts it."
 
 **Home.** this file only. Promoted at Bruce's call (2026-08-29).
 
@@ -372,6 +380,20 @@ already stated nearby, as in a summary sentence that closes a section.
   functions subscribed to that type" -> "a `dict` keyed by event type.
   Each key maps to a list of handlers, and `subscribe()` appends a
   handler to the list under the event type it handles"
+- `29_Patterns--Changing_the_Interface` 2026-09-16, four: "That interface
+  makes a library or bundle of resources more comfortable to use" ->
+  "The caller sees one entry point and never learns how those classes
+  are built and wired together, so the wiring can change without
+  affecting the caller" (`1f73cfad`, Bruce's older draft); "When you've
+  got "this", and you need "that", *Adapter* solves the problem. The
+  adapter needs only to produce a "that"." -> "An adapter's only job is
+  to produce the interface you need from the one you have." (`2c5dbf6f`,
+  Bruce's older draft, scare quotes gone); "Marking the old interface
+  makes the risk visible on a schedule; without the mark, the risk
+  surfaces when you delete something." -> "Marking it deprecated keeps
+  it working while it tells each caller what to use instead; without
+  the mark, nothing tells them."; "someone decided to retire this" ->
+  "this should no longer be called" (both `f5a7b213`, Claude-written)
 
 **Home.** literal (Accrued patterns), the pass that owns figures.
 Promoted 2026-09-01 on the second chapter's sightings (C3 -> R10).
@@ -453,6 +475,9 @@ reads the others as "prefer the noun" will overshoot.
   - "because `Proxy` names no methods in `Implementation`, the proxy
     keeps working" -> "because `Proxy` names no methods in
     `Implementation`, it keeps working"
+- `29_Patterns--Changing_the_Interface` 2026-09-16, was Claude-written:
+  "Because `WhatIUse` calls `f()` and `WhatIHave` has none" -> "and
+  `WhatIHave` has no `f()`"
 
 **Home.** the `antecedents` skill, as a keep-when (its "zero ambiguous
 pointers, not zero pronouns" line). Not a separate sweep. Promoted
@@ -606,6 +631,134 @@ definition, or the term is already a link to something else.
 **Home.** this file only: a linking convention rather than a prose
 register. Promoted 2026-09-16 on the second chapter's sighting (C12 -> R16).
 
+### R17. A reader's experiment is "If you X, Y", not "X, and Y"
+
+**Test.** An imperative whose only purpose is to set up a hypothetical
+for the clause after it ("Uncomment the line, and the checker
+reports ..."; "Define a factory class and stop there: creating an
+instance still succeeds"). Rewrite as "If you X, Y".
+
+**Keep when.** The imperative is an instruction to follow, as in an
+exercise.
+
+**Sightings.** 3, 2 chapters, was Claude-written:
+- `27_Patterns--Factory` 2026-09-01 (`6f638b05`): "Uncomment the line
+  that passes a `BrokenFactory` to `GameEnvironment`, and the checker
+  reports" -> "If you uncomment the line ..., the checker reports"
+- `27_Patterns--Factory` 2026-09-01, in conversation: "Define a factory
+  class with `make_character()` and stop there: creating an instance of
+  it still succeeds" flagged as "still hard to follow"; rewritten with
+  Python as the actor
+- `29_Patterns--Changing_the_Interface` 2026-09-16 (`974e6f15`):
+  "Uncomment the commented-out signature in `adapter_variations.py`,
+  `what_i_have: WhatIHave`, and the checker reports:" -> "If you use
+  that signature in place of the union, a type checker rejects the
+  override"
+
+**Home.** CLAUDE.md (global, Writing Style), which already states it as
+"No imperative-plus-consequence sentences"; this entry holds the pairs.
+Promoted 2026-09-17 on the second chapter's sighting (C9 -> R17).
+
+### R18. Cut the sentence that says what the output demonstrates when the output is on the page
+
+**Test.** A sentence after a listing whose subject is the output and
+whose predicate is a verdict on it ("is the point", "produce the same
+three lines", "is deliberately monotonous"). Cut it; the markers show
+the output.
+
+**Keep when.** The sentence states a consequence the output does not
+show on its own (why the lines match, what a difference would mean).
+
+**Sightings.** 3 (removal), 2 chapters, was Claude-written:
+- `28_Patterns--Function_Objects` 2026-09-16: "Three identical lines are
+  the point: the algorithm changes and the caller stays the same." ->
+  deleted
+- `28_Patterns--Function_Objects` 2026-09-16: "Those five classes
+  produce the same three lines that one function argument produced."
+  -> deleted
+- `29_Patterns--Changing_the_Interface` 2026-09-16 (`44ec1a58`): "The
+  output is deliberately monotonous." -> deleted, after
+  `adapter_variations.py`'s six identical marker lines
+
+**Home.** this file only. Promoted 2026-09-17 on the second chapter's
+sighting (C20 -> R18).
+
+### R19. Cut the sentence that restates the one before it, or the chapter's opening
+
+**Test.** Two consecutive sentences where the second says the first
+again at a different altitude (abstract after concrete, or a claim
+after its example); or a section's first sentence that restates the
+chapter's opening claim. Keep the concrete one, or the opening.
+
+**Keep when.** The second sentence adds a consequence or a mechanism
+the first did not state.
+
+**Sightings.** 6, 2 chapters
+- `27_Patterns--Factory` 2026-09-15 (`a9ca27eb`), was Claude-written:
+  "Builder chains have a second use, starting from an existing
+  configuration and varying it, covered by `dataclasses.replace()`."
+  -> "A second use for builder chains is to vary an existing
+  configuration." (the next sentence names `replace()`); "Each stage
+  relies on what the previous stage established." -> "Each stage relies
+  on the previous stage."
+- `27_Patterns--Factory` (`2b18eed8`), was Bruce-written (older draft):
+  "You must still find and edit every place that names a concrete type.
+  Creation names the type. Use does not, because polymorphism handles
+  use. The effect is the same: adding a new type means edits scattered
+  through the code." -> "adding a type means finding and editing every
+  place that names a concrete type."
+- `27_Patterns--Factory` (`0b7ff81d`), was Claude-written: "No factory
+  method and no factory class. The `dict` is the factory:" -> "No
+  factory method and no factory class:"; "The next step gives each of
+  those operations its own object. A *factory object* defines a single
+  `create()` method" -> the second sentence alone
+- `29_Patterns--Changing_the_Interface` 2026-09-16 (`f99192e5`), was
+  Bruce-written (older draft), the section-opening shape: "When you've
+  got "this", and you need "that", *Adapter* solves the problem." ->
+  deleted from the Adapter section's opening; the chapter's first
+  sentence already says "I don't have the interface I need."
+
+**Home.** this file only. Promoted 2026-09-17 on the second chapter's
+sighting, widened from consecutive sentences to the section-opening
+restatement (C8 -> R19).
+
+### R20. Say when the earlier state held instead of "used to"
+
+**Test.** Past-habitual "used to" ("a metaclass used to handle", "This
+used to be a Windows concern"). Say when the earlier state held
+("before 3.14", "before those hooks existed", "before the change") or
+state the present. The purpose sense ("is used to preserve") is a
+different phrase, and House.WeakVerb reports it.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 7 (additive), 7 files, 2026-09-17 (`cacb544f`), all
+Claude-written; Bruce named the rule ("'that used to' is generally
+mushy") on chapter 29's sentence:
+- `29_Patterns--Changing_the_Interface`: "A function that used to take a
+  string and now takes a `Path` can then warn only the string callers."
+  -> "A function that now takes a `Path` in place of a string can then
+  warn only the callers still passing a string."
+- `17_Techniques--Metaprogramming`: "every case a metaclass used to
+  handle" -> "every case a metaclass handled before those hooks existed"
+- `19_Techniques--Concurrency`: "This used to be a Windows and macOS
+  concern only" -> "Before 3.14 this was a Windows and macOS concern
+  only"
+- `40_Functional--Foundations`: "fixing the third argument used to mean
+  fixing the first two" -> "before 3.14, fixing the third argument
+  meant fixing the first two"
+- `Solutions/28`: "a bus where `BigDeposit` used to reach only `on_big`
+  now reaches" -> "a `BigDeposit` that reached only `on_big` before the
+  change now reaches"
+- `Solutions/46`: "That change buys a diagnostic where a coin flip used
+  to be." -> "That change turns the coin flip into a diagnostic."
+- `Solutions/47`: "the evening hours the battery used to cover" -> "the
+  evening hours the battery covered before it was added"
+
+**Home.** `styles/House/UsedTo.yml` (a vale warning, in place
+2026-09-17) and the CLAUDE.md watch list (global, "Consider rewriting"
+tier). Promoted at Bruce's call (2026-09-17, "accept all").
+
 ---
 
 ## Candidates
@@ -666,53 +819,6 @@ it would be padding.
 (`40323f50`), was Claude-written:
 - "Nesting the classes inside `factory()` looks stronger and is worse"
   -> "looks like stronger enforcement and is worse"
-
-### C8. Cut the sentence the next sentence restates
-
-**Test.** Two consecutive sentences where the second says the first
-again at a different altitude (abstract after concrete, or a claim
-after its example). Keep the concrete one.
-
-**Keep when.** The second sentence adds a consequence or a mechanism
-the first did not state.
-
-**Sightings.** 5, all `27_Patterns--Factory`, was Claude-written (same
-chapter, so not yet independent):
-- 2026-09-15 (`a9ca27eb`): "Builder chains have a second use, starting
-  from an existing configuration and varying it, covered by
-  `dataclasses.replace()`." -> "A second use for builder chains is to
-  vary an existing configuration." (the next sentence names
-  `replace()`); "Each stage relies on what the previous stage
-  established." -> "Each stage relies on the previous stage."
-- "You must still find and edit every place that names a concrete type.
-  Creation names the type. Use does not, because polymorphism handles
-  use. The effect is the same: adding a new type means edits scattered
-  through the code." -> "adding a type means finding and editing every
-  place that names a concrete type." (`2b18eed8`)
-- "No factory method and no factory class. The `dict` is the factory:"
-  -> "No factory method and no factory class:" (`0b7ff81d`)
-- "The next step gives each of those operations its own object. A
-  *factory object* defines a single `create()` method" -> the second
-  sentence alone (`0b7ff81d`)
-
-### C9. A reader's experiment is "If you X, Y", not "X, and Y"
-
-**Test.** An imperative whose only purpose is to set up a hypothetical
-for the clause after it ("Uncomment the line, and the checker
-reports ..."; "Define a factory class and stop there: creating an
-instance still succeeds"). Rewrite as "If you X, Y".
-
-**Keep when.** The imperative is an instruction to follow, as in an
-exercise.
-
-**Sightings.** 2, both `27_Patterns--Factory` 2026-09-01, was
-Claude-written (same chapter, so not yet independent):
-- "Uncomment the line that passes a `BrokenFactory` to
-  `GameEnvironment`, and the checker reports" -> "If you uncomment the
-  line ..., the checker reports" (`6f638b05`)
-- in conversation: "Define a factory class with `make_character()` and
-  stop there: creating an instance of it still succeeds" flagged as
-  "still hard to follow"; rewritten with Python as the actor
 
 ### C10. Join a two-part contrast with "Whereas" or "while"
 
@@ -873,22 +979,6 @@ was Claude-written (chapter and Solutions, so not yet independent):
   with two members, `__call__()` and `undo()`, and in Python that type
   is a `Protocol`."
 
-### C20. Cut the sentence that says what the output demonstrates when the output is on the page
-
-**Test.** A sentence after a listing whose subject is the output and
-whose predicate is a verdict on it ("is the point", "produce the same
-three lines"). Cut it; the markers show the output.
-
-**Keep when.** The sentence states a consequence the output does not
-show on its own (why the lines match, what a difference would mean).
-
-**Sightings.** 2 (removal), both `28_Patterns--Function_Objects` 2026-09-16,
-was Claude-written (same chapter, so not yet independent):
-- "Three identical lines are the point: the algorithm changes and the
-  caller stays the same." -> deleted
-- "Those five classes produce the same three lines that one function
-  argument produced." -> deleted
-
 ### C21. Cut the chapter roadmap paragraph; each sentence goes where its content is
 
 **Test.** An opening paragraph whose sentences each say what a later
@@ -955,6 +1045,53 @@ takes "you" off a sentence about how the design behaves.
 **Sightings.** 1, `28_Patterns--Function_Objects` 2026-09-16, was Claude-written:
 - "Adding, removing, or reordering handlers means editing a list." ->
   "To add, remove, or reorder the handlers you edit the `chain` list."
+
+### C25. Open a scenario described in words with "Consider", and don't say that it is described
+
+**Test.** An exercise or example whose material is the sentence itself
+(no listing follows) opening with "Here are" / "Here is". Write
+"Consider ...". Do not add an aside explaining that the material is
+described rather than listed.
+
+**Keep when.** None seen yet.
+
+**Sightings.** 1, `29_Patterns--Changing_the_Interface` 2026-09-17, was
+Claude-written, Bruce's own edit:
+- "Here are three wrappers: one logs each call ..." -> (Claude) "Consider
+  three wrappers, described in words rather than code: one logs each
+  call ..." -> (Bruce) "Consider three wrappers: one logs each call ..."
+
+### C26. In a heading, one verb rather than a split phrasal verb
+
+**Test.** A heading whose verb's particle sits after the object
+("Telling X Apart", "Setting X Off") where one verb says the same
+("Distinguishing X", "Offsetting X").
+
+**Keep when.** Prose sentences: the global CLAUDE.md allows a phrasal
+verb with its object present ("pass it around"). Headings only.
+
+**Sightings.** 1, `29_Patterns--Changing_the_Interface` 2026-09-17
+(`cacb544f`), was Claude-written, Bruce's own edit:
+- "## Telling the Wrappers Apart" -> "## Distinguishing the Wrappers"
+
+### C27. Call an operation by the name its mechanism uses
+
+**Test.** A synonym standing in for a term the section's API spells
+("retire" for `warnings.deprecated()`'s deprecate). Use the API's word.
+The inverse of R3, which keeps an identifier's word out of its ordinary
+sense nearby.
+
+**Keep when.** The synonym names a different act. The same edit
+separated *replacing* an interface (the unsafe move) from *deprecating*
+it (the mark that makes it safe).
+
+**Sightings.** 1, `29_Patterns--Changing_the_Interface` 2026-09-16
+(`f5a7b213`), was Claude-written:
+- "## Retiring the Old Interface" -> "## Deprecating the Old Interface";
+  "Retiring an interface is the unsafe move." -> "Replacing an
+  interface you own is the unsafe move, because every caller was
+  written against the old one."; "someone decided to retire this" ->
+  "this should no longer be called"
 
 ---
 

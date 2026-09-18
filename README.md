@@ -270,8 +270,8 @@ For my own bookkeeping.
 | 26_Patterns--Surrogate.md                 |X|
 | 27_Patterns--Factory.md                   |X|
 | 28_Patterns--Function_Objects.md          |X|
-| 29_Patterns--Changing_the_Interface.md    |_|
-| 30_Patterns--Observer.md                  | |
+| 29_Patterns--Changing_the_Interface.md    |X|
+| 30_Patterns--Observer.md                  |_|
 | 31_Patterns--State_Machines.md            | |
 | 32_Patterns--Multiple_Dispatching.md      | |
 | 33_Patterns--Visitor.md                   | |
