@@ -267,13 +267,15 @@ something else. Expect `git diff Chapters/` to show both.
 
 ### Work on one chapter
 
+Run the whole code-example gate against one chapter instead of all 47:
+
 ```sh
 make check-ch CH=07
 ```
 
-This runs the whole code-example gate against one chapter
-instead of all 47: extract, output markers, listing format, types, lint,
-tests. `CH` takes a number or a filename stem. Make this your edit loop.
+The gate extracts the chapter, then checks output markers, listing format,
+types, lint, and tests.
+`CH` takes a number or a filename stem. Make this your edit loop.
 Only `make gate` catches breakage across chapters.
 
 ### Run one example by hand
