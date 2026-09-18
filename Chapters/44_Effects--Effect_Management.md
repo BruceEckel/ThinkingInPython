@@ -943,6 +943,8 @@ If one arrives, it will contain the ideas in this chapter.
 [Effect Tracking](A_Effect_Tracking.md) works through one candidate design:
 an Effect row carried in `typing.Annotated` metadata,
 and an analysis of the tool that would propagate and check it.
+The appendix calls the result *algebraic effect tracking*:
+the row a native system keeps, without the handlers.
 
 ## Effects Are the Next Barrier
 
