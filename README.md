@@ -15,7 +15,7 @@ Opens with a condensed introduction for programmers coming from other languages.
 
 ## Read the Book Online
 
-[ThinkingInPython.com](https://thinkinginpython.com/)
+[ThinkingInPython.com](https://bruceeckel.github.io/ThinkingInPython)
 
 ## Download the Book
 
@@ -64,7 +64,7 @@ where each listing is a fenced `python` block whose first line is a
 
 ### Reading a listing
 
-A `#:` marker comment holds the output of the statement above it:
+A `#:` marker comment holds the output of the statement(s) above it:
 
 ```python
 c = Circle(10)
@@ -75,13 +75,13 @@ print(c.area)
 ```
 
 The build runs every listing and compares its stdout against these markers,
-so a marker in the book always says what the code prints.
+so a marker in the book always shows what the code prints.
 
 ### Working the exercises
 
 Each chapter ends with exercises that name the listing to start from
-("Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`").
-Copy that file, change it, run it. Then compare with the numbered answer in
+(e.g.: "Add a method `shrink(self, factor)` to `Circle` in `property_setter.py`").
+Copy the example file, change it, run it. Then compare with the numbered answer in
 that chapter's `Solutions/` file. Each solution is self-contained: it
 repeats whatever it needs from the chapter rather than importing it, so you
 can read or run one on its own.
@@ -97,20 +97,68 @@ You'll need to do this to experiment with the examples and exercises.
 ### Install
 
 1. Clone this repository onto your local machine:
-   - `git clone https://github.com/BruceEckel/ThinkingInPython.git`
-   - or, with the [GitHub CLI](https://cli.github.com/):
-     `gh repo clone BruceEckel/ThinkingInPython`
-2. You need a `make` command. Check with `make --version`.
-   - Linux and WSL: `sudo apt install make` (Debian/Ubuntu) or
-     `sudo dnf install make` (Fedora). Minimal images, including
-     Ubuntu on WSL, do not include it.
-   - macOS: install Xcode Command Line Tools if it's missing.
-   - Windows: `winget install ezwinports.make`
+
+   ```sh
+   git clone https://github.com/BruceEckel/ThinkingInPython.git
+   ```
+
+   or, with the [GitHub CLI](https://cli.github.com/):
+
+   ```sh
+   gh repo clone BruceEckel/ThinkingInPython
+   ```
+
+2. You need a `make` command. Check for one with:
+
+   ```sh
+   make --version
+   ```
+
+   If it's missing:
+   - Debian, Ubuntu, and Ubuntu on WSL (minimal images do not include it):
+
+     ```sh
+     sudo apt install make
+     ```
+
+   - Fedora:
+
+     ```sh
+     sudo dnf install make
+     ```
+
+   - macOS: install Xcode Command Line Tools.
+   - Windows:
+
+     ```sh
+     winget install ezwinports.make
+     ```
+
 3. Install [uv](https://docs.astral.sh/uv/):
-   - Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-   - macOS: `brew install uv`, or the same `curl` command as Linux
-   - Windows: `winget install --id=astral-sh.uv -e`
-4. Run `make tools-check` to verify the essential tools.
+   - Linux, and macOS without Homebrew:
+
+     ```sh
+     curl -LsSf https://astral.sh/uv/install.sh | sh
+     ```
+
+   - macOS with Homebrew:
+
+     ```sh
+     brew install uv
+     ```
+
+   - Windows:
+
+     ```sh
+     winget install --id=astral-sh.uv -e
+     ```
+
+4. Verify the essential tools:
+
+   ```sh
+   make tools-check
+   ```
+
    There is no separate install step.
    Every `make` target goes through `uv run`,
    and the first one you run creates `.venv` and installs the pinned
@@ -171,7 +219,11 @@ something else. Expect `git diff Chapters/` to show both.
 
 ### Work on one chapter
 
-`make check-ch CH=07` runs the whole code-example gate against one chapter
+```sh
+make check-ch CH=07
+```
+
+This runs the whole code-example gate against one chapter
 instead of all 47: extract, output markers, listing format, types, lint,
 tests. `CH` takes a number or a filename stem. Make this your edit loop.
 Only `make gate` catches breakage across chapters.
@@ -182,8 +234,11 @@ Only `make gate` catches breakage across chapters.
 output. Give it the file's name, or as much of its path as you care to
 type:
 
-```bash
+```sh
 make run-one deque_timing
+```
+
+```sh
 make run-one Examples/07_Foundations--Classes/property_setter.py
 ```
 
@@ -192,7 +247,7 @@ make run-one Examples/07_Foundations--Classes/property_setter.py
 It sets up what the example expects, and prints the commands it stood in
 for, because those are what you type when `make` is not at hand:
 
-```bash
+```sh
 cd Examples/03_Foundations--Containers
 PYTHONPATH=../utils uv run python deque_timing.py
 ```
@@ -207,7 +262,14 @@ import path. Miss the second line and Python says:
 ModuleNotFoundError: No module named 'benchmark'
 ```
 
-In PowerShell the `PYTHONPATH` line is `$env:PYTHONPATH = "../utils"`;
+PowerShell sets the variable in a statement of its own:
+
+```powershell
+cd Examples/03_Foundations--Containers
+$env:PYTHONPATH = "../utils"
+uv run python deque_timing.py
+```
+
 `make run-one` prints whichever form fits your shell.
 
 Use `uv run python`, not a bare `python`. A `python` already on your PATH is
@@ -217,8 +279,14 @@ usually an older release, and these examples use Python 3.15 syntax.
 
 Building the book itself needs more. `make site`, `make local`, and
 `make serve` need `pandoc` on your PATH, `make pdf` also needs `typst`, and
-`make prose` needs the standalone `vale` binary. `make tools-check-full`
-checks for all of them. See
+`make prose` needs the standalone `vale` binary.
+This checks for all of them:
+
+```sh
+make tools-check-full
+```
+
+See
 [tools/README](https://github.com/BruceEckel/ThinkingInPython/blob/master/tools/README.md)
 for details and install links.
 
