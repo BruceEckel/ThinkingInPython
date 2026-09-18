@@ -85,16 +85,12 @@ but a caller can forget to make the call.
 and `notify()` walks that copy,
 so an observer that detaches itself mid-broadcast cannot make the loop skip an observer.
 
-Python expresses the pattern with far less machinery.
-
 ## The Pythonic Observer: a List of Callables
 
-In Python an *observer* need not be an object implementing an `Observer` interface.
-It is a callable.
-An *observable* need not be a `Subject` base class with `attach()` and `detach()`.
-It is a list of callables and a way to notify them.
+In Python an observer is any callable,
+and an observable is a list of callables plus a way to notify them.
 A `@property` setter runs at every assignment to its attribute,
-so it is the place to send the notification when state changes:
+so the setter is the place to send the notification when state changes:
 
 ```python
 # observers.py
