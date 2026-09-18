@@ -651,6 +651,13 @@ Neither function needs a `BoxModel`,
 so both are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
 `BoxModel` is an `Observable[Grid]`.
+Inheriting does not stop it from being a data class,
+but a generated `__init__()` does not call the base class's `__init__()`
+([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance)),
+so a `@dataclass` `BoxModel` would have no list of observers,
+and `subscribe()` would raise an `AttributeError`.
+A `__post_init__()` that calls `super().__init__()` and builds `grid` from `size` fixes that,
+at greater length than the `__init__()` it replaces.
 `BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
 An enum, two functions, and one class make up the model:
 `Color` holds the colors and their order, the functions compute grids,
