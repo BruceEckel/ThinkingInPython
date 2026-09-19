@@ -367,8 +367,7 @@ print(grid)
 #: {(2, 3): 'red'}
 ```
 
-Like `match`, `type` is a soft keyword
-([Control Flow](04_Foundations--Control_Flow.md#pattern-matching)):
+Like `match`, `type` is a [soft keyword](04_Foundations--Control_Flow.md#pattern-matching):
 it is a keyword only at the start of this statement.
 Everywhere else, `type` is still the builtin `type()` function,
 so `type(grid)` in the same file returns `dict` as it always has.
