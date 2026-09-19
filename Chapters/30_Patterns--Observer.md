@@ -93,13 +93,16 @@ since `_observers` is already a list.
 It is not.
 An observer may react to a notification by detaching.
 A one-shot listener detaches after its first call,
-and the detach mutates `self._observers` in the middle of the loop walking it.
+and the detach mutates `self._observers` while the loop is reading it.
 If you iterate the list directly,
 removing the current observer lowers every later observer's index by one,
 while the loop's own index keeps advancing, so the loop skips the next observer.
 No exception reports the skip.
-Walking a copy makes detaching during notification safe,
-and a newcomer attaching mid-notification receives its first notification at the next change.
+The copy is a second list,
+so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
+The set of observers is therefore fixed when `notify()` begins.
+An observer detached partway through still receives this notification,
+and a newcomer attaching mid-notification receives its first one at the next change.
 
 ## The Pythonic Observer: a List of Callables
 
