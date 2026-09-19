@@ -826,10 +826,12 @@ The *view*, `box_view.py`,
 displays the boxes using the standard library's `tkinter`.
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
-A click changes up to five boxes at once, so the window is a puzzle:
+One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-From this starting grid, `palegreen` is the one color all the boxes can share.
-No sequence of clicks turns the grid all `skyblue` or all `khaki`.
+On the 8x8 grid `box_view.py` opens with,
+`palegreen` is the only color the whole grid can reach;
+no sequence of clicks turns it all `skyblue` or all `khaki`.
+The size decides that: every color works on a 3x3 grid.
 
 The model reuses the same `Broadcaster` as the thermometer,
 from `broadcaster.py`:
