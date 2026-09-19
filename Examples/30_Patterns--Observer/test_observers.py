@@ -26,7 +26,7 @@ def test_unsubscribe_stops_delivery() -> None:
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
-    t = Thermometer()
+    t = Thermometer(20.0)
     t.subscribe(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
@@ -35,7 +35,7 @@ def test_thermometer_pushes_new_value_on_set() -> None:
 
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
-    t = Thermometer()
+    t = Thermometer(0.0)
     t.celsius = 10.0  # No subscriber yet
     t.subscribe(readings.append)
     t.celsius = 20.0

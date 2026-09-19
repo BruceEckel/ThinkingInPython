@@ -22,9 +22,9 @@ class Observable[T]:
             *(obs(data) for obs in self._observers))
 
 class Thermometer(Observable[float]):
-    def __init__(self) -> None:
+    def __init__(self, celsius: float) -> None:
         super().__init__()
-        self._celsius = 0.0
+        self._celsius = celsius
 
     @property
     def celsius(self) -> float:
@@ -45,7 +45,7 @@ async def log_reading(celsius: float) -> None:
     print(f"logged: {celsius}C")
 
 async def main() -> None:
-    t = Thermometer()
+    t = Thermometer(15.0)
     t.subscribe(alarm)
     t.subscribe(log_reading)
     await t.set_celsius(20)  # Below the alarm threshold

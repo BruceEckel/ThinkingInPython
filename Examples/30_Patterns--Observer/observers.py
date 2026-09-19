@@ -18,9 +18,9 @@ class Observable[T]:
             observer(data)
 
 class Thermometer(Observable[float]):
-    def __init__(self) -> None:
+    def __init__(self, celsius: float) -> None:
         super().__init__()
-        self._celsius = 0.0
+        self._celsius = celsius
 
     @property
     def celsius(self) -> float:

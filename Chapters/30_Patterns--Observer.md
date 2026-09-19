@@ -132,9 +132,9 @@ class Observable[T]:
             observer(data)
 
 class Thermometer(Observable[float]):
-    def __init__(self) -> None:
+    def __init__(self, celsius: float) -> None:
         super().__init__()
-        self._celsius = 0.0
+        self._celsius = celsius
 
     @property
     def celsius(self) -> float:
@@ -146,13 +146,16 @@ class Thermometer(Observable[float]):
         self.notify(value)
 ```
 
-Subscribed callables then react to every assignment to `celsius`:
+The constructor requires a starting reading and assigns it to `_celsius` rather than to `celsius`,
+so construction skips the setter and notifies no one.
+
+Subscribed callables then react to every `celsius` assignment:
 
 ```python
 # thermometer.py
 from observers import Thermometer
 
-t = Thermometer()
+t = Thermometer(20.0)
 t.subscribe(lambda c: print(f"display: {c}C"))
 t.subscribe(lambda c: print("alarm!" if c > 100 else "ok"))
 t.celsius = 25
@@ -238,7 +241,7 @@ def test_unsubscribe_stops_delivery() -> None:
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
-    t = Thermometer()
+    t = Thermometer(20.0)
     t.subscribe(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
@@ -247,7 +250,7 @@ def test_thermometer_pushes_new_value_on_set() -> None:
 
 def test_late_subscriber_misses_earlier_changes() -> None:
     readings: list[float] = []
-    t = Thermometer()
+    t = Thermometer(0.0)
     t.celsius = 10.0  # No subscriber yet
     t.subscribe(readings.append)
     t.celsius = 20.0
@@ -429,9 +432,9 @@ class Observable[T]:
             *(obs(data) for obs in self._observers))
 
 class Thermometer(Observable[float]):
-    def __init__(self) -> None:
+    def __init__(self, celsius: float) -> None:
         super().__init__()
-        self._celsius = 0.0
+        self._celsius = celsius
 
     @property
     def celsius(self) -> float:
@@ -452,7 +455,7 @@ async def log_reading(celsius: float) -> None:
     print(f"logged: {celsius}C")
 
 async def main() -> None:
-    t = Thermometer()
+    t = Thermometer(15.0)
     t.subscribe(alarm)
     t.subscribe(log_reading)
     await t.set_celsius(20)  # Below the alarm threshold
