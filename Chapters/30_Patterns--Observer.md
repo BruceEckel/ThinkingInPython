@@ -230,10 +230,12 @@ tries its handlers in turn and returns the result from the first one that succee
 Testing confirms that `celsius` reports the value given to the constructor,
 that every subscriber receives the new value in subscription order,
 that a subscriber receives only the changes made after it subscribes,
-and that delivery stops after `unsubscribe()`:
+and that delivery stops after `unsubscribe()`.
+Two more tests cover a callable subscribed twice and an `unsubscribe()` that matches no subscription:
 
 ```python
 # test_observers.py
+import pytest
 from observers import Observable, Thermometer
 
 def test_notify_calls_every_subscriber() -> None:
@@ -259,6 +261,23 @@ def test_unsubscribe_stops_delivery() -> None:
     obs.notify(2)
     assert received == [1]
 
+def test_subscribing_twice_notifies_twice() -> None:
+    received: list[object] = []
+    obs = Observable[object]()
+    record = received.append
+    obs.subscribe(record)
+    obs.subscribe(record)
+    obs.notify(1)
+    assert received == [1, 1]
+    obs.unsubscribe(record)  # Removes one of the two
+    obs.notify(2)
+    assert received == [1, 1, 2]
+
+def test_unsubscribe_without_subscribe_raises() -> None:
+    obs = Observable[object]()
+    with pytest.raises(ValueError):
+        obs.unsubscribe(print)
+
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
@@ -283,12 +302,15 @@ so the list records what arrived.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
 A bound method needs no stashed reference.
-Writing `obj.update` twice builds two distinct objects that compare equal,
-because they share an instance and a function.
-`unsubscribe(obj.update)` therefore finds the one that subscribed.
-`unsubscribe()` delegates to `list.remove()`,
-so detaching an observer that never subscribed raises a `ValueError`.
-Subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
+Each `obj.update` builds a new bound-method object,
+so `obj.update is obj.update` is `False`.
+Two bound methods compare equal when they wrap the same instance and the same function,
+so `unsubscribe(obj.update)` removes the subscription that `subscribe(obj.update)` made.
+The same equality rule explains the last two tests.
+Subscribing one callable twice puts two equal entries in the list,
+so each notification calls it twice and each `unsubscribe()` removes one entry.
+`list.remove()` raises a `ValueError` when it matches nothing,
+which is what `unsubscribe()` does with a callable that never subscribed.
 
 ### Detaching During a Notification
 

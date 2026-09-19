@@ -1,4 +1,5 @@
 # test_observers.py
+import pytest
 from observers import Observable, Thermometer
 
 def test_notify_calls_every_subscriber() -> None:
@@ -23,6 +24,23 @@ def test_unsubscribe_stops_delivery() -> None:
     obs.unsubscribe(record)
     obs.notify(2)
     assert received == [1]
+
+def test_subscribing_twice_notifies_twice() -> None:
+    received: list[object] = []
+    obs = Observable[object]()
+    record = received.append
+    obs.subscribe(record)
+    obs.subscribe(record)
+    obs.notify(1)
+    assert received == [1, 1]
+    obs.unsubscribe(record)  # Removes one of the two
+    obs.notify(2)
+    assert received == [1, 1, 2]
+
+def test_unsubscribe_without_subscribe_raises() -> None:
+    obs = Observable[object]()
+    with pytest.raises(ValueError):
+        obs.unsubscribe(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
