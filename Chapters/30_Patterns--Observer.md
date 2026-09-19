@@ -429,8 +429,7 @@ so the weak part lives inside the listener.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method when you call the reference.
 While `plot` is alive, `weak` forwards the reading to it.
-Once `plot` is gone,
-the reference answers `None` and `weak` unsubscribes itself,
+Once `plot` is gone, `ref()` returns `None` and `weak` unsubscribes itself,
 which is safe mid-notification for the reason the copy in `announce()` exists.
 The `ValueError` confirms the subscription is gone:
 `unsubscribe()` finds nothing left to remove.
@@ -1070,6 +1069,6 @@ and the *Observer* is an event bus.
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
     Each attribute keeps its own listeners.
     Subscribing needs the descriptor, not the value it stores,
-    so `__get__()` answers class access by returning the descriptor,
+    so `__get__()` returns the descriptor when the class accesses it,
     and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
     Show that an assignment to one attribute calls no listener of the other.
