@@ -620,8 +620,7 @@ draws the same distinction between a table keyed by class and dispatch that foll
 
 Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that, but not the only one.
-The deeper skill is spotting the *vector of change*
-([Design Patterns](21_Patterns--Design_Patterns.md#what-is-a-pattern)),
+The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#what-is-a-pattern),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
 This chapter met each vector through a concrete requirement:
