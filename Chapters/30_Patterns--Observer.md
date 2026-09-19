@@ -202,26 +202,24 @@ so it can publish more than one kind of change.
 Event-heavy programs have mature libraries (signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
-`Thermometer` writes its `__init__()` by hand.
-Inheriting does not stop a class from being a data class,
-but a generated `__init__()` does not call the base class's `__init__()`
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance)),
-so a `@dataclass` `Thermometer` would have no list of observers,
+`Thermometer`'s constructor is simple and suggests using a `dataclass`.
+Inheriting does not stop a class from being a `dataclass`,
+but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance)).
+A `@dataclass` `Thermometer` would have no list of observers,
 and `subscribe()` would raise an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
-at greater length than the `__init__()` it replaces.
+but at greater length and complexity than the `__init__()` it replaces.
 
-An observer returns `None`.
-The `Observer` alias declares that return type,
-and the type checker rejects a subscriber that returns a value.
-Notification runs one way, from observable to observers, and nothing comes back:
-`notify()` calls each observer as a statement and reads no result.
+An observer returns `None`, as seen in the `Observer` alias.
+The type checker rejects a subscriber that returns a value.
+Notification runs one way, from observable to observers,
+so `notify()` calls each observer as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
 A notification names no receiver, and each observer may handle or ignore it,
 so one call with several observers has no single answer to collect.
-Getting a value back is a different pattern,
-such as [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
-for the first handler that answers.
+A design that needs an answer uses a different pattern.
+[*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+tries its handlers in turn and returns the result from the first one that succeeds.
 
 Testing confirms that the constructor's starting reading is readable,
 that every subscriber receives the new value in subscription order,
