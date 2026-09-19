@@ -58,8 +58,8 @@ which claims about a 3x speedup on average.
 PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you need.
 
-For a parallel, CPU-bound workload, the free-threaded build
-([The GIL and Free Threading](19_Techniques--Concurrency.md#the-gil-and-free-threading))
+For a parallel, CPU-bound workload,
+the [free-threaded build](19_Techniques--Concurrency.md#the-gil-and-free-threading)
 is the largest platform-level speedup available in 3.15,
 since it removes the lock that otherwise serializes Python bytecode across threads.
 
@@ -882,8 +882,7 @@ so they can serve as dictionary keys and as arguments to the caches below.
 ## Lazy Evaluation with Generators
 
 A list-building pipeline materializes every intermediate result.
-A generator pipeline
-([Comprehensions](16_Techniques--Comprehensions.md#generator-expressions))
+A [generator pipeline](16_Techniques--Comprehensions.md#generator-expressions)
 computes one item at a time, on demand,
 so memory use doesn't grow with the size of the source,
 and the pipeline does no work past the point where the consumer stops.
@@ -959,8 +958,7 @@ stream it from the start, like `lazy_first_evens()`.
 
 ## Caching
 
-If you call a pure function
-([Functional Foundations](40_Functional--Foundations.md#pure-functions))
+If you call a [pure function](40_Functional--Foundations.md#pure-functions)
 repeatedly with the same arguments,
 the fastest way to get the answer is to reuse the one you already computed.
 `functools.cache` stores each result the first time and replays it after that.
@@ -1134,8 +1132,7 @@ so the listing prints a comparison that holds anywhere rather than numbers that 
 and `slots=True` is the half that gets dropped,
 because the class works without it.
 A decorator of your own can apply both.
-`@dataclass_transform`
-([Metaprogramming](17_Techniques--Metaprogramming.md#where-enforcement-lives))
+[`@dataclass_transform`](17_Techniques--Metaprogramming.md#where-enforcement-lives)
 tells the type checker that the result is a frozen data class:
 
 ```python
