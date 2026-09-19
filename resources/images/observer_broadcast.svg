@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 320"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>One state change in the observable becomes one update() call on every observer in its list</title>
+  <defs>
+    <marker id="ob-tri" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- the state change that starts the broadcast -->
+  <line x1="155" y1="44" x2="155" y2="104" stroke="#1a1612" stroke-width="1.3"
+        marker-end="url(#ob-tri)"/>
+  <text x="168" y="78" font-size="11.5" fill="#1a1612">t.set_celsius(25)</text>
+
+  <!-- the observable -->
+  <rect x="50" y="108" width="210" height="84" fill="none"
+        stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="155" y="138" font-size="15" font-weight="bold" fill="#1a1612"
+        text-anchor="middle">Thermometer</text>
+  <text x="155" y="162" font-size="12" fill="#7a6e62"
+        text-anchor="middle">notify(25)</text>
+  <text x="155" y="180" font-size="11" fill="#7a6e62"
+        text-anchor="middle">_observers: [...]</text>
+
+  <!-- one update() call per observer -->
+  <line x1="263" y1="144" x2="435" y2="68" stroke="#1a1612" stroke-width="1.3"
+        marker-end="url(#ob-tri)"/>
+  <line x1="263" y1="150" x2="435" y2="150" stroke="#1a1612" stroke-width="1.3"
+        marker-end="url(#ob-tri)"/>
+  <line x1="263" y1="156" x2="435" y2="232" stroke="#1a1612" stroke-width="1.3"
+        marker-end="url(#ob-tri)"/>
+  <text x="350" y="140" font-size="11.5" fill="#8b1a1a"
+        text-anchor="middle">update(self, 25)</text>
+
+  <!-- the observers: Display is in the listing, the dashed two are not -->
+  <rect x="440" y="45" width="180" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="530" y="74" font-size="14" fill="#1a1612"
+        text-anchor="middle">Display</text>
+
+  <rect x="440" y="127" width="180" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
+  <text x="530" y="156" font-size="14" fill="#7a6e62"
+        text-anchor="middle">Plot</text>
+
+  <rect x="440" y="209" width="180" height="46" fill="none"
+        stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
+  <text x="530" y="238" font-size="14" fill="#7a6e62"
+        text-anchor="middle">Table</text>
+
+  <text x="350" y="295" font-size="11.5" fill="#7a6e62"
+        text-anchor="middle">Thermometer names no observer type</text>
+</svg>

@@ -71,6 +71,10 @@ t.set_celsius(25)
 so one change to the observable's state reaches all of them:
 `Display` prints the new reading, and a plot or a table would redraw.
 
+![One call to set_celsius() becomes one update() call on every observer in the list.
+Thermometer holds the list and names no observer type,
+so a Plot and a Table would attach the way Display does](_images/observer_broadcast)
+
 Passing `arg` is the *push* model.
 The observable supplies what changed,
 so an observer needs no reference back into the observable's state.
