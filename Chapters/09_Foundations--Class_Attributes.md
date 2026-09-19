@@ -277,6 +277,8 @@ and no attribute exists until something assigns one,
 so the first read raises an `AttributeError`.
 `ty` reports nothing here, for the reason it reports nothing for `label`:
 it trusts the declaration rather than tracking which code runs first.
+Pyright agrees, and its optional `reportUninitializedInstanceVariable` covers a bare instance annotation,
+not a `ClassVar`, so no checker catches this read.
 `Registry.count = 0` creates the attribute on the class,
 and an instance finds it by fallback.
 

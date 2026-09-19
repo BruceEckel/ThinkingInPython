@@ -452,12 +452,19 @@ for that attribute, the work `Thermometer`'s property setter did with
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
 returning the descriptor there puts `subscribe()` within reach. The
-two `@overload` declarations tell the type checker which of the two
-results it gets: `Notifying[T]` from the class, `T` from an instance.
-Without them the declared return type is the union, and `t.celsius *
-2` would fail to check. The overloads also check the listener against
-the attribute: `Thermometer.celsius.subscribe(t, readings.append)`
-passes only because `readings` is a `list[float]`.
+two `@overload` declarations tell `ty` which of the two results it
+gets: `Notifying[T]` from the class, `T` from an instance. Without
+them the declared return type is the union, and `t.celsius * 2` would
+fail to check. The overloads also check the listener against the
+attribute: `Thermometer.celsius.subscribe(t, readings.append)` passes
+only because `readings` is a `list[float]`.
+
+Pyright reads the class access differently, resolving
+`Thermometer.celsius` to `float` and rejecting `.subscribe` on it.
+The two checkers disagree about which overload a descriptor's class
+access selects, so a codebase on pyright needs the subscription
+somewhere else: a method on `Thermometer`, or a helper that looks the
+descriptor up in `type(obj).__dict__`.
 
 `subscribe()` writes the listener list into the instance's `__dict__`
 rather than declaring it on the class, where every instance would
