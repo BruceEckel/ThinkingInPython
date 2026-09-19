@@ -66,6 +66,11 @@ t.set_celsius(25)
 #: display: 25C
 ```
 
+`update()` is where each observer modifies itself.
+`notify()` calls it on every observer in the list,
+so one change to the observable's state reaches all of them:
+`Display` prints the new reading, and a plot or a table would redraw.
+
 Passing `arg` is the *push* model.
 The observable supplies what changed,
 so an observer needs no reference back into the observable's state.
@@ -154,8 +159,7 @@ The observers here are lambdas, but any function or bound method works.
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `observable` argument.
 A classic observer is an object,
-so the observable needs the name of a method to call on it,
-and the interface fixes that name as `update()`.
+so the observable needs the name of a method to call on it.
 In Python the observer is the callable, so `notify()` calls it directly:
 `observer(data)` where the classic version called `observer.update(self, arg)`.
 The remaining method names change as well:
