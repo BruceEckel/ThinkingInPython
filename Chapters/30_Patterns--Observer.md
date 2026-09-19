@@ -367,8 +367,11 @@ That call removes it from the broadcaster's list,
 not from the copy the loop is reading,
 so `once` finishes this notification and receives none after it.
 `always` receives both.
-Without the copy, removing `once` would shift `always` down into an index the loop has already passed,
-so `always: 1` would be missing.
+Without the copy, the loop would be reading the list it changes.
+`once` is at index 0 and `always` at index 1.
+Removing `once` moves `always` to index 0, which the loop has already visited,
+so the loop looks for index 1, finds the list ended there, and stops.
+`always: 1` never prints.
 
 ### Failures and Lapsed Listeners
 
