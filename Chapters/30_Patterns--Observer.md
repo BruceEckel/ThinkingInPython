@@ -664,6 +664,16 @@ class Thermometer(Broadcaster[float]):
         # A property setter cannot be awaited
         self._celsius = value
         await self.announce(value)
+```
+
+The module defines classes and runs nothing,
+so a later listing can import `Broadcaster` without starting a demo.
+The thermometer demo lives in its own file, and its listeners are coroutines:
+
+```python
+# async_thermometer.py
+import asyncio
+from async_broadcaster import Thermometer
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
@@ -713,7 +723,7 @@ Below its threshold, the alarm returns at once.
 
 ### Unsubscribing During an Async Notification
 
-`announce()` needs no `list()` copy here.
+`announce()` does not require copying via `list()`.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so an unsubscribe during the fan-out cannot skip a listener.
 The tuple also means a listener that unsubscribes mid-notification still receives this change,
@@ -722,27 +732,7 @@ an async counterpart to `self_removing_listener.py`:
 ```python
 # async_self_removing_listener.py
 import asyncio
-from collections.abc import Awaitable, Callable
-
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
-
-class Broadcaster[T]:
-    def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
-
-    def subscribe(
-        self, listener: AsyncListener[T]
-    ) -> None:
-        self._listeners.append(listener)
-
-    def unsubscribe(
-        self, listener: AsyncListener[T]
-    ) -> None:
-        self._listeners.remove(listener)
-
-    async def announce(self, data: T) -> None:
-        await asyncio.gather(
-            *(fn(data) for fn in self._listeners))
+from async_broadcaster import Broadcaster
 
 source = Broadcaster[object]()
 seen: list[str] = []
@@ -765,9 +755,6 @@ asyncio.run(main())
 print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
-
-This listing repeats `async_broadcaster.py`'s `Broadcaster` rather than importing it,
-because that module's own top-level `asyncio.run(main())` would run its thermometer demo again on import.
 
 `once` unsubscribes mid-notification and still receives that notification,
 because `gather()` already holds its coroutine before `once` runs.

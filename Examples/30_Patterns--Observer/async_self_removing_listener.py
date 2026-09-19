@@ -1,26 +1,6 @@
 # async_self_removing_listener.py
 import asyncio
-from collections.abc import Awaitable, Callable
-
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
-
-class Broadcaster[T]:
-    def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
-
-    def subscribe(
-        self, listener: AsyncListener[T]
-    ) -> None:
-        self._listeners.append(listener)
-
-    def unsubscribe(
-        self, listener: AsyncListener[T]
-    ) -> None:
-        self._listeners.remove(listener)
-
-    async def announce(self, data: T) -> None:
-        await asyncio.gather(
-            *(fn(data) for fn in self._listeners))
+from async_broadcaster import Broadcaster
 
 source = Broadcaster[object]()
 seen: list[str] = []
