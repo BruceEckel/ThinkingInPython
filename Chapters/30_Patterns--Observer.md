@@ -920,14 +920,14 @@ The handler calls the model and draws nothing.
 The model and the view share only the subscribe-and-notify contract,
 so you can attach a second view to the same model and keep both views in step.
 
-## What Stayed Constant
+## What Stays Constant
 
-One design served three jobs in this chapter: a thermometer pushing a float,
+One design serves three jobs in this chapter: a thermometer pushing a float,
 a fan-out awaiting network calls, and a GUI repainting a grid.
-In every case the observer was a callable and the observable was a list of them.
-Nothing in the pattern required an interface, a flag, or a class per reaction.
+In every case the observer is a callable and the observable is a list of them.
+The pattern requires no interface, no flag, and no class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-already took the last step.
+takes the last step.
 One list becomes a dictionary of lists keyed by event type,
 and the *Observer* is an event bus.
 
