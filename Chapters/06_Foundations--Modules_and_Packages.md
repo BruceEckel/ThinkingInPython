@@ -515,8 +515,7 @@ that eager work slows startup.
 
 Python 3.15 ([PEP 810](https://peps.python.org/pep-0810/))
 adds the `lazy` soft keyword: a keyword only inside an `import` statement,
-the way `match` is a keyword only inside a `match` statement
-([Control Flow](04_Foundations--Control_Flow.md#pattern-matching)).
+the way `match` is a keyword only inside a [`match` statement](04_Foundations--Control_Flow.md#pattern-matching).
 A `lazy import` defers loading the module until the first time you use the imported name,
 so a run pays only for the modules it uses,
 while all imports stay at the top of the file:
