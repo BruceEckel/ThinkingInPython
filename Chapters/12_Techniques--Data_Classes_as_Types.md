@@ -665,8 +665,7 @@ After that, holding the type is proof the check passed.
 No other code repeats the check, because it cannot fail.
 Illegal values are unrepresentable.
 
-Parsing once into a precise type is one aspect of functional programming
-(see [Functional Foundations](40_Functional--Foundations.md#immutability)).
+Parsing once into a precise type is one aspect of [functional programming](40_Functional--Foundations.md#immutability).
 Instead of mutating an object and re-guarding it,
 you transform one legal value into a new legal value.
 [Static Types](08_Foundations--Static_Types.md#how-much-to-annotate)
