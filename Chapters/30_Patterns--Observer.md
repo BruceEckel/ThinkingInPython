@@ -81,8 +81,6 @@ t.set_celsius(25)
 so one change to the subject's state reaches all of them:
 `Display` prints the new reading, and a plot or a table would redraw.
 
-![One call to set_celsius() becomes one update() call on every observer in the list](_images/observer_broadcast)
-
 `Thermometer` holds the list and names no observer type,
 so `Plot` and `Table` attach the same way `Display` does.
 
@@ -202,6 +200,12 @@ t.celsius = 150
 ```
 
 The listeners here are lambdas, but any function or bound method works.
+
+![One assignment to celsius calls every listener in the list](_images/observer_broadcast)
+
+The dashed `plot` is not in the listing.
+Any callable of the right shape subscribes the way the two lambdas do,
+and `Thermometer` names no listener type.
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
