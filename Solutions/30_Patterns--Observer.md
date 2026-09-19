@@ -33,7 +33,186 @@ collects them in a list. `announce()` then hands its own arguments to
 each one in turn, so every subscribed listener sees the same update,
 in subscription order.
 
-## 2. Turning `box_observer.py` into a flood-fill game
+## 2. An `announce()` that survives a failing listener
+
+```python
+# exercise_3.py
+from collections.abc import Callable
+
+type Listener[T] = Callable[[T], None]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        self._listeners: list[Listener[T]] = []
+
+    def subscribe(self, listener: Listener[T]) -> None:
+        self._listeners.append(listener)
+
+    def announce(self, data: T) -> None:
+        failures: list[Exception] = []
+        for listener in list(self._listeners):
+            try:
+                listener(data)
+            except Exception as e:
+                failures.append(e)
+        if failures:
+            raise ExceptionGroup(
+                "listener failures", failures)
+
+received: list[int] = []
+
+def broken(data: int) -> None:
+    raise RuntimeError(f"cannot handle {data}")
+
+source = Broadcaster[int]()
+source.subscribe(broken)
+source.subscribe(received.append)
+try:
+    source.announce(7)
+except* RuntimeError as group:
+    print(len(group.exceptions), received)
+#: 1 [7]
+```
+
+```python
+# test_resilient_announce.py
+import pytest
+from exercise_3 import Broadcaster
+
+def test_later_listener_still_runs_after_a_failure(
+) -> None:
+    received: list[int] = []
+
+    def broken(data: int) -> None:
+        raise RuntimeError("boom")
+
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(received.append)
+    with pytest.raises(ExceptionGroup):
+        source.announce(1)
+    assert received == [1]
+```
+
+The loop catches each failure and keeps going, so subscription order
+stops deciding who hears the change. Collecting the exceptions rather
+than discarding them is the other half: a listener that fails silently
+is worse than one that stops the loop, because nothing reports the
+failure.
+
+`ExceptionGroup` is the right container because more than one listener
+can fail on a single notification, and the caller needs every failure,
+not the first. `except*` then lets a caller handle one kind of failure
+and re-raise the rest, something a plain `except` on a single
+re-raised exception cannot do.
+
+Catching bare `Exception` here is deliberate: `announce()` has no idea
+what its listeners do, so it cannot name their failure modes. Catching
+`Exception` still lets `BaseException` through, so a
+`KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
+listener stops the notification instead of joining `failures`.
+
+## 3. The same rescue, for the async fan-out
+
+```python
+# exercise_4.py
+import asyncio
+from collections.abc import Awaitable, Callable
+
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        self._listeners: list[AsyncListener[T]] = []
+
+    def subscribe(self, listener: AsyncListener[T]) -> None:
+        self._listeners.append(listener)
+
+    async def announce(self, data: T) -> None:
+        results = await asyncio.gather(
+            *(listener(data)
+              for listener in self._listeners),
+            return_exceptions=True)
+        failures = [
+            r for r in results if isinstance(r, Exception)]
+        if failures:
+            raise ExceptionGroup(
+                "listener failures", failures)
+
+received: list[int] = []
+
+async def broken(data: int) -> None:
+    raise RuntimeError(f"cannot handle {data}")
+
+async def record(data: int) -> None:
+    await asyncio.sleep(0)
+    received.append(data)
+
+async def main() -> None:
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(record)
+    try:
+        await source.announce(7)
+    except* RuntimeError as group:
+        print(len(group.exceptions), received)
+
+asyncio.run(main())
+#: 1 [7]
+```
+
+```python
+# test_async_resilient_announce.py
+import asyncio
+import pytest
+from exercise_4 import Broadcaster
+
+def test_later_listener_still_runs_after_a_failure(
+) -> None:
+    received: list[int] = []
+
+    async def broken(data: int) -> None:
+        raise RuntimeError("boom")
+
+    async def record(data: int) -> None:
+        await asyncio.sleep(0)
+        received.append(data)
+
+    async def run() -> None:
+        source = Broadcaster[int]()
+        source.subscribe(broken)
+        source.subscribe(record)
+        with pytest.raises(ExceptionGroup):
+            await source.announce(1)
+
+    asyncio.run(run())
+    assert received == [1]
+```
+
+`return_exceptions=True` changes `gather()` from "re-raise the first
+failure immediately" to "run everything and hand back a list." That
+one keyword does what the synchronous version needed a `try` inside a
+loop to do, because `gather()` is already the loop.
+
+The results come back in argument order, so the list is a record of
+which listener produced what. This version needs the failures alone,
+so its comprehension keeps each result for which
+`isinstance(r, Exception)` is true. A successful listener returned
+`None`, which fails that test and stays out of `failures`.
+
+The exception filter uses `Exception`, not `BaseException`, for the
+reason exercise 2 gives, and for a second reason here.
+`asyncio.CancelledError` derives from `BaseException`, and
+`return_exceptions=True` still returns a cancellation among the
+results. Treating that result as an ordinary listener failure would
+swallow a cancellation the event loop meant to propagate.
+
+The synchronous and asynchronous versions now answer the same
+question, and both end in an `ExceptionGroup`. The difference is only
+where the loop lives: written by hand in the synchronous version,
+supplied by `gather()` in the async one.
+
+## 4. Turning `box_observer.py` into a flood-fill game
 
 ```python
 # exercise_2.py
@@ -128,185 +307,6 @@ drawing code needs no change, but `show()`'s parameter annotation does:
 it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 `click()`) lets the same view draw either model.
-
-## 3. An `announce()` that survives a failing listener
-
-```python
-# exercise_3.py
-from collections.abc import Callable
-
-type Listener[T] = Callable[[T], None]
-
-class Broadcaster[T]:
-    def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
-
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
-
-    def announce(self, data: T) -> None:
-        failures: list[Exception] = []
-        for listener in list(self._listeners):
-            try:
-                listener(data)
-            except Exception as e:
-                failures.append(e)
-        if failures:
-            raise ExceptionGroup(
-                "listener failures", failures)
-
-received: list[int] = []
-
-def broken(data: int) -> None:
-    raise RuntimeError(f"cannot handle {data}")
-
-source = Broadcaster[int]()
-source.subscribe(broken)
-source.subscribe(received.append)
-try:
-    source.announce(7)
-except* RuntimeError as group:
-    print(len(group.exceptions), received)
-#: 1 [7]
-```
-
-```python
-# test_resilient_announce.py
-import pytest
-from exercise_3 import Broadcaster
-
-def test_later_listener_still_runs_after_a_failure(
-) -> None:
-    received: list[int] = []
-
-    def broken(data: int) -> None:
-        raise RuntimeError("boom")
-
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(received.append)
-    with pytest.raises(ExceptionGroup):
-        source.announce(1)
-    assert received == [1]
-```
-
-The loop catches each failure and keeps going, so subscription order
-stops deciding who hears the change. Collecting the exceptions rather
-than discarding them is the other half: a listener that fails silently
-is worse than one that stops the loop, because nothing reports the
-failure.
-
-`ExceptionGroup` is the right container because more than one listener
-can fail on a single notification, and the caller needs every failure,
-not the first. `except*` then lets a caller handle one kind of failure
-and re-raise the rest, something a plain `except` on a single
-re-raised exception cannot do.
-
-Catching bare `Exception` here is deliberate: `announce()` has no idea
-what its listeners do, so it cannot name their failure modes. Catching
-`Exception` still lets `BaseException` through, so a
-`KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
-listener stops the notification instead of joining `failures`.
-
-## 4. The same rescue, for the async fan-out
-
-```python
-# exercise_4.py
-import asyncio
-from collections.abc import Awaitable, Callable
-
-type AsyncListener[T] = Callable[[T], Awaitable[None]]
-
-class Broadcaster[T]:
-    def __init__(self) -> None:
-        self._listeners: list[AsyncListener[T]] = []
-
-    def subscribe(self, listener: AsyncListener[T]) -> None:
-        self._listeners.append(listener)
-
-    async def announce(self, data: T) -> None:
-        results = await asyncio.gather(
-            *(listener(data)
-              for listener in self._listeners),
-            return_exceptions=True)
-        failures = [
-            r for r in results if isinstance(r, Exception)]
-        if failures:
-            raise ExceptionGroup(
-                "listener failures", failures)
-
-received: list[int] = []
-
-async def broken(data: int) -> None:
-    raise RuntimeError(f"cannot handle {data}")
-
-async def record(data: int) -> None:
-    await asyncio.sleep(0)
-    received.append(data)
-
-async def main() -> None:
-    source = Broadcaster[int]()
-    source.subscribe(broken)
-    source.subscribe(record)
-    try:
-        await source.announce(7)
-    except* RuntimeError as group:
-        print(len(group.exceptions), received)
-
-asyncio.run(main())
-#: 1 [7]
-```
-
-```python
-# test_async_resilient_announce.py
-import asyncio
-import pytest
-from exercise_4 import Broadcaster
-
-def test_later_listener_still_runs_after_a_failure(
-) -> None:
-    received: list[int] = []
-
-    async def broken(data: int) -> None:
-        raise RuntimeError("boom")
-
-    async def record(data: int) -> None:
-        await asyncio.sleep(0)
-        received.append(data)
-
-    async def run() -> None:
-        source = Broadcaster[int]()
-        source.subscribe(broken)
-        source.subscribe(record)
-        with pytest.raises(ExceptionGroup):
-            await source.announce(1)
-
-    asyncio.run(run())
-    assert received == [1]
-```
-
-`return_exceptions=True` changes `gather()` from "re-raise the first
-failure immediately" to "run everything and hand back a list." That
-one keyword does what the synchronous version needed a `try` inside a
-loop to do, because `gather()` is already the loop.
-
-The results come back in argument order, so the list is a record of
-which listener produced what. This version needs the failures alone,
-so its comprehension keeps each result for which
-`isinstance(r, Exception)` is true. A successful listener returned
-`None`, which fails that test and stays out of `failures`.
-
-The exception filter uses `Exception`, not `BaseException`, for the
-reason exercise 3 gives, and for a second reason here.
-`asyncio.CancelledError` derives from `BaseException`, and
-`return_exceptions=True` still returns a cancellation among the
-results. Treating that result as an ordinary listener failure would
-swallow a cancellation the event loop meant to propagate.
-
-The synchronous and asynchronous versions now answer the same
-question, and both end in an `ExceptionGroup`. The difference is only
-where the loop lives: written by hand in the synchronous version,
-supplied by `gather()` in the async one.
 
 ## 5. A new click rule, and the same view
 

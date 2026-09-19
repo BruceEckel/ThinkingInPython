@@ -102,20 +102,18 @@ but a caller can forget to make the call.
 The `list(self._observers)` copy inside `notify()` looks redundant,
 since `_observers` is already a list.
 It is not.
-An observer may react to a notification by detaching.
-A one-shot observer detaches after its first call,
-and the detach mutates `self._observers` while the loop is reading it.
-If you iterate the list directly,
-removing the current observer lowers every later observer's index by one,
-while the loop's own index keeps advancing, so the loop skips the next observer.
-No exception reports the skip.
+An observer may react to a notification by detaching,
+and a detach that reached the list the loop is reading would make the loop skip the next observer,
+with no exception to report the skip.
 The copy is a second list,
 so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
 The set of observers is therefore fixed when `notify()` begins.
 An observer detached partway through still receives this notification,
 and a newcomer attaching mid-notification receives its first one at the next change.
+[Unsubscribing During a Notification](#unsubscribing-during-a-notification)
+runs the failure the copy prevents, one index at a time.
 
-### The Names This Chapter Uses
+## The Names This Chapter Uses
 
 GoF's vocabulary is hard to hold in your head.
 `Observer` and `Observable` differ by three letters, share a stem,
@@ -228,6 +226,8 @@ and a subscriber then names that attribute:
 `t.temperature_changed.subscribe(display)`.
 One object can hold several such attributes,
 so it can publish more than one kind of change.
+[Notifying Without a Base Class](#notifying-without-a-base-class)
+drops the base class and the properties together.
 Event-heavy programs have mature libraries (signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
@@ -250,7 +250,7 @@ A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
-### Testing the Observers
+### Testing the Broadcaster
 
 Testing confirms that `celsius` reports the value given to the constructor,
 that every subscriber receives the new value in subscription order,
@@ -373,12 +373,14 @@ Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
 `always: 1` never prints.
 
-### Failures and Lapsed Listeners
+### A Listener That Raises an Exception
 
 A listener that raises an exception stops the loop,
 and the listeners after it are not called.
 Decide whether `announce()` should catch, collect, and continue
-(exercise 3 makes this concrete).
+(exercise 2 makes this concrete).
+
+### Lapsed Listeners
 
 Subscriptions are strong references.
 A bound method holds the object it came from,
@@ -751,7 +753,7 @@ because that module's own top-level `asyncio.run(main())` would run its thermome
 because `gather()` already holds its coroutine before `once` runs.
 The next `announce()` no longer calls it.
 
-### A Failing Observer Orphans the Rest
+### A Failing Listener Orphans the Rest
 
 A failing listener behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
@@ -786,7 +788,7 @@ A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
 and an exception the orphan later raises is never retrieved.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
-the async form of exercise 3's catch-collect-continue.
+the async form of exercise 2's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
 A `TaskGroup` cancels a failing task's siblings,
@@ -797,7 +799,7 @@ For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is s
 The type-keyed [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 is the same fan-out, routed by event type.
 
-## A Visual Example of Observers
+## A Visual Example: a Model and Its View
 
 The last example is the model-view split made visible.
 The *model*, `box_observer.py`,
@@ -1042,24 +1044,24 @@ and the *Observer* is an event bus.
     the smallest `Broadcaster` that lets callables subscribe,
     then notifies them.
     Demonstrate it by subscribing several listeners and causing one change that updates them all.
-2.  Turn `box_observer.py` into a simple game:
+2.  Make `Broadcaster.announce()` survive a listener that raises an exception:
+    every other listener is still notified,
+    and `announce()` re-raises the failures afterward, together,
+    as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
+    (which you build yourself here: `raise ExceptionGroup("message", failures)`).
+    Write a test in which the first listener raises an exception and the second still records its notification.
+3.  Redo exercise 2 for `async_broadcaster.py`.
+    Make `announce()` use `gather(*coros, return_exceptions=True)`,
+    separate the returned exceptions from the successes,
+    and raise them together as an `ExceptionGroup`.
+    Write a test in which the first listener raises an exception and the second still records its notification.
+4.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and clicking any square recolors your patch to that square's color,
     absorbing neighbors that now match.
     Write the neighbor test yourself, counting diagonals.
     Track the clicks it takes to make the whole field one color.
     For competition, alternate turns between players.
-3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
-    every other listener is still notified,
-    and `announce()` re-raises the failures afterward, together,
-    as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
-    (which you build yourself here: `raise ExceptionGroup("message", failures)`).
-    Write a test in which the first listener raises an exception and the second still records its notification.
-4.  Redo exercise 3 for `async_broadcaster.py`.
-    Make `announce()` use `gather(*coros, return_exceptions=True)`,
-    separate the returned exceptions from the successes,
-    and raise them together as an `ExceptionGroup`.
-    Write a test in which the first listener raises an exception and the second still records its notification.
 5.  Change the rule for a click in `box_observer.py`:
     make `recolored()` advance every box in the clicked box's row and column.
     Run `box_view.py` without editing it,

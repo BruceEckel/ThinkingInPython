@@ -16,7 +16,7 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [*Observer*](30_Patterns--Observer.md#a-visual-example-of-observers)
+- [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view)
   has `recolored()` return a new grid instead of mutating the one it received,
   so a test checks the change with no GUI in sight.
 - [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)

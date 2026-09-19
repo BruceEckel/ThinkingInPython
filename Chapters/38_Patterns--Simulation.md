@@ -452,7 +452,7 @@ and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
 Each of this chapter's three views is a separate file holding all the display code,
-the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-of-observers).
+the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view).
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
