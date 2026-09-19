@@ -91,7 +91,7 @@ The simplest approach hides construction behind a cached factory:
 an ordinary function that builds and returns an instance of a class.
 The constructor function stands in for a direct call to the class constructor.
 
-`functools.cache` ([Caching](18_Techniques--Performance.md#caching))
+[`functools.cache`](18_Techniques--Performance.md#caching)
 *memoizes* a function.
 The first call with a given set of arguments runs the function and stores the result.
 Every repeat call with those arguments returns the stored result.
