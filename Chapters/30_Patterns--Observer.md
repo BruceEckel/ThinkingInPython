@@ -923,9 +923,6 @@ A test calls them directly, and a second model can reuse them.
 Like `Thermometer`, it writes its own `__init__()`,
 which calls `Broadcaster.__init__()` and then builds `grid` from `size`.
 `BoxModel.select()` makes the next grid with `recolored()` and passes it to `announce()`.
-An enum, two functions, and one class make up the model:
-`Color` holds the colors and their order, the functions compute grids,
-and `BoxModel` holds the current grid and notifies its listeners.
 
 ### Testing the Model
 
