@@ -2148,8 +2148,7 @@ The task figure is heap measured by `tracemalloc`.
 The comparison favors tasks over threads by hundreds to one,
 against that stipulated reservation rather than a measured thread footprint.
 The exact figures move from machine to machine,
-so the listing asserts the two bounds that hold anywhere and prints what it measured under `--numbers`
-(see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine)).
+so the listing asserts the two bounds that hold anywhere and prints what it measured under [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine).
 
 A similar difference shows up in time:
 
