@@ -572,6 +572,10 @@ because an ordinary assignment inside `__setattr__()` would call `__setattr__()`
 `_watchers` needs its bare annotation because a write through `self.__dict__` declares nothing.
 Without the annotation,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
+The annotation declares an instance attribute, not a `ClassVar`:
+it binds no value, so it creates no class attribute,
+and the constructor gives each `Watched` its own list.
+A `ClassVar` would hand every instance the same list.
 `celsius` and `humidity` need no declaration:
 `ty` reads their type from the constructor's assignments.
 
