@@ -9,8 +9,11 @@ def once(data: object) -> None:
     # Unsubscribes mid-notification
     source.unsubscribe(once)
 
+def always(data: object) -> None:
+    seen.append(f"always: {data}")
+
 source.subscribe(once)
-source.subscribe(lambda d: seen.append(f"always: {d}"))
+source.subscribe(always)
 source.announce(1)
 source.announce(2)
 print(seen)
