@@ -520,7 +520,7 @@ which is the behavior you want when a listener counts readings rather than chang
 
 `Thermometer` writes a getter and a setter for each attribute it publishes,
 and inherits `subscribe()` and `announce()` from `Broadcaster`.
-`__setattr__()` replaces both.
+We can simplify all of this using `__setattr__()`.
 Python calls it on every attribute assignment,
 so one method covers every attribute of the class:
 
@@ -571,18 +571,21 @@ because an ordinary assignment inside `__setattr__()` would call `__setattr__()`
 
 In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
 Such a name is a *bare annotation*.
-It looks like a class variable and is not one,
-because nothing assigns it a value.
-The bare annotation `_watchers: list[Watcher]` is required because a write through `self.__dict__` declares nothing.
-Without the annotation,
-`ty` reports an `unresolved-attribute` error in each method that reads the list.
+It looks like a class variable but is not, because nothing assigns it a value.
 `_watchers` creates no attribute anywhere,
 and the constructor gives each `Watched` its own list.
 The same line with `= []` would create a class attribute,
 a single list shared by every `Watched`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
 works through which of these forms creates an attribute and which only declares one.
-In contrast, `celsius` and `humidity` need no declaration because `ty` reads their type from the constructor's assignments.
+
+`ty` takes an instance attribute and its type from an assignment like `self.celsius = celsius`,
+which is why `celsius` and `humidity` need no declaration.
+The constructor writes `self.__dict__["_watchers"] = []` instead,
+a write to a dictionary rather than an assignment to an attribute,
+and `ty` does not read it as one.
+The bare annotation supplies what that assignment would have: without it,
+`ty` reports an `unresolved-attribute` error in each method that reads the list.
 
 One hook covering every attribute is the trade.
 A watcher is a listener with a wider signature:
