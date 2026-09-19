@@ -5,6 +5,7 @@ from tools.check_solutions import (
     BARE_CHAPTER_LINK,
     answer_numbers,
     exercise_numbers,
+    misnamed_listings,
     out_of_order,
     selected,
 )
@@ -81,6 +82,46 @@ def test_a_gap_in_the_numbering_is_reported() -> None:
     findings = list(out_of_order([(1, 3), (3, 9)], Path("a.md"), "solution"))
     assert len(findings) == 1
     assert "numbered 3 where 2 was expected" in findings[0].message
+
+# ── listing names ─────────────────────────────────────────────────────────────
+
+def listing(name: str) -> str:
+    return f"```python\n# {name}\nprint(1)\n```\n"
+
+def test_a_listing_named_for_its_heading_is_clean() -> None:
+    assert list(misnamed_listings(doc(SOLUTIONS))) == []
+
+def test_a_listing_named_for_another_exercise_is_reported() -> None:
+    # Chapter 30 after its exercises were reordered.
+    text = "## 2. Survives a failure\n\n" + listing("exercise_3.py")
+    [finding] = misnamed_listings(doc(text))
+    assert finding.line == 4
+    assert "exercise_3.py" in finding.message
+
+def test_a_suffixed_listing_name_is_read_too() -> None:
+    text = "## 2. Two variants\n\n" + listing("exercise_2b.py")
+    assert list(misnamed_listings(doc(text))) == []
+    text = "## 2. Two variants\n\n" + listing("exercise_5_frozen.py")
+    assert len(list(misnamed_listings(doc(text)))) == 1
+
+def test_exercise_12_is_not_exercise_1() -> None:
+    text = "## 1. First\n\n" + listing("exercise_12.py")
+    assert len(list(misnamed_listings(doc(text)))) == 1
+
+def test_a_combined_heading_accepts_each_of_its_numbers() -> None:
+    text = ("## 1 & 2. Both styles\n\n" + listing("exercise_1.py")
+            + "\n" + listing("exercise_2.py"))
+    assert list(misnamed_listings(doc(text))) == []
+
+def test_a_test_file_or_helper_is_exempt() -> None:
+    text = ("## 2. Survives a failure\n\n"
+            + listing("test_resilient_announce.py")
+            + "\n" + listing("helpers.py"))
+    assert list(misnamed_listings(doc(text))) == []
+
+def test_a_listing_above_the_first_heading_is_exempt() -> None:
+    text = listing("exercise_9.py") + "\n## 1. First\n"
+    assert list(misnamed_listings(doc(text))) == []
 
 # ── chapter citations ─────────────────────────────────────────────────────────
 

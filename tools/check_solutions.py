@@ -25,6 +25,15 @@ than 1..N in order. What it cannot see is a solution that answers the
 wrong exercise under the right number; that still needs a human reading
 the two side by side.
 
+A listing's name carries the number too. Under `## 3. ...` a listing
+named `exercise_N.py` (or `exercise_Nb.py`, `exercise_N_frozen.py`) must
+have N == 3, or one of the numbers a combined heading names. Reordering
+a chapter's exercises renumbers the headings, and the names stay behind
+with nothing else reading them: chapter 30 kept `exercise_3.py` under
+`## 2.` that way, so `SolutionsCode/.../exercise_2.py` held the answer
+to exercise 4. A listing with any other name (a test file, a helper) is
+exempt.
+
 It also checks how a solution *cites* its chapter. `Solutions/` sits
 beside `Chapters/`, so a link written the way a chapter writes it,
 `](24_Patterns--Singleton.md#...)`, resolves to `Solutions/24_Patterns--Singleton.md`, a real
@@ -65,6 +74,10 @@ ANSWER = re.compile(r"^([\d\s&,-]+?)\.\s+\S")
 
 # How the numbers in a combined heading are separated.
 JOINERS = re.compile(r"[&,]")
+
+# A listing named for its exercise: "exercise_3.py", "exercise_3b.py",
+# "exercise_3_frozen.py". Matched against the slug's last path part.
+EXERCISE_LISTING = re.compile(r"^exercise_(\d+)")
 
 # A Markdown link to a numbered book file with no directory in front of
 # it, so it resolves beside the linking file: "](24_Patterns--Singleton.md#state)".
@@ -125,6 +138,32 @@ def answer_numbers(doc: Document) -> list[tuple[int, int]]:
     return found
 
 
+def misnamed_listings(doc: Document) -> Iterator[Finding]:
+    """Findings for an `exercise_N.py` under a heading numbered otherwise.
+
+    A listing above the first numbered heading has no number to match and
+    draws nothing.
+    """
+    sections: list[tuple[int, list[int], str]] = []
+    for lineno, text in doc.headings():
+        m = ANSWER.match(text)
+        if m:
+            sections.append((lineno, expand(m.group(1)), m.group(1)))
+    for block in doc.python_blocks():
+        slug = block.slug
+        m = EXERCISE_LISTING.match(Path(slug).name) if slug else None
+        above = [s for s in sections if s[0] <= block.open_at]
+        if not m or not above:
+            continue
+        _, numbers, prefix = above[-1]
+        if int(m.group(1)) not in numbers:
+            yield Finding(
+                doc.path, block.start + 1,
+                f"{slug} sits under heading {prefix.strip()}; name it "
+                f"for the exercise it answers",
+            )
+
+
 def out_of_order(
     numbered: list[tuple[int, int]], path: Path, what: str,
 ) -> Iterator[Finding]:
@@ -163,9 +202,11 @@ def compare(chapter: Path) -> Iterator[Finding]:
         )
         return
 
-    answers = answer_numbers(Document.parse(solutions))
+    solutions_doc = Document.parse(solutions)
+    answers = answer_numbers(solutions_doc)
     yield from out_of_order(exercises, chapter, "exercise")
     yield from out_of_order(answers, solutions, "solution")
+    yield from misnamed_listings(solutions_doc)
 
     answered = {n for n, _ in answers}
     for number, line in exercises:
@@ -209,7 +250,8 @@ def main(argv: list[str] | None = None) -> int:
         clean="Exercises and solutions line up.",
         problem="{n} problem(s) in Solutions/. Write the missing "
                 "solution, renumber so each `## N.` heading matches its "
-                "exercise, or fix the chapter link.",
+                "exercise, rename the listing to match its heading, or "
+                "fix the chapter link.",
     )
 
 

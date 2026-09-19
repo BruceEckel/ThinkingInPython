@@ -581,8 +581,10 @@ solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
 # The one correspondence neither tree's own checks can see: whether the
 # `## N.` headings here answer the exercises the chapter asks. Pure prose
 # on both sides, so extract_solutions.py (code) and heading_links.py
-# (anchors) both look straight past it. Takes chapter numbers to check
-# one, e.g. `make solutions-numbering ARGS=19`.
+# (anchors) both look straight past it. It also fails an `exercise_N.py`
+# listing whose N is not its heading's number, which a reordering of the
+# exercises leaves behind. Takes chapter numbers to check one, e.g.
+# `make solutions-numbering ARGS=19`.
 solutions-numbering:  ## Verify each chapter's exercises have matching solutions
 	$(PY) -m tools.check_solutions $(ARGS)
 
