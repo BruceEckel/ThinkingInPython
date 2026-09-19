@@ -323,7 +323,13 @@ Nothing requires `Blob` to supply a `sides`,
 and a subclass writing `sides = "four"` draws no report:
 `ty` reads that assignment as a fresh declaration and types `Bad.sides` as `str`,
 so the error surfaces later, wherever an `int` was expected.
-Pyright rejects the assignment where it sits.
+Pyright rejects the assignment where it sits,
+and the typing specification agrees with Pyright:
+a mutable attribute's type is [invariant](08_Foundations--Static_Types.md#variance),
+so a subclass may neither widen nor narrow it.
+The gap is `ty`'s, and a known one:
+it tracks the check under enforcing the Liskov Substitution Principle for attributes
+(`astral-sh/ty` issue 2158).
 Treat the base declaration as documentation that a checker reads,
 not as a guarantee that the attribute exists.
 
