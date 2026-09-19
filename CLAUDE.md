@@ -484,7 +484,11 @@ and how it was measured.
 - **Renumbering or renaming a chapter** touches, in all four trees
   (`Chapters/`, `Solutions/`, `Examples/`, `SolutionsCode/`): the filenames, every
   `NN_*.md` cross-reference and its link text, `build_site.py` `PARTS`,
-  `tools/data/norun.txt`, `tools/data/timing.txt`,
+  `tools/data/norun.txt`, `tools/data/timing.txt` (since 2026-09-18 the
+  gate's `skip-lists` step, `tools/check_skip_lists.py`, fails on a
+  pattern in either that matches no file under `Examples/` or
+  `SolutionsCode/`, so a missed one is loud; renaming one *listing*
+  trips it the same way),
   `tools/data/record_exceptions.txt` (keyed by chapter name, so a rename
   only), the `README.md` tracking table,
   `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any

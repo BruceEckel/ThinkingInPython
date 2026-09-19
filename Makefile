@@ -260,6 +260,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.reflow_prose --write
 	$(PY) -m tools.check_unique_slugs
 	$(PY) -m tools.extract_examples
+	$(PY) -m tools.check_skip_lists
 	$(PY) -m tools.extract_examples --write
 	$(PY) -m tools.validate_output --update Chapters
 	$(TY) check build/examples
@@ -741,7 +742,7 @@ comment-report:  ## List listing comments added since a git ref (SINCE=ref, defa
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs skip-lists \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -860,6 +861,16 @@ quoted-diagnostics-accept: extract solutions-extract  ##- Rewrite tools/data/quo
 # way to ask the same question while editing.
 unique-slugs:  ## Fail if two chapters name two listings the same
 	$(PY) -m tools.check_unique_slugs
+
+# Fail on a pattern in tools/data/norun.txt or tools/data/timing.txt that
+# matches no file under Examples/ or SolutionsCode/. A renamed or deleted
+# listing, or a renumbered chapter, leaves its pattern behind, and a stale
+# timing.txt entry is the dangerous one: the listing's wall-clock marker
+# stops being a claim, and the gate rewrites its next flip into the chapter
+# with everything green. `gate` runs this right after the drift check, so
+# the committed trees it reads are known to be current.
+skip-lists:  ## Fail if a norun.txt or timing.txt pattern matches no listing
+	$(PY) -m tools.check_skip_lists
 
 # Every Markdown check at once, parsing each file once instead of per tool.
 # The individual targets above still work; this is the fast whole-book answer.
