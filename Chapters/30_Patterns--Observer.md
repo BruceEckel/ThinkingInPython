@@ -156,10 +156,10 @@ class Thermometer(Observable[float]):
         self.notify(value)
 ```
 
-The constructor requires a starting reading and assigns it to `_celsius` rather than to `celsius`,
-so construction skips the setter and notifies no one.
+The constructor assigns its argument to `_celsius` rather than to `celsius`,
+so construction skips the setter and doesn't call `notify()`.
 
-Subscribed callables then react to every `celsius` assignment:
+Subscribed callables react to every `celsius` assignment:
 
 ```python
 # thermometer.py
@@ -177,12 +177,13 @@ t.celsius = 150
 ```
 
 The observers here are lambdas, but any function or bound method works.
+
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `observable` argument.
 A classic observer is an object,
 so the observable needs the name of a method to call on it.
 In Python the observer is the callable, so `notify()` calls it directly:
-`observer(data)` where the classic version called `observer.update(self, arg)`.
+`observer(data)` compared to the classic version calling `observer.update(self, arg)`.
 The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
@@ -192,8 +193,12 @@ or subscribes a bound method whose instance already holds the reference.
 
 `Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
 not because the pattern requires a base class.
-Holding one as an attribute (`self.temperature_changed = Observable[float]()`)
-works the same and lets one object publish more than one kind of change.
+A `Thermometer` can hold an `Observable` as an attribute instead
+(`self.temperature_changed = Observable[float]()`),
+and a subscriber then names that attribute:
+`t.temperature_changed.subscribe(display)`.
+One object can hold several such attributes,
+so it can publish more than one kind of change.
 Event-heavy programs have mature libraries (signal/slot systems),
 but for most cases the *Observer* pattern is only a list of callbacks.
 
