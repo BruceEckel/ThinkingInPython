@@ -508,9 +508,11 @@ print(seen)
 Because `echo`'s write-back matches the value the setter already holds,
 the setter returns before it reaches `announce()` again.
 The model still notifies once.
-The alternative is a re-entry flag set before `announce()` and cleared after.
-The flag breaks the cycle too,
-and fits the case where a write of an unchanged value should still proceed.
+The alternative is a re-entry flag, set before `announce()` and cleared after,
+with the setter returning early while the flag is set.
+The flag breaks the cycle without comparing values,
+so writing the same reading twice still notifies,
+which is the behavior you want when a listener counts readings rather than changes.
 
 ### Notifying Without a Base Class
 
