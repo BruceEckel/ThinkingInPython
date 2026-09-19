@@ -607,20 +607,19 @@ because a `@property` gives the checker a name to match.
 
 ## Observer and I/O
 
-Until now, no listener has waited on anything.
+So far, no listener has had to wait.
 Each prints, appends, or writes back, then returns.
 If a listener calls a network service or writes to a database,
-notifying listeners one at a time blocks on each.
-Each listener's wait delays every listener after it.
+notifying listeners one at a time delays every listener after it.
 
 If listeners are coroutines,
 `announce()` awaits them together with `asyncio.gather()`,
 so one state change notifies every listener concurrently.
 A slow listener no longer delays the others.
-`gather()` still waits for all of them,
+`gather()` waits for all of them,
 so the change finishes only after every notification succeeds.
 
-One limitation: an `async` setter returns a coroutine instead of running its body,
+An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place for the `await` that would run the coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
 The state change becomes an awaitable method rather than the assignment `t.celsius = value`.
@@ -687,6 +686,10 @@ asyncio.run(main())
 #: logged: 150C
 #: alarm sent: 150C
 ```
+
+`gather()` takes one awaitable per argument rather than an iterable of them,
+so `announce()` calls the listeners in a generator expression and [unpacks](05_Foundations--Functions.md#unpacking-arguments)
+that generator with `*`, turning each coroutine into its own argument.
 
 The `AsyncListener` alias makes the type checker reject a plain function as a listener.
 A listener must return an awaitable,
