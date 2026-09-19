@@ -35,8 +35,7 @@ so the answer can differ at every request.
 
 An Ability subclasses `Ability[T]`, where `T` is the type its handler returns.
 `Ability` declares no `__slots__`,
-so an Ability is written `@dataclass(frozen=True)` rather than `@record`
-([Performance](18_Techniques--Performance.md#record)):
+so an Ability is written `@dataclass(frozen=True)` rather than [`@record`](18_Techniques--Performance.md#record):
 an unslotted base gives every instance its `__dict__` back.
 Here is the Stateless version of `Ask` and `Tell` from [Effect Management](44_Effects--Effect_Management.md#effects-by-hand):
 
