@@ -74,13 +74,13 @@ so one change to the observable's state reaches all of them:
 ![One call to set_celsius() becomes one update() call on every observer in the list](_images/observer_broadcast)
 
 `Thermometer` holds the list and names no observer type,
-so a `Plot` and a `Table` would attach the way `Display` does.
+so `Plot` and `Table` attach the same way `Display` does.
 
 Passing `arg` is the *push* model.
-The observable supplies what changed,
+The observable (`Thermometer`) supplies what changed (the temperature),
 so an observer needs no reference back into the observable's state.
-The *pull* model sends only `observable` and lets each observer read what it needs,
-decoupling observer and observable further at the cost of a call back into the observable.
+The *pull* model sends only `observable` and lets each observer read what it needs by calling back into the observable.
+This further decouples observer and observable.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -95,8 +95,8 @@ An observer may react to a notification by detaching.
 A one-shot listener detaches after its first call,
 and the detach mutates `self._observers` in the middle of the loop walking it.
 If you iterate the list directly,
-removing the current observer shifts every later one left,
-so the loop skips the next observer.
+removing the current observer lowers every later observer's index by one,
+while the loop's own index keeps advancing, so the loop skips the next observer.
 No exception reports the skip.
 Walking a copy makes detaching during notification safe,
 and a newcomer attaching mid-notification receives its first notification at the next change.
