@@ -805,7 +805,7 @@ The failure prints the moment `loud()` raises its `ValueError`.
 and it prints only because `main()` sleeps long enough afterward to let it finish.
 A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
-and an exception the orphan raises later is discarded without a report.
+and an exception from the orphan is discarded without a report.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 the async form of exercise 2's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
