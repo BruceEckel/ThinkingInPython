@@ -198,6 +198,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     # under --watch, COPY_SCRIPT under --copy-on-select, both, or none.
     inject: str = ""
 
+    def end_headers(self) -> None:
+        """Every response, not only the pages, refuses to be cached.
+
+        `SimpleHTTPRequestHandler` sends `Last-Modified` and nothing
+        else for a static file, so a browser caches an image on its
+        own heuristics. Editing a diagram in `resources/images/` and
+        rebuilding then leaves the old drawing on screen, and
+        restarting the server does not clear it, because the stale
+        bytes are in the browser. A preview server exists to show the
+        current file.
+        """
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
     def do_GET(self) -> None:  # noqa: N802 (BaseHTTPRequestHandler's name)
         if self.path.split("?")[0] == RELOAD_PATH:
             self.reply_token()
@@ -223,7 +237,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -240,7 +253,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
