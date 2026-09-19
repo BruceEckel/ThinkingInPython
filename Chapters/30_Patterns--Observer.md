@@ -79,10 +79,10 @@ t.set_celsius(25)
 `update()` is where each observer reacts.
 `notify()` calls it on every observer in the list,
 so one change to the subject's state reaches all of them:
-`Display` prints the new reading, and a plot or a table would redraw.
+`Display` prints the new reading, and a plot or a table redraws.
 
 `Thermometer` holds the list and names no observer type,
-so a `Plot` or a `Table` would attach the same way `Display` does.
+so a `Plot` or a `Table` attaches the same way `Display` does.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
