@@ -64,9 +64,8 @@ not how you declare the target interface.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy)
 compares an ABC with a `Protocol`.
 `WhatIWant` declares no `__slots__`,
-so `ProxyAdapter` is declared with `@dataclass(frozen=True)` and not `@record`:
-an unslotted base gives each instance its `__dict__` back
-([Performance](18_Techniques--Performance.md#record)).
+so `ProxyAdapter` is declared with `@dataclass(frozen=True)` and not [`@record`](18_Techniques--Performance.md#record):
+an unslotted base gives each instance its `__dict__` back.
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object it forwards to.
 
