@@ -593,8 +593,9 @@ One method for every attribute is less precise than a property per attribute,
 in three ways.
 A watcher is a listener with a wider signature:
 it takes the attribute name along with the value,
-and filters by name to act on one attribute,
-where a `Thermometer` listener receives the temperature.
+and filters by name to act on one attribute.
+`Thermometer` publishes one attribute and is a `Broadcaster[float]`,
+so its listeners take the reading and need no name.
 Every assignment notifies, including internal bookkeeping,
 so a class that stores a cache or a counter broadcasts those writes too.
 `__setattr__()` accepts any name as well,
