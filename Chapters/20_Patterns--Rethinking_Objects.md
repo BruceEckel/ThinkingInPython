@@ -353,8 +353,7 @@ Immutability pays off only when it goes all the way down.
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#immutability)
 makes the fuller case for frozen data classes.
-The rest of this chapter's listings declare their frozen classes with `@record`
-([Performance](18_Techniques--Performance.md#record)),
+The rest of this chapter's listings declare their frozen classes with [`@record`](18_Techniques--Performance.md#record),
 which applies `@dataclass(frozen=True, slots=True)` under one name.
 
 ## Methods or Functions?
