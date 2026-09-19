@@ -601,7 +601,7 @@ and tell it again when that changes.
 Nothing verifies the wiring except a runtime failure.
 
 Python does have a mechanism that propagates on its own.
-A `ContextVar` ([Concurrency](19_Techniques--Concurrency.md#context-that-follows-the-call-chain))
+A [`ContextVar`](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 holds a value for the current task,
 and anything below reads it without receiving it as an argument.
 That is the automatic propagation the parameter list lacks,
