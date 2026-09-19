@@ -272,7 +272,8 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     assert readings == [20.0]
 ```
 
-The tests subscribe a list's `append`, so the list records what arrived.
+The tests subscribe a list's `append` to the observable,
+so the list records what arrived.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a detachable observer needs a named reference, not an inline lambda.
 A bound method needs no stashed reference.
@@ -797,7 +798,7 @@ if __name__ == "__main__":
 
 `show()` makes a square canvas, `model.size` cells on a side,
 each cell `cell_px` pixels wide.
-`draw()` paints the grid, and the view subscribes `draw()`,
+`draw()` paints the grid, and the view subscribes `draw()` to the model,
 so every change repaints.
 `draw()` is defined inside `show()`,
 so it is a closure that reads `canvas` and `cell_px`.
