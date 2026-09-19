@@ -288,6 +288,45 @@ while the `= 0` brings it into existence.
 That holds for `label: str`, for `total: ClassVar[int] = 0`,
 and for the `count` above.
 
+Declaring a `ClassVar` and leaving the value elsewhere is deliberate,
+and the common case is a base class naming what its subclasses must supply:
+
+```python
+# required_classvar.py
+from typing import ClassVar
+from exceptions import expected
+
+class Shape:
+    sides: ClassVar[int]  # Subclasses supply it
+
+class Square(Shape):
+    sides = 4
+
+class Blob(Shape):
+    pass
+
+print(Square.sides)
+#: 4
+with expected(AttributeError):
+    print(Blob.sides)
+#: [AttributeError] type object 'Blob' has no attribute
+#: 'sides'
+```
+
+`Shape` states that every shape carries a `sides`, `Square` supplies one,
+and `Blob` forgets.
+Stubs and *Protocols* use the same form throughout,
+since neither carries values.
+
+The declaration promises more than `ty` 0.0.82 delivers.
+Nothing requires `Blob` to supply a `sides`,
+and a subclass writing `sides = "four"` draws no report:
+`ty` reads that assignment as a fresh declaration and types `Bad.sides` as `str`,
+so the error surfaces later, wherever an `int` was expected.
+Pyright rejects the assignment where it sits.
+Treat the base declaration as documentation that a checker reads,
+not as a guarantee that the attribute exists.
+
 ### What `ClassVar` Catches
 
 `ClassVar` is a hint for the type checker.
