@@ -386,6 +386,34 @@ Long-lived broadcasters need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which do not keep the listener alive
 (`weakref.WeakMethod` is the bound-method form).
+A weak reference answers `None` once its object is gone:
+
+```python
+# weak_listener.py
+from weakref import WeakMethod
+
+class Plot:
+    def redraw(self, celsius: float) -> None:
+        print(f"plot: {celsius}C")
+
+plot = Plot()
+ref = WeakMethod(plot.redraw)
+live = ref()
+if live is not None:
+    live(25.0)
+#: plot: 25.0C
+
+# The bound method holds plot too
+del plot, live
+print(ref())
+#: None
+```
+
+`WeakMethod` stores the instance and the function separately, both weakly,
+and rebuilds the bound method when you call the reference.
+A broadcaster built on these calls each reference at announce time,
+skips the ones that answer `None`, and drops them from its list,
+so a listener whose object is gone costs one dead reference until the next change.
 
 ### Re-entrant Notification
 
