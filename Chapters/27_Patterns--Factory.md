@@ -329,8 +329,7 @@ def make(name: str) -> Shape:
     return Shape.registry[name]()
 ```
 
-`__init_subclass__()`
-(see [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses))
+[`__init_subclass__()`](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 lets each subclass register itself.
 Nothing in the listing calls a register function;
 the two `class` statements fill `Shape.registry` on their own.

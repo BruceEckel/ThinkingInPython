@@ -540,8 +540,7 @@ which avoids the late-binding surprise a lambda created in a loop can produce.
 Binding `exponent` above works because `power()` accepts it by keyword.
 `partial()` fills positional arguments from the left, so before 3.14,
 fixing the third argument meant fixing the first two as well.
-A function whose parameters are positional-only
-(see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters))
+A function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
 rules out the keyword escape `power()` allows.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.

@@ -92,7 +92,7 @@ for r in outputs:
 #: answer = 4
 ```
 
-`match` (see [Pattern Matching](13_Techniques--Pattern_Matching.md#class-patterns))
+[`match`](13_Techniques--Pattern_Matching.md#class-patterns)
 tells the two cases apart.
 But the distinction rests on the types `int` and `str`,
 and that dependence is fragile.

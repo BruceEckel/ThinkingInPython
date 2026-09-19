@@ -16,8 +16,8 @@ You end up testing the other type by hand,
 writing out the dispatch the language performed for the first one.
 
 The solution is *Multiple Dispatching*.
-Polymorphism broadly means that a function accepts arguments of more than one type
-(see [Rethinking Objects](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)).
+[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
+broadly means that a function accepts arguments of more than one type.
 It takes three forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.

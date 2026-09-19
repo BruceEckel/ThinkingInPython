@@ -1126,7 +1126,7 @@ but return a descriptor instead of a plain wrapper.
 That lets them change how attribute access behaves,
 and makes them work on methods,
 where a `__call__`-based class like `logged` fails.
-`@dataclass` (see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes))
+[`@dataclass`](12_Techniques--Data_Classes_as_Types.md#data-classes)
 is a class decorator like `register`,
 except it mutates the class instead of leaving it unchanged,
 adding a generated `__init__()`, `__repr__()`,

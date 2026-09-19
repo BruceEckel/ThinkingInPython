@@ -668,8 +668,8 @@ so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` also caps its length,
 discarding from the other end when a new item would overflow it.
 That is a sliding window, and a `list` has no equivalent.
-For a queue shared between threads, use `queue.Queue`
-(see [Concurrency](19_Techniques--Concurrency.md)), and for a priority queue,
+For a queue shared between threads,
+use [`queue.Queue`](19_Techniques--Concurrency.md), and for a priority queue,
 `heapq`.
 
 ### `namedtuple`
@@ -698,8 +698,8 @@ but its fields are self-documenting.
 `typing.NamedTuple` is the class form of the same idea:
 it declares a type for each field instead of listing bare names,
 so a type checker knows what each one holds.
-For a record that must be mutable, use a data class
-(see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#data-classes)).
+For a record that must be mutable,
+use a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes).
 [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions)
 compares all three.
 

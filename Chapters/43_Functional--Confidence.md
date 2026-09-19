@@ -225,10 +225,9 @@ the properties these chapters build, provide confidence at every level.
 Style contributes before the first rung.
 *Declarative* code states the result you want,
 while *imperative* code spells out each step to produce it.
-A comprehension names the result, "the squares of the even numbers"
-(see [Comprehensions](16_Techniques--Comprehensions.md)),
-and `match` names the shapes you expect
-(see [Pattern Matching](13_Techniques--Pattern_Matching.md)),
+A [comprehension](16_Techniques--Comprehensions.md) names the result,
+"the squares of the even numbers,"
+and [`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,

@@ -17,8 +17,7 @@ where the context supplies it.
 Second, route construction through a factory that returns the existing instance for a given value.
 
 Sharing one object under many names is safe when the object stays the same for everyone,
-so a flyweight must be immutable
-(see [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
+so a flyweight must be [immutable](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 
 ## Python Uses Flyweights
 

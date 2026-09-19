@@ -617,7 +617,7 @@ The biggest speedups usually come from a better algorithm.
 Choosing an algorithm with lower Big-O complexity beats micro-optimizing a slow one.
 Often the better algorithm is a better container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
-Use a `deque` (see [Containers](03_Foundations--Containers.md#deque))
+Use a [`deque`](03_Foundations--Containers.md#deque)
 when you add and remove at both ends.
 
 ### Bisect
@@ -1010,8 +1010,8 @@ A method is the usual trap.
 `@cache` keys on every argument including `self`,
 so the cache holds a reference to each instance it has seen,
 and the collector can reclaim none of them.
-For a value computed once per object, use `functools.cached_property`
-(see [Classes](07_Foundations--Classes.md#properties)),
+For a value computed once per object,
+use [`functools.cached_property`](07_Foundations--Classes.md#properties),
 which stores the result on the instance and dies with it,
 unless the class also declares `__slots__`
 (see [When Slots Does Not Fit](#when-slots-does-not-fit) below).

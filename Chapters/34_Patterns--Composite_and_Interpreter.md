@@ -155,8 +155,8 @@ if __name__ == "__main__":
 `Directory` holds a `tuple[Node, ...]`,
 so the alias names itself through one of its own members,
 and that self-reference makes the tree a tree.
-`Directory` mentions `Node` above the `type` statement that defines it
-(see [Naming Types: The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
+`Directory` mentions `Node` above the [`type` statement](08_Foundations--Static_Types.md#the-type-statement)
+that defines it.
 That works because Python evaluates annotations and `type` aliases lazily,
 the [deferred evaluation](08_Foundations--Static_Types.md#self-and-forward-references).
 The alias can therefore sit below the classes it unites,
@@ -171,8 +171,7 @@ What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
 The classic version makes the opposite trade, and the pairing has a name:
-the *expression problem*
-(see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching)).
+the [*expression problem*](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works the same split out with shapes,
 including the `assert_never()` in each `case _`:
@@ -414,8 +413,7 @@ Building `2 * x + 1` does not compute a number.
 It builds a tree, so `expr` is a value you can hand to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises a `KeyError`, naming the variable.
-The `/` makes `e` positional-only
-(see [Positional-Only and Keyword-Only Parameters](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)),
+The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 which keeps the parameter name out of the variable namespace so an expression can use `e` as a variable.
 
 `**env` costs something for that convenience at the call site.
