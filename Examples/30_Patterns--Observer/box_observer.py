@@ -20,8 +20,8 @@ def new_grid(size: int) -> Grid:
     return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
-def recolored(grid: Grid, clicked: Coord) -> Grid:
-    x, y = clicked
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    x, y = selected
     cross = [(x, y), (x - 1, y), (x + 1, y),
              (x, y - 1), (x, y + 1)]
     return grid | {cell: grid[cell].next()
@@ -33,6 +33,6 @@ class BoxModel(Broadcaster[Grid]):
         self.size = size
         self.grid = new_grid(size)
 
-    def click(self, cell: Coord) -> None:
+    def select(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
         self.announce(self.grid)

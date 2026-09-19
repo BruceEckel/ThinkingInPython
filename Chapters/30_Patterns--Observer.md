@@ -818,9 +818,9 @@ For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is s
 
 ## A Visual Example: a Model and Its View
 
-The last example is the model-view split made visible.
+This example emphasizes the model-view split.
 The *model*, `box_observer.py`,
-is a grid of colored boxes and the rule for a click.
+is a grid of colored boxes and the rule that decides what a selection changes.
 It only manipulates `Grid`s and doesn't know anything about displaying them.
 The *view*, `box_view.py`,
 displays the boxes using the standard library's `tkinter`.
@@ -857,8 +857,8 @@ def new_grid(size: int) -> Grid:
     return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
-def recolored(grid: Grid, clicked: Coord) -> Grid:
-    x, y = clicked
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    x, y = selected
     cross = [(x, y), (x - 1, y), (x + 1, y),
              (x, y - 1), (x, y + 1)]
     return grid | {cell: grid[cell].next()
@@ -870,7 +870,7 @@ class BoxModel(Broadcaster[Grid]):
         self.size = size
         self.grid = new_grid(size)
 
-    def click(self, cell: Coord) -> None:
+    def select(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
         self.announce(self.grid)
 ```
@@ -892,9 +892,9 @@ A `Grid` maps each `(column, row)` coordinate to a `Color`.
 A cell's color is `colors[(x + y) % len(colors)]`,
 so the cells along a diagonal, where `x + y` is constant, share one color.
 
-`recolored()` computes the grid that results from a click: values in,
+`recolored()` computes the grid that results from selecting a cell: values in,
 values out.
-`cross` lists the clicked cell and the four cells that share an edge with it.
+`cross` lists the selected cell and the four cells that share an edge with it.
 A cell on the border has fewer neighbors,
 so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
@@ -914,7 +914,7 @@ A test calls them directly, and a second model can reuse them.
 `BoxModel` is a `Broadcaster[Grid]`.
 Like `Thermometer`, it writes its own `__init__()`,
 which calls `Broadcaster.__init__()` and then builds `grid` from `size`.
-`BoxModel.click()` makes the next grid with `recolored()` and passes it to `announce()`.
+`BoxModel.select()` makes the next grid with `recolored()` and passes it to `announce()`.
 An enum, two functions, and one class make up the model:
 `Color` holds the colors and their order, the functions compute grids,
 and `BoxModel` holds the current grid and notifies its listeners.
@@ -923,8 +923,8 @@ and `BoxModel` holds the current grid and notifies its listeners.
 
 The model contains no display code, so you can test it without a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
-that a click in a corner stays on the grid,
-and that listeners receive the new grid after a click:
+that a selection in a corner stays on the grid,
+and that listeners receive the new grid after one:
 
 ```python
 # test_box_observer.py
@@ -951,7 +951,7 @@ def test_recolored_changes_the_cross() -> None:
                for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid
 
-def test_corner_click_stays_on_the_grid() -> None:
+def test_corner_selection_stays_on_the_grid() -> None:
     grid = new_grid(3)
     out = recolored(grid, (0, 0))
     changed = {c for c in grid if out[c] != grid[c]}
@@ -964,7 +964,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     seen: list[Grid] = []
     # The listener is a callable
     model.subscribe(seen.append)
-    model.click((1, 1))
+    model.select((1, 1))
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before
 ```
@@ -1001,7 +1001,7 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
 
     model.subscribe(draw)  # Repaint on every model change
     canvas.bind("<Button-1>",
-                lambda e: model.click(
+                lambda e: model.select(
                     (e.x // cell_px, e.y // cell_px)))
     draw(model.grid)
     root.mainloop()
@@ -1036,9 +1036,12 @@ measured from the canvas's top-left corner.
 Floor division by `cell_px` converts that position to a cell:
 with 60-pixel cells, a click at `e.x == 130` is in column `130 // 60`,
 which is `2`.
-A click on the canvas becomes a model `click()`,
+A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
 The handler calls the model and draws nothing.
+The mouse belongs to the view.
+The model's method is `select()`, so a keypress, a touch,
+or a test call reaches the same rule.
 
 The model and the view share only the subscribe-and-announce contract,
 so you can attach a second view to the same model and keep both views in step.
@@ -1075,13 +1078,13 @@ and the *Observer* is an event bus.
     Write a test in which the first listener raises an exception and the second still records its notification.
 4.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
-    and clicking any square recolors your patch to that square's color,
+    and selecting any square recolors your patch to that square's color,
     absorbing neighbors that now match.
     Write the neighbor test yourself, counting diagonals.
-    Track the clicks it takes to make the whole field one color.
+    Track the moves it takes to make the whole field one color.
     For competition, alternate turns between players.
-5.  Change the rule for a click in `box_observer.py`:
-    make `recolored()` advance every box in the clicked box's row and column.
+5.  Change the rule for a selection in `box_observer.py`:
+    make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
 6.  Write a `Notifying` descriptor

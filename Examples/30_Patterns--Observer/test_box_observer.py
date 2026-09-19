@@ -22,7 +22,7 @@ def test_recolored_changes_the_cross() -> None:
                for c in grid if c not in cross)
     assert out is not grid  # Pure: a new grid
 
-def test_corner_click_stays_on_the_grid() -> None:
+def test_corner_selection_stays_on_the_grid() -> None:
     grid = new_grid(3)
     out = recolored(grid, (0, 0))
     changed = {c for c in grid if out[c] != grid[c]}
@@ -35,6 +35,6 @@ def test_model_notifies_with_the_new_grid() -> None:
     seen: list[Grid] = []
     # The listener is a callable
     model.subscribe(seen.append)
-    model.click((1, 1))
+    model.select((1, 1))
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before

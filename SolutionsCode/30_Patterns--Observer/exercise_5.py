@@ -19,8 +19,8 @@ def new_grid(size: int) -> Grid:
     return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
-def recolored(grid: Grid, clicked: Coord) -> Grid:
-    x, y = clicked
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    x, y = selected
     return grid | {cell: color.next()
                    for cell, color in grid.items()
                    if cell[0] == x or cell[1] == y}

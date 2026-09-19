@@ -243,7 +243,7 @@ class FloodGame:
         self.size = size
         self.grid = new_grid(size)
         self.origin = origin
-        self.clicks = 0
+        self.moves = 0
         self.owned = self._flood(self.grid[origin])
 
     def _flood(self, color: Color) -> set[Coord]:
@@ -262,9 +262,9 @@ class FloodGame:
                     stack.append(other)
         return seen
 
-    def click(self, cell: Coord) -> bool:
+    def select(self, cell: Coord) -> bool:
         ("Recolor the owned patch "
-         "to the clicked cell's color.")
+         "to the selected cell's color.")
         new_color = self.grid[cell]
         if new_color == self.grid[self.origin]:
             return False  # No-op: already this color
@@ -272,7 +272,7 @@ class FloodGame:
             self.grid[c] = new_color
         # Absorb new neighbors
         self.owned = self._flood(new_color)
-        self.clicks += 1
+        self.moves += 1
         return True
 
     def is_complete(self) -> bool:
@@ -282,34 +282,34 @@ game = FloodGame(4)
 while not game.is_complete():
     remaining = [
         c for c in game.grid if c not in game.owned]
-    game.click(remaining[0])
-print("solved in", game.clicks, "clicks")
-#: solved in 6 clicks
+    game.select(remaining[0])
+print("solved in", game.moves, "moves")
+#: solved in 6 moves
 ```
 
 `_flood()` is a plain graph search (depth-first, using a stack)
 starting from `origin`, walking to every neighbor `adjacent()` says it
 touches, as long as that neighbor is still the same color.
 `FloodGame` reuses `new_grid()` from `box_observer.py` unchanged and
-adds the `adjacent()` the exercise asks for. `click()` is the game
+adds the `adjacent()` the exercise asks for. `select()` is the game
 move: it repaints
-every cell in the *currently owned* patch to the clicked cell's color,
+every cell in the *currently owned* patch to the selected cell's color,
 then re-runs `_flood()` to pick up the neighbors that now match that
-new color and have joined the patch. `game.clicks` gives the
+new color and have joined the patch. `game.moves` gives the
 single-player scoring the exercise asks for:
-the clicks it takes to make the whole field one color.
-Two players can share the same `click()`
+the moves it takes to make the whole field one color.
+Two players can share the same `select()`
 method, alternating whose turn supplies the next color, and after a
 fixed number of rounds whoever owns the larger patch wins. `FloodGame`
 can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and
-call `self.announce(self.grid)` at the end of a successful `click()`.
+call `self.announce(self.grid)` at the end of a successful `select()`.
 `box_view.py`'s existing view then repaints after every move. The
 drawing code needs no change, but `show()`'s parameter annotation does:
 it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
-`click()`) lets the same view draw either model.
+`select()`) lets the same view draw either model.
 
-## 5. A new click rule, and the same view
+## 5. A new selection rule, and the same view
 
 ```python
 # exercise_5.py
@@ -333,8 +333,8 @@ def new_grid(size: int) -> Grid:
     return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
-def recolored(grid: Grid, clicked: Coord) -> Grid:
-    x, y = clicked
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    x, y = selected
     return grid | {cell: color.next()
                    for cell, color in grid.items()
                    if cell[0] == x or cell[1] == y}
@@ -359,20 +359,20 @@ print(initials(recolored(grid, (1, 2)), 4))
 
 `Color` and `new_grid()` are copied from `box_observer.py`
 unchanged, and `recolored()` is the one function that differs. It
-keeps every cell whose column matches the click's `x` or whose row
+keeps every cell whose column matches the selection's `x` or whose row
 matches its `y`, and advances each one. The cells come from `grid`,
 so none lies outside it and the `in grid` test goes away.
 `initials()` prints each cell's first letter, one row per line. After
-the click on column 1, row 2, that column and that row have moved one
+selecting column 1, row 2, that column and that row have moved one
 color along, and the other nine cells are as they were.
 
 Pasting this `recolored()` over the one in `box_observer.py` changes
 what the window does, and `box_view.py` runs as it stands. The view
-has two connections to the model. Its click handler calls
-`model.click()` with a coordinate, and its `draw()` receives a whole
-`Grid` and paints every cell. Neither one says which cells a click
+has two connections to the model. Its mouse handler calls
+`model.select()` with a coordinate, and its `draw()` receives a whole
+`Grid` and paints every cell. Neither one says which cells a selection
 changes, so the view holds nothing that a new rule could make wrong.
-The rule sits in `recolored()`, `BoxModel.click()` calls it, and
+The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 `announce()` delivers the result. `initials()` makes the same point
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.

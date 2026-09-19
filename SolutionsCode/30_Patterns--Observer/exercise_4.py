@@ -26,7 +26,7 @@ class FloodGame:
         self.size = size
         self.grid = new_grid(size)
         self.origin = origin
-        self.clicks = 0
+        self.moves = 0
         self.owned = self._flood(self.grid[origin])
 
     def _flood(self, color: Color) -> set[Coord]:
@@ -45,9 +45,9 @@ class FloodGame:
                     stack.append(other)
         return seen
 
-    def click(self, cell: Coord) -> bool:
+    def select(self, cell: Coord) -> bool:
         ("Recolor the owned patch "
-         "to the clicked cell's color.")
+         "to the selected cell's color.")
         new_color = self.grid[cell]
         if new_color == self.grid[self.origin]:
             return False  # No-op: already this color
@@ -55,7 +55,7 @@ class FloodGame:
             self.grid[c] = new_color
         # Absorb new neighbors
         self.owned = self._flood(new_color)
-        self.clicks += 1
+        self.moves += 1
         return True
 
     def is_complete(self) -> bool:
@@ -65,6 +65,6 @@ game = FloodGame(4)
 while not game.is_complete():
     remaining = [
         c for c in game.grid if c not in game.owned]
-    game.click(remaining[0])
-print("solved in", game.clicks, "clicks")
-#: solved in 6 clicks
+    game.select(remaining[0])
+print("solved in", game.moves, "moves")
+#: solved in 6 moves
