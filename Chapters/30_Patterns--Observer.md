@@ -83,6 +83,11 @@ so one change to the subject's state reaches all of them:
 
 `Thermometer` holds the list and names no observer type,
 so a `Plot` or a `Table` attaches the same way `Display` does.
+It inherits that list from `Subject`,
+so its constructor calls `super().__init__()` to create it.
+Python runs no base-class constructor on its own
+([Classes](07_Foundations--Classes.md#inheritance)),
+and without that call `attach()` raises an `AttributeError` for the `_observers` nothing assigned.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
@@ -826,16 +831,15 @@ The *view*, `box_view.py`,
 displays the boxes using the standard library's `tkinter`.
 Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
+
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-`palegreen` is the goal because it is the only color that works.
-On the 8x8 grid `box_view.py` opens with,
+This isthe only color that works; on the 8x8 grid `box_view.py` opens with,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors.
 Exercise 6 works out which sizes reach which colors.
 
-The model reuses the same `Broadcaster` as the thermometer,
-from `broadcaster.py`:
+The model reuses `broadcaster.Broadcaster`:
 
 ```python
 # box_observer.py
