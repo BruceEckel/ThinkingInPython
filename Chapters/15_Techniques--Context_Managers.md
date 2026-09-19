@@ -491,7 +491,7 @@ and a call that raises nothing fails with an `AssertionError`,
 so a demo that stops failing is reported instead of quietly printing nothing.
 The `/` makes `types` and `fn` positional-only,
 so every keyword argument goes to `fn`.
-`**P` ([Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface))
+[`**P`](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 ties `*args` and `**kwargs` to `fn`'s own signature,
 so the type checker checks the forwarded arguments as if you had called `fn` directly:
 
