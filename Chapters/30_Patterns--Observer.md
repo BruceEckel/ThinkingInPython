@@ -152,10 +152,12 @@ t.celsius = 150
 
 The observers here are lambdas, but any function or bound method works.
 Four things from the classic version disappear: the `Observer` interface,
-the `update()` method name that the observable and every observer wrote into their code,
-a class per reaction, and the `observable` argument.
-`notify()` calls `observer(data)` where the classic version called `observer.update(self, arg)`,
-so any callable is an observer, whatever its name.
+its `update()` method, a class per reaction, and the `observable` argument.
+A classic observer is an object,
+so the observable needs the name of a method to call on it,
+and the interface fixes that name as `update()`.
+In Python the observer is the callable, so `notify()` calls it directly:
+`observer(data)` where the classic version called `observer.update(self, arg)`.
 The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
