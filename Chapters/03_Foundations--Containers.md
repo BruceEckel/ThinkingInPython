@@ -496,8 +496,7 @@ A timing depends on the machine that took it,
 so every measured listing in this book prints a comparison rather than a number.
 `report()` comes from a small helper the book supplies.
 By default the listing prints the comparison alone.
-Running it with `--numbers`
-(see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine))
+Running it with [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine)
 adds the two numbers it compares.
 
 ## Specialized Containers
