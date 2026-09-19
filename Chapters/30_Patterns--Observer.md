@@ -828,10 +828,11 @@ Clicking a box advances it to the next color, along with the boxes above, below,
 left, and right of it.
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
+`palegreen` is the goal because it is the only color that works.
 On the 8x8 grid `box_view.py` opens with,
-`palegreen` is the only color the whole grid can reach;
-no sequence of clicks turns it all `skyblue` or all `khaki`.
-The size decides that: every color works on a 3x3 grid.
+no sequence of clicks turns every box `skyblue` or every box `khaki`.
+The size decides that, and a 3x3 grid reaches all three colors.
+Exercise 6 works out which sizes reach which colors.
 
 The model reuses the same `Broadcaster` as the thermometer,
 from `broadcaster.py`:
@@ -1089,7 +1090,15 @@ and the *Observer* is an event bus.
     make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
-6.  Write a `Notifying` descriptor
+6.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+    Selecting a cell advances up to five cells by one, modulo three,
+    and selections commute, so this is a linear system over the integers mod 3:
+    the unknowns are how many times you select each cell.
+    Write Gaussian elimination mod 3 to decide whether the system has a solution,
+    and print the reachable colors for every size from 3 through 8.
+    The 8x8 grid reaches `palegreen` alone,
+    and one smaller size reaches nothing.
+7.  Write a `Notifying` descriptor
     ([Metaprogramming](17_Techniques--Metaprogramming.md#a-descriptor-that-validates))
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:

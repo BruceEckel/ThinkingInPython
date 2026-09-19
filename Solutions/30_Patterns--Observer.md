@@ -377,10 +377,116 @@ The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
-## 6. A descriptor per watched attribute
+## 6. Which colors a grid can reach
 
 ```python
 # exercise_6.py
+from enum import StrEnum
+from typing import Final
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+type Coord = tuple[int, int]
+type Row = list[int]
+
+MOD: Final[int] = len(Color)
+
+def cross(cell: Coord, size: int) -> list[Coord]:
+    x, y = cell
+    around = [(x, y), (x - 1, y), (x + 1, y),
+              (x, y - 1), (x, y + 1)]
+    return [(a, b) for a, b in around
+            if 0 <= a < size and 0 <= b < size]
+
+def system(size: int, target: int) -> list[Row]:
+    "One row per cell, with the target in the last column."
+    cells = [(x, y) for x in range(size)
+             for y in range(size)]
+    at = {cell: i for i, cell in enumerate(cells)}
+    rows = [[0] * (len(cells) + 1) for _ in cells]
+    for cell in cells:
+        for other in cross(cell, size):
+            rows[at[other]][at[cell]] = 1
+    for i, (x, y) in enumerate(cells):
+        rows[i][-1] = (target - (x + y)) % MOD
+    return rows
+
+def solvable(rows: list[Row]) -> bool:
+    width = len(rows[0]) - 1
+    pivot = 0
+    for col in range(width):
+        found = next((r for r in range(pivot, len(rows))
+                      if rows[r][col]), None)
+        if found is None:
+            continue
+        rows[pivot], rows[found] = rows[found], rows[pivot]
+        scale = pow(rows[pivot][col], -1, MOD)
+        rows[pivot] = [v * scale % MOD for v in rows[pivot]]
+        for r, row in enumerate(rows):
+            if r != pivot and row[col]:
+                factor = row[col]
+                rows[r] = [(a - factor * b) % MOD for a, b
+                           in zip(row, rows[pivot])]
+        pivot += 1
+    # A row of zeros with a nonzero target is 0 == 1
+    return all(any(row[:-1]) or row[-1] == 0
+               for row in rows)
+
+def reachable(size: int) -> list[Color]:
+    return [color for target, color in enumerate(Color)
+            if solvable(system(size, target))]
+
+for size in range(3, 9):
+    names = ", ".join(reachable(size))
+    print(f"{size}x{size}: {names or 'nothing'}")
+#: 3x3: skyblue, palegreen, khaki
+#: 4x4: skyblue, palegreen, khaki
+#: 5x5: nothing
+#: 6x6: skyblue, palegreen, khaki
+#: 7x7: skyblue, palegreen, khaki
+#: 8x8: palegreen
+```
+
+Selecting a cell adds one, modulo three, to that cell and to each
+neighbor `cross()` finds, and selecting it twice adds two. The order
+of the selections makes no difference, so a whole sequence of them is
+a count per cell, and the puzzle becomes one linear system: `M v = b`,
+over the integers mod 3. `M` records which cells each selection
+advances, `v` counts the selections, and `b` is how far each cell must
+advance to reach the target color. `system()` builds the two together,
+one row per cell, with `b` in the last column.
+
+`solvable()` answers whether that system has a solution, and never
+computes one: the question is which colors are reachable, not how.
+It is Gaussian elimination, with two changes for arithmetic mod 3.
+Dividing by a pivot is multiplying by its inverse, which `pow(x, -1,
+MOD)` supplies, and every subtraction ends in `% MOD`. Elimination
+either finds a pivot in a column or leaves that column free; what
+decides the answer is the rows that survive with every coefficient
+zero. Such a row states `0 == row[-1]`, so a nonzero last column means
+no count of selections reaches that color.
+
+The six sizes split three ways. At 3x3, 6x6, and 7x7 the matrix has
+full rank, so every color is reachable from any starting grid. At 4x4
+the rank is 14 of 16, and at 8x8 it is 60 of 64: the missing
+dimensions are combinations of cells that no selection can change, so
+the starting grid must already agree with the target on each of them.
+The 4x4 banded grid agrees for all three colors, and the 8x8 grid for
+`palegreen` alone, which is the puzzle the window poses. At 5x5 three
+dimensions are missing and no color satisfies them, so that board
+cannot be made one color at all.
+
+`Color` is a `StrEnum`, so its members go straight into
+`", ".join(reachable(size))` with no conversion, the same property
+that lets `box_view.py` hand a `Color` to `tkinter`.
+
+## 7. A descriptor per watched attribute
+
+```python
+# exercise_7.py
 from collections.abc import Callable
 from typing import overload
 
