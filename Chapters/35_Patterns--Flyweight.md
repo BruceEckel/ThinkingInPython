@@ -167,8 +167,8 @@ The type checker reads that guard too.
 `SPECS` has key type `Symbol`, so past the guard `char` is a key of `SPECS`.
 The checker narrows it to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
-The narrowing proves what a `cast()` would assert
-(see [Static Types](08_Foundations--Static_Types.md#typing-decorators-and-directives)).
+The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
+would assert.
 Prefer a guard the type checker can read.
 Keep `cast()` for the cases where no guard exists,
 because the type checker believes a `cast()` rather than verifying it.
@@ -368,8 +368,9 @@ equal to any surviving original but not the same one.
 The weak pool never produces such a pair:
 its entry lives exactly as long as someone holds the object.
 
-*Flyweight* cuts the number of objects, and `slots=True`
-([Performance](18_Techniques--Performance.md#slots)) cuts the size of each one,
+*Flyweight* cuts the number of objects,
+and [`slots=True`](18_Techniques--Performance.md#slots)
+cuts the size of each one,
 so the two are worth combining once memory is the point,
 as `Tile` does by being a record.
 They collide at one spot.
