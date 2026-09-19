@@ -579,11 +579,9 @@ Without the annotation,
 `_watchers` creates no attribute anywhere,
 and the constructor gives each `Watched` its own list.
 The same line with `= []` would create a class attribute,
-a single list shared by every `Watched`,
-which is what `ClassVar` marks when the sharing is deliberate.
-The initialization value does the creating, not `ClassVar`:
-a `ClassVar` with no value declares an attribute that does not exist yet,
-and reading it raises an `AttributeError` until an assignment creates it.
+a single list shared by every `Watched`.
+[Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
+works through which of these forms creates an attribute and which only declares one.
 In contrast, `celsius` and `humidity` need no declaration because `ty` reads their type from the constructor's assignments.
 
 One hook covering every attribute is the trade.

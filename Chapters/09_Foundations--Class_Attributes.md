@@ -246,6 +246,46 @@ shows the case that requires the annotation:
 code outside the class sets the attribute,
 and the bare annotation is the type checker's one source for its type.
 
+### A `ClassVar` With No Value Declares Too
+
+`ClassVar` says where an attribute lives, not that it exists.
+Leave the value off and the class stores nothing,
+the same as for `label` in `class_var.py`:
+
+```python
+# declared_classvar.py
+from typing import ClassVar
+from exceptions import expected
+
+class Registry:
+    count: ClassVar[int]  # Declared, no value
+
+with expected(AttributeError):
+    print(Registry.count)
+#: [AttributeError] type object 'Registry' has no attribute
+#: 'count'
+
+Registry.count = 0  # The assignment creates it
+print(Registry.count)
+#: 0
+print(Registry().count)  # Found by fallback
+#: 0
+```
+
+`count: ClassVar[int]` records that a count belongs to `Registry`,
+and no attribute exists until something assigns one,
+so the first read raises an `AttributeError`.
+`ty` reports nothing here, for the reason it reports nothing for `label`:
+it trusts the declaration rather than tracking which code runs first.
+`Registry.count = 0` creates the attribute on the class,
+and an instance finds it by fallback.
+
+The value does the creating in every case.
+An annotation states the type, and `ClassVar` adds where the attribute belongs,
+while the `= 0` brings it into existence.
+That holds for `label: str`, for `total: ClassVar[int] = 0`,
+and for the `count` above.
+
 ### What `ClassVar` Catches
 
 `ClassVar` is a hint for the type checker.
