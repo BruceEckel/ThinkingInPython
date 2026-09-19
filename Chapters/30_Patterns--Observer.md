@@ -85,9 +85,8 @@ so one change to the subject's state reaches all of them:
 so a `Plot` or a `Table` attaches the same way `Display` does.
 It inherits that list from `Subject`,
 so its constructor calls `super().__init__()` to create it.
-Python runs no base-class constructor on its own
-([Classes](07_Foundations--Classes.md#inheritance)),
-and without that call `attach()` raises an `AttributeError` for the `_observers` nothing assigned.
+Python runs no [base-class constructor](07_Foundations--Classes.md#inheritance)
+on its own, and without that call `attach()` raises an `AttributeError` for the `_observers` nothing assigned.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
@@ -882,8 +881,8 @@ class BoxModel(Broadcaster[Grid]):
         self.announce(self.grid)
 ```
 
-`Color` is a `StrEnum`, an `Enum`
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too))
+`Color` is a `StrEnum`,
+an [`Enum`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 whose members are also strings.
 `Color.KHAKI` compares equal to `"khaki"` and goes wherever a `str` goes,
 so the view can pass a `Color` to `tkinter` as a color name.
