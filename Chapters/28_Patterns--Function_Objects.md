@@ -218,8 +218,7 @@ The two comprehensions differ in when they read `n`.
 A lambda's body runs when you call the command, not when you create it,
 and all three lambdas close over the same loop variable,
 which holds 2 by the time anything calls them.
-The argument to `functools.partial`
-([Functional Foundations](40_Functional--Foundations.md#partial-application))
+The argument to [`functools.partial`](40_Functional--Foundations.md#partial-application)
 is an ordinary expression that Python evaluates where you write it,
 so each command stores the string built from its own iteration's `n` and has nothing left to look up later.
 The older fix, `lambda n=n: print(f"step {n}")`,
@@ -407,8 +406,7 @@ Because `bisection_tol` takes `tolerance` as an ordinary parameter,
 `partial` binds it by keyword, once per strategy,
 in place of `bisection_within`'s closure.
 A positional-only parameter takes no keyword,
-so binding one means passing a `Placeholder`
-([Functional Foundations](40_Functional--Foundations.md#leaving-a-gap-with-placeholder))
+so binding one means passing a [`Placeholder`](40_Functional--Foundations.md#leaving-a-gap-with-placeholder)
 in each position the caller will fill.
 
 Save the strategy class for an algorithm that carries several related methods or mutable state.
@@ -471,7 +469,7 @@ The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
 `None` is the right failure value here because a root is never `None`,
 so `float | None` says which result is which.
-A `sentinel()` ([Sentinel Values](05_Foundations--Functions.md#sentinel-values))
+A [`sentinel()`](05_Foundations--Functions.md#sentinel-values)
 is for the case where `None` is a possible result and cannot double as the failure mark.
 
 The chain has no check of its own:
@@ -782,8 +780,7 @@ expect(TypeError, bus.publish, "Deposit")
 #: [TypeError] str is not an @event
 ```
 
-`dataclass_transform`
-([Metaprogramming](17_Techniques--Metaprogramming.md#where-enforcement-lives))
+[`dataclass_transform`](17_Techniques--Metaprogramming.md#where-enforcement-lives)
 tells the type checker that a class passing through either decorator comes out a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__`,
 and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
