@@ -514,8 +514,8 @@ and fits the case where a write of an unchanged value should still proceed.
 
 ### Notifying Without a Base Class
 
-`Thermometer` pays for each published attribute with a `@property` pair,
-and takes `subscribe()` and `announce()` from a base class.
+`Thermometer` writes a getter and a setter for each attribute it publishes,
+and inherits `subscribe()` and `announce()` from `Broadcaster`.
 `__setattr__()` replaces both.
 Python calls it on every attribute assignment,
 so one method covers every attribute of the class:
