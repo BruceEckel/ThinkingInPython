@@ -834,7 +834,7 @@ left, and right of it.
 
 One click changes up to five boxes, which makes the window a puzzle:
 try to turn every box `palegreen`.
-This isthe only color that works; on the 8x8 grid `box_view.py` opens with,
+This is the only color that works; on the 8x8 grid `box_view.py` opens with,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors.
 Exercise 6 works out which sizes reach which colors.
@@ -895,7 +895,8 @@ and `nxt % len(colors)` wraps it around,
 so `Color.KHAKI.next()` is `Color.SKYBLUE`.
 
 A `Grid` maps each `(column, row)` coordinate to a `Color`.
-`new_grid()` builds a size x size grid banded into three colors.
+`new_grid()` builds a square grid, `size` cells on a side,
+banded into three colors.
 A cell's color is `colors[(x + y) % len(colors)]`,
 so the cells along a diagonal, where `x + y` is constant, share one color.
 
