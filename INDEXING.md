@@ -77,6 +77,7 @@ The index lives in one data file, for example `tools/data/index_terms.yaml`.
 Each entry has a heading, the patterns that count as a mention,
 optional subentries, and *see* and *see also* targets.
 A tool scans the chapters and computes the locators on every build.
+[[Can we use toml rather than yaml?]]
 
 ```yaml
 - term: closure
