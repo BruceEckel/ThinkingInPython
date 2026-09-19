@@ -378,7 +378,9 @@ Decide whether `announce()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 
 Subscriptions are strong references.
-A broadcaster that outlives its listeners keeps alive the instance behind every subscribed bound method,
+A bound method holds the object it came from,
+so subscribing `plot.redraw` keeps that `plot` in memory for as long as the broadcaster holds the subscription.
+A broadcaster that outlives its listeners holds every one of them that way,
 the classic *lapsed listener* leak.
 Long-lived broadcasters need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
