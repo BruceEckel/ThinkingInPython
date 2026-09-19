@@ -1,33 +1,30 @@
 # Observer
 
 The *Observer* pattern, a kind of callback,
-decouples the code that changes state from the code that reacts to the change.
-One object, the *observer*, registers interest in another, the *observable*,
-and the observable notifies the observer at every state change.
-The observable defines only the communication:
-a list of callables and the arguments it passes them.
-That choice follows the [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
-principle of designing the communication rather than the parts,
-and makes *Observer* the most dynamic of the callback patterns.
-Observers attach and detach at runtime,
+decouples code that changes state from code that reacts to the change.
+An *observer* registers interest with an *observable*.
+Whenever the observable changes state, it notifies the observer.
+The observable only defines a list of callables and the arguments it passes to those callables.
+That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
+*Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
 and the observable does not name their concrete types.
 
 Event handling is the everyday use.
 A widget keeps a list of handlers and calls each one when its event arrives.
-
-More generally, use *Observer* if a group of objects must update themselves when some other object changes state.
+More generally, use *Observer* if a group of objects must update themselves when other objects change state.
 The classic example is Smalltalk's MVC (model-view-controller),
-or the almost-equivalent Document-View architecture.
-You have some data, the *document*, and more than one view of it,
-say a plot and a table.
+or the nearly-equivalent Document-View architecture.
+A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
-The *Observer* pattern arranges that model-view split.
-The data keeps a list of views and notifies each one when it changes,
-and the data's code names no view.
+With *Observer*, changes in observable data notifies each interested view.
 
-The classic design from *GoF Design Patterns* has three parts:
-an `Observer` interface every observer implements,
-a `Subject` base class that keeps the observer list,
+The classic design comes from *GoF Design Patterns*,
+which calls the observable the *subject*.
+`Observable` says what the object does,
+and it is the name that Java's `java.util.Observable` and the reactive libraries use,
+so the listings here keep it.
+The design has three parts: an `Observer` interface every observer implements,
+an `Observable` base class that keeps the observer list,
 and a `notify()` that broadcasts to each observer in turn:
 
 ```python
@@ -36,10 +33,10 @@ from typing import Protocol
 
 class Observer[T](Protocol):
     def update(
-        self, subject: Subject[T], arg: T
+        self, observable: Observable[T], arg: T
     ) -> None: ...
 
-class Subject[T]:
+class Observable[T]:
     def __init__(self) -> None:
         self._observers: list[Observer[T]] = []
 
@@ -55,11 +52,11 @@ class Subject[T]:
 
 class Display:
     def update(
-        self, subject: Subject[float], arg: float
+        self, observable: Observable[float], arg: float
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Subject[float]):
+class Thermometer(Observable[float]):
     def set_celsius(self, value: float) -> None:
         self.notify(value)
 
@@ -70,10 +67,10 @@ t.set_celsius(25)
 ```
 
 Passing `arg` is the *push* model.
-The subject supplies what changed,
-so an observer needs no reference back into the subject's state.
-The *pull* model sends only `subject` and lets each observer read what it needs,
-decoupling observer and subject further at the cost of a call back into the subject.
+The observable supplies what changed,
+so an observer needs no reference back into the observable's state.
+The *pull* model sends only `observable` and lets each observer read what it needs,
+decoupling observer and observable further at the cost of a call back into the observable.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -156,7 +153,10 @@ t.celsius = 150
 The observers here are lambdas, but any function or bound method works.
 Four things from the classic version disappear: the `Observer` interface,
 the `update()` method the interface required, a class per reaction,
-and the `subject` argument.
+and the `observable` argument.
+The method names change as well:
+GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
+as in the reactive libraries.
 An observer that needs the changed object takes it as part of the payload
 (`notify((self, value))`),
 or subscribes a bound method whose instance already holds the reference.
