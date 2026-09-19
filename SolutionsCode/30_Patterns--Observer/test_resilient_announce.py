@@ -1,6 +1,6 @@
 # test_resilient_announce.py
 import pytest
-from exercise_3 import Broadcaster
+from exercise_2 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:

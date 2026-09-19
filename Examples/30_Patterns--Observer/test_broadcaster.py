@@ -17,11 +17,10 @@ def test_no_subscribers_is_a_noop() -> None:
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     source = Broadcaster[object]()
-    # A bound method: equal, not identical
-    record = received.append
-    source.subscribe(record)
+    source.subscribe(received.append)
     source.announce(1)
-    source.unsubscribe(record)
+    # A new bound method: equal, not identical
+    source.unsubscribe(received.append)
     source.announce(2)
     assert received == [1]
 

@@ -4,7 +4,7 @@ The *Observer* pattern, a kind of callback,
 decouples code that changes state from code that reacts to the change.
 An *observer* registers interest with a *subject*.
 Whenever the subject changes state, it notifies the observer.
-The subject only defines a list of callables and the arguments it passes to those callables.
+The subject defines only a list of callables and the arguments it passes to them.
 That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
 and the subject does not name their concrete types.
@@ -76,20 +76,22 @@ t.set_celsius(25)
 #: display: 25C
 ```
 
-`update()` is where each observer modifies itself.
+`update()` is where each observer reacts.
 `notify()` calls it on every observer in the list,
 so one change to the subject's state reaches all of them:
 `Display` prints the new reading, and a plot or a table would redraw.
 
 `Thermometer` holds the list and names no observer type,
-so `Plot` and `Table` attach the same way `Display` does.
+so a `Plot` or a `Table` would attach the same way `Display` does.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
 so an observer needs no reference back into the subject's state.
 The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
 here `subject.celsius`.
-This further decouples observer and subject.
+With pull, the subject does not decide what its observers need.
+In exchange, each observer depends on the subject's interface:
+to read `celsius`, an observer must know it is watching a `Thermometer`.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -111,15 +113,15 @@ The set of observers is therefore fixed when `notify()` begins.
 An observer detached partway through still receives this notification,
 and a newcomer attaching mid-notification receives its first one at the next change.
 [Unsubscribing During a Notification](#unsubscribing-during-a-notification)
-runs the failure the copy prevents, one index at a time.
+traces the failure the copy prevents, one index at a time.
 
 ## The Names This Chapter Uses
 
-GoF's vocabulary is hard to hold in your head.
-`Observer` and `Observable` differ by three letters, share a stem,
-and name opposite roles,
+The pattern's traditional names are hard to hold in your head.
+`java.util.Observable` and the reactive libraries call the subject an `Observable`.
+`Observer` and `Observable` share a stem and name opposite roles,
 so every listing asks you to decode which end you are looking at.
-`notify()` and `update()` name one event from two sides.
+GoF's `notify()` and `update()` name one event from two sides.
 The rest of this chapter uses names you can tell apart at a glance:
 
 | *GoF Design Patterns* | This chapter |
@@ -132,7 +134,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 
 The pattern keeps its name.
 *Observer* is what the catalogs call it,
-and `java.util.Observable` and the reactive libraries use the older nouns,
+and those libraries use the older nouns,
 so the table is also your map into that literature.
 
 ## The Pythonic Observer: a List of Callables
@@ -210,7 +212,7 @@ its `update()` method, a class per reaction, and the `subject` argument.
 A classic observer is an object,
 so the subject needs the name of a method to call on it.
 In Python the listener is the callable, so `announce()` calls it directly:
-`listener(data)` compared to the classic version calling `observer.update(self, arg)`.
+`listener(data)`, where the classic version calls `observer.update(self, arg)`.
 The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
@@ -233,7 +235,7 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 Inheriting does not stop a class from being a `dataclass`,
-but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance)).
+but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
 A `@dataclass` `Thermometer` would have no list of listeners,
 and `subscribe()` would raise an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
@@ -278,11 +280,10 @@ def test_no_subscribers_is_a_noop() -> None:
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
     source = Broadcaster[object]()
-    # A bound method: equal, not identical
-    record = received.append
-    source.subscribe(record)
+    source.subscribe(received.append)
     source.announce(1)
-    source.unsubscribe(record)
+    # A new bound method: equal, not identical
+    source.unsubscribe(received.append)
     source.announce(2)
     assert received == [1]
 
@@ -327,11 +328,12 @@ so the list records what arrived.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
 so a listener you mean to remove later needs a named reference,
 not an inline lambda.
-A bound method needs no stashed reference.
-Each `obj.update` builds a new bound-method object,
-so `obj.update is obj.update` is `False`.
+A bound method needs no stashed reference,
+as `test_unsubscribe_stops_delivery()` shows.
+Each `received.append` builds a new bound-method object,
+so `received.append is received.append` is `False`.
 Two bound methods compare equal when they wrap the same instance and the same function,
-so `unsubscribe(obj.update)` removes the subscription that `subscribe(obj.update)` made.
+so `unsubscribe(received.append)` removes the subscription that `subscribe(received.append)` made.
 The same equality rule explains the last two tests.
 Subscribing one callable twice puts two equal entries in the list,
 so each notification calls it twice and each `unsubscribe()` removes one entry.
@@ -374,7 +376,8 @@ Without the copy, the loop would be reading the list it changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
-`always: 1` never prints.
+`always` misses the first change, and `seen` ends as `['once: 1', 'always: 2']`,
+with no exception to say a listener was skipped.
 
 ### A Listener That Raises an Exception
 
@@ -433,9 +436,12 @@ A `Broadcaster` holds a strong reference to whatever you subscribe,
 so the weak part lives inside the listener.
 `WeakMethod` stores the instance and the function separately, both weakly,
 and rebuilds the bound method when you call the reference.
+An ordinary `weakref.ref(plot.redraw)` is dead the moment it is created:
+`plot.redraw` builds a new bound-method object that nothing else holds,
+so Python collects it at once and the reference returns `None`.
 While `plot` is alive, `weak` forwards the reading to it.
 Once `plot` is gone, `ref()` returns `None` and `weak` unsubscribes itself,
-which is safe mid-notification for the reason the copy in `announce()` exists.
+which is safe mid-notification because `announce()` loops over a copy.
 The `ValueError` confirms the subscription is gone:
 `unsubscribe()` finds nothing left to remove.
 
@@ -510,9 +516,9 @@ print(seen)
 #: [1]
 ```
 
-Because `echo`'s write-back matches the value the setter already holds,
-the setter returns before it reaches `announce()` again.
-`announce()` still runs once.
+`echo` writes back the value the model now stores,
+so the setter returns before it reaches `announce()` a second time.
+`announce()` runs once, for the original assignment.
 The alternative is a re-entry flag, set before `announce()` and cleared after,
 with the setter returning early while the flag is set.
 The flag breaks the cycle without comparing values,
@@ -594,19 +600,20 @@ The bare annotation supplies what that assignment would have: without it,
 
 One method for every attribute is less precise than a property per attribute,
 in three ways.
-A watcher is a listener with a wider signature:
+First, a watcher is a listener with a wider signature:
 it takes the attribute name along with the value,
 and filters by name to act on one attribute.
 `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
 so its listeners take the `float` reading and need no name.
-Every assignment reaches the watchers, including the internal ones:
+Second, every assignment reaches the watchers, including the internal ones:
 a cached result or a hit counter broadcasts like a published attribute,
 unless the class writes it through `self.__dict__` as the constructor does.
-`__setattr__()` accepts any name as well,
-so `ty` reports nothing for `w.celcius = 25.0`,
+Third, `__setattr__()` accepts any name,
+so `ty` stops checking assignments and reports nothing for `w.celcius = 25.0`,
 which quietly creates a new attribute.
-The same misspelling on `Thermometer` is an `unresolved-attribute` error,
-because a `@property` gives the checker a name to match.
+The same misspelling on `Thermometer` is an `unresolved-attribute` error.
+`Thermometer` defines no `__setattr__()`,
+so `ty` checks each assignment against the attributes the class declares.
 
 ## Observer and I/O
 
@@ -620,7 +627,7 @@ If listeners are coroutines,
 so one state change notifies every listener concurrently.
 A slow listener no longer delays the others.
 `gather()` waits for all of them,
-so the change finishes only after every notification succeeds.
+so `announce()` returns only after every listener finishes.
 
 An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place for the `await` that would run the coroutine.
@@ -628,7 +635,7 @@ The assignment therefore discards the coroutine, and the body never runs.
 The state change becomes an awaitable method rather than the assignment `t.celsius = value`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
-For this example, you only need a coroutine that pauses at `await` while others run:
+For this example, it is enough to know that a coroutine pauses at `await` while others run:
 
 ```python
 # async_broadcaster.py
@@ -711,7 +718,8 @@ The type checker also rejects the reverse mistake,
 an `async` function subscribed to the synchronous `Broadcaster`.
 Calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
-The alias's type parameter does the same job as the synchronous `Listener[T]`'s.
+In both aliases the type parameter ties the listener's argument to the broadcaster's payload:
+a `Broadcaster[float]` accepts a listener that takes a `float` and rejects one that takes a `str`.
 
 The `alarm` is slower than the log, yet the log prints first.
 Awaiting the listeners in sequence would print in subscription order,
@@ -726,7 +734,7 @@ Below its threshold, the alarm returns at once.
 
 ### Unsubscribing During an Async Notification
 
-`announce()` does not require copying via `list()`.
+The async `announce()` needs no `list()` copy.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so an unsubscribe during the fan-out cannot skip a listener.
 The tuple also means a listener that unsubscribes mid-notification still receives this change,
@@ -759,14 +767,15 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` unsubscribes mid-notification and still receives that notification,
-because `gather()` already holds its coroutine before `once` runs.
-The next `announce()` no longer calls it.
+`once` unsubscribes while `gather()` is running it,
+and `always` still receives the change,
+because `gather()` held both coroutines before either ran.
+The next `announce()` builds its tuple from the shortened list and calls `always` alone.
 
 ### A Failing Listener Orphans the Rest
 
 A failing listener behaves differently here than in the synchronous version.
-`gather()` re-raises the first exception into `set_celsius()` right away,
+`gather()` re-raises the first exception to its caller right away,
 and the unfinished listeners keep running with nobody awaiting them:
 
 ```python
@@ -796,7 +805,7 @@ The failure prints the moment `loud()` raises its `ValueError`.
 and it prints only because `main()` sleeps long enough afterward to let it finish.
 A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
-and an exception the orphan later raises is never retrieved.
+and an exception the orphan raises later is discarded without a report.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
 the async form of exercise 2's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
@@ -806,8 +815,6 @@ so a single broken listener would cancel the others mid-notification.
 
 Use the async fan-out only when the listeners are I/O-bound.
 For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
-The type-keyed [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-is the same fan-out, routed by event type.
 
 ## A Visual Example: a Model and Its View
 
@@ -891,7 +898,7 @@ values out.
 A cell on the border has fewer neighbors,
 so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
-so `cell in grid` is only `True` for a coordinate inside the grid.
+so `cell in grid` is `True` only for a coordinate inside the grid.
 The comprehension's `if` clause applies that test and skips the outside coordinates,
 so `recolored()` needs no grid size.
 The comprehension maps each cell that passes the test to its color's `next()`.
@@ -914,7 +921,7 @@ and `BoxModel` holds the current grid and notifies its listeners.
 
 ### Testing the Model
 
-The model contains no display code so it can be tested without the challenges of a GUI.
+The model contains no display code, so you can test it without a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a click in a corner stays on the grid,
 and that listeners receive the new grid after a click:
@@ -1041,7 +1048,8 @@ so you can attach a second view to the same model and keep both views in step.
 One design serves three jobs in this chapter: a thermometer pushing a float,
 a fan-out awaiting network calls, and a GUI repainting a grid.
 In every case the listener is a callable and the broadcaster is a list of them.
-The pattern requires no interface, no flag, and no class per reaction.
+The pattern requires no interface, no `update()` method,
+and no class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 takes the last step.
 One list becomes a dictionary of lists keyed by event type,

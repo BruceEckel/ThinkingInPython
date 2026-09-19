@@ -36,7 +36,7 @@ in subscription order.
 ## 2. An `announce()` that survives a failing listener
 
 ```python
-# exercise_3.py
+# exercise_2.py
 from collections.abc import Callable
 
 type Listener[T] = Callable[[T], None]
@@ -77,7 +77,7 @@ except* RuntimeError as group:
 ```python
 # test_resilient_announce.py
 import pytest
-from exercise_3 import Broadcaster
+from exercise_2 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:
@@ -115,7 +115,7 @@ listener stops the notification instead of joining `failures`.
 ## 3. The same rescue, for the async fan-out
 
 ```python
-# exercise_4.py
+# exercise_3.py
 import asyncio
 from collections.abc import Awaitable, Callable
 
@@ -165,7 +165,7 @@ asyncio.run(main())
 # test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_4 import Broadcaster
+from exercise_3 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:
@@ -215,7 +215,7 @@ supplied by `gather()` in the async one.
 ## 4. Turning `box_observer.py` into a flood-fill game
 
 ```python
-# exercise_2.py
+# exercise_4.py
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -296,8 +296,9 @@ move: it repaints
 every cell in the *currently owned* patch to the clicked cell's color,
 then re-runs `_flood()` to pick up the neighbors that now match that
 new color and have joined the patch. `game.clicks` gives the
-single-player scoring the exercise asks for, "how many clicks to turn
-the field into one color." Two players can share the same `click()`
+single-player scoring the exercise asks for:
+the clicks it takes to make the whole field one color.
+Two players can share the same `click()`
 method, alternating whose turn supplies the next color, and after a
 fixed number of rounds whoever owns the larger patch wins. `FloodGame`
 can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and
@@ -459,12 +460,12 @@ fail to check. The overloads also check the listener against the
 attribute: `Thermometer.celsius.subscribe(t, readings.append)` passes
 only because `readings` is a `list[float]`.
 
-Pyright reads the class access differently, resolving
-`Thermometer.celsius` to `float` and rejecting `.subscribe` on it.
-The two checkers disagree about which overload a descriptor's class
-access selects, so a codebase on pyright needs the subscription
-somewhere else: a method on `Thermometer`, or a helper that looks the
-descriptor up in `type(obj).__dict__`.
+Pyright rejects `Thermometer.celsius.subscribe`.
+It reads the constructor's `self.celsius = celsius` as declaring an instance attribute of type `float` beside the descriptor,
+so it types the class access as `Notifying[float] | float` and reports that `float` has no `subscribe`.
+`ty` types the class access from the `__get__()` overload alone.
+A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
+which draws no complaint from Pyright.
 
 `subscribe()` writes the listener list into the instance's `__dict__`
 rather than declaring it on the class, where every instance would

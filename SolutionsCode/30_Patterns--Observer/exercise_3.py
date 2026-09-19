@@ -1,36 +1,44 @@
 # exercise_3.py
-from collections.abc import Callable
+import asyncio
+from collections.abc import Awaitable, Callable
 
-type Listener[T] = Callable[[T], None]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
 class Broadcaster[T]:
     def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
-    def subscribe(self, listener: Listener[T]) -> None:
+    def subscribe(self, listener: AsyncListener[T]) -> None:
         self._listeners.append(listener)
 
-    def announce(self, data: T) -> None:
-        failures: list[Exception] = []
-        for listener in list(self._listeners):
-            try:
-                listener(data)
-            except Exception as e:
-                failures.append(e)
+    async def announce(self, data: T) -> None:
+        results = await asyncio.gather(
+            *(listener(data)
+              for listener in self._listeners),
+            return_exceptions=True)
+        failures = [
+            r for r in results if isinstance(r, Exception)]
         if failures:
             raise ExceptionGroup(
                 "listener failures", failures)
 
 received: list[int] = []
 
-def broken(data: int) -> None:
+async def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
-source = Broadcaster[int]()
-source.subscribe(broken)
-source.subscribe(received.append)
-try:
-    source.announce(7)
-except* RuntimeError as group:
-    print(len(group.exceptions), received)
+async def record(data: int) -> None:
+    await asyncio.sleep(0)
+    received.append(data)
+
+async def main() -> None:
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(record)
+    try:
+        await source.announce(7)
+    except* RuntimeError as group:
+        print(len(group.exceptions), received)
+
+asyncio.run(main())
 #: 1 [7]
