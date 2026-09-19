@@ -18,6 +18,8 @@ A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
 With *Observer*, a change in the observable data notifies each interested view.
 
+## The Classic Observer: an Interface to Implement
+
 The classic design comes from *GoF Design Patterns*,
 which calls the observable the *subject*.
 Here, we use `Observable` because it says what the object does.
@@ -97,6 +99,8 @@ Here `set_celsius()` calls it, so every change broadcasts at once.
 The alternative leaves that call to the client,
 so several changes can coalesce into one broadcast,
 but a caller can forget to make the call.
+
+### Why `notify()` Copies the List
 
 The `list(self._observers)` copy inside `notify()` looks redundant,
 since `_observers` is already a list.

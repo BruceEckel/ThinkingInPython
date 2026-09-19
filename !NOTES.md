@@ -1,3 +1,6 @@
+The Watcher and watch names got me thinking that the typical naming in the Observer pattern is hard to mentally keep track of.
+Words such as 'watch' and 'tell' are much more relatable. Suggest some different naming schemes. Sugest how we might be able to get away with describing the GoF naming and saying that can be difficult to track, then using our names instead, throughout the chapter.
+
 Implementation is Friction
 
 How can I improve the process on this book?
