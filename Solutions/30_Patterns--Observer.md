@@ -374,3 +374,90 @@ The rule sits in `recolored()`, `BoxModel.click()` calls it, and
 `notify()` delivers the result. `initials()` makes the same point from
 the other side: it is a second view of a `Grid`, written without
 knowing the rule.
+
+## 6. A descriptor per observable attribute
+
+```python
+# exercise_6.py
+from collections.abc import Callable
+from typing import overload
+
+type Observer[T] = Callable[[T], None]
+
+class Notifying[T]:
+    def __set_name__(
+        self, owner: type, name: str
+    ) -> None:
+        self.storage = f"_{name}"
+        self.observers = f"_observers_{name}"
+
+    @overload
+    def __get__(self, obj: None,
+                owner: type) -> Notifying[T]: ...
+    @overload
+    def __get__(self, obj: object,
+                owner: type) -> T: ...
+    def __get__(self, obj: object | None,
+                owner: type) -> T | Notifying[T]:
+        if obj is None:
+            return self  # Thermometer.celsius
+        return getattr(obj, self.storage)
+
+    def __set__(self, obj: object, value: T) -> None:
+        setattr(obj, self.storage, value)
+        for observer in getattr(obj, self.observers, ()):
+            observer(value)
+
+    def subscribe(self, obj: object,
+                  observer: Observer[T]) -> None:
+        obj.__dict__.setdefault(
+            self.observers, []).append(observer)
+
+class Thermometer:
+    celsius = Notifying[float]()
+    humidity = Notifying[float]()
+
+    def __init__(self, celsius: float,
+                 humidity: float) -> None:
+        self.celsius = celsius
+        self.humidity = humidity
+
+t = Thermometer(20.0, 0.4)
+readings: list[float] = []
+humidities: list[float] = []
+Thermometer.celsius.subscribe(t, readings.append)
+Thermometer.humidity.subscribe(t, humidities.append)
+t.celsius = 25.0
+t.humidity = 0.5
+t.celsius = 150.0
+print(readings, humidities)
+#: [25.0, 150.0] [0.5]
+print(t.celsius, t.humidity)
+#: 150.0 0.5
+```
+
+`__set_name__()` receives the name each descriptor was assigned to, so
+`celsius` and `humidity` derive different attribute names: `_celsius`
+and `_observers_celsius` for one, `_humidity` and
+`_observers_humidity` for the other. Two `Notifying` instances in one
+class therefore share no storage and no observer list, which is what
+makes the two attributes independent. `Observable` keeps one list for
+the whole object; a descriptor keeps one per attribute.
+
+`__set__()` stores the value and then calls each observer registered
+for that attribute, the work `Thermometer`'s property setter did with
+`self.notify(value)`.
+
+Class access is the part a validating descriptor never needs.
+`Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
+returning the descriptor there puts `subscribe()` within reach. The
+two `@overload` declarations tell the type checker which of the two
+results it gets: `Notifying[T]` from the class, `T` from an instance.
+Without them the declared return type is the union, and `t.celsius *
+2` would fail to check. The overloads also check the observer against
+the attribute: `Thermometer.celsius.subscribe(t, readings.append)`
+passes only because `readings` is a `list[float]`.
+
+`subscribe()` writes the observer list into the instance's `__dict__`
+rather than declaring it on the class, where every instance would
+share one list.

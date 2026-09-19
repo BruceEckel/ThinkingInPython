@@ -221,6 +221,8 @@ A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
+### Testing the Observers
+
 Testing confirms that `celsius` reports the value given to the constructor,
 that every subscriber receives the new value in subscription order,
 that a subscriber receives only the changes made after it subscribes,
@@ -284,6 +286,8 @@ because they share an instance and a function.
 so detaching an observer that never subscribed raises a `ValueError`.
 Subscribing the same callable twice means two notifications and two `unsubscribe()` calls to stop them.
 
+### Detaching During a Notification
+
 The copy in `notify()` shows its value when an observer unsubscribes mid-notification:
 
 ```python
@@ -311,6 +315,8 @@ print(seen)
 Without the copy, `once`'s self-removal would skip `always`,
 and `always: 1` would be missing.
 
+### Failures and Lapsed Listeners
+
 An observer that raises an exception stops the loop,
 and the observers after it are not called.
 Decide whether `notify()` should catch, collect, and continue
@@ -323,6 +329,8 @@ Long-lived observables need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 which do not keep the observer alive
 (`weakref.WeakMethod` is the bound-method form).
+
+### Re-entrant Notification
 
 An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
 Two-way bindings are the usual source.
@@ -399,6 +407,77 @@ The model still notifies once.
 The alternative is a re-entry flag set before `notify()` and cleared after.
 The flag breaks the cycle too,
 and fits the case where a write of an unchanged value should still proceed.
+
+### Notifying Without a Base Class
+
+`Thermometer` pays for each published attribute with a `@property` pair,
+and takes `subscribe()` and `notify()` from a base class.
+`__setattr__()` replaces both.
+Python calls it on every attribute assignment,
+so one method covers every attribute of the class:
+
+```python
+# watched.py
+from collections.abc import Callable
+
+type Watcher = Callable[[str, object], None]
+
+class Watched:
+    _watchers: list[Watcher]
+
+    def __init__(
+        self, celsius: float, humidity: float
+    ) -> None:
+        # __setattr__() reads _watchers, so it
+        # must exist before the first assignment
+        self.__dict__["_watchers"] = []
+        self.celsius = celsius
+        self.humidity = humidity
+
+    def watch(self, watcher: Watcher) -> None:
+        self._watchers.append(watcher)
+
+    def __setattr__(
+        self, name: str, value: object
+    ) -> None:
+        super().__setattr__(name, value)
+        for watcher in list(self._watchers):
+            watcher(name, value)
+
+w = Watched(20.0, 0.4)
+changes: list[tuple[str, object]] = []
+w.watch(lambda n, v: changes.append((n, v)))
+w.celsius = 25.0
+w.humidity = 0.5
+print(changes)
+#: [('celsius', 25.0), ('humidity', 0.5)]
+```
+
+The constructor writes `_watchers` through `self.__dict__` to bypass `__setattr__()`,
+which would read the list before the assignment that creates it.
+The two assignments after that line are ordinary ones,
+so each notifies a list that is still empty:
+the constructor returns before a caller can register a watcher.
+`super().__setattr__()` does the storing,
+because an ordinary assignment inside `__setattr__()` would call `__setattr__()` again.
+
+`_watchers` needs its bare annotation because a write through `self.__dict__` declares nothing.
+Without the annotation,
+`ty` reports an `unresolved-attribute` error in each method that reads the list.
+`celsius` and `humidity` need no declaration:
+`ty` reads their type from the constructor's assignments.
+
+One hook covering every attribute is the trade.
+A watcher takes the attribute name along with the value,
+and filters by name to act on one attribute,
+where a `Thermometer` observer receives the temperature.
+Every assignment notifies, including internal bookkeeping,
+so a class that stores a cache or a counter broadcasts those writes too.
+`__setattr__()` accepts any name as well,
+so `ty` reports nothing for `w.celcius = 25.0`,
+which quietly creates a new attribute.
+The same misspelling on `Thermometer` is an `unresolved-attribute` error,
+because a `@property` gives the checker a name to match.
 
 ## Observer and I/O
 
@@ -492,6 +571,19 @@ Calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
 The alias's type parameter does the same job as the synchronous `Observer[T]`'s.
 
+The `alarm` is slower than the log, yet the log prints first.
+Awaiting the observers in sequence would print in subscription order,
+alarm first.
+Concurrent fan-out lets each observer finish as soon as its own wait ends,
+so the faster observer prints first.
+The results `gather()` returns stay in argument order regardless.
+Only the side effects interleave.
+
+An observer need not act on every notification.
+Below its threshold, the alarm returns at once.
+
+### Detaching During an Async Notification
+
 `notify()` needs no `list()` copy here.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
 so a detach during the fan-out cannot skip an observer.
@@ -552,16 +644,7 @@ because that module's own top-level `asyncio.run(main())` would run its thermome
 because `gather()` already holds its coroutine before `once` runs.
 The next `notify()` no longer calls it.
 
-The `alarm` is slower than the log, yet the log prints first.
-Awaiting the observers in sequence would print in subscription order,
-alarm first.
-Concurrent fan-out lets each observer finish as soon as its own wait ends,
-so the faster observer prints first.
-The results `gather()` returns stay in argument order regardless.
-Only the side effects interleave.
-
-An observer need not act on every notification.
-Below its threshold, the alarm returns at once.
+### A Failing Observer Orphans the Rest
 
 A failing observer behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
@@ -709,6 +792,8 @@ An enum, two functions, and one class make up the model:
 `Color` holds the colors and their order, the functions compute grids,
 and `BoxModel` holds the current grid and notifies its observers.
 
+### Testing the Model
+
 The model contains no display code so it can be tested without the challenges of a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a click in a corner stays on the grid,
@@ -756,6 +841,8 @@ def test_model_notifies_with_the_new_grid() -> None:
     assert seen[-1] is model.grid
     assert model.grid[(1, 1)] != before
 ```
+
+### The View
 
 The view lives in its own file.
 It is the only code that draws to the screen.
@@ -868,3 +955,13 @@ and the *Observer* is an event bus.
     make `recolored()` advance every box in the clicked box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
+6.  Write a `Notifying` descriptor
+    ([Metaprogramming](17_Techniques--Metaprogramming.md#a-descriptor-that-validates))
+    that replaces the `@property` and `notify()` pair,
+    so one class declares several independently observable attributes:
+    `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
+    Each attribute keeps its own observers.
+    Subscribing needs the descriptor, not the value it stores,
+    so `__get__()` answers class access by returning the descriptor,
+    and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
+    Show that an assignment to one attribute calls no observer of the other.
