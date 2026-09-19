@@ -1047,7 +1047,8 @@ The mouse belongs to the view.
 or a test call drives the model the way a click does.
 
 The model and the view share only the subscribe-and-announce contract,
-so you can attach a second view to the same model and keep both views in step.
+so you can attach a second view to the same model and keep both views in step
+(see Exercise 6).
 
 ## What Stays Constant
 
@@ -1056,12 +1057,11 @@ a thermometer whose listeners print a reading,
 the same thermometer whose coroutine listeners run concurrently,
 and a grid model whose listener repaints a canvas.
 In every case the listener is a callable,
-and the broadcaster holds a list of listeners and calls each one when its state changes.
+and the broadcaster holds listeners and calls each one when its state changes.
 The pattern requires no interface, no `update()` method,
 and no class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-takes the last step.
-One list becomes a dictionary of lists keyed by event type,
+goes a step further: one list becomes a dictionary of lists keyed by event type,
 and the *Observer* is an event bus.
 
 ## Exercises
@@ -1107,8 +1107,7 @@ and the *Observer* is an event bus.
     and print the reachable colors for every size from 3 through 8.
     The 8x8 grid reaches `palegreen` alone,
     and one smaller size reaches nothing.
-8.  Write a `Notifying` descriptor
-    ([Metaprogramming](17_Techniques--Metaprogramming.md#a-descriptor-that-validates))
+8.  Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
