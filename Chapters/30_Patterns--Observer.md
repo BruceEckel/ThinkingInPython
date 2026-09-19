@@ -20,12 +20,12 @@ With *Observer*, a change in the observable data notifies each interested view.
 
 The classic design comes from *GoF Design Patterns*,
 which calls the observable the *subject*.
-`Observable` says what the object does,
-and it is the name that Java's `java.util.Observable` and the reactive libraries use,
-so the listings here keep it.
+Here, we use `Observable` because it says what the object does.
+It is also the name used by `java.util.Observable` and the reactive libraries.
+
 The design has three parts: an `Observer` interface every observer implements,
 an `Observable` base class that keeps the observer list,
-and a `notify()` that broadcasts to each observer in turn:
+and `Observable.notify()` that broadcasts to every observer:
 
 ```python
 # classic_observer.py
@@ -152,9 +152,11 @@ t.celsius = 150
 
 The observers here are lambdas, but any function or bound method works.
 Four things from the classic version disappear: the `Observer` interface,
-the `update()` method the interface required, a class per reaction,
-and the `observable` argument.
-The method names change as well:
+the `update()` method name that the observable and every observer wrote into their code,
+a class per reaction, and the `observable` argument.
+`notify()` calls `observer(data)` where the classic version called `observer.update(self, arg)`,
+so any callable is an observer, whatever its name.
+The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
 An observer that needs the changed object takes it as part of the payload
