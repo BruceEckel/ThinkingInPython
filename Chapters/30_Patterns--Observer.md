@@ -470,7 +470,7 @@ with expected(RecursionError):
 
 The setter calls `announce()`, the listener writes back through the same setter,
 and each write calls `announce()` again.
-A setter that returns early when the new value equals the stored one breaks the cycle:
+To break the cycle, the setter returns early when the new value equals the stored one:
 
 ```python
 # reentrant_announce_fixed.py
