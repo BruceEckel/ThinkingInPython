@@ -180,9 +180,9 @@ and every function whose `case _` calls `assert_never()` fails type checking unt
 Exercise 2 asks you to do that here, and to decide what a link should weigh.
 
 `walk()` is a generator, so traversing a composite is lazy.
-The `yield from` flattens the recursion into a single stream of paths,
-and any consumer of that stream stays decoupled from the tree structure
-(see [Iterators](23_Patterns--Iterators.md#delegating-with-yield-from)).
+The [`yield from`](23_Patterns--Iterators.md#delegating-with-yield-from)
+flattens the recursion into a single stream of paths,
+and any consumer of that stream stays decoupled from the tree structure.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
 A `list` there would not do: a record stops rebinding of the field,
@@ -307,9 +307,8 @@ and the walkers need the union to know they have covered every case.
 because a base class is an open set and any new subclass silently belongs to it.
 
 `Operators` declares no `__slots__`,
-so the nodes are declared with `@dataclass(frozen=True)` and not `@record`:
-an unslotted base gives each instance its `__dict__` back
-([Performance](18_Techniques--Performance.md#record)).
+so the nodes are declared with `@dataclass(frozen=True)` and not [`@record`](18_Techniques--Performance.md#record):
+an unslotted base gives each instance its `__dict__` back.
 
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
@@ -564,9 +563,9 @@ The patterns read like the algebra they implement.
 `(Num(0), other) | (other, Num(0))` says "zero on either side,
 keep the other side."
 Both alternatives bind `other`, and they must:
-every alternative in a `|` must bind the same set of names,
-so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise
-(see [Alternatives and Capture](13_Techniques--Pattern_Matching.md#alternatives-and-capture)).
+every [alternative](13_Techniques--Pattern_Matching.md#alternatives-and-capture)
+in a `|` must bind the same set of names,
+so binding `left` in one and `right` in the other is a `SyntaxError` rather than a runtime surprise.
 `(Num(a), Num(b))` captures two constants for folding.
 The same syntax does two opposite jobs: `Num(0)` after `case` is a pattern,
 and Python never calls `Num` to match it,
