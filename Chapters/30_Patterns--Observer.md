@@ -57,10 +57,19 @@ class Display:
         print(f"display: {arg}C")
 
 class Thermometer(Observable[float]):
+    def __init__(self, celsius: float) -> None:
+        super().__init__()
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
     def set_celsius(self, value: float) -> None:
+        self._celsius = value
         self.notify(value)
 
-t = Thermometer()
+t = Thermometer(20.0)
 t.attach(Display())
 t.set_celsius(25)
 #: display: 25C
@@ -79,7 +88,8 @@ so `Plot` and `Table` attach the same way `Display` does.
 Passing `arg` is the *push* model.
 The observable (`Thermometer`) supplies what changed (the temperature),
 so an observer needs no reference back into the observable's state.
-The *pull* model sends only `observable` and lets each observer read what it needs by calling back into the observable.
+The *pull* model sends only `observable` and lets each observer read what it needs by calling back into the observable,
+here `observable.celsius`.
 This further decouples observer and observable.
 
 GoF leaves one choice open: who calls `notify()`.
@@ -208,7 +218,8 @@ Getting a value back is a different pattern,
 such as [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 for the first handler that answers.
 
-Testing confirms that every subscriber receives the new value in subscription order,
+Testing confirms that the constructor's starting reading is readable,
+that every subscriber receives the new value in subscription order,
 that a subscriber receives only the changes made after it subscribes,
 and that delivery stops after `unsubscribe()`:
 
@@ -242,6 +253,7 @@ def test_unsubscribe_stops_delivery() -> None:
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
     t = Thermometer(20.0)
+    assert t.celsius == 20.0  # The starting reading
     t.subscribe(readings.append)
     t.celsius = 25.0
     t.celsius = 150.0
