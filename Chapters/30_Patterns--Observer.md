@@ -16,7 +16,7 @@ The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent Document-View architecture.
 A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
-With *Observer*, changes in observable data notifies each interested view.
+With *Observer*, a change in the observable data notifies each interested view.
 
 The classic design comes from *GoF Design Patterns*,
 which calls the observable the *subject*.
