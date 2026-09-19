@@ -774,7 +774,7 @@ The next `announce()` builds its tuple from the shortened list and calls `always
 
 ### A Failing Listener Orphans the Rest
 
-A failing listener behaves differently here than in the synchronous version.
+A failing asynchronous listener behaves differently from a failing synchronous one.
 `gather()` re-raises the first exception to its caller right away,
 and the unfinished listeners keep running with nobody awaiting them:
 
