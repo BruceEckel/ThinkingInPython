@@ -531,7 +531,7 @@ from collections.abc import Callable
 type Watcher = Callable[[str, object], None]
 
 class Watched:
-    _watchers: list[Watcher]
+    _watchers: list[Watcher]  # Bare annotation
 
     def __init__(
         self, celsius: float, humidity: float
@@ -569,15 +569,13 @@ the constructor returns before a caller can register a watcher.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` would call `__setattr__()` again.
 
-`_watchers` needs its bare annotation because a write through `self.__dict__` declares nothing.
+The bare annotation `_watchers: list[Watcher]` is required because a write through `self.__dict__` declares nothing.
 Without the annotation,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
-The annotation [declares an instance attribute](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create),
-not a `ClassVar`: it binds no value, so it creates no class attribute,
-and the constructor gives each `Watched` its own list.
-A `ClassVar` would hand every instance the same list.
-`celsius` and `humidity` need no declaration:
-`ty` reads their type from the constructor's assignments.
+It [declares an instance attribute](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
+and is not a `ClassVar`: it binds no value, so it creates no class attribute.
+The constructor gives each `Watched` its own list.
+In contrast, `celsius` and `humidity` need no declaration because `ty` reads their type from the constructor's assignments.
 
 One hook covering every attribute is the trade.
 A watcher is a listener with a wider signature:

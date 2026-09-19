@@ -4,7 +4,7 @@ from collections.abc import Callable
 type Watcher = Callable[[str, object], None]
 
 class Watched:
-    _watchers: list[Watcher]
+    _watchers: list[Watcher]  # Bare annotation
 
     def __init__(
         self, celsius: float, humidity: float
