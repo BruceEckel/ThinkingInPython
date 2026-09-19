@@ -194,7 +194,13 @@ A `__post_init__()` that calls `super().__init__()` fixes that,
 at greater length than the `__init__()` it replaces.
 
 An observer returns `None`.
-Notification runs one way, from observable to observers, and nothing comes back.
+The `Observer` alias declares that return type,
+and the type checker rejects a subscriber that returns a value.
+Notification runs one way, from observable to observers, and nothing comes back:
+`notify()` calls each observer as a statement and reads no result.
+*GoF Design Patterns* gives the reason under broadcast communication.
+A notification names no receiver, and each observer may handle or ignore it,
+so one call with several observers has no single answer to collect.
 Getting a value back is a different pattern,
 such as [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 for the first handler that answers.
