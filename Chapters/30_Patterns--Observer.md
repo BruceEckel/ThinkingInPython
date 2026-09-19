@@ -217,11 +217,11 @@ so `notify()` calls each observer as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
 A notification names no receiver, and each observer may handle or ignore it,
 so one call with several observers has no single answer to collect.
-A design that needs an answer uses a different pattern.
-[*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
+A design that needs an answer uses a different pattern;
+for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
 
-Testing confirms that the constructor's starting reading is readable,
+Testing confirms that `celsius` reports the value given to the constructor,
 that every subscriber receives the new value in subscription order,
 that a subscriber receives only the changes made after it subscribes,
 and that delivery stops after `unsubscribe()`:
