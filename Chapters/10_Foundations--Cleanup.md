@@ -301,9 +301,9 @@ except RuntimeError as e:
 ```
 
 `C opened` has no matching `closed`:
-`__init__()` raised an exception before the `with` statement received a context manager,
-so `__enter__()` and `__exit__()` never ran,
-and nothing released what `__init__()` had already acquired.
+`__init__()` raises an exception before the `with` statement receives a context manager,
+so `__enter__()` and `__exit__()` never run,
+and nothing releases what `__init__()` had already acquired.
 Acquire the resource in `__enter__()` instead of `__init__()` when construction itself can fail,
 or wrap the acquisition in its own `try`/`except` and release what you already opened before re-raising.
 
@@ -348,7 +348,7 @@ so the object survives until the program ends.
 The second `close()` does nothing: a finalizer runs at most once,
 and `alive` reports whether it still can.
 `b` holds the only reference to its `Connection`,
-so `del b` destroys the object here, where the `del c` in `cleanup.py` did not.
+so `del b` destroys the object here, where the `del c` in `cleanup.py` does not.
 Nobody calls `close()`, but the callback still runs,
 and it runs before interpreter shutdown rather than during it.
 For an object still alive when the program ends,
@@ -484,7 +484,7 @@ CPython's reference counting makes the count fall immediately.
 On an implementation with a tracing collector, such as PyPy,
 the entries disappear when its collector runs, so the counts fall late.
 This listing reads the count during normal execution.
-The `__del__()` version in `cleanup.py` waited for interpreter shutdown,
+The `__del__()` version in `cleanup.py` waits for interpreter shutdown,
 when the interpreter's bookkeeping is unreliable.
 
 ## The Rule

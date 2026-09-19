@@ -63,7 +63,7 @@ Hello, Alice!
 The demo in `test_ch46_ask_and_greet.py` uses `Scripted` rather than
 `Terminal` for the reason any book listing does: a call to `input()`
 has no terminal to read from. The substitution is the point
-either way, and neither binding required a change to
+either way, and neither binding requires a change to
 `ask_and_greet()`, which is character-for-character the same function
 under both.
 
@@ -136,7 +136,7 @@ thing. Its signature was describing a different function.
 What its callers must now declare is the point of the exercise. Before,
 `greet_all()` claimed to need nothing, so a caller could run it with no
 environment: `run(greet_all(names))`. Now every caller has two
-options, the same two `greet()`'s callers had. Supply a `Console`,
+options, the same two `greet()`'s callers have. Supply a `Console`,
 ending the requirement, or declare `Need[Console]` in its own return
 type and pass the requirement further up. No third option exists,
 which is what makes the dependency visible. The requirement appears in
@@ -201,7 +201,7 @@ carry `Never` in the yield channel, so both agree that nothing can
 fail from here on. They differ in the return channel: `str` for
 `all_handled()`, `str | ValueError` for the wrapped `one_unhandled()`.
 
-The difference is where the error stopped travelling. `all_handled()`
+The difference is where the error stops travelling. `all_handled()`
 catches both errors, then consumes both in its `match`, turning each
 into a sentence and returning a `str`. No error remains, and the
 `assert_never()` proves it: the `match` covers every case inside the
@@ -284,8 +284,8 @@ print(recorder.printed, recorder.entries)
 ```
 
 One object satisfies both protocols. The concrete-class version could
-not arrange that: `Log` was a `dataclass` holding its own entries, so
-a test had to construct one and read `log.entries` afterward. As a
+not arrange that: `Log` is a `dataclass` holding its own entries, so
+a test has to construct one and read `log.entries` afterward. As a
 `Protocol`, `Log` is a shape, and a single `Recorder` can have that
 shape and the `Console` shape at once.
 
@@ -299,8 +299,8 @@ under two different types is the case `as_type()` exists for.
 Writing both assertions in one test is the payoff. A test holding the
 whole environment can check that the greeting reached the console
 *and* that the log recorded it, in one function, with no capture of
-stdout and no temporary file. Both Effects were requests before they
-were actions, so the test decides what performing them means.
+stdout and no temporary file. Both Effects are requests before they
+are actions, so the test decides what performing them means.
 
 ## 5. A third material in the table
 
@@ -352,7 +352,7 @@ print(run(supply(METAL, ROBOTIC)(holds)()))
 so its two rows read `True` and `True`. `METAL` is the first material
 in the table that survives both nailers.
 
-The test function body needed no change because it never mentions a
+The test function body needs no change because it never mentions a
 material or a nailer. It receives two objects and an expectation,
 builds an environment from them with `supply()`, and asks whether the
 answer matches. The `parametrize` table decides which two objects
@@ -461,7 +461,7 @@ runs to completion and prints:
 The greetings are gone. `greet(name)` calls a generator function, so
 it builds an Effect and returns it. Nothing then drives that Effect,
 so its body never runs and never makes the `Need[Console]` request.
-The log entries still appear because the deletion touched only the
+The log entries still appear because the deletion touches only the
 greeting half of the function. That makes the failure quieter still:
 the program looks like it worked and produced most of its output.
 
@@ -572,7 +572,7 @@ So a spent Effect looks exactly like one that succeeded and returned
 
 The dictionary of builders behaves as a reader expects. Each pass
 calls each entry, each call builds a new generator, and each generator
-runs its body once. The stored value went from a description `run()`
+runs its body once. The stored value goes from a description `run()`
 consumes once to a recipe a caller can follow as often as it likes.
 
 That difference is why `retry()`'s type is
@@ -634,13 +634,13 @@ requirements differ, and here they do not. Only the return type
 changes, from one `str` to a `list[str]`, since `report_all()`
 collects the results rather than relaying them.
 
-`run()` raised a `RuntimeError`, and `await run_async(...)` worked.
+`run()` raises a `RuntimeError`, and `await run_async(...)` works.
 `run(effect)` is `asyncio.run(run_async(effect))`. `asyncio.run()`
 refuses to start an event loop inside a running one, so calling
 `run()` from `main()` fails. `run_async()` is the same driver in
 coroutine form, so the loop already running can await it.
 
-`ty` accepted both because both are correctly typed. `run()` takes an
+`ty` accepts both because both are correctly typed. `run()` takes an
 Effect and returns its result. `run_async()` takes an Effect and returns
 an awaitable of its result. `report_all(["a"])` satisfies either
 signature, and nothing in the type system records that this call site
@@ -705,13 +705,13 @@ annotations by choice, not by demand: `yield from` on a `@throws`
 function produces the declared success type, and naming that type
 keeps the type checker's inference pinned.
 
-Each failure surfaced at `run()`, and nowhere earlier. `Cyd` has a
+Each failure surfaces at `run()`, and nowhere earlier. `Cyd` has a
 score, so the lookup succeeds and `format_score()` fails. `Dana` has
 none, so the lookup fails and `format_score()` never runs. In both
 cases the error value travels up through the `yield from` chain
 untouched, past `announce()`, past `supply()`, to the driver. `run()`
 raises it as an ordinary exception because nothing along the way
-caught it. Declaring a failure is not handling it. The declaration
+catches it. Declaring a failure is not handling it. The declaration
 says the failure can arrive, and `catch()` turns it into a value the
 program deals with.
 

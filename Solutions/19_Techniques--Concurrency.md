@@ -262,7 +262,7 @@ no error, because raising the limit is exactly what `release()` does.
 That silence is the difference between the two objects. `asyncio.Lock`
 refuses a release it never granted, raising `RuntimeError: Lock is not
 acquired.` A semaphore has no such notion of ownership, so the same
-mistake silently widens the gate and reintroduces the race the lock was
+mistake silently widens the gate and reintroduces the race the lock is
 there to prevent.
 
 ## 6. Removing the `__main__` guard
@@ -294,10 +294,10 @@ the same `RuntimeError`:
     child processes and you have forgotten to use the proper idiom
     in the main module
 
-Each worker did what the chapter describes. To find `cpu_price()`, a
-fresh interpreter imported this module, and importing it ran every
+Each worker does what the chapter describes. To find `cpu_price()`, a
+fresh interpreter imports this module, and importing it runs every
 top-level statement, including the `with ProcessPoolExecutor()` line
-that creates workers. Each worker therefore tried to build a pool of
+that creates workers. Each worker therefore tries to build a pool of
 its own, whose workers would import the module again.
 
 The error is a guard rail rather than the real failure. Python detects
@@ -479,7 +479,7 @@ during that sleep and its task ends cancelled.
 
 That is the line between what a `TaskGroup` can and cannot undo. A
 `TaskGroup` cancels what is still running, which is why the original
-`PAIRS` had both `e` and `f` cancelled. It cannot reach into a task
+`PAIRS` has both `e` and `f` cancelled. It cannot reach into a task
 that already returned, and it cannot unprint `e: fetched` or undo
 whatever a real `fetch()` wrote to a database on its way out.
 Structured concurrency guarantees that no task outlives the block, not
@@ -599,14 +599,14 @@ asyncio.run(main())
 ```
 
 All three tasks print `context main`. Every task starts with a copy of
-the context that created it, and that context already carried
+the context that created it, and that context already carries
 `request_id = "main"`, so each copy inherits the same value. No task
 writes to the variable afterward, so all three copies stay identical
 and the original version's per-request identity disappears.
 
-The `after:` line changes too. In the chapter's version it printed
-`context -`, the default, because each `set()` happened inside a task's
-own copy and none of them could reach `main()`'s context. Here the
+The `after:` line changes too. In the chapter's version it prints
+`context -`, the default, because each `set()` happens inside a task's
+own copy and none of them can reach `main()`'s context. Here the
 `set()` is in `main()`, so it lands in `main()`'s own context and is
 still there once the group finishes. Copying runs one way: a child sees
 what the parent had at creation, and the parent sees nothing a child
@@ -655,7 +655,7 @@ print(f"threads run in parallel: {t_seq > t_thr * target}")
 #: threads run in parallel: False
 ```
 
-The assertion passes because correctness never depended on the
+The assertion passes because correctness never depends on the
 executor. `cpu_price()` reads its argument and returns a number,
 touching nothing shared, so five of them produce the same five results
 whether they run one after another, in five threads, or in five
@@ -736,9 +736,9 @@ indented block. The `with lock:` inside the body therefore starts
 *after* `next()` has already returned a number, and ends before the
 next `next()` begins. Two threads can be inside `__next__()` at the
 same moment, read the same `next_number`, and come away with the same
-ticket, exactly as they did without the lock.
+ticket, exactly as they do without the lock.
 
-The lock does cover `out.append(item)`, which never needed covering:
+The lock does cover `out.append(item)`, which never needs covering:
 `out` is a local list, one per worker, so no other thread can touch
 it.
 
@@ -792,13 +792,13 @@ is a wait, but a wait on a task that is not itself waiting on anything
 the second task holds. The first task finishes, releases both locks,
 and the second task walks the same path through an empty field.
 
-The deadlock version made the waiting circular: task one held `lock_a`
-and wanted `lock_b`, task two held `lock_b` and wanted `lock_a`, so
-each task's progress depended on the other task's progress. A deadlock
-is exactly that cycle. Ordering the acquisitions globally makes such a
-cycle impossible. A task can only ever wait on a lock that comes later
-in the order than every lock it already holds, and "later" never loops
-back to "earlier."
+The deadlock version makes the waiting circular: task one holds
+`lock_a` and wants `lock_b`, task two holds `lock_b` and wants
+`lock_a`, so each task's progress depends on the other task's
+progress. A deadlock is exactly that cycle. Ordering the
+acquisitions globally makes such a cycle impossible. A task can only
+ever wait on a lock that comes later in the order than every lock it
+already holds, and "later" never loops back to "earlier."
 
 ## 15. Awaiting `pool.submit()` directly
 
@@ -831,7 +831,7 @@ calling thread until the worker finishes. Nothing about that future
 cooperates with an event loop, and it defines no `__await__`, so
 `await` refuses it, first statically and then at runtime.
 
-`loop.run_in_executor()` is the bridge the original listing used. It
+`loop.run_in_executor()` is the bridge the original listing uses. It
 submits the call to the executor the same way `submit()` does, but
 returns an `asyncio.Future` bound to the running loop, an awaitable
 that resolves when the executor's own future completes. The task
@@ -839,9 +839,9 @@ suspends on it like any other `await`, and the loop keeps running the
 other two tasks in the meantime.
 
 The wrapper around the `TypeError` is the `TaskGroup` keeping its
-contract. `process_price()` failed as a task inside the group, so the
-group cancelled its two siblings, waited for them to end, and
-re-raised the failure wrapped in an `ExceptionGroup`, the same
-packaging `task_group.py` caught with `except*`. `main()` has no
+contract. `process_price()` fails as a task inside the group, so the
+group cancels its two siblings, waits for them to end, and re-raises
+the failure wrapped in an `ExceptionGroup`, the same packaging
+`task_group.py` catches with `except*`. `main()` has no
 `except*`, so the group propagates out of `asyncio.run()` and prints
 as the grouped traceback above.

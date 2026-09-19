@@ -82,10 +82,10 @@ def is_palindrome(s: str) -> bool:
     return s == s[::-1]
 ```
 
-The test written first stayed the same.
-Only the code changed to satisfy it.
+The test written first stays the same.
+Only the code changes to satisfy it.
 That is TDD working as a design tool:
-the test defined what "done" means before any implementation existed to shape that definition.
+the test defines what "done" means before any implementation exists to shape that definition.
 
 ## pytest
 
@@ -661,7 +661,7 @@ def elapsed(start: float) -> float:
     return time.time() - start
 ```
 
-`monkeypatch` pins it to a fixed value the same way it did for `randint()`:
+`monkeypatch` pins it to a fixed value the same way it does for `randint()`:
 
 ```python
 # test_stopwatch.py

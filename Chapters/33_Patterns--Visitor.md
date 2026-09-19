@@ -378,7 +378,7 @@ if __name__ == "__main__":
 
 The recursive call works because `Corsage` and `Flower` both define `accept()`,
 so the loop in `Corsage.accept()` calls it without knowing whether an element is a flower or another corsage.
-`flower_gen()` drove the earlier traversal from outside, one flower at a time.
+`flower_gen()` drives the earlier traversal from outside, one flower at a time.
 Here `accept()` drives it,
 the situation where the classic pattern still earns its keep.
 
@@ -395,7 +395,7 @@ calling `nectar()` instead of `fragrance()` selects the operation before anythin
 and only the flower's type is still unknown.
 One dispatch covers it.
 
-The chapter opened with that difference in intent.
+The chapter opens with that difference in intent.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself:

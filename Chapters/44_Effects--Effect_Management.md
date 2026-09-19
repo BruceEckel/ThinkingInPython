@@ -384,7 +384,7 @@ The next phase produces one benefit per subdivision:
 
 - **Exceptions** become data,
   as [Converting Effectful to Pure](#converting-effectful-to-pure)
-  showed with a `Result`.
+  shows with a `Result`.
   Failures turn into values the type checker can see,
   and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
@@ -667,7 +667,7 @@ You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-That addition is the propagation the by-hand version made you perform with parameters.
+That addition is the propagation the by-hand version makes you perform with parameters.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
@@ -839,7 +839,7 @@ and an AI can start using that language as soon as it works.
 
 Most of these are tracking systems,
 in the sense [Effect Management Systems](#effect-management-systems)
-gave the term: they provide the first part of a full EMS and stop there.
+gives the term: they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
 would be liabilities,
 because a host that pins every implementation can guarantee what generated code can do.
@@ -994,7 +994,7 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, this one stops scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions this chapter raised earlier:
+The function signature answers the questions this chapter raises earlier:
 what does this function depend on, what does it change, what can go wrong.
 Composition stops being a guess,
 because the compiler balances the books at every boundary.
@@ -1017,13 +1017,13 @@ puts it to work.
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.
-    Confirm `greet()` itself required no change,
+    Confirm `greet()` itself requires no change,
     which is the delayed-binding payoff.
 2.  Feel the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
     and log from `greet()` too.
-    The chapter counted five signatures for that version;
+    The chapter counts five signatures for that version;
     say how many of the five use the `Log` they name,
     and then what an EMS would do instead.
 3.  Classify every Effect in `slope_catch.py`,

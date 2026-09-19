@@ -136,7 +136,7 @@ print(repr(drive_naive(interview(),
 #: None
 ```
 
-Nothing in `interview()` changed, and nothing could have. It yields a
+Nothing in `interview()` changes, and nothing could have. It yields a
 `Question` and receives an `Answer`. Where the answer came from is a
 question it never asks. That is the separation the chapter teaches:
 the generator describes the conversation, and the driver interprets it.
@@ -168,7 +168,7 @@ no `Result` exists, and `None` is not a `Result` in any case. Nothing
 catches the mistake: `StopIteration.value` has type `Any`, so
 `return stop.value` satisfies a declared `Result` and `ty` reports
 nothing. The failure is silent at the type checker and silent at
-runtime. It surfaces later as a `None` where the caller expected a
+runtime. It surfaces later as a `None` where the caller expects a
 string, far from the driver that produced it.
 
 Keeping the two meanings apart is a one-line discipline: put inside the

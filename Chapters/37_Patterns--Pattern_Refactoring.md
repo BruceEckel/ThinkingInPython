@@ -320,17 +320,17 @@ print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 2
 ```
 
-Nothing failed.
-The parser built two `Plastic` objects, the sorter matched neither,
+Nothing fails.
+The parser builds two `Plastic` objects, the sorter matches neither,
 and the report totals the trash it recognized.
-Two of four pieces reached a bin,
-and the sixty pounds of plastic never appeared in the totals the plant uses.
+Two of four pieces reach a bin,
+and the sixty pounds of plastic never appears in the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
 The leak is in the `match`.
-The registry accepted `Plastic` the moment its `class` statement ran,
+The registry accepts `Plastic` the moment its `class` statement runs,
 and without that `class` statement,
-`create()` would have raised a `KeyError` at the first `Plastic:` line, loudly,
+`create()` would raise a `KeyError` at the first `Plastic:` line, loudly,
 at parse time.
 The `match` alone loses trash silently.
 
@@ -383,8 +383,8 @@ so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
 Point this sorter at `plastic.dat`,
-the file that defeated the `match` in `plastic_dropped.py`.
-The listing defines `Plastic` the same way `plastic_dropped.py` did:
+the file that defeats the `match` in `plastic_dropped.py`.
+The listing defines `Plastic` the same way `plastic_dropped.py` does:
 
 ```python
 # recycle_dict_plastic.py
@@ -416,7 +416,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 
 Every piece reaches a bin, plastic included: `parsed 4, binned 4`.
 Defining `Plastic` and naming the new data file are the only changes to the program's logic.
-The sorting loop needed no edit,
+The sorting loop needs no edit,
 unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 
 ## Adding Operations: Visitor, and Why Python Skips It
@@ -489,7 +489,7 @@ print(f"classes edited for one operation: {len(edited)}")
 ```
 
 Both operations answer correctly, and the cost is the last line.
-One new question cost an edit to all three material classes,
+One new question costs an edit to all three material classes,
 and the question after it costs three more edits.
 Those edits sit in each class body, as `note_methods.py` shows;
 in the real program they would go in `trash.py`.
@@ -592,7 +592,7 @@ print(f"classes edited for one operation: {len(edited)}")
 
 The counter reads zero.
 `hazard()` reaches every material through the registry,
-and `trash.py` is the file that did not change.
+and `trash.py` is the file that does not change.
 A third question and a fourth cost one more file each,
 where `note_methods.py` charges one edit per material every time.
 Adding a `Plastic` material means defining the class,

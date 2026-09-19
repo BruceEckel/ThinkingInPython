@@ -62,7 +62,7 @@ print(dict(counts))
 `defaultdict(int)` supplies `0` the first time the loop reads a key,
 because `int()` returns `0`. That default turns `counts[kind] += 1`
 into working code with no "does this key exist yet" check, the same
-way `defaultdict(list)` removed the check for appending to a fresh
+way `defaultdict(list)` removes the check for appending to a fresh
 list.
 
 ## 3. Set operations across three sets
@@ -174,7 +174,7 @@ print(person[0], type(person[0]).__name__)
 The unpacking line stays the same, because a `namedtuple` is a tuple
 subclass: it unpacks by position like any other tuple. The names add
 the second `print()`, where `person.height` says what `person[2]`
-meant. They cost nothing, so a heterogeneous tuple that outlives one
+means. They cost nothing, so a heterogeneous tuple that outlives one
 function is usually better as a `namedtuple` or a data class.
 
 ## 8. Building and merging a `dict`

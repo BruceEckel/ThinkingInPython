@@ -68,7 +68,7 @@ print()
 The output is the same as with the original order. The two `if`
 blocks test mutually exclusive values of `n` (`6` and `3`), so on
 any given iteration at most one of them can be true. Neither block's
-outcome depends on whether the other ran first, so checking them in
+outcome depends on whether the other runs first, so checking them in
 either order produces the same result. Order matters only when two
 conditions can both be true for the same value and send execution
 down different paths. Here they cannot.

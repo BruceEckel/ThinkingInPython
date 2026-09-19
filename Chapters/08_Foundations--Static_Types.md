@@ -241,7 +241,7 @@ and the type checker enforces it.
 
 ## Structural Typing with Protocols
 
-Earlier chapters relied on *dynamic typing*.
+Earlier chapters rely on *dynamic typing*.
 A function accepts any object,
 so long as the object supports the operations the function performs on it.
 Python checks the type at runtime, when the operation runs.

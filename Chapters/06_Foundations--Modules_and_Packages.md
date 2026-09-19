@@ -509,7 +509,7 @@ and edits to its source take effect immediately, without reinstalling.
 ## Lazy Imports
 
 Every `import` so far runs the target module's top-level code immediately,
-and that is why importing `a_package.module1` printed its message as it loaded.
+and that is why importing `a_package.module1` prints its message as it loads.
 For a large program that imports many modules but uses only some of them on any given run,
 that eager work slows startup.
 

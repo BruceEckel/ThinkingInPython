@@ -152,7 +152,7 @@ namespace the language does not treat as one: `Facade.start_car` and
 define the class, import it, and carry it around. `@staticmethod`
 exists only to stop Python passing `self` to functions that never
 wanted it.
-The module was already a namespace before anyone asked, and it comes
+The module is already a namespace before anyone asked, and it comes
 with the underscore convention, `__all__`, and one-time initialization
 built in.
 

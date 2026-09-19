@@ -1,7 +1,7 @@
 # Comprehensions
 
 *Comprehensions* build one collection from another in a single expression
-([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduced them).
+([Control Flow](04_Foundations--Control_Flow.md#comprehensions) introduces them).
 The idea originated in mathematical set-builder notation,
 and passed into functional programming.
 Haskell had list comprehensions, and Python borrowed them.

@@ -39,7 +39,7 @@ print(sorted(c.__name__ for c in Color.registry))
 Creating `Yellow` adds it to the registry. Nothing removes it yet,
 since `Color` (its only base) is never in the registry to begin with.
 Creating `Gold` adds *it* and removes its base, `Yellow`, the
-same pruning `PhthaloBlue` and `CeruleanBlue` did to `Blue` earlier.
+same pruning `PhthaloBlue` and `CeruleanBlue` do to `Blue` earlier.
 `__init_subclass__()` runs for every new subclass, so each new
 generation adds itself and prunes its parent automatically, with no
 edit to `Color`.
@@ -453,7 +453,7 @@ Handlers().on_open()
 #: first on_open
 ```
 
-`NoDuplicates` raised an exception on a repeated key. `KeepFirst`
+`NoDuplicates` raises an exception on a repeated key. `KeepFirst`
 returns instead, so Python builds the second `on_open` function, hands
 it to `__setitem__()`, and the mapping discards it. The name still
 refers to the first function when the body finishes, as

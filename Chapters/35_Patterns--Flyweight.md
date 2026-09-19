@@ -270,8 +270,8 @@ whose generated `__init__()` reintroduces the re-run.
 The damage is invisible at first,
 since re-assigning the same components changes nothing.
 It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect,
-because both run again on an object that was already finished.
-`Tile`'s `@dataclass` generated its `__repr__()` and `__eq__()`;
+because both run again on an object that is already finished.
+`Tile`'s `@dataclass` generates its `__repr__()` and `__eq__()`;
 `Color` has only `object`'s versions,
 so printing a `Color` shows the default `object.__repr__()`.
 The missing `__eq__()` costs less than it appears.
@@ -499,7 +499,7 @@ exploits the same property, using members as shared, comparable states.
 
 ## Which Pool Should You Use?
 
-The chapter showed four mechanisms,
+The chapter shows four mechanisms,
 and the question that decides between them is how much you know about the set of values.
 If you know it as you write the program,
 use an `Enum` and let the language hold the pool.

@@ -62,8 +62,8 @@ all three results. Nothing is ever evicted, so the repeat calls to
 `square(2)` and `square(1)` both find their stored answers.
 
 The difference from the chapter's `maxsize=2` run is the second
-`square(1)`. Under `maxsize=2` that call was a fourth miss, because
-computing `square(3)` had pushed `1` out to make room. One extra slot
+`square(1)`. Under `maxsize=2` that call is a fourth miss, because
+computing `square(3)` has pushed `1` out to make room. One extra slot
 converts that miss into a hit, and that conversion is the whole of
 what `maxsize` controls. With three slots the cache never evicts
 anything, so the chapter listing's comment, "Evicts 1, the least
@@ -119,7 +119,7 @@ failure `groupby()` has on unsorted input cannot occur. The two `"b"`
 entries land in the same list no matter how far apart they arrive, and
 the caller needs no `sorted()` call to make that happen.
 
-The cost is everything `groupby()` was buying. `grouped()` reads the
+The cost is everything `groupby()` is buying. `grouped()` reads the
 whole input before returning anything, so an infinite source makes it
 loop forever, and a finite one sits entirely in memory. `groupby()`
 yields each group as it arrives and keeps only the current one, which
@@ -235,14 +235,14 @@ What the `rng` parameter preserves is determinism. Two callers who
 pass `random.Random(0)` still get identical schedules, so the function
 remains testable by calling it twice and comparing, exactly as before.
 The first round is the same one `student_pairs.py` prints, because
-`random.Random(0)` is what `seed: int = 0` built internally. Nothing
+`random.Random(0)` is what `seed: int = 0` builds internally. Nothing
 about the algorithm reaches outside its arguments for randomness.
 
 What the `rng` parameter hands to the caller is control of the seed,
 and with it the responsibility for reproducibility. The
-`seed: int = 0` version accepted only an integer. A caller who wanted
-two different schedules had to pass a different one, and a caller who
-wanted this function to share a program-wide random stream had no way
+`seed: int = 0` version accepts only an integer. A caller who wants
+two different schedules has to pass a different one, and a caller who
+wants this function to share a program-wide random stream has no way
 to say so. The `rng` version allows both. In exchange, a caller can
 now pass `random.Random()` with no seed and get schedules that differ
 on every run.

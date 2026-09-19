@@ -12,12 +12,12 @@ and perhaps some should even be mathematically provable.
 This seems to me to be the broader challenge that functional programming takes on,
 and what this chapter explores.
 
-The preceding chapters built the machinery.
+The preceding chapters build the machinery.
 [Foundations](40_Functional--Foundations.md)
-established pure functions and immutable values,
-[Toolkits](41_Functional--Toolkits.md) supplied the standard library's support,
+establishes pure functions and immutable values,
+[Toolkits](41_Functional--Toolkits.md) supplies the standard library's support,
 and [Error Handling](42_Functional--Error_Handling.md)
-made failure an ordinary value.
+makes failure an ordinary value.
 This chapter asks what that machinery lets you claim about your code,
 and how far those claims can go.
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
 The `assert` passes on every run,
-because a pure call returns the same answer no matter which process ran it,
+because a pure call returns the same answer no matter which process runs it,
 or when.
 The limits above are large enough for the difference to show:
 on the machine that built this book,
@@ -217,10 +217,10 @@ along with the reasons Python parallelism uses processes rather than threads.
 
 ## A Confidence Spectrum
 
-The chapter opened by asking whether programming can make the kind of provable claims a science makes.
+The chapter opens by asking whether programming can make the kind of provable claims a science makes.
 Functional programming's answer is not one guarantee but a spectrum.
 Purity, immutability, and referential transparency,
-the properties these chapters built, provide confidence at every level.
+the properties these chapters build, provide confidence at every level.
 
 Style contributes before the first rung.
 *Declarative* code states the result you want,
@@ -230,7 +230,7 @@ A comprehension names the result, "the squares of the even numbers"
 and `match` names the shapes you expect
 (see [Pattern Matching](13_Techniques--Pattern_Matching.md)),
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
-took a `Result` apart with one branch per kind of failure.
+takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
 It also leaves the runtime free to choose the steps, which is why a SQL query,
@@ -259,7 +259,7 @@ You decide how far up the spectrum to go.
    You state a law the code must obey,
    then check it against many generated inputs.
    It searches for a counterexample instead of proving the law,
-   and that search is the falsifiability the opening required of a science.
+   and that search is the falsifiability the opening requires of a science.
    The climb from rung 3 is in expressiveness, not certainty.
    A type states only what shape a value has.
    A property can state a fact about its behavior,
@@ -383,7 +383,7 @@ Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip breaks.
 This is the unusual Unicode the hand loop's alphabet could never draw,
 found because Hypothesis draws from a wider alphabet,
-not because it guessed the bug.
+not because it guesses the bug.
 `derandomize=True` fixes the search so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.
@@ -429,7 +429,7 @@ Proof is the far end of that distance.
 The everyday win is everything below it: code you can read, check,
 and test as statements about what is true.
 That, more than the presence of functions,
-is the "functionality" the introduction set out to find.
+is the "functionality" the introduction sets out to find.
 
 Part V takes the same discipline one step further and asks the type checker to enforce it:
 [Effect Management](44_Effects--Effect_Management.md)

@@ -498,7 +498,7 @@ so every measured listing in this book prints a comparison rather than a number.
 By default the listing prints the comparison alone.
 Running it with `--numbers`
 (see [Numbers on Your Machine](18_Techniques--Performance.md#numbers-on-your-machine))
-adds the two numbers it compared.
+adds the two numbers it compares.
 
 ## Specialized Containers
 

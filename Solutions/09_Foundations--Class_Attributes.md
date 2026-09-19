@@ -55,8 +55,8 @@ print(Base.shared, Left.shared, Middle.shared, Right.shared)
 `shared`, so both track `Base.shared` through the normal attribute
 lookup chain, right up until something assigns to `Left.shared` or
 `Middle.shared` directly. `Right` holds `100` throughout, because it
-created its own separate class attribute the moment its class body ran
-`shared = 100`.
+creates its own separate class attribute the moment its class body
+runs `shared = 100`.
 
 ## 3. A second `B()` instance is unaffected by the first
 
@@ -77,7 +77,7 @@ print(b.x, b2.x)
 
 Each call to `B()` runs the generated `__init__()`, which assigns `100`
 to `self.x` as a fresh instance attribute for that particular object.
-`b.x = -1` only touches `b`'s own attribute. `b2` came from its own
+`b.x = -1` only touches `b`'s own attribute. `b2` comes from its own
 `B()` call and keeps its own `100`. `real_defaults.py` demonstrates
 the same guarantee with `A`: a constructor default creates one value
 per instance, unlike a class-body attribute, which creates one value
@@ -160,7 +160,7 @@ The error arrives at class-definition time, not at first use, and
 the full message ends with the remedy: `use default_factory`.
 `@dataclass` can detect the mistake because it inspects every default
 before generating the constructor. Nobody inspects a plain class body,
-which is why `shared_mutable.py`'s `Cart` built without complaint.
+which is why `shared_mutable.py`'s `Cart` builds without complaint.
 
 ## 6. `del` unshadows, once
 
@@ -184,10 +184,10 @@ with expected(AttributeError):
 ```
 
 `del a.x` removes the entry from the instance dictionary, which is
-the only place assignment ever wrote. `vars(a)` is empty again, and
+the only place assignment ever writes. `vars(a)` is empty again, and
 `a.x` reads `100`, because the lookup falls back to the class the
-way it did before any assignment. The class attribute kept its `100`
-throughout: the assignment and the `del` both stayed on the instance.
+way it did before any assignment. The class attribute keeps its `100`
+throughout: the assignment and the `del` both stay on the instance.
 
 The second `del a.x` fails because the instance dictionary is empty.
 `del` stops at the instance, the way assignment does, so
@@ -236,7 +236,7 @@ holds `0`.
 
 The fix names the class on the left. `Counting.total += 1` reads and
 writes the same class dictionary, so both instances report `2`.
-`vars(c)` is empty because the constructor wrote only to the class,
+`vars(c)` is empty because the constructor writes only to the class,
 and `c.total` is the read falling back to that shared value.
 
 With the `# type: ignore` removed, `ty` reports
@@ -287,7 +287,7 @@ print(Base2.shared, Left2.shared, Right2.shared)
 ```
 
 `Base.shared` holds `[1, 2]`, and so do both subclasses, because all
-three names share one list. Neither `Left` nor `Right` declared its
+three names share one list. Neither `Left` nor `Right` declares its
 own, so both names read through to `Base`, and `.append()` mutates
 what it finds there. `Left.shared is Base.shared` proves they are one
 object rather than three that happen to be equal.
@@ -297,13 +297,13 @@ inheritance rule of `class_var_inheritance.py`. Each is harmless on
 its own: an immutable `ClassVar` survives inheritance because nothing
 can change it in place, and a mutable one in a single class keeps the
 sharing visible. Together they produce a base-class list that every
-subclass writes to and none of them declared.
+subclass writes to and none of them declares.
 
 Giving `Right2` its own `shared = []` splits it off, and only it. The
 assignment in the class body creates a new entry in `Right2`'s own
 dictionary, so `Right2.shared` stops reading through to `Base2`,
 while `Left2` still shares `Base2`'s list. The result, `[1] [1] [2]`,
-follows the same rule the integer `shared` in exercise 2 showed: one
+follows the same rule the integer `shared` in exercise 2 shows: one
 value per class that declares it.
 
 The real bug this listing models is a registry on a base class. Every

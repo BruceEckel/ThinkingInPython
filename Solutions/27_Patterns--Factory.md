@@ -784,7 +784,7 @@ for an attribute named `draw` and nothing about its signature, so a
 class whose `draw()` takes an extra parameter passes here and fails
 at `@register`. The two checks cover each other: the checker
 rejects a decorated class that does not fit, and `unregistered()`
-reports a fitting class that was not decorated. `issubclass()`
+reports a fitting class that is not decorated. `issubclass()`
 against a Protocol also works only when every member is a method;
 a Protocol with a data attribute raises a `TypeError` from
 `issubclass()`, and `isinstance()` on an instance is the fallback.
@@ -855,8 +855,8 @@ available to the type checker. `Builder` is a `Callable`, and a
 error[unresolved-attribute]: Object of type `Builder` has no attribute `__name__`
 ```
 
-The chapter's `register()` in `protocol_registry.py` had no such
-problem because it received a class, and `type[S]` has a `__name__`.
+The chapter's `register()` in `protocol_registry.py` has no such
+problem because it receives a class, and `type[S]` has a `__name__`.
 Pyright accepts `build.__name__`, since it gives every function
 object's attributes to a `Callable`; `ty` does not, and the book
 checks with `ty`. Passing the name also frees the key from the
@@ -864,7 +864,7 @@ function's spelling, so the builder can be called `make_goblin()`
 while the key stays `"goblin"`.
 
 What the decorated form gains is the same openness the registries
-gained: a prototype can be defined in any module, with its name beside
+gain: a prototype can be defined in any module, with its name beside
 its definition, and `PROTOTYPES` needs no edit. The key type widens
 from the chapter's `Kind` to `str` for the same reason: an open table
 cannot list its names in advance. The builder is also a

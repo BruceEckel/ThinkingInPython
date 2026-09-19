@@ -11,7 +11,7 @@ pattern matching, the `with` statement, and comprehensions.
 
 ## Conditionals
 
-[Tour](02_Foundations--Tour.md#indentation-and-blocks) showed the basic `if`,
+[Tour](02_Foundations--Tour.md#indentation-and-blocks) shows the basic `if`,
 its colon, and its indented block.
 Python's comparison operators chain the way they do in mathematics:
 

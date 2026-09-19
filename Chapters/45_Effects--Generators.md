@@ -167,7 +167,7 @@ All three `question` variables receive an `Answer` where their declarations say 
 ## A Generator Is a Description
 
 [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-showed that calling an `async def` function runs nothing.
+shows that calling an `async def` function runs nothing.
 The call returns a coroutine: a description of work.
 A coroutine's annotation is `Coroutine[YieldType, SendType, ReturnType]`,
 the same three-part shape as a `Generator`, and the match is deliberate.
@@ -501,7 +501,7 @@ and that is why `name` and `town` read like ordinary assignments.
 
 `drive()` and `yield from` both step a generator and both finish at `StopIteration`,
 so they are easy to confuse.
-Delegation can take over the job the previous listing gave to `drive()`:
+Delegation can take over the job the previous listing gives to `drive()`:
 
 ```python
 # yield_from_nested.py
@@ -529,7 +529,7 @@ print(drive(survey(),
 ```
 
 `interview()` arrives unchanged from the previous example.
-It was the generator `drive()` drove.
+It is the generator `drive()` drives.
 Now `survey()` delegates to it.
 Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver,
 and its questions surface three frames up rather than two.
@@ -554,7 +554,7 @@ and `yield from` relays both:
 a thrown exception surfaces inside the innermost generator rather than at the delegating one,
 and a `close()` unwinds every frame in the chain.
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
-showed this already, without naming it:
+shows this already, without naming it:
 "Python resumes the generator by raising the block's exception at the `yield`."
 `throw()` is that same resumption, called directly instead of by a `with` block:
 
@@ -583,7 +583,7 @@ g.close()
 ```
 
 `g.throw(ValueError("bad input"))` raises that exception at the suspended `yield`,
-inside `worker()`'s frame, the same way the `with` block's exception did.
+inside `worker()`'s frame, the same way the `with` block's exception does.
 `worker()` catches it, prints, and yields again,
 so the generator survives a `throw()` its `except` clause handles.
 `g.close()` raises `GeneratorExit` at the `yield` the generator now waits on,
@@ -749,7 +749,7 @@ task_runner()
 
 `to_send` holds what each job's next turn will receive:
 `None` until the runner has answered that job's most recent request.
-`job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` did,
+`job.send(to_send.pop(job))` primes a fresh job the same way `next(job)` does,
 since `send(None)` and `next()` are equivalent,
 and delivers the runner's answer on every later turn.
 `Job`'s `SendType` is `str`, not `str | None`,
@@ -764,8 +764,8 @@ answering each request before the next turn.
 
 You have run a driver like `drive()` many times.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-presented `await` and the event loop as a way to overlap waiting,
-and left the mechanism alone.
+presents `await` and the event loop as a way to overlap waiting,
+and leaves the mechanism alone.
 The mechanism is the two halves `task_runner_send.py` just combined:
 `task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,

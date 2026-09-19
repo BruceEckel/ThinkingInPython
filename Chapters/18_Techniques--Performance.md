@@ -417,7 +417,7 @@ insulating the measurement from startup cost and clock granularity.
 Timings differ from machine to machine,
 so the following example prints a comparison instead of raw numbers.
 The numbers are one flag away:
-run any measured listing in this book with `--numbers` to see what your machine did
+run any measured listing in this book with `--numbers` to see what your machine does
 ([Numbers on Your Machine](#numbers-on-your-machine)).
 A `list` tests membership by scanning.
 `target in as_list` walks the list from the start,
@@ -458,12 +458,12 @@ which suits a microsecond snippet and is a long wait for anything slower,
 so always set it for a function you have not timed before.
 One machine measured the `set` at about 14,000 times faster than the list scan.
 
-A single measurement includes whatever else the machine was doing.
+A single measurement includes whatever else the machine is doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
 and the smallest of them is the run with the least interference.
 Report `min(...)`, not the mean: a slow run means something stole the CPU,
 so averaging folds that theft into your answer,
-while the fastest run is the closest you got to measuring only your code.
+while the fastest run is the closest you get to measuring only your code.
 
 A single lookup costs little either way.
 A million lookups is the difference between instant and minutes.
@@ -1425,8 +1425,8 @@ print(f"NumPy at least 3x faster: {t_numpy * 3 < t_loop}")
 Both build the same sequence of `n` numbers (it's `arange`, not `arrange`).
 `list(range(n))` boxes each one as a Python `int`.
 `np.arange()` packs them into one contiguous block of C doubles,
-the same layout `array` used earlier in this chapter,
-with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code did.
+the same layout `array` uses earlier in this chapter,
+with `dtype=np.float64` choosing the element type the way `array`'s `"d"` type code does.
 
 `vectorized()` computes the same `3x + 1` as `pure_python()`,
 but as one compiled pass over contiguous memory instead of a million individual Python-level steps.

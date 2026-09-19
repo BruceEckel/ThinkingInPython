@@ -1116,7 +1116,7 @@ instead of planning a grid path before it moved, would start.
 The two simulations so far confirm designs.
 The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
-Both times you knew the outcome in advance and ran the program to confirm it.
+Both times you know the outcome in advance and run the program to confirm it.
 This final example is different.
 `amplitude()` fixes the shape the sand will trace: the curves are its zero set.
 No line of the code computes how two thousand independent random walks find that shape and stay there.
@@ -1383,7 +1383,7 @@ the same endless counter that numbered the rats.
 
 ## The Less the Agents Know
 
-The chapter began by defining a simulation as objects that act on their own and interact through shared state.
+The chapter begins by defining a simulation as objects that act on their own and interact through shared state.
 The grains push that definition to its limit.
 The shared state is the plate, and the grains only read it.
 They never sense each other.
@@ -1395,9 +1395,9 @@ because the outcome lives in the interactions rather than the instructions.
 
 The model has a limit worth naming.
 Run it longer and agitation never stops falling:
-a grain moves roughly five orders of magnitude less per step at 20,000 steps than it did at 100.
+a grain moves roughly five orders of magnitude less per step at 20,000 steps than it does at 100.
 The nodal lines keep thinning as long as the plate shakes,
-so the number of steps you ran sets their width in any one run, not the plate.
+so the number of steps you run sets their width in any one run, not the plate.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it:
 swap `amplitude()`'s formula for a membrane's,

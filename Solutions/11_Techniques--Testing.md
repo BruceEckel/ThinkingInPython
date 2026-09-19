@@ -149,7 +149,7 @@ def test_never_negative_after_deposit(
 ```
 
 Code after a fixture's `yield` runs as teardown, once the test function
-that used the fixture finishes, whether it passed or raised. Here that
+that uses the fixture finishes, whether it passes or raises. Here that
 teardown is itself an assertion, so it doubles as a check: no matter
 what either test does to the account, `never_negative`'s balance must
 still be non-negative once the test body returns control to the

@@ -91,10 +91,10 @@ to `data.numbers`, so none of the code the decorator generated runs.
 The `hash()` failure shows the same shallowness from another side.
 `frozen=True` generates a `__hash__()` that hashes the tuple of field
 values, so hashing an `Immutable` hashes its `list`, and a `list` has no
-hash. The decorator promised an instance usable as a dict key and
-delivered one that raises a `TypeError` at the first `hash()`. Declare
+hash. The decorator promises an instance usable as a dict key and
+delivers one that raises a `TypeError` at the first `hash()`. Declare
 the field a `tuple` and both the mutation and the hash failure go away
-together, the clue that they were one problem: a frozen wrapper around
+together, the clue that they are one problem: a frozen wrapper around
 a mutable value.
 
 Nothing enforces deep immutability, and that is the answer: taking
@@ -154,7 +154,7 @@ still runs and prints `4.5`.
 
 The structural match still holds: `Package.total()` still takes no
 arguments and still returns a float at runtime. The two `NewType`
-declarations add a distinction the shapes never carried, so the type
+declarations add a distinction the shapes never carry, so the type
 checker can finally see that a weight is not a price.
 
 Delete the annotations and the program behaves exactly as it does now.
@@ -362,8 +362,8 @@ list exists. The class holds a list rather than being one, so every
 mutation goes through a method this class wrote. Nothing inherited can
 bypass a counter that nothing inherited knows about.
 
-The trade is explicit. `CountingList` got `sort()`, `index()`,
-`__len__()`, slicing, and everything else `list` offers, and got the
+The trade is explicit. `CountingList` gets `sort()`, `index()`,
+`__len__()`, slicing, and everything else `list` offers, and gets the
 counting wrong. `CountingBox` gets only the methods you write for it,
 and a caller who wants `sort()` waits until you write one. That is the
 choice composition asks you to make on purpose, instead of discovering
@@ -421,8 +421,8 @@ discards the oldest to stay inside the limit. Callers who care about
 the limit ask `full()` before pushing. `fill()` now runs on both
 classes, and that is what substitutability means.
 
-You gave up the refusal. The original `BoundedStack` guaranteed that it
-never accepted more than two items. This one guarantees only that it
+You gave up the refusal. The original `BoundedStack` guarantees that
+it never accepts more than two items. This one guarantees only that it
 never *keeps* more than two. A caller who pushes five items loses three
 of them silently. That loss is the right behavior for a ring buffer of
 recent events and the wrong behavior for a queue of work that must keep
@@ -435,4 +435,4 @@ that "a stack that can refuse" is a different type. A separate class is
 honest about that, with its own `push()` returning `bool` or raising an
 exception. Nothing then hands that class to a `fill()` written for a
 different contract. Inheritance is a claim about substitutability, and
-this class was making a claim it could not keep.
+this class makes a claim it cannot keep.

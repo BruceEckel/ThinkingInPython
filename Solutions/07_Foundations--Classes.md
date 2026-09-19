@@ -161,8 +161,8 @@ print(n.average)
 Accessing `n.total` first runs its body once, prints the `"summing"`
 message, and stores `30` on the instance. When `average`'s body then
 reads `self.total`, it hits that stored value directly. No second
-`"summing"` message appears, because `total` was already computed and
-cached before `average` ever asked for it. If you access `average`
+`"summing"` message appears, because `total` is already computed and
+cached before `average` asks for it. If you access `average`
 first, its own body triggers `total`'s computation the same way,
 just on first use instead of in advance.
 
@@ -220,9 +220,9 @@ Derived().show()
 #: Base.show
 ```
 
-The program prints `Base.show`. Nothing overrode anything: `shwo()` is
+The program prints `Base.show`. Nothing overrides anything: `shwo()` is
 a new method that happens to sit in a subclass, and `show()` resolves
-up the chain to `Base` as it always would. Python has no opinion about
+up the chain to `Base` as it always does. Python has no opinion about
 whether you meant a subclass method to replace a base-class method, so
 the misspelling is not an error, it is a second method nobody calls.
 

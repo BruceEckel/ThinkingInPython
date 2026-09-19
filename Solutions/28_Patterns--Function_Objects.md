@@ -338,7 +338,7 @@ A handler subscribed to `Deposit` starts receiving every subclass of
 `Deposit`, including subclasses written after the handler, so a
 `BigDeposit` that reached only `on_big` before the change now reaches
 `on_deposit` too. That wider reach is the intended feature, and it is
-still a behavior change to existing code. Any handler that assumed
+still a behavior change to existing code. Any handler that assumes
 `type(event) is Deposit`, or that counts events, now sees more than it
 did before.
 
@@ -421,8 +421,8 @@ can override, and `partial(print, n)` can only feed it to one call.
 
 None of the three preserves late lookup, and that is the point of the
 exercise's closing question. If the command must compute the value
-when it runs, all three fixes are wrong: they froze the value when the
-loop built the command. You then want the original behavior, aimed at
+when it runs, all three fixes are wrong: they freeze the value when the
+loop builds the command. You then want the original behavior, aimed at
 something that outlives the loop, as `report()` does by reading
 `settings` at call time. The late-binding trap and late binding as a
 feature are the same mechanism. Which one you have depends on whether

@@ -80,7 +80,7 @@ except NameError as e:
 #: name 'val' is not defined
 ```
 
-The `if` never ran, so `val` was never bound.
+The `if` never runs, so `val` is never bound.
 Indentation shows where the assignment sits, not whether it runs.
 `ty` sees that nothing ever defines `val` and reports an error on that line,
 so `# type: ignore` tells it the mistake is deliberate.
@@ -161,7 +161,7 @@ Numbers, strings, and tuples are *immutable*:
 operations produce new objects rather than changing the original.
 Lists, dictionaries, and sets are *mutable*.
 Mutability decides whether another name sees a change,
-as `a` and `b` did in `references.py`.
+as `a` and `b` do in `references.py`.
 
 ## Numbers and Arithmetic
 

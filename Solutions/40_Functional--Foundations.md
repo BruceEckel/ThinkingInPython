@@ -60,7 +60,7 @@ with expected(KeyError):
 
 You call `operations["*"](6, 4)` exactly the way you call the other
 four entries, and the calling code stays as it was. Supporting a new
-operator really was just adding one row to the table, as the chapter
+operator really is just adding one row to the table, as the chapter
 claims. The missing-key `KeyError` is caught with `expected()` from the
 shared `exceptions` helper, the same way the chapter's `dispatch.py`
 catches it.
@@ -84,7 +84,7 @@ print(double(10), triple(10), quadruple(10))
 Each call to `multiplier()` creates a new `multiply` closure with its
 own private `factor`. `quadruple` remembers `4` independently of
 `double`'s `2` and `triple`'s `3`, the same way `double` and `triple`
-were already independent of each other. The three closures share
+are already independent of each other. The three closures share
 nothing, because each `factor` is reachable only through the one
 function that captured it.
 

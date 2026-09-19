@@ -313,4 +313,4 @@ protects the shape of the algorithm, and `@abstractmethod` protects the
 presence of a step, because both are properties of the class structure
 that a base class can declare. What a step *does* once called is
 behavior, and Liskov substitution is a rule about behavior, so
-enforcing it stays where the chapter left it: with you.
+enforcing it stays where the chapter leaves it: with you.

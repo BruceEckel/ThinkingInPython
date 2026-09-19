@@ -78,7 +78,7 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 puts the varying steps in a subclass.
 Here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
-the construction-starts-the-engine choice that [drew a warning in that chapter](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+the construction-starts-the-engine choice that [draws a warning in that chapter](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
 Two facts make it safe here, and either one is easy to lose in a later edit:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
@@ -410,7 +410,7 @@ Both listings end with one more call that puts this to the test:
 feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
 where no `case` names it.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time:
-the state stayed put and ran again.
+the state stays put and runs again.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 
 ## Table-Driven State Machine
@@ -543,7 +543,7 @@ The conditions and actions are ordinary methods, stored directly in the table.
 
 The states are an `Enum`,
 so the type checker catches a misspelled state name before it can fail silently at runtime.
-`MouseAction` was a `StrEnum` because its values had to match lines of the input file.
+`MouseAction` is a `StrEnum` because its values have to match lines of the input file.
 Nothing parses these states from text, so a plain `Enum` with `auto()` serves:
 
 ```python
@@ -730,7 +730,7 @@ Adding a state or an input is now a local change:
 an entry in the table and a method or two.
 Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
-The language's first-class functions and its `dict` supply what those patterns existed to provide.
+The language's first-class functions and its `dict` supply what those patterns exist to provide.
 
 Because the machine is deterministic,
 a test can drive it through a sequence of events and check which state it reaches.

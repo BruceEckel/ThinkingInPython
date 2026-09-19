@@ -47,14 +47,14 @@ terminal to read from. The substitution is the point either way: one
 object for both parameters. You can also replace either parameter
 with a double, and the other one never notices.
 
-`greet()` required no change, and could not have required one. It
+`greet()` requires no change, and could not have required one. It
 names two capabilities it needs and calls methods on them. It never
 mentions `Console`, `input()`, `print()`, or `Scripted`, so a change of
 binding has nothing in its body to affect. That is the delayed-binding
-payoff: the choice of implementation moved to the call site, where a
+payoff: the choice of implementation moves to the call site, where a
 test can choose differently from production.
 
-Notice what the type checker still enforces after the choice moved.
+Notice what the type checker still enforces after the choice moves.
 `Console` inherits from nothing and declares no relationship to `Ask`
 or `Tell`, but it has the two methods with the right signatures, so it
 satisfies both protocols structurally. Give `Console` a `tell()` that
@@ -118,12 +118,12 @@ for line in captured.messages:
 #: Hello, Alice!
 ```
 
-Five signatures name the new Effect, and only two of them wanted to.
+Five signatures name the new Effect, and only two of them want to.
 One of the five is new rather than edited: `format_greeting()`, the
-helper that uses the `Log`. Four existing signatures had to be edited.
+helper that uses the `Log`. Four existing signatures have to be edited.
 `greet()` both uses a `Log` and accepts one, to hand down to
 `format_greeting()`. Then `session()`, `menu()`, and `main()` each
-gained a `log` parameter that they only hand to the next function.
+gain a `log` parameter that they only hand to the next function.
 
 Three of five is the number worth sitting with. The functions that pay
 sit between the Effect's user and the call site that binds it, and
@@ -236,16 +236,16 @@ Both checks disappear from `slope()`, and so does everything they
 brought with them. A `PositiveInt` cannot hold zero, so the
 `try`/`except ZeroDivisionError` goes. It cannot hold a negative
 either, so the call to `validate()` goes, and `validate()` along with
-it. The division remains, and that is the whole of what `slope()` was
+it. The division remains, and that is the whole of what `slope()` is
 ever supposed to do.
 
-The original `slope_catch.py` split the guarding in a way that was
-easy to miss. `validate()` rejected negatives but let zero through,
-and the `try` caught zero but said nothing about negatives. Two
-mechanisms in two places covered the two bad values, and neither one
-told you the other existed. `NonZero` inherited half of that split.
+The original `slope_catch.py` splits the guarding in a way that is
+easy to miss. `validate()` rejects negatives but lets zero through,
+and the `try` catches zero but says nothing about negatives. Two
+mechanisms in two places cover the two bad values, and neither one
+tells you the other exists. `NonZero` inherits half of that split.
 One predicate, `value <= 0`, covers both, because "positive" is a
-single idea and "not zero, and also not negative" was the same idea
+single idea and "not zero, and also not negative" is the same idea
 described as two exceptions.
 
 The cost moves rather than vanishing. `PositiveInt(bad)` still raises

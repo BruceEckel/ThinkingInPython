@@ -1,6 +1,6 @@
 # Toolkits
 
-[Foundations](40_Functional--Foundations.md) built behavior from small, pure,
+[Foundations](40_Functional--Foundations.md) builds behavior from small, pure,
 composable pieces.
 The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.
@@ -112,7 +112,7 @@ print(square.cache_info())
 #: CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)
 ```
 
-The single hit is the second `square(2)`, which was still in the cache.
+The single hit is the second `square(2)`, which is still in the cache.
 The second `square(1)` is a fourth miss even though `1` was the first value computed,
 and that miss proves the cache evicted `1`.
 `currsize` never passes `maxsize`:
@@ -374,7 +374,7 @@ and the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
 by feeding one's output to the next.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
-introduced several of these as iterator plumbing.
+introduces several of these as iterator plumbing.
 This section is the catalog.
 
 ### `repeat`
@@ -997,7 +997,7 @@ a shuffle, then a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.
 Seven students do not split evenly into threes,
 so one group grows to four rather than leaving anyone out,
-the same join-instead-of-sit-out choice the pair rounds made above.
+the same join-instead-of-sit-out choice the pair rounds make above.
 
 A roster smaller than one full group takes that choice to its limit.
 The `while len(pool) >= size` loop never runs,

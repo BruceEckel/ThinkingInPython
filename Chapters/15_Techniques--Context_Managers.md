@@ -142,7 +142,7 @@ if __name__ == "__main__":
 `__enter__()` returns the object that `as` binds, often `self`.
 The return annotation `Self`
 (introduced in [Static Types](08_Foundations--Static_Types.md#the-self-type))
-declares an instance of the class on which the method was called,
+declares an instance of the class on which the method is called,
 so it adapts to subclasses.
 `__exit__()` takes three arguments describing any exception;
 [The `__exit__()` Arguments](#the-__exit__-arguments) covers them.
@@ -742,7 +742,7 @@ with expected(RuntimeError):
 ```
 
 `c` never gets a `close c` line,
-because its `__enter__()` raised a `RuntimeError` before `ExitStack` could register it.
+because its `__enter__()` raises a `RuntimeError` before `ExitStack` can register it.
 `a` and `b` already entered, so both unwind in reverse,
 the same rule a comma-separated `with` follows.
 

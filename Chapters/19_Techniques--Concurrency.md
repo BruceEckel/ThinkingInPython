@@ -670,11 +670,11 @@ asyncio.run(main())
 (port `0` asks the OS to choose one)
 and hands each new connection to `handle_client()`.
 `open_connection()` opens the client side of that same socket.
-Both awaits suspend their task exactly the way `asyncio.sleep()` did,
+Both awaits suspend their task exactly the way `asyncio.sleep()` does,
 except the wake-up condition is now "the socket has bytes to read," not a timer.
 Two clients connect at once,
 and `gather()` returns their replies in argument order, `a` then `b`,
-the same guarantee `async_mechanics.py` made for sleeps.
+the same guarantee `async_mechanics.py` makes for sleeps.
 `async with server:` closes the listening socket once both requests finish.
 
 ## Escaping to a Thread
@@ -715,7 +715,7 @@ which hands the call to a worker thread and awaits its completion.
 not the one running the event loop,
 so the loop stays free to run the other four tasks while each sleep finishes.
 Five offloaded sleeps overlap and finish together,
-the same shape of result `asyncio.sleep()` gave the loop directly.
+the same shape of result `asyncio.sleep()` gives the loop directly.
 
 [Simulation](38_Patterns--Simulation.md)
 builds a full program on these mechanics:
@@ -765,7 +765,7 @@ so eight additions collapse into one.
 [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races)
 shows the identical failure with threads.
 A thread switch is preemptive,
-occurring at points the interpreter picks and you did not choose,
+occurring at points the interpreter picks and you do not choose,
 while a coroutine yields only at an `await` you chose to write.
 That makes the gap easier to find, not safer to leave unguarded.
 A read-modify-write that spans an `await` needs `asyncio.Lock`,
@@ -868,7 +868,7 @@ and every new caller must remember to pass it along.
 
 A module-level global is the obvious shortcut,
 and it fails as soon as anything overlaps.
-`async_race.py` showed why: whatever wrote last wins,
+`async_race.py` shows why: whatever wrote last wins,
 and the readers resume to find a value that belongs to somebody else.
 A `ContextVar` is the same convenience without that failure.
 It holds a value per *context*,
@@ -910,7 +910,7 @@ All three tasks assign both, then suspend at the `await`,
 then resume to read them back.
 Each task reads its own `request_id` and every task reads the same `current`,
 because by the time any of them resumes, the global holds `req-3`.
-The last line shows the other direction: `main()` created the tasks,
+The last line shows the other direction: `main()` creates the tasks,
 so their contexts are copies of `main()`'s,
 and nothing they set flows back to it.
 `request_id` returns to its default while the global stays clobbered.
@@ -1068,7 +1068,7 @@ if __name__ == "__main__":
     print([price for _, price in pairs])
 ```
 
-Everything `pool.map()` did is now explicit: starting each worker,
+Everything `pool.map()` does is now explicit: starting each worker,
 waiting for it to finish, and reassembling results that can arrive in any order
 (`sorted()` restores the input order, since each result carries its `order`).
 *Draining* a queue means reading every item out of it until it is empty.
@@ -1450,7 +1450,7 @@ and a final line that reports every update preserved rather than updates lost.
 Eight threads still take turns,
 but now no two of them ever read the same value before either writes,
 so `counter` reaches 400 every time,
-the same fix `asyncio.Lock` gave the coroutines in `async_locks.py`.
+the same fix `asyncio.Lock` gives the coroutines in `async_locks.py`.
 
 ### Free Threading
 
@@ -1489,7 +1489,7 @@ Single-threaded code pays a small penalty for this machinery,
 roughly five to fifteen percent depending on the workload,
 but this should improve in future releases.
 
-Removing the lock also removed three decades of accidental protection for C extensions,
+Removing the lock also removes three decades of accidental protection for C extensions,
 whose authors assumed that only one thread runs at a time.
 The free-threaded build comes with a safety net.
 Loading an extension that has not declared itself thread-safe re-enables the GIL for the whole process and emits a warning.
@@ -1695,7 +1695,7 @@ a call from another thread has no protection, so the class is not thread-safe.
 The similar queue interfaces hide a consequential difference.
 `queue.Queue` and `multiprocessing.Queue` block the calling thread while they wait.
 `asyncio.Queue` suspends a task instead.
-As `blocking_the_loop.py` showed,
+As `blocking_the_loop.py` shows,
 a blocked thread freezes every task on an event loop,
 while a suspended task lets the rest keep running.
 Match the queue to the concurrency model.
@@ -1987,9 +1987,9 @@ if __name__ == "__main__":
 ```
 
 Three different backends run inside one `TaskGroup`.
-`io_price()` suspends and resumes on the event loop the way `fetch()` did in this chapter's first listing.
-`to_thread()` hands `blocking_price()` to a worker thread the way it did in `to_thread.py`.
-`process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` did,
+`io_price()` suspends and resumes on the event loop the way `fetch()` does in this chapter's first listing.
+`to_thread()` hands `blocking_price()` to a worker thread the way it does in `to_thread.py`.
+`process_price()` hands `cpu_price()` to a worker process the way `parallel_cpu.py` does,
 wrapped in one `async def` so `TaskGroup` can hold it alongside the others.
 All three start together, and the block does not exit until all three finish,
 so the printed `[10, 20, 30]` holds one result from each backend.
@@ -2003,7 +2003,7 @@ its first `submit()` spawns the workers,
 and `__exit__` joins them through `shutdown(wait=True)`.
 That join is an ordinary blocking call,
 and running it on the thread driving the event loop would freeze every task on that loop,
-the same failure `blocking_the_loop.py` demonstrated with `time.sleep()`.
+the same failure `blocking_the_loop.py` demonstrates with `time.sleep()`.
 Building the pool before `asyncio.run()` and tearing it down after keeps the shutdown off the loop.
 
 Each of these two interfaces unifies one small piece of the backends,
@@ -2425,7 +2425,7 @@ These are the kinds of decisions you must make when you move from the examples i
 
 People continue to work toward better ways of concurrent programming.[^libraries]
 Only in the last decade or so have programmers widely adopted advances such as async/await and structured concurrency.
-The vocabulary this chapter built,
+The vocabulary this chapter builds,
 from processes and threads to tasks and coroutines,
 is a small corner of the territory.
 Here are a few of the topics beyond it:

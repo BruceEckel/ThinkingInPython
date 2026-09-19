@@ -488,7 +488,7 @@ expect(ValueError, parse_map, "?")
 `SPECS`, `tile()` and `to_symbol()` all disappear. The member tuples
 are the spec table, and `Tile(s)` is the pool lookup. The
 value-to-member table the metaclass builds performs the runtime
-membership check `to_symbol()` did by hand.
+membership check `to_symbol()` does by hand.
 
 The type checker catches nothing new. An unknown symbol is still a
 runtime failure, a `ValueError` from `Tile(s)`. The gain is in the

@@ -189,7 +189,7 @@ p.h()
 `__getattr__()` makes the forwarding generic:
 because `Proxy` names no methods in `Implementation`,
 it keeps working when you add a method to the implementation.
-`Implementation` here has an `h()` that `proxy_forwarding.py`'s lacked,
+`Implementation` here has an `h()` that `proxy_forwarding.py`'s lacks,
 and `p.h()` forwards it without changing `Proxy`.
 
 The double underscore on `self.__implementation` matters:
@@ -573,7 +573,7 @@ which never calls `__getattr__()`.
 A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
 This proxy names its implementation `_impl`, with one underscore,
-and so gives up the mangling that kept `proxy_getattr.py`'s attribute from colliding.
+and so gives up the mangling that keeps `proxy_getattr.py`'s attribute from colliding.
 `_impl` and `calls` now share a namespace with the implementation's own attributes:
 reading `calls` from the proxy gives the counter,
 even when the implementation defines a `calls` of its own.

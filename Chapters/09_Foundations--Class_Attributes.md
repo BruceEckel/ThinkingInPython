@@ -42,7 +42,7 @@ An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
 Assigning through an instance always writes to the instance,
 creating the instance attribute on first assignment.
-Assigning through the class name, as `Stars.rating = 9` did,
+Assigning through the class name, as `Stars.rating = 9` does,
 changes the shared value.
 `vars()` returns an object's own attribute dictionary,
 so inspecting the class with `vars(A)` and the instance with `vars(a)` shows the split:
@@ -123,7 +123,7 @@ show(b)  # sell() never touched b
 
 `sell()` and `show()` share no line of source between them.
 A reader debugging `show(b)`'s surprising `5` has to trace back through every earlier call that touched a `Stars` instance,
-because the shadowing happened inside `sell()`,
+because the shadowing happens inside `sell()`,
 a function `show()` never calls and does not import.
 
 The shadowing rule confines a change to one object only while the shared value is immutable:
@@ -200,7 +200,7 @@ print(Tally.total)
 and nothing called `label`.
 The `[CV]` tag, for *class variable*, marks an attribute the class stores.
 An assignment in the class body creates a class attribute,
-as `class_attribute_confusion.py` showed.
+as `class_attribute_confusion.py` shows.
 `total: ClassVar[int] = 0` has the `= 0`,
 so it exists on `Tally` before any instance exists.
 `label: str` has no `=`, so the class stores nothing under that name.
@@ -216,7 +216,7 @@ Constructing `a` runs `self.label = label`,
 which creates a real `label` attribute on `a`, not on `Tally`.
 `total` shows up too, by fallback.
 Reading an attribute checks the instance first, then the class,
-the rule `Stars` demonstrated in `class_attribute_confusion.py`.
+the rule `Stars` demonstrates in `class_attribute_confusion.py`.
 `a` holds no copy of its own.
 The tags agree.
 `label`, stored on `a`, carries no `[CV]`, while `total`, found by fallback,
@@ -229,7 +229,7 @@ is a declaration rather than a placeholder.
 It states that instances of this class carry a `label` attribute of type `str`,
 set somewhere.
 Here that somewhere is `__init__()`,
-and its `self.label = label` produced the attribute `display_object(a)` found.
+and its `self.label = label` produces the attribute `display_object(a)` finds.
 If you leave that assignment out of `__init__()`, no attribute exists,
 on the instance or the class.
 The type checker trusts the annotation rather than checking that some method sets the attribute,
@@ -356,7 +356,7 @@ so restating `ClassVar[int]` on an override keeps that check.
 Writing that same increment through `type(self)`,
 a common idiom for reaching "my own class" from a method,
 forks the counter once the base class has subclasses,
-the same way `Right` forked `shared`:
+the same way `Right` forks `shared`:
 
 ```python
 # classvar_fork.py
@@ -382,7 +382,7 @@ print(Base.total, Sub.total)
 `Base()` increments `Base.total` to `1`.
 The first `Sub()` reads through to that `1`, adds one,
 and the assignment creates `Sub.total = 2` on `Sub` alone,
-the same shadowing `Right` demonstrated in `class_var_inheritance.py`.
+the same shadowing `Right` demonstrates in `class_var_inheritance.py`.
 The second `Sub()` increments that separate copy to `3`.
 `Base.total` never moves past `1`, and `ty` reports no diagnostic:
 the augmented assignment is a valid `ClassVar[int]` update either way,
@@ -436,7 +436,7 @@ so a *mutable* default argument brings the sharing straight back.
 A `@dataclass` reads the annotated class-body declarations as a template and generates a constructor from them.
 The annotation marks a field.
 Without the decorator,
-the same annotated assignment stays a shared class attribute, as `Cart` showed.
+the same annotated assignment stays a shared class attribute, as `Cart` shows.
 If you write `x = 100` with no `x: int`, `@dataclass` sees no field:
 
 ```python
@@ -462,7 +462,7 @@ the generated `__init__()` takes no `x`,
 and neither the runtime nor the type checker complains.
 `b.x = -1` shadows the class attribute for that one instance,
 and an assignment through the class would still change every instance that has not shadowed it,
-the hazard `Stars` demonstrated.
+the hazard `Stars` demonstrates.
 The annotated field in `real_defaults.py` also leaves a class attribute behind,
 as its last line shows: `vars(B)` still holds `x = 100`.
 The difference is the generated `__init__()`,

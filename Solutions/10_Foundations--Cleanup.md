@@ -229,7 +229,7 @@ B closed
 ```
 
 `B closed` now prints *after* `End of program`, where the chapter's
-version printed it at the `del b`. The listing has no marker for it
+version prints it at the `del b`. The listing has no marker for it
 because the line arrives during interpreter shutdown, after the book's
 output checker has stopped capturing. That late arrival demonstrates
 the point in its own right. The rest of the output matches the

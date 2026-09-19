@@ -306,7 +306,7 @@ that stack, so the closes come out in reverse. The reversal holds for
 any number of names, including zero, the property the exercise asks
 you to confirm.
 
-The empty run is the more interesting one. Nothing opened, so nothing
+The empty run is the more interesting one. Nothing opens, so nothing
 closes, and `with ExitStack() as stack:` still enters and exits
 correctly around a body whose stack stays empty. That degenerate case
 shows why `ExitStack` exists. A fixed `with a, b, c:` line settles its

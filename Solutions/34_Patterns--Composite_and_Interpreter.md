@@ -562,10 +562,10 @@ with expected(TypeError):
 #: 'str'
 ```
 
-Before the change, `"a" + x` produced `Add(Num("a"), Var("x"))`: a
+Before the change, `"a" + x` produces `Add(Num("a"), Var("x"))`: a
 `Num` whose `value` is a string, and every walker then mishandles
 that `Num`. `str.__add__` declines a `Var`, so Python falls back to
-`Var.__radd__("a")`. The old `__radd__()` accepted anything, wrapping
+`Var.__radd__("a")`. The old `__radd__()` accepts anything, wrapping
 the string in a `Num` without looking at it.
 
 Returning `NotImplemented` puts the decision back where it belongs.
@@ -573,7 +573,7 @@ Returning `NotImplemented` puts the decision back where it belongs.
 Python raises the `TypeError` it would have raised for any other
 mismatched pair. The message comes from `str`, which is the right
 source: the left operand is what the caller wrote first, and nothing
-in this expression language ever claimed to extend `str`.
+in this expression language ever claims to extend `str`.
 
 The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
@@ -589,10 +589,10 @@ explains the convention: typeshed gives the sentinel a type
 inheriting `Any`, so returning it satisfies any declared return type.
 The declaration also lets `(2 * x + 1).right` resolve for a caller.
 
-Note what `NotImplemented` does not fix. `ty` already rejected
+Note what `NotImplemented` does not fix. `ty` already rejects
 `"a" + x` in source it can see, which is why the line above carries a
 `# type: ignore` to keep this listing in the build. The runtime hole
-was the gap between what `ty` checks and what runs. Closing it matters
+is the gap between what `ty` checks and what runs. Closing it matters
 when a program builds the expression from data the type checker never
 sees, the case an interpreter exists to handle.
 

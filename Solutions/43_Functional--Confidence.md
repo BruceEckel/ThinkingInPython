@@ -36,22 +36,22 @@ that requirement, not a fenced block executed in place.
 The assertion compares the counts alone, since the serial run carries
 the parent's process ID and the parallel run carries the workers'.
 The counts stay the same, `[1229, 2262, 3245, 4203]`: the same pure
-function gives the same answers wherever it ran, which is the point
+function gives the same answers wherever it runs, which is the point
 of the original listing. The interesting number is the second line.
 Three consecutive runs on one 32-core machine reported `2`, `3`, and
 `3` distinct process IDs.
 
 Two things follow, and neither is the one most people predict. The
 count is greater than one, so the work genuinely left the main
-process. The exercise set out to show exactly that, and
+process. The exercise sets out to show exactly that, and
 `assert parallel == serial` alone could never prove it. But the count
 also sits far below thirty-two, and it moves between runs.
 `ProcessPoolExecutor` allows one worker per core and starts a new one
 only when every existing worker is busy. Each of these four tasks is
 short enough that a free worker takes the next one before the pool
-has any reason to grow. The pool never needed thirty-two processes,
-so it never started them. A distinct-ID count is evidence that
-parallelism is available, not a measure of how much the pool used.
+has any reason to grow. The pool never needs thirty-two processes,
+so it never starts them. A distinct-ID count is evidence that
+parallelism is available, not a measure of how much the pool uses.
 
 The number depends on the core count and on scheduling, so it is
 reproducible on your machine and nowhere else. That is why it does
@@ -288,7 +288,7 @@ Generating distinct names states that precondition where the test can
 see it.
 
 The two lines guarding an empty `groups` are the interesting part,
-because the property test found the need for them. Against the
+because the property test finds the need for them. Against the
 version without them, Hypothesis reports a two-name roster with
 `size=3`, such as `names=['a', 'b']`, and a
 `ValueError: min() iterable argument is empty`. With fewer students
@@ -304,10 +304,10 @@ a size of five is one group of two. Crashing is the one answer
 inconsistent with what the function does everywhere else. The chapter
 carries the fix now, so the test above passes with no `assume()`.
 
-Finding the defect took no cleverness and no thought about edge
+Finding the defect takes no cleverness and no thought about edge
 cases. The strategy generates small rosters because Hypothesis
-prefers small examples, so a size of `3` against a roster of `2` came
-up on its own. The property said what should have been true for every
+prefers small examples, so a size of `3` against a roster of `2`
+comes up on its own. The property says what should be true for every
 roster.
 
 Breaking the function on purpose is the other half of the exercise.

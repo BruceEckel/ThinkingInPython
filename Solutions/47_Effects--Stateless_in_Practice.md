@@ -70,21 +70,21 @@ so both runs in the listing start at 23:59:59.
 The first request names the file for January 1 and the second stamps the entry January 2,
 so the bug survives the change of handler.
 It should.
-Nothing about the handler caused it.
+Nothing about the handler causes it.
 
 `archive_once()` reads the clock one time and derives both strings from that value.
-The mismatch needed two readings that could differ.
+The mismatch needs two readings that could differ.
 With one reading, the two strings cannot disagree.
 A handler still chooses the moment, and it can choose 23:59:59,
 but both strings then carry that moment.
-No handler can reproduce the bug, because the bug was not in the handler.
-It was in a function that asked twice and treated the answers as one.
+No handler can reproduce the bug, because the bug is not in the handler.
+It is in a function that asks twice and treats the answers as one.
 
 That is the general shape of a clock bug.
 Reading a clock twice reads a changing value twice,
 and two readings are two facts rather than one.
-Naming the clock as an ability made the failure reproducible.
-Deriving both strings from a single reading removed it.
+Naming the clock as an ability makes the failure reproducible.
+Deriving both strings from a single reading removes it.
 
 ## 2. A leak the type checker cannot see
 
@@ -342,7 +342,7 @@ made fresh at every request rather than once at the start.
 With every source shortened, hour 20 has no supplier, and the `Blackout`
 surfaces out of `run()`, not out of the Effect.
 `catch(Blackout)` around `run_load()` does not intercept it because `catch()`
-watches the error channel, and this exception never entered that channel.
+watches the error channel, and this exception never enters that channel.
 `choose()`, the handler, raises the `Blackout`, and a handler runs inside the
 driver while it answers a request.
 No `yield` sits between the `raise` and `run()`'s own stack frame,
@@ -587,12 +587,12 @@ Four edits, and the type checker names one of them.
 Adding line 3 without line 4 is the one `ty` reports, at the new line rather than
 at the signature: `expression of type 'TooLong', expected 'Need[Feed] |
 Need[Encyclopedia] | Unavailable | NotInteresting | NoArticle'`.
-Fixing that then breaks every caller that named the old set. `report()` stops at
+Fixing that then breaks every caller that names the old set. `report()` stops at
 its own `yield from` with the same `invalid-yield`, now carrying `TooLong` in the
 type it did not expect. Widen `catch()` and the `found:` annotation to match, and
 `assert_never()` reports `TooLong` as an unhandled branch. Every one of these is a
 compile-time stop rather than a surprise in production.
-The type checker walked the change through the program, one edit at a time.
+The type checker walks the change through the program, one edit at a time.
 
 The by-hand version takes a comparable edit and reports none of it:
 
@@ -646,11 +646,11 @@ print(research_and_report(
 #: short enough
 ```
 
-In the Effect version, `ty` told you where to go: it flagged the undeclared
-failure at the delegation that introduced it, then the widened union at every
-caller that had claimed to handle everything.
-In the by-hand version nothing told you anything.
-Adding `except TooLong` to the third `try` was a choice you make by reading the
+In the Effect version, `ty` tells you where to go: it flags the undeclared
+failure at the delegation that introduces it, then the widened union at every
+caller that claims to handle everything.
+In the by-hand version nothing tells you anything.
+Adding `except TooLong` to the third `try` is a choice you make by reading the
 code. Forget it, and a `TooLong` escapes `research_and_report()`, whose
 signature still says it returns a `str` no matter what.
 Both versions run. Only one of them has a tool that knows the set of failures
@@ -794,7 +794,7 @@ if __name__ == "__main__":
 
 `squares()` stays the same, character for character. It asks for an `Executor`
 and never says which kind, so a process pool satisfies the request as a thread
-pool did. Two things around it did change, and neither is in the Effect.
+pool does. Two things around it did change, and neither is in the Effect.
 The `__main__` guard is now required, because a process pool starts workers by
 re-importing the module, and without the guard each worker builds another pool.
 This book's output checker also skips the listing, for the same reason:
@@ -907,7 +907,7 @@ chapter describes: `run()` returns `None` and the first assertion fails on
 `None == 2`. Stopping early would leave a balance unread, and the final
 assertion catches that by checking that the iterator has nothing left.
 `written` records one entry per successful purchase, `[40, 10]`, so the
-assertions together say that `spree()` tried every price and wrote only the
+assertions together say that `spree()` tries every price and writes only the
 affordable ones.
 
 What this test cannot check is whether the two handlers agree. The `Cell`
@@ -998,7 +998,7 @@ the pipeline, as `nonempty()` does. Prefer `throw()` for a condition that only
 makes sense at that point in the Effect.
 
 Making each version fail with an undeclared type shows the same asymmetry
-exercise 2 found. Change `throw(Empty())` to `throw(ValueError())` and `ty`
+exercise 2 finds. Change `throw(Empty())` to `throw(ValueError())` and `ty`
 reports it at that line: the yielded type is `ValueError` and the annotation
 allows `Need[Ticker] | Unavailable | Empty`. Change `nonempty()`'s body to
 `raise ValueError()` while its decorator still says `@throws(Empty)`, and `ty`
@@ -1070,15 +1070,15 @@ body, and the inferred type is whatever `catch_all()` produces, so there is
 nothing left to contradict. The function silently changes its type every time
 `research()`'s error set changes.
 
-What `ty` stopped checking is the correspondence between the annotation and the
-Effect. The annotation was where a human wrote down which failures this program
-expects, and `ty`'s job was to confirm that the Effect agrees.
+What `ty` stops checking is the correspondence between the annotation and the
+Effect. The annotation is where a human writes down which failures this program
+expects, and `ty`'s job is to confirm that the Effect agrees.
 Delete the annotation and the type checker has one description instead of two,
 so it can no longer notice a disagreement. Callers still see a union, but they
 see whatever union the implementation happens to produce, and the new member
 propagates outward until it reaches something with an annotation.
 That is the same reason exercise 4 of
-[Generators](../Chapters/45_Effects--Generators.md) needed a declared type to
+[Generators](../Chapters/45_Effects--Generators.md) needs a declared type to
 catch a missing `yield from`: a type checker verifies claims, and an inferred
 type is not a claim.
 
@@ -1268,16 +1268,16 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
    |                               found `Generator[Need[Toaster], Any, str]`
 ```
 
-This one tells you about the dependency two levels down. `supply()` failed to
+This one tells you about the dependency two levels down. `supply()` fails to
 subtract `Need[Toaster]`, so it reaches `run()` still in the channel. Nothing in
-`buttered()`'s body mentions a toaster. The requirement came from `toast()`,
+`buttered()`'s body mentions a toaster. The requirement comes from `toast()`,
 which `buttered()` calls, and the error names it at the program's edge, past the
 last place that could have answered it.
 
 The two diagnostics divide the work cleanly. `invalid-yield` catches an
-under-declared signature at the delegation that broke it. `invalid-argument-type`
+under-declared signature at the delegation that breaks it. `invalid-argument-type`
 at `run()` catches an under-supplied environment at the program's edge. Neither
-one required a comment or a docstring to say what depends on what.
+one requires a comment or a docstring to say what depends on what.
 
 ## 14. A shared signature for a cast
 
@@ -1357,7 +1357,7 @@ which family it gets, and that ignorance is the property the pattern exists to
 provide. Python gives it away, because a function is already an object with a
 type: saying so takes no abstract factory class.
 
-What it does not recover is the guarantee that made the pattern worth naming.
+What it does not recover is the guarantee that makes the pattern worth naming.
 `Cast` says "give me a narrator and I will stage something." It says nothing
 about the actors inside agreeing with each other. The last line is the proof,
 and the chapter runs the same line in `two_games.py`: `play()` accepts a

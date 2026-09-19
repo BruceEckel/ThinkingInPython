@@ -1,7 +1,7 @@
 # Error Handling
 
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
-made a value carry a guarantee.
+makes a value carry a guarantee.
 This chapter does the same for errors.
 Instead of raising an exception,
 a function returns its error as an ordinary value,
@@ -344,7 +344,7 @@ The two agree on every input, and the exception version is shorter.
 What the exception version can't do:
 report which step failed as anything but a message to parse,
 or survive past the `except` clause as data,
-the way `sum_type.py` kept every result in a list at the start of this chapter.
+the way `sum_type.py` keeps every result in a list at the start of this chapter.
 
 ## Composing With bind
 
@@ -380,7 +380,7 @@ if __name__ == "__main__":
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
 `bind()` removes the boilerplate by chaining the steps.
-The error checking moved into `bind()`, where it appears once.
+The error checking moves into `bind()`, where it appears once.
 
 Functional programmers have a name for a type that carries a value plus this chaining operation:
 a *monad*.
@@ -510,7 +510,7 @@ where each step needs the previous step's answer,
 as `composing_with_bind.py` does above.
 `func_a()`, `func_b()`, and `func_c()` here take independent inputs instead,
 so stopping at the first `Err` discards whatever the later steps would have found,
-the same loss the exceptions in the opening section caused.
+the same loss the exceptions in the opening section cause.
 Exercise 3 asks you to collect every failure instead of stopping at the first.
 
 Three inputs cost three levels of nesting,
@@ -595,11 +595,11 @@ The caller cannot ignore the failure,
 because it must unpack the `Result` to reach the number.
 That error type is the base of the ordinary exception hierarchy,
 not a specific failure.
-Earlier in this chapter, `Result[int, str]` named exactly what could go wrong;
+The `Result[int, str]` earlier in this chapter names exactly what could go wrong;
 `Result[int, Exception]` says only that something did,
 no narrower than a bare `except Exception`.
 `@safe` gives up that narrower type in return for the `try`/`except` it writes for you.
-Write the `Ok`/`Err` wrapper yourself, as `func_c()` did in `composing.py`,
+Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
 when the narrower type matters more than the convenience.
 The `**P` parameter carries the wrapped function's whole parameter list through,
 the technique from [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),

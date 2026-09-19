@@ -631,7 +631,7 @@ The standard library supplies whole modules of these small, composable pieces.
 
 ## Putting the Pieces Together
 
-Every section above showed one construct on its own.
+Every section above shows one construct on its own.
 Here they work together:
 
 ```python
@@ -696,7 +696,7 @@ and the chapters ahead build on that single property.
     add `CONFIG: Final[list[int]] = [1, 2]` and a line that appends to it.
     Run `ty`, which reports nothing.
     Then add `MAX_SIZE = 200`, run `ty` again,
-    and explain why the rebinding is an error while the append was not.
+    and explain why the rebinding is an error while the append is not.
     Then change the annotation so appending *is* rejected.
 7.  In `higher_order.py`,
     replace the `map()` and `filter()` calls with comprehensions,

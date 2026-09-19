@@ -92,7 +92,7 @@ print(p.calls["f"], p.calls["g"])
 #: 2 1
 ```
 
-Where the chapter's `CountingProxy` kept one total, this one tallies
+Where the chapter's `CountingProxy` keeps one total, this one tallies
 per method name. `__getattr__()` already receives the name of the
 attribute, so the wrapper charges the count to that name before
 forwarding. The single `calls` integer becomes a `Counter`. The final
@@ -378,7 +378,7 @@ s.g()  # The old implementation is still in place
 `methods()` reports the public callables an object carries, the set a
 caller can reach through the surrogate's `__getattr__()`.
 `change_to()` compares the two sets and refuses the swap when the
-replacement drops a name the current implementation answered. The
+replacement drops a name the current implementation answers. The
 surrogate keeps what it had, so `s.g()` still works after the
 rejected swap.
 

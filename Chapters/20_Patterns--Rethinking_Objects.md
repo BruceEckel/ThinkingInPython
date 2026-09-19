@@ -309,7 +309,7 @@ def test_frozen_cannot_be_mutated() -> None:
 
 The test goes through `setattr()` because the type checker rejects `immutable.bob.name = "Ralph"`.
 `frozen=True` is the defense that holds at runtime,
-against code the type checker never saw.
+against code the type checker never sees.
 
 Two quiet changes in the listing do as much work as `frozen=True`:
 `numbers` is a `tuple`, not a `list`, and `Bob` carries `frozen=True` too.
@@ -1196,7 +1196,7 @@ if __name__ == "__main__":
 `deposit()` and `withdraw()` know where the state lives,
 so no call site can forget to thread it through.
 `account.` also lists every operation the object supports,
-the dot-completion this section opened with.
+the dot-completion this section opens with.
 This is what "bundling behavior with state" buys: one place holds the state,
 and every method that changes it lives next to it.
 OOP is useful, sometimes.

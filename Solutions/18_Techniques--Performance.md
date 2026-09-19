@@ -267,7 +267,7 @@ print(counts)
 With `set_events()` in place of the local attachment, the new entry
 is `'square': 1`. Nothing else appears, because `PY_START` fires when
 a Python code object starts running, and the module's own frame
-started before the tool attached. CPython implements `print()` in C,
+starts before the tool attaches. CPython implements `print()` in C,
 so it never starts a Python frame, and a program this small has no
 other candidates.
 
@@ -309,7 +309,7 @@ They differ because the two columns measure different things.
 including everything it called, so a caller can never show a smaller
 `cumtime` than the work beneath it. Every caller on the path
 accumulates the same time. `tottime` excludes the callees, so it
-attributes time to the frame that was actually executing.
+attributes time to the frame that is actually executing.
 
 A function high on `cumtime` and near zero on `tottime` is a
 pass-through: it is slow only because of what it calls, and rewriting

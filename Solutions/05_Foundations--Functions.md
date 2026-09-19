@@ -95,7 +95,7 @@ report("nums", 1, 2, 3, total=True)
 `total` sits between `*values` and `**options` in the parameter list,
 so it is keyword-only. Callers must write `total=True`, and neither
 `values` nor `options` can swallow it by accident. Adding the flag
-needed no change to how `report()` already collected its positional
+needs no change to how `report()` already collects its positional
 and keyword arguments.
 
 ## 5. `apply_twice()` with a lambda
@@ -223,7 +223,7 @@ the assignment in `count += 1` makes `count` local to
 has no value yet. `rebinds()` fails for the same reason even though
 its `print` comes first in time. Python decides which names are local
 when it compiles the function body, so the `count = 99` below the
-`print` already made `count` local throughout. The first `print`
+`print` already makes `count` local throughout. The first `print`
 therefore reads the unassigned local, never the module-level name.
 The second `print`, after the assignment, never runs. Both mistakes
 are visible without running the code. The type checker and the linter

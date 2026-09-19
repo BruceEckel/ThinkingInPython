@@ -184,7 +184,7 @@ No call rebuilds it.
 `__defaults__` holds the tuple of default values,
 and both calls append to the same list inside it.
 The default looks like an expression each call evaluates,
-but Python evaluated it once, at the `def`.
+but Python evaluates it once, at the `def`.
 
 Underneath, a parameter is another name bound to the caller's object,
 the binding that [Variables and References](02_Foundations--Tour.md#variables-and-references)

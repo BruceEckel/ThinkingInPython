@@ -68,7 +68,7 @@ for i in range(5):
 #: 4 Err(error='func_d(4)')
 ```
 
-Adding a fourth `.bind(func_d)` needed no change to `Result`, `Ok`,
+Adding a fourth `.bind(func_d)` needs no change to `Result`, `Ok`,
 or `Err`. `func_d()` sits before `func_c()` in the chain, so an
 `Err` from it has a later step to skip. `4` reaches `func_d()`
 because it survives `func_a()` and `func_b()`, and the `Err` that
@@ -432,8 +432,8 @@ reasons, and all three arrive as the same `None`. Compare the
 `Result` version, where the same three inputs report `func_a(1)`,
 `func_b(2)`, and `func_c(3): division by zero`.
 
-The structure of `composed()` barely changed: `if a is None` replaced
-`if isinstance(a, Err)`, and the early returns stayed. What changed is
+The structure of `composed()` barely changes: `if a is None` replaces
+`if isinstance(a, Err)`, and the early returns stay. What changes is
 what survives the return. `None` is a single value with no room to
 carry a reason, so every failure that reaches it becomes the same
 failure. The chapter names this trade. Use `| None` when absence

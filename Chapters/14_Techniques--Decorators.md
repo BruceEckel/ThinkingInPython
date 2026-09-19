@@ -398,7 +398,7 @@ if __name__ == "__main__":
 #: [TAG] two
 ```
 
-The second overload returns the shape `repeat.py` took apart,
+The second overload returns the shape `repeat.py` takes apart,
 now under the name `Decorator[P, R]`:
 a generic alias whose parameters are the wrapped function's.
 `func` defaults to `None`, and the body branches on `callable(func)`.

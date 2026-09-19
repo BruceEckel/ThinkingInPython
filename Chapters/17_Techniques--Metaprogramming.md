@@ -483,7 +483,7 @@ It is not for storage or introspection.
 ## Self-Registration of Subclasses
 
 Often a base class needs to keep track of its subclasses.
-Tracking subclasses was the textbook justification for a metaclass.
+Tracking subclasses is the textbook justification for a metaclass.
 Python calls `__init_subclass__()` automatically for every new subclass,
 so a base class can register its own subclasses in a few lines.
 This example tracks the "leaf" subclasses
@@ -680,7 +680,7 @@ The language devices you have met divide into four families.
 At runtime each sets a single attribute that nothing reads.
 The type checker carries the entire meaning,
 and [Making a Class Final](#making-a-class-final)
-built the runtime half by hand with `__init_subclass__()`.
+builds the runtime half by hand with `__init_subclass__()`.
 
 `@dataclass` is *mirrored machinery*.
 At runtime it is a code generator,
@@ -785,7 +785,7 @@ that descriptor takes over access to the attribute.
 Instead of going to the instance's `__dict__`,
 a read calls `__get__()` and a write calls `__set__()`.
 [Decorators](14_Techniques--Decorators.md#a-limitation-methods-need-a-descriptor)
-already depended on this, naming the descriptor without showing the protocol.
+already depends on this, naming the descriptor without showing the protocol.
 A function is an object like any other, and its class defines `__get__()`,
 so every function is a descriptor:
 
@@ -1380,7 +1380,7 @@ so it yields the three names the body assigned: `red`, `green`, `blue`.
 A class decorator cannot do this.
 It can only add methods that instances see,
 never a protocol method the class object itself must answer,
-which is why `Color` needed a metaclass, not a decorator.
+which is why `Color` needs a metaclass, not a decorator.
 
 `__prepare__()` is the one with no simpler substitute:
 

@@ -140,15 +140,15 @@ print(mean, count)
 ```
 
 Every caller still runs, because a `NamedTuple` was a tuple all along.
-Unpacking works, indexing works, and printing works. What changed is
+Unpacking works, indexing works, and printing works. What changes is
 everything above the mechanics.
 
-The call sites lost the names. `summarize([2.0, 4.0, 6.0])` now prints
+The call sites lose the names. `summarize([2.0, 4.0, 6.0])` now prints
 `(4.0, 3)` instead of `Stats(mean=4.0, count=3)`, so the repr no longer
 says which number is which. A reader of the call site has to open
-`summarize()` to find out. They also lost attribute access:
+`summarize()` to find out. They also lose attribute access:
 `result.mean` becomes `result[0]`, which holds the same value and no
-longer says what it is. And they lost the type as a name. Nothing can
+longer says what it is. And they lose the type as a name. Nothing can
 carry a `Stats` annotation anymore, so a function accepting a summary
 now advertises `tuple[float, int]`, which any pair of a `float` and an
 `int` satisfies.

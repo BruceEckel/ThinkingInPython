@@ -78,7 +78,7 @@ def duel(item1: Any, item2: Any) -> None:
 `item_pair_gen()` is generic over whichever base class it receives,
 and `__subclasses__()` lists that base's direct subclasses,
 as `shape_name()` in [Factory](27_Patterns--Factory.md#simple-factory-method)
-did.
+does.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
 
@@ -319,7 +319,7 @@ print(compete(Origami(), Rock()))
 ```
 
 `Origami()` matches the `Paper()` pattern,
-the same subclass `exact_match.py` showed the table refusing.
+the same subclass `exact_match.py` shows the table refusing.
 Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is: adding an `Item` means adding cases,
 not registering a function elsewhere.
@@ -369,7 +369,7 @@ print(Rock().compete(Rock()))
 Both registrations attach to `Item.compete`,
 the attribute `Paper` and `Rock` both inherit,
 so the second `@register` silently overwrites the first's entry for `Rock`.
-`self`'s type never entered that lookup, so both duels return the same answer,
+`self`'s type never enters that lookup, so both duels return the same answer,
 even though each was registered against its own class.
 
 The version most programmers write first is neither of these:
@@ -486,7 +486,7 @@ not when a test imports it.
 ## Operators Dispatch Twice
 
 Python's own operators dispatch twice,
-which answers the `Number + Number` question that opened this chapter.
+which answers the `Number + Number` question that opens this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
 Python turns around and tries `type(b).__radd__(b, a)`,
@@ -584,7 +584,7 @@ so an annotation that names it describes the wrong thing.
 Widening the return to `Any` describes nothing and turns off checking for every caller.
 
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
-builds the expression system that opened this chapter,
+builds the expression system that opens this chapter,
 using these two methods to let Python's own parser assemble the tree.
 
 ## Turning One Unknown Type Into a Second Dispatch

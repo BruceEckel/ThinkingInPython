@@ -347,9 +347,9 @@ its own first claim.
 
 On the chapter's seven-by-nine test maze, `claim()` returns `True` 25
 times for 24 open cells: one pair of rats collided.
-Both rats reached `await asyncio.sleep(0)` while the same cell still
-looked unclaimed, because neither had added that cell to `visited`
-yet. Both membership tests therefore passed, and only afterward did
+Both rats reach `await asyncio.sleep(0)` while the same cell still
+looks unclaimed, because neither has added that cell to `visited`
+yet. Both membership tests therefore pass, and only afterward does
 each rat call `self.visited.add(...)`.
 The result is two rats that each believe they alone claimed that cell.
 Both move into it, and that overlap breaks the invariant that no two
@@ -959,6 +959,6 @@ fast. As it nears a nodal line the amplitude shrinks and so does its
 step, so it slows down and stops without overshooting. Too small a kick
 starves the loop's first half, and the grain never travels. Too large a
 kick breaks the second half, since even a heavily scaled step is still
-big enough to leave the neighborhood the grain was settling into. The
+big enough to leave the neighborhood the grain is settling into. The
 default `0.05` sits where both halves work: about a twentieth of the
 plate at full amplitude, and vanishingly small once a grain arrives.

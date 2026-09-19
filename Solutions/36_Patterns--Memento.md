@@ -254,7 +254,7 @@ JSON has no tuple type, only arrays, so `strokes` comes back from
 in, tuple out, because it serializes Python's own object
 representations rather than translating into a shared,
 language-neutral format. The reconstruction compensates for what
-JSON lost: it wraps `data["strokes"]` back in `tuple(...)` before
+JSON loses: it wraps `data["strokes"]` back in `tuple(...)` before
 passing it to `Drawing`. A type checker cannot catch the omission
 here, because `json.loads()` returns `Any`, and an `Any` satisfies the
 declared `tuple[str, ...]`. Drop the `tuple(...)` and `ty check` still
@@ -498,7 +498,7 @@ illusion collapses: a `default_factory` leaves no class attribute, so
 the loaded object raises an `AttributeError` the first time anything
 reads `layer`.
 
-What pickle skipped is every line of code the class runs at
+What pickle skips is every line of code the class runs at
 construction. `pickle.loads()` builds a bare instance and writes the
 saved `__dict__` into it, so `__init__()` never runs and neither does
 `__post_init__()`. The empty title sails through a class written to

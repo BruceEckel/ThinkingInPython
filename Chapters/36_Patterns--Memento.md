@@ -82,7 +82,7 @@ so the snapshot is immutable even though the originator is not.
 rebuilding a fresh list so the sketch and the memento never share one.
 One level is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
-at the cost the previous section showed:
+at the cost the previous section shows:
 
 ```python
 # sketch.py
@@ -358,7 +358,7 @@ def test_replace_carries_other_fields() -> None:
 The caretaker needs to know nothing about the states it holds, frozen or not:
 opacity is the pattern's whole point,
 and `History[S]` below works unchanged on the classic `Memento` from `sketch.py`.
-Immutability does not add opacity; the classic form always had it.
+Immutability does not add opacity; the classic form always has it.
 What immutability removes is the explicit `save()` and `restore()` at every edit,
 since a state that cannot change is already a memento.
 Undo and redo are two stacks of past and future states,
@@ -449,7 +449,7 @@ so it never interprets anything.
 That works for any state type, from `int` to a full `Drawing`,
 with one condition: states must be immutable.
 `History` cannot protect a list that someone mutates in place.
-A `History` of lists is a stack of aliases, the bug that opened this chapter.
+A `History` of lists is a stack of aliases, the bug that opens this chapter.
 
 `History` does not require a frozen state class either.
 The classic `Memento` from `sketch.py` is already immutable,
@@ -514,7 +514,7 @@ mentions.
 *Command*-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
 Try snapshot-based undo first: immutable states make one edit inexpensive,
-as `sharing.py` showed,
+as `sharing.py` shows,
 and switch to *Command* once `growth_cost.py`'s `O(k^2)` starts to matter.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}

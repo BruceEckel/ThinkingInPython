@@ -96,7 +96,7 @@ string transformation, not a truncation: `"J"` becomes `"J"` and
 empty string, so the concatenation adds nothing to the capital. `"J"`
 and `"John"` are distinct strings, so the set keeps both.
 
-The filter existed to drop the initial `"J"` as noise. Removing it
+The filter exists to drop the initial `"J"` as noise. Removing it
 shows what the set is doing on its own: it collapses only exact
 duplicates of the normalized form, and it has no notion that `"J"`
 might be an abbreviation of `"John"`.
@@ -124,16 +124,16 @@ for n in [1, 2, 3]:  # Printing alone stays a loop
 #: item 3
 ```
 
-The original comprehension collected `print()`'s return value, which is
-always `None`, so the list it built was worthless and the brackets
-misled the reader. Giving the output expression something to return
+The original comprehension collects `print()`'s return value, which is
+always `None`, so the list it builds is worthless and the brackets
+mislead the reader. Giving the output expression something to return
 fixes both: `show()` prints and hands back the line, so `lines` holds
 the three strings a caller can assert on, write to a file, or join.
 
 Which shape is right depends on whether you want the list. Here the
 comprehension is correct, because `lines` is the point and the printing
 is incidental. The `for` loop at the end is the right shape for the
-original code, where printing was the purpose. The rule from the
+original code, where printing is the purpose. The rule from the
 chapter decides it: use a comprehension when you want the collection it
 produces, and a loop when you want the side effect.
 

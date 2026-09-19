@@ -77,7 +77,7 @@ with no error to signal the gap.
 so it does report the gap, but only at runtime,
 when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
-and the type checker cannot know which strings `export_svg()` was meant to handle.
+and the type checker cannot know which strings `export_svg()` is meant to handle.
 An `Enum` for `kind` and an `assert_never()` wildcard moves that report to check time
 ([Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching)),
 though an if-chain like `render()` still slips past it.
@@ -368,7 +368,7 @@ expect(KeyError, make, "Triangle")
 
 `make("Triangle")` fails with a `KeyError` naming the missing key,
 because no class has registered under that name.
-The closed `Literal` in `shape_table.py` rejected `"Hexagon"` before the program ran.
+The closed `Literal` in `shape_table.py` rejects `"Hexagon"` before the program runs.
 An open registry cannot do that,
 since a name becomes valid the moment some module defines the class,
 so the check moves to runtime.
@@ -501,8 +501,8 @@ A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
 draws `invalid-argument-type` at its `@register` line before the program runs.
 That is the case the previous section left to runtime,
-where a subclass that forgot `draw()` registered, failed at construction,
-and no checker saw it.
+where a subclass that forgot `draw()` registers, fails at construction,
+and no checker sees it.
 `REGISTRY` holds `type[Shape]` values and `ty` accepts calling one,
 so `make()` needs no change.
 
@@ -819,7 +819,7 @@ Suppose you write a factory subclass and forget `make_obstacle()`.
 Python defines the class,
 and the `TypeError` appears when you create an instance,
 before `GameEnvironment.__init__()` calls anything,
-the same way `Shape` fails in this chapter's earlier listings and `Partial()` did in [*Surrogate*](26_Patterns--Surrogate.md).
+the same way `Shape` fails in this chapter's earlier listings and `Partial()` does in [*Surrogate*](26_Patterns--Surrogate.md).
 A *Protocol* names the required methods and needs no base class,
 which simplifies the *Abstract Factory*:
 
@@ -890,7 +890,7 @@ the checker reports `protocol member make_obstacle is not defined on type Broken
 
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`,
-the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) showed.
+the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows.
 Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
@@ -953,14 +953,14 @@ with no error to signal it.
 `deepcopy()` restores the clone's state without running the constructor,
 so a `__post_init__()` check never sees the clone
 ([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace) shows which copying calls run it).
-A prototype of a validated type is safe because the prototype was valid,
-not because the clone was checked.
+A prototype of a validated type is safe because the prototype is valid,
+not because the clone is checked.
 When the variant differs only in field values,
 `copy.replace()` builds it through the constructor, as `knight` shows,
 so a `__post_init__()` check runs on the result.
 Every field you do not name is passed by reference,
 which is why `knight` shares `goblin`'s `powers` list,
-the same sharing `shallow` showed.
+the same sharing `shallow` shows.
 Pass a fresh list for that field when the variant must own one.
 
 `deepcopy()` copies everything it can reach,

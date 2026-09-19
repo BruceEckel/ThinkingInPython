@@ -95,7 +95,7 @@ The `int` annotation says "any integer," which is not what you mean.
 Checking the argument also says nothing about the result: `f1(6)` returns 11,
 which no rating may be.
 `f3()` is what forgetting looks like.
-`11` is not a legal rating, and nothing objected: not the annotation,
+`11` is not a legal rating, and nothing objects: not the annotation,
 not the type checker, not the running program.
 The result is a number that no rating can produce,
 passed along as if it were fine.
@@ -166,7 +166,7 @@ every time it changes the value.
 is the practice of checking arguments on the way in and results on the way out,
 with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
-A method that accepted a second rating would need a precondition for it as well.
+A method that accepts a second rating would need a precondition for it as well.
 The problem with DbC is that the contract spreads across every method that touches the value.
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
@@ -178,7 +178,7 @@ Some values must change in place over their lifetime: a counter,
 a connection's open-or-closed state, a running total.
 You cannot always replace one with a fresh instance on every change.
 The accepted answer for those is a validating setter that checks before assigning,
-the fix `f1()` skipped above: pay DbC's scattering cost,
+the fix `f1()` skips above: pay DbC's scattering cost,
 because the value has to stay mutable.
 [Immutability](#immutability) covers the case the rest of this chapter prefers,
 where a fresh, validated instance replacing the old one is cheap enough.
@@ -290,7 +290,8 @@ and `__eq__()`.
 `Messenger` shows what `@dataclass` produces,
 but not what adding the decorator changes.
 Four small classes show the difference between a class body that declares fields and one that stores them,
-and go further than [Class Attributes](09_Foundations--Class_Attributes.md) did:
+and go further than [Class Attributes](09_Foundations--Class_Attributes.md)
+does:
 
 - `A` is an ordinary class with bare annotations.
 - `B` adds default values but no constructor.
@@ -312,7 +313,7 @@ def show(obj: object) -> None:
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes `__hash__` from these reports
-([Data Classes](#data-classes) showed `@dataclass` disabling `__hash__` for `Messenger`).
+([Data Classes](#data-classes) show `@dataclass` disabling `__hash__` for `Messenger`).
 
 ### `A`: Annotations Only
 
@@ -488,7 +489,7 @@ so no constructor call can assign one.
 
 `f: ClassVar[float]` appears in neither report.
 It has no initializer, so it is a bare annotation,
-as `x` and `s` were back in `A`: a declaration recorded in `D.__annotations__`,
+as `x` and `s` are back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
 `D.f` raises `AttributeError`, for the same reason `A().x` would.
 Assigning a value is what creates the attribute;
@@ -644,7 +645,7 @@ print(Normalized("Grace@Example.com"))
 #: Normalized(text='grace@example.com')
 ```
 
-Both defenses fire here, as they did for `frozen_messenger.py`.
+Both defenses fire here, as they do for `frozen_messenger.py`.
 The type checker reports the assignment,
 and the `# type: ignore` silences it so the listing can reach the runtime failure.
 
@@ -1546,13 +1547,13 @@ and [dataclasses-json](https://github.com/lidatong/dataclasses-json)
 automate the decode side,
 reconstructing nested types from the parsed JSON and validating as they go.
 
-## Where the Checks Went
+## Where the Checks Go
 
-The checks did not disappear.
-They moved.
-`stars_unchecked.py` spread them across every function that took a rating,
-and `stars_class.py` spread them across every method that changed one.
-`stars.py` put them in the constructor,
+The checks do not disappear.
+They move.
+`stars_unchecked.py` spreads them across every function that takes a rating,
+and `stars_class.py` spreads them across every method that changes one.
+`stars.py` puts them in the constructor,
 where they run once and nothing can skip them,
 because the constructor is the only way to make the value.
 
@@ -1567,7 +1568,7 @@ and a function receiving one does its work without asking whether the value make
 
 The price also shows up in memory and time, not only at the boundaries.
 Every value is now an object:
-a constructor call and attribute access where a bare `int` or `str` needed neither.
+a constructor call and attribute access where a bare `int` or `str` needs neither.
 `copy.replace()` re-validates the whole object on every change,
 even when only one field moved.
 For a hot path, or a structure nesting many values

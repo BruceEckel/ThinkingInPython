@@ -35,7 +35,7 @@ print(render(Triangle()))
 `Triangle` never mentions `Drawable`, the same as `Circle` and
 `Square`. It qualifies purely because it has a `draw() -> str` method,
 which is the whole of `Drawable`'s required shape. Neither `Drawable`
-nor `render()` needed to change to accept it.
+nor `render()` needs to change to accept it.
 
 ## 2. Removing `# type: ignore` from `area.py`
 
@@ -67,7 +67,7 @@ The type checker pinpoints the mistake the chapter describes: `"3"`
 is a `str`, not an `int`, so it violates `width: int`. The call still
 runs without error at runtime, because `"3" * 4` is valid string
 repetition. In the book, the `# type: ignore` comment on this line
-existed only to let this deliberately-wrong example pass the book's
+exists only to let this deliberately-wrong example pass the book's
 own build. Removing the comment restores the error `ty` exists to
 catch.
 
@@ -126,7 +126,7 @@ print(t.bump().bump().report())
 ```
 
 `Tally` declares `bump()` with return type `Self`, which the type
-checker resolves to whatever class `bump()` was actually called on. On
+checker resolves to whatever class `bump()` is actually called on. On
 a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
 result. That call resolves to `LoudTally.report()`, because Python
@@ -239,11 +239,11 @@ print(count(circles))
 `ty` accepts the call because `Sequence` is covariant in its element
 type. A `Sequence[Shape]` promises only that you can read `Shape`s out
 of it, and every `Circle` you read out is a `Shape`, so a
-`list[Circle]` satisfies that promise. `list[Shape]` refused the same
+`list[Circle]` satisfies that promise. `list[Shape]` refuses the same
 argument because `list` is invariant.
 
 `shapes.append(...)` stops type-checking for the reason the widening
-worked. `Sequence` has no `append()` at all: it is the read-only
+works. `Sequence` has no `append()` at all: it is the read-only
 abstract shape, so the diagnostic is `unresolved-attribute` rather
 than an argument-type error. The type checker is not saying "you may not
 append a `Shape` here," it is saying there is no such operation on
@@ -275,7 +275,7 @@ print(shout(""))  # The empty string is falsy
 
 `ty` accepts either version, and for a good reason: truthiness
 narrows too. `None` is falsy, so inside `if text:` the type checker
-rules out `None` exactly as `is not None` did, and `.upper()` is safe
+rules out `None` exactly as `is not None` does, and `.upper()` is safe
 under both spellings.
 
 What changed is which values reach which branch. `is not None` asks

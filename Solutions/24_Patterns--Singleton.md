@@ -27,7 +27,7 @@ print(x.val, x is y, x.instance is y.instance)
 #: ['sausage', 'eggs'] False True
 ```
 
-The sentinel and the guard existed to defer creation, so removing
+The sentinel and the guard exist to defer creation, so removing
 the deferral removes both. `instance` now carries the type
 `ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]`, and
 the class body binds it to the inner instance. The bare
@@ -168,7 +168,7 @@ The two prints disagree, and the exercise turns on why.
 `from config import settings` copies a binding: two names, this
 module's `settings` and `config.settings`, initially pointing at
 one dict. Mutating through either name, as the original
-`settings["theme"] = "dark"` did, changes the object both names
+`settings["theme"] = "dark"` does, changes the object both names
 refer to, so both see the change. Assigning to `settings` changes
 only which object this module's name refers to. The name in
 `config` still points at the original empty dict, which is why the
@@ -250,8 +250,8 @@ constructors overlap and the whole run takes about 50 milliseconds.
 With it they queue, and the run takes about 400. Each thread still
 builds its own `Settings` and still returns the one it built.
 `@cache` keeps whichever finished last, so seven callers walk away
-holding objects the cache has never heard of. The lock made the
-program slower and fixed nothing, the worst outcome a lock can
+holding objects the cache has never heard of. The lock makes the
+program slower and fixes nothing, the worst outcome a lock can
 produce.
 
 You cannot move the lock to the right place either. The right place
@@ -319,8 +319,8 @@ print(a.val, b.val, a.__dict__ is b.__dict__)
 ```
 
 `x.val` is `"eggs"`, the value `Other` set. Constructing an
-unrelated subclass overwrote a value belonging to `Singleton`, and
-nothing reported it.
+unrelated subclass overwrites a value belonging to `Singleton`, and
+nothing reports it.
 
 `_shared_state` is one dict, and it lives on `Borg`. `Singleton` and
 `Other` do not declare their own, so `self._shared_state` resolves

@@ -86,7 +86,7 @@ The same call works on the whole tree, on a subtree, and on a single file.
 Adding a node type is cheap:
 a plugin writes one class and touches nothing above it.
 Adding an *operation* exposes the weakness.
-`walk()` cost a method in every class,
+`walk()` costs a method in every class,
 and counting files or finding an entry by name would each cost another.
 [*Visitor*](33_Patterns--Visitor.md) exists to solve this problem.
 
@@ -170,7 +170,7 @@ and each `match` needs one case per member of the union and no more.
 What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
-The classic version made the opposite trade, and the pairing has a name:
+The classic version makes the opposite trade, and the pairing has a name:
 the *expression problem*
 (see [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching)).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
@@ -646,7 +646,7 @@ and the escape is an iterative walk driving an explicit stack of pending nodes.
 
 Python has a composite of its own and supplies no walker for it,
 which invites you to write one.
-A `t`-string, which [Tour](02_Foundations--Tour.md#t-strings) introduced,
+A `t`-string, which [Tour](02_Foundations--Tour.md#t-strings) introduces,
 evaluates to a `Template`: a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
 Iteration skips the empty literal pieces,

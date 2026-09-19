@@ -373,7 +373,7 @@ info[revealed-type]: Revealed type
 ```
 
 `greet` is a function `ty` knows by name,
-while `bound` is a function `supply()` built, described by its signature alone.
+while `bound` is a function `supply()` builds, described by its signature alone.
 These are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sits in the first type parameter of `greet` and disappears from `bound`,
 leaving the `Never` from the alias table.
@@ -441,8 +441,8 @@ and the outer one answers only what remains.
 The type records this: `chosen` is already `(str) -> Success[None]`,
 so `fallback(chosen)` adds nothing the type checker did not know.
 
-A default costs you the guarantee that made `Need` worth declaring.
-An Effect that would have failed the type check for a missing `Console` now passes it and runs,
+A default costs you the guarantee that makes `Need` worth declaring.
+An Effect that would fail the type check for a missing `Console` now passes it and runs,
 and a forgotten binding shows up as a wrong-looking result rather than an error.
 Use one for a genuine default, a null logger or a no-op console,
 not to quiet a type checker that is telling you something.
@@ -869,7 +869,7 @@ def test_greet_all(console: Console) -> None:
 ```
 
 Two rows, two `Console` implementations,
-and neither `greet_all()` nor `greet_logged()` gained a parameter.
+and neither `greet_all()` nor `greet_logged()` gains a parameter.
 The parameter-passed version would add a `console` argument to both,
 even though only `greet()`, one level further down, uses it.
 
@@ -1163,7 +1163,7 @@ This has three consequences:
    DI usually holds one type binding for the life of the program.
    `supply()` binds for one execution of one Effect,
    so two bindings for the same type can be live at once,
-   as the screen and memory `Console`s were in [When Two Implementations Match](#when-two-implementations-match).
+   as the screen and memory `Console`s are in [When Two Implementations Match](#when-two-implementations-match).
    Test cases need no reset between them.
    DI has one flat registry and no equivalent to the handler layering of [Layering Handlers](#layering-handlers).
 
@@ -1175,7 +1175,7 @@ This has three consequences:
 
 The requirement that callers inherit is also the cost.
 Adding a dependency to a working function rewrites the return type of every function above it,
-as [Retrofitting an Effect](#retrofitting-an-effect) showed with `Need[Log]`;
+as [Retrofitting an Effect](#retrofitting-an-effect) shows with `Need[Log]`;
 DI absorbs the same change in silence, with no signature recording it.
 
 Type checking is the earliest practical time to discover these errors,
@@ -1297,7 +1297,7 @@ so `delayed_sum()` needs no `async` and no `await` of its own.
 
 `Time` has no special status in Stateless.
 It is an ordinary class whose one method is `async def sleep()`.
-`supply(Time())` binds an instance the way `supply(Console())` did.
+`supply(Time())` binds an instance the way `supply(Console())` does.
 
 Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect),
 and `Need[Time]` moves that into the Ability channel.
@@ -1380,7 +1380,7 @@ The run also prints a `RuntimeWarning` to standard error, which the output above
 `run()` builds the `run_async()` coroutine and hands it to `asyncio.run()`,
 which raises a `RuntimeError` because a loop is already running,
 so the coroutine is never awaited.
-The warning is harmless, since that coroutine never started,
+The warning is harmless, since that coroutine never starts,
 and it is a reliable sign of this mistake:
 it appears whenever asynchronous code calls `run()`.
 
@@ -1417,7 +1417,7 @@ if __name__ == "__main__":
 
 `score()` looks like an ordinary function that raises a `KeyError`,
 but `@throws` changes its type.
-`ty check scores.py` reports what it became:
+`ty check scores.py` reports what it becomes:
 
 ```text
 info[revealed-type]: Revealed type
@@ -1464,7 +1464,7 @@ print(repr(next(effect)))
 #: KeyError('Carol')
 ```
 
-The body raised the exception.
+The body raises the exception.
 `@throws` wraps that body in an ordinary `try`/`except`,
 so the wrapper catches the `KeyError` and yields the exception object over the same channel that carries Ability requests.
 That is why `Effect`'s alias puts `A | E` in the `Generator`'s first parameter:
@@ -1779,7 +1779,7 @@ The caught error moves to the result and the uncaught one remains.
 so the signature must declare that failure.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
-like `error_escapes.py` did for a single error.
+like `error_escapes.py` does for a single error.
 The test's one assertion is `pytest.raises(ValueError)`:
 the failure the signature declares is the one the caller sees.
 Failures never vanish.
@@ -1810,9 +1810,9 @@ so an `Async` request or a declared failure can still be in flight when you call
 
 The channels resolve differently:
 
-- `unsupplied.py` showed `run()` refusing an Effect that still declares an Ability,
+- `unsupplied.py` shows `run()` refusing an Effect that still declares an Ability,
   before the program starts.
-- `error_escapes.py` showed `run()` accepting an Effect that still declares a failure,
+- `error_escapes.py` shows `run()` accepting an Effect that still declares a failure,
   then raising that failure at the edge.
 
 The difference follows from what each channel holds.
@@ -1842,7 +1842,7 @@ The type checker covers both, and forgetting either is a type error.
     then write a test that supplies a recording `Log` and a recording `Console` at once and asserts on both.
 5.  Add a `Metal` material to `test_nailer.py` with a strength that survives the robotic nailer,
     and add its two rows to the table.
-    Then explain why the test function body needed no change.
+    Then explain why the test function body needs no change.
 6.  This one looks ahead to `handle()`,
     which [Abilities Are Not Special](47_Effects--Stateless_in_Practice.md#abilities-are-not-special)
     covers.
@@ -1863,7 +1863,7 @@ The type checker covers both, and forgetting either is a type error.
     Explain where the greetings went and why no tool objects.
     Then restore it, and instead remove the `yield from` in front of `need(Console)` in `greeter.py`'s `greet()`.
     This time `ty` produces two diagnostics.
-    Explain what each one caught,
+    Explain what each one catches,
     and why `ty` catches assigning a dropped request but not discarding one.
 8.  Build a registry of Effects:
     a `dict[str, Success[None]]` that maps each of two names to `supply(Console())(greet)(name)`.
@@ -1882,7 +1882,7 @@ The type checker covers both, and forgetting either is a type error.
     Then call it from inside an `async def`,
     once with `run()` and once with `await run_async()`,
     and record what each one does.
-    Explain why `ty` accepted both.
+    Explain why `ty` accepts both.
 10. `announce()` declares `Effect[Need[Console], KeyError, None]`.
     Give it a second failure:
     a helper that formats the score and raises a `ValueError` on a negative one,

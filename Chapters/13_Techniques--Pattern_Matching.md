@@ -15,7 +15,7 @@ That case matches only a dictionary whose `"type"` is `"click"`,
 and it binds `x` and `y` from that dictionary as it matches.
 `match` becomes valuable once the patterns do more than test equality.
 
-Pattern matching first appeared in [Control Flow](04_Foundations--Control_Flow.md#pattern-matching).
+Pattern matching first appears in [Control Flow](04_Foundations--Control_Flow.md#pattern-matching).
 
 `match` and `case` are *soft keywords*:
 they act as keywords only inside this statement,
@@ -524,7 +524,7 @@ then match on the dataclass: you keep the shape test and gain the field types.
 
 ## Patterns Nest
 
-Each section so far introduced one pattern form on its own.
+Each section so far introduces one pattern form on its own.
 A sub-pattern is itself a pattern,
 so any of these forms can sit inside any other:
 
@@ -700,7 +700,7 @@ so adding a type needs no change to a central `match`.
 Use `match` for a closed set of cases you want to handle in one place,
 especially when the cases need to look inside the value.
 When that closed set is a set of constants rather than a set of shapes,
-make it an `Enum` and `match` on its members, as `value_patterns.py` did.
+make it an `Enum` and `match` on its members, as `value_patterns.py` does.
 The enum hands the type checker the closed set,
 so `assert_never()` works without a `type` union.
 

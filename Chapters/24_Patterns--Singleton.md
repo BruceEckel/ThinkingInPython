@@ -10,7 +10,7 @@ For the singleton, the language already has an answer.
 ## A Module Is Already a Singleton
 
 Python imports each module once and caches it in `sys.modules`,
-as [Modules and Packages](06_Foundations--Modules_and_Packages.md) showed.
+as [Modules and Packages](06_Foundations--Modules_and_Packages.md) shows.
 Every `import` after the first produces the same module object.
 A module is a singleton, and everyone shares anything defined at module level,
 with one copy for the whole interpreter.
@@ -202,7 +202,7 @@ Three implementation notes:
    and each caller can end up holding a different object,
    with only one of them staying in the cache.
    With a constructor slow enough to widen that race,
-   eight threads calling `settings()` at once ran the constructor eight times and handed back eight different objects.
+   eight threads calling `settings()` at once run the constructor eight times and hand back eight different objects.
    When threads can arrive before the singleton exists,
    create it eagerly instead: call `settings()` once at import time,
    or use the module form, which the import system builds exactly once.
@@ -297,7 +297,7 @@ Declare only what you rebind.
 
 One thread finds `_instance` empty and builds it.
 The rest wait on the lock, and each finds `_instance` already filled.
-Under the same eight-thread race, the cached version produced eight objects.
+Under the same eight-thread race, the cached version produces eight objects.
 This version produces one, as the printed count confirms.
 The sleep stands in for a constructor that does real work,
 such as opening a file or a connection.
@@ -428,7 +428,7 @@ When the inner object needs nothing from that first call,
 you can create it *eagerly* in the class body instead,
 `instance: ClassVar[__OnlyOne] = __OnlyOne()`.
 That removes the sentinel, the guard,
-and the first-call race the cached factory met under threads,
+and the first-call race the cached factory meets under threads,
 at the cost of building the object whether or not anything uses it.
 (The bare `__OnlyOne()` works because the nested class exists at that point in the body.
 The qualified `OnlyOne.__OnlyOne()` fails,
@@ -488,7 +488,7 @@ A Borg points every instance's `__dict__` at the same storage:
 
 ![x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three](_images/borg_shared_state)
 
-The previous singleton designs stood alone;
+The previous singleton designs stand alone;
 you reuse *Borg* through inheritance:
 
 ```python
@@ -517,7 +517,7 @@ print(x.val, x is y, x.__dict__ is y.__dict__ is z.__dict__)
 #: spam False True
 ```
 
-The nested class above was a `@dataclass`; `Singleton` cannot be one.
+The nested class above is a `@dataclass`; `Singleton` cannot be one.
 The sharing depends on `super().__init__` rebinding `self.__dict__` to `_shared_state`,
 and a dataclass generates its own `__init__` that assigns the fields and [never calls the base `__init__`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance),
 so each instance keeps its own `__dict__`.

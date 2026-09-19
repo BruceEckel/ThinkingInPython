@@ -7,11 +7,11 @@ share, then take away one more thing and see whether anything breaks.
 
 ## 1. Naming a vector of change
 
-The example is a small report writer. It printed plain text, then had
+The example is a small report writer. It prints plain text, then has
 to emit CSV for a spreadsheet, then JSON for a web front end. Three
-changes along one axis, the output format. Everything else stayed put
-through all three: the rows, where they came from, what the numbers
-meant.
+changes along one axis, the output format. Everything else stays put
+through all three: the rows, where they come from, what the numbers
+mean.
 
 Here is the version that survived the first two changes:
 
@@ -41,9 +41,9 @@ print(render(rows, "csv"))
 #: paper,7
 ```
 
-Nothing absorbed the change. Each new format meant opening `render()`
-and adding a `case`, so the third request edited the same function the
-first two had. The `match` reads well and hides the cost, which is why
+Nothing absorbs the change. Each new format means opening `render()`
+and adding a `case`, so the third request edits the same function the
+first two did. The `match` reads well and hides the cost, which is why
 this shape survives as long as it does: it is not wrong, it just makes
 you the one who changes.
 
@@ -112,7 +112,7 @@ Now cross out what Python supplies:
 - The interface goes. A function is already a value with a call
   signature, and `Callable[[float], float]` states that signature
   without declaring a type.
-- The concrete classes go. Each held one method and no state, so each
+- The concrete classes go. Each holds one method and no state, so each
   becomes one function.
 - The context class goes, along with its field and its setter. There
   is no object left to hold, only an argument to pass.
@@ -139,12 +139,12 @@ print(checkout(6.0, flat), checkout(6.0, by_weight))
 #: 25.0 23.0
 ```
 
-Five constructs became one parameter, and the type checker still knows
+Five constructs become one parameter, and the type checker still knows
 what the parameter accepts: `Callable[[float], float]` rejects a
 function taking the wrong arguments as surely as an interface rejects
 a class that does not implement it.
 
-The sentence that remains is the pattern. Everything crossed out was
+The sentence that remains is the pattern. Everything crossed out is
 the cost of expressing the pattern in a language where a method cannot
 travel without an object around it. Python supplies the missing piece,
 a function that travels on its own, and
@@ -184,13 +184,13 @@ print(checkout(6.0, Flat()), checkout(6.0, ByWeight()))
 ```
 
 Remove the abstract base and turn both subclasses into functions, and
-you have exercise 2's version. What stopped working? Nothing. The
+you have exercise 2's version. What stops working? Nothing. The
 numbers are identical, `ty` still rejects a wrongly-shaped argument,
 and adding a third rule is still one new definition. Both classes
-carried a single method and no state, so the hierarchy was a container
-for functions that did not need containing. By the rule that a design
+carry a single method and no state, so the hierarchy is a container
+for functions that do not need containing. By the rule that a design
 is complete when you cannot take anything else away, the class version
-was not complete.
+is not complete.
 
 Take away one more thing and the answer changes. Remove `checkout()`'s
 `shipping` parameter, inlining `5.0` where the call was, and the

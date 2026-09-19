@@ -359,7 +359,7 @@ and each assumption creates its own problem:
   It lists the Effects someone wrote down.
   A direct call to `print()` stays invisible to the tool,
   the limit [Effect Management](44_Effects--Effect_Management.md#effect-management-for-python)
-  found in Stateless.
+  finds in Stateless.
 - **Undeclared means `Unknown`.**
   An unknown Effect spreads into every caller the way `Any` spreads through types,
   so nearly every row reads `Unknown` until someone declares the libraries below your code.

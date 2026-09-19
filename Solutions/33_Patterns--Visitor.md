@@ -41,14 +41,14 @@ for flower in (Ranunculus(), Chrysanthemum()):
 Everything on the visitor side disappears: the `Visitor` base, `Bug`,
 `Pollinator`, `Predator`, `Bee`, `Fly`, and `Worm`, and the two
 `visit()` methods. So does `accept()` on `Flower`, and with it the
-`Any` annotation the chapter had to explain. Two functions and one
+`Any` annotation the chapter has to explain. Two functions and one
 registration remain.
 
-The `Bug` classes held no state. `Pollinator` and `Predator` each
-existed to name one operation, and `Bee`, `Fly`, and `Worm` existed
-to be types the second dispatch could resolve. Once the operation is a
+The `Bug` classes hold no state. `Pollinator` and `Predator` each
+exist to name one operation, and `Bee`, `Fly`, and `Worm` exist
+to be types the second dispatch can resolve. Once the operation is a
 function, the call site names it: `pollinate(flower, "Bee")` says what
-`flower.accept(bee)` said with a class and a method.
+`flower.accept(bee)` says with a class and a method.
 
 You lose one thing: holding a visitor in a variable and passing it
 around as an object. When that matters, the function is still a value.
@@ -118,14 +118,14 @@ print(thorns(Gladiolus()))
 #: none
 ```
 
-Adding `Rose` cost two lines for the class plus one registration per
-operation that needed a non-default answer, and no existing line
-changed. Adding `thorns()` cost one new function plus one registration
-for the flower that differs, and again no existing line changed.
+Adding `Rose` costs two lines for the class plus one registration per
+operation that needs a non-default answer, and no existing line
+changes. Adding `thorns()` costs one new function plus one registration
+for the flower that differs, and again no existing line changes.
 
 `@singledispatch` makes adding an *operation* cheaper than adding a
 type, because an operation is a whole function and lives in one place.
-Adding `thorns()` was cheap because three of the four flowers accept
+Adding `thorns()` is cheap because three of the four flowers accept
 its default. `Rose` needs a distinct answer from every operation, so
 it costs one registration per operation, scattered across the file.
 That is the expression problem from

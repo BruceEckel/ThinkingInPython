@@ -57,10 +57,10 @@ print(Lizard().compete(Paper()), Rock().compete(Lizard()))
 ```
 
 Sixteen entries cover the four types against each other (4 × 4), the
-same shape as the original nine (3 × 3). Adding a fourth `Item` cost
+same shape as the original nine (3 × 3). Adding a fourth `Item` costs
 one class declaration and seven new dictionary rows (the six new
 ordered pairs `Lizard` forms with the other three, plus
-`(Lizard, Lizard)`). `compete()` itself needed no change.
+`(Lizard, Lizard)`). `compete()` itself needs no change.
 
 ## 2. Adding `Lizard` to the double-dispatch version
 
@@ -160,7 +160,7 @@ combinations.
 The comparison makes the chapter's point concrete. The table costs one
 class and seven dictionary rows to extend. The method version costs
 one class and five new methods, plus retrofitting a method onto every
-class that already existed. That cost only grows as you add more item
+class that already exists. That cost only grows as you add more item
 types. The chapter therefore recommends the table for data that is
 mostly pure lookup, and reserves the method version for combinations
 that need real, type-specific logic too large for one table cell.
@@ -442,7 +442,7 @@ depends on the order the loops happen to walk, not on anything a
 reader of the table can see. The exact version has no such question:
 either the pair is in the table or it is not.
 
-The tolerant version also loses the failure that made the exact
+The tolerant version also loses the failure that makes the exact
 version safe, though only for a subclass of a concrete item. An
 `Origami(Paper)` whose rows you forgot to write no longer raises a
 `KeyError`. It silently inherits `Paper`'s answers and plays as
