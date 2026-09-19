@@ -1051,7 +1051,7 @@ so you can attach a second view to the same model and keep both views in step.
 
 ## What Stays Constant
 
-One design serves three jobs in this chapter: a thermometer pushing a float,
+One design serves three jobs in this chapter: a thermometer announcing a float,
 a fan-out awaiting network calls, and a GUI repainting a grid.
 In every case the listener is a callable and the broadcaster is a list of them.
 The pattern requires no interface, no `update()` method,
