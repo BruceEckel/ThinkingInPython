@@ -2,12 +2,12 @@
 
 The *Observer* pattern, a kind of callback,
 decouples code that changes state from code that reacts to the change.
-An *observer* registers interest with an *observable*.
-Whenever the observable changes state, it notifies the observer.
-The observable only defines a list of callables and the arguments it passes to those callables.
+An *observer* registers interest with a *subject*.
+Whenever the subject changes state, it notifies the observer.
+The subject only defines a list of callables and the arguments it passes to those callables.
 That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
-and the observable does not name their concrete types.
+and the subject does not name their concrete types.
 
 Event handling is the everyday use.
 A widget keeps a list of handlers and calls each one when its event arrives.
@@ -16,18 +16,17 @@ The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent Document-View architecture.
 A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
-With *Observer*, a change in the observable data notifies each interested view.
+With *Observer*, a change in the subject's data notifies each interested view.
 
 ## The Classic Observer: an Interface to Implement
 
 The classic design comes from *GoF Design Patterns*,
-which calls the observable the *subject*.
-Here, we use `Observable` because it says what the object does.
-It is also the name used by `java.util.Observable` and the reactive libraries.
+and this section uses its vocabulary: the object that changes is the *subject*,
+and each *observer* implements an interface with one method.
 
 The design has three parts: an `Observer` interface every observer implements,
-an `Observable` base class that keeps the observer list,
-and `Observable.notify()` that broadcasts to every observer:
+a `Subject` base class that keeps the observer list,
+and `Subject.notify()` that broadcasts to every observer:
 
 ```python
 # classic_observer.py
@@ -35,10 +34,10 @@ from typing import Protocol
 
 class Observer[T](Protocol):
     def update(
-        self, observable: Observable[T], arg: T
+        self, subject: Subject[T], arg: T
     ) -> None: ...
 
-class Observable[T]:
+class Subject[T]:
     def __init__(self) -> None:
         self._observers: list[Observer[T]] = []
 
@@ -54,11 +53,11 @@ class Observable[T]:
 
 class Display:
     def update(
-        self, observable: Observable[float], arg: float
+        self, subject: Subject[float], arg: float
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Observable[float]):
+class Thermometer(Subject[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
@@ -79,7 +78,7 @@ t.set_celsius(25)
 
 `update()` is where each observer modifies itself.
 `notify()` calls it on every observer in the list,
-so one change to the observable's state reaches all of them:
+so one change to the subject's state reaches all of them:
 `Display` prints the new reading, and a plot or a table would redraw.
 
 ![One call to set_celsius() becomes one update() call on every observer in the list](_images/observer_broadcast)
@@ -88,11 +87,11 @@ so one change to the observable's state reaches all of them:
 so `Plot` and `Table` attach the same way `Display` does.
 
 Passing `arg` is the *push* model.
-The observable (`Thermometer`) supplies what changed (the temperature),
-so an observer needs no reference back into the observable's state.
-The *pull* model sends only `observable` and lets each observer read what it needs by calling back into the observable,
-here `observable.celsius`.
-This further decouples observer and observable.
+The subject (`Thermometer`) supplies what changed (the temperature),
+so an observer needs no reference back into the subject's state.
+The *pull* model sends only `subject` and lets each observer read what it needs by calling back into the subject,
+here `subject.celsius`.
+This further decouples observer and subject.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -106,7 +105,7 @@ The `list(self._observers)` copy inside `notify()` looks redundant,
 since `_observers` is already a list.
 It is not.
 An observer may react to a notification by detaching.
-A one-shot listener detaches after its first call,
+A one-shot observer detaches after its first call,
 and the detach mutates `self._observers` while the loop is reading it.
 If you iterate the list directly,
 removing the current observer lowers every later observer's index by one,
@@ -118,34 +117,56 @@ The set of observers is therefore fixed when `notify()` begins.
 An observer detached partway through still receives this notification,
 and a newcomer attaching mid-notification receives its first one at the next change.
 
+### The Names This Chapter Uses
+
+GoF's vocabulary is hard to hold in your head.
+`Observer` and `Observable` differ by three letters, share a stem,
+and name opposite roles,
+so every listing asks you to decode which end you are looking at.
+`notify()` and `update()` name one event from two sides.
+The rest of this chapter uses names you can tell apart at a glance:
+
+| *GoF Design Patterns* | This chapter |
+|---|---|
+| subject | `Broadcaster` |
+| observer | listener, any callable |
+| `attach()` / `detach()` | `subscribe()` / `unsubscribe()` |
+| `notify()` | `announce()` |
+| `update()` | calling the listener |
+
+The pattern keeps its name.
+*Observer* is what the catalogs call it,
+and `java.util.Observable` and the reactive libraries use the older nouns,
+so the table is also your map into that literature.
+
 ## The Pythonic Observer: a List of Callables
 
-In Python an observer is any callable that takes the notification and returns `None`,
-and an observable is a list of those callables plus a way to notify them.
+In Python a listener is any callable that takes the notification and returns `None`,
+and a broadcaster is a list of those callables plus a way to announce a change to them.
 A `@property` setter runs at every assignment to its attribute,
 so the setter is the place to send the notification when state changes:
 
 ```python
-# observers.py
+# broadcaster.py
 from collections.abc import Callable
 
-type Observer[T] = Callable[[T], None]
+type Listener[T] = Callable[[T], None]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[Observer[T]] = []
+        self._listeners: list[Listener[T]] = []
 
-    def subscribe(self, observer: Observer[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: Listener[T]) -> None:
+        self._listeners.append(listener)
 
-    def unsubscribe(self, observer: Observer[T]) -> None:
-        self._observers.remove(observer)
+    def unsubscribe(self, listener: Listener[T]) -> None:
+        self._listeners.remove(listener)
 
-    def notify(self, data: T) -> None:
-        for observer in list(self._observers):
-            observer(data)
+    def announce(self, data: T) -> None:
+        for listener in list(self._listeners):
+            listener(data)
 
-class Thermometer(Observable[float]):
+class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
@@ -157,17 +178,17 @@ class Thermometer(Observable[float]):
     @celsius.setter
     def celsius(self, value: float) -> None:
         self._celsius = value
-        self.notify(value)
+        self.announce(value)
 ```
 
 The constructor assigns its argument to `_celsius` rather than to `celsius`,
-so construction skips the setter and doesn't call `notify()`.
+so construction skips the setter and doesn't call `announce()`.
 
 Subscribed callables react to every `celsius` assignment:
 
 ```python
 # thermometer.py
-from observers import Thermometer
+from broadcaster import Thermometer
 
 t = Thermometer(20.0)
 t.subscribe(lambda c: print(f"display: {c}C"))
@@ -180,25 +201,25 @@ t.celsius = 150
 #: alarm!
 ```
 
-The observers here are lambdas, but any function or bound method works.
+The listeners here are lambdas, but any function or bound method works.
 
 Four things from the classic version disappear: the `Observer` interface,
-its `update()` method, a class per reaction, and the `observable` argument.
+its `update()` method, a class per reaction, and the `subject` argument.
 A classic observer is an object,
-so the observable needs the name of a method to call on it.
-In Python the observer is the callable, so `notify()` calls it directly:
-`observer(data)` compared to the classic version calling `observer.update(self, arg)`.
+so the subject needs the name of a method to call on it.
+In Python the listener is the callable, so `announce()` calls it directly:
+`listener(data)` compared to the classic version calling `observer.update(self, arg)`.
 The remaining method names change as well:
 GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
-An observer that needs the changed object takes it as part of the payload
-(`notify((self, value))`),
+A listener that needs the changed object takes it as part of the payload
+(`announce((self, value))`),
 or subscribes a bound method whose instance already holds the reference.
 
-`Thermometer` inherits `Observable` because that is the shortest way to get `subscribe()` and `notify()`,
+`Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
 not because the pattern requires a base class.
-A `Thermometer` can hold an `Observable` as an attribute instead
-(`self.temperature_changed = Observable[float]()`),
+A `Thermometer` can hold a `Broadcaster` as an attribute instead
+(`self.temperature_changed = Broadcaster[float]()`),
 and a subscriber then names that attribute:
 `t.temperature_changed.subscribe(display)`.
 One object can hold several such attributes,
@@ -209,18 +230,18 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 Inheriting does not stop a class from being a `dataclass`,
 but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance)).
-A `@dataclass` `Thermometer` would have no list of observers,
+A `@dataclass` `Thermometer` would have no list of listeners,
 and `subscribe()` would raise an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 
-An observer returns `None`, as seen in the `Observer` alias.
+A listener returns `None`, as seen in the `Listener` alias.
 The type checker rejects a subscriber that returns a value.
-Notification runs one way, from observable to observers,
-so `notify()` calls each observer as a statement.
+Notification runs one way, from broadcaster to listeners,
+so `announce()` calls each listener as a statement.
 *GoF Design Patterns* gives the reason under broadcast communication.
-A notification names no receiver, and each observer may handle or ignore it,
-so one call with several observers has no single answer to collect.
+A notification names no receiver, and each listener may handle or ignore it,
+so one call with several listeners has no single answer to collect.
 A design that needs an answer uses a different pattern;
 for example [*Chain of Responsibility*](28_Patterns--Function_Objects.md#chain-of-responsibility-choosing-the-handler-at-runtime)
 tries its handlers in turn and returns the result from the first one that succeeds.
@@ -234,49 +255,49 @@ and that delivery stops after `unsubscribe()`.
 Two more tests cover a callable subscribed twice and an `unsubscribe()` that matches no subscription:
 
 ```python
-# test_observers.py
+# test_broadcaster.py
 import pytest
-from observers import Observable, Thermometer
+from broadcaster import Broadcaster, Thermometer
 
-def test_notify_calls_every_subscriber() -> None:
+def test_announce_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
-    obs = Observable[int]()
-    obs.subscribe(lambda d: received.append(("a", d)))
-    obs.subscribe(lambda d: received.append(("b", d)))
-    obs.notify(42)
+    source = Broadcaster[int]()
+    source.subscribe(lambda d: received.append(("a", d)))
+    source.subscribe(lambda d: received.append(("b", d)))
+    source.announce(42)
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
     # Must not raise anything
-    Observable[str]().notify("anything")
+    Broadcaster[str]().announce("anything")
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     # A bound method: equal, not identical
     record = received.append
-    obs.subscribe(record)
-    obs.notify(1)
-    obs.unsubscribe(record)
-    obs.notify(2)
+    source.subscribe(record)
+    source.announce(1)
+    source.unsubscribe(record)
+    source.announce(2)
     assert received == [1]
 
 def test_subscribing_twice_notifies_twice() -> None:
     received: list[object] = []
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     record = received.append
-    obs.subscribe(record)
-    obs.subscribe(record)
-    obs.notify(1)
+    source.subscribe(record)
+    source.subscribe(record)
+    source.announce(1)
     assert received == [1, 1]
-    obs.unsubscribe(record)  # Removes one of the two
-    obs.notify(2)
+    source.unsubscribe(record)  # Removes one of the two
+    source.announce(2)
     assert received == [1, 1, 2]
 
 def test_unsubscribe_without_subscribe_raises() -> None:
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     with pytest.raises(ValueError):
-        obs.unsubscribe(print)
+        source.unsubscribe(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
@@ -297,10 +318,10 @@ def test_late_subscriber_misses_earlier_changes() -> None:
     assert readings == [20.0]
 ```
 
-The tests subscribe a list's `append` to the observable,
+The tests subscribe a list's `append` to the broadcaster,
 so the list records what arrived.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
-so a detachable observer needs a named reference, not an inline lambda.
+so a detachable listener needs a named reference, not an inline lambda.
 A bound method needs no stashed reference.
 Each `obj.update` builds a new bound-method object,
 so `obj.update is obj.update` is `False`.
@@ -314,24 +335,24 @@ which is what `unsubscribe()` does with a callable that never subscribed.
 
 ### Detaching During a Notification
 
-The copy in `notify()` shows its value when an observer unsubscribes mid-notification:
+The copy in `announce()` shows its value when a listener unsubscribes mid-notification:
 
 ```python
-# self_removing_observer.py
-from observers import Observable
+# self_removing_listener.py
+from broadcaster import Broadcaster
 
-obs = Observable[object]()
+source = Broadcaster[object]()
 seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
     # Detaches itself mid-notification
-    obs.unsubscribe(once)
+    source.unsubscribe(once)
 
-obs.subscribe(once)
-obs.subscribe(lambda d: seen.append(f"always: {d}"))
-obs.notify(1)
-obs.notify(2)
+source.subscribe(once)
+source.subscribe(lambda d: seen.append(f"always: {d}"))
+source.announce(1)
+source.announce(2)
 print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
@@ -343,32 +364,32 @@ and `always: 1` would be missing.
 
 ### Failures and Lapsed Listeners
 
-An observer that raises an exception stops the loop,
-and the observers after it are not called.
-Decide whether `notify()` should catch, collect, and continue
+A listener that raises an exception stops the loop,
+and the listeners after it are not called.
+Decide whether `announce()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 
 Subscriptions are strong references.
-An observable that outlives its observers keeps alive the instance behind every subscribed bound method,
+A broadcaster that outlives its listeners keeps alive the instance behind every subscribed bound method,
 the classic *lapsed listener* leak.
-Long-lived observables need disciplined `unsubscribe()` calls,
+Long-lived broadcasters need disciplined `unsubscribe()` calls,
 or [weak references](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
-which do not keep the observer alive
+which do not keep the listener alive
 (`weakref.WeakMethod` is the bound-method form).
 
 ### Re-entrant Notification
 
-An observer that writes back to the observable re-enters `notify()` from inside `notify()`.
+A listener that writes back to the broadcaster re-enters `announce()` from inside `announce()`.
 Two-way bindings are the usual source.
 The view edits the model, the model notifies the view, the view edits the model.
-Without a guard, an observer that always writes back recurses until Python raises a `RecursionError`:
+Without a guard, a listener that always writes back recurses until Python raises a `RecursionError`:
 
 ```python
-# reentrant_notify.py
+# reentrant_announce.py
+from broadcaster import Broadcaster
 from exceptions import expected
-from observers import Observable
 
-class TwoWay(Observable[int]):
+class TwoWay(Broadcaster[int]):
     def __init__(self) -> None:
         super().__init__()
         self._value = 0
@@ -380,7 +401,7 @@ class TwoWay(Observable[int]):
     @value.setter
     def value(self, new: int) -> None:
         self._value = new
-        self.notify(new)  # Re-enters if written back
+        self.announce(new)  # Re-enters if written back
 
 model = TwoWay()
 model.subscribe(
@@ -390,15 +411,15 @@ with expected(RecursionError):
 #: [RecursionError] maximum recursion depth exceeded
 ```
 
-The setter calls `notify()`, the observer writes back through the same setter,
-and each write calls `notify()` again.
+The setter calls `announce()`, the listener writes back through the same setter,
+and each write calls `announce()` again.
 Making the write conditional on the value changing breaks the cycle:
 
 ```python
-# reentrant_notify_fixed.py
-from observers import Observable
+# reentrant_announce_fixed.py
+from broadcaster import Broadcaster
 
-class TwoWay(Observable[int]):
+class TwoWay(Broadcaster[int]):
     def __init__(self) -> None:
         super().__init__()
         self._value = 0
@@ -412,7 +433,7 @@ class TwoWay(Observable[int]):
         if new == self._value:
             return  # Breaks the re-entry
         self._value = new
-        self.notify(new)
+        self.announce(new)
 
 model = TwoWay()
 seen: list[int] = []
@@ -428,16 +449,16 @@ print(seen)
 ```
 
 Because `echo`'s write-back matches the value the setter already holds,
-the setter returns before it reaches `notify()` again.
+the setter returns before it reaches `announce()` again.
 The model still notifies once.
-The alternative is a re-entry flag set before `notify()` and cleared after.
+The alternative is a re-entry flag set before `announce()` and cleared after.
 The flag breaks the cycle too,
 and fits the case where a write of an unchanged value should still proceed.
 
 ### Notifying Without a Base Class
 
 `Thermometer` pays for each published attribute with a `@property` pair,
-and takes `subscribe()` and `notify()` from a base class.
+and takes `subscribe()` and `announce()` from a base class.
 `__setattr__()` replaces both.
 Python calls it on every attribute assignment,
 so one method covers every attribute of the class:
@@ -494,9 +515,10 @@ Without the annotation,
 `ty` reads their type from the constructor's assignments.
 
 One hook covering every attribute is the trade.
-A watcher takes the attribute name along with the value,
+A watcher is a listener with a wider signature:
+it takes the attribute name along with the value,
 and filters by name to act on one attribute,
-where a `Thermometer` observer receives the temperature.
+where a `Thermometer` listener receives the temperature.
 Every assignment notifies, including internal bookkeeping,
 so a class that stores a cache or a counter broadcasts those writes too.
 `__setattr__()` accepts any name as well,
@@ -507,16 +529,16 @@ because a `@property` gives the checker a name to match.
 
 ## Observer and I/O
 
-Until now, no observer has waited on anything.
+Until now, no listener has waited on anything.
 Each prints, appends, or writes back, then returns.
-If an observer calls a network service or writes to a database,
-notifying observers one at a time blocks on each.
-Each observer's wait delays every observer after it.
+If a listener calls a network service or writes to a database,
+notifying listeners one at a time blocks on each.
+Each listener's wait delays every listener after it.
 
-If observers are coroutines,
-`notify()` awaits them together with `asyncio.gather()`,
-so one state change notifies every observer concurrently.
-A slow observer no longer delays the others.
+If listeners are coroutines,
+`announce()` awaits them together with `asyncio.gather()`,
+so one state change notifies every listener concurrently.
+A slow listener no longer delays the others.
 `gather()` still waits for all of them,
 so the change finishes only after every notification succeeds.
 
@@ -529,30 +551,30 @@ covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
 For this example, you only need a coroutine that pauses at `await` while others run:
 
 ```python
-# async_observers.py
+# async_broadcaster.py
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
-    def subscribe(self, observer: AsyncObserver[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: AsyncListener[T]) -> None:
+        self._listeners.append(listener)
 
     def unsubscribe(
-        self, observer: AsyncObserver[T]
+        self, listener: AsyncListener[T]
     ) -> None:
-        self._observers.remove(observer)
+        self._listeners.remove(listener)
 
-    async def notify(self, data: T) -> None:
-        # Fan out to every observer, then wait for all
+    async def announce(self, data: T) -> None:
+        # Fan out to every listener, then wait for all
         await asyncio.gather(
-            *(obs(data) for obs in self._observers))
+            *(fn(data) for fn in self._listeners))
 
-class Thermometer(Observable[float]):
+class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
@@ -564,7 +586,7 @@ class Thermometer(Observable[float]):
     async def set_celsius(self, value: float) -> None:
         # A property setter cannot be awaited
         self._celsius = value
-        await self.notify(value)
+        await self.announce(value)
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:
@@ -588,93 +610,93 @@ asyncio.run(main())
 #: alarm sent: 150C
 ```
 
-The `AsyncObserver` alias makes the type checker reject a plain function as an observer.
-An observer must return an awaitable,
+The `AsyncListener` alias makes the type checker reject a plain function as a listener.
+A listener must return an awaitable,
 and calling an `async` function produces one.
 The type checker also rejects the reverse mistake,
-an `async` function subscribed to the synchronous `Observable`.
+an `async` function subscribed to the synchronous `Broadcaster`.
 Calling that function returns a coroutine rather than `None`,
 and a coroutine discarded without an `await` does nothing.
-The alias's type parameter does the same job as the synchronous `Observer[T]`'s.
+The alias's type parameter does the same job as the synchronous `Listener[T]`'s.
 
 The `alarm` is slower than the log, yet the log prints first.
-Awaiting the observers in sequence would print in subscription order,
+Awaiting the listeners in sequence would print in subscription order,
 alarm first.
-Concurrent fan-out lets each observer finish as soon as its own wait ends,
-so the faster observer prints first.
+Concurrent fan-out lets each listener finish as soon as its own wait ends,
+so the faster listener prints first.
 The results `gather()` returns stay in argument order regardless.
 Only the side effects interleave.
 
-An observer need not act on every notification.
+A listener need not act on every notification.
 Below its threshold, the alarm returns at once.
 
 ### Detaching During an Async Notification
 
-`notify()` needs no `list()` copy here.
+`announce()` needs no `list()` copy here.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
-so a detach during the fan-out cannot skip an observer.
-The tuple also means an observer that unsubscribes mid-notification still receives this change,
-an async counterpart to `self_removing_observer.py`:
+so a detach during the fan-out cannot skip a listener.
+The tuple also means a listener that unsubscribes mid-notification still receives this change,
+an async counterpart to `self_removing_listener.py`:
 
 ```python
-# async_self_removing_observer.py
+# async_self_removing_listener.py
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
     def subscribe(
-        self, observer: AsyncObserver[T]
+        self, listener: AsyncListener[T]
     ) -> None:
-        self._observers.append(observer)
+        self._listeners.append(listener)
 
     def unsubscribe(
-        self, observer: AsyncObserver[T]
+        self, listener: AsyncListener[T]
     ) -> None:
-        self._observers.remove(observer)
+        self._listeners.remove(listener)
 
-    async def notify(self, data: T) -> None:
+    async def announce(self, data: T) -> None:
         await asyncio.gather(
-            *(obs(data) for obs in self._observers))
+            *(fn(data) for fn in self._listeners))
 
-obs = Observable[object]()
+source = Broadcaster[object]()
 seen: list[str] = []
 
 async def once(data: object) -> None:
     seen.append(f"once: {data}")
     # Unsubscribes mid-notification
-    obs.unsubscribe(once)
+    source.unsubscribe(once)
 
 async def always(data: object) -> None:
     seen.append(f"always: {data}")
 
 async def main() -> None:
-    obs.subscribe(once)
-    obs.subscribe(always)
-    await obs.notify(1)
-    await obs.notify(2)
+    source.subscribe(once)
+    source.subscribe(always)
+    await source.announce(1)
+    await source.announce(2)
 
 asyncio.run(main())
 print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-This listing repeats `async_observers.py`'s `Observable` rather than importing it,
+This listing repeats `async_broadcaster.py`'s `Broadcaster` rather than importing it,
 because that module's own top-level `asyncio.run(main())` would run its thermometer demo again on import.
 
 `once` unsubscribes mid-notification and still receives that notification,
 because `gather()` already holds its coroutine before `once` runs.
-The next `notify()` no longer calls it.
+The next `announce()` no longer calls it.
 
 ### A Failing Observer Orphans the Rest
 
-A failing observer behaves differently here than in the synchronous version.
+A failing listener behaves differently here than in the synchronous version.
 `gather()` re-raises the first exception into `set_celsius()` right away,
-and the unfinished observers keep running with nobody awaiting them:
+and the unfinished listeners keep running with nobody awaiting them:
 
 ```python
 # gather_orphan.py
@@ -709,10 +731,10 @@ the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
 A `TaskGroup` cancels a failing task's siblings,
-so a single broken observer would cancel the others mid-notification.
+so a single broken listener would cancel the others mid-notification.
 
-Use the async fan-out only when the observers are I/O-bound.
-For in-memory observers the synchronous `Observable` from `observers.py` is simpler and needs no event loop.
+Use the async fan-out only when the listeners are I/O-bound.
+For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
 The type-keyed [event bus](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 is the same fan-out, routed by event type.
 
@@ -731,12 +753,13 @@ try to turn every box `palegreen`.
 From this starting grid, `palegreen` is the one color all the boxes can share.
 No sequence of clicks turns the grid all `skyblue` or all `khaki`.
 
-The model reuses the same `Observable` as the thermometer, from `observers.py`:
+The model reuses the same `Broadcaster` as the thermometer,
+from `broadcaster.py`:
 
 ```python
 # box_observer.py
 from enum import StrEnum
-from observers import Observable
+from broadcaster import Broadcaster
 
 class Color(StrEnum):
     SKYBLUE = "skyblue"
@@ -763,7 +786,7 @@ def recolored(grid: Grid, clicked: Coord) -> Grid:
     return grid | {cell: grid[cell].next()
                    for cell in cross if cell in grid}
 
-class BoxModel(Observable[Grid]):
+class BoxModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -771,7 +794,7 @@ class BoxModel(Observable[Grid]):
 
     def click(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
-        self.notify(self.grid)
+        self.announce(self.grid)
 ```
 
 `Color` is a `StrEnum`, an `Enum`
@@ -810,20 +833,20 @@ and `grid` is unchanged.
 Neither function needs a `BoxModel`,
 so both are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
-`BoxModel` is an `Observable[Grid]`.
+`BoxModel` is a `Broadcaster[Grid]`.
 Like `Thermometer`, it writes its own `__init__()`,
-which calls `Observable.__init__()` and then builds `grid` from `size`.
-`BoxModel.click()` makes the next grid with `recolored()` and passes it to `notify()`.
+which calls `Broadcaster.__init__()` and then builds `grid` from `size`.
+`BoxModel.click()` makes the next grid with `recolored()` and passes it to `announce()`.
 An enum, two functions, and one class make up the model:
 `Color` holds the colors and their order, the functions compute grids,
-and `BoxModel` holds the current grid and notifies its observers.
+and `BoxModel` holds the current grid and notifies its listeners.
 
 ### Testing the Model
 
 The model contains no display code so it can be tested without the challenges of a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a click in a corner stays on the grid,
-and that observers receive the new grid after a click:
+and that listeners receive the new grid after a click:
 
 ```python
 # test_box_observer.py
@@ -861,7 +884,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
-    # The observer is a callable
+    # The listener is a callable
     model.subscribe(seen.append)
     model.click((1, 1))
     assert seen[-1] is model.grid
@@ -918,7 +941,7 @@ so it is a closure that reads `canvas` and `cell_px`.
 It paints one rectangle per cell,
 multiplying the cell's column and row by `cell_px` to get the rectangle's corners in pixels.
 It takes a `Grid` and returns `None`,
-the shape `subscribe()` requires of an observer.
+the shape `subscribe()` requires of a listener.
 No notification has arrived when the window opens,
 so `show()` calls `draw(model.grid)` once to paint the starting grid.
 
@@ -939,14 +962,14 @@ A click on the canvas becomes a model `click()`,
 and the resulting notification repaints the view.
 The handler calls the model and draws nothing.
 
-The model and the view share only the subscribe-and-notify contract,
+The model and the view share only the subscribe-and-announce contract,
 so you can attach a second view to the same model and keep both views in step.
 
 ## What Stays Constant
 
 One design serves three jobs in this chapter: a thermometer pushing a float,
 a fan-out awaiting network calls, and a GUI repainting a grid.
-In every case the observer is a callable and the observable is a list of them.
+In every case the listener is a callable and the broadcaster is a list of them.
 The pattern requires no interface, no flag, and no class per reaction.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 takes the last step.
@@ -956,9 +979,10 @@ and the *Observer* is an event bus.
 ## Exercises
 
 1.  Create a minimal *Observer* design of your own,
-    without looking at `observers.py`:
-    the smallest `Observable` that lets callables subscribe, then notifies them.
-    Demonstrate it by subscribing several observers and causing one change that updates them all.
+    without looking at `broadcaster.py`:
+    the smallest `Broadcaster` that lets callables subscribe,
+    then notifies them.
+    Demonstrate it by subscribing several listeners and causing one change that updates them all.
 2.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and clicking any square recolors your patch to that square's color,
@@ -966,28 +990,28 @@ and the *Observer* is an event bus.
     Write the neighbor test yourself, counting diagonals.
     Track the clicks it takes to make the whole field one color.
     For competition, alternate turns between players.
-3.  Make `Observable.notify()` survive an observer that raises an exception:
-    every other observer is still notified,
-    and `notify()` re-raises the failures afterward, together,
+3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
+    every other listener is still notified,
+    and `announce()` re-raises the failures afterward, together,
     as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
     (which you build yourself here: `raise ExceptionGroup("message", failures)`).
-    Write a test in which the first observer raises an exception and the second still records its notification.
-4.  Redo exercise 3 for `async_observers.py`.
-    Make `notify()` use `gather(*coros, return_exceptions=True)`,
+    Write a test in which the first listener raises an exception and the second still records its notification.
+4.  Redo exercise 3 for `async_broadcaster.py`.
+    Make `announce()` use `gather(*coros, return_exceptions=True)`,
     separate the returned exceptions from the successes,
     and raise them together as an `ExceptionGroup`.
-    Write a test in which the first observer raises an exception and the second still records its notification.
+    Write a test in which the first listener raises an exception and the second still records its notification.
 5.  Change the rule for a click in `box_observer.py`:
     make `recolored()` advance every box in the clicked box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
 6.  Write a `Notifying` descriptor
     ([Metaprogramming](17_Techniques--Metaprogramming.md#a-descriptor-that-validates))
-    that replaces the `@property` and `notify()` pair,
-    so one class declares several independently observable attributes:
+    that replaces the `@property` and `announce()` pair,
+    so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
-    Each attribute keeps its own observers.
+    Each attribute keeps its own listeners.
     Subscribing needs the descriptor, not the value it stores,
     so `__get__()` answers class access by returning the descriptor,
     and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
-    Show that an assignment to one attribute calls no observer of the other.
+    Show that an assignment to one attribute calls no listener of the other.

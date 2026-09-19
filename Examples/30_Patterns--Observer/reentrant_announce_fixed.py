@@ -1,7 +1,7 @@
-# reentrant_notify_fixed.py
-from observers import Observable
+# reentrant_announce_fixed.py
+from broadcaster import Broadcaster
 
-class TwoWay(Observable[int]):
+class TwoWay(Broadcaster[int]):
     def __init__(self) -> None:
         super().__init__()
         self._value = 0
@@ -15,7 +15,7 @@ class TwoWay(Observable[int]):
         if new == self._value:
             return  # Breaks the re-entry
         self._value = new
-        self.notify(new)
+        self.announce(new)
 
 model = TwoWay()
 seen: list[int] = []

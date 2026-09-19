@@ -1,36 +1,36 @@
 # Observer: Solutions
 
-## 1. A minimal Observer-Observable pair
+## 1. A minimal broadcaster-listener pair
 
 ```python
 # exercise_1.py
 from collections.abc import Callable
 from typing import Any
 
-class Observable:
+class Broadcaster:
     def __init__(self) -> None:
-        self._observers: list[Callable] = []
+        self._listeners: list[Callable] = []
 
-    def subscribe(self, observer: Callable) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: Callable) -> None:
+        self._listeners.append(listener)
 
-    def notify(self, *args: Any) -> None:
-        for obs in self._observers:
-            obs(*args)
+    def announce(self, *args: Any) -> None:
+        for listener in self._listeners:
+            listener(*args)
 
 calls: list[tuple[str, int]] = []
-observable = Observable()
-observable.subscribe(lambda v: calls.append(("A", v)))
-observable.subscribe(lambda v: calls.append(("B", v)))
-observable.notify(42)
+source = Broadcaster()
+source.subscribe(lambda v: calls.append(("A", v)))
+source.subscribe(lambda v: calls.append(("B", v)))
+source.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]
 ```
 
-Like `observers.py`, this solution has no separate `Observer` class at
-all. Any callable, here two `lambda`s, is an observer. `subscribe()`
-collects them in a list. `notify()` then hands its own arguments to
-each one in turn, so every subscribed observer sees the same update,
+Like `broadcaster.py`, this solution has no separate `Observer` class at
+all. Any callable, here two `lambda`s, is a listener. `subscribe()`
+collects them in a list. `announce()` then hands its own arguments to
+each one in turn, so every subscribed listener sees the same update,
 in subscription order.
 
 ## 2. Turning `box_observer.py` into a flood-fill game
@@ -121,92 +121,92 @@ single-player scoring the exercise asks for, "how many clicks to turn
 the field into one color." Two players can share the same `click()`
 method, alternating whose turn supplies the next color, and after a
 fixed number of rounds whoever owns the larger patch wins. `FloodGame`
-can also inherit from `Observable[Grid]`, as `BoxModel` does, and call
-`self.notify(self.grid)` at the end of a successful `click()`.
+can also inherit from `Broadcaster[Grid]`, as `BoxModel` does, and
+call `self.announce(self.grid)` at the end of a successful `click()`.
 `box_view.py`'s existing view then repaints after every move. The
 drawing code needs no change, but `show()`'s parameter annotation does:
 it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
-Protocol (or to `Observable[Grid]` plus `size`, `grid`, and `click()`)
-lets the same view draw either model.
+Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
+`click()`) lets the same view draw either model.
 
-## 3. A `notify()` that survives a failing observer
+## 3. An `announce()` that survives a failing listener
 
 ```python
 # exercise_3.py
 from collections.abc import Callable
 
-type Observer[T] = Callable[[T], None]
+type Listener[T] = Callable[[T], None]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[Observer[T]] = []
+        self._listeners: list[Listener[T]] = []
 
-    def subscribe(self, observer: Observer[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: Listener[T]) -> None:
+        self._listeners.append(listener)
 
-    def notify(self, data: T) -> None:
+    def announce(self, data: T) -> None:
         failures: list[Exception] = []
-        for observer in list(self._observers):
+        for listener in list(self._listeners):
             try:
-                observer(data)
+                listener(data)
             except Exception as e:
                 failures.append(e)
         if failures:
             raise ExceptionGroup(
-                "observer failures", failures)
+                "listener failures", failures)
 
 received: list[int] = []
 
 def broken(data: int) -> None:
     raise RuntimeError(f"cannot handle {data}")
 
-obs = Observable[int]()
-obs.subscribe(broken)
-obs.subscribe(received.append)
+source = Broadcaster[int]()
+source.subscribe(broken)
+source.subscribe(received.append)
 try:
-    obs.notify(7)
+    source.announce(7)
 except* RuntimeError as group:
     print(len(group.exceptions), received)
 #: 1 [7]
 ```
 
 ```python
-# test_resilient_notify.py
+# test_resilient_announce.py
 import pytest
-from exercise_3 import Observable
+from exercise_3 import Broadcaster
 
-def test_later_observer_still_runs_after_a_failure(
+def test_later_listener_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 
     def broken(data: int) -> None:
         raise RuntimeError("boom")
 
-    obs = Observable[int]()
-    obs.subscribe(broken)
-    obs.subscribe(received.append)
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(received.append)
     with pytest.raises(ExceptionGroup):
-        obs.notify(1)
+        source.announce(1)
     assert received == [1]
 ```
 
 The loop catches each failure and keeps going, so subscription order
 stops deciding who hears the change. Collecting the exceptions rather
-than discarding them is the other half: an observer that fails
-silently is worse than one that stops the loop, because nothing
-reports the failure.
+than discarding them is the other half: a listener that fails silently
+is worse than one that stops the loop, because nothing reports the
+failure.
 
-`ExceptionGroup` is the right container because more than one observer
+`ExceptionGroup` is the right container because more than one listener
 can fail on a single notification, and the caller needs every failure,
 not the first. `except*` then lets a caller handle one kind of failure
 and re-raise the rest, something a plain `except` on a single
 re-raised exception cannot do.
 
-Catching bare `Exception` here is deliberate: `notify()` has no idea
-what its observers do, so it cannot name their failure modes. Catching
+Catching bare `Exception` here is deliberate: `announce()` has no idea
+what its listeners do, so it cannot name their failure modes. Catching
 `Exception` still lets `BaseException` through, so a
-`KeyboardInterrupt` or an `asyncio.CancelledError` passing through an
-observer stops the notification instead of joining `failures`.
+`KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
+listener stops the notification instead of joining `failures`.
 
 ## 4. The same rescue, for the async fan-out
 
@@ -215,24 +215,25 @@ observer stops the notification instead of joining `failures`.
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
-    def subscribe(self, observer: AsyncObserver[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: AsyncListener[T]) -> None:
+        self._listeners.append(listener)
 
-    async def notify(self, data: T) -> None:
+    async def announce(self, data: T) -> None:
         results = await asyncio.gather(
-            *(obs(data) for obs in self._observers),
+            *(listener(data)
+              for listener in self._listeners),
             return_exceptions=True)
         failures = [
             r for r in results if isinstance(r, Exception)]
         if failures:
             raise ExceptionGroup(
-                "observer failures", failures)
+                "listener failures", failures)
 
 received: list[int] = []
 
@@ -244,11 +245,11 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    obs = Observable[int]()
-    obs.subscribe(broken)
-    obs.subscribe(record)
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(record)
     try:
-        await obs.notify(7)
+        await source.announce(7)
     except* RuntimeError as group:
         print(len(group.exceptions), received)
 
@@ -257,12 +258,12 @@ asyncio.run(main())
 ```
 
 ```python
-# test_async_resilient_notify.py
+# test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_4 import Observable
+from exercise_4 import Broadcaster
 
-def test_later_observer_still_runs_after_a_failure(
+def test_later_listener_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 
@@ -274,11 +275,11 @@ def test_later_observer_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        obs = Observable[int]()
-        obs.subscribe(broken)
-        obs.subscribe(record)
+        source = Broadcaster[int]()
+        source.subscribe(broken)
+        source.subscribe(record)
         with pytest.raises(ExceptionGroup):
-            await obs.notify(1)
+            await source.announce(1)
 
     asyncio.run(run())
     assert received == [1]
@@ -290,16 +291,16 @@ one keyword does what the synchronous version needed a `try` inside a
 loop to do, because `gather()` is already the loop.
 
 The results come back in argument order, so the list is a record of
-which observer produced what. This version needs the failures alone,
+which listener produced what. This version needs the failures alone,
 so its comprehension keeps each result for which
-`isinstance(r, Exception)` is true. A successful observer returned
+`isinstance(r, Exception)` is true. A successful listener returned
 `None`, which fails that test and stays out of `failures`.
 
 The exception filter uses `Exception`, not `BaseException`, for the
 reason exercise 3 gives, and for a second reason here.
 `asyncio.CancelledError` derives from `BaseException`, and
 `return_exceptions=True` still returns a cancellation among the
-results. Treating that result as an ordinary observer failure would
+results. Treating that result as an ordinary listener failure would
 swallow a cancellation the event loop meant to propagate.
 
 The synchronous and asynchronous versions now answer the same
@@ -371,25 +372,25 @@ has two connections to the model. Its click handler calls
 `Grid` and paints every cell. Neither one says which cells a click
 changes, so the view holds nothing that a new rule could make wrong.
 The rule sits in `recolored()`, `BoxModel.click()` calls it, and
-`notify()` delivers the result. `initials()` makes the same point from
-the other side: it is a second view of a `Grid`, written without
+`announce()` delivers the result. `initials()` makes the same point
+from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
-## 6. A descriptor per observable attribute
+## 6. A descriptor per watched attribute
 
 ```python
 # exercise_6.py
 from collections.abc import Callable
 from typing import overload
 
-type Observer[T] = Callable[[T], None]
+type Listener[T] = Callable[[T], None]
 
 class Notifying[T]:
     def __set_name__(
         self, owner: type, name: str
     ) -> None:
         self.storage = f"_{name}"
-        self.observers = f"_observers_{name}"
+        self.listeners = f"_listeners_{name}"
 
     @overload
     def __get__(self, obj: None,
@@ -405,13 +406,13 @@ class Notifying[T]:
 
     def __set__(self, obj: object, value: T) -> None:
         setattr(obj, self.storage, value)
-        for observer in getattr(obj, self.observers, ()):
-            observer(value)
+        for listener in getattr(obj, self.listeners, ()):
+            listener(value)
 
     def subscribe(self, obj: object,
-                  observer: Observer[T]) -> None:
+                  listener: Listener[T]) -> None:
         obj.__dict__.setdefault(
-            self.observers, []).append(observer)
+            self.listeners, []).append(listener)
 
 class Thermometer:
     celsius = Notifying[float]()
@@ -438,15 +439,15 @@ print(t.celsius, t.humidity)
 
 `__set_name__()` receives the name each descriptor was assigned to, so
 `celsius` and `humidity` derive different attribute names: `_celsius`
-and `_observers_celsius` for one, `_humidity` and
-`_observers_humidity` for the other. Two `Notifying` instances in one
-class therefore share no storage and no observer list, which is what
-makes the two attributes independent. `Observable` keeps one list for
+and `_listeners_celsius` for one, `_humidity` and
+`_listeners_humidity` for the other. Two `Notifying` instances in one
+class therefore share no storage and no listener list, which is what
+makes the two attributes independent. `Broadcaster` keeps one list for
 the whole object; a descriptor keeps one per attribute.
 
-`__set__()` stores the value and then calls each observer registered
+`__set__()` stores the value and then calls each listener registered
 for that attribute, the work `Thermometer`'s property setter did with
-`self.notify(value)`.
+`self.announce(value)`.
 
 Class access is the part a validating descriptor never needs.
 `Thermometer.celsius` calls `__get__()` with `obj` set to `None`, and
@@ -454,10 +455,10 @@ returning the descriptor there puts `subscribe()` within reach. The
 two `@overload` declarations tell the type checker which of the two
 results it gets: `Notifying[T]` from the class, `T` from an instance.
 Without them the declared return type is the union, and `t.celsius *
-2` would fail to check. The overloads also check the observer against
+2` would fail to check. The overloads also check the listener against
 the attribute: `Thermometer.celsius.subscribe(t, readings.append)`
 passes only because `readings` is a `list[float]`.
 
-`subscribe()` writes the observer list into the instance's `__dict__`
+`subscribe()` writes the listener list into the instance's `__dict__`
 rather than declaring it on the class, where every instance would
 share one list.

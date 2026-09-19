@@ -2,24 +2,25 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
-    def subscribe(self, observer: AsyncObserver[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: AsyncListener[T]) -> None:
+        self._listeners.append(listener)
 
-    async def notify(self, data: T) -> None:
+    async def announce(self, data: T) -> None:
         results = await asyncio.gather(
-            *(obs(data) for obs in self._observers),
+            *(listener(data)
+              for listener in self._listeners),
             return_exceptions=True)
         failures = [
             r for r in results if isinstance(r, Exception)]
         if failures:
             raise ExceptionGroup(
-                "observer failures", failures)
+                "listener failures", failures)
 
 received: list[int] = []
 
@@ -31,11 +32,11 @@ async def record(data: int) -> None:
     received.append(data)
 
 async def main() -> None:
-    obs = Observable[int]()
-    obs.subscribe(broken)
-    obs.subscribe(record)
+    source = Broadcaster[int]()
+    source.subscribe(broken)
+    source.subscribe(record)
     try:
-        await obs.notify(7)
+        await source.announce(7)
     except* RuntimeError as group:
         print(len(group.exceptions), received)
 

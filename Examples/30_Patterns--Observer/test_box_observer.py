@@ -33,7 +33,7 @@ def test_model_notifies_with_the_new_grid() -> None:
     model = BoxModel(3)
     before = model.grid[(1, 1)]
     seen: list[Grid] = []
-    # The observer is a callable
+    # The listener is a callable
     model.subscribe(seen.append)
     model.click((1, 1))
     assert seen[-1] is model.grid

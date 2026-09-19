@@ -2,21 +2,21 @@
 from collections.abc import Callable
 from typing import Any
 
-class Observable:
+class Broadcaster:
     def __init__(self) -> None:
-        self._observers: list[Callable] = []
+        self._listeners: list[Callable] = []
 
-    def subscribe(self, observer: Callable) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: Callable) -> None:
+        self._listeners.append(listener)
 
-    def notify(self, *args: Any) -> None:
-        for obs in self._observers:
-            obs(*args)
+    def announce(self, *args: Any) -> None:
+        for listener in self._listeners:
+            listener(*args)
 
 calls: list[tuple[str, int]] = []
-observable = Observable()
-observable.subscribe(lambda v: calls.append(("A", v)))
-observable.subscribe(lambda v: calls.append(("B", v)))
-observable.notify(42)
+source = Broadcaster()
+source.subscribe(lambda v: calls.append(("A", v)))
+source.subscribe(lambda v: calls.append(("B", v)))
+source.announce(42)
 print(calls)
 #: [('A', 42), ('B', 42)]

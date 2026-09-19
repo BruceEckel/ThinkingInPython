@@ -1,5 +1,5 @@
 # thermometer.py
-from observers import Thermometer
+from broadcaster import Thermometer
 
 t = Thermometer(20.0)
 t.subscribe(lambda c: print(f"display: {c}C"))

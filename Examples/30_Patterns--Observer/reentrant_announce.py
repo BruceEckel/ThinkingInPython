@@ -1,8 +1,8 @@
-# reentrant_notify.py
+# reentrant_announce.py
+from broadcaster import Broadcaster
 from exceptions import expected
-from observers import Observable
 
-class TwoWay(Observable[int]):
+class TwoWay(Broadcaster[int]):
     def __init__(self) -> None:
         super().__init__()
         self._value = 0
@@ -14,7 +14,7 @@ class TwoWay(Observable[int]):
     @value.setter
     def value(self, new: int) -> None:
         self._value = new
-        self.notify(new)  # Re-enters if written back
+        self.announce(new)  # Re-enters if written back
 
 model = TwoWay()
 model.subscribe(

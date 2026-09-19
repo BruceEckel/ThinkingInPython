@@ -3,10 +3,10 @@ from typing import Protocol
 
 class Observer[T](Protocol):
     def update(
-        self, observable: Observable[T], arg: T
+        self, subject: Subject[T], arg: T
     ) -> None: ...
 
-class Observable[T]:
+class Subject[T]:
     def __init__(self) -> None:
         self._observers: list[Observer[T]] = []
 
@@ -22,11 +22,11 @@ class Observable[T]:
 
 class Display:
     def update(
-        self, observable: Observable[float], arg: float
+        self, subject: Subject[float], arg: float
     ) -> None:
         print(f"display: {arg}C")
 
-class Thermometer(Observable[float]):
+class Thermometer(Subject[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius

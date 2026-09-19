@@ -1,9 +1,9 @@
-# test_async_resilient_notify.py
+# test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_4 import Observable
+from exercise_4 import Broadcaster
 
-def test_later_observer_still_runs_after_a_failure(
+def test_later_listener_still_runs_after_a_failure(
 ) -> None:
     received: list[int] = []
 
@@ -15,11 +15,11 @@ def test_later_observer_still_runs_after_a_failure(
         received.append(data)
 
     async def run() -> None:
-        obs = Observable[int]()
-        obs.subscribe(broken)
-        obs.subscribe(record)
+        source = Broadcaster[int]()
+        source.subscribe(broken)
+        source.subscribe(record)
         with pytest.raises(ExceptionGroup):
-            await obs.notify(1)
+            await source.announce(1)
 
     asyncio.run(run())
     assert received == [1]

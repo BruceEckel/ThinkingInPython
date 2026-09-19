@@ -1,6 +1,6 @@
 # box_observer.py
 from enum import StrEnum
-from observers import Observable
+from broadcaster import Broadcaster
 
 class Color(StrEnum):
     SKYBLUE = "skyblue"
@@ -27,7 +27,7 @@ def recolored(grid: Grid, clicked: Coord) -> Grid:
     return grid | {cell: grid[cell].next()
                    for cell in cross if cell in grid}
 
-class BoxModel(Observable[Grid]):
+class BoxModel(Broadcaster[Grid]):
     def __init__(self, size: int) -> None:
         super().__init__()
         self.size = size
@@ -35,4 +35,4 @@ class BoxModel(Observable[Grid]):
 
     def click(self, cell: Coord) -> None:
         self.grid = recolored(self.grid, cell)
-        self.notify(self.grid)
+        self.announce(self.grid)

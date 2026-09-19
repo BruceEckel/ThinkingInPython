@@ -1,27 +1,27 @@
-# async_observers.py
+# async_broadcaster.py
 import asyncio
 from collections.abc import Awaitable, Callable
 
-type AsyncObserver[T] = Callable[[T], Awaitable[None]]
+type AsyncListener[T] = Callable[[T], Awaitable[None]]
 
-class Observable[T]:
+class Broadcaster[T]:
     def __init__(self) -> None:
-        self._observers: list[AsyncObserver[T]] = []
+        self._listeners: list[AsyncListener[T]] = []
 
-    def subscribe(self, observer: AsyncObserver[T]) -> None:
-        self._observers.append(observer)
+    def subscribe(self, listener: AsyncListener[T]) -> None:
+        self._listeners.append(listener)
 
     def unsubscribe(
-        self, observer: AsyncObserver[T]
+        self, listener: AsyncListener[T]
     ) -> None:
-        self._observers.remove(observer)
+        self._listeners.remove(listener)
 
-    async def notify(self, data: T) -> None:
-        # Fan out to every observer, then wait for all
+    async def announce(self, data: T) -> None:
+        # Fan out to every listener, then wait for all
         await asyncio.gather(
-            *(obs(data) for obs in self._observers))
+            *(fn(data) for fn in self._listeners))
 
-class Thermometer(Observable[float]):
+class Thermometer(Broadcaster[float]):
     def __init__(self, celsius: float) -> None:
         super().__init__()
         self._celsius = celsius
@@ -33,7 +33,7 @@ class Thermometer(Observable[float]):
     async def set_celsius(self, value: float) -> None:
         # A property setter cannot be awaited
         self._celsius = value
-        await self.notify(value)
+        await self.announce(value)
 
 async def alarm(celsius: float) -> None:
     if celsius > 100:

@@ -1,46 +1,46 @@
-# test_observers.py
+# test_broadcaster.py
 import pytest
-from observers import Observable, Thermometer
+from broadcaster import Broadcaster, Thermometer
 
-def test_notify_calls_every_subscriber() -> None:
+def test_announce_calls_every_subscriber() -> None:
     received: list[tuple[str, object]] = []
-    obs = Observable[int]()
-    obs.subscribe(lambda d: received.append(("a", d)))
-    obs.subscribe(lambda d: received.append(("b", d)))
-    obs.notify(42)
+    source = Broadcaster[int]()
+    source.subscribe(lambda d: received.append(("a", d)))
+    source.subscribe(lambda d: received.append(("b", d)))
+    source.announce(42)
     assert received == [("a", 42), ("b", 42)]
 
 def test_no_subscribers_is_a_noop() -> None:
     # Must not raise anything
-    Observable[str]().notify("anything")
+    Broadcaster[str]().announce("anything")
 
 def test_unsubscribe_stops_delivery() -> None:
     received: list[object] = []
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     # A bound method: equal, not identical
     record = received.append
-    obs.subscribe(record)
-    obs.notify(1)
-    obs.unsubscribe(record)
-    obs.notify(2)
+    source.subscribe(record)
+    source.announce(1)
+    source.unsubscribe(record)
+    source.announce(2)
     assert received == [1]
 
 def test_subscribing_twice_notifies_twice() -> None:
     received: list[object] = []
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     record = received.append
-    obs.subscribe(record)
-    obs.subscribe(record)
-    obs.notify(1)
+    source.subscribe(record)
+    source.subscribe(record)
+    source.announce(1)
     assert received == [1, 1]
-    obs.unsubscribe(record)  # Removes one of the two
-    obs.notify(2)
+    source.unsubscribe(record)  # Removes one of the two
+    source.announce(2)
     assert received == [1, 1, 2]
 
 def test_unsubscribe_without_subscribe_raises() -> None:
-    obs = Observable[object]()
+    source = Broadcaster[object]()
     with pytest.raises(ValueError):
-        obs.unsubscribe(print)
+        source.unsubscribe(print)
 
 def test_thermometer_pushes_new_value_on_set() -> None:
     readings: list[float] = []
