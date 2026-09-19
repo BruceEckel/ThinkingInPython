@@ -325,7 +325,8 @@ def test_late_subscriber_misses_earlier_changes() -> None:
 The tests subscribe a list's `append` to the broadcaster,
 so the list records what arrived.
 `unsubscribe()` matches by equality, and a lambda equals only itself,
-so a detachable listener needs a named reference, not an inline lambda.
+so a listener you mean to remove later needs a named reference,
+not an inline lambda.
 A bound method needs no stashed reference.
 Each `obj.update` builds a new bound-method object,
 so `obj.update is obj.update` is `False`.
@@ -337,7 +338,7 @@ so each notification calls it twice and each `unsubscribe()` removes one entry.
 `list.remove()` raises a `ValueError` when it matches nothing,
 which is what `unsubscribe()` does with a callable that never subscribed.
 
-### Detaching During a Notification
+### Unsubscribing During a Notification
 
 The copy in `announce()` shows its value when a listener unsubscribes mid-notification:
 
@@ -350,7 +351,7 @@ seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
-    # Detaches itself mid-notification
+    # Unsubscribes mid-notification
     source.unsubscribe(once)
 
 source.subscribe(once)
@@ -361,10 +362,13 @@ print(seen)
 #: ['once: 1', 'always: 1', 'always: 2']
 ```
 
-`once` receives the first change and detaches.
+`once` receives the first change and unsubscribes.
+That call removes it from the broadcaster's list,
+not from the copy the loop is reading,
+so `once` finishes this notification and receives none after it.
 `always` receives both.
-Without the copy, `once`'s self-removal would skip `always`,
-and `always: 1` would be missing.
+Without the copy, removing `once` would shift `always` down into an index the loop has already passed,
+so `always: 1` would be missing.
 
 ### Failures and Lapsed Listeners
 
@@ -634,11 +638,11 @@ Only the side effects interleave.
 A listener need not act on every notification.
 Below its threshold, the alarm returns at once.
 
-### Detaching During an Async Notification
+### Unsubscribing During an Async Notification
 
 `announce()` needs no `list()` copy here.
 The `*` unpacks the generator into a tuple of coroutines before `gather()` runs,
-so a detach during the fan-out cannot skip a listener.
+so an unsubscribe during the fan-out cannot skip a listener.
 The tuple also means a listener that unsubscribes mid-notification still receives this change,
 an async counterpart to `self_removing_listener.py`:
 

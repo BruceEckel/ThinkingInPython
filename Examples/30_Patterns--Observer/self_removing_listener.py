@@ -6,7 +6,7 @@ seen: list[str] = []
 
 def once(data: object) -> None:
     seen.append(f"once: {data}")
-    # Detaches itself mid-notification
+    # Unsubscribes mid-notification
     source.unsubscribe(once)
 
 source.subscribe(once)
