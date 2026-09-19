@@ -562,10 +562,11 @@ print(changes)
 ```
 
 The constructor writes `_watchers` through `self.__dict__` to bypass `__setattr__()`,
-which would read the list before the assignment that creates it.
-The two assignments after that line are ordinary ones,
-so each notifies a list that is still empty:
-the constructor returns before a caller can register a watcher.
+which would read `_watchers` before the assignment that creates it.
+The two assignments after that line are ordinary
+(they go through `__setattr__()`).
+Each notifies a list that is still empty;
+because the constructor hasn't returned, no caller can register a watcher.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` would call `__setattr__()` again.
 
@@ -577,7 +578,8 @@ and the constructor gives each `Watched` its own list.
 The same line with `= []` would create a class attribute,
 a single list shared by every `Watched`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
-works through which of these forms creates an attribute and which only declares one.
+covers the difference between declaring an attribute and creating one,
+for instance attributes and class variables both.
 
 `ty` takes an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
