@@ -596,8 +596,9 @@ it takes the attribute name along with the value,
 and filters by name to act on one attribute.
 `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
 so its listeners take the `float` reading and need no name.
-Every assignment notifies, including internal bookkeeping,
-so a class that stores a cache or a counter broadcasts those writes too.
+Every assignment reaches the watchers, including the internal ones:
+a cached result or a hit counter broadcasts like a published attribute,
+unless the class writes it through `self.__dict__` as the constructor does.
 `__setattr__()` accepts any name as well,
 so `ty` reports nothing for `w.celcius = 25.0`,
 which quietly creates a new attribute.
