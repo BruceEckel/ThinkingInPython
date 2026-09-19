@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 320"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 275"
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>One state change in the observable becomes one update() call on every observer in its list</title>
   <defs>
@@ -48,7 +48,4 @@
         stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
   <text x="530" y="238" font-size="14" fill="#7a6e62"
         text-anchor="middle">Table</text>
-
-  <text x="350" y="295" font-size="11.5" fill="#7a6e62"
-        text-anchor="middle">Thermometer names no observer type</text>
 </svg>

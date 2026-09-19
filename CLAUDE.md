@@ -254,6 +254,45 @@ three in the book ("State the rule...") are the verb. The check has
 been in `GATE_CHECKS` since 2026-09-16, so `verify`, `gate`, and
 `verify-ch` fail on a plain name.
 
+## Diagrams: the figure labels, the caption names, the prose explains
+
+A figure is a hand-authored SVG in `resources/images/`, referenced from
+the prose as `![caption](_images/<name>)` with no extension.
+`build_site.py` and `build_epub.py` resolve it (the EPUB rasterizes the
+SVG to PNG, so a rasterizer must be on PATH: `resvg`, `rsvg-convert`,
+`magick`, or `inkscape`). There is no Mermaid, Graphviz, or PlantUML
+anywhere in the repo, and a diagram written as a fenced block renders
+as nothing.
+
+Three rules about what text goes where, from Bruce's 2026-09-18 ruling
+on chapter 30's `observer_broadcast.svg`:
+
+- **No caption inside the SVG.** A drawing carries labels on its
+  parts, nothing else. A sentence summarizing the figure, set in small
+  type along the bottom, is a caption in the wrong place: pandoc
+  already prints the Markdown alt text as a `<figcaption>` under the
+  image, so an embedded one shows up twice, in two type sizes.
+- **The Markdown caption is one short sentence** naming what the figure
+  shows. Chapter 30's is "One call to set_celsius() becomes one
+  update() call on every observer in the list."
+- **Everything else goes in the prose after the figure**, as ordinary
+  sentences with the usual code spans. The second clause cut from
+  chapter 30's caption became the paragraph under it: "`Thermometer`
+  holds the list and names no observer type, so a `Plot` and a `Table`
+  would attach the way `Display` does."
+
+The existing diagrams share a visual vocabulary worth matching, since
+nothing enforces it: a `viewBox` with no width or height,
+`font-family="'JetBrains Mono', Consolas, monospace"`, a `<title>` for
+screen readers, and the cover palette from `tools/make_cover.py`,
+`#1a1612` for ink and text, `#c8bfb0` for ordinary box strokes,
+`#7a6e62` for muted text, `#8b1a1a` to mark the one class the figure
+is about. A dashed stroke marks a box that the listing does not
+contain (`surrogate.svg`'s "Etc.", `observer_broadcast.svg`'s `Plot`
+and `Table`). Before committing a new one, rasterize it the way the
+EPUB does and look at the PNG; text that fits in a browser can collide
+once rasterized.
+
 ## `@record`: the book's frozen data class, from chapter 18 on
 
 `utils/record.py` (chapter 18, `#record`) is
