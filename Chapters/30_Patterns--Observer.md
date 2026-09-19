@@ -569,16 +569,21 @@ the constructor returns before a caller can register a watcher.
 `super().__setattr__()` does the storing,
 because an ordinary assignment inside `__setattr__()` would call `__setattr__()` again.
 
+In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
+Such a name is a *bare annotation*.
+It looks like a class variable and is not one,
+because nothing assigns it a value.
 The bare annotation `_watchers: list[Watcher]` is required because a write through `self.__dict__` declares nothing.
 Without the annotation,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
-In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
-It looks like a class variable and is not one:
-`_watchers` puts nothing on the class,
+`_watchers` creates no attribute anywhere,
 and the constructor gives each `Watched` its own list.
 The same line with `= []` would create a class attribute,
 a single list shared by every `Watched`,
 which is what `ClassVar` marks when the sharing is deliberate.
+The initialization value does the creating, not `ClassVar`:
+a `ClassVar` with no value declares an attribute that does not exist yet,
+and reading it raises an `AttributeError` until an assignment creates it.
 In contrast, `celsius` and `humidity` need no declaration because `ty` reads their type from the constructor's assignments.
 
 One hook covering every attribute is the trade.
