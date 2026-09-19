@@ -313,7 +313,7 @@ def show(obj: object) -> None:
 so each report lists only the dunders a class customizes,
 not the standard machinery every object inherits from `object`.
 For clarity, `show()` also excludes `__hash__` from these reports
-([Data Classes](#data-classes) show `@dataclass` disabling `__hash__` for `Messenger`).
+([Data Classes](#data-classes) shows `@dataclass` disabling `__hash__` for `Messenger`).
 
 ### `A`: Annotations Only
 
