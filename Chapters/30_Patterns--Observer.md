@@ -572,9 +572,13 @@ because an ordinary assignment inside `__setattr__()` would call `__setattr__()`
 The bare annotation `_watchers: list[Watcher]` is required because a write through `self.__dict__` declares nothing.
 Without the annotation,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
-It [declares an instance attribute](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create)
-and is not a `ClassVar`: it binds no value, so it creates no class attribute.
-The constructor gives each `Watched` its own list.
+In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
+It looks like a class variable and is not one:
+`_watchers` puts nothing on the class,
+and the constructor gives each `Watched` its own list.
+The same line with `= []` would create a class attribute,
+a single list shared by every `Watched`,
+which is what `ClassVar` marks when the sharing is deliberate.
 In contrast, `celsius` and `humidity` need no declaration because `ty` reads their type from the constructor's assignments.
 
 One hook covering every attribute is the trade.
