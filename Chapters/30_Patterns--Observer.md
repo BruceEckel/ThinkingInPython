@@ -572,9 +572,9 @@ because an ordinary assignment inside `__setattr__()` would call `__setattr__()`
 
 In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
 Such a name is a *bare annotation*.
-It looks like a class variable but is not, because nothing assigns it a value.
+It looks like a class variable but is not, because it is not assigned a value.
 `_watchers` creates no attribute anywhere,
-and the constructor gives each `Watched` its own list.
+and the constructor gives each `Watched` its own `_watchers` list.
 The same line with `= []` would create a class attribute,
 a single list shared by every `Watched`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
@@ -589,7 +589,8 @@ and `ty` does not read it as one.
 The bare annotation supplies what that assignment would have: without it,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
 
-One hook covering every attribute is the trade.
+One method for every attribute is less precise than a property per attribute,
+in three ways.
 A watcher is a listener with a wider signature:
 it takes the attribute name along with the value,
 and filters by name to act on one attribute,
