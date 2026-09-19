@@ -123,8 +123,8 @@ With inheritance in C++ or Java,
 you often inherit only to establish a common interface.
 Python is different.
 You inherit an implementation, to reuse the code from the base class.
-Python can still name an interface without inheritance: a `Protocol`
-([Static Types](08_Foundations--Static_Types.md))
+Python can still name an interface without inheritance:
+a [`Protocol`](08_Foundations--Static_Types.md)
 describes the shape a function needs, with no base class to inherit.
 
 First import the base class the same way you import any name from a module
