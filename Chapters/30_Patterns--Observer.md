@@ -106,8 +106,8 @@ and a newcomer attaching mid-notification receives its first one at the next cha
 
 ## The Pythonic Observer: a List of Callables
 
-In Python an observer is any callable,
-and an observable is a list of callables plus a way to notify them.
+In Python an observer is any callable that takes the notification and returns `None`,
+and an observable is a list of those callables plus a way to notify them.
 A `@property` setter runs at every assignment to its attribute,
 so the setter is the place to send the notification when state changes:
 
