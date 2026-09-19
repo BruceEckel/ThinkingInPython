@@ -142,10 +142,10 @@ The pattern keeps its name.
 and those libraries use the older nouns,
 so the table is also your map into that literature.
 
-## The Pythonic Observer: a List of Callables
+## The Pythonic Observer: Callables in a List
 
 In Python a listener is any callable that takes the notification and returns `None`,
-and a broadcaster is a list of those callables plus a way to announce a change to them.
+and a broadcaster holds a list of those callables and announces each change to them.
 A `@property` setter runs at every assignment to its attribute,
 so the setter is the place to send the notification when state changes:
 
