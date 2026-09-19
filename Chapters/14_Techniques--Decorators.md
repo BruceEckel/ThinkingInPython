@@ -1131,9 +1131,8 @@ is a class decorator like `register`,
 except it mutates the class instead of leaving it unchanged,
 adding a generated `__init__()`, `__repr__()`,
 and `__eq__()` to the same object it received.
-`@functools.cache` and `@functools.lru_cache`
-(see [Performance](18_Techniques--Performance.md#caching))
-wrap a function in the same closure-plus-`func` shape as `add_behavior`,
+[`@functools.cache`](18_Techniques--Performance.md#caching)
+and `@functools.lru_cache` wrap a function in the same closure-plus-`func` shape as `add_behavior`,
 storing results in a memo dictionary instead of printing around the call.
 Understanding any of these needs no new syntax.
 They are ordinary decorators.
