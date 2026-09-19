@@ -210,7 +210,7 @@ then gain a duplicate `Circle` and `Square` on every call after that.
 
 ### Alternative Constructors Are Factories
 
-`Month.of()` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
+[`Month.of()`](12_Techniques--Data_Classes_as_Types.md#enums-are-types-too)
 is an alternative constructor,
 a method on the type that builds an instance from data the constructor rejects.
 There, `Month(7)` raises a `ValueError` because no member has the value `7`,
@@ -227,7 +227,7 @@ A factory over a closed set of products collapses to a lookup,
 the form the next section builds by hand,
 and then lets the classes fill for an open set.
 
-`from_fahrenheit()` in [Classes](07_Foundations--Classes.md#static-and-class-methods)
+[`from_fahrenheit()`](07_Foundations--Classes.md#static-and-class-methods)
 is the usual form of alternative constructor:
 a `@classmethod` that computes the constructor's arguments and ends with `return cls(...)`.
 That form is the most common factory in Python code,
@@ -241,8 +241,8 @@ A factory turns data, such as a name,
 into an object without scattering constructors through your code.
 In Python a class is a first-class object.
 You can store it in a variable and call it to construct an instance.
-You saw this in `defaultdict(list)` in [Containers](03_Foundations--Containers.md#defaultdict)
-and `field(default_factory=list)` in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
+You saw this in [`defaultdict(list)`](03_Foundations--Containers.md#defaultdict)
+and [`field(default_factory=list)`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 Both take a class where a function would do,
 and call it whenever they need a fresh value.
 
@@ -494,7 +494,7 @@ make("Circle").draw()
 #     pass
 ```
 
-`register()` is the decorator from [Decorators](14_Techniques--Decorators.md#decorating-classes)
+`register()` is the [class decorator](14_Techniques--Decorators.md#decorating-classes)
 with one change: its type parameter is bounded to `Shape`.
 The bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
@@ -891,7 +891,7 @@ the checker reports `protocol member make_obstacle is not defined on type Broken
 With the Protocol, the checker reports the omission before the program runs.
 That is earlier than the construction-time `TypeError` from the abstract base classes in `abstract_factory_abc.py`,
 the same failure [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows.
-Checking against a Protocol is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
+Checking against a Protocol is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 Structural typing preserves the purpose of the interfaces,
 without the coupling a shared base class imposes.
 

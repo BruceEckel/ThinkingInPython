@@ -279,7 +279,7 @@ print(type(greet("Alice")))
 ```
 
 `greet("Alice")` builds a description of a greeting.
-This is the description/execution split from [Effect Management](44_Effects--Effect_Management.md#library-effect-management).
+This is the [description/execution split](44_Effects--Effect_Management.md#library-effect-management).
 A language with builtin Effects intercepts an Effect where it runs.
 Stateless is ordinary Python, so when a function body calls `console.print()`,
 the call goes straight to `console` and the library never sees it.
@@ -1434,7 +1434,7 @@ The `Generator`'s first parameter carries `A | E`
 ([The Effect Definition](#the-effect-definition)).
 `Try` fills `A` with `Never`, so `Never | KeyError` reduces to `KeyError`.
 
-`Try` carries the same idea as the `Result` type in [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results),
+`Try` carries the same idea as the [`Result` type](42_Functional--Error_Handling.md#turning-exceptions-into-results),
 built differently.
 A `Result` is a wrapper the function returns at once,
 and the caller matches on it.

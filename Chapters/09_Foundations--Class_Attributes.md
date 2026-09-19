@@ -89,7 +89,7 @@ but both live in the same class dictionary.
 That is why assigning `a.show = something` would shadow the method for `a` alone.
 
 One kind of class attribute follows a different rule.
-A `@property` from [Classes](07_Foundations--Classes.md#properties)
+A [`@property`](07_Foundations--Classes.md#properties)
 owns its name on the class,
 so reading calls its getter and assigning calls its setter,
 and neither one touches the instance dictionary.
@@ -156,8 +156,7 @@ A type checker accepts the line too:
 `a.items.append("apple")` is a correct call on a `list[str]`.
 [Real Per-Object Defaults](#real-per-object-defaults),
 at the end of this chapter, gives each object its own value instead.
-A mutable default belongs in a `@dataclass` field with a `default_factory`,
-covered in [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
+A mutable default belongs in a `@dataclass` field with a [`default_factory`](12_Techniques--Data_Classes_as_Types.md#defaults-built-not-shared).
 
 ## Declaring Shared State with ClassVar
 

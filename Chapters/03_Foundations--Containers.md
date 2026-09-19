@@ -797,7 +797,7 @@ Neither you nor the code that receives it can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
 An immutable container is safe as a default argument,
-unlike the mutable default in [Functions](05_Foundations--Functions.md#default-arguments).
+unlike the [mutable default](05_Foundations--Functions.md#default-arguments).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that `dict` still show through.

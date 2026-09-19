@@ -273,7 +273,7 @@ for matrix multiplication.
 The built-in numeric types do not implement it,
 but array libraries such as NumPy do.
 The same character in front of a `def` or a `class` means something else:
-that is decorator syntax, covered in [Decorators](14_Techniques--Decorators.md).
+that is [decorator syntax](14_Techniques--Decorators.md).
 
 ## Booleans, None, and Truthiness
 
@@ -338,8 +338,7 @@ and it replaces every falsy `x`:
 a legitimate `0` or `""` gets the fallback just as a missing value does.
 When zero or an empty string is a legal value, test for `None` instead:
 `default if x is None else x`.
-That is a conditional expression,
-covered in [Control Flow](04_Foundations--Control_Flow.md).
+That is a [conditional expression](04_Foundations--Control_Flow.md).
 
 ## Strings
 

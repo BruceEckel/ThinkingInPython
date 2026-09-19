@@ -93,7 +93,7 @@ def __iter__(self: Self) -> Generator[Self, T, T]:
 
 It yields once, so the handler receives one request.
 The `yield from` then evaluates to that generator's return value,
-the rule from [The Return Channel](45_Effects--Generators.md#the-return-channel),
+the [return-channel rule](45_Effects--Generators.md#the-return-channel),
 and here that value is whatever the handler sent back.
 The Ability produces nothing on its own.
 `prompt` is payload on the request, there for the handler to read,
@@ -1081,7 +1081,7 @@ The library provides a second door on each side.
 Where `success(value)` builds a description that produces a value,
 `throw(reason)` builds one that fails.
 Its type is `Try[E, Never]`,
-the alias from [The Effect Type](46_Effects--Stateless.md#the-effect-type),
+the [`Try` alias](46_Effects--Stateless.md#the-effect-type),
 with `Never` recording that no value can come out of it.
 `yield from` sends that failure into the channel of the Effect that contains it:
 

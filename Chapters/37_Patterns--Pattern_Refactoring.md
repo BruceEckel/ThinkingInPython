@@ -32,7 +32,7 @@ In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically,
 and a `create()` method builds an instance from a material name,
-the dictionary factory from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
+the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
 
 ![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
 
@@ -424,7 +424,7 @@ unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
 and a design that makes new types cheap ordinarily makes new operations expensive:
-that trade is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
+that trade is the [expression problem](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 
 Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.

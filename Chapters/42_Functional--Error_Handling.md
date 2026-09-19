@@ -602,7 +602,7 @@ no narrower than a bare `except Exception`.
 Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
 when the narrower type matters more than the convenience.
 The `**P` parameter carries the wrapped function's whole parameter list through,
-the technique from [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
+the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
 so `parse("42")` type-checks and `parse(42)` does not:
 `@safe` changes only the return type, never what the function accepts.
 

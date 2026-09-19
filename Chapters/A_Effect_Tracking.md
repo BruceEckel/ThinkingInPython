@@ -412,7 +412,7 @@ and the tool supplies neither.
 Metadata is data, and its reader decides what it means.
 A static reader can treat it as a row.
 A runtime reader can treat it as a binding.
-FastAPI's `Depends` from [Dependency Injection](46_Effects--Stateless.md#dependency-injection)
+FastAPI's [`Depends`](46_Effects--Stateless.md#dependency-injection)
 goes in `Annotated` metadata in the form FastAPI recommends,
 and the framework supplies the dependency when a request arrives.
 Nothing connects the two readers.

@@ -27,8 +27,7 @@ or a function or class defined in the same file.
 The largest remaining group is a method called on a local variable with no annotation,
 and [From a Call to a Name](#from-a-call-to-a-name) recovers part of that group.
 
-The checker follows Koka's policy,
-from [Effect Tracking](A_Effect_Tracking.md#why-a-native-system-tracks-best).
+The checker follows [Koka's policy](A_Effect_Tracking.md#why-a-native-system-tracks-best).
 A function with no written row gets an inferred one.
 The checker compares a written row with the function's body,
 and the function's callers trust the declaration.
@@ -595,7 +594,7 @@ It is never checked, because it is the program's edge,
 and its inferred row says what running the file performs.
 
 `read_module()` is the one operation here that can fail.
-It returns a `Result` from [Error Handling](42_Functional--Error_Handling.md#a-result-type),
+It returns a [`Result`](42_Functional--Error_Handling.md#a-result-type),
 so a parse failure becomes a value the caller must look at.
 
 ```python
@@ -722,7 +721,7 @@ def infer(known: dict[str, Facts], table: Table) -> Rows:
 A declared row passes through unchanged, which is how callers come to trust it.
 An undeclared row becomes the union of what its calls perform.
 `infer()` is the loop.
-The walrus operator from [Control Flow](04_Foundations--Control_Flow.md)
+The [walrus operator](04_Foundations--Control_Flow.md)
 lets the `while` condition compute the next rows and compare them in one expression.
 Each step can add members to a row and cannot remove one,
 and the vocabulary is finite, so the loop ends.

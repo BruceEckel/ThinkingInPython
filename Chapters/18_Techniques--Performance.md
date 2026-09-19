@@ -870,7 +870,7 @@ The heap fits a different shape of problem:
 pushes and pops interleaved over time, with nothing to presort in advance.
 Re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
 
-The immutable containers from [Containers](03_Foundations--Containers.md#immutability)
+The [immutable containers](03_Foundations--Containers.md#immutability)
 are not a speed upgrade.
 A `frozenset` looks up just as fast as a `set`,
 a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.

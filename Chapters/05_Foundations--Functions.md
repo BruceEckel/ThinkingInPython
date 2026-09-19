@@ -245,7 +245,7 @@ show(["a", "b"])
 #: (2 items)
 ```
 
-With the type hints from [Static Types](08_Foundations--Static_Types.md#type-hints),
+With the [type hints](08_Foundations--Static_Types.md#type-hints),
 such a parameter reads:
 
     items: Sequence[str] = ()

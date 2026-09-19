@@ -158,7 +158,7 @@ and that self-reference makes the tree a tree.
 `Directory` mentions `Node` above the `type` statement that defines it
 (see [Naming Types: The `type` Statement](08_Foundations--Static_Types.md#the-type-statement)).
 That works because Python evaluates annotations and `type` aliases lazily,
-the deferred evaluation described in [Self and forward references](08_Foundations--Static_Types.md#self-and-forward-references).
+the [deferred evaluation](08_Foundations--Static_Types.md#self-and-forward-references).
 The alias can therefore sit below the classes it unites,
 where it reads as a summary of them rather than as a forward declaration.
 The recursion in the type predicts the recursion everywhere else:
@@ -228,7 +228,7 @@ The classic version is still useful when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
 a method on a base class lets them do that without touching your code,
 but a central `match` needs editing.
-The guidance from [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
+The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-to-match)
 applies directly.
 Match over a closed set, use polymorphism for an open one.
 

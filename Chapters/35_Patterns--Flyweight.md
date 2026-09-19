@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
 Twenty-four cells, three objects.
 `[*row for row in field]` flattens the grid into one list of cells,
-the comprehension unpacking from [Comprehensions](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
+the [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 `Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells would collapse to three with or without sharing.
@@ -319,7 +319,7 @@ For tile kinds and colors that is fine, since the universe of values is small.
 When the universe grows without bound, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
-the live-instance registry from [Cleanup](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
+the [live-instance registry](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 fixes the leak.
 It holds its values weakly,
 so an entry disappears as soon as no one else uses the object:
@@ -494,7 +494,7 @@ The missing `Tile.ROCK` case is the gap;
 adding it back makes the diagnostic disappear with no other change.
 The cost is flexibility.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
-The table-driven state machine in [State Machines](31_Patterns--State_Machines.md#table-driven-state-machine)
+The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
 
 ## Which Pool Should You Use?

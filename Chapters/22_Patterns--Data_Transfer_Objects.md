@@ -126,7 +126,7 @@ print(p)
 ### `NamedTuple`
 
 A `NamedTuple` declares its fields the same way but produces an immutable record.
-`typing.NamedTuple` is the class form of the `namedtuple()` in [Containers](03_Foundations--Containers.md#namedtuple).
+`typing.NamedTuple` is the class form of [`namedtuple()`](03_Foundations--Containers.md#namedtuple).
 Both build a subclass of `tuple` whose positions also have names,
 but the class form declares a type for each field,
 so a type checker knows a `Color`'s `r` is an `int`.
@@ -166,7 +166,7 @@ An attribute bag accepts every write; a declared field rejects this one,
 at runtime and in the checker.
 Because no field can change, `_replace()` is the way to change one:
 it produces an updated copy.
-`copy.replace()` from [The General Form of `replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
+[`copy.replace()`](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 does the same job for any immutable record, including a frozen data class.
 Immutability also makes the record hashable,
 so a `Color` can key a `dict` or join a `set`.
@@ -323,7 +323,7 @@ and when inherited ordering and array-shaped JSON would be wrong rather than con
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
-a `TypedDict` from [Static Types](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
+a [`TypedDict`](08_Foundations--Static_Types.md#dictionary-and-record-shapes)
 names the keys and their types for the type checker while the value stays a real dict.
 When the data need only *become* a dict on the way out,
 `_asdict()` on a `NamedTuple` and `dataclasses.asdict()` on a data class each produce one.
@@ -334,7 +334,7 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
 
 1.  In `messenger_idiom.py`,
     create a second `Messenger` with different keyword arguments and confirm the two instances do not share attributes
-    (unlike a class attribute from [Class Attributes](09_Foundations--Class_Attributes.md)).
+    (unlike a [class attribute](09_Foundations--Class_Attributes.md)).
 2.  In `point_dataclass.py`, add a third field, `z: float`,
     to the `Point` dataclass,
     and update the `Point(...)` call to pass three arguments.

@@ -133,7 +133,7 @@ With `add_behavior` on a `def add(a, b)`,
 the call `add(2, 3)` raises a `TypeError`:
 the wrapper takes zero positional arguments, and the call passes two.
 A wrapper that must handle any function collects the call with `*args, **kwargs` and forwards it unchanged,
-the pattern from [Unpacking Arguments](05_Foundations--Functions.md#unpacking-arguments).
+the [argument-unpacking pattern](05_Foundations--Functions.md#unpacking-arguments).
 This decorator traces calls, and its `wrapper()` takes that shape:
 
 ```python

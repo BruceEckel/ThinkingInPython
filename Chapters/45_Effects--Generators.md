@@ -685,7 +685,7 @@ task_runner()
 
 `@task` calls each generator function once at definition time,
 queues the generator it builds, and hands the function back unchanged,
-the registering-decorator shape from [Decorators](14_Techniques--Decorators.md#decorating-classes).
+the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
 One that finishes raises `StopIteration` and never rejoins the queue.

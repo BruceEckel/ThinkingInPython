@@ -910,7 +910,7 @@ so `cell in grid` is `True` only for a coordinate inside the grid.
 The comprehension's `if` clause applies that test and skips the outside coordinates,
 so `recolored()` needs no grid size.
 The comprehension maps each cell that passes the test to its color's `next()`.
-The dictionary merge from [Containers](03_Foundations--Containers.md#dictionaries)
+The [dictionary merge](03_Foundations--Containers.md#dictionaries)
 builds the new grid: `|` produces a new dictionary,
 and when both operands hold the same key, the right operand's value wins.
 The result is a copy of `grid` that differs in the cells of the cross,

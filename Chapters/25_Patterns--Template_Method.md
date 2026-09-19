@@ -69,7 +69,7 @@ Only the type checker enforces `@final`.
 At runtime the decorator only sets `__final__ = True` on the function,
 and nothing in the interpreter reads that attribute.
 If you want the interpreter to refuse an override,
-the `__init_subclass__()` technique from [Making a Class Final](17_Techniques--Metaprogramming.md#making-a-class-final)
+the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
 also works with methods, and raises an exception when `"run" in cls.__dict__`.
 
 The step methods default to `...`,

@@ -1024,7 +1024,7 @@ and `assert_never()` turns each one into a type checker error naming the shape y
 
 The OOP approach assumes you add types more often than operations,
 and that assumption often fails.
-This trade-off is the expression problem from [Pattern Matching](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
+This trade-off is the [expression problem](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explore it further.

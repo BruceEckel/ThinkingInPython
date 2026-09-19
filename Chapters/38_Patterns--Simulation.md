@@ -52,7 +52,7 @@ When the last rat dies, the pack has mapped every cell reachable from the entry.
 The rat never imports the blackboard.
 It needs only an object with matching methods,
 so a `Protocol` describes what it expects.
-That `Protocol` is structural typing from [Static Types](08_Foundations--Static_Types.md#structural-typing-with-protocols).
+That `Protocol` is [structural typing](08_Foundations--Static_Types.md#structural-typing-with-protocols).
 The rat works with anything that can claim a cell, spawn a rat,
 record a message, and hand out a number.
 
@@ -169,13 +169,13 @@ The blackboard holds everything the rats share.
 `claim()` is the heart of the program.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-It sidesteps the read-modify-write race from [Concurrency](19_Techniques--Concurrency.md#a-single-thread-still-races).
+It sidesteps the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races).
 That race needs a suspension point inside the update,
 and `claim()` contains none,
 so the atomicity comes from the shape of the code rather than from a lock
 (exercise 3 inserts a suspension point and looks at what breaks).
 `next_number()` hands out rat numbers from `itertools.count()`,
-the endless counter from [Iterators](23_Patterns--Iterators.md#reusable-algorithms).
+the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
 `explore()` claims the entry and releases the first rat inside an `asyncio.TaskGroup`:
 
 ```python
@@ -673,7 +673,7 @@ so code that reads `room` skips the `None` check.
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so adding a new kind of item needs no change here.
 If you define the subclass with its symbol, the factory finds it.
-This is the registry idea from [Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
+This is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses
 (that chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and its exercise 9 writes it),

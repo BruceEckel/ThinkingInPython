@@ -5,7 +5,7 @@ introduced in [Control Flow](04_Foundations--Control_Flow.md#context-managers),
 marks out a span of execution:
 it runs setup before a block and cleanup after it,
 even if the block raises an exception.
-That guarantee is far more reliable than the `__del__()` approach in [Cleanup](10_Foundations--Cleanup.md).
+That guarantee is far more reliable than the [`__del__()` approach](10_Foundations--Cleanup.md).
 This chapter shows how to write your own context managers, and how `with` works.
 
 The payoff is a borrower's contract two lines long:
@@ -525,7 +525,7 @@ Where a demonstration needs several statements or an assignment in the guarded b
 
 A context manager brackets a block of statements,
 with setup before and cleanup after.
-A typical decorator from [Decorators](14_Techniques--Decorators.md)
+A typical [decorator](14_Techniques--Decorators.md)
 brackets a function call the same way.
 `contextlib.ContextDecorator` connects the two.
 A subclass works both as a context manager and as a decorator.
