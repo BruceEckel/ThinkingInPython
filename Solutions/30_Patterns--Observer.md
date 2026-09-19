@@ -377,10 +377,116 @@ The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
-## 6. Which colors a grid can reach
+## 6. Two views on one model
 
 ```python
 # exercise_6.py
+from collections import Counter
+from collections.abc import Callable
+from enum import StrEnum
+
+class Color(StrEnum):
+    SKYBLUE = "skyblue"
+    PALEGREEN = "palegreen"
+    KHAKI = "khaki"
+
+    def next(self) -> Color:
+        colors = list(Color)
+        nxt = colors.index(self) + 1
+        return colors[nxt % len(colors)]
+
+type Coord = tuple[int, int]
+type Grid = dict[Coord, Color]
+type Listener[T] = Callable[[T], None]
+
+def new_grid(size: int) -> Grid:
+    colors = list(Color)
+    return {(x, y): colors[(x + y) % len(colors)]
+            for x in range(size) for y in range(size)}
+
+def recolored(grid: Grid, selected: Coord) -> Grid:
+    x, y = selected
+    cross = [(x, y), (x - 1, y), (x + 1, y),
+             (x, y - 1), (x, y + 1)]
+    return grid | {cell: grid[cell].next()
+                   for cell in cross if cell in grid}
+
+class Broadcaster[T]:
+    def __init__(self) -> None:
+        self._listeners: list[Listener[T]] = []
+
+    def subscribe(self, listener: Listener[T]) -> None:
+        self._listeners.append(listener)
+
+    def announce(self, data: T) -> None:
+        for listener in list(self._listeners):
+            listener(data)
+
+class BoxModel(Broadcaster[Grid]):
+    def __init__(self, size: int) -> None:
+        super().__init__()
+        self.size = size
+        self.grid = new_grid(size)
+
+    def select(self, cell: Coord) -> None:
+        self.grid = recolored(self.grid, cell)
+        self.announce(self.grid)
+
+model = BoxModel(3)
+
+def letters(grid: Grid) -> None:
+    for y in range(model.size):
+        print(" ".join(grid[(x, y)][0]
+                       for x in range(model.size)))
+
+def tally(grid: Grid) -> None:
+    counts = Counter(grid.values())
+    print(" ".join(f"{c[0]}:{counts[c]}" for c in Color))
+
+model.subscribe(letters)
+model.subscribe(tally)
+model.select((1, 1))
+#: s k k
+#: k s p
+#: k p p
+#: s:2 p:3 k:4
+model.select((0, 0))
+#: p s k
+#: s s p
+#: k p p
+#: s:3 p:4 k:2
+```
+
+The model is `box_observer.py`'s, copied here so the solution runs on
+its own: `Color`, `new_grid()`, and `recolored()` unchanged, and a
+`Broadcaster` trimmed to the two methods this example calls.
+`BoxModel` is the chapter's, and the exercise adds nothing to it.
+
+`letters()` and `tally()` are the two views. Each takes a `Grid` and
+returns `None`, the shape `subscribe()` requires, so each is a
+listener the same way `draw()` is. `letters()` prints the first
+character of each color, one row per line, and `tally()` counts the
+colors with a `Counter`.
+Neither one names the other, and neither names the model's rule.
+
+`model.select((1, 1))` calls `recolored()` once and `announce()` once,
+and `announce()` calls both views in subscription order. They read the
+same `Grid` object, so the letters and the counts describe one state
+of the model: the first selection advances the five cells of the
+cross, which moves two cells out of `skyblue` and two into `khaki`.
+The corner selection that follows has three cells inside the grid
+rather than five.
+
+Adding a third view means one more `subscribe()` call. `box_view.py`'s
+`draw()` is such a view, and `show(model)` attaches it to a model that
+already has these two, so the window and the terminal report the same
+grid. Running that combination means `show()` takes over with
+`root.mainloop()`, so start it last.
+
+## 7. Which colors a grid can reach
+
+```python
+# exercise_7.py
 from enum import StrEnum
 from typing import Final
 
@@ -483,10 +589,10 @@ cannot be made one color at all.
 `", ".join(reachable(size))` with no conversion, the same property
 that lets `box_view.py` hand a `Color` to `tkinter`.
 
-## 7. A descriptor per watched attribute
+## 8. A descriptor per watched attribute
 
 ```python
-# exercise_7.py
+# exercise_8.py
 from collections.abc import Callable
 from typing import overload
 

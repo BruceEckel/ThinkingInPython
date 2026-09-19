@@ -1091,7 +1091,13 @@ and the *Observer* is an event bus.
     make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
-6.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+6.  Attach a second view to `box_observer.py`'s `BoxModel`.
+    Write one view that prints a letter per cell and another that prints how many cells each color holds,
+    subscribe both to the same model,
+    and show that one `select()` updates the pair.
+    Keep both views textual so the example runs without a window,
+    and leave the model as `box_observer.py` has it.
+7.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
     Selecting a cell advances up to five cells by one, modulo three,
     and selections commute, so this is a linear system over the integers mod 3:
     the unknowns are how many times you select each cell.
@@ -1099,7 +1105,7 @@ and the *Observer* is an event bus.
     and print the reachable colors for every size from 3 through 8.
     The 8x8 grid reaches `palegreen` alone,
     and one smaller size reaches nothing.
-7.  Write a `Notifying` descriptor
+8.  Write a `Notifying` descriptor
     ([Metaprogramming](17_Techniques--Metaprogramming.md#a-descriptor-that-validates))
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:
