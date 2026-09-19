@@ -976,11 +976,10 @@ def test_model_notifies_with_the_new_grid() -> None:
 
 ### The View
 
-The view lives in its own file.
-It is the only code that draws to the screen.
+The view is the only code that draws to the screen.
 Run `box_view.py` to play.
-It opens a window, so the example harness skips it
-(`tools/data/norun.txt` lists it).
+Because it opens a window, the example harness skips it
+(see `tools/data/norun.txt`).
 
 ```python
 # box_view.py
@@ -996,8 +995,7 @@ def show(model: BoxModel, cell_px: int = 60) -> None:
     canvas.pack()
 
     def draw(grid: Grid) -> None:
-        # Or the old rectangles accumulate
-        canvas.delete("all")
+        canvas.delete("all")  # Clear old rectangles
         for (x, y), color in grid.items():
             canvas.create_rectangle(
                 x * cell_px, y * cell_px,
@@ -1025,12 +1023,12 @@ It paints one rectangle per cell,
 multiplying the cell's column and row by `cell_px` to get the rectangle's corners in pixels.
 It takes a `Grid` and returns `None`,
 the shape `subscribe()` requires of a listener.
-No notification has arrived when the window opens,
-so `show()` calls `draw(model.grid)` once to paint the starting grid.
+When the window opens,
+`show()` calls `draw(model.grid)` once to paint the starting grid.
 
 `draw()` clears the canvas before repainting.
-Without that line each notification adds another `size * size` rectangles on top of the last set.
-The window looks the same while the canvas's list of items grows without limit,
+Otherwise, each notification adds another `size * size` rectangles on top of the last set.
+The window looks the same but the canvas's list of items grows without limit,
 the same quiet accumulation as a lapsed listener.
 
 `canvas.bind()` registers the lambda as the handler for `"<Button-1>"`,
@@ -1045,8 +1043,8 @@ A click on the canvas becomes a `select()` on the model,
 and the resulting notification repaints the view.
 The handler calls the model and draws nothing.
 The mouse belongs to the view.
-The model's method is `select()`, so a keypress, a touch,
-or a test call reaches the same rule.
+`select()` takes a cell rather than a mouse event, so a keypress, a touch,
+or a test call drives the model the way a click does.
 
 The model and the view share only the subscribe-and-announce contract,
 so you can attach a second view to the same model and keep both views in step.
