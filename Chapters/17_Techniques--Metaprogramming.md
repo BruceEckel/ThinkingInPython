@@ -85,8 +85,8 @@ but simpler hooks cover almost every case a metaclass handled before those hooks
   It replaces most "do something at each class definition" metaclasses.
 - `__set_name__()` lets a class attribute learn its own name,
   at class-creation time.
-- *Class decorators* transform a class after Python builds it
-  ([Decorating Classes](14_Techniques--Decorators.md#decorating-classes)).
+- [*Class decorators*](14_Techniques--Decorators.md#decorating-classes)
+  transform a class after Python builds it.
 
 Use a metaclass only when these cannot do the job.
 This chapter starts by building classes by hand,
