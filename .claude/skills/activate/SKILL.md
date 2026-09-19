@@ -257,8 +257,19 @@ Defensible in isolation, wrong there:
 the sentence states a rule about two designs, not an incident,
 and once a sentence states the rule, every verb in it states the rule.
 Reserve the past for sentences that point at the listing.
-A retrospective closing section ("In every case the observer was a callable")
-narrates the chapter the reader just finished, and stays past.
+
+A closing section is where this goes wrong most often,
+because retrospection pulls every verb into the past.
+Chapter 30's closing section read
+"What Stayed Constant. One design served three jobs in this chapter...
+In every case the observer was a callable",
+and Bruce corrected all of it to the present on 2026-09-19:
+a closing section states what the pattern is, not what the chapter did.
+The heading goes with it, so "What Stayed Constant" is "What Stays Constant".
+The same test still decides each verb:
+a sentence pointing at one run keeps the past,
+a sentence stating standing behavior takes the present,
+whatever section it sits in.
 
 **One word in the present indicative.**
 The future and past rules are two cases of a wider one:
@@ -403,6 +414,10 @@ and it becomes part of every future pass.
 - "every operation callers need" becomes "every operation".
   A restrictive qualifier the reader supplies anyway
   costs two words and narrows nothing.
+- "What Stayed Constant" becomes "What Stays Constant", with its section.
+  A heading naming standing behavior takes the present,
+  and a retrospective heading pulls the section's verbs into the past behind it.
+  Check the section under every past-tense heading.
 - "the `class` statement raises instead of finishing" becomes
   "the `class` statement raises a `TypeError` instead of finishing".
   "Raises" always takes an object: name the exception,
