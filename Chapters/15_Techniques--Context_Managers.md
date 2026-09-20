@@ -569,9 +569,8 @@ Each call of the decorated function builds a fresh manager,
 so you can call `report()` any number of times,
 each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
-The machinery applies `functools.wraps`,
-so `report` keeps its name and docstring
-(see [Maintaining the Wrapped Interface](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)).
+The machinery applies [`functools.wraps`](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
+so `report` keeps its name and docstring.
 
 Here's the same `banner` as a class.
 This time it inherits from `ContextDecorator`:
