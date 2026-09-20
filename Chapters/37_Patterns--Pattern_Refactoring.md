@@ -96,13 +96,12 @@ so `cls.registry` always resolves to that one table.
 Call it as `Trash.create()`.
 
 `@dataclass` builds `__init__()` from the bare `weight: float` annotation alone:
-the two `ClassVar` attributes belong to the class, so they stay out of it
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)).
+the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
+belong to the class, so they stay out of it.
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
 The subclasses omit the annotation because the name and its type carry over from the base declaration;
-restating `ClassVar[float]` would also keep the type checker's guard on the override
-([Class Attributes](09_Foundations--Class_Attributes.md#classvar-and-inheritance)).
+restating `ClassVar[float]` would also keep [the type checker's guard on the override](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
 
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` builds it.
