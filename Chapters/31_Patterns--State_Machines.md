@@ -948,8 +948,8 @@ Choose a library once the machine outgrows what a page of code should carry.
 7.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
     A single `TemperatureReading` input must be able to lead to heating,
     cooling, or idle, decided entirely by conditions on one `(state, input)` key.
-8.  Write a `mouse_move_generator()`
-    ([Iterators](23_Patterns--Iterators.md#generators))
+8.  Write a `mouse_move_generator()`,
+    a [generator](23_Patterns--Iterators.md#generators)
     that yields valid `MouseAction` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
