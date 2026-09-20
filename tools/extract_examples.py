@@ -46,12 +46,14 @@ hold files that are not generated from the book.
 Check mode also looks the other way: a file under ``Examples/`` (besides
 ``__pycache__`` and ``.idea``) that no current block generates, left behind by
 a rename or deletion since the drift check above only flags missing/changed
-blocks, not extras. Each stray is further classified by grepping every chapter
-for its bare filename: *orphaned* (the name appears nowhere) fails the check
-the same as a missing or changed block; *referenced* (the name still appears
-in some chapter's prose, e.g. a hand-written helper mentioned but not
-extracted) is reported but does not fail the check, since deleting it needs a
-human to confirm it is truly unused. Pass ``--prune`` to delete the orphaned
+blocks, not extras. Each stray is further classified by grepping the chapter
+that generates its directory for its bare filename: *orphaned* (the name
+appears nowhere in that chapter) fails the check the same as a missing or
+changed block; *referenced* (the name still appears in that chapter's prose,
+e.g. a hand-written helper mentioned but not extracted) is reported but does
+not fail the check, since deleting it needs a human to confirm it is truly
+unused. A stray under a directory no chapter generates, such as ``utils/``,
+is grepped for across every chapter instead. Pass ``--prune`` to delete the orphaned
 files (never the referenced ones).
 
 Usage:
@@ -159,18 +161,37 @@ def classify_strays(
     named only by a chapter is still orphaned as far as the solutions are
     concerned, since no solution block can be producing it.
 
+    The search is per chapter. An extracted directory is named for
+    the stem of the Markdown that generates it, so a stray's first
+    path part says which file could mention it, and only that file
+    is searched. Searching the whole tree made every per-chapter
+    name unprunable: an `exercise_2.py` left behind by a renumbering
+    in one chapter reads as mentioned because thirty other Solutions
+    files carry a listing of that name. A stray under a directory
+    with no Markdown behind it (``utils/``, whose helpers any chapter
+    may name) falls back to the whole tree.
+
     The name must match whole, not as a substring. Renaming
     ``locked_settings.py`` to ``singleton_locked_settings.py`` leaves a
     stray whose name reads as "mentioned" inside the new one, and a
     substring test reports that leftover as referenced forever, so the
     most common source of strays would never be prunable.
     """
-    book_text = "\n".join(
-        md.read_text(encoding="utf-8") for md in md_files(search))
+    mds = md_files(search)
+    by_stem = {md.stem: md for md in mds}
+    whole_tree: str | None = None
     orphaned, referenced = [], []
     for rel in strays:
         name = re.escape(Path(rel).name)
-        mentioned = re.search(rf"\b{name}\b", book_text) is not None
+        md = by_stem.get(Path(rel).parts[0])
+        if md is not None:
+            text = md.read_text(encoding="utf-8")
+        else:
+            if whole_tree is None:
+                whole_tree = "\n".join(
+                    m.read_text(encoding="utf-8") for m in mds)
+            text = whole_tree
+        mentioned = re.search(rf"\b{name}\b", text) is not None
         (referenced if mentioned else orphaned).append(rel)
     return orphaned, referenced
 

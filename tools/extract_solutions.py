@@ -20,11 +20,14 @@ Check mode also reports strays, the same way ``extract_examples.py`` does:
 a file under ``SolutionsCode/`` that no current block generates, left behind
 by a rename or a renumbered exercise since the drift check only flags
 missing/changed blocks, not extras. Each stray is classified by grepping
-``Solutions/*.md`` for its bare filename: *orphaned* (the name appears
-nowhere) fails the check; *referenced* is reported for a human to judge.
-Grepping the solutions alone is deliberate. A leftover named only by a
-chapter is still orphaned here, because no solution block can be producing
-it, and the chapter's own copy lives under ``Examples/``. Pass ``--prune``
+the one ``Solutions/*.md`` file that generates its directory for its bare
+filename: *orphaned* (the name appears nowhere there) fails the check;
+*referenced* is reported for a human to judge. Grepping the solutions alone
+is deliberate. A leftover named only by a chapter is still orphaned here,
+because no solution block can be producing it, and the chapter's own copy
+lives under ``Examples/``. Grepping one file rather than all of them is
+deliberate too: every chapter has an ``exercise_2.py``, so a leftover from a
+renumbering would otherwise read as referenced forever. Pass ``--prune``
 to delete the orphaned files (never the referenced ones).
 
 Usage:
