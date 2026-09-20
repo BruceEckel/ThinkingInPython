@@ -144,9 +144,9 @@ Each call still reads and updates `account.balance`,
 the state the bound method carries with it.
 
 An object can be callable too.
-When a class defines `__call__()`
-([Decorators](14_Techniques--Decorators.md#a-class-decorator-with-state)),
-its instances carry state and still satisfy `Command`.
+When a class defines `__call__()`,
+its instances [carry state](14_Techniques--Decorators.md#a-class-decorator-with-state)
+and still satisfy `Command`.
 Here, `Repeat` is a [record](18_Techniques--Performance.md#record),
 so its configuration cannot change after construction:
 
