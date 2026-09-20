@@ -1,0 +1,67 @@
+# Prose references to numbered exercises, each paired with the
+# Solutions heading it points at, as last read by a human.
+# Tree/Chapter_Name<TAB>target Chapter_Name<TAB>number<TAB>title,
+# one per reference, sorted. Rewritten by
+# `make exercise-refs-accept`; read the delta with
+# `make exercise-refs` before accepting.
+# See tools/exercise_refs.py.
+Chapters/Changing_the_Interface	Changing_the_Interface	1	A dict-style lookup over a list of pairs
+Chapters/Composite_and_Interpreter	Composite_and_Interpreter	2	A `Symlink` node
+Chapters/Composite_and_Interpreter	Composite_and_Interpreter	6	Declining with `NotImplemented`
+Chapters/Confidence	Confidence	1	Which process ran each call
+Chapters/Effect_Management	Effect_Management	2	Threading a `Log` Effect through by hand
+Chapters/Error_Handling	Error_Handling	2	`Err.map_error()`
+Chapters/Error_Handling	Error_Handling	3	`combined()` that collects every failure
+Chapters/Factory	Factory	10	Finding the class that forgot `@register`
+Chapters/Factory	Factory	9	Recursing through `__subclasses__()`
+Chapters/Flyweight	Flyweight	2	`tracemalloc`, cached vs. uncached `tile()`
+Chapters/Function_Objects	Function_Objects	1	Undo, added to `command.py`
+Chapters/Memento	Memento	2	A bounded `History`
+Chapters/Memento	Memento	3	Serializing a `Drawing` to JSON
+Chapters/Memento	Memento	4	`Memento` holding the list itself
+Chapters/Multiple_Dispatching	Multiple_Dispatching	1	Adding `Lizard` to the table version
+Chapters/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
+Chapters/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Chapters/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Chapters/Multiple_Dispatching	Multiple_Dispatching	9	A table of callables
+Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
+Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
+Chapters/Observer	Observer	3	An `announce()` that survives a failing listener
+Chapters/Observer	Observer	7	Two views on one model
+Chapters/Observer	Observer	8	Which colors a grid can reach
+Chapters/Performance	Performance	6	A subclass that forgets `__slots__`
+Chapters/Simulation	Factory	9	Recursing through `__subclasses__()`
+Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
+Chapters/Simulation	Simulation	7	Changing the physics
+Chapters/Singleton	Singleton	1	`singleton_pattern.py` rewritten to eager initialization
+Chapters/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
+Chapters/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
+Chapters/Stateless	Effect_Management	2	Threading a `Log` Effect through by hand
+Chapters/Stateless_in_Practice	Stateless_in_Practice	5	A fourth failure
+Chapters/Static_Types	Static_Types	5	What a missing type parameter default costs
+Solutions/Class_Attributes	Class_Attributes	2	A third subclass with no override
+Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`
+Solutions/Composite_and_Interpreter	Composite_and_Interpreter	3	`Neg` and `Div`
+Solutions/Confidence	Confidence	1	Which process ran each call
+Solutions/Design_Patterns	Design_Patterns	2	Subtracting a pattern
+Solutions/Effect_Management	Effect_Management	2	Threading a `Log` Effect through by hand
+Solutions/Effect_Management	Effect_Management	4	`PositiveInt` in place of both checks
+Solutions/Functions	Functions	6	Unpacking both containers at a call site
+Solutions/Modules_and_Packages	Modules_and_Packages	4	Renaming `module.py` to `Module.py`
+Solutions/Multiple_Dispatching	Multiple_Dispatching	7	A business-modeling environment
+Solutions/Multiple_Dispatching	Multiple_Dispatching	8	Weapons, battles, and a full meeting
+Solutions/Observer	Observer	3	An `announce()` that survives a failing listener
+Solutions/Simulation	Simulation	4	A `Coin` item
+Solutions/Simulation	Simulation	5	Sending the robot somewhere other than the `!`
+Solutions/Simulation	Simulation	7	Changing the physics
+Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
+Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
+Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
+Solutions/State_Machines	State_Machines	6	An elevator, table-driven
+Solutions/Stateless_in_Practice	Generators	4	Removing the `yield from`
+Solutions/Stateless_in_Practice	Stateless_in_Practice	13	A dependency two levels down
+Solutions/Stateless_in_Practice	Stateless_in_Practice	2	A leak the type checker cannot see
+Solutions/Stateless_in_Practice	Stateless_in_Practice	2	A leak the type checker cannot see
+Solutions/Stateless_in_Practice	Stateless_in_Practice	3	A wind turbine between solar and the battery
+Solutions/Stateless_in_Practice	Stateless_in_Practice	4	A scripted outlet
+Solutions/Testing	Testing	4	The environment variable, patched and then injected

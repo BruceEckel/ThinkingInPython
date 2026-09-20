@@ -1042,6 +1042,42 @@ NEW hit is either a stale quote to fix or a fresh deliberate edit to
 accept with `make quoted-diagnostics-accept`. `--all` lists every hit
 regardless of the baseline.
 
+## exercise_refs.py
+
+The book names its exercises by number in prose: "Exercise 8 works
+out which sizes reach which colors", "the reason exercise 3 gives",
+"exercise 4 of [Generators](...)". `check_solutions.py` gates that a
+chapter's exercise list and its Solutions headings agree with each
+other, so after an exercise is inserted the two still agree, every
+gate is green, and each sentence naming a later exercise names the
+wrong one. Chapter 30 collected five such references when commit
+a2cc5a98 inserted an exercise at 2.
+
+Whether a sentence describes its exercise is a judgment, but the
+failure is mechanical: the title under a referenced number changed.
+`make exercise-refs` pairs every reference in `Chapters/` and
+`Solutions/` with the Solutions heading for its number, `## N.
+<title>`, in the chapter the reference targets, and compares the
+pairs with `tools/data/exercise_refs_baseline.txt`. NEW is a pair the
+baseline lacks (the exercise under that number changed, or the
+reference was written since the last accept) and fails the gate; GONE
+reports and does not. Reread each NEW sentence against the title
+printed beside it, then fix the number or run
+`make exercise-refs-accept`. `--all` lists every pair.
+
+It reads "exercise 3", "exercises 3 and 4", "the second exercise",
+and "the previous/next exercise" (resolved from the exercise item or
+the `## N.` section the sentence sits in). The target is the file's
+own chapter unless the reference is tied to a chapter link: "exercise
+4 of [Generators](...)", "[Generators](...)'s exercise 4", or "its
+exercise 9" after a link earlier in the paragraph. Two findings are
+errors that no baseline accepts: a number the target's Solutions file
+lacks, and an exercise of "the previous chapter", which a chapter
+split retargets silently. Entries are keyed by chapter name, so a
+renumbering leaves the baseline alone and a chapter rename does not.
+"The last three exercises" and an exercise described without a
+number are invisible to it.
+
 ## Advisory checks: check_links.py and list_todos.py
 
 Neither is part of `verify`/`gate`/`ci`. Run them now and then.

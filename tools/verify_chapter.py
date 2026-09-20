@@ -28,7 +28,10 @@ The steps, in order, mirror `verify` (fixers first, markers before sync):
 6. The Markdown gates: ``check_all`` on the chapter (every gate check, or
    the ``--checks`` list the Makefile passes from ``GATE_CHECKS``),
    ``anchors`` and ``widths`` on the Solutions file, quoted ``ty``
-   diagnostics in both, exercise/solution numbering, unique slugs.
+   diagnostics in both, prose references to numbered exercises in
+   both (the ones these two files make; a reference another chapter
+   makes to this chapter's exercises needs the whole-book run),
+   exercise/solution numbering, unique slugs.
 7. ``ty``, ``ruff``, ``run_examples``, and ``pytest`` over the chapter's
    directory in each build tree.
 
@@ -130,6 +133,8 @@ def main(argv: list[str] | None = None) -> int:
     results += [
         run("quoted-diagnostics",
             [*PY, "-m", "tools.check_quoted_diagnostics", *map(str, prose)]),
+        run("exercise-refs",
+            [*PY, "-m", "tools.exercise_refs", *map(str, prose)]),
         run("solutions-numbering",
             [*PY, "-m", "tools.check_solutions", number]),
         run("unique-slugs", [*PY, "-m", "tools.check_unique_slugs"]),

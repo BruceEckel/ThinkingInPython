@@ -257,6 +257,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
 	$(PY) -m tools.check_all widths records --paths Solutions
 	$(PY) -m tools.check_quoted_diagnostics
+	$(PY) -m tools.exercise_refs
 	$(PY) -m tools.reflow_prose --write
 	$(PY) -m tools.check_unique_slugs
 	$(PY) -m tools.extract_examples
@@ -744,7 +745,7 @@ comment-report:  ## List listing comments added since a git ref (SINCE=ref, defa
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept unique-slugs skip-lists \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept exercise-refs exercise-refs-accept unique-slugs skip-lists \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -854,6 +855,20 @@ quoted-diagnostics: extract solutions-extract  ## Diff quoted ty diagnostics aga
 
 quoted-diagnostics-accept: extract solutions-extract  ##- Rewrite tools/data/quoted_diagnostics_baseline.txt from the current run
 	$(PY) -m tools.check_quoted_diagnostics --accept
+
+# A sentence that names an exercise by number ("exercise 3 makes this
+# concrete") is prose, so inserting or reordering an exercise leaves it
+# pointing at the wrong one with every other gate green: the chapter's
+# list and its Solutions headings still agree with each other. This
+# pairs each reference with the Solutions title under its number and
+# compares the pairs with tools/data/exercise_refs_baseline.txt. NEW
+# fails the gate: reread the sentence against that title, then fix the
+# number or accept the pair. Reads Markdown only. Part of `gate`.
+exercise-refs:  ## Diff prose "exercise N" references against the exercise titles in the baseline (accept with `make exercise-refs-accept`)
+	$(PY) -m tools.exercise_refs $(ARGS)
+
+exercise-refs-accept:  ##- Rewrite tools/data/exercise_refs_baseline.txt from the current run
+	$(PY) -m tools.exercise_refs --accept
 
 # Fail if two chapters give different listings the same filename. Nothing
 # else catches this: the two files land in different Examples/ directories,

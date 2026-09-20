@@ -156,7 +156,20 @@ the book deliberately makes against an edited copy of a listing live
 in `tools/data/quoted_diagnostics_baseline.txt`. A NEW entry after a
 listing edit is a stale quote to requote, or a fresh deliberate edit
 to accept with `make quoted-diagnostics-accept`; `--all` lists every
-hit. `make verify`'s gate also
+hit. `exercise_refs.py` (in the gate since 2026-09-20) does the same
+for prose that names an exercise by number: each "exercise N", "the
+second exercise", or "the previous exercise" in `Chapters/` and
+`Solutions/` is paired with the Solutions title under that number,
+and the pairs live in `tools/data/exercise_refs_baseline.txt`.
+Inserting or reordering an exercise changes the title under every
+later number, so every reference to one turns NEW and fails the gate.
+Reread each NEW sentence against the title printed beside it, fix the
+number or `make exercise-refs-accept`, and never accept without that
+read: chapter 30 carried five stale numbers for a day after commit
+a2cc5a98 inserted an exercise at 2, with every gate green. A new
+reference is NEW too, until accepted. `make verify-ch` sees only the
+references its two files make, so after moving an exercise run
+`make exercise-refs` over the book. `make verify`'s gate also
 runs `validate_output.py --update` over all of `Chapters/` now, so a stale
 `#:` marker anywhere self-heals (rewriting `Chapters/`) instead of failing
 the build, the same way `fix-eol`/`sync` already self-heal other drift.
@@ -528,8 +541,11 @@ and how it was measured.
   pattern in either that matches no file under `Examples/` or
   `SolutionsCode/`, so a missed one is loud; renaming one *listing*
   trips it the same way),
-  `tools/data/record_exceptions.txt` (keyed by chapter name, so a rename
-  only), the `README.md` tracking table,
+  `tools/data/record_exceptions.txt` and
+  `tools/data/exercise_refs_baseline.txt` (both keyed by chapter name,
+  so a rename only; after one, `make exercise-refs` shows each pair as
+  GONE plus NEW, and `make exercise-refs-accept` settles it), the
+  `README.md` tracking table,
   `deep_review_db.md`/`readability_db.md`/`bruce_edit_db.md`, and any
   `tools/tests/` fixture naming a chapter. Appendices use letter prefixes
   (`A_...`); build_site labels them "Appendix X".
