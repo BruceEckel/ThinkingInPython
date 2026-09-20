@@ -190,8 +190,7 @@ not mutation of the object it holds,
 which [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
 The demo builds `src` first, then places it inside `root`.
-Nothing can modify `src` afterward, so sharing subtrees is safe
-(see [Functional Foundations](40_Functional--Foundations.md#immutability)).
+Nothing can modify `src` afterward, so sharing subtrees is safe.
 
 ```python
 # test_filesystem.py
