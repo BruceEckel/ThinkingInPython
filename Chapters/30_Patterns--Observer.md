@@ -245,7 +245,7 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 Inheriting does not stop a class from being a `dataclass`,
-but [a generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
+but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
 A `@dataclass` `Thermometer` would have no list of listeners,
 and `subscribe()` would raise an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
