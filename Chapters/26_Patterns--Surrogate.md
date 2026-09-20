@@ -811,8 +811,7 @@ the single generic surrogate in `state_surrogate.py` is simpler and just as flex
     misspell `self._impl` as `self._imp` inside `__getattr__()` and run it.
     Use the fallback-hook behavior this chapter describes to explain why the failure reports as `RecursionError` rather than an `AttributeError` naming the typo.
 5.  Create a program similar to a DBMS that allows only a fixed number of connections at a time.
-    Implement this with a singleton-like system
-    ([*Singleton*](24_Patterns--Singleton.md))
+    Implement this with a system modeled on [*Singleton*](24_Patterns--Singleton.md)
     that controls the number of "connection" objects it creates.
     When a user finishes with a connection,
     the system must check that connection back in for reuse.
