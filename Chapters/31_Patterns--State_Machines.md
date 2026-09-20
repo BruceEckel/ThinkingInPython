@@ -33,19 +33,6 @@ Python does not require this Protocol.
 It earns its few lines twice over: annotations can name `State` as a type,
 and a state class that leaves a method out fails the type check wherever the program uses it as a `State`,
 before anything runs.
-A base class could do the first job as well:
-
-    class State: pass
-
-Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
-and a base whose methods `raise NotImplementedError` moves the failure into the base,
-with whatever message you write there.
-[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows the other option:
-make `State` an `ABC` with `@abstractmethod` on both methods,
-and constructing an incomplete subclass fails outright.
-The type checker reports that construction too,
-so an `ABC` fails as early as the Protocol does.
-The two base classes fail only when the program runs, at the call.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -79,14 +66,6 @@ while the varying behavior lives in each `State`'s `run()` and `next()`.
 [*Template Method*](25_Patterns--Template_Method.md)
 puts the varying steps in a subclass.
 Here they come from the `State` objects the machine holds.
-The constructor also runs the initial state,
-the construction-starts-the-engine choice that [draws a warning in that chapter](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
-Two facts make it safe here, and either one is easy to lose in a later edit:
-the subclass below, `MouseTrap`,
-assigns nothing in its `__init__()` after the `super().__init__()` call,
-and no state's `run()` reads anything off the machine.
-If you give a `State` a `run()` that reads a machine attribute,
-that chapter's warning applies again.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
@@ -254,6 +233,30 @@ trap.run_all([MouseAction.ESCAPES])
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
+`StateMachine`'s constructor runs the initial state,
+the construction-starts-the-engine choice that [draws a warning in *Template Method*](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+Two facts make it safe here, and either one is easy to lose in a later edit:
+`MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
+and no state's `run()` reads anything off the machine.
+If you give a `State` a `run()` that reads a machine attribute,
+that warning applies again.
+
+None of the four state classes inherits from `State`.
+Each satisfies the Protocol by defining `run()` and `next()`.
+A base class could also give the annotations a type to name:
+
+    class State: pass
+
+Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
+and a base whose methods `raise NotImplementedError` moves the failure into the base,
+with whatever message you write there.
+[*Surrogate*](26_Patterns--Surrogate.md#proxy) shows the other option:
+make `State` an `ABC` with `@abstractmethod` on both methods,
+and constructing an incomplete subclass fails outright.
+The type checker reports that construction too,
+so an `ABC` fails as early as the Protocol does.
+The two base classes fail only when the program runs, at the call.
+
 ### A Table Inside Each State
 
 The `match` statements inside `next()` work,
@@ -268,6 +271,8 @@ and module-level code fills in the tables once every state object exists.
 
 `TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
 and leaves `run()` abstract for its subclasses.
+It is an `ABC`, the alternative the first version set aside,
+because here the base has code to share: every subclass inherits `next()`.
 Its `next()` looks the input up in that dict,
 so the `StateMachine` class from the previous example still serves.
 `TableState.__init__()` starts every state with an empty dict.
@@ -395,7 +400,12 @@ which only repeats the event the message already names.
 
 The two versions also answer a question this input file does not ask:
 what happens on an unexpected input?
-They answer it differently.
+Both listings end with one more call that asks it:
+feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
+where neither the `match` nor the table names it.
+Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
+Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
+
 Version 1's `case _` arms return the current state,
 so an input a state does not recognize raises no exception and the machine stays put.
 Staying put is not the same as doing nothing:
@@ -403,18 +413,12 @@ Staying put is not the same as doing nothing:
 so a transition back to the current state runs that state's action a second time.
 Version 2's table holds only the explicit transitions,
 and its `next()` raises an exception on anything else.
+
 Either answer can be right, so choose it on purpose.
 Staying put suits a machine fed from a noisy source that includes events meant for something else.
 Raising an exception suits a table you are still building,
 where a missing entry is a bug to flag,
 and the table-driven engine below raises an exception for the same reason.
-
-Both listings end with one more call that puts this to the test:
-feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
-where neither the `match` nor the table names it.
-Version 1 prints `Waiting: Broadcasting cheese smell` a second time:
-the state stays put and runs again.
-Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 
 ## Table-Driven State Machine
 
@@ -519,22 +523,6 @@ so it belongs last in its group, as the `else` for the rows above it.
 Without such a row, a group can match nothing.
 When every condition returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
-The lookup keys on `type(event)` exactly,
-a dictionary probe rather than an `isinstance()` walk.
-The vending machine below keys separate rows on `FirstDigit` and `SecondDigit`,
-two subclasses of `Digit` that differ only in their class.
-The exact match has a cost.
-A further subclass of an event type matches none of its parent's rows,
-because the table must name an event's exact class.
-
-The engine passes the event to both callables, whether they need it or not,
-which is why the vending machine's `refund()` takes an argument it ignores.
-The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
-and no one signature covers them all.
-That `...` costs you a check:
-nothing verifies that a row's condition and action accept the event class its key names.
-If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
-the table type-checks clean and does the wrong thing at runtime.
 
 ### A Vending Machine
 
@@ -544,7 +532,11 @@ then either dispenses the item, reports it sold out,
 or clears a selection that costs more than the money inserted.
 The conditions and actions are ordinary methods, stored directly in the table.
 
-![Five states, QUIESCENT, COLLECTING, SELECTING, UNAVAILABLE, and WANT_MORE; money loops COLLECTING back on itself, a first digit moves to SELECTING, and a second digit branches three ways on price and stock, while Quit refunds from any of the other states back to QUIESCENT](_images/stateMachine)
+![The vending machine's five states and the inputs that move it between them](_images/stateMachine)
+
+Money loops `COLLECTING` back on itself, a first digit moves to `SELECTING`,
+and a second digit branches three ways on price and stock.
+`Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The states are an `Enum`,
 so the type checker catches a misspelled state name before it can fail silently at runtime.
@@ -726,10 +718,27 @@ That is the cost of the ordering rule stated above:
 a row lower in the list can never override one above it,
 even when the lower row is the one that matters.
 
+The engine's lookup keys on `type(event)` exactly,
+a dictionary probe rather than an `isinstance()` walk.
+The table keys separate rows on `FirstDigit` and `SecondDigit`,
+two subclasses of `Digit` that differ only in their class.
+The exact match has a cost.
+A further subclass of an event type matches none of its parent's rows,
+because the table must name an event's exact class.
+
 The table goes in `__init__()` rather than in the class body,
 because each entry is a bound method:
 `self.add_money` carries this machine with it,
 so each `VendingMachine` gets a table wired to its own money and stock.
+
+The engine passes the event to both callables, whether they need it or not,
+which is why `refund()` takes an argument it ignores.
+The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
+and no one signature covers them all.
+That `...` costs you a check:
+nothing verifies that a row's condition and action accept the event class its key names.
+If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
+the table type-checks clean and does the wrong thing at runtime.
 
 Adding a state or an input is now a local change:
 an entry in the table and a method or two.
@@ -813,15 +822,8 @@ because it fixes one output device into the engine.
 Recording a message instead leaves the choice to whoever is watching.
 
 Using `tkinter`, you can build a GUI for the vending machine.
-The panel reads `amount`, the stock, and `message` and shows them on screen.
-The coin and item buttons turn presses into events for `handle()`,
-and the GUI catches a click that the state machine rejects
-(a selection before any money, say) and shows a message rather than crashing.
-The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
-Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
-the [late-binding trap](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
-The three fixed buttons use lambdas safely,
-since they close over nothing that varies.
+The panel reads `amount`, the stock, and `message` and shows them on screen,
+and its coin and item buttons turn presses into events for `handle()`.
 Because this listing requires user interaction, the harness skips it
 (`tools/data/norun.txt`):
 
@@ -894,6 +896,15 @@ def show() -> None:
 if __name__ == "__main__":
     show()
 ```
+
+`send()` hands each event to `handle()` and catches the `NoTransition` that a rejected click raises
+(a selection before any money, say),
+so the GUI shows a message rather than crashing.
+The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
+Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
+the [late-binding trap](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
+The three fixed buttons use lambdas safely,
+since they close over nothing that varies.
 
 ## Which Design Should You Use?
 
