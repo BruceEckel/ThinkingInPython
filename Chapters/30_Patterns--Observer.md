@@ -87,9 +87,9 @@ so a `Plot` or a `Table` attaches the same way `Display` does.
 It inherits that list from `Subject`,
 so its constructor calls `super().__init__()` to create it.
 An `__init__()` in a subclass [replaces the base class's](07_Foundations--Classes.md#inheritance),
-so `Subject.__init__()` runs only when `super()` calls it,
-and without that call nothing creates `_observers`,
-so `attach()` raises an `AttributeError`.
+so `Subject.__init__()` runs only when `super()` calls it.
+Without that call nothing creates `_observers`,
+and `attach()` raises an `AttributeError`.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
