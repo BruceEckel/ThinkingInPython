@@ -99,8 +99,8 @@ With pull, the subject does not decide what its observers need.
 In exchange, each observer depends on the subject's interface:
 to read `celsius`, an observer must know it is watching a `Thermometer`.
 The type checker enforces that dependency:
-an `update()` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
-so pull costs a runtime `isinstance()` check or a second type parameter on the protocol.
+an `update()` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`.
+Pull therefore costs a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -348,7 +348,7 @@ The same equality rule explains the last two tests.
 Subscribing one callable twice puts two equal entries in the list,
 so each notification calls it twice and each `unsubscribe()` removes one entry.
 `list.remove()` raises a `ValueError` when it matches nothing,
-which is what `unsubscribe()` does with a callable that never subscribed.
+so `unsubscribe()` raises a `ValueError` when its callable never subscribed.
 
 ### Unsubscribing During a Notification
 
@@ -394,7 +394,7 @@ with no exception to say a listener was skipped.
 A listener that raises an exception stops the loop,
 and the listeners after it are not called.
 Decide whether `announce()` should catch, collect, and continue
-(exercise 2 makes this concrete).
+(exercise 3 makes this concrete).
 
 ### Lapsed Listeners
 
@@ -602,7 +602,7 @@ for instance attributes and class variables both.
 
 `ty` takes an instance attribute and its type from an assignment like `self.celsius = celsius`,
 which is why `celsius` and `humidity` need no declaration.
-The constructor writes `self.__dict__["_watchers"] = []` instead,
+For `_watchers` the constructor writes `self.__dict__["_watchers"] = []`,
 a write to a dictionary rather than an assignment to an attribute,
 and `ty` does not read it as one.
 The bare annotation supplies what that assignment would have: without it,
@@ -630,7 +630,7 @@ so `ty` checks each assignment against the attributes the class declares.
 So far, no listener has had to wait.
 Each prints, appends, or writes back, then returns.
 If a listener calls a network service or writes to a database,
-notifying listeners one at a time delays every listener after it.
+notifying listeners one at a time delays every listener after that one.
 
 If listeners are coroutines,
 `announce()` awaits them together with `asyncio.gather()`,
@@ -642,7 +642,8 @@ so `announce()` returns only after every listener finishes.
 An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place for the `await` that would run the coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
-The state change becomes an awaitable method rather than the assignment `t.celsius = value`.
+The state change becomes an awaitable method, `set_celsius()`,
+rather than the assignment `t.celsius = value`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 covers the `asyncio` mechanics here (`async def`, `await`, `gather()`, `run()`).
 For this example, it is enough to know that a coroutine pauses at `await` while others run:
@@ -817,7 +818,7 @@ A real caller rarely adds that wait.
 The program moves on before the orphan finishes,
 and an exception from the orphan is discarded without a report.
 `gather(*coros, return_exceptions=True)` returns the failures as data instead,
-the async form of exercise 2's catch-collect-continue.
+the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
 A `TaskGroup` cancels a failing task's siblings,
@@ -842,7 +843,7 @@ try to turn every box `palegreen`.
 This is the only color that works; on the 8x8 grid `box_view.py` opens with,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors.
-Exercise 6 works out which sizes reach which colors.
+Exercise 8 works out which sizes reach which colors.
 
 The model reuses `broadcaster.Broadcaster`:
 
@@ -934,7 +935,7 @@ then builds `grid` from `size`.
 The model contains no display code, so you can test it without a GUI.
 Testing confirms that `recolored()` changes the cross and no other cell,
 that a selection in a corner stays on the grid,
-and that listeners receive the new grid after one:
+and that listeners receive the new grid after a selection:
 
 ```python
 # test_box_observer.py
@@ -1053,7 +1054,7 @@ or a test call drives the model the way a click does.
 
 The model and the view share only the subscribe-and-announce contract,
 so you can attach a second view to the same model and keep both views in step
-(see Exercise 6).
+(see Exercise 7).
 
 ## What Stays Constant
 
@@ -1081,7 +1082,8 @@ and the *Observer* is an event bus.
     A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
     so make it type-check two ways:
     once with a runtime `isinstance()` check inside `update()`,
-    and once with an `Observer[S, T]` protocol whose subject type `Subject` supplies as `Self`.
+    and once with an `Observer[S, T]` protocol whose first parameter is the subject type,
+    which `Subject` supplies as `Self`.
     Say what each version costs.
 3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
     every other listener is still notified,
@@ -1125,6 +1127,6 @@ and the *Observer* is an event bus.
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.
     Each attribute keeps its own listeners.
     Subscribing needs the descriptor, not the value it stores,
-    so `__get__()` returns the descriptor when the class accesses it,
+    so `__get__()` returns the descriptor for an access through the class,
     and `Thermometer.celsius.subscribe(t, readings.append)` reaches it.
     Show that an assignment to one attribute calls no listener of the other.

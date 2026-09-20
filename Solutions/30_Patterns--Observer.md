@@ -322,7 +322,7 @@ so its comprehension keeps each result for which
 `None`, which fails that test and stays out of `failures`.
 
 The exception filter uses `Exception`, not `BaseException`, for the
-reason exercise 2 gives, and for a second reason here.
+reason exercise 3 gives, and for a second reason here.
 `asyncio.CancelledError` derives from `BaseException`, and
 `return_exceptions=True` still returns a cancellation among the
 results. Treating that result as an ordinary listener failure would
