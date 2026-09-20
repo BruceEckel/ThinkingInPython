@@ -620,8 +620,7 @@ The PEP also describes a third value, `none`, a global off switch.
 CPython removed it before the 3.15 release.
 
 Don't make an import lazy when you import a module for what its body does rather than for a name it defines.
-A module that registers a plugin class
-([Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)),
+A module that registers a [plugin class](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 installs a codec, or fills a table does that work as it loads.
 If nothing touches the lazily imported name,
 the module stays unloaded and its registration is missing.
