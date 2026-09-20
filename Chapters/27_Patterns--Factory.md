@@ -78,8 +78,7 @@ so it does report the gap, but only at runtime,
 when someone first asks it for a triangle.
 Nothing at edit time points at the missing case,
 and the type checker cannot know which strings `export_svg()` is meant to handle.
-An `Enum` for `kind` and an `assert_never()` wildcard moves that report to check time
-([Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching)),
+An `Enum` for `kind` and an `assert_never()` wildcard [moves that report to check time](13_Techniques--Pattern_Matching.md#exhaustive-matching),
 though an if-chain like `render()` still slips past it.
 Either way, adding a type means editing every call site.
 
