@@ -98,8 +98,10 @@ here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
 In exchange, each observer depends on the subject's interface:
 to read `celsius`, an observer must know it is watching a `Thermometer`.
-The type checker enforces that dependency:
-an `update()` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`.
+The type checker enforces that dependency.
+`Subject[float]` has no `celsius`,
+so the observer must declare its `subject` parameter as a `Thermometer`,
+and an `update()` narrowed that way no longer satisfies `Observer[float]`.
 Pull therefore costs a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF leaves one choice open: who calls `notify()`.
@@ -144,7 +146,7 @@ The rest of this chapter uses names you can tell apart at a glance:
 
 The pattern keeps its name.
 *Observer* is what the catalogs call it,
-and those libraries use the older nouns,
+and Java and the reactive libraries use the older nouns,
 so the table is also your map into that literature.
 
 ## The Pythonic Observer: Callables in a List
@@ -228,7 +230,7 @@ GoF's `attach()` and `detach()` become `subscribe()` and `unsubscribe()`,
 as in the reactive libraries.
 A listener that needs the changed object takes it as part of the payload
 (`announce((self, value))`),
-or subscribes a bound method whose instance already holds the reference.
+or is a bound method of an object that holds a reference to the broadcaster.
 
 `Thermometer` inherits `Broadcaster` because that is the shortest way to get `subscribe()` and `announce()`,
 not because the pattern requires a base class.
@@ -393,6 +395,7 @@ with no exception to say a listener was skipped.
 
 A listener that raises an exception stops the loop,
 and the listeners after it are not called.
+The exception leaves `announce()` and reaches the code that assigned to `celsius`.
 Decide whether `announce()` should catch, collect, and continue
 (exercise 3 makes this concrete).
 
@@ -639,6 +642,9 @@ A slow listener no longer delays the others.
 `gather()` waits for all of them,
 so `announce()` returns only after every listener finishes.
 
+An `announce()` that awaits is a coroutine,
+and its caller must `await` it in turn,
+so the setter that calls it would need to be `async` too.
 An `async` setter returns a coroutine instead of running its body,
 and an assignment offers no place for the `await` that would run the coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
@@ -732,7 +738,8 @@ and a coroutine discarded without an `await` does nothing.
 In both aliases the type parameter ties the listener's argument to the broadcaster's payload:
 a `Broadcaster[float]` accepts a listener that takes a `float` and rejects one that takes a `str`.
 
-The `alarm` is slower than the log, yet the log prints first.
+`alarm` subscribes before `log_reading`,
+yet at 150 degrees the log prints first.
 Awaiting the listeners in sequence would print in subscription order,
 alarm first.
 Concurrent fan-out lets each listener finish as soon as its own wait ends,
@@ -1100,7 +1107,7 @@ and the *Observer* is an event bus.
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and selecting any square recolors your patch to that square's color,
     absorbing neighbors that now match.
-    Write the neighbor test yourself, counting diagonals.
+    Write the neighbor test yourself, and count diagonal squares as neighbors.
     Track the moves it takes to make the whole field one color.
     For competition, alternate turns between players.
 6.  Change the rule for a selection in `box_observer.py`:
