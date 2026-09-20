@@ -407,10 +407,9 @@ Because collecting and unpacking are inverses,
 a function can gather arguments it knows nothing about and pass them on unchanged.
 `trace()` accepts any call and forwards it,
 and that is the standard shape of a wrapper.
-A function is an object like any other,
+A function is an [object like any other](40_Functional--Foundations.md#functions-as-first-class-objects),
 so you can pass `report` to `trace()` as an argument,
-and `func.__name__` reads the name of whatever function arrived
-(see [Functions as First-Class Objects](40_Functional--Foundations.md#functions-as-first-class-objects)).
+and `func.__name__` reads the name of whatever function arrived.
 [Decorators](14_Techniques--Decorators.md) builds on that forwarding.
 
 Forwarding an arbitrary `**kwargs` can still collide with a name the wrapped function already receives.
