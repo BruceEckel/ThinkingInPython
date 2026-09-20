@@ -149,10 +149,10 @@ so the table is also your map into that literature.
 
 ## The Pythonic Observer: Callables in a List
 
-In Python a listener is any callable that takes the notification and returns `None`,
-and a broadcaster holds a list of those callables and announces each change to them.
-A `@property` setter runs at every assignment to its attribute,
-so the setter is the place to send the notification when state changes:
+In Python a listener is any callable that takes a notification and returns `None`,
+and a broadcaster announces each change to a list of those callables.
+A `@property` setter is the place to send the notification when state changes,
+because a setter runs at every assignment to its attribute:
 
 ```python
 # broadcaster.py
@@ -213,14 +213,14 @@ The listeners here are lambdas, but any function or bound method works.
 
 ![One assignment to celsius calls every listener in the list](_images/observer_broadcast)
 
-The dashed `plot` is not in the listing.
+The dashed `Plot` and `Table` are not in the listing.
 Any callable of the right shape subscribes the way the two lambdas do,
 and `Thermometer` names no listener type.
 
 Four things from the classic version disappear: the `Observer` interface,
 its `update()` method, a class per reaction, and the `subject` argument.
 A classic observer is an object,
-so the subject needs the name of a method to call on it.
+so `notify()` calls the method its interface names, `update()`.
 In Python the listener is the callable, so `announce()` calls it directly:
 `listener(data)`, where the classic version calls `observer.update(self, arg)`.
 The remaining method names change as well:
