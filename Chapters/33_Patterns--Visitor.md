@@ -285,9 +285,8 @@ When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 A forgotten registration then fails at its first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
-goes further and lets the type checker catch the omission instead
-([*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)),
-at the price of a set of types no one else can extend.
+goes further and lets the type checker [catch the omission](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)
+instead, at the price of a set of types no one else can extend.
 Adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
