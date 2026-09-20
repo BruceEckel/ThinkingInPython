@@ -110,9 +110,9 @@ but a caller can forget to make the call.
 
 ### Why `notify()` Copies the List
 
-The `list(self._observers)` copy inside `notify()` looks redundant,
-since `_observers` is a list.
-The copy is not.
+`_observers` is a list,
+so the `list(self._observers)` copy inside `notify()` looks redundant.
+It is not.
 An observer may react to a notification by detaching,
 and a detach that reached the list the loop is reading would make the loop skip the next observer,
 with no exception to report the skip.
