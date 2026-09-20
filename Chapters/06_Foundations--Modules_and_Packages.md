@@ -375,8 +375,9 @@ A cycle is a design signal:
 move the shared piece into a third module both can import.
 When the cycle exists only in annotations,
 an `if TYPE_CHECKING:` import breaks it,
-because Python does not evaluate annotations at import time
-(see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)).
+because Python does not evaluate annotations at import time.
+[A robot in a maze](38_Patterns--Simulation.md#a-robot-in-a-maze)
+imports `Room` that way, and every use of the name is an annotation.
 
 ## What a Module Exports
 
