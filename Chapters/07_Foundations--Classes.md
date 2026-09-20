@@ -127,8 +127,7 @@ Python can still name an interface without inheritance:
 a [`Protocol`](08_Foundations--Static_Types.md)
 describes the shape a function needs, with no base class to inherit.
 
-First import the base class the same way you import any name from a module
-(see [Modules and Packages](06_Foundations--Modules_and_Packages.md)).
+First import the base class the same way you import [any name from a module](06_Foundations--Modules_and_Packages.md).
 Then inherit by listing the base class in parentheses after the name of the inheriting class.
 Python supports multiple inheritance, so you can list several classes,
 though [Rethinking Objects](20_Patterns--Rethinking_Objects.md)
