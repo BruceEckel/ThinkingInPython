@@ -98,6 +98,9 @@ here `subject.celsius`.
 With pull, the subject does not decide what its observers need.
 In exchange, each observer depends on the subject's interface:
 to read `celsius`, an observer must know it is watching a `Thermometer`.
+The type checker enforces that dependency:
+an `update()` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
+so pull costs a runtime `isinstance()` check or a second type parameter on the protocol.
 
 GoF leaves one choice open: who calls `notify()`.
 Here `set_celsius()` calls it, so every change broadcasts at once.
@@ -1072,35 +1075,42 @@ and the *Observer* is an event bus.
     the smallest `Broadcaster` that lets callables subscribe,
     then notifies them.
     Demonstrate it by subscribing several listeners and causing one change that updates them all.
-2.  Make `Broadcaster.announce()` survive a listener that raises an exception:
+2.  Rewrite `classic_observer.py` to use the pull model:
+    `Display.update()` reads `subject.celsius` instead of `arg`.
+    A `Display` that narrows its `subject` parameter to `Thermometer` no longer satisfies `Observer[float]`,
+    so make it type-check two ways:
+    once with a runtime `isinstance()` check inside `update()`,
+    and once with an `Observer[S, T]` protocol whose subject type `Subject` supplies as `Self`.
+    Say what each version costs.
+3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
     every other listener is still notified,
     and `announce()` re-raises the failures afterward, together,
     as an [`ExceptionGroup`](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)
     (which you build yourself here: `raise ExceptionGroup("message", failures)`).
     Write a test in which the first listener raises an exception and the second still records its notification.
-3.  Redo exercise 2 for `async_broadcaster.py`.
+4.  Redo exercise 3 for `async_broadcaster.py`.
     Make `announce()` use `gather(*coros, return_exceptions=True)`,
     separate the returned exceptions from the successes,
     and raise them together as an `ExceptionGroup`.
     Write a test in which the first listener raises an exception and the second still records its notification.
-4.  Turn `box_observer.py` into a simple game:
+5.  Turn `box_observer.py` into a simple game:
     you own the contiguous patch of same-colored squares containing the top-left corner,
     and selecting any square recolors your patch to that square's color,
     absorbing neighbors that now match.
     Write the neighbor test yourself, counting diagonals.
     Track the moves it takes to make the whole field one color.
     For competition, alternate turns between players.
-5.  Change the rule for a selection in `box_observer.py`:
+6.  Change the rule for a selection in `box_observer.py`:
     make `recolored()` advance every box in the selected box's row and column.
     Run `box_view.py` without editing it,
     and explain why the view needed no change.
-6.  Attach a second view to `box_observer.py`'s `BoxModel`.
+7.  Attach a second view to `box_observer.py`'s `BoxModel`.
     Write one view that prints a letter per cell and another that prints how many cells each color holds,
     subscribe both to the same model,
     and show that one `select()` updates the pair.
     Keep both views textual so the example runs without a window,
     and leave the model as `box_observer.py` has it.
-7.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
+8.  Work out which colors the whole grid can reach from `new_grid(size)` under `box_observer.py`'s rule.
     Selecting a cell advances up to five cells by one, modulo three,
     and selections commute, so this is a linear system over the integers mod 3:
     the unknowns are how many times you select each cell.
@@ -1108,7 +1118,7 @@ and the *Observer* is an event bus.
     and print the reachable colors for every size from 3 through 8.
     The 8x8 grid reaches `palegreen` alone,
     and one smaller size reaches nothing.
-8.  Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
+9.  Write a `Notifying` [descriptor](17_Techniques--Metaprogramming.md#a-descriptor-that-validates)
     that replaces the `@property` and `announce()` pair,
     so one class declares several independently watched attributes:
     `celsius = Notifying[float]()` beside `humidity = Notifying[float]()`.

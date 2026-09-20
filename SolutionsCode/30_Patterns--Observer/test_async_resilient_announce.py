@@ -1,7 +1,7 @@
 # test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_3 import Broadcaster
+from exercise_4 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:

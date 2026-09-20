@@ -1,6 +1,4 @@
 # exercise_6.py
-from collections import Counter
-from collections.abc import Callable
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -15,7 +13,6 @@ class Color(StrEnum):
 
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
-type Listener[T] = Callable[[T], None]
 
 def new_grid(size: int) -> Grid:
     colors = list(Color)
@@ -24,52 +21,23 @@ def new_grid(size: int) -> Grid:
 
 def recolored(grid: Grid, selected: Coord) -> Grid:
     x, y = selected
-    cross = [(x, y), (x - 1, y), (x + 1, y),
-             (x, y - 1), (x, y + 1)]
-    return grid | {cell: grid[cell].next()
-                   for cell in cross if cell in grid}
+    return grid | {cell: color.next()
+                   for cell, color in grid.items()
+                   if cell[0] == x or cell[1] == y}
 
-class Broadcaster[T]:
-    def __init__(self) -> None:
-        self._listeners: list[Listener[T]] = []
+def initials(grid: Grid, size: int) -> str:
+    return "\n".join(
+        " ".join(grid[(x, y)][0] for x in range(size))
+        for y in range(size))
 
-    def subscribe(self, listener: Listener[T]) -> None:
-        self._listeners.append(listener)
-
-    def announce(self, data: T) -> None:
-        for listener in list(self._listeners):
-            listener(data)
-
-class BoxModel(Broadcaster[Grid]):
-    def __init__(self, size: int) -> None:
-        super().__init__()
-        self.size = size
-        self.grid = new_grid(size)
-
-    def select(self, cell: Coord) -> None:
-        self.grid = recolored(self.grid, cell)
-        self.announce(self.grid)
-
-model = BoxModel(3)
-
-def letters(grid: Grid) -> None:
-    for y in range(model.size):
-        print(" ".join(grid[(x, y)][0]
-                       for x in range(model.size)))
-
-def tally(grid: Grid) -> None:
-    counts = Counter(grid.values())
-    print(" ".join(f"{c[0]}:{counts[c]}" for c in Color))
-
-model.subscribe(letters)
-model.subscribe(tally)
-model.select((1, 1))
-#: s k k
-#: k s p
-#: k p p
-#: s:2 p:3 k:4
-model.select((0, 0))
-#: p s k
-#: s s p
-#: k p p
-#: s:3 p:4 k:2
+grid = new_grid(4)
+print(initials(grid, 4))
+#: s p k s
+#: p k s p
+#: k s p k
+#: s p k s
+print(initials(recolored(grid, (1, 2)), 4))
+#: s k k s
+#: p s s p
+#: s p k s
+#: s k k s

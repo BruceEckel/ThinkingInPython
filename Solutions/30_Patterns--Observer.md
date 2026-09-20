@@ -33,10 +33,131 @@ collects them in a list. `announce()` then hands its own arguments to
 each one in turn, so every subscribed listener sees the same update,
 in subscription order.
 
-## 2. An `announce()` that survives a failing listener
+## 2. The pull model, twice
+
+The protocol here is `classic_observer.py`'s, unchanged.
+`update()` declares the widest type `attach()` can hand it,
+`Subject[float]`, and narrows that to a `Thermometer` before reading
+`celsius`:
 
 ```python
-# exercise_2.py
+# exercise_2_narrowing.py
+from typing import Protocol
+
+class Observer[T](Protocol):
+    def update(
+        self, subject: Subject[T], arg: T
+    ) -> None: ...
+
+class Subject[T]:
+    def __init__(self) -> None:
+        self._observers: list[Observer[T]] = []
+
+    def attach(self, observer: Observer[T]) -> None:
+        self._observers.append(observer)
+
+    def notify(self, arg: T) -> None:
+        for observer in list(self._observers):
+            observer.update(self, arg)
+
+class Thermometer(Subject[float]):
+    def __init__(self, celsius: float) -> None:
+        super().__init__()
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    def set_celsius(self, value: float) -> None:
+        self._celsius = value
+        self.notify(value)
+
+class Display:
+    def update(
+        self, subject: Subject[float], arg: float
+    ) -> None:
+        assert isinstance(subject, Thermometer)
+        print(f"display: {subject.celsius}C")
+
+t = Thermometer(20.0)
+t.attach(Display())
+t.set_celsius(25)
+#: display: 25C
+```
+
+The `assert` is the cost. It runs on every notification, and it states
+a requirement the protocol cannot: this `Display` works for a
+`Thermometer` and fails on any other `Subject[float]`, at the moment
+of the first notification rather than at the `attach()` call the type
+checker reads.
+
+The second version moves the subject's type into the protocol.
+`Observer[S, T]` takes it as a parameter, and `Subject` supplies its
+own type with `Self`, so `Thermometer.attach()` asks for an
+`Observer[Thermometer, float]`:
+
+```python
+# exercise_2_generic.py
+from typing import Protocol, Self
+
+class Observer[S, T](Protocol):
+    def update(self, subject: S, arg: T) -> None: ...
+
+class Subject[T]:
+    def __init__(self) -> None:
+        self._observers: list[Observer[Self, T]] = []
+
+    def attach(
+        self, observer: Observer[Self, T]
+    ) -> None:
+        self._observers.append(observer)
+
+    def notify(self, arg: T) -> None:
+        for observer in list(self._observers):
+            observer.update(self, arg)
+
+class Thermometer(Subject[float]):
+    def __init__(self, celsius: float) -> None:
+        super().__init__()
+        self._celsius = celsius
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    def set_celsius(self, value: float) -> None:
+        self._celsius = value
+        self.notify(value)
+
+class Display:
+    def update(
+        self, subject: Thermometer, arg: float
+    ) -> None:
+        print(f"display: {subject.celsius}C")
+
+t = Thermometer(20.0)
+t.attach(Display())
+t.set_celsius(25)
+#: display: 25C
+```
+
+`Display.update()` now declares `subject: Thermometer` and the call
+type-checks. The cost is at the other end: observers are typed to the
+subject they watch, so a display written for a `Thermometer` cannot
+attach to a different `Subject[float]`. A parameter is contravariant,
+so an observer that declares the wider `Subject[float]` still attaches
+to any of them, and an observer that reads `celsius` is the one that
+gives up that freedom.
+
+Both versions print the same line, and neither needs `arg`. That is
+pull's bargain: the subject decides nothing about what its observers
+read, and each observer pays by knowing what it is watching.
+
+## 3. An `announce()` that survives a failing listener
+
+```python
+# exercise_3.py
 from collections.abc import Callable
 
 type Listener[T] = Callable[[T], None]
@@ -77,7 +198,7 @@ except* RuntimeError as group:
 ```python
 # test_resilient_announce.py
 import pytest
-from exercise_2 import Broadcaster
+from exercise_3 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:
@@ -112,10 +233,10 @@ what its listeners do, so it cannot name their failure modes. Catching
 `KeyboardInterrupt` or an `asyncio.CancelledError` passing through a
 listener stops the notification instead of joining `failures`.
 
-## 3. The same rescue, for the async fan-out
+## 4. The same rescue, for the async fan-out
 
 ```python
-# exercise_3.py
+# exercise_4.py
 import asyncio
 from collections.abc import Awaitable, Callable
 
@@ -165,7 +286,7 @@ asyncio.run(main())
 # test_async_resilient_announce.py
 import asyncio
 import pytest
-from exercise_3 import Broadcaster
+from exercise_4 import Broadcaster
 
 def test_later_listener_still_runs_after_a_failure(
 ) -> None:
@@ -212,10 +333,10 @@ question, and both end in an `ExceptionGroup`. The difference is only
 where the loop lives: written by hand in the synchronous version,
 supplied by `gather()` in the async one.
 
-## 4. Turning `box_observer.py` into a flood-fill game
+## 5. Turning `box_observer.py` into a flood-fill game
 
 ```python
-# exercise_4.py
+# exercise_5.py
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -309,10 +430,10 @@ it names `BoxModel`, and a `FloodGame` is not one. Widening it to a
 Protocol (or to `Broadcaster[Grid]` plus `size`, `grid`, and
 `select()`) lets the same view draw either model.
 
-## 5. A new selection rule, and the same view
+## 6. A new selection rule, and the same view
 
 ```python
-# exercise_5.py
+# exercise_6.py
 from enum import StrEnum
 
 class Color(StrEnum):
@@ -377,10 +498,10 @@ The rule sits in `recolored()`, `BoxModel.select()` calls it, and
 from the other side: it is a second view of a `Grid`, written without
 knowing the rule.
 
-## 6. Two views on one model
+## 7. Two views on one model
 
 ```python
-# exercise_6.py
+# exercise_7.py
 from collections import Counter
 from collections.abc import Callable
 from enum import StrEnum
@@ -483,10 +604,10 @@ already has these two, so the window and the terminal report the same
 grid. Running that combination means `show()` takes over with
 `root.mainloop()`, so start it last.
 
-## 7. Which colors a grid can reach
+## 8. Which colors a grid can reach
 
 ```python
-# exercise_7.py
+# exercise_8.py
 from enum import StrEnum
 from typing import Final
 
@@ -589,10 +710,10 @@ cannot be made one color at all.
 `", ".join(reachable(size))` with no conversion, the same property
 that lets `box_view.py` hand a `Color` to `tkinter`.
 
-## 8. A descriptor per watched attribute
+## 9. A descriptor per watched attribute
 
 ```python
-# exercise_8.py
+# exercise_9.py
 from collections.abc import Callable
 from typing import overload
 

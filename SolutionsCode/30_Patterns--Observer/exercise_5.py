@@ -6,11 +6,6 @@ class Color(StrEnum):
     PALEGREEN = "palegreen"
     KHAKI = "khaki"
 
-    def next(self) -> Color:
-        colors = list(Color)
-        nxt = colors.index(self) + 1
-        return colors[nxt % len(colors)]
-
 type Coord = tuple[int, int]
 type Grid = dict[Coord, Color]
 
@@ -19,25 +14,57 @@ def new_grid(size: int) -> Grid:
     return {(x, y): colors[(x + y) % len(colors)]
             for x in range(size) for y in range(size)}
 
-def recolored(grid: Grid, selected: Coord) -> Grid:
-    x, y = selected
-    return grid | {cell: color.next()
-                   for cell, color in grid.items()
-                   if cell[0] == x or cell[1] == y}
+def adjacent(a: Coord, b: Coord) -> bool:
+    return (a != b and abs(a[0] - b[0]) <= 1
+            and abs(a[1] - b[1]) <= 1)
 
-def initials(grid: Grid, size: int) -> str:
-    return "\n".join(
-        " ".join(grid[(x, y)][0] for x in range(size))
-        for y in range(size))
+class FloodGame:
+    ("Flood-fill game: grow a patch "
+     "from the origin to fill the board.")
+    def __init__(self, size: int,
+                 origin: Coord = (0, 0)) -> None:
+        self.size = size
+        self.grid = new_grid(size)
+        self.origin = origin
+        self.moves = 0
+        self.owned = self._flood(self.grid[origin])
 
-grid = new_grid(4)
-print(initials(grid, 4))
-#: s p k s
-#: p k s p
-#: k s p k
-#: s p k s
-print(initials(recolored(grid, (1, 2)), 4))
-#: s k k s
-#: p s s p
-#: s p k s
-#: s k k s
+    def _flood(self, color: Color) -> set[Coord]:
+        ("Every cell reachable from origin "
+         "through same-colored cells.")
+        seen: set[Coord] = set()
+        stack = [self.origin]
+        while stack:
+            cell = stack.pop()
+            if cell in seen or self.grid.get(cell) != color:
+                continue
+            seen.add(cell)
+            for other in self.grid:
+                if (adjacent(cell, other)
+                    and other not in seen):
+                    stack.append(other)
+        return seen
+
+    def select(self, cell: Coord) -> bool:
+        ("Recolor the owned patch "
+         "to the selected cell's color.")
+        new_color = self.grid[cell]
+        if new_color == self.grid[self.origin]:
+            return False  # No-op: already this color
+        for c in self.owned:
+            self.grid[c] = new_color
+        # Absorb new neighbors
+        self.owned = self._flood(new_color)
+        self.moves += 1
+        return True
+
+    def is_complete(self) -> bool:
+        return len(self.owned) == self.size * self.size
+
+game = FloodGame(4)
+while not game.is_complete():
+    remaining = [
+        c for c in game.grid if c not in game.owned]
+    game.select(remaining[0])
+print("solved in", game.moves, "moves")
+#: solved in 6 moves
