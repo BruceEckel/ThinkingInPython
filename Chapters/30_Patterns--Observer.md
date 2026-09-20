@@ -921,8 +921,8 @@ Neither function needs a `BoxModel`,
 so both are defined at module level and not inside the class.
 A test calls them directly, and a second model can reuse them.
 `BoxModel` is a `Broadcaster[Grid]`.
-Like `Thermometer`, it writes its own `__init__()`,
-which calls `Broadcaster.__init__()` and then builds `grid` from `size`.
+Its `__init__()` calls `Broadcaster.__init__()` as `Thermometer`'s does,
+then builds `grid` from `size`.
 `BoxModel.select()` makes the next grid with `recolored()` and passes it to `announce()`.
 
 ### Testing the Model
