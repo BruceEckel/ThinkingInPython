@@ -1743,8 +1743,7 @@ stopping when the program is fast enough:
 7. Cut per-object memory with `slots=True`, `array`, and `memoryview`.
 8. Vectorize with NumPy, or JIT-compile the loop with Numba.
 9. Rewrite the proven-hot function in Rust.
-10. Restructure for async or parallelism
-    ([Concurrency](19_Techniques--Concurrency.md)).
+10. Restructure for [async or parallelism](19_Techniques--Concurrency.md).
 
 After every change, measure again.
 Optimizations interact, the bottleneck moves,
