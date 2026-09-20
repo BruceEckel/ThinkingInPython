@@ -85,9 +85,8 @@ so one change to the subject's state reaches all of them:
 `Thermometer` holds the list and names no observer type,
 so a `Plot` or a `Table` attaches the same way `Display` does.
 It inherits that list from `Subject`,
-so its constructor calls `super().__init__()` to create it.
-An `__init__()` in a subclass [replaces the base class's](07_Foundations--Classes.md#inheritance),
-so `Subject.__init__()` runs only when `super()` calls it.
+so its constructor calls [`super().__init__()`](07_Foundations--Classes.md#inheritance)
+to create it.
 Without that call nothing creates `_observers`,
 and `attach()` raises an `AttributeError`.
 
