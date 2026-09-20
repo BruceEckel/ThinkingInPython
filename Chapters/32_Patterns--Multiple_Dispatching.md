@@ -277,9 +277,9 @@ on the way to the answer.
 
 ## One Type or Many
 
-For dispatch on one argument's type, `functools.singledispatch`
-(see [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch))
-gives you open, per-type functions.
+For dispatch on one argument's type, `functools.singledispatch` gives you open,
+per-type functions, as [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
+shows.
 For dispatch on two or more types at once,
 the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` then means adding rows to the table,
