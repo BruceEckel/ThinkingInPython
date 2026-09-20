@@ -9,9 +9,10 @@ That choice follows [the principle of designing the communication rather than th
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
 and the subject does not name their concrete types.
 
-Event handling is the everyday use.
-A widget keeps a list of handlers and calls each one when its event arrives.
-More generally, use *Observer* if a group of objects must update themselves when other objects change state.
+Use *Observer* if a group of objects must update themselves when other objects change state.
+The common use is event handling:
+a widget keeps a list of handlers and calls each one when its event arrives.
+
 The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent Document-View architecture.
 A *document* has more than one way to view it, for example a plot and a table.
@@ -85,8 +86,9 @@ so one change to the subject's state reaches all of them:
 so a `Plot` or a `Table` attaches the same way `Display` does.
 It inherits that list from `Subject`,
 so its constructor calls `super().__init__()` to create it.
-Python runs no [base-class constructor](07_Foundations--Classes.md#inheritance)
-on its own, and without that call `attach()` raises an `AttributeError` for the `_observers` nothing assigned.
+An `__init__()` in a subclass [replaces the base class's](07_Foundations--Classes.md#inheritance),
+so `Subject.__init__()` runs only when `super()` calls it,
+and without that call `attach()` raises an `AttributeError` for the `_observers` nothing assigned.
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
