@@ -508,8 +508,7 @@ and the request carries the hour so the handler can consult the conditions at th
 `Ask` carries a prompt for the same reason.
 `Source` carries no `@runtime_checkable`,
 because nothing calls `isinstance()` against it.
-That decorator matters where `supply()` matches an instance to a requested class
-([Supplying an Interface](46_Effects--Stateless.md#supplying-an-interface)).
+That decorator matters where `supply()` [matches an instance to a requested class](46_Effects--Stateless.md#supplying-an-interface).
 Here `handle()` matches on the Ability's own type, `Outlet`,
 and the `Source` that comes back is only a return value.
 `draw()` is the lifting wrapper: it asks the source whether it can still supply,
