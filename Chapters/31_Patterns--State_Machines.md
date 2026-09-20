@@ -43,7 +43,9 @@ with whatever message you write there.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows the other option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
 and constructing an incomplete subclass fails outright.
-Both fail later than the check, at the call or at construction.
+The type checker reports that construction too,
+so an `ABC` fails as early as the Protocol does.
+The two base classes fail only when the program runs, at the call.
 
 The `StateMachine` keeps track of the current state,
 which the constructor initializes.
@@ -80,10 +82,11 @@ Here they come from the `State` objects the machine holds.
 The constructor also runs the initial state,
 the construction-starts-the-engine choice that [draws a warning in that chapter](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
 Two facts make it safe here, and either one is easy to lose in a later edit:
-`MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
+the subclass below, `MouseTrap`,
+assigns nothing in its `__init__()` after the `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
 If you give a `State` a `run()` that reads a machine attribute,
-the trap is back.
+that chapter's warning applies again.
 
 In this style of *StateMachine*, each state decides the next state.
 As an example, here's a fancy mousetrap that can move through several states while trapping a mouse.
@@ -261,7 +264,7 @@ A state's table cannot sit in that state's class body,
 because the entries name the other states,
 and those states exist only after every class definition has run.
 So the classes come first,
-and the tables fill in at module level once every state object exists.
+and module-level code fills in the tables once every state object exists.
 
 `TableState` supplies `next()` from a `transitions` dict that maps each input to its next state,
 and leaves `run()` abstract for its subclasses.
@@ -408,7 +411,7 @@ and the table-driven engine below raises an exception for the same reason.
 
 Both listings end with one more call that puts this to the test:
 feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
-where no `case` names it.
+where neither the `match` nor the table names it.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time:
 the state stays put and runs again.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
@@ -445,9 +448,12 @@ so it can carry only the values you knew about then,
 and every member of one enum shares that enum's class,
 so they would all arrive under the same dispatch key.
 
-The names restart here.
+This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
 and `State` is now an `Enum` of names rather than a `Protocol` the state classes satisfy.
+The states in this design do nothing.
+The table holds all the behavior.
+
 The file's name differs from the first engine's `state_machine.py` on purpose.
 Python caches a module in `sys.modules` under its import name
 ([Modules and Packages](06_Foundations--Modules_and_Packages.md) shows the cache),
@@ -455,8 +461,6 @@ and a later `import` takes the cached module without looking at any file.
 Two files named `state_machine.py` in one program therefore collapse into one:
 whichever imported first wins,
 and the second import silently gets the wrong module.
-The states in this design do nothing.
-The table holds all the behavior.
 
 ### The Engine
 
@@ -517,13 +521,14 @@ When every condition returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
 The lookup keys on `type(event)` exactly,
 a dictionary probe rather than an `isinstance()` walk.
-That lets the vending machine below treat `FirstDigit` and `SecondDigit` as distinct inputs even though both derive from `Digit`.
-It cuts the other way too.
+The vending machine below keys separate rows on `FirstDigit` and `SecondDigit`,
+two subclasses of `Digit` that differ only in their class.
+The exact match has a cost.
 A further subclass of an event type matches none of its parent's rows,
 because the table must name an event's exact class.
 
 The engine passes the event to both callables, whether they need it or not,
-which is why `refund()` takes an argument it ignores.
+which is why the vending machine's `refund()` takes an argument it ignores.
 The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
 and no one signature covers them all.
 That `...` costs you a check:
@@ -730,7 +735,7 @@ Adding a state or an input is now a local change:
 an entry in the table and a method or two.
 Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
-The language's first-class functions and its `dict` supply what those patterns exist to provide.
+The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
 
 Because the machine is deterministic,
 a test can drive it through a sequence of events and check which state it reaches.
@@ -815,7 +820,7 @@ and the GUI catches a click that the state machine rejects
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
-The three fixed buttons above use lambdas safely,
+The three fixed buttons use lambdas safely,
 since they close over nothing that varies.
 Because this listing requires user interaction, the harness skips it
 (`tools/data/norun.txt`):
@@ -892,7 +897,8 @@ if __name__ == "__main__":
 
 ## Which Design Should You Use?
 
-The two designs answer the same question and put the answer in different places.
+The two designs answer the same question, which state comes next,
+and put the answer in different places.
 
 Each-state-decides suits a machine whose states do something and have few transitions apiece.
 The state class owns both halves,
@@ -912,12 +918,12 @@ so that per-state action has no home:
 an action shared by several edges into the same state must repeat on every row that leads there,
 or route through a helper the table does not provide on its own.
 
-The tell is which you would rather read: one state's transitions,
+The deciding question is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
 A machine small enough to hold in your head goes either way,
 and a machine that arrived as a diagram belongs in the table.
 
-Both designs also cost you what a library would supply.
+With either design you write for yourself what a library would supply.
 Mature libraries such as `transitions` and `python-statemachine` add guards,
 callbacks, and hierarchical states for the price of an import.
 Choose one of the two designs here when you cannot take that dependency,
