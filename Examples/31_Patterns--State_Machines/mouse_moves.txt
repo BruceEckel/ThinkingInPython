@@ -8,9 +8,3 @@ mouse appears
 mouse enters trap
 mouse trapped
 mouse removed
-mouse appears
-mouse runs away
-mouse appears
-mouse enters trap
-mouse trapped
-mouse removed

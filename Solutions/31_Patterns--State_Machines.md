@@ -84,93 +84,96 @@ mood by name, so a third mood changes only which `Mood` object
 surrogate from [*Surrogate*](../Chapters/26_Patterns--Surrogate.md#state),
 applied to a new domain.
 
-## 2. A washing machine, table-driven
+## 2. The mood machine, on the first design
 
 ```python
 # exercise_2.py
-from dataclasses import dataclass
-from enum import Enum, auto
-from table_machine import StateMachine, Table
+from collections.abc import Iterable
+from typing import Protocol
 
-class WashState(Enum):
-    IDLE = auto()
-    FILLING = auto()
-    WASHING = auto()
-    RINSING = auto()
-    SPINNING = auto()
-    DONE = auto()
+# The chapter's state.py and state_machine.py, inlined:
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...
 
-@dataclass
-class Start:
-    load_kg: float
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def run_all(self, inputs: Iterable[object]) -> None:
+        for event in inputs:
+            print(event)
+            self.current_state = (
+                self.current_state.next(event))
+            self.current_state.run()
 
-class Full:
-    pass
-class WashDone:
-    pass
-class RinseDone:
-    pass
-class SpinDone:
-    pass
+class TakePill:
+    def __repr__(self) -> str:
+        return "TakePill"
 
-class WashingMachine(StateMachine):
-    def __init__(self) -> None:
-        self.load_kg = 0.0
-        self.log: list[str] = []
-        table: Table = {
-            (WashState.IDLE, Start):
-                [(None, self.begin, WashState.FILLING)],
-            (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"),
-                  WashState.WASHING)],
-            (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"),
-                  WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [
-                (self.too_heavy, self.log_msg("slow spin"),
-                 WashState.SPINNING),
-                (None, self.log_msg("fast spin"),
-                 WashState.SPINNING),
-            ],
-            (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"),
-                  WashState.DONE)],
-        }
-        super().__init__(WashState.IDLE, table)
+class Annoy:
+    def __repr__(self) -> str:
+        return "Annoy"
 
-    def begin(self, start: Start) -> None:
-        self.load_kg = start.load_kg
-        self.log.append("filling")
+class Calm:
+    def __repr__(self) -> str:
+        return "Calm"
 
-    def too_heavy(self, event: RinseDone) -> bool:
-        return self.load_kg > 6
+class Happy:
+    def run(self) -> None:
+        print("Great to see you!")
+    def next(self, event: object) -> State:
+        if isinstance(event, Annoy):
+            return Grumpy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-    def log_msg(self, msg: str):
-        def action(event: object) -> None:
-            self.log.append(msg)
-        return action
+class Grumpy:
+    def run(self) -> None:
+        print("What do you want?")
+    def next(self, event: object) -> State:
+        if isinstance(event, Calm):
+            return Happy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
-heavy = WashingMachine()
-for event in [Start(8), *cycle]:
-    heavy.handle(event)
-print(heavy.log)
-#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
-light = WashingMachine()
-for event in [Start(3), *cycle]:
-    light.handle(event)
-print(light.log)
-#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
+class Prozac:
+    def run(self) -> None:
+        print("Everything is wonderful.")
+    def next(self, event: object) -> State:
+        return self
+
+StateMachine(Happy()).run_all(
+    [Annoy(), Calm(), TakePill(), Annoy()])
+#: Great to see you!
+#: Annoy
+#: What do you want?
+#: Calm
+#: Great to see you!
+#: TakePill
+#: Everything is wonderful.
+#: Annoy
+#: Everything is wonderful.
 ```
 
-The `(RINSING, RinseDone)` key holds the two rows the exercise asks
-for, told apart by `too_heavy()`. A load over six kilograms takes the
-slow spin, and anything lighter falls through to the unconditional
-fast-spin row below it. A `RinseDone` event carries no data of its
-own, so the condition reads `load_kg` off the machine, where
-`begin()` recorded it when the cycle started. The rest of the cycle
-is a straight line, one event type per state, and the machine is
-still the chapter's `table_machine.py` engine unchanged.
+Each state decides its own successor. `Happy.next()` answers `Annoy`
+with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
+both answer `TakePill` with a `Prozac` that returns itself for
+everything after. Nothing outside the states holds the transition
+rules, which is exactly what distinguishes this design from the
+table-driven one exercise 7 uses: there the rules live in a dictionary
+a reader can audit in one place, and here they live in the `next()`
+method of whichever state is current.
+
+Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
+object through `change_to()`, this version reaches the same moods by
+returning a new `State` from `next()`. Both model "a thing that
+changes behavior over time." The *State* surrogate suits that job when
+each mood needs real per-mood logic. The table-driven machine wins
+when the transitions themselves, not the mood behaviors, are the part
+worth making explicit and easy to audit.
 
 ## 3. A word-driven state machine with per-state transition tables
 
@@ -271,101 +274,176 @@ audit and edit as a unit. The chapter's own
 [table-driven state machine](../Chapters/31_Patterns--State_Machines.md#table-driven-state-machine)
 makes the same trade-off over the per-state `mouse_trap_states.py`.
 
-## 5. The mood machine, on the first design
+## 5. `mouse_move_generator()`
 
 ```python
 # exercise_5.py
-from collections.abc import Iterable
-from typing import Protocol
+import random
+from collections.abc import Iterator
+from enum import StrEnum
 
-# The chapter's state.py and state_machine.py, inlined:
-class State(Protocol):
-    def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+class MouseAction(StrEnum):
+    APPEARS = "mouse appears"
+    RUNS_AWAY = "mouse runs away"
+    ENTERS = "mouse enters trap"
+    ESCAPES = "mouse escapes"
+    TRAPPED = "mouse trapped"
+    REMOVED = "mouse removed"
 
-class StateMachine:
-    def __init__(self, initial_state: State) -> None:
-        self.current_state = initial_state
-        self.current_state.run()
-    def run_all(self, inputs: Iterable[object]) -> None:
-        for event in inputs:
-            print(event)
-            self.current_state = (
-                self.current_state.next(event))
-            self.current_state.run()
+NEXT_ACTIONS: dict[MouseAction | None,
+                   list[MouseAction]] = {
+    None: [MouseAction.APPEARS],
+    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
+                          MouseAction.ENTERS],
+    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
+    MouseAction.ENTERS: [MouseAction.ESCAPES,
+                         MouseAction.TRAPPED],
+    MouseAction.ESCAPES: [MouseAction.APPEARS],
+    MouseAction.TRAPPED: [MouseAction.REMOVED],
+    MouseAction.REMOVED: [MouseAction.APPEARS],
+}
 
-class TakePill:
-    def __repr__(self) -> str:
-        return "TakePill"
+def mouse_move_generator(
+    count: int, seed: int = 0
+) -> Iterator[MouseAction]:
+    rng = random.Random(seed)
+    previous: MouseAction | None = None
+    for _ in range(count):
+        previous = rng.choice(NEXT_ACTIONS[previous])
+        yield previous
 
-class Annoy:
-    def __repr__(self) -> str:
-        return "Annoy"
-
-class Calm:
-    def __repr__(self) -> str:
-        return "Calm"
-
-class Happy:
-    def run(self) -> None:
-        print("Great to see you!")
-    def next(self, event: object) -> State:
-        if isinstance(event, Annoy):
-            return Grumpy()
-        if isinstance(event, TakePill):
-            return Prozac()
-        return self
-
-class Grumpy:
-    def run(self) -> None:
-        print("What do you want?")
-    def next(self, event: object) -> State:
-        if isinstance(event, Calm):
-            return Happy()
-        if isinstance(event, TakePill):
-            return Prozac()
-        return self
-
-class Prozac:
-    def run(self) -> None:
-        print("Everything is wonderful.")
-    def next(self, event: object) -> State:
-        return self
-
-StateMachine(Happy()).run_all(
-    [Annoy(), Calm(), TakePill(), Annoy()])
-#: Great to see you!
-#: Annoy
-#: What do you want?
-#: Calm
-#: Great to see you!
-#: TakePill
-#: Everything is wonderful.
-#: Annoy
-#: Everything is wonderful.
+moves = list(mouse_move_generator(8, seed=1))
+print(" ".join(m.name for m in moves[:4]))
+#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
+print(" ".join(m.name for m in moves[4:]))
+#: APPEARS ENTERS TRAPPED REMOVED
 ```
 
-Each state decides its own successor. `Happy.next()` answers `Annoy`
-with a `Grumpy`, `Grumpy.next()` answers `Calm` with a `Happy`, and
-both answer `TakePill` with a `Prozac` that returns itself for
-everything after. Nothing outside the states holds the transition
-rules, which is exactly what distinguishes this design from the
-table-driven one exercise 6 uses: there the rules live in a dictionary
-a reader can audit in one place, and here they live in the `next()`
-method of whichever state is current.
+`NEXT_ACTIONS` is a small state machine of its own: a dictionary from
+"the action just produced" to "the legal actions that can follow it,"
+including the special `None` key for "nothing has happened yet," which
+leads only to `APPEARS`. The generator's own state is just `previous`,
+the last action it yielded. Each call to `next()` (one iteration of
+the consuming `for` loop) picks a legal successor and remembers it for
+the following call. `NEXT_ACTIONS` constrains every choice, so every
+sequence this generator produces is legal by construction.
+`mouse_trap_states.py`'s `next()` methods enforce the same guarantee by hand,
+one state class at a time.
 
-Where exercise 1's `UnpredictablePerson` swaps in a whole `Mood`
-object through `change_to()`, this version reaches the same moods by
-returning a new `State` from `next()`. Both model "a thing that
-changes behavior over time." The *State* surrogate suits that job when
-each mood needs real per-mood logic. The table-driven machine wins
-when the transitions themselves, not the mood behaviors, are the part
-worth making explicit and easy to audit.
-
-## 6. An elevator, table-driven
+## 6. A washing machine, table-driven
 
 ```python
 # exercise_6.py
+from dataclasses import dataclass
+from enum import Enum, auto
+from exceptions import expect
+from table_machine import NoTransition, StateMachine, Table
+
+class WashState(Enum):
+    IDLE = auto()
+    FILLING = auto()
+    WASHING = auto()
+    RINSING = auto()
+    SPINNING = auto()
+    DONE = auto()
+
+@dataclass
+class Start:
+    load_kg: float
+
+class Full:
+    pass
+class WashDone:
+    pass
+class RinseDone:
+    pass
+class SpinDone:
+    pass
+
+class WashingMachine(StateMachine):
+    def __init__(self) -> None:
+        self.load_kg = 0.0
+        self.log: list[str] = []
+        table: Table = {
+            (WashState.IDLE, Start):
+                [(None, self.begin, WashState.FILLING)],
+            (WashState.FILLING, Full):
+                [(None, self.log_msg("washing"),
+                  WashState.WASHING)],
+            (WashState.WASHING, WashDone):
+                [(None, self.log_msg("rinsing"),
+                  WashState.RINSING)],
+            (WashState.RINSING, RinseDone): [
+                (self.too_heavy, self.log_msg("slow spin"),
+                 WashState.SPINNING),
+                (None, self.log_msg("fast spin"),
+                 WashState.SPINNING),
+            ],
+            (WashState.SPINNING, SpinDone):
+                [(None, self.log_msg("done"),
+                  WashState.DONE)],
+        }
+        super().__init__(WashState.IDLE, table)
+
+    def begin(self, start: Start) -> None:
+        self.load_kg = start.load_kg
+        self.log.append("filling")
+
+    def too_heavy(self, event: RinseDone) -> bool:
+        return self.load_kg > 6
+
+    def log_msg(self, msg: str):
+        def action(event: object) -> None:
+            self.log.append(msg)
+        return action
+
+cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
+heavy = WashingMachine()
+for event in [Start(8), *cycle]:
+    heavy.handle(event)
+print(heavy.log)
+#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
+light = WashingMachine()
+for event in [Start(3), *cycle]:
+    light.handle(event)
+print(light.log)
+#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
+
+# Start pressed again, mid-cycle:
+busy = WashingMachine()
+busy.handle(Start(3))
+expect(NoTransition, busy.handle, Start(5))
+#: [NoTransition] no transition from <WashState.FILLING: 2>
+#: on Start
+print(busy.state.name, busy.load_kg)
+#: FILLING 3
+```
+
+The `(RINSING, RinseDone)` key holds the two rows the exercise asks
+for, told apart by `too_heavy()`. A load over six kilograms takes the
+slow spin, and anything lighter falls through to the unconditional
+fast-spin row below it. A `RinseDone` event carries no data of its
+own, so the condition reads `load_kg` off the machine, where
+`begin()` recorded it when the cycle started. The rest of the cycle
+is a straight line, one event type per state, and the machine is
+still the chapter's `table_machine.py` engine unchanged.
+
+A second `Start` during `FILLING` finds no row, so `handle()` raises
+`NoTransition`. The press changes nothing: the state is still
+`FILLING` and `load_kg` is still 3, because the engine finds a row
+before it runs any action. For a washing machine the caller should
+ignore the press: catch `NoTransition` and carry on, as
+`vending_view.py`'s `send()` does. A control panel is the noisy
+source the chapter describes, and a cycle that stopped because
+someone leaned on a button would be the worse failure. Raising the
+exception is still the right default for the engine. A caller can
+turn an exception into a no-op, and cannot turn a silent no-op into
+a report.
+
+## 7. An elevator, table-driven
+
+```python
+# exercise_7.py
 from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
@@ -461,10 +539,10 @@ passes wins. `above()` and `below()` pick `MOVING_UP` or
 `MOVING_DOWN`, and a call for the current floor falls through both
 conditions to open the doors with no travel.
 
-## 7. A heating/air-conditioning system, table-driven
+## 8. A heating/air-conditioning system, table-driven
 
 ```python
-# exercise_7.py
+# exercise_8.py
 from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
@@ -526,62 +604,6 @@ band falls through to the unconditional row back to `IDLE`. Every
 decision in the machine is a condition on the one event type. Every
 action slot here holds `None`, and the fall-through rows leave the
 condition slot `None` too, so both slots really are optional per row.
-
-## 8. `mouse_move_generator()`
-
-```python
-# exercise_8.py
-import random
-from collections.abc import Iterator
-from enum import StrEnum
-
-class MouseAction(StrEnum):
-    APPEARS = "mouse appears"
-    RUNS_AWAY = "mouse runs away"
-    ENTERS = "mouse enters trap"
-    ESCAPES = "mouse escapes"
-    TRAPPED = "mouse trapped"
-    REMOVED = "mouse removed"
-
-NEXT_ACTIONS: dict[MouseAction | None,
-                   list[MouseAction]] = {
-    None: [MouseAction.APPEARS],
-    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
-                          MouseAction.ENTERS],
-    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
-    MouseAction.ENTERS: [MouseAction.ESCAPES,
-                         MouseAction.TRAPPED],
-    MouseAction.ESCAPES: [MouseAction.APPEARS],
-    MouseAction.TRAPPED: [MouseAction.REMOVED],
-    MouseAction.REMOVED: [MouseAction.APPEARS],
-}
-
-def mouse_move_generator(
-    count: int, seed: int = 0
-) -> Iterator[MouseAction]:
-    rng = random.Random(seed)
-    previous: MouseAction | None = None
-    for _ in range(count):
-        previous = rng.choice(NEXT_ACTIONS[previous])
-        yield previous
-
-moves = list(mouse_move_generator(8, seed=1))
-print(" ".join(m.name for m in moves[:4]))
-#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
-print(" ".join(m.name for m in moves[4:]))
-#: APPEARS ENTERS TRAPPED REMOVED
-```
-
-`NEXT_ACTIONS` is a small state machine of its own: a dictionary from
-"the action just produced" to "the legal actions that can follow it,"
-including the special `None` key for "nothing has happened yet," which
-leads only to `APPEARS`. The generator's own state is just `previous`,
-the last action it yielded. Each call to `next()` (one iteration of
-the consuming `for` loop) picks a legal successor and remembers it for
-the following call. `NEXT_ACTIONS` constrains every choice, so every
-sequence this generator produces is legal by construction.
-`mouse_trap_states.py`'s `next()` methods enforce the same guarantee by hand,
-one state class at a time.
 
 ## 9. A `Nickel` the table has never heard of
 

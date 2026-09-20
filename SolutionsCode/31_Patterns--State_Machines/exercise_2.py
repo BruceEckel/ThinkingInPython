@@ -1,74 +1,69 @@
 # exercise_2.py
-from dataclasses import dataclass
-from enum import Enum, auto
-from table_machine import StateMachine, Table
+from collections.abc import Iterable
+from typing import Protocol
 
-class WashState(Enum):
-    IDLE = auto()
-    FILLING = auto()
-    WASHING = auto()
-    RINSING = auto()
-    SPINNING = auto()
-    DONE = auto()
+# The chapter's state.py and state_machine.py, inlined:
+class State(Protocol):
+    def run(self) -> None: ...
+    def next(self, event: object) -> State: ...
 
-@dataclass
-class Start:
-    load_kg: float
+class StateMachine:
+    def __init__(self, initial_state: State) -> None:
+        self.current_state = initial_state
+        self.current_state.run()
+    def run_all(self, inputs: Iterable[object]) -> None:
+        for event in inputs:
+            print(event)
+            self.current_state = (
+                self.current_state.next(event))
+            self.current_state.run()
 
-class Full:
-    pass
-class WashDone:
-    pass
-class RinseDone:
-    pass
-class SpinDone:
-    pass
+class TakePill:
+    def __repr__(self) -> str:
+        return "TakePill"
 
-class WashingMachine(StateMachine):
-    def __init__(self) -> None:
-        self.load_kg = 0.0
-        self.log: list[str] = []
-        table: Table = {
-            (WashState.IDLE, Start):
-                [(None, self.begin, WashState.FILLING)],
-            (WashState.FILLING, Full):
-                [(None, self.log_msg("washing"),
-                  WashState.WASHING)],
-            (WashState.WASHING, WashDone):
-                [(None, self.log_msg("rinsing"),
-                  WashState.RINSING)],
-            (WashState.RINSING, RinseDone): [
-                (self.too_heavy, self.log_msg("slow spin"),
-                 WashState.SPINNING),
-                (None, self.log_msg("fast spin"),
-                 WashState.SPINNING),
-            ],
-            (WashState.SPINNING, SpinDone):
-                [(None, self.log_msg("done"),
-                  WashState.DONE)],
-        }
-        super().__init__(WashState.IDLE, table)
+class Annoy:
+    def __repr__(self) -> str:
+        return "Annoy"
 
-    def begin(self, start: Start) -> None:
-        self.load_kg = start.load_kg
-        self.log.append("filling")
+class Calm:
+    def __repr__(self) -> str:
+        return "Calm"
 
-    def too_heavy(self, event: RinseDone) -> bool:
-        return self.load_kg > 6
+class Happy:
+    def run(self) -> None:
+        print("Great to see you!")
+    def next(self, event: object) -> State:
+        if isinstance(event, Annoy):
+            return Grumpy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-    def log_msg(self, msg: str):
-        def action(event: object) -> None:
-            self.log.append(msg)
-        return action
+class Grumpy:
+    def run(self) -> None:
+        print("What do you want?")
+    def next(self, event: object) -> State:
+        if isinstance(event, Calm):
+            return Happy()
+        if isinstance(event, TakePill):
+            return Prozac()
+        return self
 
-cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
-heavy = WashingMachine()
-for event in [Start(8), *cycle]:
-    heavy.handle(event)
-print(heavy.log)
-#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
-light = WashingMachine()
-for event in [Start(3), *cycle]:
-    light.handle(event)
-print(light.log)
-#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
+class Prozac:
+    def run(self) -> None:
+        print("Everything is wonderful.")
+    def next(self, event: object) -> State:
+        return self
+
+StateMachine(Happy()).run_all(
+    [Annoy(), Calm(), TakePill(), Annoy()])
+#: Great to see you!
+#: Annoy
+#: What do you want?
+#: Calm
+#: Great to see you!
+#: TakePill
+#: Everything is wonderful.
+#: Annoy
+#: Everything is wonderful.

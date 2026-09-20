@@ -1,83 +1,84 @@
 # exercise_6.py
 from dataclasses import dataclass
 from enum import Enum, auto
-from table_machine import StateMachine, Table
+from exceptions import expect
+from table_machine import NoTransition, StateMachine, Table
 
-class ElevatorState(Enum):
+class WashState(Enum):
     IDLE = auto()
-    MOVING_UP = auto()
-    MOVING_DOWN = auto()
-    DOORS_OPEN = auto()
-    DOORS_CLOSING = auto()
+    FILLING = auto()
+    WASHING = auto()
+    RINSING = auto()
+    SPINNING = auto()
+    DONE = auto()
 
 @dataclass
-class CallButton:
-    floor: int
+class Start:
+    load_kg: float
 
-class ArrivedAtFloor:
+class Full:
     pass
-class CloseDoors:
+class WashDone:
+    pass
+class RinseDone:
+    pass
+class SpinDone:
     pass
 
-@dataclass
-class DoorSensor:
-    blocked: bool
-
-class Elevator(StateMachine):
-    def __init__(self, floor: int = 0) -> None:
-        self.floor = floor
-        self.target = floor
+class WashingMachine(StateMachine):
+    def __init__(self) -> None:
+        self.load_kg = 0.0
+        self.log: list[str] = []
         table: Table = {
-            (ElevatorState.IDLE, CallButton): [
-                (self.above, self.set_target,
-                 ElevatorState.MOVING_UP),
-                (self.below, self.set_target,
-                 ElevatorState.MOVING_DOWN),
-                (None, None, ElevatorState.DOORS_OPEN),
+            (WashState.IDLE, Start):
+                [(None, self.begin, WashState.FILLING)],
+            (WashState.FILLING, Full):
+                [(None, self.log_msg("washing"),
+                  WashState.WASHING)],
+            (WashState.WASHING, WashDone):
+                [(None, self.log_msg("rinsing"),
+                  WashState.RINSING)],
+            (WashState.RINSING, RinseDone): [
+                (self.too_heavy, self.log_msg("slow spin"),
+                 WashState.SPINNING),
+                (None, self.log_msg("fast spin"),
+                 WashState.SPINNING),
             ],
-            (ElevatorState.MOVING_UP, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
-                [(None, self.arrive,
-                  ElevatorState.DOORS_OPEN)],
-            (ElevatorState.DOORS_OPEN, CloseDoors):
-                [(None, None, ElevatorState.DOORS_CLOSING)],
-            (ElevatorState.DOORS_CLOSING, DoorSensor): [
-                (self.obstructed, None,
-                 ElevatorState.DOORS_OPEN),
-                (None, None, ElevatorState.IDLE),
-            ],
+            (WashState.SPINNING, SpinDone):
+                [(None, self.log_msg("done"),
+                  WashState.DONE)],
         }
-        super().__init__(ElevatorState.IDLE, table)
+        super().__init__(WashState.IDLE, table)
 
-    def above(self, call: CallButton) -> bool:
-        return call.floor > self.floor
+    def begin(self, start: Start) -> None:
+        self.load_kg = start.load_kg
+        self.log.append("filling")
 
-    def below(self, call: CallButton) -> bool:
-        return call.floor < self.floor
+    def too_heavy(self, event: RinseDone) -> bool:
+        return self.load_kg > 6
 
-    def set_target(self, call: CallButton) -> None:
-        self.target = call.floor
+    def log_msg(self, msg: str):
+        def action(event: object) -> None:
+            self.log.append(msg)
+        return action
 
-    def arrive(self, event: object) -> None:
-        self.floor = self.target
+cycle = [Full(), WashDone(), RinseDone(), SpinDone()]
+heavy = WashingMachine()
+for event in [Start(8), *cycle]:
+    heavy.handle(event)
+print(heavy.log)
+#: ['filling', 'washing', 'rinsing', 'slow spin', 'done']
+light = WashingMachine()
+for event in [Start(3), *cycle]:
+    light.handle(event)
+print(light.log)
+#: ['filling', 'washing', 'rinsing', 'fast spin', 'done']
 
-    def obstructed(self, sensor: DoorSensor) -> bool:
-        return sensor.blocked
-
-elevator = Elevator(floor=0)
-elevator.handle(CallButton(3))
-print(elevator.state, elevator.floor)
-#: ElevatorState.MOVING_UP 0
-elevator.handle(ArrivedAtFloor())
-print(elevator.state, elevator.floor)
-#: ElevatorState.DOORS_OPEN 3
-elevator.handle(CloseDoors())
-elevator.handle(DoorSensor(blocked=True))
-print(elevator.state)
-#: ElevatorState.DOORS_OPEN
-elevator.handle(CloseDoors())
-elevator.handle(DoorSensor(blocked=False))
-print(elevator.state)
-#: ElevatorState.IDLE
+# Start pressed again, mid-cycle:
+busy = WashingMachine()
+busy.handle(Start(3))
+expect(NoTransition, busy.handle, Start(5))
+#: [NoTransition] no transition from <WashState.FILLING: 2>
+#: on Start
+print(busy.state.name, busy.load_kg)
+#: FILLING 3

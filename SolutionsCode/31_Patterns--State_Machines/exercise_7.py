@@ -3,49 +3,81 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from table_machine import StateMachine, Table
 
-class HVACState(Enum):
+class ElevatorState(Enum):
     IDLE = auto()
-    HEATING = auto()
-    COOLING = auto()
+    MOVING_UP = auto()
+    MOVING_DOWN = auto()
+    DOORS_OPEN = auto()
+    DOORS_CLOSING = auto()
 
 @dataclass
-class TemperatureReading:
-    degrees: float
+class CallButton:
+    floor: int
 
-class HVAC(StateMachine):
-    def __init__(self, target: float = 20,
-                 band: float = 2) -> None:
-        self.target = target
-        self.band = band
+class ArrivedAtFloor:
+    pass
+class CloseDoors:
+    pass
+
+@dataclass
+class DoorSensor:
+    blocked: bool
+
+class Elevator(StateMachine):
+    def __init__(self, floor: int = 0) -> None:
+        self.floor = floor
+        self.target = floor
         table: Table = {
-            (HVACState.IDLE, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
+            (ElevatorState.IDLE, CallButton): [
+                (self.above, self.set_target,
+                 ElevatorState.MOVING_UP),
+                (self.below, self.set_target,
+                 ElevatorState.MOVING_DOWN),
+                (None, None, ElevatorState.DOORS_OPEN),
             ],
-            (HVACState.HEATING, TemperatureReading): [
-                (self.too_cold, None, HVACState.HEATING),
-                (None, None, HVACState.IDLE),
-            ],
-            (HVACState.COOLING, TemperatureReading): [
-                (self.too_hot, None, HVACState.COOLING),
-                (None, None, HVACState.IDLE),
+            (ElevatorState.MOVING_UP, ArrivedAtFloor):
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
+            (ElevatorState.MOVING_DOWN, ArrivedAtFloor):
+                [(None, self.arrive,
+                  ElevatorState.DOORS_OPEN)],
+            (ElevatorState.DOORS_OPEN, CloseDoors):
+                [(None, None, ElevatorState.DOORS_CLOSING)],
+            (ElevatorState.DOORS_CLOSING, DoorSensor): [
+                (self.obstructed, None,
+                 ElevatorState.DOORS_OPEN),
+                (None, None, ElevatorState.IDLE),
             ],
         }
-        super().__init__(HVACState.IDLE, table)
+        super().__init__(ElevatorState.IDLE, table)
 
-    def too_cold(self, r: TemperatureReading) -> bool:
-        return r.degrees < self.target - self.band
+    def above(self, call: CallButton) -> bool:
+        return call.floor > self.floor
 
-    def too_hot(self, r: TemperatureReading) -> bool:
-        return r.degrees > self.target + self.band
+    def below(self, call: CallButton) -> bool:
+        return call.floor < self.floor
 
-hvac = HVAC()
-for degrees in [15, 17, 21, 30, 20]:
-    hvac.handle(TemperatureReading(degrees))
-    print(degrees, hvac.state.name)
-#: 15 HEATING
-#: 17 HEATING
-#: 21 IDLE
-#: 30 COOLING
-#: 20 IDLE
+    def set_target(self, call: CallButton) -> None:
+        self.target = call.floor
+
+    def arrive(self, event: object) -> None:
+        self.floor = self.target
+
+    def obstructed(self, sensor: DoorSensor) -> bool:
+        return sensor.blocked
+
+elevator = Elevator(floor=0)
+elevator.handle(CallButton(3))
+print(elevator.state, elevator.floor)
+#: ElevatorState.MOVING_UP 0
+elevator.handle(ArrivedAtFloor())
+print(elevator.state, elevator.floor)
+#: ElevatorState.DOORS_OPEN 3
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=True))
+print(elevator.state)
+#: ElevatorState.DOORS_OPEN
+elevator.handle(CloseDoors())
+elevator.handle(DoorSensor(blocked=False))
+print(elevator.state)
+#: ElevatorState.IDLE

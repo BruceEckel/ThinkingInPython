@@ -1,7 +1,7 @@
 # Prose references to numbered exercises, each paired with the
 # Solutions heading it points at, as last read by a human.
-# Tree/Chapter_Name<TAB>target Chapter_Name<TAB>number<TAB>title,
-# one per reference, sorted. Rewritten by
+# Tree/Chapter_Name<TAB>target Chapter_Name<TAB>number<TAB>
+# title, one per reference, sorted. Rewritten by
 # `make exercise-refs-accept`; read the delta with
 # `make exercise-refs` before accepting.
 # See tools/exercise_refs.py.
@@ -57,7 +57,7 @@ Solutions/Simulation	Simulation	7	Changing the physics
 Solutions/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
 Solutions/State_Machines	State_Machines	3	A word-driven state machine with per-state transition tables
-Solutions/State_Machines	State_Machines	6	An elevator, table-driven
+Solutions/State_Machines	State_Machines	7	An elevator, table-driven
 Solutions/Stateless_in_Practice	Generators	4	Removing the `yield from`
 Solutions/Stateless_in_Practice	Stateless_in_Practice	13	A dependency two levels down
 Solutions/Stateless_in_Practice	Stateless_in_Practice	2	A leak the type checker cannot see

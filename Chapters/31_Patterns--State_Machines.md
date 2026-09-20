@@ -93,7 +93,8 @@ The members still hash and look up correctly, so they work as dictionary keys,
 and `MouseAction("mouse appears")` returns the matching member,
 which is how the code below parses the test input.
 
-A text file supplies the sequence of mouse inputs:
+A text file supplies the sequence of mouse inputs,
+nine moves that between them exercise every transition in the trap:
 
 ```text
 # mouse_moves.txt
@@ -102,12 +103,6 @@ mouse runs away
 mouse appears
 mouse enters trap
 mouse escapes
-mouse appears
-mouse enters trap
-mouse trapped
-mouse removed
-mouse appears
-mouse runs away
 mouse appears
 mouse enters trap
 mouse trapped
@@ -208,18 +203,6 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse enters trap
-#: Trapping: Closing door
-#: mouse trapped
-#: Holding: Mouse caught
-#: mouse removed
-#: Waiting: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
 # fires and the machine stays at Waiting:
@@ -231,6 +214,16 @@ trap.run_all([MouseAction.ESCAPES])
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
+Each state is one shared object.
+A state class stores nothing,
+so a single `Waiting` serves every `MouseTrap` and every visit to that state.
+Each `next()` is a `match` on the event:
+a `case` for every input the state recognizes,
+and a `case _` that returns the state the machine is in.
+`Waiting.next()` returns `MouseTrap.luring` although `MouseTrap` is defined further down the file.
+Python looks up a name inside a function when the function runs,
+not when its `def` executes,
+and by the time anything calls `next()` the whole module has run and `MouseTrap` exists.
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 `StateMachine`'s constructor runs the initial state,
@@ -355,7 +348,7 @@ MouseTrap.holding.transitions = {
 text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
+MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
 #: mouse appears
 #: Luring: Presenting Cheese, door open
@@ -385,10 +378,7 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 #: escapes
 ```
 
-The demonstration stops after the first nine moves,
-which between them exercise every transition in the trap.
-The rest of the input file only repeats them,
-so the output continues as in the first version.
+The output matches the first version's, move for move.
 
 With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
@@ -426,6 +416,8 @@ The previous design keeps each state's transitions inside the state class.
 A fully table-driven design can go further and represent the entire machine as a single transition table.
 All the behavior then lives in one place,
 so you can build and maintain it directly from a state-transition diagram.
+The example is a vending machine, built in two steps:
+an engine that knows nothing about vending, then the machine's table.
 
 For a given current state and input, a transition row answers three questions:
 whether a condition must pass, what action runs during the transition,
@@ -443,7 +435,7 @@ and the table is an ordinary `dict`.
 
 The inputs change shape too.
 The mousetrap's inputs are `MouseAction` members, names with nothing attached.
-A vending machine's inputs carry values: what a coin is worth,
+The vending machine's inputs carry values: what a coin is worth,
 which digit the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
@@ -459,12 +451,10 @@ The states in this design do nothing.
 The table holds all the behavior.
 
 The file's name differs from the first engine's `state_machine.py` on purpose.
-Python caches a module in `sys.modules` under its import name
+Python caches each module under its import name
 ([Modules and Packages](06_Foundations--Modules_and_Packages.md) shows the cache),
-and a later `import` takes the cached module without looking at any file.
-Two files named `state_machine.py` in one program therefore collapse into one:
-whichever imported first wins,
-and the second import silently gets the wrong module.
+so a program that imports two files named `state_machine.py` gets the first one both times,
+with no error.
 
 ### The Engine
 
@@ -917,8 +907,16 @@ so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and wher
 and adding a state is one class.
 It reads best when the transitions are obvious from the state's own name.
 An action that must run on every entry into one state,
-such as chiming whenever the machine reaches `COLLECTING`,
+such as sounding a chime whenever the trap reaches `Holding`,
 belongs in that state's `run()`, written once.
+
+Inside that design, `match` statements and per-state tables differ in who handles an input the state does not recognize.
+With `match`, each state's `case _` sets its own policy,
+in the method you are reading.
+With tables, `TableState.next()` sets one policy for every state,
+and each class shrinks to its `run()`.
+The tables read better as the states multiply,
+because every state's transitions have the same shape and sit together at the bottom of the file.
 
 One-table suits a machine you build from a diagram, whose inputs carry data,
 or whose transitions need conditions.
@@ -946,9 +944,8 @@ Choose a library once the machine outgrows what a page of code should carry.
 1.  Using [*State*](26_Patterns--Surrogate.md#state),
     make a class called `UnpredictablePerson` that changes the kind of response to its `hello()` method depending on its current `Mood`.
     Add another kind of `Mood` called `Prozac`.
-2.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
-    Give one `(state, input)` pair two rows told apart by a condition,
-    such as a load too heavy for the fast spin.
+2.  Turn exercise 1's `UnpredictablePerson` into a state machine using `state_machine.py`,
+    the first design, where each state decides the next one.
 3.  Create a *StateMachine* system in which the current state and the input together determine the next state.
     Use a `dict` to map a `str` naming a state to its state object.
     Give each state subclass its own transition table,
@@ -956,21 +953,26 @@ Choose a library once the machine outgrows what a page of code should carry.
     Feed the machine a sequence of single words,
     such as a text file with one word per line.
 4.  Modify the previous exercise so that you can configure the state machine by editing a single transition table.
-5.  Modify the "mood" exercise (exercise 1)
-    so that it becomes a state machine using `state_machine.py`,
-    the first design, where each state decides the next one.
-6.  Create an elevator state machine using `tabledriven/table_machine.py`.
-    Give the "doors closing" state two rows for the same input,
-    one guarded by a door-obstruction condition.
-7.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
-    A single `TemperatureReading` input must be able to lead to heating,
-    cooling, or idle, decided entirely by conditions on one `(state, input)` key.
-8.  Write a `mouse_move_generator()`,
+5.  Write a `mouse_move_generator()`,
     a [generator](23_Patterns--Iterators.md#generators)
     that yields valid `MouseAction` moves in sequence,
     where each possible move depends on the previous one
     (it is another state machine).
     Have it accept an `int` for the number of moves to produce, then stop.
+6.  Apply the table-driven `StateMachine` from `tabledriven/table_machine.py` to a washing-machine problem.
+    Give one `(state, input)` pair two rows told apart by a condition,
+    such as a load too heavy for the fast spin.
+    Then press `Start` in the middle of a cycle,
+    an input that state has no row for,
+    and decide what the caller does with the `NoTransition`:
+    ignore the press or stop the machine.
+    Say which policy suits a washing machine, and why.
+7.  Create an elevator state machine using `tabledriven/table_machine.py`.
+    Give the "doors closing" state two rows for the same input,
+    one guarded by a door-obstruction condition.
+8.  Create a heating/air-conditioning system using `tabledriven/table_machine.py`.
+    A single `TemperatureReading` input must be able to lead to heating,
+    cooling, or idle, decided entirely by conditions on one `(state, input)` key.
 9.  Build a two-state machine that collects `Money`,
     modeled on `vending_machine.py`'s.
     Add a `Nickel` class deriving from `Money` and feed one in without touching the table.

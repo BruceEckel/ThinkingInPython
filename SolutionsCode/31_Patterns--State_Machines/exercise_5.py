@@ -1,69 +1,40 @@
 # exercise_5.py
-from collections.abc import Iterable
-from typing import Protocol
+import random
+from collections.abc import Iterator
+from enum import StrEnum
 
-# The chapter's state.py and state_machine.py, inlined:
-class State(Protocol):
-    def run(self) -> None: ...
-    def next(self, event: object) -> State: ...
+class MouseAction(StrEnum):
+    APPEARS = "mouse appears"
+    RUNS_AWAY = "mouse runs away"
+    ENTERS = "mouse enters trap"
+    ESCAPES = "mouse escapes"
+    TRAPPED = "mouse trapped"
+    REMOVED = "mouse removed"
 
-class StateMachine:
-    def __init__(self, initial_state: State) -> None:
-        self.current_state = initial_state
-        self.current_state.run()
-    def run_all(self, inputs: Iterable[object]) -> None:
-        for event in inputs:
-            print(event)
-            self.current_state = (
-                self.current_state.next(event))
-            self.current_state.run()
+NEXT_ACTIONS: dict[MouseAction | None,
+                   list[MouseAction]] = {
+    None: [MouseAction.APPEARS],
+    MouseAction.APPEARS: [MouseAction.RUNS_AWAY,
+                          MouseAction.ENTERS],
+    MouseAction.RUNS_AWAY: [MouseAction.APPEARS],
+    MouseAction.ENTERS: [MouseAction.ESCAPES,
+                         MouseAction.TRAPPED],
+    MouseAction.ESCAPES: [MouseAction.APPEARS],
+    MouseAction.TRAPPED: [MouseAction.REMOVED],
+    MouseAction.REMOVED: [MouseAction.APPEARS],
+}
 
-class TakePill:
-    def __repr__(self) -> str:
-        return "TakePill"
+def mouse_move_generator(
+    count: int, seed: int = 0
+) -> Iterator[MouseAction]:
+    rng = random.Random(seed)
+    previous: MouseAction | None = None
+    for _ in range(count):
+        previous = rng.choice(NEXT_ACTIONS[previous])
+        yield previous
 
-class Annoy:
-    def __repr__(self) -> str:
-        return "Annoy"
-
-class Calm:
-    def __repr__(self) -> str:
-        return "Calm"
-
-class Happy:
-    def run(self) -> None:
-        print("Great to see you!")
-    def next(self, event: object) -> State:
-        if isinstance(event, Annoy):
-            return Grumpy()
-        if isinstance(event, TakePill):
-            return Prozac()
-        return self
-
-class Grumpy:
-    def run(self) -> None:
-        print("What do you want?")
-    def next(self, event: object) -> State:
-        if isinstance(event, Calm):
-            return Happy()
-        if isinstance(event, TakePill):
-            return Prozac()
-        return self
-
-class Prozac:
-    def run(self) -> None:
-        print("Everything is wonderful.")
-    def next(self, event: object) -> State:
-        return self
-
-StateMachine(Happy()).run_all(
-    [Annoy(), Calm(), TakePill(), Annoy()])
-#: Great to see you!
-#: Annoy
-#: What do you want?
-#: Calm
-#: Great to see you!
-#: TakePill
-#: Everything is wonderful.
-#: Annoy
-#: Everything is wonderful.
+moves = list(mouse_move_generator(8, seed=1))
+print(" ".join(m.name for m in moves[:4]))
+#: APPEARS RUNS_AWAY APPEARS RUNS_AWAY
+print(" ".join(m.name for m in moves[4:]))
+#: APPEARS ENTERS TRAPPED REMOVED

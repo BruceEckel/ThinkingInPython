@@ -85,18 +85,6 @@ MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Holding: Mouse caught
 #: mouse removed
 #: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse runs away
-#: Waiting: Broadcasting cheese smell
-#: mouse appears
-#: Luring: Presenting Cheese, door open
-#: mouse enters trap
-#: Trapping: Closing door
-#: mouse trapped
-#: Holding: Mouse caught
-#: mouse removed
-#: Waiting: Broadcasting cheese smell
 
 # ESCAPES has no case in Waiting, so case _
 # fires and the machine stays at Waiting:

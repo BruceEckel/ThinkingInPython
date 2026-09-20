@@ -71,7 +71,7 @@ MouseTrap.holding.transitions = {
 text = Path("mouse_moves.txt").read_text()
 moves = [line.strip() for line in text.splitlines()
          if line.strip() and not line.startswith("#")]
-MouseTrap().run_all([MouseAction(m) for m in moves[:9]])
+MouseTrap().run_all([MouseAction(m) for m in moves])
 #: Waiting: Broadcasting cheese smell
 #: mouse appears
 #: Luring: Presenting Cheese, door open
