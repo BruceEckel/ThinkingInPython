@@ -113,9 +113,10 @@ but a caller can forget to make the call.
 `_observers` is a list,
 so the `list(self._observers)` copy inside `notify()` looks redundant.
 It is not.
-An observer may react to a notification by detaching,
-and a detach that reached the list the loop is reading would make the loop skip the next observer,
-with no exception to report the skip.
+An observer may react to a notification by detaching.
+If the loop read `self._observers` directly,
+that `detach()` would shift the remaining observers down one index,
+and the loop would skip one of them without raising an exception.
 The copy is a second list,
 so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
 The set of observers is therefore fixed when `notify()` begins.
