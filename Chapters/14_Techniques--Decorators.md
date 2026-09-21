@@ -12,6 +12,8 @@ The decorator receives the thing it decorates, does something with it,
 then returns a result, which Python binds to the original name.
 Most decorators apply to functions, so this chapter starts there.
 
+## What `@` Does {#what-at-does}
+
 To apply a decorator,
 put `@` followed by the decorator name on the line above the definition.
 For simplicity, this first example uses an untyped `Callable`:
@@ -163,6 +165,8 @@ if __name__ == "__main__":
 #: <- add = 5
 ```
 
+### `wraps` Keeps the Runtime Interface
+
 `functools.wraps` copies the original function's metadata onto the wrapper:
 its name, docstring, and other attributes.
 Without it, the decorated `add` reports its name as `wrapper` and loses its docstring,
@@ -172,8 +176,10 @@ misleading debuggers, `help()`, and documentation tools.
 so `add.__wrapped__(2, 3)` calls the function without the tracing,
 and `inspect.signature()` follows that chain automatically.
 
-`wraps` keeps the runtime interface.
-The type parameters (introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes))
+### `**P` and `R` Keep the Static Interface {#p-and-r-keep-the-static-interface}
+
+`wraps` keeps the runtime interface, and the type parameters
+(introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes))
 keep the static one.
 `trace[**P, R]` declares two of them.
 `R` is the wrapped function's return type.
