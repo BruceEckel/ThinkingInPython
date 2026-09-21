@@ -619,7 +619,7 @@ You write one function.
 The type varies underneath it.
 
 *Parametric polymorphism* is a single implementation for multiple types.
-[Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)'s `first[T]` and `Box[T]` show this.
+[Static Types](08_Foundations--Static_Types.md#type-parameters)'s `first[T]` and `Box[T]` show this.
 One body works for any `T`.
 The type checker infers the concrete type behind `T` at each call site.
 
@@ -1025,7 +1025,7 @@ and `assert_never()` turns each one into a type checker error naming the shape y
 
 The OOP approach assumes you add types more often than operations,
 and that assumption often fails.
-This trade-off is the [expression problem](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
+This trade-off is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 and [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explore it further.
