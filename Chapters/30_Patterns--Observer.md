@@ -1118,12 +1118,67 @@ The object that changes names no listener type, which is what the pattern buys.
 It still decides what those listeners hear about,
 for objects it has no other awareness of.
 A threshold makes that concrete.
-A `Thermometer` that announces only changes above half a degree holds that half degree on its listeners' behalf,
-and nothing in the class says which listener asked for it.
+This thermometer announces a reading only when it differs from the reading before it by at least `_delta`:
 
+```python
+# threshold.py
+from broadcaster import Broadcaster
+
+class ThresholdThermometer(Broadcaster[float]):
+    def __init__(
+        self, celsius: float, delta: float
+    ) -> None:
+        super().__init__()
+        self._celsius = celsius
+        self._delta = delta
+
+    @property
+    def celsius(self) -> float:
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float) -> None:
+        change = abs(value - self._celsius)
+        self._celsius = value
+        if change >= self._delta:
+            self.announce(value)
+
+def display(celsius: float) -> None:
+    print(f"display: {celsius}C")
+
+log: list[float] = []
+t = ThresholdThermometer(20.0, 0.5)
+t.subscribe(log.append)
+t.subscribe(display)
+for reading in [20.2, 20.9, 21.0, 22.0]:
+    t.celsius = reading
+#: display: 20.9C
+#: display: 22.0C
+print(log)
+#: [20.9, 22.0]
+```
+
+`_delta` is the thermometer's field and its listeners' business.
+Half a degree suits `display`, which repaints when a reading looks different.
+It does not suit `log`, which exists to record every reading,
+and two of the four readings reach neither listener.
+`log` has no way to ask for them,
+and nothing in `ThresholdThermometer` says which listener the half degree was for.
+
+Moving the comparison into the listeners puts the number where the need is.
+`display` remembers the last value it drew and skips a reading close to it,
+`log` appends whatever arrives,
+and the setter goes back to announcing every assignment.
+The thermometer then knows nothing about tolerance,
+and every listener that wants one writes the same comparison.
+
+That repetition is the right trade for a question about *how much*.
+*Which kind* is a different question, and repetition answers it badly,
+because a listener cannot subscribe to a kind of change the announcement never distinguishes.
+`watched.py` pays that cost,
+with every watcher taking the attribute name and filtering it.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-answers the question rather than relocating it:
-one list becomes a dictionary of lists keyed by event type,
+removes it: one list becomes a dictionary of lists keyed by event type,
 so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.
 The publisher decides which event it is publishing, which it already knows,
 in place of deciding who needs to hear.
