@@ -307,6 +307,8 @@ A bare `assert` like this one reports only `AssertionError` if the law fails.
 Python prints the assert's source code, not the value that broke it,
 so finding the failing input means adding a `print()` and rerunning by hand.
 
+### The Same Law in Hypothesis
+
 Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
@@ -342,6 +344,8 @@ It also shrinks that input to the smallest example that still fails,
 a second improvement,
 so the bug surfaces as the clearest case rather than a random one.
 The framework automates falsification.
+
+### Shrinking a Failure
 
 The two listings above both pass, so nothing has shrunk yet.
 The next codec has a bug, and it is the Unicode gap promised earlier:
@@ -391,6 +395,8 @@ This function exists to fail,
 and a failing `test_` function would fail the build,
 so its name drops the `test_` prefix and the listing calls it directly inside a `try`.
 
+### A Family of Property Shapes
+
 The *roundtrip* law is one member of a small family of reusable property shapes,
 and knowing the family is most of the skill.
 An *invariant* states a fact about every output:
@@ -400,6 +406,7 @@ sorting a sorted list leaves it alone.
 An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
+
 The trap to avoid is a property that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
