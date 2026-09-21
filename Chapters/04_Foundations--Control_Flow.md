@@ -533,13 +533,13 @@ The handler matches on the class.
 [Classes](07_Foundations--Classes.md) covers class definitions in full.
 
 `joining_line()` digs the joining sentence out of the formatted traceback,
-so the output above is the text Python would print, not a summary of it.
+so the output above is the text Python prints, not a summary of it.
 `from e` sets `__cause__` and produces the "direct cause" line.
 With no `from`, Python still records the earlier exception in `__context__` and produces the "During handling" line.
 `from None` sets `__suppress_context__`,
 and nothing appears above the new exception.
 Use `from e` when the earlier exception explains this one,
-and `from None` when the earlier exception would only distract from your own message.
+and `from None` when the earlier exception only distracts from your own message.
 
 ### Ask Forgiveness, Not Permission
 
