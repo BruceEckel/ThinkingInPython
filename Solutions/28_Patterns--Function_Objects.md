@@ -50,7 +50,7 @@ print(account["balance"])
 
 A bare function is no longer enough, though not because of state.
 `callable_command.py`'s `Repeat` already carries its configuration and
-is still called with `()`, so state alone would not force a class.
+is still called with `()`, so state alone does not force a class.
 Undo forces one, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
 
@@ -329,7 +329,7 @@ bus.publish(BigDeposit(500))
 so iterating it in order calls the most specific handlers first and the
 inherited ones after. That order is what "parents last" asks for.
 `publish()` keeps using `.get()` for the same reason the chapter gives:
-indexing a `defaultdict` on a read would insert an empty list for every
+indexing a `defaultdict` on a read inserts an empty list for every
 class in every published event's MRO, `object` included.
 
 Adding `unsubscribe()` cannot break an existing caller, since code that
