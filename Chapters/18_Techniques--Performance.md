@@ -261,7 +261,7 @@ burns most of the time.
 `slow()` spends most of the total in a single call,
 so it needs a better algorithm.
 `<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
-where fewer calls would help more than a faster body.
+where fewer calls help more than a faster body.
 
 ### The Sampling Profiler
 
@@ -349,7 +349,7 @@ which the interpreter calls each time a monitored Python function begins.
 it attaches the event to one code object,
 and that is why `square()` is absent from the count even though it ran.
 The event does not spread to whatever that code calls,
-so a helper that `fib()` invokes would go uncounted as well.
+so a helper that `fib()` invokes goes uncounted as well.
 The global form is `set_events()`,
 which fires for every Python function in the process,
 and that is where the two differ in cost.
@@ -409,7 +409,7 @@ and after the first hit the monitored code returns to full speed.
 The trade against a profiler is the usual one.
 A profiler gives you a ranked table with no code to write.
 `sys.monitoring` gives you one number about one function,
-and that is the better tool when you know which function matters and the profiler's overhead would change the answer.
+and that is the better tool when you know which function matters and the profiler's overhead changes the answer.
 
 ## Benchmark Alternatives with `timeit`
 
@@ -798,7 +798,7 @@ keeps it, which is not sorted order.
 Use the heap version of every operation.
 The list's own `pop(0)` returns the smallest value the first time,
 but it also destroys the heap ordering,
-so a second `pop(0)` would return 6 while 4 is still in the list:
+so a second `pop(0)` returns 6 while 4 is still in the list:
 
 ```python
 # heap_corruption.py
@@ -885,7 +885,7 @@ answers this exact "top-N" question directly,
 and is the tool to use before hand-rolling either comparison here.
 The heap fits a different shape of problem:
 pushes and pops interleaved over time, with nothing to presort in advance.
-Re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
+Re-sorting after every insertion costs far more than one incremental `heappush()`/`heappop()` pair.
 
 ## Lazy Evaluation with Generators
 
@@ -1475,7 +1475,7 @@ compiles such a function to machine code on its first call:
     print(f"Numba speedup: {t_python / t_numba:.1f}x")
     # Sample run: Numba speedup: 15.9x
 
-`njit(count_primes)` wraps the same function `@njit` would decorate,
+`njit(count_primes)` wraps the same function `@njit` decorates,
 and returns something that compiles itself at the first call.
 Calling `fast_count_primes(1)` first pays the compilation and warm-up cost outside the timed region,
 so the comparison measures steady-state speed.
@@ -1787,7 +1787,7 @@ not just where it sits on that curve:
 7.  In `monitoring_counts.py`,
     swap `set_local_events()` for `set_events()` and say which entry in the `Counter` is new and why.
     Then get the same two counts back using two local attachments instead,
-    and explain what the two versions would stop agreeing about in a larger program.
+    and explain what the two versions stop agreeing about in a larger program.
 8.  Profile a script of your own with `uv run python -m cProfile -s cumulative`.
     Name the function with the largest `tottime` and the one with the largest `cumtime`,
     and explain why they are usually not the same function.
