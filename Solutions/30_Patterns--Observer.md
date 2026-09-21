@@ -325,8 +325,8 @@ The exception filter uses `Exception`, not `BaseException`, for the
 reason exercise 3 gives, and for a second reason here.
 `asyncio.CancelledError` derives from `BaseException`, and
 `return_exceptions=True` still returns a cancellation among the
-results. Treating that result as an ordinary listener failure would
-swallow a cancellation the event loop meant to propagate.
+results. Treating that result as an ordinary listener failure
+swallows a cancellation the event loop meant to propagate.
 
 The synchronous and asynchronous versions now answer the same
 question, and both end in an `ExceptionGroup`. The difference is only
@@ -788,8 +788,8 @@ Class access is the part a validating descriptor never needs.
 returning the descriptor there puts `subscribe()` within reach. The
 two `@overload` declarations tell `ty` which of the two results it
 gets: `Notifying[T]` from the class, `T` from an instance. Without
-them the declared return type is the union, and `t.celsius * 2` would
-fail to check. The overloads also check the listener against the
+them the declared return type is the union, and `t.celsius * 2` fails
+to check. The overloads also check the listener against the
 attribute: `Thermometer.celsius.subscribe(t, readings.append)` passes
 only because `readings` is a `list[float]`.
 
@@ -801,5 +801,5 @@ A codebase on Pyright looks the descriptor up in `type(obj).__dict__` instead,
 which draws no complaint from Pyright.
 
 `subscribe()` writes the listener list into the instance's `__dict__`
-rather than declaring it on the class, where every instance would
-share one list.
+rather than declaring it on the class, where every instance shares
+one list.
