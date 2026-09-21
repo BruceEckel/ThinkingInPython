@@ -172,7 +172,7 @@ Use `partialmethod` inside a class body and `partial` everywhere else.
 ### `cached_property`
 
 Runs a property's code once, on first access, then reuses the stored result.
-[Classes](07_Foundations--Classes.md#properties)
+[Classes](07_Foundations--Classes.md#cached-property)
 covers it alongside `@property`.
 
 ```python
@@ -671,7 +671,7 @@ stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and no more expensive.
 `tee()` wins when the consumers stay roughly in step.
-[Iterators](23_Patterns--Iterators.md#the-costs-of-laziness)
+[Iterators](23_Patterns--Iterators.md#what-tee-buffers)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
 so handing them to separate threads corrupts it.
