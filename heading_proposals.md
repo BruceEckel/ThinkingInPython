@@ -818,9 +818,10 @@ In "Property-Based Testing" (628 words, 3 listings):
   `slope()`,"
   The comparison now sits under "Make the Bad Value Impossible",
   which names only the third approach.
-- [ ] **H** L436 `### What a Full EMS Does`
+- [ ] **H** L436 `### Tracking and Management`
   Before: "An Effect Management System (EMS) keeps track of Effects"
-  The 638-word opening is its own topic. L1047, 46:944, and L841
+  Alternative: "The Three Parts of an EMS". The 638-word opening is
+  its own topic. L1047, 46:944, and L841
   link to the `##` for the three-item list, 40 lines below.
 
 Lone subheading:
