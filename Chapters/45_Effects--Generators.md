@@ -304,7 +304,7 @@ Each `yield from` runs its target until that generator runs out,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The target decides how many values each delegation contributes.
 The `from` is what delegates.
-Without it, `yield one()` would hand the generator object itself to the driver as a single value.
+Without it, `yield one()` hands the generator object itself to the driver as a single value.
 "Exhausted" describes where the delegation ends,
 not when the driver receives each value.
 Each value still leaves the inner generator only when the driver asks for the next one.
@@ -802,7 +802,7 @@ That is the question the next chapter puts into the type system.
     leaving `profile: Result = interview()`.
     Run `ty check` and the script, and explain both results.
     Which one told you more,
-    and what would the type checker have said if `profile` carried no annotation?
+    and what does the type checker say if `profile` carries no annotation?
 5.  `report()` in `yield_from_return.py` yields but does not return.
     Rewrite it to also return the character count,
     and give it the full annotation.
