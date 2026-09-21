@@ -166,6 +166,8 @@ Because `MyList` inherits `list`, it gets all the methods from `list`.
 
 Printing the class of the class produces the metaclass.
 
+### A Family of Generated Classes
+
 Generating classes programmatically with `type` pays off when a family of classes differs only by name.
 Where you might otherwise write many near-identical subclasses by hand,
 you can instead generate them dynamically.
@@ -233,7 +235,9 @@ as its `action`: the late-binding trap `late_binding.py` demonstrates in [Functi
 It is a nested function, not a method defined inside a `class` statement,
 so the compiler never gives it the `__class__` cell that zero-argument `super()` needs.
 
-The dict comprehension builds all seven classes whether the schedule uses them or not.
+### Building Each Class on First Lookup
+
+The dict comprehension in `eager_event_classes.py` builds all seven classes whether the schedule uses them or not.
 Seven is cheap; hundreds would cost.
 So the next version delays building each class until the first lookup asks for it,
 at the price of a `dict` subclass and a placeholder for the classes not yet built:
@@ -447,7 +451,9 @@ so it gets no `__class__` cell and cannot use zero-argument `super()`.
 Text that reaches the compiler as a class body gets the cell.
 A function object handed to `type()` does not.
 
-That string is also the danger.
+### The Injection Risk
+
+The `klass` string is the danger in this approach.
 `exec()` runs its argument with the full power of the language,
 and `klass` splices `class_name` directly into source text.
 An unvalidated name containing a newline and a second statement could then break out of the `class` block and run anything,
@@ -461,7 +467,10 @@ Treat `exec()` and `eval()` like string-built SQL:
 safe on values you've already validated,
 dangerous on anything that reaches the program from outside, unchecked.
 
-Both generators carry a second cost, unrelated to injection.
+### Generated Classes Cannot Be Pickled
+
+Both generators, `type()` and `exec()`, have a second limitation,
+unrelated to injection.
 `exec()`'s private `namespace` has no `__name__` key,
 so the class it creates gets `__module__` set to `"builtins"`.
 `pickle.dumps()` on an instance then raises a `PicklingError`,
@@ -676,6 +685,8 @@ The last two sections keep circling one question:
 who enforces a rule about a class, and when?
 The language devices you have met divide into four families.
 
+### The Four Families
+
 `@final` and `@override` are *markers*.
 At runtime each sets a single attribute that nothing reads.
 The type checker carries the entire meaning,
@@ -705,6 +716,8 @@ The fourth family runs in the other direction:
 annotations survive into the running program,
 as [The `inspect` Module](#the-inspect-module) shows,
 so a library can read the checker's types and enforce them live.
+
+### `@dataclass_transform` Is a Claim {#dataclass-transform}
 
 How does the checker know what `@dataclass` does?
 For the standard library, the knowledge is built in.
@@ -817,6 +830,8 @@ print(plain.__get__(p, Person)())
 
 The last line performs by hand what `p.greet()` does automatically.
 Method binding is the descriptor protocol at work.
+
+### A Descriptor That Learns Its Name
 
 A class attribute learning its own name is another job that once needed a metaclass.
 In `x = Field()` below, `Field()` runs before the assignment,
@@ -1209,7 +1224,7 @@ but it is heavier than the problem usually requires.
 from a class decorator down to a module.
 Choose the lightest tool that solves your problem.
 
-### Multiple Inheritance and Metaclasses
+## Multiple Inheritance and Metaclasses
 
 `Singleton` stores its cache in `_instances`, a `dict` attribute,
 rather than inheriting from `dict`.
@@ -1445,6 +1460,8 @@ The `inspect` module is the other half of metaprogramming:
 it reads the structure of live objects.
 It answers questions like which members an object has,
 what a function's signature is, and what its docstring says.
+
+### The Core Functions
 
 `inspect` works on any live object: modules, classes, functions, methods,
 and instances.
