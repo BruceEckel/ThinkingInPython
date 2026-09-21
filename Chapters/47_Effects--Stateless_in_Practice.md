@@ -353,7 +353,9 @@ but here the margin is a `timedelta`.
 No fixture patches `datetime`, nothing sleeps,
 and each assertion compares values the test chose.
 
-Skipping the wait is the obvious benefit.
+### A Clock That Crosses Midnight
+
+Skipping the wait is the obvious benefit of a handled clock.
 A handler can also produce moments that are hard to get from a real clock.
 Here, `archive()` reads the clock twice,
 once to name a file and once to stamp what goes in it:
@@ -409,7 +411,9 @@ A supplied instance answers every request the same way,
 and so do `frozen` and `tomorrow`,
 each reporting one moment however often you ask.
 
-Compare this to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations),
+### A Source Named in the Type
+
+Compare these handlers to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations),
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 That works, but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
 Here the return type names the source instead,
@@ -1476,7 +1480,16 @@ print(len(script.lines), script.lines[1])
 
 One engine, four runs, and the only difference is what you supply.
 
-The third mixes the casts, and nothing objects.
+The fourth run swaps one cast member and captures the output.
+`Script` records what arrives,
+so a test reads the lines back as a list with no `capsys` and no monkeypatching,
+the same swap `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
+made with one Ability rather than three.
+The engine holds no printing to intercept.
+
+### The Unmatched Cast
+
+The third run mixes the casts, and nothing objects.
 A `Kitty` bats at a `Weapon`.
 It type-checks, and it runs.
 That is a real loss against the *Abstract Factory*,
@@ -1490,12 +1503,7 @@ and `kitties_and_puzzles()` does.
 The guarantee moves from a class hierarchy into a two-line function.
 Know which of those you are getting.
 
-The fourth run swaps one cast member and captures the output.
-`Script` records what arrives,
-so a test reads the lines back as a list with no `capsys` and no monkeypatching,
-the same swap `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
-made with one Ability rather than three.
-The engine holds no printing to intercept.
+### The Nine-Argument Ceiling
 
 The cast has a ceiling on how wide it can get.
 `supply()`'s declaration carries overloads for one through nine values,
@@ -1520,6 +1528,8 @@ An Effect that asks for ten separate things is usually two Effects.
 said that a caller could retry a pipeline without touching it.
 Stateless provides a few decorators that add such behavior.
 Retry is the one to study, because of what it does to the type.
+
+### `retry()` and a Flaky Database
 
 `Database` fails a fixed number of times before working,
 so the example is repeatable:
@@ -1596,7 +1606,9 @@ Three attempts against a database that fails twice succeed on the third,
 and three attempts against one that always fails produce a `RetryError` holding every failure.
 `save_user()` stays unchanged through all of it.
 
-Read the trace before you use this on real code.
+### What Retry Cannot Judge
+
+Read the trace before you use `retry()` on real code.
 Each attempt line is `Database.save()` running again,
 so the decorated function runs its whole body once per attempt.
 Retrying a charge or an append duplicates it.
@@ -1889,7 +1901,9 @@ raising a leftover error rather than returning it:
 These two are the only functions that perform work,
 which is the description/execution split in table form.
 
-The rule has a reason, and the reason has a cost.
+## `run()` Builds a Loop per Call
+
+The rule about where to call `run()` and `run_async()` has a reason.
 `run()` is `asyncio.run(run_async(effect))`,
 building a fresh event loop for the call and tearing it down after.
 If you call it from inside a loop already running
