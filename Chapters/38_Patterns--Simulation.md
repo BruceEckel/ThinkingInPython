@@ -849,8 +849,9 @@ handing each run of matching letters to `pair = list(group)`.
 every target letter marks exactly two rooms, never one, never three.
 A typo that leaves a letter unpaired, or repeats it a third time,
 fails here at build time, naming the offending letter.
-Without that check the builder would leave a `Teleport` whose `target_room` was never set,
-and the robot would find the mistake by stepping into it.
+Without that check the build still stops,
+at `room1, room2 = pair` on the next line,
+with a `ValueError` about unpacking that does not name the letter.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
 each proves that the occupant really is a `Teleport` before the code touches `target_room`.
 
