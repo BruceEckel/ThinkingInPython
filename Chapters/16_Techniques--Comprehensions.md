@@ -402,9 +402,12 @@ The comprehension finishes building `py_paths`, as strings,
 while the directory still exists.
 The `for` loop runs after the directory disappears,
 and by then nothing needs the files.
-Turning those brackets into parentheses would break the program:
-a generator expression would not start walking until `sorted()` pulls on it,
+If you turn those brackets into parentheses,
+the program prints nothing and raises no exception.
+A generator expression does not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
+By then the directory is gone,
+and `Path.walk()` ignores the error unless you pass `on_error`.
 [Generator Expressions](#the-gap-between-creation-and-consumption)
 returns to that gap.
 
