@@ -332,8 +332,8 @@ arguments (`{"number": self.number}`), overrides the named ones with
 `|`, and rebuilds through `type(self)(...)`. The validation runs
 because the rebuild goes through `__init__()`. A frozen data class
 stays validated across a replacement for the same reason. Any
-`__replace__()` that restored the state directly, the way
-`copy.copy()` does, would skip the check.
+`__replace__()` that restores the state directly, the way
+`copy.copy()` does, skips the check.
 
 ## 6. A `ClassVar` counter on a frozen `Stars`
 
