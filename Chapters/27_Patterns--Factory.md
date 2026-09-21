@@ -378,7 +378,7 @@ and `make()` builds it with no change to the factory.
 `Shape.__subclasses__()` could have built the table instead,
 but it lists only direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
 uses this same self-registration.
 
 ### Hazards of Self Registration
@@ -406,7 +406,7 @@ a class defined inside a function or a test stays in the table,
 and the strong reference keeps it alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
-`cls.registry` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
+`cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
 so a subclass that defines its own `registry` would create a second table that `make()` never reads,
 with no error to signal it.
 
@@ -958,7 +958,7 @@ with no error to signal it.
 
 `deepcopy()` restores the clone's state without running the constructor,
 so a `__post_init__()` check never sees the clone
-([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace) shows which copying calls run it).
+([Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#copy-skips-the-constructor) shows which copying calls run it).
 A prototype of a validated type is safe because the prototype is valid,
 not because the clone is checked.
 When the variant differs only in field values,
