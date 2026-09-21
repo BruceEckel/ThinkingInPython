@@ -255,3 +255,22 @@ before/after pair, and it becomes part of every future pass.
   Give the sentence one actor for its whole length, the one that is
   really acting (Python, the checker, the driver), and state what that
   actor does with the case.
+- **The appositive summary noun with a negative relative.**
+  "The Context becomes useful when something must hold the current
+  algorithm between calls, a job no parameter can do" stacks four costs
+  in five words: the reader supplies the missing "that", holds "job"
+  open across an object gap, builds "a parameter does this" in order to
+  cancel it, and works out which job "a job" names, since it names only
+  the preceding clause.
+  Name the actor and say what it does:
+  "A parameter carries a strategy into one call and is gone when the
+  call returns, so a Context earns its place when the algorithm must
+  outlast the call."
+  The same shape appears as "a case no listing here builds", "a way no
+  argument list records", "a name no descriptor claims", and in subject
+  position as "a builder nothing decorates is absent from the table".
+  Restoring "that" fixes only the first cost, so it is not the repair.
+  Where the absence is the claim, keep the negative and give it a main
+  clause with its object in place ("No listing here builds one."),
+  or name the thing instead of the quantifier ("an undecorated
+  builder", "the type with no values").

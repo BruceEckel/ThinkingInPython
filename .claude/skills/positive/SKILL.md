@@ -151,3 +151,10 @@ Bruce reviews the diff and commits himself.
 Negation shapes Bruce has flagged that the families above do not name
 yet. When he identifies a new one, add it here as a bullet with a
 before/after pair, and it becomes part of every future pass.
+
+- **The appositive summary noun with a negative relative.**
+  "a job no parameter can do", "a case no listing here builds".
+  The negation is one of four stacked costs, so the repair is
+  structural.
+  `straighten`'s Accrued patterns carries the full entry and the
+  before/after pair.
