@@ -148,8 +148,8 @@ search moves on.
 
 The case check is deliberate, and
 [PEP 235](https://peps.python.org/pep-0235/) says why: without it, a
-program written on Windows would import happily there and fail the
-first time it ran on Linux, where the two names really are different
+program written on Windows imports happily there and fails the first
+time it runs on Linux, where the two names really are different
 files. Making the case rule the same everywhere turns a portability
 bug that surfaces in someone else's CI into one that surfaces on your
 own machine.
