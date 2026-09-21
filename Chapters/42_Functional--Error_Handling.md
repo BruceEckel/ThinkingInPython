@@ -92,7 +92,7 @@ for r in outputs:
 #: answer = 4
 ```
 
-[`match`](13_Techniques--Pattern_Matching.md#class-patterns)
+[`match`](13_Techniques--Pattern_Matching.md#builtin-types-and-subclasses)
 tells the two cases apart.
 But the distinction rests on the types `int` and `str`,
 and that dependence is fragile.
@@ -112,7 +112,7 @@ Other languages call this a *tagged* or *discriminated* union.
 `@final` states that neither can have subclasses.
 The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
 `A`, `B`, `E`, and `F` are type parameters
-(introduced in [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
+(introduced in [Static Types](08_Foundations--Static_Types.md#type-parameters)):
 placeholders that take concrete types when you use the class.
 Here they have no bounds or constraints, so any type can fill them.
 `Result` is useful beyond this chapter,
@@ -607,7 +607,7 @@ no narrower than a bare `except Exception`.
 Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
 when the narrower type matters more than the convenience.
 The `**P` parameter carries the wrapped function's whole parameter list through,
-the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
+the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface),
 so `parse("42")` type-checks and `parse(42)` does not:
 `@safe` changes only the return type, never what the function accepts.
 
