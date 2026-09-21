@@ -459,7 +459,7 @@ and the chapters after it build a checked system on that idea.
     Report the counterexample Hypothesis shrinks to,
     run it a few times to see which characters it settles on,
     and explain what they reveal about Unicode case mapping.
-5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations):
+5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
