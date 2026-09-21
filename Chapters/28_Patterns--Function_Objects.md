@@ -333,6 +333,14 @@ with a `find()` method.
 A "Context" class holds the chosen algorithm.
 The Context becomes useful when something must hold the current algorithm between calls,
 a job no parameter can do.
+Smalltalk's MVC is that arrangement,
+and *GoF Design Patterns* names it as an example of *Strategy*:
+a view holds a controller,
+and the controller decides how the view responds to input.
+Replacing the controller changes the response without changing the display,
+and a controller that ignores input events disables the view.
+[*Observer*](30_Patterns--Observer.md) covers MVC's other half,
+where a model notifies its views.
 
 Python uses strategies-as-functions constantly without calling them a pattern.
 The `key` argument passed to `sorted()`, `min()`, and `max()` is a strategy.
