@@ -16,10 +16,10 @@ This book has emphasized the benefits of pure functions in numerous places:
 - [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
   turns shapes into immutable data,
   so one pure function replaces a method on each class.
-- [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view)
+- [*Observer*](30_Patterns--Observer.md#the-model)
   has `recolored()` return a new grid instead of mutating the one it received,
   so a test checks the change with no GUI in sight.
-- [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+- [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
   reduces competition between items to pure logic,
   a dictionary lookup with nothing to mock.
 - [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#simplification-rewrites-the-tree)
@@ -840,7 +840,7 @@ A language written for an AI can drop the conveniences that help a person read c
 and an AI can start using that language as soon as it works.
 
 Most of these are tracking systems,
-in the sense [Effect Management Systems](#effect-management-systems)
+in the sense [Effect Management Systems](#tracking-and-management)
 gives the term: they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
 would be liabilities,
@@ -1046,4 +1046,4 @@ puts it to work.
     then make the helper `async` and follow what the type checker and the interpreter force you to change,
     all the way up to `asyncio.run()`.
     Name the two properties of a full EMS that `async` does *not* have,
-    using the three-item list in [Effect Management Systems](#effect-management-systems).
+    using the three-item list in [Effect Management Systems](#tracking-and-management).
