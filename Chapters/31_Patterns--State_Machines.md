@@ -383,7 +383,7 @@ The output matches the first version's, move for move.
 With many `State` classes to maintain,
 the tables read more easily than the `match` statements.
 `next()` raises its `RuntimeError` `from None`.
-Chaining would keep the `KeyError`,
+Chaining keeps the `KeyError`,
 which only repeats the event the message already names.
 
 ### An Unexpected Input
@@ -439,10 +439,10 @@ The vending machine's inputs carry values: what a coin is worth,
 which digit the user pressed.
 So each input becomes an object of its own class,
 and the table keys on that class rather than on a value.
-An enum would fail here twice: you set its members when you write it,
+An enum fails here twice: you set its members when you write it,
 so it can carry only the values you knew about then,
 and every member of one enum shares that enum's class,
-so they would all arrive under the same dispatch key.
+so they all arrive under the same dispatch key.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
@@ -703,7 +703,7 @@ Both conditions are now true, and `too_expensive` sits first in that row's list,
 so it wins.
 The machine reports `COLLECTING`, as though a dollar more would sell it,
 when the slot is empty and no amount of money would.
-If you swapped the row order, the same input would report `UNAVAILABLE` instead.
+If you swap the row order, the same input reports `UNAVAILABLE` instead.
 That is the cost of the ordering rule stated above:
 a row lower in the list can never override one above it,
 even when the lower row is the one that matters.
@@ -895,7 +895,7 @@ if __name__ == "__main__":
 (a selection before any money, say),
 so the GUI shows a message rather than crashing.
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
-Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
+Sixteen lambdas closing over `r` and `c` all see the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 The three fixed buttons use lambdas safely,
 since they close over nothing that varies.
@@ -936,7 +936,7 @@ gathered in that state, or the whole machine's, gathered in one table.
 A machine small enough to hold in your head goes either way,
 and a machine that arrived as a diagram belongs in the table.
 
-With either design you write for yourself what a library would supply.
+With either design you write for yourself what a library supplies.
 Mature libraries such as `transitions` and `python-statemachine` add guards,
 callbacks, and hierarchical states for the price of an import.
 Choose one of the two designs here when you cannot take that dependency,
