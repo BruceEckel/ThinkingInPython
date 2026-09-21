@@ -71,10 +71,9 @@ that balances against nothing.
 exactly `{"Aluminum", "Paper", "Glass", "Cardboard"}` and `Plastic` is
 now a fifth entry. That failure is correct behavior for the test. The
 test exists to prove that defining a subclass registers it, so a new
-material *should* move the assertion. A test that passed here would
-mean `__init_subclass__()` had stopped doing its job. Update the
-expected set and the test goes back to guarding what it exists to
-guard.
+material *should* move the assertion. A test that passes here means
+`__init_subclass__()` has stopped doing its job. Update the expected
+set and the test goes back to guarding what it exists to guard.
 
 ## 2. `price()` and `heaviest()`
 
