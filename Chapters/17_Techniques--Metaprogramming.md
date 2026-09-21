@@ -227,9 +227,9 @@ and mypy models it as `ty` does.
 and the `cast()` records it at the one place that creates a class.
 
 `make()` exists so that each `init()` closes over its own `name`.
-A lambda written inline in the comprehension would close over the comprehension's variable instead,
-so every generated class would record the final name, `RingBell`,
-as its `action`: the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap).
+A lambda written inline in the comprehension closes over the comprehension's variable instead,
+so every generated class records the final name, `RingBell`, as its `action`:
+the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap).
 
 `init()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 It is a nested function, not a method defined inside a `class` statement,
@@ -346,9 +346,9 @@ and marks every event `isinstance()` recognizes as a `RingBell` with a leading `
 That is the behavior a distinct subclass adds:
 a generated class doing something a plain string could not.
 
-Calling `Event(class_name, hour, minute)` directly would still produce the right field values,
-but every entry would share one type,
-and `run_events()` would have no class left to check against.
+Calling `Event(class_name, hour, minute)` directly still produces the right field values,
+but every entry shares one type,
+and `run_events()` has no class left to check against.
 The `* ` marker depends on `RingBell` being a distinct class,
 not just a distinct name.
 
@@ -356,7 +356,7 @@ not just a distinct name.
 `Event._event_maker[class_name]` reads as an ordinary lookup,
 and the overridden `__getitem__()` decides whether that lookup returns a class or builds one first.
 The alternative, a `make_event()` function,
-would push that decision into every caller.
+pushes that decision into every caller.
 
 `load_schedule()` reads that file, filtering out blank lines and comments,
 then builds an `Event` from each resulting line.
@@ -746,7 +746,7 @@ expect(TypeError, User, "Guido", 30)
 ```
 
 The checker synthesizes a `User.__init__()` from the field declarations,
-with `name` required and `age` defaulted, exactly as it would for `@dataclass`.
+with `name` required and `age` defaulted, exactly as it does for `@dataclass`.
 It believes the declaration without ever running `model()`,
 so the call checks clean and fails at runtime: this `model()` generates nothing,
 and `object`'s constructor takes no arguments.
@@ -991,7 +991,7 @@ so the constructor validates its arguments without a line devoted to it.
 The rejected assignment never reaches `_width`,
 which is why `r.area()` still reports the value set before it.
 A `property` protects one attribute the same way,
-but `Rectangle` would then carry the check twice, once per attribute.
+but `Rectangle` then carries the check twice, once per attribute.
 A descriptor is the reusable form.
 The rule lives in one class, and each attribute that needs it says `Positive()`.
 
@@ -1212,7 +1212,7 @@ with `class Singleton[T](type)` and `_instances: ClassVar[dict[type, T]]`.
 That fails twice.
 A `ClassVar` means one shared value for the whole class,
 so it cannot depend on a type parameter that varies per instantiation.
-And a subclass would have to write `class ASingleton(metaclass=Singleton[ASingleton]):`,
+And a subclass must write `class ASingleton(metaclass=Singleton[ASingleton]):`,
 naming `ASingleton` before its class body finishes defining it.[^crtp]
 The method-level `[T]` on `__call__()` avoids both problems.
 It binds `T` from `cls` at the call site, `ASingleton()`,
@@ -1289,7 +1289,7 @@ so `Sub` has it and a `Sub` instance does not.
 That is the metamethod rule from the start of [Intercepting Instance Creation](#intercepting-instance-creation),
 failing out loud: an instance of `Sub` is not an instance of `Base`,
 so nothing in its lookup chain reaches `Mixin`.
-A `classmethod` would answer on both.
+A `classmethod` answers on both.
 
 The constraint here is the ordinary "at most one layout-bearing base" rule that governs every Python class,
 not something specific to metaclasses.
@@ -1431,7 +1431,7 @@ so `NoDuplicates` sees the second `on_open` assigned to a name it already holds.
 Python then hands the finished mapping to `type.__new__()`.
 `__prepare__()` must carry `@classmethod`.
 Python calls it on the metaclass before any class object exists,
-so an ordinary method would receive the class name as its `self` and leave `bases` unfilled,
+so an ordinary method receives the class name as its `self` and leaves `bases` unfilled,
 producing a `TypeError` that says nothing about the real mistake.
 No other hook can do this: `__init_subclass__()`, `__set_name__()`,
 and a class decorator all run after the body has finished,
@@ -1873,7 +1873,7 @@ The comparison uses `is`, not `==`,
 since a dunder inherited unchanged from `object` is the same function object,
 not merely an equal one.
 
-`exclude` drops specific names regardless of what `dunder` would otherwise show,
+`exclude` drops specific names regardless of what `dunder` otherwise shows,
 and it applies to any member, not just dunders.
 `display_object(obj, REDEFINED_DUNDERS, exclude=("__hash__",))` shows whatever `REDEFINED_DUNDERS` finds redefined,
 minus `__hash__`, useful when a listing has already made that point and repeating it only adds noise.
