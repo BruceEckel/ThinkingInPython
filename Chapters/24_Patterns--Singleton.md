@@ -479,7 +479,7 @@ When `__new__()` returns an instance of the class under construction,
 Python runs `__init__()` on it,
 so a singleton `__new__()` triggers `__init__()` on the shared instance after *every* construction.
 `SingletonClassVar` defines no `__init__()`, so `__new__()` does all the work.
-A `__new__()` that returned some other object would skip `__init__()` and fail `isinstance()` as well.
+A `__new__()` that returns some other object skips `__init__()` and fails `isinstance()` as well.
 
 ### Borg: Singleton By Inheritance
 
