@@ -163,6 +163,8 @@ Copying a two-field `Point` costs so little that you can ignore it.
 A large structure that changes often pays that cost on every change,
 the price immutability charges for the coordination it removes.
 
+### Immutability in Annotations
+
 Type annotations can state immutability so a type checker enforces it.
 `typing.Final` marks a name you must not rebind.
 The read-only collection types in `collections.abc`,
@@ -203,7 +205,9 @@ again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`, and let `Final` guard only the name.
 
-Immutability also offers two things a mutable value cannot.
+### A Stable Hash and Safe Sharing
+
+Immutability offers two things a mutable value cannot.
 The first is a *stable hash*, one that holds for the value's whole life,
 so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy,
