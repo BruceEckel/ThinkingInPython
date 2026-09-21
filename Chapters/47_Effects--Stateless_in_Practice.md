@@ -137,7 +137,7 @@ The by-hand version puts two objects in every signature.
 This one threads nothing.
 `greet()` takes no arguments,
 and the two Effects live in the return type where a type checker can follow them.
-That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#effect-management-systems)
+That second channel in the signature is the one [Effect Management](44_Effects--Effect_Management.md#tracking-and-management)
 says an EMS needs.
 
 The whole library is visible in `two_way_generator.py` from [Generators](45_Effects--Generators.md#a-generator-is-a-description).
@@ -413,7 +413,7 @@ each reporting one moment however often you ask.
 
 ### A Source Named in the Type
 
-Compare these handlers to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#case-study-pairing-rotations),
+Compare these handlers to `student_pairs.py` in [Functional Toolkits](41_Functional--Toolkits.md#groups-of-any-size),
 which makes randomness repeatable a different way, by taking a `seed` parameter.
 That works, but every function between the caller and the `random.Random` call must declare the parameter and pass it along.
 Here the return type names the source instead,
