@@ -383,7 +383,7 @@ so `tee` delivers the second pass the generator could not.
 The second half of the listing shows the price.
 `tee` buffers every item the leading branch consumes until the trailing one catches up,
 so when `first` drains while `second` waits, the buffer holds the whole stream.
-That is the memory a list would use, and the comparison confirms it
+That is the memory a list uses, and the comparison confirms it
 (one machine measured 4,096,992 bytes buffered against 3,999,992 for the list).
 The last block advances `first2` and `second2` together instead,
 one `zip()` step at a time,
@@ -627,7 +627,7 @@ so `TypedIterator` need only define `__next__()`.
 
 The `dataclass` decoration carries `eq=False`.
 A data class that generates `__eq__()` sets `__hash__` to `None`,
-so the wrapper could no longer go in a set or serve as a dict key,
+so the wrapper can no longer go in a set or serve as a dict key,
 as every other iterator in Python can.
 Field-by-field comparison is also the wrong question to ask about a cursor:
 two wrappers over one source compare equal as soon as their counts agree,
@@ -905,7 +905,7 @@ The protocol costs you nothing, and tells you nothing.
     Call it on `[1, "ab", 2]` and explain the `RecursionError` you get,
     given that a one-character string is still a `Sequence`.
     Then fix `flatten()` so a `str` yields as one item,
-    and say what the same fix would look like in `flatten_loop()`.
+    and say what the same fix looks like in `flatten_loop()`.
 10. `typed()` raises a `TypeError` on the first item of the wrong type,
     which ends the stream.
     Write `typed_skipping()`, which drops mismatched items and keeps going,
