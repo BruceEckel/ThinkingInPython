@@ -1085,9 +1085,46 @@ In every case the listener is a callable,
 and the broadcaster holds listeners and calls each one when its state changes.
 The pattern requires no interface, no `update()` method,
 and no class per reaction.
+
+## Deciding What Matters
+
+A thermometer measures temperature.
+`Thermometer` measures, decides which changes are worth announcing,
+and tells the listeners,
+three subjects where [cohesion](21_Patterns--Design_Patterns.md#design-principles)
+wants one.
+The telling is the cheap addition.
+`Broadcaster` holds the list and the loop in a base class,
+and `watched.py` drops the base class and announces from `__setattr__()`,
+so one method covers every attribute.
+The job still belongs to the object either way, and its code lives elsewhere.
+
+Deciding which change is worth announcing is the job that stays,
+and in every design here the object whose state changed is what decides.
+`Thermometer`'s setter announces every assignment,
+which says that every change matters to everyone.
+[Leaving that call to the client](#push-or-pull)
+instead lets several changes coalesce into one announcement,
+and lets a caller forget to make it.
+Push hands the listeners what the thermometer takes them to need,
+and pull leaves them to read what they want through an interface they must then know.
+`watched.py` declines to choose: two states, `celsius` and `humidity`,
+share one channel, so every watcher wakes for either and filters by the name it is handed.
+
+*Observer* therefore removes one coupling and leaves a second one standing.
+The object that changes names no listener type, which is what the pattern buys.
+It still decides what those listeners hear about,
+for objects it has no other awareness of.
+A threshold makes that concrete.
+A `Thermometer` that announces only changes above half a degree holds that half degree on its listeners' behalf,
+and nothing in the class says which listener asked for it.
+
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
-goes a step further: one list becomes a dictionary of lists keyed by event type,
-and the *Observer* is an event bus.
+answers the question rather than relocating it:
+one list becomes a dictionary of lists keyed by event type,
+so an announcement carries the kind of thing that happened and each handler subscribes to the kind it cares about.
+The publisher decides which event it is publishing, which it already knows,
+in place of deciding who needs to hear.
 
 ## Exercises
 
