@@ -944,7 +944,7 @@ def greet(name: str) -> Depend[Need[Console], None]:
     console.print(f"Hello, {name}!")
 ```
 
-The second of the three things [a full EMS does](44_Effects--Effect_Management.md#effect-management-systems)
+The second of the three things [a full EMS does](44_Effects--Effect_Management.md#tracking-and-management)
 is separate each Effect's interface from its implementation.
 `Console` as a `Protocol` holds no implementation.
 `Terminal` is one implementation and `Recorder` is another,
@@ -1692,7 +1692,7 @@ error[unsupported-operator]: Unsupported `+` operation
    |                              Has type `int | KeyError`
 ```
 
-This is the same guarantee the `Result` type gives in [Error Handling](42_Functional--Error_Handling.md#a-result-type),
+This is the same guarantee the `Result` type gives in [Error Handling](42_Functional--Error_Handling.md#reaching-the-answer),
 and `catch()` reaches it without rewriting the body of `score()`.
 
 ## Multiple Errors
