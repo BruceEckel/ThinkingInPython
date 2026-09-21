@@ -294,7 +294,7 @@ Here `prefs` stores `mute` as `None`, so `None` cannot also mean "not supplied,"
 and the `MISSING` sentinel keeps the two cases apart.
 A stored `None` comes back untouched,
 and a missing key with no default comes back as `MISSING`
-(a real `get()` would re-raise the `KeyError` there, as the comment says).
+(a real `get()` re-raises the `KeyError` there, as the comment says).
 
 Create a sentinel once and share that name.
 Each `sentinel()` call builds a new object, even for the same name,
@@ -556,7 +556,7 @@ print(square(9))
 ```
 
 `square = lambda n: n * n` gives up the anonymity that is a lambda's point,
-and the function's name in a traceback stays `<lambda>` where a `def` would show `square`.
+and the function's name in a traceback stays `<lambda>` where a `def` shows `square`.
 Unlike the body of an anonymous function in many other languages,
 a lambda body must be a single expression.
 For anything more complicated, write a separate function.
