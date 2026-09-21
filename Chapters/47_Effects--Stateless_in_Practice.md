@@ -348,7 +348,7 @@ def test_batch_due(elapsed: timedelta, due: bool) -> None:
 `at()` builds a handler from a moment,
 so each test freezes its own clock in one line.
 The parametrized case one minute short of a day is the reading a real clock cannot produce on demand.
-Against a real clock you would have to start the test at the right minute,
+Against a real clock you must start the test at the right minute,
 but here the margin is a `timedelta`.
 No fixture patches `datetime`, nothing sleeps,
 and each assertion compares values the test chose.
@@ -772,7 +772,7 @@ so nothing needs resetting between tests and two tests can run in either order.
 When one function owns a number, a local variable is the right tool,
 and `count_heads()` keeps its count in one.
 The pair pays off when separate functions share the cell,
-as `purchase()` and any other spender would,
+as `purchase()` and any other spender do,
 without a parameter threaded through every signature between them.
 
 This pattern has a name.
@@ -976,7 +976,7 @@ and that failure ends `research()` where it stands,
 so the `need(Encyclopedia)` on the next line does not run and no one consults a library.
 `catch()` receives that failure and `report()` matches on it as a value,
 which is why the run still prints a message.
-A failure ends the remaining steps the way a raised exception would,
+A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
@@ -1388,9 +1388,8 @@ the practice [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-e
 recommends.
 
 Each Ability needs a shape of its own.
-`Obstacle.blocks()` could have been named `name()`,
-which `Hero` already declares.
-`Hero` would stay distinct, since it also declares `approach()`,
+`Obstacle.blocks()` could be named `name()`, which `Hero` already declares.
+`Hero` stays distinct even then, since it also declares `approach()`,
 but each actor you add is another chance for a genuine collision.
 Two Protocols with matching methods leave argument order to decide which request each one answers,
 the ambiguity of [When Two Implementations Match](46_Effects--Stateless.md#when-two-implementations-match).
