@@ -129,8 +129,8 @@ here rather than simplifying to `-> Any`. It ties the return type to
 flags a misspelled attribute on the result. Two details follow from
 that annotation. `cls: type[T]` hides the fact that `cls` is a
 `Singleton`, so the body writes `type.__call__(cls, ...)`, where a
-type checker would reject a zero-argument `super()`. For the same
-reason the body reads the cache through the class name,
+type checker rejects a zero-argument `super()`. For the same reason
+the body reads the cache through the class name,
 `Singleton._instances`, rather than through `cls`.
 
 ## 4. Declaring finality with a keyword in the class header
@@ -410,7 +410,7 @@ can do anything the program can do.
 The payload needs a little care, because `make_class()` splices
 `class_name` in twice. The first splice supplies the attack lines. The
 second lands inside the `super().__init__("...")` string literal, where
-a bare newline would be a `SyntaxError` before anything runs. So the
+a bare newline is a `SyntaxError` before anything runs. So the
 payload's last line opens a triple-quoted string, `Y = """`. That
 string swallows the second splice, and the trailing `#` comments out
 the `")` left over after it closes. The result compiles, and the
