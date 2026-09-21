@@ -186,6 +186,8 @@ so a class inheriting from `_Circle` is not in the list.
 For a deeper hierarchy, recurse through each subclass's own `__subclasses__()`.
 Exercise 9 writes that recursion.
 
+### Hiding the Concrete Classes
+
 The concrete shapes carry a leading underscore because no caller needs their names.
 `factory()` returns `Shape`,
 so a caller only works with `Shape`s and never writes `_Circle`.
@@ -379,6 +381,8 @@ while `__init_subclass__()` runs for every class anywhere below `Shape`.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)
 uses this same self-registration.
 
+### Hazards of Self Registration
+
 `__init_subclass__()` runs as the subclass's `class` statement executes.
 When the subclasses sit in the same file as `make()`, as in `registry.py`,
 the registration runs before anything calls `make()`,
@@ -413,7 +417,10 @@ the one `__init_subclass__()` avoids by naming `Shape.registry`.
 And `Circle.make("Square")` would be legal as well as misleading,
 since the key decides what `make()` builds,
 not the class you name before the dot.
-A method of any kind would also put back the factory method this section set out to remove.
+A method of any kind would also put back the factory method that [The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
+set out to remove.
+
+### Testing the Registry
 
 Testing confirms that every subclass registers itself,
 and that a new subclass needs no change to `make()`.
@@ -498,13 +505,14 @@ The bound turns the decorator into a check.
 A decorated class must satisfy the Protocol, so a class without `draw()`,
 or with a `draw()` that takes an extra parameter,
 draws `invalid-argument-type` at its `@register` line before the program runs.
-That is the case the previous section left to runtime,
+That is the case [Self Registration](#self-registration) left to runtime,
 where a subclass that forgot `draw()` registers, fails at construction,
 and no checker sees it.
 `REGISTRY` holds `type[Shape]` values and `ty` accepts calling one,
 so `make()` needs no change.
 
-Two hazards from the previous section disappear with the class attribute.
+Two hazards from [Hazards of Self Registration](#hazards-of-self-registration)
+disappear with the class attribute.
 There is no `cls.registry` to resolve through the MRO,
 and no class for a `@classmethod` to sit on,
 since the table is a module-level name that `make()` reads directly.
