@@ -69,6 +69,8 @@ an unslotted base gives each instance its `__dict__` back.
 The name `ProxyAdapter` uses the term "[*Proxy*](26_Patterns--Surrogate.md#proxy)" loosely:
 *GoF Design Patterns* requires a *Proxy* to have the same interface as the object it forwards to.
 
+### Three Places for the Adaptation
+
 The adaptation can live in two other places: the call site,
 or the adaptee's own class.
 
@@ -124,6 +126,8 @@ and every client of the adapter can call every method of the adaptee,
 `g()` and `h()` included.
 Composition keeps the two interfaces separate.
 Inheritance merges them.
+
+### What an Override May Change
 
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
 `WhatIUse2.op()` renames that parameter to `item`.
