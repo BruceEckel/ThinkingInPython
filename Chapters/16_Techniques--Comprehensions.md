@@ -52,7 +52,10 @@ In this comprehension:
 -   If the member is an integer,
     the output expression squares it and appends it to the output list.
 
-The built-in functions `map()` and `filter()` with a `lambda` achieve the same results.
+### The `map()` and `filter()` Equivalent
+
+The built-in functions `map()` and `filter()`, each given a `lambda`,
+produce the same list that `list_comprehension.py` builds.
 `filter()` applies a predicate to a sequence and retains the members that pass it.
 It produces a lazy iterator, which `list()` expands into a `list`:
 
@@ -109,6 +112,8 @@ but only when its predicate is a named function annotated to return `TypeIs[int]
 (the [narrowing summary](08_Foundations--Static_Types.md#type-narrowing) covers the pair).
 `filter(None, items)` is the other narrowing form.
 It drops the falsy values, and the type checker knows no `None` survives.
+
+### Scope and the Walrus Operator
 
 A comprehension has a scope of its own:
 
@@ -599,6 +604,8 @@ A second argument makes them required:
 `sum(n * n for n in nums, 0)` is a `SyntaxError`,
 and `sum((n * n for n in nums), 0)` is the fix.
 
+### A Generator Expression Runs Once
+
 `genexp_consumers.py` iterates `nums` three times because `range` is re-iterable:
 each `for` over it starts again at zero.
 A generator expression is not re-iterable:
@@ -620,6 +627,8 @@ so `any()` sees no elements and reports `False` instead of `True`,
 with no exception to say the question was never asked.
 When you must traverse something twice,
 either materialize it with `list()` or write the generator expression again.
+
+### The Gap Between Creation and Consumption
 
 A generator expression defers everything but one thing.
 Creating one evaluates the outermost iterable immediately:
