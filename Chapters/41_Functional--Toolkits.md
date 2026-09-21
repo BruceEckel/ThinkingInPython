@@ -1013,10 +1013,12 @@ because the alternative is a round in which nobody meets anyone.
 
 `met()` runs once per candidate per slot,
 so it looks like the place for `@cache` from earlier in this chapter.
-Caching it would be wrong.
+If you add `@cache`, the first call raises a `TypeError`,
+because `met()` takes a `list` and a `list` is unhashable.
+If you pass a tuple instead, the calls succeed and the schedule gets worse.
 `met()` reads `history`, and `history` changes at the end of every round,
-so an answer cached in round 0 would come back unchanged in round 6,
-long after the counts it summed had changed.
+so an answer cached in round 0 comes back unchanged in a later round,
+after the counts it summed have changed.
 The `cache` entry's rule, pure functions only, is the reason:
 a function that reads mutable state is impure, however simple its body looks.
 
