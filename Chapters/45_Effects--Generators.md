@@ -549,7 +549,21 @@ A `Question` comes out, the driver looks it up, and the request stops there.
 `yield from` answers nothing.
 It relays the request upward and passes the reply back down untouched,
 so `survey()` has no idea what a `Question` means.
-A driver can also `throw()` an exception into a generator or `close()` it,
+
+`StopIteration` divides `drive()` and `yield from` along that same line.
+Both catch it and both take `stop.value`,
+but they hand that value to different places.
+`drive()` returns the `Result` to its own caller, ending the conversation.
+`yield from` feeds it to the enclosing generator as the value of the expression,
+after which that generator keeps running.
+
+`yield from` composes descriptions and a driver interprets them.
+A program can hold any number of descriptions and needs one driver,
+at its outermost edge.
+
+### `throw()` and `close()` Reach the Innermost Generator
+
+A driver can `throw()` an exception into a generator or `close()` it,
 and `yield from` relays both:
 a thrown exception surfaces inside the innermost generator rather than at the delegating one,
 and a `close()` unwinds every frame in the chain.
@@ -619,17 +633,6 @@ expect(RuntimeError, s.close)
 so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
 A driver that abandons a live generator shuts it down with `close()`,
 so a generator meant to be driven by others must let `GeneratorExit` end it.
-
-`StopIteration` divides `drive()` and `yield from` along that same line.
-Both catch it and both take `stop.value`,
-but they hand that value to different places.
-`drive()` returns the `Result` to its own caller, ending the conversation.
-`yield from` feeds it to the enclosing generator as the value of the expression,
-after which that generator keeps running.
-
-`yield from` composes descriptions and a driver interprets them.
-A program can hold any number of descriptions and needs one driver,
-at its outermost edge.
 
 ## The Driver You Already Use
 
