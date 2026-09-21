@@ -99,7 +99,7 @@ reported individually as `test_add_interest_rates[0.0]`,
 because the two sides of the assertion, `100 + 100 * rate` in the method
 and `100 * (1 + rate)` in the test, can round differently, not because
 these four rates round. For `0.0`, `0.05`, `0.5`, and `1.0` on a balance
-of `100`, the two sides are bit-identical and `==` would pass just as
+of `100`, the two sides are bit-identical and `==` passes just as
 well. A rate such as `0.1`, where the two sides differ by one bit, or
 interest applied more than once, is where the assertion needs the
 tolerance.
@@ -201,7 +201,7 @@ rename, and it survives dropping the environment variable entirely.
 
 `tmp_path` is still worth taking in the second test, even though
 nothing touches the disk, because it supplies a real, valid path
-where a hard-coded one would differ across operating systems.
+where a hard-coded one differs across operating systems.
 
 The trade is that injection moves the decision outward: somebody has
 to read `APP_CONFIG` and pass the directory in. That somebody is
