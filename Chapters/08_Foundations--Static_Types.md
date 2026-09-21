@@ -593,7 +593,7 @@ one release after the bracket syntax.
 ### `**P` and the Older `TypeVar` Syntax {#paramspec-and-typevar}
 
 A special form, `**P`, captures the types of an entire parameter list.
-[Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
+[Decorators](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
 uses `**P` to give a wrapper the same signature as the function it wraps.
 
 Before Python 3.12 you wrote type parameters with `TypeVar` and `Generic`,
@@ -765,7 +765,7 @@ The abstract container types come from `collections.abc`.
 | `[T: Base]`, `[T: (int, str)]` | A bounded or constrained type parameter, see [Generic Functions and Classes](#generic-functions-and-classes) |
 | `[T = str]` | A type parameter default, used when you omit the brackets, see [Type Parameter Defaults](#type-parameter-defaults) |
 | `TypeVar`, `Generic[T]` | The pre-3.12 way to write type parameters, see [Generic Functions and Classes](#generic-functions-and-classes) |
-| `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface) |
+| `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
 ### Structural Typing
@@ -802,7 +802,7 @@ The abstract container types come from `collections.abc`.
 | Construct | Meaning |
 |-----------|---------|
 | `Self` | The enclosing class type; useful for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
-| `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) |
+| `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
 
 ### Typing Decorators and Directives
 
@@ -815,7 +815,7 @@ The abstract container types come from `collections.abc`.
 | `@final` | Forbids subclassing the class, or overriding the method, see [Metaprogramming](17_Techniques--Metaprogramming.md#making-a-class-final) |
 | `cast(T, x)` | Tells the type checker to treat `x` as `T`; [*Flyweight*](35_Patterns--Flyweight.md#typing-the-symbol-set) shows the runtime guard to prefer over it |
 | `assert_never(x)`, `assert_type(x, T)`, `reveal_type(x)` | Type-checker assertions and aids; `assert_never()` shown in [Pattern Matching](13_Techniques--Pattern_Matching.md#exhaustive-matching) |
-| `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) |
+| `TYPE_CHECKING` | A flag that is `True` only to the type checker, for type-only imports, see [Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory) |
 
 The runtime ignores all of these.
 They exist for the type checker and the reader.
