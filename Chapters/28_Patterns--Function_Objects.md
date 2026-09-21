@@ -788,7 +788,7 @@ expect(TypeError, bus.publish, "Deposit")
 #: [TypeError] str is not an @event
 ```
 
-[`dataclass_transform`](17_Techniques--Metaprogramming.md#where-enforcement-lives)
+[`dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that a class passing through either decorator comes out a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__`,
 and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
@@ -861,7 +861,7 @@ When each type needs exactly one,
 and a new type must add its own without editing a central function,
 `functools.singledispatch` is the solution.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
-and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)
+and [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)
 both use it.
 
 ## Choosing the Lightest Callable
