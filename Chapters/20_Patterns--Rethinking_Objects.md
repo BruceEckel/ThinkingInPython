@@ -803,7 +803,9 @@ so you cannot grep a codebase for every type that implements one,
 the way you can search for subclasses of a base class.
 Protocols connect pieces without requiring any piece to change.
 
-Because membership is structural,
+#### One Class, Many Protocols
+
+Because protocol membership is structural,
 one class can satisfy any number of protocols at once,
 with no inheritance graph connecting them.
 Each protocol names only the shape it needs.
