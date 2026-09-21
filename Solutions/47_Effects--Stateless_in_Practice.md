@@ -913,8 +913,10 @@ affordable ones.
 What this test cannot check is whether the two handlers agree. The `Cell`
 version has one piece of state, so the next `Get` returns whatever the last
 `Put` wrote. Here the test scripts the balances independently of the writes, so
-a `spree()` that wrote the wrong amount, say `funds` instead of `funds - price`,
-would still see the same balance sequence and still pass.
+nothing in it checks that a balance read is the amount the last `Put` wrote.
+The script says 40 follows the first purchase because the test's author did that
+subtraction. A `spree()` that writes the wrong amount, say `funds` instead of
+`funds - price`, still fails, at `written == [40, 10]`.
 The scripted test checks the Effect's shape: which requests the Effect makes, in
 which order, with which payloads.
 The `Cell` test checks that the requests compose into correct arithmetic.
