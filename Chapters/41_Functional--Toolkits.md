@@ -512,7 +512,7 @@ print(list(accumulate([1, 2, 3, 4], mul)))
 ```
 
 `accumulate()` is `reduce()` with the intermediate results kept:
-the last value it yields is the value `reduce()` would return.
+the last value it yields is the value `reduce()` returns.
 
 ### `compress`
 
@@ -562,7 +562,7 @@ print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 The same trailing `1` marks the same distinction from the other direction.
 `dropwhile()` stops testing once the predicate fails,
 so the final `1` comes through,
-where `filterfalse()` would test every element and return `[3, 4]`.
+where `filterfalse()` tests every element and returns `[3, 4]`.
 
 ### `filterfalse`
 
@@ -1070,7 +1070,7 @@ the question a chain of pure functions leaves open.
     Write `grouped(data, key)` returning a `dict[K, list[V]]` that cannot make that mistake,
     and say what it costs relative to `groupby()`.
 5.  Decorate `deep_sum()` with `@cache` and explain the exception.
-    What would have to change about the `Nested` alias for caching to be possible?
+    What must change about the `Nested` alias for caching to be possible?
 6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.
     Replace that with an `rng: random.Random` parameter.
     Which property of the function does that preserve,
