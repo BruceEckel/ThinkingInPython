@@ -369,7 +369,7 @@ What immutability removes is the explicit `save()` and `restore()` at every edit
 since a state that cannot change is already a memento.
 Undo and redo are two stacks of past and future states,
 generic over the state type
-(the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#generic-functions-and-classes)):
+(the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#type-parameters)):
 
 ![Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future](_images/memento_history)
 
@@ -515,7 +515,7 @@ def test_bounds_are_reported() -> None:
 
 The alternative design stores commands instead of states.
 Each undoable action carries its own inverse,
-the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md)
+the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md#a-callable-object-as-a-command)
 mentions.
 *Command*-based undo saves memory when a snapshot is large,
 at the cost of writing and testing an inverse for every action.
