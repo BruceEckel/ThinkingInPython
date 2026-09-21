@@ -129,7 +129,7 @@ You cannot post-process an f-string this way, because the string it
 produces carries no label. `f"{name} scored {score:.0f}%"` evaluates to
 the single string `Alice scored 92%`, and nothing in that string records
 that `Alice` came from a variable and ` scored ` came from the source.
-A post-processor has only the characters, so it would have to guess
+A post-processor has only the characters, so it must guess
 which spans to quote by matching them against the values. The guess
 fails as soon as a literal happens to look like a value: with
 `name = "scored"`, the finished string reads `scored scored 92%`, and
