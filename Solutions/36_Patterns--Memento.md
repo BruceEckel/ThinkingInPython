@@ -433,7 +433,7 @@ Worth doing in a library; noise in a solution.
 `restore_field()` must go through `do()` for the reason the section
 gives, and the listing's last line proves it: the partial restore is
 itself an action, so it belongs on the timeline. Editing `_past`
-directly would rewrite history rather than extend it, leaving the user
+directly rewrites history rather than extending it, leaving the user
 who wanted the strokes back no way to change their mind. Direct
 editing also desynchronizes the caretaker's own bookkeeping: `do()`
 clears `_future`, so a `_past` edited behind the caretaker's back
