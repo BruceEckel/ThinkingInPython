@@ -229,7 +229,7 @@ and the `cast()` records it at the one place that creates a class.
 `make()` exists so that each `init()` closes over its own `name`.
 A lambda written inline in the comprehension would close over the comprehension's variable instead,
 so every generated class would record the final name, `RingBell`,
-as its `action`: the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
+as its `action`: the late-binding trap `late_binding.py` demonstrates in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap).
 
 `init()` calls `Event.__init__(self, ...)` directly instead of `super().__init__(...)`.
 It is a nested function, not a method defined inside a `class` statement,
@@ -595,8 +595,8 @@ def test_independent_hierarchies_have_separate_registries(
 
 The mechanism is reliable.
 The registries built on it fail in two ways that have nothing to do with `__init_subclass__()`.
-[Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
-covers both: a class in a module nobody imports never registers,
+[Factory](27_Patterns--Factory.md#hazards-of-self-registration) covers both:
+a class in a module nobody imports never registers,
 and keying on `cls.__name__` lets two same-named classes overwrite each other.
 
 ## Making a Class Final
