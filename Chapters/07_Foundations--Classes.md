@@ -194,6 +194,21 @@ In `display()`, you can call `show()` as a method of `self`.
 When you override a method but still want the base-class version,
 call it through `super()`, as the overridden `show()` does.
 
+The class `Different` also has a method named `show()`,
+but does not derive from `Simple`.
+`f()` in `demo_subclass.py` demonstrates dynamic typing.
+It requires one thing of `obj`, a `show()` it can call,
+so it accepts a `Derived` and a `Different` alike.
+
+An `import` inside a class body binds the imported name like any other assignment,
+so importing a module-level function there attaches it to the class as a method,
+`self` and all.
+More than one unrelated class can pick up the same function this way,
+but that import trick is a curiosity more than a technique:
+a helper object or a plain module-level function is almost always clearer.
+
+### Method Resolution Order
+
 `super()` and ordinary attribute lookup both follow one list,
 the class's *method resolution order* (MRO).
 The MRO names the classes Python searches for a name,
@@ -226,6 +241,8 @@ C().show()  # A comes first in the MRO
 
 `C.__mro__` lists `A` before `B`, so `C().show()` runs `A`'s version, not `B`'s.
 
+### Calling the Base Constructor
+
 The base-class constructor runs because `Derived`'s constructor calls it.
 Unlike C++ and Java, Python never calls a base-class constructor on its own.
 If you remove the `super().__init__(text)` line, nothing creates `self.s`,
@@ -247,19 +264,6 @@ expect(AttributeError, Broken("ignored").show)
 
 A derived class that defines no constructor of its own inherits and runs the base version.
 `Derived` also inherits `show_twice()` unchanged.
-
-The class `Different` also has a method named `show()`,
-but does not derive from `Simple`.
-`f()` in `demo_subclass.py` demonstrates dynamic typing.
-It requires one thing of `obj`, a `show()` it can call,
-so it accepts a `Derived` and a `Different` alike.
-
-An `import` inside a class body binds the imported name like any other assignment,
-so importing a module-level function there attaches it to the class as a method,
-`self` and all.
-More than one unrelated class can pick up the same function this way,
-but that import trick is a curiosity more than a technique:
-a helper object or a plain module-level function is almost always clearer.
 
 ## Marking Overrides with `@override`
 
@@ -351,6 +355,8 @@ print(c.area)  # Properties don't use parentheses
 `radius` is a plain attribute here and `area` a computation,
 and the call site reads both the same way.
 
+### Adding a Setter
+
 A `@property` with a getter alone rejects writes:
 assigning to it raises an `AttributeError`.
 A *setter* enables writing,
@@ -432,6 +438,8 @@ The getter and setter are independent,
 so you choose the access you want by defining one or both.
 A write-only property is possible but rare;
 a plain method expresses that intent better.
+
+### Caching with `cached_property` {#cached-property}
 
 A `@property` reruns its code on every access.
 When the computation is expensive and the answer cannot change,
