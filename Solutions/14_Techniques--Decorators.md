@@ -26,8 +26,8 @@ print(Point.__name__, Empty.__name__)
 Both `decorating` lines print before anything else, because a class
 decorator runs when the `class` statement finishes, not at
 instantiation. `announce` returns `cls` unchanged, so `Point` is the
-same class object it would have been without the decorator. The only
-effect is the side effect.
+class object the `class` statement created. The only effect is the
+side effect.
 
 `register` returns its argument the same way, and the comparison is
 the point. A class decorator that returns its argument can observe
@@ -155,10 +155,10 @@ from `Drink`, and nothing needs to. The type checker matches the
 
 `Decaf` is worth noticing. Its `add_cost` is `0.0`, so it changes the
 description and leaves the price alone. A class-per-combination
-design would still need a separate class for every decaf variant.
-Adding a fourth extra means one class with one number in it, and the
-extras compose in any order, since each layer knows only about the
-drink directly inside it.
+design still needs a separate class for every decaf variant. Adding a
+fourth extra means one class with one number in it, and the extras
+compose in any order, since each layer knows only about the drink
+directly inside it.
 
 ## 4. A class-level counter shared across every decorated function
 
@@ -316,7 +316,7 @@ legal calls. Eviction relies on a dictionary preserving insertion
 order, so `next(iter(cache))` is the oldest key. Evicting the oldest
 key makes this a first-in-first-out cache rather than the
 least-recently-used cache `functools.lru_cache` gives you. A real
-implementation would have to reconsider that trade.
+implementation must reconsider that trade.
 
 ## 6. `retry(times)` in the function form
 
@@ -372,8 +372,8 @@ attempt sits outside it, with no handler. That last call satisfies
 both requirements at once. It returns `R` on success, so the function
 has a return value on every path the type checker can see. It also
 lets the last exception propagate untouched rather than re-raising a
-copy. Re-raising from inside the loop with `raise` would also work,
-but then the type checker cannot tell that the function always either
+copy. Re-raising from inside the loop with `raise` also works, but
+then the type checker cannot tell that the function always either
 returns or raises an exception.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the
