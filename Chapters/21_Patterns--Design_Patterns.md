@@ -293,8 +293,14 @@ and the rest are here for your own designs.
 -   *Independence* or *Orthogonality*.
     Express independent ideas independently.
     Orthogonality complements separating what varies from what stays the same,
-    and is part of the Low-Coupling-High-Cohesion message:
-    few connections between parts, and one subject per part.
+    and is part of the Low-Coupling-High-Cohesion message.
+    *Coupling* is the degree to which one part depends on another,
+    so low coupling means few connections between parts.
+    *Cohesion* is the degree to which the contents of one part serve a single subject,
+    so high cohesion means one subject per part.
+    The two measure the same design from opposite sides.
+    Changing a part with low cohesion means editing code for an unrelated subject in the same place,
+    and changing a tightly coupled part means editing the parts that depend on it.
     [Rethinking Objects](20_Patterns--Rethinking_Objects.md#prefer-composition-to-inheritance)
     argues for composition on those grounds.
 -   *Managed Coupling*.
