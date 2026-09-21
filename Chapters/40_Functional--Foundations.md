@@ -312,7 +312,7 @@ whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code itself never changes.
 A key the table has no row for raises a plain `KeyError`,
-where an `if`/`elif` chain would normally end in an `else`.
+where an `if`/`elif` chain normally ends in an `else`.
 The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
@@ -384,7 +384,7 @@ the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` earn their keep when the function already exists.
-`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name says what the comprehension would repeat.
+`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name says what the comprehension repeats.
 The two also return different things.
 The comprehension hands you a finished list.
 `map()` hands you an iterator you can feed into the next stage without building the list.
@@ -521,9 +521,9 @@ print(square.func.__name__, square.keywords)
 `square` and `cube` are specializations of `power`,
 each with one argument already supplied.
 The keyword does real work here.
-`partial(power, 2)` would bind `base` instead,
+`partial(power, 2)` binds `base` instead,
 because positional arguments fill from the left,
-and `square(5)` would then compute `2 ** 5`.
+and `square(5)` then computes `2 ** 5`.
 Partial application turns a general function into the specific one a caller needs.
 `multiplier()` in [Closures](#closures) does the same by hand,
 a factory that fixes one argument and returns a function expecting the rest.
