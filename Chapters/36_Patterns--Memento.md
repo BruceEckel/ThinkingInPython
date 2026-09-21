@@ -129,6 +129,8 @@ In Python it is a convention,
 though freezing the memento makes an accidental edit fail loudly:
 assigning different strokes to the snapshot raises a `FrozenInstanceError`.
 
+### Why `Memento` Is a Class
+
 You could skip the class and write `type Memento = tuple[str, ...]`.
 Every call site would still type-check.
 But an alias creates no new type.
@@ -194,6 +196,10 @@ If you run the program anyway,
 it fails at the first line that expects `.strokes`.
 Reassigning `checkpoint.strokes` fails at both stages too:
 a record freezes the attribute, not just the tuple inside it.
+
+### Testing the Sketch
+
+Three tests pin down the copying:
 
 ```python
 # test_sketch.py
@@ -592,8 +598,9 @@ For untrusted storage or other languages,
 convert the state with `dataclasses.asdict()` and write JSON,
 which exercise 3 explores.
 
-Pickle's other limitation is time:
-the class can change between the save and the load.
+### A Class That Changes After the Save
+
+The class can change between the save and the load.
 The bytes encode a class by module and name,
 not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
@@ -665,7 +672,9 @@ which is often nowhere near the line that called `pickle.loads()`.
 Pickle is convenient because it hides this contract.
 Nothing enforces that the class on load matches the class on save.
 
-Drift in the other direction is quieter still.
+### A Deleted Field Leaves a Ghost
+
+Deleting a field is quieter than adding one.
 If you delete a field, the old bytes load with no error anywhere.
 The dropped name arrives in the object's `__dict__` as a ghost attribute,
 readable but invisible to the class definition,
@@ -703,13 +712,15 @@ The `repr()` shows a one-field object while the `__dict__` shows two entries,
 and the loaded object is `==` to a `SketchV1` that never had a title,
 so nothing downstream can tell them apart.
 
-Databases hit the same problem and gave it a name.
+### Schema Migrations and Safer Formats
+
+Databases hit the same drift and gave its remedy a name.
 A *schema migration* is the disciplined version of this drift, a versioned,
 deliberate step that moves the table shape and its data forward together,
 instead of discovering the mismatch when a query runs.
 
-When either limitation rules out `pickle`,
-other libraries answer drift and security separately.
+When drift or the security risk rules out `pickle`,
+other libraries answer the two separately.
 `msgspec` and `pydantic` both validate on load.
 A shape mismatch raises a clear error at the boundary,
 instead of the delayed `AttributeError` from `pickle_drift.py`.
