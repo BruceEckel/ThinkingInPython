@@ -72,7 +72,7 @@ At this point `palindrome.py` does not exist,
 so running this file fails before a single assertion runs:
 `pytest` cannot import a module that is not there.
 That failure is the point.
-It confirms the test would catch a missing implementation, not just a wrong one.
+It confirms the test catches a missing implementation, not just a wrong one.
 Only now does the implementation appear,
 sized to make every case in the test pass and nothing more:
 
@@ -210,10 +210,10 @@ test_account.py:11: AssertionError
 
 The `where` line is the rewriting at work:
 `pytest` keeps the sub-expression `account.balance` and its value,
-which a bare `assert` statement would discard.
+which a bare `assert` statement discards.
 `Account` is a `@dataclass`,
 so its generated `__repr__()` names the field values.
-A hand-written class with no `__repr__()` would print `<account.Account object at 0x...>` there instead.
+A hand-written class with no `__repr__()` prints `<account.Account object at 0x...>` there instead.
 
 ## Testing for Exceptions
 
@@ -242,7 +242,7 @@ def test_overdraft_reports_the_shortfall() -> None:
 The assertion after the block belongs outside it:
 a failed withdrawal must leave the balance alone,
 and that check has nothing to do with the exception.
-Inside the block it would never run:
+Inside the block it never runs:
 the exception from `withdraw()` skips the rest of the block,
 and `pytest.raises()` then absorbs it.
 
@@ -253,7 +253,7 @@ Testing floating-point results for exact equality is unreliable.
 which allows a small tolerance: a relative difference of 1e-6,
 unless you pass `rel=` or `abs=`.
 
-That test would pass with `==` as well.
+That test passes with `==` as well.
 `100.0 + 100.0 * 0.05` is exactly `105.0` on any IEEE double,
 and so is every other whole-percent rate on this starting balance.
 The trouble starts once error accumulates:
@@ -466,7 +466,7 @@ and the fixture when the same variation should sweep across a whole suite.
 
 A *white-box* test reaches into the internals of the code it checks.
 A *black-box* test treats the code as an opaque box and exercises only its public interface,
-the way a client would.
+the way a client does.
 
 In a language with access control, the compiler enforces the difference.
 Python has no access control, so every attribute is reachable.
@@ -570,9 +570,9 @@ def test_missing_file_raises(
 
 `data_dir()` reads `APP_DATA` on every call,
 so `monkeypatch.setenv()` can redirect it.
-A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` would read the variable once,
+A module-level `DATA_DIR = Path(os.environ.get("APP_DATA", "."))` reads the variable once,
 at import time, before any test body runs,
-so patching the environment afterward would change nothing.
+so patching the environment afterward changes nothing.
 Reading a setting where you use it, rather than caching it at import,
 is most of what makes a module testable.
 
@@ -647,7 +647,7 @@ or introduce a context object to carry the parameter.
 `monkeypatch` skips that plumbing: it patches the name in place,
 at the cost of a process-wide patch that stands until teardown restores the name.
 Choose injection when the parameter already sits near the boundary.
-Choose `monkeypatch` when threading it through would touch more code than the test is worth.
+Choose `monkeypatch` when threading it through touches more code than the test is worth.
 
 ### The Clock
 
@@ -778,7 +778,7 @@ def test_current_temp(
 `weather` imports the function with `from urllib.request import urlopen`,
 and that statement binds `urlopen` in `weather`'s own namespace,
 so `weather.urlopen` is the name the call site reads and the name to patch.
-Patching `urllib.request.urlopen` instead would leave `weather`'s copy untouched.
+Patching `urllib.request.urlopen` instead leaves `weather`'s copy untouched.
 One rule covers both import forms: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
@@ -866,7 +866,7 @@ a line a test happened to execute is not the same as a line a test checks.
     which returns `Path(os.environ["APP_CONFIG"]) / "settings.ini"`,
     and test it with `monkeypatch` and `tmp_path`.
     Then rewrite the function to take the directory as an argument and test it again.
-    Which test would survive a change to the environment variable's name?
+    Which test survives a change to the environment variable's name?
 5.  `weather.current_temp()` calls `urlopen()`.
     Write a second function that takes a fetcher as an argument instead,
     and test both: one with `monkeypatch`, one with a plain function passed in.
