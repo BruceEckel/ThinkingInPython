@@ -183,8 +183,8 @@ the name the caller uses.
 object's, and it adds no behavior to a call that goes through. What it
 adds is a decision about whether the call goes through at all. Remove
 it and every call reaches the implementation, including the ones the
-proxy should have refused, so what you lose is control over when and
-whether the call happens. This wrapper is the
+proxy refuses, so what you lose is control over when and whether the
+call happens. This wrapper is the
 [protection proxy](../Chapters/26_Patterns--Surrogate.md#protection-proxy).
 
 None of the three is a *Façade*, because a *Façade* narrows many objects
