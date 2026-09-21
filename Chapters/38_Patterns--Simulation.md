@@ -254,6 +254,8 @@ The other four fields are internal bookkeeping rather than constructor arguments
 `init=False` keeps them out of the generated signature,
 and each `default_factory` builds a fresh object per blackboard.
 
+### Running the Maze
+
 The maze layout lives in a text file.
 The loader drops blank lines and any line beginning with `#`, so the first line,
 naming the file's path, drops out and the rest is the maze.
@@ -1034,7 +1036,9 @@ def test_walls_block_and_food_is_eaten() -> None:
     assert game.robot.room is blocked
 ```
 
-That same model drives a graphical view.
+### Watching the Robot
+
+The same model drives a graphical view.
 `maze_view.py` builds the maze, calls `solve()` for the route,
 draws each room as a colored cell,
 and steps the robot along that route on a timer.
