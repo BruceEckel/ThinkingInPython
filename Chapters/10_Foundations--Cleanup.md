@@ -475,8 +475,7 @@ You need the dictionary as soon as you look instances up rather than count them,
 and [*Flyweight*](35_Patterns--Flyweight.md)
 looks its shared objects up in a pool keyed by the values that define them.
 `id(self)` is the key here because the registry needs one entry per object,
-not per name: two counters could share a name,
-and one would then displace the other.
+not per name: two counters could share a name, and one then displaces the other.
 Reused `id()` values are harmless,
 since the dictionary holds only live objects and no two live objects share an id.
 `live_count()` returns the size of that registry,
@@ -548,7 +547,7 @@ so the registry cannot become the leak it exists to catch.
     (rebinding the name) and confirm `live_count()` still reaches `0`.
     The two do different things to the list object.
     Say what each one does,
-    then say what a second name bound to the same list would see after each.
+    then say what a second name bound to the same list sees after each.
 2.  In `weak_value.py`, add a classmethod `live_names()` to `Counter` that returns a sorted list of the `.name` of every live instance,
     by reading `cls._instances.values()`.
 3.  In `cleanup.py`, change the loop to build `counters` with a list comprehension instead of `append()` in a `for` loop,
