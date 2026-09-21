@@ -544,7 +544,7 @@ The fallback runs in one direction: `repr()` never consults `__str__()`.
 A container builds its own display from the `__repr__()` of its elements,
 and that is why the list prints `Point(3, 4)` rather than `(3, 4)`.
 In an f-string, `{p}` selects `__str__()` and `{p!r}` selects `__repr__()`.
-By convention `__repr__()` returns the call that would rebuild the object,
+By convention `__repr__()` returns the call that rebuilds the object,
 so it reads `Point(3, 4)`.
 
 Define `__repr__()` on classes you debug,
@@ -597,9 +597,9 @@ The subclass inherits the method unchanged.
 `Reading.from_fahrenheit(212)` proves it: `cls` is `Reading` there,
 not `Temperature`, so `type(r).__name__` reports `'Reading'`.
 Naming the class directly, `return Temperature(...)`,
-would hard-code `Temperature` into every subclass, including `Reading`.
+hard-codes `Temperature` into every subclass, including `Reading`.
 
-`is_freezing()` would also work as a module-level function.
+`is_freezing()` also works as a module-level function.
 Inside the class it sits where a reader looks for it,
 and a subclass can replace it the way it replaces any other method.
 
