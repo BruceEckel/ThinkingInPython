@@ -47,7 +47,9 @@ Once you find a part of your program that's likely to change,
 patterns can prevent those changes from causing secondary effects throughout your code.
 That isolation makes the code cheaper to maintain and usually simpler to understand.
 
-Isolation has a price.
+### What an Abstraction Erases
+
+Isolating what changes discards information.
 An abstraction is a bet about which details no caller will ever need,
 and a good abstraction does more than hide those details.
 It erases them.
@@ -65,6 +67,8 @@ and the layer that made the code simple now stands between you and the fix.
 This is one reason [Performance](18_Techniques--Performance.md)
 tells you to measure at a realistic size rather than trust a small trial.
 
+### The Vector of Change
+
 Often, the most difficult part of developing an elegant and cheap-to-maintain design is discovering what I call "the vector of change"
 (here, "vector" means a direction of change, not an array of numbers).
 You look for the most important thing that changes in your system,
@@ -77,6 +81,8 @@ You do not predict it.
 Guessing at it up front often adds complexity to allow flexibility in a direction nobody uses.
 The second time a requirement shifts the same part of the design,
 you have evidence.
+
+### Patterns You Have Already Seen
 
 Design patterns isolate changes in your code.
 You have seen some design patterns in this book.
