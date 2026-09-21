@@ -117,7 +117,7 @@ Two schools of thought exist:
     A bottom value represents a computation that does not terminate normally or result in a standard value.
     Because ⊥ is a valid theoretical value, raising an error that nothing catches
     is technically referentially transparent.
-    You could replace the function call with the crash itself, and the program's behavior wouldn't change.
+    You can replace the function call with the crash itself, and the program's behavior doesn't change.
 
 2.  **Functional**: Exceptions bypass normal control flow,
     which makes code difficult to reason about.
@@ -541,7 +541,7 @@ and `greet()` never changes.
 Delayed binding by hand explains why "pass in your dependencies" is such durable advice.
 
 The signature says what `greet()` needs, not everything `greet()` might do:
-a `print()` in the body would still be invisible.
+a `print()` in the body is still invisible.
 [Effect Management for Python?](#effect-management-for-python)
 returns to that limit.
 
@@ -843,8 +843,7 @@ Most of these are tracking systems,
 in the sense [Effect Management Systems](#tracking-and-management)
 gives the term: they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
-would be liabilities,
-because a host that pins every implementation can guarantee what generated code can do.
+are liabilities, because a host that pins every implementation can guarantee what generated code can do.
 
 Two go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
