@@ -17,6 +17,8 @@ and [Serializing to JSON](12_Techniques--Data_Classes_as_Types.md#serializing-to
 turns one into the wire format for a network call.
 This chapter teaches the object, not the crossing.
 
+## A Hand-Rolled Messenger
+
 A Messenger is an object with attributes corresponding to the names of the data you pass or return:
 
 ```python
