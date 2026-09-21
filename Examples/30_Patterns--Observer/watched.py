@@ -9,8 +9,8 @@ class Watched:
     def __init__(
         self, celsius: float, humidity: float
     ) -> None:
-        # __setattr__() reads _watchers, so it
-        # must exist before the first assignment
+        # __setattr__() reads _watchers before it
+        # stores, so no assignment can create it
         self.__dict__["_watchers"] = []
         self.celsius = celsius
         self.humidity = humidity
@@ -21,8 +21,9 @@ class Watched:
     def __setattr__(
         self, name: str, value: object
     ) -> None:
+        watchers = list(self._watchers)
         super().__setattr__(name, value)
-        for watcher in list(self._watchers):
+        for watcher in watchers:
             watcher(name, value)
 
 w = Watched(20.0, 0.4)

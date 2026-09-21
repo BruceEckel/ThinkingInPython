@@ -1,9 +1,9 @@
 # Observer
 
 The *Observer* pattern, a kind of callback,
-decouples code that changes state from code that reacts to the change.
+decouples code that changes state from code that reacts to the state change.
 An *observer* registers interest with a *subject*.
-Whenever the subject changes state, it notifies the observer.
+When the subject changes state, it notifies the observer.
 The subject defines only a list of callables and the arguments it passes to them.
 That choice follows [the principle of designing the communication rather than the parts](21_Patterns--Design_Patterns.md#design-principles).
 *Observer* is the most dynamic of the callback patterns because observers attach and detach at runtime,
@@ -22,8 +22,10 @@ With *Observer*, a change in the subject's data notifies each interested view.
 ## The Classic Observer: an Interface to Implement
 
 The classic design comes from *GoF Design Patterns*,
-and this section uses its vocabulary: the object that changes is the *subject*,
-and each *observer* implements an interface with one method.
+and this section uses that vocabulary:
+
+- The object that changes is the *subject*
+- Each *observer* implements an interface with one method
 
 The design has three parts: an `Observer` interface every observer implements,
 a `Subject` base class that keeps the observer list,
@@ -77,18 +79,19 @@ t.set_celsius(25)
 #: display: 25C
 ```
 
-`update()` is where each observer reacts.
-`notify()` calls it on every observer in the list,
-so one change to the subject's state reaches all of them:
-`Display` prints the new reading, and a plot or a table redraws.
+`notify()` calls `update()` on every observer in the list,
+so one change to the subject's state reaches all observers.
+`Display` prints the new reading, and a `Plot` or a `Table` redraws.
 
 `Thermometer` holds the list and names no observer type,
 so a `Plot` or a `Table` attaches the same way `Display` does.
-It inherits that list from `Subject`,
-so its constructor calls [`super().__init__()`](07_Foundations--Classes.md#inheritance)
-to create it.
-Without that call nothing creates `_observers`,
+`Subject.__init__()` creates that list,
+so `Thermometer`'s constructor calls [`super().__init__()`](07_Foundations--Classes.md#calling-the-base-constructor)
+to run it.
+If you remove that call, a `Thermometer` has no `_observers` attribute,
 and `attach()` raises an `AttributeError`.
+
+### Push or Pull
 
 Passing `arg` is the *push* model.
 The subject (`Thermometer`) supplies what changed (the temperature),
@@ -112,13 +115,13 @@ but a caller can forget to make the call.
 
 ### Why `notify()` Copies the List
 
-`_observers` is a list,
-so the `list(self._observers)` copy inside `notify()` looks redundant.
+`_observers` is a list, so inside `notify()`,
+the copy via `list(self._observers)` looks redundant.
 It is not.
 An observer may react to a notification by detaching.
-If the loop read `self._observers` directly,
-that `detach()` would shift the remaining observers down one index,
-and the loop would skip one of them without raising an exception.
+If the loop reads `self._observers` directly,
+that `detach()` shifts the remaining observers down one index,
+and the loop skips one of them without raising an exception.
 The copy is a second list,
 so `detach()` changes `self._observers` while the loop reads a list nobody is modifying.
 The set of observers is therefore fixed when `notify()` begins.
@@ -248,8 +251,8 @@ but for most cases the *Observer* pattern is only a list of callbacks.
 `Thermometer`'s constructor is simple and suggests using a `dataclass`.
 Inheriting does not stop a class from being a `dataclass`,
 but [a `dataclass`-generated `__init__()` does not call the base class's `__init__()`](12_Techniques--Data_Classes_as_Types.md#dataclass-inheritance).
-A `@dataclass` `Thermometer` would have no list of listeners,
-and `subscribe()` would raise an `AttributeError`.
+A `@dataclass` `Thermometer` has no list of listeners,
+and `subscribe()` raises an `AttributeError`.
 A `__post_init__()` that calls `super().__init__()` fixes that,
 but at greater length and complexity than the `__init__()` it replaces.
 
@@ -384,7 +387,7 @@ That call removes it from the broadcaster's list,
 not from the copy the loop is reading,
 so `once` finishes this notification and receives none after it.
 `always` receives both.
-Without the copy, the loop would be reading the list it changes.
+Without the copy, the loop reads the list it changes.
 `once` is at index 0 and `always` at index 1.
 Removing `once` moves `always` to index 0, which the loop has already visited,
 so the loop looks for index 1, finds the list ended there, and stops.
@@ -558,8 +561,8 @@ class Watched:
     def __init__(
         self, celsius: float, humidity: float
     ) -> None:
-        # __setattr__() reads _watchers, so it
-        # must exist before the first assignment
+        # __setattr__() reads _watchers before it
+        # stores, so no assignment can create it
         self.__dict__["_watchers"] = []
         self.celsius = celsius
         self.humidity = humidity
@@ -570,8 +573,9 @@ class Watched:
     def __setattr__(
         self, name: str, value: object
     ) -> None:
+        watchers = list(self._watchers)
         super().__setattr__(name, value)
-        for watcher in list(self._watchers):
+        for watcher in watchers:
             watcher(name, value)
 
 w = Watched(20.0, 0.4)
@@ -583,21 +587,24 @@ print(changes)
 #: [('celsius', 25.0), ('humidity', 0.5)]
 ```
 
-The constructor writes `_watchers` through `self.__dict__` to bypass `__setattr__()`,
-which would read `_watchers` before the assignment that creates it.
+`__setattr__()` copies `_watchers` before it stores the new value,
+so an ordinary `self._watchers = []` raises an `AttributeError`:
+the copy reads an attribute that does not exist yet.
+The constructor therefore writes `_watchers` through `self.__dict__`,
+which bypasses `__setattr__()`.
 The two assignments after that line are ordinary
 (they go through `__setattr__()`).
 Each notifies a list that is still empty;
 because the constructor hasn't returned, no caller can register a watcher.
 `super().__setattr__()` does the storing,
-because an ordinary assignment inside `__setattr__()` would call `__setattr__()` again.
+because an ordinary assignment inside `__setattr__()` calls `__setattr__()` again.
 
 In a class body, a name with a type and no initialization value [declares an attribute rather than creating one](09_Foundations--Class_Attributes.md#a-bare-annotation-declares-it-does-not-create).
 Such a name is a *bare annotation*.
 It looks like a class variable but is not, because it is not assigned a value.
 `_watchers` creates no attribute anywhere,
 and the constructor gives each `Watched` its own `_watchers` list.
-The same line with `= []` would create a class attribute,
+The same line with `= []` creates a class attribute,
 a single list shared by every `Watched`.
 [Class Attributes](09_Foundations--Class_Attributes.md#a-classvar-with-no-value-declares-too)
 covers the difference between declaring an attribute and creating one,
@@ -608,7 +615,7 @@ which is why `celsius` and `humidity` need no declaration.
 For `_watchers` the constructor writes `self.__dict__["_watchers"] = []`,
 a write to a dictionary rather than an assignment to an attribute,
 and `ty` does not read it as one.
-The bare annotation supplies what that assignment would have: without it,
+The bare annotation supplies the attribute and its type instead: without it,
 `ty` reports an `unresolved-attribute` error in each method that reads the list.
 
 One method for every attribute is less precise than a property per attribute,
@@ -644,9 +651,9 @@ so `announce()` returns only after every listener finishes.
 
 An `announce()` that awaits is a coroutine,
 and its caller must `await` it in turn,
-so the setter that calls it would need to be `async` too.
+so the setter that calls it must be `async` too.
 An `async` setter returns a coroutine instead of running its body,
-and an assignment offers no place for the `await` that would run the coroutine.
+and an assignment offers no place to `await` that coroutine.
 The assignment therefore discards the coroutine, and the body never runs.
 The state change becomes an awaitable method, `set_celsius()`,
 rather than the assignment `t.celsius = value`.
@@ -740,8 +747,7 @@ a `Broadcaster[float]` accepts a listener that takes a `float` and rejects one t
 
 `alarm` subscribes before `log_reading`,
 yet at 150 degrees the log prints first.
-Awaiting the listeners in sequence would print in subscription order,
-alarm first.
+Awaiting the listeners in sequence prints in subscription order, alarm first.
 Concurrent fan-out lets each listener finish as soon as its own wait ends,
 so the faster listener prints first.
 The results `gather()` returns stay in argument order regardless.
@@ -829,7 +835,7 @@ the async form of exercise 3's catch-collect-continue.
 [Concurrency](19_Techniques--Concurrency.md#structured-concurrency-with-taskgroup)'s `TaskGroup` is the usual choice for concurrent awaits,
 but not here.
 A `TaskGroup` cancels a failing task's siblings,
-so a single broken listener would cancel the others mid-notification.
+so a single broken listener cancels the others mid-notification.
 
 Use the async fan-out only when the listeners are I/O-bound.
 For in-memory listeners the synchronous `Broadcaster` from `broadcaster.py` is simpler and needs no event loop.
@@ -851,6 +857,8 @@ This is the only color that works; on the 8x8 grid `box_view.py` opens with,
 no sequence of clicks turns every box `skyblue` or every box `khaki`.
 The size decides that, and a 3x3 grid reaches all three colors.
 Exercise 8 works out which sizes reach which colors.
+
+### The Model
 
 The model reuses `broadcaster.Broadcaster`:
 
