@@ -299,7 +299,7 @@ That guarantee, or the constructor syntax, is what the bookkeeping buys.
 When you need neither,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
-One more property carries over from [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory:
+One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory:
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object,
 one wins the pool, and identity between their two results fails.
