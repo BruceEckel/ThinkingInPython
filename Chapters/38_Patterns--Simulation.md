@@ -244,7 +244,7 @@ class Blackboard:
 A `TaskGroup` stays open until every task inside it has finished,
 including tasks created after the block began.
 That is the shape of this problem: each rat can create more rats.
-A single `asyncio.gather(*self.tasks)` would miss most of them,
+A single `asyncio.gather(*self.tasks)` misses most of them,
 because `gather()` fixes its argument list at the moment of the call,
 before those rats exist.
 
@@ -868,7 +868,7 @@ so when the robot moves away the room behaves like any other empty room.
 ### Choosing the Path
 
 The robot can now move, but nothing tells it where to go.
-A string of `n`/`s`/`e`/`w` characters would replay a route somebody else worked out.
+A string of `n`/`s`/`e`/`w` characters replays a route somebody else worked out.
 Instead the robot searches the room graph for its own.
 
 `solve()` is a breadth-first search over `Room` objects.
