@@ -59,7 +59,7 @@ PyPy typically trails CPython's newest language version,
 so confirm it supports the features and third-party packages you need.
 
 For a parallel, CPU-bound workload,
-the [free-threaded build](19_Techniques--Concurrency.md#the-gil-and-free-threading)
+the [free-threaded build](19_Techniques--Concurrency.md#free-threading)
 is the largest platform-level speedup available in 3.15,
 since it removes the lock that otherwise serializes Python bytecode across threads.
 
@@ -195,7 +195,7 @@ Neither one rescues a quadratic algorithm.
 
 [PEP 836](https://peps.python.org/pep-0836/) sets the bar the JIT must clear:
 5% over the interpreter alone for 3.16,
-then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#the-gil-and-free-threading)
+then 20% for the JIT combined with [free threading](19_Techniques--Concurrency.md#free-threading)
 by 3.17.
 The PEP calls that the minimum for continuing to develop the JIT inside CPython,
 and even then, turning it on by default would need separate approval from the release manager.
@@ -1017,7 +1017,7 @@ A method is the usual trap.
 so the cache holds a reference to each instance it has seen,
 and the collector can reclaim none of them.
 For a value computed once per object,
-use [`functools.cached_property`](07_Foundations--Classes.md#properties),
+use [`functools.cached_property`](07_Foundations--Classes.md#cached-property),
 which stores the result on the instance and dies with it,
 unless the class also declares `__slots__`
 (see [When Slots Does Not Fit](#when-slots-does-not-fit) below).
@@ -1140,7 +1140,7 @@ so the listing prints a comparison that holds anywhere rather than numbers that 
 and `slots=True` is the half that gets dropped,
 because the class works without it.
 A decorator of your own can apply both.
-[`@dataclass_transform`](17_Techniques--Metaprogramming.md#where-enforcement-lives)
+[`@dataclass_transform`](17_Techniques--Metaprogramming.md#dataclass-transform)
 tells the type checker that the result is a frozen data class:
 
 ```python
