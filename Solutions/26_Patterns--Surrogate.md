@@ -382,9 +382,9 @@ replacement drops a name the current implementation answers. The
 surrogate keeps what it had, so `s.g()` still works after the
 rejected swap.
 
-The type checker cannot make this decision. It would have to compare
-the type of the value the surrogate holds right now against the type of
-the argument. The surrogate's attribute is `Any`, because
+The type checker cannot make this decision. It must compare the type
+of the value the surrogate holds right now against the type of the
+argument. The surrogate's attribute is `Any`, because
 `__getattr__()` delegation deliberately leaves the implementation's
 type untracked. Annotating both against a `Protocol` states a fixed
 shape that every implementation must meet, a different guarantee. A
