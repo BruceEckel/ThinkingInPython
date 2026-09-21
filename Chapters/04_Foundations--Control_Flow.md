@@ -142,6 +142,8 @@ print(total)
 #: 8
 ```
 
+### The Loop `else` Clause
+
 A loop may have an `else` clause.
 It runs when the loop finishes with no `break`,
 and that makes it natural for search loops:
@@ -203,6 +205,8 @@ and the outer `break` runs right after.
 `locate(9)` breaks neither loop,
 so the inner `else` continues on each row and the outer `else` prints `"not found"`.
 
+### `range()`, `enumerate()`, and `zip()`
+
 `for` walks any iterable directly.
 A list, a set, a dictionary, or a string needs no index.
 Use `range()` for counting and `enumerate()` when you also need the index:
@@ -257,6 +261,8 @@ When you need the index as well, wrap the `zip()` in `enumerate()`.
 The nesting shows up in the loop header, where the inner pair needs parentheses:
 `for i, (name, score) in enumerate(zip(names, scores)):`.
 
+### The Walrus Operator
+
 The *walrus operator* `:=` assigns a value as part of an expression,
 so you can compute, name, and test a value in one place:
 
@@ -287,6 +293,8 @@ The walrus also collapses `while_true.py` into its loop header:
 `while (value := values.pop(0)) != 0:`.
 A comprehension can use `:=` the same way,
 and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
+
+### Mutating a Container While Looping
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
 [Containers](03_Foundations--Containers.md#lists)
@@ -455,6 +463,8 @@ so a broad clause above a narrow one makes the narrow one unreachable.
 Order them most specific first.
 To log an exception and still let it propagate, re-raise it with a bare `raise`.
 
+### Exception Chaining
+
 Raising an exception while handling another attaches the first exception to the new one.
 Python reports both, and `from` decides how the two connect:
 
@@ -530,6 +540,8 @@ With no `from`, Python still records the earlier exception in `__context__` and 
 and nothing appears above the new exception.
 Use `from e` when the earlier exception explains this one,
 and `from None` when the earlier exception would only distract from your own message.
+
+### Ask Forgiveness, Not Permission
 
 Python's culture leans on "easier to ask forgiveness than permission,"
 abbreviated EAFP.
