@@ -896,7 +896,7 @@ if __name__ == "__main__":
 so the GUI shows a message rather than crashing.
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all see the loop's final values,
-the [late-binding trap](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime).
+the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 The three fixed buttons use lambdas safely,
 since they close over nothing that varies.
 
