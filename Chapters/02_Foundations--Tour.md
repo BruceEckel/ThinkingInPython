@@ -342,6 +342,8 @@ That is a [conditional expression](04_Foundations--Control_Flow.md).
 
 ## Strings
 
+### String Literals
+
 Single or double quotes create strings.
 If you surround a string with double quotes,
 you can embed single quotes and vice versa:
