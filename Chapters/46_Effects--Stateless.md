@@ -199,7 +199,7 @@ two bounds on the library's type variables do that instead.
 `A` is bound to `Ability[Any]`
 ([Waiting on a Coroutine](#waiting-on-a-coroutine) states the rule for `Depend`),
 and `E` is bound to `Exception`,
-so a class that subclassed both would satisfy each bound at once,
+so a class that subclasses both satisfies each bound at once,
 a case no listing here builds.
 At runtime, `run()`'s driver tells the two apart with `case Exception() as error`:
 whatever the generator yields that matches `Exception` is a failure,
@@ -868,7 +868,7 @@ def test_greet_all(console: Console) -> None:
 
 Two rows, two `Console` implementations,
 and neither `greet_all()` nor `greet_logged()` gains a parameter.
-The parameter-passed version would add a `console` argument to both,
+The parameter-passed version adds a `console` argument to both,
 even though only `greet()`, one level further down, uses it.
 
 ## Supplying an Interface
@@ -1149,7 +1149,7 @@ An EMS sets a higher bar:
 the dependency must appear in the signature so the type checker can verify it,
 which is why the EMS `greet()` returns `Depend[Need[Console], None]` while `dependency_injection.py`'s returns `None`.
 An EMS tracks every dependency,
-so the type checker catches the errors that programmer memory and exhaustive testing would otherwise have to catch.
+so the type checker catches the errors that programmer memory and exhaustive testing must otherwise catch.
 
 ### No Container, Three Consequences
 
