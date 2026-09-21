@@ -88,7 +88,7 @@ nothing on the instance, so look at the class.
 `display_object()`, the inspection helper first used in [Classes](07_Foundations--Classes.md),
 reports attributes and methods separately,
 but both live in the same class dictionary.
-That is why assigning `a.show = something` would shadow the method for `a` alone.
+That is why assigning `a.show = something` shadows the method for `a` alone.
 
 One kind of class attribute follows a different rule.
 A [`@property`](07_Foundations--Classes.md#properties)
@@ -168,7 +168,7 @@ A mutable default belongs in a `@dataclass` field with a [`default_factory`](12_
 
 When you genuinely want one shared value, say so with `ClassVar` from `typing`.
 The type checker then treats the attribute as class-wide,
-and rejects the instance assignment that would shadow it:
+and rejects the instance assignment that shadows it:
 
 ```python
 # class_var.py
@@ -555,7 +555,7 @@ The name stays an ordinary shared class attribute,
 the generated `__init__()` takes no `x`,
 and neither the runtime nor the type checker complains.
 `b.x = -1` shadows the class attribute for that one instance,
-and an assignment through the class would still change every instance that has not shadowed it,
+and an assignment through the class still changes every instance that has not shadowed it,
 the hazard `Stars` demonstrates.
 The annotated field in `real_defaults.py` also leaves a class attribute behind,
 as its last line shows: `vars(B)` still holds `x = 100`.
