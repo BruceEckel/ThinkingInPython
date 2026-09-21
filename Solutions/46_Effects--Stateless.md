@@ -365,7 +365,8 @@ names an instance, so every combination of instances is a valid
 environment for it. The parametrize table is a list of environments,
 and the test body is the driver that runs the Effect in each one. Six
 rows share one assertion. A version constructing its own `Material`
-inside `holds()` would need six copies of the function.
+inside `holds()` needs three copies of the function, one per material,
+and a version that also constructs its own `Nailer` needs all six.
 
 ## 6. A handler that builds what was requested
 
