@@ -345,12 +345,12 @@ so neither ever reaches its `fetched` print.
 The shared deadline puts both failures in the group.
 The loop runs every timer due at one instant in the same turn,
 so `c` and `d` both raise before the group's own callback runs and starts cancelling.
-Had each called `asyncio.sleep(0.03)`,
-the two timers would have been set a few microseconds apart,
+If each calls `asyncio.sleep(0.03)`,
+the two timers are set a few microseconds apart,
 since each call reads the clock when it runs,
-and a loop that woke between them would have run `c`'s failure,
-cancelled `d` while its timer was still pending,
-and delivered a group holding one exception.
+and a loop that wakes between them runs `c`'s failure,
+cancels `d` while its timer is still pending,
+and delivers a group holding one exception.
 
 The block exits once every task has either finished or ended in cancellation.
 As it exits, it re-raises both failures wrapped in an *exception group*,
@@ -919,8 +919,8 @@ so their contexts are copies of `main()`'s,
 and nothing they set flows back to it.
 `request_id` returns to its default while the global stays clobbered.
 
-Deleting the global and writing `handle(name)`'s value into a parameter would work here,
-and would keep working until a logging helper four calls down needs the value.
+Deleting the global and writing `handle(name)`'s value into a parameter works here,
+and keeps working until a logging helper four calls down needs the value.
 That is the problem a `ContextVar` solves.
 
 You often set a variable for part of a call and restore it afterward,
@@ -963,7 +963,8 @@ The `offloaded` line is the reason `ContextVar`, rather than `threading.local`,
 is the modern answer.
 `threading.local` gives each *thread* its own value,
 and a thread is the wrong unit twice over.
-Thousands of tasks share one event-loop thread, so they would share one value.
+Thousands of tasks share one event-loop thread,
+so `threading.local` gives them all one value.
 And a value stored on a thread does not travel when work moves,
 while `asyncio.to_thread()` copies the current context into the worker,
 so the offloaded `audit()` still knows which request it is serving.
@@ -1267,7 +1268,7 @@ def compare(
 ```
 
 Two timings of the same type come back from one call,
-so a bare `tuple[float, float]` would force every caller to remember which float came first.
+so a bare `tuple[float, float]` forces every caller to remember which float came first.
 `Times` names them, as [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#returning-multiple-values)
 describes.
 The two callers below use the two styles a `NamedTuple` allows,
@@ -1365,7 +1366,7 @@ Single-threaded code paid almost nothing.
 Every alternative undid one of the earlier decisions.
 Atomic count updates slow every program to benefit a few.
 A 1996 patch tried fine-grained locks and ran single-threaded code about twice as slow.
-A tracing garbage collector would have broken every extension.
+A tracing garbage collector breaks every extension.
 In rejecting that 1996 patch,
 Guido van Rossum set the bar that stood for three decades:
 remove the GIL without slowing single-threaded code.
@@ -1495,7 +1496,7 @@ Only other threads pay for an atomic operation.
 Permanent objects like `None`, `True`, and small integers become *immortal*.
 Their counts never change.
 Immortality arrived in 3.12 for every build but pays off most here,
-since it removes the one atomic operation every thread would otherwise contest.
+since it removes the one atomic operation every thread otherwise contests.
 Mutable containers like dictionaries and lists carry individual locks,
 so two threads contend only when they touch the same container.
 Single-threaded code pays a small penalty for this machinery,
@@ -2019,7 +2020,7 @@ Creating a `ProcessPoolExecutor` sets up its queues and pipes,
 its first `submit()` spawns the workers,
 and `__exit__` joins them through `shutdown(wait=True)`.
 That join is an ordinary blocking call,
-and running it on the thread driving the event loop would freeze every task on that loop,
+and running it on the thread driving the event loop freezes every task on that loop,
 the same failure `blocking_the_loop.py` demonstrates with `time.sleep()`.
 Building the pool before `asyncio.run()` and tearing it down after keeps the shutdown off the loop.
 
