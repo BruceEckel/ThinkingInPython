@@ -34,6 +34,8 @@ The `list` automatically resizes itself.
 The `for` statement iterates through `odds`,
 so `x` takes on each value in the `list`.
 
+### Indexing and Slicing
+
 A `list` holds objects, of any kind, in an ordered, mutable sequence.
 Indexing starts at zero, and negative indices count from the end.
 A *slice* `[start:stop:step]` copies a subrange, with `stop` excluded:
@@ -57,6 +59,8 @@ print(xs[::-1])  # Reversed
 ```
 
 Slicing works on any sequence, including strings and tuples.
+
+### Growing, Shrinking, and Sorting
 
 Lists grow, shrink, and answer questions about themselves:
 
@@ -105,6 +109,8 @@ Uppercase sorts before lowercase because Python compares strings by code point.
 shows how a `key=` function changes the ordering;
 `key=str.lower` would fold the case here.
 
+### Mixed Element Types
+
 Each slot of a `list` holds a reference to whatever object you put there,
 so the same `list` can mix strings, numbers, `None`, and other containers:
 
@@ -127,6 +133,8 @@ A `list` of mixed types usually means each element needs different handling.
 A `tuple`, a [data class](12_Techniques--Data_Classes_as_Types.md#data-classes),
 or distinct lists, each holding a single type,
 express those differing roles better.
+
+### Two List Traps
 
 Two list operations produce surprises.
 `*` repeats a reference rather than copying what it points at,
@@ -762,6 +770,8 @@ so each line that attempts it carries a `# type: ignore`.
 The comment silences the type checker.
 The runtime exception is what the listing exists to show.
 
+### `frozendict`
+
 A `MappingProxyType` is a window onto a `dict` that still exists and can change;
 a `frozendict` owns its contents outright.
 This listing requires Python 3.15:
@@ -803,7 +813,9 @@ so changes to that `dict` still show through.
 In `immutable_containers.py`,
 writing to `settings` changes what `config` reports.
 
-Immutability is also shallow.
+### Shallow Immutability
+
+Immutability is shallow.
 An immutable container fixes which objects it holds,
 not what those objects contain:
 
@@ -832,6 +844,8 @@ A container holding an unhashable object is unhashable too.
 Immutability pays off when it goes all the way down.
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 shows the same leak inside a frozen data class.
+
+## Choosing a Container
 
 Choosing a container comes down to one question: what do you do with it most?
 Ordered items you walk through are a `list`.
