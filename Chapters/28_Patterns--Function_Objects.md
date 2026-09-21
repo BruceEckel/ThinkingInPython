@@ -470,7 +470,7 @@ To add, remove, or reorder the handlers you edit the `chain` list.
 
 The test is `root is not None`, not `if root`.
 A finder returns `0.0` for a function whose root is at zero, and `0.0` is falsy,
-so a truthiness test would discard a correct answer and call the next finder.
+so a truthiness test discards a correct answer and calls the next finder.
 The hazard is the truthiness test, not the choice of failure value.
 Whichever value marks failure, compare the result against it with `is`.
 `None` is the right failure value here because a root is never `None`,
@@ -626,13 +626,13 @@ letting the `defaultdict` build each event type's list on first use.
 `publish` reads with `.get(type(event), [])` instead of indexing,
 because indexing a `defaultdict` inserts an empty list as a side effect.
 Every published event type with no subscriber, such as `Closed`,
-would otherwise leave a stray entry behind.
+otherwise leaves a stray entry behind.
 
 The lookup uses `type(event)`, which matches the class and no ancestor.
 A subclass of `Deposit` published to this bus matches no handler,
 so `publish()` calls nothing, exactly as it does for `Closed`.
-Walking `type(event).__mro__` and calling every handler along it would give a subclass event its parent's handlers.
-An event would then run every handler registered anywhere in its ancestry,
+Walking `type(event).__mro__` and calling every handler along it gives a subclass event its parent's handlers.
+An event then runs every handler registered anywhere in its ancestry,
 not only the ones registered for its own type.
 
 Testing confirms that publishing calls every handler registered for a type,
@@ -792,7 +792,7 @@ expect(TypeError, bus.publish, "Deposit")
 tells the type checker that a class passing through either decorator comes out a frozen data class.
 `Audit(threshold=50)` therefore has its generated `__init__`,
 and `ty` reports `Audit(50).threshold = 1` as assignment to a read-only property,
-as it would with `@dataclass(frozen=True)` written directly.
+as it does with `@dataclass(frozen=True)` written directly.
 The tags are runtime facts.
 `@handler` reads the annotation on the first parameter after `self` in `__call__`,
 the same annotation the type checker checks, so a handler names its event once.
@@ -804,8 +804,8 @@ Each decorator registers `built`, the class that `dataclass()` returns,
 and not the `cls` it received.
 A class's slots are fixed when the class is created,
 so `slots=True` makes `dataclass()` build a new class and return it.
-Registering `cls` would put a class in `EVENTS` that no event is an instance of,
-and `@handler` would reject `Announce` because its `Deposit` is not an `@event`.
+Registering `cls` puts a class in `EVENTS` that no event is an instance of,
+and `@handler` rejects `Announce` because its `Deposit` is not an `@event`.
 
 The price is the registration-time check of the first version.
 `subscribe(Deposit, on_withdraw)` fails under `ty` because no `E` fits both arguments.
