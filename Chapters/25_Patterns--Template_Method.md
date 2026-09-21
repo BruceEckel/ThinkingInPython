@@ -188,7 +188,7 @@ not just catch misspellings for free.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
-as shown in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance).
+as shown in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes).
 The runtime then refuses to instantiate a subclass that forgot it.
 
 The test supplies a recording subclass and verifies the anchored flow:
