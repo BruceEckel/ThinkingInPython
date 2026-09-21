@@ -783,6 +783,8 @@ One rule covers both import forms: patch the name the calling code looks up.
 The same approach isolates a database, a message queue, or any other service.
 Replace the boundary function with a stand-in and assert against its result.
 
+### Stubs and Mocks
+
 A stand-in like `fake_urlopen()` is a *stub*:
 it answers with a canned value and records nothing.
 The standard library's `unittest.mock` builds stubs for you,
