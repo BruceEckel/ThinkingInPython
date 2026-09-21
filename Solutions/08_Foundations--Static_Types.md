@@ -163,8 +163,8 @@ With `= str` in place, `ty check` reports `str` for
 `Unknown` while still finding no errors in the file. That is the
 lesson: an unsolved type parameter does not fail the check, it
 switches the check off for every expression downstream of it.
-`words.top().upper()` passes either way, and so would
-`words.top().no_such_method()`. A default converts a silently
+`words.top().upper()` passes either way. Without the default, so
+does `words.top().no_such_method()`. A default converts a silently
 unchecked annotation into a checked one. That conversion is why a
 default earns its place on a class whose parameter has one common
 answer.
