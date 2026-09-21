@@ -132,7 +132,7 @@ Inheritance merges them.
 The `/` in `WhatIUse.op()` makes its parameter positional-only.
 `WhatIUse2.op()` renames that parameter to `item`.
 The rename is legal because callers cannot use a positional-only parameter name.
-Renaming a keyword-capable parameter would break any caller passing it by keyword,
+Renaming a keyword-capable parameter breaks any caller passing it by keyword,
 so `ty` rejects a renamed keyword-capable parameter in an override.
 A checker that accepts such a rename compares the types in an override and skips the parameter names.
 
@@ -150,7 +150,7 @@ The commented-out signature in `adapter_variations.py` takes a `WhatIHave` alone
 which is all Approach 2 needs for its own callers.
 If you use that signature in place of the union,
 a type checker rejects the override:
-a `WhatIUse2` would refuse the `WhatIWant` that every `WhatIUse` accepts,
+a `WhatIUse2` refuses the `WhatIWant` that every `WhatIUse` accepts,
 and that breaks [substitutability](20_Patterns--Rethinking_Objects.md#liskov-substitution).
 `ty` reports the rejection as `invalid-method-override`:
 
@@ -515,4 +515,4 @@ without the mark, nothing tells them.
     and one refuses calls unless you set a flag.
     Classify each as *Proxy*, *Decorator*, *Adapter*,
     or *Façade* using the "remove it and you lose" test from the table,
-    and say what you would lose in each case.
+    and say what you lose in each case.
