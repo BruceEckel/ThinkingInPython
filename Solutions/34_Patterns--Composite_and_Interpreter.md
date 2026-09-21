@@ -570,10 +570,10 @@ the string in a `Num` without looking at it.
 
 Returning `NotImplemented` puts the decision back where it belongs.
 `__radd__()` now answers only for an `int`, so both sides decline and
-Python raises the `TypeError` it would have raised for any other
-mismatched pair. The message comes from `str`, which is the right
-source: the left operand is what the caller wrote first, and nothing
-in this expression language ever claims to extend `str`.
+Python raises the `TypeError` it raises for any other mismatched pair.
+The message comes from `str`, which is the right source: the left
+operand is what the caller wrote first, and nothing in this expression
+language ever claims to extend `str`.
 
 The forward methods need the same guard for the same reason. Without
 it `x + "a"` wraps the string in a `Num` and builds the ill-typed tree
@@ -757,12 +757,12 @@ its own children: `work += [Op.ADD, right, left]` puts `Op.ADD`
 deepest, so it comes off last, by which point the two values it needs
 are on `values`. Pushing `right` before `left` makes `left` pop
 first, which matters for the subtraction and division a fuller
-language would add.
+language adds.
 
 `Op` is an enum rather than a string so the `match` stays exhaustive.
 `work` holds `Expr | Op`, and every member of both types has its own
-case, so `assert_never()` still type-checks. A string marker would
-leave `case _` reachable and the guarantee gone.
+case, so `assert_never()` still type-checks. A string marker leaves
+`case _` reachable and the guarantee gone.
 
 `sys.setrecursionlimit()` is the other escape, and it is a worse one.
 The limit is a guard rather than a budget, because each Python frame
