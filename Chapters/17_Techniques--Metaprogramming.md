@@ -238,9 +238,10 @@ so the compiler never gives it the `__class__` cell that zero-argument `super()`
 ### Building Each Class on First Lookup
 
 The dict comprehension in `eager_event_classes.py` builds all seven classes whether the schedule uses them or not.
-Seven is cheap; hundreds would cost.
+Seven classes are few enough to build up front.
+With hundreds, most are built and never used.
 So the next version delays building each class until the first lookup asks for it,
-at the price of a `dict` subclass and a placeholder for the classes not yet built:
+which takes a `dict` subclass and a placeholder for the classes not yet built:
 
 ```python
 # greenhouse.py
