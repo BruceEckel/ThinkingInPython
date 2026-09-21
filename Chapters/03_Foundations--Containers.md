@@ -363,7 +363,7 @@ the right operand's value wins, so `"y"` comes out as `20`.
 The last line feeds `dict()` an iterable of `(key, value)` pairs,
 and any iterable that yields such pairs will do.
 `zip()` pairs up two sequences element by element.
-[Control Flow](04_Foundations--Control_Flow.md#loops)
+[Control Flow](04_Foundations--Control_Flow.md#range-enumerate-and-zip)
 covers it with the other loop tools.
 
 Changing a `dict`'s size while iterating it raises a `RuntimeError` instead of quietly skipping elements,
@@ -806,7 +806,7 @@ Neither you nor the code that receives it can add, remove,
 or replace an element by accident,
 so a container of immutable elements needs no defensive copy before you share it.
 An immutable container is safe as a default argument,
-unlike the [mutable default](05_Foundations--Functions.md#default-arguments).
+unlike the [mutable default](05_Foundations--Functions.md#the-mutable-default-trap).
 A `MappingProxyType` is the one exception to watch.
 It blocks writes through the view, but it is a window onto the original `dict`,
 so changes to that `dict` still show through.
