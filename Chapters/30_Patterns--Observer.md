@@ -1101,8 +1101,10 @@ and `watched.py` drops the base class and announces from `__setattr__()`,
 so one method covers every attribute.
 The job still belongs to the object either way, and its code lives elsewhere.
 
-Deciding which change is worth announcing is the job that stays,
-and in every design here the object whose state changed is what decides.
+Deciding which change is worth announcing is the job that stays.
+That decision belongs to the object whose state changes, or to whoever calls it.
+It never belongs to a listener,
+which filters what it receives and cannot ask for what was never announced.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
