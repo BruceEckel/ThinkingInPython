@@ -237,6 +237,8 @@ print(list(sq))  # Exhausted: empty, and no error
 #: []
 ```
 
+### The Body Waits for the First `next()`
+
 Calling `squares(6)` runs none of its body.
 The `print` at the top fires only when something demands the first value.
 It fires once, not on every value.
@@ -269,7 +271,9 @@ expect(ValueError, squares, -1)
 `squares()` has no `yield`, so calling it runs the check immediately.
 Only `produce()` waits.
 
-The second surprise is the second call to `list(sq)`.
+### An Exhausted Generator Is Silently Empty
+
+The second surprise in `generator_lifecycle.py` is its second call to `list(sq)`.
 An exhausted generator produces nothing and raises nothing,
 so the empty `list(sq)` leaves no error to point at the bug.
 
@@ -318,6 +322,8 @@ so the type checker rejects the generator at the call instead of letting it run 
 and that is why the listing leaves it out:
 every chapter listing must type-check.
 `total()` in `iterators.py` stays `Iterable[int]` because it sums once.
+
+### What `tee()` Buffers
 
 `itertools.tee(it, 2)` splits one iterator into two independent ones.
 That looks like a third way to walk data twice,
@@ -695,6 +701,8 @@ The language calls both on your behalf.
 [Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves)
 describes this dissolution.
 
+### `first()` and `current_item()` Rebuild the List
+
 Written in Python, the four GoF *Iterator* methods show what `first()` and `current_item()` ask of a source.
 Over a list they are unremarkable.
 `first()` resets an index, `is_done()` compares it to `len()`,
@@ -782,6 +790,8 @@ and in the advice to collect into a list when you must walk data twice.
 Python dropped both methods rather than paying for them everywhere.
 Without them, `advance()` must return the value it reached;
 that method is `__next__()`.
+
+### Asking Consumes an Item
 
 You can ask a GoF iterator repeatedly whether it has finished,
 without disturbing it.
