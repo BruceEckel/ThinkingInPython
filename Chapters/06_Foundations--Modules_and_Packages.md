@@ -181,8 +181,8 @@ To make a directory a package, you put a special file named `__init__.py` in it.
 An empty `__init__.py`, the common case,
 only flags the directory as a package.^[The name `__init__.py` often confuses people. In hindsight, it might have been better to name the file `__package__.py`.]
 One with content usually re-exports the package's public names:
-if `a_package/__init__.py` re-exported `function1`,
-`from a_package import function1` would work and callers would never learn which submodule defines `function1`.
+if `a_package/__init__.py` re-exports `function1`,
+`from a_package import function1` works and callers never learn which submodule defines `function1`.
 You can still import a directory without `__init__.py` as a *namespace package*,
 but an explicit `__init__.py` makes the package's identity and boundary clear,
 so this book uses one by default.
@@ -253,7 +253,7 @@ print(hasattr(a_package, "module1"))
 ```
 
 No submodule loads, and no message prints beyond the package's own.
-`a_package.module1.function1()` here would raise `AttributeError: module 'a_package' has no attribute 'module1'`.
+`a_package.module1.function1()` here raises `AttributeError: module 'a_package' has no attribute 'module1'`.
 The submodule becomes an attribute of the package only when something imports it by name.
 
 You can also name the package with `from`:
@@ -434,8 +434,8 @@ print(sorted(n for n in dir() if not n.startswith("__")))
 #: ['helper', 'public']
 ```
 
-Without `__all__`, the star import would bind `public`, `helper`,
-and `undeclared`: everything not underscored.
+Without `__all__`, the star import binds `public`, `helper`, and `undeclared`:
+everything not underscored.
 With it, only the listed names arrive,
 and the star import skips `_internal` either way.
 
@@ -630,7 +630,7 @@ To change the setting for a whole run without editing source,
 run with `-X lazy_imports=MODE` or set `PYTHON_LAZY_IMPORTS=MODE`.
 Both accept one of two values.
 `normal`, the default, defers only the imports you marked `lazy`.
-`all` defers every module-level import the keyword could have marked,
+`all` defers every module-level import the keyword can mark,
 so the imports it cannot mark, such as one inside a `try` block, stay eager.
 The PEP also describes a third value, `none`, a global off switch.
 CPython removed it before the 3.15 release.
