@@ -239,7 +239,7 @@ do. A `@dataclass` also hashes by value, but only when frozen
 disqualified outright. Between a frozen dataclass and a `NamedTuple`
 here, the tuple form wins on convenience: unpacking a coordinate as
 `x, y = point` and using it wherever a plain tuple is expected are
-both things the scenario wants and a frozen dataclass would refuse.
+both things the scenario wants and a frozen dataclass refuses.
 
 **The JSON record is a `@dataclass`.** JSON's own encoding already
 loses field names when the shape is a `NamedTuple`
@@ -250,4 +250,4 @@ from a tuple's positions, are also where the validation this scenario
 wants belongs: [Data Classes as
 Types](../Chapters/12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes a `@dataclass`'s `__post_init__()` the place to reject a
-value the JSON decoder would otherwise accept unchecked.
+value the JSON decoder otherwise accepts unchecked.
