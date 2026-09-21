@@ -1243,7 +1243,7 @@ Both defenses fire again.
 The type checker reports each class as an invalid frozen-dataclass subclass,
 which the `# type: ignore` silences so the listing can reach the runtime failure.
 
-`frozen=True` works by installing a `__setattr__()` that rejects every assignment,
+`frozen=True` works by installing a `__setattr__()` that rejects an assignment to any field of the frozen class,
 and a subclass inherits that method.
 A plain subclass of a frozen class is half writable,
 its own fields assignable and the inherited ones not.
