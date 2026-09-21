@@ -386,6 +386,12 @@ so the `TaskGroup` block waits on a task it ordered to stop.
 If a task must clean up as it stops, catch `asyncio.CancelledError` by name,
 do the cleanup, and re-raise it.
 
+You can also stop a `TaskGroup` deliberately.
+`tg.cancel()` (3.15) cancels every task in the group,
+for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
+
+### Failures as Values with `gather()`
+
 When one task's failure should not stop the others,
 `gather(..., return_exceptions=True)` handles the situation differently:
 
@@ -444,10 +450,6 @@ A health check across ten services needs all the answers including the errors,
 not a cancelled remainder of the batch.
 `TaskGroup` has no such mode.
 Keeping siblings alive past a failure means catching exceptions inside each task yourself.
-
-You can also stop a `TaskGroup` deliberately.
-`tg.cancel()` (3.15) cancels every task in the group,
-for the case where the answer arrives before the batch finishes and the remaining work has lost its value.
 
 ### Bounding a Wait with `asyncio.timeout()` {#bounding-a-wait-with-asynciotimeout}
 
@@ -570,6 +572,8 @@ The CPU tasks never `await`, so each runs to the end before the next starts:
 peak 1.
 
 The event loop overlaps waiting, not computing.
+
+### `time.sleep()` Stops the Loop
 
 `asyncio.sleep()` in `io_price` is not `time.sleep()`.
 Awaiting `asyncio.sleep()` suspends only the current task and hands control to the event loop,
@@ -1003,8 +1007,10 @@ The work now spreads across multiple interpreters, each on its own core,
 instead of one interpreter on one core.
 With enough cores the wall-clock time falls toward the time of a single task.
 
+### What a Process Pool Requires
+
 Three issues separate a process pool from the in-process tools in this chapter,
-and all three surface in this short listing:
+and all three surface in `parallel_cpu.py`:
 
 1. The `if __name__ == "__main__"` guard keeps each worker from building a pool of its own.
    To create a worker, the operating system starts a fresh Python interpreter,
@@ -1034,6 +1040,8 @@ and all three surface in this short listing:
    The `list(...)` around the call turns a failure in any worker into an exception here,
    at a point you can catch it.
    That third point is true of every `Executor`, not only a process pool.
+
+### Raw `multiprocessing`
 
 The `multiprocessing` module underneath `ProcessPoolExecutor` exposes the raw pieces of a separate process:
 a `Process` you start and `join()`, and a `Queue` to carry results back,
@@ -1082,7 +1090,8 @@ Drain a queue carrying bulky data before joining.
 It reuses a pool of workers instead of spawning one process per call,
 returns ordered results without manual bookkeeping,
 and shares its `submit()`/`map()`/`Future` interface with `ThreadPoolExecutor`,
-so switching between processes and threads, as the next section does,
+so switching between processes and threads,
+as [The GIL and Free Threading](#the-gil-and-free-threading) does,
 is a one-line change.
 
 A pool fits work shaped like a function call: one call in, one result out.
@@ -1092,6 +1101,8 @@ Use `multiprocessing` when the job is a different shape:
 - Processes that share state through a `multiprocessing.Manager`, `Value`,
   or `Array`.
   `ProcessPoolExecutor` does not expose these.
+
+### Measuring the Speedup
 
 You can test the claim that wall-clock time falls toward a single task's time as you add more cores.
 Split a fixed amount of work into a growing number of tasks,
@@ -1212,7 +1223,9 @@ The standard CPython build has one GIL for the whole process,
 so only one thread runs Python bytecode at a time,
 no matter how many cores sit idle.
 
-However, a thread waiting on I/O releases the GIL.
+### Threads Overlap Waits, Not Computing
+
+A thread waiting on I/O releases the GIL.
 That release is why a thread pool helps with I/O-bound work.
 The next two examples make that concrete, one for waiting and one for computing.
 Both use the same harness,
@@ -1878,7 +1891,9 @@ Two real points of convergence exist in the standard library, though,
 not because the models are secretly the same,
 but because two small pieces of them genuinely are.
 
-The first is `concurrent.futures.Executor`.
+### One `Executor` Interface, Three Pools
+
+The first point of convergence is `concurrent.futures.Executor`.
 `ThreadPoolExecutor`, `ProcessPoolExecutor`,
 and `InterpreterPoolExecutor` share more than a resemblance:
 all three subclass `Executor` and present its `submit()` and `map()` interface.
@@ -1938,6 +1953,8 @@ so both are awaitable and neither blocks anything.
 `loop.run_in_executor()` is the bridge between the two:
 it submits to the executor and returns an `asyncio.Future` that resolves when the executor's own future does.
 That is why `process_price()` below calls it instead of `pool.submit()`.
+
+### One `await`, Any Backend
 
 The second point of convergence is `await`.
 A native coroutine, a `to_thread()` call,
@@ -2016,7 +2033,7 @@ Everything else about the backends stays different.
 Processes and subinterpreters genuinely run at once
 (five separate GILs)](_images/concurrency_models)
 
-### Are Threads Still Necessary?
+## Are Threads Still Necessary?
 
 `asyncio` handles I/O-bound work.
 Processes and subinterpreters handle CPU-bound work.
@@ -2068,7 +2085,7 @@ Python still offers no safe way to cancel a running thread.
 Free threading changes a thread's job.
 It does not change `asyncio`'s.
 
-### Measuring the Difference
+### Measuring the Memory
 
 You can support the claim that a thread costs far more memory than a task.
 `threading.stack_size()` reports and sets the stack CPython reserves for each new thread.
@@ -2150,7 +2167,9 @@ against that stipulated reservation rather than a measured thread footprint.
 The exact figures move from machine to machine,
 so the listing asserts the two bounds that hold anywhere and prints what it measured under [`--numbers`](18_Techniques--Performance.md#numbers-on-your-machine).
 
-A similar difference shows up in time:
+### Measuring the Time
+
+A thread also takes longer to create than a task:
 
 ```python
 # thread_vs_task_speed.py
