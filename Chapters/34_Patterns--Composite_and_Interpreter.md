@@ -87,7 +87,7 @@ Adding a node type is cheap:
 a plugin writes one class and touches nothing above it.
 Adding an *operation* exposes the weakness.
 `walk()` costs a method in every class,
-and counting files or finding an entry by name would each cost another.
+and counting files or finding an entry by name each costs another.
 [*Visitor*](33_Patterns--Visitor.md) exists to solve this problem.
 
 ## A Composite of Data Classes
@@ -317,7 +317,7 @@ Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
 They build nodes.
 Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)` type-check.
-Left implicit, `self` would mean "some subclass of `Operators`,"
+Left implicit, `self` means "some subclass of `Operators`,"
 and the type checker cannot know that every such subclass is in the `Expr` union.
 The `Expr` annotation tells it so.
 `ty` accepts a `self` annotation narrower than the class.
@@ -406,7 +406,7 @@ if __name__ == "__main__":
 ```
 
 Data classes generate `__eq__()`, so two trees compare by value,
-and the demo confirms that the operators build the tree you would assemble by hand.
+and the demo confirms that the operators build the tree you assemble by hand.
 Printing `expr.left` shows the nesting: the `Add` at the root holds a `Mul`,
 which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
@@ -424,9 +424,9 @@ so the live dicts at any moment total the tree's depth times the number of bound
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
 `**env` also creates the name collision the `/` exists to close:
-without the `/`, `e` would be an eligible keyword,
+without the `/`, `e` is an eligible keyword,
 and `test_e_is_available_as_a_variable()` below confirms the guard works.
-A `dict[str, int]` parameter would pass the same bindings by reference at every call,
+A `dict[str, int]` parameter passes the same bindings by reference at every call,
 needing neither the `/` nor this explanation.
 This chapter keeps `**env` anyway,
 for `evaluate(expr, x=3)` instead of `evaluate(expr, {"x": 3})`.
@@ -556,7 +556,7 @@ if __name__ == "__main__":
 
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
 `2` and `3` are both `int`, so Python adds them to `5` before any node exists,
-and the fold this section teaches would never fire.
+and the fold this section teaches never fires.
 `Num(2)` is already a node,
 so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
 This is the limit of borrowing the host parser:
@@ -576,8 +576,8 @@ while `Num(0)` after `return` is a constructor call.
 
 Matching the pair of simplified children, rather than the original node,
 lets the rules compose.
-A `case Add(Num(0), other)` at the top of the function would test the tree as the caller wrote it,
-and `(0 * y) + x` would keep its zero:
+A `case Add(Num(0), other)` at the top of the function tests the tree as the caller wrote it,
+and `(0 * y) + x` keeps its zero:
 the left child is a `Mul` and only becomes a `Num` once something simplifies it.
 Simplifying both children first and matching the results catches the identity the recursion just exposed,
 which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
@@ -665,7 +665,7 @@ Everything else about walking a `Template` is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
-so an `isinstance` test narrows it as well as a `match` would,
+so an `isinstance` test narrows it as well as a `match` does,
 and the `else` branch is the `str` case.
 The structure is data, and what it means is whatever a function decides:
 
@@ -739,8 +739,8 @@ The reason is structural rather than clever:
 `to_query()` receives the literal pieces and the values as separate things,
 so it can never confuse them.
 Written as an f-string,
-the same line would arrive as one finished `str` with the attack already spliced in,
-and the only remaining defense would be inspecting the result to guess which characters the program wrote and which a user did.
+the same line arrives as one finished `str` with the attack already spliced in,
+and the only remaining defense is inspecting the result to guess which characters the program wrote and which a user did.
 
 That is the general argument for handing a consumer the structure instead of the answer.
 A finished string has thrown away the distinction on which the safety decision depends.
