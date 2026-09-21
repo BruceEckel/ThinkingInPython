@@ -113,7 +113,7 @@ Use this section's table when you know the problem but not the name.
 |---------|--------|
 | *Active Object* | Decouple a method call from its execution by giving the object its own thread. |
 | *Balking* | Refuse an action when the object is in an unsuitable state. |
-| [*Double-Checked Locking*](24_Patterns--Singleton.md#tests-threads-and-locks) | Cut locking cost when lazily initializing a shared resource. |
+| [*Double-Checked Locking*](24_Patterns--Singleton.md#double-checked-locking-and-eager-creation) | Cut locking cost when lazily initializing a shared resource. |
 | [*Future/Promise*](19_Techniques--Concurrency.md#one-task-many-backends) | Represent a result that becomes available later. |
 | *Guarded Suspension* | Block a call until a precondition becomes true. |
 | *Half-Sync/Half-Async* | Separate synchronous and asynchronous work, joined by a queue. |
@@ -123,7 +123,7 @@ Use this section's table when you know the problem but not the name.
 | [*Producer-Consumer*](19_Techniques--Concurrency.md#coordinating-threads-with-queues) | Decouple work creation from processing through a shared queue. |
 | *Reactor* | Dispatch incoming requests to handlers synchronously as they arrive. |
 | *Read-Write Lock* | Allow concurrent readers but exclusive writers. |
-| [*Thread Pool*](19_Techniques--Concurrency.md#one-task-many-backends) | Reuse a fixed set of worker threads across many tasks. |
+| [*Thread Pool*](19_Techniques--Concurrency.md#one-executor-interface-three-pools) | Reuse a fixed set of worker threads across many tasks. |
 | [*Thread-Specific Storage*](19_Techniques--Concurrency.md#context-that-follows-the-call-chain) | Give each thread its own copy of a value, as `threading.local` does; `ContextVar` scopes the value to the context instead. |
 
 ## Architectural (POSA)
@@ -188,7 +188,7 @@ Use this section's table when you know the problem but not the name.
 | *Circuit Breaker* | Stop calling a failing service until it recovers. |
 | *Command Query Responsibility Segregation* (CQRS) | Separate the read model from the write model. |
 | *Event Sourcing* | Store state as a log of events instead of current values. |
-| [*Retry*](47_Effects--Stateless_in_Practice.md#adding-behavior-to-an-existing-effect) | Re-attempt a failed operation, often with backoff. |
+| [*Retry*](47_Effects--Stateless_in_Practice.md#retry-and-a-flaky-database) | Re-attempt a failed operation, often with backoff. |
 | *Saga* | Run a long transaction as a series of compensable steps. |
 | *Service Discovery* | Locate service instances dynamically. |
 | *Sidecar* | Attach helper functionality to a service as a separate process. |
@@ -230,7 +230,7 @@ Use this section's table when you know the problem but not the name.
 | [*Double Dispatch*](32_Patterns--Multiple_Dispatching.md) | Resolve behavior from the runtime types of two objects, through two calls. |
 | [*Fluent Interface*](27_Patterns--Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
 | [*Function Object*](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
-| [*Lazy Initialization*](07_Foundations--Classes.md#properties) | Create a value on first use. |
+| [*Lazy Initialization*](07_Foundations--Classes.md#cached-property) | Create a value on first use. |
 | [*Multiton*](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
 | [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object) | Use an object with neutral behavior in place of null. |
 | [*Object Pool*](15_Techniques--Context_Managers.md#an-object-pool) | Reuse expensive objects from a managed pool. |
