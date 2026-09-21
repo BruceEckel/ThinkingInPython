@@ -17,7 +17,7 @@ builds the part of it that needs no type inference.
 
 ## The Tracking Problem
 
-[Effect Management Systems](44_Effects--Effect_Management.md#effect-management-systems)
+[Effect Management Systems](44_Effects--Effect_Management.md#tracking-and-management)
 separates tracking from management.
 Tracking tells you which Effects a function can perform,
 and management lets you replace what those Effects do.
