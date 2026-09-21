@@ -400,6 +400,8 @@ uses `type Shape = Circle | Square` to define a closed set of alternatives that 
 
 ## Generic Functions and Classes {#generic-functions-and-classes}
 
+### Type Parameters
+
 Consider a function that returns the first element of a list.
 This function works on a list holding any type.
 A useful annotation makes the return type match the list's element type,
@@ -588,6 +590,8 @@ so `class Table[K = str, V]` is a syntax error.
 Type parameter defaults arrived in Python 3.13,
 one release after the bracket syntax.
 
+### `**P` and the Older `TypeVar` Syntax {#paramspec-and-typevar}
+
 A special form, `**P`, captures the types of an entire parameter list.
 [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
 uses `**P` to give a wrapper the same signature as the function it wraps.
@@ -692,7 +696,7 @@ The abstract container types come from `collections.abc`.
      headings, and a link inside one would nest an <a> inside the TOC's
      own <a> for that entry. -->
 
-### Basic types
+### Basic Types
 
 <a href="https://docs.python.org/3/library/stdtypes.html#built-in-types" target="_blank" rel="noopener">Python documentation: basic types</a>
 
@@ -721,7 +725,7 @@ The abstract container types come from `collections.abc`.
 | `Callable[[A, B], R]` | A function taking `A`, `B` and returning `R` (`...` for any parameters) |
 | `type[C]` | The class object `C`, not an instance of it, see [Classes as Values](#classes-as-values-type) |
 
-### Unions, optionals, and literals
+### Unions, Optionals, and Literals
 
 <a href="https://docs.python.org/3/library/typing.html#typing.Union" target="_blank" rel="noopener">Python documentation: unions, optionals, and literals</a>
 
@@ -731,7 +735,7 @@ The abstract container types come from `collections.abc`.
 | `X` \| `None` | Optional: `X` or `None`, see [Type Hints](#type-hints) |
 | `Literal[...]` | One of a fixed set of constant values, e.g. `Literal["r", "w"]`, see [The `type` Statement](#the-type-statement) |
 
-### Aliases and distinct types
+### Aliases and Distinct Types
 
 <a href="https://docs.python.org/3/library/typing.html#type-aliases" target="_blank" rel="noopener">Python documentation: aliases and distinct types</a>
 
@@ -741,7 +745,7 @@ The abstract container types come from `collections.abc`.
 | `NewType("Id", int)` | A distinct type, `int` at runtime but separate to the type checker; the base can be any class, not just a builtin |
 | `Annotated[T, meta]` | `T` carrying extra metadata for libraries and tools |
 
-### Constants and class variables
+### Constants and Class Variables
 
 <a href="https://docs.python.org/3/library/typing.html#typing.Final" target="_blank" rel="noopener">Python documentation: constants and class variables</a>
 
@@ -764,7 +768,7 @@ The abstract container types come from `collections.abc`.
 | `**P` (`ParamSpec`) | Captures a callable's parameter list including types, for decorators, see [Decorators](14_Techniques--Decorators.md#maintaining-the-wrapped-interface) |
 | `*Ts` (`TypeVarTuple`), `Unpack`, `Concatenate` | Variadic generics and parameter manipulation |
 
-### Structural typing
+### Structural Typing
 
 <a href="https://docs.python.org/3/library/typing.html#protocols" target="_blank" rel="noopener">Python documentation: structural typing</a>
 
@@ -773,7 +777,7 @@ The abstract container types come from `collections.abc`.
 | `Protocol` | A required shape (methods and attributes), satisfied without inheritance, see [Structural Typing with Protocols](#structural-typing-with-protocols) |
 | `@runtime_checkable` | Allows `isinstance()` against a `Protocol`, see [*Surrogate*](26_Patterns--Surrogate.md#proxy) |
 
-### Dictionary and record shapes
+### Dictionary and Record Shapes
 
 <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict" target="_blank" rel="noopener">Python documentation: dictionary and record shapes</a>
 
@@ -783,7 +787,7 @@ The abstract container types come from `collections.abc`.
 | `Required[...]`, `NotRequired[...]`, `ReadOnly[...]` | Per-key control inside a `TypedDict` |
 | `NamedTuple` | A typed, named tuple class, see [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#the-standard-library-versions) |
 
-### Type narrowing
+### Type Narrowing
 
 <a href="https://docs.python.org/3/library/typing.html#typing.TypeGuard" target="_blank" rel="noopener">Python documentation: type narrowing</a>
 
@@ -791,7 +795,7 @@ The abstract container types come from `collections.abc`.
 |-----------|---------|
 | `TypeGuard[T]`, `TypeIs[T]` | A boolean predicate that narrows a type: `TypeGuard` narrows only where it returns `True`, `TypeIs` narrows both branches |
 
-### Self and forward references
+### Self and Forward References
 
 <a href="https://docs.python.org/3/library/typing.html#typing.Self" target="_blank" rel="noopener">Python documentation: self and forward references</a>
 
@@ -800,7 +804,7 @@ The abstract container types come from `collections.abc`.
 | `Self` | The enclosing class type; useful for fluent methods and alternative constructors, see [The `Self` Return Type](#the-self-type) |
 | `"Name"` | A *forward reference* to a not-yet-defined type; quoting is optional under deferred evaluation (PEP 649), see [Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze) |
 
-### Typing decorators and directives
+### Typing Decorators and Directives
 
 <a href="https://docs.python.org/3/library/typing.html#functions-and-decorators" target="_blank" rel="noopener">Python documentation: typing decorators and directives</a>
 
