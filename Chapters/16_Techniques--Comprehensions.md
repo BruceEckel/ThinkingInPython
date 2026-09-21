@@ -164,7 +164,7 @@ print(cubes)
 `(y := cube_if_even(x))` calls `cube_if_even` once, binds its result to `y`,
 and the `if` tests that same result.
 The output expression then reuses `y`.
-Without the walrus, the filter and the output would each need their own call,
+Without the walrus, the filter and the output each need their own call,
 `cube_if_even(x) is not None` and `cube_if_even(x)`,
 computing it twice for every element that passes.
 
@@ -289,7 +289,7 @@ Nesting one comprehension inside another builds a list of lists.
 Writing two `for` clauses in one comprehension flattens instead,
 producing a single list.
 Those clauses *do* read left to right,
-in the order the equivalent nested loops would appear:
+in the order the equivalent nested loops appear:
 
 ```python
 # flatten.py
@@ -657,8 +657,8 @@ so the code reads `factor` when `list()` pulls the values rather than at the gen
 The answer is `[10, 20, 30]` instead of `[2, 4, 6]`.
 A list comprehension has no such gap: it reads everything at once.
 That gap is also why `path_walk_comprehension.py` uses brackets.
-Its outermost iterable, `root.walk()`, would be called at creation,
-but the walking and the filtering would wait for a consumer that arrives after the directory disappears.
+With parentheses, its outermost iterable, `root.walk()`, is called at creation,
+but the walking and the filtering wait for a consumer that arrives after the directory disappears.
 [Iterators](23_Patterns--Iterators.md#generators) explores generators further,
 and [Generators](45_Effects--Generators.md)
 covers the values they receive as well as the ones they produce.
