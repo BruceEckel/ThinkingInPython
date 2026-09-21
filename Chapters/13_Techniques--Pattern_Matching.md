@@ -200,7 +200,7 @@ A starred name can appear anywhere in a sequence pattern, not only at the end,
 as long as the pattern has no more than one.
 `last_of()` puts it first:
 `[*init, last]` binds every element but the last to `init`.
-`[first, *middle, last]` would put it in the middle instead,
+`[first, *middle, last]` puts it in the middle instead,
 binding the two ends by name and everything between them to `middle`.
 
 A sequence pattern deliberately excludes `str`, `bytes`, and `bytearray`.
@@ -366,7 +366,7 @@ print(describe(3.5))
 Because a subclass matches, the order of the cases decides which one wins.
 `bool` is a subclass of `int`,
 so moving `case bool(b)` below `case int(n)` makes it unreachable:
-`describe(True)` would answer `int True`.
+`describe(True)` answers `int True`.
 
 In `int(n)`, the positional sub-pattern binds the whole value rather than an attribute.
 Python special-cases a handful of builtins this way
