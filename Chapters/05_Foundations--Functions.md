@@ -47,7 +47,7 @@ print(greet.__doc__)
 
 A docstring documents the function for a reader or a tool,
 not for the interpreter, which stores the text without acting on it.
-[Metaprogramming](17_Techniques--Metaprogramming.md#the-inspect-module)
+[Metaprogramming](17_Techniques--Metaprogramming.md#the-core-functions)
 reads it back with `inspect.getdoc()`.
 
 The signatures so far give only the function name and the parameter names,
