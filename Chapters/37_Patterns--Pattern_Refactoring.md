@@ -90,7 +90,7 @@ a classmethod, so it needs no `@classmethod` decorator and its first parameter i
 It runs once per subclass, immediately after Python creates that subclass,
 so each one can register itself in `Trash.registry` automatically.
 `create()` is a class method reading `cls.registry`.
-[Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
+[Factory](27_Patterns--Factory.md#hazards-of-self-registration)
 warns that this form can mislead:
 `Aluminum.create("Paper", 1.0)` is legal and returns a `Paper`.
 The lookup is safe here because every subclass writes to `Trash.registry` and none defines a `registry` of its own,
@@ -370,7 +370,7 @@ including ones added at runtime.
 Nothing needs maintaining, and nothing gets forgotten.
 The key is the *exact* class.
 That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
-and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md),
+and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table),
 and it first appeared in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)'s event bus.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
@@ -427,7 +427,7 @@ unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 So far the chapter has made new *types* cheap.
 The other axis of change is adding new *operations*,
 and a design that makes new types cheap ordinarily makes new operations expensive:
-that trade is the [expression problem](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
+that trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
 
 ### A Method on Every Material
 
@@ -618,7 +618,7 @@ provides the same dispatch in method form.
 The chapter now holds two kinds of dispatch that disagree about subclasses.
 `bins[type(t)]` keys on the exact class,
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
-`singledispatch` resolves through the [MRO](07_Foundations--Classes.md#inheritance),
+`singledispatch` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
 so that same piece answers with `Aluminum`'s note.
 Each is right for its job.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
@@ -628,7 +628,7 @@ draws the same distinction between a table keyed by class and dispatch that foll
 
 Design patterns are about separating things that change from things that stay the same.
 Polymorphism is one way to do that, but not the only one.
-The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#what-is-a-pattern),
+The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
 This chapter met each vector through a concrete requirement:
