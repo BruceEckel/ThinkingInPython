@@ -50,16 +50,16 @@ class Process: ...
 class Unknown: ...
 ```
 
-One question decides whether something deserves a name: would a test replace it?
+One question decides whether something deserves a name: does a test replace it?
 A test replaces the clock, the network, and the file system.
 No test replaces `len()`.
-A finer vocabulary would make the rows unreadable and the table below unmaintainable.
+A finer vocabulary makes the rows unreadable and the table below unmaintainable.
 
 Appendix A lists three answers to the question of what untracked code performs.
 This checker takes the third, a separate declaration,
 because the first two are wrong for `print()`.
 It writes to the console,
-and calling it `Unknown` would put `Unknown` in nearly every row.
+and calling it `Unknown` puts `Unknown` in nearly every row.
 The declaration cannot go on the function.
 A builtin has no `__annotations__` and no `__dict__` in which to store one,
 so `print.__annotations__ = {}` raises an `AttributeError`.
@@ -1094,8 +1094,7 @@ so each one appears in a row instead of going unreported:
   or with a `type` alias imported from another module.
 - An inherited method, because the checker reads no class hierarchy.
 
-Four limits produce no `Unknown`,
-and a production tool would need to remove them.
+Four limits produce no `Unknown`, and a production tool must remove them.
 The checker finds `Annotated` and `performs` by those names,
 so a declaration written with `typing.Annotated` or an `as` alias goes unread.
 A decorator that wraps a function changes what calling it performs,
