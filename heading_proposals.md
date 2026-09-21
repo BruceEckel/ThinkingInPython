@@ -353,7 +353,7 @@ Pair, in "The `__exit__()` Arguments" (837 words, 6 listings):
 
 Set of three, in "An Object Pool" (654 words, 4 listings):
 
-- [ ] **M** L925 `### The Queue as Throttle`
+- [ ] **M** L925 `### An Empty Pool Blocks the Caller`
   Before: "The queue does more than store the idle items."
   The *Flyweight* paragraph at L982 would fit poorly under it; move it
   up to follow L923.
@@ -401,10 +401,10 @@ Pair, in "Generating Classes with `exec()`":
   Before: "That string is also the danger."
   Reword: "The `klass` string is the danger in this approach."
   Exercise 9 sends the reader back here.
-- [ ] **M** L464 `### What Generated Classes Give Up`
+- [ ] **M** L464 `### Generated Classes Cannot Be Pickled`
   Before: "Both generators carry a second cost, unrelated to injection."
-  Reword: "Both generators, `type()` and `exec()`, carry a cost
-  unrelated to injection."
+  Reword: "Both generators, `type()` and `exec()`, have a second
+  limitation, unrelated to injection."
 
 Pair, in "Where Enforcement Lives":
 
@@ -499,7 +499,7 @@ Level change:
   tasks, not on the `Executor`/`await` convergence its parent names.
   No link targets either anchor. Under the new `##`: rename L2071 to
   "### Measuring the Memory", and add "### Measuring the Time" at
-  L2153, first sentence "A thread also costs more time to create than
+  L2153, first sentence "A thread also takes longer to create than
   a task:".
 
 ## 20 Rethinking Objects
@@ -518,7 +518,7 @@ In "What Is a Pattern?" (698 words, no `###`):
 
 - [ ] **M** L50 `### What an Abstraction Erases` (optional)
   Before: "Isolation has a price."
-  Reword: "Isolating what changes has a price."
+  Reword: "Isolating what changes discards information."
 - [ ] **H** L68 `### The Vector of Change`
   Before: "Often, the most difficult part of developing an elegant"
   Chapter 37 L622 links "*vector of change*" to the `##`.
@@ -549,9 +549,9 @@ Set of three, in "The Costs of Laziness" (543 words, 4 listings):
 
 Pair, in "The Pattern That Disappeared":
 
-- [ ] **M** L698 `### What `first()` and `current_item()` Cost`
+- [ ] **M** L698 `### `first()` and `current_item()` Rebuild the List`
   Before: "Written in Python, the four GoF *Iterator* methods show"
-- [ ] **M** L786 `### Asking Costs an Item`
+- [ ] **M** L786 `### Asking Consumes an Item`
   Before: "You can ask a GoF iterator repeatedly whether it has"
 
 ## 24 Singleton
@@ -583,7 +583,7 @@ No `###` proposals.
 - [ ] (medium) Promote "### What Proxy Solves" (L469, 529 words, 4
   listings) to `##`, then add "### Virtual Proxy" (L494),
   "### Protection Proxy" (L526), "### Smart Reference" (L573). The
-  anchor Solutions 29 uses is unchanged. The cost is the chapter's
+  anchor Solutions 29 uses is unchanged. It would break the chapter's
   Proxy / State / One Surrogate triad of `##` headings.
 
 ## 27 Factory (hand-edited, higher bar)
@@ -757,7 +757,7 @@ Pair, in "Adding Operations: Visitor, and Why Python Skips It":
   Reword: "The same model drives a graphical view."
   The other two simulations each have "Testing ..." then
   "Watching ...".
-- [ ] **M** L257 `### Turning the Rats Loose`
+- [ ] **M** L257 `### Running the Maze`
   Before: "The maze layout lives in a text file."
 
 ## 40 Functional Foundations
@@ -782,7 +782,7 @@ Pair, in "Case Study: Pairing Rotations" (709 words):
   Before: "The trick stops working the moment the groups"
   Reword: "Rotation stops working the moment the groups are threes,
   fours, or any size but two."
-- [ ] **M** L1010 `### What `history` Costs`
+- [ ] **M** L1010 `### `history` Is Mutable State`
   Before: "`met()` runs once per candidate per slot,"
 
 ## 42 Functional Error Handling
@@ -854,7 +854,8 @@ links for three different reasons):
   `isinstance()`."
 - [ ] **M** L916 `### An Interface Instead of a Base Class`
   Before: "Stateless's own `Console` pays that cost."
-  Reword: "...pays the cost of inheritance."
+  Reword: "Stateless's own `Console` can only be replaced by a
+  subclass."
 
 Pair, in "Dependency Injection" (833 words, no `###`):
 
@@ -862,7 +863,8 @@ Pair, in "Dependency Injection" (833 words, no `###`):
   Before: "Stateless has no container."
 - [ ] **H** L1176 `### Churn in Every Signature`
   Before: "The requirement that callers inherit is also the cost."
-  Reword: "A requirement that every caller inherits is also a cost."
+  Reword: "A requirement that every caller inherits is also a
+  drawback."
 
 Pair, in "Waiting on a Coroutine" (479 words, 5 listings):
 
@@ -923,8 +925,7 @@ In "Adding Behavior to an Existing Effect":
 
 Level change (medium):
 
-- [ ] `## What `run()` Costs` after the tables in "The Toolkit", over
+- [ ] `## `run()` Builds a Loop per Call` after the tables in "The Toolkit", over
   L1892-1944 (`run_cost.py` and its measurement). First sentence:
-  "Calling `run()` from synchronous code and `run_async()` from inside
-  a loop is a rule with a reason, and the reason has a cost." Leaving
-  it also works.
+  "The rule about where to call `run()` and `run_async()` has a
+  reason." Leaving it also works.
