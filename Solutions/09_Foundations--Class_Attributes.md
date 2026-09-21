@@ -116,7 +116,7 @@ reports `2`, because nothing wrote to the class. This shadow is
 precisely the bug `ClassVar` exists to catch. Declare `total:
 ClassVar[int] = 0` instead, and the type checker flags `a.total = 99`
 as an error before the line ever runs, because it can see the
-assignment would create this shadow.
+assignment creates this shadow.
 
 ## 5. A per-instance list, via `default_factory`
 
