@@ -495,7 +495,7 @@ and a call that raises nothing fails with an `AssertionError`,
 so a demo that stops failing is reported instead of quietly printing nothing.
 The `/` makes `types` and `fn` positional-only,
 so every keyword argument goes to `fn`.
-[`**P`](14_Techniques--Decorators.md#maintaining-the-wrapped-interface)
+[`**P`](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface)
 ties `*args` and `**kwargs` to `fn`'s own signature,
 so the type checker checks the forwarded arguments as if you had called `fn` directly:
 
@@ -573,7 +573,7 @@ Each call of the decorated function builds a fresh manager,
 so you can call `report()` any number of times,
 each with its own enter and exit.
 The single-use caution from `trace_gen.py` still holds for the manager object you name in a `with`.
-The machinery applies [`functools.wraps`](14_Techniques--Decorators.md#maintaining-the-wrapped-interface),
+The machinery applies [`functools.wraps`](14_Techniques--Decorators.md#wraps-keeps-the-runtime-interface),
 so `report` keeps its name and docstring.
 
 Here's the same `banner` as a class.
@@ -628,7 +628,7 @@ A hand-written decorator can do all three,
 because it defines its own wrapper function:
 [`repeat`](14_Techniques--Decorators.md#decorators-that-take-arguments)
 forwards `*args` and `**kwargs` and returns the wrapped function's result,
-while [`hijack`](14_Techniques--Decorators.md)
+while [`hijack`](14_Techniques--Decorators.md#what-at-does)
 returns a replacement that runs instead of the original function,
 skipping its call.
 What `banner` offers instead is one definition,
