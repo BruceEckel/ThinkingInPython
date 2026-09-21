@@ -81,6 +81,8 @@ as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.
 `duel()` settles for `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
 
+## Two Dispatches Through Methods
+
 Here is *Multiple Dispatching* in action:
 
 ```python
@@ -184,7 +186,10 @@ Its answers are data rather than methods, so a class has nothing to forget,
 and its `Item` declares the one method the dispatch needs, `compete()`,
 so the opponent parameter takes `Item` rather than `Any`.
 
-Each `Item` type encodes the answers for its own combinations.
+## One Lookup in a Table
+
+In `paper_scissors_rock.py`,
+each `Item` type encodes the answers for its own combinations.
 Together they form a table spread across the classes.
 That table is hard to maintain if you expect to modify the behavior or to add a new `Item` class.
 Making the table explicit can be more sensible, like this:
@@ -292,6 +297,8 @@ while the table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
 
+### `match` with Class Patterns
+
 A `match` statement with class patterns is a third option for a two-type decision.
 Like `singledispatch`, it tolerates subclasses: it tests with `isinstance()`,
 so a subclass matches the pattern its base would:
@@ -322,6 +329,8 @@ the same subclass `exact_match.py` shows the table refusing.
 Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is: adding an `Item` means adding cases,
 not registering a function elsewhere.
+
+### The `singledispatchmethod` Trap
 
 `functools.singledispatchmethod`
 ([Functional Toolkits](41_Functional--Toolkits.md#singledispatchmethod) catalogs it)
@@ -371,7 +380,9 @@ so the second `@register` silently overwrites the first's entry for `Rock`.
 `self`'s type never enters that lookup, so both duels return the same answer,
 even though each was registered against its own class.
 
-The version most programmers write first is neither of these:
+### Methods or Table
+
+The version most programmers write first is neither the methods nor the table:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it is the worst of both worlds.
