@@ -297,7 +297,7 @@ and [Comprehensions](16_Techniques--Comprehensions.md) covers that use.
 ### Mutating a Container While Looping
 
 Changing a container while a `for` loop walks it is the classic control-flow bug.
-[Containers](03_Foundations--Containers.md#lists)
+[Containers](03_Foundations--Containers.md#two-list-traps)
 hit it while removing from a list.
 Lists and dictionaries are the two containers you are most likely to mutate this way,
 and each one fails differently.
