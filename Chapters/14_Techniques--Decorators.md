@@ -300,10 +300,10 @@ passing the function where `repeat` expects `times`.
 The `times < 1` check turns that into a `TypeError` at decoration,
 since a function does not support `< 1`,
 though the message says nothing about parentheses.
-A `repeat` without that comparison would fail silently.
-Python would bind `greet` to `decorate`.
-Calling `greet("Bob")` would then pass `"Bob"` where `decorate` expects a function and hand back a wrapper,
-and the only symptom would be missing output.
+A `repeat` without that comparison fails silently.
+Python binds `greet` to `decorate`.
+Calling `greet("Bob")` then passes `"Bob"` where `decorate` expects a function and hands back a wrapper,
+and the only symptom is missing output.
 The annotations catch the mistake either way,
 at the decoration rather than at the call:
 `ty` reports that `repeat` expected an `int` for `times` and got a function.
@@ -874,9 +874,8 @@ if __name__ == "__main__":
 `register()` returns `cls` unchanged, so this decoration adds no wrapper.
 `register()` exists for the side effect of recording the class.
 The type parameter `T` does for a class decorator what `**P` and `R` do for a function decorator.
-If `register`'s annotation were `(cls: type) -> type`,
-it would hand back a bare `type`,
-and `ty` and Pyright would see `Espresso()` as an `Any`.
+If `register`'s annotation is `(cls: type) -> type`,
+it hands back a bare `type`, and `ty` and Pyright see `Espresso()` as an `Any`.
 A class decorator can also return a replacement class,
 just as a function decorator returns a replacement function.
 
@@ -1148,7 +1147,7 @@ takes it up.
 Every decorator costs two things `wraps` does not remove,
 since `wraps` copies metadata, not the call itself.
 A traceback through a decorated function shows `wrapper`,
-one more frame than the caller and the original body alone would show.
+one more frame than the caller and the original body alone show.
 Each call also pays for an extra Python-level function call, the wrapper's own,
 before the real body runs.
 Neither matters for a function called occasionally;
