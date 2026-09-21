@@ -672,7 +672,7 @@ together and `t_seq > t_thr * 1.5` is `False`.
 `InterpreterPoolExecutor` wins the same benchmark because each
 subinterpreter has its own GIL. The work spreads across processors
 instead of time-slicing on one.
-[The GIL and Free Threading](../Chapters/19_Techniques--Concurrency.md#the-gil-and-free-threading)
+[Subinterpreters](../Chapters/19_Techniques--Concurrency.md#subinterpreters)
 gives the reason: the GIL is per interpreter, not per process, so more
 interpreters mean more locks and real parallelism. A free-threaded
 build reaches the same end by removing the GIL instead of multiplying
