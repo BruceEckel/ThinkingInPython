@@ -980,7 +980,7 @@ For a small fixed set, that is an `Enum`.
 with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
 Python evaluates a default value once, at class definition,
 so every `Months` would read and write that one list,
-the trap shown in [Functions](05_Foundations--Functions.md#default-arguments).
+the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).
 `field(default_factory=make_months)` supplies a function instead of a value,
 and each new `Months` calls it and gets its own fresh list.
 
@@ -1089,7 +1089,7 @@ The first two tests are `test_stars.py` inverted.
 There, no illegal `Stars` can exist.
 Here, `Stars(11)` builds one,
 because a factory function is advice rather than a gate,
-a limit every factory in [Factory](27_Patterns--Factory.md#simple-factory-method)
+a limit every factory in [Factory](27_Patterns--Factory.md#hiding-the-concrete-classes)
 shares.
 The third test shows why the check cannot move inside the type.
 `NamedTuple` refuses `__new__()`, refuses `__init__()` the same way,
