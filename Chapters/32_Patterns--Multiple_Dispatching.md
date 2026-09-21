@@ -172,14 +172,14 @@ If you misread that convention, every result in the class appears backward.
 Each `eval_*()` method also receives an `item` argument, the original caller:
 the same object `compete()` held as `self` before passing it along.
 This game ignores it, since the outcome depends only on the two types.
-A richer game would read the caller's state through it.
+A richer game reads the caller's state through it.
 
 Those `Any` annotations give up static checking.
 `Item` declares only `__str__()`,
 so `Any` is the only annotation available short of a `Protocol` naming all four methods.
 With `Any`, a class can omit one of the nine answers and the type checker stays silent.
 Python raises an `AttributeError` at the first duel that needs the missing method.
-A `Protocol` listing the four methods would restore the checking,
+A `Protocol` listing the four methods restores the checking,
 at the price of a declaration that repeats every class's method names.
 The table version sidesteps the problem.
 Its answers are data rather than methods, so a class has nothing to forget,
