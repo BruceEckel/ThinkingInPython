@@ -281,8 +281,9 @@ def test_every_student_appears_once_per_round(
 The `unique=True` on the roster strategy is doing real work.
 `group_rounds()` keys its history by `frozenset` of names, so two
 students sharing a name are one student to the algorithm. The
-property would then fail for a reason that says nothing about the
-code.
+property still passes on such a roster, because every name lands in
+one group, but the schedule it checks counts the two as one student
+when it avoids repeat meetings.
 Generating distinct names states that precondition where the test can
 see it.
 
