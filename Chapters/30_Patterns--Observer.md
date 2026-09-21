@@ -363,7 +363,7 @@ so `unsubscribe()` raises a `ValueError` when its callable never subscribed.
 
 ### Unsubscribing During a Notification
 
-The copy in `announce()` shows its value when a listener unsubscribes mid-notification:
+The copy in `announce()` matters when a listener unsubscribes mid-notification:
 
 ```python
 # self_removing_listener.py
@@ -931,7 +931,7 @@ so the cells along a diagonal, where `x + y` is constant, share one color.
 
 `recolored()` computes the grid that results from selecting a cell: values in,
 values out.
-`cross` lists the selected cell and the four cells that share an edge with it.
+`cross` holds the selected cell and the four cells that share an edge with it.
 A cell on the border has fewer neighbors,
 so some of the coordinates in `cross` lie outside the grid.
 A `Grid` is keyed by coordinate,
@@ -1056,7 +1056,7 @@ When the window opens,
 `show()` calls `draw(model.grid)` once to paint the starting grid.
 
 `draw()` clears the canvas before repainting.
-Otherwise, each notification adds another `size * size` rectangles on top of the last set.
+Otherwise, each notification adds another `size * size` rectangles on top of the previous ones.
 The window looks the same but the canvas's list of items grows without limit,
 the same quiet accumulation as a lapsed listener.
 
@@ -1097,7 +1097,7 @@ and no class per reaction.
 A thermometer measures temperature.
 `Thermometer` measures, decides which changes are worth announcing,
 and tells the listeners,
-three subjects where [cohesion](21_Patterns--Design_Patterns.md#design-principles)
+three jobs where [cohesion](21_Patterns--Design_Patterns.md#design-principles)
 wants one.
 The telling is the cheap addition.
 `Broadcaster` holds the list and the loop in a base class,
@@ -1172,7 +1172,7 @@ and two of the four readings reach neither listener.
 `log` has no way to recover them,
 and nothing in `ThresholdThermometer` says which listener the half degree was for.
 [`reentrant_announce_fixed.py`](#re-entrant-notification)
-makes a smaller version of the same call:
+makes a smaller version of the same decision:
 its setter returns early when the new value equals the stored one,
 and a listener that counts readings rather than changes needs the announcement it drops.
 
