@@ -397,8 +397,8 @@ print(f"both under 50 microseconds per call at 100 parts: "
 The ratio does not go away. One machine measured `join` about 19
 times faster at 10,000 parts and about 7 times faster at 100. What
 goes away is the amount at stake: at 100 short strings both versions
-finish in a couple of microseconds, so the loop would have to run
-thousands of times before the choice showed up in a profile.
+finish in a couple of microseconds, so the loop must run thousands
+of times before the choice shows up in a profile.
 
 That is the answer to "at which size does it stop mattering": not at
 a size where the two become equally fast, but at a size where both
