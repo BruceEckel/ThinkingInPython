@@ -1371,7 +1371,7 @@ Guido van Rossum set the bar that stood for three decades:
 remove the GIL without slowing single-threaded code.
 Attempts kept failing to clear it, so workarounds appeared instead.
 `multiprocessing` arrived in 2008, `asyncio` in 2014,
-and the per-interpreter GIL of the next section in 2023.
+and the per-interpreter GIL of [Subinterpreters](#subinterpreters) in 2023.
 
 ### The GIL Does Not Prevent Races
 
@@ -1637,7 +1637,7 @@ The four jobs arrive from two threads in an unpredictable interleaving.
 Waiting for both producer futures before submitting the consumer guarantees every job is already in the queue once `consume()` starts,
 so the drain still comes out in priority order no matter who won each race.
 Collecting the producer futures and calling `result()` turns a producer's exception into one you can see,
-as [Parallelism](#parallelism)'s third point describes.
+as [Parallelism](#what-a-process-pool-requires)'s third point describes.
 When two jobs share a priority,
 tuple comparison falls through to the second field, the description string.
 
@@ -1647,7 +1647,7 @@ and it wakes the instant `put()` adds an item, with no polling in between.
 This listing's queue already holds every job by the time `consume()` starts,
 so its first `get()` returns immediately,
 but the same code runs unchanged whether the queue is empty or already stocked.
-The [Object Pool](15_Techniques--Context_Managers.md#an-object-pool)
+The [Object Pool](15_Techniques--Context_Managers.md#an-empty-pool-blocks-the-caller)
 in Context Managers uses the same `Queue` as a throttle.
 
 A consumer parked in `get()` still needs a way to stop.
@@ -2501,7 +2501,7 @@ Here are a few of the topics beyond it:
 6.  Remove the `if __name__ == "__main__"` guard from `parallel_cpu.py`,
     so its body runs unconditionally, and run it.
     Read the error, whose useful part is the `RuntimeError` traceback each failing child process printed above the `BrokenProcessPool` at the bottom,
-    then explain it with the import mechanics described in [Parallelism](#parallelism):
+    then explain it with the import mechanics described in [Parallelism](#what-a-process-pool-requires):
     what did each worker process do when it imported the module?
 7.  In `gil_race.py`, remove the `time.sleep(0.000_001)` call and run the script several times.
     Explain, using [The GIL Does Not Prevent Races](#the-gil-does-not-prevent-races),
