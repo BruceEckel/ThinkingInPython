@@ -177,8 +177,7 @@ and the message names the method the author probably meant.
 The `class Typo` statement raises a `TypeError` instead of finishing too,
 so the misspelling fails at import time,
 not later when the framework runs and the step silently does nothing.
-Rejecting every new method would catch the typo too,
-but it would also forbid `report()`,
+Rejecting every new method catches the typo too, but it also forbids `report()`,
 and a framework that bans helper methods in its subclasses is too restrictive.
 The heuristic cuts the other way too: `class Weird` never finishes either,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches` to flag it,
@@ -273,7 +272,7 @@ an instance of a subclass must work in its place.
 The base `run()` calls `customize1()` and `customize2()`,
 trusting that what the subclass supplies fits the algorithm's shape.
 An override can break that trust and still type-check.
-It raises an exception where the base would not,
+It raises an exception where the base does not,
 leaves a step empty when the flow depends on it,
 or performs the step on one pass and skips the next:
 
@@ -416,4 +415,4 @@ Ask how the algorithm might break, and choose the mechanism that protects it.
     one whose `customize1()` raises an exception the base never raises,
     and one that leaves `customize2()` at its `...` default when the flow depends on it.
     `ty` reports neither.
-    What would have to be true of the base class for a type checker to catch either one?
+    What must be true of the base class for a type checker to catch either one?
