@@ -201,8 +201,8 @@ info: `Never` and `Webhook & ~Email & ~Sms & ~Push` are not equivalent types
 The fence shows the first, in `render()`. The second is identical, at
 line 43 in `cost()`.
 
-`assert_never()` declares its parameter as `Never`, the type no value
-has, so the call checks only when the cases above it have already
+`assert_never()` declares its parameter as `Never`, the type with no
+values, so the call checks only when the cases above it have already
 eliminated every member of the union. The inferred type spells out
 what survived those cases: a `Webhook` that is none of the three
 handled types. That is the value which can reach the line, so the

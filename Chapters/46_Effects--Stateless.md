@@ -199,8 +199,8 @@ two bounds on the library's type variables do that instead.
 `A` is bound to `Ability[Any]`
 ([Waiting on a Coroutine](#waiting-on-a-coroutine) states the rule for `Depend`),
 and `E` is bound to `Exception`,
-so a class that subclasses both satisfies each bound at once,
-a case no listing here builds.
+so a class that subclasses both satisfies each bound at once.
+No listing here builds one.
 At runtime, `run()`'s driver tells the two apart with `case Exception() as error`:
 whatever the generator yields that matches `Exception` is a failure,
 and everything else is an Ability request.

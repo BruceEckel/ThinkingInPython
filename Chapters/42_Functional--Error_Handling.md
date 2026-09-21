@@ -801,9 +801,9 @@ and do-notation that makes combining multiple results read more directly than ne
 ## Which Failures Get a Result
 
 A `Result` does not replace every exception.
-Exceptions are still appropriate for truly exceptional conditions,
-the ones no caller can reasonably handle,
-such as running out of memory or a programming bug.
+Exceptions are still appropriate for truly exceptional conditions:
+running out of memory, a programming bug,
+anything a caller cannot reasonably handle.
 Some languages call these errors *panics* and separate them from regular exceptions.
 
 Use a `Result` for the failures that are part of a function's normal job:

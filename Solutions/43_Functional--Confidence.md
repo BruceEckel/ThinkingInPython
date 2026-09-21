@@ -398,8 +398,8 @@ miss, since the environment usually holds still during a run.
 Substituting `30` for `timeout()` is correct until someone sets
 `TIMEOUT`, and then the substituted version and the original disagree
 while both still look right. Tests show the problem first: one test
-that sets the variable changes the answer for every test after it, in
-a way no argument list records.
+that sets the variable changes the answer for every test after it, and
+no argument list records the dependency.
 
 The repair is the same for both, and it is the one this part of the
 book keeps making. Move the hidden input into the parameter list.

@@ -331,12 +331,11 @@ In the classic form,
 each algorithm becomes a class derived from a `FindRoot` interface,
 with a `find()` method.
 A "Context" class holds the chosen algorithm.
-The Context becomes useful when something must hold the current algorithm between calls,
-a job no parameter can do.
-Smalltalk's MVC is that arrangement,
-and *GoF Design Patterns* names it as an example of *Strategy*:
-a view holds a controller,
-and the controller decides how the view responds to input.
+A parameter carries a strategy into one call and is gone when the call returns,
+so a Context earns its place when the algorithm must outlast the call.
+A view holding a controller is that Context in Smalltalk's MVC,
+and *GoF Design Patterns* names the pair as an example of *Strategy*:
+the controller decides how the view responds to input.
 Replacing the controller changes the response without changing the display,
 and a controller that ignores input events disables the view.
 [*Observer*](30_Patterns--Observer.md) covers MVC's other half,
@@ -821,7 +820,7 @@ With one argument there is no pair to compare,
 so a class with the right `__call__` that skipped `@handler` passes the type checker and fails only when `subscribe()` looks it up.
 Tests cover that refusal and the other three: a non-event published,
 a `@handler` class with no `__call__`,
-and one whose `__call__` accepts something no `@event` produced:
+and one whose `__call__` annotates `int` instead of an `@event` class:
 
 ```python
 # test_tagged_bus.py

@@ -172,11 +172,11 @@ exercise 4 moves it out of `slope()`.
 
 `withdraw()` is both a side cause and a side effect in three lines, and
 that pairing is what makes it interesting. `balance -= amount` reads
-the global and writes it back, so the function's result depends on
-something no caller passed, and the call changes something no caller
-can see. Reading and rewriting the global is why `withdraw(30)` twice
-returns `70` then `40`, the demonstration the
-[Foundations](../Chapters/40_Functional--Foundations.md#pure-functions)
+the global and writes it back, so the function's result depends on the
+global `balance` rather than on its arguments, and the call changes
+`balance` where no caller can see it. Reading and rewriting the global
+is why `withdraw(30)` twice returns `70` then `40`, the demonstration
+the [Foundations](../Chapters/40_Functional--Foundations.md#pure-functions)
 chapter uses to show purity failing;
 [Confidence](../Chapters/43_Functional--Confidence.md#referential-transparency)
 reuses `withdraw()` to show referential transparency failing. The three

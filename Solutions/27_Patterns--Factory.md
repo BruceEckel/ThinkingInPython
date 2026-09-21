@@ -872,7 +872,7 @@ when a test wants one that nothing has touched. The costs are the
 table literal becoming a decorator plus a function for each monster,
 the name repeated at every definition, and the two failures the
 chapter attached to registration:
-a builder nothing decorates is absent from the table,
+an undecorated builder is absent from the table,
 with a `KeyError` from `spawn()` that points at nothing, and a
-builder in a module nothing imports never runs. For two monsters in
+builder in an unimported module never runs. For two monsters in
 one file, the table literal says the same thing in fewer lines.

@@ -908,7 +908,7 @@ A descriptor that defines `__set__()` is a *data descriptor*,
 and on every lookup a data descriptor outranks the instance's `__dict__`.
 If `__get__()` asks `obj` for plain `"x"`,
 that lookup routes back to the descriptor and calls `__get__()` again, forever.
-Storing under `"_x"`, a name no descriptor claims, breaks the loop.
+No descriptor is assigned to `_x`, so storing the value there breaks the loop.
 
 A descriptor with only `__get__()` is a *non-data descriptor*,
 and the ranking reverses: the instance's `__dict__` wins.
