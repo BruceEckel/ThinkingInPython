@@ -149,8 +149,8 @@ earns its place because it repeats no part of `sorted()`'s
 implementation. It arrives at the same answer by a different route.
 That independence is what makes an oracle worth having, and what
 makes `assert sorted(xs) == sorted(xs)` worthless. Capping the list
-length keeps the quadratic oracle cheap, since the bugs it would
-catch show up on short inputs.
+length keeps the quadratic oracle cheap, since the bugs it catches
+show up on short inputs.
 
 ## 4. A law that is false
 
@@ -216,10 +216,9 @@ length. One rule survives. `str.casefold()`, rather than
 `str.lower()`, is the operation intended for case-insensitive
 comparison, and even `casefold()` promises no reversibility.
 
-A hand-written loop over `"abcde"` would never have reached `µ`. The
-generated strings reach the parts of the repertoire nobody thinks to
-type, and that reach is the argument for property testing in one
-example.
+A hand-written loop over `"abcde"` never reaches `µ`. The generated
+strings reach the parts of the repertoire nobody thinks to type, and
+that reach is the argument for property testing in one example.
 
 ## 5. A property test for `group_rounds()`
 
