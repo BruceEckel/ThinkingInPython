@@ -380,7 +380,7 @@ and Python catches it the same way, by refusing to compile any `case` after it:
 `SyntaxError: name capture 'str' makes remaining patterns unreachable`.
 
 Matching on `isinstance()` is the opposite of the exact-type dispatch that a `dict` keyed on `type(value)` performs.
-[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table)
 relies on that dispatch, and there a subclass finds no entry at all.
 
 ```python
