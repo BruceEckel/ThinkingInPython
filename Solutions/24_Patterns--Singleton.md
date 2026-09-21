@@ -32,7 +32,7 @@ the deferral removes both. `instance` now carries the type
 `ClassVar[__OnlyOne]` rather than `ClassVar[__OnlyOne | None]`, and
 the class body binds it to the inner instance. The bare
 `__OnlyOne()` works there. The qualified `OnlyOne.__OnlyOne()`
-would fail, since `OnlyOne` is unbound until its own body finishes.
+fails, since `OnlyOne` is unbound until its own body finishes.
 `__init__()` shrinks to the one `append`. Externally nothing
 changes: `x.val` accumulates the same way, `x is y` is still
 `False`, and `x.instance is y.instance` is still `True`. The cost
