@@ -10,8 +10,10 @@ Normally you'd add something to the base class interface,
 but that's not an option.
 How do you get around this?
 
+## The Classic Visitor
+
 *Visitor*, the final pattern in *GoF Design Patterns*,
-solves this kind of problem.
+solves the problem of a hierarchy you cannot change.
 It lets you extend the interface of the primary class hierarchy.
 It requires one method on the primary class hierarchy,
 typically called `accept()`,
@@ -295,6 +297,8 @@ use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatch
 instead.
 It dispatches on the first argument after `self`.
 
+### Testing the Operations
+
 Because each operation is a plain function, testing is direct.
 Call it with each flower type and assert the result.
 The cases worth covering are the registered types,
@@ -341,6 +345,8 @@ def test_dispatch_follows_inheritance() -> None:
 
     assert nectar(Hybrid()) == "Hybrid: abundant nectar"
 ```
+
+### Where Visitor Still Fits
 
 *Visitor* still has a place:
 when the elements must drive the traversal themselves from inside `accept()`,
