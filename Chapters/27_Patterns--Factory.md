@@ -203,11 +203,11 @@ so the name a caller passes to `factory()` is `"Circle"`, not `_Circle`.
 Nesting the classes inside `factory()` looks like stronger enforcement,
 but is worse.
 Because a `class` statement is executable code,
-every `factory()` call would define fresh `Circle` and `Square` classes.
-Two shapes from different calls would then share behavior but not a class,
+every `factory()` call defines fresh `Circle` and `Square` classes.
+Two shapes from different calls then share behavior but not a class,
 failing `type(a) is type(b)` and `isinstance()` alike.
-`Shape.__subclasses__()` would be empty until the first call,
-then gain a duplicate `Circle` and `Square` on every call after that.
+`Shape.__subclasses__()` is empty until the first call,
+then gains a duplicate `Circle` and `Square` on every call after that.
 
 ### Alternative Constructors Are Factories
 
@@ -299,8 +299,8 @@ so `SHAPES` cannot gain a shape name without adding it to the `Literal` first.
 
 ### Self Registration
 
-It would be even nicer if a new `Shape` subclass would register itself with no edit to existing code.
-In this case, a closed `Literal` would complicate things by requiring an edit for every new subclass.
+It is even nicer if a new `Shape` subclass registers itself with no edit to existing code.
+In this case, a closed `Literal` complicates things by requiring an edit for every new subclass.
 A closed set of names suits `Literal`, while an open set does not:
 
 ```python
@@ -375,7 +375,7 @@ so the check moves to runtime.
 
 To add a `Triangle` is a single class definition,
 and `make()` builds it with no change to the factory.
-`Shape.__subclasses__()` could have built the table instead,
+`Shape.__subclasses__()` can build the table instead,
 but it lists only direct subclasses,
 while `__init_subclass__()` runs for every class anywhere below `Shape`.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)
@@ -407,17 +407,17 @@ and the strong reference keeps it alive for the rest of the process.
 
 `__init_subclass__()` names `Shape.registry` rather than `cls.registry` on purpose:
 `cls.registry` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
-so a subclass that defines its own `registry` would create a second table that `make()` never reads,
+so a subclass that defines its own `registry` creates a second table that `make()` never reads,
 with no error to signal it.
 
 `make()` stays a module-level function for two reasons.
-A `@classmethod` would look up `cls.registry`,
-so a subclass with its own `registry` would send `Triangle.make()` to that second table,
+A `@classmethod` looks up `cls.registry`,
+so a subclass with its own `registry` sends `Triangle.make()` to that second table,
 the one `__init_subclass__()` avoids by naming `Shape.registry`.
-And `Circle.make("Square")` would be legal as well as misleading,
+And `Circle.make("Square")` is legal as well as misleading,
 since the key decides what `make()` builds,
 not the class you name before the dot.
-A method of any kind would also put back the factory method that [The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
+A method of any kind also puts back the factory method that [The Pythonic Factory: a Dictionary](#the-pythonic-factory-a-dictionary)
 set out to remove.
 
 ### Testing the Registry
@@ -455,7 +455,7 @@ def test_unknown_name_raises() -> None:
 
 The last test asks for `"Hexagon"` rather than the `"Triangle"` that `registry_demo.py` used,
 because the `Triangle` defined in the previous test is still in the registry.
-A `make("Triangle")` here would succeed,
+A `make("Triangle")` here succeeds,
 because the registry keeps every entry it has taken.
 
 ### Explicit Registration with a Protocol
@@ -810,7 +810,7 @@ The `GameEnvironment` controls the setup and play of the game.
 Setup and play are simple here,
 but the initial conditions and the way the state changes can determine much of a game's outcome.
 `GameEnvironment` has no place to vary the rules of play,
-so a real game would add one: a subclass overriding `play()`,
+so a real game adds one: a subclass overriding `play()`,
 or a rules object passed alongside the factory.
 
 `interact_with()` dispatches on the character's type and `obstacle.description()` dispatches again on the obstacle's.
