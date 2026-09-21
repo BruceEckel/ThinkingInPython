@@ -42,7 +42,7 @@ print(vars(m))
 The constructor replaces the object's `__dict__` with the `dict` that the `**kwargs` parameter automatically creates.
 `vars(m)` returns that same `__dict__`,
 and its output shows that the attributes and the keyword arguments are one dict:
-`m.more = 11` adds a key, just as passing `more=11` to the constructor would.
+`m.more = 11` adds a key, just as passing `more=11` to the constructor does.
 
 Because `**kwargs` is the only parameter,
 `Messenger` accepts keyword arguments alone:
@@ -321,7 +321,7 @@ Choose `NamedTuple` when it is: unpacking, multiple return values,
 compatibility with code that expects a tuple.
 Choose a [frozen dataclass](12_Techniques--Data_Classes_as_Types.md#immutability)
 when a record should be a distinct type that equals only its own kind,
-and when inherited ordering and array-shaped JSON would be wrong rather than convenient.
+and when inherited ordering and array-shaped JSON are wrong rather than convenient.
 
 When the data must stay a dict,
 because it arrives as JSON or goes back out as JSON,
@@ -351,8 +351,8 @@ see [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-
 5.  In `fetch_stats.py`,
     change `summarize()` to return a bare `tuple[float, int]`.
     Every caller still runs.
-    What did the call sites lose,
-    and which mistakes would the type checker still catch?
+    What do the call sites lose,
+    and which mistakes does the type checker still catch?
 6.  In `still_a_tuple.py`, add `class Point3(NamedTuple)` with fields `x`, `y`,
     `z`.
     Predict `Color(1, 2, 3) == Point3(1, 2, 3)` before running it,
