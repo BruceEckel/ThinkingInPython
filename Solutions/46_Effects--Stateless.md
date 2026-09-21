@@ -76,7 +76,7 @@ still picks among them the same way.
 
 `as_type(Console)` is doing quiet work in both calls, and the work is
 static. `supply()` reads the Ability from the declared type of its
-argument, so `supply(scripted)` alone would build a handler for
+argument, so `supply(scripted)` alone builds a handler for
 `Need[Scripted]` rather than the `Need[Console]` that
 `ask_and_greet()` requests. The wrapper turns that static type into
 `Console`. At runtime the wrapper returns `scripted` untouched, and
@@ -291,7 +291,7 @@ shape and the `Console` shape at once.
 
 The two `as_type()` calls are what make one object answerable to two
 requests. `supply()` reads the Ability from each argument's declared
-type, so `supply(recorder, recorder)` would build a handler for
+type, so `supply(recorder, recorder)` builds a handler for
 `Need[Recorder]`, an Ability neither Effect requests. Each wrapper
 names the role this instance fills. Supplying the same object twice
 under two different types is the case `as_type()` exists for.
@@ -420,7 +420,7 @@ At runtime the handler answered three requests across the two calls,
 two for `Console` and one for `Clock`, even though `default()`
 annotates its parameter `Need[Console]`. `ty` believes the handler
 answers only `Need[Console]`, which is why the second `run()` needs a
-`# type: ignore` and would otherwise report a leftover `Need[Clock]`.
+`# type: ignore` and otherwise reports a leftover `Need[Clock]`.
 
 `handle()`'s `t = get_origin(t) or t` is the evidence. `handle()`
 reads the annotation, reduces `Need[Console]` to its origin, `Need`,
@@ -435,7 +435,7 @@ runtime class, so no runtime check tells the two apart. The annotation
 is the only place the distinction exists, and `handle()` uses it for
 matching but cannot enforce it. The gap is real. A handler like
 `default()` genuinely handles more than its type says, and one that
-assumes `ability.t` is a `Console` would receive a `Clock` with
+assumes `ability.t` is a `Console` receives a `Clock` with
 nothing to stop it.
 
 ## 7. Two ways to drop a `yield from`
@@ -731,7 +731,7 @@ error[invalid-yield]: Yield expression type does not match annotation
    |                            expected `Need[Console] | KeyError`
 ```
 
-The error appears on line 29, the `yield from` that would introduce the
+The error appears on line 29, the `yield from` that introduces the
 undeclared failure, not on the signature and not at the call site. That
 is the useful place for it. The diagnostic names both the failure that
 escaped and the delegation it escaped through, so the fix is either to
