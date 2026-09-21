@@ -212,9 +212,11 @@ and the code that creates the cycle often lives far from the code that owns the 
 
 Two approaches are more reliable:
 
-1. An explicit cleanup method such as the `close()` that file objects provide,
-   which a `with` block calls.
-   The method runs whether or not an error interrupts the code:
+### An Explicit `close()` and a `with` Block
+
+The first is an explicit cleanup method,
+such as the `close()` that file objects provide, which a `with` block calls.
+The method runs whether or not an error interrupts the code:
 
 ```python
 # closable.py
@@ -270,7 +272,9 @@ nothing stops your own code from calling it again,
 so a real `close()` must guard itself against being called more than once,
 the way a file object's `close()` does.
 
-`Socket.__init__()` also prints "opened" before `__enter__()` runs.
+### A Raising `__init__()` Leaks the Resource {#raising-init-leaks}
+
+`Socket.__init__()` prints "opened" before `__enter__()` runs.
 That ordering hides a trap:
 if `__init__()` raises an exception after acquiring the resource,
 the `with` statement never receives a context manager,
@@ -307,8 +311,10 @@ and nothing releases what `__init__()` had already acquired.
 Acquire the resource in `__enter__()` instead of `__init__()` when construction itself can fail,
 or wrap the acquisition in its own `try`/`except` and release what you already opened before re-raising.
 
-2. `weakref.finalize()`,
-   which registers a cleanup callback for an object without giving that callback a reference to the object:
+### `weakref.finalize()` as a Backstop
+
+The second is `weakref.finalize()`,
+which registers a cleanup callback for an object without giving that callback a reference to the object:
 
 ```python
 # finalizer.py
@@ -355,7 +361,10 @@ For an object still alive when the program ends,
 `finalize()` runs the callback from the `atexit` module's exit handlers,
 ahead of the teardown that makes `__del__()` unreliable.
 
-The `self.close` mistake produces no error, only an object that never goes away:
+### The `self.close` Trap
+
+Passing `self.close` to `finalize()` produces no error,
+only an object that never goes away:
 
 ```python
 # finalize_trap.py
@@ -391,6 +400,8 @@ reference counting reclaimed it there, before `gc.collect()` ran.
 The listing turns `atexit` off on `Leaky`'s finalizer,
 so `False True` answers whether the collector reclaimed each object,
 rather than whether a callback eventually ran at exit.
+
+### A Slotted Class Needs `__weakref__` {#slotted-class-needs-weakref}
 
 `finalize()` needs a target that supports weak references,
 and so does the `WeakValueDictionary` in the next section.
