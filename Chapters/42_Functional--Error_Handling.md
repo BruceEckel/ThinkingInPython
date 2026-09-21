@@ -177,7 +177,10 @@ if __name__ == "__main__":
 A function reports failure by returning an `Err` object,
 success by returning an `Ok` object.
 
-`Result[int, str]` says this function returns an `int` on success or a `str` on failure.
+### Reaching the Answer
+
+`func_a()`'s return type, `Result[int, str]`,
+says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
 `unwrap()` makes that literal: only `Ok` defines it,
 so `func_a(i).unwrap()` fails the type checker,
@@ -219,7 +222,9 @@ Use `Result` when the caller may need to act on the reason,
 or when several different failures must stay distinguishable,
 as [Matching on the Error](#matching-on-the-error) shows below.
 
-A function like this is a *Total Function*,
+### Total Functions
+
+A function like `func_a()` is a *Total Function*,
 one whose return type accounts for every outcome it can produce,
 success or failure.
 If the function raises an exception instead,
