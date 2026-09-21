@@ -894,7 +894,9 @@ because those rounds use every one of the `n * (n - 1) / 2` possible pairs exact
 The classical fix for an odd roster is a phantom player:
 whoever draws the phantom sits out that round.
 
-The trick stops working the moment the groups are threes, fours,
+### Groups of Any Size
+
+Rotation stops working the moment the groups are threes, fours,
 or any size but two.
 The circle method is a closed-form answer to one narrow question,
 "how do you 1-factorize a complete graph into perfect matchings,"
@@ -1006,6 +1008,8 @@ and the `if pool and not groups` line opens one.
 Without it, `min()` receives no groups to compare and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,
 because the alternative is a round in which nobody meets anyone.
+
+### `history` Is Mutable State
 
 `met()` runs once per candidate per slot,
 so it looks like the place for `@cache` from earlier in this chapter.
