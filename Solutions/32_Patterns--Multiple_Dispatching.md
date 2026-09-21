@@ -339,7 +339,7 @@ The swap is where subtraction differs from addition. Python calls
 so `self` is the right operand and `other` is the left one. The method
 must put them back in the order the source wrote them.
 `Meters(other - self.n)` gives `Meters(7)`. Writing
-`Meters(self.n - other)`, the same body `__sub__()` uses, would give
+`Meters(self.n - other)`, the same body `__sub__()` uses, gives
 `Meters(-7)`: a correct-looking method that quietly returns the
 negative of every reflected subtraction. `__radd__()` hides that swap
 because addition commutes, so the mistake costs nothing there and
@@ -350,7 +350,7 @@ straight to `Meters.__rsub__`, which returns `NotImplemented` for a
 `str`. With both sides declining, Python raises the `TypeError`, and
 the message names both types. Returning `NotImplemented` rather than
 raising an exception makes that message possible: an exception raised
-inside `__rsub__()` would report `Meters`'s complaint instead of
+inside `__rsub__()` reports `Meters`'s complaint instead of
 Python's account of which pair of types has no defined subtraction.
 
 ## 6. Making the table tolerate subclasses
@@ -700,7 +700,7 @@ The `(Paper, Rock)` cell receives both items, so it can consult
 `item1.wet`. That is the first of the two reasons the chapter gives
 for preferring the double-dispatch version: behavior that reads the
 object's own state. A cell holding a function answers it. Whatever
-`Paper.eval_rock()` could have read, `paper_vs_rock()` can read too,
+`Paper.eval_rock()` can read, `paper_vs_rock()` can read too,
 from the same two objects.
 
 The second reason survives. A subclass still cannot override one
