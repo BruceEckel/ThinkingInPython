@@ -466,7 +466,7 @@ Forwarding through `__getattr__()` gives up both.
 A surrogate is not its implementation,
 and code that checks with `isinstance()` should check for the method instead.
 
-### What Proxy Solves
+## What Proxy Solves
 
 *GoF Design Patterns* lists these common uses for *Proxy*:
 
@@ -490,6 +490,8 @@ it forwards to a weakly referenced object and raises `ReferenceError` once nothi
 [Cleanup](10_Foundations--Cleanup.md#reliable-alternatives)
 uses `weakref.ref()`, and a `WeakValueDictionary` in the section that follows,
 both from the same module and neither needing this one.
+
+### Virtual Proxy
 
 A *Virtual proxy* delays building an expensive object until something asks for it:
 
@@ -522,6 +524,8 @@ print(p.query())
 Building `Lazy` prints nothing.
 `__getattr__()` builds `Expensive` on the first forwarded access,
 and every later access reuses that same instance.
+
+### Protection Proxy
 
 A *Protection proxy* decides whether a call reaches the implementation.
 Because `__getattr__()` receives the requested name, the check is one condition:
@@ -569,6 +573,8 @@ It fails `isinstance()` for a different reason:
 as [A *Surrogate* Is Not Its Implementation](#a-surrogate-is-not-its-implementation)
 explains, the Protocol check uses `inspect.getattr_static()`,
 which never calls `__getattr__()`.
+
+### Smart Reference
 
 A *Smart reference* proxy adds behavior around each access.
 With `__getattr__()` you can wrap every method call, for example to count them.
