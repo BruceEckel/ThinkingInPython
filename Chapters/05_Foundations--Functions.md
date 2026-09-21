@@ -149,6 +149,8 @@ A parameter with a default cannot come before one without.
 [Keyword-only parameters](#positional-only-and-keyword-only-parameters)
 are exempt, because the caller names them.
 
+### The Mutable Default Trap
+
 Python evaluates a default value once, when it executes the `def`,
 so every call shares that one object.
 A mutable default therefore carries changes from one call to the next:
@@ -221,8 +223,10 @@ so the local name points at a new list and the caller's list stays as it was.
 Mutating an argument reaches outside the function.
 Rebinding one does not.
 
+### Safe Defaults
+
 `good_append()` builds a fresh list on every call,
-and any function that mutates such a parameter must do the same.
+and any function that mutates a parameter with a default must do the same.
 If the function only reads the parameter,
 use an immutable default such as an empty tuple.
 Calls still share that tuple,
