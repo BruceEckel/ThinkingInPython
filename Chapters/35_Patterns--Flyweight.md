@@ -143,7 +143,7 @@ Twenty-four cells, three objects.
 the [comprehension unpacking](16_Techniques--Comprehensions.md#unpacking-in-comprehensions).
 The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 `Tile` is a record, so its generated `__eq__()` compares field values,
-and a set of cells would collapse to three with or without sharing.
+and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
 The grid can grow to any size and the object count stays at the number of tile kinds,
 because `@cache` returns the same `Tile` for the same symbol every time.
@@ -168,7 +168,7 @@ The type checker reads that guard too.
 The checker narrows it to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
-would assert.
+asserts.
 Prefer a guard the type checker can read.
 Keep `cast()` for the cases where no guard exists,
 because the type checker believes a `cast()` rather than verifying it.
@@ -209,7 +209,7 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 The freezing must hold all the way down.
 A record blocks assignment to a field, not mutation inside one,
-so a `Tile` holding a `list` would leak that list to every cell that shares the tile
+so a `Tile` holding a `list` leaks that list to every cell that shares the tile
 (the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
 Every field here is immutable, which makes the sharing safe.
 
