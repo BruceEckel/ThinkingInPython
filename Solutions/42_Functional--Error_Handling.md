@@ -296,8 +296,8 @@ one word.
 `TypeError`, which `@safe(ValueError)` never catches, so the
 `TypeError` propagates through `wrapper` untouched and the caller
 sees an ordinary traceback. Under the chapter's `@safe` that same
-`TypeError` would have arrived as `Err(TypeError(...))`,
-indistinguishable from a bad-input failure.
+`TypeError` arrives as `Err(TypeError(...))`, indistinguishable from
+a bad-input failure.
 
 The `SafeDecorator` protocol keeps the types honest. `safe()`
 returns a function that is itself generic over the function it
