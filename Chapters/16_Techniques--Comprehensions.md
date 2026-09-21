@@ -405,7 +405,8 @@ and by then nothing needs the files.
 Turning those brackets into parentheses would break the program:
 a generator expression would not start walking until `sorted()` pulls on it,
 and that pull comes outside the `with`.
-[Generator Expressions](#generator-expressions) returns to that gap.
+[Generator Expressions](#the-gap-between-creation-and-consumption)
+returns to that gap.
 
 ## Breaking Up a Complex Comprehension
 
