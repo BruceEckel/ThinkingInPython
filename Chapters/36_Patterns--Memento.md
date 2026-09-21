@@ -132,7 +132,7 @@ assigning different strokes to the snapshot raises a `FrozenInstanceError`.
 ### Why `Memento` Is a Class
 
 You could skip the class and write `type Memento = tuple[str, ...]`.
-Every call site would still type-check.
+Every call site still type-checks.
 But an alias creates no new type.
 Any `tuple[str, ...]` in the program satisfies it,
 including one a caretaker builds or unpacks by hand.
@@ -298,7 +298,7 @@ Each `draw()` builds a fresh tuple of `n + 1` pointers and copies nothing else,
 so one `draw()` costs pointers proportional to the current length of `strokes`,
 not the whole `Drawing`.
 The stroke comes from `"".join([...])` rather than the literal `"circle"` because the compiler interns a literal,
-and interning would make the identity check print `True` even for a copied string.
+and interning makes the identity check print `True` even for a copied string.
 
 A single `draw()` is cheap.
 A `History` that keeps every past state is not,
@@ -770,4 +770,4 @@ Whenever you see rewind, rollback, or restore, something is producing mementos.
     Does the default appear?
     Now add a `__post_init__()` that rejects an empty title,
     and load the blank one again.
-    What did pickle skip, and what would `copy.replace()` have caught?
+    What did pickle skip, and what does `copy.replace()` catch?
