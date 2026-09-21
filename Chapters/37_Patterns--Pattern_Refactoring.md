@@ -103,7 +103,7 @@ belong to the class, so they stay out of it.
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
 The subclasses omit the annotation because the name and its type carry over from the base declaration;
-restating `ClassVar[float]` would also keep [the type checker's guard on the override](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
+restating `ClassVar[float]` also keeps [the type checker's guard on the override](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
 
 Adding a new recyclable type is a single class definition.
 It registers itself, and `create()` builds it.
@@ -333,7 +333,7 @@ not an exception to debug.
 The leak is in the `match`.
 The registry accepts `Plastic` the moment its `class` statement runs,
 and without that `class` statement,
-`create()` would raise a `KeyError` at the first `Plastic:` line, loudly,
+`create()` raises a `KeyError` at the first `Plastic:` line, loudly,
 at parse time.
 The `match` alone loses trash silently.
 
@@ -497,7 +497,7 @@ Both operations answer correctly, and the cost is the last line.
 One new question costs an edit to all three material classes,
 and the question after it costs three more edits.
 Those edits sit in each class body, as `note_methods.py` shows;
-in the real program they would go in `trash.py`.
+in the real program they go in `trash.py`.
 A method belongs in the body of its own class by design:
 you can assign a function onto a class from outside,
 but behavior scattered that way is unmaintainable.
