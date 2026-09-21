@@ -694,10 +694,10 @@ so `solve()` returns `None` and the walrus in the `while` reads it as
 The search has to run again after every meal because both of its ends
 move. `Food.interact()` replaces the food with an `Empty()`, so the
 room the robot just arrived at stops being a goal, and the robot's
-own room is now the new start. A single search at the start would
-plan a route to a piece of food and then eat, on the way, some of the
-food it was going to visit later. Re-searching costs almost nothing:
-each search touches at most a few hundred rooms.
+own room is now the new start. A single search at the start plans a
+route to a piece of food and then eats, on the way, some of the food
+it is going to visit later. Re-searching costs almost nothing: each
+search touches at most a few hundred rooms.
 
 Nearest-first does not give the shortest tour that eats everything.
 Choosing the closest food each time is a greedy choice made with no
