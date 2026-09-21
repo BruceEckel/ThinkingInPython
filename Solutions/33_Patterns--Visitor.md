@@ -195,7 +195,7 @@ listing keeps `ty` quiet about that call. Delete it and `ty` reports
 the mismatch.
 
 That is the price the chapter names for keeping `Any`. The `Any` moves
-an error a type checker could have caught into the run. The classic
-pattern pays that price because its `Visitor` base is empty. Either
-fix buys the check back: declaring `visit()` abstract on that base, or
-writing the `Visits` protocol above.
+an error a type checker can catch into the run. The classic pattern
+pays that price because its `Visitor` base is empty. Either fix buys
+the check back: declaring `visit()` abstract on that base, or writing
+the `Visits` protocol above.
