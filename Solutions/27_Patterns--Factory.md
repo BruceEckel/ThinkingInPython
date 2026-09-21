@@ -467,9 +467,8 @@ The demo never uses the name `extra_shapes`, so ruff reports the
 import as unused and the `noqa` comment is the only sign that it is
 deliberate. That is the shape the chapter warns about: an import that
 exists for its side effect. It must stay an ordinary import, since a
-`lazy import` would defer the module body, and with it the two
-`class` statements, until the first use of a name the demo never
-uses.
+`lazy import` defers the module body, and with it the two `class`
+statements, until the first use of a name the demo never uses.
 
 ## 7. What `copy.copy()` costs a prototype registry
 
