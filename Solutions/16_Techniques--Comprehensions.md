@@ -13,7 +13,7 @@ print(result)
 
 The predicate has two parts, `isinstance(e, str)` and `e.isdigit()`,
 both of which must be true before `int(e)` ever runs. `"a"` fails
-`isdigit()`, so it never reaches `int()`, which would otherwise raise a
+`isdigit()`, so it never reaches `int()`, which otherwise raises a
 `ValueError`. `"4"` is the only element that is both a string and made
 entirely of digits, so it is the one the comprehension converts and
 squares.
@@ -62,9 +62,9 @@ filter and adds one entry. `"Ni"` is still the only name the filter
 drops. The filter tests the original name, not the upper-cased key, so
 the filter judges a name before the output expression ever runs. That
 ordering matters when the output expression changes the length, as
-`name * 2` would.
+`name * 2` does.
 
-Two names that upper-case to the same string would collide, since the
+Two names that upper-case to the same string collide, since the
 comprehension builds a `dict` and a later key overwrites an earlier
 one. Adding `"robin"` alongside `"Robin"` produces one `'ROBIN'` entry,
 not two, and the value comes from whichever name appears last in the
