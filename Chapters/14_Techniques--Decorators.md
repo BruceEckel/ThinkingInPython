@@ -883,8 +883,7 @@ just as a function decorator returns a replacement function.
 A registry filled this way is as complete as the imports that ran:
 a class in a module nobody imported never registers.
 Keying on `cls.__name__` also means two same-named classes from different modules overwrite each other.
-[Factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
-returns to both.
+[Factory](27_Patterns--Factory.md#hazards-of-self-registration) returns to both.
 
 [Metaprogramming](17_Techniques--Metaprogramming.md#self-registration-of-subclasses)
 shows `__init_subclass__()`,
