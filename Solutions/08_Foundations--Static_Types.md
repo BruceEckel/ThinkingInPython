@@ -131,9 +131,9 @@ a `LoudTally`, `Self` means `LoudTally`, so `t.bump().bump()`
 type-checks as a `LoudTally` and `.report()` is available on the
 result. That call resolves to `LoudTally.report()`, because Python
 always starts method lookup from the actual (most derived) class. If
-`bump()`'s return annotation were the fixed type `Tally` instead of
-`Self`, the type checker would reject `.report()` on the chained
-result, since plain `Tally` has no `report()` method.
+`bump()`'s return annotation is the fixed type `Tally` instead of
+`Self`, the type checker rejects `.report()` on the chained result,
+since plain `Tally` has no `report()` method.
 
 ## 5. What a missing type parameter default costs
 
