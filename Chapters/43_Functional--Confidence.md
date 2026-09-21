@@ -210,7 +210,7 @@ A `functools.partial` survives,
 because it pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
-and without the guard every worker would build a pool of its own.
+and without the guard every worker builds a pool of its own.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
 covers the pickling boundary and the guard,
 along with the reasons Python parallelism uses processes rather than threads.
@@ -332,7 +332,7 @@ def test_roundtrip(sample: str) -> None:
 ```
 
 The listing repeats the two functions rather than importing them,
-because importing `property_check.py` would run its thousand-iteration loop inside the test run.
+because importing `property_check.py` runs its thousand-iteration loop inside the test run.
 
 `@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
 By default Hypothesis generates a hundred of them,
@@ -391,8 +391,7 @@ not because it guesses the bug.
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.
 A real test needs neither.
-This function exists to fail,
-and a failing `test_` function would fail the build,
+This function exists to fail, and a failing `test_` function fails the build,
 so its name drops the `test_` prefix and the listing calls it directly inside a `try`.
 
 ### A Family of Property Shapes
@@ -468,7 +467,7 @@ and the chapters after it build a checked system on that idea.
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
-    For each, name the substitution that would change the program's behavior,
+    For each, name the substitution that changes the program's behavior,
     then rewrite it so the value arrives as an argument.
 7.  Take the `describe()` function from [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
