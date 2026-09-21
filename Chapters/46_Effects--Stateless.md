@@ -400,8 +400,6 @@ and wrapping that in `supply(Console())` leaves `(list[str]) -> Success[None]`.
 You can bind some Abilities near the Effect and the others at the edge,
 with the type recording what each layer left behind.
 
-### A Default Binding
-
 A dependency injection container often lets you register a fallback for a type nobody else provides.
 Stateless has no such registration, and `need()` takes no default argument.
 Layering produces one all the same.
@@ -879,7 +877,8 @@ even though only `greet()`, one level further down, uses it.
 substituted a `Recorder` for a `Console` but postponed the reason for using `as_type(Console)`.
 That call answers two questions, for two audiences: static analysis and runtime.
 
-First, the static issue.
+### What the Type Checker Reads
+
 `supply()` reads the Ability from the declared type of its argument,
 so handing `recorder` to `supply()` builds a handler for `Need[Recorder]`,
 a different Ability from the `Need[Console]` that `greet()` requests.
@@ -897,7 +896,9 @@ the type checker believes it even when the object has no relation to `Console`.
 so passing it an object that fails to implement `Console` is a type error.
 `as_type()` widens to a supertype; `cast()` replaces one type with any other.
 
-Second, the runtime issue, which the library decides using `isinstance()`.
+### What `isinstance()` Checks
+
+The library decides the runtime question with `isinstance()`.
 `supply()` builds a handler that checks each request with `isinstance(instance, ability.t)`,
 where `ability.t` is the class inside the `Need`.
 In `test_greeter.py`, `ability.t` is `Console` and `instance` is `recorder`,
@@ -913,7 +914,9 @@ If you add a `read_line()` method to `Console` tomorrow,
 `Recorder` inherits the real one silently,
 so a test meant to record performs live console I/O.
 
-Stateless's own `Console` pays that cost.
+### An Interface Instead of a Base Class
+
+Stateless's own `Console` can only be replaced by a subclass.
 [Builtin Dependencies](#builtin-dependencies) named it a concrete class,
 and its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass and nothing else.
@@ -1148,6 +1151,8 @@ which is why the EMS `greet()` returns `Depend[Need[Console], None]` while `depe
 An EMS tracks every dependency,
 so the type checker catches the errors that programmer memory and exhaustive testing would otherwise have to catch.
 
+### No Container, Three Consequences
+
 Stateless has no container.
 `supply()` is a function call, and its arguments are the bindings.
 This has three consequences:
@@ -1173,7 +1178,9 @@ This has three consequences:
    `holds()` declares `Need[Material] | Need[Nailer]` in its signature,
    and a caller that does not supply them inherits the requirement.
 
-The requirement that callers inherit is also the cost.
+### Churn in Every Signature
+
+A requirement that every caller inherits is also a drawback.
 Adding a dependency to a working function rewrites the return type of every function above it,
 as [Retrofitting an Effect](#retrofitting-an-effect) shows with `Need[Log]`;
 DI absorbs the same change in silence, with no signature recording it.
@@ -1233,6 +1240,8 @@ and `supply()` handles only a `Need`.
 yet its result comes from a coroutine.
 `wait()` hands the coroutine out as a request and the driver awaits it,
 so the asynchrony stops at the Ability channel instead of spreading to `report()` and everything that calls it.
+
+### `sleep()` Carries Two Abilities
 
 You need `wait()` at the boundary where a coroutine enters the Effect world.
 A function that already returns an Effect needs no `wait()`,
@@ -1298,6 +1307,8 @@ so `delayed_sum()` needs no `async` and no `await` of its own.
 `Time` has no special status in Stateless.
 It is an ordinary class whose one method is `async def sleep()`.
 `supply(Time())` binds an instance the way `supply(Console())` does.
+
+### A Clock That Never Waits
 
 Reading a clock is a [side cause](44_Effects--Effect_Management.md#what-is-an-effect),
 and `Need[Time]` moves that into the Ability channel.
@@ -1521,8 +1532,10 @@ An exception raised where no `@throws` wraps the body bypasses the type,
 a hole that [Nothing stops an undeclared Effect](47_Effects--Stateless_in_Practice.md#nothing-stops-an-undeclared-effect)
 examines.
 
-Because the driver throws the failure back in,
-an ordinary `try`/`except` around a `yield from` catches it,
+### Catching Is Not Handling
+
+The driver throws a failure back into the generator,
+so an ordinary `try`/`except` around a `yield from` catches it,
 provided `run()` drives that Effect directly.
 Catching is different from handling.
 The exception leaves as a yielded value, travels out to `run()`,
@@ -1682,7 +1695,7 @@ error[unsupported-operator]: Unsupported `+` operation
 This is the same guarantee the `Result` type gives in [Error Handling](42_Functional--Error_Handling.md#a-result-type),
 and `catch()` reaches it without rewriting the body of `score()`.
 
-### Multiple Errors
+## Multiple Errors
 
 `catch()` tracks multiple error types.
 `SCORES` stores its values as `int`s,
