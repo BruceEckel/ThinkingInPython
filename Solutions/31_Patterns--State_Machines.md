@@ -434,8 +434,8 @@ A second `Start` during `FILLING` finds no row, so `handle()` raises
 before it runs any action. For a washing machine the caller should
 ignore the press: catch `NoTransition` and carry on, as
 `vending_view.py`'s `send()` does. A control panel is the noisy
-source the chapter describes, and a cycle that stopped because
-someone leaned on a button would be the worse failure. Raising the
+source the chapter describes, and a cycle that stops because
+someone leans on a button is the worse failure. Raising the
 exception is still the right default for the engine. A caller can
 turn an exception into a no-op, and cannot turn a silent no-op into
 a report.
