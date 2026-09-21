@@ -535,7 +535,7 @@ Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
 which avoids the late-binding surprise a lambda created in a loop can produce.
-[Function Objects](28_Patterns--Function_Objects.md#command-choosing-the-operation-at-runtime)'s `late_binding.py` demonstrates that surprise.
+[Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)'s `late_binding.py` demonstrates that surprise.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
