@@ -107,7 +107,7 @@ so `x = x.sort()` binds `None` and loses the list.
 Uppercase sorts before lowercase because Python compares strings by code point.
 [Functions](05_Foundations--Functions.md#lambdas)
 shows how a `key=` function changes the ordering;
-`key=str.lower` would fold the case here.
+`key=str.lower` folds the case here.
 
 ### Mixed Element Types
 
@@ -317,7 +317,7 @@ and leaving it off is a common slip:
 `for name, age in ages` iterates the keys and tries to unpack each one.
 Unpacking `"Alice"` into two names raises a `ValueError`,
 since the string has more than two characters.
-A two-character key such as `"Bo"` would unpack into its letters and the loop would finish with no error.
+A two-character key such as `"Bo"` unpacks into its letters and the loop finishes with no error.
 
 `keys()` is also set-like, and so is `items()` when every value is hashable:
 each supports `&`, `|`, `-`,
@@ -673,7 +673,7 @@ Use a `deque` for a single-threaded queue.
 Indexing its middle is O(n), though,
 so a `deque` does not replace a `list` you index by position.
 A `deque(maxlen=n)` also caps its length,
-discarding from the other end when a new item would overflow it.
+discarding from the other end when a new item overflows it.
 That is a sliding window, and a `list` has no equivalent.
 For a queue shared between threads,
 use [`queue.Queue`](19_Techniques--Concurrency.md), and for a priority queue,
