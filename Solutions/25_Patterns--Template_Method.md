@@ -300,13 +300,13 @@ program runs. No checker could catch the omission before, because
 "deliberately empty" and "forgotten" were the same code, and only
 the base class could have recorded that difference.
 
-`Exploder`'s exception is not repairable this way. Catching it would
-require the base class to state which exceptions a step may raise, and
-the type checker to hold every override to that list, which is Java's
-`throws` clause. Python has no such declaration, and no annotation
-expresses "this raises nothing." An exception type in a docstring is
-a note to a human. Only discipline, review, or a test catches
-`Exploder`.
+`Exploder`'s exception is not repairable this way. Catching it
+requires the base class to state which exceptions a step may raise,
+and the type checker to hold every override to that list, which is
+Java's `throws` clause. Python has no such declaration, and no
+annotation expresses "this raises nothing." An exception type in a
+docstring is a note to a human. Only discipline, review, or a test
+catches `Exploder`.
 
 That split is the chapter's point stated from the other side. `@final`
 protects the shape of the algorithm, and `@abstractmethod` protects the
