@@ -211,7 +211,7 @@ print(alias)
 
 Augmented assignment on a mutable object changes it in place,
 so every other name for it sees the change.
-`items = items + [3]` would instead build a new list and leave `alias` alone.
+`items = items + [3]` instead builds a new list and leaves `alias` alone.
 For an `int`, both forms rebind the name,
 so `total += 5` above behaves the way `+=` does in any other language.
 
@@ -537,8 +537,8 @@ because the finished string no longer says which characters came from where.
 it passes the literal text through unchanged,
 and it rejects an interpolated value that contains a single quote,
 the way `trouble` does above.
-An f-string would have finished assembling the result, quote and all,
-before any code had a chance to object.
+An f-string finishes assembling the result, quote and all,
+before any code can object.
 Uppercasing and rejecting are small demonstrations;
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#a-template-is-a-tree)
 builds a full query from the parts the same way.
@@ -587,13 +587,13 @@ Tools such as ruff point out violations and fix many of them automatically.
     Every version runs.
     Using [Naming Conventions](#naming-conventions),
     say what each form signals to a reader who did not write the code,
-    and which of the three a linter would flag.
+    and which of the three a linter flags.
 5.  In `tstrings.py`, write a third consumer, `quoted(template)`,
     that wraps every interpolated value in single quotes and leaves the literal text alone,
     then print `quoted(message)`.
     Explain why you cannot post-process an f-string the same way.
 6.  Before running anything,
-    write down what C or Java would print for `-9 / 4` and `-9 % 4` using integer math,
+    write down what C or Java prints for `-9 / 4` and `-9 % 4` using integer math,
     then what Python prints for `-9 // 4` and `-9 % 4`.
     Run `print(-9 // 4, -9 % 4)` and check.
     State the rule that predicts the sign of the result of `%`.
