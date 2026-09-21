@@ -2,6 +2,7 @@
 
 The *Observer* pattern, a kind of callback,
 decouples code that changes state from code that reacts to the state change.
+Something changes, and something else is interested in that change.
 An *observer* registers interest with a *subject*.
 When the subject changes state, it notifies the observer.
 The subject defines only a list of callables and the arguments it passes to them.
@@ -1073,9 +1074,11 @@ The mouse belongs to the view.
 `select()` takes a cell rather than a mouse event, so a keypress, a touch,
 or a test call drives the model the way a click does.
 
-The model and the view share only the subscribe-and-announce contract,
+The model names nothing about views,
 so you can attach a second view to the same model and keep both views in step
 (see Exercise 7).
+The dependency runs one way, and the view is the end that carries it:
+`box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`.
 
 ## What Stays Constant
 
@@ -1104,7 +1107,7 @@ The job still belongs to the object either way, and its code lives elsewhere.
 Deciding which change is worth announcing is the job that stays.
 That decision belongs to the object whose state changes, or to whoever calls it.
 It never belongs to a listener,
-which filters what it receives and cannot ask for what was never announced.
+which filters what it receives and cannot recover a change it was never told about.
 `Thermometer`'s setter announces every assignment,
 which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
@@ -1161,18 +1164,24 @@ print(log)
 ```
 
 `_delta` is the thermometer's field and its listeners' business.
-Half a degree suits `display`, which repaints when a reading looks different.
-It does not suit `log`, which exists to record every reading,
+Half a degree is a judgment about what a display needs,
+and `display` prints whatever it receives.
+It is the wrong judgment for `log`, which exists to record every reading,
 and two of the four readings reach neither listener.
-`log` has no way to ask for them,
+`log` has no way to recover them,
 and nothing in `ThresholdThermometer` says which listener the half degree was for.
+[`reentrant_announce_fixed.py`](#re-entrant-notification)
+makes a smaller version of the same call:
+its setter returns early when the new value equals the stored one,
+and a listener that counts readings rather than changes needs the announcement it drops.
 
-Moving the comparison into the listeners puts the number where the need is.
-`display` remembers the last value it drew and skips a reading close to it,
-`log` appends whatever arrives,
-and the setter goes back to announcing every assignment.
-The thermometer then knows nothing about tolerance,
+Move the comparison into the listeners and the number sits where the need is.
+`display` then remembers the last value it drew and skips a reading close to it,
+`log` appends whatever arrives, and the setter announces every assignment again.
+The thermometer knows nothing about tolerance,
 and every listener that wants one writes the same comparison.
+`async_thermometer.py`'s `alarm` already works this way,
+returning at once for a reading below 100 degrees.
 
 That repetition is the right trade for a question about *how much*.
 *Which kind* is a different question, and repetition answers it badly,
