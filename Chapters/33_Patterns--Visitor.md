@@ -168,9 +168,9 @@ The chapter keeps `Any` because the empty `Visitor` base is what the classic pat
 and seeing the price is part of the point.
 The price is that nothing checks the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
-That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
+That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods).
 This `Any` is a choice,
-unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md),
+unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
 where a bag of attributes named at runtime leaves no precise type to write.
 
 Notice where the behavior lives.
@@ -352,7 +352,7 @@ def test_dispatch_follows_inheritance() -> None:
 when the elements must drive the traversal themselves from inside `accept()`,
 or when a framework you do not own already calls that method.
 But in Python that is rare.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#adding-operations-visitor-and-why-python-skips-it)'s recycling-note example reaches the same conclusion:
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)'s recycling-note example reaches the same conclusion:
 `singledispatch` is the open-method mechanism that *Visitor* fakes.
 
 A minimal example shows the traversal case.
