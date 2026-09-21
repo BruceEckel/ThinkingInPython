@@ -198,9 +198,9 @@ formats its elements with `repr()` and never with `str()`. `{t!r}`
 asks for the same `Temperature(21.0)` form inside an f-string.
 
 The two forms answer different questions. `Temperature(21.0)` says
-what would rebuild this object, which is what you want in a traceback
-or a debugger. `21.0C` says what the value means, which is what you
-want in output a user reads.
+what rebuilds this object, which is what you want in a traceback or a
+debugger. `21.0C` says what the value means, which is what you want
+in output a user reads.
 
 ## 6. A misspelled override, with and without the decorator
 
