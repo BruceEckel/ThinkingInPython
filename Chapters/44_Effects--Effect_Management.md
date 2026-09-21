@@ -263,6 +263,8 @@ inherits that guarantee.
 `slope()` is never in danger of dividing by zero,
 so it needs no `try` and no `Result` to say so.
 
+### Combine the First and Third
+
 All three approaches take the division failure out of `slope()`,
 but they push the cost to different places.
 A `Result` makes every caller handle failure explicitly, at every call site.
@@ -378,8 +380,6 @@ Think of Effect analysis as two phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
-### Subdividing the Impure Portion
-
 The next phase produces one benefit per subdivision:
 
 - **Exceptions** become data,
@@ -432,6 +432,8 @@ whether it is safe to run in parallel with another,
 and what happens when you call it twice in a row.
 That knowledge is what lets you compose functions,
 which is how programs grow large.
+
+### Tracking and Management
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
