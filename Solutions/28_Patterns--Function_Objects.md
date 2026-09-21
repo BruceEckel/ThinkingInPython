@@ -50,8 +50,8 @@ print(account["balance"])
 
 A bare function is no longer enough, though not because of state.
 `callable_command.py`'s `Repeat` already carries its configuration and
-is still called with `()`, so state alone does not force a class.
-Undo forces one, because a command now answers two requests,
+is still called with `()`, so state alone does not force more than a
+callable. Undo does, because a command now answers two requests,
 `__call__()` and `undo()`, and a callable has only one call.
 
 `Deposit` also has to remember what it did, here the account and the
