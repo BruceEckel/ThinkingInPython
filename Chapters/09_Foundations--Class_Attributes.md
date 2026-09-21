@@ -246,7 +246,7 @@ If you delete it, `ty` still infers `label: str` correctly from `self.label = la
 because the parameter's own type carries through to the attribute it initializes.
 The annotation stays for symmetry with `total`,
 so both names read together at the top instead of one hiding inside the constructor.
-[Simulation](38_Patterns--Simulation.md#a-robot-in-a-maze)
+[Simulation](38_Patterns--Simulation.md#rooms-robots-and-the-item-factory)
 shows the case that requires the annotation:
 code outside the class sets the attribute,
 and the bare annotation is the type checker's one source for its type.
@@ -398,7 +398,7 @@ It is writing one where you meant a per-object default.
 
 Subclasses inherit a `ClassVar` declared on a base class like any other class attribute.
 A subclass that doesn't declare its own copy reads straight through to the base's value,
-via the normal [method resolution order](07_Foundations--Classes.md#inheritance).
+via the normal [method resolution order](07_Foundations--Classes.md#method-resolution-order).
 A subclass that assigns its own value creates a separate class attribute,
 independent of the base and of sibling subclasses:
 
@@ -483,7 +483,7 @@ the augmented assignment is a valid `ClassVar[int]` update either way,
 and nothing in the annotation says which class name should receive it.
 Write the increment through the literal class name, as `class_var.py` does,
 whenever a `ClassVar` must count across every subclass rather than fork one counter per subclass.
-[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#simulating-a-trash-recycler)'s registry sidesteps this by mutating `Trash.registry` in place,
+[Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#the-trash-hierarchy)'s registry sidesteps this by mutating `Trash.registry` in place,
 never reassigning it through `cls`.
 
 ## Real Per-Object Defaults
@@ -522,7 +522,7 @@ In `real_defaults.py` it is a default argument,
 and `self.x = x` runs on every construction,
 giving each object its own storage before anything can read it.
 The difference is not the value but where you write it.
-Python still builds the [default value](05_Foundations--Functions.md#default-arguments)
+Python still builds the [default value](05_Foundations--Functions.md#the-mutable-default-trap)
 once, at definition time,
 so a *mutable* default argument brings the sharing straight back.
 `100` is immutable, so this default is safe.
