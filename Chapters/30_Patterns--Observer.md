@@ -1095,17 +1095,17 @@ and no class per reaction.
 ## Deciding What Matters
 
 A thermometer measures temperature.
-`Thermometer` measures, decides which changes are worth announcing,
-and tells the listeners,
-three jobs where [cohesion](21_Patterns--Design_Patterns.md#design-principles)
-wants one.
-The telling is the cheap addition.
+`Thermometer` measures, decides which changes to announce,
+and tells the listeners.
+[Cohesion](21_Patterns--Design_Patterns.md#design-principles)
+is one job per class, and that is three.
+Of the two additions, only the telling moves out of the class.
 `Broadcaster` holds the list and the loop in a base class,
 and `watched.py` drops the base class and announces from `__setattr__()`,
 so one method covers every attribute.
 The job still belongs to the object either way, and its code lives elsewhere.
 
-Deciding which change is worth announcing is the job that stays.
+Deciding which changes to announce is the job that stays.
 That decision belongs to the object whose state changes, or to whoever calls it.
 It never belongs to a listener,
 which filters what it receives and cannot recover a change it was never told about.
@@ -1114,13 +1114,14 @@ which says that every change matters to everyone.
 [Leaving that call to the client](#push-or-pull)
 instead lets several changes coalesce into one announcement,
 and lets a caller forget to make it.
-Push hands the listeners what the thermometer takes them to need,
-and pull leaves them to read what they want through an interface they must then know.
+Push sends the value the thermometer chose.
+Pull sends the thermometer,
+so each listener reads the attribute it names and depends on that interface.
 `watched.py` declines to choose: two states, `celsius` and `humidity`,
 share one channel, so every watcher wakes for either and filters by the name it is handed.
 
 *Observer* therefore removes one coupling and leaves a second one standing.
-The object that changes names no listener type, which is what the pattern buys.
+The object that changes names no listener type.
 It still decides what those listeners hear about,
 for objects it has no other awareness of.
 A threshold makes that concrete.
@@ -1180,14 +1181,15 @@ Move the comparison into the listeners and the number sits where the need is.
 `display` then remembers the last value it drew and skips a reading close to it,
 `log` appends whatever arrives, and the setter announces every assignment again.
 The thermometer knows nothing about tolerance,
-and every listener that wants one writes the same comparison.
+and each listener that filters by size repeats the same comparison.
 `async_thermometer.py`'s `alarm` already works this way,
 returning at once for a reading below 100 degrees.
 
-That repetition is the right trade for a question about *how much*.
+The repetition is correct for a question about *how much*,
+because each listener's threshold is its own number.
 *Which kind* is a different question, and repetition answers it badly,
 because a listener cannot subscribe to a kind of change the announcement never distinguishes.
-`watched.py` pays that cost,
+`watched.py` shows that repetition,
 with every watcher taking the attribute name and filtering it.
 [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type)
 removes it: one list becomes a dictionary of lists keyed by event type,
@@ -1209,7 +1211,7 @@ in place of deciding who needs to hear.
     once with a runtime `isinstance()` check inside `update()`,
     and once with an `Observer[S, T]` protocol whose first parameter is the subject type,
     which `Subject` supplies as `Self`.
-    Say what each version costs.
+    Say what each version adds.
 3.  Make `Broadcaster.announce()` survive a listener that raises an exception:
     every other listener is still notified,
     and `announce()` re-raises the failures afterward, together,
