@@ -171,7 +171,7 @@ What changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
 The classic version makes the opposite trade, and the pairing has a name:
-the [*expression problem*](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
+the [*expression problem*](13_Techniques--Pattern_Matching.md#the-expression-problem).
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#polymorphism-without-inheritance)
 works the same split out with shapes,
 including the `assert_never()` in each `case _`:
