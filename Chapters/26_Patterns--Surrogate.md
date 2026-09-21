@@ -316,12 +316,12 @@ The assignment stores `level` in the proxy's `__dict__`,
 not the implementation's `__dict__`.
 The next `p.level` lookup succeeds without calling `__getattr__()`.
 The proxy reports `"high"` and the implementation reports `"low"`.
-The type checker rejects the assignment because `Proxy` declares no `level` and no `__setattr__()` that would accept one.
+The type checker rejects the assignment because `Proxy` declares no `level` and no `__setattr__()` that accepts one.
 
 To forward writes, define `__setattr__()`.
 `__setattr__()` then intercepts every assignment,
 including the one in `__init__()`.
-Forwarding that first assignment would recurse,
+Forwarding that first assignment recurses,
 because the implementation does not exist yet,
 so `__init__()` stores the implementation another way:
 
@@ -356,7 +356,7 @@ because a declared `__setattr__()` makes the type checker accept assignment to a
 
 The implementation attribute no longer needs a double underscore.
 Mangling rewrites identifiers, not string literals,
-so storing a double-underscore name through `object.__setattr__()` would mean writing the mangled form,
+so storing a double-underscore name through `object.__setattr__()` means writing the mangled form,
 `"_WriteProxy__implementation"`, by hand.
 
 ### The Recursion Trap
@@ -365,7 +365,7 @@ The fallback hook `__getattr__()` can recurse.
 If `__getattr__()`'s body reads a proxy attribute that does not exist,
 the failed lookup calls `__getattr__()` again.
 Python reports this as a `RecursionError`,
-not the `AttributeError` that would name the cause.
+not the `AttributeError` that names the cause.
 
 A misspelled `self._implementation` is one cause.
 Rebuilding a proxy through `copy.copy()` or `pickle` is another:
