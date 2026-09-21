@@ -217,7 +217,9 @@ Here's how you run `cProfile` on `my_program.py`:
 
     uv run python -m cProfile -s cumulative my_program.py
 
-The report is a table, one row per function.
+### Reading a `cProfile` Report
+
+`cProfile`'s report is a table, one row per function.
 This one profiles a small script, `prof_demo.py`,
 built with one obvious hot spot and one function called too many times:
 
@@ -260,6 +262,8 @@ burns most of the time.
 so it needs a better algorithm.
 `<genexpr>`'s ten thousand calls show `helper()` paying per-element overhead,
 where fewer calls would help more than a faster body.
+
+### The Sampling Profiler
 
 Python 3.15 gathers the profilers into a single `profiling` package
 ([PEP 799](https://peps.python.org/pep-0799/)).
@@ -458,6 +462,8 @@ which suits a microsecond snippet and is a long wait for anything slower,
 so always set it for a function you have not timed before.
 One machine measured the `set` at about 14,000 times faster than the list scan.
 
+### Trusting a Measurement
+
 A single measurement includes whatever else the machine is doing.
 `timeit.repeat(f, number=100, repeat=5)` returns a list of five such totals,
 and the smallest of them is the run with the least interference.
@@ -619,6 +625,15 @@ Often the better algorithm is a better container.
 Use a `set` or `dict` for membership and lookup instead of scanning a `list`.
 Use a [`deque`](03_Foundations--Containers.md#deque)
 when you add and remove at both ends.
+
+The [immutable containers](03_Foundations--Containers.md#immutability)
+are not a speed upgrade.
+A `frozenset` looks up just as fast as a `set`,
+a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
+In CPython these share the same machinery.
+Choose immutability for correctness and safe sharing.
+Immutable values are hashable,
+so they can serve as dictionary keys and as arguments to the caches below.
 
 ### Bisect
 
@@ -808,6 +823,8 @@ For a priority queue shared across threads,
 [Concurrency](19_Techniques--Concurrency.md#coordinating-threads-with-queues)
 shows it in use.
 
+### Heap Versus Sort
+
 A heap answers a different question than a hash-based container.
 A `set` tells you whether a value is present in O(1),
 but it knows nothing about order,
@@ -869,15 +886,6 @@ and is the tool to use before hand-rolling either comparison here.
 The heap fits a different shape of problem:
 pushes and pops interleaved over time, with nothing to presort in advance.
 Re-sorting after every insertion would cost far more than one incremental `heappush()`/`heappop()` pair.
-
-The [immutable containers](03_Foundations--Containers.md#immutability)
-are not a speed upgrade.
-A `frozenset` looks up just as fast as a `set`,
-a `frozendict` behaves like a `dict`, and a `tuple` scans like a `list`.
-In CPython these share the same machinery.
-Choose immutability for correctness and safe sharing.
-Immutable values are hashable,
-so they can serve as dictionary keys and as arguments to the caches below.
 
 ## Lazy Evaluation with Generators
 
