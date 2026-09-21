@@ -394,7 +394,7 @@ because even there the backslash escapes the closing quote.
 ### Common String Operations
 
 Strings are immutable sequences with a large set of methods.
-[Slicing](03_Foundations--Containers.md#lists)
+[Slicing](03_Foundations--Containers.md#indexing-and-slicing)
 also selects a range of characters, and `in` tests membership:
 
 ```python
