@@ -94,6 +94,8 @@ print(step("jump"))
 #: unknown command: jump
 ```
 
+## A Bare Name Captures, a Dotted Name Compares
+
 A bare name always binds.
 It does not compare against a variable of that name,
 so a named constant in a `case` silently captures instead.
@@ -294,9 +296,10 @@ A positional pattern raises a `TypeError` when `__match_args__` is too short to 
 For an ordinary class `R` that lacks one,
 `case R(1)` reports `TypeError: R() accepts 0 positional sub-patterns (1 given)`.
 
-Keyword patterns work differently.
-`Point(x=0, y=y)` matches by attribute name, through attribute access,
-not through `__match_args__`.
+### Keyword Patterns
+
+A keyword pattern such as `Point(x=0, y=y)` matches by attribute name,
+through attribute access, not through `__match_args__`.
 Keyword patterns also work on any object with the named attributes,
 data class or not, and let you match a subset of attributes while ignoring the rest:
 
@@ -331,6 +334,8 @@ so every positional pattern silently starts matching a different field.
 `Point()` with no arguments, keyword or positional,
 matches any `Point` instance.
 Use it as a type-only check or a final catch-all.
+
+### Builtin Types and Subclasses
 
 The type test is `isinstance()`, so a subclass matches its base's pattern:
 
@@ -710,6 +715,8 @@ SMS, or push.
 Every channel renders the notification into a message string for a recipient.
 Every channel also has a rough cost to send a message.
 
+### The Inheritance Version
+
 The inheritance answer declares both operations as abstract methods on a base class.
 Each channel is a subclass that implements them,
 and dynamic binding picks the correct implementation at each call:
@@ -783,7 +790,9 @@ and `Push` to define both `render()` and `cost()`.
 Leave one out, and the class stays abstract:
 instantiating it raises a `TypeError`.
 
-A type union with `match` takes the opposite shape.
+### The `match` Version
+
+A type union with `match` takes the opposite shape from the class hierarchy.
 The channels become plain data,
 and each operation is a free function that inspects the type:
 
@@ -862,6 +871,8 @@ def test_oo_and_match_agree(
     assert oo.render("Dana") == nm.render(data, "Dana")
     assert oo.cost() == nm.cost(data)
 ```
+
+### The Expression Problem
 
 Try growing the system in each direction.
 First, add a new type: a `Webhook` channel.
