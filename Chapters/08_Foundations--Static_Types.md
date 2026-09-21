@@ -224,7 +224,7 @@ print(MAX_RETRIES, GREETING, HISTORY)
 
 `Final` blocks rebinding the name, not mutation of the object the name holds.
 `HISTORY.append("first")` checks and runs,
-the same as it would on a non-`Final` list.
+the same as it does on a non-`Final` list.
 The type checker refuses only an assignment to the name `HISTORY`.
 This is the misconception `Final` invites: the word suggests immutability,
 but the object stays mutable.
@@ -502,12 +502,13 @@ print(count(circles))
 ```
 
 A `list` accepts writes.
-`add_square()` would append a `Shape` to a list its caller believes holds only circles.
+If you pass `circles`,
+`add_square()` appends a `Shape` to a list its caller believes holds only circles.
 The type checker refuses the call to prevent that.
 A read-only container has no such problem,
 so `Sequence[Shape]` accepts a `list[Circle]`.
 Annotating a parameter `Sequence[T]` instead of `list[T]` declares that the function only reads,
-so the function accepts arguments that a `list[T]` parameter would reject.
+so the function accepts arguments that a `list[T]` parameter rejects.
 A `list[T]` is *invariant* in `T`, and a `Sequence[T]` is *covariant*.
 
 ### Type Parameter Defaults {#type-parameter-defaults}
@@ -644,7 +645,7 @@ so a call on a subclass produces an instance of that subclass, not of the base.
 
 Type hints do not change what the program does.
 Python stores them and otherwise ignores them.
-A wrong type that slips past the type checker behaves as it would have without hints.
+A wrong type that slips past the type checker behaves as it does without hints.
 Checking is a separate step you run, the same way you run tests.
 If you need a runtime guarantee,
 use `isinstance()` or a library that validates data.
