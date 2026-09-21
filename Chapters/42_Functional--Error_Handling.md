@@ -96,7 +96,7 @@ for r in outputs:
 tells the two cases apart.
 But the distinction rests on the types `int` and `str`,
 and that dependence is fragile.
-If a successful answer were also a string, the two cases would collide.
+If a successful answer is also a string, the two cases collide.
 You need something that says "success" or "failure" no matter what types they carry.
 
 ## A Result Type
@@ -476,8 +476,8 @@ if __name__ == "__main__":
 Each lambda's parameter is the previous step's answer,
 and the answers stay reachable because the nesting keeps them in scope:
 `a` is still visible inside the inner lambda where `b` arrives.
-A flat sequence of `bind()` calls could not give you that,
-because each step would see only the value handed to it.
+A flat sequence of `bind()` calls cannot give you that,
+because each step sees only the value handed to it.
 
 A third input adds a third level:
 
@@ -746,7 +746,7 @@ because typeshed declares it on `BaseException`.
 Reading it before any `add_note()` call therefore type-checks,
 and then raises an `AttributeError` at runtime.
 The listing prints with `traceback.format_exception_only()`,
-which renders the message and the notes and leaves out the file paths a full traceback would carry.
+which renders the message and the notes and leaves out the file paths a full traceback carries.
 
 Context matters more here than in ordinary exception code,
 because a `Result` keeps the exception as a value rather than propagating it.
