@@ -105,6 +105,8 @@ A `Command` base class is worthwhile when the commands share implementation.
 A second operation alone does not call for one;
 the undo discussion below needs only a type.
 
+### A Bound Method as a Command
+
 Halfway between the function form and the class form,
 a *bound method* is a ready-made command.
 `account.deposit` names a function with its instance attached,
@@ -143,7 +145,9 @@ with no `Command` class.
 Each call still reads and updates `account.balance`,
 the state the bound method carries with it.
 
-An object can be callable too.
+### A Callable Object as a Command
+
+An object can be callable.
 When a class defines `__call__()`,
 its instances [carry state](14_Techniques--Decorators.md#a-class-decorator-with-state)
 and still satisfy `Command`.
@@ -185,6 +189,8 @@ A callable alone cannot express a second operation, `undo()`.
 so an undoable list of commands needs a type with two members,
 `__call__()` and `undo()`, and that type is a `Protocol`.
 Exercise 1 builds that `Protocol`.
+
+### The Late-Binding Trap
 
 Building commands in a loop can produce Python's best-known closure mistake:
 
@@ -668,6 +674,8 @@ def test_get_leaves_no_stray_handler_list() -> None:
     bus.publish(Closed("done"))
     assert Closed not in bus._handlers
 ```
+
+## A Tagged Bus: Handlers That Name Their Event
 
 In `event_bus.py`, the events are records, the handlers are functions,
 and the bus is a `dict`.
