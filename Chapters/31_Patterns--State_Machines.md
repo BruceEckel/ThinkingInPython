@@ -736,6 +736,8 @@ Nothing here needs a `switch`, reflection,
 or a `Condition`/`Transition` class hierarchy.
 The language's first-class functions and its `dict` supply what those mechanisms exist to provide.
 
+### Testing the Vending Machine
+
 Because the machine is deterministic,
 a test can drive it through a sequence of events and check which state it reaches.
 The cases worth pinning down are a successful purchase,
@@ -800,6 +802,8 @@ def test_no_transition_raises() -> None:
     with pytest.raises(NoTransition):
         vm.handle(Quit())
 ```
+
+### A View for the Vending Machine
 
 Because the actions set `vm.message` instead of printing,
 `VendingMachine` produces no output of its own,
