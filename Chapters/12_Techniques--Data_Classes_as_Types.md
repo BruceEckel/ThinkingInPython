@@ -47,7 +47,7 @@ A handler can read `e.subject` and `e.reason` rather than parsing them from the 
 
 `check()` uses an explicit `raise` instead of `assert 1 <= stars <= 10`.
 Python strips every `assert` when you run with `-O` or `-OO`,
-which would silently disable every validation this chapter builds,
+which silently disables every validation this chapter builds,
 exactly the failure this chapter exists to prevent.
 No flag removes a `raise`.
 
@@ -159,7 +159,7 @@ Catching the exception does not undo the damage.
 
 The order is a choice, not something mutation forces.
 `f1()` could check the sum before assigning it,
-and then `damaged` would stay `Stars(8)` instead of holding a corrupted `13`.
+and then `damaged` stays `Stars(8)` instead of holding a corrupted `13`.
 What mutation forces is that every method must choose that order correctly,
 every time it changes the value.
 `f1()` here is what happens the one time a method gets that order wrong.
@@ -168,7 +168,7 @@ every time it changes the value.
 is the practice of checking arguments on the way in and results on the way out,
 with a class invariant that must hold between calls.
 `f1()` takes no argument, so only the postcondition appears here.
-A method that accepts a second rating would need a precondition for it as well.
+A method that accepts a second rating needs a precondition for it as well.
 The problem with DbC is that the contract spreads across every method that touches the value.
 The invariant is the part this chapter replaces.
 `_validate()` states it, and every mutating method must remember to call it.
@@ -493,7 +493,7 @@ so no constructor call can assign one.
 It has no initializer, so it is a bare annotation,
 as `x` and `s` are back in `A`: a declaration recorded in `D.__annotations__`,
 with no value stored anywhere to report.
-`D.f` raises `AttributeError`, for the same reason `A().x` would.
+`D.f` raises `AttributeError`, for the same reason `A().x` does.
 Assigning a value is what creates the attribute;
 declaring it `ClassVar` creates nothing by itself.
 
@@ -875,7 +875,7 @@ No thirteenth month can exist, because `Month` defines no such value.
 Each member is a pair rather than a bare day count because `Enum` treats members with equal values as aliases of one another.
 Writing `APRIL = 30` and `JUNE = 30` makes `JUNE` a second name for `APRIL`,
 and only three day counts are distinct,
-so `list(Month)` would return three members instead of twelve.
+so `list(Month)` returns three members instead of twelve.
 Pairing each month with its number keeps all twelve values distinct,
 which `of()` relies on when it indexes `list(Month)`.
 The cost is that the member's value is no longer the month number,
@@ -979,7 +979,7 @@ For a small fixed set, that is an `Enum`.
 `@dataclass` rejects `= make_months()` at class-definition time,
 with `ValueError: mutable default <class 'list'> for field months is not allowed: use default_factory`.
 Python evaluates a default value once, at class definition,
-so every `Months` would read and write that one list,
+so every `Months` reads and writes that one list,
 the trap shown in [Functions](05_Foundations--Functions.md#the-mutable-default-trap).
 `field(default_factory=make_months)` supplies a function instead of a value,
 and each new `Months` calls it and gets its own fresh list.
@@ -1245,7 +1245,7 @@ which the `# type: ignore` silences so the listing can reach the runtime failure
 
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
 and a subclass inherits that method.
-A plain subclass of a frozen class would be half writable,
+A plain subclass of a frozen class is half writable,
 its own fields assignable and the inherited ones not.
 A frozen subclass of a plain base is the opposite,
 freezing every attribute the mutable base expects to set.
@@ -1310,7 +1310,7 @@ leaving `source` positional.
 
 `KW_ONLY` also lifts the ordering rule.
 A field with no default normally cannot follow one that has a default,
-because the generated `__init__()` would then need a required parameter after an optional one,
+because the generated `__init__()` then needs a required parameter after an optional one,
 and Python refuses that with `TypeError: non-default argument 'b' follows default argument 'a'`.
 Fields after `_: KW_ONLY` are keyword-only,
 so their order no longer matters and the rule stops applying.
