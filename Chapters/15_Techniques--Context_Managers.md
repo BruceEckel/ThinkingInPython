@@ -357,8 +357,10 @@ which includes both its type and its arguments, not just `exc_type.__name__`.
 `__enter__()` returns `None` because this manager has nothing to hand to `as`.
 You can still write `as`, but it binds `None`.
 
-A fuller version of the same idea takes several types at once,
-and with no argument catches everything.
+### The `expected` Manager
+
+`expected` is a fuller version of `expected_one`:
+it takes several types at once, and with no argument it catches everything.
 Its name says how the book uses it: the block is expected to raise,
 and the manager shows what it raised.
 It is useful enough to reuse elsewhere in the book, so it lives in `utils/`,
@@ -479,6 +481,8 @@ and the `with` statement absorbs the error so `survived` still prints.
 
 In the last example, `x` receives the return value of `__enter__()`,
 which for `expected()` is `None`.
+
+### The `expect()` Function
 
 Many listings in this book call something to show the exception it raises.
 `expect()` is the function form of that demonstration.
@@ -922,6 +926,15 @@ so the count is back to two.
 and it never creates or destroys anything.
 It only tracks custody.
 
+An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
+its nearest neighbor.
+A flyweight is immutable and shared by everyone at once.
+A pooled object is usually mutable or stateful,
+so the pool lends it to one borrower at a time,
+and the lease exists to take it back.
+
+### An Empty Pool Blocks the Caller
+
 The queue does more than store the idle items.
 `Queue` is thread-safe, and `get()` blocks while the pool is empty,
 so a borrower waits until someone else's `with` block ends and a return makes an item available.
@@ -979,12 +992,7 @@ and the demo measures that rather than assuming it.
 `Queue.qsize()` is only approximate once more than one thread is borrowing,
 because another thread can lease or return between the count and its use.
 
-An object pool differs from [*Flyweight*](35_Patterns--Flyweight.md),
-its nearest neighbor.
-A flyweight is immutable and shared by everyone at once.
-A pooled object is usually mutable or stateful,
-so the pool lends it to one borrower at a time,
-and the lease exists to take it back.
+### Testing the Lease
 
 Three tests pin down what the lease guarantees:
 the item leaves the pool and comes back,
@@ -1017,7 +1025,9 @@ def test_objects_reused_not_recreated() -> None:
         assert second is first
 ```
 
-A production pool adds refinements to this skeleton,
+### What the Skeleton Leaves Out
+
+A production pool adds refinements to the `Pool` skeleton,
 such as lazily creating items on first demand,
 validating an item before lending it out,
 and giving `get()` a timeout so a starved borrower fails loudly instead of waiting forever.
