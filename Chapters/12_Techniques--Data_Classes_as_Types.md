@@ -15,6 +15,8 @@ Code that receives one need not check it again.
 This material comes from my PyCon 2022 talk,
 [Making Data Classes Work for You](https://www.youtube.com/watch?v=w77Kjs5dEko).
 
+## `check()` and `TypeFailure`
+
 The following `check()` function appears throughout the chapter.
 It raises `TypeFailure`,
 a custom exception meaning a value falls outside the type's allowed set:
@@ -614,6 +616,8 @@ The validation lives in one place, the constructor, so it is easy to change.
 Immutability guarantees no one can rebind the fields after construction,
 and when the fields are immutable too, no one can damage the value.
 
+### Normalizing a Frozen Field
+
 `__post_init__()` can check a field but cannot change one.
 `frozen=True` works by installing a `__setattr__()` that rejects every assignment,
 including the ones arriving from inside the class,
@@ -656,6 +660,8 @@ Which to choose depends on the type.
 Normalizing inside makes `Normalized("A@b.com")` and `Normalized("a@b.com")` the same value,
 which is usually what an email address should mean.
 Refusing instead keeps the constructor a gate and leaves the cleanup to the caller.
+
+### Parse, Don't Validate
 
 Validating once, at construction, often goes by the name *parse,
 don't validate*.^[Coined by Alexis King in her 2019 essay ["Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/).]
@@ -1200,6 +1206,8 @@ so the generated `__init__` never calls that constructor.
 That `__init__` takes the class's own fields plus any inherited from data class bases,
 and its body assigns each one.
 
+## Frozen and Plain Data Classes Do Not Mix
+
 Two data classes in one hierarchy must agree about `frozen`.
 Mixing the settings fails in either direction:
 
@@ -1343,7 +1351,9 @@ so `Stars.__post_init__()` runs on the copy.
 A validated type stays validated across a replacement,
 which makes "transform one legal value into a new legal value" a safe thing to say.
 
-The `copy` module's other two functions copy without calling the constructor.
+### `copy()` and `deepcopy()` Skip the Constructor {#copy-skips-the-constructor}
+
+`copy.copy()` and `copy.deepcopy()` copy without calling the constructor.
 Printing from `__post_init__()` shows which calls run it:
 
 ```python
@@ -1381,6 +1391,8 @@ and dangerous when the state comes from a file written by an older version of th
 the case [*Memento*](36_Patterns--Memento.md) revisits.
 `copy.replace()` is the one that keeps the guarantee,
 because rebuilding through the constructor is the only way to get the check back.
+
+### Defining `__replace__()` {#defining-replace}
 
 `__replace__()` is a dunder like any other,
 so a class that is not a data class can join by defining it:
