@@ -57,7 +57,7 @@ print(other)
 `clear()` changes the object every name can see. Rebinding changes
 only which object this one name points at. The two coincide in
 `weak_value.py` because that list has exactly one reference. With
-two references, rebinding would leave the `Counter` objects alive
+two references, rebinding leaves the `Counter` objects alive
 and `live_count()` stuck at `3`.
 
 ## 2. Listing the names of every live instance
