@@ -38,8 +38,7 @@ The three-parameter annotation names all three channels:
 `Prompt`, receives an `Amount`, and finally returns a `Total`. Three
 `NewType` aliases over `str`, `int`, and `int` keep the two integer
 channels apart, so transposing the `SendType` and the `ReturnType`
-would be a type checker error rather than a bug that shows up in
-arithmetic.
+is a type checker error rather than a bug that shows up in arithmetic.
 
 Driving `tally()` by hand takes four calls: one `next()` and three
 sends. `next(t)` runs the body up to the first `yield` and produces the
@@ -144,15 +143,15 @@ Swapping one interpreter for another leaves the description untouched.
 
 The two drivers differ in the property they rely on. The dictionary
 driver looks each answer up by the request, so it answers correctly no
-matter what order the questions arrive in, and it would answer a
-repeated question the same way twice. The iterator driver goes by
+matter what order the questions arrive in, and it answers a repeated
+question the same way twice. The iterator driver goes by
 position, so it depends on the generator asking the questions the
 driver has replies for, in that order. Both satisfy the same type. The
 type says what travels, not what the driver knows.
 
 One detail in `drive_in_order()` earns its comment. `next(answers)` sits
 outside the `try` because the `except StopIteration` meant for the
-conversation would otherwise catch a `StopIteration` raised by an
+conversation otherwise catches a `StopIteration` raised by an
 exhausted answer list. Two different iterators raising one exception
 type is a real hazard when a driver holds both.
 
