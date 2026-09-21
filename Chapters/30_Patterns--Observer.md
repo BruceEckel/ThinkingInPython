@@ -629,6 +629,8 @@ it takes the attribute name along with the value,
 and filters by name to act on one attribute.
 `Thermometer` publishes one attribute and is a `Broadcaster[float]`,
 so its listeners take the `float` reading and need no name.
+[Deciding What Matters](#deciding-what-matters) returns to that filter,
+where a watcher sorting its own notifications is the subject declining to decide.
 Second, every assignment reaches the watchers, including the internal ones:
 a cached result or a hit counter broadcasts like a published attribute,
 unless the class writes it through `self.__dict__` as the constructor does.
