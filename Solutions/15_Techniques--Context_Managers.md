@@ -91,8 +91,8 @@ exception class or a tuple of them, and
 Note the double parentheses. `expected((ZeroDivisionError, TypeError))`
 passes one argument, a tuple. `expected(ZeroDivisionError, TypeError)`
 passes two, and Python raises a `TypeError` at the call itself, since
-`expected` declares a single parameter. A version taking `*types` would
-accept the second spelling, and that is the design
+`expected` declares a single parameter. A version taking `*types`
+accepts the second spelling, and that is the design
 `contextlib.suppress` chose.
 
 ## 3. A third manager on one `with` line
@@ -316,9 +316,9 @@ comes from.
 
 The `sys.argv` rewrite stays out of the extracted listings, because
 the book's output checker runs every listing inside one process with
-its own arguments, and a script reading `sys.argv` would see the
-checker's arguments instead. The listing below passes the names to
-`wrap()` directly, so the checker can run it, and it shows both cases:
+its own arguments, and a script reading `sys.argv` sees the checker's
+arguments instead. The listing below passes the names to `wrap()`
+directly, so the checker can run it, and it shows both cases:
 
 ```python
 # exercise_7.py
