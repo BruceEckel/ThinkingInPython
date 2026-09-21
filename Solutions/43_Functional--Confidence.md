@@ -89,7 +89,7 @@ exercise, and it says nothing at all about thread parallelism.
 `threading.get_ident()` is the equivalent for threads. The two pools
 present the identical `map()` interface and differ this fundamentally
 underneath. That contrast is the substitutable-backend point from
-[Concurrency](../Chapters/19_Techniques--Concurrency.md#one-task-many-backends).
+[Concurrency](../Chapters/19_Techniques--Concurrency.md#one-executor-interface-three-pools).
 
 ## 3. Three property shapes for `sorted()`
 
