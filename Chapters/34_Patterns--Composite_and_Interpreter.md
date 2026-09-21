@@ -291,6 +291,8 @@ def wrap(value: Expr | int) -> Expr:
     return Num(value) if isinstance(value, int) else value
 ```
 
+### The Nodes and the `Operators` Base
+
 The four node classes are the grammar.
 An expression is a number, a variable, a sum, or a product.
 `Add` and `Mul` hold other expressions, so the tree is a composite.
@@ -308,6 +310,8 @@ because a base class is an open set and any new subclass silently belongs to it.
 `Operators` declares no `__slots__`,
 so the nodes are declared with `@dataclass(frozen=True)` and not [`@record`](18_Techniques--Performance.md#record):
 an unslotted base gives each instance its `__dict__` back.
+
+### Operators That Build Nodes
 
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
