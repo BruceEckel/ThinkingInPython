@@ -129,7 +129,7 @@ Adding `thorns()` is cheap because three of the four flowers accept
 its default. `Rose` needs a distinct answer from every operation, so
 it costs one registration per operation, scattered across the file.
 That is the expression problem from
-[Pattern Matching](../Chapters/13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching):
+[Pattern Matching](../Chapters/13_Techniques--Pattern_Matching.md#the-expression-problem):
 methods on a class make adding a type cheap, functions over a hierarchy
 make adding an operation cheap, and no arrangement makes both cheap at
 once.
