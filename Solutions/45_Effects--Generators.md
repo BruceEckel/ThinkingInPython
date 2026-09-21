@@ -366,11 +366,12 @@ directions, and `None` is the only value it accepts.
 
 An annotation cannot express "`None` for the first call, `Answer`
 afterward," because a single `SendType` covers every call. Widening the
-`SendType` to `Answer | None` would state the exception in the type, at
-the price of forcing every `yield` expression inside the generator to
-handle a `None` that arrives only once. Priming with `next()` sidesteps
-the whole question: the one call that cannot carry a value comes from
-the one function that cannot pass one.
+`SendType` to `Answer | None` states the exception in the type, and
+every `yield` expression whose value the generator uses as an `Answer`
+must then handle a `None` that arrives only once. This generator only
+formats what it receives, so it passes the check either way. Priming
+with `next()` sidesteps the whole question: the one call that cannot
+carry a value comes from the one function that cannot pass one.
 
 ## 7. A vending machine as a single generator
 
