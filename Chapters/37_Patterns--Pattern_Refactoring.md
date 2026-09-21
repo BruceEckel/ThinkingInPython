@@ -28,6 +28,8 @@ The program must sort it by material and report the total value of each kind.
 The trash starts out as an undifferentiated pile,
 and you must recover the type of each piece to sort it.
 
+### The `Trash` Hierarchy
+
 In the `Trash` hierarchy, each material carries a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically,
@@ -132,6 +134,8 @@ def test_sum_value_totals_weight_times_value() -> None:
     # 2*1.67 + 5*0.10
     assert sum_value(items) == pytest.approx(3.84)
 ```
+
+### The Data File and Its Parser
 
 A data file describes the trash to process, one `Name:weight` line per piece:
 
@@ -425,6 +429,8 @@ The other axis of change is adding new *operations*,
 and a design that makes new types cheap ordinarily makes new operations expensive:
 that trade is the [expression problem](13_Techniques--Pattern_Matching.md#dynamic-binding-vs-pattern-matching).
 
+### A Method on Every Material
+
 Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.
 Now the safety officer wants a disposal hazard printed beside it.
@@ -506,8 +512,11 @@ with no separate table to keep in step with the class list.
 It loses once you do not own the hierarchy,
 or once operations start to outnumber materials.
 
-[*Visitor*](33_Patterns--Visitor.md) is the classic escape, and it is elaborate:
-a visitor class, an `accept()` method on every element,
+### One `singledispatch` Function per Operation
+
+[*Visitor*](33_Patterns--Visitor.md)
+is the classic way to add an operation without editing the classes,
+and it is elaborate: a visitor class, an `accept()` method on every element,
 and double dispatch to reach the right overload,
 all to work around a language that cannot add a method to a class from outside.
 `functools.singledispatch` reaches the same implementation in one call,
