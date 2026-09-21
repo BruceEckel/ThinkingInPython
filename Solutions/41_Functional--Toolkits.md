@@ -33,8 +33,8 @@ instead of `list(items)` mutates the caller's list as the loop drains
 it. Using `append()` where `extend()` belongs pushes the sublist as
 a single element and loops forever on it. Using `pop(0)` still gives
 the right total but walks the structure breadth-first, a different
-order from the recursive version's. That order would matter the moment
-the function did anything order-dependent. The recursive version
+order from the recursive version's. That order matters the moment the
+function does anything order-dependent. The recursive version
 cannot make any of these mistakes, because it never has the choice.
 
 ## 2. `lru_cache` with `maxsize=3`
@@ -88,8 +88,8 @@ print(list(islice(batch_totals(count(1), 3), 5)))
 summing, so the body fits on one line with no hand-written loop.
 
 Passing `count(1)` is the proof of laziness. `count()` never ends, so
-if `batch_totals()` built a list of batches, or if `batched()` read
-its source eagerly, the call would never return. The call returns
+if `batch_totals()` builds a list of batches, or if `batched()` reads
+its source eagerly, the call never returns. The call returns
 immediately, and `islice()` then pulls exactly five totals, so
 `count()` yields exactly fifteen integers in all. The first total is
 `1 + 2 + 3`, and each later one is nine larger, since every batch
@@ -157,10 +157,10 @@ expect(TypeError, deep_sum,
 `cache` stores results in a dictionary keyed on the arguments, so
 every argument has to be hashable. A `list` is not hashable, because
 its contents can change after the cache stores it, and a mutated key
-would no longer hash to the slot holding its entry. The call fails
+no longer hashes to the slot holding its entry. The call fails
 before `deep_sum()`'s body runs at all.
 
-For caching to be possible, `Nested` would have to describe an
+For caching to be possible, `Nested` must describe an
 immutable structure: `type Nested = int | tuple[Nested, ...]`, with
 the parameter annotated `tuple[Nested, ...]` rather than
 `list[Nested]`. Tuples hash by contents, and their contents cannot
