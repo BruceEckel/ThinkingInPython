@@ -378,8 +378,10 @@ returns or raises an exception.
 
 `@wraps(func)` keeps the identity: `flaky.__name__` reports the
 wrapped function's name, not `wrapper`. Without it, every retried
-function in a traceback or a log would report itself as `wrapper`,
-and a traceback is precisely where you least want the name wrong.
+function reports itself as `wrapper` to a log line or a test report
+that reads `__name__`. A traceback is the same either way: it names
+each frame from the code object, which `wraps` leaves alone, so the
+`wrapper` frame appears with or without it.
 
 Catching bare `Exception` is deliberate here and worth flagging: a
 real `retry` should take the exception types it retries, since
