@@ -555,9 +555,9 @@ The other tasks are the interesting part. `gather()` does not cancel
 them when the exception propagates, unlike a `TaskGroup`, so `e` and
 `f` are still sleeping when `main()` returns. `asyncio.run()` then
 cancels whatever tasks remain as it shuts the loop down, which is why
-`e` and `f` print nothing further. Had `main()` gone on to other work,
-they would have run to completion in the background with nobody
-waiting on their results.
+`e` and `f` print nothing further. If `main()` goes on to other work,
+they run to completion in the background with nobody waiting on their
+results.
 
 That combination, results discarded and siblings left running, is why
 `return_exceptions=True` and `TaskGroup` exist.
