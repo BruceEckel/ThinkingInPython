@@ -15,6 +15,10 @@ a widget keeps a list of handlers and calls each one when its event arrives.
 
 The classic example is Smalltalk's MVC (model-view-controller),
 or the nearly-equivalent Document-View architecture.
+Document-View folds the controller into the view,
+so it has two parts where MVC has three,
+but the part *Observer* explains is the same in both:
+one subject holds a list of views and names no view type.
 A *document* has more than one way to view it, for example a plot and a table.
 When the data changes, every view must refresh.
 With *Observer*, a change in the subject's data notifies each interested view.
