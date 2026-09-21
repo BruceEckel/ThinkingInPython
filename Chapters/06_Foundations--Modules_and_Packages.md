@@ -85,6 +85,8 @@ which re-runs the body into the existing module object.
 Reloading leaves every name bound by a `from ... import` pointing at the old objects,
 so restarting is the reliable choice.
 
+## Importing Names with `from` and `as`
+
 To bring a name into the current namespace, use the `from` keyword:
 
 ```python
@@ -138,6 +140,8 @@ if __name__ == "__main__":
     print(m.useful_function())
 #: I'm being useful!
 ```
+
+## The Module Namespace
 
 A module's namespace is an ordinary dict you can read and write.
 `globals()` returns it as a mutable `dict`,
@@ -291,6 +295,8 @@ because `from` loads exactly what `import` loads.
 The whole module runs either way.
 The statement decides only which names this file binds.
 
+### Nested Packages
+
 You can put a second package underneath the first one:
 
 ```python
@@ -357,6 +363,8 @@ A relative import needs a package context, and a file run as a script has none.
 Running `python a_package/module4.py` raises `ImportError: attempted relative import with no known parent package`.
 Run it as `python -m a_package.module4` instead.
 
+### Circular Imports
+
 Two modules in a package can end up importing each other.
 Python places the first one to load in `sys.modules` before its body finishes,
 so a `from` import in the second finds a partially initialized module and fails with `ImportError: cannot import name ... (most likely due to a circular import)`.
@@ -371,6 +379,7 @@ Python suspects a name collision with a library instead of a cycle:
 Python names the offending file by its full path, abbreviated here as `...`.
 With a plain `import`, the failure surfaces later,
 wherever the code first uses a name the module has not defined yet.
+
 A cycle is a design signal:
 move the shared piece into a third module both can import.
 When the cycle exists only in annotations,
@@ -537,6 +546,8 @@ and once loaded the names behave like eagerly imported ones.
 The output is the same either way, so this listing cannot show the deferral;
 the next one does.
 
+### Deferring an Import Before 3.15
+
 Before 3.15, deferring a costly import meant moving it inside the function that needed it.
 That works, but it hides the dependency:
 nothing at the top of the file mentions the module,
@@ -552,6 +563,9 @@ The pandas and numpy packages use that technique to keep import time low.
 `lazy import` needs no hand-written `__getattr__`, and defers any imported name,
 not only a package's submodules.
 The `__getattr__` pattern still matters for code that must run on a Python older than 3.15.
+
+### Watching the Deferral
+
 You can watch `lazy` defer the load by importing a module whose body prints when it runs:
 
 ```python
@@ -606,6 +620,8 @@ so `sys.lazy_modules` is not a clean "what my program deferred" list.
 so the set tracks only names still waiting,
 not names your program ever deferred.
 Check it for a specific name you marked lazy, rather than reading the whole set.
+
+### Limits of `lazy`
 
 `lazy` works with both `import` and `from ... import`, but only at module scope.
 Using it inside a function, a class body, or a `try` block is a `SyntaxError`,
