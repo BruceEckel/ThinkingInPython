@@ -198,6 +198,8 @@ def test_direct_construction_bypasses_pool() -> None:
     assert bypassed is not tile("~")
 ```
 
+### Freezing the Shared Tile
+
 Freezing `Tile` hides the sharing from clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile.
