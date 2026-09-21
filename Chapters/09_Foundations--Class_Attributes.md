@@ -38,6 +38,8 @@ print(a.rating, b.rating)  # 'b' reads the class attribute
 #: 1 9
 ```
 
+### Two Dictionaries, One Lookup
+
 An instance and its class each have their own attribute dictionary.
 Reading an attribute checks the instance first, then falls back to the class.
 Assigning through an instance always writes to the instance,
@@ -95,6 +97,8 @@ so reading calls its getter and assigning calls its setter,
 and neither one touches the instance dictionary.
 The rest of this chapter covers ordinary values stored in a class body.
 
+### The Bug Surfaces Far from Its Cause
+
 A class attribute reads like a default right up until someone assigns to an attribute of the same name on one instance.
 After that, a change to the class attribute reaches every other object,
 while the object that assigned keeps its own value.
@@ -125,6 +129,8 @@ show(b)  # sell() never touched b
 A reader debugging `show(b)`'s surprising `5` has to trace back through every earlier call that touched a `Stars` instance,
 because the shadowing happens inside `sell()`,
 a function `show()` never calls and does not import.
+
+### A Shared Mutable Value
 
 The shadowing rule confines a change to one object only while the shared value is immutable:
 
@@ -286,6 +292,8 @@ An annotation states the type, and `ClassVar` adds where the attribute belongs,
 while the `= 0` brings it into existence.
 That holds for `label: str`, for `total: ClassVar[int] = 0`,
 and for the `count` above.
+
+### A Base Class Declares, a Subclass Supplies
 
 Declaring a `ClassVar` and leaving the value elsewhere is deliberate,
 and the common case is a base class naming what its subclasses must supply:
