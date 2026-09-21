@@ -72,6 +72,8 @@ If you want the interpreter to refuse an override,
 the [`__init_subclass__()` technique](17_Techniques--Metaprogramming.md#making-a-class-final)
 also works with methods, and raises an exception when `"run" in cls.__dict__`.
 
+### Hooks and the Misspelled Override
+
 The step methods default to `...`,
 so a subclass overrides only the steps it cares about,
 and a forgotten step silently does nothing.
