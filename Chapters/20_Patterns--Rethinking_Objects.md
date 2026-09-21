@@ -130,7 +130,7 @@ for guarantees no type checker sees:
 and `test_immutable.py` pins down that a frozen field refuses assignment.
 The same pattern covers substitutability:
 a test written against `Stack`'s contract, run against `BoundedStack` too,
-would have caught `fill()` failing on the third item.
+catches `fill()` failing on the third item.
 
 Substitutability is one thing OOP promised that no tool can check.
 OOP made four promises: encapsulation,
@@ -934,7 +934,7 @@ if __name__ == "__main__":
 
 Without the `# type: ignore`, `ty` rejects the second call.
 `UserId` and `int` are different types to the type checker.
-The same distinction would separate `Priced` from `Weighted` in `protocol_collision.py` if `total()` returned a `Price` or a `Weight` instead of a bare `float`.
+The same distinction separates `Priced` from `Weighted` in `protocol_collision.py` if `total()` returns a `Price` or a `Weight` instead of a bare `float`.
 
 `NewType` is only an aid during type checking.
 It builds no wrapper object.
@@ -1257,4 +1257,4 @@ or whether immutable data, a function, and a protocol already solve the problem.
     keep the base contract that `push()` always succeeds,
     and expose "full" some other way.
     Then say what you gave up,
-    and whether `BoundedStack` should have been a subclass of `Stack` at all.
+    and whether `BoundedStack` should be a subclass of `Stack` at all.
