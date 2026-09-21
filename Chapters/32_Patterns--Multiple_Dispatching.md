@@ -277,7 +277,7 @@ except KeyError as e:
 
 A dictionary probe compares keys by equality,
 so `Origami` is not `Paper` however closely the two relate.
-Nothing walks the [MRO](07_Foundations--Classes.md#inheritance)
+Nothing walks the [MRO](07_Foundations--Classes.md#method-resolution-order)
 on the way to the answer.
 
 ## One Type or Many
