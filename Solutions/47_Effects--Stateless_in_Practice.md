@@ -897,14 +897,14 @@ print(run(scripted((60, 50, 30, 20))), written)
 #: 2 [40, 10]
 ```
 
-The scripted balances are the four the `Cell` version would have produced:
+The scripted balances are the four the `Cell` version produces:
 `100` before the first purchase, `40` after it, `40` again because `purchase()`
 refuses the `50` and writes nothing, and `10` after the `30` goes through.
 `spree()` attempts all four prices, and the test proves it from both sides.
-A fifth price would exhaust the script, and `handle()` would read the
+A fifth price exhausts the script, and `handle()` reads the
 `StopIteration` from `read()` as the end of the Effect, the silent trap the
 chapter describes: `run()` returns `None` and the first assertion fails on
-`None == 2`. Stopping early would leave a balance unread, and the final
+`None == 2`. Stopping early leaves a balance unread, and the final
 assertion catches that by checking that the iterator has nothing left.
 `written` records one entry per successful purchase, `[40, 10]`, so the
 assertions together say that `spree()` tries every price and writes only the
@@ -1272,7 +1272,7 @@ This one tells you about the dependency two levels down. `supply()` fails to
 subtract `Need[Toaster]`, so it reaches `run()` still in the channel. Nothing in
 `buttered()`'s body mentions a toaster. The requirement comes from `toast()`,
 which `buttered()` calls, and the error names it at the program's edge, past the
-last place that could have answered it.
+last place that can answer it.
 
 The two diagnostics divide the work cleanly. `invalid-yield` catches an
 under-declared signature at the delegation that breaks it. `invalid-argument-type`
