@@ -273,7 +273,7 @@ print(tally(), tally(), tally())
 reads `factor` in `multiplier()`, and reading a captured name needs no
 declaration. `increment()` assigns `count`, and assignment is how
 Python decides a name is local. Without `nonlocal`, the
-`count += step` line would create a fresh local and read it before any
+`count += step` line creates a fresh local and reads it before any
 value exists.
 
 Deleting the `nonlocal` line draws two complaints, in order. `ty`
