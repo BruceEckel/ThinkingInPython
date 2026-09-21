@@ -215,7 +215,9 @@ Three implementation notes:
    and the cache keeps whichever finished last.
    The check must run inside the lock, as `singleton_locked_settings.py` shows.
 
-The race is easy to see with a wide enough window:
+### The First-Call Race
+
+The first-call race is easy to see with a wide enough window:
 
 ```python
 # singleton_cached_race.py
@@ -305,7 +307,9 @@ Without the sleep, the cached version showed no duplicates across twenty trials,
 and that silence is the more dangerous case.
 A window too narrow to reproduce is still a window.
 
-Every call now acquires the lock,
+### Double-Checked Locking and Eager Creation
+
+Every call to the locked `settings()` acquires the lock,
 including the thousands that arrive long after the object exists.
 That is the price of laziness under threads.
 
