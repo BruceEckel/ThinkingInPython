@@ -1,5 +1,3 @@
-Look for places where ### level headers would be helpful
-
 Implementation is Friction
 
 How can I improve the process on this book?
