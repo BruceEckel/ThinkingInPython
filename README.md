@@ -421,3 +421,4 @@ For my own bookkeeping.
 | 47_Effects--Stateless_in_Practice.md      | |
 | A_Effect_Tracking.md                      | |
 | B_An_Effect_Checker.md                    | |
+| C_Coupling.md                             | |
