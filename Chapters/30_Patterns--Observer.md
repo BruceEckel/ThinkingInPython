@@ -1081,12 +1081,142 @@ so you can attach a second view to the same model and keep both views in step
 The dependency runs one way, and the view is the end that carries it:
 `box_view.py` imports `BoxModel`, reads `size` and `grid`, and calls `select()`.
 
+## Where the Controller Goes
+
+The chapter opened by saying Document-View folds the controller into the view.
+Here is that fold with everything else held still: one model, one notification,
+and the input handling in two places.
+The model is a counter, and both versions import this one file:
+
+```python
+# counter_model.py
+from broadcaster import Broadcaster
+
+class Counter(Broadcaster[int]):
+    def __init__(self) -> None:
+        super().__init__()
+        self._count = 0
+
+    @property
+    def count(self) -> int:
+        return self._count
+
+    def add(self, delta: int) -> None:
+        self._count += delta
+        self.announce(self._count)
+```
+
+In Document-View, one class draws and interprets input:
+
+```python
+# document_view.py
+from counter_model import Counter
+
+class View:
+    def __init__(self, model: Counter) -> None:
+        self._model = model
+
+    def draw(self, count: int) -> None:
+        print(f"count: {count}")
+
+    def key(self, char: str) -> None:
+        if char == "+":
+            self._model.add(1)
+        elif char == "-":
+            self._model.add(-1)
+
+model = Counter()
+view = View(model)
+model.subscribe(view.draw)
+for char in "++-x":
+    view.key(char)
+#: count: 1
+#: count: 2
+#: count: 1
+```
+
+`draw()` is the output and `key()` is the input,
+and `View` holds the model because `key()` needs somewhere to send the request.
+`x` matches neither branch, so it changes nothing.
+
+MVC splits that class in two:
+
+```python
+# model_view_controller.py
+from typing import Protocol
+from counter_model import Counter
+
+class Keys(Protocol):
+    def key(self, char: str) -> None: ...
+
+class View:  # Draws, and holds no model
+    def draw(self, count: int) -> None:
+        print(f"count: {count}")
+
+class StepKeys:  # Interprets, and holds the model
+    def __init__(self, model: Counter) -> None:
+        self._model = model
+
+    def key(self, char: str) -> None:
+        if char == "+":
+            self._model.add(1)
+        elif char == "-":
+            self._model.add(-1)
+
+class NoKeys:  # Reads input and changes nothing
+    def key(self, char: str) -> None: ...
+
+model = Counter()
+view = View()
+model.subscribe(view.draw)
+control: Keys = StepKeys(model)
+for char in "++-x":
+    control.key(char)
+#: count: 1
+#: count: 2
+#: count: 1
+control = NoKeys()  # View and model untouched
+for char in "+++":
+    control.key(char)
+print(model.count)
+#: 1
+```
+
+Three things are the same in the two versions.
+The model file, imported by both.
+The line that connects the model to the view, `model.subscribe(view.draw)`.
+And the printed output for the same four keystrokes.
+*Observer* does the same work either way,
+which is why the chapter's opening calls the two architectures nearly equivalent.
+
+One thing moves.
+`key()` leaves `View` and becomes `StepKeys`,
+and the model reference goes with it.
+The MVC `View` holds nothing and defines one method.
+Document-View's `View` does two jobs, and each MVC class does one.
+
+The last four lines show what that move gives you.
+`NoKeys` satisfies `Keys` and does nothing,
+so assigning it stops the input with no edit to `View`,
+the example *GoF Design Patterns* gives for the separation.
+`StepKeys` also runs with no view attached,
+so a test drives `key()` and reads `model.count` without drawing anything.
+A third key language is a third class beside these two.
+
+The model-to-view coupling is the same in both versions,
+so the separation changes nothing there.
+It separates drawing from input handling,
+two jobs that share one class in `document_view.py`.
+`box_view.py` is the Document-View version at full size: `draw()` paints,
+the `bind()` lambda interprets the click, and both sit inside `show()`.
+
 ## What Stays Constant
 
-One design serves three jobs in this chapter:
+One design serves four jobs in this chapter:
 a thermometer whose listeners print a reading,
 the same thermometer whose coroutine listeners run concurrently,
-and a grid model whose listener repaints a canvas.
+a grid model whose listener repaints a canvas,
+and a counter wired as Document-View and as MVC.
 In every case the listener is a callable,
 and the broadcaster holds listeners and calls each one when its state changes.
 The pattern requires no interface, no `update()` method,
