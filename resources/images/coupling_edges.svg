@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 705 262"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>The same dependency written three ways: an ABC needs two edges in source, a Protocol one, and a Callable none outside the caller</title>
+  <defs>
+    <marker id="ed-solid" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+    <marker id="ed-hollow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+  <text x="15" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Nominal</text>
+  <text x="15" y="38" font-size="10.5" fill="#7a6e62" text-anchor="start">class Circle(Shape):  # an ABC</text>
+  <rect x="15" y="70" width="80" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="55.0" y="92.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">area()</text>
+  <rect x="135" y="70" width="90" height="36" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
+  <text x="180.0" y="92.2" font-size="12" fill="#7a6e62" text-anchor="middle">Shape</text>
+  <rect x="135" y="160" width="90" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="180.0" y="182.2" font-size="12" fill="#1a1612" text-anchor="middle">Circle</text>
+  <line x1="97.0" y1="88.0" x2="131.0" y2="88.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ed-solid)"/>
+  <line x1="180.0" y1="158.0" x2="180.0" y2="110.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ed-hollow)"/>
+  <text x="142.0" y="128.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">inherits</text>
+  <text x="15" y="224" font-size="11" fill="#1a1612" text-anchor="start">edges in source: 2</text>
+  <text x="248" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Structural</text>
+  <text x="248" y="38" font-size="10.5" fill="#7a6e62" text-anchor="start">class Shape(Protocol):</text>
+  <rect x="248" y="70" width="80" height="36" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="288.0" y="92.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">area()</text>
+  <rect x="368" y="70" width="90" height="36" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
+  <text x="413.0" y="92.2" font-size="12" fill="#7a6e62" text-anchor="middle">Shape</text>
+  <rect x="368" y="160" width="90" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="413.0" y="182.2" font-size="12" fill="#1a1612" text-anchor="middle">Circle</text>
+  <line x1="330.0" y1="88.0" x2="364.0" y2="88.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#ed-solid)"/>
+  <line x1="413.0" y1="158.0" x2="413.0" y2="110.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="1.5,3" marker-end="url(#ed-hollow)"/>
+  <text x="377.0" y="128.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">checked</text>
+  <text x="248" y="224" font-size="11" fill="#1a1612" text-anchor="start">edges in source: 1</text>
+  <text x="481" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Callable</text>
+  <text x="481" y="38" font-size="10.5" fill="#7a6e62" text-anchor="start">def area(shape: Callable[[], float])</text>
+  <rect x="481" y="62" width="130" height="54" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="546.0" y="86.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">area()</text>
+  <text x="546.0" y="101.2" font-size="9" fill="#7a6e62" text-anchor="middle">Callable[[], float]</text>
+  <rect x="601" y="160" width="90" height="36" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="646.0" y="181.7" font-size="10.5" fill="#1a1612" text-anchor="middle">circle_area</text>
+  <line x1="623.5" y1="158.0" x2="580.8" y2="120.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="1.5,3" marker-end="url(#ed-hollow)"/>
+  <text x="640.2" y="143.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">checked</text>
+  <text x="481" y="224" font-size="11" fill="#1a1612" text-anchor="start">edges in source: 0</text>
+  <line x1="238" y1="10" x2="238" y2="232" stroke="#c8bfb0" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="471" y1="10" x2="471" y2="232" stroke="#c8bfb0" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="10" y="252" font-size="10.5" fill="#7a6e62" text-anchor="start">Dotted: an edge the type checker draws at check time; no file names the other.</text>
+</svg>
