@@ -12,6 +12,8 @@ Adding an interface leaves the existing one in place, so nothing breaks.
 When the new interface is meant to replace one you own,
 callers keep using the old one until you mark it deprecated.
 
+![`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class that names both `WhatIWant` and `WhatIHave`](_images/coupling_29)
+
 ## Adapter
 
 An adapter's only job is to produce the interface you need from the one you have.

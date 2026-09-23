@@ -7,6 +7,8 @@ The call site names the signature it will call and says nothing about where the 
 [Design Patterns](21_Patterns--Design_Patterns.md#design-principles)
 states that principle as "design the communication, not the parts."
 
+![The macro loop names only the `Command` signature, and three functions satisfy it by having that signature](_images/coupling_28)
+
 Each pattern defers something:
 
 - *Command* defers *what* to do, so you can store the action and run it later.

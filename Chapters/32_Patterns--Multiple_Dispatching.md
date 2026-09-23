@@ -8,6 +8,8 @@ But when you say `a + b`,
 and you don't know the exact type of either `a` or `b`,
 how can you get them to interact properly?
 
+![`duel()` names only `Item`, and `Paper`, `Scissors`, and `Rock` each name an eval method for every other](_images/coupling_32)
+
 The answer starts with a fact about the language that rarely comes up.
 Python dispatches on one type at a time.
 When two objects of unknown type interact,

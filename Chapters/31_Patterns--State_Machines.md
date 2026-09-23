@@ -8,6 +8,8 @@ from one object to the next.
 Each implementation represents one state the system can occupy,
 so the system behaves differently as it moves from state to state.
 
+![`StateMachine` names only `State`, each state satisfies it, and the states name the next state through `MouseTrap`](_images/coupling_31)
+
 The code that moves the system from one state to the next is often a [*Template Method*](25_Patterns--Template_Method.md),
 as the following framework for a basic state machine shows.
 You call `run()` on a state to perform its behavior,

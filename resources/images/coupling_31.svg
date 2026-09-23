@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>StateMachine names only State, each state satisfies it, and the states name the next state through MouseTrap</title>
+  <defs>
+    <marker id="c31-solid" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+    <marker id="c31-hollow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto"
+            markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+  <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">State Machine</text>
+  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="20" y="48" width="110" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="75.0" y="71.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">StateMachine</text>
+  <rect x="182" y="48" width="90" height="38" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
+  <text x="227.0" y="71.2" font-size="12" fill="#7a6e62" text-anchor="middle">State</text>
+  <rect x="20" y="168" width="110" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="75.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">MouseTrap</text>
+  <rect x="324" y="92" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="369.0" y="115.2" font-size="12" fill="#1a1612" text-anchor="middle">Waiting</text>
+  <rect x="200" y="160" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="245.0" y="183.2" font-size="12" fill="#1a1612" text-anchor="middle">Luring</text>
+  <line x1="132.0" y1="67.0" x2="178.0" y2="67.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>
+  <line x1="75.0" y1="166.0" x2="75.0" y2="90.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-hollow)"/>
+  <line x1="322.0" y1="96.4" x2="276.0" y2="82.2" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
+  <line x1="241.6" y1="158.0" x2="230.7" y2="90.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
+  <line x1="322.0" y1="123.1" x2="134.0" y2="171.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="218.0" y="139.4" font-size="10.5" fill="#8b1a1a" text-anchor="middle">next</text>
+  <line x1="198.0" y1="181.2" x2="134.0" y2="184.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: one per state. The table form moves them into one dict.</text>
+  <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>
+  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
+  <line x1="480" y1="100" x2="510" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
+  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
+  <line x1="480" y1="120" x2="510" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-hollow)"/>
+  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
+  <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+</svg>

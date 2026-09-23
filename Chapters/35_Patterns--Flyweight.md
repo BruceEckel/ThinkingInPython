@@ -7,6 +7,8 @@ The *Flyweight* pattern supports them by sharing.
 Instead of many objects,
 you keep one object per distinct value and reference it many times.
 
+![`parse_map()` names `tile()`, and `tile()` is the one place that constructs a `Tile`](_images/coupling_35)
+
 Two ideas make sharing work.
 
 First, split each object's state in two.

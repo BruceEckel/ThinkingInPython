@@ -6,6 +6,8 @@ a method, defined in the base class,
 that drives the application by calling other base-class methods,
 some of which you override.
 
+![`MyApp` inherits `ApplicationFramework`'s internals, while `run_framework()` names only the `Step` signature its two functions satisfy](_images/coupling_25)
+
 Python's own `unittest` is this kind of application framework.
 You subclass `TestCase` and supply `setUp()`, your `test_*` methods,
 and `tearDown()`.

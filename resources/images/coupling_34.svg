@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>disk_usage() and walk() each name both node types, and Directory names only the Node union</title>
+  <defs>
+    <marker id="c34-solid" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+    <marker id="c34-hollow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto"
+            markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+  <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Composite</text>
+  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="20" y="48" width="110" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="75.0" y="71.2" font-size="12" fill="#1a1612" text-anchor="middle">disk_usage()</text>
+  <rect x="20" y="108" width="110" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="75.0" y="131.2" font-size="12" fill="#1a1612" text-anchor="middle">walk()</text>
+  <rect x="324" y="48" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="369.0" y="71.2" font-size="12" fill="#1a1612" text-anchor="middle">File</text>
+  <rect x="324" y="108" width="96" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="372.0" y="131.2" font-size="12" fill="#1a1612" text-anchor="middle">Directory</text>
+  <rect x="182" y="174" width="90" height="38" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
+  <text x="227.0" y="190.2" font-size="12" fill="#7a6e62" text-anchor="middle">Node</text>
+  <text x="227.0" y="205.2" font-size="9" fill="#7a6e62" text-anchor="middle">File | Directory</text>
+  <line x1="132.0" y1="67.0" x2="320.0" y2="67.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
+  <line x1="132.0" y1="78.5" x2="320.0" y2="116.5" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
+  <line x1="132.0" y1="115.4" x2="320.0" y2="77.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
+  <line x1="132.0" y1="127.0" x2="320.0" y2="127.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
+  <line x1="123.4" y1="148.0" x2="178.0" y2="171.7" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>
+  <line x1="325.9" y1="148.0" x2="276.0" y2="170.7" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>
+  <text x="326.9" y="163.3" font-size="10.5" fill="#8b1a1a" text-anchor="middle">entries</text>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: two per function, on purpose: a new node type must reach every match, and the checker lists them.</text>
+  <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
+  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>
+  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
+  <line x1="480" y1="100" x2="510" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c34-hollow)"/>
+  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
+  <line x1="480" y1="120" x2="510" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-hollow)"/>
+  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
+  <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+</svg>

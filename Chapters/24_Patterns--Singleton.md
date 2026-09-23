@@ -7,6 +7,8 @@ the question [When a Pattern Dissolves](21_Patterns--Design_Patterns.md#when-a-p
 poses for every pattern.
 For the singleton, the language already has an answer.
 
+![Every importer names `config.py` by its module name, and the import system hands each one the same instance](_images/coupling_24)
+
 ## A Module Is Already a Singleton
 
 Python imports each module once and caches it in `sys.modules`,

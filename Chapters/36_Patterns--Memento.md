@@ -8,6 +8,8 @@ an opaque snapshot of itself.
 A *caretaker* (the undo machinery)
 stores mementos and hands one back when asked, without looking inside.
 
+![`Sketch` names `Memento`, and `History` names only a type parameter, so it holds a `Memento` without reading it](_images/coupling_36)
+
 The pattern exists because of mutation.
 An object that changes in place destroys its own past,
 so you must copy the past and guard it.

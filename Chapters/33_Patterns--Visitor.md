@@ -3,6 +3,8 @@
 The *Visitor* pattern uses *Multiple Dispatching*.
 People can confuse the two by looking at the implementation rather than the intent.
 
+![`Flower` names only `Visitor` and `Pollinator` names only `Flower`, so no visitor names a concrete flower](_images/coupling_33)
+
 *Visitor* assumes you have a primary class hierarchy you cannot change.
 Perhaps it's from another vendor and you can't touch its source.
 However, you'd like to add new polymorphic methods to it.

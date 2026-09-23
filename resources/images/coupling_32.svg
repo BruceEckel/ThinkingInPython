@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
+     font-family="'JetBrains Mono', Consolas, monospace">
+  <title>duel() names only Item, and Paper, Scissors, and Rock each name an eval method for every other</title>
+  <defs>
+    <marker id="c32-solid" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+    <marker id="c32-hollow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="10" markerHeight="10" orient="auto"
+            markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    </marker>
+  </defs>
+  <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Multiple Dispatching</text>
+  <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
+  <rect x="20" y="108" width="80" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="60.0" y="131.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">duel()</text>
+  <rect x="150" y="108" width="76" height="38" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
+  <text x="188.0" y="131.2" font-size="12" fill="#7a6e62" text-anchor="middle">Item</text>
+  <rect x="246" y="40" width="86" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="289.0" y="63.2" font-size="12" fill="#1a1612" text-anchor="middle">Paper</text>
+  <rect x="246" y="174" width="86" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="289.0" y="197.2" font-size="12" fill="#1a1612" text-anchor="middle">Rock</text>
+  <rect x="346" y="107" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="391.0" y="130.2" font-size="12" fill="#1a1612" text-anchor="middle">Scissors</text>
+  <line x1="102.0" y1="127.0" x2="146.0" y2="127.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-solid)"/>
+  <line x1="257.8" y1="80.0" x2="222.2" y2="104.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-hollow)"/>
+  <line x1="256.9" y1="172.0" x2="223.2" y2="150.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-hollow)"/>
+  <line x1="344.0" y1="126.2" x2="230.0" y2="126.8" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-hollow)"/>
+  <line x1="318.2" y1="84.2" x2="353.2" y2="107.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <line x1="361.8" y1="100.8" x2="326.8" y2="77.8" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <line x1="356.3" y1="142.8" x2="321.3" y2="165.8" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <line x1="323.7" y1="176.2" x2="358.7" y2="153.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <line x1="284.0" y1="80.0" x2="284.0" y2="170.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <line x1="294.0" y1="172.0" x2="294.0" y2="82.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 6. Adding a fourth item edits all three.</text>
+  <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c32-solid)"/>
+  <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
+  <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-solid)"/>
+  <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
+  <line x1="480" y1="100" x2="510" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c32-hollow)"/>
+  <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
+  <line x1="480" y1="120" x2="510" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c32-hollow)"/>
+  <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
+  <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
+  <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
+</svg>

@@ -8,6 +8,8 @@ That is the communication-first design [Design Patterns](21_Patterns--Design_Pat
 asks for: the caller states what it needs,
 and the container's type stays out of the conversation.
 
+![`total()` names only `Iterable`, and a `list`, a generator, and `Countdown` satisfy it without naming it](_images/coupling_23)
+
 Python builds iterators into the language.
 Any object that follows the *iterator protocol* works with `for`,
 comprehensions, `sum()`, `sorted()`, unpacking,
