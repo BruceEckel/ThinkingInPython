@@ -920,25 +920,25 @@ for kick in (0.005, 0.05, 0.5):
         for _ in range(target - steps):
             plate.step(kick=kick)
         steps = target
-        readings.append(f"{plate.agitation():.3f}")
+        readings.append(f"{plate.agitation():.2f}")
     print(f"kick {kick:<5}: {' '.join(readings)}")
-#: kick 0.005: 0.585 0.560 0.494 0.380
-#: kick 0.05 : 0.585 0.073 0.005 0.000
-#: kick 0.5  : 0.585 0.106 0.012 0.000
+#: kick 0.005: 0.58 0.56 0.49 0.38
+#: kick 0.05 : 0.58 0.07 0.00 0.00
+#: kick 0.5  : 0.58 0.11 0.01 0.00
 ```
 
 `kick=0.005` produces order too slowly. Each step displaces a grain by
 at most one percent of the plate, so a grain starting in the middle
 of a bright region needs hundreds of steps to walk anywhere near a
-nodal line. After 1200 steps agitation has fallen from `0.585` to
-`0.380`, roughly a third of the way, while the default kick was
-already down to `0.005` by step 400. Rendered, this run still looks
+nodal line. After 1200 steps agitation has fallen from `0.58` to
+`0.38`, roughly a third of the way, while the default kick was
+already down to `0.00` by step 400. Rendered, this run still looks
 like noise with a faint trace of structure in it. Nothing is wrong
 with the physics. The run is simply not finished, and finishing it
 means more steps than anyone wants to watch.
 
 `kick=0.5` fails differently, and the agitation column is what makes
-that failure interesting: agitation collapses to `0.000` as
+that failure interesting: agitation collapses to `0.00` as
 convincingly as it does at the default kick. The figure never appears
 anyway. A half-unit displacement can throw a grain across the plate in
 one step, so a grain never traces a descent toward the nearest nodal

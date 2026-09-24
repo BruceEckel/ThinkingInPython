@@ -14,6 +14,10 @@ list to keep in sync. A handful of targets never run, regardless of tier:
     recurse.
   * check-ch -- takes a CH= chapter selector and exits with a usage error
     without one; there is no chapter this script could pick for it.
+  * pyright -- the raw run over both trees, which prints every
+    disagreement with ty (all of them in tools/data/pyright_baseline.txt)
+    and exits nonzero by design; pyright-review, which runs here, is
+    the check that passes when the baseline is current.
 
 Most targets are read-only or safely idempotent (extract, sync, and the
 various check-* targets rewrite a tracked file only if it is genuinely out
@@ -73,6 +77,8 @@ EXCLUDED: dict[str, str] = {
     "rewrite": "runs headless claude passes that cost tokens and edit prose",
     "check-ch": "needs a CH= chapter selector this smoke test cannot supply",
     "verify-ch": "needs a CH= chapter selector this smoke test cannot supply",
+    "pyright": "the raw run prints the baseline disagreements with ty and "
+               "exits nonzero by design; pyright-review is the check",
 }
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in

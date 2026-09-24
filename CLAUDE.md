@@ -462,6 +462,19 @@ and how it was measured.
   the code it precedes. Chapter 6's `package_only.py` was annealed into the
   hugging form and broke the build; its neighbors `using_packages.py` and
   `from_packages.py` already had the right shape.
+- **A seeded simulation can still print differently on Linux.** Solutions
+  38's `exercise_8.py` seeds its `random.Random`, and the gate in the WSL
+  clone rewrote one of its `#:` readings anyway (`0.012` on Windows,
+  `0.010` on Linux, 2026-09-24). The seed fixes the random draws; the
+  C library's `cos` does not agree to the last bit between Windows and
+  glibc, and a chaotic run (a kick that throws a grain across the plate
+  each step) multiplies that last bit by about ten a step until a
+  three-decimal reading moves. The chapter's own `chladni_plate` marker,
+  at the default kick, matched on both. The fix was two decimals in that
+  one listing, which both platforms print alike; do not reseed, and do
+  not accept the Linux rewrite, which the next run's drift check then
+  fails on. A `git diff` on a simulation marker after a Linux run is
+  this until proven otherwise.
 - **Async timing markers flip silently on Windows timers.** A `#:` trace
   that depends on ordering between asyncio deadlines needs wide margins.
   Chapter 19's `task_group.py` cancellation demo with 0.01/0.02/0.03s
