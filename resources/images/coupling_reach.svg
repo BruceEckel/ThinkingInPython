@@ -6,6 +6,10 @@
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
+    <marker id="rc-solid-red" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#8b1a1a" stroke="#8b1a1a" stroke-width="0.8" stroke-linejoin="round"/>
+    </marker>
     <marker id="rc-hollow" viewBox="0 0 18 12" refX="1" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
@@ -27,10 +31,10 @@
   <line x1="92.0" y1="68.0" x2="113.6" y2="68" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
   <line x1="150.8" y1="88.0" x2="90.1" y2="138.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
   <line x1="173.0" y1="88.0" x2="168.4" y2="133.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
-  <line x1="196.2" y1="88.0" x2="248.7" y2="137.5" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid)"/>
+  <line x1="196.2" y1="88.0" x2="248.7" y2="137.5" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid-red)"/>
   <line x1="51.0" y1="88.0" x2="53.3" y2="133.6" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
   <line x1="73.2" y1="88.0" x2="131.2" y2="137.9" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
-  <path d="M92,86.1 Q167.2,88.3 222.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid)"/>
+  <path d="M92,86.1 Q167.2,88.3 222.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid-red)"/>
   <line x1="350" y1="10" x2="350" y2="200" stroke="#c8bfb0" stroke-width="1" stroke-dasharray="4,4"/>
   <text x="370" y="22" font-size="13" font-weight="bold" fill="#1a1612" text-anchor="start">Report names a protocol</text>
   <rect x="370" y="50" width="80" height="36" fill="#8b1a1a" fill-opacity="0.13" rx="4"/>
@@ -53,6 +57,6 @@
   <line x1="641.9" y1="148.0" x2="646.1" y2="106.3" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#rc-hollow)"/>
   <line x1="411.0" y1="88.0" x2="413.3" y2="133.6" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
   <line x1="433.2" y1="88.0" x2="491.2" y2="137.9" stroke="#1a1612" stroke-width="2.8" marker-end="url(#rc-solid)"/>
-  <path d="M452,86.1 Q527.2,88.3 582.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid)"/>
+  <path d="M452,86.1 Q527.2,88.3 582.2,137.5" fill="none" stroke="#8b1a1a" stroke-width="2.8" marker-end="url(#rc-solid-red)"/>
   <text x="10" y="222" font-size="10.5" fill="#7a6e62" text-anchor="start">Shaded: the parts whose source changes when MdWriter is added. Red: the edges that change adds.</text>
 </svg>

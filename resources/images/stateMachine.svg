@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -30 860 650"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 -100 770 740"
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Vending machine state diagram</title>
   <defs>
@@ -8,102 +8,74 @@
     </marker>
   </defs>
 
-  <!-- state nodes -->
-  <circle cx="110" cy="320" r="50" fill="#f5f0e8" stroke="#1a1612" stroke-width="1.6"/>
-  <text x="110" y="316" font-size="13.5" font-weight="bold" fill="#1a1612"
-        text-anchor="middle">QUIESCENT</text>
+  <circle cx="110" cy="330" r="50" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="110" y="335" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">QUIESCENT</text>
 
-  <circle cx="380" cy="150" r="52" fill="#f5f0e8" stroke="#1a1612" stroke-width="1.6"/>
-  <text x="380" y="146" font-size="13.5" font-weight="bold" fill="#1a1612"
-        text-anchor="middle">COLLECTING</text>
+  <circle cx="380" cy="150" r="52" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="380" y="155" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">COLLECTING</text>
 
-  <circle cx="400" cy="320" r="58" fill="#f5f0e8" stroke="#8b1a1a" stroke-width="1.8"/>
-  <text x="400" y="316" font-size="13.5" font-weight="bold" fill="#1a1612"
-        text-anchor="middle">SELECTING</text>
+  <circle cx="410" cy="350" r="58" fill="none" stroke="#8b1a1a" stroke-width="1.8"/>
+  <text x="410" y="355" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">SELECTING</text>
 
-  <circle cx="680" cy="210" r="52" fill="#f5f0e8" stroke="#1a1612" stroke-width="1.6"/>
-  <text x="680" y="200" font-size="12.5" font-weight="bold" fill="#1a1612"
-        text-anchor="middle">UNAVAILABLE</text>
+  <circle cx="720" cy="220" r="52" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="720" y="225" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">UNAVAILABLE</text>
 
-  <circle cx="680" cy="470" r="52" fill="#f5f0e8" stroke="#1a1612" stroke-width="1.6"/>
-  <text x="680" y="466" font-size="13" font-weight="bold" fill="#1a1612"
-        text-anchor="middle">WANT_MORE</text>
+  <circle cx="720" cy="500" r="52" fill="none" stroke="#1a1612" stroke-width="1.6"/>
+  <text x="720" y="505" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">WANT_MORE</text>
 
   <!-- initial-state marker -->
-  <circle cx="110" cy="230" r="6" fill="#1a1612"/>
-  <line x1="110" y1="236" x2="110" y2="253.6" stroke="#1a1612" stroke-width="1.4"
-        marker-end="url(#sm-tri)"/>
+  <circle cx="110" cy="240" r="6" fill="#1a1612"/>
+  <line x1="110" y1="246" x2="110" y2="267.6" stroke="#1a1612" stroke-width="1.4" marker-end="url(#sm-tri)"/>
 
   <!-- QUIESCENT -> COLLECTING -->
-  <line x1="150" y1="294" x2="325.5" y2="184.6" stroke="#7a6e62" stroke-width="1.2"
-        marker-end="url(#sm-tri)"/>
-  <text x="175" y="248" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Money</text>
-  <text x="175" y="262" font-size="11" fill="#7a6e62" text-anchor="middle">/ add_money</text>
-
-  <!-- COLLECTING self-loop -->
-  <path d="M345,105 C321.4,34.3 426.8,30.2 417.9,92.9" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="380" y="24" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Money</text>
-  <text x="380" y="38" font-size="11" fill="#7a6e62" text-anchor="middle">/ add_money</text>
-
-  <!-- COLLECTING -> SELECTING -->
-  <line x1="386" y1="202" x2="391.6" y2="249.7" stroke="#7a6e62" stroke-width="1.2"
-        marker-end="url(#sm-tri)"/>
-  <text x="335" y="255" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
-  <text x="335" y="269" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
-
-  <!-- SELECTING -> COLLECTING (too_expensive) -->
-  <path d="M396,265 Q464.3,228.1 399.8,204" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="465" y="205" font-size="11" fill="#8b1a1a">SecondDigit</text>
-  <text x="465" y="218" font-size="10.5" fill="#8b1a1a">[too_expensive]</text>
-  <text x="465" y="231" font-size="11" fill="#7a6e62">/ clear</text>
-
-  <!-- SELECTING -> UNAVAILABLE (sold_out) -->
-  <line x1="454" y1="299" x2="620.5" y2="233.5" stroke="#7a6e62" stroke-width="1.2"
-        marker-end="url(#sm-tri)"/>
-  <text x="543" y="248" font-size="11" fill="#8b1a1a" text-anchor="middle">SecondDigit [sold_out]</text>
-  <text x="543" y="262" font-size="11" fill="#7a6e62" text-anchor="middle">/ clear</text>
-
-  <!-- UNAVAILABLE -> SELECTING -->
-  <path d="M636,222 Q547.2,312.6 470.4,309.2" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="565" y="335" font-size="11.5" fill="#8b1a1a" text-anchor="middle">FirstDigit</text>
-  <text x="565" y="349" font-size="11" fill="#7a6e62" text-anchor="middle">/ choose_row</text>
-
-  <!-- SELECTING -> WANT_MORE (else) -->
-  <line x1="451" y1="347" x2="623.1" y2="439.1" stroke="#7a6e62" stroke-width="1.2"
-        marker-end="url(#sm-tri)"/>
-  <text x="542" y="382" font-size="11" fill="#8b1a1a" text-anchor="middle">SecondDigit [else]</text>
-  <text x="542" y="396" font-size="11" fill="#7a6e62" text-anchor="middle">/ dispense</text>
-
-  <!-- WANT_MORE -> SELECTING -->
-  <path d="M632,452 Q525.2,469.2 458.4,362.7" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="500" y="470" font-size="11.5" fill="#8b1a1a" text-anchor="middle">FirstDigit</text>
-  <text x="500" y="484" font-size="11" fill="#7a6e62" text-anchor="middle">/ choose_row</text>
-
-  <!-- SELECTING -> QUIESCENT -->
-  <line x1="342" y1="320" x2="170.4" y2="320" stroke="#7a6e62" stroke-width="1.2"
-        marker-end="url(#sm-tri)"/>
-  <text x="250" y="308" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="250" y="336" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
-
+  <path d="M143.4,292.8 Q209.1,198.6 318.9,170.1" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="265" y="163" font-size="11.5" fill="#8b1a1a" text-anchor="end">Money</text>
+  <text x="265" y="176" font-size="11" fill="#7a6e62" text-anchor="end">/ add_money</text>
   <!-- COLLECTING -> QUIESCENT -->
-  <path d="M345,115 Q223.1,32.1 148.7,266" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="220" y="50" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="220" y="64" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
-
+  <path d="M345.2,188.7 Q279.1,282.6 169.2,310.6" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="210" y="317" font-size="11.5" fill="#8b1a1a" text-anchor="start">Quit</text>
+  <text x="210" y="330" font-size="11" fill="#7a6e62" text-anchor="start">/ refund</text>
+  <!-- COLLECTING self-loop -->
+  <path d="M354.0,105.0 C312.1,27.0 436.9,23.2 411.1,93.7" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="436" y="44" font-size="11.5" fill="#8b1a1a" text-anchor="start">Money</text>
+  <text x="436" y="58" font-size="11" fill="#7a6e62" text-anchor="start">/ add_money</text>
+  <!-- COLLECTING -> SELECTING -->
+  <path d="M372.2,201.4 Q342.3,249.3 376.2,288.8" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="354" y="260" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
+  <text x="354" y="274" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <!-- SELECTING -> COLLECTING -->
+  <path d="M418.7,292.7 Q446.9,243.7 411.5,205.5" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="438" y="191" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
+  <text x="438" y="205" font-size="11.5" fill="#8b1a1a" text-anchor="start">[too_expensive]</text>
+  <text x="438" y="218" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
+  <!-- SELECTING -> UNAVAILABLE -->
+  <path d="M467.4,341.5 Q580.9,330.2 669.0,259.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="583" y="331" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
+  <text x="583" y="344" font-size="11.5" fill="#8b1a1a" text-anchor="start">[sold_out]</text>
+  <text x="583" y="358" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
+  <!-- UNAVAILABLE -> SELECTING -->
+  <path d="M668.6,227.6 Q554.9,237.5 465.9,307.2" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="593" y="226" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
+  <text x="593" y="239" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <!-- SELECTING -> WANT_MORE -->
+  <path d="M454.3,387.4 Q541.6,466.8 656.8,487.6" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="551" y="473" font-size="11.5" fill="#8b1a1a" text-anchor="end">SecondDigit</text>
+  <text x="551" y="486" font-size="11.5" fill="#8b1a1a" text-anchor="end">[else]</text>
+  <text x="551" y="500" font-size="11" fill="#7a6e62" text-anchor="end">/ dispense</text>
+  <!-- WANT_MORE -> SELECTING -->
+  <path d="M680.3,466.5 Q594.0,386.0 479.0,363.7" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="627" y="396" font-size="11.5" fill="#8b1a1a" text-anchor="start">FirstDigit</text>
+  <text x="627" y="410" font-size="11" fill="#7a6e62" text-anchor="start">/ choose_row</text>
+  <!-- SELECTING -> QUIESCENT -->
+  <path d="M352.5,357.7 Q256.9,403.6 168.7,349.9" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="253" y="396" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="253" y="410" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
   <!-- UNAVAILABLE -> QUIESCENT -->
-  <path d="M645,168 Q521.6,-22.5 135.2,262.4" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="520" y="-8" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="520" y="6" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
-
+  <path d="M672.6,198.7 Q304.9,-338.3 148.6,282.9" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="354" y="-73" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="354" y="-60" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
   <!-- WANT_MORE -> QUIESCENT -->
-  <path d="M645,505 Q385,578.6 134.7,370.2" fill="none" stroke="#7a6e62"
-        stroke-width="1.2" marker-end="url(#sm-tri)"/>
-  <text x="380" y="568" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="380" y="582" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
+  <path d="M670.8,516.8 Q330.7,728.0 147.8,379.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-tri)"/>
+  <text x="364" y="605" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="364" y="618" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
 </svg>
