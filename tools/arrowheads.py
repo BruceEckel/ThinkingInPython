@@ -1,9 +1,12 @@
 """The book's arrowheads: four standard SVG markers and the geometry they need.
 
 Every figure draws its arrowheads from this set, so they match across the
-book. `make figures` (`tools/figure_gallery.py`) fails on a `<marker>`
-that is not one of them, and `tools/coupling_panels.py` writes its
-panels' markers with `marker_def()`.
+book, and each head is drawn in the color of the line that carries it,
+so a figure with gray and red edges defines one marker per color.
+`make figures` (`tools/figure_gallery.py`) fails on a `<marker>` that is
+not one of the set (`marker_kinds()`) or that sits on a line of another
+color (`mismatched_heads()`); `tools/coupling_panels.py` and
+`tools/state_machine_figure.py` write their markers with `marker_def()`.
 
     filled   a swept head with a notched back: a call, a reference, a
              transition, anything that points
@@ -208,3 +211,36 @@ def reverse_path(d: str) -> str:
 def shorten_path_start(d: str, by: float) -> str:
     """Path data `d` with `by` cut off the start of its first segment."""
     return reverse_path(shorten_path_end(reverse_path(d), by))
+
+
+EDGE_RE = re.compile(r"<(?:line|polyline|path)\b[^>]*?/>", re.DOTALL)
+USE_RE = re.compile(r'marker-(?:start|end)="url\(#([^)]+)\)"')
+STROKE_RE = re.compile(r'\bstroke="([^"]+)"')
+
+
+def marker_colors(svg: str) -> dict[str, str]:
+    """Each marker's id and the stroke color its shape is drawn in."""
+    out: dict[str, str] = {}
+    for m in MARKER_RE.finditer(svg):
+        mid, color = ID_RE.search(m.group()), STROKE_RE.search(m.group())
+        if mid and color:
+            out[mid.group(1)] = color.group(1).lower()
+    return out
+
+
+def mismatched_heads(svg: str) -> list[str]:
+    """Each marker used on an edge drawn in a color other than its own.
+
+    A head matches its line, so a gray edge carries a gray head and a
+    red one a red head; a marker per color does it.
+    """
+    colors = marker_colors(svg)
+    out: list[str] = []
+    for m in EDGE_RE.finditer(svg):
+        stroke = STROKE_RE.search(m.group())
+        for mid in USE_RE.findall(m.group()):
+            if (stroke and mid in colors
+                    and colors[mid] != stroke.group(1).lower()
+                    and mid not in out):
+                out.append(mid)
+    return out

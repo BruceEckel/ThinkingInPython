@@ -41,6 +41,7 @@ fix-eol	quick
 fix-imports	quick
 fix-listings	quick
 fix-pattern-names	quick
+fix-state-machine-figure	quick
 footnotes	quick
 gate	long
 gate-status	quick
@@ -73,6 +74,7 @@ solutions-gate	normal
 solutions-numbering	quick
 spell	quick
 spell-add	quick
+state-machine-figure	quick
 sweep	normal
 sync	quick
 test	quick

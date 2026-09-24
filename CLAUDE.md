@@ -315,7 +315,10 @@ the gallery draw on white, so the edge stops short of its target by
 the head's `trim` and the head, anchored at its back, reaches the
 border. `marker_def()` writes the `<marker>`; `shorten_line()` and
 `shorten_path_end()`/`shorten_path_start()` shorten a hand-drawn edge.
-`make figures` fails on any other marker. Before committing a new one, rasterize it the way the
+Each head takes its line's color, one marker per color in a figure
+(a gray edge gets a gray head, a red edge a red one).
+`make figures` fails on any other marker and on a head whose color
+differs from its line's. Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
 once rasterized. `make figures` (in `make verify` since 2026-09-24,
 `tools/figure_gallery.py`) builds `build/figures/index.html`: every
@@ -326,7 +329,16 @@ arrowhead markers) that marks anything outside the palette. Bruce
 names a figure by its number there or its file stem; it fails on a
 reference with no file and only reports a file no chapter references.
 
-The one family of generated figures is the coupling-notation panel at
+Two figure sources are generated, and their SVGs are never edited by
+hand. Chapter 31's `stateMachine.svg` comes from
+`tools/state_machine_figure.py` (since 2026-09-24): each transition
+names its two states, how far its curve bows, and where along the curve
+its label sits, and the script computes the rest. Edit the spec, run
+`make fix-state-machine-figure`, and look at the PNG in `make figures`,
+since nothing detects two labels colliding; `make state-machine-figure`
+(in `gate`, `verify-ch`, and `sweep`) fails on drift.
+
+The larger family of generated figures is the coupling-notation panel at
 the top of each pattern chapter, 23 through 36
 (`resources/images/coupling_NN.svg`, merged 2026-09-23). Chapter 21's
 Coupling section (merged from Appendix C on 2026-09-24) defines the

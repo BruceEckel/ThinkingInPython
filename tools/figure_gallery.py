@@ -11,9 +11,11 @@ first of `build_epub.SVG_TOOLS` on PATH; a PNG is redrawn only when its
 SVG is newer, so a rebuild costs nothing when nothing changed.
 
 Every `<marker>` must be one of the book's four arrowheads in
-`tools/arrowheads.py` (filled, hollow, open, diamond), in any color; the
-style line names each marker's kind, and a marker that matches none of
-them fails the build, so a new figure cannot bring back an old shape.
+`tools/arrowheads.py` (filled, hollow, open, diamond), drawn in the
+color of the line that carries it; the style line names each marker's
+kind, and a marker that matches none of them, or one on a line of
+another color, fails the build, so a new figure cannot bring back an
+old shape or a black head on a gray line.
 
 Under each figure is a style line: the distinct colors, stroke widths,
 dash patterns, font families and sizes, and arrowhead markers the SVG
@@ -48,7 +50,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools import build_epub, build_site
-from tools.arrowheads import marker_kinds
+from tools.arrowheads import marker_kinds, mismatched_heads
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
 
@@ -132,6 +134,7 @@ class Style:
     markers: list[str] = field(default_factory=list)
     marker_uses: dict[str, int] = field(default_factory=dict)
     marker_kinds: dict[str, str | None] = field(default_factory=dict)
+    mismatched: list[str] = field(default_factory=list)
 
     @property
     def odd_markers(self) -> list[str]:
@@ -164,6 +167,9 @@ class Style:
         if self.odd_markers:
             out.append("arrowhead outside tools/arrowheads.py: "
                        + ", ".join(self.odd_markers))
+        if self.mismatched:
+            out.append("arrowhead color differs from its line: "
+                       + ", ".join(self.mismatched))
         return out
 
 
@@ -210,6 +216,7 @@ def read_style(text: str) -> Style:
         markers=_uniq(MARKER_DEF_RE.findall(text)),
         marker_uses=uses,
         marker_kinds=marker_kinds(text),
+        mismatched=mismatched_heads(text),
     )
 
 
@@ -494,9 +501,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  NONSTANDARD ARROWHEAD in {f.name}.svg: "
               + ", ".join(f.style.odd_markers)
               + " (use tools/arrowheads.py marker_def())")
+    clash = [f for f in figures if f.style and f.style.mismatched]
+    for f in clash:
+        assert f.style
+        print(f"  ARROWHEAD COLOR in {f.name}.svg: "
+              + ", ".join(f.style.mismatched)
+              + " sit on lines of another color (add a marker per color)")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing or odd else 0
+    return 1 if missing or odd or clash else 0
 
 
 if __name__ == "__main__":

@@ -1,10 +1,12 @@
 """Tests for tools/arrowheads.py: the check knows the four standard heads
-in any color and rejects anything else, and shortening an edge takes off
-the length asked for while keeping the head on the edge's line."""
+in any color and rejects anything else, a head matches its line's
+color, and shortening an edge takes off the length asked for while
+keeping the head on the edge's line."""
 from __future__ import annotations
 import math
 import pytest
-from tools.arrowheads import (HEADS, marker_def, marker_kinds, reverse_path,
+from tools.arrowheads import (HEADS, marker_def, marker_kinds,
+                              mismatched_heads, reverse_path,
                               shorten_curve, shorten_line, shorten_path_end,
                               shorten_path_start)
 
@@ -47,3 +49,13 @@ def test_path_start_and_end_trim_the_right_segment() -> None:
     assert shorten_path_end("M0,0 L0,50 L40,50", 10) == "M0,0 L0,50 L30,50"
     assert shorten_path_start("M0,0 L0,50 L40,50", 10) == "M0,10 L0,50 L40,50"
     assert reverse_path("M1,2 L3,4 Q5,6 7,8") == "M7,8 Q5,6 3,4 L1,2"
+
+
+def test_a_head_must_match_the_color_of_its_line() -> None:
+    svg = (marker_def("ink", "filled", "#1a1612")
+           + marker_def("gray", "filled", "#7a6e62")
+           + '<line x1="0" y1="0" x2="9" y2="0" stroke="#7a6e62" '
+             'marker-end="url(#gray)"/>'
+           + '<path d="M0,0 L9,9" stroke="#7a6e62" '
+             'marker-end="url(#ink)"/>')
+    assert mismatched_heads(svg) == ["ink"]

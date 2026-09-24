@@ -6,6 +6,10 @@
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
+    <marker id="dp-tri-muted" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-linejoin="round"/>
+    </marker>
     <marker id="dp-diamond" viewBox="0 0 22 12" refX="21" refY="6"
             markerWidth="22" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M1,6 L11,1 L21,6 L11,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
@@ -14,11 +18,11 @@
 
   <!-- realization: Margherita, Hawaiian, and Topping implement Pizza -->
   <line x1="105" y1="190" x2="414.1" y2="115.8" stroke="#7a6e62" stroke-width="1.2"
-        stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
+        stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
   <line x1="305" y1="190" x2="445.4" y2="119.4" stroke="#7a6e62" stroke-width="1.2"
-        stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
+        stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
   <line x1="535" y1="190" x2="506.7" y2="127" stroke="#7a6e62" stroke-width="1.2"
-        stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
+        stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
 
   <!-- inheritance: Garlic, Olives, and Feta extend Topping -->
   <line x1="435" y1="350" x2="468.8" y2="314" stroke="#1a1612" stroke-width="1.2"

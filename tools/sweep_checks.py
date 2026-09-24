@@ -67,6 +67,7 @@ from tools.timed_make import format_seconds
 SWEEP_TARGETS: list[str] = [
     "checks",
     "coupling-panels",
+    "state-machine-figure",
     "solutions-numbering",
     "ty",
     "lint",

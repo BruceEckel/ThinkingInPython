@@ -10,6 +10,10 @@
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
+    <marker id="c24-hollow-muted" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-linejoin="round"/>
+    </marker>
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Singleton</text>
   <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
@@ -29,7 +33,7 @@
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c24-solid)"/>
   <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
-  <line x1="480" y1="100" x2="493.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c24-hollow)"/>
+  <line x1="480" y1="100" x2="493.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c24-hollow-muted)"/>
   <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
   <line x1="480" y1="120" x2="493.6" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c24-hollow)"/>
   <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>

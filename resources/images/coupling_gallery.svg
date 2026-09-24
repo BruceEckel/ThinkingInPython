@@ -6,9 +6,9 @@
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
-    <marker id="gl-hollow" viewBox="0 0 18 12" refX="1" refY="6"
+    <marker id="gl-hollow-muted" viewBox="0 0 18 12" refX="1" refY="6"
             markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
   <text x="18" y="26" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Strategy</text>
@@ -22,8 +22,8 @@
   <rect x="178" y="170" width="70" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="213.0" y="190.8" font-size="11" fill="#1a1612" text-anchor="middle">Sum</text>
   <line x1="128.0" y1="90.0" x2="133.6" y2="90" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
-  <line x1="147.3" y1="168.0" x2="173.5" y2="127.8" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
-  <line x1="210.1" y1="168.0" x2="204.2" y2="130.2" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="147.3" y1="168.0" x2="173.5" y2="127.8" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
+  <line x1="210.1" y1="168.0" x2="204.2" y2="130.2" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <text x="18" y="241" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 0</text>
   <text x="268" y="26" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Observer</text>
   <line x1="268" y1="32" x2="498" y2="32" stroke="#c8bfb0" stroke-width="0.8"/>
@@ -35,7 +35,7 @@
   <text x="457.0" y="190.8" font-size="11" fill="#1a1612" text-anchor="middle">Display</text>
   <line x1="364.0" y1="90.0" x2="395.6" y2="90" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
   <text x="386.0" y="82.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">notify</text>
-  <line x1="457.0" y1="168.0" x2="457" y2="130.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="457.0" y1="168.0" x2="457" y2="130.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="429.6" y1="168.0" x2="361.8" y2="121.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
   <text x="366.6" y="153.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">attach</text>
   <text x="268" y="241" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, toward the stable part</text>
@@ -53,8 +53,8 @@
   <text x="570.0" y="207.7" font-size="10.5" fill="#1a1612" text-anchor="middle">PdfProduct</text>
   <line x1="612.0" y1="74.0" x2="643.6" y2="74" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
   <line x1="570.0" y1="94.0" x2="570" y2="109.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
-  <line x1="703.0" y1="124.0" x2="703" y2="112.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
-  <line x1="570.0" y1="184.0" x2="570" y2="182.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="703.0" y1="124.0" x2="703" y2="112.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
+  <line x1="570.0" y1="184.0" x2="570" y2="182.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="658.7" y1="164.0" x2="625.3" y2="179.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
   <text x="632.3" y="190.1" font-size="10.5" fill="#8b1a1a" text-anchor="middle">creates</text>
   <text x="518" y="241" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, moved out of Client</text>
@@ -69,7 +69,7 @@
   <rect x="150" y="437" width="96" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="198.0" y="457.9" font-size="11" fill="#1a1612" text-anchor="middle">Adaptee</text>
   <line x1="112.0" y1="335.0" x2="133.6" y2="335" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
-  <line x1="198.0" y1="379.0" x2="198" y2="375.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="198.0" y1="379.0" x2="198" y2="375.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="198.0" y1="417.0" x2="198" y2="420.6" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
   <text x="18" y="486" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, inside Adapter</text>
   <text x="268" y="271" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Decorator</text>
@@ -83,8 +83,8 @@
   <rect x="400" y="415" width="96" height="34" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="448.0" y="435.9" font-size="11" fill="#1a1612" text-anchor="middle">Topping</text>
   <line x1="362.0" y1="335.0" x2="383.6" y2="335" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
-  <line x1="345.1" y1="413.0" x2="403.2" y2="368.9" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
-  <line x1="434.0" y1="413.0" x2="434" y2="375.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="345.1" y1="413.0" x2="403.2" y2="368.9" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
+  <line x1="434.0" y1="413.0" x2="434" y2="375.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="462.0" y1="413.0" x2="462" y2="371.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
   <text x="496.0" y="390.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">wraps</text>
   <text x="268" y="486" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 0</text>
@@ -104,19 +104,19 @@
   <text x="713.0" y="457.7" font-size="10.5" fill="#1a1612" text-anchor="middle">Num</text>
   <line x1="612.0" y1="319.0" x2="643.6" y2="319" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
   <text x="634.0" y="311.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">accept</text>
-  <line x1="703.0" y1="365.0" x2="703" y2="357.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
-  <line x1="555.1" y1="437.0" x2="565.1" y2="357.3" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="703.0" y1="365.0" x2="703" y2="357.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
+  <line x1="555.1" y1="437.0" x2="565.1" y2="357.3" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="659.5" y1="405.0" x2="599.3" y2="432.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
-  <line x1="625.1" y1="437.0" x2="587.2" y2="355.9" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="625.1" y1="437.0" x2="587.2" y2="355.9" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="682.7" y1="405.0" x2="661.1" y2="426.3" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
-  <line x1="695.0" y1="437.0" x2="605.2" y2="352.3" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="695.0" y1="437.0" x2="605.2" y2="352.3" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <line x1="705.9" y1="405.0" x2="708.4" y2="422.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
   <text x="518" y="486" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 3, all in Pricer</text>
   <line x1="20" y1="512" x2="41.6" y2="512" stroke="#1a1612" stroke-width="2.8" marker-end="url(#gl-solid)"/>
   <text x="62" y="516" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line x1="230" y1="512" x2="251.6" y2="512" stroke="#1a1612" stroke-width="1.3" marker-end="url(#gl-solid)"/>
   <text x="272" y="516" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
-  <line x1="410" y1="512" x2="427.6" y2="512" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow)"/>
+  <line x1="410" y1="512" x2="427.6" y2="512" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#gl-hollow-muted)"/>
   <text x="452" y="516" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
   <rect x="550" y="504" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
   <text x="584" y="516" font-size="10.5" fill="#7a6e62" text-anchor="start">the part kept free of change</text>

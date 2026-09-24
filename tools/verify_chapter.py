@@ -140,6 +140,8 @@ def main(argv: list[str] | None = None) -> int:
         run("unique-slugs", [*PY, "-m", "tools.check_unique_slugs"]),
         run("coupling-panels",
             [*PY, "-m", "tools.coupling_panels", "--check"]),
+        run("state-machine-figure",
+            [*PY, "-m", "tools.state_machine_figure", "--check"]),
     ]
     results += code_checks("examples", EXAMPLES_TREE / md.stem,
                            EXAMPLES_TREE)

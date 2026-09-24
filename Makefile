@@ -201,6 +201,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
 	$(PY) -m tools.check_all widths records --paths Solutions
 	$(PY) -m tools.coupling_panels --check
+	$(PY) -m tools.state_machine_figure --check
 	$(PY) -m tools.check_quoted_diagnostics
 	$(PY) -m tools.exercise_refs
 	$(PY) -m tools.reflow_prose --write
@@ -590,7 +591,7 @@ ci: gate site  ## Run the full local gate: check, ty, ruff, run, pytest, site
         quoted-diagnostics quoted-diagnostics-accept exercise-refs \
         exercise-refs-accept unique-slugs skip-lists solutions-numbering \
         pattern-names fix-pattern-names records coupling-panels \
-        fix-coupling-panels coupling-panels-png checks fix-checks
+        fix-coupling-panels coupling-panels-png state-machine-figure \n        fix-state-machine-figure checks fix-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -760,6 +761,16 @@ fix-coupling-panels:  ##- Regenerate resources/images/coupling_NN.svg from the s
 # spec edit the way the EPUB will render it. Writes only build/coupling/.
 coupling-panels-png:  ##- Rasterize every resources/images/coupling_*.svg into build/coupling/ with the EPUB's rasterizer, to check by eye
 	$(PY) -m tools.coupling_panels --png
+
+# Chapter 31's vending-machine diagram is drawn from the spec in
+# tools/state_machine_figure.py, since its labels have to sit beside
+# thirteen curved transitions; this fails when the committed SVG differs
+# from what the spec draws. In `gate` since 2026-09-24.
+state-machine-figure:  ## Fail if resources/images/stateMachine.svg differs from its spec in tools/state_machine_figure.py; `make fix-state-machine-figure` regenerates
+	$(PY) -m tools.state_machine_figure --check
+
+fix-state-machine-figure:  ##- Regenerate resources/images/stateMachine.svg from its spec
+	$(PY) -m tools.state_machine_figure
 
 # Every Markdown check at once, parsing each file once instead of per tool:
 # check_all's whole registry, which is the GATE_CHECKS list the gate runs,

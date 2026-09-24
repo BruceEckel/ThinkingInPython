@@ -131,9 +131,17 @@ class Edge:
 STYLES: dict[str, tuple[str, float, str, str]] = {
     "heavy": (INK, 2.8, "", "solid"),
     "thin": (INK, 1.3, "", "solid"),
-    "realize": (MUTED, 1.2, ' stroke-dasharray="5,4"', "hollow"),
+    "realize": (MUTED, 1.2, ' stroke-dasharray="5,4"', "hollow-muted"),
     "inherit": (INK, 1.3, "", "hollow"),
-    "checked": (MUTED, 1.2, ' stroke-dasharray="1.5,3"', "hollow"),
+    "checked": (MUTED, 1.2, ' stroke-dasharray="1.5,3"', "hollow-muted"),
+}
+
+# Each marker a style names: its shape in tools/arrowheads.py and its
+# color, which matches the line's.
+MARKERS: dict[str, tuple[str, str]] = {
+    "solid": ("filled", INK),
+    "hollow": ("hollow", INK),
+    "hollow-muted": ("hollow", MUTED),
 }
 
 
@@ -150,7 +158,7 @@ def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
     stroke, width, dash, head = STYLES[e.kind]
     marker = f'marker-end="url(#{pid}-{head})"'
     # The line stops short by the head's length, and the head reaches the box.
-    trim = HEADS["filled" if head == "solid" else head].trim
+    trim = HEADS[MARKERS[head][0]].trim
     if e.bend:
         mx, my = (x1 + x2) / 2 + nx * e.bend, (y1 + y2) / 2 + ny * e.bend
         lx = (x1 + x2) / 2 + nx * e.bend / 2
@@ -182,8 +190,10 @@ def text(x: float, y: float, s: str, size: float = 12, fill: str = INK,
 
 
 def defs(pid: str) -> str:
-    return ("  <defs>\n" + marker_def(f"{pid}-solid", "filled", INK)
-            + marker_def(f"{pid}-hollow", "hollow", INK) + "  </defs>\n")
+    return ("  <defs>\n"
+            + "".join(marker_def(f"{pid}-{name}", kind, color)
+                      for name, (kind, color) in MARKERS.items())
+            + "  </defs>\n")
 
 
 def legend(x: float, y: float, pid: str) -> str:
@@ -198,7 +208,7 @@ def legend(x: float, y: float, pid: str) -> str:
     for i, (kind, label) in enumerate(rows):
         yy = y + i * 20
         stroke, width, dash, head = STYLES[kind]
-        end = x + 30 - HEADS["filled" if head == "solid" else head].trim
+        end = x + 30 - HEADS[MARKERS[head][0]].trim
         out += (f'  <line x1="{x}" y1="{yy}" x2="{end:g}" y2="{yy}" '
                 f'stroke="{stroke}" stroke-width="{width}"{dash} '
                 f'marker-end="url(#{pid}-{head})"/>\n')
