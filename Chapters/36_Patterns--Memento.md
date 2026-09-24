@@ -373,7 +373,7 @@ Undo and redo are two stacks of past and future states,
 generic over the state type
 (the `class History[S]` syntax is from [Static Types](08_Foundations--Static_Types.md#type-parameters)):
 
-![Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future](_images/memento_history)
+![History moves the present between two stacks, _past and _future](_images/memento_history)
 
 ```python
 # history.py

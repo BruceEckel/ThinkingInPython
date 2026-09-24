@@ -156,7 +156,7 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-![Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, putting execution inside Paper.eval_scissors() rather than Scissors's own code](_images/double_dispatch)
+![Scissors.compete(paper) hands the second call to Paper.eval_scissors()](_images/double_dispatch)
 
 Follow one duel to keep the perspective straight.
 `scissors.compete(paper)` resolves `self` to `Scissors`, the first dispatch,
