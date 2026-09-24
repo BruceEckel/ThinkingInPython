@@ -274,8 +274,12 @@ spell-add:  ## Accept every unknown word: spellcheck's into wordlist.txt, codesp
 
 # House-style lint with Vale: no em-dashes and no filler phrases. Run one
 # chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.
-# Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
+# Vale is a standalone binary (not uv-managed; `make tools-check-full`
+# says how to install it). Its style packages (.vale.ini's Packages)
+# download into the gitignored styles/ on the first run here, since
+# without them every run dies with "style 'write-good' does not exist".
 prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
+	$(if $(wildcard styles/write-good),,$(VALE) sync)
 	$(VALE) $(PROSE_FILES)
 
 ##+ checks pattern-names

@@ -356,19 +356,25 @@ dev tools (`ty`, `ruff`, `pytest`) that `uv run` resolves from `uv.lock`.
 both to get this far), so their absence doesn't fail the exit code. `--full`
 adds the tools a book maintainer needs for the rest of `make help`: `pandoc`
 (`make site`, `make local`, `make epub`, `make pdf`), `typst` (`make pdf`),
-the standalone `vale` binary (`make prose`), and `gh` (`make release`).
+the standalone `vale` binary (`make prose`), `gh` (`make release`), pyright
+(`make pyright-review`; on Ubuntu its bundled node also needs `libatomic1`),
+and an SVG rasterizer, any of `resvg`, `rsvg-convert`, `magick`, or
+`inkscape` (the EPUB's figures, `make cover`, `coupling-panels-png`).
 
 A failing run ends with the commands that install what is missing on the
 machine it ran on, ready to paste: one `winget install` line on Windows,
 one `brew install` line where Homebrew is on PATH, one `sudo apt install`
 line on the Debian family, and a download command for a tool the package
 manager lacks (Ubuntu packages neither `typst` nor `vale`, so those come
-from their GitHub release archives). Each tool's packages per manager are
-in the script's `TOOLS` list.
+from their GitHub release archives, and so does pandoc, since Ubuntu's own
+is older than the EPUB and PDF builds' floor, `build_epub.PANDOC_MINIMUM`).
+Each tool's packages per manager are in the script's `TOOLS` list, and
+`install_hint(name)` gives a build script the same per-machine command for
+its own error message.
 
 ```
 make tools-check        # uv, ty, ruff, pytest (make/git checked, assumed)
-make tools-check-full   # the above, plus pandoc, typst, vale, and gh
+make tools-check-full   # the above, plus pandoc, typst, vale, gh, pyright, a rasterizer
 ```
 
 ## doctor.py
@@ -815,8 +821,10 @@ only. The rules live in `styles/House/` and are wired up by `.vale.ini`:
 * `EmDash` (error): no `—`, `–`, or `--` used as a dash.
 * `Filler` (warning): throat-clearing phrases ("this is the whole idea", and so on).
 
-To add the community packages for passive-voice and usage checks, list them in
-`.vale.ini` (`Packages = write-good, proselint`) and run `vale sync` once.
+The community packages for passive-voice and usage checks are listed in
+`.vale.ini` (`Packages = write-good, proselint`); `make prose` runs `vale
+sync` to download them into the gitignored `styles/` the first time, when
+that directory has no `write-good`.
 
 ## check_all.py
 

@@ -548,8 +548,7 @@ def rasterize(out_dir: Path) -> int:
     from tools import build_epub
     tool = build_epub.find_svg_tool()
     if tool is None:
-        print("no SVG rasterizer on PATH; install one of "
-              + ", ".join(build_epub.SVG_TOOLS) + " (scoop install resvg)")
+        print(f"no SVG rasterizer on PATH; {build_epub.svg_tool_hint()}")
         return 1
     out_dir.mkdir(parents=True, exist_ok=True)
     svgs = sorted(IMAGES.glob("coupling_*.svg"))

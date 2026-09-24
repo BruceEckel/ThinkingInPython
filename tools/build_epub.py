@@ -42,9 +42,10 @@ The book's diagrams are SVG, which the site serves as-is. Kindle's SVG
 support is unreliable, so this build rasterizes each one to PNG and
 points the EPUB at that instead. The conversion needs one of `resvg`
 (preferred: the renderer typst uses, so the EPUB's diagrams match the
-PDF's; `scoop install resvg`), `rsvg-convert`, `magick`, or
-`inkscape`; with none of them installed the build still succeeds and
-keeps the SVGs, printing a note.
+PDF's), `rsvg-convert`, `magick`, or `inkscape`; with none of them
+installed the build still succeeds and keeps the SVGs, printing a note
+with the install command for this machine (`make tools-check-full`
+prints the same one).
 
 The build produces two EPUBs from one assembly, differing only in
 stylesheet. Listings carry the same token `<span>`s in both (keyword,
@@ -84,7 +85,7 @@ import zipfile
 from html import escape
 from pathlib import Path
 
-from tools import build_site
+from tools import build_site, check_tools
 from tools.build_site import Chapter
 from tools import listing_links
 from tools.heading_links import ATTR_BLOCK, EXPLICIT_ID, LINK, pandoc_anchor
@@ -121,8 +122,14 @@ SVG_PNG_WIDTH = 1600
 # First found wins. resvg leads: it is the same renderer typst uses,
 # so the EPUB's rasterized diagrams match the PDF's, and it is the one
 # with a packaged Windows install (scoop install resvg; rsvg-convert
-# has no winget/scoop package on Windows).
+# has no winget/scoop package on Windows). check_tools.py's "svg
+# rasterizer" row checks the same four and names the install command.
 SVG_TOOLS = ("resvg", "rsvg-convert", "magick", "inkscape")
+# `--syntax-highlighting` and `--split-level` below are pandoc 3.x
+# options (Ubuntu 22.04's 2.9 rejects them as unknown); the floor both
+# this build and the PDF's check lives with the tool check that reports
+# an older pandoc.
+PANDOC_MINIMUM = check_tools.PANDOC_MINIMUM
 # The listing font. The bare generic keyword is deliberate: on a
 # Kindle Paperwhite `"Courier New", Courier, monospace` fell back to
 # the body serif instead of walking the list to the generic. (The
@@ -300,8 +307,10 @@ def relink(text: str, prefix: str, ids: Ids, unresolved: set[str]) -> str:
 # --------------------------------------------------------------------------- #
 # SVG diagrams to PNG, for readers that cannot draw SVG
 # --------------------------------------------------------------------------- #
-def svg_command(tool: str, src: Path, dst: Path) -> list[str]:
-    """The command line that rasterizes `src` to `dst` with `tool`.
+def svg_command(tool: str, src: Path, dst: Path,
+                width: int = SVG_PNG_WIDTH) -> list[str]:
+    """The command line that rasterizes `src` to `dst` with `tool`,
+    `width` pixels wide.
 
     Each one flattens onto white. The diagrams have no background of
     their own and draw in near-black, so a transparent PNG would vanish
@@ -310,20 +319,20 @@ def svg_command(tool: str, src: Path, dst: Path) -> list[str]:
     match tool:
         case "resvg":
             # Width alone preserves the aspect ratio.
-            return [tool, "--width", str(SVG_PNG_WIDTH),
+            return [tool, "--width", str(width),
                     "--background", "white", str(src), str(dst)]
         case "rsvg-convert":
-            return [tool, "--width", str(SVG_PNG_WIDTH),
+            return [tool, "--width", str(width),
                     "--keep-aspect-ratio", "--background-color", "white",
                     "-o", str(dst), str(src)]
         case "magick":
             return [tool, "-density", "200", "-background", "white",
                     str(src), "-flatten",
-                    "-resize", f"{SVG_PNG_WIDTH}x>", "-strip",
+                    "-resize", f"{width}x>", "-strip",
                     f"PNG8:{dst}"]
         case "inkscape":
             return [tool, "--export-type=png",
-                    f"--export-width={SVG_PNG_WIDTH}",
+                    f"--export-width={width}",
                     "--export-background=white", "--export-background-opacity=1",
                     f"--export-filename={dst}", str(src)]
         case _:
@@ -336,6 +345,14 @@ def find_svg_tool() -> str | None:
         if shutil.which(tool):
             return tool
     return None
+
+
+def svg_tool_hint() -> str:
+    """What to install when find_svg_tool() finds nothing: the four
+    names, and the command for this machine."""
+    from tools.check_tools import install_hint
+    return (f"install one of {', '.join(SVG_TOOLS)} "
+            f"({install_hint('svg rasterizer')})")
 
 
 def rasterize_svgs(img_map: dict[str, str],
@@ -355,7 +372,7 @@ def rasterize_svgs(img_map: dict[str, str],
         return img_map, [
             f"NOTE: {len(svgs)} diagram(s) stay SVG, which some readers "
             "(Kindle among them) will not draw.",
-            f"      Install one of {', '.join(SVG_TOOLS)} to convert them.",
+            f"      To convert them, {svg_tool_hint()}.",
         ]
 
     stage.mkdir(parents=True, exist_ok=True)
@@ -1001,7 +1018,7 @@ def run_pandoc(src: Path, css: Path, meta: Path, epub: Path,
 def build(out_dir: Path, keep_source: bool = False,
           keep_svg: bool = False, release: str | None = None,
           listing_links_on: bool = True) -> int:
-    build_site.check_pandoc()
+    build_site.check_pandoc(PANDOC_MINIMUM)
     chapters = build_site.discover()
     if not chapters:
         sys.exit("error: no chapters found in Chapters/")

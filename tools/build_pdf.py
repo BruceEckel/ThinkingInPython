@@ -49,9 +49,6 @@ from tools.config import ROOT
 
 PDF_NAME = "ThinkingInPython.pdf"
 PDF_ENGINE = "typst"
-TYPST_HINT = ("winget install Typst.Typst (Windows) / "
-              "brew install typst (macOS) / "
-              "https://github.com/typst/typst/releases")
 PAPER = "us-letter"
 # Parts and chapters are level 1, their sections level 2. Deep enough
 # to navigate by, shallow enough that the contents stays a contents.
@@ -217,8 +214,9 @@ def before_typst() -> str:
 
 def check_typst() -> None:
     if shutil.which(PDF_ENGINE) is None:
+        from tools.check_tools import install_hint
         sys.exit(f"error: {PDF_ENGINE} not found on PATH. "
-                 f"Install it: {TYPST_HINT}")
+                 f"Install it: {install_hint('typst')}")
 
 
 def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
@@ -257,7 +255,7 @@ def run_pandoc(src: Path, meta: Path, header: Path, before: Path,
 
 def build(out_dir: Path, keep_source: bool = False,
           release: str | None = None) -> int:
-    build_site.check_pandoc()
+    build_site.check_pandoc(build_epub.PANDOC_MINIMUM)
     check_typst()
     chapters = build_site.discover()
     if not chapters:

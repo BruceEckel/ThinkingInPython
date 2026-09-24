@@ -191,10 +191,38 @@ def static_tag(name: str) -> str:
 # --------------------------------------------------------------------------- #
 # Pandoc
 # --------------------------------------------------------------------------- #
-def check_pandoc() -> None:
+def pandoc_version() -> tuple[int, ...] | None:
+    """pandoc's version as a tuple, or None when it is not on PATH."""
     if shutil.which("pandoc") is None:
+        return None
+    proc = subprocess.run(["pandoc", "--version"], capture_output=True,
+                          text=True, encoding="utf-8")
+    words = proc.stdout.split()
+    if proc.returncode != 0 or len(words) < 2:
+        return None
+    return tuple(int(n) for n in words[1].split(".") if n.isdigit())
+
+
+def check_pandoc(minimum: tuple[int, ...] = (3, 0)) -> None:
+    """Exit unless pandoc is on PATH and at least `minimum`.
+
+    Ubuntu's own pandoc is old (2.9 on 22.04), and an old pandoc fails
+    on an option it lacks with "Unknown option", which says nothing
+    about what to install. The EPUB and PDF builds pass a higher floor:
+    `--syntax-highlighting` and the typst engine arrived in the 3.x
+    line. The install hint is the one `make tools-check-full` prints
+    for this machine.
+    """
+    from tools.check_tools import install_hint
+    found = pandoc_version()
+    if found is None:
         sys.exit("error: pandoc not found on PATH. "
-                 "Install it: https://pandoc.org/installing.html")
+                 f"Install it: {install_hint('pandoc')}")
+    if found < minimum:
+        want = ".".join(map(str, minimum))
+        have = ".".join(map(str, found))
+        sys.exit(f"error: pandoc {have} is older than the {want} this "
+                 f"build needs. Install a current one: {install_hint('pandoc')}")
 
 
 def render_chapter(body: str, ch: Chapter,

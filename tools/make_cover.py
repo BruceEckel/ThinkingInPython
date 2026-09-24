@@ -44,7 +44,6 @@ Usage:
 import argparse
 import base64
 import math
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -150,12 +149,14 @@ def titles_svg(h: int, ink: str = INK,
 
 
 def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
-    resvg = shutil.which("resvg")
-    if resvg is None:
-        raise SystemExit("resvg not found; scoop install resvg")
+    """Rasterize with whichever SVG tool the EPUB build would use."""
+    from tools import build_epub
+    tool = build_epub.find_svg_tool()
+    if tool is None:
+        raise SystemExit(
+            f"no SVG rasterizer on PATH; {build_epub.svg_tool_hint()}")
     subprocess.run(
-        [resvg, "--width", str(width), str(svg_path),
-         str(png_path)],
+        build_epub.svg_command(tool, svg_path, png_path, width=width),
         check=True)
 
 

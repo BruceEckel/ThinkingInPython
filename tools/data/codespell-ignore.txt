@@ -1,6 +1,7 @@
 adaptee
 bale
 bellow
+celcius
 dum
 effekt
 onlyonce
