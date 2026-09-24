@@ -41,11 +41,28 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from tools import build_epub
+from tools import build_epub, build_site
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
 
 SOLUTIONS_DIR = ROOT / "Solutions"
+
+
+def site_column_width() -> int:
+    """The site's content column in px, read from its stylesheet.
+
+    A figure is an `<img>` with `max-width: 100%` inside `.page`, whose
+    width is the `--max-width` custom property, so this is the width
+    the site draws every figure at.
+    """
+    m = re.search(r"--max-width:\s*(\d+)px", build_site.render_css())
+    if m is None:
+        raise ValueError("build_site.render_css() sets no --max-width")
+    return int(m.group(1))
+
+
+SITE_WIDTH = site_column_width()
+READER_WIDTH = 420
 OUT_DIR = BUILD_DIR / "figures"
 PNG_DIR = OUT_DIR / "png"
 
@@ -266,10 +283,11 @@ code { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12.5px; }
 .card .fig { padding: 8px; background: #fff; border: 1px dashed var(--box);
              display: inline-block; max-width: 100%; }
 .card img { display: block; max-width: 100%; height: auto; }
-main.book .card .fig { width: 700px; }
-main.reader .card .fig { width: 420px; }
+main.book .card .fig { width: __SITE__px; }
+main.reader .card .fig { width: __READER__px; }
 main.full .card .fig { width: 100%; box-sizing: border-box; }
 .style { font-size: 12.5px; color: var(--muted); margin-top: 8px;
+         /* Widths above are substituted by render_html. */
          display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; }
 .style b { color: var(--ink); font-weight: 600; }
 .sw { display: inline-block; width: 11px; height: 11px; border: 1px solid
@@ -394,10 +412,12 @@ def render_html(figures: list[Figure], tool: str | None) -> str:
             f"{html.escape(fig.path.suffix) if fig.path else ''}</code></h2>"
             f'<div class="where">{_where(fig)}</div>'
             f'<p class="caption">{cap}</p>{img}{flag_line}{style}</section>')
+    css = (CSS.replace("__SITE__", str(SITE_WIDTH))
+              .replace("__READER__", str(READER_WIDTH)))
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <title>Thinking in Python: figures</title>
-<style>{CSS}</style></head>
+<style>{css}</style></head>
 <body>
 <h1>Thinking in Python: figures</h1>
 <div class="meta">{len(figures)} figures, {unref} referenced by no chapter,
@@ -409,8 +429,8 @@ Refer to a figure by its number or its file name.</div>
 <button data-render="svg" class="on">SVG (site, PDF)</button>
 <button data-render="png"{"" if tool else " disabled"}>PNG (EPUB)</button></span>
 <span><label>Width:</label>
-<button data-width="reader">e-reader (420px)</button>
-<button data-width="book">book (700px)</button>
+<button data-width="reader">e-reader ({READER_WIDTH}px)</button>
+<button data-width="book">site column ({SITE_WIDTH}px)</button>
 <button data-width="full">full</button></span>
 </div>
 <table class="index"><tr><th>#</th><th>file</th><th>referenced at</th>
