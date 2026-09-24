@@ -304,12 +304,20 @@ is about. A dashed stroke marks a box that the listing does not
 contain (`surrogate.svg`'s "Etc.", `observer_broadcast.svg`'s `Plot`
 and `Table`). Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
-once rasterized.
+once rasterized. `make figures` (in `make all` since 2026-09-24,
+`tools/figure_gallery.py`) builds `build/figures/index.html`: every
+figure in book order, numbered, with its file name, chapter, line,
+and caption, switchable between the live SVG and the EPUB's PNG,
+and a style line per figure (colors, stroke widths, dashes, fonts,
+arrowhead markers) that marks anything outside the palette. Bruce
+names a figure by its number there or its file stem; it fails on a
+reference with no file and only reports a file no chapter references.
 
 The one family of generated figures is the coupling-notation panel at
 the top of each pattern chapter, 23 through 36
-(`resources/images/coupling_NN.svg`, merged 2026-09-23). Appendix C
-(`Chapters/C_Coupling.md`) defines the notation: a heavy edge names a
+(`resources/images/coupling_NN.svg`, merged 2026-09-23). Chapter 21's
+Coupling section (merged from Appendix C on 2026-09-24) defines the
+notation: a heavy edge names a
 concrete class, a thin edge names an interface, a dashed hollow-headed
 edge satisfies one, a solid hollow-headed edge inherits, and the red
 box is the part the pattern keeps free of change. `tools/coupling_panels.py`

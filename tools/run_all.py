@@ -57,6 +57,7 @@ ALL_TARGETS: list[str] = [
     "solutions-output",
     "sync",
     "solutions-sync",
+    "figures",
     "gate",
 ]
 

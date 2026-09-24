@@ -66,6 +66,7 @@ EXCLUDED: dict[str, str] = {
     "release": "tags the repo and publishes a GitHub release",
     "release-prune": "deletes old GitHub releases",
     "kindle": "opens the Send to Kindle desktop app (a GUI)",
+    "figures-open": "opens a browser on the figure gallery",
     "by-hand": "opens every GUI example and waits for a human to close it",
     "preview-check": "needs node, and the network to install jsdom",
     "verify-targets": "this is the target that runs this script",

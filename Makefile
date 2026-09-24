@@ -332,7 +332,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Build and site
 
-.PHONY: sync check prune site preview-check cover epub pdf release release-prune local serve
+.PHONY: sync check prune site preview-check cover epub pdf release release-prune local serve figures figures-open
 
 # Write the extracted tree straight into Examples/, syncing the committed copy
 # to the Markdown. Run after editing a code block so the drift check passes.
@@ -430,6 +430,20 @@ local: site  ## Build the site, serve it with live reload and copy-on-select, op
 
 serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
 	$(PY) -m tools.serve
+
+# Every figure the prose references, in book order and numbered, on one
+# page, with the SVG the site and PDF draw (read live from
+# resources/images/) and the PNG the EPUB draws, to check the drawings
+# against each other by eye: arrowheads, stroke widths, fonts, palette.
+# A style line under each figure lists what it draws with and marks
+# what falls outside the cover palette. Fails on a reference to a
+# figure with no file, since the book would render nothing there. `make
+# all` runs it, so the gallery tracks the working tree.
+figures:  ## Build build/figures/index.html, a numbered gallery of every figure in the book, to check style by eye (`make figures-open` opens it)
+	$(PY) -m tools.figure_gallery
+
+figures-open:  ##- Build the figure gallery and open it in a browser
+	$(PY) -m tools.figure_gallery --open
 
 # Headed "Code examples" rather than "Examples" so its slug is `code`: a
 # section slug must not equal a target name (make_help.py enforces this),
