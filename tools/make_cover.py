@@ -156,7 +156,8 @@ def rasterize(svg_path: Path, png_path: Path, width: int) -> None:
         raise SystemExit(
             f"no SVG rasterizer on PATH; {build_epub.svg_tool_hint()}")
     subprocess.run(
-        build_epub.svg_command(tool, svg_path, png_path, width=width),
+        build_epub.svg_command(tool, svg_path, png_path, width=width,
+                               background=None),
         check=True)
 
 
@@ -549,18 +550,18 @@ def drawn_outputs(preview: bool) -> None:
     from PIL import Image
 
     master = cover_svg()
-    (STATIC / "cover.svg").write_text(master, encoding="utf-8")
+    (STATIC / "cover.svg").write_text(master, encoding="utf-8", newline="\n")
     if preview:
         rasterize(STATIC / "cover.svg",
                   STATIC / "cover-preview.png", 500)
         print("wrote cover-preview.png (drawn mode)")
         return
     (STATIC / "cover-eink.svg").write_text(
-        eink(cover_svg(h=EINK_H)), encoding="utf-8")
+        eink(cover_svg(h=EINK_H)), encoding="utf-8", newline="\n")
     (STATIC / "cover-letter.svg").write_text(
-        cover_svg(h=LETTER_H), encoding="utf-8")
+        cover_svg(h=LETTER_H), encoding="utf-8", newline="\n")
     (STATIC / "cover-art.svg").write_text(
-        art_svg(), encoding="utf-8")
+        art_svg(), encoding="utf-8", newline="\n")
     rasterize(STATIC / "cover.svg",
               STATIC / "cover-color.png", 1600)
     rasterize(STATIC / "cover-eink.svg",
@@ -640,9 +641,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.preview:
         return 0
     (STATIC / "favicon.svg").write_text(
-        favicon_svg(), encoding="utf-8")
+        favicon_svg(), encoding="utf-8", newline="\n")
     (STATIC / "chapter-ornament.svg").write_text(
-        ornament_svg(), encoding="utf-8")
+        ornament_svg(), encoding="utf-8", newline="\n")
     # The PDF and EPUB chapter headings use a raster of the
     # ornament (Kindle will not draw SVG).
     rasterize(STATIC / "chapter-ornament.svg",

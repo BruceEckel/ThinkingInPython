@@ -8,7 +8,10 @@ the time when it fails. The child make runs with `TIMED=1`, which
 selects the real rules, and GNU Make passes a command-line variable on
 to every make the child starts, so a nested `$(MAKE) sweep` or the
 per-target subprocesses in verify.py and sweep_checks.py print no line
-of their own (those two time each step themselves).
+of their own (those two time each step themselves). A goal that
+exits 0 has its time recorded in build/target_times.json
+(target_times.py), which is where the help listing's time column
+comes from.
 
 Usage, from the Makefile only:
     python -m tools.timed_make <make-executable> <goal>
@@ -52,7 +55,11 @@ def main(argv: list[str] | None = None) -> int:
             [make, "--no-print-directory", "TIMED=1", goal])
     except KeyboardInterrupt:
         code = 130
-    print(report(goal, code, time.monotonic() - start), flush=True)
+    seconds = time.monotonic() - start
+    print(report(goal, code, seconds), flush=True)
+    if code == 0:
+        from tools.target_times import record
+        record(goal, seconds)
     return code
 
 

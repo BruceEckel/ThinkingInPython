@@ -85,8 +85,10 @@ from prompt_toolkit.output import Output
 from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.styles import Style
 
-from tools.make_help import MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc
+from tools.make_help import (
+    LEGEND, MAX_WIDTH, MIN_DOC, Section, Target, wrap_doc)
 from tools.config import ROOT
+from tools.target_times import Timing
 
 if TYPE_CHECKING:
     # A type alias prompt_toolkit defines only for checkers.
@@ -104,6 +106,9 @@ COLOR = Style.from_dict({
     "selected": "reverse",
     "footer": "reverse",
     "recipe": "ansiyellow",
+    "quick": "ansigreen",
+    "long": "ansiyellow",
+    "verylong": "ansired",
 })
 MONO = Style.from_dict({
     "heading": "bold",
@@ -117,33 +122,46 @@ MONO = Style.from_dict({
 @dataclass(frozen=True)
 class Row:
     """One line group in a view. Only target rows take the highlight;
-    headings and blanks are skipped over."""
-    kind: str                       # "heading", "target", "blank"
+    headings, blanks, and the closing note are skipped over."""
+    kind: str                       # "heading", "target", "blank", "note"
     label: str = ""                 # target name, or a heading's slug
-    doc: str = ""                   # doc text, or a heading's title
+    doc: str = ""                   # doc text, a heading's title, a note
     target: Target | None = None
+    time: str = ""                  # the time column: "56s" or a tier
+    tier: str = ""                  # what colors it
 
     @property
     def selectable(self) -> bool:
         return self.kind == "target"
 
 
-def section_rows(section: Section) -> list[Row]:
-    """`make help style`: one section's heading and its listed targets."""
+def section_rows(section: Section,
+                 times: Mapping[str, Timing] | None = None) -> list[Row]:
+    """`make help style`: one section's heading and its listed targets,
+    each with its time when `times` knows it."""
+    known = times or {}
     rows = [Row("heading", f"{section.slug}:", section.title)]
-    rows += [Row("target", t.name, t.doc, target=t) for t in section.listed()]
+    for t in section.listed():
+        timing = known.get(t.name)
+        rows.append(Row("target", t.name, t.doc, target=t,
+                        time=timing.label if timing else "",
+                        tier=timing.tier if timing else ""))
     return rows
 
 
-def all_rows(sections: Sequence[Section]) -> list[Row]:
-    """`make` and `make help`: every section, a blank line between."""
+def all_rows(sections: Sequence[Section],
+             times: Mapping[str, Timing] | None = None) -> list[Row]:
+    """`make` and `make help`: every section, a blank line between, and
+    the time column's legend last when there is a column to explain."""
     rows: list[Row] = []
     for section in sections:
         if not section.slug:
             continue
         if rows:
             rows.append(Row("blank"))
-        rows += section_rows(section)
+        rows += section_rows(section, times)
+    if times:
+        rows += [Row("blank"), Row("note", doc=LEGEND)]
     return rows
 
 
@@ -384,7 +402,9 @@ class Picker:
         width = self._width()
         label_width = max(
             (len(r.label) for r in self.rows if r.selectable), default=0)
-        indent = 2 + label_width + 2
+        time_width = max(
+            (len(r.time) for r in self.rows if r.selectable), default=0)
+        indent = 2 + label_width + 2 + (time_width + 2 if time_width else 0)
         body = width - indent
         fragments: StyleAndTextTuples = []
         line = heading_line = cursor_heading = 0
@@ -398,6 +418,12 @@ class Picker:
             if row.kind == "blank":
                 fragments.append(("", "\n", handler))
                 line += 1
+                continue
+            if row.kind == "note":
+                for text in wrap_doc(row.doc, width):
+                    fragments.append(("class:dim", text, handler))
+                    fragments.append(("", "\n", handler))
+                    line += 1
                 continue
             if row.kind == "heading":
                 heading_line = line
@@ -418,10 +444,20 @@ class Picker:
             for text, hit in split_match(row.label, self.query):
                 style = label_style + (" class:match" if hit else "")
                 fragments.append((style, text, handler))
-            fragments += [
-                (extra.strip(), f"{pad}  {first}", handler),
-                ("", "\n", handler),
-            ]
+            if time_width:
+                tier = "class:" + row.tier.replace(" ", "") if row.tier else ""
+                fragments += [
+                    (extra.strip(), f"{pad}  ", handler),
+                    ((tier + extra).strip(), f"{row.time:>{time_width}}",
+                     handler),
+                    (extra.strip(), f"  {first}", handler),
+                    ("", "\n", handler),
+                ]
+            else:
+                fragments += [
+                    (extra.strip(), f"{pad}  {first}", handler),
+                    ("", "\n", handler),
+                ]
             for more in lines[1:]:
                 fragments.append((extra.strip(), " " * indent + more, handler))
                 fragments.append(("", "\n", handler))
@@ -472,6 +508,8 @@ def filter_rows(rows: list[Row], query: str) -> list[Row]:
     kept: list[Row] = []
     group: list[Row] = []       # the current heading plus its matches
     for row in [*rows, Row("blank")]:
+        if row.kind == "note":
+            continue
         if row.kind == "heading":
             group = [row]
         elif row.kind == "blank":

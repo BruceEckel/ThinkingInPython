@@ -36,7 +36,12 @@ commit, not any uncommitted changes, so it tests each target's own wiring
 rather than whether running it right now would leave your draft clean.
 
 Every target's combined stdout/stderr is saved to
-build/target_test_logs/<target>.log for inspection after the run.
+build/target_test_logs/<target>.log for inspection after the run. Each
+passing target's time is recorded for the help listing
+(build/target_times.json), and the run ends by rewriting
+tools/data/target_tiers.txt, the committed tier per target that the
+listing falls back on for a target this machine has not run; commit
+that file when it changes.
 
 Usage:
     python -m tools.verify_targets                  # every target
@@ -57,6 +62,7 @@ from typing import cast
 
 from tools.make_help import MAKEFILE, entries
 from tools.config import ROOT
+from tools import target_times
 
 LOG_DIR = ROOT / "build" / "target_test_logs"
 DEFAULT_TIMEOUT = 300.0
@@ -82,7 +88,8 @@ EXCLUDED: dict[str, str] = {
 }
 
 # Targets whose recipe rewrites tracked files unconditionally: run these in
-# a disposable worktree rather than this working tree.
+# a disposable worktree rather than this working tree. `cover` is one:
+# it regenerates the committed cover JPEGs under resources/static/.
 # The clean-* targets belong here too: they rmtree build/, and this
 # script's own logs live under build/, so run in this tree they wiped
 # every log written before them (make clean was added 2026-08-29, after
@@ -91,7 +98,7 @@ EXCLUDED: dict[str, str] = {
 WORKTREE_TARGETS: frozenset[str] = frozenset({
     "verify", "reflow", "spell-add", "fix-imports", "fix-listings",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
-    "fix-pattern-names", "fix-coupling-panels",
+    "fix-pattern-names", "fix-coupling-panels", "cover",
     "output",
     "clean", "clean-examples", "clean-solutions", "clean-site",
     "clean-epub", "clean-pdf",
@@ -231,6 +238,14 @@ def main(argv: list[str] | None = None) -> int:
     failed = [r for r in results if not r.ok]
     print(f"\n{len(results)} target(s) tested, {len(failed)} failed, "
           f"{len(skipped)} skipped.")
+
+    passed = {r.name: r.seconds for r in results if r.ok}
+    for name, seconds in passed.items():
+        target_times.record(name, seconds)
+    if passed:
+        target_times.write_baseline(passed)
+        print(f"Recorded {len(passed)} timing(s); tiers written to "
+              f"{target_times.BASELINE.relative_to(ROOT)}.")
 
     if failed:
         print("\nFailed targets:")

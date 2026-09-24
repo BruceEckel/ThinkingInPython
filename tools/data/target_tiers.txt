@@ -1,0 +1,90 @@
+# How long each make target takes, as a tier: quick (under 5 s),
+# normal (under 30 s), long (under 2 min), very long. Written by
+# `make verify-targets` from its own measurements; a line for a target
+# that run never executes is kept as it was. The help listing shows
+# this tier for a target this machine has not run yet, and the
+# measured seconds (build/target_times.json) once it has.
+anchors	quick
+banned	quick
+check	quick
+check-ch	quick
+checks	quick
+ci	long
+claims	quick
+clean	quick
+clean-epub	quick
+clean-examples	quick
+clean-pdf	quick
+clean-site	quick
+clean-solutions	quick
+code-width	quick
+comment-caps	quick
+comment-periods	quick
+comment-report	quick
+comment-spacing	quick
+coupling-panels	quick
+coupling-panels-png	quick
+cover	quick
+eol	quick
+epub	normal
+exercise-coverage	quick
+exercise-refs	quick
+exercise-refs-accept	quick
+extract	quick
+figures	quick
+fix-checks	quick
+fix-comment-caps	quick
+fix-comment-periods	quick
+fix-comment-spacing	quick
+fix-coupling-panels	quick
+fix-eol	quick
+fix-imports	quick
+fix-listings	quick
+fix-pattern-names	quick
+footnotes	quick
+gate	long
+gate-status	quick
+help	quick
+libs-check	quick
+lint	quick
+listings	quick
+output	normal
+output-check	normal
+pattern-names	quick
+pdf	normal
+prune	quick
+pyright-accept	normal
+pyright-review	normal
+python-upgrade	very long
+quoted-diagnostics	quick
+quoted-diagnostics-accept	quick
+records	quick
+reflow	quick
+reflow-check	quick
+release	very long
+rewrite	very long
+run	normal
+run-one	quick
+self-reference	quick
+self-reference-report	quick
+site	normal
+skip-lists	quick
+solutions-gate	normal
+solutions-numbering	quick
+spell	quick
+spell-add	quick
+sweep	normal
+sync	quick
+test	quick
+todos	quick
+tools-check	quick
+tools-check-full	quick
+tools-status	quick
+tools-test	normal
+tools-upgrade	long
+ty	quick
+unique-slugs	quick
+verify	long
+verify-ch	normal
+verify-targets	very long
+widths	quick

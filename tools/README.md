@@ -167,6 +167,14 @@ when the output is piped), with continuation lines indented under the doc
 column so the target names stay in one column. A backticked command and a
 hyphenated target name both wrap as one unit.
 
+A time column sits between the name and the doc: how long the target
+took the last time it passed on this machine (`56s`, `1m 32s`), or, for
+a target this machine has not run, its tier from the committed
+`tools/data/target_tiers.txt` (`quick`, `normal`, `long`, `very long`).
+The column is colored by tier, green for quick, yellow for long, red for
+very long, and a legend closes the listing. [target_times.py](#target_times.py)
+below has the sources and the thresholds.
+
 ```
 make              # every section's targets (so does `make help`)
 make help style   # one section's targets
@@ -293,7 +301,9 @@ that ends on the Makefile's last line), and make passes that variable on
 to every make the child starts, so nested runs print no line of their
 own. `verify.py` and `sweep_checks.py` start one make per step from
 Python and time each step themselves, so `make verify` and `make sweep`
-show a seconds column in their summary tables. `make TIMED=0 verify`
+show a seconds column in their summary tables. Each of those, and this
+script, records a passing run's time for the help listing's time column
+(see [target_times.py](#target_times.py)). `make TIMED=0 verify`
 skips the wrapper; `make -n` needs no such bypass, since make runs a
 recipe line that names `$(MAKE)` even under `-n` and the child inherits
 the flag, so the dry run prints the real recipe.
@@ -306,7 +316,29 @@ and idempotent targets run directly; a target that bakes `--fix`/`--write`
 into its recipe runs in a disposable git worktree, so this working tree is
 never touched. `tools-upgrade`, `python-upgrade`, `serve`, and `local`
 never run at all, being network or environment mutations or a server that
-blocks forever. Logs land in `build/target_test_logs/`.
+blocks forever. Logs land in `build/target_test_logs/`. Each passing
+target's time is recorded for the help listing, and the run ends by
+rewriting `tools/data/target_tiers.txt`, the committed tier per target
+that the listing falls back on for a target this machine has not run.
+Commit that file when the run changes it.
+
+## target_times.py
+
+Where the help listing's time column comes from. Two sources, the first
+preferred: `build/target_times.json`, this machine's last passing run of
+each target, written by everything that already times a run
+(`timed_make.py` for every goal named on a command line, `verify.py` and
+`sweep_checks.py` for each of their steps, `verify_targets.py` for every
+target it runs), and `tools/data/target_tiers.txt`, committed, one tier
+per target, which `verify_targets.py` writes from its own measurements
+and merges over the lines already there. The tiers are quick (under 5 s),
+normal (under 30 s), long (under 2 min), and very long; `TIERS` in the
+script sets them. A tier changes rarely, which keeps the committed file's
+diffs small, while the local cache carries real seconds.
+
+```
+uv run python -m tools.target_times   # what the listing knows, per target
+```
 
 ## check_chapter.py
 

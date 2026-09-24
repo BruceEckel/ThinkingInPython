@@ -60,6 +60,13 @@ comment sits touching it. The static listing below is what a pipe, CI,
 and `--pick never` get, and what the picker falls back to if
 prompt_toolkit is not installed.
 
+A time column sits between the name and the doc: this machine's last
+successful run of the target (build/target_times.json, written by every
+timer in tools/), or, for a target this machine has not run, its tier
+from tools/data/target_tiers.txt, which `make verify-targets` writes.
+The column is colored by tier (quick green, long yellow, very long red)
+and a legend closes the listing; target_times.py has the thresholds.
+
 Output is colored when stdout is a terminal: section headings bold with the
 slug highlighted, target names in color. `NO_COLOR` turns it off,
 `FORCE_COLOR` (or `--color always`) turns
@@ -88,8 +95,17 @@ from pathlib import Path
 from typing import IO
 
 from tools.config import ROOT
+from tools.target_times import TIERS, Timing
 
 MAKEFILE = ROOT / "Makefile"
+
+# What the time column means, printed once under the listing.
+LEGEND = ("Time: this machine's last run, or the tier from "
+          "tools/data/target_tiers.txt. Tiers: "
+          + ", ".join(f"{name} under {int(limit)} s" if limit < 120
+                      else f"{name} under {int(limit // 60)} min"
+                      if limit != float("inf") else name
+                      for name, limit in TIERS) + ".")
 
 # Wrap no wider than this however wide the terminal is, and give up on
 # wrapping (printing one long line) rather than squeeze the doc column
@@ -115,15 +131,25 @@ class Palette:
     target: str = ""
     dim: str = ""
     reset: str = ""
+    quick: str = ""
+    long: str = ""
+    verylong: str = ""
 
     def paint(self, code: str, text: str) -> str:
         return f"{code}{text}{self.reset}" if code else text
+
+    def paint_time(self, tier: str, text: str) -> str:
+        """The time column's color: a tier's own, `normal` plain."""
+        codes = {"quick": self.quick, "long": self.long,
+                 "very long": self.verylong}
+        return self.paint(codes.get(tier, ""), text)
 
 
 PLAIN = Palette()
 ANSI = Palette(
     heading="\x1b[1m", slug="\x1b[1;36m", target="\x1b[36m",
-    dim="\x1b[2m", reset="\x1b[0m")
+    dim="\x1b[2m", reset="\x1b[0m",
+    quick="\x1b[32m", long="\x1b[33m", verylong="\x1b[31m")
 
 
 def _enable_windows_vt() -> bool:
@@ -327,9 +353,15 @@ def terminal_width(override: int | None = None) -> int:
     return min(shutil.get_terminal_size((80, 24)).columns, MAX_WIDTH)
 
 
-def _table(rows: list[tuple[str, str]], width: int,
-           paint: Callable[[str], str] = str) -> list[str]:
-    """Two columns, the second wrapped and hanging-indented under itself.
+def _table(rows: list[tuple[str, str, str]], width: int,
+           paint: Callable[[str], str] = str,
+           paint_time: Callable[[str, str], str] = lambda _tier, t: t,
+           tiers: Mapping[str, str] | None = None,
+           time_width: int = 0) -> list[str]:
+    """Label, time, and doc columns, the doc wrapped and hanging-indented
+    under itself. The time column is at least `time_width` wide, so
+    every section's doc column lines up, and is left out when that is
+    zero and every row's time is empty.
 
     Three things must survive intact. A hyphenated target name
     (`fix-comment-spacing`) stays whole via break_on_hyphens; an over-long
@@ -338,15 +370,21 @@ def _table(rows: list[tuple[str, str]], width: int,
     express, so the spaces inside backticks are swapped for a placeholder
     that is not whitespace and swapped back afterward.
 
-    `paint` colors the label; padding is measured on the raw label so the
-    escape codes it adds never shift the doc column.
+    `paint` colors the label and `paint_time` the time (given its tier
+    from `tiers`); padding is measured on the raw text so the escape
+    codes they add never shift the doc column.
     """
-    label_width = max((len(label) for label, _ in rows), default=0)
+    label_width = max((len(label) for label, _, _ in rows), default=0)
+    time_width = max([time_width, *(len(t) for _, t, _ in rows)])
     lines: list[str] = []
-    for label, doc in rows:
+    for label, when, doc in rows:
         pad = " " * (label_width - len(label))
         lead = f"  {paint(label)}{pad}  "
-        indent = " " * (2 + label_width + 2)
+        if time_width:
+            tier = (tiers or {}).get(label, "")
+            lead += paint_time(tier, f"{when:>{time_width}}") + "  "
+        indent = " " * (2 + label_width + 2
+                        + (time_width + 2 if time_width else 0))
         body = width - len(indent)
         if body < MIN_DOC:
             lines.append(f"{lead}{doc}")
@@ -370,9 +408,16 @@ def wrap_doc(doc: str, width: int) -> list[str]:
 
 
 def _rows(targets: list[Target], width: int,
-          palette: Palette = PLAIN) -> list[str]:
-    return _table([(t.name, t.doc) for t in targets], width,
-                  lambda name: palette.paint(palette.target, name))
+          palette: Palette = PLAIN,
+          times: Mapping[str, Timing] | None = None) -> list[str]:
+    known = times or {}
+    return _table(
+        [(t.name, known[t.name].label if t.name in known else "", t.doc)
+         for t in targets],
+        width, lambda name: palette.paint(palette.target, name),
+        palette.paint_time,
+        {name: timing.tier for name, timing in known.items()},
+        max((len(t.label) for t in known.values()), default=0))
 
 
 def _heading(section: Section, palette: Palette) -> str:
@@ -400,26 +445,40 @@ def check(sections: list[Section]) -> None:
 
 
 def render_section(section: Section, width: int | None = None,
-                   palette: Palette = PLAIN) -> str:
+                   palette: Palette = PLAIN,
+                   times: Mapping[str, Timing] | None = None) -> str:
     """The heading line names the slug first (`style: Style gates`), so
-    the full listing doubles as the index of what `make help NAME` takes."""
-    rows = _rows(section.listed(), width or terminal_width(), palette)
+    the full listing doubles as the index of what `make help NAME` takes.
+    `times` fills the time column; none means no column."""
+    rows = _rows(section.listed(), width or terminal_width(), palette,
+                 times)
     return "\n".join([_heading(section, palette), *rows])
 
 
+def legend(width: int, palette: Palette = PLAIN) -> str:
+    """The time column's key, wrapped to `width`, dimmed."""
+    return "\n".join(palette.paint(palette.dim, line)
+                     for line in wrap_doc(LEGEND, width))
+
+
 def render_all(sections: list[Section], width: int | None = None,
-               palette: Palette = PLAIN) -> str:
+               palette: Palette = PLAIN,
+               times: Mapping[str, Timing] | None = None) -> str:
     """Every section expanded, in Makefile order: what `make` prints.
 
     Secondary targets stay folded, as in a single section, since the doc
-    text of the sibling that names them is right there above.
+    text of the sibling that names them is right there above. With
+    `times`, the legend for the time column closes the listing.
     """
     width = width or terminal_width()
     blocks: list[str] = []
     if preamble := next((s for s in sections if not s.slug), None):
-        blocks.append("\n".join(_rows(preamble.listed(), width, palette)))
-    blocks += [render_section(s, width, palette)
+        blocks.append("\n".join(_rows(preamble.listed(), width, palette,
+                                      times)))
+    blocks += [render_section(s, width, palette, times)
                for s in sections if s.slug]
+    if times:
+        blocks.append(legend(width, palette))
     return "\n\n".join(blocks)
 
 
@@ -449,6 +508,8 @@ def main(argv: list[str] | None = None) -> int:
 
     sections = parse(args.makefile.read_text(encoding="utf-8"))
     check(sections)
+    from tools.target_times import timings
+    times = timings()
     width = terminal_width(args.width)
     colored = {"always": True, "never": False}.get(
         args.color, None)
@@ -471,8 +532,9 @@ def main(argv: list[str] | None = None) -> int:
             print("(interactive picker unavailable: `uv sync` installs "
                   "prompt_toolkit)", file=sys.stderr)
         else:
-            rows = (help_picker.section_rows(match) if match is not None
-                    else help_picker.all_rows(sections))
+            rows = (help_picker.section_rows(match, times)
+                    if match is not None
+                    else help_picker.all_rows(sections, times))
             # The menu reports a target's failure in its own output and
             # a "(exited with status N)" line; exiting nonzero here too
             # would only make the outer make add "*** [help] Error N",
@@ -481,9 +543,9 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
     if match is not None:
-        print(render_section(match, width, palette))
+        print(render_section(match, width, palette, times))
     else:
-        print(render_all(sections, width, palette))
+        print(render_all(sections, width, palette, times))
     return 0
 
 

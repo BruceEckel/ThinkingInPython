@@ -52,6 +52,7 @@ import time
 
 from tools.make_help import MAKEFILE, entries
 from tools.config import ROOT
+from tools.target_times import record
 from tools.timed_make import format_seconds
 
 # Every check a tool upgrade can break, in run order. Cheapest and most
@@ -100,6 +101,8 @@ def main(argv: list[str] | None = None) -> int:
         start = time.monotonic()
         proc = subprocess.run(["make", name], cwd=ROOT)
         took[name] = time.monotonic() - start
+        if proc.returncode == 0:
+            record(name, took[name])
         if proc.returncode != 0:
             failed.append(name)
             print(f"\n{name} FAILED (exit {proc.returncode}); continuing.\n")

@@ -683,7 +683,13 @@ and how it was measured.
   exits on a `##+` naming no documented target or one defined in that same
   section. The sections are ordered by how often they are used, Everyday
   first and Cleanup last, and a new target goes in the section for its
-  job, with a `##+` in Everyday if it becomes a daily command. Parsed by `tools/make_help.py`,
+  job, with a `##+` in Everyday if it becomes a daily command. A time
+  column (since 2026-09-24) shows each target's last passing run on this
+  machine, recorded in `build/target_times.json` by `timed_make.py`,
+  `verify.py`, `sweep_checks.py`, and `verify_targets.py`, or else its
+  tier from `tools/data/target_tiers.txt`, which `make verify-targets`
+  rewrites and which is committed; `tools/target_times.py` has the
+  thresholds. Parsed by `tools/make_help.py`,
   deliberately not `grep`/`awk`, since GNU Make on Windows can fall back to
   `cmd.exe` as `SHELL` when no POSIX shell is on PATH.
   `tools/README.md`'s own "Commands" section deliberately does not re-list every

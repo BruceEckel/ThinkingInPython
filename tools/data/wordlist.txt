@@ -47,6 +47,7 @@ combinators
 composable
 conformant
 conftest
+contravariant
 coplien
 coq
 coroutine
@@ -129,6 +130,7 @@ isinstance
 iterable
 iterables
 json
+keypress
 koka
 kotlin
 kyo
@@ -174,6 +176,7 @@ nailers
 namespace
 namespaced
 namespaces
+natively
 newline
 newlines
 nondeterminism
@@ -296,6 +299,7 @@ unescaped
 unfindable
 unflattened
 unhashable
+unimported
 uninterruptible
 unlifted
 unnormalized
@@ -305,6 +309,7 @@ unprint
 unrepresentable
 unrun
 unshadows
+unslotted
 unstarred
 unsupplied
 unsynchronized
@@ -315,6 +320,7 @@ unvalidated
 upcasting
 uppercases
 uppercasing
+urlopen
 uvloop
 validators
 varargs

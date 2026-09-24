@@ -40,6 +40,7 @@ import time
 
 from tools.make_help import MAKEFILE, entries
 from tools.config import ROOT
+from tools.target_times import record
 from tools.timed_make import format_seconds
 
 # The everyday loop, in run order. Add a make target name here to include
@@ -94,6 +95,8 @@ def main(argv: list[str] | None = None) -> int:
         proc = subprocess.run(["make", name], cwd=ROOT)
         took[name] = time.monotonic() - start
         ran.append(name)
+        if proc.returncode == 0:
+            record(name, took[name])
         if proc.returncode != 0:
             print(f"\n{name} failed (exit {proc.returncode}); stopping.\n")
             print(_listing("Ran:", ran, took))

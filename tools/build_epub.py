@@ -308,32 +308,36 @@ def relink(text: str, prefix: str, ids: Ids, unresolved: set[str]) -> str:
 # SVG diagrams to PNG, for readers that cannot draw SVG
 # --------------------------------------------------------------------------- #
 def svg_command(tool: str, src: Path, dst: Path,
-                width: int = SVG_PNG_WIDTH) -> list[str]:
+                width: int = SVG_PNG_WIDTH,
+                background: str | None = "white") -> list[str]:
     """The command line that rasterizes `src` to `dst` with `tool`,
     `width` pixels wide.
 
-    Each one flattens onto white. The diagrams have no background of
-    their own and draw in near-black, so a transparent PNG would vanish
-    against a dark theme.
+    Each one flattens onto `background`. The diagrams have no background
+    of their own and draw in near-black, so a transparent PNG would
+    vanish against a dark theme. None keeps the SVG's own transparency,
+    which the cover wants: it paints its whole canvas itself.
     """
     match tool:
         case "resvg":
             # Width alone preserves the aspect ratio.
-            return [tool, "--width", str(width),
-                    "--background", "white", str(src), str(dst)]
+            flat = ["--background", background] if background else []
+            return [tool, "--width", str(width), *flat, str(src), str(dst)]
         case "rsvg-convert":
-            return [tool, "--width", str(width),
-                    "--keep-aspect-ratio", "--background-color", "white",
-                    "-o", str(dst), str(src)]
+            flat = ["--background-color", background] if background else []
+            return [tool, "--width", str(width), "--keep-aspect-ratio",
+                    *flat, "-o", str(dst), str(src)]
         case "magick":
-            return [tool, "-density", "200", "-background", "white",
-                    str(src), "-flatten",
+            flat = (["-background", background, str(src), "-flatten"]
+                    if background else [str(src)])
+            return [tool, "-density", "200", *flat,
                     "-resize", f"{width}x>", "-strip",
-                    f"PNG8:{dst}"]
+                    f"PNG8:{dst}" if background else str(dst)]
         case "inkscape":
+            flat = ([f"--export-background={background}",
+                     "--export-background-opacity=1"] if background else [])
             return [tool, "--export-type=png",
-                    f"--export-width={width}",
-                    "--export-background=white", "--export-background-opacity=1",
+                    f"--export-width={width}", *flat,
                     f"--export-filename={dst}", str(src)]
         case _:
             raise ValueError(f"unknown SVG tool: {tool}")

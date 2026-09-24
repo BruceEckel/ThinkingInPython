@@ -9,8 +9,10 @@ import re
 import pytest
 
 from tools.make_help import (
-    ANSI, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, can_colorize, check, entries,
-    parse, render_all, render_section, terminal_width, want_picker, wrap_doc)
+    ANSI, LEGEND, MAKEFILE, MAX_WIDTH, MIN_DOC, PLAIN, can_colorize, check,
+    entries, parse, render_all, render_section, terminal_width, want_picker,
+    wrap_doc)
+from tools.target_times import Timing
 
 _ESCAPES = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -322,3 +324,28 @@ def test_the_real_makefile_has_notes_for_the_everyday_targets():
         assert targets[name].notes, name
         assert targets[name].recipe or targets[name].prereqs, name
     assert targets["verify"].recipe == ("$(PY) -m tools.verify $(ARGS)",)
+
+
+# ---- the time column
+
+TIMES = {"eol": Timing("0.3s", "quick"), "build-thing": Timing("long", "long")}
+
+
+def test_times_add_a_column_of_shared_width_and_a_legend():
+    out = render_all(parse(SAMPLE), 80, times=TIMES)
+    lines = out.splitlines()
+    build = next(line for line in lines if line.startswith("  build-thing"))
+    eol = next(line for line in lines if line.startswith("  eol"))
+    assert build == "  build-thing  long  Build the thing"
+    assert eol.startswith("  eol  0.3s  Check for CRLF")
+    assert lines[-1].endswith("very long.") and LEGEND.startswith(lines[-2])
+    assert render_all(parse(SAMPLE), 80) == render_all(parse(SAMPLE), 80,
+                                                       times={})
+
+
+def test_time_column_is_colored_by_tier():
+    out = render_section(parse(SAMPLE)[2], 80, ANSI, TIMES)
+    assert "[32m0.3s[0m" in out
+    out = render_section(parse(SAMPLE)[1], 80, ANSI, TIMES)
+    assert "[33mlong[0m" in out
+    assert "[31m" not in out

@@ -17,7 +17,8 @@ from tools.help_picker import (
     INTERRUPTED, next_version, notes_lines, run_target, section_rows,
     session,
     split_match, variable_default, variables)
-from tools.make_help import MAKEFILE, Target, parse
+from tools.make_help import LEGEND, MAKEFILE, Target, parse
+from tools.target_times import Timing
 
 UP, DOWN = "\x1b[A", "\x1b[B"
 ENTER, ESC, BACKSPACE = "\r", "\x1b", "\x7f"
@@ -438,3 +439,25 @@ def test_notes_lines_keep_an_indented_paragraph_as_written():
     target = Target("x", "Do x", notes="Install it with:\n  winget install x")
     texts = [t for _, t in notes_lines(target, 60)]
     assert texts[3:] == ["  Install it with:", "    winget install x"]
+
+
+def test_rows_carry_times_and_the_listing_ends_with_the_legend():
+    times = {"verify": Timing("56s", "long"), "ty": Timing("quick", "quick")}
+    rows = all_rows(_sections(), times)
+    verify = next(r for r in rows if r.label == "verify")
+    assert (verify.time, verify.tier) == ("56s", "long")
+    assert next(r for r in rows if r.label == "sweep").time == ""
+    assert rows[-1].kind == "note" and rows[-1].doc == LEGEND
+    assert not rows[-1].selectable
+    assert all_rows(_sections())[-1].kind == "target"
+    kept = filter_rows(rows, "quick")     # the legend never matches
+    assert all(r.kind != "note" for r in kept)
+    assert [r.label for r in kept if r.selectable] == []
+
+
+def test_the_body_renders_the_time_column_in_its_tier_style():
+    times = {"verify": Timing("56s", "long")}
+    picker = Picker(all_rows(_sections(), times), output=DummyOutput())
+    fragments = picker._body()
+    style, text = next((s, t) for s, t, *_ in fragments if t.strip() == "56s")
+    assert "class:long" in style
