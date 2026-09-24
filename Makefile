@@ -44,7 +44,12 @@ ARGS ?=
 # never drift apart; anything longer goes in a plain `#` comment above it.
 # `##-` in place of `##` marks a target secondary: still documented and still
 # smoke-tested by `make verify-targets`, but folded out of the listing because
-# a sibling's doc text names it (`fix-eol` under `eol`).
+# a sibling's doc text names it (`fix-eol` under `eol`). A `##+ name name`
+# line repeats targets defined in other sections into the section it sits
+# in, at that point in the listing, so the everyday section can show
+# `check-ch` and `spell` without moving their definitions. The sections
+# run from the everyday loop down to setup and cleanup: what you run most
+# is at the top of the menu, what you run rarely at the bottom.
 # Parsed by tools/make_help.py instead of grep/awk, so help has no dependency
 # on a POSIX toolchain being on PATH (every other target already needs Python).
 #
@@ -106,73 +111,22 @@ $(TIMED_GOALS):
 endif
 else
 
-##@ Setup
-
-.PHONY: tools-check tools-check-full doctor verify-targets tools-test \
-        tools-upgrade
-
-# What a reader needs for the everyday commands below: uv, plus the
-# uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
-# assumed present, since you needed both to get this far.
-tools-check:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
-	$(PY) -m tools.check_tools
-
-# Adds the tools a book maintainer needs for the rest of `make help`:
-# pandoc (site/local/epub/pdf), typst (pdf), and the standalone vale
-# binary (prose).
-tools-check-full:  ## Check every tool, including pandoc, typst, and vale (site/pdf/prose)
-	$(PY) -m tools.check_tools --full
-
-# Read-only: catches a stale uv silently stuck on an old Python prerelease,
-# and (Windows) a process running from .venv that would lock it on upgrade.
-# Prints the exact fix command instead of applying anything itself.
-doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
-	$(PY) -m tools.doctor
-
-# Runs every other target here and reports which ones fail. Read-only/idempotent
-# targets run directly; a target that bakes --fix/--write/--add into its recipe
-# (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
-# fix-comment-caps, fix-comment-spacing, and the clean-* targets, which
-# would otherwise wipe the logs below) runs in a disposable git worktree
-# instead, so this working tree is never touched. tools-upgrade, python-upgrade,
-# serve, and local never run (network/environment mutation, or a server that
-# blocks forever); see tools/verify_targets.py's docstring. Logs land in
-# build/target_test_logs/.
-verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
-	$(PY) -m tools.verify_targets
-
-# The harness's own unit tests (tools/tests/), covering the shared library
-# modules and the pure logic inside the entry points. Distinct from `test`,
-# which runs the book's example tests under build/examples/. `gate` runs
-# this first: every later step trusts these tools, so a broken one makes
-# the rest of the gate's verdict meaningless.
-tools-test:  ## Run the harness's own unit tests (tools/tests/)
-	$(PYTEST) $(PYTEST_N) tools/tests
-
-# Updates uv itself (when it was installed via its standalone installer),
-# best-effort upgrades a globally installed `ty` (`uv tool upgrade ty`,
-# what bare `ty` on PATH resolves to), then upgrades every uv-managed dev
-# tool (ty, ruff, pytest, ...) to the latest version pyproject.toml
-# allows, rewriting uv.lock. pandoc, typst, and vale are updated
-# best-effort through winget or Homebrew, whichever is on PATH.
-# make/git are left alone. Review `git diff uv.lock` before committing.
-# For the pinned Python version itself, use `make python-upgrade`.
-#
-# Ends by stamping the upgrade (so the gate can stop nagging) and running
-# `sweep`, which reports every check the new tools broke rather than
-# stopping at the first. A failing sweep here means the upgrade landed
-# and the book needs fixing, not that the upgrade failed; the stamp is
-# written first for that reason.
-tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/typst/vale
-	$(PY) -m tools.upgrade_tools
-	$(MAKE) tools-check-full
-	$(PY) -m tools.tool_stamp --write
-	$(MAKE) sweep
-
 ##@ Everyday
 
-.PHONY: all verify verify-ch sync-ci gate gate-status tools-status libs-check sweep ci reset \
-        python-upgrade
+.PHONY: verify-ch all verify sweep gate gate-status
+
+# `make verify` scoped to one chapter and its Solutions file, in a few
+# seconds instead of tens: fix-eol, reflow, both extracts, this chapter's
+# #: markers (chapter and Solutions), both syncs and drift checks, the
+# Markdown gates on these two files, then ty/ruff/run/pytest over the
+# chapter's directory in each build tree. GATE_CHECKS is passed through so
+# the Markdown checks are the gate's by construction. It writes no gate
+# stamp: a change that can reach other chapters (a renamed listing, a
+# utils/ helper, a heading others link to) still needs `make verify`.
+verify-ch:  ## The verify loop for one chapter and its Solutions file (CH=28), a few seconds
+	$(PY) -m tools.verify_chapter $(CH) --checks $(GATE_CHECKS)
+
+##+ check-ch run-one
 
 # The edit-and-check loop to repeat after touching a chapter: every
 # mutating fixer (reflow, the comment-style fixers, import sorting,
@@ -197,19 +151,16 @@ all:  ## Run every everyday fixer plus sync and gate; ARGS=--help lists them wit
 # SolutionsCode one run behind whenever a marker needed fixing.
 verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line endings, refresh #: markers, sync Examples/ and SolutionsCode/, then run every gate except the site build
 
-# The same loop scoped to one chapter and its Solutions file, in a few
-# seconds instead of tens: fix-eol, reflow, both extracts, this chapter's
-# #: markers (chapter and Solutions), both syncs and drift checks, the
-# Markdown gates on these two files, then ty/ruff/run/pytest over the
-# chapter's directory in each build tree. GATE_CHECKS is passed through so
-# the Markdown checks are the gate's by construction. It writes no gate
-# stamp: a change that can reach other chapters (a renamed listing, a
-# utils/ helper, a heading others link to) still needs `make verify`.
-verify-ch:  ## The verify loop for one chapter and its Solutions file (CH=28), a few seconds
-	$(PY) -m tools.verify_chapter $(CH) --checks $(GATE_CHECKS)
-
-# Same as verify, plus the site build at the end.
-sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
+# `gate` stops at its first failure, and since `solutions-gate` is one of
+# its prerequisites, that half runs first and can hide every Chapters/
+# failure behind it. So one `gate` rarely shows the whole blast radius of
+# a tool upgrade. This runs every static check over both trees to
+# completion and summarizes which failed. `tools-upgrade` ends with it;
+# run it directly after any change wide enough that the first failure is
+# unlikely to be the only one. The #: markers are excluded on purpose
+# (see the script docstring).
+sweep:  ## Run every check over both trees, reporting all failures instead of the first
+	$(PY) -m tools.sweep_checks
 
 # The Markdown checks the gate enforces, run together by check_all.py in one
 # process with one parse per file, rather than as separate scripts. Names
@@ -279,179 +230,110 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 gate-status:  ## Report when the gate last passed and what changed since
 	$(PY) -m tools.gate_stamp
 
-# When were the dev tools last upgraded, and to what? `tools-upgrade`
-# writes this stamp; `gate` reads it and prints one line (nothing more,
-# and never a failure) once it is older than tool_stamp.py's threshold.
-# With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
-# correctly treated as current.
-tools-status:  ## Report when the dev tools were last upgraded, and to what
-	$(PY) -m tools.tool_stamp
+##+ local spell prose
 
-# Is a release waiting for a library the listings import (Stateless,
-# numpy, hypothesis, time-machine)? Reads uv.lock, asks PyPI for each
-# one's latest version, and prints the ones that are behind. It changes
-# nothing and always exits 0, offline included, and it joins no gate: a
-# gate that reaches the network fails for reasons the book did not
-# cause. Upgrade one library alone with `uv lock --upgrade-package NAME`
-# and `uv sync`; CLAUDE.md's Stateless-upgrade entry says what to
-# re-check afterward.
-libs-check:  ## Compare the locked library versions (Stateless, numpy, ...) with the latest on PyPI
-	$(PY) -m tools.libs_check
+# Headed "Writing" rather than "Prose" for the same reason as "Code
+# examples" above: `prose` is a target in this section.
+##@ Writing and spelling
 
-# `gate` stops at its first failure, and since `solutions-gate` is one of
-# its prerequisites, that half runs first and can hide every Chapters/
-# failure behind it. So one `gate` rarely shows the whole blast radius of
-# a tool upgrade. This runs every static check over both trees to
-# completion and summarizes which failed. `tools-upgrade` ends with it;
-# run it directly after any change wide enough that the first failure is
-# unlikely to be the only one. The #: markers are excluded on purpose
-# (see the script docstring).
-sweep:  ## Run every check over both trees, reporting all failures instead of the first
-	$(PY) -m tools.sweep_checks
+.PHONY: spell spell-add prose reflow reflow-check rewrite
 
-# Mirrors the GitHub Actions gates plus a site build, all run locally. The
-# default GitHub Actions path only builds and publishes the site; these gates
-# run in CI only on request (see tools/README.md).
-ci: gate site  ## Run the full local gate: check, ty, ruff, run, pytest, site
+# Spell-check the book and lint it for small mechanical slips. codespell
+# catches known misspellings (prose and code comments); prose_lint catches
+# spacing/blank-line/punctuation slips; spellcheck.py is a full-dictionary check
+# of the prose, with accepted terms in tools/data/wordlist.txt. Run one chapter with
+# CH= (e.g. `make spell CH=29`) or a path with DOCS=.
+spell:  ## codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)
+	$(SPELL) $(PROSE_FILES)
+	$(PY) -m tools.prose_lint $(PROSE_FILES)
+	$(PY) -m tools.spellcheck $(PROSE_FILES)
 
-# Throw away build/examples/ and rebuild it from the Markdown. Run this when
-# a check reports drift you cannot explain (a stale tree from an older Markdown,
-# or one carried over from another machine).
-reset: clean-examples extract  ## Regenerate build/examples/ from the Markdown (fixes drift)
-	@echo "build/examples/ regenerated from the Markdown."
+# Accept every word spellcheck.py doesn't recognize into tools/data/wordlist.txt
+# and every word codespell flags into tools/data/codespell-ignore.txt (both
+# sorted, deduplicated) instead of failing. The two checkers keep separate
+# lists, and codespell reads code where spellcheck.py reads prose only, so
+# a class name codespell dislikes needs the second list. It cannot tell a
+# real term from a typo, so always review the diff before committing; a
+# real typo belongs in the prose, not in either list.
+spell-add:  ## Accept every unknown word: spellcheck's into wordlist.txt, codespell's into codespell-ignore.txt (review the diff!)
+	$(PY) -m tools.spellcheck $(PROSE_FILES) --add
 
-# Upgrade the development Python and re-check the book against it.
-# `make python-upgrade` pulls the latest patch of the pinned minor (from
-# .python-version); `make python-upgrade TO=3.15` repins to a new minor first
-# (rewriting .python-version and the requires-python floor). Both resync the
-# venv and run the gate. Run through `uv run --no-project` so the orchestrating
-# interpreter is not the venv that `uv sync` rebuilds.
-python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify
-	uv run --no-project python -m tools.upgrade_python $(TO)
-	$(MAKE) verify
+# House-style lint with Vale: no em-dashes and no filler phrases. Run one
+# chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.
+# Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
+prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
+	$(VALE) $(PROSE_FILES)
 
-##@ Build and site
+##+ checks pattern-names
 
-.PHONY: sync check prune site preview-check cover epub pdf release release-prune local serve figures figures-open
+# Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
+# headings are left untouched; a file is rewritten only if it round-trips).
+# Target one chapter with CH=, e.g. `make reflow CH=02` or `make reflow CH=Tour`.
+reflow:  ## Rewrite prose to one sentence per line (CH=02 for one chapter)
+	$(PY) -m tools.reflow_prose --write $(CH)
 
-# Write the extracted tree straight into Examples/, syncing the committed copy
-# to the Markdown. Run after editing a code block so the drift check passes.
-sync:  ## Update the committed Examples/ tree from the Markdown
-	$(PY) -m tools.extract_examples --write -o Examples
+reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
+	$(PY) -m tools.reflow_prose $(CH)
 
-check:  ## Verify book examples match the committed Examples/ tree
-	$(PY) -m tools.extract_examples
-
-# `check`/`gate` already fail on an orphaned stray (a file under Examples/
-# with no matching block and no mention anywhere in the book, typically left
-# behind by a rename). This deletes exactly those; a stray whose filename is
-# still mentioned somewhere in the book is left alone for a human to review.
-# It prunes SolutionsCode/ in the same run, since a renamed listing that
-# both trees copy (a utils/ helper) otherwise fails solutions-gate after
-# the Examples/ prune looked complete; `solutions-prune` is that half alone.
-prune:  ## Delete orphaned stray files under Examples/ and SolutionsCode/ (see `check`; `solutions-prune` for the second tree alone)
-	$(PY) -m tools.extract_examples --prune
-	$(PY) -m tools.extract_solutions --prune
-
-site:  ## Render Chapters/ into build/site/ with pandoc
-	$(PY) -m tools.build_site
-
-# Hovers and taps every link on every built page under jsdom and fails on
-# a link into the book that shows no panel, a navigation link that shows
-# one, or a panel with something wrong in it. In no gate: it needs node,
-# and its first run installs jsdom under build/node/ from the network.
-# After an edit to resources/static/link-preview.js alone, `node
-# tools/site_preview_check.js` reruns it against the site already built.
-preview-check: site  ## Build the site, then test its link previews under jsdom (needs node)
-	node tools/site_preview_check.js
-
-# The cover images and favicon are generated files under
-# resources/static/, committed so the builds never depend on the
-# generator's tools (resvg, Pillow). To use new cover art, drop
-# the image at resources/cover-source.jpg and rerun this; with no
-# source image the script falls back to its own drawn serpent.
-cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
-	$(PY) -m tools.make_cover
-
-# Two EPUBs from the same Chapters/, for e-readers: -color (syntax
-# highlighting in color, for backlit readers) and -eink (bolding
-# instead, for grayscale screens). The site keeps one HTML page per
-# chapter, so a cross-reference stays a link between files; an EPUB
-# is a single document, so build_epub.py namespaces every heading id by
-# chapter (ch12-immutability) before merging. Without that, the 44 chapters
-# ending in `## Exercises` and the nine other repeated headings would collide
-# and pandoc would quietly retarget those links. Needs pandoc, like `site`.
-epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub with pandoc
-	$(PY) -m tools.build_epub
-
-# Hands the built EPUB to Amazon's Send to Kindle desktop app, which
-# opens its dialog with the file queued, and opens an Explorer window
-# with the file selected for drag and drop; the Send click is the app's.
-# Rebuilds the EPUB first (the same build as `epub`) only when it is
-# missing or older than Chapters/, resources/, or the builder, so a
-# fresh build is sent as-is. Excluded from verify-targets' smoke
-# test: it opens a GUI.
-kindle:  ## Send the e-ink EPUB to a Kindle via the Send to Kindle app, rebuilding it first if stale (VARIANT=color for the other)
-	$(PY) -m tools.send_to_kindle $(VARIANT)
-
-# One PDF from the same merged, anchor-namespaced Markdown stream the
-# EPUB uses (build_pdf.py reuses build_epub.py's assembly), rendered by
-# pandoc through typst. Typst draws the SVG diagrams directly and
-# highlights the listings itself, so this build needs no rasterizer.
-# Needs pandoc and the typst binary (`make tools-check-full` verifies).
-pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and typst
-	$(PY) -m tools.build_pdf
-
-# Publish a GitHub release whose uploaded assets are exactly the
-# freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
-# preflight (clean tree, HEAD pushed, tag free, gh authenticated),
-# then `make verify` so a book that fails the gate can never ship,
-# then fresh `make pdf` + `make epub`, then
-# `gh release create v$(VERSION)`. Deliberately excluded from
-# verify-targets' smoke test: it tags the repo and publishes to GitHub.
-release:  ## Verify, rebuild the PDF and EPUBs, publish them with the reader guides as a GitHub release, then prune releases older than the newest two (VERSION=1.0)
-	$(PY) -m tools.release $(VERSION)
-
-# The prune step of `release` on its own. Tags stay, so history and the
-# menu's next-version guess are untouched. Excluded from verify-targets'
-# smoke test: it deletes from GitHub.
-release-prune:  ## Delete GitHub releases older than the newest two (their tags stay)
-	$(PY) -m tools.release --prune
-
-# --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
-# not a full site build), then the open page reloads itself.
-# --copy-on-select makes a mouse selection copy itself to the clipboard
-# as «text» (Chapter › Section), for lifting passages out of the
-# rendered book. Both scripts are added
-# to pages as they are served; build/site/ and the published site never
-# carry them, and `make serve` gets neither.
-local: site  ## Build the site, serve it with live reload and copy-on-select, open a browser
-	$(PY) -m tools.serve --open --watch --copy-on-select
-
-serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
-	$(PY) -m tools.serve
-
-# Every figure the prose references, in book order and numbered, on one
-# page, with the SVG the site and PDF draw (read live from
-# resources/images/) and the PNG the EPUB draws, to check the drawings
-# against each other by eye: arrowheads, stroke widths, fonts, palette.
-# A style line under each figure lists what it draws with and marks
-# what falls outside the cover palette. Fails on a reference to a
-# figure with no file, since the book would render nothing there. `make
-# all` runs it, so the gallery tracks the working tree.
-figures:  ## Build build/figures/index.html, a numbered gallery of every figure in the book, to check style by eye (`make figures-open` opens it)
-	$(PY) -m tools.figure_gallery
-
-figures-open:  ##- Build the figure gallery and open it in a browser
-	$(PY) -m tools.figure_gallery --open
+# AI editing passes over one chapter's prose, edited in place. Each pass
+# is one headless `claude -p "/<skill> <chapter>"` run. Reflow and the
+# prose gates run after every pass, and the chain stops at the first
+# failure. It costs tokens and is nondeterministic, so it is never part
+# of verify/gate/ci, refuses to run under CI, and needs a `git diff`
+# review before you commit.
+#
+# The passes, in the order they run (PASSES in tools/rewrite.py):
+#
+#   elements-of-style  default  Strunk: active voice, positive form,
+#                               omit needless words
+#   activate           opt-in   clear the passive, there-is, and
+#                               weak-verb warnings from `make prose`
+#   literal            default  say what the machinery does: a literal
+#                               verb for each figure of speech
+#   positive           default  say what happens, not what does not:
+#                               keep only the negations that claim
+#   straighten         default  one sentence, one load: name the actor,
+#                               split at the seam
+#   cohesion           default  old before new: one topic string per
+#                               paragraph, the news at the end
+#   antecedents        default  name what each this/it/which points at
+#                               when two things could be meant
+#   readability        opt-in   remove AI-writing tells; its own rule
+#                               is "only when asked", so it never runs
+#                               unless you name it here
+#   bruce-edit-apply   default  apply the promoted rules in
+#                               bruce_edit_db.md
+#
+# A bare `make rewrite CH=25` runs the seven defaults. To add an opt-in
+# pass to them: ARGS="--also activate". To run only the passes you
+# name: ARGS="--passes activate readability". To run all nine:
+# ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
+# commands without running them.
+#
+# Several chapters run in parallel: CH="25 28 30" or CH=30-40 (a range,
+# inclusive; CH="25 30-32" mixes them) runs one pass chain per chapter,
+# four at a time (ARGS=-j2 changes that). Each chain edits
+# only its own chapter and checks only its own chapter, so they never
+# trip each other, and their output arrives per step under a [NN]
+# prefix. ARGS=--serial runs them one after another with output
+# streamed live, the mode for watching a pass work.
+#
+# Each pass names its own model (PASSES in tools/rewrite.py; ARGS=--list
+# shows them). MODEL= forces one model on every pass for a run:
+# MODEL=claude-sonnet-5 is the cheap lap. Each pass header prints the
+# model it used.
+MODEL ?=
+rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--list)
+	$(PY) -m tools.rewrite $(CH) $(if $(MODEL),--model $(MODEL)) $(ARGS)
 
 # Headed "Code examples" rather than "Examples" so its slug is `code`: a
 # section slug must not equal a target name (make_help.py enforces this),
 # and `examples` is a target below.
 ##@ Code examples (build/examples/)
 
-.PHONY: check-ch examples run run-one by-hand output output-check test ty pyright pyright-review pyright-accept lint \
-        fix-imports extract
+.PHONY: check-ch run-one run examples by-hand output output-check test ty \
+        lint fix-imports sync check prune extract pyright-review \
+        pyright-accept pyright
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
 # spends most of its time executing listings you did not touch; this runs the
@@ -460,18 +342,6 @@ figures-open:  ##- Build the figure gallery and open it in a browser
 # also catches cross-chapter breakage: run that before committing.
 check-ch:  ## Run the code checks for one chapter only (CH=12), ~1s
 	$(PY) -m tools.check_chapter $(CH)
-
-# An alias for `run`, kept because older notes name it: `run` already
-# depends on `extract`, so both build the same two targets in the same order.
-examples: extract run  ##- Extract then run (an alias for `run`)
-
-# These all read build/examples/, so each depends on `extract` to rebuild it
-# first. make builds `extract` once per invocation, so depending on it from
-# several targets does not re-extract. This is what stops a stale tree (e.g. a
-# gitignored build/examples/ left over from an older Markdown) from being
-# checked. Use `make reset` to force a clean regeneration.
-run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
-	$(PY) -m tools.run_examples
 
 # Run one example the way the book assumes: from inside its own chapter
 # directory, with the tree's utils/ on PYTHONPATH, so its sibling imports
@@ -483,6 +353,18 @@ run: extract  ## Run every extracted .py and report failures (`make examples` is
 # same as F=deque_timing (the block under `help` turns the word into F).
 run-one:  ## Run one example and show its output (`make run-one deque_timing`, or F=)
 	$(PY) -m tools.run_one_example $(F)
+
+# These all read build/examples/, so each depends on `extract` to rebuild it
+# first. make builds `extract` once per invocation, so depending on it from
+# several targets does not re-extract. This is what stops a stale tree (e.g. a
+# gitignored build/examples/ left over from an older Markdown) from being
+# checked. Use `make reset` to force a clean regeneration.
+run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
+	$(PY) -m tools.run_examples
+
+# An alias for `run`, kept because older notes name it: `run` already
+# depends on `extract`, so both build the same two targets in the same order.
+examples: extract run  ##- Extract then run (an alias for `run`)
 
 # Start every example listed under `# [by-hand]` in tools/data/norun.txt,
 # all at once, each from its own chapter directory with utils/ on
@@ -510,6 +392,37 @@ test: extract  ## Run the book's pytest examples (test_*.py)
 ty: extract  ## Type-check the extracted examples (must be clean)
 	$(TY) check build/examples
 
+lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
+	$(RUFF) check build/examples
+
+# Organize imports in the book's python listings (ruff's I rule), writing the
+# result back into the Markdown. Depends on extract so ruff sees each listing's
+# siblings and classifies imports the way the lint gate does.
+fix-imports: extract  ## Sort imports and drop unused ones in the listings (ruff I,F401), in the Markdown
+	$(PY) -m tools.fix_imports --fix
+
+# Write the extracted tree straight into Examples/, syncing the committed copy
+# to the Markdown. Run after editing a code block so the drift check passes.
+sync:  ## Update the committed Examples/ tree from the Markdown
+	$(PY) -m tools.extract_examples --write -o Examples
+
+check:  ## Verify book examples match the committed Examples/ tree
+	$(PY) -m tools.extract_examples
+
+# `check`/`gate` already fail on an orphaned stray (a file under Examples/
+# with no matching block and no mention anywhere in the book, typically left
+# behind by a rename). This deletes exactly those; a stray whose filename is
+# still mentioned somewhere in the book is left alone for a human to review.
+# It prunes SolutionsCode/ in the same run, since a renamed listing that
+# both trees copy (a utils/ helper) otherwise fails solutions-gate after
+# the Examples/ prune looked complete; `solutions-prune` is that half alone.
+prune:  ## Delete orphaned stray files under Examples/ and SolutionsCode/ (see `check`; `solutions-prune` for the second tree alone)
+	$(PY) -m tools.extract_examples --prune
+	$(PY) -m tools.extract_solutions --prune
+
+extract:  ## Write build/examples/ from the Markdown
+	$(PY) -m tools.extract_examples --write
+
 # Pyright is a second opinion, not a gate. The listings carry no pyright
 # suppressions; every disagreement with `ty` is an entry in
 # tools/data/pyright_baseline.txt, and the review prints only the delta:
@@ -525,23 +438,93 @@ pyright-accept: extract solutions-extract  ##- Rewrite tools/data/pyright_baseli
 pyright: extract  ##- Run pyright raw over the extracted examples
 	$(PYRIGHT) build/examples
 
-lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
-	$(RUFF) check build/examples
+##@ Book builds (site, EPUB, PDF)
 
-# Organize imports in the book's python listings (ruff's I rule), writing the
-# result back into the Markdown. Depends on extract so ruff sees each listing's
-# siblings and classifies imports the way the lint gate does.
-fix-imports: extract  ## Sort imports and drop unused ones in the listings (ruff I,F401), in the Markdown
-	$(PY) -m tools.fix_imports --fix
+.PHONY: local serve site preview-check epub pdf kindle figures figures-open \
+        cover
 
-extract:  ## Write build/examples/ from the Markdown
-	$(PY) -m tools.extract_examples --write
+# --watch polls Chapters/ and rebuilds the edited chapter (one pandoc run,
+# not a full site build), then the open page reloads itself.
+# --copy-on-select makes a mouse selection copy itself to the clipboard
+# as «text» (Chapter › Section), for lifting passages out of the
+# rendered book. Both scripts are added
+# to pages as they are served; build/site/ and the published site never
+# carry them, and `make serve` gets neither.
+local: site  ## Build the site, serve it with live reload and copy-on-select, open a browser
+	$(PY) -m tools.serve --open --watch --copy-on-select
+
+serve:  ## Serve build/site/ at http://localhost:8000 (no rebuilding)
+	$(PY) -m tools.serve
+
+site:  ## Render Chapters/ into build/site/ with pandoc
+	$(PY) -m tools.build_site
+
+# Hovers and taps every link on every built page under jsdom and fails on
+# a link into the book that shows no panel, a navigation link that shows
+# one, or a panel with something wrong in it. In no gate: it needs node,
+# and its first run installs jsdom under build/node/ from the network.
+# After an edit to resources/static/link-preview.js alone, `node
+# tools/site_preview_check.js` reruns it against the site already built.
+preview-check: site  ## Build the site, then test its link previews under jsdom (needs node)
+	node tools/site_preview_check.js
+
+# Two EPUBs from the same Chapters/, for e-readers: -color (syntax
+# highlighting in color, for backlit readers) and -eink (bolding
+# instead, for grayscale screens). The site keeps one HTML page per
+# chapter, so a cross-reference stays a link between files; an EPUB
+# is a single document, so build_epub.py namespaces every heading id by
+# chapter (ch12-immutability) before merging. Without that, the 44 chapters
+# ending in `## Exercises` and the nine other repeated headings would collide
+# and pandoc would quietly retarget those links. Needs pandoc, like `site`.
+epub:  ## Render Chapters/ into build/epub/ThinkingInPython-{color,eink}.epub with pandoc
+	$(PY) -m tools.build_epub
+
+# One PDF from the same merged, anchor-namespaced Markdown stream the
+# EPUB uses (build_pdf.py reuses build_epub.py's assembly), rendered by
+# pandoc through typst. Typst draws the SVG diagrams directly and
+# highlights the listings itself, so this build needs no rasterizer.
+# Needs pandoc and the typst binary (`make tools-check-full` verifies).
+pdf:  ## Render Chapters/ into build/pdf/ThinkingInPython.pdf with pandoc and typst
+	$(PY) -m tools.build_pdf
+
+# Hands the built EPUB to Amazon's Send to Kindle desktop app, which
+# opens its dialog with the file queued, and opens an Explorer window
+# with the file selected for drag and drop; the Send click is the app's.
+# Rebuilds the EPUB first (the same build as `epub`) only when it is
+# missing or older than Chapters/, resources/, or the builder, so a
+# fresh build is sent as-is. Excluded from verify-targets' smoke
+# test: it opens a GUI.
+kindle:  ## Send the e-ink EPUB to a Kindle via the Send to Kindle app, rebuilding it first if stale (VARIANT=color for the other)
+	$(PY) -m tools.send_to_kindle $(VARIANT)
+
+# Every figure the prose references, in book order and numbered, on one
+# page, with the SVG the site and PDF draw (read live from
+# resources/images/) and the PNG the EPUB draws, to check the drawings
+# against each other by eye: arrowheads, stroke widths, fonts, palette.
+# A style line under each figure lists what it draws with and marks
+# what falls outside the cover palette. Fails on a reference to a
+# figure with no file, since the book would render nothing there. `make
+# all` runs it, so the gallery tracks the working tree.
+figures:  ## Build build/figures/index.html, a numbered gallery of every figure in the book, to check style by eye (`make figures-open` opens it)
+	$(PY) -m tools.figure_gallery
+
+figures-open:  ##- Build the figure gallery and open it in a browser
+	$(PY) -m tools.figure_gallery --open
+
+# The cover images and favicon are generated files under
+# resources/static/, committed so the builds never depend on the
+# generator's tools (resvg, Pillow). To use new cover art, drop
+# the image at resources/cover-source.jpg and rerun this; with no
+# source image the script falls back to its own drawn serpent.
+cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
+	$(PY) -m tools.make_cover
 
 ##@ Solutions (Solutions/, build/solutions/)
 
 .PHONY: solutions-sync solutions-check solutions-prune solutions-extract \
-        solutions-output solutions-output-check solutions-ty solutions-pyright solutions-lint \
-        solutions-run solutions-test solutions-numbering solutions-gate
+        solutions-output solutions-output-check solutions-ty \
+        solutions-pyright solutions-lint solutions-run solutions-test \
+        solutions-numbering solutions-gate
 
 # Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
 # instead of Chapters/. Each Solutions code block is self-contained (it
@@ -624,144 +607,45 @@ solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run,
 	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
 	$(PYTEST) $(PYTEST_N) build/solutions
 
-# Headed "Writing" rather than "Prose" for the same reason as "Code
-# examples" above: `prose` is a target in this section.
-##@ Writing and spelling
+##@ Publishing a release
 
-.PHONY: reflow reflow-check rewrite spell spell-add prose links todos \
-        claims exercise-coverage comment-report
+.PHONY: release release-prune ci sync-ci
 
-# Rewrite prose paragraphs to one sentence per line (code, tables, lists, and
-# headings are left untouched; a file is rewritten only if it round-trips).
-# Target one chapter with CH=, e.g. `make reflow CH=02` or `make reflow CH=Tour`.
-reflow:  ## Rewrite prose to one sentence per line (CH=02 for one chapter)
-	$(PY) -m tools.reflow_prose --write $(CH)
+# Publish a GitHub release whose uploaded assets are exactly the
+# freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
+# preflight (clean tree, HEAD pushed, tag free, gh authenticated),
+# then `make verify` so a book that fails the gate can never ship,
+# then fresh `make pdf` + `make epub`, then
+# `gh release create v$(VERSION)`. Deliberately excluded from
+# verify-targets' smoke test: it tags the repo and publishes to GitHub.
+release:  ## Verify, rebuild the PDF and EPUBs, publish them with the reader guides as a GitHub release, then prune releases older than the newest two (VERSION=1.0)
+	$(PY) -m tools.release $(VERSION)
 
-reflow-check:  ## Report which chapters would reflow, no write (CH=02 for one)
-	$(PY) -m tools.reflow_prose $(CH)
+# The prune step of `release` on its own. Tags stay, so history and the
+# menu's next-version guess are untouched. Excluded from verify-targets'
+# smoke test: it deletes from GitHub.
+release-prune:  ## Delete GitHub releases older than the newest two (their tags stay)
+	$(PY) -m tools.release --prune
 
-# AI editing passes over one chapter's prose, edited in place. Each pass
-# is one headless `claude -p "/<skill> <chapter>"` run. Reflow and the
-# prose gates run after every pass, and the chain stops at the first
-# failure. It costs tokens and is nondeterministic, so it is never part
-# of verify/gate/ci, refuses to run under CI, and needs a `git diff`
-# review before you commit.
-#
-# The passes, in the order they run (PASSES in tools/rewrite.py):
-#
-#   elements-of-style  default  Strunk: active voice, positive form,
-#                               omit needless words
-#   activate           opt-in   clear the passive, there-is, and
-#                               weak-verb warnings from `make prose`
-#   literal            default  say what the machinery does: a literal
-#                               verb for each figure of speech
-#   positive           default  say what happens, not what does not:
-#                               keep only the negations that claim
-#   straighten         default  one sentence, one load: name the actor,
-#                               split at the seam
-#   cohesion           default  old before new: one topic string per
-#                               paragraph, the news at the end
-#   antecedents        default  name what each this/it/which points at
-#                               when two things could be meant
-#   readability        opt-in   remove AI-writing tells; its own rule
-#                               is "only when asked", so it never runs
-#                               unless you name it here
-#   bruce-edit-apply   default  apply the promoted rules in
-#                               bruce_edit_db.md
-#
-# A bare `make rewrite CH=25` runs the seven defaults. To add an opt-in
-# pass to them: ARGS="--also activate". To run only the passes you
-# name: ARGS="--passes activate readability". To run all nine:
-# ARGS=--all. ARGS=--list prints this table; ARGS=--dry-run prints the
-# commands without running them.
-#
-# Several chapters run in parallel: CH="25 28 30" or CH=30-40 (a range,
-# inclusive; CH="25 30-32" mixes them) runs one pass chain per chapter,
-# four at a time (ARGS=-j2 changes that). Each chain edits
-# only its own chapter and checks only its own chapter, so they never
-# trip each other, and their output arrives per step under a [NN]
-# prefix. ARGS=--serial runs them one after another with output
-# streamed live, the mode for watching a pass work.
-#
-# Each pass names its own model (PASSES in tools/rewrite.py; ARGS=--list
-# shows them). MODEL= forces one model on every pass for a run:
-# MODEL=claude-sonnet-5 is the cheap lap. Each pass header prints the
-# model it used.
-MODEL ?=
-rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--list)
-	$(PY) -m tools.rewrite $(CH) $(if $(MODEL),--model $(MODEL)) $(ARGS)
+# Mirrors the GitHub Actions gates plus a site build, all run locally. The
+# default GitHub Actions path only builds and publishes the site; these gates
+# run in CI only on request (see tools/README.md).
+ci: gate site  ## Run the full local gate: check, ty, ruff, run, pytest, site
 
-# Spell-check the book and lint it for small mechanical slips. codespell
-# catches known misspellings (prose and code comments); prose_lint catches
-# spacing/blank-line/punctuation slips; spellcheck.py is a full-dictionary check
-# of the prose, with accepted terms in tools/data/wordlist.txt. Run one chapter with
-# CH= (e.g. `make spell CH=29`) or a path with DOCS=.
-spell:  ## codespell + prose_lint + full-dictionary spellcheck (CH=29 for one)
-	$(SPELL) $(PROSE_FILES)
-	$(PY) -m tools.prose_lint $(PROSE_FILES)
-	$(PY) -m tools.spellcheck $(PROSE_FILES)
+# Same as verify, plus the site build at the end.
+sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
 
-# Accept every word spellcheck.py doesn't recognize into tools/data/wordlist.txt
-# and every word codespell flags into tools/data/codespell-ignore.txt (both
-# sorted, deduplicated) instead of failing. The two checkers keep separate
-# lists, and codespell reads code where spellcheck.py reads prose only, so
-# a class name codespell dislikes needs the second list. It cannot tell a
-# real term from a typo, so always review the diff before committing; a
-# real typo belongs in the prose, not in either list.
-spell-add:  ## Accept every unknown word: spellcheck's into wordlist.txt, codespell's into codespell-ignore.txt (review the diff!)
-	$(PY) -m tools.spellcheck $(PROSE_FILES) --add
-
-# House-style lint with Vale: no em-dashes and no filler phrases. Run one
-# chapter with CH= (e.g. `make prose CH=29`) or a path with DOCS=.
-# Vale is a standalone binary (not uv-managed); see .vale.ini for install notes.
-prose:  ## House-style lint with Vale (CH=29 for one chapter; needs vale binary)
-	$(VALE) $(PROSE_FILES)
-
-# Advisory only, and deliberately not part of `verify` or `ci`: the network
-# is flaky and a dead external site should never block a build. Run it now
-# and then to catch link rot; heading_links.py covers internal links.
-links:  ## Check the book's external URLs for link rot (advisory, needs network)
-	$(PY) -m tools.check_links
-
-# Advisory only, like `links` above: lists `TODO(tag): ...` HTML-comment
-# markers left in the Markdown (see tools/list_todos.py), each one an
-# example that stays illustrative until something outside the book's
-# control changes (a dependency ships a wheel, a build becomes the
-# default). Never fails, and is not part of `verify`/`gate`/`ci`.
-todos:  ## List TODO(tag): ... markers left in the book (advisory)
-	$(PY) -m tools.list_todos
-
-# Advisory. heading_links.py proves a cross-chapter link resolves; this
-# asks the question it cannot, whether the target says what the link text
-# claims. Most links either name the chapter or quote the target heading,
-# and neither can drift; what is left is the handful of author-written
-# phrases describing what is over there. Run one chapter with ARGS=33.
-claims:  ## List cross-chapter links whose text makes an unchecked claim
-	$(PY) -m tools.check_claims $(ARGS)
-
-# Advisory. Which `##` sections no exercise practices, per chapter. A
-# worklist rather than a gate: a conclusion or a table wants no exercise,
-# and the matching is literal, so it under-reports coverage. Confirm a
-# reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
-exercise-coverage:  ## List chapter sections that no exercise practices
-	$(PY) -m tools.exercise_coverage $(ARGS)
-
-# Advisory. Lists the comments in listings that are new since a git
-# ref, for a human to judge: a comment that says what its own line says
-# (`class Contact:  # A Contact has a Name and an Address`) comes out,
-# and no rule can tell that one from a comment that teaches. Directives,
-# `#:` markers, and the file-name line are skipped. SINCE=v0.5.9 for a
-# tag or commit (default HEAD, the uncommitted edits); ARGS=--all lists
-# every comment in the book.
-comment-report:  ## List listing comments added since a git ref (SINCE=ref, default HEAD; advisory)
-	$(PY) -m tools.comment_report --since $(or $(SINCE),HEAD) $(ARGS)
+##+ kindle libs-check tools-status
 
 ##@ Style gates
 
-.PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
+.PHONY: eol fix-eol listings fix-listings widths banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept exercise-refs exercise-refs-accept unique-slugs skip-lists \
-        pattern-names fix-pattern-names records coupling-panels fix-coupling-panels coupling-panels-png checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference \
+        quoted-diagnostics quoted-diagnostics-accept exercise-refs \
+        exercise-refs-accept unique-slugs skip-lists pattern-names \
+        fix-pattern-names records coupling-panels fix-coupling-panels \
+        coupling-panels-png checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -780,28 +664,15 @@ fix-eol:  ##- Convert any CRLF in tracked text files to LF
 listings:  ## Check listings keep blank lines minimal; `make fix-listings` strips them
 	$(PY) -m tools.listing_format
 
+fix-listings:  ##- Remove the offending blank lines from listings
+	$(PY) -m tools.listing_format --fix
+
 # Fail if any listing line in Chapters/ or Solutions/ is wider than 60
 # characters (a trailing `# type: ignore` pragma is the one exemption).
 # There is no fixer: wrap the statement, move the comment, or shorten
 # the printed output.
 widths:  ## Fail if a listing line exceeds the 60-character width
 	$(PY) -m tools.listing_width Chapters Solutions
-
-# A survey, not a gate: every listing line wider than WIDTH (raw width,
-# no pragma exemption), with its Examples/ or SolutionsCode/ path and
-# line, its Markdown path and line, its width, and the line itself.
-# For sizing questions ("what breaks at 50?"), not for enforcement.
-# Writes build/reports/code_width.html and opens it in the browser,
-# where a slider re-filters the width live, and stays running (Ctrl+C
-# to stop) so a click on a row can open that line in Zed through its
-# CLI. ARGS=--tsv prints one tab-separated row per line instead;
-# ARGS=--no-open only writes the page.
-WIDTH ?= 60
-code-width:  ## Show every listing line wider than WIDTH=nn (default 60) in the browser (ARGS=--tsv for rows)
-	$(PY) -m tools.code_width --width $(WIDTH) $(ARGS) Chapters Solutions
-
-fix-listings:  ##- Remove the offending blank lines from listings
-	$(PY) -m tools.listing_format --fix
 
 # Fail if any phrase in tools/data/banned_phrases.txt appears anywhere in the book.
 banned:  ## Fail if any tools/data/banned_phrases.txt phrase is in the book
@@ -851,13 +722,6 @@ footnotes:  ## Fail if a footnote label is defined in more than one chapter
 self-reference:  ## Fail if a claim the book makes about its own chapters is false
 	$(PY) -m tools.check_self_reference
 
-# Advisory, like `claims`. Adds the grounding rule: a sentence linking to
-# a chapter that contains none of the code terms the sentence names. It
-# catches real misattributions and also fires on sentences whose terms
-# belong to the linking chapter, so it reports rather than gates.
-self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
-	$(PY) -m tools.check_self_reference --advisory $(ARGS)
-
 # A quoted ty diagnostic is prose, so a listing edit that shifts a
 # quoted line, or a ty upgrade that rewords a message, leaves the quote
 # stale with every other gate green. This compares each quote's gutter
@@ -905,22 +769,6 @@ unique-slugs:  ## Fail if two chapters name two listings the same
 skip-lists:  ## Fail if a norun.txt or timing.txt pattern matches no listing
 	$(PY) -m tools.check_skip_lists
 
-# Every Markdown check at once, parsing each file once instead of per tool.
-# The individual targets above still work; this is the fast whole-book answer.
-# Vale (`make prose`) runs after them, so this one target answers "is the prose
-# clean?" as well. Vale runs only on a bare `make checks`: with ARGS set the
-# caller asked for something narrower (`ARGS=--list`, or one check by name),
-# and a whole-book Vale pass is no part of that answer. Vale is a standalone
-# binary rather than a uv-managed one, so this target now needs it installed;
-# `make tools-check-full` reports whether it is. `gate` and `ci` do not run
-# Vale, and still pass without it.
-checks:  ## Run every Markdown check plus the Vale prose lint (ARGS=--list lists the checks); `make fix-checks` applies them
-	$(PY) -m tools.check_all $(ARGS)
-	$(if $(ARGS),,$(VALE) $(PROSE_FILES))
-
-fix-checks:  ##- Apply every fix those checks can make
-	$(PY) -m tools.check_all --fix
-
 # Every naming of a design pattern is *Capitalized* and italic, on every
 # mention, since names like State, Command, and Proxy are ordinary words
 # otherwise. The names live in tools/data/pattern_names.txt. In GATE_CHECKS
@@ -958,6 +806,22 @@ fix-coupling-panels:  ##- Regenerate resources/images/coupling_NN.svg from the s
 coupling-panels-png:  ##- Rasterize every resources/images/coupling_*.svg into build/coupling/ with the EPUB's rasterizer, to check by eye
 	$(PY) -m tools.coupling_panels --png
 
+# Every Markdown check at once, parsing each file once instead of per tool.
+# The individual targets above still work; this is the fast whole-book answer.
+# Vale (`make prose`) runs after them, so this one target answers "is the prose
+# clean?" as well. Vale runs only on a bare `make checks`: with ARGS set the
+# caller asked for something narrower (`ARGS=--list`, or one check by name),
+# and a whole-book Vale pass is no part of that answer. Vale is a standalone
+# binary rather than a uv-managed one, so this target now needs it installed;
+# `make tools-check-full` reports whether it is. `gate` and `ci` do not run
+# Vale, and still pass without it.
+checks:  ## Run every Markdown check plus the Vale prose lint (ARGS=--list lists the checks); `make fix-checks` applies them
+	$(PY) -m tools.check_all $(ARGS)
+	$(if $(ARGS),,$(VALE) $(PROSE_FILES))
+
+fix-checks:  ##- Apply every fix those checks can make
+	$(PY) -m tools.check_all --fix
+
 # The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
 # registry). `checks` is the one to run while editing, since it adds the Vale
 # pass; this one answers the narrower "will the gate pass?" and is what `sweep`
@@ -965,9 +829,168 @@ coupling-panels-png:  ##- Rasterize every resources/images/coupling_*.svg into b
 gate-checks:  ## Run just the Markdown checks the gate enforces
 	$(PY) -m tools.check_all $(GATE_CHECKS)
 
+##@ Reports (advisory, no gate)
+
+.PHONY: links todos claims exercise-coverage comment-report \
+        self-reference-report code-width
+
+# Advisory only, and deliberately not part of `verify` or `ci`: the network
+# is flaky and a dead external site should never block a build. Run it now
+# and then to catch link rot; heading_links.py covers internal links.
+links:  ## Check the book's external URLs for link rot (advisory, needs network)
+	$(PY) -m tools.check_links
+
+# Advisory only, like `links` above: lists `TODO(tag): ...` HTML-comment
+# markers left in the Markdown (see tools/list_todos.py), each one an
+# example that stays illustrative until something outside the book's
+# control changes (a dependency ships a wheel, a build becomes the
+# default). Never fails, and is not part of `verify`/`gate`/`ci`.
+todos:  ## List TODO(tag): ... markers left in the book (advisory)
+	$(PY) -m tools.list_todos
+
+# Advisory. heading_links.py proves a cross-chapter link resolves; this
+# asks the question it cannot, whether the target says what the link text
+# claims. Most links either name the chapter or quote the target heading,
+# and neither can drift; what is left is the handful of author-written
+# phrases describing what is over there. Run one chapter with ARGS=33.
+claims:  ## List cross-chapter links whose text makes an unchecked claim
+	$(PY) -m tools.check_claims $(ARGS)
+
+# Advisory. Which `##` sections no exercise practices, per chapter. A
+# worklist rather than a gate: a conclusion or a table wants no exercise,
+# and the matching is literal, so it under-reports coverage. Confirm a
+# reported section by eye. ARGS=18 for one chapter, ARGS=--deep for ###.
+exercise-coverage:  ## List chapter sections that no exercise practices
+	$(PY) -m tools.exercise_coverage $(ARGS)
+
+# Advisory. Lists the comments in listings that are new since a git
+# ref, for a human to judge: a comment that says what its own line says
+# (`class Contact:  # A Contact has a Name and an Address`) comes out,
+# and no rule can tell that one from a comment that teaches. Directives,
+# `#:` markers, and the file-name line are skipped. SINCE=v0.5.9 for a
+# tag or commit (default HEAD, the uncommitted edits); ARGS=--all lists
+# every comment in the book.
+comment-report:  ## List listing comments added since a git ref (SINCE=ref, default HEAD; advisory)
+	$(PY) -m tools.comment_report --since $(or $(SINCE),HEAD) $(ARGS)
+
+# Advisory, like `claims`. Adds the grounding rule: a sentence linking to
+# a chapter that contains none of the code terms the sentence names. It
+# catches real misattributions and also fires on sentences whose terms
+# belong to the linking chapter, so it reports rather than gates.
+self-reference-report:  ## List sentences attributing terms to a chapter that lacks them (advisory)
+	$(PY) -m tools.check_self_reference --advisory $(ARGS)
+
+# A survey, not a gate: every listing line wider than WIDTH (raw width,
+# no pragma exemption), with its Examples/ or SolutionsCode/ path and
+# line, its Markdown path and line, its width, and the line itself.
+# For sizing questions ("what breaks at 50?"), not for enforcement.
+# Writes build/reports/code_width.html and opens it in the browser,
+# where a slider re-filters the width live, and stays running (Ctrl+C
+# to stop) so a click on a row can open that line in Zed through its
+# CLI. ARGS=--tsv prints one tab-separated row per line instead;
+# ARGS=--no-open only writes the page.
+WIDTH ?= 60
+code-width:  ## Show every listing line wider than WIDTH=nn (default 60) in the browser (ARGS=--tsv for rows)
+	$(PY) -m tools.code_width --width $(WIDTH) $(ARGS) Chapters Solutions
+
+##+ pyright-review libs-check gate-status tools-status
+
+##@ Setup and upgrades
+
+.PHONY: tools-check tools-check-full doctor tools-test verify-targets \
+        tools-status libs-check tools-upgrade python-upgrade
+
+# What a reader needs for the everyday commands below: uv, plus the
+# uv-managed dev tools (ty, ruff, pytest). make and git are checked too but
+# assumed present, since you needed both to get this far.
+tools-check:  ## Check the tools a reader needs (uv, ty, ruff, pytest)
+	$(PY) -m tools.check_tools
+
+# Adds the tools a book maintainer needs for the rest of `make help`:
+# pandoc (site/local/epub/pdf), typst (pdf), and the standalone vale
+# binary (prose).
+tools-check-full:  ## Check every tool, including pandoc, typst, and vale (site/pdf/prose)
+	$(PY) -m tools.check_tools --full
+
+# Read-only: catches a stale uv silently stuck on an old Python prerelease,
+# and (Windows) a process running from .venv that would lock it on upgrade.
+# Prints the exact fix command instead of applying anything itself.
+doctor:  ## Diagnose environment problems (stale uv, locked .venv); read-only
+	$(PY) -m tools.doctor
+
+# The harness's own unit tests (tools/tests/), covering the shared library
+# modules and the pure logic inside the entry points. Distinct from `test`,
+# which runs the book's example tests under build/examples/. `gate` runs
+# this first: every later step trusts these tools, so a broken one makes
+# the rest of the gate's verdict meaningless.
+tools-test:  ## Run the harness's own unit tests (tools/tests/)
+	$(PYTEST) $(PYTEST_N) tools/tests
+
+# Runs every other target here and reports which ones fail. Read-only/idempotent
+# targets run directly; a target that bakes --fix/--write/--add into its recipe
+# (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
+# fix-comment-caps, fix-comment-spacing, and the clean-* targets, which
+# would otherwise wipe the logs below) runs in a disposable git worktree
+# instead, so this working tree is never touched. tools-upgrade, python-upgrade,
+# serve, and local never run (network/environment mutation, or a server that
+# blocks forever); see tools/verify_targets.py's docstring. Logs land in
+# build/target_test_logs/.
+verify-targets:  ## Smoke-test every make target; mutating ones run in a disposable worktree
+	$(PY) -m tools.verify_targets
+
+# When were the dev tools last upgraded, and to what? `tools-upgrade`
+# writes this stamp; `gate` reads it and prints one line (nothing more,
+# and never a failure) once it is older than tool_stamp.py's threshold.
+# With no stamp yet, uv.lock's mtime stands in, so a fresh clone is
+# correctly treated as current.
+tools-status:  ## Report when the dev tools were last upgraded, and to what
+	$(PY) -m tools.tool_stamp
+
+# Is a release waiting for a library the listings import (Stateless,
+# numpy, hypothesis, time-machine)? Reads uv.lock, asks PyPI for each
+# one's latest version, and prints the ones that are behind. It changes
+# nothing and always exits 0, offline included, and it joins no gate: a
+# gate that reaches the network fails for reasons the book did not
+# cause. Upgrade one library alone with `uv lock --upgrade-package NAME`
+# and `uv sync`; CLAUDE.md's Stateless-upgrade entry says what to
+# re-check afterward.
+libs-check:  ## Compare the locked library versions (Stateless, numpy, ...) with the latest on PyPI
+	$(PY) -m tools.libs_check
+
+# Updates uv itself (when it was installed via its standalone installer),
+# best-effort upgrades a globally installed `ty` (`uv tool upgrade ty`,
+# what bare `ty` on PATH resolves to), then upgrades every uv-managed dev
+# tool (ty, ruff, pytest, ...) to the latest version pyproject.toml
+# allows, rewriting uv.lock. pandoc, typst, and vale are updated
+# best-effort through winget or Homebrew, whichever is on PATH.
+# make/git are left alone. Review `git diff uv.lock` before committing.
+# For the pinned Python version itself, use `make python-upgrade`.
+#
+# Ends by stamping the upgrade (so the gate can stop nagging) and running
+# `sweep`, which reports every check the new tools broke rather than
+# stopping at the first. A failing sweep here means the upgrade landed
+# and the book needs fixing, not that the upgrade failed; the stamp is
+# written first for that reason.
+tools-upgrade:  ## Update uv, the uv-managed dev tools, and (best-effort) global ty/pandoc/typst/vale
+	$(PY) -m tools.upgrade_tools
+	$(MAKE) tools-check-full
+	$(PY) -m tools.tool_stamp --write
+	$(MAKE) sweep
+
+# Upgrade the development Python and re-check the book against it.
+# `make python-upgrade` pulls the latest patch of the pinned minor (from
+# .python-version); `make python-upgrade TO=3.15` repins to a new minor first
+# (rewriting .python-version and the requires-python floor). Both resync the
+# venv and run the gate. Run through `uv run --no-project` so the orchestrating
+# interpreter is not the venv that `uv sync` rebuilds.
+python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a minor), resync, verify
+	uv run --no-project python -m tools.upgrade_python $(TO)
+	$(MAKE) verify
+
 ##@ Cleanup
 
-.PHONY: clean clean-examples clean-solutions clean-site clean-epub clean-pdf
+.PHONY: clean clean-examples clean-solutions clean-site clean-epub clean-pdf \
+        reset
 
 # Everything under build/ is derived and gitignored, so wiping it loses
 # nothing that a gate or build cannot regenerate. The stamps go too: the
@@ -992,5 +1015,11 @@ clean-epub:  ##- Remove build/epub/
 
 clean-pdf:  ##- Remove build/pdf/
 	$(PY) -c "import shutil; shutil.rmtree('build/pdf', ignore_errors=True)"
+
+# Throw away build/examples/ and rebuild it from the Markdown. Run this when
+# a check reports drift you cannot explain (a stale tree from an older Markdown,
+# or one carried over from another machine).
+reset: clean-examples extract  ## Regenerate build/examples/ from the Markdown (fixes drift)
+	@echo "build/examples/ regenerated from the Markdown."
 
 endif  # TIMED

@@ -17,13 +17,21 @@ and smoke-tested, but folded out of the listing because a sibling's doc text
 names it (`fix-eol` under `eol`). That keeps `make help style` at ten rows
 instead of sixteen without hiding a target from `verify_targets.py`.
 
-Two invariants are enforced rather than assumed, both raising SystemExit
+A `##+ name name ...` line repeats targets defined in other sections into
+the section it sits in, at that point in the listing. The sections run
+from the everyday loop down to setup and cleanup, and a target that
+belongs to more than one job (`sync` is both an everyday step and a
+code-examples step) is listed under each; `entries()` reports it once.
+
+Four invariants are enforced rather than assumed, each raising SystemExit
 with a message naming the offender:
 
   * No two sections share a slug.
   * No slug equals a target name. The Makefile neutralizes the word after
     `help` so `make help style` parses as one goal, and that would override
     a real recipe if a slug ever collided with one.
+  * Every `##+` name is a documented target (parse() checks this).
+  * No `##+` repeats a target inside the section that defines it.
 
 This exists so `make help` has no dependency on `grep`/`awk` being on PATH.
 Every other target already requires Python (via `uv run`), so routing help
@@ -75,7 +83,7 @@ import shutil
 import sys
 import textwrap
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import IO
 
@@ -97,6 +105,7 @@ _JOINER = "\x00"
 
 _TARGET = re.compile(r"^([a-zA-Z_-]+):([^#]*?)##(-?)\s?(.*)$")
 _CATEGORY = re.compile(r"^##@\s?(.*)$")
+_REPEAT = re.compile(r"^##\+\s?(.*)$")
 
 @dataclass(frozen=True)
 class Palette:
@@ -169,6 +178,11 @@ class Target:
     named on its own line (`verify: fix-eol sync gate`), which is all a
     prerequisites-only target has. Each is empty when the Makefile has
     none.
+
+    `repeat` marks a copy listed in a second section by a `##+` line:
+    the same target, shown again where a reader would also look for
+    it. `entries()` leaves the copies out, so a smoke test through it
+    runs each target once.
     """
     name: str
     doc: str
@@ -176,11 +190,13 @@ class Target:
     notes: str = ""
     recipe: tuple[str, ...] = ()
     prereqs: tuple[str, ...] = ()
+    repeat: bool = False
 
 
 @dataclass(frozen=True)
 class Section:
-    """One `##@` heading and the targets under it."""
+    """One `##@` heading and the targets under it, in file order, with
+    the targets a `##+` line repeats here at the point of that line."""
     slug: str
     title: str
     targets: list[Target] = field(default_factory=list)
@@ -193,8 +209,19 @@ _ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*[?:+]?=")
 
 
 def parse(text: str) -> list[Section]:
-    """Sections in file order. The first holds any pre-heading target."""
+    """Sections in file order. The first holds any pre-heading target.
+
+    A `##+ name name ...` line repeats targets defined elsewhere into
+    the section it sits in, at that point in the listing, so a target
+    can appear under every heading where someone would look for it
+    (`sync` under both Everyday and Code examples). Each name must be
+    a documented target defined in another section; a name with no
+    definition, or one already defined in this section, raises
+    SystemExit, since either means the Makefile says something the
+    listing cannot show.
+    """
     sections = [Section("", "")]
+    pending: list[tuple[Section, int, str]] = []   # where each ##+ goes
     lines = text.splitlines()
     for i, line in enumerate(lines):
         category = _CATEGORY.match(line)
@@ -202,29 +229,60 @@ def parse(text: str) -> list[Section]:
             title = category.group(1)
             sections.append(Section(title.split()[0].lower(), title))
             continue
+        repeat = _REPEAT.match(line)
+        if repeat:
+            section = sections[-1]
+            pending += [(section, len(section.targets), name)
+                        for name in repeat.group(1).split()]
+            continue
         target = _TARGET.match(line)
         if target:
             sections[-1].targets.append(Target(
                 target.group(1), target.group(4), target.group(3) == "-",
                 notes=_notes(lines, i), recipe=_recipe(lines, i),
                 prereqs=tuple(target.group(2).split())))
+    _resolve(sections, pending)
     return [s for s in sections if s.targets]
+
+
+def _resolve(sections: list[Section],
+             pending: list[tuple[Section, int, str]]) -> None:
+    """Insert each `##+` name's Target copy where its line sat.
+
+    Insertions go last-first within a section so an earlier index is
+    still right after a later one has been filled.
+    """
+    defined = {t.name: (s, t) for s in sections for t in s.targets}
+    for section, at, name in reversed(pending):
+        if name not in defined:
+            raise SystemExit(
+                f"make_help: `##+ {name}` under {section.title!r} names "
+                "no documented target. Check the spelling, or give the "
+                "target a `## doc` comment.")
+        home, target = defined[name]
+        if home is section:
+            raise SystemExit(
+                f"make_help: `##+ {name}` repeats a target inside its "
+                f"own section {section.title!r}; it is listed there "
+                "already.")
+        section.targets.insert(at, replace(target, repeat=True))
 
 
 def _notes(lines: list[str], at: int) -> str:
     """The `#` comment block ending on the line above `lines[at]`.
 
-    A `##@` heading or anything that is not a comment ends the block, so
-    a blank line between the comment and the target means no notes. A
-    variable assignment (`WIDTH ?= 60`) between the two is kept as the
-    block's own last paragraph, since it names a default the target
-    honors.
+    A `##@` heading, a `##+` line, or anything that is not a comment
+    ends the block, so a blank line between the comment and the target
+    means no notes. A variable assignment (`WIDTH ?= 60`) between the
+    two is kept as the block's own last paragraph, since it names a
+    default the target honors.
     """
     block: list[str] = []
     j = at - 1
     while j >= 0:
         line = lines[j]
-        if line.startswith("#") and not line.startswith("##@"):
+        if (line.startswith("#") and not line.startswith("##@")
+                and not line.startswith("##+")):
             block.append(line[1:].removeprefix(" "))
         elif _ASSIGNMENT.match(line) and not block:
             block += [line.strip(), ""]
@@ -250,13 +308,15 @@ def entries(text: str) -> list[tuple[str, str] | tuple[None, str]]:
 
     The flat view, kept for verify_targets.py and sweep_checks.py. Includes
     secondary targets, so hiding a row from the listing never hides it from
-    the smoke test.
+    the smoke test, and leaves out `##+` repeats, so a target listed in
+    two sections is still one target to run.
     """
     found: list[tuple[str, str] | tuple[None, str]] = []
     for section in parse(text):
         if section.title:
             found.append((None, section.title))
-        found.extend((t.name, t.doc) for t in section.targets)
+        found.extend((t.name, t.doc) for t in section.targets
+                     if not t.repeat)
     return found
 
 

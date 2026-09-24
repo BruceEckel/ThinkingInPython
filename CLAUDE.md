@@ -659,7 +659,14 @@ and how it was measured.
   still smoke-tested, but folded out of the listing because a sibling's doc text
   names it (every `fix-*` under its check). Keep `entries()` reporting secondary
   targets, since `verify_targets.py` enumerates through it and `sweep_checks.py`
-  looks up doc text through it. Parsed by `tools/make_help.py`,
+  looks up doc text through it. A `##+ name name` line (since 2026-09-24)
+  repeats targets defined elsewhere into the section it sits in, at that
+  point in the listing, so one target can appear under every heading where
+  someone would look for it; `entries()` skips the repeats, and `make_help`
+  exits on a `##+` naming no documented target or one defined in that same
+  section. The sections are ordered by how often they are used, Everyday
+  first and Cleanup last, and a new target goes in the section for its
+  job, with a `##+` in Everyday if it becomes a daily command. Parsed by `tools/make_help.py`,
   deliberately not `grep`/`awk`, since GNU Make on Windows can fall back to
   `cmd.exe` as `SHELL` when no POSIX shell is on PATH.
   `tools/README.md`'s own "Commands" section deliberately does not re-list every

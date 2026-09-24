@@ -155,7 +155,13 @@ section's heading, lowercased (each heading leads with it, as in
 gets the static text.
 A `##-` comment marks a target secondary: documented and smoke-tested,
 but folded out of the listing because a sibling's doc text names it
-(each `fix-*` under the check it repairs). It replaces a `grep | awk`
+(each `fix-*` under the check it repairs). A `##+ name name` line
+repeats targets defined in other sections into the section it sits in,
+at that point, so a target that belongs to two jobs (`sync` is an
+everyday step and a code-examples step) is listed under both; the flat
+`entries()` view reports it once, so the smoke test runs it once. The
+sections run from the everyday loop down to setup and cleanup, most
+used first. It replaces a `grep | awk`
 one-liner so `make help` has no dependency on a POSIX toolchain being on
 PATH: every other target already requires Python (via `uv run`), and this
 keeps `help` consistent with that.

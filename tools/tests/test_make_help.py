@@ -82,6 +82,75 @@ def test_a_slug_that_shadows_a_target_is_rejected():
         check(parse(text))
 
 
+REPEATED = """\
+##@ Everyday
+
+verify:  ## Run the gate
+##+ sync fix-eol
+gate:  ## The gate
+
+##@ Code examples
+
+sync:  ## Sync the tree
+# Notes for eol.
+##+ gate
+# Notes for eol, continued.
+eol:  ## Check line endings; `make fix-eol` converts them
+fix-eol:  ##- Convert them
+"""
+
+
+def test_a_repeat_line_lists_targets_defined_elsewhere_in_place():
+    everyday, code = parse(REPEATED)
+    assert [t.name for t in everyday.targets] == [
+        "verify", "sync", "fix-eol", "gate"]
+    assert [t.name for t in code.targets] == [
+        "sync", "gate", "eol", "fix-eol"]
+    sync = everyday.targets[1]
+    assert sync.repeat and sync.doc == "Sync the tree"
+    assert not code.targets[0].repeat
+
+
+def test_a_repeat_keeps_the_targets_secondary_flag():
+    """A `##-` target stays folded wherever it is repeated; the sibling
+    that names it is what the reader sees."""
+    everyday = parse(REPEATED)[0]
+    assert [t.name for t in everyday.listed()] == ["verify", "sync", "gate"]
+
+
+def test_entries_lists_a_repeated_target_once():
+    """verify_targets.py runs every name entries() reports, so a repeat
+    must not run its target twice."""
+    names = [n for n, _ in entries(REPEATED) if n]
+    assert names == ["verify", "gate", "sync", "eol", "fix-eol"]
+
+
+def test_a_repeat_line_ends_the_notes_walk():
+    eol = parse(REPEATED)[1].targets[2]
+    assert eol.name == "eol"
+    assert eol.notes == "Notes for eol, continued."
+
+
+def test_a_repeat_of_an_unknown_target_is_rejected():
+    text = "##@ Everyday\n##+ nonesuch\nverify:  ## d\n"
+    with pytest.raises(SystemExit, match="names no documented target"):
+        parse(text)
+
+
+def test_a_repeat_inside_its_own_section_is_rejected():
+    text = "##@ Everyday\nverify:  ## d\n##+ verify\n"
+    with pytest.raises(SystemExit, match="inside its own section"):
+        parse(text)
+
+
+def test_the_real_makefile_repeats_targets_into_everyday():
+    everyday = next(s for s in _real() if s.slug == "everyday")
+    repeated = [t.name for t in everyday.targets if t.repeat]
+    assert repeated, "Everyday should repeat the common targets"
+    listed = [t.name for t in everyday.listed()]
+    assert listed[0] == "verify-ch"
+
+
 LONG = "##@ Style gates\nx:  ## " + "word " * 40 + "\n"
 
 
