@@ -10,6 +10,11 @@ the PNG the EPUB draws, rasterized here at the EPUB's width with the
 first of `build_epub.SVG_TOOLS` on PATH; a PNG is redrawn only when its
 SVG is newer, so a rebuild costs nothing when nothing changed.
 
+Every `<marker>` must be one of the book's four arrowheads in
+`tools/arrowheads.py` (filled, hollow, open, diamond), in any color; the
+style line names each marker's kind, and a marker that matches none of
+them fails the build, so a new figure cannot bring back an old shape.
+
 Under each figure is a style line: the distinct colors, stroke widths,
 dash patterns, font families and sizes, and arrowhead markers the SVG
 uses, with anything outside the cover palette or the book's monospace
@@ -25,8 +30,9 @@ Usage:
 `make figures` is the one-command form and `make verify` runs it, so the
 gallery tracks the working tree. A figure the prose references with no
 file under `resources/images/` fails the build, since the book would
-render nothing there; a file no chapter references is listed at the end
-of the gallery and reported, not failed.
+render nothing there, and so does a nonstandard arrowhead; a file no
+chapter references is listed at the end of the gallery and reported, not
+failed.
 """
 from __future__ import annotations
 
@@ -42,6 +48,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools import build_epub, build_site
+from tools.arrowheads import marker_kinds
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
 
@@ -124,6 +131,11 @@ class Style:
     sizes: list[str] = field(default_factory=list)
     markers: list[str] = field(default_factory=list)
     marker_uses: dict[str, int] = field(default_factory=dict)
+    marker_kinds: dict[str, str | None] = field(default_factory=dict)
+
+    @property
+    def odd_markers(self) -> list[str]:
+        return [m for m, kind in self.marker_kinds.items() if kind is None]
 
     @property
     def odd_colors(self) -> list[str]:
@@ -149,6 +161,9 @@ class Style:
             out.append("font other than " + BOOK_FONT)
         if not self.families:
             out.append("no font-family")
+        if self.odd_markers:
+            out.append("arrowhead outside tools/arrowheads.py: "
+                       + ", ".join(self.odd_markers))
         return out
 
 
@@ -194,6 +209,7 @@ def read_style(text: str) -> Style:
         sizes=sorted(_uniq(SIZE_RE.findall(text)), key=float),
         markers=_uniq(MARKER_DEF_RE.findall(text)),
         marker_uses=uses,
+        marker_kinds=marker_kinds(text),
     )
 
 
@@ -335,8 +351,11 @@ def _swatch(color: str) -> str:
 def _style_rows(s: Style) -> str:
     def row(label: str, value: str) -> str:
         return f"<b>{label}</b><span>{value or '<i>none</i>'}</span>"
+    def kind(m: str) -> str:
+        k = s.marker_kinds.get(m)
+        return f" {k}" if k else ' <span class="odd">nonstandard</span>'
     markers = ", ".join(
-        f"<code>{html.escape(m)}</code>"
+        f"<code>{html.escape(m)}</code>{kind(m)}"
         + (f" ×{s.marker_uses[m]}" if m in s.marker_uses else " (unused)")
         for m in s.markers)
     families = ", ".join(
@@ -469,9 +488,15 @@ def main(argv: list[str] | None = None) -> int:
     for f in missing:
         r = f.refs[0]
         print(f"  NO FILE: _images/{f.name} at {_doc_label(r.doc)}:{r.line}")
+    odd = [f for f in figures if f.style and f.style.odd_markers]
+    for f in odd:
+        assert f.style
+        print(f"  NONSTANDARD ARROWHEAD in {f.name}.svg: "
+              + ", ".join(f.style.odd_markers)
+              + " (use tools/arrowheads.py marker_def())")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing else 0
+    return 1 if missing or odd else 0
 
 
 if __name__ == "__main__":

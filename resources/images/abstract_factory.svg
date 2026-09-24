@@ -2,25 +2,25 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Two concrete factories and the two product hierarchies they build from</title>
   <defs>
-    <marker id="af-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="11" markerHeight="11" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="af-tri" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
-    <marker id="af-open" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="9" markerHeight="9" orient="auto">
-      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#8b1a1a" stroke-width="1.4"/>
+    <marker id="af-open" viewBox="0 0 18 12" refX="17" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L17,6 L1.5,10.5" fill="none" stroke="#8b1a1a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
   </defs>
 
   <!-- each concrete factory realizes GameElementFactory -->
-  <line x1="115" y1="170" x2="388" y2="96" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="785" y1="170" x2="512" y2="96" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="115" y1="170" x2="372.2" y2="100.3" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="785" y1="170" x2="527.8" y2="100.3" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
   <!-- the two product hierarchies -->
-  <line x1="344" y1="171" x2="381" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="556" y1="171" x2="519" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="344" y1="273" x2="381" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
-  <line x1="556" y1="273" x2="519" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="344" y1="171" x2="364.6" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="556" y1="171" x2="535.4" y2="171" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="344" y1="273" x2="364.6" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
+  <line x1="556" y1="273" x2="535.4" y2="273" stroke="#1a1612" stroke-width="1.2" marker-end="url(#af-tri)"/>
 
   <!-- what each factory method returns: one matched pair per factory -->
   <line x1="189" y1="220" x2="226" y2="180" stroke="#8b1a1a" stroke-width="1.3"

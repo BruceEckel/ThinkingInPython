@@ -2,24 +2,24 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>A surrogate and the implementation deriving from a common base class</title>
   <defs>
-    <marker id="sg-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="11" markerHeight="11" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="sg-tri" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
-    <marker id="sg-diamond" viewBox="0 0 16 10" refX="1" refY="5"
-            markerWidth="17" markerHeight="11" orient="auto">
-      <path d="M1,5 L8,1 L15,5 L8,9 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="sg-diamond" viewBox="0 0 22 12" refX="21" refY="6"
+            markerWidth="22" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,6 L11,1 L21,6 L11,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
 
   <!-- realization: Surrogate and each Implementation derive from Interface -->
-  <line x1="90" y1="130" x2="300" y2="72" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="90" y1="130" x2="284.2" y2="76.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
-  <line x1="280" y1="130" x2="330" y2="72" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="280" y1="130" x2="319.3" y2="84.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
-  <line x1="470" y1="130" x2="380" y2="72" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="470" y1="130" x2="393.8" y2="80.9" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
-  <line x1="640" y1="130" x2="410" y2="72" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="640" y1="130" x2="425.9" y2="76" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri)"/>
 
   <!-- Interface -->
@@ -53,7 +53,7 @@
         text-anchor="middle">Etc.</text>
 
   <!-- aggregation: Surrogate holds an implementation at runtime -->
-  <line x1="160" y1="260" x2="350" y2="260" stroke="#1a1612" stroke-width="1.2"
+  <line x1="180" y1="260" x2="350" y2="260" stroke="#1a1612" stroke-width="1.2"
         marker-start="url(#sg-diamond)"/>
   <text x="255" y="248" font-size="11.5" fill="#8b1a1a"
         text-anchor="middle">implementation</text>

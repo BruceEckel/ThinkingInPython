@@ -2,34 +2,34 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other</title>
   <defs>
-    <marker id="dp-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="11" markerHeight="11" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="dp-tri" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
-    <marker id="dp-diamond" viewBox="0 0 16 10" refX="1" refY="5"
-            markerWidth="17" markerHeight="11" orient="auto">
-      <path d="M1,5 L8,1 L15,5 L8,9 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="dp-diamond" viewBox="0 0 22 12" refX="21" refY="6"
+            markerWidth="22" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,6 L11,1 L21,6 L11,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
 
   <!-- realization: Margherita, Hawaiian, and Topping implement Pizza -->
-  <line x1="105" y1="190" x2="430" y2="112" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="105" y1="190" x2="414.1" y2="115.8" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
-  <line x1="305" y1="190" x2="460" y2="112" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="305" y1="190" x2="445.4" y2="119.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
-  <line x1="535" y1="190" x2="500" y2="112" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="535" y1="190" x2="506.7" y2="127" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri)"/>
 
   <!-- inheritance: Garlic, Olives, and Feta extend Topping -->
-  <line x1="435" y1="350" x2="480" y2="302" stroke="#1a1612" stroke-width="1.2"
+  <line x1="435" y1="350" x2="468.8" y2="314" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
-  <line x1="625" y1="350" x2="535" y2="302" stroke="#1a1612" stroke-width="1.2"
+  <line x1="625" y1="350" x2="549.5" y2="309.7" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
-  <line x1="815" y1="350" x2="590" y2="302" stroke="#1a1612" stroke-width="1.2"
+  <line x1="815" y1="350" x2="606" y2="305.4" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
 
   <!-- aggregation: Topping "has a" Pizza -->
-  <path d="M640,220 Q 770,140 570,110" fill="none" stroke="#1a1612" stroke-width="1.2"
+  <path d="M656.7,209 Q755.9,137.9 570,110" fill="none" stroke="#1a1612" stroke-width="1.2"
         marker-start="url(#dp-diamond)"/>
   <text x="705" y="152" font-size="11.5" fill="#1a1612" text-anchor="middle">pizza</text>
 

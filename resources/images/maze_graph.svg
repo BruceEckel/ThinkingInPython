@@ -2,9 +2,9 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room</title>
   <defs>
-    <marker id="mz-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="mz-tri" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
 
@@ -28,11 +28,11 @@
   <text x="255" y="55" font-size="11" fill="#7a6e62" text-anchor="middle">Teleport target="b"</text>
 
   <!-- off-map doors converge on the single shared EDGE room -->
-  <polyline points="200,78 200,20 452,20 452,167 460,167" fill="none" stroke="#7a6e62"
+  <polyline points="200,78 200,20 440,20 440,167 447.6,167" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri)"/>
-  <polyline points="392,134 452,134 452,192 460,192" fill="none" stroke="#7a6e62"
+  <polyline points="392,134 440,134 440,192 447.6,192" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri)"/>
-  <polyline points="72,302 72,345 452,345 452,217 460,217" fill="none" stroke="#7a6e62"
+  <polyline points="72,302 72,345 440,345 440,217 447.6,217" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri)"/>
 
   <!-- room markers -->

@@ -2,9 +2,9 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Vending machine state diagram</title>
   <defs>
-    <marker id="sm-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="11" markerHeight="11" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="sm-tri" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
 
@@ -31,78 +31,78 @@
 
   <!-- initial-state marker -->
   <circle cx="110" cy="230" r="6" fill="#1a1612"/>
-  <line x1="110" y1="236" x2="110" y2="266" stroke="#1a1612" stroke-width="1.4"
+  <line x1="110" y1="236" x2="110" y2="253.6" stroke="#1a1612" stroke-width="1.4"
         marker-end="url(#sm-tri)"/>
 
   <!-- QUIESCENT -> COLLECTING -->
-  <line x1="150" y1="294" x2="336" y2="178" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="150" y1="294" x2="325.5" y2="184.6" stroke="#7a6e62" stroke-width="1.2"
         marker-end="url(#sm-tri)"/>
   <text x="175" y="248" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Money</text>
   <text x="175" y="262" font-size="11" fill="#7a6e62" text-anchor="middle">/ add_money</text>
 
   <!-- COLLECTING self-loop -->
-  <path d="M345,105 C320,30 440,30 415,105" fill="none" stroke="#7a6e62"
+  <path d="M345,105 C321.4,34.3 426.8,30.2 417.9,92.9" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="380" y="24" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Money</text>
   <text x="380" y="38" font-size="11" fill="#7a6e62" text-anchor="middle">/ add_money</text>
 
   <!-- COLLECTING -> SELECTING -->
-  <line x1="386" y1="202" x2="393" y2="262" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="386" y1="202" x2="391.6" y2="249.7" stroke="#7a6e62" stroke-width="1.2"
         marker-end="url(#sm-tri)"/>
   <text x="335" y="255" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
   <text x="335" y="269" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
 
   <!-- SELECTING -> COLLECTING (too_expensive) -->
-  <path d="M396,265 Q470,225 388,200" fill="none" stroke="#7a6e62"
+  <path d="M396,265 Q464.3,228.1 399.8,204" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="465" y="205" font-size="11" fill="#8b1a1a">SecondDigit</text>
   <text x="465" y="218" font-size="10.5" fill="#8b1a1a">[too_expensive]</text>
   <text x="465" y="231" font-size="11" fill="#7a6e62">/ clear</text>
 
   <!-- SELECTING -> UNAVAILABLE (sold_out) -->
-  <line x1="454" y1="299" x2="632" y2="229" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="454" y1="299" x2="620.5" y2="233.5" stroke="#7a6e62" stroke-width="1.2"
         marker-end="url(#sm-tri)"/>
   <text x="543" y="248" font-size="11" fill="#8b1a1a" text-anchor="middle">SecondDigit [sold_out]</text>
   <text x="543" y="262" font-size="11" fill="#7a6e62" text-anchor="middle">/ clear</text>
 
   <!-- UNAVAILABLE -> SELECTING -->
-  <path d="M636,222 Q540,320 458,308" fill="none" stroke="#7a6e62"
+  <path d="M636,222 Q547.2,312.6 470.4,309.2" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="565" y="335" font-size="11.5" fill="#8b1a1a" text-anchor="middle">FirstDigit</text>
   <text x="565" y="349" font-size="11" fill="#7a6e62" text-anchor="middle">/ choose_row</text>
 
   <!-- SELECTING -> WANT_MORE (else) -->
-  <line x1="451" y1="347" x2="634" y2="445" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="451" y1="347" x2="623.1" y2="439.1" stroke="#7a6e62" stroke-width="1.2"
         marker-end="url(#sm-tri)"/>
   <text x="542" y="382" font-size="11" fill="#8b1a1a" text-anchor="middle">SecondDigit [else]</text>
   <text x="542" y="396" font-size="11" fill="#7a6e62" text-anchor="middle">/ dispense</text>
 
   <!-- WANT_MORE -> SELECTING -->
-  <path d="M632,452 Q520,470 452,352" fill="none" stroke="#7a6e62"
+  <path d="M632,452 Q525.2,469.2 458.4,362.7" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="500" y="470" font-size="11.5" fill="#8b1a1a" text-anchor="middle">FirstDigit</text>
   <text x="500" y="484" font-size="11" fill="#7a6e62" text-anchor="middle">/ choose_row</text>
 
   <!-- SELECTING -> QUIESCENT -->
-  <line x1="342" y1="320" x2="158" y2="320" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="342" y1="320" x2="170.4" y2="320" stroke="#7a6e62" stroke-width="1.2"
         marker-end="url(#sm-tri)"/>
   <text x="250" y="308" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
   <text x="250" y="336" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
 
   <!-- COLLECTING -> QUIESCENT -->
-  <path d="M345,115 Q220,30 145,278" fill="none" stroke="#7a6e62"
+  <path d="M345,115 Q223.1,32.1 148.7,266" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="220" y="50" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
   <text x="220" y="64" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
 
   <!-- UNAVAILABLE -> QUIESCENT -->
-  <path d="M645,168 Q520,-25 125,270" fill="none" stroke="#7a6e62"
+  <path d="M645,168 Q521.6,-22.5 135.2,262.4" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="520" y="-8" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
   <text x="520" y="6" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
 
   <!-- WANT_MORE -> QUIESCENT -->
-  <path d="M645,505 Q380,580 125,362" fill="none" stroke="#7a6e62"
+  <path d="M645,505 Q385,578.6 134.7,370.2" fill="none" stroke="#7a6e62"
         stroke-width="1.2" marker-end="url(#sm-tri)"/>
   <text x="380" y="568" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
   <text x="380" y="582" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>

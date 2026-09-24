@@ -34,7 +34,9 @@ def test_read_style_collects_the_distinct_drawing_attributes() -> None:
     assert s.markers == ["head", "spare"]
     assert s.marker_uses == {"head": 2}
     assert s.odd_colors == ["#ff0000"]
-    assert s.flags == ["color outside the palette"]
+    assert s.odd_markers == ["head", "spare"]
+    assert s.flags == ["color outside the palette",
+                       "arrowhead outside tools/arrowheads.py: head, spare"]
 
 
 def test_scan_pairs_references_with_files_and_reports_the_rest(

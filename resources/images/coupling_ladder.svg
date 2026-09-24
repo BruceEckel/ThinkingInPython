@@ -2,13 +2,13 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Six degrees of what one part of a program knows about another, from inheriting its internals down to receiving a value</title>
   <defs>
-    <marker id="ld-solid" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    <marker id="ld-solid" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
-    <marker id="ld-hollow" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="ld-hollow" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
   <text x="30" y="24" font-size="12" fill="#7a6e62" text-anchor="start">The dependent part knows</text>

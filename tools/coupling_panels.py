@@ -43,6 +43,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tools.arrowheads import HEADS, marker_def, shorten_curve
+
 ROOT = Path(__file__).resolve().parent.parent
 IMAGES = ROOT / "resources" / "images"
 
@@ -50,7 +52,6 @@ INK = "#1a1612"
 BOX = "#c8bfb0"
 MUTED = "#7a6e62"
 MARK = "#8b1a1a"
-PAPER = "#f5f0e8"
 FONT = "font-family=\"'JetBrains Mono', Consolas, monospace\""
 
 WIDTH = 700
@@ -148,18 +149,23 @@ def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
         x2, y2 = x2 + nx * e.shift, y2 + ny * e.shift
     stroke, width, dash, head = STYLES[e.kind]
     marker = f'marker-end="url(#{pid}-{head})"'
+    # The line stops short by the head's length, and the head reaches the box.
+    trim = HEADS["filled" if head == "solid" else head].trim
     if e.bend:
         mx, my = (x1 + x2) / 2 + nx * e.bend, (y1 + y2) / 2 + ny * e.bend
+        lx = (x1 + x2) / 2 + nx * e.bend / 2
+        ly = (y1 + y2) / 2 + ny * e.bend / 2
+        _, (mx, my), (x2, y2) = shorten_curve(
+            [(x1, y1), (mx, my), (x2, y2)], trim)
         out = (f'  <path d="M{x1:.1f},{y1:.1f} Q{mx:.1f},{my:.1f} '
                f'{x2:.1f},{y2:.1f}" fill="none" stroke="{stroke}" '
                f'stroke-width="{width}"{dash} {marker}/>\n')
-        lx = (x1 + x2) / 2 + nx * e.bend / 2
-        ly = (y1 + y2) / 2 + ny * e.bend / 2
     else:
+        lx, ly = (x1 + x2) / 2, (y1 + y2) / 2
+        x2, y2 = x2 - dx / length * trim, y2 - dy / length * trim
         out = (f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" '
                f'y2="{y2:.1f}" stroke="{stroke}" stroke-width="{width}"'
                f'{dash} {marker}/>\n')
-        lx, ly = (x1 + x2) / 2, (y1 + y2) / 2
     if e.label:
         out += (f'  <text x="{lx + e.dx:.1f}" y="{ly + e.dy:.1f}" '
                 f'font-size="10.5" fill="{MARK}" text-anchor="middle">'
@@ -176,18 +182,8 @@ def text(x: float, y: float, s: str, size: float = 12, fill: str = INK,
 
 
 def defs(pid: str) -> str:
-    return f'''  <defs>
-    <marker id="{pid}-solid" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="{INK}" stroke="{INK}" stroke-width="1"/>
-    </marker>
-    <marker id="{pid}-hollow" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="10" markerHeight="10" orient="auto"
-            markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="{PAPER}" stroke="{INK}" stroke-width="1"/>
-    </marker>
-  </defs>
-'''
+    return ("  <defs>\n" + marker_def(f"{pid}-solid", "filled", INK)
+            + marker_def(f"{pid}-hollow", "hollow", INK) + "  </defs>\n")
 
 
 def legend(x: float, y: float, pid: str) -> str:
@@ -202,7 +198,8 @@ def legend(x: float, y: float, pid: str) -> str:
     for i, (kind, label) in enumerate(rows):
         yy = y + i * 20
         stroke, width, dash, head = STYLES[kind]
-        out += (f'  <line x1="{x}" y1="{yy}" x2="{x + 30}" y2="{yy}" '
+        end = x + 30 - HEADS["filled" if head == "solid" else head].trim
+        out += (f'  <line x1="{x}" y1="{yy}" x2="{end:g}" y2="{yy}" '
                 f'stroke="{stroke}" stroke-width="{width}"{dash} '
                 f'marker-end="url(#{pid}-{head})"/>\n')
         out += text(x + 38, yy + 4, label, 10.5, MUTED)

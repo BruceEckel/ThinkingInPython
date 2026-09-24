@@ -2,14 +2,14 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>One assignment to celsius becomes one call on every listener in the broadcaster's list</title>
   <defs>
-    <marker id="ob-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="10" markerHeight="10" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    <marker id="ob-tri" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
 
   <!-- the state change that starts the broadcast -->
-  <line x1="155" y1="44" x2="155" y2="104" stroke="#1a1612" stroke-width="1.3"
+  <line x1="155" y1="44" x2="155" y2="91.6" stroke="#1a1612" stroke-width="1.3"
         marker-end="url(#ob-tri)"/>
   <text x="168" y="78" font-size="11.5" fill="#1a1612">t.celsius = 25</text>
 
@@ -24,11 +24,11 @@
         text-anchor="middle">_listeners: [...]</text>
 
   <!-- one call per listener -->
-  <line x1="263" y1="144" x2="435" y2="68" stroke="#1a1612" stroke-width="1.3"
+  <line x1="263" y1="144" x2="423.7" y2="73" stroke="#1a1612" stroke-width="1.3"
         marker-end="url(#ob-tri)"/>
-  <line x1="263" y1="150" x2="435" y2="150" stroke="#1a1612" stroke-width="1.3"
+  <line x1="263" y1="150" x2="422.6" y2="150" stroke="#1a1612" stroke-width="1.3"
         marker-end="url(#ob-tri)"/>
-  <line x1="263" y1="156" x2="435" y2="232" stroke="#1a1612" stroke-width="1.3"
+  <line x1="263" y1="156" x2="423.7" y2="227" stroke="#1a1612" stroke-width="1.3"
         marker-end="url(#ob-tri)"/>
   <text x="350" y="140" font-size="11.5" fill="#8b1a1a"
         text-anchor="middle">listener(25)</text>

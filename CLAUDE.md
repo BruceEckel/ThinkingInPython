@@ -306,7 +306,16 @@ screen readers, and the cover palette from `tools/make_cover.py`,
 `#7a6e62` for muted text, `#8b1a1a` to mark the one class the figure
 is about. A dashed stroke marks a box that the listing does not
 contain (`surrogate.svg`'s "Etc.", `observer_broadcast.svg`'s `Plot`
-and `Table`). Before committing a new one, rasterize it the way the
+and `Table`). Arrowheads come from `tools/arrowheads.py` and nowhere
+else (2026-09-24, Bruce's pick from a comparison sheet): `filled`, a
+swept head, for anything that points; `hollow`, an open triangle, only
+for inherits or satisfies; `open`, a V, for a return; `diamond` for
+aggregation. None is filled with the paper color, since the EPUB and
+the gallery draw on white, so the edge stops short of its target by
+the head's `trim` and the head, anchored at its back, reaches the
+border. `marker_def()` writes the `<marker>`; `shorten_line()` and
+`shorten_path_end()`/`shorten_path_start()` shorten a hand-drawn edge.
+`make figures` fails on any other marker. Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
 once rasterized. `make figures` (in `make verify` since 2026-09-24,
 `tools/figure_gallery.py`) builds `build/figures/index.html`: every

@@ -2,16 +2,16 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three</title>
   <defs>
-    <marker id="bg-tri" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="11" markerHeight="11" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="bg-tri" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
   </defs>
 
   <!-- arrows: each object's __dict__ points at the one shared dict -->
-  <line x1="110" y1="90" x2="270" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
-  <line x1="300" y1="90" x2="300" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
-  <line x1="490" y1="90" x2="330" y2="150" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+  <line x1="110" y1="90" x2="258.4" y2="145.6" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+  <line x1="300" y1="90" x2="300" y2="137.6" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
+  <line x1="490" y1="90" x2="341.6" y2="145.6" stroke="#1a1612" stroke-width="1.2" marker-end="url(#bg-tri)"/>
 
   <!-- x -->
   <rect x="30" y="20" width="160" height="70" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="6"/>

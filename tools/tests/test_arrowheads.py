@@ -1,0 +1,49 @@
+"""Tests for tools/arrowheads.py: the check knows the four standard heads
+in any color and rejects anything else, and shortening an edge takes off
+the length asked for while keeping the head on the edge's line."""
+from __future__ import annotations
+import math
+import pytest
+from tools.arrowheads import (HEADS, marker_def, marker_kinds, reverse_path,
+                              shorten_curve, shorten_line, shorten_path_end,
+                              shorten_path_start)
+
+
+def test_every_standard_head_is_recognized_in_any_color() -> None:
+    svg = "".join(marker_def(f"m-{k}", k, c)
+                  for k, c in zip(HEADS, ["#1a1612", "#7a6e62",
+                                          "#8b1a1a", "#1a1612"]))
+    assert marker_kinds(svg) == {f"m-{k}": k for k in HEADS}
+
+
+def test_a_hand_written_head_is_recognized_whatever_its_layout() -> None:
+    one_line = " ".join(marker_def("x", "hollow", "#1a1612").split())
+    assert marker_kinds(one_line) == {"x": "hollow"}
+
+
+def test_the_old_paper_filled_triangle_is_nonstandard() -> None:
+    old = ('<marker id="t" viewBox="0 0 10 10" refX="9" refY="5" '
+           'markerWidth="11" markerHeight="11" orient="auto">'
+           '<path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" '
+           'stroke-width="1"/></marker>')
+    assert marker_kinds(old) == {"t": None}
+
+
+def test_shorten_line_moves_the_end_back_along_the_line() -> None:
+    assert shorten_line((0, 0), (30, 40), 10) == pytest.approx((24, 32))
+    with pytest.raises(ValueError):
+        shorten_line((0, 0), (3, 4), 10)
+
+
+def test_shorten_curve_cuts_the_arc_length_from_the_end() -> None:
+    pts = [(0.0, 0.0), (50.0, 80.0), (100.0, 0.0)]
+    short = shorten_curve(pts, 12.4)
+    assert short[0] == pts[0]
+    # The new end lies on the old curve, about 12.4 back along it.
+    assert 12 < math.dist(short[-1], pts[-1]) <= 12.4
+
+
+def test_path_start_and_end_trim_the_right_segment() -> None:
+    assert shorten_path_end("M0,0 L0,50 L40,50", 10) == "M0,0 L0,50 L30,50"
+    assert shorten_path_start("M0,0 L0,50 L40,50", 10) == "M0,10 L0,50 L40,50"
+    assert reverse_path("M1,2 L3,4 Q5,6 7,8") == "M7,8 Q5,6 3,4 L1,2"

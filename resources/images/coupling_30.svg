@@ -2,14 +2,13 @@
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>Subject names only Observer, Thermometer inherits Subject, and Display satisfies Observer while naming Subject in its signature</title>
   <defs>
-    <marker id="c30-solid" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#1a1612" stroke="#1a1612" stroke-width="1"/>
+    <marker id="c30-solid" viewBox="0 0 18 12" refX="5" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0.5,0.5 L17.4,6 L0.5,11.5 L5,6 Z" fill="#1a1612" stroke="#1a1612" stroke-width="0.8" stroke-linejoin="round"/>
     </marker>
-    <marker id="c30-hollow" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="10" markerHeight="10" orient="auto"
-            markerUnits="userSpaceOnUse">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#f5f0e8" stroke="#1a1612" stroke-width="1"/>
+    <marker id="c30-hollow" viewBox="0 0 18 12" refX="1" refY="6"
+            markerWidth="18" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1,1 L17.4,6 L1,11 Z" fill="none" stroke="#1a1612" stroke-width="1.2" stroke-linejoin="round"/>
     </marker>
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Observer</text>
@@ -22,20 +21,20 @@
   <text x="75.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">Thermometer</text>
   <rect x="196" y="168" width="100" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="246.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">Display</text>
-  <line x1="132.0" y1="67.0" x2="192.0" y2="67.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-solid)"/>
+  <line x1="132.0" y1="67.0" x2="179.6" y2="67.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-solid)"/>
   <text x="162.0" y="59.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">notify</text>
-  <line x1="75.0" y1="166.0" x2="75.0" y2="90.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-hollow)"/>
-  <line x1="246.0" y1="166.0" x2="246.0" y2="90.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow)"/>
-  <line x1="216.1" y1="166.0" x2="107.8" y2="90.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
+  <line x1="75.0" y1="166.0" x2="75.0" y2="106.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-hollow)"/>
+  <line x1="246.0" y1="166.0" x2="246.0" y2="106.4" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow)"/>
+  <line x1="216.1" y1="166.0" x2="117.9" y2="97.1" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
   <text x="187.9" y="142.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">update()</text>
   <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, in Display's signature. The subject side names no observer class.</text>
-  <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
+  <line x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c30-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
-  <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-solid)"/>
+  <line x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-solid)"/>
   <text x="518" y="84" font-size="10.5" fill="#7a6e62" text-anchor="start">names an interface</text>
-  <line x1="480" y1="100" x2="510" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow)"/>
+  <line x1="480" y1="100" x2="493.6" y2="100" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c30-hollow)"/>
   <text x="518" y="104" font-size="10.5" fill="#7a6e62" text-anchor="start">satisfies it</text>
-  <line x1="480" y1="120" x2="510" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-hollow)"/>
+  <line x1="480" y1="120" x2="493.6" y2="120" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c30-hollow)"/>
   <text x="518" y="124" font-size="10.5" fill="#7a6e62" text-anchor="start">inherits its internals</text>
   <rect x="482" y="132" width="26" height="16" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="3"/>
   <text x="518" y="144" font-size="10.5" fill="#7a6e62" text-anchor="start">kept free of change</text>
