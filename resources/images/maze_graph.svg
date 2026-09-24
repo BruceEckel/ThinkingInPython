@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room</title>
   <defs>
     <marker id="mz-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="10" markerHeight="10" orient="auto">

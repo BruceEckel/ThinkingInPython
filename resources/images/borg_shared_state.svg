@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 230"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>x, y, and z are three distinct objects, but every __dict__ points at the same _shared_state, so the last write wins for all three</title>
   <defs>
     <marker id="bg-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="11" markerHeight="11" orient="auto">

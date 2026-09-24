@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 400"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material</title>
   <defs>
     <marker id="ts-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="11" markerHeight="11" orient="auto">

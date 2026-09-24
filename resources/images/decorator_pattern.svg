@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 470"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other</title>
   <defs>
     <marker id="dp-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="11" markerHeight="11" orient="auto">

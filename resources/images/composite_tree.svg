@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>The same shape, two applications: a filesystem tree where a Directory holds File or Directory entries, and an expression tree where Add and Mul hold other expressions</title>
 
   <!-- divider -->
   <line x1="470" y1="8" x2="470" y2="300" stroke="#c8bfb0" stroke-width="1"/>

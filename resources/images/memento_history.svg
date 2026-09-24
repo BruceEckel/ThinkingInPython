@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 480"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Three lanes holding state: do() pushes present into _past and clears _future; undo() shuttles present into _future and pops _past; redo() shuttles present into _past and pops _future</title>
   <defs>
     <marker id="mh-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="10" markerHeight="10" orient="auto">

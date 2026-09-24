@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Scissors.compete(paper) calls item.eval_scissors(self); self and item swap sides on the second call, putting execution inside Paper.eval_scissors() rather than Scissors's own code</title>
   <defs>
     <marker id="dd-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="10" markerHeight="10" orient="auto">

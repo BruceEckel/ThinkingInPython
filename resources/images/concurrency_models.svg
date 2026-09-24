@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 600"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Asyncio and threads share a single GIL and take turns. Processes and subinterpreters genuinely run at once (five separate GILs)</title>
 
   <text x="220" y="30" font-size="11" fill="#7a6e62">time -&gt;</text>
   <line x1="220" y1="38" x2="590" y2="38" stroke="#c8bfb0" stroke-width="1"/>

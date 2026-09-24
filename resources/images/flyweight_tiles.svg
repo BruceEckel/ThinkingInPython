@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 300"
      font-family="'JetBrains Mono', Consolas, monospace">
+  <title>Two water cells far apart in the grid are the same object; the whole 24-cell map reduces to 3 shared Tile instances</title>
   <defs>
     <marker id="fw-tri" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="11" markerHeight="11" orient="auto">
