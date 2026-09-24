@@ -1326,8 +1326,8 @@ def test_kicks_never_knock_grains_off_the_plate() -> None:
 
 ### Watching It Happen
 
-The tkinter view shows what the text version cannot: the collapse as it unfolds,
-and the pattern surviving a change of rules.
+The `tkinter` view shows what the text version cannot:
+the collapse as it unfolds, and the pattern surviving a change of rules.
 Each grain keeps one color from a small palette,
 so you can watch individual grains mix while the collective figure forms.
 Every 200 frames the view switches the plate to a new mode.
