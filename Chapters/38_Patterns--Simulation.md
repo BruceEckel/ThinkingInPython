@@ -688,9 +688,13 @@ Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case.
 `EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object):
-it answers like any other room and sends the robot back where it started:
+it answers like any other room and sends the robot back where it started.
 
-![A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room](_images/maze_graph)
+![The maze as a graph of rooms, with teleport jumps and one shared EDGE room](_images/maze_graph)
+
+`Doors.connect()` links each room to its neighbors on the grid.
+Teleports add links that cross the grid:
+two rooms whose `Teleport` items share a target letter lead to each other.
 
 ```python
 # robot_explorer/world.py
