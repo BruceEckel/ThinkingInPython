@@ -869,8 +869,9 @@ so when the robot moves away the room behaves like any other empty room.
 ### Choosing the Path
 
 The robot can now move, but nothing tells it where to go.
-A string of `n`/`s`/`e`/`w` characters replays a route somebody else worked out.
-Instead the robot searches the room graph for its own.
+`run()` replays a string of `n`/`s`/`e`/`w` characters,
+a route somebody else worked out, as the test does with `game.run("e")`.
+Instead of being handed one, the robot searches the room graph for its own.
 
 `solve()` is a breadth-first search over `Room` objects.
 It expands the room reached in the fewest moves first,
