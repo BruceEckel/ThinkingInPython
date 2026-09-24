@@ -550,10 +550,10 @@ _VARIABLE = re.compile(r"\b([A-Z][A-Z_]*)=([^\s,;)]*)")
 _DEFAULT = re.compile(r"^([A-Z][A-Z_]*)\s*[?:+]?=\s*(.*)$")
 
 # Variables a target's doc mentions that the menu should not ask about:
-# `make all ARGS=--help` only lists what `all` would run, which is not
-# what someone picking `all` from a menu wants to be asked on every run.
+# `make verify ARGS=--help` only lists what `verify` would run, which is
+# not what someone picking `verify` from a menu should be asked every run.
 NO_PROMPT: dict[str, frozenset[str]] = {
-    "all": frozenset({"ARGS"}),
+    "verify": frozenset({"ARGS"}),
 }
 
 

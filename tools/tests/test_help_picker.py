@@ -104,15 +104,16 @@ def test_rendering_caps_the_scroll_at_the_highlighted_sections_heading():
     rows = all_rows(_sections())
     picker = Picker(rows, output=DummyOutput())
     picker.window.vertical_scroll = 500      # as if arrowed far down
-    picker.search("must be clean")           # doc-only: `ty` first, row 1
-    assert picker.rows[picker.cursor].label == "ty"
+    picker.search("CH=")                     # doc-only: `verify-ch`, row 1
+    assert picker.rows[picker.cursor].label == "verify-ch"
     picker._body()
     assert picker.window.vertical_scroll == 0    # its heading is line 0
-    picker.move_to_end(last=True)            # under "solutions:"
+    picker.move_to_end(last=True)            # check-ch's repeat, under "code:"
+    assert picker.rows[picker.cursor].label == "check-ch"
     picker.window.vertical_scroll = 500
     text = "".join(f[1] for f in picker._body())
     heading_line = next(i for i, line in enumerate(text.splitlines())
-                        if line.startswith("solutions: "))
+                        if line.startswith("code: "))
     assert heading_line > 0
     assert picker.window.vertical_scroll == heading_line
     picker.window.vertical_scroll = 0        # never scrolls forward
@@ -287,8 +288,8 @@ def test_variables_come_from_the_doc_with_their_examples():
     assert variables(_target("code-width")) == [
         ("WIDTH", "nn"), ("ARGS", "--tsv")]
     assert variables(_target("test")) == []
-    assert "ARGS=" in _target("all").doc          # documented, but
-    assert variables(_target("all")) == []        # never prompted for
+    assert "ARGS=" in _target("verify").doc       # documented, but
+    assert variables(_target("verify")) == []     # never prompted for
 
 
 @pytest.mark.parametrize("tags, expected", [
@@ -420,12 +421,10 @@ def test_notes_lines_show_the_doc_the_comment_block_and_the_recipe():
 
 
 def test_a_prerequisites_only_target_lists_them():
-    verify = next(t for s in _sections() for t in s.targets
-                  if t.name == "verify")
-    texts = [t for _, t in notes_lines(verify, 72)]
+    ci = next(t for s in _sections() for t in s.targets if t.name == "ci")
+    texts = [t for _, t in notes_lines(ci, 72)]
     at = texts.index("Prerequisites:")
-    assert texts[at + 1].startswith("    fix-eol ")
-    assert "gate" in texts[at + 1]
+    assert texts[at + 1] == "    gate site"
     assert "Runs:" not in texts
 
 

@@ -318,7 +318,7 @@ def test_sample_targets_default_to_no_notes():
 def test_the_real_makefile_has_notes_for_the_everyday_targets():
     sections = parse(MAKEFILE.read_text(encoding="utf-8"))
     targets = {t.name: t for s in sections for t in s.targets}
-    for name in ("all", "verify", "gate", "sweep", "tools-upgrade"):
+    for name in ("verify", "gate", "sweep", "tools-upgrade"):
         assert targets[name].notes, name
         assert targets[name].recipe or targets[name].prereqs, name
-    assert targets["verify"].prereqs[-1] == "gate"
+    assert targets["verify"].recipe == ("$(PY) -m tools.verify $(ARGS)",)

@@ -22,9 +22,9 @@ directly against this working tree.
 
 A handful of targets bake --fix/--write/--add/--update into their recipe
 (reflow, spell-add, fix-imports, fix-listings, fix-comment-periods,
-fix-comment-caps, fix-comment-spacing, output, solutions-output, and all,
-which chains most of the others): reflow alone would reformat most of
-the book's prose on every run, since it is not covered by any gate. Those
+fix-comment-caps, fix-comment-spacing, output, and verify, which chains
+most of the others): reflow alone would reformat most of the book's
+prose on every run, since it is not covered by any gate. Those
 run inside a disposable `git worktree` checked out at HEAD instead, so
 this working tree is never touched. The clean-* targets run there too,
 since they remove build/, which holds this script's own logs. That worktree reflects the last
@@ -83,10 +83,10 @@ EXCLUDED: dict[str, str] = {
 # this script) and the final failure report then crashed reading a log
 # that no longer existed.
 WORKTREE_TARGETS: frozenset[str] = frozenset({
-    "all", "reflow", "spell-add", "fix-imports", "fix-listings",
+    "verify", "reflow", "spell-add", "fix-imports", "fix-listings",
     "fix-comment-periods", "fix-comment-caps", "fix-comment-spacing",
     "fix-pattern-names", "fix-coupling-panels",
-    "output", "solutions-output",
+    "output",
     "clean", "clean-examples", "clean-solutions", "clean-site",
     "clean-epub", "clean-pdf",
 })

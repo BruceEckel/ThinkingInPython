@@ -11,8 +11,9 @@ is a `# path/slug.py` comment is an extractable example. `Examples/` is **genera
 from the Markdown** by `tools/extract_examples.py`, so:
 
 - Edit the code **in the Markdown block**, never in `Examples/` directly.
-- After editing, sync the committed tree: `make sync`
-  (= `uv run python -m tools.extract_examples --write -o Examples`).
+- After editing, sync the committed trees: `make sync`
+  (= `uv run python -m tools.extract_examples --write -o Examples` and
+  the same for `extract_solutions` into `SolutionsCode/`).
 - `Examples/` also holds files with no Markdown block (hand-written helpers,
   `.idea/`, `__pycache__`). `tools/extract_examples.py`'s check mode (part of
   `make check`/`gate`/`verify`/`ci`) flags these automatically: a stray file
@@ -126,13 +127,16 @@ scoped to that chapter and its Solutions file, in a few seconds. It
 reflows the chapter only, since the gate never reflows `Solutions/`,
 and it writes no gate stamp; a change that other chapters depend on
 (a renamed listing, a `utils/` helper, a linked heading) still needs
-the whole-book run. That run is `make verify` (fix line endings,
-refresh `#:` output markers, sync, then every gate but the site build). `make all` is the heavier version:
-it also runs every mutating fixer (`reflow`, the comment-style fixers, import
-sorting, blank-line cleanup) before the marker refresh and sync; its ordered
-target list lives in `tools/run_all.py` (`ALL_TARGETS`), and `make all
-ARGS=--help` lists it without running anything. In both, the marker refresh
-runs *before* the sync, not after: `gate`/`solutions-gate` refresh markers
+the whole-book run. That run is `make verify`: fix line endings, every
+mutating fixer (the comment-style fixers, import sorting, blank-line
+cleanup), refresh the `#:` output markers in both trees, sync `Examples/`
+and `SolutionsCode/`, build the figure gallery, then every gate but the
+site build. Its ordered step list lives in `tools/verify.py`
+(`VERIFY_TARGETS`), and `make verify ARGS=--help` lists it without
+running anything. Until 2026-09-24 this was two targets, `verify` without
+the fixers and `all` with them; `all` is gone, since every fixer repairs
+something the gate would otherwise fail on. The marker refresh runs
+*before* the sync, not after: `gate`/`solutions-gate` refresh markers
 too, but only after their own prior sync step already copied the Markdown,
 so a marker that needed fixing would otherwise stay one sync behind until
 the next run caught it up. When iterating on one chapter, the manual
@@ -304,7 +308,7 @@ is about. A dashed stroke marks a box that the listing does not
 contain (`surrogate.svg`'s "Etc.", `observer_broadcast.svg`'s `Plot`
 and `Table`). Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
-once rasterized. `make figures` (in `make all` since 2026-09-24,
+once rasterized. `make figures` (in `make verify` since 2026-09-24,
 `tools/figure_gallery.py`) builds `build/figures/index.html`: every
 figure in book order, numbered, with its file name, chapter, line,
 and caption, switchable between the live SVG and the EPUB's PNG,
@@ -709,8 +713,9 @@ and how it was measured.
   by annotating the dict explicitly, `Final[dict[type[Expr], int]]`, in
   Solutions ch34). After `make tools-upgrade`, run
   `uv run ty check build/examples` **and** `uv run ty check build/solutions`
-  before assuming the first failure is the only one: `make all` stops at
-  the first failing gate and `solutions-gate` runs last.
+  before assuming the first failure is the only one: `make verify` stops
+  at the first failing gate, and `solutions-gate` runs first, as `gate`'s
+  prerequisite.
   The 0.0.75 to 0.0.77 upgrade (2026-09-02, alongside Python 3.15.0b3 to
   3.15.0rc2) was the first with **no fallout at all**: `make sweep` green
   on both trees, no marker or reflow drift, and all four version-pinned
@@ -765,7 +770,7 @@ and how it was measured.
   wrong diagnostic codes, wrong message text, and twice a claim built on
   the wrong wording that inverts the point being taught (see
   `exercise_review.md` Part 2.1). Earlier upgrade sweeps went through
-  `Chapters/` and stopped. Nothing gates this: `solutions-output-check`
+  `Chapters/` and stopped. Nothing gates this: `output-check`
   validates `#:` markers, and a diagnostic quoted in prose is not a
   marker. `grep -rn "^error\[\|^warning\[\|^info\[" Chapters/ Solutions/`
   finds all 40 in the book (33 errors, 7 `reveal_type` quotes), so the
@@ -891,17 +896,14 @@ and how it was measured.
   whenever the first failure is unlikely to be the only one. A tool
   upgrade is the standard case, and `tools-upgrade` now ends with it.
 - **A green `make sweep` does not mean the committed trees are current,
-  and does not mean the `#:` markers are right.** `sweep` runs
-  gate-checks, solutions-numbering, ty, lint, solutions-ty,
-  solutions-lint, run, test, and solutions-test. It does *not* run
-  `solutions-check` (the `SolutionsCode/` drift check) or the output
-  validators. Editing a `Solutions/*.md` listing therefore leaves
-  `SolutionsCode/` stale behind a green sweep, and a stale marker
-  survives too. `make verify` covers both, through `solutions-sync` and
-  `solutions-output`. When iterating with `sweep`, run
-  `uv run python -m tools.extract_solutions` and
-  `uv run python -m tools.validate_output --tree "$(pwd)/build/solutions" Solutions`
-  before believing the tree is clean.
+  and does not mean the `#:` markers are right.** `sweep` runs checks,
+  coupling-panels, solutions-numbering, ty, lint, run, and test, each
+  over both build trees. It does *not* run `check` (the `Examples/` and
+  `SolutionsCode/` drift check) or `output-check`. Editing a listing in
+  either Markdown tree therefore leaves its committed copy stale behind
+  a green sweep, and a stale marker survives too. `make verify` covers
+  both, through `sync` and `output`. When iterating with `sweep`, run
+  `make check output-check` before believing the tree is clean.
 - **A `#:` marker that measures memory or time is a claim about the
   process the gate runs it in, not about a standalone run.** Chapter
   35's `exercise_2.py` prints a `tracemalloc` peak ratio; standalone its
@@ -987,7 +989,7 @@ and how it was measured.
   new target goes inside that block, and `TIMED=0` bypasses the
   wrapper. A tool that runs `make` from Python inherits `TIMED=1`
   through `MAKEFLAGS` when it was itself started by make, so
-  `run_all.py` and `sweep_checks.py` time their own steps.
+  `verify.py` and `sweep_checks.py` time their own steps.
 - Detailed conventions and decisions are in project memory (`MEMORY.md` index).
 - `thinking-in-python-skill.md` (repo root) and
   `.claude/skills/thinking-in-python/SKILL.md` are duplicate copies of the

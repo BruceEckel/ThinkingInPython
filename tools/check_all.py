@@ -13,8 +13,8 @@ land in one list, sorted by file and line, so the report reads top to
 bottom through the book rather than grouped by which tool noticed.
 
 The registry is the CHECKS list below: an explicit list of the `Check`
-objects the checker modules define, in the spirit of run_all.py's
-ALL_TARGETS. Adding a check means importing it and putting it in the
+objects the checker modules define, in the spirit of verify.py's
+VERIFY_TARGETS. Adding a check means importing it and putting it in the
 list, and it then appears in --list, in the default run, and as a
 selectable name. Deliberately not a discovery mechanism that scans the
 directory: an explicit list is greppable, is obvious to a human adding

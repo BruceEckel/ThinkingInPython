@@ -122,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
         run("solutions-sync", [*extract_sol, "-o", "SolutionsCode"]),
         run("drift", [*PY, "-m", "tools.extract_examples"]),
         run("solutions-drift", [*PY, "-m", "tools.extract_solutions"]),
-        run("gate-checks",
+        run("checks",
             [*PY, "-m", "tools.check_all", *(args.checks or []),
              "--paths", str(md)]),
     ]

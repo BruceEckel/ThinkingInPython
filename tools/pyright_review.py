@@ -70,7 +70,7 @@ def run_pyright() -> list[dict[str, object]]:
         if not tree.is_dir():
             sys.exit(
                 f"{tree} is missing; "
-                "run make extract / solutions-extract"
+                "run make extract"
             )
     cmd = [
         sys.executable, "-m", "pyright", "--outputjson",

@@ -212,29 +212,8 @@ copy.
   make lint
   ```
 
-- Execute every extracted solution and report failures:
-
-  ```sh
-  make solutions-run
-  ```
-
-- Run the solutions' `pytest` examples:
-
-  ```sh
-  make solutions-test
-  ```
-
-- Type-check every solution, over `build/solutions/`:
-
-  ```sh
-  make solutions-ty
-  ```
-
-- Lint every solution the same way:
-
-  ```sh
-  make solutions-lint
-  ```
+- Each of those four covers `build/solutions/`, the extracted exercise
+  answers, in the same run.
 
 - Run every solutions check at once (exercise numbering, drift, output markers, types, lint, runs, tests):
 

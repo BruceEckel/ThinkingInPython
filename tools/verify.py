@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
 """Run the everyday edit-and-check loop: every fixer, then the full gate.
 
-`make all` is what to run after touching a chapter: every mutating fixer
-(reflow, the comment-style fixers, import sorting, blank-line cleanup),
-a refresh of the `#:` output markers, a sync of the generated trees, then
-the full gate. It exists because `make verify` only runs the fixer its
-own gate already forces (`fix-eol`) plus a bare `gate`; the rest, `reflow`
-especially, are not gated at all, so a real edit-and-check loop has to run
-them by hand every time.
+`make verify` is what to run after touching a chapter: every mutating
+fixer (the comment-style fixers, import sorting, blank-line cleanup), a
+refresh of the `#:` output markers, a sync of the committed Examples/ and
+SolutionsCode/ trees, the figure gallery, then the full gate. Each fixer
+repairs something the gate would otherwise fail on, and the gate already
+self-heals line endings, reflow, and markers, so a loop without the
+fixers would only trade a fix for a failure.
 
-`output`/`solutions-output` (the targets that rewrite `#:` markers to
-match a listing's real stdout) run before `sync`/`solutions-sync` on
-purpose, not after: `sync`/`solutions-sync` mirror the Markdown as it
-currently reads into the committed Examples/SolutionsCode trees, and
+`output` (the target that rewrites `#:` markers to match a listing's real
+stdout, in both trees) runs before `sync` on purpose, not after: `sync`
+mirrors the Markdown as it currently reads into the committed trees, and
 `gate`/`solutions-gate` only rewrite markers *inside* that same run, after
 their own sync step already ran. Reversing that order (marker rewrite,
 then sync) is what makes a stale marker converge in this single run
 instead of needing the next one to catch up.
 
-ALL_TARGETS below is the single list to edit: add or remove a make target
-name there and both the run order and the --help listing update
+VERIFY_TARGETS below is the single list to edit: add or remove a make
+target name there and both the run order and the --help listing update
 themselves, since the doc text is read straight from that target's own
 `## text` comment in the Makefile (the same one `make help` reads).
 Nothing else needs to change.
@@ -31,8 +30,8 @@ target, matching how a single Makefile recipe's own sequential lines
 already behave.
 
 Usage:
-    python -m tools.run_all            # run every target in ALL_TARGETS
-    python -m tools.run_all --help     # list the targets, without running
+    python -m tools.verify            # run every target in VERIFY_TARGETS
+    python -m tools.verify --help     # list the targets, without running
 """
 
 import argparse
@@ -44,19 +43,17 @@ from tools.config import ROOT
 from tools.timed_make import format_seconds
 
 # The everyday loop, in run order. Add a make target name here to include
-# it; its --help text is read from the Makefile automatically.
-ALL_TARGETS: list[str] = [
+# it; its --help text is read from the Makefile automatically. The gate
+# reflows prose itself (`reflow_prose --write`), so reflow is not a step.
+VERIFY_TARGETS: list[str] = [
     "fix-eol",
-    "reflow",
     "fix-comment-caps",
     "fix-comment-periods",
     "fix-comment-spacing",
     "fix-listings",
     "fix-imports",
     "output",
-    "solutions-output",
     "sync",
-    "solutions-sync",
     "figures",
     "gate",
 ]
@@ -85,13 +82,13 @@ def _listing(heading: str, names: list[str],
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__,
-        epilog=_listing("make all runs, in order:", ALL_TARGETS),
+        epilog=_listing("make verify runs, in order:", VERIFY_TARGETS),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.parse_args(argv)
 
     ran: list[str] = []
     took: dict[str, float] = {}
-    for name in ALL_TARGETS:
+    for name in VERIFY_TARGETS:
         print(f"-> {name}")
         start = time.monotonic()
         proc = subprocess.run(["make", name], cwd=ROOT)
@@ -101,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"\n{name} failed (exit {proc.returncode}); stopping.\n")
             print(_listing("Ran:", ran, took))
             return proc.returncode
-    print("\nmake all: every target passed.\n")
+    print("\nmake verify: every target passed.\n")
     print(_listing("Ran:", ran, took))
     return 0
 

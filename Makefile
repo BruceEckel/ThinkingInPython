@@ -24,8 +24,8 @@ DOCS ?= Chapters Solutions
 # loudly instead of silently linting everything.
 PROSE_CH = $(wildcard Chapters/$(CH)*.md Solutions/$(CH)*.md)
 PROSE_FILES = $(if $(CH),$(if $(PROSE_CH),$(PROSE_CH),Chapters/$(CH)*.md),$(DOCS))
-# Extra args for `make all`, e.g. `make all ARGS=--help` to list its
-# targets (tools/run_all.py's ALL_TARGETS) without running them.
+# Extra args for `make verify`, e.g. `make verify ARGS=--help` to list
+# its steps (tools/verify.py's VERIFY_TARGETS) without running them.
 ARGS ?=
 
 # Every target here is phony: none names a file it builds. This used to be
@@ -94,7 +94,7 @@ endif
 # code and the time, on failure) after the goal's own output. The child
 # runs with TIMED=1, which selects the real rules below, and GNU Make
 # hands a command-line variable on to every make the child starts, so a
-# nested `$(MAKE)` or a per-target subprocess in run_all.py and
+# nested `$(MAKE)` or a per-target subprocess in verify.py and
 # sweep_checks.py prints no line of its own (those two time each step
 # themselves). `make TIMED=0 verify` runs the rules directly with no
 # timing. `make -n` still shows the real recipe: GNU Make runs a recipe
@@ -113,7 +113,7 @@ else
 
 ##@ Everyday
 
-.PHONY: verify-ch all verify sweep gate gate-status
+.PHONY: verify-ch verify sweep gate solutions-gate gate-status
 
 # `make verify` scoped to one chapter and its Solutions file, in a few
 # seconds instead of tens: fix-eol, reflow, both extracts, this chapter's
@@ -129,27 +129,20 @@ verify-ch:  ## The verify loop for one chapter and its Solutions file (CH=28), a
 ##+ check-ch run-one
 
 # The edit-and-check loop to repeat after touching a chapter: every
-# mutating fixer (reflow, the comment-style fixers, import sorting,
-# blank-line cleanup), a refresh of the #: output markers, a sync of the
-# generated trees, then the full gate. The marker refresh runs before the
-# sync on purpose, so a stale #: marker converges in this one run instead
-# of needing a second `make all` to catch up. The ordered target list, and
-# the doc text `ARGS=--help` prints for each one, both live in
-# tools/run_all.py (ALL_TARGETS) -- add a target there to include it,
-# nothing else needs to change.
-all:  ## Run every everyday fixer plus sync and gate; ARGS=--help lists them without running
-	$(PY) -m tools.run_all $(ARGS)
-
-# Fix any CRLF in the working tree, refresh the #: output markers, sync
-# Examples/ and SolutionsCode/ from the Markdown, then run every gate except
-# the site build. The everyday "is everything still good?" command after
-# editing Chapters/ or Solutions/. Order matters: fix-eol runs first so the
-# eol check inside gate sees an already-clean tree, and output/
-# solutions-output (which rewrite stale #: markers) run before sync/
-# solutions-sync so the marker rewrite is what gets synced, not a since-
-# corrected-in-place Markdown -- reversing that leaves Examples/
-# SolutionsCode one run behind whenever a marker needed fixing.
-verify: fix-eol output solutions-output sync solutions-sync gate  ## Fix line endings, refresh #: markers, sync Examples/ and SolutionsCode/, then run every gate except the site build
+# mutating fixer (the comment-style fixers, import sorting, blank-line
+# cleanup), a refresh of the #: output markers, a sync of the committed
+# Examples/ and SolutionsCode/ trees, the figure gallery, then the full
+# gate. Each fixer repairs something the gate would otherwise fail on,
+# and the gate already self-heals line endings, reflow, and markers, so
+# a fixer-free loop would only trade a fix for a failure. The marker
+# refresh runs before the sync on purpose: the gate refreshes markers
+# too, but only after its own sync step already copied the Markdown, so
+# a stale marker would otherwise stay one sync behind until the next
+# run caught it up. The ordered step list, and the doc text ARGS=--help
+# prints for each one, both live in tools/verify.py (VERIFY_TARGETS);
+# add a target there to include it, nothing else needs to change.
+verify:  ## The everyday loop: every fixer, refresh #: markers, sync Examples/ and SolutionsCode/, figures, then every gate but the site build (ARGS=--help lists the steps)
+	$(PY) -m tools.verify $(ARGS)
 
 # `gate` stops at its first failure, and since `solutions-gate` is one of
 # its prerequisites, that half runs first and can hide every Chapters/
@@ -186,7 +179,7 @@ GATE_DOCS = tools/README.md Solutions
 
 # The local gate without the site build: line endings, listing density, drift
 # check, output markers, ty, ruff, run, pytest, plus the same checks for
-# Solutions/ (solutions-gate). `verify` runs `sync`/`solutions-sync` first;
+# Solutions/ (solutions-gate). `verify` runs `sync` first;
 # `ci` adds the site. validate_output.py runs with --update: a stale #: marker
 # self-heals (rewriting Chapters/) the same way fix-eol/sync already do,
 # rather than failing the build. A raised exception where none is expected
@@ -194,7 +187,7 @@ GATE_DOCS = tools/README.md Solutions
 # also fails on an orphaned stray under Examples/ (a file no block generates
 # and no chapter mentions); run `make prune` to delete those.
 # solutions-gate applies the same stray check to SolutionsCode/ against
-# Solutions/*.md; `prune` covers that tree too (`solutions-prune` alone).
+# Solutions/*.md; `prune` covers that tree too.
 # reflow_prose.py runs here with --write, so prose that drifts out of
 # Semantic Line Breaks self-heals (rewriting Chapters/) the same way
 # fix-eol and validate_output's marker --update do, instead of failing the
@@ -222,6 +215,27 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PYTEST) $(PYTEST_N) build/examples
 	$(PY) -m tools.gate_stamp --write gate
 	$(PY) -m tools.tool_stamp --nag
+
+# Mirrors `gate`, but for Solutions/: numbering, drift check, output
+# markers, ty, ruff, run, pytest. This skipped the run step until
+# 2026-08-31, on the reasoning that every extractable block carries a #:
+# marker and so is already executed by the marker refresh. That was wrong:
+# 24 answers carry no marker and are not tests, so nothing ran them, and
+# the first run over the tree found one that could not execute at all. It costs
+# about six seconds. The numbering check runs first because it is the
+# cheapest and reports a missing answer, which no later step here would
+# notice. extract_solutions.py also fails on an orphaned stray under
+# SolutionsCode/; `make prune` deletes exactly those. Folded out of the
+# listing: `gate` names it, and `gate` is what you run.
+solutions-gate:  ##- The Solutions gate: numbering, check, output, ty, ruff, run, pytest
+	$(PY) -m tools.check_solutions
+	$(PY) -m tools.extract_solutions
+	$(PY) -m tools.extract_solutions --write
+	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
+	$(TY) check build/solutions
+	$(RUFF) check build/solutions
+	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
+	$(PYTEST) $(PYTEST_N) build/solutions
 
 # When did the book last pass the gate, and has anything changed since?
 # The stamp records a hash per Chapters/ and Solutions/ file, so this
@@ -326,14 +340,11 @@ MODEL ?=
 rewrite:  ## AI editing passes over chapters' prose (CH="25 28"; MODEL=; ARGS=--list)
 	$(PY) -m tools.rewrite $(CH) $(if $(MODEL),--model $(MODEL)) $(ARGS)
 
-# Headed "Code examples" rather than "Examples" so its slug is `code`: a
-# section slug must not equal a target name (make_help.py enforces this),
-# and `examples` is a target below.
-##@ Code examples (build/examples/)
+##@ Code examples (build/examples/, build/solutions/)
 
-.PHONY: check-ch run-one run examples by-hand output output-check test ty \
-        lint fix-imports sync check prune extract pyright-review \
-        pyright-accept pyright
+.PHONY: check-ch run-one run by-hand output output-check test ty lint \
+        fix-imports sync check prune extract pyright-review pyright-accept \
+        pyright
 
 # The edit loop for one chapter's listings. `gate` checks all 44 chapters and
 # spends most of its time executing listings you did not touch; this runs the
@@ -354,17 +365,20 @@ check-ch:  ## Run the code checks for one chapter only (CH=12), ~1s
 run-one:  ## Run one example and show its output (`make run-one deque_timing`, or F=)
 	$(PY) -m tools.run_one_example $(F)
 
-# These all read build/examples/, so each depends on `extract` to rebuild it
-# first. make builds `extract` once per invocation, so depending on it from
-# several targets does not re-extract. This is what stops a stale tree (e.g. a
-# gitignored build/examples/ left over from an older Markdown) from being
-# checked. Use `make reset` to force a clean regeneration.
-run: extract  ## Run every extracted .py and report failures (`make examples` is an alias)
+# These all read the build trees, so each depends on `extract` to rebuild
+# them first. make builds `extract` once per invocation, so depending on it
+# from several targets does not re-extract, and `extract` wipes each tree
+# before writing it, so a stale tree (a gitignored build/ left over from an
+# older Markdown) never survives to be checked. Each target covers both
+# trees. `output` alone executes only a block that carries a #: marker and
+# `test` only a test_*.py, which together leave two dozen Solutions answers
+# that nothing else runs (importable helpers, and standalone programs whose
+# behavior the answer describes in prose), so `run` runs every one. The
+# absolute --tree is required, not stylistic: it goes on PYTHONPATH, and a
+# relative path stops resolving the moment an example changes directory.
+run: extract  ## Run every extracted .py in both build trees and report failures
 	$(PY) -m tools.run_examples
-
-# An alias for `run`, kept because older notes name it: `run` already
-# depends on `extract`, so both build the same two targets in the same order.
-examples: extract run  ##- Extract then run (an alias for `run`)
+	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
 
 # Start every example listed under `# [by-hand]` in tools/data/norun.txt,
 # all at once, each from its own chapter directory with utils/ on
@@ -376,24 +390,34 @@ examples: extract run  ##- Extract then run (an alias for `run`)
 by-hand:  ## Open every example that needs a human, all at once, and report how each one exits (ARGS=--list to only list them)
 	$(PY) -m tools.by_hand $(ARGS)
 
-# Rewrite the #: output markers inside the Markdown's ```python listings to the
-# stdout each listing actually produces. Depends on extract so each listing runs
-# from build/examples/<chapter>/, where its sibling imports and data files live.
-output: extract  ## Update the #: output markers in the book's listings
+# Rewrite the #: output markers inside the Markdown's ```python listings, in
+# Chapters/ and Solutions/, to the stdout each listing actually produces.
+# Depends on extract so each listing runs from its build directory, where its
+# sibling imports and data files live. validate_output.py needs an absolute
+# --tree for Solutions: a block runs with cwd inside build/solutions/<chapter>,
+# and a relative tree argument stops resolving once cwd changes (the same
+# gotcha run_examples.py's --tree has; see tools/README.md).
+output: extract  ## Update the #: output markers in Chapters/ and Solutions/ listings
 	$(PY) -m tools.validate_output --update Chapters
+	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
 
 # Same, but report mismatches instead of rewriting (a gate-friendly check).
-output-check: extract  ## Verify the #: output markers without rewriting
+output-check: extract  ## Verify the #: output markers in Chapters/ and Solutions/ without rewriting
 	$(PY) -m tools.validate_output Chapters
+	$(PY) -m tools.validate_output --tree "$(CURDIR)/build/solutions" Solutions
 
-test: extract  ## Run the book's pytest examples (test_*.py)
+# One pytest run per tree, so a failure report names the tree it is in.
+test: extract  ## Run the pytest examples (test_*.py) in both build trees
 	$(PYTEST) $(PYTEST_N) build/examples
+	$(PYTEST) $(PYTEST_N) build/solutions
 
-ty: extract  ## Type-check the extracted examples (must be clean)
-	$(TY) check build/examples
+# One ty run over both trees, so a failure in build/examples never hides
+# one in build/solutions (a failing recipe line stops the lines after it).
+ty: extract  ## Type-check build/examples/ and build/solutions/ (must be clean)
+	$(TY) check build/examples build/solutions
 
-lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
-	$(RUFF) check build/examples
+lint: extract  ## PEP8-lint both build trees with ruff (must be clean)
+	$(RUFF) check build/examples build/solutions
 
 # Organize imports in the book's python listings (ruff's I rule), writing the
 # result back into the Markdown. Depends on extract so ruff sees each listing's
@@ -401,13 +425,19 @@ lint: extract  ## PEP8-lint the extracted examples with ruff (must be clean)
 fix-imports: extract  ## Sort imports and drop unused ones in the listings (ruff I,F401), in the Markdown
 	$(PY) -m tools.fix_imports --fix
 
-# Write the extracted tree straight into Examples/, syncing the committed copy
-# to the Markdown. Run after editing a code block so the drift check passes.
-sync:  ## Update the committed Examples/ tree from the Markdown
+# Write the extracted trees straight into the committed copies, Examples/
+# from Chapters/ and SolutionsCode/ from Solutions/, so the drift check
+# passes. Run after editing a code block. Each Solutions block is
+# self-contained (it redeclares whatever book context it needs) rather
+# than importing from Examples/, so that tree never breaks when a book
+# example changes.
+sync:  ## Update the committed Examples/ and SolutionsCode/ trees from the Markdown
 	$(PY) -m tools.extract_examples --write -o Examples
+	$(PY) -m tools.extract_solutions --write -o SolutionsCode
 
-check:  ## Verify book examples match the committed Examples/ tree
+check:  ## Verify the committed Examples/ and SolutionsCode/ trees match the Markdown
 	$(PY) -m tools.extract_examples
+	$(PY) -m tools.extract_solutions
 
 # `check`/`gate` already fail on an orphaned stray (a file under Examples/
 # with no matching block and no mention anywhere in the book, typically left
@@ -415,28 +445,30 @@ check:  ## Verify book examples match the committed Examples/ tree
 # still mentioned somewhere in the book is left alone for a human to review.
 # It prunes SolutionsCode/ in the same run, since a renamed listing that
 # both trees copy (a utils/ helper) otherwise fails solutions-gate after
-# the Examples/ prune looked complete; `solutions-prune` is that half alone.
-prune:  ## Delete orphaned stray files under Examples/ and SolutionsCode/ (see `check`; `solutions-prune` for the second tree alone)
+# the Examples/ prune looked complete.
+prune:  ## Delete orphaned stray files under Examples/ and SolutionsCode/ (see `check`)
 	$(PY) -m tools.extract_examples --prune
 	$(PY) -m tools.extract_solutions --prune
 
-extract:  ## Write build/examples/ from the Markdown
+# Both build trees, each wiped before it is written.
+extract:  ## Write build/examples/ and build/solutions/ from the Markdown
 	$(PY) -m tools.extract_examples --write
+	$(PY) -m tools.extract_solutions --write
 
 # Pyright is a second opinion, not a gate. The listings carry no pyright
 # suppressions; every disagreement with `ty` is an entry in
 # tools/data/pyright_baseline.txt, and the review prints only the delta:
 # NEW (a fresh disagreement) and GONE (pyright caught up, or the listing
 # changed). Read it after editing listings or after `make tools-upgrade`
-# moves pyright. `pyright` and `solutions-pyright` are the raw runs.
-pyright-review: extract solutions-extract  ## Diff pyright over both trees against the baseline (advisory; accept with `make pyright-accept`)
+# moves pyright. `pyright` is the raw run.
+pyright-review: extract  ## Diff pyright over both trees against the baseline (advisory; accept with `make pyright-accept`)
 	$(PY) -m tools.pyright_review
 
-pyright-accept: extract solutions-extract  ##- Rewrite tools/data/pyright_baseline.txt from the current pyright run
+pyright-accept: extract  ##- Rewrite tools/data/pyright_baseline.txt from the current pyright run
 	$(PY) -m tools.pyright_review --accept
 
-pyright: extract  ##- Run pyright raw over the extracted examples
-	$(PYRIGHT) build/examples
+pyright: extract  ##- Run pyright raw over both build trees
+	$(PYRIGHT) build/examples build/solutions
 
 ##@ Book builds (site, EPUB, PDF)
 
@@ -519,97 +551,9 @@ figures-open:  ##- Build the figure gallery and open it in a browser
 cover:  ## Rebuild the covers from resources/cover-source.jpg (and the favicon)
 	$(PY) -m tools.make_cover
 
-##@ Solutions (Solutions/, build/solutions/)
-
-.PHONY: solutions-sync solutions-check solutions-prune solutions-extract \
-        solutions-output solutions-output-check solutions-ty \
-        solutions-pyright solutions-lint solutions-run solutions-test \
-        solutions-numbering solutions-gate
-
-# Same idea as `sync`/`check`/`extract` above, applied to Solutions/*.md
-# instead of Chapters/. Each Solutions code block is self-contained (it
-# redeclares whatever book context it needs) rather than importing from
-# Examples/, so this tree never breaks when a book example changes.
-solutions-sync:  ## Update the committed SolutionsCode/ tree from Solutions/*.md
-	$(PY) -m tools.extract_solutions --write -o SolutionsCode
-
-solutions-check:  ## Verify Solutions/*.md matches the committed SolutionsCode/ tree
-	$(PY) -m tools.extract_solutions
-
-# The solutions half of `prune`, which runs both. A renumbered exercise is
-# the usual source: the block moves from exercise_2 to exercise_1 and the
-# old file stays, with nothing generating it and nothing importing it.
-solutions-prune:  ##- Delete orphaned stray files under SolutionsCode/ only (see `solutions-check`)
-	$(PY) -m tools.extract_solutions --prune
-
-solutions-extract:  ## Write build/solutions/ from Solutions/*.md
-	$(PY) -m tools.extract_solutions --write
-
-# validate_output.py needs an absolute --tree: Solutions/*.md's blocks run
-# with cwd inside build/solutions/<chapter>, and a relative tree argument
-# stops resolving once cwd changes (the same gotcha run_examples.py's
-# --tree has; see tools/README.md).
-solutions-output: solutions-extract  ## Update the #: output markers in Solutions/*.md
-	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
-
-solutions-output-check: solutions-extract  ## Verify the #: output markers in Solutions/*.md, no rewrite
-	$(PY) -m tools.validate_output --tree "$(CURDIR)/build/solutions" Solutions
-
-solutions-ty: solutions-extract  ## Type-check build/solutions/ (must be clean)
-	$(TY) check build/solutions
-
-solutions-pyright: solutions-extract  ##- Run pyright raw over build/solutions/
-	$(PYRIGHT) build/solutions
-
-solutions-lint: solutions-extract  ## PEP8-lint build/solutions/ with ruff (must be clean)
-	$(RUFF) check build/solutions
-
-# The Solutions counterpart of `run`. solutions-output only executes a block
-# that carries a #: marker, and solutions-test only a test_*.py, which
-# together leave two dozen answers that nothing ever runs: importable
-# helpers, and standalone programs whose behavior the answer describes in
-# prose instead of a marker. This runs every one of them. The absolute
-# --tree is required, not stylistic: it goes on PYTHONPATH, and a relative
-# path stops resolving the moment an example changes directory.
-solutions-run: solutions-extract  ## Run every extracted solution and report failures
-	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
-
-solutions-test: solutions-extract  ## Run Solutions' pytest examples (test_*.py)
-	$(PYTEST) $(PYTEST_N) build/solutions
-
-# The one correspondence neither tree's own checks can see: whether the
-# `## N.` headings here answer the exercises the chapter asks. Pure prose
-# on both sides, so extract_solutions.py (code) and heading_links.py
-# (anchors) both look straight past it. It also fails an `exercise_N.py`
-# listing whose N is not its heading's number, which a reordering of the
-# exercises leaves behind. Takes chapter numbers to check one, e.g.
-# `make solutions-numbering ARGS=19`.
-solutions-numbering:  ## Verify each chapter's exercises have matching solutions
-	$(PY) -m tools.check_solutions $(ARGS)
-
-# Mirrors `gate`, but for Solutions/: numbering, drift check, output
-# markers, ty, ruff, run, pytest. This skipped the run step until
-# 2026-08-31, on the reasoning that every extractable block carries a #:
-# marker and so is already executed by solutions-output. That was wrong: 24
-# answers carry no marker and are not tests, so nothing ran them, and the
-# first `solutions-run` found one that could not execute at all. It costs
-# about six seconds. The numbering check runs first because it is the
-# cheapest and reports a missing answer, which no later step here would
-# notice. extract_solutions.py also fails on an orphaned stray under
-# SolutionsCode/; `make prune` (or `make solutions-prune`) deletes exactly those.
-solutions-gate:  ## The Solutions gate: numbering, check, output, ty, ruff, run, pytest
-	$(PY) -m tools.check_solutions
-	$(PY) -m tools.extract_solutions
-	$(PY) -m tools.extract_solutions --write
-	$(PY) -m tools.validate_output --update --tree "$(CURDIR)/build/solutions" Solutions
-	$(TY) check build/solutions
-	$(RUFF) check build/solutions
-	$(PY) -m tools.run_examples --tree "$(CURDIR)/build/solutions"
-	$(PYTEST) $(PYTEST_N) build/solutions
-
 ##@ Publishing a release
 
-.PHONY: release release-prune ci sync-ci
+.PHONY: release release-prune ci
 
 # Publish a GitHub release whose uploaded assets are exactly the
 # freshly rebuilt PDF and the two EPUBs. release.py orchestrates:
@@ -632,9 +576,6 @@ release-prune:  ## Delete GitHub releases older than the newest two (their tags 
 # run in CI only on request (see tools/README.md).
 ci: gate site  ## Run the full local gate: check, ty, ruff, run, pytest, site
 
-# Same as verify, plus the site build at the end.
-sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus the site build (the full CI gate)
-
 ##+ kindle libs-check tools-status
 
 ##@ Style gates
@@ -643,9 +584,9 @@ sync-ci: output solutions-output sync solutions-sync ci  ## Like verify, plus th
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
         fix-comment-spacing anchors footnotes self-reference \
         quoted-diagnostics quoted-diagnostics-accept exercise-refs \
-        exercise-refs-accept unique-slugs skip-lists pattern-names \
-        fix-pattern-names records coupling-panels fix-coupling-panels \
-        coupling-panels-png checks fix-checks gate-checks
+        exercise-refs-accept unique-slugs skip-lists solutions-numbering \
+        pattern-names fix-pattern-names records coupling-panels \
+        fix-coupling-panels coupling-panels-png checks fix-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -730,10 +671,10 @@ self-reference:  ## Fail if a claim the book makes about its own chapters is fal
 # line added) live in tools/data/quoted_diagnostics_baseline.txt, and
 # the run prints the delta: NEW fails the gate until the quote is fixed
 # or, for a new deliberate edit, accepted. Part of `gate`.
-quoted-diagnostics: extract solutions-extract  ## Diff quoted ty diagnostics against their listings and the baseline (accept with `make quoted-diagnostics-accept`)
+quoted-diagnostics: extract  ## Diff quoted ty diagnostics against their listings and the baseline (accept with `make quoted-diagnostics-accept`)
 	$(PY) -m tools.check_quoted_diagnostics $(ARGS)
 
-quoted-diagnostics-accept: extract solutions-extract  ##- Rewrite tools/data/quoted_diagnostics_baseline.txt from the current run
+quoted-diagnostics-accept: extract  ##- Rewrite tools/data/quoted_diagnostics_baseline.txt from the current run
 	$(PY) -m tools.check_quoted_diagnostics --accept
 
 # A sentence that names an exercise by number ("exercise 3 makes this
@@ -768,6 +709,16 @@ unique-slugs:  ## Fail if two chapters name two listings the same
 # the committed trees it reads are known to be current.
 skip-lists:  ## Fail if a norun.txt or timing.txt pattern matches no listing
 	$(PY) -m tools.check_skip_lists
+
+# The one correspondence neither tree's own checks can see: whether the
+# `## N.` headings here answer the exercises the chapter asks. Pure prose
+# on both sides, so extract_solutions.py (code) and heading_links.py
+# (anchors) both look straight past it. It also fails an `exercise_N.py`
+# listing whose N is not its heading's number, which a reordering of the
+# exercises leaves behind. Takes chapter numbers to check one, e.g.
+# `make solutions-numbering ARGS=19`.
+solutions-numbering:  ## Verify each chapter's exercises have matching solutions
+	$(PY) -m tools.check_solutions $(ARGS)
 
 # Every naming of a design pattern is *Capitalized* and italic, on every
 # mention, since names like State, Command, and Proxy are ordinary words
@@ -806,28 +757,16 @@ fix-coupling-panels:  ##- Regenerate resources/images/coupling_NN.svg from the s
 coupling-panels-png:  ##- Rasterize every resources/images/coupling_*.svg into build/coupling/ with the EPUB's rasterizer, to check by eye
 	$(PY) -m tools.coupling_panels --png
 
-# Every Markdown check at once, parsing each file once instead of per tool.
-# The individual targets above still work; this is the fast whole-book answer.
-# Vale (`make prose`) runs after them, so this one target answers "is the prose
-# clean?" as well. Vale runs only on a bare `make checks`: with ARGS set the
-# caller asked for something narrower (`ARGS=--list`, or one check by name),
-# and a whole-book Vale pass is no part of that answer. Vale is a standalone
-# binary rather than a uv-managed one, so this target now needs it installed;
-# `make tools-check-full` reports whether it is. `gate` and `ci` do not run
-# Vale, and still pass without it.
-checks:  ## Run every Markdown check plus the Vale prose lint (ARGS=--list lists the checks); `make fix-checks` applies them
+# Every Markdown check at once, parsing each file once instead of per tool:
+# check_all's whole registry, which is the GATE_CHECKS list the gate runs,
+# so a bare `make checks` answers "will the gate's Markdown checks pass?"
+# and `sweep` runs it. The individual targets above still work. Vale is
+# `make prose`, so `make checks prose` is the whole prose answer.
+checks:  ## Run every Markdown check the gate enforces (ARGS=--list lists them); `make fix-checks` applies the fixable ones
 	$(PY) -m tools.check_all $(ARGS)
-	$(if $(ARGS),,$(VALE) $(PROSE_FILES))
 
 fix-checks:  ##- Apply every fix those checks can make
 	$(PY) -m tools.check_all --fix
-
-# The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
-# registry). `checks` is the one to run while editing, since it adds the Vale
-# pass; this one answers the narrower "will the gate pass?" and is what `sweep`
-# runs, so the sweep's verdict matches the gate's.
-gate-checks:  ## Run just the Markdown checks the gate enforces
-	$(PY) -m tools.check_all $(GATE_CHECKS)
 
 ##@ Reports (advisory, no gate)
 
@@ -989,8 +928,7 @@ python-upgrade:  ## Upgrade the dev Python (latest patch; TO=3.15 to repin a min
 
 ##@ Cleanup
 
-.PHONY: clean clean-examples clean-solutions clean-site clean-epub clean-pdf \
-        reset
+.PHONY: clean clean-examples clean-solutions clean-site clean-epub clean-pdf
 
 # Everything under build/ is derived and gitignored, so wiping it loses
 # nothing that a gate or build cannot regenerate. The stamps go too: the
@@ -1015,11 +953,5 @@ clean-epub:  ##- Remove build/epub/
 
 clean-pdf:  ##- Remove build/pdf/
 	$(PY) -c "import shutil; shutil.rmtree('build/pdf', ignore_errors=True)"
-
-# Throw away build/examples/ and rebuild it from the Markdown. Run this when
-# a check reports drift you cannot explain (a stale tree from an older Markdown,
-# or one carried over from another machine).
-reset: clean-examples extract  ## Regenerate build/examples/ from the Markdown (fixes drift)
-	@echo "build/examples/ regenerated from the Markdown."
 
 endif  # TIMED

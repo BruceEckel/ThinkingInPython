@@ -22,10 +22,10 @@ together or separately, and what that costs.
   runs pyright over both trees and prints only the delta against the baseline,
   NEW for a disagreement the baseline lacks and GONE for one that no longer fires.
   `make pyright-accept` rewrites the baseline after you have read the delta.
-  `make pyright` and `make solutions-pyright` are the raw runs.
+  `make pyright` is the raw run over both trees.
 - None of it is in `verify`, `gate`, `sweep`, or `ci`,
   and no listing carries a pyright suppression comment.
-  `make ty` and `make solutions-ty` are untouched.
+  `make ty` is untouched.
 
 ## Together or separately
 

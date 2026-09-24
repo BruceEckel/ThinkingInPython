@@ -119,28 +119,23 @@ prints its wall-clock time when it finishes (`make verify: 1m 32s`);
 explains the mechanism. The everyday ones:
 
 ```
-make all        # every everyday fixer, refresh markers, sync, then the full gate but the site
-make verify     # refresh markers, sync Examples/ and SolutionsCode/, then every gate but the site
-make sync-ci    # like verify, plus the site build (the full gate)
+make verify     # every fixer, refresh markers, sync Examples/ and SolutionsCode/, then the full gate but the site
 make ci         # the full local gate: check, ty, ruff, run, pytest, site
 ```
 
-`make all` is the loop to repeat after editing a chapter: every mutating
-fixer (`reflow`, the comment-style fixers, import sorting, blank-line
-cleanup), then a refresh of the `#:` output markers, then a sync of the
-generated trees, then the full gate; see [run_all.py](#run_all.py) below.
-`make verify` is the lighter everyday command: it skips the fixers and
-just refreshes markers and pushes your Markdown changes out to
-`Examples/` (so the drift check passes) and your `Solutions/` changes out
-to `SolutionsCode/`, then runs every gate except the site build. `make
-sync-ci` does the same and also builds the site. Both `verify` and
-`sync-ci` refresh markers (`output`/`solutions-output`) *before*
-syncing, on purpose: `gate`/`solutions-gate` also refresh markers, but
-only after whatever sync step ran ahead of them already copied the
-Markdown, so a marker that needed fixing would otherwise stay one sync
-behind until the *next* run caught it up. `make ci` runs the gate (with
-site) without syncing first, so it still fails on drift, the way GitHub
-Actions does.
+`make verify` is the loop to repeat after editing a chapter: every
+mutating fixer (the comment-style fixers, import sorting, blank-line
+cleanup), then a refresh of the `#:` output markers in both trees, then
+a sync of your Markdown changes out to `Examples/` and `SolutionsCode/`
+(so the drift check passes), the figure gallery, then every gate except
+the site build; see [verify.py](#verify.py) below. It refreshes markers
+(`output`) *before* syncing, on purpose: `gate`/`solutions-gate` also
+refresh markers, but only after whatever sync step ran ahead of them
+already copied the Markdown, so a marker that needed fixing would
+otherwise stay one sync behind until the *next* run caught it up. `make
+ci` runs the gate (with site) without syncing first, so it still fails
+on drift, the way GitHub Actions does; `make verify site` is the same
+run with the sync.
 
 ## make_help.py
 
@@ -238,18 +233,19 @@ and a nonzero status here would only make the outer make add an
 key bindings through prompt_toolkit's pipe input, so they need no
 terminal.
 
-## run_all.py
+## verify.py
 
-Runs `make all`: the everyday edit-and-check loop, as an ordered list of
-`make` targets (`ALL_TARGETS` in the script) run one at a time as their own
-subprocess, stopping at the first failure. Add or remove a target name in
-that list to change what `make all` runs; its `--help` text comes straight
-from that target's own `## text` comment in the Makefile (the same one
-`make help` reads), so nothing else needs updating.
+Runs `make verify`: the everyday edit-and-check loop, as an ordered list
+of `make` targets (`VERIFY_TARGETS` in the script) run one at a time as
+their own subprocess, stopping at the first failure. Add or remove a
+target name in that list to change what `make verify` runs; its `--help`
+text comes straight from that target's own `## text` comment in the
+Makefile (the same one `make help` reads), so nothing else needs
+updating.
 
 ```
-make all               # run every target in ALL_TARGETS, in order
-make all ARGS=--help   # list them, with their doc text, without running
+make verify               # run every target in VERIFY_TARGETS, in order
+make verify ARGS=--help   # list them, with their doc text, without running
 ```
 
 ## sweep_checks.py
@@ -270,9 +266,9 @@ make sweep     # every check over both trees, all failures, exit 1 if any
 `make tools-upgrade` ends with it, so an upgrade's damage arrives attached
 to the upgrade that caused it. The list is `SWEEP_TARGETS` in the script,
 and each row's description is read from that target's own `## text` in the
-Makefile. It sweeps `gate-checks` (the gate's Markdown selection) rather
-than `checks`, since `checks` also runs Vale, a standalone binary the sweep
-would then require. The `#:` markers
+Makefile. Each target covers both build trees, and `ty` and `lint` run
+one invocation over both, so a failure in one tree never hides the
+other's. The `#:` markers
 are deliberately not swept: `make verify` rewrites a stale marker instead
 of failing on it, so a nondeterministic listing would report a difference
 here every run.
@@ -294,8 +290,8 @@ code still reaches the shell. The child runs with `TIMED=1`, which
 selects the real rules (they sit inside an `ifeq ($(TIMED),)` block
 that ends on the Makefile's last line), and make passes that variable on
 to every make the child starts, so nested runs print no line of their
-own. `run_all.py` and `sweep_checks.py` start one make per step from
-Python and time each step themselves, so `make all` and `make sweep`
+own. `verify.py` and `sweep_checks.py` start one make per step from
+Python and time each step themselves, so `make verify` and `make sweep`
 show a seconds column in their summary tables. `make TIMED=0 verify`
 skips the wrapper; `make -n` needs no such bypass, since make runs a
 recipe line that names `$(MAKE)` even under `-n` and the child inherits
@@ -436,9 +432,9 @@ A stray whose bare filename appears nowhere in `Chapters/*.md` is
 helper) is *referenced* and only reported, since deleting it needs a human.
 
 ```
-make sync    # write Examples/ from the Markdown
-make check   # verify the Markdown matches Examples/
-make prune   # delete the orphaned strays check flags (and solutions-check's)
+make sync    # write Examples/ and SolutionsCode/ from the Markdown
+make check   # verify the Markdown matches both committed trees
+make prune   # delete the orphaned strays check flags, in both trees
 ```
 
 A block whose slug starts with `rust/` (e.g. `# rust/fastcount/demo.py`)
@@ -600,28 +596,23 @@ usual source. The grep covers the solutions alone: a leftover named only
 by a chapter is still orphaned here, since no solution block generates it
 and the chapter's own copy lives under `Examples/`.
 
+The `make` targets that cover `Examples/` cover this tree in the same
+run: `sync`, `check`, `prune`, `extract`, `output`, `output-check`,
+`ty`, `lint`, `run`, and `test` each take both trees (until 2026-09-24
+each had a `solutions-*` twin). Two targets are Solutions-only:
+
 ```
-make solutions-sync           # write SolutionsCode/ from Solutions/*.md
-make solutions-check          # verify Solutions/*.md matches SolutionsCode/
-make solutions-prune          # the SolutionsCode/ half of `make prune`
-make solutions-extract        # write build/solutions/ (for the checks below)
-make solutions-output-check   # verify #: markers in Solutions/*.md, no rewrite
-make solutions-output         # rewrite them
-make solutions-ty             # type-check build/solutions/
-make solutions-lint           # ruff-check build/solutions/
-make solutions-test           # pytest build/solutions/ (test_*.py)
 make solutions-numbering      # every exercise has a solution (below)
-make solutions-gate           # all of the above in one go
+make solutions-gate           # numbering, drift, output, ty, ruff, run, pytest
 ```
 
-`solutions-gate` runs as part of the main `gate` (and therefore `verify`,
-`sync-ci`, and `ci`), so a Solutions regression fails the same build a book
-regression would. There is no Solutions counterpart to `run_examples.py`:
-every extractable Solutions block already carries a `#:` marker (checked by
-`solutions-output`, which executes the block to compare), and a block with
-none is a deliberately-unrun illustrative fragment (no `# file.py` slug), the
-same convention `Chapters/` uses for code that only makes sense narrated in
-prose (a type error, a race outcome).
+`solutions-gate` runs as part of the main `gate` (and therefore `verify`
+and `ci`), so a Solutions regression fails the same build a book
+regression would. An extractable Solutions block with no `#:` marker and
+no `# file.py` slug is a deliberately-unrun illustrative fragment, the
+same convention `Chapters/` uses for code that only makes sense narrated
+in prose (a type error, a race outcome); `run` executes the two dozen
+answers that have a slug but carry no marker and are not tests.
 
 `validate_output.py` needs an **absolute** `--tree` when pointed at
 `Solutions/`: a block runs with its cwd inside `build/solutions/<chapter>/`,
@@ -834,7 +825,6 @@ grouped by which tool noticed.
 make checks                # every Markdown check, one pass
 make checks ARGS=--list    # their names and descriptions
 make fix-checks            # apply every fix they can make
-make gate-checks           # just the subset `gate` enforces
 ```
 
 The registry is the explicit `CHECKS` list in the script, deliberately not
@@ -1479,10 +1469,11 @@ Day to day:
 
 1. Make your changes by editing `Chapters/` (the source of truth for prose and
    code alike) or `Solutions/` (worked exercise answers).
-2. Run `make sync-ci`: it pushes any code-block edits out to `Examples/` and
-   `SolutionsCode/`, then runs the full gate (drift, run, pytest, ty, ruff,
-   site, plus the same for `Solutions/`). Use plain `make ci` when you want to
-   confirm there is no drift rather than paper over it.
+2. Run `make verify site`: it pushes any code-block edits out to
+   `Examples/` and `SolutionsCode/`, then runs the full gate (drift, run,
+   pytest, ty, ruff, plus the same for `Solutions/`) and builds the site.
+   Use plain `make ci` when you want to confirm there is no drift rather
+   than paper over it.
 3. When it is green, commit and push, including any updated `Examples/` or
    `SolutionsCode/` files. The default CI path just rebuilds and publishes the
    site; it does not re-run the gates, so the push is fast.

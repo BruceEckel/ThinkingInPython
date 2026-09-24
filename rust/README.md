@@ -7,8 +7,8 @@ directory holds real, buildable copies of those examples.
 
 It is deliberately separate from the rest of the book's tooling.
 The repository root's `Makefile` never enters this directory and never
-requires a Rust toolchain: `make verify`, `make gate`, `make all`, and
-`make ci` all work with no Rust installed. Building and running the code
+requires a Rust toolchain: `make verify`, `make gate`, and `make ci`
+all work with no Rust installed. Building and running the code
 here is an extra, opt-in step for a reader (or maintainer) who has Rust
 and wants to reproduce the speedup numbers themselves.
 

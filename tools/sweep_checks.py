@@ -17,11 +17,11 @@ in fact moved five sites across three chapters as well.
 
 This runs each check to completion and summarizes:
 
-    gate-checks     ok
+    checks          ok
     ty              FAIL
     lint            ok
     ...
-    2 of 8 checks failed: ty, solutions-ty
+    2 of 7 checks failed: ty, run
 
 `make tools-upgrade` ends with this, so an upgrade's damage arrives
 attached to the upgrade that caused it. It is worth running on its own
@@ -29,9 +29,11 @@ attached to the upgrade that caused it. It is worth running on its own
 unlikely to be the only one.
 
 Each check runs as its own `make <target>` subprocess with output
-streamed live, the arrangement tools/run_all.py already uses. Every one
-of those targets depends on its own extract step, so both build trees
-are rebuilt before anything reads them.
+streamed live, the arrangement tools/verify.py already uses. Every one
+of those targets covers both build trees and depends on `extract`, so
+both trees are rebuilt before anything reads them; `ty` and `lint` run
+one invocation over both, so a failure in one tree never hides the
+other's.
 
 The `#:` output markers are deliberately not swept. `make verify`
 rewrites a stale marker rather than failing on it, and a genuinely
@@ -57,22 +59,18 @@ from tools.timed_make import format_seconds
 # actually changes, and seeing them before the slower run/test steps
 # means the interesting output is not scrolled away.
 #
-# gate-checks leads because it is the cheapest of all (one process, one
-# parse per file), so it cannot scroll anything away. It is `gate`'s own
-# Markdown selection rather than `checks`, which also runs Vale: Vale is a
-# standalone binary this sweep would otherwise require, and the two now
-# cover the same registry anyway.
+# checks leads because it is the cheapest of all (one process, one parse
+# per file), so it cannot scroll anything away; it is the gate's own
+# Markdown selection (check_all's whole registry), and Vale is `prose`,
+# which no gate runs.
 SWEEP_TARGETS: list[str] = [
-    "gate-checks",
+    "checks",
     "coupling-panels",
     "solutions-numbering",
     "ty",
     "lint",
-    "solutions-ty",
-    "solutions-lint",
     "run",
     "test",
-    "solutions-test",
 ]
 
 

@@ -7,7 +7,7 @@ this script (the `TIMED` block there), so `make verify` prints
 the time when it fails. The child make runs with `TIMED=1`, which
 selects the real rules, and GNU Make passes a command-line variable on
 to every make the child starts, so a nested `$(MAKE) sweep` or the
-per-target subprocesses in run_all.py and sweep_checks.py print no line
+per-target subprocesses in verify.py and sweep_checks.py print no line
 of their own (those two time each step themselves).
 
 Usage, from the Makefile only:

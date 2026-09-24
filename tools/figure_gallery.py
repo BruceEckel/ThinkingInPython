@@ -22,7 +22,7 @@ Usage:
     uv run python -m tools.figure_gallery --open    # and open it
     uv run python -m tools.figure_gallery --no-png  # skip rasterizing
 
-`make figures` is the one-command form and `make all` runs it, so the
+`make figures` is the one-command form and `make verify` runs it, so the
 gallery tracks the working tree. A figure the prose references with no
 file under `resources/images/` fails the build, since the book would
 render nothing there; a file no chapter references is listed at the end
