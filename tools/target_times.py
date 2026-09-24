@@ -91,7 +91,7 @@ def record(name: str, seconds: float, path: Path = CACHE) -> None:
                       timespec="seconds")}
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n",
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
 
 
 def baseline(path: Path = BASELINE) -> dict[str, str]:
@@ -117,7 +117,7 @@ def write_baseline(times: Mapping[str, float],
     tiers = baseline(path)
     tiers.update({name: tier(s) for name, s in times.items()})
     body = "".join(f"{name}\t{tiers[name]}\n" for name in sorted(tiers))
-    path.write_text(_HEADER + body, encoding="utf-8")
+    path.write_text(_HEADER + body, encoding="utf-8", newline="\n")
     return tiers
 
 
