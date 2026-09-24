@@ -306,6 +306,28 @@ and `Table`). Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
 once rasterized.
 
+The one family of generated figures is the coupling-notation panel at
+the top of each pattern chapter, 23 through 36
+(`resources/images/coupling_NN.svg`, merged 2026-09-23). Appendix C
+(`Chapters/C_Coupling.md`) defines the notation: a heavy edge names a
+concrete class, a thin edge names an interface, a dashed hollow-headed
+edge satisfies one, a solid hollow-headed edge inherits, and the red
+box is the part the pattern keeps free of change. `tools/coupling_panels.py`
+holds a `Panel` spec per chapter, in that chapter's own class and
+function names, plus the `CAPTIONS` dict with the Markdown captions
+(code spans on the identifiers, because the pattern-name gate reads a
+bare "Proxy" or "Observer" in a caption as an unitalicized pattern
+name). Edit the spec and run `make fix-coupling-panels`; never edit
+one of these SVGs by hand. `make coupling-panels` (in `gate`,
+`verify-ch`, and `sweep`) fails when a committed SVG differs from what
+the spec draws, so a listing rename that misses the spec is loud. The
+2026-09-23 verification of all fourteen found two recurring mistakes
+worth checking a new panel for: drawing the GoF shape instead of the
+listing's (chapter 26 had a `Service` protocol no listing declares),
+and counting a call through `Any` as naming a class (chapter 32's
+`eval_*()` methods). A panel's note counts the heavy edges drawn and
+says when demo or wiring code is left out.
+
 ## `@record`: the book's frozen data class, from chapter 18 on
 
 `utils/record.py` (chapter 18, `#record`) is

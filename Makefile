@@ -256,6 +256,7 @@ gate: solutions-gate  ## The gate without sync or site (check, reflow, slugs, ou
 	$(PY) -m tools.check_all $(GATE_CHECKS)
 	$(PY) -m tools.check_all anchors --paths $(GATE_DOCS)
 	$(PY) -m tools.check_all widths records --paths Solutions
+	$(PY) -m tools.coupling_panels --check
 	$(PY) -m tools.check_quoted_diagnostics
 	$(PY) -m tools.exercise_refs
 	$(PY) -m tools.reflow_prose --write
@@ -745,7 +746,8 @@ comment-report:  ## List listing comments added since a git ref (SINCE=ref, defa
 
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
-        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept exercise-refs exercise-refs-accept unique-slugs skip-lists \n        pattern-names fix-pattern-names records checks fix-checks gate-checks
+        fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept exercise-refs exercise-refs-accept unique-slugs skip-lists \
+        pattern-names fix-pattern-names records coupling-panels fix-coupling-panels checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -923,6 +925,19 @@ fix-pattern-names:  ##- Wrap plain pattern names in italics (sentence-start ambi
 # Solutions/.
 records:  ## Fail if a frozen data class after chapter 18 could be @record, or a @record has an unslotted base
 	$(PY) -m tools.record_check
+
+# The coupling-notation panel at the top of each pattern chapter (23-36)
+# is generated from a per-chapter spec in tools/coupling_panels.py into
+# resources/images/coupling_NN.svg. The spec names that chapter's classes
+# and functions, so a listing rename means editing the spec and
+# regenerating; this fails when a committed SVG differs from what the spec
+# draws, so a stale panel cannot ride through the gate. In `gate` since
+# 2026-09-23, the day the panels merged.
+coupling-panels:  ## Fail if a chapter's coupling panel SVG differs from its spec in tools/coupling_panels.py; `make fix-coupling-panels` regenerates
+	$(PY) -m tools.coupling_panels --check
+
+fix-coupling-panels:  ##- Regenerate resources/images/coupling_NN.svg from the specs
+	$(PY) -m tools.coupling_panels
 
 # The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
 # registry). `checks` is the one to run while editing, since it adds the Vale

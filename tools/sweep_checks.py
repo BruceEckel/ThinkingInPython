@@ -64,6 +64,7 @@ from tools.timed_make import format_seconds
 # cover the same registry anyway.
 SWEEP_TARGETS: list[str] = [
     "gate-checks",
+    "coupling-panels",
     "solutions-numbering",
     "ty",
     "lint",
