@@ -285,6 +285,13 @@
     .chapter-nav a { color: var(--muted); border: none; }
     .chapter-nav a:hover { color: var(--accent); }
     .chapter-nav .spacer { flex: 1; }
+    /* The same links above the chapter label, ruled underneath. */
+    .chapter-nav-top {
+      margin: 0 0 2rem;
+      padding: 0 0 1rem;
+      border-top: none;
+      border-bottom: 1px solid var(--rule);
+    }
 
     /* Index / TOC page */
     .book-title {
@@ -341,6 +348,11 @@
 <body>
   <a class="toc-toggle" href="index.html">Contents</a>
   <div class="page">
+    <nav class="chapter-nav chapter-nav-top">
+      $if(prev-url)$<a href="$prev-url$">← $prev-title$</a>$else$<span></span>$endif$
+      <span class="spacer"></span>
+      $if(next-url)$<a href="$next-url$">$next-title$ →</a>$endif$
+    </nav>
     $if(chapter-label)$
     <div class="chapter-label">$chapter-label$</div>
     $endif$
