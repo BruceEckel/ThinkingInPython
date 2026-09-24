@@ -870,8 +870,10 @@ so when the robot moves away the room behaves like any other empty room.
 
 The robot can now move, but nothing tells it where to go.
 `run()` replays a string of `n`/`s`/`e`/`w` characters,
-a route somebody else worked out, as the test does with `game.run("e")`.
-Instead of being handed one, the robot searches the room graph for its own.
+and so far a person writes that string, as the test does with `game.run("e")`.
+For the whole maze, `solve()` writes it:
+a search over the room graph that returns the same kind of string,
+so `game.run(solve(game))` walks the route the search found.
 
 `solve()` is a breadth-first search over `Room` objects.
 It expands the room reached in the fewest moves first,
