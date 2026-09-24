@@ -699,6 +699,7 @@ route to a piece of food and then eats, on the way, some of the food
 it is going to visit later. Re-searching costs almost nothing: each
 search touches at most a few hundred rooms.
 
+<!-- vale proselint.GenderBias = NO -->
 Nearest-first does not give the shortest tour that eats everything.
 Choosing the closest food each time is a greedy choice made with no
 view of what comes after it, and the maze punishes that. Two pieces
@@ -709,6 +710,7 @@ complete tour is a travelling-salesman problem over the food rooms,
 and its first leg is often not the shortest leg available. What the
 greedy tour does guarantee is that every leg is itself a shortest
 path, which is all breadth-first search promises.
+<!-- vale proselint.GenderBias = YES -->
 
 ## 6, 7, and 8: the Chladni plate
 

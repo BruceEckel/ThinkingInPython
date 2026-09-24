@@ -515,8 +515,8 @@ so `make()` needs no change.
 
 Two hazards from [Hazards of Self Registration](#hazards-of-self-registration)
 disappear with the class attribute.
-There is no `cls.registry` to resolve through the MRO,
-and no class for a `@classmethod` to sit on,
+No `cls.registry` lookup walks the MRO,
+and no `@classmethod` needs a class to sit on,
 since the table is a module-level name that `make()` reads directly.
 An intermediate class also stays out of the table unless something decorates it.
 Under `__init_subclass__()`,

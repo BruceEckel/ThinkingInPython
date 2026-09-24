@@ -185,7 +185,7 @@ The heuristic cuts the other way too: `class Weird` never finishes either,
 because `customized_report()` shares enough letters with `customize2` for `get_close_matches` to flag it,
 even though it is not a typo.
 A team that adopts this check should expect to rename an occasional legitimate method,
-not just catch misspellings for free.
+not only to catch misspellings.
 
 If every subclass must supply a step,
 inherit from `ABC` and declare that step with `@abstractmethod`,
