@@ -17,21 +17,28 @@ SVG by hand:
 
     uv run python -m tools.coupling_panels            # write all
     uv run python -m tools.coupling_panels --check    # report drift
+    uv run python -m tools.coupling_panels --png      # rasterize to look
 
 `--check` regenerates in memory and exits nonzero if any committed SVG
-differs, so a future gate can call it the way `extract_examples`'s
-check mode works for `Examples/`. It is not in any gate today.
+differs, the way `extract_examples`'s check mode works for `Examples/`;
+`make coupling-panels` runs it in the gate. `--png` rasterizes every
+`resources/images/coupling_*.svg` (the panels and Appendix C's figures)
+into `build/coupling/` with the same rasterizer and width the EPUB
+uses, since text that fits in a browser can collide once rasterized;
+`make coupling-panels-png` is the one-command form. It needs one of
+`build_epub.SVG_TOOLS` on PATH and says so when none is.
 
 The visual vocabulary matches the hand-authored figures: a `viewBox`
 with no width or height, JetBrains Mono, the cover palette from
 `make_cover.py`, and a `<title>` for screen readers. The canvas is 700
 wide like the other figures, so the site renders every figure at the
-same scale; the drawing sits on the left and a three-line legend on the
+same scale; the drawing sits on the left and a four-line legend on the
 right.
 """
 from __future__ import annotations
 import argparse
 import math
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -536,11 +543,36 @@ def render_all() -> dict[Path, str]:
             for ch, p in sorted(PANELS.items())}
 
 
+def rasterize(out_dir: Path) -> int:
+    """Rasterize every committed coupling_*.svg into `out_dir` as the EPUB would."""
+    from tools import build_epub
+    tool = build_epub.find_svg_tool()
+    if tool is None:
+        print("no SVG rasterizer on PATH; install one of "
+              + ", ".join(build_epub.SVG_TOOLS) + " (scoop install resvg)")
+        return 1
+    out_dir.mkdir(parents=True, exist_ok=True)
+    svgs = sorted(IMAGES.glob("coupling_*.svg"))
+    for src in svgs:
+        dst = out_dir / f"{src.stem}.png"
+        subprocess.run(build_epub.svg_command(tool, src, dst), check=True,
+                       capture_output=True)
+    print(f"rasterized {len(svgs)} figure(s) with {tool} into "
+          f"{out_dir.relative_to(ROOT)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     ap.add_argument("--check", action="store_true",
                     help="report SVGs that differ from the spec; write nothing")
+    ap.add_argument("--png", nargs="?", const=ROOT / "build" / "coupling",
+                    type=Path, metavar="DIR",
+                    help="rasterize every coupling_*.svg into DIR "
+                         "(default build/coupling/) and write nothing else")
     args = ap.parse_args(argv)
+    if args.png is not None:
+        return rasterize(args.png)
     drift = 0
     for path, body in render_all().items():
         current = path.read_text(encoding="utf-8") if path.exists() else None

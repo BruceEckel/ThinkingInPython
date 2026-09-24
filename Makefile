@@ -747,7 +747,7 @@ comment-report:  ## List listing comments added since a git ref (SINCE=ref, defa
 .PHONY: eol fix-eol listings fix-listings widths code-width banned comment-periods \
         fix-comment-periods comment-caps fix-comment-caps comment-spacing \
         fix-comment-spacing anchors footnotes self-reference self-reference-report quoted-diagnostics quoted-diagnostics-accept exercise-refs exercise-refs-accept unique-slugs skip-lists \
-        pattern-names fix-pattern-names records coupling-panels fix-coupling-panels checks fix-checks gate-checks
+        pattern-names fix-pattern-names records coupling-panels fix-coupling-panels coupling-panels-png checks fix-checks gate-checks
 
 # Every check here has a `fix-` counterpart, named in the check's own doc
 # text and marked `##-` so the listing shows one row per rule instead of two.
@@ -933,11 +933,16 @@ records:  ## Fail if a frozen data class after chapter 18 could be @record, or a
 # regenerating; this fails when a committed SVG differs from what the spec
 # draws, so a stale panel cannot ride through the gate. In `gate` since
 # 2026-09-23, the day the panels merged.
-coupling-panels:  ## Fail if a chapter's coupling panel SVG differs from its spec in tools/coupling_panels.py; `make fix-coupling-panels` regenerates
+coupling-panels:  ## Fail if a chapter's coupling panel SVG differs from its spec in tools/coupling_panels.py; `make fix-coupling-panels` regenerates, `make coupling-panels-png` rasterizes to look
 	$(PY) -m tools.coupling_panels --check
 
 fix-coupling-panels:  ##- Regenerate resources/images/coupling_NN.svg from the specs
 	$(PY) -m tools.coupling_panels
+
+# Text that fits in a browser can collide once rasterized, so look at a
+# spec edit the way the EPUB will render it. Writes only build/coupling/.
+coupling-panels-png:  ##- Rasterize every resources/images/coupling_*.svg into build/coupling/ with the EPUB's rasterizer, to check by eye
+	$(PY) -m tools.coupling_panels --png
 
 # The subset `gate` enforces (GATE_CHECKS above, now check_all's whole
 # registry). `checks` is the one to run while editing, since it adds the Vale
