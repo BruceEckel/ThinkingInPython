@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"
      font-family="'JetBrains Mono', Consolas, monospace">
   <title>A room graph: local grid adjacency from Doors.connect(), non-local jumps between rooms that share a Teleport target letter, and every off-map door converging on one shared EDGE room</title>
   <defs>
@@ -22,10 +22,10 @@
 
   <!-- non-local teleport jumps, overlaid on the grid -->
   <path d="M200,134 Q264,95 328,246" fill="none" stroke="#8b1a1a" stroke-width="1.4" stroke-dasharray="6,4"/>
-  <text x="278" y="150" font-size="11" fill="#8b1a1a" text-anchor="middle">Teleport target="a"</text>
+  <text x="300" y="215" font-size="11" fill="#8b1a1a" text-anchor="end">Teleport target="a"</text>
 
   <path d="M328,78 Q232,40 136,190" fill="none" stroke="#7a6e62" stroke-width="1.4" stroke-dasharray="2,4"/>
-  <text x="255" y="55" font-size="11" fill="#7a6e62" text-anchor="middle">Teleport target="b"</text>
+  <text x="268" y="45" font-size="11" fill="#7a6e62" text-anchor="middle">Teleport target="b"</text>
 
   <!-- off-map doors converge on the single shared EDGE room -->
   <polyline points="200,78 200,20 440,20 440,167 447.6,167" fill="none" stroke="#7a6e62"
@@ -58,6 +58,4 @@
   <rect x="460" y="150" width="150" height="80" fill="none" stroke="#8b1a1a" stroke-width="1.5" rx="6"/>
   <text x="535" y="187" font-size="14" font-weight="bold" fill="#1a1612" text-anchor="middle">EDGE</text>
   <text x="535" y="205" font-size="10.5" fill="#7a6e62" text-anchor="middle">every off-map door</text>
-
-  <text x="320" y="365" font-size="11.5" fill="#7a6e62" text-anchor="middle">Grid adjacency from Doors.connect(); non-local jumps from paired Teleports; every edge door shares one EDGE room</text>
 </svg>

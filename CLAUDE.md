@@ -318,7 +318,11 @@ border. `marker_def()` writes the `<marker>`; `shorten_line()` and
 Each head takes its line's color, one marker per color in a figure
 (a gray edge gets a gray head, a red edge a red one).
 `make figures` fails on any other marker and on a head whose color
-differs from its line's. Before committing a new one, rasterize it the way the
+differs from its line's.
+It also measures text (`tools/svg_text.py`, 0.6 em per character in
+JetBrains Mono) and fails on text past the `viewBox`, which every
+renderer cuts off, or overlapping other text; text lying across a line
+still needs the PNG and an eye. Before committing a new one, rasterize it the way the
 EPUB does and look at the PNG; text that fits in a browser can collide
 once rasterized. `make figures` (in `make verify` since 2026-09-24,
 `tools/figure_gallery.py`) builds `build/figures/index.html`: every

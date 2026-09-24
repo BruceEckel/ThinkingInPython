@@ -36,7 +36,7 @@
   <line x1="123.4" y1="148.0" x2="166.6" y2="166.8" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>
   <line x1="325.9" y1="148.0" x2="287.3" y2="165.6" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>
   <text x="326.9" y="163.3" font-size="10.5" fill="#8b1a1a" text-anchor="middle">entries</text>
-  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: two per function, on purpose: a new node type must reach every match, and the checker lists them.</text>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: two per function, on purpose: a new node type must reach every match, and ty lists them.</text>
   <line x1="480" y1="60" x2="497.6" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c34-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line x1="480" y1="80" x2="497.6" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c34-solid)"/>

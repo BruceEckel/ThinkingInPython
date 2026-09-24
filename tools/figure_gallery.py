@@ -17,6 +17,10 @@ kind, and a marker that matches none of them, or one on a line of
 another color, fails the build, so a new figure cannot bring back an
 old shape or a black head on a gray line.
 
+Text is measured too (`tools/svg_text.py`): text that runs past the
+`viewBox`, where every renderer cuts it off, or into other text fails
+the build. Text lying across a line or a shape still needs the eye.
+
 Under each figure is a style line: the distinct colors, stroke widths,
 dash patterns, font families and sizes, and arrowhead markers the SVG
 uses, with anything outside the cover palette or the book's monospace
@@ -51,6 +55,7 @@ from pathlib import Path
 
 from tools import build_epub, build_site
 from tools.arrowheads import marker_kinds, mismatched_heads
+from tools.svg_text import clipped, collisions
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
 
@@ -135,6 +140,14 @@ class Style:
     marker_uses: dict[str, int] = field(default_factory=dict)
     marker_kinds: dict[str, str | None] = field(default_factory=dict)
     mismatched: list[str] = field(default_factory=list)
+    clipped: list[str] = field(default_factory=list)
+    collisions: list[tuple[str, str]] = field(default_factory=list)
+
+    @property
+    def text_faults(self) -> list[str]:
+        return ([f"text past the viewBox: {t!r}" for t in self.clipped]
+                + [f"text overlaps: {a!r} and {b!r}"
+                   for a, b in self.collisions])
 
     @property
     def odd_markers(self) -> list[str]:
@@ -170,6 +183,7 @@ class Style:
         if self.mismatched:
             out.append("arrowhead color differs from its line: "
                        + ", ".join(self.mismatched))
+        out += self.text_faults
         return out
 
 
@@ -217,6 +231,8 @@ def read_style(text: str) -> Style:
         marker_uses=uses,
         marker_kinds=marker_kinds(text),
         mismatched=mismatched_heads(text),
+        clipped=clipped(text),
+        collisions=collisions(text),
     )
 
 
@@ -507,9 +523,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  ARROWHEAD COLOR in {f.name}.svg: "
               + ", ".join(f.style.mismatched)
               + " sit on lines of another color (add a marker per color)")
+    crowded = [f for f in figures if f.style and f.style.text_faults]
+    for f in crowded:
+        assert f.style
+        for fault in f.style.text_faults:
+            print(f"  TEXT in {f.name}.svg: {fault}")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing or odd or clash else 0
+    return 1 if missing or odd or clash or crowded else 0
 
 
 if __name__ == "__main__":

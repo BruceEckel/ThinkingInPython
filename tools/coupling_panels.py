@@ -348,20 +348,20 @@ PANELS: dict[int, Panel] = {
         "The list that builds macro names three functions, and the loop that "
         "runs it names only the Command signature",
         (Node("macro", C1, R1, w=100, sub="list[Command]"),
-         Node("for command in macro", C1, R3, w=160, kind="mark",
-              sub="command()"),
-         Node("Command", C2 + 30, R3, w=110, kind="interface",
+         Node("no_more()", C2, R1, w=96),
+         Node("ceased()", C2, R2, w=96),
+         Node("fjords()", C2, R3, w=96),
+         Node("Command", C3, R2 - 12, w=120, kind="interface",
               sub="Callable[[], None]"),
-         Node("no_more()", C3 + 10, R1, w=96),
-         Node("ceased()", C3 + 10, R2, w=96),
-         Node("fjords()", C3 + 10, R3, w=96)),
-        (Edge("for command in macro", "Command", "thin"),
-         Edge("macro", "no_more()", "heavy"),
+         Node("for command in macro", C3 - 20, R3 + 4, w=160, kind="mark",
+              sub="command()")),
+        (Edge("macro", "no_more()", "heavy"),
          Edge("macro", "ceased()", "heavy"),
          Edge("macro", "fjords()", "heavy"),
          Edge("no_more()", "Command", "realize"),
-         Edge("ceased()", "Command", "realize", shift=-10),
-         Edge("fjords()", "Command", "realize", shift=8)),
+         Edge("ceased()", "Command", "realize"),
+         Edge("fjords()", "Command", "realize"),
+         Edge("for command in macro", "Command", "thin")),
         "heavy edges: 3, all in the line that builds the list. The loop "
         "names none.",
     ),
@@ -431,8 +431,8 @@ PANELS: dict[int, Panel] = {
          Edge("Scissors", "eval_*()", "realize", shift=6),
          Edge("Rock", "eval_*()", "thin", shift=6),
          Edge("Rock", "eval_*()", "realize", shift=-6)),
-        "heavy edges: 0. The coupling is in method names: each class defines "
-        "eval_paper(), eval_scissors(), and eval_rock().",
+        "heavy edges: 0. The coupling is in the method names eval_paper(), "
+        "eval_scissors(), and eval_rock().",
     ),
     33: Panel(
         "Visitor",
@@ -469,7 +469,7 @@ PANELS: dict[int, Panel] = {
          Edge("walk()", "Node", "thin"),
          Edge("Directory", "Node", "thin", label="entries", dx=26, dy=4)),
         "heavy edges: two per function, on purpose: a new node type must "
-        "reach every match, and the checker lists them.",
+        "reach every match, and ty lists them.",
     ),
     35: Panel(
         "Flyweight",
