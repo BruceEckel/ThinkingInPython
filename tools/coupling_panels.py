@@ -1,6 +1,6 @@
 """Generate the coupling-notation panel at the top of each pattern chapter.
 
-Appendix C (`Chapters/C_Coupling.md`) draws six GoF patterns in one
+Chapter 21's Coupling section draws six GoF patterns in one
 notation: a heavy edge names a concrete class, a thin edge names an
 interface, a dashed edge with a hollow head satisfies one, and the red
 box is the part the pattern keeps free of change. This script draws one
@@ -22,7 +22,7 @@ SVG by hand:
 `--check` regenerates in memory and exits nonzero if any committed SVG
 differs, the way `extract_examples`'s check mode works for `Examples/`;
 `make coupling-panels` runs it in the gate. `--png` rasterizes every
-`resources/images/coupling_*.svg` (the panels and Appendix C's figures)
+`resources/images/coupling_*.svg` (the panels and chapter 21's figures)
 into `build/coupling/` with the same rasterizer and width the EPUB
 uses, since text that fits in a browser can collide once rasterized;
 `make coupling-panels-png` is the one-command form. It needs one of
