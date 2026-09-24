@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 236"
      font-family="'JetBrains Mono', Consolas, monospace">
-  <title>StateMachine names only State, each state satisfies it, and the states name the next state through MouseTrap</title>
+  <title>StateMachine names only State, each state satisfies it, and MouseTrap and its states name each other</title>
   <defs>
     <marker id="c31-solid" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="9" markerHeight="9" orient="auto" markerUnits="userSpaceOnUse">
@@ -22,16 +22,19 @@
   <text x="75.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">MouseTrap</text>
   <rect x="324" y="92" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
   <text x="369.0" y="115.2" font-size="12" fill="#1a1612" text-anchor="middle">Waiting</text>
-  <rect x="200" y="160" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="245.0" y="183.2" font-size="12" fill="#1a1612" text-anchor="middle">Luring</text>
+  <rect x="324" y="170" width="90" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="369.0" y="193.2" font-size="12" fill="#1a1612" text-anchor="middle">Luring</text>
   <line x1="132.0" y1="67.0" x2="178.0" y2="67.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>
   <line x1="75.0" y1="166.0" x2="75.0" y2="90.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-hollow)"/>
   <line x1="322.0" y1="96.4" x2="276.0" y2="82.2" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
-  <line x1="241.6" y1="158.0" x2="230.7" y2="90.0" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
-  <line x1="322.0" y1="123.1" x2="134.0" y2="171.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
-  <text x="218.0" y="139.4" font-size="10.5" fill="#8b1a1a" text-anchor="middle">next</text>
-  <line x1="198.0" y1="181.2" x2="134.0" y2="184.2" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
-  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: one per state. The table form moves them into one dict.</text>
+  <path d="M344.6,168.0 Q270.5,162.4 253.8,90.0" fill="none" stroke="#7a6e62" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#c31-hollow)"/>
+  <line x1="320.7" y1="118.3" x2="132.7" y2="166.9" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="196.7" y="132.6" font-size="10.5" fill="#8b1a1a" text-anchor="middle">next</text>
+  <line x1="133.3" y1="177.1" x2="321.3" y2="128.5" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="257.3" y="170.8" font-size="10.5" fill="#8b1a1a" text-anchor="middle">builds</text>
+  <line x1="322.0" y1="183.7" x2="134.0" y2="182.4" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <line x1="132.0" y1="192.4" x2="320.0" y2="193.7" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: two per state, a cycle. The table form moves the next-state choice into a dict per state.</text>
   <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c31-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c31-solid)"/>

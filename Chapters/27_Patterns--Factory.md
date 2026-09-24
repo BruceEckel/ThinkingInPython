@@ -10,7 +10,7 @@ and that creation code names the concrete class.
 If object creation is spread throughout your application,
 adding a type means finding and editing every place that names a concrete class.
 
-![The caller names `Shape` and `make()`, and `make()` is the one place that names `Circle` and `Square`](_images/coupling_27)
+![The caller names `make()`, and `make()` is the one place that names `Shape`, `Circle`, and `Square`](_images/coupling_27)
 
 Here `Triangle` has just joined the hierarchy.
 Two call sites build shapes by naming `Circle` or `Square` directly,

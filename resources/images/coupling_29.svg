@@ -25,7 +25,7 @@
   <line x1="118.0" y1="67.0" x2="168.0" y2="67.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c29-solid)"/>
   <line x1="226.1" y1="166.0" x2="223.0" y2="90.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c29-hollow)"/>
   <line x1="284.0" y1="187.0" x2="326.0" y2="187.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c29-solid)"/>
-  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1, inside ProxyAdapter, so a change to WhatIHave reaches one class.</text>
+  <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: 1 among the classes, inside ProxyAdapter. The demo names what it wires.</text>
   <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c29-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>
   <line x1="480" y1="80" x2="510" y2="80" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c29-solid)"/>

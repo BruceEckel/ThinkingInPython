@@ -259,19 +259,23 @@ PANELS: dict[int, Panel] = {
          Edge("list", "Iterable[int]", "realize"),
          Edge("fibonacci()", "Iterable[int]", "realize"),
          Edge("Countdown", "Iterable[int]", "realize")),
-        "heavy edges: 0. The protocol total() names is one the language defines.",
+        "heavy edges: 0 in total(). Only the demo that hands it a source "
+        "names that source.",
     ),
     24: Panel(
         "Singleton",
         "Every importer names config.py by its module name, and the import "
         "system hands each one the same instance",
-        (Node("config.py", C2, R2, w=170, kind="mark",
-              sub="one instance per process"),
-         Node("a.py", C1, R1, w=80),
-         Node("b.py", C1, R3, w=80)),
-        (Edge("a.py", "config.py", "heavy", label="import", dx=24, dy=-10),
-         Edge("b.py", "config.py", "heavy", label="import", dx=24, dy=18)),
-        "heavy edges: one per importer, all pointing at a name that does not change.",
+        (Node("config.py", C2 + 30, R2, w=170, kind="mark",
+              sub="one instance per interpreter"),
+         Node("module_singleton.py", C1, R1, w=160),
+         Node("shared_config.py", C1, R3, w=160)),
+        (Edge("module_singleton.py", "config.py", "heavy", label="import",
+              dx=10, dy=-10),
+         Edge("shared_config.py", "config.py", "heavy", label="import",
+              dx=10, dy=18)),
+        "heavy edges: one per importer, all pointing at a name that does not "
+        "change.",
     ),
     25: Panel(
         "Template Method",
@@ -282,41 +286,42 @@ PANELS: dict[int, Panel] = {
          Node("run_framework()", 256, R1, w=160, kind="mark"),
          Node("Step", 288, R2, w=96, kind="interface",
               sub="Callable[[], None]"),
-         Node("two functions", 256, R3, w=160, kind="absent")),
+         Node("two lambdas", 256, R3, w=160)),
         (Edge("MyApp", "ApplicationFramework", "inherit",
               label="overrides two steps", dx=70, dy=4),
          Edge("run_framework()", "Step", "thin"),
-         Edge("two functions", "Step", "realize")),
+         Edge("two lambdas", "Step", "realize")),
         "left: the inherit edge is the widest rung; right: the same algorithm "
         "with one thin edge.",
         extra=(divider(228),),
     ),
     26: Panel(
         "Surrogate",
-        "The caller names Service, Proxy and Implementation satisfy it, "
-        "and only Proxy names Implementation",
-        (Node("caller", C1, R2, w=80, kind="mark"),
-         Node("Service", C2 - 20, R2, kind="interface"),
-         Node("Proxy", C3 - 10, R1, w=90),
-         Node("Implementation", C3 - 10, R3, w=126)),
-        (Edge("caller", "Service", "thin"),
-         Edge("Proxy", "Service", "realize"),
-         Edge("Implementation", "Service", "realize"),
-         Edge("Proxy", "Implementation", "heavy")),
-        "heavy edges: 1, inside Proxy. State swaps the class at the far end "
-        "of that edge.",
+        "Proxy and Complete both inherit Service, Proxy holds one, and only "
+        "the caller names either class",
+        (Node("Proxy", C1, R1, w=90, kind="mark"),
+         Node("Service", C2 + 10, R1, kind="interface", sub="ABC"),
+         Node("Complete", C3 + 10, R1, w=96),
+         Node("caller", C2 + 10, R3, w=96)),
+        (Edge("Proxy", "Service", "inherit", shift=-8),
+         Edge("Proxy", "Service", "thin", shift=8, label="holds", dy=18),
+         Edge("Complete", "Service", "inherit"),
+         Edge("caller", "Proxy", "heavy"),
+         Edge("caller", "Complete", "heavy")),
+        "heavy edges: 2, both in the caller that builds the pair. Proxy "
+        "names only Service.",
     ),
     27: Panel(
         "Factory",
-        "The caller names Shape and make(), and make() is the one place that "
-        "names Circle and Square",
+        "The caller names make(), and make() is the one place that names "
+        "Shape, Circle, and Square",
         (Node("caller", C1, R1, w=80, kind="mark"),
          Node("make()", C2, R1, w=90),
          Node("Shape", C1, R3, w=80, kind="interface"),
          Node("Circle", C2, R3, w=80),
          Node("Square", C3, R3, w=80)),
-        (Edge("caller", "Shape", "thin"),
-         Edge("caller", "make()", "heavy"),
+        (Edge("caller", "make()", "heavy"),
+         Edge("make()", "Shape", "thin", label="returns", dx=-30, dy=-4),
          Edge("make()", "Circle", "heavy", label="SHAPES", dx=30, dy=4),
          Edge("make()", "Square", "heavy"),
          Edge("Circle", "Shape", "inherit"),
@@ -326,19 +331,25 @@ PANELS: dict[int, Panel] = {
     ),
     28: Panel(
         "Function Objects",
-        "The macro loop names only the Command signature, and three "
-        "functions satisfy it by having that signature",
-        (Node("macro loop", C1, R2, w=100, kind="mark", sub="command()"),
-         Node("Command", C2, R2, w=110, kind="interface",
+        "The list that builds macro names three functions, and the loop that "
+        "runs it names only the Command signature",
+        (Node("macro", C1, R1, w=100, sub="list[Command]"),
+         Node("for command in macro", C1, R3, w=160, kind="mark",
+              sub="command()"),
+         Node("Command", C2 + 30, R3, w=110, kind="interface",
               sub="Callable[[], None]"),
-         Node("no_more()", C3, R1, w=96),
-         Node("ceased()", C3, R2, w=96),
-         Node("fjords()", C3, R3, w=96)),
-        (Edge("macro loop", "Command", "thin"),
+         Node("no_more()", C3 + 10, R1, w=96),
+         Node("ceased()", C3 + 10, R2, w=96),
+         Node("fjords()", C3 + 10, R3, w=96)),
+        (Edge("for command in macro", "Command", "thin"),
+         Edge("macro", "no_more()", "heavy"),
+         Edge("macro", "ceased()", "heavy"),
+         Edge("macro", "fjords()", "heavy"),
          Edge("no_more()", "Command", "realize"),
-         Edge("ceased()", "Command", "realize"),
-         Edge("fjords()", "Command", "realize")),
-        "heavy edges: 0. The interface is a signature, so no class declares it.",
+         Edge("ceased()", "Command", "realize", shift=-10),
+         Edge("fjords()", "Command", "realize", shift=8)),
+        "heavy edges: 3, all in the line that builds the list. The loop "
+        "names none.",
     ),
     29: Panel(
         "Adapter",
@@ -351,61 +362,63 @@ PANELS: dict[int, Panel] = {
         (Edge("WhatIUse", "WhatIWant", "thin"),
          Edge("ProxyAdapter", "WhatIWant", "inherit"),
          Edge("ProxyAdapter", "WhatIHave", "heavy")),
-        "heavy edges: 1, inside ProxyAdapter, so a change to WhatIHave "
-        "reaches one class.",
+        "heavy edges: 1 among the classes, inside ProxyAdapter. The demo "
+        "names what it wires.",
     ),
     30: Panel(
         "Observer",
-        "Thermometer names only Observer, Display satisfies it, and the "
-        "wiring code is the one place that names both",
-        (Node("Thermometer", C1, R1, w=110, kind="mark"),
+        "Subject names only Observer, Thermometer inherits Subject, and "
+        "Display satisfies Observer while naming Subject in its signature",
+        (Node("Subject", C1, R1, w=110, kind="mark"),
          Node("Observer", C2 + 24, R1, w=100, kind="interface"),
-         Node("Display", C2 + 24, R3, w=100),
-         Node("wiring", C1, R3, w=80)),
-        (Edge("Thermometer", "Observer", "thin", label="notify", dy=-8),
+         Node("Thermometer", C1, R3, w=110),
+         Node("Display", C2 + 24, R3, w=100)),
+        (Edge("Subject", "Observer", "thin", label="notify", dy=-8),
+         Edge("Thermometer", "Subject", "inherit"),
          Edge("Display", "Observer", "realize"),
-         Edge("wiring", "Thermometer", "heavy"),
-         Edge("wiring", "Display", "heavy", label="attach", dx=0, dy=14)),
-        "heavy edges: 2, both in the wiring. Neither Thermometer nor Display "
-        "names the other.",
+         Edge("Display", "Subject", "heavy", label="update()", dx=26, dy=14)),
+        "heavy edges: 1, in Display's signature. The subject side names no "
+        "observer class.",
     ),
     31: Panel(
         "State Machine",
-        "StateMachine names only State, each state satisfies it, and the "
-        "states name the next state through MouseTrap",
+        "StateMachine names only State, each state satisfies it, and "
+        "MouseTrap and its states name each other",
         (Node("StateMachine", C1, R1, w=110, kind="mark"),
          Node("State", C2 + 10, R1, w=90, kind="interface"),
          Node("MouseTrap", C1, R3, w=110),
          Node("Waiting", C3, 92, w=90),
-         Node("Luring", 200, 160, w=90)),
+         Node("Luring", C3, 170, w=90)),
         (Edge("StateMachine", "State", "thin"),
          Edge("MouseTrap", "StateMachine", "inherit"),
          Edge("Waiting", "State", "realize"),
-         Edge("Luring", "State", "realize"),
-         Edge("Waiting", "MouseTrap", "heavy", label="next", dx=-10, dy=-8),
-         Edge("Luring", "MouseTrap", "heavy")),
-        "heavy edges: one per state. The table form moves them into one dict.",
+         Edge("Luring", "State", "realize", bend=-44),
+         Edge("Waiting", "MouseTrap", "heavy", shift=5, label="next",
+              dx=-30, dy=-10),
+         Edge("MouseTrap", "Waiting", "heavy", shift=5, label="builds",
+              dx=30, dy=18),
+         Edge("Luring", "MouseTrap", "heavy", shift=5),
+         Edge("MouseTrap", "Luring", "heavy", shift=5)),
+        "heavy edges: two per state, a cycle. The table form moves the "
+        "next-state choice into a dict per state.",
     ),
     32: Panel(
         "Multiple Dispatching",
-        "duel() names only Item, and Paper, Scissors, and Rock each name an "
-        "eval method for every other",
-        (Node("duel()", C1, R2, w=80, kind="mark"),
-         Node("Item", 150, R2, w=76, kind="interface"),
-         Node("Paper", 246, 40, w=86),
-         Node("Rock", 246, 174, w=86),
-         Node("Scissors", 346, 107, w=90)),
-        (Edge("duel()", "Item", "thin"),
-         Edge("Paper", "Item", "inherit"),
-         Edge("Rock", "Item", "inherit"),
-         Edge("Scissors", "Item", "inherit"),
-         Edge("Paper", "Scissors", "heavy", shift=5),
-         Edge("Scissors", "Paper", "heavy", shift=5),
-         Edge("Scissors", "Rock", "heavy", shift=5),
-         Edge("Rock", "Scissors", "heavy", shift=5),
-         Edge("Paper", "Rock", "heavy", shift=5),
-         Edge("Rock", "Paper", "heavy", shift=5)),
-        "heavy edges: 6. Adding a fourth item edits all three.",
+        "Paper, Scissors, and Rock each define an eval method for every item "
+        "and call one through Any, so a fourth item edits all three",
+        (Node("Paper", C1, R1, w=90),
+         Node("Scissors", C1, R3, w=90),
+         Node("Rock", C3 + 10, R2, w=90),
+         Node("eval_*()", C2 - 4, R2, w=118, kind="absent",
+              sub="undeclared")),
+        (Edge("Paper", "eval_*()", "thin", shift=6),
+         Edge("Paper", "eval_*()", "realize", shift=-6),
+         Edge("Scissors", "eval_*()", "thin", shift=-6),
+         Edge("Scissors", "eval_*()", "realize", shift=6),
+         Edge("Rock", "eval_*()", "thin", shift=6),
+         Edge("Rock", "eval_*()", "realize", shift=-6)),
+        "heavy edges: 0. The coupling is in method names: each class defines "
+        "eval_paper(), eval_scissors(), and eval_rock().",
     ),
     33: Panel(
         "Visitor",
@@ -416,7 +429,7 @@ PANELS: dict[int, Panel] = {
          Node("Chrysanthemum", C1, R3, w=130),
          Node("Pollinator", C3, R2 + 6, w=96),
          Node("Bee", C3, R3 + 6, w=96)),
-        (Edge("Flower", "Visitor", "thin", label="accept", dy=-8),
+        (Edge("Flower", "Visitor", "thin", label="pollinate, eat", dy=-8),
          Edge("Pollinator", "Flower", "thin", label="visit", dx=-24, dy=14),
          Edge("Chrysanthemum", "Flower", "inherit"),
          Edge("Pollinator", "Visitor", "inherit"),
@@ -438,6 +451,7 @@ PANELS: dict[int, Panel] = {
          Edge("disk_usage()", "Directory", "heavy"),
          Edge("walk()", "File", "heavy"),
          Edge("walk()", "Directory", "heavy"),
+         Edge("disk_usage()", "Node", "thin"),
          Edge("walk()", "Node", "thin"),
          Edge("Directory", "Node", "thin", label="entries", dx=26, dy=4)),
         "heavy edges: two per function, on purpose: a new node type must "
@@ -445,17 +459,22 @@ PANELS: dict[int, Panel] = {
     ),
     35: Panel(
         "Flyweight",
-        "parse_map() names tile(), and tile() is the one place that "
-        "constructs a Tile",
+        "parse_map() names tile(), to_symbol(), and Tile, and tile() is the "
+        "one place that constructs a Tile",
         (Node("parse_map()", C1, R2, w=110, kind="mark"),
-         Node("tile()", C2 + 10, R2, w=90, sub="@cache"),
-         Node("Tile", C3 + 10, R2, w=80),
-         Node("SPECS", C2 + 10, R3 + 8, w=90)),
+         Node("tile()", C2 + 10, R1, w=90, sub="@cache"),
+         Node("Tile", C3 + 10, R1, w=80),
+         Node("to_symbol()", C2 + 10, R3, w=100),
+         Node("SPECS", C3 + 10, R3, w=80)),
         (Edge("parse_map()", "tile()", "heavy"),
-         Edge("tile()", "Tile", "heavy", label="constructs", dy=18),
-         Edge("tile()", "SPECS", "heavy")),
-        "heavy edges: 3. Only tile() constructs, so every caller shares its "
-        "instances.",
+         Edge("parse_map()", "to_symbol()", "heavy"),
+         Edge("parse_map()", "Tile", "heavy", bend=30, label="returns",
+              dx=0, dy=16),
+         Edge("tile()", "Tile", "heavy", label="constructs", dy=-10),
+         Edge("tile()", "SPECS", "heavy"),
+         Edge("to_symbol()", "SPECS", "heavy")),
+        "heavy edges: 6, and only tile() constructs, so every caller shares "
+        "its instances.",
     ),
     36: Panel(
         "Memento",
@@ -486,26 +505,27 @@ CAPTIONS: dict[int, str] = {
     25: "`MyApp` inherits `ApplicationFramework`'s internals, while "
         "`run_framework()` names only the `Step` signature its two functions "
         "satisfy",
-    26: "The caller names `Service`, `Proxy` and `Implementation` satisfy it, "
-        "and only `Proxy` names `Implementation`",
-    27: "The caller names `Shape` and `make()`, and `make()` is the one place "
-        "that names `Circle` and `Square`",
-    28: "The macro loop names only the `Command` signature, and three "
-        "functions satisfy it by having that signature",
+    26: "`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, "
+        "and only the caller names either class",
+    27: "The caller names `make()`, and `make()` is the one place that names "
+        "`Shape`, `Circle`, and `Square`",
+    28: "The list that builds `macro` names three functions, and the loop "
+        "that runs it names only the `Command` signature",
     29: "`WhatIUse` names `WhatIWant`, and `ProxyAdapter` is the one class "
         "that names both `WhatIWant` and `WhatIHave`",
-    30: "`Thermometer` names only `Observer`, `Display` satisfies it, and the "
-        "wiring code is the one place that names both",
-    31: "`StateMachine` names only `State`, each state satisfies it, and the "
-        "states name the next state through `MouseTrap`",
-    32: "`duel()` names only `Item`, and `Paper`, `Scissors`, and `Rock` each "
-        "name an eval method for every other",
+    30: "`Subject` names only `Observer`, `Thermometer` inherits `Subject`, "
+        "and `Display` satisfies `Observer` while naming `Subject` in its "
+        "signature",
+    31: "`StateMachine` names only `State`, each state satisfies it, and "
+        "`MouseTrap` and its states name each other",
+    32: "`Paper`, `Scissors`, and `Rock` each define an eval method for every "
+        "item and call one through `Any`, so a fourth item edits all three",
     33: "`Flower` names only `Visitor` and `Pollinator` names only `Flower`, "
         "so no visitor names a concrete flower",
     34: "`disk_usage()` and `walk()` each name both node types, and "
         "`Directory` names only the `Node` union",
-    35: "`parse_map()` names `tile()`, and `tile()` is the one place that "
-        "constructs a `Tile`",
+    35: "`parse_map()` names `tile()`, `to_symbol()`, and `Tile`, and "
+        "`tile()` is the one place that constructs a `Tile`",
     36: "`Sketch` names `Memento`, and `History` names only a type parameter, "
         "so it holds a `Memento` without reading it",
 }

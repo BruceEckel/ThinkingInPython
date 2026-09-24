@@ -3,7 +3,7 @@
 Something changes, and something else is interested in that change.
 The *Observer* pattern connects the two.
 
-![`Thermometer` names only `Observer`, `Display` satisfies it, and the wiring code is the one place that names both](_images/coupling_30)
+![`Subject` names only `Observer`, `Thermometer` inherits `Subject`, and `Display` satisfies `Observer` while naming `Subject` in its signature](_images/coupling_30)
 
 *Observer* decouples code that changes state from code that reacts to the state change.
 An *observer* registers interest with a *subject*.

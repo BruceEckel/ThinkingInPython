@@ -14,17 +14,17 @@
   </defs>
   <text x="10" y="20" font-size="13" font-weight="bold" font-style="italic" fill="#1a1612" text-anchor="start">Singleton</text>
   <line x1="10" y1="27" x2="440" y2="27" stroke="#c8bfb0" stroke-width="0.8"/>
-  <rect x="172" y="108" width="170" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
-  <text x="257.0" y="124.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">config.py</text>
-  <text x="257.0" y="139.2" font-size="9" fill="#7a6e62" text-anchor="middle">one instance per process</text>
-  <rect x="20" y="48" width="80" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="60.0" y="71.2" font-size="12" fill="#1a1612" text-anchor="middle">a.py</text>
-  <rect x="20" y="168" width="80" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
-  <text x="60.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">b.py</text>
-  <line x1="102.0" y1="79.8" x2="181.5" y2="104.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
-  <text x="165.7" y="81.9" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
-  <line x1="102.0" y1="174.2" x2="181.5" y2="150.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
-  <text x="165.7" y="180.1" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
+  <rect x="202" y="108" width="170" height="38" fill="none" stroke="#8b1a1a" stroke-width="1.6" rx="4"/>
+  <text x="287.0" y="124.2" font-size="12" font-weight="bold" fill="#1a1612" text-anchor="middle">config.py</text>
+  <text x="287.0" y="139.2" font-size="9" fill="#7a6e62" text-anchor="middle">one instance per interpreter</text>
+  <rect x="20" y="48" width="160" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="100.0" y="71.2" font-size="12" fill="#1a1612" text-anchor="middle">module_singleton.py</text>
+  <rect x="20" y="168" width="160" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="100.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">shared_config.py</text>
+  <line x1="165.4" y1="88.0" x2="215.3" y2="104.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
+  <text x="200.4" y="86.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
+  <line x1="165.4" y1="166.0" x2="215.3" y2="150.0" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
+  <text x="200.4" y="176.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">import</text>
   <text x="10" y="224" font-size="10.5" fill="#7a6e62" text-anchor="start">heavy edges: one per importer, all pointing at a name that does not change.</text>
   <line x1="480" y1="60" x2="510" y2="60" stroke="#1a1612" stroke-width="2.8" marker-end="url(#c24-solid)"/>
   <text x="518" y="64" font-size="10.5" fill="#7a6e62" text-anchor="start">names a concrete class</text>

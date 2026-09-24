@@ -6,7 +6,7 @@ When you call a method in the surrogate,
 the surrogate calls that method in the implementing class.
 The two patterns are so similar that *Proxy* is a special case of *State*.
 
-![The caller names `Service`, `Proxy` and `Implementation` satisfy it, and only `Proxy` names `Implementation`](_images/coupling_26)
+![`Proxy` and `Complete` both inherit `Service`, `Proxy` holds one, and only the caller names either class](_images/coupling_26)
 
 From a base class, derive the surrogate along with the class or classes that provide the implementation:
 

@@ -24,8 +24,8 @@
   <rect x="288" y="108" width="96" height="38" fill="none" stroke="#7a6e62" stroke-width="1.3" rx="12"/>
   <text x="336.0" y="124.2" font-size="12" fill="#7a6e62" text-anchor="middle">Step</text>
   <text x="336.0" y="139.2" font-size="9" fill="#7a6e62" text-anchor="middle">Callable[[], None]</text>
-  <rect x="256" y="168" width="160" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4" stroke-dasharray="4,3"/>
-  <text x="336.0" y="191.2" font-size="12" fill="#7a6e62" text-anchor="middle">two functions</text>
+  <rect x="256" y="168" width="160" height="38" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <text x="336.0" y="191.2" font-size="12" fill="#1a1612" text-anchor="middle">two lambdas</text>
   <line x1="110.0" y1="166.0" x2="110.0" y2="90.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c25-hollow)"/>
   <text x="180.0" y="132.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">overrides two steps</text>
   <line x1="336.0" y1="88.0" x2="336.0" y2="104.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c25-solid)"/>
