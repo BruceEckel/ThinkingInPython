@@ -96,8 +96,9 @@ uv sync          # optional: the first `uv run` or make target does the same
 ```
 
 Run `make tools-check` to confirm everything resolved (`uv`, `ty`,
-`ruff`, `pytest`); `make tools-check-full` also checks `pandoc` and `vale`,
-needed only for `make site`/`make local` and `make prose`. See
+`ruff`, `pytest`); `make tools-check-full` also checks `pandoc`, `typst`,
+`vale`, and `gh`, needed only for the site, EPUB, PDF, prose, and release
+targets, and prints the install commands for anything missing. See
 [check_tools.py](#check_tools.py) below. If something you expect to work
 doesn't, `make doctor` (see [doctor.py](#doctor.py)) checks for the couple
 of environment problems that look like a bug in the book but aren't.
@@ -354,11 +355,20 @@ dev tools (`ty`, `ruff`, `pytest`) that `uv run` resolves from `uv.lock`.
 `make` and `git` are checked too but marked "assumed" (you already needed
 both to get this far), so their absence doesn't fail the exit code. `--full`
 adds the tools a book maintainer needs for the rest of `make help`: `pandoc`
-(`make site`, `make local`) and the standalone `vale` binary (`make prose`).
+(`make site`, `make local`, `make epub`, `make pdf`), `typst` (`make pdf`),
+the standalone `vale` binary (`make prose`), and `gh` (`make release`).
+
+A failing run ends with the commands that install what is missing on the
+machine it ran on, ready to paste: one `winget install` line on Windows,
+one `brew install` line where Homebrew is on PATH, one `sudo apt install`
+line on the Debian family, and a download command for a tool the package
+manager lacks (Ubuntu packages neither `typst` nor `vale`, so those come
+from their GitHub release archives). Each tool's packages per manager are
+in the script's `TOOLS` list.
 
 ```
 make tools-check        # uv, ty, ruff, pytest (make/git checked, assumed)
-make tools-check-full   # the above, plus pandoc and vale
+make tools-check-full   # the above, plus pandoc, typst, vale, and gh
 ```
 
 ## doctor.py
