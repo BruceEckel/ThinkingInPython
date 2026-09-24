@@ -290,7 +290,7 @@ The question is not whether one part depends on another,
 since a program whose parts do not depend on each other does nothing,
 but how much of the other part the dependence reaches.
 
-![Six degrees of what one part knows about another, from inheriting its internals down to receiving a value](_images/coupling_ladder)
+![Six degrees of what one part knows about another](_images/coupling_ladder)
 
 Each rung is something the dependent part knows.
 A subclass knows its parent's internals: which methods call which,
@@ -330,7 +330,7 @@ A thin edge names an interface.
 A dashed edge with a hollow head says the part satisfies that interface.
 With those three edges alone, six GoF patterns look like this:
 
-![Six patterns drawn only as coupling: which part names a concrete class, which names an interface, and which satisfies one](_images/coupling_gallery)
+![Six GoF patterns drawn only as coupling](_images/coupling_gallery)
 
 The red box in each panel is the part the pattern keeps free of change.
 Read the heavy edges first, because they are where a change reaches.
@@ -384,7 +384,7 @@ On the left, `Report` names each writer class and chooses between them.
 On the right, `Report` names a `Writer` protocol.
 Then a Markdown writer arrives.
 
-![Adding a writer reaches two parts when Report names each writer, and one when Report names a protocol](_images/coupling_reach)
+![What adding a Markdown writer changes in two designs of Report](_images/coupling_reach)
 
 The shaded parts are the ones whose source changes,
 and the red edges are the ones the change adds.
@@ -405,7 +405,7 @@ One more diagram explains why so many of the pattern chapters subtract code as t
 Take a caller that needs an `area()` from whatever it receives,
 and write the same dependence three ways.
 
-![The same dependency written three ways: an ABC needs two edges in source, a Protocol one, and a Callable none outside the caller](_images/coupling_edges)
+![One dependency written three ways: with an ABC, a Protocol, and a Callable](_images/coupling_edges)
 
 With an abstract base class, two edges exist in source:
 the caller names `Shape`, and `Circle` names `Shape` in its `class` line.

@@ -36,7 +36,7 @@ which `__init_subclass__()` fills automatically,
 and a `create()` method builds an instance from a material name,
 the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
 
-![Each Trash subclass registers itself, and sorting keys the bins dict by type(t) instead of naming any material](_images/trash_sorter)
+![Each Trash subclass registers itself, and the bins are keyed by class](_images/trash_sorter)
 
 ```python
 # trash.py

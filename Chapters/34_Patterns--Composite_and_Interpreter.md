@@ -13,7 +13,7 @@ This chapter builds each pattern with [exhaustive matching](13_Techniques--Patte
 
 ![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
 
-![The same shape, two applications: a filesystem tree where a Directory holds File or Directory entries, and an expression tree where Add and Mul hold other expressions](_images/composite_tree)
+![One tree shape serves a filesystem and an arithmetic expression](_images/composite_tree)
 
 ## The Classic Composite
 

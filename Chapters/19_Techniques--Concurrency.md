@@ -2030,9 +2030,12 @@ not the whole.
 `await` unifies backends that share only a result that arrives later.
 Everything else about the backends stays different.
 
-![Asyncio and threads share a single GIL and take turns.
-Processes and subinterpreters genuinely run at once
-(five separate GILs)](_images/concurrency_models)
+![Four concurrency models, and how many GILs each one gives its workers](_images/concurrency_models)
+
+`asyncio` and a thread pool run under one GIL, so their calls take turns.
+A process pool and an interpreter pool give each worker its own GIL,
+so five CPU-bound calls run at once.
+The interpreter pool keeps all five workers in one process.
 
 ## Are Threads Still Necessary?
 

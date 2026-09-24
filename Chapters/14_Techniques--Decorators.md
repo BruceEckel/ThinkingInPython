@@ -1005,7 +1005,7 @@ A topping dynamically wraps a pizza, adds to the cost,
 and adds to the description.
 Because a topping is a pizza, you can wrap a topping in another topping.
 
-![Margherita and Hawaiian satisfy Pizza directly; Topping wraps a Pizza and also satisfies it, so Garlic, Olives, and Feta can wrap any pizza, including each other](_images/decorator_pattern)
+![Each topping wraps a Pizza and is itself a Pizza](_images/decorator_pattern)
 
 ```python
 # pizza_decorator.py
