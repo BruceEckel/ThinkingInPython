@@ -133,7 +133,8 @@ class Node:
 
 @dataclass(frozen=True)
 class Edge:
-    """`kind` is heavy, thin, realize, inherit, or checked."""
+    """`kind` is heavy, thin, realize, inherit, or checked. `corner`
+    aims the edge at the target's corner nearest the source."""
     a: str
     b: str
     kind: str = "thin"
@@ -142,6 +143,7 @@ class Edge:
     dy: float = -6
     shift: float = 0
     bend: float = 0
+    corner: bool = False
 
 
 STYLES: dict[str, tuple[str, float, str, str]] = {
@@ -163,8 +165,14 @@ MARKERS: dict[str, tuple[str, str]] = {
 
 def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
     a, b = nodes[e.a], nodes[e.b]
-    x1, y1 = a.edge_point(b.cx, b.cy, 2)
-    x2, y2 = b.edge_point(a.cx, a.cy, 4)
+    if e.corner:
+        # Aim at the target's padded corner nearest the source.
+        x2 = b.cx + math.copysign(b.w / 2 + 4, a.cx - b.cx)
+        y2 = b.cy + math.copysign(b.h / 2 + 4, a.cy - b.cy)
+        x1, y1 = a.edge_point(x2, y2, 2)
+    else:
+        x1, y1 = a.edge_point(b.cx, b.cy, 2)
+        x2, y2 = b.edge_point(a.cx, a.cy, 4)
     dx, dy = x2 - x1, y2 - y1
     length = math.hypot(dx, dy) or 1
     nx, ny = -dy / length, dx / length
@@ -289,9 +297,9 @@ PANELS: dict[int, Panel] = {
          Node("fibonacci()", C3, R2, w=100),
          Node("Countdown", C3, R3, w=100)),
         (Edge("total()", "Iterable[int]", "thin"),
-         Edge("list", "Iterable[int]", "realize"),
+         Edge("list", "Iterable[int]", "realize", corner=True),
          Edge("fibonacci()", "Iterable[int]", "realize"),
-         Edge("Countdown", "Iterable[int]", "realize")),
+         Edge("Countdown", "Iterable[int]", "realize", corner=True)),
         "heavy edges: 0 in total(). Only the demo that hands it a source "
         "names that source.",
     ),
@@ -304,9 +312,9 @@ PANELS: dict[int, Panel] = {
          Node("module_singleton.py", C1, R1, w=160),
          Node("shared_config.py", C1, R3, w=160)),
         (Edge("module_singleton.py", "config.py", "heavy", label="import",
-              dx=10, dy=-10),
+              dx=10, dy=-10, corner=True),
          Edge("shared_config.py", "config.py", "heavy", label="import",
-              dx=10, dy=18)),
+              dx=10, dy=18, corner=True)),
         "heavy edges: one per importer, all pointing at a name that does not "
         "change.",
     ),
@@ -340,8 +348,8 @@ PANELS: dict[int, Panel] = {
         (Edge("Proxy", "Service", "inherit", shift=-8),
          Edge("Proxy", "Service", "thin", shift=8, label="holds", dy=18),
          Edge("Complete", "Service", "inherit"),
-         Edge("caller", "Proxy", "heavy"),
-         Edge("caller", "Complete", "heavy")),
+         Edge("caller", "Proxy", "heavy", corner=True),
+         Edge("caller", "Complete", "heavy", corner=True)),
         "heavy edges: 2, both in the caller that builds the pair. Proxy "
         "names only Service.",
     ),
@@ -355,9 +363,10 @@ PANELS: dict[int, Panel] = {
          Node("Circle", C2 + 5, R3, w=80),
          Node("Square", C3, R3, w=80)),
         (Edge("caller", "make()", "heavy"),
-         Edge("make()", "Shape", "thin", label="returns", dx=-30, dy=-4),
+         Edge("make()", "Shape", "thin", label="returns", dx=-30, dy=-4,
+              corner=True),
          Edge("make()", "Circle", "heavy", label="SHAPES", dx=30, dy=4),
-         Edge("make()", "Square", "heavy"),
+         Edge("make()", "Square", "heavy", corner=True),
          Edge("Circle", "Shape", "inherit"),
          Edge("Square", "Shape", "inherit", bend=-46)),
         "heavy edges: 3. The two that name a shape sit in one table, and "
@@ -371,19 +380,20 @@ PANELS: dict[int, Panel] = {
          Node("no_more()", C2, R1, w=96),
          Node("ceased()", C2, R2, w=96),
          Node("fjords()", C2, R3, w=96),
-         Node("Command", C3, R2 - 12, w=120, kind="interface",
+         Node("Command", C3, R2, w=120, kind="interface",
               sub="Callable[[], None]"),
-         Node("for command in macro", C3 - 20, R3 + 4, w=160, kind="mark",
+         Node("for command in macro", C3 - 20, R3 + 14, w=160, kind="mark",
               sub="command()")),
         (Edge("macro", "no_more()", "heavy"),
          Edge("macro", "ceased()", "heavy"),
-         Edge("macro", "fjords()", "heavy"),
+         Edge("macro", "fjords()", "heavy", corner=True),
          Edge("no_more()", "Command", "realize"),
          Edge("ceased()", "Command", "realize"),
          Edge("fjords()", "Command", "realize"),
          Edge("for command in macro", "Command", "thin")),
         "heavy edges: 3, all in the line that builds the list. The loop "
         "names none.",
+        height=HEIGHT + 10,
     ),
     29: Panel(
         "Adapter",
@@ -410,7 +420,8 @@ PANELS: dict[int, Panel] = {
         (Edge("Subject", "Observer", "thin", label="notify", dy=-8),
          Edge("Thermometer", "Subject", "inherit"),
          Edge("Display", "Observer", "realize"),
-         Edge("Display", "Subject", "heavy", label="update()", dx=26, dy=14)),
+         Edge("Display", "Subject", "heavy", label="update()", dx=-36,
+              dy=14, corner=True)),
         "heavy edges: 1, in Display's signature. The subject side names no "
         "observer class.",
     ),
@@ -425,7 +436,7 @@ PANELS: dict[int, Panel] = {
          Node("Luring", C3, 170, w=90)),
         (Edge("StateMachine", "State", "thin"),
          Edge("MouseTrap", "StateMachine", "inherit"),
-         Edge("Waiting", "State", "realize"),
+         Edge("Waiting", "State", "realize", corner=True),
          Edge("Luring", "State", "realize", bend=-44),
          Edge("Waiting", "MouseTrap", "heavy", shift=5, label="next",
               dx=-30, dy=-10),
@@ -464,7 +475,8 @@ PANELS: dict[int, Panel] = {
          Node("Pollinator", C3, 120, w=96),
          Node("Bee", C3, 196, w=96)),
         (Edge("Flower", "Visitor", "thin", label="pollinate, eat", dy=-8),
-         Edge("Pollinator", "Flower", "thin", label="visit", dx=-24, dy=14),
+         Edge("Pollinator", "Flower", "thin", label="visit", dx=-24, dy=14,
+              corner=True),
          Edge("Chrysanthemum", "Flower", "inherit"),
          Edge("Pollinator", "Visitor", "inherit"),
          Edge("Bee", "Pollinator", "inherit")),
@@ -483,12 +495,13 @@ PANELS: dict[int, Panel] = {
          Node("Node", C2 + 10, R3 + 6, w=90, kind="interface",
               sub="File | Directory")),
         (Edge("disk_usage()", "File", "heavy"),
-         Edge("disk_usage()", "Directory", "heavy"),
-         Edge("walk()", "File", "heavy"),
+         Edge("disk_usage()", "Directory", "heavy", corner=True),
+         Edge("walk()", "File", "heavy", corner=True),
          Edge("walk()", "Directory", "heavy"),
          Edge("disk_usage()", "Node", "thin"),
-         Edge("walk()", "Node", "thin"),
-         Edge("Directory", "Node", "thin", label="entries", dx=26, dy=4)),
+         Edge("walk()", "Node", "thin", corner=True),
+         Edge("Directory", "Node", "thin", label="entries", dx=38, dy=10,
+              corner=True)),
         "heavy edges: two per function, on purpose: a new node type must "
         "reach every match, and ty lists them.",
     ),
@@ -501,12 +514,12 @@ PANELS: dict[int, Panel] = {
          Node("Tile", C3 + 10, R1, w=80),
          Node("to_symbol()", C2 + 10, R3, w=100),
          Node("SPECS", C3 + 10, R3, w=80)),
-        (Edge("parse_map()", "tile()", "heavy"),
-         Edge("parse_map()", "to_symbol()", "heavy"),
+        (Edge("parse_map()", "tile()", "heavy", corner=True),
+         Edge("parse_map()", "to_symbol()", "heavy", corner=True),
          Edge("parse_map()", "Tile", "heavy", bend=30, label="returns",
               dx=0, dy=16),
          Edge("tile()", "Tile", "heavy", label="constructs", dy=-10),
-         Edge("tile()", "SPECS", "heavy"),
+         Edge("tile()", "SPECS", "heavy", corner=True),
          Edge("to_symbol()", "SPECS", "heavy")),
         "heavy edges: 6, and only tile() constructs, so every caller shares "
         "its instances.",
@@ -592,7 +605,7 @@ GALLERY: tuple[Cell, ...] = (
           Node("Max", 100, 164, w=70, h=34, size=11),
           Node("Sum", 178, 164, w=70, h=34, size=11)),
          (Edge("Context", "Strategy", "thin"),
-          Edge("Max", "Strategy", "realize"),
+          Edge("Max", "Strategy", "realize", corner=True),
           Edge("Sum", "Strategy", "realize")),
          "heavy edges: 0"),
     Cell("Observer", 1, 0,
@@ -602,7 +615,7 @@ GALLERY: tuple[Cell, ...] = (
          (Edge("Subject", "Observer", "thin", label="notify"),
           Edge("Display", "Observer", "realize"),
           Edge("Display", "Subject", "heavy", label="attach",
-               dx=-30, dy=12)),
+               dx=-30, dy=12, corner=True)),
          "heavy edges: 1, toward the stable part"),
     Cell("Factory Method", 2, 0,
          (Node("Client", 530, 50, w=80, h=36, kind="mark"),
@@ -615,7 +628,7 @@ GALLERY: tuple[Cell, ...] = (
           Edge("PdfCreator", "Creator", "realize"),
           Edge("PdfProduct", "Product", "realize"),
           Edge("PdfCreator", "PdfProduct", "heavy", label="creates",
-               dx=12, dy=18)),
+               dx=12, dy=18, corner=True)),
          "heavy edges: 1, moved out of Client"),
     Cell("Adapter", 0, 1,
          (Node("Client", 30, 320, w=80, h=40, kind="mark"),
@@ -633,7 +646,7 @@ GALLERY: tuple[Cell, ...] = (
           Node("Pizza", 280, 440, w=80, h=34, size=11),
           Node("Topping", 400, 440, w=96, h=34, size=11)),
          (Edge("Client", "Component", "thin"),
-          Edge("Pizza", "Component", "realize"),
+          Edge("Pizza", "Component", "realize", corner=True),
           Edge("Topping", "Component", "realize", shift=-14),
           Edge("Topping", "Component", "thin", label="wraps", shift=14,
                dx=34, dy=4)),
@@ -648,10 +661,10 @@ GALLERY: tuple[Cell, ...] = (
          (Edge("Element", "Visitor", "thin", label="accept"),
           Edge("Pricer", "Visitor", "realize"),
           Edge("Add", "Element", "realize"),
-          Edge("Pricer", "Add", "heavy"),
+          Edge("Pricer", "Add", "heavy", corner=True),
           Edge("Mul", "Element", "realize"),
           Edge("Pricer", "Mul", "heavy"),
-          Edge("Num", "Element", "realize"),
+          Edge("Num", "Element", "realize", corner=True),
           Edge("Pricer", "Num", "heavy")),
          "heavy edges: 3, all in Pricer"),
 )

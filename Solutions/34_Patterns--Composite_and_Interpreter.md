@@ -823,13 +823,15 @@ print(root.disk_usage())
 ```
 
 What breaks in the closed version is not subtle. `type Node = File |
-Directory` lives in your source, so a plugin cannot extend it. A
-`Symlink` passed to `disk_usage()` then falls through every case to
-`assert_never()`. The type checker cannot warn the plugin author,
-because from its side the union is complete: the mismatch only exists
-at the call. The plugin's alternatives are to vendor a patched copy
-of your module or to persuade you to add the case. The open design
-removes that coupling.
+Directory` lives in your source, so a plugin cannot extend it. The
+type checker does warn the plugin author: `ty` reports a `Symlink`
+passed to `disk_usage()`, or placed in a `Directory`'s entries, as
+`invalid-argument-type`. The warning leaves the plugin nothing to fix,
+because the union it would have to extend is yours. Code the checker
+never sees fares worse: its `Symlink` falls through every case to
+`assert_never()`, which raises at runtime. The plugin's alternatives
+are to vendor a patched copy of your module or to persuade you to add
+the case. The open design removes that coupling.
 
 Moving the operation back onto the classes reverses the trade the
 chapter spent the first two sections making. Adding `Symlink` now

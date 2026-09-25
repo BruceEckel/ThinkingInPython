@@ -580,9 +580,10 @@ the search order rather than the inheritance. `item_factory()` walks
 `Item`, so a `Coin(Food)` never appears there at all. No entry matches
 `$`, and the loop falls through to the factory's last line, which
 treats any unrecognized symbol as a teleport target. So
-`item_factory("$")` returns `Teleport("$")`. The robot then walks into a
-teleporter where a coin was meant to be, the topology of the maze
-changes underneath the hard-coded route, and `game.robot.coins` stays
+`item_factory("$")` returns `Teleport("$")`. The two `$` cells become
+a teleport pair, the robot walks into a teleporter where the maze
+should hold a coin, the topology changes underneath the hard-coded
+route, and `game.robot.coins` stays
 `0`. A one-word change to a class header moves a character out of
 the factory's search and silently substitutes a different `Item`.
 
@@ -942,9 +943,9 @@ means more steps than anyone wants to watch.
 `kick=0.5` fails differently, and the agitation column is what makes
 that failure interesting: agitation collapses to `0.00` as
 convincingly as it does at the default kick. The figure never appears
-anyway. A half-unit displacement can throw a grain across the plate in
-one step, so a grain never traces a descent toward the nearest nodal
-line. The grain jumps somewhere unrelated and stays only if that spot
+anyway. A kick of up to half the plate, and the full width where the
+amplitude peaks at 2, can throw a grain across the plate in one step,
+so a grain never traces a descent toward the nearest nodal line. The grain jumps somewhere unrelated and stays only if that spot
 happens to be quiet. Grains accumulate in whichever quiet regions they
 land in first, mostly the corners, and the lines between them stay
 empty. The plate reports settled sand in the wrong places.
@@ -962,5 +963,6 @@ step, so it slows down and stops without overshooting. Too small a kick
 starves the loop's first half, and the grain never travels. Too large a
 kick breaks the second half, since even a heavily scaled step is still
 big enough to leave the neighborhood the grain is settling into. The
-default `0.05` sits where both halves work: about a twentieth of the
-plate at full amplitude, and vanishingly small once a grain arrives.
+default `0.05` sits where both halves work: at most a tenth of the
+plate where the amplitude peaks, and vanishingly small once a grain
+arrives.

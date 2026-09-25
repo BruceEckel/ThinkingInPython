@@ -5,13 +5,13 @@ This chapter builds three,
 each giving its agents less to work with than the last.
 A pack of rats coordinates through a shared blackboard,
 a single robot walks a maze where each object it meets decides what happens,
-and a plate of vibrating sand runs on grains that know nothing.
+and a plate of vibrating sand runs on grains that hold nothing but a position.
 The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture:
-the formula fixes its shape, and the grains find it.
+the formula fixes its shape, and the grains gather on it.
 
-The chapter works the first example, the pack of rats, from end to end.
-It puts asyncio tasks, a shared coordination object,
+The first example, the pack of rats, puts asyncio tasks,
+a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
@@ -20,32 +20,33 @@ introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
 
 The problem has three types.
 
-A *maze* knows its own layout.
+A *maze* holds its own layout.
 Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
 and it hands out an entry point.
-The maze never decides anything.
-It only answers questions.
+The maze decides nothing; it only reports what a coordinate contains.
 
 A *blackboard* is the shared surface on which every rat writes.
-Blackboard is a classic coordination pattern.
-Independent agents read from and write to one common data structure instead of talking to each other directly.
+*Blackboard* is a classic coordination pattern.
+Independent agents read from and write to one common data structure instead of calling each other directly.
 Here the blackboard owns the maze, records which cells the rats have explored,
-hands out rat numbers, and launches new rats.
+hands out rat numbers, and creates the task for each new rat.
 The rats run as cooperative `asyncio` tasks.
-They take turns instead of running at the same instant,
-so the blackboard needs no lock.
-Nothing interrupts a rat partway through an update.
+They take turns, one at a time, so the blackboard needs no lock:
+each rat finishes its update before the next one runs.
 
 A *rat* explores.
 Each rat runs as its own task.
-From its current cell it looks at the four neighbors and tries to claim the open ones.
+From its current cell it calls `claim()` on each of the four neighbors,
+and each open, unclaimed one becomes a move.
 Claiming a cell both marks it visited and reserves it,
-so no two rats cover the same ground.
-When a rat finds more than one open neighbor,
-it keeps the first for itself and spawns a new rat down each of the others,
-then yields so its siblings can run.
-When it can claim nothing, it has reached a dead end and its task ends.
-When the last rat dies, the pack has mapped every cell reachable from the entry.
+so no two rats claim the same cell.
+When a rat claims more than one neighbor,
+it keeps the first for itself and spawns a new rat at each of the others.
+After every move it yields so its siblings can run.
+When every neighbor is a wall or already claimed,
+the rat has reached a dead end and its task ends.
+When the last rat's task ends,
+the pack has claimed every cell reachable from the entry.
 
 ### The Rat and the Blackboard
 
@@ -159,24 +160,23 @@ class Maze:
         raise ValueError("the maze has no open cell")
 ```
 
-`Cell` nests inside `Maze` because it names concepts only `Maze` uses,
-and it is a `StrEnum` rather than an `Enum` so its members keep acting like real strings.
-`WALL` still works as the fill character for `ljust()`,
-and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
-because a `StrEnum` member is its string value.
+`Cell` nests inside `Maze` because it names concepts only `Maze` uses.
+It is a `StrEnum` rather than an `Enum`, so each member is also a `str`.
+That is why `WALL` serves as the fill character for `ljust()`,
+and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell.
 
 The blackboard holds everything the rats share.
-`claim()` is the heart of the program.
+`claim()` holds the rule the whole program depends on.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-It sidesteps the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races).
-That race needs a suspension point inside the update,
-and `claim()` contains none,
-so the atomicity comes from the shape of the code rather than from a lock
-(exercise 3 inserts a suspension point and looks at what breaks).
+Its atomicity comes from the absence of that `await` rather than from a lock:
+the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
+needs a suspension point inside the update,
+and `claim()` runs from its test to its `add()` as one synchronous stretch.
+Exercise 3 inserts a suspension point and counts the cells claimed twice.
 `next_number()` hands out rat numbers from `itertools.count()`,
 the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
-`explore()` claims the entry and releases the first rat inside an `asyncio.TaskGroup`:
+`explore()` claims the entry and creates the first rat's task inside an `asyncio.TaskGroup`:
 
 ```python
 # rats_and_mazes/blackboard.py
@@ -243,22 +243,25 @@ class Blackboard:
 
 A `TaskGroup` stays open until every task inside it has finished,
 including tasks created after the block began.
-That is the shape of this problem: each rat can create more rats.
-A single `asyncio.gather(*self.tasks)` misses most of them,
-because `gather()` fixes its argument list at the moment of the call,
-before those rats exist.
+That matches this problem: each rat can create more rats.
+A single `asyncio.gather(*self.tasks)` would await only the tasks in the list at the moment of the call,
+because `gather()` fixes its argument list then,
+and most of the rats do not exist yet.
 
-`group`'s declaration is `field(init=False)`, and only `explore()` assigns it,
-the same declaration-without-assignment the robot example later in this chapter uses for `Robot.room`.
-The other four fields are internal bookkeeping rather than constructor arguments:
+`group` carries `field(init=False)`, and only `explore()` assigns it.
+The robot example later in this chapter declares `Robot.room` the same way,
+without assigning it.
+The other four `init=False` fields, `visited`, `tasks`, `messages`,
+and `_numbers`, are internal bookkeeping:
 `init=False` keeps them out of the generated signature,
 and each `default_factory` builds a fresh object per blackboard.
 
 ### Running the Maze
 
 The maze layout lives in a text file.
-The loader drops blank lines and any line beginning with `#`, so the first line,
-naming the file's path, drops out and the rest is the maze.
+The loader skips blank lines and any line beginning with `#`,
+including the first line, which names the file's path.
+The rest is the maze.
 
 ```text
 # rats_and_mazes/amaze.txt
@@ -279,11 +282,12 @@ naming the file's path, drops out and the rest is the maze.
 *********************
 ```
 
-Running the demo turns the rats loose,
+The demo awaits `explore()`,
 then prints the first eight log messages and the mapped maze.
-The log shows what the map cannot:
-rat 1 spawns rat 2 and then dies before rat 2 does,
-and numbers arrive in spawn order rather than completion order.
+The log shows what the map cannot.
+Rat 1 spawns rat 2 and then dead-ends before rat 2 does:
+`__post_init__` assigns each number at spawn time,
+so the numbers follow spawn order rather than completion order.
 The full log runs to eighteen messages, two per rat.
 
 ```python
@@ -333,17 +337,17 @@ asyncio.run(main())
 
 `amaze.txt` has no loop:
 every open cell connects to the rest of the maze by exactly one path.
-Every `claim()` the run above rejects on an open cell is a rat looking back at the cell it came from,
-never two rats reaching for the same open cell.
-On this maze, `claim()`'s atomicity is never tested against two rats competing for new ground,
-only against cells the rats have walked: one rat's own trail,
-or the cell a parent still occupies when its new rat looks back.
+So every `claim()` the run above rejects on an open cell is a rat testing a cell already claimed:
+its own previous cell,
+or the parent's cell when a newly spawned rat tests its neighbors.
+Only a maze with a loop lets two rats try to claim the same new cell,
+the race the atomicity resolves.
 
 ### Contention on a Loop
 
 A maze with a loop closes a second path between two cells,
-so two different rats can approach the same open cell from opposite directions.
-Eight open cells around one wall block, with one loop, are enough to force it:
+so two different rats can reach the same open cell from opposite directions.
+Eight open cells around one wall block are enough to force the race:
 
 ```python
 # rats_and_mazes/ring_contention.py
@@ -391,23 +395,29 @@ asyncio.run(main())
 ```
 
 The entry has two open neighbors,
-so rat 1 keeps one arm and spawns rat 2 down the other.
+so rat 1 keeps one neighbor and spawns rat 2 at the other.
 `CountingBlackboard` tallies every `claim()` rejected on an open cell.
-Seven of the nine rejections are backtracking, `len(blackboard.visited) - 1`,
-one per non-entry cell looking back at the cell it came from.
-The other two belong to the loop's closing edge, examined from both ends:
-rat 1 dead-ends wanting `(3, 3)`, already claimed by rat 2,
-and rat 2 dead-ends wanting `(2, 3)`, already claimed by rat 1.
+Seven of the nine rejections are backtracking:
+each rat tests the cell it came from, once per cell other than the entry,
+and `len(blackboard.visited) - 1` counts those cells.
+The other two belong to the loop's closing edge, tested from both ends:
+rat 1 dead-ends at `(2, 3)` because rat 2 already claimed `(3, 3)`,
+and rat 2 dead-ends at `(3, 3)` because rat 1 already claimed `(2, 3)`.
 Each rat loses a cell to the other, not to itself.
 That is the race `claim()`'s atomicity exists to resolve,
-and a perfect maze like `amaze.txt` never puts it to the test.
+and a perfect maze like `amaze.txt` never produces it.
 
 ### Testing Full Coverage
 
-Because claiming is atomic,
-the rats always cover every cell reachable from the entry,
-no matter how the tasks interleave.
+However the tasks interleave,
+the rats cover every cell reachable from the entry,
+because every claimed cell gets a rat,
+and that rat tests all four of its neighbors.
 The test verifies this by comparing the cells the rats visited against a flood fill of the same maze.
+Coverage does not depend on atomic claiming: `visited` is a set,
+so a cell claimed twice still counts once.
+Atomicity adds the other guarantee, one rat per cell,
+which only a count like exercise 3's can see.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -450,17 +460,17 @@ def test_rats_map_every_reachable_cell() -> None:
 The same model drives a GUI demonstration.
 `rats_view.py` lets the rats finish exploring,
 records the order in which they claimed cells,
-and replays that order on a `tkinter` canvas: walls in gray,
-then each claimed cell turning green one after another,
+and replays that order on a `tkinter` canvas.
+The canvas shows the walls in gray, then each claimed cell turns green in turn,
 so you watch the pack move through the maze from the entry outward.
+The view records the order by subclassing `Blackboard` and overriding `claim()`,
+so the model stays as written.
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view).
-The missing piece is the subscription:
-no model in this chapter notifies anybody,
-so each view drives or replays its model instead of waiting for a notification.
-`rats_view.py` records that order by subclassing `Blackboard` and overriding `claim()`,
-so the model needs no change.
-The harness skips it, like every windowed view in this book.
+The subscription half of *Observer* is absent.
+No model in this chapter notifies a view,
+so each view drives or replays its model itself.
+The harness skips `rats_view.py`, like every windowed view in this book.
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -524,19 +534,18 @@ if __name__ == "__main__":
     show()
 ```
 
-Concurrency here is a shape for the code, not a source of speed.
+Concurrency here organizes the code and adds no speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
-Nothing runs at the same instant as anything else,
-and no thread or process ever overlaps another,
-so the design buys no speed over a single-threaded worklist.
-A plain stack of frontiers, popped and pushed in a loop,
+The tasks run one at a time,
+so the design runs no faster than a single-threaded worklist:
+a plain stack of frontiers, popped and pushed in a loop,
 visits the same 139 cells.
-What `asyncio` buys is control flow:
+What `asyncio` provides is control flow:
 each rat's own path through the maze stays one `while` loop in `run()`,
-instead of a stack of pending frontiers threaded through one function by hand.
-The cost is the runtime itself,
-one more moving part for a program that never overlaps anything.
+instead of a stack of pending frontiers that one function pushes and pops by hand.
+What it adds is the event loop,
+a component whose one job here is to hand the turn from rat to rat.
 
 Jeremy Meyer wrote the original Java version of this example.
 
@@ -547,15 +556,16 @@ Object-oriented design is another.
 This second example, adapted from my *Atomic Kotlin* book,
 walks a single robot through a maze.
 It shows how polymorphism removes conditionals.
-A `Room` asks its occupant what to do,
-and each type of occupant answers for itself.
+A `Room` calls its occupant's `interact()`,
+and each type of occupant defines its own.
 
 ### Rooms, Robots, and the Item Factory
 
 The occupants are `Item`s.
 `Room.enter()` calls `occupant.interact()` and returns the room in which the robot ends up.
-A wall keeps the robot where it is, food feeds the robot and lets it in,
-a teleport returns a distant room.
+A wall returns the robot's current room,
+food replaces itself with `Empty` and returns its own room,
+a teleport returns its paired room.
 No `if` or `elif` on the type of occupant appears in the movement code:
 
 ```python
@@ -657,38 +667,43 @@ def item_factory(symbol: str) -> Item:
 `world.py` imports `Edge`, `Item`, `Robot`, and `Urge` from `items.py`,
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
-so that import never runs and no cycle forms.
-Every use of `Room` below is an annotation (`room: Room`, `-> Room`),
+so the runtime skips that import and the cycle exists for the checker alone.
+Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`),
 never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
-`room` gets only a declaration, `room: Room` with no value.
-That line tells the type checker a `Room` belongs there and stores nothing at runtime.
-`GameBuilder` creates the attribute when it places the robot and sets `robot.room`.
+`room` gets a bare declaration, `room: Room`,
+which tells the type checker the attribute's type and keeps that type `Room` instead of `Room | None`,
+so code that reads `room` skips the `None` check.
+`GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
 Reading `room` before then raises an `AttributeError`,
 and the builder runs first, so every read comes after.
-Declaring it this way keeps the type `Room` instead of `Room | None`,
-so code that reads `room` skips the `None` check.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
-so adding a new kind of item needs no change here.
-If you define the subclass with its symbol, the factory finds it.
-This is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
+so a new kind of item registers itself: define the subclass with its symbol,
+and the factory finds it.
+That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
-`__subclasses__()` reports only direct subclasses
-(that chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method) describes the recursion for deeper hierarchies, and its exercise 9 writes it),
+`__subclasses__()` reports only direct subclasses,
 so a new item must inherit from `Item` itself.
-Deriving from `Food` to borrow its behavior hides the class from the factory,
-which falls through to the last line and builds a `Teleport` instead.
+If you derive a class from `Food` to inherit its behavior,
+that class is a grandchild of `Item`.
+`Item.__subclasses__()` leaves it out,
+so the loop falls through to its last line and builds a `Teleport`.
+The same chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method)
+describes the recursion for deeper hierarchies,
+and that chapter's exercise 9 writes the recursion.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.
 Doors that lead nowhere point at one shared `EDGE` room,
 the void outside the maze,
 so the robot can try any direction without a special case.
-`EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object):
-it answers like any other room and sends the robot back where it started.
+`EDGE` is a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object).
+It takes `enter()` like any other room,
+and its `Edge` occupant's `interact()` returns `robot.room`,
+so the robot stays where it was.
 
 ![The maze as a graph of rooms, with teleport jumps and one shared EDGE room](_images/maze_graph)
 
@@ -742,10 +757,10 @@ the opposite order from the rats example's `(column, row)`,
 because `GameBuilder` walks the maze text line by line.
 
 One move is one chain.
-`Robot.move()` asks `doors.open(urge)` for the neighboring room,
+`Robot.move()` calls `doors.open(urge)`, which returns the neighboring room,
 `EDGE` when no door leads that way.
-`enter()` hands the robot to that room,
-and whatever room its occupant's `interact()` returns becomes `robot.room`.
+That room's `enter()` passes the robot to its occupant's `interact()`,
+and whatever room `interact()` returns becomes `robot.room`.
 Every rule of the game lives in some `interact()`.
 
 ### Building the Maze in Stages
@@ -753,11 +768,10 @@ Every rule of the game lives in some `interact()`.
 `GameBuilder` assembles the maze in three stages: a room for every character,
 then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
-so splitting them into labeled passes keeps the construction readable instead of tangling it into one loop.
+so splitting them into labeled passes keeps each stage separate instead of interleaving all three in one loop.
 [Factory](27_Patterns--Factory.md#builder)
-counts this as one of the cases where *Builder* survives in Python,
-because construction here is genuinely a process rather than a single call.
-`GameBuilder` assembles the maze in three stages.
+counts `GameBuilder` among the cases where *Builder* survives in Python,
+because construction here is a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
@@ -845,49 +859,50 @@ string_maze = """
 """.strip()
 ```
 
-Stage 3 pairs the teleports by target letter.
-The sort by target letter puts each pair of partners side by side.
+Stage 3 pairs the teleports.
+Sorting by target letter puts each pair of partners side by side.
 `groupby(teleports, key=target)` then walks the sorted rooms in one pass,
-handing each run of matching letters to `pair = list(group)`.
+yielding each run of matching letters,
+and `pair = list(group)` collects each run.
 `assert len(pair) == 2, letter` checks a rule the maze layout must obey:
-every target letter marks exactly two rooms, never one, never three.
-A typo that leaves a letter unpaired, or repeats it a third time,
-fails here at build time, naming the offending letter.
-Without that check the build still stops,
-at `room1, room2 = pair` on the next line,
-with a `ValueError` about unpacking that does not name the letter.
-The `assert isinstance` lines that follow are for the type checker as much as for safety:
-each proves that the occupant really is a `Teleport` before the code touches `target_room`.
+every target letter marks exactly two rooms.
+A typo that gives a letter one room, or three, fails here at build time,
+naming the offending letter.
+If you remove the check, the build still stops,
+at `room1, room2 = pair` on the next line.
+The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
+The `assert isinstance` lines that follow serve the type checker as much as safety.
+Each narrows the occupant to `Teleport` before the code assigns `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 That is not the type switch that polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
-and the movement code that runs afterward never asks again.
-The `Robot` branch also explains `Room(Empty())`:
-the robot is the one item that does not become an occupant.
-Its cell gets an `Empty` occupant instead,
-so when the robot moves away the room behaves like any other empty room.
+and the movement code that runs afterward never tests a type again.
+
+The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
+The robot is the one item that moves,
+so its cell gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
 
 ### Choosing the Path
 
-The robot can now move, but nothing tells it where to go.
+The robot can now move, but nothing supplies its moves.
 `run()` replays a string of `n`/`s`/`e`/`w` characters,
 and so far a person writes that string, as the test does with `game.run("e")`.
-For the whole maze, `solve()` writes it:
-a search over the room graph that returns the same kind of string,
+For the whole maze, `solve()` computes the string.
+`solve()` searches the room graph and returns the same kind of string,
 so `game.run(solve(game))` walks the route the search found.
 
 `solve()` is a breadth-first search over `Room` objects.
 It expands the room reached in the fewest moves first,
 so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
-so it never needs coordinates, only rooms and the moves between them.
-`landing()` decides whether a door is passable by inspecting the occupant's type,
-reproducing what `Room.enter()` gets from `interact()`:
-a `Wall` or an `Edge` blocks, a `Teleport` reports its target room,
-and anything else is the room itself:
+so it works entirely in rooms and the moves between them.
+`landing()` decides whether a door is passable by testing the occupant's type with `isinstance`,
+and that test reproduces what `Room.enter()` gets from `interact()`.
+For a `Wall` or an `Edge` it returns `None`, for a `Teleport` the target room,
+and for anything else the room itself:
 
 ```python
 # robot_explorer/solver.py
@@ -929,16 +944,16 @@ def solve(game: GameBuilder) -> str:
 
 `seen` holds `Room` objects.
 `Room` defines no `__eq__`,
-so it keeps `object`'s identity comparison and identity hash,
-which a graph search needs:
-two rooms holding the same kind of item are still two different places.
-Adding a room to `seen` when it enters the queue, rather than when it leaves,
-keeps a room from entering the queue twice.
+so it keeps `object`'s identity comparison and identity hash.
+A graph search needs identity,
+because two rooms holding the same kind of item are still two different places.
+`solve()` adds a room to `seen` when the room enters the queue,
+rather than when it leaves, so each room enters the queue once.
 
-Searching changes nothing.
+Searching leaves the maze as it was.
 `solve()` reads doors and occupants and never calls `enter()`,
-so the robot eats no food and stays where it started.
-The path it returns is exactly the string `run()` expects:
+so every `.` stays in place and the robot stays where it started.
+The path `solve()` returns is the string `run()` expects:
 
 ```python
 # robot_explorer/robot_demo.py
@@ -1006,10 +1021,10 @@ print(game.show_maze())
 
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
-The teleports are not shortcuts here.
-If `landing()` refuses them the way it refuses a `Wall`,
-`solve()` raises a `ValueError`:
-without the teleports no route to the `!` exists at all.
+The teleports are not shortcuts but the only way through.
+If `landing()` returns `None` for them, as it does for a `Wall`,
+`solve()` raises a `ValueError`,
+because every route to the `!` passes through a teleport.
 
 ### Testing the Walk
 
@@ -1051,7 +1066,7 @@ The same model drives a graphical view.
 draws each room as a colored cell,
 and steps the robot along that route on a timer.
 The view is the only part that touches the screen,
-and the model neither knows nor cares that it exists.
+and no module of the model imports it.
 
 ```python
 # robot_explorer/maze_view.py
@@ -1108,7 +1123,7 @@ if __name__ == "__main__":
     show()
 ```
 
-Three ideas from earlier chapters carry the design.
+Three ideas from earlier chapters make up the design.
 [Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
 replaces a type switch,
 a [factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
@@ -1117,21 +1132,22 @@ and a [*Null Object*](20_Patterns--Rethinking_Objects.md#null-object)
 removes the check for a missing door.
 None of them needs concurrency.
 
-Two further resources on mazes:
+Two resources go further:
 a survey of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm),
 and Craig Reynolds on [steering behavior for autonomous moving objects](https://www.red3d.com/cwr/steer/),
-which is where a robot that steered continuously,
-instead of planning a grid path before it moved, would start.
+the starting point for a robot that steers continuously instead of planning a grid path before it moves.
 
 ## Order from Noise
 
 The two simulations so far confirm designs.
-The rats cover every reachable cell because `claim()` is atomic.
+The rats cover every reachable cell, one rat per cell,
+because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
-This final example is different.
-`amplitude()` fixes the shape the sand will trace: the curves are its zero set.
-No line of the code computes how two thousand independent random walks find that shape and stay there.
+The third example gives you only half the outcome.
+`amplitude()` fixes the shape the sand will trace:
+the curves are the formula's zero set.
+No line of the code computes how two thousand independent random walks reach that shape and stay there.
 That is simulation's other purpose,
 to discover behavior instead of confirming it.
 
@@ -1147,19 +1163,16 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 
 ### The Model
 
-The model needs almost nothing.
+The model is small.
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
 Physics supplies the formula, an approximation for a plate with free edges.
-Treat it as given.
-All that matters here is its shape.
+Treat it as given; only its shape matters here.
 The field is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
-All of the simulation's logic sits in `step()`.
+All the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
-Grains never look at each other and remember nothing.
-No line of the code decides where a grain settles,
-only the local scaling of its own blind steps.
+Grains never read each other's positions and store nothing but their own.
 
 ```python
 # chladni_plate/chladni.py
@@ -1228,14 +1241,12 @@ class Plate:
 
 `bounce()` reflects a kicked grain off the edge instead of letting it leave the plate.
 `agitation()` measures the mean vibration strength directly under the grains.
-Grains scattered at random feel the field's average, so agitation starts high.
-A grain resting on a nodal line feels zero.
-One number summarizes how settled the sand is.
-`render()` draws grain density as characters,
-in the same spirit as `Blackboard.render()`,
+Grains scattered at random sample the field's average, so agitation starts high.
+A grain resting on a nodal line contributes zero.
+One number says how settled the sand is.
+`render()` draws grain density as characters, as `Blackboard.render()` does,
 so the model can show its state without a window.
-The demo shakes the plate 1200 times,
-printing agitation at four checkpoints along the way:
+The demo calls `step()` 1200 times, printing agitation at four checkpoints:
 
 ```python
 # chladni_plate/chladni_demo.py
@@ -1291,22 +1302,25 @@ print(plate.render())
 Agitation collapses toward zero, and the picture shows why.
 The grains have gathered on the nodal lines of mode `(2, 3)`.
 Nothing steered them there.
-A loud region flings its grains around until a random wander crosses a quiet line,
-where the kicks shrink toward nothing.
+In a loud region the kicks stay large,
+so a grain keeps moving until a random step crosses a quiet line,
+where the kicks shrink toward zero.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
-The randomness is not fighting the order but producing it.
-The curves themselves are no mystery:
-`amplitude()`'s zero set draws them directly, without simulating a single grain.
-What the run demonstrates is the trap, not the shape: blind,
+The randomness produces the order instead of opposing it.
+
+The curves themselves come from the formula alone.
+A plot of `amplitude()`'s zero set draws them.
+The run demonstrates the gathering, not the shape: random,
 uncoordinated steps concentrate onto a curve that no grain,
 and no line of `step()`, ever names.
 
 ### Testing a Random Process
 
-A test cannot guess where a particular grain ends up after a million random kicks.
-It pins down the aggregate instead.
-Shaking must collapse agitation, and no kick may throw a grain off the plate.
+A test cannot predict where a particular grain ends up after hundreds of random kicks.
+It checks the aggregate instead.
+Four hundred steps must divide agitation by ten,
+and no kick may leave a grain outside the plate.
 Seeding `random.Random` makes any failure reproducible.
 
 ```python
@@ -1335,10 +1349,9 @@ the collapse as it unfolds, and the pattern surviving a change of rules.
 Each grain keeps one color from a small palette,
 so you can watch individual grains mix while the collective figure forms.
 Every 200 frames the view switches the plate to a new mode.
-The old figure suddenly sits on loud regions of the new field.
-It bursts back into chaos, mixes, and condenses into a different figure.
-The order is not a property of the grains.
-It belongs to the field on which they sit.
+The old figure now lies on loud regions of the new field.
+The grains scatter, mix, and gather into a different figure.
+The order belongs not to the grains but to the field on which they sit.
 
 ```python
 # chladni_plate/chladni_view.py
@@ -1388,28 +1401,28 @@ if __name__ == "__main__":
     show()
 ```
 
-`itertools.cycle()` constructs an infinite iterator from any finite iterable:
-it yields the source's elements in sequence and starts over when it reaches the end.
+`itertools.cycle()` constructs an infinite iterator from any finite iterable.
+It yields the source's elements in sequence and starts over when it reaches the end.
 `itertools.count(1)` numbers the frames,
 the same endless counter that numbered the rats.
 
 ## The Less the Agents Know
 
 The chapter begins by defining a simulation as objects that act on their own and interact through shared state.
-The grains push that definition to its limit.
-The shared state is the plate, and the grains only read it.
-They never sense each other.
+The grains are the limiting case of that definition.
+The shared state is the plate,
+and a grain's whole interaction with it is one read of the field at its own position.
 Even so, structure that no agent encodes appears in the aggregate.
 This is *emergence*:
 global order arising from local rules that never mention it.
-The less the agents understand, the more the run can tell you,
-because the outcome lives in the interactions rather than the instructions.
+The less each agent's rule uses, the more the run can tell you,
+because the outcome comes from the interactions rather than from the instructions.
 
-The model has a limit worth naming.
-Run it longer and agitation never stops falling:
-a grain moves roughly five orders of magnitude less per step at 20,000 steps than it does at 100.
-The nodal lines keep thinning as long as the plate shakes,
-so the number of steps you run sets their width in any one run, not the plate.
+The model has one limit.
+If you run it longer, agitation keeps falling.
+A grain moves roughly five orders of magnitude less per step at 20,000 steps than it does at 100.
+The nodal lines keep thinning as long as `step()` keeps running,
+so in any one run the step count, not the plate, sets their width.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it:
 swap `amplitude()`'s formula for a membrane's,
@@ -1433,28 +1446,30 @@ Run it.
     Build a maze for which that set is not empty,
     and explain what makes a cell unreachable.
 3.  Break the atomicity of `claim()`.
-    Make `claim()` an `async def`, which pulls the `Recorder` protocol,
-    `Rat.run()`'s comprehension, and `explore()` along with it,
-    and put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
+    Make `claim()` an `async def`,
+    which forces the same change on the `Recorder` protocol,
+    `Rat.run()`'s comprehension, and `explore()`.
+    Put `await asyncio.sleep(0)` between the membership test and `self.visited.add(...)`.
     Then count how many calls return `True` and compare that count with `len(blackboard.visited)`,
     using a maze that contains a loop.
     `amaze.txt` is a perfect maze,
     so no two rats ever reach one unclaimed cell and the counts always agree.
-    `test_rats_and_mazes.py` still passes, because `visited` is a set:
-    the guarantee that broke is "one rat per cell", not "every cell visited".
-    What does the extra success cost the rats,
+    `test_rats_and_mazes.py` still passes, because `visited` is a set.
+    The guarantee that broke is "one rat per cell", not "every cell visited".
+    What happens to the two rats that both claimed one cell,
     and why does the original `claim()`, with no `await` inside it,
     need no lock?
 4.  Add a new kind of `Item` to the robot maze.
-    Define a `Coin` subclass of `Item` with the symbol `$` whose `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
+    Define a `Coin` subclass of `Item` with the symbol `$`.
+    Its `interact()` removes itself the way `Food` does and adds one to a coin count carried by the `Robot`.
     Place a few `$` characters in the maze and report how many the robot collects.
-    You shouldn't need to touch `item_factory()`, `Room`, or `GameBuilder`.
+    `item_factory()`, `Room`, and `GameBuilder` stay as they are.
     Explain why the factory finds your new item on its own,
-    and what it does if you derive `Coin` from `Food` instead.
+    and what the factory does if you derive `Coin` from `Food` instead.
 5.  Send the robot to something other than the `!`.
     `solve()` stops at whatever room holds an `EndGame`,
-    which is the one goal it can express.
-    Replace that test with a `Callable[[Room], bool]` parameter,
+    the one goal it can express.
+    Replace that `isinstance` test with a `Callable[[Room], bool]` parameter,
     so the caller says what counts as arriving,
     and change nothing else in the search,
     beyond letting `solve()` return `None` when no room matches.
@@ -1462,7 +1477,7 @@ Run it.
     search for the nearest room holding a `Food`, walk there,
     and repeat until no `Food` remains, then search for the `!` and walk that.
     Report how many pieces of food the robot ate and how many moves the whole tour took.
-    Two questions the run answers for you.
+    The run answers two questions for you.
     Why does the search have to run again after every meal instead of once at the start?
     And why does asking for the nearest food each time not produce the shortest tour that eats everything?
 6.  Freeze the plate.

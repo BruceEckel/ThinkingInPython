@@ -32,6 +32,7 @@ Chapters/Observer	Observer	8	Which colors a grid can reach
 Chapters/Performance	Performance	6	A subclass that forgets `__slots__`
 Chapters/Simulation	Factory	9	Recursing through `__subclasses__()`
 Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
+Chapters/Simulation	Simulation	3	Breaking `claim()`'s atomicity
 Chapters/Simulation	Simulation	7	Changing the physics
 Chapters/Singleton	Singleton	1	`singleton_pattern.py` rewritten to eager initialization
 Chapters/State_Machines	State_Machines	1	`UnpredictablePerson` with a `Prozac` mood
