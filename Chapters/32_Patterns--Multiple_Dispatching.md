@@ -171,24 +171,25 @@ and that is the outcome for the scissors that started the duel,
 not for the `Paper` whose code is running, since scissors cut paper.
 Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
-If you misread that convention, every result in the class appears backward.
+Read that convention the other way,
+and every result in the class appears reversed.
 Each `eval_*()` method also receives an `item` argument, the original caller:
 the same object `compete()` held as `self` before passing it as the argument.
-This game ignores it, since the outcome depends only on the two types.
+This game ignores it, since the outcome depends on the two types alone.
 A richer game reads the caller's state through it.
 
-Those `Any` annotations give up static checking.
-`Item` declares only `__str__()`,
-so `Any` is the only annotation available short of a `Protocol` naming all four methods.
-With `Any`, a class can omit one of the nine answers and the type checker reports nothing.
-Python raises an `AttributeError` at the first duel that needs the missing method.
+Those `Any` annotations turn off static checking.
+`Item` declares `__str__()` alone,
+so the choices for the parameter are `Any` or a `Protocol` naming all four methods.
+With `Any`, a class that supplies eight of the nine answers passes the type checker,
+and Python raises an `AttributeError` at the first duel that calls the ninth.
 A `Protocol` listing the four methods restores the checking,
-and adds a declaration that repeats every class's method names.
-The table version has neither problem.
-Its answers are rows in one dictionary rather than methods on each class,
-so no class has a method to omit,
+at the price of a declaration that repeats every class's method names.
+The table version keeps the checking and declares each name once.
+Its answers are rows in one dictionary,
+so a class is complete the moment it inherits `compete()`,
 and its `Item` declares the one method the dispatch needs, `compete()`,
-so the opponent parameter takes `Item` rather than `Any`.
+so the opponent parameter takes `Item`.
 
 ## One Lookup in a Table
 
@@ -251,8 +252,7 @@ if __name__ == "__main__":
 Dictionary keys are flexible.
 A tuple works as a key, the same as a single object.
 The lookup shares two properties with the [table-driven state machine](31_Patterns--State_Machines.md#the-engine).
-It matches classes exactly,
-so a subclass of `Paper` finds none of `Paper`'s rows.
+It matches classes exactly, so a subclass of `Paper` needs rows of its own.
 And a missing pair raises a `KeyError` at the first duel that needs it,
 the fail-fast policy that suits a table you are still filling in.
 Adding `Lizard` in exercise 1 puts you in that situation.
@@ -391,9 +391,9 @@ it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it combines the drawbacks of both.
 The type tests repeat in every class as in the method version,
-with none of dispatch's automatic resolution,
+with the programmer resolving by hand what dispatch would resolve for free,
 and every new `Item` forces an edit to every ladder.
-Both patterns in this chapter exist to avoid writing it.
+Both patterns in this chapter replace it.
 
 The double-dispatch version, with `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class,
@@ -426,11 +426,10 @@ print(DampPaper().compete(Scissors()))
 #: lose
 ```
 
-`DampPaper` overrides its outcome against `Rock` and inherits every other combination from `Paper`,
-unchanged, through `super().compete(item)`.
-The table version has no comparable override:
-changing one cell means editing the shared `OUTCOME` dictionary,
-and that edit affects every `Item` rather than one subclass.
+`DampPaper` overrides its outcome against `Rock` and inherits every other combination from `Paper` through `super().compete(item)`.
+In the table version,
+the same change edits one cell of the shared `OUTCOME` dictionary,
+and every `Item` sees the new cell.
 
 ## Testing Both Versions
 
@@ -493,10 +492,8 @@ The test imports the two modules, not their classes.
 `getattr(module, player)` looks the class up on whichever module the test received,
 so one table of nine expected answers drives two independent sets of `Paper`,
 `Scissors`, and `Rock` classes.
-Importing both modules runs no demonstration loop,
-because each guards its loop with `if __name__ == "__main__"`,
-so the loop runs only when you execute the file directly,
-not when a test imports it.
+Each module guards its demonstration loop with `if __name__ == "__main__"`,
+so direct execution runs the loop and the test's import defines only the classes.
 
 ## Operators Dispatch Twice
 
@@ -511,13 +508,11 @@ Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 This fallback is how a type written decades after `int` can add itself to an `int` on the left.
-Do not confuse the reflected forms with the in-place forms,
-`__iadd__()` and its siblings,
-which serve `+=` and take no part in the fallback.
+The in-place forms, `__iadd__()` and its siblings, are a separate family:
+they serve `+=`, and `a + b` never calls one.
 Returning `NotImplemented`
 (a sentinel value, not the lookalike `NotImplementedError` exception)
-signals that this operand does not implement the operation for the other operand's type,
-and the interpreter then tries the other operand.
+hands the operation to the other operand, which the interpreter tries next.
 Here is the machinery, with each dispatch traced:
 
 ```python
@@ -563,24 +558,22 @@ with expected(TypeError):
 The first two additions resolve inside `__add__()`:
 one of the left operand's `isinstance()` tests matches the right operand.
 `4 + Meters(3)` calls `int.__add__()` first,
-and `int.__add__()` does not implement addition with a `Meters`,
-so it returns `NotImplemented`.
+which returns `NotImplemented` for a `Meters` operand.
 The sentinel is a decline rather than an error,
 so Python tries `Meters.__radd__()` next,
 whose trace line shows the operands in swapped order.
 The last case shows why the sentinel exists.
 `Meters.__add__()` runs and declines the string,
 and `str` defines no `__radd__()`.
-Only after both sides have declined does Python raise a `TypeError`.
+Python raises the `TypeError` once both sides have declined.
 
-Three details of the fallback are easy to miss.
-Raising a `TypeError` inside `__add__()` is not the same as returning `NotImplemented`.
-The exception propagates immediately,
-so Python never calls the right operand's `__radd__()`.
-Only a returned sentinel makes Python try the second dispatch.
-Python also skips the reflected call when both operands have the same type,
-so `__add__()` alone resolves `Meters + Meters`.
-A class that implements only `__radd__()` cannot add two of its own instances.
+Three details of the fallback deserve a close look.
+Raising a `TypeError` inside `__add__()` ends the expression there,
+since the exception propagates immediately;
+only a returned sentinel makes Python try the right operand's `__radd__()`.
+When both operands have the same type, Python tries `__add__()` alone,
+so `__add__()` by itself resolves `Meters + Meters`,
+and adding two instances of a class that implements `__radd__()` by itself raises a `TypeError`.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
 Python tries that reflected method first,
@@ -612,7 +605,7 @@ what do you do with a type the first dispatch could not resolve?
 The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second dispatch,
 a second method call that resolves the type by running a method lookup.
 The `OUTCOME` table answers it differently.
-`compete()` is defined once on `Item` and no subclass overrides it,
+`compete()` is defined once on `Item` and every subclass inherits it,
 so `OUTCOME[type(self), type(item)]` is one dictionary lookup keyed on both types at once,
 not a second method resolution.
 The methods perform the second dispatch through a second method call that you write,
