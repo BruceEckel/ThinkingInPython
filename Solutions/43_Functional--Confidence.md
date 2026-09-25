@@ -246,19 +246,19 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                closest = min(pool, key=lambda c: sum(
+                stranger = min(pool, key=lambda c: sum(
                     history[frozenset((m, c))]
                     for m in group))
-                pool.remove(closest)
-                group.append(closest)
+                pool.remove(stranger)
+                group.append(stranger)
             groups.append(group)
         # Roster smaller than one group
         if pool and not groups:
             groups.append([])
         for extra in pool:
-            roomiest = min(groups, key=lambda g: sum(
+            host = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
-            roomiest.append(extra)
+            host.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:
             for pair in combinations(g, 2):
@@ -315,9 +315,9 @@ Delete the loop that places leftovers:
 
 ```python
         for extra in pool:
-            roomiest = min(groups, key=lambda g: sum(
+            host = min(groups, key=lambda g: sum(
                 history[frozenset((m, extra))] for m in g))
-            roomiest.append(extra)
+            host.append(extra)
 ```
 
 `group_rounds()` now drops the students who do not fill a whole
