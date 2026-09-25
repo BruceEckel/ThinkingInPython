@@ -304,6 +304,25 @@ mutable, and every later `draw()` changes it. That is why `save()`
 must copy into a `tuple`, an immutable container, instead of wrapping
 a mutable list in a frozen dataclass.
 
+Two of those failures prove less than they seem. The second and third
+tests compare `checkpoint.strokes` with a tuple, and a `list` never
+equals a `tuple`, so a `Memento` holding a *copied* list fails them
+too, with no sharing at all. The test that exposes the corruption
+compares contents only, so the type change alone cannot fail it:
+
+```python
+def test_memento_is_a_snapshot() -> None:
+    sketch = Sketch()
+    sketch.draw("a")
+    checkpoint = sketch.save()
+    sketch.draw("b")
+    assert list(checkpoint.strokes) == ["a"]
+```
+
+Against the shared-list version, `checkpoint.strokes` is `["a", "b"]`
+when the assertion runs, because `draw("b")` appended to the one list
+both objects hold.
+
 ## 5. `goto(steps_back)`
 
 ```python
