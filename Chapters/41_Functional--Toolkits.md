@@ -6,9 +6,9 @@ The standard library supplies two modules of such pieces.
 `functools` operates on functions themselves.
 `itertools` assembles lazy iterators from composable parts.
 This chapter tours both toolkits,
-then turns to two techniques that pair naturally with them,
-lazy evaluation and recursion,
-and closes with a case study that puts several of the pieces to work on one problem.
+then turns to two techniques that pair naturally with them:
+lazy evaluation and recursion.
+A case study closes it, putting several of the pieces to work on one problem.
 
 ## The `functools` Toolkit
 
@@ -18,7 +18,7 @@ Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table:
 each has an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
-CPython implements the ones where speed matters most in C: `reduce()`,
+CPython implements in C the ones where speed matters most: `reduce()`,
 `partial()`, and the two caches.
 What follows starts with the simplest tools and works up to `singledispatch` and `singledispatchmethod`,
 which take one registered function per type.
@@ -69,27 +69,27 @@ print(fib.cache_info())
 ```
 
 Because `fib()` is recursive,
-the cache now holds every value up to and including 30,
-and the counts show what caching saved.
+the cache now holds every value up to and including 30.
+The counts show what caching saved.
 The 31 misses are the 31 distinct arguments, `0` through `30`.
 The 28 hits are the calls that found a stored answer.
-Fifty-nine calls in all, against 2,692,537 for the undecorated version,
+That is fifty-nine calls in all, against 2,692,537 for the undecorated version,
 where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
-Fibonacci also has an iterative form, `a, b = b, a + b` in a loop,
-that needs neither recursion nor a cache.
+Fibonacci also has an iterative form that needs neither recursion nor a cache:
+`a, b = b, a + b` in a loop.
 It stays the running example here because it keeps the point about caching small:
 the branching and the repeated subproblem are what matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
-so the cache holds a strong reference to each instance forever,
-the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
+so the cache holds a strong reference to each instance forever.
+That is the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
 in cache form.
 For the usual case, one expensive value per instance,
-use `@cached_property` below,
-which stores the result in the instance's `__dict__`,
+use `@cached_property` below.
+It stores the result in the instance's `__dict__`,
 so the result goes away with the instance.
 
 ### `lru_cache`
@@ -202,7 +202,7 @@ print(x.squared)
 ```
 
 The stored result stays when an input changes:
-changing an attribute the property read leaves the stored value as it was.
+`x.n = 10` leaves `squared` at `25`.
 `del x.squared` resets it.
 Deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
@@ -240,9 +240,9 @@ print(greet.__name__, "-", greet.__doc__)
 ```
 
 If you delete the `@wraps(func)` line,
-that same `print()` reports `wrapper - None`:
-the name `greet` refers to `wrapper` either way,
-and `wraps()` is what copies the original's name and docstring onto it.
+that same `print()` reports `wrapper - None`.
+The name `greet` refers to `wrapper` either way;
+`wraps()` is what copies the original's name and docstring onto it.
 Everything that reads those attributes then reads the wrapper's: `help()`,
 `inspect.signature()`,
 and any tool that reports a function by its name or docstring.
@@ -251,8 +251,8 @@ so a tool that wants the original can reach it.
 
 ### `cmp_to_key`
 
-Wraps an old-style comparator, a function returning negative, zero, or positive,
-into a key function `sorted()` uses directly.
+Wraps an old-style comparator into a key function `sorted()` uses directly.
+A comparator takes two values and returns negative, zero, or positive.
 
 ```python
 # functools_cmp_to_key.py
@@ -309,7 +309,7 @@ Turns a plain function into one that dispatches on the type of its first argumen
 with per-type implementations you register separately.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 uses `singledispatch()` as an alternative to the *Visitor* pattern,
-including why the registered function below takes the name `_`.
+and explains why the registered function below takes the name `_`.
 
 ```python
 # functools_singledispatch.py
@@ -328,8 +328,8 @@ print(describe("hi"), "|", describe(5))
 ```
 
 `singledispatch()` dispatches on the first argument alone,
-so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md),
-and a keyword-only argument cannot select the implementation.
+so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md).
+A keyword-only argument cannot select the implementation either.
 
 ### `singledispatchmethod`
 
@@ -368,8 +368,8 @@ instead of loops you write and test again.
 `itertools` builds lazy iterators from a small set of composable pieces.
 Each one produces values on demand instead of building a list up front,
 the property [Lazy Evaluation](#lazy-evaluation) revisits below.
-Each is also a loop you would otherwise write by hand,
-already written in C and already correct on the edge cases a hand-written version can miss:
+Each is also a loop you would otherwise write by hand.
+The `itertools` version is already written in C and already correct on the edge cases a hand-written version can miss:
 the empty iterable, the single element,
 and the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
@@ -393,8 +393,8 @@ print(list(map(pow, range(5), repeat(2))))
 ```
 
 The fixed form replaces the list you would have written as `["x"] * 3`.
-The infinite form is the reason to import it:
-it supplies a constant argument for as many calls as `map()` makes,
+The infinite form is the reason to import it.
+It supplies a constant argument for as many calls as `map()` makes,
 and it holds one object in memory, however many that is.
 Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
@@ -415,8 +415,8 @@ print(list(islice(range(10), 2, 8, 2)))
 Two differences from a list slice.
 `islice()` rejects negative indices with a `ValueError`,
 since a negative index counts from an end the iterable may never reach.
-And it consumes what it passes over: give it an iterator,
-and that iterator resumes where the slice stopped, since `islice()` advanced it;
+And it consumes what it passes over.
+Give it an iterator, and that iterator resumes where the slice stopped;
 a list slice leaves the list as it was.
 
 ### `count`
@@ -481,8 +481,8 @@ print(list(pairwise([1, 2, 3, 4])))
 ### `batched`
 
 Groups an iterable into fixed-size tuples,
-with a shorter final batch when the length leaves a remainder,
-the kind of remainder logic that's easy to get wrong in a hand-written loop.
+with a shorter final batch when the length leaves a remainder.
+A hand-written loop gets that remainder wrong easily.
 
 ```python
 # itertools_batched.py
@@ -494,8 +494,8 @@ print(list(batched(range(7), 3)))
 
 A short final batch is normal for pagination and wrong for fixed-width records.
 For fixed-width records,
-`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` instead,
-the same choice `zip(strict=True)` offers below.
+`batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` instead.
+`zip(strict=True)` below offers the same choice.
 
 ### `accumulate`
 
@@ -612,7 +612,7 @@ print(list(zip_longest([1, 2, 3], [4, 5],
 #: [(1, 4), (2, 5), (3, MISSING)]
 ```
 
-Three ways to zip inputs of different lengths,
+Python offers three ways to zip inputs of different lengths,
 and the choice says what a mismatch means.
 Plain `zip()` stops at the shortest and raises no error,
 which is right when the extra elements are genuinely surplus.
@@ -646,8 +646,8 @@ with the same key function both times.
 The comprehension's `list(g)` is necessary.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group empties the previous group's view.
-`list(groupby(data))` therefore returns three keys paired with three empty iterators:
-the outer `list()` walks all the way to the end before anything reads a group.
+`list(groupby(data))` therefore returns three keys paired with three empty iterators,
+because the outer `list()` walks all the way to the end before anything reads a group.
 Consume each group before asking for the next one,
 as the comprehension above does.
 
@@ -668,9 +668,9 @@ print(list(a), list(b))
 Two cautions.
 After `tee()`, use only the returned iterators.
 Advancing the original source consumes values the copies never receive.
-And `tee()` buffers every value one copy has consumed and the other still awaits,
-so draining `a` completely before touching `b`, as this demo does,
-stores the whole sequence.
+And `tee()` buffers every value one copy has consumed and the other still awaits.
+This demo drains `a` completely before touching `b`,
+so `tee()` stores the whole sequence.
 When one consumer runs far ahead of the other,
 `list()` is simpler and uses the same memory.
 `tee()` saves memory when the consumers stay roughly in step.
@@ -694,12 +694,13 @@ print(list(product("AB", [1, 2])))
 
 Unlike the tools above,
 `product()` reads its inputs completely before yielding its first tuple,
-so every input must be finite: `product(count(1), "AB")` never returns,
+so every input must be finite.
+`product(count(1), "AB")` never returns,
 because the call itself reads `count(1)` to an end that never comes.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
-Three ways to draw `r` elements from an iterable, separated by two questions:
+Three tools draw `r` elements from an iterable, and two questions separate them:
 does order matter, and may an element repeat?
 The same input and the same `r` make the answers comparable:
 
@@ -748,7 +749,9 @@ print(list(islice(squares, 3)))
 Four stages read from an infinite source,
 and all four wait for `list()` to pull.
 The second `print()` shows the source resuming at `n` = 16 rather than 13,
-because `takewhile()` must pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeds the limit.
+because `takewhile()` pulls one more total,
+the 590 from the batch `(169, 196, 225)`, finds it over the limit,
+and discards it.
 A pull-based pipeline reads one value further than it keeps,
 and here that one value was a batch of three squares.
 
@@ -788,8 +791,8 @@ one at a time, the same way any `for` loop consumes a generator.
 The fifth `computing square` line is the last,
 because `islice()` asks for exactly five.
 `list(squares())[:5]` looks equivalent and is a different program.
-It builds the whole list before slicing, so it asks `squares()` for every value,
-and `squares()` never runs out.
+It builds the whole list before slicing, so it asks `squares()` for every value.
+`squares()` never runs out, so the program never reaches the slice.
 Slicing lazily lets the source be infinite.
 Slicing a list requires a source that ends.
 [Lazy Evaluation with Generators](18_Techniques--Performance.md#lazy-evaluation-with-generators)
@@ -798,8 +801,8 @@ looks at the same idea from the perspective of memory and speed.
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
 so memory use stays constant whatever the size of the source.
-Stages chain together, passing one item at a time between them,
-and a consumer that stops early, such as `any()` or `next()`,
+Stages chain together, passing one item at a time between them.
+A consumer that stops early, such as `any()` or `next()`,
 ends the upstream work at the same point.
 
 ## Recursion
@@ -826,8 +829,8 @@ print(sys.getrecursionlimit())
 ```
 
 A `for` loop computes this same factorial in about the same number of lines and stays in one frame at any `n`.
-Python pushes a frame for every recursive call, including one in tail position,
-and caps the stack, so deep recursion raises a `RecursionError`.
+Python pushes a frame for every recursive call, including one in tail position.
+The stack has a cap, so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine;
 a long flat sequence calls for a loop or one of the `itertools` tools.
 For counting down to zero, the loop is as fast and as short as the recursion.
@@ -841,9 +844,9 @@ That is why the recursive `fib()` under [`cache`](#cache)
 gets a decorator rather than a rewrite as a loop:
 the recursion states the definition, and the cache removes the repetition.
 
-A different reason to recurse: some problems are naturally self-similar,
-such as walking a tree,
-where each subproblem occurs once and a cache would save nothing.
+Self-similar problems, such as walking a tree,
+are a different reason to recurse.
+In a tree walk each subproblem occurs once, and a cache would save nothing.
 Code that walks a tree, nested data,
 or a directory reads best when its shape matches the data's shape.
 The function handles one node and calls itself for the rest:
@@ -866,11 +869,12 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 ```
 
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
-Writing this as a loop means building your own stack to track which sublists are still open,
-and getting the push and pop correct at every depth.
-The recursive version gets that bookkeeping from the call stack,
-so the body says what to do with one element and where to descend,
-and the call stack tracks the depth.
+To write this as a loop,
+you build your own stack to track which sublists are still open,
+and you get the push and pop correct at every depth.
+The recursive version hands that bookkeeping to the call stack.
+The body says what to do with one element and where to descend;
+the call stack tracks the depth.
 
 ## Case Study: Pairing Rotations
 
@@ -898,10 +902,10 @@ whoever draws the phantom sits out that round.
 
 Rotation is a pairs-only method.
 The circle method is a closed-form answer to one narrow question,
-"how do you 1-factorize a complete graph into perfect matchings,"
-and pairs are the only group size where that question has a tidy rotation-based answer.
-Scheduling groups of three so that every pair meets exactly once is far harder:
-that problem is *Kirkman's schoolgirl problem*,
+"how do you 1-factorize a complete graph into perfect matchings."
+Pairs are the only group size where that question has a tidy rotation-based answer.
+Groups of three are far harder to schedule so that every pair meets exactly once.
+That problem is *Kirkman's schoolgirl problem*,
 solvable only for specific roster sizes, each by a construction of its own.
 A given `students` and `size` may have no exact answer,
 so the general version below trades rotation for a greedy search and settles for a good schedule.
@@ -992,17 +996,18 @@ Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
 at the cost of `14` repeat meetings.
 An odd roster leaves one player over,
-so each round adds that player to an existing pair,
-and those triples produce the repeats.
+so each round adds that player to an existing pair.
+A triple holds three meetings where a pair holds one,
+and those two extra meetings a round, over seven rounds, are the `14` repeats.
 `group_rounds()` covers the pairs with no rotation and no fixed player:
 a shuffle, then a greedy choice repeated until the pool is empty.
 Called with `size=3`, the same function schedules trios instead.
-Seven students make two threes with one left over, so one group grows to four,
-the same join-instead-of-sit-out choice the pair rounds make above.
+Seven students make two threes with one left over, so one group grows to four.
+That is the same join-instead-of-sit-out choice the pair rounds make above.
 
 A roster smaller than one full group is the extreme case of that choice.
-The `while len(pool) >= size` loop exits at once and leaves `groups` empty,
-and the `if pool and not groups` line creates the one group the leftovers fold into.
+The `while len(pool) >= size` loop exits at once and leaves `groups` empty.
+The `if pool and not groups` line then creates the one group the leftovers fold into.
 If you delete that line,
 `min()` receives an empty sequence and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,
@@ -1015,24 +1020,22 @@ so it looks like the place for `@cache` from earlier in this chapter.
 If you add `@cache`, the first call raises a `TypeError`,
 because `met()` takes a `list` and a `list` is unhashable.
 If you pass a tuple instead, the calls succeed and the schedule gets worse.
-`met()` reads `history`, and `history` changes at the end of every round,
-so an answer cached in round 0 comes back unchanged in a later round,
-after the counts it summed have changed.
+`met()` reads `history`, which changes at the end of every round.
+An answer cached in round 0 therefore comes back unchanged in a later round,
+after the counts it summed have grown.
 The `cache` entry's rule, pure functions only, is the reason:
 a function that reads mutable state is impure, however simple its body looks.
 
 The general version needs memory, where the circle method needs a round number:
 which pair sits where in round `r` follows from `r` alone.
-`group_rounds()` needs the `history` `Counter`, because no formula predicts,
-from a round number alone,
-which grouping of arbitrary size keeps every pair's meeting count lowest.
+`group_rounds()` needs the `history` `Counter`,
+because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
 `group_rounds()` remains deterministic in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` draws every number from its own seeded state.
-Computing round `100` now means generating rounds `0` through `99` first,
-where the circle method could compute round `100` directly,
-from its arithmetic alone.
+To reach round `100`, `group_rounds()` generates rounds `0` through `99` first;
+the circle method computes round `100` directly, from its arithmetic alone.
 [Recursion](#recursion) makes the same choice, memory for generality,
 when the problem outgrows a loop's counter and needs a stack.
 
@@ -1051,15 +1054,15 @@ The second rule is that the pieces exist to stack.
 A real pipeline is five or six,
 and it holds one item in memory at a time at any length.
 [Error Handling](42_Functional--Error_Handling.md)
-asks what such a pipeline does when one stage fails,
-the question a chain of pure functions leaves open.
+asks what such a pipeline does when one stage fails.
+A chain of pure functions leaves that question open.
 
 ## Exercises
 
 1.  Rewrite `deep_sum()` from `nested_sum.py` without recursion,
     using a list as an explicit stack.
     Compare the two versions for length,
-    and name the places an off-by-one can occur in the loop version that do not exist in the recursive one.
+    and name where an off-by-one can occur in the loop version but not in the recursive one.
 2.  `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
     Change `maxsize` to `3`, predict the four numbers before running it,
     then run it and account for any difference.
