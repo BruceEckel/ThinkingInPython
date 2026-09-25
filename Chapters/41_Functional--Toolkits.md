@@ -88,7 +88,7 @@ so the cache holds a strong reference to each instance forever.
 That is the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#the-pythonic-observer-callables-in-a-list)
 in cache form.
 For the usual case, one expensive value per instance,
-use `@cached_property` below.
+use [`@cached_property`](#cached_property).
 It stores the result in the instance's `__dict__`,
 so the result goes away with the instance.
 
@@ -163,9 +163,9 @@ print(Text("7").zero_pad(3))
 
 Since Python 3.14 a `partial` object is a descriptor too,
 so writing `zero_pad = partial(pad, fill="0")` here works.
-The two differ as soon as an argument is positional.
+`partial` and `partialmethod` differ as soon as an argument is positional.
 `partialmethod` passes the instance first and the bound arguments after it,
-which a method expects.
+the order a method expects.
 `partial` passes the bound arguments first and the instance after them,
 so `partial(pad, 5)` calls `pad(5, instance)` and fails with `AttributeError: 'int' object has no attribute 'value'`.
 Use `partialmethod` inside a class body and `partial` everywhere else.
@@ -358,7 +358,7 @@ print(d.describe("hi"), "|", d.describe(5))
 
 `singledispatchmethod` dispatches on the first argument after `self`,
 never on `self`, so the type of `value` selects the implementation,
-just as it does for the plain function above.
+just as it does for the plain `describe()` in `functools_singledispatch.py`.
 
 `itertools` does the same for iteration: ready-made pieces you compose,
 instead of loops you write and test again.
@@ -495,7 +495,7 @@ print(list(batched(range(7), 3)))
 A short final batch is normal for pagination and wrong for fixed-width records.
 For fixed-width records,
 `batched(data, 3, strict=True)` raises `ValueError: batched(): incomplete batch` instead.
-`zip(strict=True)` below offers the same choice.
+`zip(strict=True)` under [`zip_longest`](#zip_longest) offers the same choice.
 
 ### `accumulate`
 
@@ -544,7 +544,7 @@ The input carries a trailing `1` to separate `takewhile()` from `filter()`.
 `filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
 because `filter()` skips a failing element and tests the next.
 `takewhile()` stops at the first failure and never reaches the last element.
-On finite data that is a detail.
+On finite data the distinction is a detail.
 On an infinite source it decides whether the program terminates.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
 works through that case.
@@ -615,17 +615,17 @@ print(list(zip_longest([1, 2, 3], [4, 5],
 Python offers three ways to zip inputs of different lengths,
 and the choice says what a mismatch means.
 Plain `zip()` stops at the shortest and raises no error,
-which is right when the extra elements are genuinely surplus.
+the right choice when the extra elements are genuinely surplus.
 `zip(a, b, strict=True)` raises `ValueError: zip() argument 2 is shorter than argument 1`,
-which is right when equal lengths are an invariant you want checked.
+the right choice when equal lengths are an invariant you want checked.
 `zip_longest()` pads,
-which is right when the missing elements are data in their own right.
+the right choice when the missing elements are data in their own right.
 
 ### `groupby`
 
 Groups consecutive elements that share a key.
 The input must arrive sorted by that key,
-since it groups only adjacent elements.
+since `groupby()` groups only adjacent elements.
 
 ```python
 # itertools_groupby.py
@@ -722,9 +722,10 @@ print(list(product("AB", repeat=2)))
 
 `permutations()` counts orderings, so `AB` and `BA` are two results.
 `combinations()` treats those as the same draw and keeps one,
-which is right when you want each pair of distinct elements once.
+and keeping one is right when you want each pair of distinct elements once.
 `combinations_with_replacement()` also ignores order,
-but draws from the full input each time, which is where `AA` comes from.
+but draws from the full input each time,
+and that repeated draw is where `AA` comes from.
 `product()` with `repeat=` is the fourth combination of answers:
 order matters and elements repeat, so it yields all four pairs.
 
@@ -836,12 +837,12 @@ The stack has a cap, so deep recursion raises a `RecursionError`.
 a long flat sequence calls for a loop or one of the `itertools` tools.
 For counting down to zero, the loop is as fast and as short as the recursion.
 Recursion is the better choice once the problem branches rather than repeats,
-as the next example shows.
+as `nested_sum.py` shows.
 
 Branching adds a problem of its own.
 More than one branch can reach the same subproblem,
 and a plain recursive function recomputes it every time.
-That is why the recursive `fib()` under [`cache`](#cache)
+That recomputation is why the recursive `fib()` under [`cache`](#cache)
 gets a decorator rather than a rewrite as a loop:
 the recursion states the definition, and the cache removes the repetition.
 
@@ -870,7 +871,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 ```
 
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
-To write this as a loop,
+To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
 and you get the push and pop correct at every depth.
 The recursive version hands that bookkeeping to the call stack.
@@ -893,7 +894,7 @@ Fix one player and arrange the rest in a circle.
 Each round, pair players sitting across from each other,
 then rotate everyone but the fixed player by one seat.
 For an even number of players `n`,
-that produces `n - 1` rounds with no repeated pair.
+the circle method produces `n - 1` rounds with no repeated pair.
 No schedule can do better,
 because those rounds use every one of the `n * (n - 1) / 2` possible pairs exactly once.
 The classical fix for an odd roster is a phantom player:
@@ -1005,7 +1006,7 @@ and those two extra meetings a round, over seven rounds, are the `14` repeats.
 
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over, so one group grows to four.
-That is the same join-instead-of-sit-out choice the pair rounds make above.
+Growing one group is the same join-instead-of-sit-out choice the pair rounds make above.
 
 A roster smaller than one full group is the extreme case of that choice.
 The `while len(pool) >= size` loop exits at once and leaves `groups` empty.
@@ -1018,7 +1019,7 @@ because the alternative is a round in which nobody meets anyone.
 ### `history` Is Mutable State
 
 `met()` runs once per candidate per slot,
-so it looks like the place for `@cache` from earlier in this chapter.
+so it looks like the place for [`@cache`](#cache).
 If you add `@cache`, the first call raises a `TypeError`,
 because `met()` takes a `list` and a `list` is unhashable.
 If you pass a tuple instead, the calls succeed and the schedule gets worse.
@@ -1080,6 +1081,6 @@ A chain of pure functions leaves that question open.
 5.  Decorate `deep_sum()` with `@cache` and explain the exception.
     What must change about the `Nested` alias for caching to be possible?
 6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.
-    Replace that with an `rng: random.Random` parameter.
-    Which property of the function does that preserve,
+    Replace the `seed` parameter with an `rng: random.Random` parameter.
+    Which property of the function does the `rng` parameter preserve,
     and which one does it leave to the caller?
