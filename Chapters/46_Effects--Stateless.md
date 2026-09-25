@@ -646,6 +646,7 @@ That looks like protection, but it is an accident.
 That `yield from` is the only `yield` in `greet_all()`,
 so deleting it turns `greet_all()` into an ordinary function.
 The type checker reports the changed shape rather than the discarded Effect.
+
 A function with a second `yield` keeps its shape, so every check passes.
 `greet_logged()` in [Retrofitting an Effect](#retrofitting-an-effect)
 makes two requests, one for the greeting and one for the log.
@@ -653,6 +654,7 @@ If you write its first line as a bare `greet(name)`, every check passes.
 `ty` and `ruff` report nothing, the program runs, the log gains both entries,
 and no greeting prints.
 The call still builds a description, and the body discards it unrun.
+
 The same trap exists in ZIO for the same reason.
 An Effect written as a bare statement is a discarded value there too.
 In ZIO Direct the fix is `.run`,
@@ -914,12 +916,12 @@ No check reports it.
 
 ### An Interface Instead of a Base Class
 
-Only a subclass can replace Stateless's own `Console`.
-[Builtin Dependencies](#builtin-dependencies) named it a concrete class.
+Stateless's own `Console` is the concrete class [Builtin Dependencies](#builtin-dependencies)
+named, and only a subclass can replace it.
 Its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass.
-A structurally identical double fails with a `MissingAbilityError` whatever static type `as_type()` gives it.
-A double for the builtin `Console` must inherit from it.
+A structurally identical double fails with a `MissingAbilityError` whatever static type `as_type()` gives it,
+so a double for the builtin `Console` must inherit from it.
 That `Console` implements `input()` as well as `print()`,
 so a double that overrides only `print()` reads live stdin.
 An interface has no implementation to inherit by accident:
@@ -999,11 +1001,11 @@ declares its Abilities as `Protocol`s and shows the annotation that replaces tha
 write one boundary function whose parameter annotations name the interface types,
 and call `supply()` inside it.
 The parameter annotation upcasts the argument,
-so every call site passes its implementation bare.
+so every call site passes its implementation bare,
+and every function between that boundary and the Effect reads the same under either form.
 An annotated local variable is different:
 `screen: Console = Terminal()` narrows back to `Terminal` at the assignment,
 so `supply(screen)` builds a `Need[Terminal]` handler again.
-Every function between that boundary and the Effect reads the same under either form.
 
 ## When Two Implementations Match
 
@@ -1120,14 +1122,13 @@ The invariant "the value under key `type[T]` is a `T`" therefore lives in `regis
 
 `greet()`'s body matches `greeter.py`'s `greet()` line for line,
 apart from `console: Console = get(Console)` in place of `console = yield from need(Console)`.
+Its signature matches the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency):
+both read `(str) -> None`, and neither names the `Console` it uses.
 
 The first `greet("Alice")` fails at runtime because nothing has registered a `Console` yet;
 the second succeeds because the binding now exists.
 The two calls are identical, and the types say nothing about registration,
 so the type checker accepts both.
-
-This `greet()` has the same signature as the `untyped_greet.py` version in [Declaring a Dependency](#declaring-a-dependency).
-Both read `(str) -> None`, and neither names the `Console` it uses.
 
 DI meets its goal: the `Console` is swappable.
 But it relocates a [side cause](44_Effects--Effect_Management.md#what-is-an-effect)
@@ -1137,9 +1138,9 @@ rather than declaring one, so the type checker never validates the dependency.
 a body reads the container directly, with `get(Console)`.
 Constructor injection is the stronger, more common shape,
 and frameworks such as FastAPI's `Depends` build on it.
-The dependency arrives as a parameter,
+It answers the container-lookup complaint above:
+the dependency arrives as a parameter,
 so a static type checker validates every call that supplies one.
-Constructor injection answers the container-lookup complaint above.
 The binding happens once, at the endpoint or the constructor.
 Every function that boundary calls passes the dependency onward as a parameter,
 the same parameter an EMS replaces with a channel in the return type.
@@ -1363,6 +1364,7 @@ That is the cost behind "a synchronous program calls it once,
 at the outermost edge" ([The Simplest Effect](#the-simplest-effect)).
 `test_nailer.py` starts a loop once per parametrized case,
 which is fine for four rows and worth remembering for a much longer parametrized list.
+
 The event loop has a second consequence when you incorporate Stateless into an existing application.
 `asyncio.run()` refuses to start a second event loop inside a running one,
 so you cannot call `run()` from any `async def`:
@@ -1386,11 +1388,11 @@ asyncio.run(main())
 #: Hello, Bob!
 ```
 
-The run also prints a `RuntimeWarning` to standard error;
-the output above shows standard output alone.
 `run()` builds the `run_async()` coroutine and hands it to `asyncio.run()`,
 which raises a `RuntimeError` because a loop is already running.
-Nothing awaits the coroutine, and that is what the warning reports.
+Nothing awaits the coroutine,
+so the run also prints a `RuntimeWarning` to standard error,
+which the output above leaves out because it shows standard output alone.
 The warning is harmless, and a reliable sign of this mistake:
 it appears whenever asynchronous code calls `run()`.
 
@@ -1537,12 +1539,11 @@ examines.
 The driver throws a failure back into the generator,
 so an ordinary `try`/`except` around a `yield from` catches it,
 provided `run()` drives that Effect directly.
-Catching is different from handling.
 The generator yields the exception as a value,
 `run()` receives it and calls `throw()`,
 and that `throw()` raises the exception in the innermost suspended frame,
 where the `except` clause runs.
-The `KeyError` stays in the channel,
+Catching is different from handling: the `KeyError` stays in the channel,
 so the signature keeps declaring a failure that can no longer escape.
 A `catch()` further out changes the outcome again:
 it matches the yielded value before the driver sees it and returns that value as the result,
@@ -1671,14 +1672,15 @@ That makes `value` something to `match` on rather than an exception to catch.
 
 `Success` describes the Effect rather than the lookup: both channels are empty,
 with nothing left to supply and no failure for `run()` to raise.
+The Effect "succeeds" at producing either a score or a `KeyError` that reports the missing score.
+A raised `KeyError` is a failure.
+A returned `KeyError` is data.
+
 `reporter` is a function that builds an Effect,
 as its `Callable[[str], Success[None]]` annotation states:
 give it a `str` and it produces an Effect that needs nothing and cannot fail.
 `run()` drives that Effect,
 so `reporter("Alice")` comes first and `run()` second.
-The Effect "succeeds" at producing either a score or a `KeyError` that reports the missing score.
-A raised `KeyError` is a failure.
-A returned `KeyError` is data.
 
 Moving the error into the result forces every caller to match on it.
 Drop the `match` and use `value` directly as a number,
@@ -1796,7 +1798,7 @@ so its signature must declare that failure.
 Calling it on `"Bob"` carries that failure up to the `run()` call at the program's edge,
 which raises it as an ordinary exception,
 like `error_escapes.py` does for a single error.
-The test's one assertion is `pytest.raises(ValueError)`:
+The test's assertion for Bob is `pytest.raises(ValueError)`:
 the failure the signature declares is the one the caller sees.
 Failures never vanish.
 They only relocate.
