@@ -162,6 +162,11 @@ not patching one slot in place.
 Copying a two-field `Point` takes so little time that you can ignore it.
 A large structure that changes often copies the whole value on every change.
 That time and memory are the price of sharing without coordination.
+Languages built around immutability answer this with *persistent* data structures,
+which share every part a change leaves alone;
+Python's standard library has none,
+so a large value that changes often is the one place a mutable structure,
+kept private to one function, is still the right choice.
 
 ### Immutability in Annotations
 
