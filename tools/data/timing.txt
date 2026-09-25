@@ -22,6 +22,7 @@
 19_Techniques--Concurrency/io_threads.py
 19_Techniques--Concurrency/gil_threads.py
 19_Techniques--Concurrency/subinterpreters.py
+44_Effects--Effect_Management/pure_and_pointless.py
 46_Effects--Stateless/real_clock.py
 47_Effects--Stateless_in_Practice/parallel.py
 47_Effects--Stateless_in_Practice/run_cost.py

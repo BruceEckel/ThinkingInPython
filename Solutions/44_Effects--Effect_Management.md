@@ -120,7 +120,7 @@ for line in captured.messages:
 
 Five signatures name the new Effect, and only two of them want to.
 One of the five is new rather than edited: `format_greeting()`, the
-helper that uses the `Log`. Four existing signatures have to be edited.
+helper that uses the `Log`. You must edit four existing signatures.
 `greet()` both uses a `Log` and accepts one, to hand down to
 `format_greeting()`. Then `session()`, `menu()`, and `main()` each
 gain a `log` parameter that they only hand to the next function.
@@ -158,7 +158,7 @@ while `greet()` stays unchanged.
 | `slope_catch.py` | `rise / 0` raises a `ZeroDivisionError` | Exception | Catch the expected exception, or make the bad value impossible |
 | `withdraw()` | writes the `balance` global | Side effect | Pass the implementation in as a parameter |
 | `withdraw()` | reads the `balance` global | Side cause | Pass the implementation in as a parameter |
-| `Thermometer` | `notify()` calls into every observer | Side effect | Pass the implementation in as a parameter |
+| `Thermometer` | `announce()` calls every subscribed listener | Side effect | Pass the implementation in as a parameter |
 | `Thermometer` | `_celsius` read by `celsius` | Side cause | Pass the implementation in as a parameter |
 
 Neither function in `slope_catch.py` has a side effect or a side
@@ -183,15 +183,16 @@ reuses `withdraw()` to show referential transparency failing. The three
 conversions in [Converting Effectful to Pure](../Chapters/44_Effects--Effect_Management.md#converting-effectful-to-pure)
 all manage the exception Effect, so none of them applies here. The
 by-hand technique for a side cause and a side effect is the other one:
-take the balance as a parameter and return the new one. The same inputs then give the same answer, and the caller
+take the balance as a parameter and return the new one. The same
+inputs then give the same answer, and the caller
 holds the state.
 
 `Thermometer` is the same pair wearing a design pattern.
 The `celsius` setter writes `_celsius`, an instance attribute rather
-than a global, and then calls `notify()`, which invokes arbitrary code
-in every registered observer. The write is a side effect on the
-object. The notification is a side effect on the world, since an
-observer may print, record, or fail. Reading `celsius` is a side cause
+than a global, and then calls `announce()`, which invokes arbitrary code
+in every subscribed listener. The write is a side effect on the
+object. The notification is a side effect on the world, since a
+listener may print, record, or fail. Reading `celsius` is a side cause
 for the same reason `withdraw()` reading `balance` is one: the value
 can change between calls, so the answer depends on history rather than
 arguments. The functional conversion returns each reading as a value
@@ -200,8 +201,8 @@ whatever state it keeps. That is what the chapter calls
 [pushing the Effects to the edges](../Chapters/44_Effects--Effect_Management.md#a-program-can-never-be-pure).
 
 Notice one thing across all three: the classification is not a property
-of the language feature used. A global, an instance attribute, and an
-observer list are three storage mechanisms for one idea: something
+of the language feature used. A global, an instance attribute, and a
+listener list are three storage mechanisms for one idea: something
 outside the call participates in the result.
 
 ## 4. `PositiveInt` in place of both checks

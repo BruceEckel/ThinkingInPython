@@ -27,13 +27,12 @@ This book has emphasized the benefits of pure functions in numerous places:
 
 In every one of those cases you can settle the question of purity by reading one function.
 That stops working as soon as the function calls others.
-If one or more of those other functions have side effects,
-they make the calling function impure too.
+If any of them has a side effect, the calling function is impure too.
 To discover whether a function is impure,
 you must either trust the documentation or examine that function's code.
 
 Reading every callee soon becomes tedious and error-prone.
-A type system that verified purity for you would remove that reading.
+That reading is the work a type system would do for you, if it verified purity.
 A system that does so is an *Effect Management System*.
 
 ## What Is an Effect?
@@ -50,10 +49,10 @@ and ordinarily no signature on the path mentions any of them.
 That inheritance is the difficulty.
 Something that stays inside the function performing it needs no system to manage it,
 because one read of that function settles the question.
-An Effect travels outward instead, one call at a time,
-and each step is invisible until something in the types records it.
+An Effect passes from callee to caller instead, one call at a time,
+and no signature on the path shows it until something in the types records it.
 
-Three things travel that way.
+Three things pass from callee to caller that way.
 The first is a *side effect*:
 calling the function does something besides return a result,
 changing the environment outside the function.
@@ -76,8 +75,7 @@ what the environment does to the function.
 Suppose your function reads the time of day, or a random number.
 The read changes nothing in the environment,
 yet the result differs from one call to the next.
-Any information a function uses beyond its arguments is a side cause,
-when that information can change between calls.
+Information a function uses beyond its arguments is a side cause whenever it can change between calls.
 The usual sources are I/O: the time of day, a random number,
 a database or network read.
 Reading a global variable that something else can rebind is enough on its own.
@@ -85,9 +83,9 @@ A captured constant, as in [Closures](40_Functional--Foundations.md#closures),
 is not.
 
 The third is an exception,
-which travels the same path and hides in the same place.
+which propagates from callee to caller the same way and appears in no signature either.
 People argue about whether an exception makes a function *impure*,
-so it gets the next section to itself.
+so that argument gets the next section to itself.
 
 ## Are Exceptions Impure?
 
@@ -112,25 +110,23 @@ Two schools of thought exist:
     The function reads nothing outside itself and changes nothing outside itself.
     Purity says the outcome depends on the arguments alone.
 
-    Formal computer science theory backs this view.
+    Computer science theory backs this view.
     Pure languages like Haskell treat an unhandled runtime exception or crash as a *bottom* value, denoted ⊥.
-    A bottom value represents a computation that does not terminate normally or result in a standard value.
-    Because ⊥ is a valid theoretical value, raising an error that nothing catches
-    is technically referentially transparent.
-    You can replace the function call with the crash itself, and the program's behavior doesn't change.
+    A bottom value stands for a computation that never produces an ordinary value.
+    Because ⊥ is a value in the theory, raising an error that nothing catches
+    is referentially transparent:
+    you can replace the function call with the crash itself, and the program behaves the same.
 
 2.  **Functional**: Exceptions bypass normal control flow,
-    which makes code difficult to reason about.
-    To make code easier to reason about,
-    functional programming avoids exceptions altogether.
-    A *Total Function* doesn't raise exceptions,
-    but instead returns errors as data using explicit wrapper types,
+    and that bypass makes code difficult to reason about,
+    so functional programming avoids them altogether.
+    A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
 
-The argument over purity does not settle the question this chapter asks.
+The argument over purity leaves this chapter's question open.
 If you write a function `a()` that calls a function `b()` that raises an exception,
-then `a()` raises that exception too, unless `a()` catches it,
-and `a()`'s signature says nothing about it.
+then `a()` raises that exception too, unless `a()` catches it.
+`a()`'s signature says nothing about the exception.
 `a()` takes the exception on by calling `b()`, whichever school you join,
 so an exception is an Effect alongside the side effect and the side cause.
 
@@ -144,7 +140,7 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-This chapter imports the shared helpers `result.py` and `safe.py` directly instead of rebuilding them.
+This chapter reuses that chapter's `result.py` and `safe.py` helpers.
 If you decorate the original `slope()`, unchanged,
 every exception it raises becomes a value instead of a crash:
 
@@ -167,16 +163,15 @@ for args in [(10, 2), (10, 0)]:
 #: slope(10, 0): ZeroDivisionError
 ```
 
-`@safe` catches whatever `slope()` raises,
-so the fix lives outside the function it repairs.
-`slope()` is now total,
-and the caller must unpack the `Result` to reach the number.
-Nothing escapes through a raised exception.
+`@safe` catches whatever `slope()` raises, so the fix is the decorator,
+not a change to the function it wraps.
+`slope()` is now total: every call returns a `Result`,
+and the caller must unpack it to reach the number.
 
 ### Catch the Exception You Expect
 
 If you catch and handle the exception within the function,
-it never escapes to become an Effect.
+it stays inside that function, so it is not an Effect.
 `slope()` can catch the one exception it names and turn the failure into an ordinary `float`,
 its existing return type, instead of introducing a new type:
 
@@ -203,26 +198,26 @@ expect(ValueError, slope, 10, -1)
 #: [ValueError] run cannot be negative: -1
 ```
 
-This works, and it needs no new type.
+Catching the exception works, and it needs no new type.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
 and the `try` around it catches only `ZeroDivisionError`.
-This listing puts `validate()` four lines from `slope()`,
-so the gap is easy to spot.
-In a real call stack the raise usually sits many files away,
-and finding it means reading every callee: the tedious,
-error-prone work an Effect Management System replaces.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
-Catching by hand covers exactly the exceptions you know a callee can raise,
-and knowing every one of them is the tracking problem an Effect Management System exists to solve.
+This listing puts `validate()` directly above `slope()`,
+so the uncaught `ValueError` is easy to spot.
+In a real call stack the `raise` is usually in another file, several calls down,
+and finding it means reading every callee: the tedious,
+error-prone work an Effect Management System replaces.
+Catching by hand covers exactly the exceptions you know a callee can raise.
+Knowing every one of them is the tracking problem an Effect Management System solves.
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
 The compiler never computed that list from the functions a body called,
 so an exception introduced three levels down meant editing every signature above it by hand.
-Programmers usually escaped that work by widening the specification until it said nothing.
-The specifications leaked implementation details,
+Programmers usually avoided that work by widening the specification until it permitted every exception.
+The specifications exposed implementation details,
 and most people now count them a failure.
 C++ reduced its version to a single bit: whether a function throws at all.
 
@@ -231,8 +226,8 @@ C++ reduced its version to a single bit: whether a function throws at all.
 The third approach removes the failure instead of handling it.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes illegal values impossible to construct.
-If you give `run` a type that cannot hold zero,
-`slope()` never needs to check for zero:
+If you give `run` a type that excludes zero,
+the check moves out of `slope()` and into the type:
 
 ```python
 # slope_nonzero.py
@@ -257,32 +252,33 @@ with expected(ValueError):
 #: [ValueError] NonZero cannot hold 0
 ```
 
-The check still runs, but only once, when a `NonZero` comes into existence.
+The check runs once, in `__post_init__()`, when `NonZero(...)` builds the value.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
-`slope()` is never in danger of dividing by zero,
+`slope()` can never divide by zero,
 so it needs no `try` and no `Result` to say so.
 
 ### Combine the First and Third
 
-All three approaches take the division failure out of `slope()`,
-but they push the cost to different places.
+All three approaches keep a division by zero from escaping `slope()` as an exception,
+but each puts the handling in a different place.
 A `Result` makes every caller handle failure explicitly, at every call site.
-`@safe` catches `Exception` broadly,
+`@safe` catches `Exception`,
 so `slope_result.py`'s `Result[float, Exception]` cannot distinguish `ZeroDivisionError` from a bug,
-the same cost [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
+the same limitation [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 names.
-Catching by hand hides the fix inside `slope()`,
-at the cost of a blind spot for an exception nobody thought to catch.
-A restrictive type pays once, at construction,
-and every function downstream is pure by inheritance rather than by discipline.
+Catching by hand puts the fix inside `slope()`,
+and an exception the `try` does not name still propagates out.
+A restrictive type checks once, at construction,
+and every function downstream is pure because it receives the type,
+not because its author remembered a check.
 None of the three makes the failure disappear.
-A `Result` turns it into a value, a `try` consumes it,
+A `Result` turns it into a value, a `try` catches it,
 and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
 
-These three are not a menu from which to pick one.
-The standard practice combines the first and third:
+Standard practice combines the first and third,
+the `Result` and the restrictive type:
 parse untrusted input into the restrictive type at the boundary,
 using a `Result` to report a bad value instead of raising one,
 and let every function past that boundary take `NonZero` and stay total:
@@ -322,17 +318,17 @@ for text in ["2", "0"]:
 and `@safe` turns that failure into a `Result` its caller must unpack.
 Past that one `match`, `slope()` never checks anything:
 `NonZero` already guarantees `run.value` isn't 0.
-One technique handles the input a caller doesn't trust,
-the other lets every function downstream trust what it receives.
+The `Result` handles the input a caller doesn't trust,
+and `NonZero` lets every function downstream trust what it receives.
 
 ## A Program Can Never Be Pure
 
-A perfectly pure program computes something but never lets anyone see it.
+A perfectly pure program computes something and writes the result nowhere.
 It reads nothing from its environment and changes nothing in its environment,
 so its result never reaches a screen, a file, a socket,
 or even the exit code the operating system checks.
 From outside the process,
-that program is indistinguishable from a program that computes nothing.
+that program looks exactly like one that computes nothing.
 
 ```python
 # pure_and_pointless.py
@@ -358,7 +354,7 @@ so a caller sees the same thing from each.
 `compute_and_discard()` still takes measurably longer,
 because Python runs every loop you write, worthless or not.
 A perfectly pure computation, followed to its logical end,
-is a space heater with extra steps.
+heats the processor and does nothing else.
 
 Effects are not a defect to design away.
 They are the reason a program exists.
@@ -366,12 +362,12 @@ Effect Management keeps the Effects and isolates them,
 so the rest of the program can stay pure.
 People call this "pushing the Effects to the edges."
 
-So why track them at all?
-The first and most obvious reason is parallelism.
-A function with no Effects touches nothing shared,
+What does keeping the rest pure buy you?
+The first and most obvious answer is parallelism.
+A function with no Effects reads and writes nothing shared,
 so it is safe to run in parallel.
 The same guarantee makes testing trivial.
-A pure function needs no setup, no mocks, and no teardown.
+A pure function needs no setup or teardown, and nothing to mock.
 Call it with arguments and check the result.
 
 ## Two Phases of Effect Analysis
@@ -380,12 +376,13 @@ Think of Effect analysis as two phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
-The next phase produces one benefit per subdivision:
+The second phase divides the impure part by kind,
+and each kind yields its own benefit:
 
 - **Exceptions** become data,
   as [Converting Effectful to Pure](#converting-effectful-to-pure)
   shows with a `Result`.
-  Failures turn into values the type checker can see,
+  Failures turn into values whose type the checker verifies,
   and a test checks for an `Err` as easily as an `Ok`.
 - **Side causes** become replaceable inputs.
   A test substitutes a fixed clock for the real one,
@@ -396,22 +393,22 @@ The next phase produces one benefit per subdivision:
   then inspects the recording.
 
 Each of those benefits is a testing benefit, for one reason.
-A test must run in an environment it completely controls,
-and an untracked Effect is a part of the environment outside that control.
+A test must run in an environment it controls,
+and an untracked Effect is part of the environment outside that control.
 Every Effect you isolate is one your tests can control.
 
-All of this depends on knowing where the Effects are.
+Every one of those benefits depends on knowing where the Effects are.
 In a small program you find them by inspection.
-As programs grow, inspection stops scaling,
-and the rest of this chapter is about what replaces it.
+As programs grow, inspection stops scaling.
+The rest of this chapter is about what replaces it.
 
 ## Effect Management Systems
 
 Return to the failing test from the chapter's opening.
-Most functions in most programs have that hidden life,
-and it makes code hard to understand:
+Most functions in most programs perform Effects their signatures leave out,
+and that makes code hard to understand:
 
-- Can you call this function in a test without mocking half the world?
+- Can you call this function in a test without mocking every service it calls?
 - If you call it twice with the same arguments, do you get the same result?
 - Does it behave differently in a different environment?
 - Does it fail silently, loudly, or not at all?
@@ -424,41 +421,43 @@ In a small codebase you can hold that knowledge in your head.
 In a large one you cannot.
 A function you understand today gets called by a function written next week,
 which gets called by code a colleague writes next month.
-Each step adds invisible dependencies, and no one has the full picture.
+Each step adds dependencies no signature names, and no one knows the whole set.
 
-Tracking is the missing piece.
+Tracking is what is missing.
 With it you know what a function does:
 whether it is safe to run in parallel with another,
 and what happens when you call it twice in a row.
-That knowledge is what lets you compose functions,
-which is how programs grow large.
+That knowledge lets you compose functions,
+and composition is how programs grow large.
 
 ### Tracking and Management
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
-that Effect belongs in your function's type: a native system adds it for you,
-while a library like Stateless has you declare it and verifies the declaration.
+that Effect belongs in your function's type.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
+A native system adds each Effect for you;
+a library like Stateless has you declare each one,
+and the type checker verifies each declaration.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it names the kinds of impurity.
 
 A full EMS does three things:
 
 1. **Tracks Effects.**
-   The type system knows which Effects a function may perform.
+   The type system records which Effects a function may perform.
 2. **Separates each Effect's interface from its implementation.**
    A function declares which Effects it uses, not how to fulfill them.
 3. **Binds the implementation later.**
    Some caller or context supplies the implementation,
    at a point after the function's definition.
 
-The first item can stand alone,
-and the difference between it and the whole list matters in the chapters that follow.
+The first item can stand alone.
+The difference between it and the whole list matters in the chapters that follow.
 *Effect tracking* tells you which Effects a function can perform.
-A system that stops at tracking still tells you whether a function is pure,
+Tracking alone tells you whether a function is pure,
 and names the kinds of impurity a caller takes on.
 Effect management is tracking plus the second and third items.
 Once an Effect is an interface and a caller binds the implementation later,
@@ -474,16 +473,16 @@ Delayed binding exists so that one fixed codebase can serve many contexts
 (test, production, retry-wrapped) without edits.
 When a hundred functions declare "I need something that can read from storage,"
 none of them contains an opinion about what that storage is.
-They all flow up to a single point, usually the edge of the program,
-where storage binds to an implementation.
+Each declaration propagates to its caller, up to a single point,
+usually the edge of the program, where storage binds to an implementation.
 Changing that one binding changes the behavior of all hundred functions at once.
 A test provides an in-memory binding, production provides the real database,
 and none of the hundred functions change.
 Cross-cutting behavior gets the same treatment.
 To add caching, tracing, or retries to every storage access,
 you insert a layer at the binding point instead of touching every call site.
-The complexity of variation concentrates at the boundary of the program,
-while the interior stays simple and uniform.
+Variation concentrates at the boundary of the program,
+and the functions below it stay simple and uniform.
 
 ### Effects by Hand
 
@@ -545,7 +544,7 @@ a `print()` in the body is still invisible.
 [Effect Management for Python?](#effect-management-for-python)
 returns to that limit.
 
-The technique works, but the bookkeeping falls on you.
+The technique works, but you do the bookkeeping.
 Every function that calls `greet()` must accept an `Ask` and a `Tell` so it can pass them down.
 Parameters accumulate at every level of the call stack:
 
@@ -591,31 +590,31 @@ print(captured.messages)
 ```
 
 `session()`, `menu()`, and `main()` never call `ask.ask()` or `tell.tell()`,
-yet each must name both parameters just to pass them to the function below it.
+yet each must name both parameters only to pass them to the function below it.
 Nothing propagates automatically.
-If you add a `Log` Effect three levels down,
+If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
-and `main()`, plus the new function that logs, five signatures in all.
+and `main()`, plus the new helper, five signatures in all.
 Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
-but you still must tell the injector what every function needs,
+but you must tell the injector what every function needs,
 and tell it again when that changes.
-Nothing verifies the wiring except a runtime failure.
+Only a runtime failure verifies the wiring.
 
-Python does have a mechanism that propagates on its own.
+Python has one mechanism that propagates on its own.
 A [`ContextVar`](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 holds a value for the current task,
-and anything below reads it without receiving it as an argument.
+and any function the task calls reads the value without receiving it as an argument.
 That is the automatic propagation the parameter list lacks,
 but the `ContextVar` removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
 and a `greet()` that reads two `ContextVar`s states nothing.
-Setting the wrong one, or forgetting to set one,
-surfaces as a failure at the moment of the read, in whatever frame needs it.
-The bookkeeping stays, and moves out of the type checker's sight.
+Setting the wrong one, or forgetting to set one, fails at the read,
+in whatever frame reads it.
+The bookkeeping stays, and the type checker can no longer verify it.
 An EMS moves the bookkeeping into the type system,
-where a native system maintains it for you,
-and a library like Stateless verifies every declaration you write.
+where a native system maintains it for you, or, with a library like Stateless,
+the type checker verifies every declaration you write.
 That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
 
@@ -623,11 +622,11 @@ one that carries Effect information without occupying the argument list.
 
 Ideally, Effect tracking comes built into the language,
 as a *native* Effect system.
-In a native system, Effects live in the type system alongside ordinary types.
+In a native system, the type system holds Effects alongside ordinary types.
 A function's signature carries two pieces of information: what it returns,
 and what Effects it performs.
 The body looks like ordinary sequential code.
-The compiler observes what you call and tracks the Effects,
+The compiler reads what the body calls and infers the Effects,
 the same way it tracks whether a value is an integer or a string.
 
 The examples in this section and the next come from my research,
@@ -661,34 +660,35 @@ fun main() : <console,exn> ()
 
 The angle brackets in `greet()`'s signature hold the *Effect row*,
 the set of Effects the function performs.
-The row is the second channel.
-`ask` and `tell` are part of the type without encumbering the argument list.
+The row is the second channel:
+`ask` and `tell` are part of the type without adding a parameter.
 The compiler infers the row from what the body calls,
 so you rarely write one by hand.
 You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-That addition is the propagation the by-hand version makes you perform with parameters.
+The by-hand version makes you perform that addition yourself,
+one parameter per signature.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
+The compiler rejects a program that performs an Effect with no handler in scope,
+so every Effect a running program performs has a handler.
 Think of a handler as a generalized `except` block.
 An `except` block intercepts exceptions and decides what happens next.
 A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
 Handling an Effect also discharges it.
-`main()`'s row is not `<ask,tell>` but `<console,exn>`:
-the handlers remove `ask` and `tell`,
-and the row that remains holds the Effects the handler bodies perform,
+`main()`'s row is not `<ask,tell>` but `<console,exn>`.
+The handlers remove `ask` and `tell`,
+and the row that remains holds the Effects the handler bodies perform:
 `console` from the printing and reading, `exn` because `readline()` can fail.
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
-The compiler rejects a program that performs an Effect with no handler in scope,
-so no Effect reaches the runtime unhandled.
 
-That separation is the core of every Effect system.
-The code that requests an Effect stands apart from the code that performs it,
+Separating the request from its fulfillment is the core of every Effect system:
+the code that requests an Effect stands apart from the code that performs it,
 and a handler sits between them.
 `greet()` names `ask` and `tell` without deciding what either one means.
 The handler decides, and a different handler decides differently.
@@ -699,15 +699,19 @@ the rest of the computation from that point forward.
 An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
-which behaves like a normal function return.
-It can discard the continuation, which behaves like an exception.
+and the operation then behaves like a normal function return.
+It can discard the continuation,
+and the operation then behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
-This design, operations declared as an interface plus handlers that receive the continuation,
-is called *algebraic effects*.
+*Algebraic effects* is the name for this design:
+operations declared as an interface,
+plus handlers that receive the continuation.
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
+That makes a suspended generator a continuation you can resume once or discard,
+but never resume twice, because nothing can copy a generator's paused frame.
 [Generators](45_Effects--Generators.md) covers the full two-way form,
 the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
@@ -766,7 +770,7 @@ object Main extends ZIOAppDefault:
 
 The three type parameters of `ZIO[Tell, Nothing, Unit]` carry the Effect information.
 `Tell` is the environment the computation requires.
-`Nothing` is the error type, meaning this one cannot fail.
+`Nothing` is the error type, meaning `hello` cannot fail.
 `Unit` is what it produces on success.
 The signature does the same job as Koka's Effect row.
 It tells you what `hello` needs, what can go wrong, and what comes back.
@@ -778,8 +782,8 @@ All of that, to print one string.
 The machinery exists because the language cannot intercept an Effect at the point where it runs,
 the way a native handler can.
 A library can act only on values, so every Effect must become a value.
-`hello` is a data structure describing a program,
-and nothing executes until the ZIO runtime interprets that structure at `run`,
+`hello` is a data structure describing a program.
+Nothing executes until the ZIO runtime interprets that structure at `run`,
 the boundary between description and action (sometimes called "the edge").
 
 The TypeScript [Effect](https://effect.website/) library works the same way:
@@ -813,10 +817,11 @@ rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
-A library has only the description route,
-and deferring execution is the price it pays for delayed binding in a language never designed for Effects.
-That price is a conceptual layer you carry everywhere.
-You must always know whether a value is a description or an action.
+A library has only the description route.
+In a language never designed for Effects,
+it gets delayed binding by deferring execution.
+That deferral adds one question to every value you handle:
+is it a description or an action?
 Code that mixes the two compiles cleanly but misbehaves,
 because the imperative part runs during the description's construction,
 not at its execution.
@@ -835,15 +840,15 @@ rebuilds the `ask`/`tell` pair from [Effects by Hand](#effects-by-hand).
 
 At this writing, experimental languages designed for AI code generation are proliferating.
 Their designers try to balance better code generation for the AI against human verifiability.
-Adoption skips the years a human language spends waiting for people to learn it.
 A language written for an AI can drop the conveniences that help a person read code,
-and an AI can start using that language as soon as it works.
+and an AI can start using that language as soon as it works,
+so adoption skips the years a human language spends waiting for people to learn it.
 
 Most of these are tracking systems,
-in the sense [Effect Management Systems](#tracking-and-management)
-gives the term: they provide the first part of a full EMS and stop there.
+in the sense [Tracking and Management](#tracking-and-management) gives the term:
+they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
-are liabilities, because a host that pins every implementation can guarantee what generated code can do.
+are liabilities, because a host that supplies every implementation itself can guarantee what generated code can do.
 
 Two go further.
 In [Pact](https://github.com/KikotVit/pact-lang),
@@ -860,7 +865,7 @@ the second and third properties of a full EMS.
 
 The Python language has no Effect Management System, but it has a start.
 Python already tracks one Effect in function signatures,
-and enforces that tracking virally: `async`.
+and enforces that tracking on every caller: `async`.
 
 ```python
 # coroutines_are_descriptions.py
@@ -880,14 +885,14 @@ print(asyncio.run(description), ran)
 ```
 
 Calling `greet()` builds a coroutine object, a description of work,
-and runs none of it.
-The empty list is the evidence that the body never executed.
-The description executes only when something awaits it or hands it to `asyncio.run()`.
+and `ran` stays empty.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 opened with the same demonstration.
-That is the library Effect system model.
-Descriptions compose inside `async def` functions,
+The body runs only when something awaits the description or hands it to `asyncio.run()`.
+That is the library Effect system model:
+descriptions compose inside `async def` functions,
 and `asyncio.run()` is the boundary where description becomes action.
+
 Python enforces the tracking the way an EMS does.
 `await` is a syntax error outside an `async def`,
 so any function that awaits a coroutine must become `async`,
@@ -903,16 +908,15 @@ The [returns](https://github.com/dry-python/returns)
 library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional--Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
-The [effect](https://pypi.org/project/effect/) library,
-no relation to the TypeScript library of the same name,
-ports the description/execution split to Python.
+The [effect](https://pypi.org/project/effect/)
+library ports the description/execution split to Python;
+it shares only its name with the TypeScript library.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
-Each of these gives you the discipline of one part of an EMS.
-The guarantee is missing, because no type checker enforces it.
+Each of these supplies part of an EMS, and none supplies all three parts.
 
-One library goes the rest of the way.
+One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
 encodes an Effect's dependencies and failures into the return type of every function that performs them,
 and a type checker verifies that each caller carries them forward.
@@ -920,26 +924,27 @@ Declaring a dependency you never bind is a type error.
 Calling an effectful function from one annotated as pure is a type error.
 That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.
-That chapter builds it up one step at a time.
+That chapter builds those three parts up one step at a time.
 
-The guarantee has a boundary.
+The guarantee has a limit.
 Stateless verifies that the Effects you *declare* propagate consistently.
 A function can still call `print()` directly,
 next to its carefully declared Effects.
 In Koka, that call changes the function's Effect row, and every caller's row.
-In Python, the call is invisible to every tool.
+In Python, no tool reports the call.
 A library checks the Effects you wrote down;
 checking the ones you left out takes the language.
 
 Could Python itself gain Effect tracking,
-so that the declarations write themselves?
-The annotation syntax could carry it:
+so that a tool infers every declaration instead of you writing it?
+The annotation syntax could carry the Effect row:
 imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
 across every library on PyPI, almost all of which carry no Effect annotations.
-`async` succeeded because it arrived with the language and split the world visibly.
-An Effect row must spread through an ecosystem of untracked code.
+`async` succeeded because it arrived with the language,
+and its keyword marks each function that carries the Effect.
+An Effect row must instead reach every library in an ecosystem of untracked code.
 Gradual typing faced the same problem, and took a decade.
 No PEP proposes Effect tracking today.
 If one arrives, it will contain the ideas in this chapter.
@@ -953,17 +958,17 @@ the row a native system keeps, without the handlers.
 
 The history of programming is a history of scaling barriers.
 Each time, the pattern is the same.
-Something the programmer tracks by hand works fine in small programs.
+Something the programmer tracks by hand works in small programs.
 Systems grow until hand-tracking fails.
 The solution moves that tracking into the language or the toolchain,
 and a generation later, nobody can imagine doing it by hand.
 
 Namespaces are the clearest example.
-Early languages put every name in one global pool,
+Early languages put every name in one global namespace,
 and the programmer prevented collisions by hand.
 Collisions were often silent, producing hidden bugs,
 and third-party libraries made the problem worse.
-The solution gave every name a home.
+The solution divided names among separate namespaces.
 In Python, every module is automatically a namespace,
 and the practice is so settled that the Zen of Python ends by celebrating it:
 <!-- vale House.EmDash = NO -->
@@ -974,7 +979,7 @@ The language does the bookkeeping.
 
 The same pattern repeats across the field.
 Version control gave every state of the code a name you can return to,
-so experimentation stopped being risky.
+so experimenting became safe.
 Automated testing moved "does it still work?" from a manual ritual into the build.
 Garbage collection took the tracking of memory ownership out of the programmer's head.
 Each of these met resistance as unnecessary overhead, then won adoption,
@@ -995,10 +1000,10 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, this one stops scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions this chapter raises earlier:
+The function signature answers the questions from [Effect Management Systems](#effect-management-systems):
 what does this function depend on, what does it change, what can go wrong.
-Composition stops being a guess,
-because the compiler balances the books at every boundary.
+The compiler checks every composition,
+comparing each callee's Effects with the caller's declaration at each call.
 The languages that do this today are young,
 and the libraries that retrofit it are demanding.
 That was true of every solution to every previous barrier at this stage.
@@ -1006,10 +1011,11 @@ Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
-Python offers no native version of Effect tracking, and will not soon.
+Python offers no native Effect tracking beyond `async`, and will not soon.
 The next three chapters build the library version:
 [Generators](45_Effects--Generators.md) supplies the mechanism,
-[Stateless](46_Effects--Stateless.md) builds the Effect type on top of it,
+[Stateless](46_Effects--Stateless.md)
+builds a library Effect system on top of it,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 puts it to work.
 
@@ -1018,9 +1024,9 @@ puts it to work.
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.
-    Confirm `greet()` itself requires no change,
-    which is the delayed-binding payoff.
-2.  Feel the bookkeeping the chapter describes.
+    Confirm `greet()` itself requires no change:
+    serving a new context without edits is what delayed binding provides.
+2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
     and log from `greet()` too.
@@ -1045,4 +1051,4 @@ puts it to work.
     then make the helper `async` and follow what the type checker and the interpreter force you to change,
     all the way up to `asyncio.run()`.
     Name the two properties of a full EMS that `async` does *not* have,
-    using the three-item list in [Effect Management Systems](#tracking-and-management).
+    using the three-item list in [Tracking and Management](#tracking-and-management).
