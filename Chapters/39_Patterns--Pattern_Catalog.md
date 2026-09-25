@@ -28,8 +28,7 @@ A few idioms below belong to no single source.
 This chapter groups them by what they share instead:
 language idioms tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
-What those three groups leave over sits in Other Patterns and Idioms,
-whose rows share no trait.
+The rest sits in Other Patterns and Idioms, whose rows share no trait.
 The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
@@ -256,7 +255,7 @@ Python includes the piece their inventors set out to supply.
 | [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch` |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
-What remains after the subtraction is the intent, not the structure.
+The subtraction leaves the intent, not the structure.
 [Reading the Chapters Ahead](21_Patterns--Design_Patterns.md#reading-the-chapters-ahead)
 argues this in general.
 Each linked chapter shows one case.
