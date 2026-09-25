@@ -195,8 +195,10 @@ Generator[Need[Console] | KeyError, Any, None]
 `A` and `E` share the first type parameter, and `R` is the third.
 Nothing in the union itself tells a request from a failure;
 two bounds on the library's type variables do that instead.
-`A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`,
-so a class that subclasses both satisfies each bound at once.
+`A`'s bound is `Ability[Any]`, and `E`'s bound is `Exception`.
+The two bounds do not exclude each other:
+a class that subclasses both would satisfy each at once,
+and at runtime it would count as a failure.
 No listing here builds one.
 [Waiting on a Coroutine](#waiting-on-a-coroutine)
 states the `A` bound as the rule for `Depend`.
@@ -547,7 +549,7 @@ The expected type in that message names two things that come later in this chapt
   the subject of [The Error Channel](#the-error-channel)
   and everything after it.
 
-`run()` accepts an Effect whose Ability channel has narrowed to those two,
+`run()` accepts an Effect whose yield channel has narrowed to those two,
 which is all that remains once you supply every other Ability.
 `greet("Alice")` still has `Need[Console]`, so it fails type checking.
 
@@ -702,7 +704,7 @@ Here, the signature and the body must agree.
 ## Retrofitting an Effect
 
 The second exercise in [Effect Management](44_Effects--Effect_Management.md#exercises)
-has you add a `Log` Effect alongside `greet()` and count the signatures you edit.
+has you add a `Log` Effect alongside `greet()` and count how many of the edited signatures use it.
 Here it is in Stateless:
 
 ```python
@@ -1171,7 +1173,7 @@ Having no container has three consequences:
    so two bindings for the same type can be live at once,
    as the screen and memory `Console`s are in [When Two Implementations Match](#when-two-implementations-match).
    Test cases need no reset between them.
-   DI has one flat registry and no equivalent to the handler layering of [Layering Handlers](#layering-handlers).
+   A typical DI container has one flat registry and no equivalent to the handler layering of [Layering Handlers](#layering-handlers).
 
 3. Stateless function requirements live in the function type.
    DI leaves that information in the bodies that ask for it.
@@ -1401,8 +1403,10 @@ it appears whenever asynchronous code calls `run()`.
 A synchronous program calls `run()` once at its outermost edge.
 A program that is already asynchronous, a web service or a bot,
 awaits `run_async()` at the edge of each request.
-Picking the wrong one is a runtime error rather than a type error,
+Calling `run()` inside a coroutine is a runtime error rather than a type error,
 one of the few mistakes in this chapter that the type checker cannot report.
+The opposite mistake, calling `run_async()` without `await` in synchronous code,
+draws `ty`'s `unused-awaitable` warning.
 
 ## The Error Channel
 
@@ -1632,7 +1636,7 @@ because it matches the yielded value itself rather than relying on the driver to
 `catch()` empties the error channel the way `supply()` empties the Ability channel,
 but the two do different things with what they remove.
 `supply()` provides the Ability inside the Effect,
-so the Ability parameter becomes `Never` and the result type omits the `Console`
+so the Ability parameter becomes `Never` and the result type stays as it was
 ([Supplying the Dependency](#supplying-the-dependency)).
 `@throws` puts a raised exception into the channel,
 and `catch()` takes it back out as a value in the result:
@@ -1843,7 +1847,8 @@ which Python does with or without the Effect type.
 So the two guarantees differ:
 you must resolve a dependency before anything runs,
 while a declared failure stays in the type until you choose where to handle it.
-The type checker covers both, and forgetting either is a type error.
+The type checker covers both declarations,
+and forgetting to declare either is a type error.
 
 ## Exercises
 
