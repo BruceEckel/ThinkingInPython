@@ -16,14 +16,14 @@ class Trash:
             cls.bin = cls
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
 class CrushedAluminum(Aluminum):
-    value = 1.67
+    value: ClassVar[float] = 1.67
     bin = Aluminum
 
 class Glass(Trash):
-    value = 0.23
+    value: ClassVar[float] = 0.23
 
 @singledispatch
 def recycling_note(t: Trash) -> str:

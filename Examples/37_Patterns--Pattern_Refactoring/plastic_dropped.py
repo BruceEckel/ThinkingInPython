@@ -1,5 +1,6 @@
 # plastic_dropped.py
 from collections import defaultdict
+from typing import ClassVar
 from parse_trash import parse
 from trash import (
     Aluminum,
@@ -12,7 +13,7 @@ from trash import (
 )
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)

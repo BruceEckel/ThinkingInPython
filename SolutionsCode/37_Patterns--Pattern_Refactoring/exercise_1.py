@@ -20,10 +20,10 @@ class Trash:
         return Trash.registry[name](weight)
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 def sum_value(items: list[Trash]) -> float:
     return sum(t.weight * t.value for t in items)
