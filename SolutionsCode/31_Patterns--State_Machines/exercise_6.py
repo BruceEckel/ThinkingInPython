@@ -1,4 +1,5 @@
 # exercise_6.py
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
@@ -57,7 +58,8 @@ class WashingMachine(StateMachine):
     def too_heavy(self, event: RinseDone) -> bool:
         return self.load_kg > 6
 
-    def log_msg(self, msg: str):
+    def log_msg(
+            self, msg: str) -> Callable[[object], None]:
         def action(event: object) -> None:
             self.log.append(msg)
         return action

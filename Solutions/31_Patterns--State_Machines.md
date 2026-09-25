@@ -179,7 +179,7 @@ worth making explicit and easy to audit.
 
 ```python
 # exercise_3.py
-from __future__ import annotations
+from typing import ClassVar
 
 class Controller:
     def __init__(self, initial: str) -> None:
@@ -194,7 +194,7 @@ class Controller:
         self.current = state.next_state(word)
 
 class WordState:
-    TRANSITIONS: dict[str, str] = {}
+    TRANSITIONS: ClassVar[dict[str, str]] = {}
 
     def next_state(self, word: str) -> str:
         return self.TRANSITIONS.get(
@@ -323,17 +323,19 @@ print(" ".join(m.name for m in moves[4:]))
 "the action just produced" to "the legal actions that can follow it,"
 including the special `None` key for "nothing has happened yet," which
 leads only to `APPEARS`. The generator's own state is just `previous`,
-the last action it yielded. Each call to `next()` (one iteration of
-the consuming `for` loop) picks a legal successor and remembers it for
+the last action it yielded. Each `next()` call on the generator,
+here made by `list()`, picks a legal successor and remembers it for
 the following call. `NEXT_ACTIONS` constrains every choice, so every
 sequence this generator produces is legal by construction.
-`mouse_trap_states.py`'s `next()` methods enforce the same guarantee by hand,
-one state class at a time.
+`mouse_trap_states.py` accepts any move in any state and lets each
+`case _` absorb the ones that make no sense there, so the generator's
+table is the stricter of the two.
 
 ## 6. A washing machine, table-driven
 
 ```python
 # exercise_6.py
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
 from exceptions import expect
@@ -392,7 +394,8 @@ class WashingMachine(StateMachine):
     def too_heavy(self, event: RinseDone) -> bool:
         return self.load_kg > 6
 
-    def log_msg(self, msg: str):
+    def log_msg(
+            self, msg: str) -> Callable[[object], None]:
         def action(event: object) -> None:
             self.log.append(msg)
         return action
@@ -433,8 +436,8 @@ A second `Start` during `FILLING` finds no row, so `handle()` raises
 `FILLING` and `load_kg` is still 3, because the engine finds a row
 before it runs any action. For a washing machine the caller should
 ignore the press: catch `NoTransition` and carry on, as
-`vending_view.py`'s `send()` does. A control panel is the noisy
-source the chapter describes, and a cycle that stops because
+`vending_view.py`'s `send()` does. A control panel is a source of
+stray presses, and a cycle that stops because
 someone leans on a button is the worse failure. Raising the
 exception is still the right default for the engine. A caller can
 turn an exception into a no-op, and cannot turn a silent no-op into
