@@ -73,9 +73,10 @@ every ambiguous "this"/"it"/"which" gets its noun. `make rewrite CH=NN`
 runs these five plus `elements-of-style` and `bruce-edit-apply` by
 default; `make rewrite ARGS=--list` shows the set and the model each
 pass runs on. Each pass can name its own model in `tools/rewrite.py`'s
-`PASSES`; all resolve to `DEFAULT_MODEL` (Fable 5) today, `MODEL_NOTES`
-there records the A/B evidence behind that, and `MODEL=` forces one
-model on a run.
+`PASSES`; all resolve to `DEFAULT_MODEL`, Opus 5.5 since 2026-09-25
+(Fable 5 before, moved to spare Bruce's Fable usage, not on a new
+measurement). `MODEL_NOTES` there records the A/B evidence and the
+move, and `MODEL=` forces one model on a run.
 Every pass checks any claim it rewrites against the listing it
 describes; the 2026-09-01 sweep of chapters 30-47 found nine factual
 errors that way, none of them gate-detectable.

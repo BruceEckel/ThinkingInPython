@@ -162,7 +162,7 @@ PASSES: tuple[Pass, ...] = (
 # --model forces on every pass. Every pass currently resolves to this
 # one; the per-pass field exists so a measured difference can be acted
 # on without touching the runner. MODEL_NOTES holds the evidence so far.
-DEFAULT_MODEL = "claude-fable-5"
+DEFAULT_MODEL = "claude-opus-5-5"
 
 MODEL_NOTES = """
 2026-09-01, chapter 25, straighten and positive, Opus 5 vs Fable 5,
@@ -209,6 +209,14 @@ default. MODEL=claude-sonnet-5 is the cheap lap to try one by hand;
 score bruce-edit-apply by its rule-firing report against a by-hand
 count, and activate by the metadiscourse it removes and the voice it
 keeps.
+
+2026-09-25: DEFAULT_MODEL moved from Fable 5 to Opus 5.5 at Bruce's
+request, to keep make rewrite from drawing on his Fable usage. This is
+not a new A/B result. The 2026-09-01 comparison was against Opus 5,
+and Opus 5.5 has not been measured on these passes. When reading its
+first runs, look for what Opus 5 did there: added "only"s, figurative
+flourishes, and splits of two-fact sentences that read fine as one.
+MODEL=claude-fable-5 still selects Fable for a run.
 """
 
 # How many chapters run at once in parallel mode. Each is a live
