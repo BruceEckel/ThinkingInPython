@@ -236,6 +236,28 @@ The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-
 applies directly.
 Match over a closed set, use polymorphism for an open one.
 
+A file and a directory are both a `Path`,
+which makes `pathlib` look like a *Composite*.
+It has the uniform interface: `name`, `exists()`,
+and `stat()` work on either kind of entry,
+and `iterdir()` and `rglob()` walk the tree without asking which kind they hold.
+It lacks the structure.
+A `Path` is an immutable value that names a location and holds no entries.
+The tree lives in the operating system's filesystem,
+and `iterdir()` asks the OS for the children each time you call it.
+No `Path` method recurses through that tree the way `disk_usage()` does.
+On a directory, `stat().st_size` reports the size of the directory entry rather than the size of its contents,
+so the recursion falls to you:
+
+```python
+total = sum(p.stat().st_size for p in root.rglob("*")
+            if p.is_file())
+```
+
+`rglob()` supplies the traversal,
+and `sum()` supplies the combining step that `disk_usage()` performs for a `Directory`.
+The filesystem is the composite, and a `Path` is a handle into it.
+
 ## Interpreter
 
 A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
