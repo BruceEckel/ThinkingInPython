@@ -1,9 +1,10 @@
 # Foundations
 
 This chapter begins the book's exploration of functional programming.
-The ideas pay off before the vocabulary arrives.
+The ideas are useful before you learn their names.
 A pure function cannot corrupt state you forgot about.
-It has fewer bugs to chase, and it needs no mock or fixture to test.
+A bug in it reproduces from the arguments alone,
+and it needs no mock or fixture to test.
 A cache from `functools`, or a sliding window from `itertools`,
 is code you never write yourself,
 already correct on the edge case you would otherwise miss.
@@ -12,9 +13,9 @@ so it parallelizes with no new code.
 And code built from small,
 checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
-The functional style asks you to keep loops, classes, and mutation,
-and to notice when a piece of code can depend on its arguments alone,
-then write it that way.
+In the functional style you keep loops, classes, and mutation,
+notice when a piece of code can depend on its arguments alone,
+and then write it that way.
 
 This chapter builds the foundations: pure functions, immutable values,
 and the ways Python lets you pass, capture, specialize, and combine functions.
@@ -24,7 +25,7 @@ turns failure into an ordinary value,
 and [Confidence](43_Functional--Confidence.md)
 examines what the discipline lets you claim about your code.
 Those four chapters are Part IV.
-Part V then takes the same discipline further.
+Part V then applies the same discipline to a function's effects.
 [Effect Management](44_Effects--Effect_Management.md)
 tracks a function's effects in its type,
 and [Generators](45_Effects--Generators.md)
@@ -40,7 +41,7 @@ It reads nothing that can change, and it changes nothing outside itself.
 Given the same arguments, it always produces the same outcome,
 whether that outcome is a returned value or a raised exception.
 A *side effect* is anything a function does beyond producing that outcome,
-such as printing, touching a file or the network,
+such as printing, reading or writing a file or the network,
 or mutating something outside the function.
 A pure function has none.
 
@@ -68,17 +69,17 @@ print(withdraw(30), withdraw(30))
 
 `double()` returns the same answer every time.
 `withdraw()` does not,
-because each call changes `balance` and the next call sees the new value.
+because each call changes `balance` and the next call reads the new value.
 To understand one `withdraw()` call you must trace every call before it.
 
-The payoff is trust.
 A pure function is the most reliable code you can write,
 because its inputs fully describe its behavior.
 You can call it from many threads at once,
 because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional--Confidence.md#automatic-parallelism)
 turns that safety into speed.
-A cache can store its results, knowing the answer never goes stale.
+A cache can store its results,
+because the same arguments always produce the same answer.
 That makes [`functools.cache`](41_Functional--Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
 And a pure function tests with a single assertion and no fixture,
@@ -121,7 +122,7 @@ Each freezes only its own top level:
 the tuple `([1], 2)` always holds that same list,
 and anyone can still append to the list.
 Removing shared mutable state is the practical core of the functional style.
-A value that never changes stays what you last saw,
+A value that never changes stays what you last read,
 whatever code ran in between.
 
 Instead of modifying an object, you build a new one from the old:
@@ -149,21 +150,20 @@ print(moved)
 
 The type checker rejects the direct form `p.x = 5` before the program runs.
 To show that the runtime rejects the assignment too,
-the listing writes it as `setattr(p, "x", 5)`,
-which the type checker lets through.
+the listing writes it as `setattr(p, "x", 5)`, which the type checker accepts.
 The original `p` stays untouched, and `moved` is a separate value.
-When values never change underneath you,
+When a value never changes after creation,
 two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
-That safety has a cost.
+That safety has a cost, and the cost is copying.
 Python's immutable types share no structure:
 `moved = Point(p.x + 10, p.y)` above builds a new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
-Copying a two-field `Point` costs so little that you can ignore it.
-A large structure that changes often pays that cost on every change,
-the price immutability charges for the coordination it removes.
+Copying a two-field `Point` takes so little time that you can ignore it.
+A large structure that changes often copies the whole value on every change,
+and that time and memory are the cost of the coordination immutability removes.
 
 ### Immutability in Annotations
 
@@ -194,7 +194,7 @@ The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error.
-The constraint runs one way only.
+The constraint applies to one side only.
 `Sequence[int]` states that `total()` does not mutate its argument.
 It says nothing about the caller,
 who still holds the `list` and can append to it at any time,
@@ -205,7 +205,7 @@ if you declare `CONFIG: Final[list[int]] = [...]`,
 That is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
-`Final[tuple[int, ...]]`, and let `Final` guard only the name.
+`Final[tuple[int, ...]]`, and `Final` then forbids only the rebinding.
 
 ### A Stable Hash and Safe Sharing
 
@@ -213,7 +213,7 @@ Immutability offers two things a mutable value cannot.
 The first is a *stable hash*, one that holds for the value's whole life,
 so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy,
-because no recipient can change the value out from under you.
+because no recipient can change the value you still hold.
 A `list` offers neither:
 
 ```python
@@ -253,7 +253,7 @@ A function in Python is an object like any other,
 which is what *first-class* means.
 You can bind a function to a name, store it in a container,
 pass it as an argument, and return it from another function.
-A function value is data you can move around.
+A function value is data you can store and pass.
 
 ```python
 # first_class.py
@@ -273,7 +273,7 @@ print(table["title"]("functional python"))
 The dictionary holds functions as values,
 so a lookup yields a function you can immediately call.
 The [Function Objects](28_Patterns--Function_Objects.md)
-chapter approaches the same capability from the pattern side.
+chapter treats the same capability as a design pattern.
 
 Treating functions as values lets data drive control flow.
 A dictionary of functions replaces a long `if`/`elif` chain,
@@ -322,7 +322,7 @@ and the plugin registries that let a program grow without editing its core.
 solves the same `if`/`elif` problem with `match`,
 and the two differ in one way that decides between them.
 A `match` is code: adding an operator means editing the function,
-and the type checker sees every case.
+and the type checker verifies every case.
 The table is data: adding an operator means adding a row,
 which another module can do at import time and a test can do at runtime.
 Choose `match` when you know the whole set of cases as you write the function,
@@ -337,16 +337,16 @@ where they fit best.
 Their value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
-instead of sending it to a named function defined elsewhere.
+instead of defining it as a named function elsewhere.
 `sorted(words, key=lambda w: w.lower())` states the sort order right where the code sorts.
-Naming that one-liner costs a line, a name to invent,
-and a definition to look up, and buys nothing.
+Naming that one-liner adds a line, a name to invent,
+and a definition to look up, and changes nothing about the sort.
 For anything larger, write a `def`.
 A named function carries a docstring, a readable name in tracebacks,
-and room to grow.
+and room for more than one expression.
 
 A *higher-order function* takes a function as an argument, returns one, or both.
-Three built-ins are the workhorses.
+Three built-ins cover the common cases.
 `map()` applies a function to every element of an iterable.
 `filter()` keeps the elements for which a function returns true.
 `sorted()` accepts a `key` function that decides the ordering:
@@ -368,7 +368,7 @@ print(sorted(words, key=len))
 #: ['pie', 'kiwi', 'banana', 'watermelon']
 ```
 
-Each call hands a function to another function and lets it do the looping.
+Each call passes a function to another function, which does the looping.
 Returning a function is the other half of the definition.
 [Closures](#closures) covers it below.
 
@@ -377,7 +377,7 @@ The `list()` calls do real work.
 so `print(map(...))` shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing.
 `sorted()` is the exception:
-it must see every element before it can order any of them,
+it must read every element before it can order any of them,
 so it always returns a list.
 
 The lambdas above exist to show the machinery,
@@ -385,11 +385,11 @@ and for these cases Python offers a lookalike you should usually prefer,
 the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
 more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
-`map()` and `filter()` earn their keep when the function already exists.
-`map(str.strip, lines)` beats `[line.strip() for line in lines]` because the name says what the comprehension repeats.
+`map()` and `filter()` are the better choice when the function already exists.
+`map(str.strip, lines)` reads better than `[line.strip() for line in lines]` because the name says what the comprehension repeats.
 The two also return different things.
-The comprehension hands you a finished list.
-`map()` hands you an iterator you can feed into the next stage without building the list.
+The comprehension builds a finished list.
+`map()` returns an iterator you can pass to the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
 The rule of thumb: existing function, use the higher-order form;
@@ -397,12 +397,13 @@ expression you write inline, use the comprehension.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
-Higher-order functions separate the walking from the work.
-`map()`, `filter()`, and `sorted()` each contain the loop that walks the data,
-written once, and you supply only the part that differs from one use to the next.
-You stop rewriting the same iteration scaffold,
-and you stop making the off-by-one and accumulator-initialization mistakes it invites.
-The idea runs the other direction, too.
+Higher-order functions separate the iteration from the operation.
+`map()`, `filter()`,
+and `sorted()` each contain the loop that iterates over the data, written once,
+and you supply only the part that differs from one use to the next.
+You stop rewriting the same loop,
+and you stop making the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
+The idea also applies the other way around.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
 A decorator does this, as [Decorators](14_Techniques--Decorators.md) shows.
@@ -436,8 +437,8 @@ print(inspect.getclosurevars(triple).nonlocals)
 ```
 
 `multiplier()` returns `multiply()`,
-and each returned function remembers its own `factor`.
-The last two lines show that memory directly:
+and each returned function holds its own `factor`.
+The last two lines show the captured value directly:
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
@@ -474,10 +475,10 @@ Each call to `make_counter()` builds an independent counter with its own `count`
 Only `increment()` can name that variable, so only `increment()` can change it.
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
-`withdraw()` mutates a module-level name that any code can touch.
-`increment()` mutates a name that only it can touch.
+`withdraw()` mutates a module-level name that any code can assign.
+`increment()` mutates a name that only it can assign.
 When state must exist,
-a closure is one way to give exactly one function the right to change it.
+a closure is one way to let exactly one function change it.
 
 The privacy is Python's usual kind, a convention.
 `inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
@@ -492,11 +493,11 @@ so `count += 1` on its own makes `count` a fresh local variable.
 The statement then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
-Forgetting it is the standard stumble when a closure first needs to assign to a captured name,
-and the runtime message blames a local variable
+Forgetting it is the usual mistake when a closure first needs to assign to a captured name,
+and the runtime message names a local variable
 ("cannot access local variable 'count' where it is not associated with a value")
 instead of the missing declaration.
-The type checker is the better guide here.
+The type checker's report is the more useful one.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
 
@@ -546,7 +547,7 @@ Binding `exponent` above works because `power()` accepts it by keyword.
 `partial()` fills positional arguments from the left, so before 3.14,
 fixing the third argument meant fixing the first two as well.
 A function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
-rules out the keyword escape `power()` allows.
+rules out the keyword form `power()` allows.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The listing below carries two `# type: ignore` comments,
@@ -578,16 +579,15 @@ and the marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types,
-so `Placeholder` looks like a value of the wrong type,
-and the resulting callable looks like it takes no arguments.
+so `ty` reports `Placeholder` as a value of the wrong type,
+and types the resulting callable as one that takes no arguments.
 The runtime behaves correctly.
-The annotations for this feature lag behind the runtime.
+The stub for `partial()` does not yet describe what `Placeholder` does at runtime.
 
 ## Composing Functions
 
-*Function composition* builds a new function by feeding one function's output straight into the next.
-You can assemble behavior from small pieces,
-the way a pipeline reads as a sequence of steps:
+*Function composition* builds a new function that passes one function's result straight to the next.
+You can assemble behavior from small pieces, one stage at a time:
 
 ```python
 # compose_functions.py
@@ -618,8 +618,8 @@ print(compose(label, increment_then_double)(10))
 `compose(double, increment)` returns a function that increments first,
 then doubles.
 Each piece stays small and pure,
-and you combine them without touching their internals.
-The type parameters earn their place on the second `print()`:
+and you combine them without changing either one.
+The type parameters matter on the second `print()`:
 the type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
@@ -671,7 +671,7 @@ Five of the chapter's ideas work at once: a record for the value,
 `Sequence` to state that `report()` only reads, two pure functions,
 `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
-The second `print()` is the payoff.
+The second `print()` shows what the discipline gives you.
 The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
@@ -687,7 +687,7 @@ and the chapters ahead build on that single property.
 2.  In `dispatch.py`, add a `"*"` operator to the `operations` table backed by a new `mul()` function,
     with no change to how `operations["*"](6, 4)` gets called.
 3.  In `closures.py`, add `quadruple = multiplier(4)` and confirm it behaves independently of `double` and `triple`,
-    each remembering its own `factor`.
+    each holding its own `factor`.
 4.  In `compose_functions.py`, write a third small function, `square(n)`,
     and build `increment_then_double_then_square = compose(square, increment_then_double)`.
     Predict `increment_then_double_then_square(3)` before running it.
