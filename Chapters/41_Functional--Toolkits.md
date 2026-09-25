@@ -16,11 +16,12 @@ The standard library provides the building blocks of functional Python under `fu
 from a single `reduce()` call to an alternate dispatch mechanism.
 Each one replaces code you would otherwise write and debug yourself.
 Caching logic, an eviction policy, a dispatch table:
-each hides an edge case that's easy to miss on the first attempt.
+each has an edge case that's easy to miss on the first attempt.
 These tools are already written and already correct.
 CPython implements the ones where speed matters most in C: `reduce()`,
 `partial()`, and the two caches.
-What follows starts with the simplest tools and works up to the ones with the most moving parts.
+What follows starts with the simplest tools and works up to `singledispatch` and `singledispatchmethod`,
+which take one registered function per type.
 
 ### `reduce`
 
@@ -40,8 +41,7 @@ the `operator` module supplies a named function for each operator,
 so a fold never needs a `lambda a, b: a + b`.
 For addition specifically, `sum()` is the dedicated built-in,
 and `math.prod()` covers multiplication.
-`reduce()` earns its keep for every other fold,
-where no dedicated built-in exists.
+`reduce()` is the tool for every other fold, where no dedicated built-in exists.
 On an empty sequence it raises `TypeError: reduce() of empty iterable with no initial value`,
 because it has nothing to return.
 A third argument supplies that starting value,
@@ -50,7 +50,7 @@ so `reduce(add, [], 0)` returns `0` instead of raising an exception.
 ### `cache`
 
 Remembers every result forever,
-so repeated calls with the same arguments cost nothing.
+so a repeated call with the same arguments returns the stored result without running the body.
 `@cache` works correctly only for pure functions.
 A cached function with side effects runs those effects on the first call and never again.
 
@@ -89,7 +89,8 @@ the lapsed-listener leak of [The Pythonic *Observer*](30_Patterns--Observer.md#t
 in cache form.
 For the usual case, one expensive value per instance,
 use `@cached_property` below,
-which stores the result on the instance and dies with it.
+which stores the result in the instance's `__dict__`,
+so the result goes away with the instance.
 
 ### `lru_cache`
 
@@ -116,7 +117,7 @@ The single hit is the second `square(2)`, which is still in the cache.
 The second `square(1)` is a fourth miss even though `1` was the first value computed,
 and that miss proves the cache evicted `1`.
 `currsize` never passes `maxsize`:
-a new entry gets in only by pushing another one out.
+the cache discards the least recently used entry before it stores a new one.
 
 ### `partial`
 
@@ -162,7 +163,7 @@ print(Text("7").zero_pad(3))
 
 Since Python 3.14 a `partial` object is a descriptor too,
 so writing `zero_pad = partial(pad, fill="0")` here works.
-The two stop agreeing the moment an argument is positional.
+The two differ as soon as an argument is positional.
 `partialmethod` passes the instance first and the bound arguments after it,
 which a method expects.
 `partial` passes the bound arguments first and the instance after them,
@@ -200,9 +201,9 @@ print(x.squared)
 #: 25
 ```
 
-The cached result outlives its inputs:
+The stored result stays when an input changes:
 changing an attribute the property read leaves the stored value as it was.
-The escape hatch is `del x.squared`.
+`del x.squared` resets it.
 Deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
 First access isn't thread-safe either.
@@ -212,7 +213,7 @@ so two threads racing on the first read can both find the value missing and both
 ### `wraps`
 
 Copies a wrapped function's name and docstring onto its wrapper,
-so introspection still sees the original.
+so a tool that reads those attributes reports the original.
 [Decorators](14_Techniques--Decorators.md#decorators-as-classes)
 covers its sibling, `update_wrapper()`, for wrapping with a class instance.
 
@@ -296,9 +297,9 @@ print(light < heavy, light <= heavy, light > heavy)
 The plain class exists to show the tool.
 In real code this `Weight` would be `@dataclass(frozen=True, order=True)`,
 which generates all five comparison methods from the field order and makes `total_ordering` unnecessary.
-`total_ordering` earns its keep when the class cannot be a dataclass,
+`total_ordering` is the right tool when the class cannot be a dataclass,
 or when the ordering is not simply the fields in declaration order.
-Even then, each synthesized comparison costs more than a hand-written one:
+Even then, each synthesized comparison is slower than a hand-written one:
 it wraps a call to your `__lt__` or `__eq__`.
 A directly generated method skips that extra Python-level call.
 
@@ -326,9 +327,9 @@ print(describe("hi"), "|", describe(5))
 #: a str | the number 5
 ```
 
-`singledispatch()` examines only the first argument,
+`singledispatch()` dispatches on the first argument alone,
 so a rule that depends on two types needs [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md),
-and a keyword-only argument cannot drive the dispatch.
+and a keyword-only argument cannot select the implementation.
 
 ### `singledispatchmethod`
 
@@ -368,13 +369,13 @@ instead of loops you write and test again.
 Each one produces values on demand instead of building a list up front,
 the property [Lazy Evaluation](#lazy-evaluation) revisits below.
 Each is also a loop you would otherwise write by hand,
-already tuned in C and already correct on the edge cases a hand-rolled version tends to miss:
+already written in C and already correct on the edge cases a hand-written version can miss:
 the empty iterable, the single element,
 and the point where two sequences run out at different lengths.
 Combine them the way you combine any small function,
-by feeding one's output to the next.
+by passing one's output to the next.
 [Reusable Algorithms](23_Patterns--Iterators.md#reusable-algorithms)
-introduces several of these as iterator plumbing.
+introduces several of these as stages in lazy pipelines.
 This section is the catalog.
 
 ### `repeat`
@@ -392,7 +393,7 @@ print(list(map(pow, range(5), repeat(2))))
 ```
 
 The fixed form replaces the list you would have written as `["x"] * 3`.
-The infinite form is the one that earns the import:
+The infinite form is the reason to import it:
 it supplies an argument that never changes, without building a list to hold it.
 Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
@@ -442,7 +443,7 @@ print(list(islice(cycle("AB"), 5)))
 ```
 
 `cycle()` saves each element the first time through,
-so the whole input stays in memory as long as the cycle lives.
+so the whole input stays in memory for as long as the `cycle` object exists.
 
 ### `chain`
 
@@ -540,7 +541,7 @@ print(list(takewhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 
 The input carries a trailing `1` to separate `takewhile()` from `filter()`.
 `filter(lambda n: n < 3, ...)` returns `[1, 2, 1]`,
-because filtering skips what fails and keeps looking.
+because `filter()` skips a failing element and tests the next.
 `takewhile()` stops at the first failure and never reaches the last element.
 On finite data that is a detail.
 On an infinite source it decides whether the program terminates.
@@ -561,12 +562,12 @@ print(list(dropwhile(lambda n: n < 3, [1, 2, 3, 4, 1])))
 
 The same trailing `1` marks the same distinction from the other direction.
 `dropwhile()` stops testing once the predicate fails,
-so the final `1` comes through,
+so it yields the final `1`,
 where `filterfalse()` tests every element and returns `[3, 4]`.
 
 ### `filterfalse`
 
-Keeps the elements a predicate rejects, the mirror of `filter()`.
+Keeps the elements a predicate rejects, the complement of `filter()`.
 
 ```python
 # itertools_filterfalse.py
@@ -591,7 +592,7 @@ print(list(starmap(pow, [(2, 5), (3, 2)])))
 ### `zip_longest`
 
 Zips iterables of different lengths,
-filling the gaps instead of stopping at the shortest.
+filling the missing positions instead of stopping at the shortest.
 The default filler is `None`.
 When `None` is a valid element,
 pass a distinct [sentinel](05_Foundations--Functions.md#sentinel-values)
@@ -612,7 +613,7 @@ print(list(zip_longest([1, 2, 3], [4, 5],
 
 Three ways to zip inputs of different lengths,
 and the choice says what a mismatch means.
-Plain `zip()` stops at the shortest and says nothing,
+Plain `zip()` stops at the shortest and raises no error,
 which is right when the extra elements are genuinely surplus.
 `zip(a, b, strict=True)` raises `ValueError: zip() argument 2 is shorter than argument 1`,
 which is right when equal lengths are an invariant you want checked.
@@ -622,7 +623,8 @@ which is right when the missing elements are data in their own right.
 ### `groupby`
 
 Groups consecutive elements that share a key.
-The input must arrive sorted by that key, since it merges only neighbors.
+The input must arrive sorted by that key,
+since it groups only adjacent elements.
 
 ```python
 # itertools_groupby.py
@@ -635,12 +637,12 @@ print([(k, list(g)) for k, g in groupby(["b", "a", "b"])])
 #: [('b', ['b']), ('a', ['a']), ('b', ['b'])]
 ```
 
-The second line is what unsorted input costs you:
-`"b"` comes back as two separate groups, and no error says so.
+The second line shows what unsorted input does:
+`"b"` comes back as two separate groups, and no error reports it.
 `sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
 with the same key function both times.
 
-The comprehension's `list(g)` earns its place.
+The comprehension's `list(g)` is necessary.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group invalidates the previous group's view.
 `list(groupby(data))` therefore returns three keys paired with three empty iterators:
@@ -664,13 +666,13 @@ print(list(a), list(b))
 
 Two cautions.
 After `tee()`, use only the returned iterators.
-Advancing the original source steals values the copies never see.
+Advancing the original source consumes values the copies never receive.
 And `tee()` buffers every value one copy has consumed and the other has not,
 so draining `a` completely before touching `b`, as this demo does,
 stores the whole sequence.
 When one consumer runs far ahead of the other,
-`list()` is simpler and no more expensive.
-`tee()` wins when the consumers stay roughly in step.
+`list()` is simpler and uses no more memory.
+`tee()` uses less memory when the consumers stay roughly in step.
 [Iterators](23_Patterns--Iterators.md#what-tee-buffers)
 measures that buffering and adds a third caution:
 `tee()` shares one unlocked buffer between its branches,
@@ -692,8 +694,8 @@ print(list(product("AB", [1, 2])))
 
 Unlike the tools above,
 `product()` reads its inputs completely before yielding its first tuple,
-so none of them can be infinite: `product(count(1), "AB")` hangs at the call,
-before anything asks for a value.
+so none of them can be infinite: `product(count(1), "AB")` never returns,
+because the call itself reads `count(1)` to an end that never comes.
 
 ### `permutations` and `combinations` {#permutations-and-combinations}
 
@@ -722,8 +724,8 @@ print(list(product("AB", repeat=2)))
 which is right when you want each pair of distinct elements once.
 `combinations_with_replacement()` also ignores order,
 but draws from the full input each time, which is where `AA` comes from.
-`product()` with `repeat=` fills the fourth corner:
-order matters and elements repeat, so all four pairs survive.
+`product()` with `repeat=` is the fourth combination of answers:
+order matters and elements repeat, so it yields all four pairs.
 
 ### Composing the Pieces
 
@@ -743,12 +745,12 @@ print(list(islice(squares, 3)))
 #: [256, 289, 324]
 ```
 
-Four stages sit on top of an infinite source,
+Four stages read from an infinite source,
 and none of them run until `list()` pulls.
 The second `print()` shows the source resuming at `n` = 16 rather than 13,
 because `takewhile()` must pull the batch `(169, 196, 225)` and discard it to discover that its total of 590 exceeds the limit.
 A pull-based pipeline reads one value further than it keeps,
-and that one value cost three squares.
+and here that one value was a batch of three squares.
 
 ## Lazy Evaluation
 
@@ -796,7 +798,7 @@ looks at the same idea from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
-so memory use stays flat whatever the size of the source.
+so memory use stays constant whatever the size of the source.
 Stages chain together without building intermediate lists between them,
 and a consumer that stops early, such as `any()` or `next()`,
 keeps the upstream stages from computing the items it never reaches.
@@ -824,17 +826,17 @@ print(sys.getrecursionlimit())
 #: 1000
 ```
 
-A `for` loop computes this same factorial in about the same number of lines and stays clear of that limit.
+A `for` loop computes this same factorial in about the same number of lines and never reaches that limit.
 Python does not optimize tail calls and limits the call stack,
 so deep recursion raises a `RecursionError`.
-`sys.setrecursionlimit()` lifts that ceiling when the depth is genuine,
+`sys.setrecursionlimit()` raises that limit when the depth is genuine,
 but it is the wrong answer for a long flat sequence,
 where a loop or one of the `itertools` tools is the better choice.
 For counting down to zero, the loop is as fast and as short as the recursion.
-Recursion pays off once the problem branches rather than repeats,
+Recursion is the better choice once the problem branches rather than repeats,
 as the next example shows.
 
-Branching brings a cost that counting down does not.
+Branching adds a problem that counting down does not have.
 More than one branch can reach the same subproblem,
 and a plain recursive function recomputes it every time.
 That is why the recursive `fib()` under [`cache`](#cache)
@@ -845,7 +847,7 @@ A different reason to recurse: some problems are naturally self-similar,
 such as walking a tree, with no repeated subproblem and so no need for a cache.
 Code that walks a tree, nested data,
 or a directory reads best when its shape matches the data's shape.
-The function handles one node and trusts itself for the rest:
+The function handles one node and calls itself for the rest:
 
 ```python
 # nested_sum.py
@@ -874,7 +876,7 @@ and says nothing about depth.
 ## Case Study: Pairing Rotations
 
 Pair up participants for an activity across several rounds,
-and avoid repeating a pairing until every possible pairing has had a turn.
+and avoid repeating a pairing until every possible pairing has occurred once.
 Several of these ideas work together here in one small program,
 instead of appearing one at a time: an infinite generator for the rounds,
 `islice()` to take as many of them as you want,
@@ -904,7 +906,7 @@ Scheduling groups of three without repeats is far harder:
 that problem is *Kirkman's schoolgirl problem*,
 solvable only for specific roster sizes and with no simple formula behind it.
 An exact answer may not exist for a given `students` and `size`,
-so the general version below gives up rotation and settles for a good schedule rather than a perfect one.
+so the general version below gives up rotation and produces a good schedule rather than a perfect one.
 It builds each group one member at a time,
 adding whoever the current members have met the fewest times.
 Those meeting counts come from a running history rather than from a round number:
@@ -991,19 +993,19 @@ Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
 at the cost of `14` repeat meetings.
 An odd roster leaves one player over,
-so each round folds that player into an existing pair,
+so each round adds that player to an existing pair,
 and those triples produce the repeats.
 `group_rounds()` covers the pairs with no rotation and no fixed player:
-a shuffle, then a greedy choice repeated until the roster runs out.
+a shuffle, then a greedy choice repeated until the pool is empty.
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over,
 so one group grows to four rather than leaving anyone out,
 the same join-instead-of-sit-out choice the pair rounds make above.
 
-A roster smaller than one full group takes that choice to its limit.
+A roster smaller than one full group is the extreme case of that choice.
 The `while len(pool) >= size` loop never runs,
 so no group exists to fold the leftovers into,
-and the `if pool and not groups` line opens one.
+and the `if pool and not groups` line creates one.
 Without it, `min()` receives no groups to compare and raises a `ValueError`.
 Two students and a requested size of five produce one group of two,
 because the alternative is a round in which nobody meets anyone.
@@ -1021,8 +1023,7 @@ after the counts it summed have changed.
 The `cache` entry's rule, pure functions only, is the reason:
 a function that reads mutable state is impure, however simple its body looks.
 
-Generality costs something.
-The circle method needs no memory.
+The general version needs memory that the circle method does not.
 Which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`, because no formula predicts,
 from a round number alone,
@@ -1034,8 +1035,8 @@ since `random.Random(seed)` draws every number from its own seeded state.
 Computing round `100` now means generating rounds `0` through `99` first,
 where the circle method could compute round `100` directly,
 from its arithmetic alone.
-That trade, memory for generality, is the same one [Recursion](#recursion)
-makes when a loop's simple counter is not enough and the problem needs a stack instead.
+[Recursion](#recursion) makes the same choice, memory for generality,
+when a loop's simple counter is not enough and the problem needs a stack instead.
 
 ## Choosing From the Toolkits
 
@@ -1059,7 +1060,7 @@ the question a chain of pure functions leaves open.
 1.  Rewrite `deep_sum()` from `nested_sum.py` without recursion,
     using a list as an explicit stack.
     Compare the two versions for length,
-    and name the places an off-by-one can hide in the loop version that do not exist in the recursive one.
+    and name the places an off-by-one can occur in the loop version that do not exist in the recursive one.
 2.  `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
     Change `maxsize` to `3`, predict the four numbers before running it,
     then run it and account for any difference.
@@ -1075,4 +1076,4 @@ the question a chain of pure functions leaves open.
 6.  `group_rounds()` takes a `seed` and builds its own `random.Random`.
     Replace that with an `rng: random.Random` parameter.
     Which property of the function does that preserve,
-    and which one does it hand to the caller?
+    and which one does it leave to the caller?
