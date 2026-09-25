@@ -201,17 +201,17 @@ Purity makes parallel safe.
 Whether parallel pays at a given size is a separate question,
 and the timing answers it.
 
-Purity makes the calls safe to run together.
-Sending them to a worker adds requirements of its own.
+Sending the calls to a worker adds requirements of its own.
 Each argument and each result pickles to cross the process boundary.
 The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
 and that rules out two shapes these chapters use often.
-A `functools.partial` pickles, as its wrapped function plus its bound arguments.
+A `functools.partial` pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
-and without the guard every worker builds a pool of its own.
+and without the guard each worker re-runs the pool-building code,
+which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
 covers the pickling boundary and the guard,
 along with the reasons Python parallelism uses processes rather than threads.
@@ -241,7 +241,7 @@ You decide how far up the spectrum to go.
 1. The first rung, local reasoning, takes the least work.
    Pure functions and immutable values let you understand one piece at a time,
    with no hidden state to keep track of.
-   Most code stops here.
+   Most code needs no more.
 2. Next are tests over chosen examples,
    the subject of [Testing](11_Techniques--Testing.md).
    Each one checks a single input against a single answer,
@@ -312,7 +312,8 @@ so to find that value you add a `print()` and rerun by hand.
 ### The Same Law in Hypothesis
 
 Hypothesis turns the hand-written loop into a declaration.
-You describe the inputs with a *Strategy* and state the law once,
+You describe the inputs with a *strategy*,
+Hypothesis's name for an input generator, and state the law once,
 as a normal `test_` function.
 The framework supplies the cases.
 It draws on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,

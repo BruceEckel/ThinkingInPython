@@ -46,12 +46,14 @@ count is greater than one, so the work genuinely left the main
 process. The exercise sets out to show exactly that, and
 `assert parallel == serial` alone could never prove it. But the count
 also sits far below thirty-two, and it moves between runs.
-`ProcessPoolExecutor` allows one worker per core and starts a new one
-only when every existing worker is busy. Each of these four tasks is
-short enough that a free worker takes the next one before the pool
-has any reason to grow. The pool never needs thirty-two processes,
-so it never starts them. A distinct-ID count is evidence that
-parallelism is available, not a measure of how much the pool uses.
+`ProcessPoolExecutor` allows one worker per core, but it starts
+workers on demand: a submitted task starts a new worker only when no
+existing worker is idle. Four tasks therefore start at most four
+processes, never thirty-two. Starting a process takes longer than
+these tasks run, so the first worker up often finishes its task and
+takes the next one from the queue before the last worker is ready.
+A distinct-ID count shows that the work left the main process, not
+how many processes the pool started.
 
 The number depends on the core count and on scheduling, so it is
 reproducible on your machine and nowhere else. That is why it does
@@ -470,8 +472,8 @@ has to reconstruct that `result` must be an `Err` by ruling out the
 
 `ty` reports the same thing about both. Inside the `Ok` it knows
 `float` either way, and in the error branches it knows `Exception`
-narrowed to `ValueError` or `ZeroDivisionError`. That agreement is
-recent, and the precision behind it rests on one decorator: both `Ok`
+narrowed to `ValueError` or `ZeroDivisionError`. The precision
+behind that agreement rests on one decorator: both `Ok`
 and `Err` carry `@final`, in the listing above and in
 `utils/result.py`. Without that decorator `ty` 0.0.82 allows for a
 class inheriting from both, so the intersection of the two stays
