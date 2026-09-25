@@ -125,8 +125,8 @@ Two schools of thought exist:
 
 The argument over purity leaves this chapter's question open.
 If you write a function `a()` that calls a function `b()` that raises an exception,
-then `a()` raises that exception too, unless `a()` catches it,
-and `a()`'s signature says nothing about it.
+then `a()` raises that exception too, unless `a()` catches it.
+`a()`'s signature says nothing about the exception.
 `a()` takes the exception on by calling `b()`, whichever school you join,
 so an exception is an Effect alongside the side effect and the side cause.
 
@@ -204,13 +204,13 @@ But it guards only the exceptions `slope()`'s `try` names.
 and the `try` around it catches only `ZeroDivisionError`.
 This listing puts `validate()` directly above `slope()`,
 so the uncaught `ValueError` is easy to spot.
-In a real call stack the `raise` is usually in another file, several calls down,
-and finding it means reading every callee: the tedious,
+In a real call stack the `raise` is usually in another file, several calls down.
+Finding it means reading every callee: the tedious,
 error-prone work an Effect Management System replaces.
 Because `slope()` calls `validate()`,
 `validate()`'s Effect becomes `slope()`'s Effect.
-Catching by hand covers exactly the exceptions you know a callee can raise,
-and knowing every one of them is the tracking problem an Effect Management System solves.
+Catching by hand covers exactly the exceptions you know a callee can raise.
+Knowing every one of them is the tracking problem an Effect Management System solves.
 
 C++ and Java tried to track exceptions with *exception specifications*,
 a list of exceptions written by hand on each function.
@@ -397,8 +397,8 @@ Every Effect you isolate is one your tests can control.
 
 All of this depends on knowing where the Effects are.
 In a small program you find them by inspection.
-As programs grow, inspection stops scaling,
-and the rest of this chapter is about what replaces it.
+As programs grow, inspection stops scaling.
+The rest of this chapter is about what replaces it.
 
 ## Effect Management Systems
 
@@ -432,8 +432,9 @@ and composition is how programs grow large.
 
 An Effect Management System (EMS) keeps track of Effects in functions.
 If your function calls an effectful function,
-that Effect belongs in your function's type: a native system adds it for you,
-and a library like Stateless has you declare it, then verifies the declaration.
+that Effect belongs in your function's type.
+A native system adds it for you; a library like Stateless has you declare it,
+then verifies the declaration.
 If another function then calls yours,
 the same Effect belongs in that function's type,
 and so on out to the edge of the program.
@@ -450,8 +451,8 @@ A full EMS does three things:
    Some caller or context supplies the implementation,
    at a point after the function's definition.
 
-The first item can stand alone,
-and the difference between it and the whole list matters in the chapters that follow.
+The first item can stand alone.
+The difference between it and the whole list matters in the chapters that follow.
 *Effect tracking* tells you which Effects a function can perform.
 Tracking alone tells you whether a function is pure,
 and names the kinds of impurity a caller takes on.
@@ -664,7 +665,8 @@ You annotate explicitly when you want a constraint,
 such as declaring that a function must remain Effect-free.
 If another function calls `greet()`,
 the compiler adds `ask` and `tell` to that function's row automatically.
-That addition is the propagation the by-hand version makes you perform with parameters.
+The by-hand version makes you perform that addition yourself,
+one parameter per signature.
 
 Something must eventually fulfill every Effect,
 and the construct that fulfills one is a *handler*.
@@ -673,9 +675,9 @@ An `except` block intercepts exceptions and decides what happens next.
 A handler intercepts any Effect operation and decides what it means.
 In `main()`, the `with fun ask(prompt)` handler decides that `ask` means "prompt the console and read a line."
 Handling an Effect also discharges it.
-`main()`'s row is not `<ask,tell>` but `<console,exn>`:
-the handlers remove `ask` and `tell`,
-and the row that remains holds the Effects the handler bodies perform,
+`main()`'s row is not `<ask,tell>` but `<console,exn>`.
+The handlers remove `ask` and `tell`,
+and the row that remains holds the Effects the handler bodies perform:
 `console` from the printing and reading, `exn` because `readline()` can fail.
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
@@ -698,9 +700,9 @@ which behaves like a normal function return.
 It can discard the continuation, which behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
-The name for this design,
-operations declared as an interface plus handlers that receive the continuation,
-is *algebraic effects*.
+*Algebraic effects* is the name for this design:
+operations declared as an interface,
+plus handlers that receive the continuation.
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
@@ -774,8 +776,8 @@ All of that, to print one string.
 The machinery exists because the language cannot intercept an Effect at the point where it runs,
 the way a native handler can.
 A library can act only on values, so every Effect must become a value.
-`hello` is a data structure describing a program,
-and nothing executes until the ZIO runtime interprets that structure at `run`,
+`hello` is a data structure describing a program.
+Nothing executes until the ZIO runtime interprets that structure at `run`,
 the boundary between description and action (sometimes called "the edge").
 
 The TypeScript [Effect](https://effect.website/) library works the same way:
@@ -809,8 +811,9 @@ rather than a feature of Effect Management.
 Native systems deliver tracking, interface separation,
 and delayed binding while the code runs eagerly,
 with no description trees and no interpreter.
-A library has only the description route, and it gets delayed binding,
-in a language never designed for Effects, by deferring execution.
+A library has only the description route.
+In a language never designed for Effects,
+it gets delayed binding by deferring execution.
 That deferral adds one question to every value you handle:
 is it a description or an action?
 Code that mixes the two compiles cleanly but misbehaves,
@@ -898,9 +901,9 @@ The [returns](https://github.com/dry-python/returns)
 library provides `Result` and `Maybe` containers like those in [Error Handling](42_Functional--Error_Handling.md),
 plus an `IO` container that marks a value as having come from input/output,
 and a `RequiresContext` container for delayed binding of dependencies.
-The [effect](https://pypi.org/project/effect/) library,
-no relation to the TypeScript library of the same name,
-ports the description/execution split to Python.
+The [effect](https://pypi.org/project/effect/)
+library ports the description/execution split to Python;
+it shares only its name with the TypeScript library.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
