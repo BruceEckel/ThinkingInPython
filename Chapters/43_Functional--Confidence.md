@@ -73,8 +73,8 @@ The first `withdraw(30)` evaluates to `70`,
 so substituting `70` for it ought to change nothing.
 It changes `110` into `140`.
 `withdraw()` is not referentially transparent,
-and any expression containing it inherits the problem,
-so substitution reasoning stops at the first impure call.
+and any expression containing it inherits the problem.
+Substitution reasoning stops at the first impure call.
 
 A `global` statement is one way to break substitution.
 A function that mutates an argument is another:
@@ -95,8 +95,8 @@ print(cart)
 Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
-The call also appends to `cart`, and substituting the list does not,
-so calling it twice leaves `cart` different from calling it once.
+The call also appends to `cart`, and the list put in its place appends nothing.
+Substitute the list for either call and `cart` ends with one `'eggs'` fewer.
 
 Referential transparency also makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
@@ -130,8 +130,8 @@ print(f"balance: {balance}")
 
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`,
-and hands back the stored `70` the second time,
-and nothing reports the skipped subtraction.
+and hands back the stored `70` the second time.
+Nothing reports the skipped subtraction.
 `lru_cache` returns the stored result for any repeated arguments,
 and nothing in the language checks that the function it wraps is referentially transparent.
 
@@ -144,8 +144,8 @@ The calls can run in any order, on any schedule, on any number of cores,
 and the answers stay the same.
 
 Shared state takes that freedom away.
-Two parallel `withdraw()` calls could both read `balance` before either writes it back,
-and the second write overwrites the first, so `balance` records one withdrawal.
+Two parallel `withdraw()` calls could both read `balance` before either writes it back.
+The second write then overwrites the first, so `balance` records one withdrawal.
 A lock makes that safe, and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it: with nothing shared,
 a lock has nothing to guard.
@@ -189,20 +189,21 @@ which the operating system places on separate cores.
 The `assert` passes on every run,
 because a pure call returns the same answer whichever process runs it,
 and whenever.
-The limits above are large enough for the difference to show:
-on the machine that built this book,
+The limits above are large enough for the difference to show.
+On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
-well over the 1.3x margin the last line checks.
+well over the 1.3x margin `faster` checks.
 At smaller limits the serial run finishes before a pool has started its workers,
-so a reader who shrinks the limits back down will see the parallel run take longer than the serial one.
+so if you shrink the limits back down,
+the parallel run takes longer than the serial one.
 Purity makes parallel safe.
 Whether parallel pays at a given size is a separate question,
 and the timing answers it.
 
 Purity makes the calls safe to run together.
 Sending them to a worker adds requirements of its own.
-Each argument and each result pickles to cross the process boundary,
-and the function pickles as its qualified name,
+Each argument and each result pickles to cross the process boundary.
+The function pickles as its qualified name,
 so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
 and that rules out two shapes these chapters use often.
@@ -225,13 +226,13 @@ Style contributes before the first rung.
 *Declarative* code states the result you want;
 *imperative* code spells out each step to produce it.
 A [comprehension](16_Techniques--Comprehensions.md) names the result,
-"the squares of the even numbers,"
-and [`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
+"the squares of the even numbers."
+[`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
-It also leaves the runtime free to choose the steps, which is why a SQL query,
+It also leaves the runtime free to choose the steps, so a SQL query,
 a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never call directly.
 
 You decide how far up the spectrum to go.
@@ -303,17 +304,17 @@ and it holds for every input the loop tries.
 A property test states what must always be true.
 The machine searches for a counterexample.
 A bare `assert` like this one reports a broken law as an `AssertionError`,
-and the traceback shows the assert's source line,
-so finding the value that broke it means adding a `print()` and rerunning by hand.
+and the traceback shows the assert's source line but not the value that broke it.
+To find that value, you add a `print()` and rerun by hand.
 
 ### The Same Law in Hypothesis
 
 Hypothesis turns the hand-written loop into a declaration.
 You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
-The framework supplies the cases,
-drawing on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
-so it generates inputs outside the loop's alphabet, such as unusual Unicode:
+The framework supplies the cases.
+It draws on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
+so it reaches inputs the loop never tries, such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -335,8 +336,8 @@ because importing `property_check.py` runs its thousand-iteration loop inside th
 
 `@given(strategies.text())` calls `test_roundtrip()` once per generated string.
 By default Hypothesis generates a hundred of them,
-a tenth of the hand-written loop's thousand,
-and they cover more of the input space,
+a tenth of the hand-written loop's thousand.
+They cover more of the input space,
 because Hypothesis generates boundary values and unusual characters instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input,
 the first improvement over the bare `assert` above.
@@ -378,24 +379,25 @@ except AssertionError as e:
 `encode()` still turns text into UTF-8 bytes,
 but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
 The two agree on the 128 ASCII code points,
-so `property_check.py`'s five-letter alphabet, drawn from those,
-passes all thousand cases:
-every string it builds decodes the same way under both.
-Hypothesis draws from the full range a Python string holds,
-and shrinks its failure down to the smallest code point outside that agreement,
+and `property_check.py`'s five-letter alphabet sits inside those.
+Every string its loop builds decodes the same way under both,
+so all thousand cases pass.
+Hypothesis draws from every character UTF-8 can encode.
+It shrinks its failure down to the smallest code point outside that agreement,
 `'\x80'`, the first character UTF-8 needs more than one byte to encode.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip returns a different string.
-This is the unusual Unicode the hand loop's alphabet kept out of reach,
-and Hypothesis found it by drawing from a wider alphabet,
+This is the unusual Unicode the hand loop's alphabet kept out of reach.
+Hypothesis found it by drawing from a wider alphabet,
 treating `decode()` as opaque throughout.
 `derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` discards the example database,
 so every run searches from scratch.
 A real test keeps the defaults.
-This function exists to fail, and a failing `test_` function fails the build,
-so its name drops the `test_` prefix and the listing calls it directly inside a `try`.
+This function exists to fail, and a failing `test_` function fails the build.
+Its name therefore drops the `test_` prefix,
+and the listing calls it directly inside a `try`.
 
 ### A Family of Property Shapes
 
