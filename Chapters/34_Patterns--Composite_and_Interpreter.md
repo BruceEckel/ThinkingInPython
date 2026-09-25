@@ -13,14 +13,21 @@ This chapter builds each pattern with [exhaustive matching](13_Techniques--Patte
 
 ![`disk_usage()` and `walk()` each name both node types, and `Directory` names only the `Node` union](_images/coupling_34)
 
-![One tree shape serves a filesystem and an arithmetic expression](_images/composite_tree)
-
 ## The Classic Composite
 
 A file system is the canonical composite.
 A directory holds entries, and each entry is a file or another directory.
 The point is uniformity: one call serves a file, a directory,
 and the whole tree.
+
+![One tree shape serves a filesystem and an arithmetic expression](_images/composite_tree)
+
+The left tree is the one this section builds.
+`disk_usage(root)` adds up every file below `root` to get 1940,
+and the same call on `src/` or on `readme.md` answers for that subtree or file.
+The right tree is the expression `2 * x + 1`,
+which the [*Interpreter*](#interpreter)
+section evaluates with the same kind of recursion.
 
 The traditional version puts each operation inside the node classes,
 under an abstract method on a shared base:
