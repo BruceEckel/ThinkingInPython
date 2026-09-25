@@ -84,7 +84,8 @@ for path in root.walk():
 ```
 
 `Directory.disk_usage()` calls `disk_usage()` on each entry without testing whether the entry is a `File` or another `Directory`.
-The same call works on the whole tree, on a subtree, and on a single file.
+The demo's first `print()` makes that one call on the whole tree,
+on the `src` subtree, and on a lone file.
 
 Adding a node type is one class: a plugin writes it and edits nothing above it.
 Adding an *operation* exposes the weakness.
@@ -247,7 +248,7 @@ Representing each construct as a node type turns evaluation into a tree walk.
 
 In most languages the pattern needs a class per construct and a parser to build the trees.
 Python shrinks the classes and removes the parser, for one specific case:
-sentences written as Python source, with operands that are already nodes.
+sentences written as Python source in which every operator has at least one node operand.
 A data class declares a node in three lines,
 and operator overloading lets Python's own parser build the trees.
 A GoF *Interpreter* more often parses a rules file, a configuration value,
@@ -341,7 +342,7 @@ The reflected methods depend on the operator dispatch from [*Multiple Dispatchin
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods accept any operand.
-The type checker reports `"a" + x` in source it sees,
+`ty` reports `"a" + x` as `unsupported-operator` in source it checks,
 but at runtime `str.__add__` declines, `Var.__radd__` runs,
 and the result is `Add(Num("a"), x)`,
 an ill-typed tree whose error waits for `evaluate()` to add the `"a"`.
@@ -428,7 +429,8 @@ An unbound variable raises a `KeyError`, naming the variable.
 `**env` gives the call site `evaluate(expr, x=3)` rather than `evaluate(expr, {"x": 3})`,
 and that convenience has a memory cost.
 Each recursive call packs a fresh dict from `**env`,
-so the live dicts at any moment total the tree's depth times the number of bound variables.
+so at any moment one dict is live per level of recursion,
+holding the tree's depth times the number of bound variables in entries.
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
 `**env` is also why the `/` is there.
@@ -566,10 +568,10 @@ if __name__ == "__main__":
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
 With `2 + 3`, both operands are plain `int`,
 so Python adds them to `5` before any node exists.
-`simplify()` would then receive a `Num(5)` already folded.
+`simplify()` would receive `5 * x` with the fold already done.
 `Num(2)` is already a node,
 so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
-The folded `2 + 3` is the limit of using the host parser:
+`2 + 3` shows the limit of using the host parser:
 an operator builds a node when either operand is one,
 and does plain arithmetic otherwise.
 
@@ -592,13 +594,16 @@ so `(0 * y) + x` keeps its zero.
 The left child is a `Mul`,
 and only becomes a `Num` once something simplifies it.
 Simplifying both children first, then matching the results,
-applies the rule to the `Num(0)` the recursion just produced;
-simplifying first is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
+applies the rule to the `Num(0)` the recursion just produced.
+That order is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
 `frozen=True` blocks every field assignment,
 so `simplify()` never edits the input.
 `simplify()` returns a new tree that shares unchanged subtrees with the original.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
+The guard tests identity with `is` rather than equality with `==`.
+Sharing means the same object, and a data class's `==` compares whole subtrees,
+so it would walk each subtree again at every level of the recursion.
 
 ```python
 # test_simplify.py
@@ -755,7 +760,7 @@ Written as an f-string,
 the same line is one finished `str` with the attack already inside it.
 The only remaining defense is inspecting the result to guess which characters the program wrote and which a user did.
 
-The injection attempt makes the general argument for handing a consumer the structure instead of the answer.
+That separation is the general argument for handing a consumer the structure instead of the answer.
 A finished string no longer records which characters the program wrote and which a user did,
 and the safety decision depends on that distinction.
 Textbooks usually present the *Interpreter* pattern as a way to add operations to a language.
@@ -795,7 +800,7 @@ Here it keeps a decision available to whoever should make it.
     Then write `evaluate_iterative()`,
     which walks the same tree with an explicit stack and no recursion,
     and check that the two agree on a small expression.
-    Raising the limit with `sys.setrecursionlimit()` is the other alternative.
+    Raising the limit with `sys.setrecursionlimit()` is another way out.
     Say what it costs.
 9.  A plugin package needs to add its own entry types to `filesystem.py` without editing your code.
     Sketch what breaks, then write the version of `disk_usage()` that supports it.
