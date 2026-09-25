@@ -49,11 +49,7 @@ DRAWINGS = (
        for c in GALLERY])
 
 # Edges left a little off straight on purpose, with the reason.
-KNOWN_TILTS: dict[tuple[str, str, str], str] = {
-    ("chapter 28", "ceased()", "Command"):
-        "Command sits 12 high to clear the loop box under it; leveling "
-        "it pushes that box into the note",
-}
+KNOWN_TILTS: dict[tuple[str, str, str], str] = {}
 NEAR_MISS = 15  # centers closer than this on one axis should be equal
 NOTE_SIZE = 10.5  # the notes' font size; a character is 0.6 of it wide
 

@@ -371,9 +371,9 @@ PANELS: dict[int, Panel] = {
          Node("no_more()", C2, R1, w=96),
          Node("ceased()", C2, R2, w=96),
          Node("fjords()", C2, R3, w=96),
-         Node("Command", C3, R2 - 12, w=120, kind="interface",
+         Node("Command", C3, R2, w=120, kind="interface",
               sub="Callable[[], None]"),
-         Node("for command in macro", C3 - 20, R3 + 4, w=160, kind="mark",
+         Node("for command in macro", C3 - 20, R3 + 14, w=160, kind="mark",
               sub="command()")),
         (Edge("macro", "no_more()", "heavy"),
          Edge("macro", "ceased()", "heavy"),
@@ -384,6 +384,7 @@ PANELS: dict[int, Panel] = {
          Edge("for command in macro", "Command", "thin")),
         "heavy edges: 3, all in the line that builds the list. The loop "
         "names none.",
+        height=HEIGHT + 10,
     ),
     29: Panel(
         "Adapter",
