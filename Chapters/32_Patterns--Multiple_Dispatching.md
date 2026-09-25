@@ -23,8 +23,9 @@ broadly means that a function accepts arguments of more than one type.
 It takes three forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
-The form at work in this chapter is the runtime dispatch that inheritance provides,
-which resolves on the type of one object, the one receiving the method call.
+This chapter uses the third form,
+the runtime dispatch that inheritance provides.
+It resolves on the type of one object, the one receiving the method call.
 That is why one method call can resolve only one unknown type.
 
 To dispatch on two unknown types, you need two method calls.
@@ -35,13 +36,13 @@ and the two dispatches go through methods named `compete()` and `eval_*()`.
 If two different type hierarchies interact,
 you need a dispatching method call for each hierarchy.
 
-Python already performs this second dispatch for you when the interaction is an operator:
-`a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines,
-which is how the opening `Number + Number` question resolves
+When the interaction is an operator,
+Python already performs this second dispatch for you:
+`a + b` retries as `b.__radd__(a)` if `a.__add__(b)` declines.
+That retry is how the opening `Number + Number` question resolves
 ([Operators Dispatch Twice](#operators-dispatch-twice) below).
-The rest of this chapter builds the general technique,
-for an interaction that is not an operator, using a game of paper, scissors,
-rock as the working example.
+The rest of this chapter builds the general technique for an interaction that is not an operator,
+with a game of paper, scissors, rock as the working example.
 
 Both versions below share one result type, an enumeration called `Outcome`:
 either `WIN`, `LOSE`, or `DRAW`.
@@ -77,8 +78,8 @@ def duel(item1: Any, item2: Any) -> None:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 ```
 
-`item_pair_gen()` is generic over whichever base class it receives,
-and `__subclasses__()` lists that base's direct subclasses,
+`item_pair_gen()` is generic over whichever base class it receives.
+`__subclasses__()` lists that base's direct subclasses,
 as [`shape_name()`](27_Patterns--Factory.md#simple-factory-method) does.
 `duel()` annotates both parameters `Any` because the two versions below define separate `Item` hierarchies,
 and this file must serve both.
@@ -166,9 +167,9 @@ It resolves `paper` and runs `Paper.eval_scissors()`,
 the one method in which both types are fixed:
 its class is `Paper` and its name says `Scissors`.
 Which competitor does that result describe?
-`Paper.eval_scissors()` returns `WIN`,
-and that is the outcome for the scissors that started the duel,
-not for the `Paper` whose code is running, since scissors cut paper.
+`Paper.eval_scissors()` returns `WIN`.
+Scissors cut paper, so that is the outcome for the scissors that started the duel,
+not for the `Paper` whose code is running.
 Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
 Read that convention the other way,
@@ -187,8 +188,8 @@ A `Protocol` listing the four methods restores the checking,
 at the price of a declaration that repeats every class's method names.
 The table version keeps the checking and declares each name once.
 Its answers are rows in one dictionary,
-so a class is complete the moment it inherits `compete()`,
-and its `Item` declares the one method the dispatch needs, `compete()`,
+so a class is complete the moment it inherits `compete()`.
+Its `Item` declares the one method the dispatch needs, `compete()`,
 so the opponent parameter takes `Item`.
 
 ## One Lookup in a Table
@@ -295,7 +296,7 @@ with no methods to edit across the classes.
 
 The two match types differently.
 `singledispatch` resolves through the MRO,
-so a function registered for a base class is chosen for every subclass,
+so a function registered for a base class serves every subclass,
 while the table matches the class exactly.
 Swapping one for the other changes which pairings the code covers,
 not just how many types it considers.
@@ -329,24 +330,23 @@ print(compete(Origami(), Rock()))
 ```
 
 `Origami()` matches the `Paper()` pattern,
-the same subclass whose lookup `exact_match.py` shows raising `KeyError`.
+though the table lookup in `exact_match.py` raised `KeyError` for the same subclass.
 Unlike `singledispatch`, every case sits together in one block,
 closed the way the table is: adding an `Item` means adding cases,
 not registering a function elsewhere.
 
 ### The `singledispatchmethod` Trap
 
-`functools.singledispatchmethod`
-([Functional Toolkits](41_Functional--Toolkits.md#singledispatchmethod) catalogs it)
+[`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 combines the two dispatches in one decorator.
 It dispatches once on `self` through ordinary method resolution,
-then again on its first argument through `singledispatch`,
-which is the pair of dispatches the `eval_*()` family writes out by hand.
+then again on its first argument through `singledispatch`.
+That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
-One mistake raises no error and prints a plausible answer:
-each class needs its own `@singledispatchmethod`,
-because registering on a shared base gives every subclass one dispatcher,
-and the resolution on `self` then reaches that same dispatcher for every subclass.
+One mistake raises no error and prints a plausible answer.
+Registering on a shared base gives every subclass one dispatcher,
+and the resolution on `self` then reaches that same dispatcher for every subclass,
+so each class needs its own `@singledispatchmethod`.
 Here is the overwrite:
 
 ```python
@@ -382,7 +382,7 @@ Both registrations attach to `Item.compete`,
 the attribute `Paper` and `Rock` both inherit,
 so the second `@register` silently overwrites the first's entry for `Rock`.
 `self`'s type never enters that lookup, so both duels return the same answer,
-even though each was registered against its own class.
+even though each registration went through its own class.
 
 ### Methods or Table
 
@@ -390,19 +390,19 @@ The version most programmers write first is neither the methods nor the table:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
 It works, and it combines the drawbacks of both.
-The type tests repeat in every class as in the method version,
-with the programmer resolving by hand what dispatch would resolve for free,
-and every new `Item` forces an edit to every ladder.
+The type tests repeat in every class, as in the method version,
+and the programmer resolves by hand what dispatch would resolve for free.
+Every new `Item` forces an edit to every ladder.
 Both patterns in this chapter replace it.
 
-The double-dispatch version, with `eval_paper()`, `eval_scissors()`,
-and `eval_rock()` on every class,
-comes from languages where a table keyed by a pair of types is awkward to write.
+The double-dispatch version puts `eval_paper()`, `eval_scissors()`,
+and `eval_rock()` on every class.
+It comes from languages where a table keyed by a pair of types is awkward to write.
 There, spreading the table across the classes is the easier form to write.
 A Python `dict` takes a tuple of classes as a key,
 so the table is both shorter and easier to maintain.
-A table cell can hold a function, so even elaborate behavior fits the table,
-which is what exercise 9 builds.
+A table cell can hold a function, so even elaborate behavior fits the table.
+Exercise 9 builds that version.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
@@ -502,17 +502,18 @@ which answers the `Number + Number` question that opens this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
 Python then tries `type(b).__radd__(b, a)`, the *reflected* form of `__add__()`.
-The first call dispatches on `a`'s type, the fallback on `b`'s,
-and that is double dispatching, built into the language.
+The first call dispatches on `a`'s type, the fallback on `b`'s.
+That is double dispatching, built into the language.
 Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 This fallback is how a type written decades after `int` can add itself to an `int` on the left.
 The in-place forms, `__iadd__()` and its siblings, are a separate family:
 they serve `+=`, and `a + b` never calls one.
-Returning `NotImplemented`
-(a sentinel value, not the lookalike `NotImplementedError` exception)
-hands the operation to the other operand, which the interpreter tries next.
+Returning `NotImplemented` hands the operation to the other operand,
+which the interpreter tries next.
+`NotImplemented` is a sentinel value,
+not the lookalike `NotImplementedError` exception.
 Here is the machinery, with each dispatch traced:
 
 ```python
@@ -572,18 +573,18 @@ Raising a `TypeError` inside `__add__()` ends the expression there,
 since the exception propagates immediately;
 only a returned sentinel makes Python try the right operand's `__radd__()`.
 When both operands have the same type, Python tries `__add__()` alone,
-so `__add__()` by itself resolves `Meters + Meters`,
-and adding two instances of a class that implements `__radd__()` by itself raises a `TypeError`.
+so `__add__()` by itself resolves `Meters + Meters`.
+Adding two instances of a class that implements only `__radd__()` raises a `TypeError`.
 One case reverses the order:
 when the right operand's type is a subclass of the left's and overrides the reflected method,
 Python tries that reflected method first,
 so the subclass's method runs before the base's.
 
-Both methods declare `-> Meters` even though each can return `NotImplemented`,
-and that is the standard convention rather than a shortcut.
+Both methods declare `-> Meters` even though each can return `NotImplemented`.
+That is the standard convention rather than a shortcut.
 Typeshed annotates `timedelta.__add__()` as returning `timedelta`, not a union.
-It can do that because it gives `NotImplemented` a type that inherits from `Any`,
-so returning the sentinel satisfies any declared return type.
+It can do that because it gives `NotImplemented` a type that inherits from `Any`.
+Returning the sentinel then satisfies any declared return type.
 Writing the union out, `Meters | NotImplementedType`,
 makes `ty` reject `(Meters(1) + Meters(2)).n`,
 since the sentinel branch has no `n`.
@@ -605,7 +606,7 @@ what do you do with a type the first dispatch could not resolve?
 The `eval_*()` family and `__add__()` with `__radd__()` answer it with a second dispatch,
 a second method call that resolves the type by running a method lookup.
 The `OUTCOME` table answers it differently.
-`compete()` is defined once on `Item` and every subclass inherits it,
+`Item` defines `compete()` once and every subclass inherits it,
 so `OUTCOME[type(self), type(item)]` is one dictionary lookup keyed on both types at once,
 not a second method resolution.
 The methods perform the second dispatch through a second method call that you write,
@@ -630,10 +631,13 @@ Everywhere else you choose between writing a second dispatch in methods and repl
 3.  In `test_paper_scissors.py`, add `Lizard`'s seven matchups to `EXPECTED`,
     taking it from nine entries to sixteen,
     and confirm both versions still agree with each other and with `EXPECTED`.
-4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter that it updates in place with a tally of every item type it chooses,
-    while still yielding `(item1, item2)` pairs so existing calls need no change.
-    Pass in your own `Counter` and print how many times `Lizard` appeared after iterating over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
-    since the counter fills only as you consume the generator.
+4.  In `arena.py`, give `item_pair_gen()` an optional `counts: Counter[str] | None = None` parameter,
+    and have it update that counter in place with a tally of every item type it chooses.
+    It still yields `(item1, item2)` pairs, so existing calls need no change.
+    The counter fills only as you consume the generator,
+    so pass in your own `Counter`,
+    iterate over all 100 pairs from `item_pair_gen(Item, 100, counts)`,
+    and then print how many times `Lizard` appeared.
 5.  Give `Meters` a `__sub__()` and a `__rsub__()`.
     `__sub__()` handles a `Meters`, an `int`, or a `float`,
     and returns `NotImplemented` for anything else.
