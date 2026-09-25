@@ -49,9 +49,8 @@ the deliberate choice; the section stays where it is.
 proposed either a closing three-sentence passage or two exercises, on the
 grounds that the chapter currently stops on a table row and also closes Part
 III. Declined. (The separately-proposed "Patterns Python Absorbed" table *was*
-accepted and is in the chapter; that is not the rejected part.) Chapters 39 and
-41 are the book's only two without exercises, and the absence is deliberate for
-both.
+accepted and is in the chapter; that is not the rejected part.) Chapter 39 is
+the book's only chapter without exercises, and the absence is deliberate.
 
 **Do not narrate tool-version history.** Two 2026-08-11 blocks proposed keeping
 a record of what `ty` used to get wrong (46_Effects--Stateless's PEP 695 alias gap,
