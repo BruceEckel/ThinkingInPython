@@ -17,10 +17,9 @@ a method call resolves the type of only one of them, its receiver.
 You end up testing the other type by hand,
 writing out the dispatch the language performed for the first one.
 
-The solution is *Multiple Dispatching*.
-[Polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism)
-broadly means that a function accepts arguments of more than one type.
-It takes three forms.
+That dispatch is one form of [polymorphism](20_Patterns--Rethinking_Objects.md#what-is-polymorphism),
+which broadly means that a function accepts arguments of more than one type.
+Polymorphism takes three forms.
 Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
 This chapter uses the third form,
@@ -28,7 +27,8 @@ the runtime dispatch that inheritance provides.
 It resolves on the type of one object, the one receiving the method call.
 That is why one method call can resolve only one unknown type.
 
-To dispatch on two unknown types, you need two method calls.
+The solution is *Multiple Dispatching*: to dispatch on two unknown types,
+you need two method calls.
 The first resolves the first type, and the second resolves the second.
 Two unknown types means two dispatches, which is *double dispatching*.
 In the example below, both interacting objects come from a single hierarchy,
@@ -174,8 +174,9 @@ Every `eval_*()` method answers for the original caller,
 the type named in the method's own name.
 Read that convention the other way,
 and every result in the class appears reversed.
-Each `eval_*()` method also receives an `item` argument, the original caller:
-the same object `compete()` held as `self` before passing it as the argument.
+
+That original caller arrives in each `eval_*()` method as its `item` argument:
+the same object `compete()` held as `self` before passing it along.
 This game ignores it, since the outcome depends on the two types alone.
 A richer game reads the caller's state through it.
 
@@ -250,8 +251,9 @@ if __name__ == "__main__":
 #: Scissors <--> Scissors : draw
 ```
 
-Dictionary keys are flexible.
-A tuple works as a key, the same as a single object.
+Dictionary keys are flexible: a tuple works as a key,
+the same as a single object.
+
 The lookup shares two properties with the [table-driven state machine](31_Patterns--State_Machines.md#the-engine).
 It matches classes exactly, so a subclass of `Paper` needs rows of its own.
 And a missing pair raises a `KeyError` at the first duel that needs it,
@@ -343,8 +345,8 @@ It dispatches once on `self` through ordinary method resolution,
 then again on its first argument through `singledispatch`.
 That is the pair of dispatches the `eval_*()` family writes out by hand.
 Like `singledispatch`, it matches on the MRO rather than exactly.
-One mistake raises no error and prints a plausible answer.
-Registering on a shared base gives every subclass one dispatcher,
+One mistake raises no error and prints a plausible answer:
+a `@singledispatchmethod` declared on a shared base gives every subclass one dispatcher,
 and the resolution on `self` then reaches that same dispatcher for every subclass,
 so each class needs its own `@singledispatchmethod`.
 Here is the overwrite:
@@ -401,8 +403,9 @@ It comes from languages where a table keyed by a pair of types is awkward to wri
 There, spreading the table across the classes is the easier form to write.
 A Python `dict` takes a tuple of classes as a key,
 so the table is both shorter and easier to maintain.
-A table cell can hold a function, so even elaborate behavior fits the table.
-Exercise 9 builds that version.
+A table cell can hold a function, so even elaborate behavior fits the table;
+exercise 9 builds that version.
+
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
@@ -502,18 +505,18 @@ which answers the `Number + Number` question that opens this chapter.
 `a + b` first tries `type(a).__add__(a, b)`.
 If that returns the special value `NotImplemented`,
 Python then tries `type(b).__radd__(b, a)`, the *reflected* form of `__add__()`.
+`NotImplemented` is a sentinel value,
+not the lookalike `NotImplementedError` exception,
+and returning it hands the operation to the other operand for the interpreter to try next.
 The first call dispatches on `a`'s type, the fallback on `b`'s.
 That is double dispatching, built into the language.
+The fallback is how a type written decades after `int` can add itself to an `int` on the left.
+
 Every arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
-This fallback is how a type written decades after `int` can add itself to an `int` on the left.
 The in-place forms, `__iadd__()` and its siblings, are a separate family:
 they serve `+=`, and `a + b` never calls one.
-Returning `NotImplemented` hands the operation to the other operand,
-which the interpreter tries next.
-`NotImplemented` is a sentinel value,
-not the lookalike `NotImplementedError` exception.
 Here is the machinery, with each dispatch traced:
 
 ```python
