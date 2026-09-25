@@ -3,7 +3,7 @@
 [Effect Management](44_Effects--Effect_Management.md#library-effect-management)
 introduced library Effect systems.
 [Stateless](https://github.com/suned/stateless)
-is a library that implements an Effect Management System (EMS).
+implements an Effect Management System (EMS).
 
 Stateless encodes an Effect's dependencies and failures into the return type of a function,
 and a type checker verifies that every caller either absorbs the Effects or carries them forward.
@@ -51,8 +51,7 @@ For example:
 Effect[Need[Console], KeyError, None]
 ```
 
-This particular Effect needs a `Console`, can fail with a `KeyError`,
-and produces nothing.
+This Effect needs a `Console`, can fail with a `KeyError`, and produces nothing.
 The first parameter is `Need[Console]` rather than `Console`:
 the Effect asks for a console, and something else supplies one later.
 [Nothing Runs Yet](#nothing-runs-yet)
@@ -196,9 +195,9 @@ Generator[Need[Console] | KeyError, Any, None]
 `A` and `E` share the first type parameter, and `R` is the third.
 Nothing in the union itself tells a request from a failure;
 two bounds on the library's type variables do that instead.
-`A` is bound to `Ability[Any]`
+`A`'s bound is `Ability[Any]`
 ([Waiting on a Coroutine](#waiting-on-a-coroutine) states the rule for `Depend`),
-and `E` is bound to `Exception`,
+and `E`'s bound is `Exception`,
 so a class that subclasses both satisfies each bound at once.
 No listing here builds one.
 At runtime, `run()`'s driver tells the two apart with `case Exception() as error`:
@@ -268,7 +267,7 @@ In your own code, first check what the library declares.
 ## Nothing Runs Yet
 
 Calling `greet()` performs no work.
-It simply returns a `Generator`:
+It returns a `Generator`:
 
 ```python
 # describe_only.py
@@ -354,7 +353,7 @@ if __name__ == "__main__":
 ```
 
 `reveal_type()` is a message to the type checker.
-At runtime it only prints the class of its argument (`function`, here)
+At runtime it prints only the class of its argument (`function`, here)
 to standard error, so the answer comes from `ty check reveal_bound.py`:
 
 ```text
@@ -372,8 +371,8 @@ info[revealed-type]: Revealed type
    |                 ^^^^^ `(name: str) -> Generator[Never, Any, None]`
 ```
 
-`greet` is a function `ty` knows by name,
-while `bound` is a function `supply()` builds, described by its signature alone.
+`greet` is a function `ty` knows by name;
+`bound` is a function `supply()` builds, described by its signature alone.
 These are the expanded forms of `Depend[Need[Console], None]` and `Success[None]`.
 `Need[Console]` sits in the first type parameter of `greet` and disappears from `bound`,
 leaving the `Never` from the alias table.
@@ -428,8 +427,8 @@ run(fallback(chosen)("Bob"))
 #: [chosen] Hello, Bob!
 ```
 
-`fallback` is an ordinary handler, applied at the edge,
-while `chosen` is a second handler already applied to `greet`.
+`fallback` is an ordinary handler, applied at the edge;
+`chosen` is a second handler already applied to `greet`.
 The first run has nothing between `greet()` and that edge,
 so the default answers.
 The second wraps `greet()` in its own `supply()` first,
@@ -587,8 +586,8 @@ def test_greet() -> None:
     assert recorder.messages == ["Hello, Alice!"]
 ```
 
-The test needs no `capsys`, no monkeypatching of `print`, and no mock.
-It supplies a different `Console`, while `greet()` stays unchanged and unaware.
+The test captures nothing from stdout and mocks nothing:
+it supplies a different `Console`, and `greet()` stays unchanged and unaware.
 
 `as_type(Console)` is the only ceremony in that test.
 It says "treat this recorder as a `Console`,"
@@ -842,8 +841,8 @@ A new `Material` is a new row.
 Dependencies as parameters serve this test as well,
 because `holds(material, nailer)` is easy to call four times.
 The two styles diverge when the dependency sits three calls deep.
-The parameter version then adds two parameters to every function on the path,
-while this version still changes only the row.
+The parameter version then adds two parameters to every function on the path;
+this version still changes only the row.
 `audit_log.py`'s `greet_all()` is that depth: the test calls `greet_all()`,
 `greet_all()` calls `greet_logged()`,
 and `greet_logged()` requests `Need[Log]` and calls `greet()`,
@@ -916,7 +915,7 @@ so a test meant to record performs live console I/O.
 
 ### An Interface Instead of a Base Class
 
-Stateless's own `Console` can only be replaced by a subclass.
+Only a subclass can replace Stateless's own `Console`.
 [Builtin Dependencies](#builtin-dependencies) named it a concrete class,
 and its accessors name that class,
 so `isinstance()` accepts an instance of the class or a subclass and nothing else.
@@ -956,7 +955,7 @@ and `isinstance()` accepts only a `@runtime_checkable` Protocol,
 so the Protocol carries that decorator;
 without it the first request raises a `TypeError`.
 
-`as_type()` is still needed.
+You still need `as_type()`.
 This listing supplies a `Terminal` both ways:
 
 ```python
@@ -989,7 +988,7 @@ which leaves `greet()`'s `Need[Console]` in place;
 the unhandled request passes through to `run()`, where the error appears.
 An interface needs the `as_type()` upcast more than a base class does:
 you can instantiate a concrete `Console` and supply it directly,
-while an interface reaches `supply()` only through an implementation.
+but an interface reaches `supply()` only through an implementation.
 
 `console_protocol.py` is the form to write in production.
 Most listings in these two chapters use a concrete `Console` instead,
@@ -1390,7 +1389,7 @@ The run also prints a `RuntimeWarning` to standard error, which the output above
 (standard output only) omits.
 `run()` builds the `run_async()` coroutine and hands it to `asyncio.run()`,
 which raises a `RuntimeError` because a loop is already running,
-so the coroutine is never awaited.
+so nothing awaits the coroutine.
 The warning is harmless, since that coroutine never starts,
 and it is a reliable sign of this mistake:
 it appears whenever asynchronous code calls `run()`.
@@ -1499,8 +1498,8 @@ def announce(
     console.print(f"{name}: {value}")
 ```
 
-This uses all three parameters of `Effect[A, E, R]`.
-`announce()` needs a `Console`, can fail with `KeyError`, and produces nothing.
+`announce()` uses all three parameters of `Effect[A, E, R]`:
+it needs a `Console`, can fail with `KeyError`, and produces nothing.
 If you drop the `KeyError` from the annotation,
 `ty` points at the `yield from score(name)` line.
 Every function on the path has to declare it.
