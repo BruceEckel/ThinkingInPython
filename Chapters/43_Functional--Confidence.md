@@ -44,9 +44,9 @@ an implementation may cache the call, run the two calls in either order,
 or skip the second.
 The language has no way to mark `add()` as pure,
 so CPython leaves all three to you.
-You can also reason about the code by substitution,
-the same move you make in algebra.
-Referential transparency lets you check parts of a program,
+The same substitution serves your reasoning as well as the machine's optimization:
+you can reason about the code by replacing a call with its value,
+the move you make in algebra, and so check parts of a program,
 and sometimes prove them correct.
 
 Substitution stops working the moment a function reads or writes outside itself.
@@ -98,14 +98,13 @@ It is not.
 The call also appends to `cart`, and the list put in its place appends nothing.
 Substitute the list for either call and `cart` ends with one `'eggs'` fewer.
 
-Referential transparency also makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
-safe.
-A memoizer can return a stored result because the call is interchangeable with its value.
+Referential transparency is what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
+safe: a memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
-from a cache to a database query planner,
-benefits from referential transparency.
-The more your program is referentially transparent, the more of it a machine,
-or a proof, can verify.
+from a cache to a database query planner, benefits the same way,
+and the more of your program is referentially transparent,
+the more of it a machine, or a proof, can verify.
+
 Caching an impure function returns wrong values and raises no exception.
 `withdraw()` reads and writes `balance`,
 so decorating it with `lru_cache` leaves `balance` wrong:
@@ -189,6 +188,7 @@ which the operating system places on separate cores.
 The `assert` passes on every run,
 because a pure call returns the same answer whichever process runs it,
 and whenever.
+
 The limits above are large enough for the difference to show.
 On the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
@@ -301,11 +301,12 @@ print("1000 random cases passed")
 
 The law is "decoding an encoding returns the original,"
 and it holds for every input the loop tries.
-A property test states what must always be true.
-The machine searches for a counterexample.
+That is the shape of every property test:
+a law that states what must always be true,
+and a machine that searches for a counterexample.
 A bare `assert` like this one reports a broken law as an `AssertionError`,
-and the traceback shows the assert's source line but not the value that broke it.
-To find that value, you add a `print()` and rerun by hand.
+and the traceback shows the assert's source line but not the value that broke it,
+so to find that value you add a `print()` and rerun by hand.
 
 ### The Same Law in Hypothesis
 
@@ -390,11 +391,13 @@ so the round trip returns a different string.
 This is the unusual Unicode the hand loop's alphabet kept out of reach.
 Hypothesis found it by drawing from a wider alphabet,
 treating `decode()` as opaque throughout.
+
 `derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` discards the example database,
 so every run searches from scratch.
 A real test keeps the defaults.
+
 This function exists to fail, and a failing `test_` function fails the build.
 Its name therefore drops the `test_` prefix,
 and the listing calls it directly inside a `try`.
@@ -416,7 +419,8 @@ Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
-All of these require purity.
+
+Every shape in the family requires purity:
 Hypothesis can rerun and shrink freely because each call depends on its arguments alone.
 
 ## Affordable Proof
