@@ -33,16 +33,15 @@ print(low is low2, high is high2)
 #: True False
 ```
 
-Both `int("256")` calls return the same cached object,
-while each `int("100000")` call builds a fresh one.
+Both `int("256")` calls return the same cached object;
+each `int("100000")` call builds a fresh one.
 The cache covers a fixed range of values chosen at CPython build time.
 The range usually quoted is `-5` through `256`, but each build picks its own.
 This build caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
 
-The listing parses each value from a string for a reason.
-The compiler pools equal constants within one code object, so with literals
-(`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
+The listing parses each value from a string because the compiler pools equal constants within one code object:
+with literals (`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
 That sharing comes from the pooling, not from the integer cache.
 Because the result of `is` on a literal depends on details like this pooling,
 Python emits a `SyntaxWarning` for it.
@@ -205,7 +204,7 @@ def test_direct_construction_bypasses_pool() -> None:
 
 ### Freezing the Shared Tile
 
-Freezing `Tile` is what makes sharing it safe.
+Freezing `Tile` makes sharing it safe.
 A frozen tile keeps its values for its whole life,
 so every cell that shares it reads the same values on every visit.
 
@@ -216,7 +215,7 @@ The freezing must hold all the way down.
 A record blocks assignment to a field, not mutation inside one,
 so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile,
 the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
-Every field here is immutable, which makes the sharing safe.
+Every field here is immutable, so the sharing is safe.
 
 ## Interning in the Constructor
 
@@ -325,7 +324,7 @@ populate the pool eagerly or guard the insert with a lock.
 Both pools so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` grows with every new color.
-For tile kinds and colors that is fine, since the set of values is small.
+Tile kinds and colors are small sets, so holding them forever costs little.
 When the set keeps growing, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
@@ -373,8 +372,7 @@ The pool guarantees sharing and lets each object's other references decide its l
 the same design as `sys.intern()`.
 
 If you want a bounded pool instead,
-`functools.lru_cache(maxsize=n)` gives the factory an eviction policy,
-and holds the most recent `n` alive by itself.
+`functools.lru_cache(maxsize=n)` gives the factory an eviction policy and holds the most recent `n` alive by itself.
 An eviction ends the guarantee.
 Requesting an evicted value builds a fresh object,
 equal to any surviving original and distinct from it.
@@ -467,7 +465,7 @@ With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 skipping `Tile.__new__()` so the call does not recurse.
 `_value_` is a name Enum's metaclass reads,
 to build the `Tile(".")` lookup table and the member's `repr()`,
-so `__new__()` must assign to that exact name rather than something like `_symbol_`.
+so `__new__()` must assign to that exact name rather than a name of its own such as `_symbol_`.
 
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
@@ -509,8 +507,8 @@ error[invalid-return-type]: Function can implicitly return
 The function returns `None` implicitly for `Tile.ROCK`,
 the member the `match` leaves out, and adding that case clears the diagnostic.
 
-The enum gives up loading at runtime: `tile()` could load `SPECS` from a file,
-while `Tile.GRASS` is source code.
+The enum gives up loading at runtime: `tile()` could load `SPECS` from a file;
+`Tile.GRASS` is source code.
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
 builds on an `Enum` the same way, using the enum's members as shared,
 comparable states.
@@ -541,7 +539,7 @@ Dataframe libraries such as pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
-In every case the benefit is the same:
+The benefit is the same in all three:
 memory proportional to the number of distinct values, not the number of uses.
 When every instance of a type comes from the pool,
 you can write its equality checks as `is`.
