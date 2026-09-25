@@ -43,10 +43,10 @@ Because `add(2, 3)` and `5` are interchangeable,
 an implementation may cache the call, run the two calls in either order,
 or skip the second.
 The language has no way to mark `add()` as pure,
-so CPython applies none of the three and leaves them to you.
-You can also reason about the code by substitution,
-the same move you make in algebra.
-Referential transparency lets you check parts of a program,
+so CPython leaves all three to you.
+The same substitution serves your reasoning as well as the machine's optimization:
+you can reason about the code by replacing a call with its value,
+the move you make in algebra, and so check parts of a program,
 and sometimes prove them correct.
 
 Substitution stops working the moment a function reads or writes outside itself.
@@ -71,13 +71,13 @@ print(70 + withdraw(30))
 
 The first `withdraw(30)` evaluates to `70`,
 so substituting `70` for it ought to change nothing.
-It changes `110` into `140`.
+The substitution changes `110` into `140`.
 `withdraw()` is not referentially transparent,
-and any expression containing it inherits the problem,
-so substitution reasoning stops at the first impure call.
+and any expression containing it inherits the problem.
+Substitution reasoning stops at the first impure call.
 
-`global` is not the only way to break substitution.
-A function that mutates an argument breaks it too, with no global in sight:
+A `global` statement is one way to break substitution.
+A function that mutates an argument is another:
 
 ```python
 # mutates_argument.py
@@ -95,20 +95,19 @@ print(cart)
 Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
-The call also appends to `cart`, a change substitution cannot see,
-so calling it twice leaves `cart` different from calling it once.
+The call also appends to `cart`, and the list put in its place appends nothing.
+Substitute the list for either call and `cart` ends with one `'eggs'` fewer.
 
-Referential transparency also makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
-safe.
-A memoizer can hand back a stored result because the call is interchangeable with its value.
+Referential transparency is what makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
+safe: a memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
-from a cache to a database query planner,
-benefits from referential transparency.
-The more your program is referentially transparent, the more of it a machine,
-or a proof, can verify.
-Caching an impure function breaks silently instead of raising an exception.
-`withdraw()` is not referentially transparent,
-so decorating it with `lru_cache` corrupts its own bookkeeping:
+from a cache to a database query planner, benefits the same way,
+and the more of your program is referentially transparent,
+the more of it a machine, or a proof, can verify.
+
+Caching an impure function returns wrong values and raises no exception.
+`withdraw()` reads and writes `balance`,
+so decorating it with `lru_cache` leaves `balance` wrong:
 
 ```python
 # cached_withdraw.py
@@ -129,23 +128,25 @@ print(f"balance: {balance}")
 ```
 
 Two withdrawals of `30` should leave `balance` at `40`.
-The second call is a cache hit,
-so `withdraw()` never runs a second time and never subtracts the second `30`,
-with no error to report the loss.
-`lru_cache` trusts every call it wraps to be referentially transparent,
-and nothing in the language checks that trust.
+The second call is a cache hit, so `withdraw()` runs once, subtracts one `30`,
+and hands back the stored `70` the second time.
+Nothing reports the skipped subtraction.
+`lru_cache` returns the stored result for any repeated arguments,
+and nothing in the language checks that the function it wraps is referentially transparent.
 
 ## Automatic Parallelism
 
 A pure function is automatically parallelizable.
-Each call depends only on its arguments, so no call can affect another.
+Each call's answer comes from its arguments alone,
+so no call can affect another.
 The calls can run in any order, on any schedule, on any number of cores,
-and the answers do not change.
+and the answers stay the same.
 
-Impure code has no such freedom.
-Two parallel `withdraw()` calls could both read `balance` before either writes it back,
-and one withdrawal vanishes.
-A lock makes that safe, and the lock serializes the work you wanted to overlap.
+Shared state takes that freedom away.
+Two parallel `withdraw()` calls could both read `balance` before either writes it back.
+The second write then overwrites the first, so `balance` records one withdrawal.
+A lock makes the two calls safe,
+and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it: with nothing shared,
 a lock has nothing to guard.
 
@@ -186,31 +187,31 @@ if __name__ == "__main__":
 `pool.map()` sends the same calls to worker processes,
 which the operating system places on separate cores.
 The `assert` passes on every run,
-because a pure call returns the same answer no matter which process runs it,
-or when.
-The limits above are large enough for the difference to show:
-on the machine that built this book,
-the serial run took a few seconds and the parallel run about half that,
-comfortably clearing the 1.3x margin the last line checks.
-Smaller limits finish before spawning the worker processes pays for itself,
-so a reader who shrinks the limits back down will watch parallel lose.
-Purity makes parallel safe.
-It says nothing about whether parallel is worth it at a given size.
-No locks, no queues, no shared state:
-a pure function is ready to run in parallel, unchanged.
+because a pure call returns the same answer whichever process runs it,
+and whenever.
 
-Purity makes the calls safe to run together.
-It does not make them easy to move.
-Each argument and each result pickles to cross the process boundary,
-and the function travels by name,
-so `count_primes()` must live at the top level of a module a worker can import.
+The limits above are large enough for the difference to show.
+On the machine that built this book,
+the serial run took a few seconds and the parallel run about half that,
+well over the 1.3x margin `faster` checks.
+At smaller limits the serial run finishes before a pool has started its workers,
+so if you shrink the limits back down,
+the parallel run takes longer than the serial one.
+Purity makes parallel safe.
+Whether parallel pays at a given size is a separate question,
+and the timing answers it.
+
+Sending the calls to a worker adds requirements of its own.
+Each argument and each result pickles to cross the process boundary.
+The function pickles as its qualified name,
+so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
-and that rules out two shapes these chapters favor.
-A `functools.partial` survives,
-because it pickles as its wrapped function plus its bound arguments.
+and that rules out two shapes these chapters use often.
+A `functools.partial` pickles as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
-and without the guard every worker builds a pool of its own.
+and without the guard each worker re-runs the pool-building code,
+which fails in the worker with a `RuntimeError` and in the parent with `BrokenProcessPool`.
 [Concurrency](19_Techniques--Concurrency.md#parallelism)
 covers the pickling boundary and the guard,
 along with the reasons Python parallelism uses processes rather than threads.
@@ -223,58 +224,58 @@ Purity, immutability, and referential transparency,
 the properties these chapters build, provide confidence at every level.
 
 Style contributes before the first rung.
-*Declarative* code states the result you want,
-while *imperative* code spells out each step to produce it.
+*Declarative* code states the result you want;
+*imperative* code spells out each step to produce it.
 A [comprehension](16_Techniques--Comprehensions.md) names the result,
-"the squares of the even numbers,"
-and [`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
+"the squares of the even numbers."
+[`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
 the way [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
 takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
-It also leaves the runtime free to choose the steps, which is why a SQL query,
-a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see.
+It also leaves the runtime free to choose the steps, so a SQL query,
+a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never call directly.
 
 You decide how far up the spectrum to go.
 
-1. The cheapest rung is local reasoning.
+1. The first rung, local reasoning, takes the least work.
    Pure functions and immutable values let you understand one piece at a time,
-   with no hidden state to carry in your head.
+   with no hidden state to keep track of.
    Most code needs no more.
 2. Next are tests over chosen examples,
    the subject of [Testing](11_Techniques--Testing.md).
-   Each one pins a single input to a single answer,
-   so what you learn is no wider than the examples you invent.
+   Each one checks a single input against a single answer,
+   so the examples you invent bound what you learn.
 3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
    Python's version of it is partial.
    An `Any`, a `cast()`,
-   or data arriving from outside the program leaves a gap no type checker can close,
-   so the theorem holds only as far as the annotations do.
-   Running `ty` over the examples in this book still rules out a useful class of mistakes,
+   or data arriving from outside the program leaves a value the type checker takes on trust,
+   so the theorem holds exactly as far as the annotations reach.
+   Running `ty` over the examples in this book catches a useful class of mistakes,
    and that is most of what this rung offers.
 4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
-   It searches for a counterexample instead of proving the law,
+   The check searches for a counterexample instead of proving the law,
    and that search is the falsifiability the opening requires of a science.
-   The climb from rung 3 is in expressiveness, not certainty.
-   A type states only what shape a value has.
-   A property can state a fact about its behavior,
+   What this rung adds to rung 3 is expressiveness, not certainty.
+   A type states what shape a value has.
+   A property can state a fact about the value's behavior,
    at the cost of checking a sample of inputs instead of every one.
 5. At the top is formal proof.
    In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
    and a machine checks the proof.
-   This is real, but rare outside specialized work.
+   Formal proof is real, but rare outside specialized work.
 
 ## Property-Based Testing
 
 You can write a property check by hand,
 looping over random inputs and asserting the law.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
-does the same thing with sharper inputs,
+does the same thing with inputs it chooses at boundaries and unusual values,
 and shrinks any failure to a minimal counterexample:
 
 ```python
@@ -301,20 +302,22 @@ print("1000 random cases passed")
 
 The law is "decoding an encoding returns the original,"
 and it holds for every input the loop tries.
-A property test states what must always be true.
-The machine searches for a counterexample.
-A bare `assert` like this one reports only `AssertionError` if the law fails.
-Python prints the assert's source code, not the value that broke it,
-so finding the failing input means adding a `print()` and rerunning by hand.
+That is the shape of every property test:
+a law that states what must always be true,
+and a machine that searches for a counterexample.
+A bare `assert` like this one reports a broken law as an `AssertionError`,
+and the traceback shows the assert's source line but not the value that broke it,
+so to find that value you add a `print()` and rerun by hand.
 
 ### The Same Law in Hypothesis
 
 Hypothesis turns the hand-written loop into a declaration.
-You describe the inputs with a *Strategy* and state the law once,
+You describe the inputs with a *strategy*,
+Hypothesis's name for an input generator, and state the law once,
 as a normal `test_` function.
-The framework supplies the cases,
-drawing on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
-so it reaches inputs the loop cannot produce, such as unusual Unicode:
+The framework supplies the cases.
+It draws on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
+so it reaches inputs the loop never tries, such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -334,21 +337,25 @@ def test_roundtrip(sample: str) -> None:
 The listing repeats the two functions rather than importing them,
 because importing `property_check.py` runs its thousand-iteration loop inside the test run.
 
-`@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
+`@given(strategies.text())` calls `test_roundtrip()` once per generated string.
 By default Hypothesis generates a hundred of them,
-a tenth of the hand-written loop's thousand, and they still cover more ground,
-because Hypothesis aims at boundaries and oddities instead of sampling evenly.
+a tenth of the hand-written loop's thousand.
+Those hundred strings cover more of the input space,
+because Hypothesis generates boundary values and unusual characters instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input,
-the first improvement over the bare `assert` above.
+the first improvement over `property_check.py`'s bare `assert`.
 It also shrinks that input to the smallest example that still fails,
 a second improvement,
-so the bug surfaces as the clearest case rather than a random one.
+so Hypothesis reports the bug as the smallest case rather than a random one.
 The framework automates falsification.
 
 ### Shrinking a Failure
 
-The two listings above both pass, so nothing has shrunk yet.
-The next codec has a bug, and it is the Unicode gap promised earlier:
+`property_check.py` and `test_property.py` both pass,
+and shrinking needs a failure.
+The next codec has a bug,
+and the bug is the unusual-Unicode case [The Same Law in Hypothesis](#the-same-law-in-hypothesis)
+mentions:
 
 ```python
 # shrinking.py
@@ -376,23 +383,28 @@ except AssertionError as e:
 
 `encode()` still turns text into UTF-8 bytes,
 but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
-The two agree on the 128 ASCII code points,
-so `property_check.py`'s five-letter alphabet, built only from those,
-can run all thousand cases and never reach the mismatch.
-Hypothesis draws from the full range a Python string holds,
-and shrinks its failure down to the smallest code point outside that agreement,
+UTF-8 and Latin-1 agree on the 128 ASCII code points,
+and `property_check.py`'s five-letter alphabet sits inside those.
+Every string its loop builds decodes the same way under both,
+so all thousand cases pass.
+Hypothesis draws from every character UTF-8 can encode.
+It shrinks its failure down to the smallest code point outside that agreement,
 `'\x80'`, the first character UTF-8 needs more than one byte to encode.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
-so the round trip breaks.
-This is the unusual Unicode the hand loop's alphabet could never draw,
-found because Hypothesis draws from a wider alphabet,
-not because it guesses the bug.
-`derandomize=True` fixes the search so this book gets the same answer every run,
+so the round trip returns a different string.
+That code point is the unusual Unicode the hand-written loop's alphabet kept out of reach.
+Hypothesis found it by drawing from a wider alphabet,
+treating `decode()` as opaque throughout.
+
+`derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
-`database=None` keeps it from replaying a case an earlier run saved.
-A real test needs neither.
-This function exists to fail, and a failing `test_` function fails the build,
-so its name drops the `test_` prefix and the listing calls it directly inside a `try`.
+`database=None` discards the example database,
+so every run searches from scratch.
+A real test keeps the defaults.
+
+`roundtrip()` exists to fail, and a failing `test_` function fails the build.
+`roundtrip()` therefore drops the `test_` prefix from its name,
+and the listing calls it directly inside a `try`.
 
 ### A Family of Property Shapes
 
@@ -401,42 +413,42 @@ and knowing the family is most of the skill.
 An *invariant* states a fact about every output:
 sorting produces an ordered list.
 *Idempotence* states that repeating changes nothing:
-sorting a sorted list leaves it alone.
+sorting a sorted list returns the same order.
 An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
-The trap to avoid is a property that restates the implementation.
+The mistake to avoid is a property that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
-All of these lean on purity.
-Hypothesis can rerun and shrink freely because each call is independent of every other.
+
+Every shape in the family requires purity:
+Hypothesis can rerun and shrink freely because each call depends on its arguments alone.
 
 ## Affordable Proof
 
-Two caveats keep the chapter's argument from overreaching.
+Two caveats limit the chapter's argument.
 First, proof works on imperative code too:
 Hoare logic and tools like Dafny verify it.
 What purity changes is the cost.
 With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.
-Haskell programmers rarely prove a program correct.
-They lean on types and on reasoning by substitution,
-and save full proof for the few places that earn it.
+Haskell programmers rely on types and on reasoning by substitution,
+and write a full proof for the few places that need one.
 
-The thread running through these chapters is not that functions are special.
+The claim these chapters share is not that functions are special.
 It is that purity, immutability,
-and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
-Proof is the far end of that distance.
-The everyday win is everything below it: code you can read, check,
+and referential transparency reduce the work of turning "I believe this is correct" into "I can show why."
+A full proof does all of that work.
+The everyday gain comes from doing part of it: code you can read, check,
 and test as statements about what is true.
-That, more than the presence of functions,
+That gain, more than the presence of functions,
 is the "functionality" the introduction sets out to find.
 
-Part V takes the same discipline one step further and asks the type checker to enforce it:
+Part V extends the same discipline and asks the type checker to enforce it:
 [Effect Management](44_Effects--Effect_Management.md)
 puts a function's effects in its signature,
 and the chapters after it build a checked system on that idea.
@@ -447,28 +459,28 @@ and the chapters after it build a checked system on that idea.
     Narrow `assert parallel == serial` to compare only the counts,
     since the serial run now carries the parent's ID and the parallel one carries the workers'.
     Compare the number of distinct IDs to `os.process_cpu_count()`,
-    and run it three times before deciding what it means.
+    and run `parallel_pure.py` three times before deciding what that number means.
 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
-3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
+3.  Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](#a-family-of-property-shapes):
     an invariant (every adjacent pair of the output is in order) and idempotence
     (sorting a sorted list changes nothing).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
-    run it a few times to see which characters it settles on,
-    and explain what they reveal about Unicode case mapping.
+    run the test a few times to see which characters Hypothesis reports,
+    and explain what those characters reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
     Then break `group_rounds()` on purpose, run the test twice,
-    and confirm the same counterexample arrives both times:
+    and confirm Hypothesis reports the same counterexample both times:
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that changes the program's behavior,
-    then rewrite it so the value arrives as an argument.
+    then rewrite the function so the value arrives as an argument.
 7.  Take the `describe()` function from [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
-    Count the lines, then run `ty` on both and compare what each one knows about the value inside the `Ok`.
+    Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
