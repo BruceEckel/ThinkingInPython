@@ -140,7 +140,7 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-This chapter imports that chapter's `result.py` and `safe.py` helpers unchanged.
+This chapter reuses that chapter's `result.py` and `safe.py` helpers.
 If you decorate the original `slope()`, unchanged,
 every exception it raises becomes a value instead of a crash:
 
@@ -260,7 +260,7 @@ so it needs no `try` and no `Result` to say so.
 
 ### Combine the First and Third
 
-All three approaches take the division failure out of `slope()`,
+All three approaches keep a division by zero from escaping `slope()` as an exception,
 but each puts the handling in a different place.
 A `Result` makes every caller handle failure explicitly, at every call site.
 `@safe` catches `Exception`,
@@ -362,8 +362,8 @@ Effect Management keeps the Effects and isolates them,
 so the rest of the program can stay pure.
 People call this "pushing the Effects to the edges."
 
-So why track them at all?
-The first and most obvious reason is parallelism.
+What does keeping the rest pure buy you?
+The first and most obvious answer is parallelism.
 A function with no Effects reads and writes nothing shared,
 so it is safe to run in parallel.
 The same guarantee makes testing trivial.
@@ -376,7 +376,8 @@ Think of Effect analysis as two phases.
 The first phase separates pure from impure, and produces parallelism, caching,
 and easy testing for the pure part.
 
-The next phase produces one benefit per subdivision:
+The second phase divides the impure part by kind,
+and each kind yields its own benefit:
 
 - **Exceptions** become data,
   as [Converting Effectful to Pure](#converting-effectful-to-pure)
@@ -439,7 +440,7 @@ the same Effect belongs in that function's type,
 and so on out to the edge of the program.
 A native system adds each Effect for you;
 a library like Stateless has you declare each one,
-then verifies the declaration.
+and the type checker verifies each declaration.
 With an EMS, the function signature tells you whether the function is pure,
 and for an impure function it names the kinds of impurity.
 
@@ -591,9 +592,9 @@ print(captured.messages)
 `session()`, `menu()`, and `main()` never call `ask.ask()` or `tell.tell()`,
 yet each must name both parameters only to pass them to the function below it.
 Nothing propagates automatically.
-If you add a `Log` Effect three levels down,
+If a new helper that `greet()` calls needs a `Log` Effect,
 you edit every signature on the path: `greet()`, `session()`, `menu()`,
-and `main()`, plus the new function that logs, five signatures in all.
+and `main()`, plus the new helper, five signatures in all.
 Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
 but you must tell the injector what every function needs,
@@ -612,8 +613,8 @@ Setting the wrong one, or forgetting to set one, fails at the read,
 in whatever frame reads it.
 The bookkeeping stays, and the type checker can no longer verify it.
 An EMS moves the bookkeeping into the type system,
-where a native system maintains it for you,
-and a library like Stateless verifies every declaration you write.
+where a native system maintains it for you, or, with a library like Stateless,
+the type checker verifies every declaration you write.
 That takes a second channel in the signature,
 one that carries Effect information without occupying the argument list.
 
@@ -709,6 +710,8 @@ plus handlers that receive the continuation.
 
 A Python generator suspends a computation,
 hands control to whoever is driving it, and resumes it with a value.
+That makes a suspended generator a continuation you can resume once or discard,
+but never resume twice, because nothing can copy a generator's paused frame.
 [Generators](45_Effects--Generators.md) covers the full two-way form,
 the mechanism behind the Python Effect library in [Stateless](46_Effects--Stateless.md).
 
@@ -842,8 +845,8 @@ and an AI can start using that language as soon as it works,
 so adoption skips the years a human language spends waiting for people to learn it.
 
 Most of these are tracking systems,
-in the sense [Effect Management Systems](#tracking-and-management)
-gives the term: they provide the first part of a full EMS and stop there.
+in the sense [Tracking and Management](#tracking-and-management) gives the term:
+they provide the first part of a full EMS and stop there.
 For their purpose the other two parts, interface separation and delayed binding,
 are liabilities, because a host that supplies every implementation itself can guarantee what generated code can do.
 
@@ -911,8 +914,7 @@ it shares only its name with the TypeScript library.
 Code builds objects describing intents, and separate performers execute them,
 swappable for tests.
 The [eff](https://github.com/orsinium-labs/eff) library models Effect handlers.
-Each of these gives you the discipline of one part of an EMS.
-The guarantee is missing, because no type checker enforces it.
+Each of these supplies part of an EMS, and none supplies all three parts.
 
 One library supplies all three parts.
 [Stateless](46_Effects--Stateless.md)
@@ -1009,10 +1011,11 @@ Namespaces once looked like ceremony.
 Effect tracking will look obvious in hindsight,
 and future programmers will regard a function with hidden Effects the way you regard a program written in one global namespace.
 
-Python offers no native version of Effect tracking, and will not soon.
+Python offers no native Effect tracking beyond `async`, and will not soon.
 The next three chapters build the library version:
 [Generators](45_Effects--Generators.md) supplies the mechanism,
-[Stateless](46_Effects--Stateless.md) builds the Effect type on top of it,
+[Stateless](46_Effects--Stateless.md)
+builds a library Effect system on top of it,
 and [Stateless in Practice](47_Effects--Stateless_in_Practice.md)
 puts it to work.
 
@@ -1048,4 +1051,4 @@ puts it to work.
     then make the helper `async` and follow what the type checker and the interpreter force you to change,
     all the way up to `asyncio.run()`.
     Name the two properties of a full EMS that `async` does *not* have,
-    using the three-item list in [Effect Management Systems](#tracking-and-management).
+    using the three-item list in [Tracking and Management](#tracking-and-management).
