@@ -105,6 +105,10 @@ def start(path: Path, tree: Path) -> Running:
     existing = env.get("PYTHONPATH")
     env["PYTHONPATH"] = (str(utils) if not existing
                          else f"{utils}{os.pathsep}{existing}")
+    # stderr goes to a file for the report, so a terminal that sets
+    # FORCE_COLOR must not put escape codes in it; PYTHON_COLORS=0
+    # overrides FORCE_COLOR for the child's traceback.
+    env["PYTHON_COLORS"] = "0"
     errors = tempfile.TemporaryFile()
     proc = subprocess.Popen([sys.executable, path.name], cwd=path.parent,
                             env=env, stderr=errors)
