@@ -196,8 +196,6 @@ Smaller limits finish before spawning the worker processes pays for itself,
 so a reader who shrinks the limits back down will watch parallel lose.
 Purity makes parallel safe.
 It says nothing about whether parallel is worth it at a given size.
-No locks, no queues, no shared state:
-a pure function is ready to run in parallel, unchanged.
 
 Purity makes the calls safe to run together.
 It does not make them easy to move.
@@ -223,8 +221,8 @@ Purity, immutability, and referential transparency,
 the properties these chapters build, provide confidence at every level.
 
 Style contributes before the first rung.
-*Declarative* code states the result you want,
-while *imperative* code spells out each step to produce it.
+*Declarative* code states the result you want;
+*imperative* code spells out each step to produce it.
 A [comprehension](16_Techniques--Comprehensions.md) names the result,
 "the squares of the even numbers,"
 and [`match`](13_Techniques--Pattern_Matching.md) names the shapes you expect,
