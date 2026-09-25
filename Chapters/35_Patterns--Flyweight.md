@@ -148,8 +148,8 @@ The listing counts `id(t)` rather than `len(set(cells))` on purpose.
 `Tile` is a record, so its generated `__eq__()` compares field values,
 and a set of cells collapses to three with or without sharing.
 Only identity proves sharing.
-The grid can grow to any size and the object count stays at the number of tile kinds,
-because `@cache` returns the same `Tile` for the same symbol every time.
+`@cache` returns the same `Tile` for the same symbol every time,
+so the object count stays at the number of tile kinds however large the grid grows.
 The grid itself holds each cell's position.
 Asking "is the cell at row 1, column 5 walkable?" is `field[1][5].walkable`,
 with the asker supplying the coordinates.
@@ -203,7 +203,7 @@ def test_direct_construction_bypasses_pool() -> None:
 
 ### Freezing the Shared Tile
 
-Freezing `Tile` is what lets clients share it.
+Freezing `Tile` lets clients share it.
 A frozen tile keeps its values for its whole life,
 so every cell that shares it reads the same values on every visit.
 
@@ -212,8 +212,8 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 The freezing must hold all the way down.
 A record blocks assignment to a field, not mutation inside one,
-so a `Tile` holding a `list` gives every cell that shares the tile the same mutable list
-(the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
+so a `Tile` holding a `list` hands the same mutable list to every cell that shares the tile,
+the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
 Every field here is immutable, which makes the sharing safe.
 
 ## Interning in the Constructor
@@ -222,8 +222,8 @@ A factory function like `tile()` has a visibly different name and call syntax,
 so a caller can see that construction goes through something other than the class.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__()` instead.
-Putting the pool in `__new__()` is the same technique [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
-uses.
+[*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
+keeps its pool in `__new__()` the same way.
 Here the cache keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*:
 
@@ -259,8 +259,8 @@ if __name__ == "__main__":
 ```
 
 The construction syntax stays the same,
-so a caller sees an ordinary constructor call and receives a shared object
-(this is how CPython's small-integer cache works).
+so a caller sees an ordinary constructor call and receives a shared object.
+CPython's small-integer cache works the same way.
 The bookkeeping is by hand, and `__new__()` adds a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
@@ -268,10 +268,10 @@ so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore leaves `__init__()` to `object`,
 and the call reaches `object.__init__()`.
 `Color` overrides `__new__()` alone,
-so that inherited `__init__()` accepts the three arguments and discards them.
+so the inherited `__init__()` accepts the three arguments and discards them.
 A `@dataclass` would generate an `__init__()`, and the re-run with it.
 That re-run re-assigns the same components,
-so at first the object stays as it was.
+so with three plain fields the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
 the re-run repeats both on an object that is already finished.
 `Tile`'s `@record` generates its `__repr__()` and `__eq__()`;
@@ -280,16 +280,17 @@ so printing a `Color` shows the default `object.__repr__()`.
 The default `__eq__()` suits a perfectly interned type.
 Equal values are the same object, so the identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods,
-and each consequence pulls in another:
-the generated `__eq__()` sets `__hash__` to `None`,
+but each consequence pulls in another.
+The generated `__eq__()` sets `__hash__` to `None`.
 `frozen=True` brings the hash back,
-and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
+and then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
 A `defaultdict` calls its `default_factory` with no arguments,
 and building a `Color` needs the three components,
 so `_pool` stays a plain dict with an explicit `get()`.
 
 `_pool` keys on the components alone, and every subclass shares the one dict,
-so a subclass and `Color` asking for the same components both receive the object the first call built.
+so the first request for a set of components builds the object and every later one receives it,
+whether `Color` or a subclass asks.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
 The two forms differ in one guarantee.
@@ -304,8 +305,8 @@ the `@cache` factory from `tile_map.py` does the same job with one decorator.
 
 One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory:
 every lazy check-then-insert pool races under threads.
-Two threads asking for the same new color can each build "the" shared object,
-the second store overwrites the first,
+Two threads asking for the same new color can each build "the" shared object.
+The second store overwrites the first,
 and the two threads hold distinct objects.
 `@cache` races the same way.
 Its C implementation runs the lookup, the call to your function,
@@ -377,12 +378,12 @@ so every request during that life returns the one object.
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one,
-so the two are worth combining once memory is the point,
-as `Tile` does by being a record.
+so the two are worth combining once memory is the point.
+`Tile` combines them by being a record.
 The combination has one catch.
 A weak reference needs a `__weakref__` slot,
 and a slotted class gets one only by declaring it,
-so slotting `Name` as it stands makes `_pool[text] = found` raise a `TypeError`.
+so if you slot `Name` as it stands, `_pool[text] = found` raises a `TypeError`.
 `weakref_slot=True` adds that slot.
 `record()` has no such option, so `Name` keeps `@dataclass(frozen=True)`.
 
@@ -441,19 +442,19 @@ if __name__ == "__main__":
 
 `walkable` is a bare annotation, not a `ClassVar`.
 It declares a per-member attribute, the same role a dataclass field plays,
-except `__new__()` assigns it by hand instead of a generated `__init__()`.
+except that `__new__()` assigns it by hand where a generated `__init__()` would.
 `__new__()` runs during class creation,
 before the `class` statement binds the name `Tile`,
-so every member has its `walkable` by the time any code can read it,
-and the bare annotation is enough.
+so every member has its `walkable` by the time any code can read it.
+The bare annotation is enough.
 
 Each member's tuple goes to `__new__()`,
 which stores the walkability and assigns `_value_`,
 so the member's value is its map symbol rather than the tuple.
 `__new__()`, not `__init__()`, must assign `_value_`.
 Enum reads `_value_` as soon as `__new__()` returns,
-so an `__init__()` that assigns `_value_` later comes too late:
-the lookup table behind `Tile(".")` stays keyed by the tuples.
+so an `__init__()` that assigns `_value_` later comes too late.
+The lookup table behind `Tile(".")` stays keyed by the tuples.
 With `_value_` set in `__new__()`, `Tile(".")` is a lookup.
 
 `object.__new__(cls)` builds a bare instance directly,
@@ -466,8 +467,8 @@ Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
 and a fixed set of members: `Tile("?")` raises a `ValueError`,
 and `Tile.DOOR` raises an `AttributeError`.
-A `match` over `Tile` needs no `case _:` catch-all once every member has a case,
-and if you leave one out,
+A `match` over `Tile` needs no `case _:` catch-all once every member has a case.
+If you leave one out,
 the type checker reports the missing case before any `Tile` value reaches the code at runtime:
 
 ```python
@@ -499,9 +500,9 @@ error[invalid-return-type]: Function can implicitly return
   |                             ^^^
 ```
 
-The diagnostic reports the missing `Tile.ROCK` case,
-and adding that case clears it.
-What the enum gives up is loading at runtime:
+The function returns `None` implicitly for `Tile.ROCK`,
+the member the `match` leaves out, and adding that case clears the diagnostic.
+The enum gives up loading at runtime.
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
