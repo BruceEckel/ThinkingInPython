@@ -21,7 +21,7 @@ class Item:
         return self.symbol
 
 class Robot(Item):
-    symbol = "R"
+    symbol: ClassVar[str] = "R"
     # Set by the builder when the robot is placed
     room: Room
 
@@ -33,14 +33,14 @@ class Robot(Item):
         self.room = self.room.doors.open(urge).enter(self)
 
 class Wall(Item):
-    symbol = "#"
+    symbol: ClassVar[str] = "#"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return robot.room  # Cannot pass: stay put
 
 class Food(Item):
-    symbol = "."
+    symbol: ClassVar[str] = "."
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
@@ -48,7 +48,7 @@ class Food(Item):
         return room
 
 class Teleport(Item):
-    symbol = ""  # Set per target letter
+    symbol: ClassVar[str] = ""  # Set per target letter
     target_room: Room  # Paired up by the builder
 
     def __init__(self, target: str) -> None:
@@ -63,14 +63,14 @@ class Teleport(Item):
         return self.target
 
 class Empty(Item):
-    symbol = "_"
+    symbol: ClassVar[str] = "_"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
         return room
 
 class Edge(Item):
-    symbol = "/"
+    symbol: ClassVar[str] = "/"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:
@@ -78,7 +78,7 @@ class Edge(Item):
         return robot.room
 
 class EndGame(Item):
-    symbol = "!"
+    symbol: ClassVar[str] = "!"
 
     @override
     def interact(self, robot: Robot, room: Room) -> Room:

@@ -43,6 +43,7 @@ Data Transfer Object
 Multiple Dispatching
 Event Bus
 State Machine
+Blackboard
 
 # Phrases that contain a name without naming the pattern (chapter and
 # section titles quoted as link text, mostly). Skipped wherever found.
