@@ -222,7 +222,7 @@ completed collector's `print()`, then the first prompt of the next
 collector. The two-line sends are `send(2)`, `send(4)`, and `send(6)`,
 so the output alternates between one-line and two-line responses all
 the way down. The second line of `send(6)`'s pair is the exception: no
-collector is left to prompt, so `gamma` finishes, `both()` raises
+collector remains to prompt, so `gamma` finishes, `both()` raises
 `StopIteration`, and the `except` prints `both() is exhausted`.
 
 `both()` takes no part in that alternation. It contains three
