@@ -24,7 +24,8 @@ Function overloading in C++ picks a function from the argument types.
 Generics write one body that works across many types.
 This chapter uses the third form,
 the runtime dispatch that inheritance provides.
-It resolves on the type of one object, the one receiving the method call.
+Runtime dispatch resolves on the type of one object,
+the one receiving the method call.
 That is why one method call can resolve only one unknown type.
 
 The solution is *Multiple Dispatching*: to dispatch on two unknown types,
@@ -44,8 +45,10 @@ That retry is how the opening `Number + Number` question resolves
 The rest of this chapter builds the general technique for an interaction that is not an operator,
 with a game of paper, scissors, rock as the working example.
 
-Both versions below share one result type, an enumeration called `Outcome`:
-either `WIN`, `LOSE`, or `DRAW`.
+The two versions of the game below,
+one dispatching through methods and one looking up a table,
+share one result type, an enumeration called `Outcome`: either `WIN`, `LOSE`,
+or `DRAW`.
 `Outcome` is a `StrEnum`,
 so each member is its string value and prints as `win`, `lose`, or `draw`:
 
@@ -177,7 +180,8 @@ and every result in the class appears reversed.
 
 That original caller arrives in each `eval_*()` method as its `item` argument:
 the same object `compete()` held as `self` before passing it along.
-This game ignores it, since the outcome depends on the two types alone.
+This game ignores the argument,
+since the outcome depends on the two types alone.
 A richer game reads the caller's state through it.
 
 Those `Any` annotations turn off static checking.
@@ -292,11 +296,11 @@ For dispatch on one argument's type, `functools.singledispatch` gives you open,
 per-type functions, as [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 shows.
 For dispatch on two or more types at once,
-the table above is the idiomatic answer: a `dict` keyed by a tuple of types.
+the `OUTCOME` table is the idiomatic answer: a `dict` keyed by a tuple of types.
 Adding a new `Item` then means adding rows to the table,
 with no methods to edit across the classes.
 
-The two match types differently.
+`singledispatch` and the table match types differently.
 `singledispatch` resolves through the MRO,
 so a function registered for a base class serves every subclass,
 while the table matches the class exactly.
@@ -383,7 +387,8 @@ print(Rock().compete(Rock()))
 Both registrations attach to `Item.compete`,
 the attribute `Paper` and `Rock` both inherit,
 so the second `@register` silently overwrites the first's entry for `Rock`.
-`self`'s type never enters that lookup, so both duels return the same answer,
+`self`'s type never enters the `singledispatch` lookup,
+so both duels return the same answer,
 even though each registration went through its own class.
 
 ### Methods or Table
@@ -395,7 +400,7 @@ It works, and it combines the drawbacks of both.
 The type tests repeat in every class, as in the method version,
 and the programmer resolves by hand what dispatch would resolve for free.
 Every new `Item` forces an edit to every ladder.
-Both patterns in this chapter replace it.
+Both patterns in this chapter replace the ladder.
 
 The double-dispatch version puts `eval_paper()`, `eval_scissors()`,
 and `eval_rock()` on every class.
@@ -600,7 +605,7 @@ Widening the return to `Any` describes nothing and turns off checking for every 
 
 [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md#interpreter)
 builds the expression system that opens this chapter,
-using these two methods to let Python's own parser assemble the tree.
+using `__add__()` and `__radd__()` to let Python's own parser assemble the tree.
 
 ## Turning One Unknown Type Into a Second Dispatch
 
@@ -653,7 +658,7 @@ Everywhere else you choose between writing a second dispatch in methods and repl
     as `exact_match.py` does.
     Explain the `KeyError` in terms of how the lookup matches.
     Then make the table match subclasses by walking both operands' `__mro__` for the first pair that has a row,
-    and say what becomes of each of the two properties named after the table listing.
+    and say what becomes of each of the two properties the lookup shares with the table-driven state machine.
 7.  Create a business-modeling environment with three types of `Inhabitant`:
     `Dwarf` (for engineers), `Elf` (for marketers), and `Troll` (for managers).
     Now create a class called `Project` that creates the different inhabitants and causes them to `interact()` with each other.
