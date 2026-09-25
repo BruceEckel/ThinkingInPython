@@ -106,7 +106,7 @@ You need something that says "success" or "failure" no matter what types they ca
 Make success and failure explicit by defining them as types.
 `Ok` wraps an answer, `Err` wraps an error,
 and `Result` is the union of the two.
-The class is now the tag that tells the two cases apart,
+The value's class is now the tag that tells the two cases apart,
 so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
 `Ok` and `Err` are both frozen data classes,
@@ -184,13 +184,13 @@ success by returning an `Ok` object.
 `func_a()`'s return type, `Result[int, str]`,
 says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()`, a name borrowed from Rust, makes that literal.
+`unwrap()`, a name borrowed from Rust, makes that unpacking literal.
 Reading the `answer` field directly works the same way;
 use whichever name reads better in your own code.
 Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
 The only way to the answer is narrowing to one of the two classes.
-The asymmetry holds at runtime as well as under the type checker:
+`Err` lacks `unwrap()` at runtime as well as under the type checker:
 
 ```python
 # must_unwrap.py
@@ -209,10 +209,10 @@ except AttributeError as e:
 The `# type: ignore` is the point of the listing.
 `ty` rejects the bare line,
 reporting that `Err[str]` in the union has no `unwrap`,
-so a reader who writes this in their own code sees that report first,
+so a reader who writes that line in their own code sees that report first,
 at check time.
 
-This is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
+`Result` is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
 put the meaning in the type.
 Python's simpler form is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
@@ -251,7 +251,7 @@ def lies(i: int) -> Result[int, str]:
     # raises satisfies any declared return type.
 ```
 
-`func_a(1)` returns a `Result` that this line discards,
+`func_a(1)` returns a `Result` that the listing discards,
 and `lies()` never returns the `Result` its signature declares.
 `ty` accepts both.
 
@@ -305,10 +305,11 @@ if __name__ == "__main__":
 The check names `Err`, one of the two concrete classes,
 because `Result` is a `type` alias rather than a class.
 The type checker rejects `isinstance(a, Result)`,
-and at runtime it raises a `TypeError`.
+and at runtime the call raises a `TypeError`.
 
-This works, and it keeps errors as values, but every step is the same sequence:
-call, check for `Err`, return early, unwrap, go on.
+`composed()` works, and it keeps errors as values,
+but every step is the same sequence: call, check for `Err`, return early,
+unwrap, go on.
 Written with exceptions and one `try` at the top,
 the same composition is shorter:
 
@@ -345,17 +346,19 @@ if __name__ == "__main__":
 #: 4 4
 ```
 
-The two agree on every input, and the exception version is shorter,
-but it says less: it reports which step failed as a message to parse.
+The two `composed()` functions agree on every input,
+and the exception version is shorter, but it says less:
+it reports which step failed as a message to parse.
 The failure disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
 ## Composing With bind
 
-`bind()` is that sequence, written once.
+`bind()` is the sequence `composing.py` repeats at every step, written once.
 Look again at the two `bind()` methods in `result.py`.
 On an `Ok`, `bind()` passes the answer to the next function.
-On an `Err`, it skips the function and returns itself, the same failure.
+On an `Err`, `bind()` skips the function and returns the `Err` itself,
+the same failure.
 The two signatures differ because `Err` holds no answer to pass to the next step.
 `Err.bind()` therefore accepts a callable with any parameter list,
 and its return type is `Err[E]`, the same failure.
@@ -476,7 +479,7 @@ if __name__ == "__main__":
 Each lambda's parameter is the previous step's answer.
 The nesting keeps every earlier answer in scope,
 so `a` is still visible inside the inner lambda that receives `b`.
-A flat sequence of `bind()` calls cannot give you that,
+A flat sequence of `bind()` calls cannot keep the earlier answer in scope,
 because each step's function receives one argument, the previous answer.
 
 A third input adds a third level:
@@ -507,15 +510,16 @@ if __name__ == "__main__":
 
 Each nested bind keeps the earlier answers in scope.
 An `Err` anywhere short-circuits to the end.
-Of the four inputs, the last passes all three steps,
+Of the four inputs, only `(7, 5)` passes all three steps,
 so `add()` runs for that input alone.
 
 Short-circuiting is right for a dependent chain,
 where each step needs the previous step's answer,
 as in `composing_with_bind.py` above.
-`func_a()`, `func_b()`, and `func_c()` here take independent inputs,
+`func_a()`, `func_b()`,
+and `func_c()` in `combining.py` take independent inputs,
 so stopping at the first `Err` discards whatever the later steps would have found.
-The exceptions in the opening section cause the same loss.
+The exception in `exceptions_lose_data.py` causes the same loss.
 Exercise 3 asks you to collect every failure.
 
 Three inputs need three levels of nesting,
@@ -599,11 +603,11 @@ if __name__ == "__main__":
 but `@safe` has changed its return type to `Result[int, Exception]`,
 so the caller must unpack the `Result` to reach the number.
 That error type, `Exception`, is the base of the ordinary exception hierarchy.
-The `Result[int, str]` earlier in this chapter names exactly what could go wrong;
+`returning_result.py`'s `Result[int, str]` names exactly what could go wrong;
 `Result[int, Exception]` says that something did,
 which is all a bare `except Exception` says.
 `@safe` names `Exception` because it writes one `try`/`except` for every function it wraps,
-and the base class is the one type that covers them all.
+and the base class is the one type that covers whatever those functions raise.
 Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
 when the narrower type matters more than the convenience.
 
@@ -613,9 +617,9 @@ including the ones that are defects rather than expected outcomes.
 If you misspell a name inside the wrapped function,
 `@safe` returns the resulting `NameError` as an ordinary `Err`,
 which looks the same as bad input.
-The version here is deliberately small.
+The version in `safe.py` is deliberately small.
 A production version takes the exception types to catch as an argument and lets the rest propagate.
-That keeps the distinction the chapter ends on:
+Letting the rest propagate keeps the distinction the chapter ends on:
 a failure the caller can handle versus a bug the caller cannot.
 
 `@safe` changes the return type and keeps what the function accepts:
@@ -692,8 +696,7 @@ if __name__ == "__main__":
 
 `@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
-`compute()` returns that `Result`,
-a value the caller keeps after the call returns,
+`compute()` returns a `Result`, a value the caller keeps after the call returns,
 so the comprehension computes all three results before `describe()` matches any of them.
 A raised exception would have ended the comprehension at the first failure.
 
@@ -706,7 +709,7 @@ The frame that has that answer is rarely the frame that raised the exception.
 A handler far enough up the stack to report the failure cannot see the locals that would explain it.
 
 Most code catches the exception and raises a new one with a better message.
-That replaces the original type,
+The new exception replaces the original type,
 so a caller who wants the original must read it from the new exception's `__cause__` or `__context__`.
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
@@ -747,11 +750,11 @@ which the raiser's frame does not have.
 which the first call creates.
 The type checker treats `__notes__` as always present,
 because typeshed declares it on `BaseException`.
-Reading it before any `add_note()` call therefore type-checks,
+Reading `__notes__` before any `add_note()` call therefore type-checks,
 and then raises an `AttributeError` at runtime.
 
-Context matters more here than in ordinary exception code,
-because a `Result` keeps the exception as a value rather than propagating it.
+Context matters more under a `Result` than in ordinary exception code,
+because the `Result` keeps the exception as a value rather than propagating it.
 Nothing prints a traceback for an `Err` stored in a list.
 The exception inside still holds its `__traceback__`,
 but the `except` clause that caught it returned it as a value,
@@ -786,7 +789,7 @@ for field, value in (("age", "42"), ("size", "oops")):
 The note attaches before the exception becomes a value,
 in the one frame that has both the exception and the field name.
 Code that reads the `Err` later can report which field failed without the frame that parsed it.
-This is the chapter's opening argument, applied one level down:
+The note is the chapter's opening argument, applied one level down:
 `Err` says the call failed, the exception says what went wrong,
 and a note says which piece of work produced it.
 
@@ -800,7 +803,7 @@ and it works the same way with `isinstance()`.
 A library can supply `Result` for you.
 The [returns](https://github.com/dry-python/returns)
 library provides a `Result` type whose two cases are `Success` and `Failure`,
-the same `@safe` decorator you built earlier in this chapter,
+the same `@safe` decorator you built in `safe.py`,
 and do-notation that makes combining multiple results read more directly than nested binds.
 
 ## Which Failures Get a Result
