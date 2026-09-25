@@ -94,6 +94,12 @@ for path in root.walk():
 The demo's first `print()` makes that one call on the whole tree,
 on the `src` subtree, and on a lone file.
 
+`File` and `Directory` use `@dataclass(frozen=True)` rather than `@record`.
+`Node` declares no `__slots__`,
+so it gives every instance a `__dict__` and undoes the slots a record adds.
+[Rethinking Objects](20_Patterns--Rethinking_Objects.md#abstract-base-classes)
+shows the alternative, an empty `__slots__` on the base.
+
 Adding a node type is one class: a plugin writes it and edits nothing above it.
 Adding an *operation* exposes the weakness.
 `walk()` needs a method in every class,
