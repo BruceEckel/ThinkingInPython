@@ -7,7 +7,7 @@
   <line x1="580" y1="34" x2="590" y2="38" stroke="#c8bfb0" stroke-width="1"/>
   <line x1="580" y1="42" x2="590" y2="38" stroke="#c8bfb0" stroke-width="1"/>
   <!-- key -->
-  <rect x="620" y="20" width="24" height="16" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="620" y="20" width="24" height="16" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <text x="650" y="32" font-size="10.5" fill="#7a6e62">process</text>
   <rect x="712" y="22" width="20" height="12" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <text x="738" y="32" font-size="10.5" fill="#7a6e62">interpreter</text>
@@ -16,7 +16,7 @@
   <text x="20" y="72" font-size="13" font-weight="bold" fill="#1a1612">asyncio</text>
   <text x="20" y="88" font-size="10.5" fill="#7a6e62">1 OS thread</text>
   <text x="20" y="104" font-size="10.5" font-style="italic" fill="#8b1a1a">1 GIL</text>
-  <rect x="210" y="60" width="380" height="30" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="60" width="380" height="30" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="64" width="372" height="22" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="68" width="64" height="14" fill="#1a1612" fill-opacity="0.15" stroke="#1a1612" stroke-width="0.8"/>
   <rect x="284" y="68" width="64" height="14" fill="#1a1612" fill-opacity="0.15" stroke="#1a1612" stroke-width="0.8"/>
@@ -29,7 +29,7 @@
   <text x="20" y="150" font-size="13" font-weight="bold" fill="#1a1612">ThreadPoolExecutor</text>
   <text x="20" y="166" font-size="10.5" fill="#7a6e62">5 OS threads</text>
   <text x="20" y="182" font-size="10.5" font-style="italic" fill="#8b1a1a">1 GIL, shared by all 5</text>
-  <rect x="210" y="140" width="380" height="112" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="140" width="380" height="112" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="144" width="372" height="104" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <line x1="220" y1="170" x2="580" y2="170" stroke="#c8bfb0" stroke-width="0.8"/>
   <rect x="220" y="163" width="64" height="14" fill="#1a1612" fill-opacity="0.15" stroke="#1a1612" stroke-width="0.8"/>
@@ -47,19 +47,19 @@
   <text x="20" y="312" font-size="13" font-weight="bold" fill="#1a1612">ProcessPoolExecutor</text>
   <text x="20" y="328" font-size="10.5" fill="#7a6e62">5 processes</text>
   <text x="20" y="344" font-size="10.5" font-style="italic" fill="#8b1a1a">5 GILs, 1 per process</text>
-  <rect x="210" y="296" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="296" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="300" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="303" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
-  <rect x="210" y="322" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="322" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="326" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="329" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
-  <rect x="210" y="348" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="348" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="352" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="355" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
-  <rect x="210" y="374" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="374" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="378" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="381" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
-  <rect x="210" y="400" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="400" width="124" height="22" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="404" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="407" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
   <text x="400" y="442" font-size="10.5" fill="#7a6e62" text-anchor="middle">5x in one step: five GILs run at once, on five cores</text>
@@ -68,7 +68,7 @@
   <text x="20" y="482" font-size="13" font-weight="bold" fill="#1a1612">InterpreterPoolExecutor</text>
   <text x="20" y="498" font-size="10.5" fill="#7a6e62">5 interpreters, 1 process</text>
   <text x="20" y="514" font-size="10.5" font-style="italic" fill="#8b1a1a">5 GILs, 1 per interpreter</text>
-  <rect x="210" y="466" width="380" height="112" fill="none" stroke="#c8bfb0" stroke-width="1.3" rx="4"/>
+  <rect x="210" y="466" width="380" height="112" fill="none" stroke="#c8bfb0" stroke-width="2" rx="4"/>
   <rect x="214" y="474" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
   <rect x="220" y="477" width="64" height="8" fill="#8b1a1a" fill-opacity="0.25" stroke="#8b1a1a" stroke-width="0.8"/>
   <rect x="214" y="494" width="116" height="14" fill="none" stroke="#7a6e62" stroke-width="1.5" stroke-dasharray="0.1,3" stroke-linecap="round" rx="2"/>
