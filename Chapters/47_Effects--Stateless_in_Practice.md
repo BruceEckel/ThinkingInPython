@@ -392,7 +392,7 @@ Under `steady` the two dates agree and the function looks correct.
 `crossing` answers the first request one second before midnight and the second request one second after midnight.
 Now the file carries January 1's name and the entry inside it carries January 2's date.
 A day of entries can end up in the wrong file,
-and the window for the mistake is one second wide.
+and the window for the mistake is only as wide as the gap between the two reads.
 
 Using a real clock, you wait for that window and probably miss it.
 A test that runs at nine in the morning reads the clock twice on the same date and passes,
@@ -982,7 +982,7 @@ A failure ends the remaining steps the way a raised exception does,
 and no step tests for it.
 Where the run stops depends on where the failure arises.
 The fourth run prints no trace,
-since `DeadWire.latest()` raises `Unavailable` before printing;
+since `DeadWire.latest()` raises `Unavailable` without printing anything;
 the third reaches the library and fails there.
 
 `report()` handles the two channels differently.
@@ -1072,7 +1072,7 @@ so a second caller can catch the same three failures and choose different messag
 retry the whole pipeline, or let one failure through to the edge,
 without editing the pipeline.
 
-## Two More Doors
+## A Second Way In and Out
 
 The error channel you have seen has one way in and one way out.
 `@throws` lifts what ordinary code raises,
@@ -1204,7 +1204,7 @@ Under `ty` 0.0.82 both orders infer the same result type.
 The Ability channel is where the orders differ.
 `supply(feed, book)(catch_all(research))` comes back with `Never` there,
 and `catch_all(supply(feed, book)(research))` with `Unknown`:
-the same two handlers, and the order changes the reading.
+the same two calls in the other order.
 `bound` has a name so that you can reveal its type on its own,
 and [The type checker decides what survives handling](#the-type-checker-decides-what-survives-handling)
 explains the difference.
@@ -1960,7 +1960,7 @@ print(f"run() at least 50x slower: "
 
 `run_async()` reuses the loop already running and costs little beyond the Effect itself.
 `run()` builds and tears down a loop on every call,
-hundreds of times the cost of `run_async()`.
+at least fifty times the cost of `run_async()`, by the listing's own measure.
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.
@@ -2015,7 +2015,7 @@ expect(ZeroDivisionError, run, caller())
 #: [ZeroDivisionError] division by zero
 ```
 
-`@throws` lifts only the exception types it names, and `ratio()` names none,
+`ratio()` carries no `@throws`,
 so the `ZeroDivisionError` propagates as an ordinary raised exception,
 untracked.
 `catch()` matches the values an Effect yields, not exceptions the body raises,
@@ -2032,7 +2032,7 @@ and a zero denominator still throws.
 The difference is at runtime.
 An exception thrown inside a computation ZIO runs becomes a *defect*,
 recorded on the `Cause` beside the typed error channel.
-There `sandbox()` can recover it, and the runtime logs it as a dying fiber.
+`sandbox()` can recover a defect, and the runtime logs it as a dying fiber.
 Stateless has no defect channel,
 so the exception leaves `run()` as an ordinary Python exception.
 
@@ -2161,7 +2161,7 @@ Trust a green check only where you have seen the same construct produce a red on
 and the generator body is syntax that hides the chaining.
 `Result` in [Error Handling](42_Functional--Error_Handling.md#composing-with-bind)
 has the same two operations, written out by hand.
-Stateless's documentation calls it an algebraic effect system,
+Stateless's documentation calls the library an algebraic effect system,
 and both descriptions are right.
 A monad plus handlers is how you build algebraic effects in a language with no native support for them.
 The monad is the mechanism that chains the steps,
@@ -2287,8 +2287,9 @@ The type agrees with the runtime.
 with `Boom` nowhere in it.
 The fix is the discipline `catch()` and `catch_all` already teach:
 move the failure into the result before you fork.
+Apply `catch_all()` before `@fork`: with `bad` left undecorated,
 `fork(catch_all(bad))` matches the overload for an Effect with no declared error,
-and `wait()` returns the union instead of raising it.
+and `wait()` returns `Boom | int` instead of raising.
 
 ## What Survives the Library
 
@@ -2384,7 +2385,7 @@ It is a language that does the encoding for you.
     Explain what the types claim, what the run does,
     and which line restores the guarantee.
 3.  Add a wind turbine to `power.py` that is available only during a fixed windy stretch of the evening,
-    put it between solar and the battery in `controller()`,
+    put it between solar and the battery in the `sun_first` order,
     and confirm `run_load()` needs no change.
     Then shorten every source until some hour has no supplier, run it,
     and say where the `Blackout` propagates to and why `catch(Blackout)` around `run_load()` does not intercept it.
@@ -2398,7 +2399,7 @@ It is a language that does the encoding for you.
     Follow the type checker's diagnostics until the program type-checks again,
     and list every line you edited.
     Then do the same to `research_by_hand.py` and say which tool named the lines to change in each case.
-6.  `scenarios.py` supplies a `DeadWire` that fails before printing.
+6.  `scenarios.py` supplies a `DeadWire` that fails without printing anything.
     Write a `DullWire` whose `latest()` succeeds but returns a headline with no topic in `TOPICS`,
     and predict the trace before running it.
 7.  Wrap `research()` in `retry()` and supply a `Time()`.
