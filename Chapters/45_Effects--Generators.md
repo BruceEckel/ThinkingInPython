@@ -22,13 +22,13 @@ and this chapter stands on its own.
 ## Annotating a Generator
 
 Earlier examples annotate every generator with the short `Iterator` form.
-That fits a generator that only produces values.
+That form fits a generator that only produces values.
 
 A generator that also receives values needs the full annotation:
 
     Generator[YieldType, SendType, ReturnType]
 
-This names the three things a generator exchanges with its caller:
+This annotation names the three things a generator exchanges with its caller:
 
 - `YieldType` is the type `yield` hands out,
   thus the type `next(generator)` returns.
@@ -124,7 +124,8 @@ A returning generator also raises `StopIteration`,
 and the `Result` arrives as that exception's `value`.
 A `for` loop never sees that value,
 because `for` catches the `StopIteration` and discards it along with its `value`.
-To read the `ReturnType`, catch the exception yourself, as this listing does.
+To read the `ReturnType`, catch the exception yourself,
+as `interview_generator.py` does.
 
 A newly created generator pauses at the top of the function body,
 before any code runs, so no `yield` expression is waiting to receive a value.
@@ -178,7 +179,7 @@ The match is deliberate.
 Calling `interview()` returns a generator object but runs nothing in the function body.
 `next()` and `send()` do that work, one `yield` at a time.
 
-A generator is the more useful of the two here because you write the driver.
+A generator is more useful than a coroutine here because you write the driver.
 The event loop receives a coroutine's requests;
 whatever code calls `next()` and `send()` receives a generator's.
 The generator yields a *request* out,
@@ -250,7 +251,7 @@ Nothing verifies it.
 Its body is three questions and a `return`,
 with no dictionary and no `input()` call.
 It yields each question and suspends until `send()` supplies the answer.
-`drive()` decides how to meet those needs,
+`drive()` decides how to answer those questions,
 and it takes the answers as a parameter.
 Swapping the dictionary for a database changes a single argument.
 
@@ -269,7 +270,7 @@ which serializes the conversation.
 Generators can carry an EMS because they nest.
 `yield from` runs an inner generator to exhaustion,
 passing every yielded request out to the outer driver and every sent answer back down.
-Each of the three channels crosses that boundary differently.
+Each of the three channels crosses a `yield from` differently.
 
 ### Running to Exhaustion
 
@@ -405,12 +406,13 @@ two frames below the driver.
 `both()` needs no forwarding code of its own,
 because `yield from` does the forwarding.
 
-`g.send(2)` supplies alpha's second value, which lets `collect("alpha")` finish.
-That finish completes the first `yield from`, so `both()` starts the second.
+`g.send(2)` supplies alpha's second value, so `collect("alpha")` finishes.
+That finish completes the first `yield from`,
+so `both()` starts the second `yield from`.
 A single `send()` therefore ends one inner generator and produces the first prompt of the next.
 The driver sees `StopIteration` only when `both()` finishes its last delegation.
 
-The natural first attempt is to write the loop by hand.
+The natural first attempt is to write the forwarding as a loop by hand.
 That loop silently discards every sent value:
 
 ```python
@@ -506,7 +508,7 @@ A single loop at the edge of the program interprets Effects yielded anywhere ins
 
 `drive()` and `yield from` both step a generator and both finish at `StopIteration`,
 so they are easy to confuse.
-Delegation can take over the job the previous listing gives to `drive()`:
+Delegation can take over the job `yield_from_delegates.py` gives to `drive()`:
 
 ```python
 # yield_from_nested.py
@@ -533,10 +535,10 @@ print(drive(survey(),
 #: Alice of Wonderland, friend Rabbit, color blue
 ```
 
-The listing imports `interview()` unchanged from the previous example,
+The listing imports `interview()` unchanged from `yield_from_delegates.py`,
 where `drive()` drove it directly.
 Now `survey()` delegates to it.
-Its `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
+`interview()`'s `Result` arrives as the value of an expression instead of as `stop.value` in the driver.
 Its questions reach `drive()` through three frames rather than two,
 and `survey()` asks about a color,
 so the call merges one more pair into `ANSWERS` with the dictionary union operator.
@@ -560,7 +562,7 @@ so `survey()` contains no code that reads a `Question`.
 Both catch it and both take `stop.value`,
 but they hand that value to different places.
 `drive()` returns the `Result` to its own caller, ending the conversation.
-`yield from` makes it the value of the expression in the enclosing generator,
+`yield from` makes the `Result` the value of the expression in the enclosing generator,
 after which that generator keeps running.
 
 `yield from` composes descriptions, and a driver interprets them.
@@ -574,7 +576,8 @@ and `yield from` relays both.
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
 and `close()` unwinds every frame in the chain.
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
-shows this already, described from the `with` block's side:
+already shows an exception raised at a generator's `yield`,
+described from the `with` block's side:
 "Python resumes the generator by raising the block's exception at the `yield`."
 `throw()` is that same resumption, called directly instead of by a `with` block:
 
@@ -696,7 +699,7 @@ task_runner()
 
 `@task` is the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes):
 it calls each generator function once at definition time,
-queues the generator it builds, and hands the function back unchanged.
+queues the generator that call builds, and hands the function back unchanged.
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
 One that finishes raises `StopIteration`, and the runner drops it.
@@ -706,7 +709,7 @@ though neither names the other and no threads exist.
 
 `task_runner()` calls `next()` and takes turns;
 `drive()` calls `send()` and answers questions.
-Giving each job a question combines the two in one loop:
+Giving each job a question combines turn-taking and answering in one loop:
 
 ```python
 # task_runner_send.py
