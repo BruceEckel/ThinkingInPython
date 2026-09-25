@@ -29,8 +29,15 @@ from pathlib import Path
 from tools.repo import add_paths_arg, md_files
 
 URL_RE = re.compile(r"https?://[^\s)\]>\"'`]+")
-# Some hosts refuse requests without a browser-ish User-Agent.
-HEADERS = {"User-Agent": "Mozilla/5.0 (ThinkingInPython link check)"}
+# Some hosts refuse requests without a browser User-Agent, and some
+# (the UT Austin repository) refuse a Mozilla prefix with a custom tail,
+# so this is a complete browser string.
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        " (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
+    )
+}
 
 
 def find_urls(files: list[Path]) -> dict[str, list[str]]:
