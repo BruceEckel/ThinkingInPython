@@ -10,8 +10,8 @@ The first two confirm a design you can predict from the code.
 The third produces a pattern no one wrote down as a picture:
 the formula fixes its shape, and the grains gather on it.
 
-The chapter works the first example, the pack of rats, from end to end.
-That example puts asyncio tasks, a shared coordination object,
+The first example, the pack of rats, puts asyncio tasks,
+a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
@@ -26,7 +26,7 @@ and it hands out an entry point.
 The maze decides nothing; it only reports what a coordinate contains.
 
 A *blackboard* is the shared surface on which every rat writes.
-Blackboard is a classic coordination pattern.
+*Blackboard* is a classic coordination pattern.
 Independent agents read from and write to one common data structure instead of calling each other directly.
 Here the blackboard owns the maze, records which cells the rats have explored,
 hands out rat numbers, and creates the task for each new rat.
@@ -41,8 +41,8 @@ and each open, unclaimed one becomes a move.
 Claiming a cell both marks it visited and reserves it,
 so no two rats claim the same cell.
 When a rat claims more than one neighbor,
-it keeps the first for itself and spawns a new rat at each of the others,
-then yields so its siblings can run.
+it keeps the first for itself and spawns a new rat at each of the others.
+After every move it yields so its siblings can run.
 When every neighbor is a wall or already claimed,
 the rat has reached a dead end and its task ends.
 When the last rat's task ends,
@@ -340,7 +340,7 @@ every open cell connects to the rest of the maze by exactly one path.
 So every `claim()` the run above rejects on an open cell is a rat testing a cell already claimed:
 its own previous cell,
 or the parent's cell when a newly spawned rat tests its neighbors.
-Only a maze with a loop lets two rats call `claim()` on one unclaimed cell,
+Only a maze with a loop lets two rats try to claim the same new cell,
 the race the atomicity resolves.
 
 ### Contention on a Loop
@@ -409,10 +409,15 @@ and a perfect maze like `amaze.txt` never produces it.
 
 ### Testing Full Coverage
 
-Because claiming is atomic,
-the rats always cover every cell reachable from the entry,
-no matter how the tasks interleave.
+However the tasks interleave,
+the rats cover every cell reachable from the entry,
+because every claimed cell gets a rat,
+and that rat tests all four of its neighbors.
 The test verifies this by comparing the cells the rats visited against a flood fill of the same maze.
+Coverage does not depend on atomic claiming: `visited` is a set,
+so a cell claimed twice still counts once.
+Atomicity adds the other guarantee, one rat per cell,
+which only a count like exercise 3's can see.
 
 ```python
 # rats_and_mazes/test_rats_and_mazes.py
@@ -1135,7 +1140,8 @@ the starting point for a robot that steers continuously instead of planning a gr
 ## Order from Noise
 
 The two simulations so far confirm designs.
-The rats cover every reachable cell because `claim()` is atomic.
+The rats cover every reachable cell, one rat per cell,
+because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
