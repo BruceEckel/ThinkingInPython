@@ -24,19 +24,18 @@ def group_rounds(
             leader = pool.pop()
             group = [leader]
             while len(group) < size:
-                closest = min(pool,
-                              key=lambda c: met(group, c))
-                pool.remove(closest)
-                group.append(closest)
+                stranger = min(pool,
+                               key=lambda c: met(group, c))
+                pool.remove(stranger)
+                group.append(stranger)
             groups.append(group)
         # Roster smaller than one group
         if pool and not groups:
             groups.append([])
         # Too few left for a full group of `size`
         for extra in pool:
-            roomiest = min(groups,
-                           key=lambda g: met(g, extra))
-            roomiest.append(extra)
+            host = min(groups, key=lambda g: met(g, extra))
+            host.append(extra)
         round_result: Round = [tuple(g) for g in groups]
         for g in round_result:
             for pair in combinations(g, 2):
