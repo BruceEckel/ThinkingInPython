@@ -84,6 +84,9 @@ Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
 `restore()` copies in the other direction,
 rebuilding a fresh list so the sketch and the memento never share one.
+`copy.copy(sketch)` looks like a shortcut for `save()`,
+but it copies only the `Sketch`: the copy's `strokes` is the same list,
+the alias from `aliased_snapshot.py` one level down.
 One level is enough because a stroke is a string.
 An originator holding containers inside containers needs `copy.deepcopy()` in `save()`,
 and pays the cost described in [A Snapshot Is Not a Reference](#a-snapshot-is-not-a-reference):
@@ -302,11 +305,14 @@ print(after.strokes is before.strokes, len(after.strokes))
 ```
 
 The two objects share the stroke strings, not the tuple holding them.
-Each `draw()` builds a fresh tuple of `n + 1` pointers,
-and that tuple is its whole cost,
-proportional to the current length of `strokes`.
-The stroke comes from `"".join([...])` because the compiler interns a literal like `"circle"`,
-and interning makes the identity check print `True` for a copied string too.
+On a drawing with `n` strokes,
+`draw()` builds a fresh tuple of `n + 1` pointers,
+and that tuple is its whole cost.
+The stroke comes from `"".join([...])` because the compiler interns a literal like `"circle"`:
+every `"circle"` literal in the module is one object,
+so `is` would print `True` whether or not `draw()` kept the caller's string.
+A string built at runtime is an object of its own,
+so here `True` means `after` holds the same string object as `before`.
 
 A single `draw()` allocates one tuple.
 A caretaker that keeps every past state, the `History` class in `history.py`,
@@ -371,10 +377,10 @@ def test_replace_carries_other_fields() -> None:
 
 ## The Caretaker: a Generic History
 
-The caretaker reads no field of the states it holds, frozen or mutable,
+The caretaker reads no field of the states it holds,
 since opacity is the pattern's whole point.
-`History[S]` below works as written on the classic `Memento` from `sketch.py`,
-because the classic form already has opacity.
+The classic form already has that opacity,
+so `History[S]` below holds the classic `Memento` from `sketch.py` as readily as a `Drawing`.
 What immutability removes is the explicit `save()` and `restore()` at every edit,
 since a state that keeps its value is already a memento.
 Undo and redo are two stacks of past and future states,
@@ -452,9 +458,9 @@ Nothing mutates, so every other state stays valid,
 and the program runs on with the history one state short.
 `apply()` takes the edit instead of its result.
 It reads `present` itself and passes whatever the edit returns straight to `do()`,
-so both steps happen at every call site.
-`do()` stays public for a state that other code builds,
-as `history_classic.py` shows below.
+so no call site can build a state and forget to record it.
+`do()` stays public for a state built some other way than by editing the present,
+such as the `Sketch` mementos that `history_classic.py` passes to it below.
 
 `undo()` and `redo()` trust the caller:
 undoing an empty past raises `IndexError` from `pop()`.
@@ -727,8 +733,8 @@ so every later comparison treats them as the same.
 ### Schema Migrations and Safer Formats
 
 Databases have the same drift, and its remedy there has a name.
-A *schema migration* is the disciplined version of this drift, a versioned,
-deliberate step that changes the table shape and its data together,
+A *schema migration* makes the drift deliberate:
+a versioned step that changes the table shape and its data together,
 instead of letting a query discover the mismatch.
 
 When drift or the security risk is too much to accept,
@@ -744,7 +750,7 @@ so pickle's security risk does not apply.
 
 ## Snapshots in the Wild
 
-Version control is the *Memento* pattern applied to a whole file tree.
+Version control applies the *Memento* pattern to files.
 A git commit is an immutable snapshot of your whole tree,
 and checkout is `restore()`.
 Git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.
