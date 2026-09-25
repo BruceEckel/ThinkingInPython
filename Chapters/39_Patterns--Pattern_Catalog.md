@@ -16,7 +16,7 @@ and [*State Machine*](31_Patterns--State_Machines.md) are one such pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
 A design rarely needs both at once.
-The body of this book argues that a number of these patterns are unnecessary in Python
+The body of this book argues that several of these patterns are unnecessary in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables follow each source's own grouping,
@@ -74,7 +74,7 @@ Use this section's table when you know the problem but not the name.
 | Pattern | Intent |
 |---------|--------|
 | [*Abstract Factory*](27_Patterns--Factory.md#abstract-factories) | Create families of related objects without naming concrete classes. |
-| [*Builder*](27_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the step-by-step assembly separate from the finished object. |
+| [*Builder*](27_Patterns--Factory.md#builder) | Build a complex object in steps, keeping the assembly separate from the finished object. |
 | [*Factory Method*](27_Patterns--Factory.md#subclasses-choose-the-type) | Defer instantiation to a method so subclasses choose the concrete type. |
 | [*Prototype*](27_Patterns--Factory.md#prototype) | Create new objects by cloning an existing instance. |
 | [*Singleton*](24_Patterns--Singleton.md) | Ensure a class has one instance with a single point of access. |
@@ -219,7 +219,7 @@ Use this section's table when you know the problem but not the name.
 | Pattern | Intent |
 |---------|--------|
 | [*Dependency Injection*](11_Techniques--Testing.md#isolating-tests-from-the-world) | Supply an object's collaborators from outside it. |
-| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. Dependency Injection and Service Locator each implement it. |
+| [*Inversion of Control*](25_Patterns--Template_Method.md#the-anchored-algorithm) | Let a framework call your code rather than the reverse. *Dependency Injection* and *Service Locator* each implement it. |
 | [*Service Locator*](46_Effects--Stateless.md#dependency-injection) | Look up dependencies through a central registry. |
 
 ## Other Patterns and Idioms
@@ -228,7 +228,7 @@ Use this section's table when you know the problem but not the name.
 |---------|--------|
 | [*Borg* (Monostate)](24_Patterns--Singleton.md#borg-singleton-by-inheritance) | Let every instance share one set of state instead of sharing one instance. |
 | [*Double Dispatch*](32_Patterns--Multiple_Dispatching.md) | Resolve behavior from the runtime types of two objects, through two calls. |
-| [*Fluent Interface*](27_Patterns--Factory.md#builder) | Chain method calls that return the receiver for readable APIs. |
+| [*Fluent Interface*](27_Patterns--Factory.md#builder) | Return the receiver from each method so calls chain into one expression. |
 | [*Function Object*](28_Patterns--Function_Objects.md) | Decouple the choice of function to call from the place that calls it. |
 | [*Lazy Initialization*](07_Foundations--Classes.md#cached-property) | Create a value on first use. |
 | [*Multiton*](35_Patterns--Flyweight.md#interning-in-the-constructor) | Manage a pool of singletons, one per key. |
