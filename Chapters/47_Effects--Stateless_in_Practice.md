@@ -229,14 +229,13 @@ a network stub that fails twice and then succeeds, or the clock below.
 That state has one trap, and it is silent.
 `next(script)` raises `StopIteration` once the sequence runs out.
 `StopIteration` is how a driver learns that an Effect has finished,
-so `handle()` reads the exhausted script as the end of the program.
+so `handle()` reads the exhausted script as the end of the program:
+every other exception a handler raises propagates out of `run()` as itself,
+and this one never propagates.
 If you ask `count_heads()` for six tosses from this five-value script,
 `run()` produces `None` instead of a count, with no exception.
 That is the same silent `None` that [An Effect Runs Once](46_Effects--Stateless.md#an-effect-runs-once)
 shows for a spent Effect.
-Every other exception a handler raises propagates out of `run()` as itself.
-This one is the signal the driver reads as the end of the program,
-so it never propagates.
 Indexing a list rather than walking an iterator turns the mistake into an `IndexError` that propagates out of `run()`.
 
 ### A Clock
@@ -398,9 +397,8 @@ and the window for the mistake is one second wide.
 Using a real clock, you wait for that window and probably miss it.
 A test that runs at nine in the morning reads the clock twice on the same date and passes,
 so the only evidence is a bug report saying the log file is occasionally short by a few lines.
-With the Ability, a handler chooses the moment.
-`archive()` does not read a clock.
-It asks for a moment, and a handler decides which moment that is.
+With the Ability, `archive()` does not read a clock: it asks for a moment,
+and a handler chooses which moment that is.
 Both handlers answer the same two requests.
 They differ in whether midnight falls between them.
 
@@ -736,9 +734,9 @@ print(f"remaining: {cell.amount}")
 `Get` has `Flip`'s shape: no payload, and the answer type is its whole content.
 `Put` has `Tell`'s: payload out, nothing back.
 `purchase()` is the function that uses both.
-It reads, decides, and writes.
-The decision sits between the two requests, in code that mentions no cell.
-Its signature declares the shared state.
+It reads, decides, and writes, and the decision sits between the two requests,
+in code that mentions no cell.
+`purchase()`'s signature declares the shared state:
 `Depend[Get | Put, bool]` tells a caller this function reads or writes something that outlives it.
 `spree()` composes purchases, and its signature carries the same union.
 
@@ -780,15 +778,14 @@ This pattern has a name.
 Treatments of algebraic effects open with the *State effect*,
 `get` and `put` as its two operations.
 This section builds that effect on Stateless's machinery.
-One warning comes with it,
-and [Where the Guarantee Stops](#where-the-guarantee-stops)
-returns to the theme.
-Nothing guards the cell.
+
+One warning comes with it: nothing guards the cell.
 Forking two Effects that share a `Cell` interleaves their reads and writes,
 and no type reports the race.
 ZIO's `Ref` is this cell with atomic update built in.
 Stateless has no equivalent,
 so under `fork()` the cell is as exposed as any Python global.
+[Where the Guarantee Stops](#where-the-guarantee-stops) returns to the theme.
 
 ## Composing a Program
 
@@ -971,8 +968,9 @@ A full Effect system calls each pair of bindings a *scenario*,
 and here a scenario is nothing more than arguments to `supply()`.
 
 Every printed line in that trace comes from a supplied implementation,
-because the pipeline holds no output of its own.
-The second run also stops after `feed: fetching`.
+because the pipeline holds no output of its own,
+so the trace also records where each run stopped.
+The second run stops after `feed: fetching`.
 `topic_of()` yields a `NotInteresting`,
 and that failure ends `research()` where it stands.
 The `need(Encyclopedia)` on the next line does not run,
@@ -1319,7 +1317,7 @@ error[invalid-yield]: Yield expression type does not match annotation
 ```
 
 The type checker checks the other end too.
-`ty` rejects the `run()` call,
+Leave `Oven(220)` out of `supply()`, and `ty` rejects the `run()` call,
 finding a `Generator[Need[Oven], Any, str]` where it expected an empty Ability channel.
 That is the rejection [Forgetting to Supply](46_Effects--Stateless.md#forgetting-to-supply)
 shows, now arising from a dependency two levels down.
@@ -1379,17 +1377,15 @@ def encounter() -> Depend[
     narrator.say(hero.approach(obstacle.blocks()))
 ```
 
-`encounter()` holds all the engine's logic,
-and the only types it mentions are the three Protocols.
+`encounter()` holds all the engine's logic; it constructs no `GameEnvironment`,
+holds no factory, and the only types it mentions are the three Protocols.
 It prints nothing itself.
 Output is an Ability like the other two:
 `Narrator` is one of the three requests,
 so the code that supplies it chooses whether a line prints, goes into a list,
 or disappears.
-The program constructs no `GameEnvironment` and holds no factory.
-The union appears in full rather than as an alias,
-the practice [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
-recommends.
+As [Retrofitting an Effect](46_Effects--Stateless.md#retrofitting-an-effect)
+recommends, the union appears in full rather than as an alias.
 
 Each Ability needs a shape of its own.
 You could rename `Obstacle.blocks()` to `name()`, which `Hero` already declares.
@@ -1485,10 +1481,10 @@ One engine, four runs, and the only difference is what you supply.
 
 The fourth run swaps one cast member and captures the output.
 `Script` records what arrives,
-so a test reads the lines back as a list with no `capsys` and no monkeypatching.
+so a test reads the lines back as a list with no `capsys` and no monkeypatching:
+the engine holds no printing to intercept.
 `test_greeter.py` in [Swapping the Implementation](46_Effects--Stateless.md#swapping-the-implementation)
 made the same swap with one Ability rather than three.
-The engine holds no printing to intercept.
 
 ### The Unmatched Cast
 
@@ -1820,6 +1816,7 @@ so the five sleeps overlap.
 If you fork and wait inside a single loop,
 each `wait()` blocks on the task the same iteration just created,
 so the sleeps run one after another and take about five times as long.
+
 The pool is an Ability, not a global,
 so `squares()` declares `Need[Executor]` and names no pool.
 Supplying a `ProcessPoolExecutor` moves the same work into processes,
@@ -1964,7 +1961,8 @@ print(f"run() at least 50x slower: "
 `run()` builds and tears down a loop on every call,
 hundreds of times the cost of `run_async()`.
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
-From inside one, `run_async()` is both the one that works and the one that is fast.
+From inside a running loop,
+`run_async()` is both the one that works and the one that is fast.
 
 ## Where the Guarantee Stops
 
@@ -2145,11 +2143,11 @@ error[invalid-argument-type]: Argument to function `run` is incorrect
 ```
 
 The `# type: ignore` silences that diagnostic,
-since the listing provokes the matching runtime failure on purpose.
-The `MissingAbilityError` it prints names the `Log` nobody supplied.
-`catch()` behaves the same way.
-If you catch one of two declared errors, the other stays in the error channel.
-Nesting the `supply()` inside the `run()` call keeps this diagnostic.
+since the listing provokes the matching runtime failure on purpose,
+and the `MissingAbilityError` it prints names the `Log` nobody supplied.
+Nesting the `supply()` inside the `run()` call keeps the diagnostic.
+`catch()` behaves the same way: if you catch one of two declared errors,
+the other stays in the error channel.
 
 The library's types ask the type checker a hard inference question,
 and the answer changes from one release of the checker to the next.
