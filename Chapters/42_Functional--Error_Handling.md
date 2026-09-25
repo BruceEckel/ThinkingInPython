@@ -13,7 +13,7 @@ It does not appear in the function's return type,
 so the signature reads as though the call always succeeds.
 And forgetting to handle one is easy.
 
-Returning the failure as a value removes all three.
+Returning the failure as a value addresses all three.
 Failure appears in the return type,
 so the type checker forces a caller to check for the failure before reading the answer,
 and a reviewer sees it without reading the body.
@@ -61,8 +61,7 @@ flags that scattering as a problem.
 ## Return the Error as a Value
 
 The function's return type becomes a union of the answer type and the error type.
-A union like this is a *sum type* (a *disjoint* union):
-a value that is one thing or another.
+A union like this is a *sum type*: a value that is one thing or another.
 Python's union carries no tag,
 so only the value's runtime type says which side you received.
 The error is just another return value, so every result stays in the list:
@@ -109,7 +108,7 @@ and `Result` is the union of the two.
 The value's class is now the tag that tells the two cases apart,
 so the union stays unambiguous whatever the two sides carry.
 Other languages call this a *tagged* or *discriminated* union.
-`Ok` and `Err` are both frozen data classes,
+`Ok` and `Err` are both [records](18_Techniques--Performance.md#record),
 `Ok` parameterized over the answer type and `Err` over the error type.
 `@final` states that neither can have subclasses.
 The type checker narrows a `Result` to one of the two classes because `Result` is a union of them.
@@ -153,7 +152,7 @@ type Result[A, E] = Ok[A] | Err[E]
 ```
 
 Ignore `bind()` for the moment.
-The two data classes and the `Result` alias are enough to report errors.
+The two records and the `Result` alias are enough to report errors.
 A function that might fail returns a `Result`.
 The signature names both outcomes:
 
@@ -348,7 +347,9 @@ if __name__ == "__main__":
 
 The two `composed()` functions agree on every input,
 and the exception version is shorter, but it says less:
-it reports which step failed as a message to parse.
+it reports which step failed as a message to parse,
+and only when the raiser wrote the step into the message:
+input 3's `division by zero` names no step at all.
 The failure disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
@@ -361,7 +362,7 @@ On an `Err`, `bind()` skips the function and returns the `Err` itself,
 the same failure.
 The two signatures differ because `Err` holds no answer to pass to the next step.
 `Err.bind()` therefore accepts a callable with any parameter list,
-and its return type is `Err[E]`, the same failure.
+and its return type is `Err[E]`, because it returns `self`.
 An `Err` anywhere in a chain skips the rest of the steps,
 because each later `bind()` returns that same `Err`:
 
@@ -387,12 +388,11 @@ if __name__ == "__main__":
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
 `bind()` removes the boilerplate by chaining the steps:
-the check that `composing.py` repeated at every step now sits inside `bind()`,
-written once.
+`composed()` has no `isinstance()` check and no early return left.
 
-Functional programmers have a name for a type that carries a value plus this chaining operation:
-a *monad*.
-Knowing the word is optional; the word marks a reusable shape:
+Functional programmers have a name for a type with a way to wrap a plain value
+(`Ok()` here) and this chaining operation: a *monad*.
+You can use `bind()` without the word, which names a reusable shape:
 `Maybe` chains a value that might be absent,
 `Result` chains one that might have failed,
 and an async container chains one whose computation has not finished yet,
@@ -421,7 +421,7 @@ with no `pytest.raises()`.
 The tests check that `unwrap()` returns the answer,
 and that `bind()` chains a success and short-circuits a failure.
 The last assertion uses `is` rather than `==`,
-proving the same `Err` object comes back and the lambda does not run:
+proving `bind()` returns the original `Err` object rather than anything the lambda would build:
 
 ```python
 # test_result.py
@@ -442,12 +442,13 @@ Testing confirms that the hand-written and `bind()` versions agree on every inpu
 
 ```python
 # test_composing.py
+import pytest
 from composing import composed as composed_manual
 from composing_with_bind import composed as composed_bind
 
-def test_manual_and_bind_agree() -> None:
-    for i in range(5):
-        assert composed_manual(i) == composed_bind(i)
+@pytest.mark.parametrize("i", range(5))
+def test_manual_and_bind_agree(i: int) -> None:
+    assert composed_manual(i) == composed_bind(i)
 ```
 
 ## Combining Multiple Results
@@ -710,7 +711,9 @@ A handler far enough up the stack to report the failure cannot see the locals th
 
 Most code catches the exception and raises a new one with a better message.
 The new exception replaces the original type,
-so a caller who wants the original must read it from the new exception's `__cause__` or `__context__`.
+so a caller who wants the original must read it from the new exception's `__cause__`
+(set by `raise New(...) from e`) or `__context__`
+(set when a handler raises without `from`).
 `BaseException.add_note()`, added in Python 3.11,
 improves the message and keeps the exception.
 It appends a line to the one you already have, and the traceback prints it:
@@ -797,6 +800,9 @@ The `Err` branch reads `error.__notes__`,
 and that read type-checks because the `match` narrowed the `Result` to `Err`.
 The narrowing works because `Result` is a union of exactly two classes,
 and it works the same way with `isinstance()`.
+Reading `error.__notes__` directly is safe here only because `parse_field()` adds a note on every failure.
+An exception that arrives from code you did not write may carry no notes,
+so read it with `getattr(error, "__notes__", [])`.
 
 ## The returns Library
 
@@ -839,7 +845,7 @@ reuses this `Result` machinery to convert Effects.
     leaving an `Ok` untouched
     (for chains to keep working, `Ok` needs its own `map_error()` that returns `self`).
     Use it to add a prefix to every error.
-3.  Rewrite `combined` so it collects all the failures instead of stopping at the first one,
+3.  Rewrite `combined()` so it collects all the failures instead of stopping at the first one,
     returning `Result[str, list[str]]`.
     Write the tests first.
 4.  Change `@safe` so it takes the exception types it should catch,
