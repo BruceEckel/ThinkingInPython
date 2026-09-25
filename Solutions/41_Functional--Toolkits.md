@@ -21,7 +21,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 #: 21
 ```
 
-The loop version runs a line longer than the recursive one, so brevity
+The loop version runs two lines longer than the recursive one, so brevity
 is not the argument either way. What changed is how much of the
 bookkeeping is yours. The recursive version never names a stack: the
 call stack holds the sublists still to walk, and `return` pops one.
@@ -31,11 +31,13 @@ Here you allocate the stack, seed it with a copy of `items`, choose
 Three of those choices are places to be wrong. Seeding with `items`
 instead of `list(items)` mutates the caller's list as the loop drains
 it. Using `append()` where `extend()` belongs pushes the sublist as
-a single element and loops forever on it. Using `pop(0)` still gives
-the right total but walks the structure breadth-first, a different
-order from the recursive version's. That order matters the moment the
-function does anything order-dependent. The recursive version
-cannot make any of these mistakes, because it never has the choice.
+a single element and loops forever on it. The pop end decides the
+visiting order, and neither end gives the recursive version's
+left-to-right walk: `pop()` visits the leaves right to left, and
+`pop(0)` walks the structure breadth-first. Both still give the right
+total, but the order matters the moment the function does anything
+order-dependent. The recursive version cannot make any of these
+mistakes, because it never has the choice.
 
 ## 2. `lru_cache` with `maxsize=3`
 

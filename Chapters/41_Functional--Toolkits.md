@@ -161,7 +161,7 @@ print(Text("7").zero_pad(3))
 #: 007
 ```
 
-Since Python 3.14 a `partial` object is a descriptor too,
+A `partial` object is a descriptor too,
 so writing `zero_pad = partial(pad, fill="0")` here works.
 `partial` and `partialmethod` differ as soon as an argument is positional.
 `partialmethod` passes the instance first and the bound arguments after it,
@@ -242,8 +242,8 @@ print(greet.__name__, "-", greet.__doc__)
 
 If you delete the `@wraps(func)` line,
 that same `print()` reports `wrapper - None`,
-and so does every tool that reports a function by its name or docstring,
-`help()` among them.
+and every tool that reports a function by its name or docstring,
+`help()` among them, reports the wrapper too.
 The name `greet` refers to `wrapper` either way;
 `wraps()` is what copies the original's name and docstring onto it.
 `wraps()` also sets `greet.__wrapped__` to the original function,
@@ -395,7 +395,7 @@ print(list(map(pow, range(5), repeat(2))))
 The fixed form replaces the list you would have written as `["x"] * 3`.
 The infinite form is the reason to import it.
 It supplies a constant argument for as many calls as `map()` makes,
-and it holds one object in memory, however many that is.
+and it holds one object in memory however many calls there are.
 Here the output stops when `range(5)` runs out,
 because `map()` stops at its shortest input.
 
@@ -747,8 +747,8 @@ print(list(islice(squares, 3)))
 #: [256, 289, 324]
 ```
 
-Four stages read from an infinite source,
-and all four wait for `list()` to pull.
+The pipeline stacks four stages on an infinite source,
+and none of them runs until `list()` pulls.
 The second `print()` shows the source resuming at `n` = 16 rather than 13,
 because `takewhile()` pulls one more total,
 the 590 from the batch `(169, 196, 225)`, finds it over the limit,
@@ -835,7 +835,8 @@ Python pushes a frame for every recursive call, including one in tail position.
 The stack has a cap, so deep recursion raises a `RecursionError`.
 `sys.setrecursionlimit()` raises that limit when the depth is genuine;
 a long flat sequence calls for a loop or one of the `itertools` tools.
-For counting down to zero, the loop is as fast and as short as the recursion.
+For a countdown like this one, the loop is as short as the recursion and faster,
+since it makes no calls.
 Recursion is the better choice once the problem branches rather than repeats,
 as `nested_sum.py` shows.
 
@@ -873,7 +874,7 @@ print(deep_sum([1, [2, [3, 4], 5], 6]))
 `deep_sum()` states what to do with one element and delegates the nesting to itself.
 To write `deep_sum()` as a loop,
 you build your own stack to track which sublists are still open,
-and you get the push and pop correct at every depth.
+and you must get the push and pop right at every depth.
 The recursive version hands that bookkeeping to the call stack.
 The body says what to do with one element and where to descend;
 the call stack tracks the depth.
@@ -903,12 +904,14 @@ whoever draws the phantom sits out that round.
 ### Groups of Any Size
 
 Rotation is a pairs-only method.
-The circle method is a closed-form answer to one narrow question,
-"how do you 1-factorize a complete graph into perfect matchings."
+The circle method is a closed-form answer to one narrow question:
+how do you split every possible pair into rounds in which each player appears exactly once?
 Pairs are the only group size where that question has a tidy rotation-based answer.
 Groups of three are far harder to schedule so that every pair meets exactly once.
-That problem is *Kirkman's schoolgirl problem*,
-solvable only for specific roster sizes, each by a construction of its own.
+The best-known case is *Kirkman's schoolgirl problem*,
+fifteen students walking in threes on seven days.
+A perfect trio schedule exists only when the roster size leaves a remainder of 3 when divided by 6,
+so seven students have none.
 A given `students` and `size` may have no exact answer,
 so the general version below trades rotation for a greedy search and settles for a good schedule.
 It builds each group one member at a time,
@@ -1056,8 +1059,8 @@ the single element, or the last partial batch.
 
 The second rule is that the pieces exist to stack.
 `islice(count(10, 2), 5)` in this chapter is two stages.
-A real pipeline is five or six,
-and it holds one item in memory at a time at any length.
+A real pipeline is five or six, and it holds only the few items in flight,
+however long its source.
 [Error Handling](42_Functional--Error_Handling.md)
 asks what such a pipeline does when one stage fails.
 A chain of pure functions leaves that question open.
@@ -1067,7 +1070,7 @@ A chain of pure functions leaves that question open.
 1.  Rewrite `deep_sum()` from `nested_sum.py` without recursion,
     using a list as an explicit stack.
     Compare the two versions for length,
-    and name where an off-by-one can occur in the loop version but not in the recursive one.
+    and name the mistakes the loop version allows that the recursive one cannot make.
 2.  `functools_lru_cache.py` prints `CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)`.
     Change `maxsize` to `3`, predict the four numbers before running it,
     then run it and account for any difference.
