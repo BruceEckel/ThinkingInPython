@@ -3,7 +3,7 @@
 This chapter follows one problem through several designs.
 A first solution solves it,
 then you ask "what will change?" and reshape the design so that kind of change touches one place.
-That reshaping is Martin Fowler's *Refactoring*,
+That reshaping follows the method of Martin Fowler's *Refactoring*,
 applied to patterns rather than single statements.
 
 The chapter is also a Python lesson.
@@ -12,7 +12,7 @@ single dispatch, closed classes, and types that are not values.
 Python's classes stay open, its types are values,
 and `functools.singledispatch` adds an operation from outside a class,
 so some of those patterns become unnecessary.
-This chapter names each one at the point where the example would otherwise need it.
+This chapter names each one where the example would otherwise need it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
 one design, then a requirement that makes it report wrong totals,
@@ -262,9 +262,8 @@ Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interprete
 may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union to compare the cases against,
 but `Trash` is deliberately open: the registry exists to accept new subclasses.
-This `match` runs over an open set,
-and [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
-warns against a `match` over an open set.
+[Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
+warns against exactly this shape: a `match` over an open set.
 
 A `case _:` wildcard could catch a new material:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
@@ -525,11 +524,11 @@ or once operations start to outnumber materials.
 is the classic way to add an operation without editing the classes.
 It is elaborate: a visitor class, an `accept()` method on every element,
 and double dispatch to select the right overload,
-all to work around a language that cannot add a method to a class from outside.
+all to work around a statically typed language that cannot add a method to a class from outside.
 `functools.singledispatch` selects the same implementation in one call.
 Any module can register an implementation for a new type.
 
-In Python, a single-dispatch function implements *Visitor*:
+In Python, a single-dispatch function does *Visitor*'s job:
 
 ```python
 # recycling_note.py
@@ -571,7 +570,7 @@ That fallback is also the risk: a forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
 Here "no special handling" is a genuine answer for `Paper`,
 so the fallback is correct.
-When every material needs an answer of its own,
+When the default answer would be wrong for an unregistered material,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 
@@ -615,7 +614,7 @@ where `note_methods.py` needs one edit per material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
 Python still has the expression problem,
-but each side is now one line instead of an edit spread across classes.
+but each side is now an addition in one place instead of an edit spread across classes.
 
 `singledispatch` is for behavior that differs by type.
 The earlier `sum_value()` does the same thing for every type,
@@ -623,6 +622,9 @@ so it stays an ordinary function.
 For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
+[*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#the-singledispatchmethod-trap)
+shows it in use, along with the one mistake it makes easy:
+a `@singledispatchmethod` on a shared base gives every subclass the same dispatcher.
 
 The chapter now holds two kinds of dispatch that treat subclasses differently.
 `bins[type(t)]` keys on the exact class,
