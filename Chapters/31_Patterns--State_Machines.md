@@ -13,7 +13,8 @@ so the system behaves differently as it moves from state to state.
 The code that moves the system from one state to the next is often a [*Template Method*](25_Patterns--Template_Method.md),
 as the following framework for a basic state machine shows.
 You call `run()` on a state to perform its behavior,
-and you pass an "input" object to the state so it can tell you which state to enter next.
+and you pass an "input" object to the state's `next()`,
+which returns the state to enter next.
 The chapter shows two designs that differ in one way: in the first,
 each `State` object decides its own next state; in the second,
 a single table holds every transition.
@@ -32,7 +33,7 @@ class State(Protocol):
 ```
 
 Python does not require this Protocol.
-It earns its few lines twice over: annotations can name `State` as a type,
+Its few lines do two things: annotations can name `State` as a type,
 and a state class that leaves a method out fails the type check wherever the program uses it as a `State`,
 before anything runs.
 
@@ -229,8 +230,8 @@ and by the time anything calls `next()` the whole module has run and `MouseTrap`
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 `StateMachine`'s constructor runs the initial state,
-the construction-starts-the-engine choice that [draws a warning in *Template Method*](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
-Two facts make it safe here, and either one is easy to lose in a later edit:
+the construction-starts-the-engine choice that [*Template Method* warns against](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
+Two facts make it safe here, and a later edit can undo either one:
 `MouseTrap.__init__()` assigns nothing after its `super().__init__()` call,
 and no state's `run()` reads anything off the machine.
 If you give a `State` a `run()` that reads a machine attribute,
@@ -243,7 +244,7 @@ A base class could also give the annotations a type to name:
     class State: pass
 
 Calling `run()` or `next()` on a derived type that lacks them then raises an `AttributeError`,
-and a base whose methods `raise NotImplementedError` moves the failure into the base,
+and a base whose methods `raise NotImplementedError` raises from the base's method instead,
 with whatever message you write there.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows the other option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
@@ -390,38 +391,38 @@ which only repeats the event the message already names.
 
 ### An Unexpected Input
 
-The two versions also answer a question this input file does not ask:
-what happens on an unexpected input?
-Both listings end with one more call that asks it:
-feeding `MouseAction.ESCAPES` to a fresh trap sitting in `Waiting`,
+The two versions also differ on a case this input file never sends:
+an unexpected input.
+Both listings end with one more call that sends one:
+feeding `MouseAction.ESCAPES` to a fresh trap in `Waiting`,
 where neither the `match` nor the table names it.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
 Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 
 Version 1's `case _` arms return the current state,
-so an input a state does not recognize raises no exception and the machine stays put.
-Staying put is not the same as doing nothing:
+so an input a state does not recognize raises no exception and the machine stays in the same state.
+Staying in the same state is not the same as doing nothing:
 `run_all()` calls `run()` on whatever state `next()` returns,
 so a transition back to the current state runs that state's action a second time.
 Version 2's table holds only the explicit transitions,
 and its `next()` raises an exception on anything else.
 
 Either answer can be right, so choose it on purpose.
-Staying put suits a machine fed from a noisy source that includes events meant for something else.
+Staying in the same state suits a machine fed from a source that includes events meant for something else.
 Raising an exception suits a table you are still building,
-where a missing entry is a bug to flag,
+where a missing entry is a bug the exception reports,
 and the table-driven engine below raises an exception for the same reason.
 
 ## Table-Driven State Machine
 
 The previous design keeps each state's transitions inside the state class.
-A fully table-driven design can go further and represent the entire machine as a single transition table.
-All the behavior then lives in one place,
+A fully table-driven design represents the entire machine as a single transition table.
+All the behavior is then in one place,
 so you can build and maintain it directly from a state-transition diagram.
 The example is a vending machine, built in two steps:
-an engine that knows nothing about vending, then the machine's table.
+an engine with no vending-specific code in it, then the machine's table.
 
-For a given current state and input, a transition row answers three questions:
+For a given current state and input, a transition row records three things:
 whether a condition must pass, what action runs during the transition,
 and what state comes next.
 As a table:
@@ -431,7 +432,7 @@ As a table:
 The original Java version of this example needed two extra class hierarchies,
 `Condition` and `Transition`,
 because the Java of the time had no way to store a method as a value.
-Python functions are first-class, so those hierarchies vanish.
+Python functions are first-class, so the Python version needs neither hierarchy.
 A condition is any callable returning a `bool`, an action is any callable,
 and the table is an ordinary `dict`.
 
@@ -444,7 +445,7 @@ and the table keys on that class rather than on a value.
 An enum fails here twice: you set its members when you write it,
 so it can carry only the values you knew about then,
 and every member of one enum shares that enum's class,
-so they all arrive under the same dispatch key.
+so `type(event)` is the same key for all of them.
 
 This design reuses two names with new meanings.
 `tabledriven/table_machine.py` holds a different `StateMachine` from the one above,
@@ -461,7 +462,7 @@ with no error.
 ### The Engine
 
 For the current state and the type of the incoming event,
-the engine walks the candidate transitions in order,
+the engine tries the candidate transitions in order,
 takes the first whose condition passes (or has no condition),
 runs that transition's action, and moves to the next state:
 
@@ -526,12 +527,15 @@ The conditions and actions are ordinary methods, stored directly in the table.
 
 ![The vending machine's five states and the inputs that move it between them](_images/stateMachine)
 
-Money loops `COLLECTING` back on itself, a first digit moves to `SELECTING`,
-and a second digit branches three ways on price and stock.
+`Money` keeps the machine in `COLLECTING`,
+a first digit moves it to `SELECTING`,
+and a second digit goes to one of three states, decided by price and stock.
 `Quit` refunds from any of the other states back to `QUIESCENT`.
 
 The states are an `Enum`,
-so the type checker catches a misspelled state name before it can fail silently at runtime.
+so the type checker reports a misspelled state name before the program runs.
+A misspelled string would name a state no row matches,
+and no checker would report it.
 `MouseAction` is a `StrEnum` because its values have to match lines of the input file.
 Nothing parses these states from text, so a plain `Enum` with `auto()` serves:
 
@@ -701,33 +705,33 @@ The state names the condition;
 the message alone leaves you inferring it from the quantity.
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
-Both conditions are now true, and `too_expensive` sits first in that row's list,
-so it wins.
+Both conditions are now true,
+and `too_expensive` comes first in that row's list, so the engine takes it.
 The machine reports `COLLECTING`, as though a dollar more would sell it,
 when the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
-That is the cost of the ordering rule stated above:
+That follows from the ordering rule stated above:
 a row lower in the list can never override one above it,
 even when the lower row is the one that matters.
 
 The engine's lookup keys on `type(event)` exactly,
-a dictionary probe rather than an `isinstance()` walk.
+one dictionary lookup rather than an `isinstance()` test against each row.
 The table keys separate rows on `FirstDigit` and `SecondDigit`,
 two subclasses of `Digit` that differ only in their class.
-The exact match has a cost.
-A further subclass of an event type matches none of its parent's rows,
-because the table must name an event's exact class.
+The same exactness excludes a further subclass:
+an event whose class derives from `Money` matches none of `Money`'s rows,
+because the key is the event's exact class.
 
 The table goes in `__init__()` rather than in the class body,
 because each entry is a bound method:
-`self.add_money` carries this machine with it,
-so each `VendingMachine` gets a table wired to its own money and stock.
+`self.add_money` holds a reference to this machine,
+so each `VendingMachine`'s table calls methods that read and write its own `amount` and `items`.
 
 The engine passes the event to both callables, whether they need it or not,
 which is why `refund()` takes an argument it ignores.
 The `Callable[..., bool]` and `Callable[..., None]` annotations leave the parameters as `...` because each method declares the specific event type it handles,
 and no one signature covers them all.
-That `...` costs you a check:
+That `...` gives up a check:
 nothing verifies that a row's condition and action accept the event class its key names.
 If you pair a `SecondDigit` key with a method written for a `FirstDigit`,
 the table type-checks clean and does the wrong thing at runtime.
@@ -742,8 +746,8 @@ The language's first-class functions and its `dict` supply what those mechanisms
 
 Because the machine is deterministic,
 a test can drive it through a sequence of events and check which state it reaches.
-The cases worth pinning down are a successful purchase,
-the two conditional branches (too expensive and sold out), a refund,
+The cases worth testing are a successful purchase, the two conditional branches
+(too expensive and sold out), a refund,
 and the error when no transition matches:
 
 ```python
@@ -814,8 +818,9 @@ The text demo in `vending_machine.py` reads `message` and prints it.
 Contrast `run_all()` in the first design,
 which prints its input from inside the framework.
 Printing there is convenient for a book listing and wrong for a reusable machine,
-because it fixes one output device into the engine.
-Recording a message instead leaves the choice to whoever is watching.
+because it puts the `print()` call in the engine,
+where every user of `run_all()` gets it.
+Recording a message instead leaves the output to the caller.
 
 Using `tkinter`, you can build a GUI for the vending machine.
 The panel reads `amount`, the stock, and `message` and shows them on screen,
@@ -895,9 +900,9 @@ if __name__ == "__main__":
 
 `send()` hands each event to `handle()` and catches the `NoTransition` that a rejected click raises
 (a selection before any money, say),
-so the GUI shows a message rather than crashing.
+so the GUI shows a message instead of the traceback `tkinter` would otherwise print.
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
-Sixteen lambdas closing over `r` and `c` all see the loop's final values,
+Sixteen lambdas closing over `r` and `c` would all read the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
 The three fixed buttons use lambdas safely,
 since they close over nothing that varies.
@@ -908,15 +913,15 @@ The two designs answer the same question, which state comes next,
 and put the answer in different places.
 
 Each-state-decides suits a machine whose states do something and have few transitions apiece.
-The state class owns both halves,
-so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and where it can go next,
+The state class holds both the action and the transitions,
+so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it,
 and adding a state is one class.
 It reads best when the transitions are obvious from the state's own name.
 An action that must run on every entry into one state,
 such as sounding a chime whenever the trap reaches `Holding`,
 belongs in that state's `run()`, written once.
 
-Inside that design, `match` statements and per-state tables differ in who handles an input the state does not recognize.
+Inside that design, `match` statements and per-state tables differ in which code handles an input the state does not recognize.
 With `match`, each state's `case _` sets its own policy,
 in the method you are reading.
 With tables, `TableState.next()` sets one policy for every state,
@@ -929,21 +934,21 @@ or whose transitions need conditions.
 Everything is in one place, in the same order as the diagram,
 and adding a state or an input is an entry in the table and a method or two.
 The states shrink to `Enum` members with no behavior,
-so that per-state action has no home:
+so the design has no single place for that per-state action:
 an action shared by several edges into the same state must repeat on every row that leads there,
 or route through a helper the table does not provide on its own.
 
 The deciding question is which you would rather read: one state's transitions,
 gathered in that state, or the whole machine's, gathered in one table.
-A machine small enough to hold in your head goes either way,
-and a machine that arrived as a diagram belongs in the table.
+A machine with a few states works in either design,
+and a machine you drew as a diagram first belongs in the table.
 
 With either design you write for yourself what a library supplies.
-Mature libraries such as `transitions` and `python-statemachine` add guards,
-callbacks, and hierarchical states for the price of an import.
+Mature libraries such as `transitions` and `python-statemachine` supply guards,
+callbacks, and hierarchical states, and using one adds a dependency.
 Choose one of the two designs here when you cannot take that dependency,
 or want the mechanism visible in your own code.
-Choose a library once the machine outgrows what a page of code should carry.
+Choose a library once the machine needs more than a page of code.
 
 ## Exercises
 
