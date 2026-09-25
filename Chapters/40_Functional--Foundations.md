@@ -6,10 +6,9 @@ A pure function cannot corrupt state you forgot about.
 A bug in it reproduces from the arguments alone,
 and it needs no mock or fixture to test.
 A cache from `functools`, or a sliding window from `itertools`,
-is code you never write yourself,
+is code the library wrote for you,
 already correct on the edge case you would otherwise miss.
-A function with no shared state needs no lock,
-so it parallelizes with no new code.
+A function that shares no state is already safe to run in parallel.
 And code built from small,
 checkable pieces is code you can reason about by substitution,
 the same way you check a line of algebra.
@@ -168,7 +167,7 @@ and that time and memory are the cost of the coordination immutability removes.
 ### Immutability in Annotations
 
 Type annotations can state immutability so a type checker enforces it.
-`typing.Final` marks a name you must not rebind.
+`typing.Final` marks a name bound once, at its declaration.
 The read-only collection types in `collections.abc`,
 such as `Sequence` and `Mapping`, describe a value you only read.
 They have no `append()` or item assignment,
@@ -194,10 +193,9 @@ The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
 Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
 is a type error.
-The constraint applies to one side only.
-`Sequence[int]` states that `total()` does not mutate its argument.
-It says nothing about the caller,
-who still holds the `list` and can append to it at any time,
+The constraint binds one side.
+`Sequence[int]` declares that `total()` only reads its argument.
+The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding:
 if you declare `CONFIG: Final[list[int]] = [...]`,
@@ -205,7 +203,8 @@ if you declare `CONFIG: Final[list[int]] = [...]`,
 That is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
-`Final[tuple[int, ...]]`, and `Final` then forbids only the rebinding.
+`Final[tuple[int, ...]]`: the tuple guards the contents,
+and `Final` guards the binding.
 
 ### A Stable Hash and Safe Sharing
 
@@ -402,7 +401,7 @@ Higher-order functions separate the iteration from the operation.
 and `sorted()` each contain the loop that iterates over the data, written once,
 and you supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
-and you stop making the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
+and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 The idea also applies the other way around.
 A function that takes a function can wrap it with operations like timing,
 retries, or logging.
@@ -450,8 +449,8 @@ That is the difference between a captured constant and the global `balance` that
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
 Once the factory returns,
-the captured variable has a name in no scope but the inner function's,
-so ordinary code cannot read or rebind it.
+the inner function's scope is the one place the captured variable has a name,
+so the inner function alone can read or rebind it.
 That gives you encapsulation without declaring a class:
 
 ```python
@@ -504,7 +503,7 @@ If you delete the `nonlocal` line,
 ## Partial Application
 
 *Partial application* fixes some of a function's arguments and produces a new function that expects the rest.
-`functools.partial()` does this without a hand-written wrapper:
+`functools.partial()` builds that new function from the old one and the fixed arguments:
 
 ```python
 # partial.py
@@ -538,16 +537,16 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
-and so avoids the late-binding surprise a lambda created in a loop can produce.
-[Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)'s `late_binding.py` demonstrates that surprise.
+where a lambda created in a loop reads each captured name at call time,
+the late-binding surprise [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)'s `late_binding.py` demonstrates.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
 Binding `exponent` above works because `power()` accepts it by keyword.
 `partial()` fills positional arguments from the left, so before 3.14,
 fixing the third argument meant fixing the first two as well.
-A function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters)
-rules out the keyword form `power()` allows.
+For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
+position is the only way to bind an argument.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
 The listing below carries two `# type: ignore` comments,
@@ -568,9 +567,8 @@ print(percent.args)
 ```
 
 `percent` fixes the bounds and leaves the middle argument open,
-the specialization `partial()` alone could never express.
-A `Placeholder` reserves the position without supplying a value.
-The caller must still fill it:
+the specialization a hand-written wrapper supplied before 3.14.
+A `Placeholder` reserves the position and leaves the value to the caller:
 calling `percent()` with no argument raises a `TypeError`.
 The library also rejects a *trailing* placeholder, for the opposite reason:
 `partial()` already appends the call's arguments after the bound ones,
@@ -623,11 +621,11 @@ The type parameters matter on the second `print()`:
 the type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
-You grow a composition by adding a stage rather than by enlarging one.
+You grow a composition by adding a stage.
 Each stage is also testable on its own,
-and you build larger behavior by naming a new composition rather than by writing new logic.
+and a larger behavior is a new named composition of existing stages.
 When a requirement changes,
-you insert or swap a single stage and leave every other one untouched.
+you insert or swap a single stage and the others stay as they were.
 
 The standard library supplies whole modules of these small, composable pieces.
 [Toolkits](41_Functional--Toolkits.md) tours them.
