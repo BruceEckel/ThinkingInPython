@@ -12,7 +12,7 @@ Listing a pattern here does not recommend it.
 Many overlap, some solve the same problem in different ways,
 and several exist only to work around limits of a particular language.
 [*State*](26_Patterns--Surrogate.md#state)
-and [*State Machine*](31_Patterns--State_Machines.md) are one such pair.
+and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
 A design rarely needs both at once.
@@ -22,9 +22,9 @@ the body of this book argues, dissolve in Python
 
 The tables follow each source's own grouping,
 so each name sits where its source puts it.
-That includes GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
+One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
 which [Design Patterns](21_Patterns--Design_Patterns.md)
-accepts for *Creational* and questions for the other two.
+accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source and sit instead in three groups by what they share:
 language idioms tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
@@ -255,7 +255,7 @@ Python includes the piece their inventors set out to supply.
 | [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch) | `functools.singledispatch` |
 | [*Flyweight*](35_Patterns--Flyweight.md#python-uses-flyweights) | Interned strings and cached small integers |
 
-The subtraction leaves the intent, not the structure.
+Subtracting Python's share leaves the intent, not the structure.
 [Reading the Chapters Ahead](21_Patterns--Design_Patterns.md#reading-the-chapters-ahead)
 argues this in general.
 Each linked chapter shows one case.
