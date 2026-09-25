@@ -16,7 +16,7 @@ First, split each object's state in two.
 so it can live in the shared object.
 *Extrinsic state* varies per use, so it must live outside,
 where the context supplies it.
-Second, route construction through a factory that returns the existing instance for a given value.
+Second, construct every object through a factory that returns the existing instance for a given value.
 
 Sharing one object under many names is safe when the object stays the same for everyone,
 so a flyweight must be [immutable](20_Patterns--Rethinking_Objects.md#the-immutability-solution).
@@ -43,7 +43,7 @@ The listing parses each value from a string for a reason.
 The compiler pools equal constants within one code object, so with literals
 (`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
 That sharing comes from the pooling, not from the integer cache.
-Parsing at runtime keeps the compiler out,
+Parsing at runtime gives the compiler no integer constant to pool,
 so any sharing that remains comes from the cache.
 (That pooling is also why Python warns about `is` on a literal.)
 
@@ -64,8 +64,9 @@ print(intern(joined) is intern(joined2))
 
 The two `join()` calls build equal but distinct strings,
 and `intern()` maps both to one shared copy.
-Interned strings make comparison cheap.
-Equal means identical, so `==` collapses to a pointer check.
+Interned strings compare in one step when they are equal.
+Equal means identical,
+and CPython's `==` on two strings checks identity before it compares characters.
 
 The small-integer cache and string interning are CPython implementation details,
 not language guarantees.
@@ -83,7 +84,7 @@ The tile's position is extrinsic.
 It is the cell's coordinates in the grid, so the `Tile` object never stores it.
 
 The factory pairs `functools.cache` with a constructor function,
-the same building block behind [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
+the same pairing behind [*Singleton*](24_Patterns--Singleton.md#when-you-want-a-class-cache-the-instance)'s cached factory.
 There the function takes no arguments,
 so caching produces one shared instance overall.
 Here `tile()` takes a symbol,
@@ -161,19 +162,19 @@ Exercise 2 measures the memory behind it.
 so `Tile.symbol` and `SPECS` can hold only one of them.
 If you add a kind to `SPECS` without adding it to `Symbol`,
 the type checker rejects the mismatch.
-`tile()` trusts its argument is already a `Symbol`,
-so the untrusted boundary is `to_symbol()`,
-the one place raw text meets the checked type.
+`tile()` declares its parameter a `Symbol` and checks nothing itself,
+so the boundary is `to_symbol()`,
+the one function that takes a `str` and returns a `Symbol`.
 It checks membership in `SPECS` at runtime and raises a `KeyError` if the character is not there.
-The type checker reads that guard too.
-`SPECS` has key type `Symbol`, so past the guard `char` is a key of `SPECS`.
-The checker narrows it to `Symbol`,
+The type checker narrows on the same guard.
+`SPECS` has key type `Symbol`,
+so past the guard the checker narrows `char` to `Symbol`,
 and `return char` satisfies the declared return type with nothing added.
 The narrowing proves what a [`cast()`](08_Foundations--Static_Types.md#typing-decorators-and-directives)
 asserts.
-Prefer a guard the type checker can read.
+Prefer a guard the type checker narrows on.
 Keep `cast()` for the cases where no guard exists,
-because the type checker believes a `cast()` rather than verifying it.
+because the type checker accepts a `cast()` without verifying it.
 
 ```python
 # test_tile_map.py
@@ -202,7 +203,7 @@ def test_direct_construction_bypasses_pool() -> None:
 
 ### Freezing the Shared Tile
 
-Freezing `Tile` hides the sharing from clients.
+Freezing `Tile` keeps the sharing from affecting clients.
 Nothing they can do to one cell's tile affects another,
 because nothing they can do affects the tile.
 
@@ -211,17 +212,17 @@ Mutating the grass tile in one cell changes every grass cell in the map.
 
 The freezing must hold all the way down.
 A record blocks assignment to a field, not mutation inside one,
-so a `Tile` holding a `list` leaks that list to every cell that shares the tile
+so a `Tile` holding a `list` gives every cell that shares the tile the same mutable list
 (the shallow-freezing trap in [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)).
 Every field here is immutable, which makes the sharing safe.
 
 ## Interning in the Constructor
 
 A factory function like `tile()` has a visibly different name and call syntax,
-which warns callers of something unusual.
+so a caller can see that construction goes through something other than the class.
 If you want callers to keep writing `Color(...)`,
 hide the pool inside `__new__()` instead.
-Hiding the pool in `__new__()` is the maneuver [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
+Putting the pool in `__new__()` is the same technique [*Singleton*](24_Patterns--Singleton.md#the-classic-implementations)
 uses.
 Here the cache keys on the constructor arguments instead of a single fixed key.
 A pool of singletons keyed this way is sometimes called *Multiton*:
@@ -260,7 +261,7 @@ if __name__ == "__main__":
 The construction syntax stays the same,
 and callers cannot tell they received a shared object
 (this is how CPython's small-integer cache works).
-The cost is bookkeeping by hand.
+The bookkeeping is by hand, and `__new__()` adds a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
@@ -270,17 +271,18 @@ The call still reaches `object.__init__()`.
 so that inherited `__init__()` accepts the three arguments and ignores them.
 That rules out `@dataclass`,
 whose generated `__init__()` reintroduces the re-run.
-The damage is invisible at first,
+The re-run is harmless at first,
 since re-assigning the same components changes nothing.
-It appears the moment a field has a `default_factory` or `__post_init__()` has a side effect,
+It stops being harmless the moment a field has a `default_factory` or `__post_init__()` has a side effect,
 because both run again on an object that is already finished.
-`Tile`'s `@dataclass` generates its `__repr__()` and `__eq__()`;
+`Tile`'s `@record` generates its `__repr__()` and `__eq__()`;
 `Color` has only `object`'s versions,
 so printing a `Color` shows the default `object.__repr__()`.
-The missing `__eq__()` costs less than it appears.
+The missing `__eq__()` matters less than it appears.
 For a perfectly interned type, equal values are the same object,
 so the default identity comparison answers correctly.
-`@dataclass(init=False)` could restore those two generated methods, at a price:
+`@dataclass(init=False)` could restore those two generated methods,
+with two consequences:
 the generated `__eq__()` sets `__hash__` to `None` unless you also pass `frozen=True`,
 and `frozen=True` then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
 A `defaultdict` calls its `default_factory` with no arguments,
@@ -295,22 +297,22 @@ The two forms differ in one guarantee.
 `tile()` interns the calls that go through it,
 and a direct `Tile("~", "water", False)` bypasses it,
 building a second object equal to the pooled water tile.
-`Color(...)` routes every construction through the pool,
-so `is` is as trustworthy as `==`.
-That guarantee, or the constructor syntax, is what the bookkeeping buys.
+Every `Color(...)` call looks in the pool first,
+so two `Color`s with the same components are the same object and `is` answers what `==` would.
+The bookkeeping exists for that guarantee, or for the constructor syntax.
 When you need neither,
 the `@cache` factory from `tile_map.py` does the same job with less machinery.
 
 One more property carries over from [*Singleton*](24_Patterns--Singleton.md#the-first-call-race)'s cached factory:
 every lazy check-then-insert pool races under threads.
 Two threads asking for the same new color can each build "the" shared object,
-one wins the pool, and identity between their two results fails.
+the second store overwrites the first,
+and the two threads hold distinct objects.
 `@cache` races the same way.
-Its C implementation invites the assumption that one call is atomic,
-but the lookup, the call to your function,
-and the store are three separate steps,
+Its C implementation does not make one call atomic: the lookup,
+the call to your function, and the store are three separate steps,
 so threads that all miss on the same key each run the function and each keep their own result.
-When flyweights meet threads,
+When more than one thread uses a pool,
 populate the pool eagerly or guard the insert with a lock.
 
 ## A Pool That Does Not Leak
@@ -318,14 +320,14 @@ populate the pool eagerly or guard the insert with a lock.
 Both pools so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` never shrinks.
-For tile kinds and colors that is fine, since the universe of values is small.
-When the universe grows without bound, such as symbols in a long-running parser,
+For tile kinds and colors that is fine, since the set of values is small.
+When the set grows without bound, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
 the [live-instance registry](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
 fixes the leak.
 It holds its values weakly,
-so an entry disappears as soon as no one else uses the object:
+so it removes an entry as soon as nothing else references the object:
 
 ```python
 # weak_pool.py
@@ -359,28 +361,30 @@ if __name__ == "__main__":
 
 While any reference to the `Name` survives,
 every call to `name("alpha")` returns that same object.
-When the last reference dies,
-CPython's reference counting frees the object and the pool entry evaporates with it.
+When the last reference goes away,
+CPython's reference counting frees the object,
+and the weak reference's callback removes the pool entry.
 The pool guarantees sharing without extending lifetimes,
 which is the same design as `sys.intern()`.
 If you want a bounded pool instead,
 `functools.lru_cache(maxsize=n)` gives the factory an eviction policy,
-at the price of keeping the most recent `n` alive whether or not anyone uses them.
-Eviction also weakens the sharing guarantee:
+and keeps the most recent `n` alive whether or not anything else references them.
+After an eviction, sharing is no longer guaranteed:
 requesting an evicted value builds a fresh object,
 equal to any surviving original but not the same one.
 The weak pool never produces such a pair:
-its entry lives exactly as long as someone holds the object.
+its entry lives exactly as long as something references the object.
 
 *Flyweight* cuts the number of objects,
 and [`slots=True`](18_Techniques--Performance.md#slots)
 cuts the size of each one,
 so the two are worth combining once memory is the point,
 as `Tile` does by being a record.
-They collide at one spot.
-A slotted class drops the `__weakref__` slot a weak reference needs,
+The combination fails in one case.
+A slotted class has no `__weakref__` slot unless it declares one,
+and a weak reference needs that slot,
 so slotting `Name` makes `_pool[text] = found` raise a `TypeError`.
-`weakref_slot=True` puts that slot back.
+`weakref_slot=True` adds that slot.
 `record()` has no such option, so `Name` keeps `@dataclass(frozen=True)`.
 
 ```python
@@ -439,8 +443,9 @@ if __name__ == "__main__":
 `walkable` is a bare annotation, not a `ClassVar`.
 It declares a per-member attribute, the same role a dataclass field plays,
 except `__new__()` assigns it by hand instead of a generated `__init__()`.
-`__new__()` runs before any member becomes visible,
-so every member has its `walkable` by the time anything can read it,
+`__new__()` runs during class creation,
+before the `class` statement binds the name `Tile`,
+so every member has its `walkable` by the time any code can read it,
 and the annotation needs no default or sentinel.
 
 Each member's tuple goes to `__new__()`,
@@ -460,10 +465,11 @@ so `__new__()` must assign to that exact name rather than something like `_symbo
 
 Name, symbol, and attribute access all reach the same shared member.
 The enum version also brings iteration, exhaustive `match`,
-and protection against inventing a tile kind that does not exist.
+and a fixed set of members: `Tile("?")` raises a `ValueError`,
+and `Tile.DOOR` raises an `AttributeError`.
 A `match` over `Tile` needs no `case _:` catch-all once every member has a case,
 and if you leave one out,
-the type checker reports the gap before any `Tile` value reaches the code at runtime:
+the type checker reports the missing case before any `Tile` value reaches the code at runtime:
 
 ```python
 # tile_enum_match.py
@@ -494,9 +500,9 @@ error[invalid-return-type]: Function can implicitly return
   |                             ^^^
 ```
 
-The missing `Tile.ROCK` case is the gap;
+The missing `Tile.ROCK` case is what the diagnostic reports;
 adding it back makes the diagnostic disappear with no other change.
-The cost is flexibility.
+What the enum gives up is loading at runtime:
 `tile()` could load `SPECS` from a file, while `Tile.GRASS` is source code.
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
 exploits the same property, using members as shared, comparable states.
@@ -508,7 +514,7 @@ and the question that decides between them is how much you know about the set of
 If you know it as you write the program,
 use an `Enum` and let the language hold the pool.
 If callers must keep writing `C(...)`,
-intern in `__new__()` and pay the bookkeeping.
+intern in `__new__()` and write the bookkeeping.
 If the set grows without bound,
 use a `WeakValueDictionary` so the pool cannot become a leak.
 Otherwise use a `@cache` factory, which is the least machinery for the job.
