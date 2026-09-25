@@ -39,8 +39,10 @@ A *pure function* computes its result from its arguments alone.
 It reads nothing that can change, and it changes nothing outside itself.
 Given the same arguments, it always produces the same outcome,
 whether that outcome is a returned value or a raised exception.
-It has no *side effects*: no printing, no file or network access,
-no mutation of anything outside the function.
+A *side effect* is anything a function does beyond producing that outcome,
+such as printing, touching a file or the network,
+or mutating something outside the function.
+A pure function has none.
 
 Purity is the foundation on which everything else in these chapters builds.
 You can reason about a pure function the way you reason about an equation:
@@ -109,7 +111,7 @@ If you delete the second `total = 0`, the second assertion fails.
 That line is the fixture the impure version needs, and purity removes it.
 `slope()` appears again later in the book:
 [Are Exceptions Impure?](44_Effects--Effect_Management.md#are-exceptions-impure)
-asks of this same function whether raising an exception breaks its purity.
+asks whether raising an exception breaks its purity.
 
 ## Immutability
 
@@ -156,7 +158,7 @@ and concurrent code needs no lock to read it.
 
 That safety has a cost.
 Python's immutable types share no structure:
-`moved = Point(p.x + 10, p.y)` above builds an entirely new `Point`,
+`moved = Point(p.x + 10, p.y)` above builds a new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
 Copying a two-field `Point` costs so little that you can ignore it.
@@ -446,7 +448,8 @@ That is the difference between a captured constant and the global `balance` that
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
-The captured variable has no name in any enclosing scope,
+Once the factory returns,
+the captured variable has a name in no scope but the inner function's,
 so ordinary code cannot read or rebind it.
 That gives you encapsulation without declaring a class:
 
@@ -534,7 +537,7 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
-which avoids the late-binding surprise a lambda created in a loop can produce.
+and so avoids the late-binding surprise a lambda created in a loop can produce.
 [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)'s `late_binding.py` demonstrates that surprise.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
@@ -546,9 +549,8 @@ A function whose parameters are [positional-only](05_Foundations--Functions.md#p
 rules out the keyword escape `power()` allows.
 `functools.Placeholder` (Python 3.14 and later)
 is a marker that reserves a position for the caller.
-The listing below carries two `# type: ignore` comments.
-They mark a type-checker limitation, not a mistake in the code,
-as the paragraph after the listing explains:
+The listing below carries two `# type: ignore` comments,
+which the paragraph after it explains:
 
 ```python
 # placeholder.py
@@ -665,8 +667,7 @@ print(data[0])
 #: Reading(sensor='a', celsius=18.0)
 ```
 
-Five of the chapter's ideas are doing work at once:
-a frozen dataclass for the value,
+Five of the chapter's ideas work at once: a record for the value,
 `Sequence` to state that `report()` only reads, two pure functions,
 `partial()` to turn a two-argument predicate into the one-argument callable `filter()` requires,
 and `map()` and `filter()` for the traversal.
