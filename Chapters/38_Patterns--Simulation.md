@@ -11,7 +11,7 @@ The third produces a pattern no one wrote down as a picture:
 the formula fixes its shape, and the grains gather on it.
 
 The chapter works the first example, the pack of rats, from end to end.
-It puts asyncio tasks, a shared coordination object,
+That example puts asyncio tasks, a shared coordination object,
 and structural typing together in one small program.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 introduces the `asyncio` mechanics (`async def`, `await`, `gather`, `run`).
@@ -251,7 +251,8 @@ and most of the rats do not exist yet.
 `group` carries `field(init=False)`, and only `explore()` assigns it.
 The robot example later in this chapter declares `Robot.room` the same way,
 without assigning it.
-The other four fields are internal bookkeeping:
+The other four `init=False` fields, `visited`, `tasks`, `messages`,
+and `_numbers`, are internal bookkeeping:
 `init=False` keeps them out of the generated signature,
 and each `default_factory` builds a fresh object per blackboard.
 
@@ -346,7 +347,7 @@ the race the atomicity resolves.
 
 A maze with a loop closes a second path between two cells,
 so two different rats can reach the same open cell from opposite directions.
-Eight open cells around one wall block are enough to force it:
+Eight open cells around one wall block are enough to force the race:
 
 ```python
 # rats_and_mazes/ring_contention.py
@@ -662,7 +663,7 @@ def item_factory(symbol: str) -> Item:
 so `from world import Room` here is circular.
 `TYPE_CHECKING` is `True` only for a type checker reading the file and `False` at runtime,
 so the runtime skips that import and the cycle exists for the checker alone.
-Every use of `Room` below is an annotation (`room: Room`, `-> Room`),
+Every use of `Room` in `items.py` is an annotation (`room: Room`, `-> Room`),
 never a runtime lookup.
 
 `Robot` holds its two pieces of state in different ways.
@@ -678,16 +679,17 @@ and the builder runs first, so every read comes after.
 It searches `Item.__subclasses__()` for a matching `symbol`,
 so a new kind of item registers itself: define the subclass with its symbol,
 and the factory finds it.
-This is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
+That search is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary),
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses,
 so a new item must inherit from `Item` itself.
 If you derive a class from `Food` to inherit its behavior,
-it is a grandchild of `Item`.
+that class is a grandchild of `Item`.
 `Item.__subclasses__()` leaves it out,
 so the loop falls through to its last line and builds a `Teleport`.
 The same chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method)
-describes the recursion for deeper hierarchies, and its exercise 9 writes it.
+describes the recursion for deeper hierarchies,
+and that chapter's exercise 9 writes the recursion.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.
 Doors that lead nowhere point at one shared `EDGE` room,
@@ -763,7 +765,7 @@ then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
 so splitting them into labeled passes keeps each stage separate instead of interleaving all three in one loop.
 [Factory](27_Patterns--Factory.md#builder)
-counts this among the cases where *Builder* survives in Python,
+counts `GameBuilder` among the cases where *Builder* survives in Python,
 because construction here is a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
@@ -855,14 +857,15 @@ string_maze = """
 Stage 3 pairs the teleports.
 Sorting by target letter puts each pair of partners side by side.
 `groupby(teleports, key=target)` then walks the sorted rooms in one pass,
-yielding each run of matching letters, which `pair = list(group)` collects.
+yielding each run of matching letters,
+and `pair = list(group)` collects each run.
 `assert len(pair) == 2, letter` checks a rule the maze layout must obey:
 every target letter marks exactly two rooms.
 A typo that gives a letter one room, or three, fails here at build time,
 naming the offending letter.
 If you remove the check, the build still stops,
 at `room1, room2 = pair` on the next line.
-The `ValueError` it raises says how many values it expected and leaves you to find the letter.
+The `ValueError` that unpacking raises says how many values it expected and leaves you to find the letter.
 The `assert isinstance` lines that follow serve the type checker as much as safety.
 Each narrows the occupant to `Teleport` before the code assigns `target_room`.
 
@@ -882,7 +885,7 @@ so its cell gets an `Empty` occupant and behaves like any other empty room once 
 The robot can now move, but nothing supplies its moves.
 `run()` replays a string of `n`/`s`/`e`/`w` characters,
 and so far a person writes that string, as the test does with `game.run("e")`.
-For the whole maze, `solve()` computes it.
+For the whole maze, `solve()` computes the string.
 `solve()` searches the room graph and returns the same kind of string,
 so `game.run(solve(game))` walks the route the search found.
 
@@ -892,7 +895,7 @@ so the first route it finds to the `!` is a shortest one.
 It makes the same `doors.open(urge)` calls `Robot.move()` makes,
 so it works entirely in rooms and the moves between them.
 `landing()` decides whether a door is passable by testing the occupant's type with `isinstance`,
-which reproduces what `Room.enter()` gets from `interact()`.
+and that test reproduces what `Room.enter()` gets from `interact()`.
 For a `Wall` or an `Edge` it returns `None`, for a `Teleport` the target room,
 and for anything else the room itself:
 
@@ -939,13 +942,13 @@ def solve(game: GameBuilder) -> str:
 so it keeps `object`'s identity comparison and identity hash.
 A graph search needs identity,
 because two rooms holding the same kind of item are still two different places.
-`solve()` adds a room to `seen` when it enters the queue,
+`solve()` adds a room to `seen` when the room enters the queue,
 rather than when it leaves, so each room enters the queue once.
 
 Searching leaves the maze as it was.
 `solve()` reads doors and occupants and never calls `enter()`,
 so every `.` stays in place and the robot stays where it started.
-The path it returns is the string `run()` expects:
+The path `solve()` returns is the string `run()` expects:
 
 ```python
 # robot_explorer/robot_demo.py
@@ -1136,7 +1139,8 @@ The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
 The third example gives you only half the outcome.
-`amplitude()` fixes the shape the sand will trace: the curves are its zero set.
+`amplitude()` fixes the shape the sand will trace:
+the curves are the formula's zero set.
 No line of the code computes how two thousand independent random walks reach that shape and stay there.
 That is simulation's other purpose,
 to discover behavior instead of confirming it.
@@ -1301,7 +1305,7 @@ The randomness produces the order instead of opposing it.
 
 The curves themselves come from the formula alone.
 A plot of `amplitude()`'s zero set draws them.
-The run demonstrates the capture, not the shape: random,
+The run demonstrates the gathering, not the shape: random,
 uncoordinated steps concentrate onto a curve that no grain,
 and no line of `step()`, ever names.
 
@@ -1455,11 +1459,11 @@ Run it.
     Place a few `$` characters in the maze and report how many the robot collects.
     `item_factory()`, `Room`, and `GameBuilder` stay as they are.
     Explain why the factory finds your new item on its own,
-    and what it does if you derive `Coin` from `Food` instead.
+    and what the factory does if you derive `Coin` from `Food` instead.
 5.  Send the robot to something other than the `!`.
     `solve()` stops at whatever room holds an `EndGame`,
-    which is the one goal it can express.
-    Replace that test with a `Callable[[Room], bool]` parameter,
+    the one goal it can express.
+    Replace that `isinstance` test with a `Callable[[Room], bool]` parameter,
     so the caller says what counts as arriving,
     and change nothing else in the search,
     beyond letting `solve()` return `None` when no room matches.
