@@ -6,7 +6,7 @@
 # exercise_1.py
 balance = 100
 
-def deposit(amount):
+def deposit(amount: int) -> int:
     global balance
     balance += amount
     return balance
@@ -61,16 +61,18 @@ with expected(KeyError):
 You call `operations["*"](6, 4)` exactly the way you call the other
 four entries, and the calling code stays as it was. Supporting a new
 operator really is just adding one row to the table, as the chapter
-claims. The missing-key `KeyError` is caught with `expected()` from the
-shared `exceptions` helper, the same way the chapter's `dispatch.py`
-catches it.
+claims. `expected()` from the shared `exceptions` helper catches the
+missing-key `KeyError`, the same way it does in the chapter's
+`dispatch.py`.
 
 ## 3. A fourth independent closure
 
 ```python
 # exercise_3.py
-def multiplier(factor):
-    def multiply(n):
+from collections.abc import Callable
+
+def multiplier(factor: int) -> Callable[[int], int]:
+    def multiply(n: int) -> int:
         return n * factor
     return multiply
 
@@ -92,16 +94,20 @@ function that captured it.
 
 ```python
 # exercise_4.py
-def compose(f, g):
-    def composed(x):
+from collections.abc import Callable
+
+def compose[T, U, V](
+    f: Callable[[U], V], g: Callable[[T], U]
+) -> Callable[[T], V]:
+    def composed(x: T) -> V:
         return f(g(x))
     return composed
 
-def increment(n):
+def increment(n: int) -> int:
     return n + 1
-def double(n):
+def double(n: int) -> int:
     return n * 2
-def square(n):
+def square(n: int) -> int:
     return n * n
 
 increment_then_double = compose(double, increment)

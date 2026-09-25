@@ -1,6 +1,8 @@
 # exercise_3.py
-def multiplier(factor):
-    def multiply(n):
+from collections.abc import Callable
+
+def multiplier(factor: int) -> Callable[[int], int]:
+    def multiply(n: int) -> int:
         return n * factor
     return multiply
 

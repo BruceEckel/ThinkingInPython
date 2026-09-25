@@ -11,8 +11,8 @@ already correct on the edge case you would otherwise miss.
 A function that shares no state is already safe to run in parallel.
 And you can reason about code built from small,
 checkable pieces by substitution, the same way you check a line of algebra.
-In the functional style you keep loops, classes, and mutation,
-notice when a piece of code can depend on its arguments alone,
+The functional style lets you keep loops, classes, and mutation.
+It asks you to notice when a piece of code can depend on its arguments alone,
 and then write it that way.
 
 This chapter builds the foundations: pure functions, immutable values,
@@ -192,7 +192,7 @@ The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
 The type checker rejects `MAX_SIZE = 200` written later in the module,
 and rejects `values.append(4)` inside `total()`.
-The constraint binds one side.
+The constraint covers only `total()`'s side.
 `Sequence[int]` declares that `total()` only reads its argument.
 The caller keeps its `list` and can append to it at any time,
 including from another thread while `total()` is running.
@@ -208,7 +208,8 @@ and `Final` guards the binding.
 ### A Stable Hash and Safe Sharing
 
 Immutability offers two things a mutable value cannot.
-The first is a *stable hash*, one that holds for the value's whole life,
+The first is a *stable hash* of the contents,
+one that holds for the value's whole life,
 so the value can be a dictionary key or a set member.
 The second is sharing without a defensive copy,
 because no recipient can change the value you still hold.
@@ -234,7 +235,7 @@ with expected(TypeError):
 #: [TypeError] unhashable type: 'list'
 ```
 
-Equality based on *contents* removes hashing, not mutability by itself.
+What costs a type its hash is contents-based equality, not mutability by itself.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 A `list` and an unfrozen `@dataclass` both compare by contents,
@@ -331,7 +332,7 @@ and a table when the set should grow from outside.
 
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Foundations--Functions.md#lambdas).
-The higher-order functions in this section take lambdas as inline arguments,
+The functions in this section take lambdas as inline arguments,
 where a lambda fits best.
 A lambda's value is locality.
 When a transformation is one short expression,
@@ -378,6 +379,10 @@ and a second pass over the same object silently produces nothing.
 `sorted()` is the exception:
 it must read every element before it can order any of them,
 so it always returns a list.
+It is also the pure counterpart of `list.sort()`,
+which [Containers](03_Foundations--Containers.md)
+shows reordering the list in place and returning `None`.
+`sorted()` builds a new list and leaves its input as it was.
 
 The lambdas above exist to show the machinery.
 For these cases Python offers a lookalike you should usually prefer,
@@ -385,7 +390,8 @@ the [comprehension](16_Techniques--Comprehensions.md).
 `[n * n for n in numbers]` says more directly what `map()` plus a fresh lambda says,
 and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` are the better choice when the function already exists.
-`map(str.strip, lines)` reads better than `[line.strip() for line in lines]` because the name says what the comprehension repeats.
+`map(str.strip, lines)` reads better than `[line.strip() for line in lines]`,
+because `str.strip` names the operation once, with no loop variable to invent.
 
 Beyond how they read, a comprehension and `map()` return different things.
 The comprehension builds a finished list.
@@ -404,10 +410,9 @@ and you supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 
-A higher-order function can also work the other way around:
-instead of containing the loop,
-it wraps the function it receives with operations like timing, retries,
-or logging.
+A higher-order function can also return a function:
+it wraps the one it receives with operations like timing, retries, or logging,
+and returns the wrapper.
 A decorator does that wrapping, as [Decorators](14_Techniques--Decorators.md)
 shows.
 
@@ -441,15 +446,15 @@ print(inspect.getclosurevars(triple).nonlocals)
 
 `multiplier()` returns `multiply()`,
 and each returned function holds its own `factor`.
-The last two lines show the captured value directly:
+The last two lines show the captured values directly:
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
 `factor` never changes after capture,
 so the same argument always produces the same answer.
-A captured constant differs from the global `balance` that makes `withdraw()` unpredictable in exactly that way:
-nothing changes it after capture.
+`withdraw()` is unpredictable because every call changes the global `balance`;
+nothing changes `factor` after capture.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
@@ -476,7 +481,6 @@ print(tally(), tally(), tally())
 ```
 
 Each call to `make_counter()` builds an independent counter with its own `count`.
-Only `increment()` can name that variable, so only `increment()` can change it.
 
 `increment()` is impure on purpose, to contrast with `withdraw()`.
 `withdraw()` mutates a module-level name that any code can assign.
@@ -493,14 +497,15 @@ a closure states an intention that the language does not enforce.
 The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
 But any assignment to a name inside a function makes that name local,
-so `count += 1` on its own makes `count` a fresh local variable.
-`count += 1` then reads that local before anything has assigned it,
-and the call fails with `UnboundLocalError`.
+so without a declaration, `count += 1` makes `count` a fresh local variable,
+reads that local before anything has assigned it,
+and fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 
 Forgetting the declaration is the usual mistake when a closure first assigns to a captured name.
-The runtime message names a local variable instead of the missing declaration:
-"cannot access local variable 'count' where it is not associated with a value".
+The runtime message,
+"cannot access local variable 'count' where it is not associated with a value,"
+names a local variable instead of the missing declaration.
 The type checker's report is the more useful one.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
@@ -543,7 +548,7 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
-where a lambda created in a loop reads each captured name at call time.
+whereas a lambda created in a loop reads each captured name at call time.
 `late_binding.py` in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
 demonstrates that late-binding trap.
 
@@ -577,10 +582,9 @@ print(percent.args)
 Before 3.14, a hand-written wrapper supplied that specialization.
 A `Placeholder` reserves the position and leaves the value to the caller:
 calling `percent()` with no argument raises a `TypeError`.
-The library also rejects a *trailing* placeholder, for the opposite reason.
+The library also rejects a *trailing* placeholder, because it would do nothing.
 `partial()` already appends the call's arguments after the bound ones,
 so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
-The marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime,
