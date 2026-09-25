@@ -35,6 +35,15 @@ since they remove build/, which holds this script's own logs. That worktree refl
 commit, not any uncommitted changes, so it tests each target's own wiring
 rather than whether running it right now would leave your draft clean.
 
+An advisory target reports findings by exiting nonzero, and make turns
+every recipe failure into exit 2, so its exit code cannot tell a finding
+from a crash. `links` is one: a site's bad afternoon would otherwise turn
+this run red. For such a target, ADVISORY names the line its script
+prints once it has run to completion; a nonzero exit with that line in
+the output passes, and the findings are shown as a note in the summary
+instead of a failure. A crash, a usage error, or a timeout never prints
+the line, so those still fail.
+
 Every target's combined stdout/stderr is saved to
 build/target_test_logs/<target>.log for inspection after the run. Each
 passing target's time is recorded for the help listing
@@ -52,6 +61,7 @@ Usage:
 import argparse
 import contextlib
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -87,6 +97,12 @@ EXCLUDED: dict[str, str] = {
                "exits nonzero by design; pyright-review is the check",
 }
 
+# name -> the completion line an advisory target prints last, whatever
+# it found. check_links ends with "88 ok, 1 failing.".
+ADVISORY: dict[str, re.Pattern[str]] = {
+    "links": re.compile(r"^\d+ ok, \d+ failing\.$", re.MULTILINE),
+}
+
 # Targets whose recipe rewrites tracked files unconditionally: run these in
 # a disposable worktree rather than this working tree. `cover` is one:
 # it regenerates the committed cover JPEGs under resources/static/.
@@ -111,6 +127,7 @@ class Result:
     ok: bool
     seconds: float
     summary: str  # empty on success; "exit N" or "timed out" on failure
+    note: str = ""  # an advisory target's findings, on a pass
 
 
 def documented_targets() -> list[str]:
@@ -144,8 +161,17 @@ def run_target(name: str, cwd: Path, timeout: float) -> Result:
     output = proc.stdout + proc.stderr
     _write_log(name, output)
     if proc.returncode != 0:
+        done = ADVISORY.get(name)
+        if done and (found := done.search(output)):
+            return Result(name, True, seconds, "", found.group(0))
         return Result(name, False, seconds, f"exit {proc.returncode}")
     return Result(name, True, seconds, "")
+
+
+def status(result: Result) -> str:
+    if not result.ok:
+        return f"FAILED ({result.summary})"
+    return f"ok, advisory: {result.note}" if result.note else "ok"
 
 
 def _write_log(name: str, output: str) -> None:
@@ -216,8 +242,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"-> {name} ...", end=" ", flush=True)
         result = run_target(name, ROOT, args.timeout)
         results.append(result)
-        print("ok" if result.ok else f"FAILED ({result.summary})",
-              f"[{result.seconds:.1f}s]")
+        print(status(result), f"[{result.seconds:.1f}s]")
 
     if worktree:
         print(f"\nSetting up a disposable worktree for "
@@ -227,8 +252,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"-> {name} (worktree) ...", end=" ", flush=True)
                 result = run_target(name, wt, args.timeout)
                 results.append(result)
-                print("ok" if result.ok else f"FAILED ({result.summary})",
-                      f"[{result.seconds:.1f}s]")
+                print(status(result), f"[{result.seconds:.1f}s]")
 
     if skipped:
         print("\nNever run (see the module docstring for why):")
@@ -246,6 +270,14 @@ def main(argv: list[str] | None = None) -> int:
         target_times.write_baseline(passed)
         print(f"Recorded {len(passed)} timing(s); tiers written to "
               f"{target_times.BASELINE.relative_to(ROOT)}.")
+
+    noted = [r for r in results if r.note]
+    if noted:
+        print("\nAdvisory findings (not failures):")
+        for r in noted:
+            print(f"\n{r.name} ({r.note}):")
+            print(log_tail(r.name))
+            print(f"  (full log: build/target_test_logs/{r.name}.log)")
 
     if failed:
         print("\nFailed targets:")
