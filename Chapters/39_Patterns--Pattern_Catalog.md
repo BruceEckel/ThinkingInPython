@@ -16,7 +16,7 @@ and [*State Machine*](31_Patterns--State_Machines.md) are one such pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
 A design rarely needs both at once.
-The body of this book argues that several of these patterns are unnecessary in Python
+The body of this book argues that several of these patterns dissolve in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables follow each source's own grouping,
@@ -33,7 +33,7 @@ whose rows share no trait.
 The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
-An unlinked name means the book has no section on that pattern.
+A name without a link leaves that pattern to the literature.
 
 ## Finding a Pattern by Problem
 
