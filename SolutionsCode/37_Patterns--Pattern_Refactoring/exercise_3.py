@@ -14,19 +14,19 @@ class Trash:
         Trash.registry[cls.__name__] = cls
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
 class Paper(Trash):
-    value = 0.10
+    value: ClassVar[float] = 0.10
 
 class Glass(Trash):
-    value = 0.23
+    value: ClassVar[float] = 0.23
 
 class Cardboard(Trash):
-    value = 0.79
+    value: ClassVar[float] = 0.79
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 class Sorter:
     @singledispatchmethod

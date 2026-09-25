@@ -17,10 +17,10 @@ class Trash:
         return Trash.registry[name](weight)
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 items = [Trash.create("Plastic", 10.0),
          Trash.create("Aluminum", 2.0)]

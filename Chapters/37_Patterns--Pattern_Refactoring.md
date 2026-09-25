@@ -61,16 +61,16 @@ class Trash:
         return cls.registry[name](weight)
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
 class Paper(Trash):
-    value = 0.10
+    value: ClassVar[float] = 0.10
 
 class Glass(Trash):
-    value = 0.23
+    value: ClassVar[float] = 0.23
 
 class Cardboard(Trash):
-    value = 0.79
+    value: ClassVar[float] = 0.79
 
 def sum_value(items: list[Trash]) -> float:
     total = sum(t.weight * t.value for t in items)
@@ -102,12 +102,11 @@ Call it as `Trash.create()`.
 `@record` builds `__init__()` from the bare `weight: float` annotation alone:
 the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
 belong to the class, so they stay out of `__init__()`.
-Each subclass's `value = ...` line creates a class attribute of its own,
+Each subclass's `value` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
-A subclass's bare `value = 1.67` inherits the name and its type from the base declaration,
-but not the type checker's guard:
-`ty` rejects `Trash(1.0).value = 2.0` and accepts `Aluminum(1.0).value = 2.0`.
-Restating `ClassVar[float]` on the override [keeps that check](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
+Each subclass restates `ClassVar[float]`,
+which keeps [the check](09_Foundations--Class_Attributes.md#classvar-and-inheritance)
+that makes `ty` reject `Aluminum(1.0).value = 2.0`.
 
 A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
@@ -217,7 +216,7 @@ Glass:3.0
 ## The First Cut: Checking Every Type
 
 The most obvious way to sort is to test each piece for its type using `match`
-(the `rtti` in the file name is *run-time type identification*, the C++ name for discovering a type at runtime):
+(the `rtti` in the file name stands for *run-time type identification*, the C++ name for discovering a type at runtime):
 
 ```python
 # recycle_rtti.py
@@ -288,6 +287,7 @@ Plastic:40
 ```python
 # plastic_dropped.py
 from collections import defaultdict
+from typing import ClassVar
 from parse_trash import parse
 from trash import (
     Aluminum,
@@ -300,7 +300,7 @@ from trash import (
 )
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)
@@ -396,11 +396,12 @@ The listing defines `Plastic` the same way `plastic_dropped.py` does:
 ```python
 # recycle_dict_plastic.py
 from collections import defaultdict
+from typing import ClassVar
 from parse_trash import parse
 from trash import Bins, Trash, sum_value
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)
@@ -461,7 +462,7 @@ class Trash:
         return "none"
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
     def note(self) -> str:
         return "Aluminum: crush and bale"
@@ -470,7 +471,7 @@ class Aluminum(Trash):
         return "sharp edges"
 
 class Glass(Trash):
-    value = 0.23
+    value: ClassVar[float] = 0.23
 
     def note(self) -> str:
         return "Glass: sort by color, then crush"
@@ -479,7 +480,7 @@ class Glass(Trash):
         return "sharp edges"
 
 class Cardboard(Trash):
-    value = 0.79
+    value: ClassVar[float] = 0.79
 
     def note(self) -> str:
         return "Cardboard: flatten and bundle"

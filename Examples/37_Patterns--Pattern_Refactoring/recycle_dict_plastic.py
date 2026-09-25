@@ -1,10 +1,11 @@
 # recycle_dict_plastic.py
 from collections import defaultdict
+from typing import ClassVar
 from parse_trash import parse
 from trash import Bins, Trash, sum_value
 
 class Plastic(Trash):
-    value = 0.15
+    value: ClassVar[float] = 0.15
 
 pieces = parse("plastic.dat")
 bins: Bins = defaultdict(list)

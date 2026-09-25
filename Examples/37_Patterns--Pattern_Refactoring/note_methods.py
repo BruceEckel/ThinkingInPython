@@ -15,7 +15,7 @@ class Trash:
         return "none"
 
 class Aluminum(Trash):
-    value = 1.67
+    value: ClassVar[float] = 1.67
 
     def note(self) -> str:
         return "Aluminum: crush and bale"
@@ -24,7 +24,7 @@ class Aluminum(Trash):
         return "sharp edges"
 
 class Glass(Trash):
-    value = 0.23
+    value: ClassVar[float] = 0.23
 
     def note(self) -> str:
         return "Glass: sort by color, then crush"
@@ -33,7 +33,7 @@ class Glass(Trash):
         return "sharp edges"
 
 class Cardboard(Trash):
-    value = 0.79
+    value: ClassVar[float] = 0.79
 
     def note(self) -> str:
         return "Cardboard: flatten and bundle"
