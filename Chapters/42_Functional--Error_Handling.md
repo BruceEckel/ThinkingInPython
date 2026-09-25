@@ -184,14 +184,12 @@ success by returning an `Ok` object.
 `func_a()`'s return type, `Result[int, str]`,
 says it returns an `int` on success or a `str` on failure.
 To get the answer, the caller must unpack the `Result`.
-`unwrap()` makes that literal.
-`Ok` alone defines it, so the type checker rejects `func_a(i).unwrap()`,
+`unwrap()`, a name borrowed from Rust, makes that literal.
+Reading the `answer` field directly works the same way;
+use whichever name reads better in your own code.
+Both exist on `Ok` alone, so the type checker rejects `func_a(i).unwrap()`,
 as it rejects using the `Result` as if it were a number.
 The only way to the answer is narrowing to one of the two classes.
-`unwrap()` is a name borrowed from Rust;
-reading the `answer` field directly works the same way, since that field, too,
-exists on `Ok` alone.
-Use whichever name reads better in your own code.
 The asymmetry holds at runtime as well as under the type checker:
 
 ```python
@@ -347,8 +345,8 @@ if __name__ == "__main__":
 #: 4 4
 ```
 
-The two agree on every input, and the exception version is shorter.
-It also says less: it reports which step failed as a message to parse.
+The two agree on every input, and the exception version is shorter,
+but it says less: it reports which step failed as a message to parse.
 The failure disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
@@ -385,8 +383,9 @@ if __name__ == "__main__":
 
 The body is now one line that reads in order: `func_a()`, then `func_b()`,
 then `func_c()`.
-`bind()` removes the boilerplate by chaining the steps.
-The error checking moves into `bind()`, where it appears once.
+`bind()` removes the boilerplate by chaining the steps:
+the check that `composing.py` repeated at every step now sits inside `bind()`,
+written once.
 
 Functional programmers have a name for a type that carries a value plus this chaining operation:
 a *monad*.
@@ -597,9 +596,9 @@ if __name__ == "__main__":
 ```
 
 `parse()` still reads like a normal function that returns an `int`,
-but `@safe` has changed its return type to `Result[int, Exception]`.
-The caller must unpack the `Result` to reach the number.
-That error type is the base of the ordinary exception hierarchy.
+but `@safe` has changed its return type to `Result[int, Exception]`,
+so the caller must unpack the `Result` to reach the number.
+That error type, `Exception`, is the base of the ordinary exception hierarchy.
 The `Result[int, str]` earlier in this chapter names exactly what could go wrong;
 `Result[int, Exception]` says that something did,
 which is all a bare `except Exception` says.
@@ -607,13 +606,6 @@ which is all a bare `except Exception` says.
 and the base class is the one type that covers them all.
 Write the `Ok`/`Err` wrapper yourself, as `func_c()` does in `composing.py`,
 when the narrower type matters more than the convenience.
-The `**P` parameter carries the wrapped function's whole parameter list through,
-the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface).
-`parse("42")` therefore type-checks and the checker rejects `parse(42)`.
-`@safe` changes the return type and keeps what the function accepts.
-
-That chapter explains how to write decorators like `@safe`,
-including `functools.wraps`.
 
 `@safe` catches `Exception`,
 which is every ordinary failure the wrapped function can produce,
@@ -625,6 +617,13 @@ The version here is deliberately small.
 A production version takes the exception types to catch as an argument and lets the rest propagate.
 That keeps the distinction the chapter ends on:
 a failure the caller can handle versus a bug the caller cannot.
+
+`@safe` changes the return type and keeps what the function accepts:
+the `**P` parameter carries the wrapped function's whole parameter list through,
+so `parse("42")` type-checks and the checker rejects `parse(42)`.
+`**P` is the technique for [maintaining the wrapped interface](14_Techniques--Decorators.md#p-and-r-keep-the-static-interface),
+and that chapter explains how to write decorators like `@safe`,
+including `functools.wraps`.
 
 The tests for `@safe` check that a good input becomes an `Ok`,
 and that a raised exception becomes an `Err` holding that exception:
@@ -693,9 +692,9 @@ if __name__ == "__main__":
 
 `@safe` wraps both `parse()` and `reciprocal()`, so `bind()` chains them.
 A `ValueError` from a bad number and a `ZeroDivisionError` from dividing by zero each become the `error` field of an ordinary `Err`.
-`compute()` produces the `Result` and returns it.
-The comprehension computes all three results before `describe()` matches any of them,
-because a `Result` is a value the caller keeps after the call returns.
+`compute()` returns that `Result`,
+a value the caller keeps after the call returns,
+so the comprehension computes all three results before `describe()` matches any of them.
 A raised exception would have ended the comprehension at the first failure.
 
 ## Attaching Context to an Exception {#attaching-context-to-an-exception}
@@ -737,6 +736,9 @@ except ValueError as e:
 
 The bare `raise` re-raises the same object, so it keeps its type, `ValueError`,
 and its original traceback.
+The listing prints with `traceback.format_exception_only()`,
+which renders the message and the notes and leaves out the file paths a full traceback carries.
+
 Notes accumulate.
 As the stack unwinds,
 each `except` clause on the way out can add a line built from its own frame's locals,
@@ -747,8 +749,6 @@ The type checker treats `__notes__` as always present,
 because typeshed declares it on `BaseException`.
 Reading it before any `add_note()` call therefore type-checks,
 and then raises an `AttributeError` at runtime.
-The listing prints with `traceback.format_exception_only()`,
-which renders the message and the notes and leaves out the file paths a full traceback carries.
 
 Context matters more here than in ordinary exception code,
 because a `Result` keeps the exception as a value rather than propagating it.
