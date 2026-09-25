@@ -169,10 +169,10 @@ The blackboard holds everything the rats share.
 `claim()` holds the rule the whole program depends on.
 It tests and marks a cell in one step with no `await` in between,
 so a single rat gets each cell even when several reach it.
-The [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
-needs a suspension point inside the update.
-`claim()` runs from its test to its `add()` as one synchronous stretch,
-so its atomicity comes from the absence of an `await` rather than from a lock.
+Its atomicity comes from the absence of that `await` rather than from a lock:
+the [read-modify-write race](19_Techniques--Concurrency.md#a-single-thread-still-races)
+needs a suspension point inside the update,
+and `claim()` runs from its test to its `add()` as one synchronous stretch.
 Exercise 3 inserts a suspension point and counts the cells claimed twice.
 `next_number()` hands out rat numbers from `itertools.count()`,
 the [endless counter](23_Patterns--Iterators.md#reusable-algorithms).
@@ -284,7 +284,7 @@ The rest is the maze.
 The demo awaits `explore()`,
 then prints the first eight log messages and the mapped maze.
 The log shows what the map cannot.
-Rat 1 spawns rat 2 and then dead-ends before rat 2 does.
+Rat 1 spawns rat 2 and then dead-ends before rat 2 does:
 `__post_init__` assigns each number at spawn time,
 so the numbers follow spawn order rather than completion order.
 The full log runs to eighteen messages, two per rat.
@@ -396,8 +396,8 @@ asyncio.run(main())
 The entry has two open neighbors,
 so rat 1 keeps one neighbor and spawns rat 2 at the other.
 `CountingBlackboard` tallies every `claim()` rejected on an open cell.
-Seven of the nine rejections are backtracking.
-Each rat tests the cell it came from, once per cell other than the entry,
+Seven of the nine rejections are backtracking:
+each rat tests the cell it came from, once per cell other than the entry,
 and `len(blackboard.visited) - 1` counts those cells.
 The other two belong to the loop's closing edge, tested from both ends:
 rat 1 dead-ends at `(2, 3)` because rat 2 already claimed `(3, 3)`,
@@ -457,7 +457,7 @@ records the order in which they claimed cells,
 and replays that order on a `tkinter` canvas.
 The canvas shows the walls in gray, then each claimed cell turns green in turn,
 so you watch the pack move through the maze from the entry outward.
-It records the order by subclassing `Blackboard` and overriding `claim()`,
+The view records the order by subclassing `Blackboard` and overriding `claim()`,
 so the model stays as written.
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view).
@@ -532,8 +532,8 @@ Concurrency here organizes the code and adds no speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
 The tasks run one at a time,
-so the design runs no faster than a single-threaded worklist.
-A plain stack of frontiers, popped and pushed in a loop,
+so the design runs no faster than a single-threaded worklist:
+a plain stack of frontiers, popped and pushed in a loop,
 visits the same 139 cells.
 What `asyncio` provides is control flow:
 each rat's own path through the maze stays one `while` loop in `run()`,
@@ -668,12 +668,11 @@ never a runtime lookup.
 `Robot` holds its two pieces of state in different ways.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
 `room` gets a bare declaration, `room: Room`,
-which tells the type checker the attribute's type.
+which tells the type checker the attribute's type and keeps that type `Room` instead of `Room | None`,
+so code that reads `room` skips the `None` check.
 `GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
 Reading `room` before then raises an `AttributeError`,
 and the builder runs first, so every read comes after.
-Declaring it this way keeps the type `Room` instead of `Room | None`,
-so code that reads `room` skips the `None` check.
 
 `item_factory()` turns a maze character into an `Item`.
 It searches `Item.__subclasses__()` for a matching `symbol`,
@@ -683,12 +682,12 @@ This is the [registry idea](27_Patterns--Factory.md#the-pythonic-factory-a-dicti
 using the class hierarchy as the registry.
 `__subclasses__()` reports only direct subclasses,
 so a new item must inherit from `Item` itself.
-That chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method)
-describes the recursion for deeper hierarchies, and its exercise 9 writes it.
 If you derive a class from `Food` to inherit its behavior,
 it is a grandchild of `Item`.
 `Item.__subclasses__()` leaves it out,
 so the loop falls through to its last line and builds a `Teleport`.
+The same chapter's [Simple *Factory Method*](27_Patterns--Factory.md#simple-factory-method)
+describes the recursion for deeper hierarchies, and its exercise 9 writes it.
 
 A `Room` holds one item and connects to its neighbors through a `Doors` object.
 Doors that lead nowhere point at one shared `EDGE` room,
@@ -872,7 +871,8 @@ with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
 That is not the type switch that polymorphism removes.
 `GameBuilder` still must tell the kinds of item apart, once,
 and the movement code that runs afterward never tests a type again.
-The `Robot` branch also explains `Room(Empty())`.
+
+The `Robot` branch builds `Room(Empty())` rather than `Room(occupant)`.
 The robot is the one item that moves,
 so its cell gets an `Empty` occupant and behaves like any other empty room once the robot moves away.
 `show_maze()` draws the `R` by checking which room the robot is in rather than reading an occupant.
@@ -1298,6 +1298,7 @@ where the kicks shrink toward zero.
 Noise can carry a grain into a quiet place.
 It cannot carry the grain back out.
 The randomness produces the order instead of opposing it.
+
 The curves themselves come from the formula alone.
 A plot of `amplitude()`'s zero set draws them.
 The run demonstrates the capture, not the shape: random,
