@@ -66,8 +66,8 @@ print(deep)
 so `shallow` and `todo` are different objects.
 But their elements are the same inner lists,
 so `todo[0].append("cheese")` changes the first element of `shallow` too.
-`copy.deepcopy()` walks the whole structure and creates a new copy of every nested container,
-so `deep`'s inner lists are new objects of its own.
+`copy.deepcopy()` walks the whole structure and copies every nested container,
+so `deep` holds inner lists of its own.
 The later `todo[0].append("jam")` changes `todo`'s inner list,
 and `deep`'s keeps its three elements.
 That walk costs time and memory proportional to the whole nested structure it rebuilds,
@@ -78,7 +78,7 @@ a state that nests containers inside containers copies the whole structure on ev
 ## The Classic Memento
 
 As *GoF Design Patterns* presents the pattern,
-every classic memento is some version of copying the state before it changes.
+every classic memento copies the state before it changes.
 Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
@@ -246,7 +246,7 @@ Both `save()` and `restore()` must copy.
 
 ## Immutability
 
-All of that copying exists because `Sketch` mutates its list.
+All that copying exists because `Sketch` mutates its list.
 A state that never mutates needs no copy.
 Once the state is a record, every state is a memento:
 
@@ -286,7 +286,7 @@ using `dataclasses.replace()` to change one field and copy the rest.
 Since each call returns a `Drawing`, the calls chain.
 Saving means keeping a reference,
 the assignment that aliased in `aliased_snapshot.py`.
-Here that assignment is safe because the object bound to `before` keeps its value for as long as it exists,
+Here that assignment is safe because the object bound to `before` keeps its value as long as it exists,
 so the `Memento` class, `save()`, `restore()`, and the copying are all gone.
 `after` shares the two original stroke strings with `before`,
 so a history of `Drawing` states stores each stroke once and duplicates only the pointers:
@@ -587,7 +587,7 @@ and every method on `Drawing` works from one.
 `copy.replace()` is the general version of `dataclasses.replace()`,
 as [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#the-general-form-of-replace)
 describes.
-`copy.replace()` rather than the `dataclasses` one keeps the technique available to whatever state type a `History` holds:
+Choosing `copy.replace()` over the `dataclasses` one keeps the technique available to whatever state type a `History` holds:
 `NamedTuple`, `datetime`, and any class defining `__replace__()` all accept it.
 
 ## Mementos That Outlive the Process
@@ -627,7 +627,7 @@ If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 The error comes later, from whatever reads a field the bytes never carried.
 `pickle_drift.py` simulates that drift.
-`SketchV1` sits in a module of its own because in reality a class drifts between two runs of a program:
+`SketchV1` sits in a module of its own because a real class drifts between two runs of a program:
 
 ```python
 # sketch_v1.py
@@ -694,11 +694,11 @@ matching the class on load to the class on save is your job.
 
 ### A Deleted Field Leaves a Ghost
 
-Deleting a field raises no exception at all: the old bytes load,
+Deleting a field raises no exception: the old bytes load,
 and every later read succeeds.
 `pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute.
-The class declares no such field,
-so `getattr()` finds it while `repr()` omits it and `==` ignores it.
+The class declares no such field, so `getattr()` finds it, `repr()` omits it,
+and `==` ignores it.
 The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift in `pickle_drift.py` raises `AttributeError` when something reads the new field.
 This one raises nothing, and the data is wrong.
@@ -726,7 +726,7 @@ print(restored == SketchV1(("circle",)))
 ```
 
 Each print contradicts the one before it.
-The `repr()` shows a one-field object while the `__dict__` shows two entries.
+The `repr()` shows a one-field object; the `__dict__` shows two entries.
 The loaded object is `==` to a `SketchV1` built with strokes alone,
 so every later comparison treats them as the same.
 
