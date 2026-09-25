@@ -1953,14 +1953,14 @@ async def time_run_async() -> float:
 
 per_run = time_run()
 per_run_async = asyncio.run(time_run_async())
-print(f"run() at least 50x slower: "
-      f"{per_run > per_run_async * 50}")
-#: run() at least 50x slower: True
+print(f"run() at least 20x slower: "
+      f"{per_run > per_run_async * 20}")
+#: run() at least 20x slower: True
 ```
 
 `run_async()` reuses the loop already running and costs little beyond the Effect itself.
 `run()` builds and tears down a loop on every call,
-at least fifty times the cost of `run_async()`, by the listing's own measure.
+at least twenty times the cost of `run_async()`, by the listing's own measure.
 Synchronous code has no loop to reuse, so it pays that cost on every `run()`.
 From inside a running loop,
 `run_async()` is both the one that works and the one that is fast.

@@ -482,10 +482,10 @@ class DeadWire:
     def latest(self) -> str:
         raise Unavailable("offline")
 
-class DullWire:
+class StaleWire:
     def latest(self) -> str:
         print("feed: fetching")
-        return "local council approves new roundabout"
+        raise Unavailable("stale connection")
 
 @dataclass
 class Library:
@@ -656,11 +656,11 @@ signature still says it returns a `str` no matter what.
 Both versions run. Only one of them has a tool that knows the set of failures
 changed.
 
-## 6. A dull headline
+## 6. A stale wire
 
 ```python
 # exercise_6.py
-from feeds import SHELF, DullWire
+from feeds import SHELF, StaleWire
 from report import report
 from research import Encyclopedia, Feed
 from stateless import run, supply
@@ -668,29 +668,25 @@ from stateless import run, supply
 def outcome(feed: Feed, book: Encyclopedia) -> str:
     return run(supply(feed, book)(report)())
 
-print(outcome(DullWire(), SHELF))
+print(outcome(StaleWire(), SHELF))
 #: feed: fetching
-#: nothing worth researching
+#: no headline today
 ```
 
-The prediction is two lines: `feed: fetching`, then
-`nothing worth researching`.
+The prediction is two lines: `feed: fetching`, then `no headline today`.
 
-`DullWire.latest()` succeeds, so `fetch()` returns a headline and the feed's own
-trace line prints, a line `DeadWire` never reached.
-The pipeline then stops one step later. `topic_of()` scans `TOPICS` for
-`"stock market"` and `"genome"`, finds neither in a headline about a roundabout,
-and raises `NotInteresting`, which `@throws` sends into the error channel.
-`research()` never reaches `need(Encyclopedia)`, so no library lookup happens
-and no `library:` line prints.
-
-`DullWire` and `WEATHER` produce identical traces, and that sameness is the
-useful part. `DullWire` is a class whose method returns a fixed uninteresting
-string, while `WEATHER` is a `Wire` holding one, so they differ in construction
-and not in behavior.
-`report()` cannot tell the two apart, and that is the point of a test double:
-the Effect sees a `Feed`, and every `Feed` that behaves the same way is the same
-scenario.
+`StaleWire` and `DeadWire` fail the same way.
+Each `latest()` raises `Unavailable`, `@throws` on `fetch()` sends it into the
+error channel, `research()` stops there, and `report()` matches it and returns
+`"no headline today"`.
+The difference is where inside `latest()` the failure arises.
+`StaleWire.latest()` prints its trace line before it raises, so
+`feed: fetching` appears; `DeadWire.latest()` raises on its first line, so the
+run prints only the message.
+The trace shows how far each supplied implementation got before it failed,
+which the value `report()` returns cannot show.
+Neither run reaches `need(Encyclopedia)`, so no `library:` line prints in
+either.
 
 ## 7. Retrying the wrong failure
 
