@@ -10,8 +10,7 @@ so the system behaves differently as it moves from state to state.
 
 ![`StateMachine` names only `State`, each state satisfies it, and `MouseTrap` and its states name each other](_images/coupling_31)
 
-A [*Template Method*](25_Patterns--Template_Method.md)
-often moves the system from one state to the next,
+The code that moves the system from one state to the next is often a [*Template Method*](25_Patterns--Template_Method.md),
 as the following framework for a basic state machine shows.
 You call `run()` on a state to perform its behavior,
 and you pass an "input" object to the state's `next()`,
@@ -219,13 +218,17 @@ trap.run_all([MouseAction.ESCAPES])
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
-Each state is one shared object: a state class stores nothing,
-so a single `Waiting` serves every `MouseTrap` and every visit to that state.
+A state class stores nothing, so each state can be one shared object:
+a single `Waiting` serves every `MouseTrap` and every visit to that state.
 The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 Each `next()` is a `match` on the event:
 a `case` for every input the state recognizes,
 and a `case _` that returns the state the machine is in.
+Each `case` names its member through the class, as in `MouseAction.APPEARS`.
+A dotted name compares the event with that member,
+while a bare `APPEARS` would be a capture pattern that matches every event
+([Pattern Matching](13_Techniques--Pattern_Matching.md#a-bare-name-captures-a-dotted-name-compares)).
 `Waiting.next()` returns `MouseTrap.luring` although `MouseTrap` is defined further down the file.
 Python looks up a name inside a function when the function runs,
 not when its `def` executes.
@@ -247,11 +250,14 @@ A base class could also give the annotations a type to name:
 
     class State: pass
 
-With that base the error waits for the call.
-Python constructs an instance of a derived class that defines `run()` alone,
-and the machine runs it until something calls its `next()`;
-that call raises an `AttributeError`.
-A base whose methods `raise NotImplementedError` raises from the base's method instead,
+With that base, the type checker rejects the engine itself,
+since `State` declares no `next()` for `run_all()` to call.
+At runtime, Python builds a derived class that defines `run()` alone without complaint,
+and the machine runs it.
+The error waits until something calls its `next()`,
+which raises an `AttributeError`.
+A base whose methods `raise NotImplementedError` satisfies the checker,
+and raises from the base's method instead,
 with whatever message you write there.
 [*Surrogate*](26_Patterns--Surrogate.md#proxy) shows one more option:
 make `State` an `ABC` with `@abstractmethod` on both methods,
@@ -401,8 +407,9 @@ because the chained `KeyError` would only repeat the event the message already n
 ### An Unexpected Input
 
 The two versions also differ on an unexpected input,
-a case outside the nine moves in the file.
-Both listings end with one more call that sends one:
+one the current state does not name.
+The nine moves in the file never produce one,
+so both listings end with one more call:
 feeding `MouseAction.ESCAPES` to a fresh trap in `Waiting`,
 where neither the `match` nor the table names that input.
 Version 1 prints `Waiting: Broadcasting cheese smell` a second time.
@@ -410,9 +417,9 @@ Version 2 raises `RuntimeError: Waiting has no transition for mouse escapes`.
 
 Version 1's `case _` arms return the current state,
 so an unrecognized input keeps the machine where it is.
-Staying in the same state is itself a transition.
+Staying in the same state still does something.
 `run_all()` calls `run()` on whatever state `next()` returns,
-so a transition back to the current state runs that state's action a second time.
+so returning the current state runs that state's action a second time.
 Version 2's table holds the explicit transitions alone,
 and its `next()` raises an exception on every other input.
 
@@ -717,7 +724,7 @@ this time with too little money for it as well.
 Both conditions are now true,
 and `too_expensive` comes first in that row's list,
 so the engine takes that row.
-The machine reports `COLLECTING`, as though a dollar more would sell it,
+The machine reports `COLLECTING`, as though more money would sell it,
 although the slot is empty and no amount of money would.
 If you swap the row order, the same input reports `UNAVAILABLE` instead.
 Both results follow from the ordering rule stated in [The Engine](#the-engine):

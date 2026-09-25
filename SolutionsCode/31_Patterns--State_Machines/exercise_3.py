@@ -1,5 +1,5 @@
 # exercise_3.py
-from __future__ import annotations
+from typing import ClassVar
 
 class Controller:
     def __init__(self, initial: str) -> None:
@@ -14,7 +14,7 @@ class Controller:
         self.current = state.next_state(word)
 
 class WordState:
-    TRANSITIONS: dict[str, str] = {}
+    TRANSITIONS: ClassVar[dict[str, str]] = {}
 
     def next_state(self, word: str) -> str:
         return self.TRANSITIONS.get(
