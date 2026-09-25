@@ -109,6 +109,7 @@ if __name__ == "__main__":
 
 `flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
 the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
+
 The `accept()`/`visit()` pair is the *double dispatch*.
 `accept()` passes the concrete flower to the visitor,
 `visit()` resolves the visitor's type,
@@ -117,10 +118,11 @@ In the classic pattern every element class overrides `accept()`,
 which resolves the element's type.
 Here one inherited `accept()` is enough,
 because the `pollinate()` or `eat()` call resolves the flower's type a step later.
-The last line of output is the one where both dispatches change the result.
-`Chrysanthemum` overrides `eat()`
+
+The last line of output is the one where both dispatches change the result,
+because `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide).
-That line therefore depends on both unknown types at once:
+That line depends on both unknown types at once:
 the worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
 If you delete the override, every flower resolves to the same `Flower.eat()`,
@@ -254,22 +256,23 @@ if __name__ == "__main__":
 `flower: Gladiolus` stores that implementation in the dispatch table under the key `Gladiolus`.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
+
 Each registered implementation takes the name `_`.
-A call to `nectar()` finds that implementation through the dispatch table,
-so the name is free to be anything.
+The name is free to be anything,
+since a call to `nectar()` finds that implementation through the dispatch table.
 `_` is the conventional placeholder for a name that exists only to satisfy `def`.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
 so every implementation stays in the table.
 
 Nothing edits `Flower`.
-Each operation is a separate function,
-and the `@singledispatch` default handles every other type.
+Each operation is a separate function.
 Dispatch follows inheritance:
 a subclass resolves to its nearest registered ancestor.
 Every class descends from `object`,
 where `@singledispatch` registers the base implementation,
-so no type falls outside the table.
+so the default handles every type with no registered ancestor,
+and none falls outside the table.
 The tests below check each case.
 
 The listing's last two output lines inspect the dispatch table the decorator built.
@@ -283,6 +286,7 @@ The default is also the risk.
 A new `Flower` subclass gets the default answer until someone registers it.
 Both the runtime and the checker accept the call,
 so a forgotten registration produces a wrong result rather than a failure.
+
 The default also accepts arguments outside `Flower`.
 `@singledispatch` registers the base implementation under `object`,
 not under the `Flower` in its annotation,
@@ -291,6 +295,7 @@ so `nectar(42)` returns `42: no nectar`.
 because the dispatcher that `@singledispatch` builds declares its parameters as `Any`.
 Only mypy rejects it,
 since mypy's built-in `singledispatch` plugin checks the call against the base function's signature.
+
 When the default answer would be wrong for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` in place of the fallback string.
 A forgotten registration then fails at its first call.
@@ -300,9 +305,11 @@ before anything runs.
 The price is a closed set.
 The `match` runs over a union of types,
 so adding a type means editing the union.
-Adding a new operation is a new function.
+
+Under `@singledispatch`, adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
+
 When the operation should read like a method,
 use [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 instead.
@@ -414,7 +421,7 @@ calling `nectar()` instead of `fragrance()` selects the operation before anythin
 The flower's type is the one thing left for runtime to resolve,
 and one dispatch covers it.
 
-The chapter opens with that difference in intent.
+The chapter opens with the difference in intent.
 *Visitor* adds operations to a hierarchy you cannot edit,
 and its double dispatch is the means.
 *Multiple Dispatching* is the end in itself: two objects must interact,
