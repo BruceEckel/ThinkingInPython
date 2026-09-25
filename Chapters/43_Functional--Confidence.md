@@ -71,7 +71,7 @@ print(70 + withdraw(30))
 
 The first `withdraw(30)` evaluates to `70`,
 so substituting `70` for it ought to change nothing.
-It changes `110` into `140`.
+The substitution changes `110` into `140`.
 `withdraw()` is not referentially transparent,
 and any expression containing it inherits the problem.
 Substitution reasoning stops at the first impure call.
@@ -145,7 +145,8 @@ and the answers stay the same.
 Shared state takes that freedom away.
 Two parallel `withdraw()` calls could both read `balance` before either writes it back.
 The second write then overwrites the first, so `balance` records one withdrawal.
-A lock makes that safe, and the lock serializes the work you wanted to overlap.
+A lock makes the two calls safe,
+and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it: with nothing shared,
 a lock has nothing to guard.
 
@@ -257,17 +258,17 @@ You decide how far up the spectrum to go.
 4. Above that is [*property-based testing*](#property-based-testing).
    You state a law the code must obey,
    then check it against many generated inputs.
-   It searches for a counterexample instead of proving the law,
+   The check searches for a counterexample instead of proving the law,
    and that search is the falsifiability the opening requires of a science.
    What this rung adds to rung 3 is expressiveness, not certainty.
    A type states what shape a value has.
-   A property can state a fact about its behavior,
+   A property can state a fact about the value's behavior,
    at the cost of checking a sample of inputs instead of every one.
 5. At the top is formal proof.
    In a dependently-typed language such as Lean, Idris, or Rocq (formerly Coq),
    you prove a program correct for every possible input,
    and a machine checks the proof.
-   This is real, but rare outside specialized work.
+   Formal proof is real, but rare outside specialized work.
 
 ## Property-Based Testing
 
@@ -338,10 +339,10 @@ because importing `property_check.py` runs its thousand-iteration loop inside th
 `@given(strategies.text())` calls `test_roundtrip()` once per generated string.
 By default Hypothesis generates a hundred of them,
 a tenth of the hand-written loop's thousand.
-They cover more of the input space,
+Those hundred strings cover more of the input space,
 because Hypothesis generates boundary values and unusual characters instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input,
-the first improvement over the bare `assert` above.
+the first improvement over `property_check.py`'s bare `assert`.
 It also shrinks that input to the smallest example that still fails,
 a second improvement,
 so Hypothesis reports the bug as the smallest case rather than a random one.
@@ -349,9 +350,11 @@ The framework automates falsification.
 
 ### Shrinking a Failure
 
-The two listings above both pass, and shrinking needs a failure.
+`property_check.py` and `test_property.py` both pass,
+and shrinking needs a failure.
 The next codec has a bug,
-and it is the unusual-Unicode case the previous section mentions:
+and the bug is the unusual-Unicode case [The Same Law in Hypothesis](#the-same-law-in-hypothesis)
+mentions:
 
 ```python
 # shrinking.py
@@ -379,7 +382,7 @@ except AssertionError as e:
 
 `encode()` still turns text into UTF-8 bytes,
 but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
-The two agree on the 128 ASCII code points,
+UTF-8 and Latin-1 agree on the 128 ASCII code points,
 and `property_check.py`'s five-letter alphabet sits inside those.
 Every string its loop builds decodes the same way under both,
 so all thousand cases pass.
@@ -388,7 +391,7 @@ It shrinks its failure down to the smallest code point outside that agreement,
 `'\x80'`, the first character UTF-8 needs more than one byte to encode.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
 so the round trip returns a different string.
-This is the unusual Unicode the hand loop's alphabet kept out of reach.
+That code point is the unusual Unicode the hand-written loop's alphabet kept out of reach.
 Hypothesis found it by drawing from a wider alphabet,
 treating `decode()` as opaque throughout.
 
@@ -398,8 +401,8 @@ the job `random.seed(42)` does in the hand-written loop.
 so every run searches from scratch.
 A real test keeps the defaults.
 
-This function exists to fail, and a failing `test_` function fails the build.
-Its name therefore drops the `test_` prefix,
+`roundtrip()` exists to fail, and a failing `test_` function fails the build.
+`roundtrip()` therefore drops the `test_` prefix from its name,
 and the listing calls it directly inside a `try`.
 
 ### A Family of Property Shapes
@@ -441,7 +444,7 @@ and referential transparency reduce the work of turning "I believe this is corre
 A full proof does all of that work.
 The everyday gain comes from doing part of it: code you can read, check,
 and test as statements about what is true.
-That, more than the presence of functions,
+That gain, more than the presence of functions,
 is the "functionality" the introduction sets out to find.
 
 Part V extends the same discipline and asks the type checker to enforce it:
@@ -455,17 +458,17 @@ and the chapters after it build a checked system on that idea.
     Narrow `assert parallel == serial` to compare only the counts,
     since the serial run now carries the parent's ID and the parallel one carries the workers'.
     Compare the number of distinct IDs to `os.process_cpu_count()`,
-    and run it three times before deciding what it means.
+    and run `parallel_pure.py` three times before deciding what that number means.
 2.  Replace `ProcessPoolExecutor` with `ThreadPoolExecutor` in the previous exercise and explain the IDs you see instead.
-3.  Write Hypothesis properties for `sorted()` using two shapes from the family above:
+3.  Write Hypothesis properties for `sorted()` using two shapes from [A Family of Property Shapes](#a-family-of-property-shapes):
     an invariant (every adjacent pair of the output is in order) and idempotence
     (sorting a sorted list changes nothing).
     Then add the oracle property that `sorted(xs)` agrees with a hand-written insertion sort on short lists.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
-    run it a few times to see which characters it reports,
-    and explain what they reveal about Unicode case mapping.
+    run the test a few times to see which characters Hypothesis reports,
+    and explain what those characters reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any group size,
     every student appears in exactly one group per round.
@@ -476,7 +479,7 @@ and the chapters after it build a checked system on that idea.
 6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
     For each, name the substitution that changes the program's behavior,
-    then rewrite it so the value arrives as an argument.
+    then rewrite the function so the value arrives as an argument.
 7.  Take the `describe()` function from [Error Handling](42_Functional--Error_Handling.md#matching-on-the-error)
     and rewrite its `match` as `isinstance()` tests.
-    Count the lines, then run `ty` on both and compare what each one knows about the value inside the `Ok`.
+    Count the lines, then run `ty` on both versions and compare what it knows about the value inside the `Ok` in each.
