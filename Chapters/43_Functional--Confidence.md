@@ -77,7 +77,7 @@ and any expression containing it inherits the problem,
 so substitution reasoning stops at the first impure call.
 
 `global` is not the only way to break substitution.
-A function that mutates an argument breaks it too, with no global in sight:
+A function that mutates an argument breaks it too, without a `global` statement:
 
 ```python
 # mutates_argument.py
@@ -95,20 +95,20 @@ print(cart)
 Each call to `add_item()` returns the same list the caller passed in,
 so replacing the call with that list looks safe.
 It is not.
-The call also appends to `cart`, a change substitution cannot see,
+The call also appends to `cart`, and substituting the list does not,
 so calling it twice leaves `cart` different from calling it once.
 
 Referential transparency also makes [`lru_cache`](41_Functional--Toolkits.md#lru_cache)
 safe.
-A memoizer can hand back a stored result because the call is interchangeable with its value.
+A memoizer can return a stored result because the call is interchangeable with its value.
 Every optimization that skips or reuses work,
 from a cache to a database query planner,
 benefits from referential transparency.
 The more your program is referentially transparent, the more of it a machine,
 or a proof, can verify.
-Caching an impure function breaks silently instead of raising an exception.
+Caching an impure function returns wrong values and raises no exception.
 `withdraw()` is not referentially transparent,
-so decorating it with `lru_cache` corrupts its own bookkeeping:
+so decorating it with `lru_cache` leaves `balance` wrong:
 
 ```python
 # cached_withdraw.py
@@ -131,9 +131,9 @@ print(f"balance: {balance}")
 Two withdrawals of `30` should leave `balance` at `40`.
 The second call is a cache hit,
 so `withdraw()` never runs a second time and never subtracts the second `30`,
-with no error to report the loss.
-`lru_cache` trusts every call it wraps to be referentially transparent,
-and nothing in the language checks that trust.
+and nothing reports the skipped subtraction.
+`lru_cache` returns the stored result for any repeated arguments,
+and nothing in the language checks that the function it wraps is referentially transparent.
 
 ## Automatic Parallelism
 
@@ -144,7 +144,7 @@ and the answers do not change.
 
 Impure code has no such freedom.
 Two parallel `withdraw()` calls could both read `balance` before either writes it back,
-and one withdrawal vanishes.
+and the second write overwrites the first, so `balance` records one withdrawal.
 A lock makes that safe, and the lock serializes the work you wanted to overlap.
 Purity removes the problem instead of managing it: with nothing shared,
 a lock has nothing to guard.
@@ -191,21 +191,20 @@ or when.
 The limits above are large enough for the difference to show:
 on the machine that built this book,
 the serial run took a few seconds and the parallel run about half that,
-comfortably clearing the 1.3x margin the last line checks.
-Smaller limits finish before spawning the worker processes pays for itself,
-so a reader who shrinks the limits back down will watch parallel lose.
+well over the 1.3x margin the last line checks.
+Smaller limits finish in less time than the pool takes to start its workers,
+so a reader who shrinks the limits back down will see the parallel run take longer than the serial one.
 Purity makes parallel safe.
 It says nothing about whether parallel is worth it at a given size.
 
 Purity makes the calls safe to run together.
-It does not make them easy to move.
+It does not make them easy to send to a worker.
 Each argument and each result pickles to cross the process boundary,
-and the function travels by name,
-so `count_primes()` must live at the top level of a module a worker can import.
+and the function pickles as its qualified name,
+so `count_primes()` must sit at the top level of a module a worker can import.
 A `lambda` or a closure fails with a `PicklingError`,
-and that rules out two shapes these chapters favor.
-A `functools.partial` survives,
-because it pickles as its wrapped function plus its bound arguments.
+and that rules out two shapes these chapters use often.
+A `functools.partial` pickles, as its wrapped function plus its bound arguments.
 The `if __name__ == "__main__"` guard exists for the same reason:
 each worker imports this module to find `count_primes()`,
 and without the guard every worker builds a pool of its own.
@@ -231,24 +230,24 @@ takes a `Result` apart with one branch per kind of failure.
 A description of the result is easier to check than a sequence of steps,
 because less of it can be wrong.
 It also leaves the runtime free to choose the steps, which is why a SQL query,
-a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never see.
+a NumPy expression, or a dataframe operation can run on an optimized or parallel engine you never call directly.
 
 You decide how far up the spectrum to go.
 
-1. The cheapest rung is local reasoning.
+1. The first rung, local reasoning, takes the least work.
    Pure functions and immutable values let you understand one piece at a time,
-   with no hidden state to carry in your head.
+   with no hidden state to keep track of.
    Most code needs no more.
 2. Next are tests over chosen examples,
    the subject of [Testing](11_Techniques--Testing.md).
-   Each one pins a single input to a single answer,
+   Each one checks a single input against a single answer,
    so what you learn is no wider than the examples you invent.
 3. Next is type checking.
    A type signature is a small theorem, and the function body is its proof.
    This is the [Curry-Howard correspondence](https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence).
    Python's version of it is partial.
    An `Any`, a `cast()`,
-   or data arriving from outside the program leaves a gap no type checker can close,
+   or data arriving from outside the program leaves a value no type checker verifies,
    so the theorem holds only as far as the annotations do.
    Running `ty` over the examples in this book still rules out a useful class of mistakes,
    and that is most of what this rung offers.
@@ -257,7 +256,7 @@ You decide how far up the spectrum to go.
    then check it against many generated inputs.
    It searches for a counterexample instead of proving the law,
    and that search is the falsifiability the opening requires of a science.
-   The climb from rung 3 is in expressiveness, not certainty.
+   What this rung adds to rung 3 is expressiveness, not certainty.
    A type states only what shape a value has.
    A property can state a fact about its behavior,
    at the cost of checking a sample of inputs instead of every one.
@@ -272,7 +271,7 @@ You decide how far up the spectrum to go.
 You can write a property check by hand,
 looping over random inputs and asserting the law.
 A tool like [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)
-does the same thing with sharper inputs,
+does the same thing with inputs it chooses at boundaries and unusual values,
 and shrinks any failure to a minimal counterexample:
 
 ```python
@@ -312,7 +311,7 @@ You describe the inputs with a *Strategy* and state the law once,
 as a normal `test_` function.
 The framework supplies the cases,
 drawing on every character UTF-8 can encode rather than `property_check.py`'s five-letter alphabet,
-so it reaches inputs the loop cannot produce, such as unusual Unicode:
+so it generates inputs the loop cannot produce, such as unusual Unicode:
 
 ```python
 # test_property.py
@@ -332,21 +331,23 @@ def test_roundtrip(sample: str) -> None:
 The listing repeats the two functions rather than importing them,
 because importing `property_check.py` runs its thousand-iteration loop inside the test run.
 
-`@given(strategies.text())` feeds `test_roundtrip()` a stream of generated strings.
+`@given(strategies.text())` calls `test_roundtrip()` once per generated string.
 By default Hypothesis generates a hundred of them,
-a tenth of the hand-written loop's thousand, and they still cover more ground,
-because Hypothesis aims at boundaries and oddities instead of sampling evenly.
+a tenth of the hand-written loop's thousand,
+and they still cover more of the input space,
+because Hypothesis generates boundary values and unusual characters instead of sampling evenly.
 When a law fails, Hypothesis reports the failing input,
 the first improvement over the bare `assert` above.
 It also shrinks that input to the smallest example that still fails,
 a second improvement,
-so the bug surfaces as the clearest case rather than a random one.
+so Hypothesis reports the bug as the smallest case rather than a random one.
 The framework automates falsification.
 
 ### Shrinking a Failure
 
 The two listings above both pass, so nothing has shrunk yet.
-The next codec has a bug, and it is the Unicode gap promised earlier:
+The next codec has a bug,
+and it is the unusual-Unicode case the previous section mentions:
 
 ```python
 # shrinking.py
@@ -376,16 +377,16 @@ except AssertionError as e:
 but `decode()` now reads those bytes back as Latin-1 instead of UTF-8.
 The two agree on the 128 ASCII code points,
 so `property_check.py`'s five-letter alphabet, built only from those,
-can run all thousand cases and never reach the mismatch.
+can run all thousand cases without generating a string the two decodings disagree on.
 Hypothesis draws from the full range a Python string holds,
 and shrinks its failure down to the smallest code point outside that agreement,
 `'\x80'`, the first character UTF-8 needs more than one byte to encode.
 Decoding those two bytes as Latin-1 returns two characters where one went in,
-so the round trip breaks.
+so the round trip returns a different string.
 This is the unusual Unicode the hand loop's alphabet could never draw,
 found because Hypothesis draws from a wider alphabet,
-not because it guesses the bug.
-`derandomize=True` fixes the search so this book gets the same answer every run,
+not because it inspects `decode()`.
+`derandomize=True` seeds the search from a hash of the test function so this book gets the same answer every run,
 the job `random.seed(42)` does in the hand-written loop.
 `database=None` keeps it from replaying a case an earlier run saved.
 A real test needs neither.
@@ -399,22 +400,22 @@ and knowing the family is most of the skill.
 An *invariant* states a fact about every output:
 sorting produces an ordered list.
 *Idempotence* states that repeating changes nothing:
-sorting a sorted list leaves it alone.
+sorting a sorted list returns the same order.
 An *oracle* states that two implementations agree:
 the simple version you can check by reading matches the fast one.
 `parallel_pure.py`'s `assert parallel == serial` makes that claim about `map()` and `pool.map()`.
 
-The trap to avoid is a property that restates the implementation.
+The mistake to avoid is a property that restates the implementation.
 Asserting `encode(text) == text.encode().hex()` tests nothing,
 because the test and the code share any bug.
 A good law, like the roundtrip,
 constrains the function's behavior without repeating its body.
-All of these lean on purity.
+All of these require purity.
 Hypothesis can rerun and shrink freely because each call is independent of every other.
 
 ## Affordable Proof
 
-Two caveats keep the chapter's argument from overreaching.
+Two caveats limit the chapter's argument.
 First, proof works on imperative code too:
 Hoare logic and tools like Dafny verify it.
 What purity changes is the cost.
@@ -422,19 +423,19 @@ With no mutable state to track, each step of the reasoning is shorter.
 Functional programming does not make correctness provable so much as it makes the proof affordable.
 Second, most functional code stops well below the top rung.
 Haskell programmers rarely prove a program correct.
-They lean on types and on reasoning by substitution,
-and save full proof for the few places that earn it.
+They rely on types and on reasoning by substitution,
+and write a full proof only for the few places that need one.
 
-The thread running through these chapters is not that functions are special.
+The claim these chapters share is not that functions are special.
 It is that purity, immutability,
-and referential transparency shrink the distance between "I believe this is correct" and "I can show why."
-Proof is the far end of that distance.
-The everyday win is everything below it: code you can read, check,
+and referential transparency reduce the work of turning "I believe this is correct" into "I can show why."
+A full proof does all of that work.
+The everyday gain comes from doing part of it: code you can read, check,
 and test as statements about what is true.
 That, more than the presence of functions,
 is the "functionality" the introduction sets out to find.
 
-Part V takes the same discipline one step further and asks the type checker to enforce it:
+Part V extends the same discipline and asks the type checker to enforce it:
 [Effect Management](44_Effects--Effect_Management.md)
 puts a function's effects in its signature,
 and the chapters after it build a checked system on that idea.
@@ -454,14 +455,14 @@ and the chapters after it build a checked system on that idea.
 4.  State a law that is false and watch Hypothesis falsify it:
     `@given(strategies.text())` with `assert s.upper().lower() == s.lower()`.
     Report the counterexample Hypothesis shrinks to,
-    run it a few times to see which characters it settles on,
+    run it a few times to see which characters it reports,
     and explain what they reveal about Unicode case mapping.
 5.  Write a property test for `group_rounds()` from [Toolkits](41_Functional--Toolkits.md#groups-of-any-size):
     for any roster and any group size,
     every student appears in exactly one group per round.
     Use a strategy that generates rosters of distinct names.
     Then break `group_rounds()` on purpose, run the test twice,
-    and confirm the same counterexample arrives both times:
+    and confirm Hypothesis reports the same counterexample both times:
     Hypothesis records a failing case under `.hypothesis/` and replays it first on the next run.
 6.  Write two functions that are *not* referentially transparent without using `global`:
     one that reads `datetime.now()`, and one that reads an environment variable.
