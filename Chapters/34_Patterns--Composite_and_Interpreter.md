@@ -188,12 +188,13 @@ flattens the recursion into a single stream of paths,
 and any consumer of that stream stays decoupled from the tree structure.
 
 The `entries` field is a tuple of `Node`, so the whole tree is immutable.
-A `list` there would not do: a record stops rebinding of the field,
-not mutation of the object it holds,
+A `list` there would leave the tree mutable:
+a record freezes the binding of the field,
+and the list it holds keeps its `append()`,
 which [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
 The demo builds `src` first, then places it inside `root`.
-Nothing can modify `src` afterward, so sharing subtrees is safe.
+`src` stays as built, so sharing subtrees is safe.
 
 ```python
 # test_filesystem.py
@@ -225,10 +226,10 @@ def test_empty_directory() -> None:
     assert list(walk(Directory("empty", ()))) == []
 ```
 
-The classic version is still useful when the set of node types is open.
+The classic version wins when the set of node types is open.
 If plugins or other packages must add new kinds of entries,
-a method on a base class lets them do that without editing your code,
-but a central `match` needs editing.
+a method on a base class lets them do that in their own code,
+while a central `match` needs an edit in yours.
 The [guidance on when not to match](13_Techniques--Pattern_Matching.md#when-not-to-match)
 applies directly.
 Match over a closed set, use polymorphism for an open one.
@@ -247,9 +248,8 @@ sentences written as Python source, with operands that are already nodes.
 A data class declares a node in three lines,
 and operator overloading lets Python's own parser build the trees.
 A GoF *Interpreter* more often parses a rules file, a configuration value,
-or a query a user types at runtime, and none of those is Python source,
-so this technique does not apply to them.
-They still need a real parser.
+or a query a user types at runtime; those arrive as text,
+and text needs a real parser.
 Here is the complete grammar for a small arithmetic language:
 
 ```python
@@ -310,22 +310,20 @@ and each walker's `assert_never()` needs the union to verify that its `match` co
 because a base class is an open set and any new subclass silently belongs to it.
 
 `Operators` declares no `__slots__`,
-so the nodes are declared with `@dataclass(frozen=True)` and not [`@record`](18_Techniques--Performance.md#record):
-an instance whose base declares no `__slots__` has a `__dict__` whatever its own class declares.
+so an instance of any subclass carries a `__dict__` whatever its own class declares,
+and the nodes keep `@dataclass(frozen=True)` instead of becoming [records](18_Techniques--Performance.md#record).
 
 ### Operators That Build Nodes
 
 Every node inherits `__add__()` and `__mul__()`,
 and those methods do not compute anything.
 They build nodes.
-Annotating `self` as `Expr` rather than leaving it implicit lets `Add(self, ...)` type-check.
-Left implicit, `self` means "some subclass of `Operators`,"
-and the type checker cannot know that every such subclass is in the `Expr` union.
-The `Expr` annotation declares that.
+Annotating `self` as `Expr` lets `Add(self, ...)` type-check.
+An implicit `self` means "some subclass of `Operators`,"
+and the `Expr` annotation declares to the type checker that `self` is a member of the union.
 `ty` accepts a `self` annotation narrower than the class.
-Pyright and mypy reject one,
-since both require the declared type of `self` to be a supertype of its class,
-and under either of them the portable form leaves `self` unannotated and writes `cast(Expr, self)` at each construction.
+Pyright and mypy require the declared type of `self` to be a supertype of its class,
+so under either of them the portable form leaves `self` implicit and writes `cast(Expr, self)` at each construction.
 Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
@@ -338,11 +336,12 @@ The reflected methods depend on the operator dispatch from [*Multiple Dispatchin
 `2 * x` works because `int.__mul__` returns `NotImplemented` and Python turns to `x.__rmul__(2)`.
 Unlike that chapter's `Meters`, though,
 these reflected methods accept any operand.
-The type checker rejects `"a" + x` in source it checks,
-but at runtime nothing checks: `str.__add__` declines, `Var.__radd__` runs,
-and it returns `Add(Num("a"), x)`, an ill-typed tree instead of an error.
+The type checker reports `"a" + x` in source it sees,
+but at runtime `str.__add__` declines, `Var.__radd__` runs,
+and the result is `Add(Num("a"), x)`,
+an ill-typed tree whose error waits for `evaluate()` to add the `"a"`.
 Exercise 6 makes each operator method return `NotImplemented` for an operand it cannot use,
-so `"a" + x` raises `TypeError` instead.
+so `"a" + x` raises `TypeError` at the `+`.
 
 SymPy expressions, Polars column arithmetic,
 and SQLAlchemy filter conditions all use this technique.
@@ -357,20 +356,20 @@ so an expression written with them builds nodes instead of computing.
 `@dataclass` writes its own `__eq__()` onto every node class,
 and attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
-`expr.py` never overloads `==`; the nodes compare by value instead,
-which is what the demo below and its tests rely on.
+`expr.py` leaves `==` alone; the nodes compare by value,
+which the demo below and its tests rely on.
 A library whose `==` must build a node, the way SQLAlchemy's `col == 5` does,
-gives up structural comparison (`eq=False` on the dataclass)
+trades structural comparison for it (`eq=False` on the dataclass)
 and writes its own `__eq__()`.
-This chapter keeps structural comparison, so its nodes cannot do both.
-`and`, `or`, and `not` you cannot overload either way:
-Python tests the operand's truth value,
+This chapter keeps structural comparison; a class gets one or the other.
+`and`, `or`, and `not` belong to Python alone:
+it tests the operand's truth value,
 then `and` and `or` return one of the two objects, and `not` returns a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
-An expression language that needs boolean operators overloads `&` and `|` instead,
-which is why a Pandas filter reads `(a > 1) & (b > 2)` with parentheses that arithmetic would not need.
+An expression language that needs boolean operators overloads `&` and `|`,
+which is why a Pandas filter reads `(a > 1) & (b > 2)`.
 The parentheses change the parse: `&` binds tighter than `>`,
-so without them Python parses `1 & b` first.
+so bare `a > 1 & b > 2` parses `1 & b` first.
 
 ## Evaluation Is a Tree Walk
 
@@ -425,13 +424,13 @@ Each recursive call packs a fresh dict from `**env`,
 so the live dicts at any moment total the tree's depth times the number of bound variables.
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
-`**env` also creates the name collision the `/` prevents: without the `/`,
-`e` is an eligible keyword,
-and `test_e_is_available_as_a_variable()` below confirms that `e=5` binds the variable.
+`**env` is also why the `/` is there: with `e` positional-only,
+`e=5` lands in `env`,
+and `test_e_is_available_as_a_variable()` below confirms that it binds the variable.
 A `dict[str, int]` parameter passes the same bindings by reference at every call,
-needing neither the `/` nor this explanation.
-This chapter keeps `**env` anyway,
-for `evaluate(expr, x=3)` instead of `evaluate(expr, {"x": 3})`.
+and it would spare both the `/` and this explanation.
+This chapter keeps `**env` for the call site:
+`evaluate(expr, x=3)` rather than `evaluate(expr, {"x": 3})`.
 
 ```python
 # test_evaluate.py
@@ -557,12 +556,14 @@ if __name__ == "__main__":
 ```
 
 `messy` writes `Num(2) + 3` rather than the plainer `2 + 3` on purpose.
-`2` and `3` are both `int`, so Python adds them to `5` before any node exists,
-and the fold this section teaches never runs.
+`2` and `3` are both `int`,
+so Python adds them to `5` while both are plain integers,
+and `simplify()` receives a `Num(5)` already folded.
 `Num(2)` is already a node,
 so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
 This is the limit of using the host parser:
-an operation builds a node only when at least one operand already is one.
+an operator builds a node when either operand is one,
+and does plain arithmetic otherwise.
 
 The patterns read like the algebra they implement.
 `(Num(0), other) | (other, Num(0))` says "zero on either side,
@@ -588,7 +589,7 @@ which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 `frozen=True` blocks every field assignment,
 so `simplify()` never edits the input.
 It returns a new tree that shares unchanged subtrees with the original:
-the `is` guard in each `case _` returns the node it received when neither child simplified to anything different.
+the `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 
 ```python
 # test_simplify.py
@@ -658,12 +659,12 @@ so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
 Iterating a `Template` is flat:
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
 so the walk itself is a loop rather than a recursion.
-An interpolation's value has no such limit.
-It can be a `Template`, built by nesting one `t`-string inside another.
+An interpolation's value can itself be a `Template`,
+built by nesting one `t`-string inside another.
 Combining `t`-strings with `+`, as the `query` in the listing below does,
-concatenates them into one flat `Template` instead,
-so only nesting produces a `Template`-valued interpolation,
-and a walker that loops over the top level still needs to recurse into any value that turns out to be a `Template`.
+concatenates them into one flat `Template`,
+so nesting is the one way to produce a `Template`-valued interpolation,
+and a walker that loops over the top level must also recurse into any value that turns out to be a `Template`.
 Everything else about walking a `Template` is this chapter's shape.
 
 Iterating a `Template` produces `str | Interpolation`,
@@ -727,10 +728,9 @@ print(values2)
 `outer` interpolates `inner`, another `Template`, rather than a plain value.
 `to_query()` checks for that case and recurses,
 so `inner`'s pieces flatten into the same `sql` string and `values` list,
-instead of leaving a `Template` object in `values2`,
-which no database driver accepts.
+and every entry in `values2` is a value a database driver accepts.
 Composing `t`-strings this way builds a nested composite,
-even though iterating any one `Template` stays flat.
+while iterating any one `Template` stays flat.
 
 `to_query()` and `to_shape()` stand in the same relationship as `evaluate()` and `to_infix()`:
 two operations over one structure, which names neither of them,
