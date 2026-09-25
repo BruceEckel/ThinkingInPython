@@ -23,8 +23,7 @@ The problem has three types.
 A *maze* knows its own layout.
 Given a coordinate, it reports whether each neighboring cell is a wall or an opening,
 and it hands out an entry point.
-The maze never decides anything.
-It only answers questions.
+The maze decides nothing; it only answers questions.
 
 A *blackboard* is the shared surface on which every rat writes.
 Blackboard is a classic coordination pattern.
@@ -161,8 +160,8 @@ class Maze:
 
 `Cell` nests inside `Maze` because it names concepts only `Maze` uses,
 and it is a `StrEnum` rather than an `Enum` so its members keep acting like real strings.
-`WALL` still works as the fill character for `ljust()`,
-and comparing `self.rows[y][x]` against `Cell.OPEN` still works,
+`WALL` serves as the fill character for `ljust()`,
+and `self.rows[y][x]` compares equal to `Cell.OPEN` on an open cell,
 because a `StrEnum` member is its string value.
 
 The blackboard holds everything the rats share.
@@ -257,7 +256,7 @@ and each `default_factory` builds a fresh object per blackboard.
 ### Running the Maze
 
 The maze layout lives in a text file.
-The loader drops blank lines and any line beginning with `#`, so the first line,
+The loader skips blank lines and any line beginning with `#`, so the first line,
 naming the file's path, drops out and the rest is the maze.
 
 ```text
@@ -335,15 +334,15 @@ asyncio.run(main())
 every open cell connects to the rest of the maze by exactly one path.
 Every `claim()` the run above rejects on an open cell is a rat looking back at the cell it came from,
 never two rats reaching for the same open cell.
-On this maze, `claim()`'s atomicity is never tested against two rats competing for new ground,
-only against cells the rats have walked: one rat's own trail,
+On this maze, `claim()`'s atomicity never faces two rats competing for new ground,
+only cells the rats have walked: one rat's own trail,
 or the cell a parent still occupies when its new rat looks back.
 
 ### Contention on a Loop
 
 A maze with a loop closes a second path between two cells,
 so two different rats can approach the same open cell from opposite directions.
-Eight open cells around one wall block, with one loop, are enough to force it:
+Eight open cells around one wall block are enough to force it:
 
 ```python
 # rats_and_mazes/ring_contention.py
@@ -453,14 +452,14 @@ records the order in which they claimed cells,
 and replays that order on a `tkinter` canvas: walls in gray,
 then each claimed cell turning green one after another,
 so you watch the pack move through the maze from the entry outward.
+It records the order by subclassing `Blackboard` and overriding `claim()`,
+so the model needs no change.
 Each of this chapter's three views is a separate file holding all the display code,
 the model-view split of [*Observer*](30_Patterns--Observer.md#a-visual-example-a-model-and-its-view).
 The missing piece is the subscription:
 no model in this chapter notifies anybody,
 so each view drives or replays its model instead of waiting for a notification.
-`rats_view.py` records that order by subclassing `Blackboard` and overriding `claim()`,
-so the model needs no change.
-The harness skips it, like every windowed view in this book.
+The harness skips `rats_view.py`, like every windowed view in this book.
 
 ```python
 # rats_and_mazes/rats_view.py
@@ -527,8 +526,7 @@ if __name__ == "__main__":
 Concurrency here is a shape for the code, not a source of speed.
 Every rat awaits `asyncio.sleep(0)` at the same point,
 so the tasks take turns in round robin and the run stays deterministic.
-Nothing runs at the same instant as anything else,
-and no thread or process ever overlaps another,
+No task, thread, or process ever overlaps another,
 so the design buys no speed over a single-threaded worklist.
 A plain stack of frontiers, popped and pushed in a loop,
 visits the same 139 cells.
@@ -665,7 +663,7 @@ never a runtime lookup.
 `__init__` assigns `finished`, so each robot owns its own flag from the start.
 `room` gets only a declaration, `room: Room` with no value.
 That line tells the type checker a `Room` belongs there and stores nothing at runtime.
-`GameBuilder` creates the attribute when it places the robot and sets `robot.room`.
+`GameBuilder` creates the attribute by assigning `robot.room` when it places the robot.
 Reading `room` before then raises an `AttributeError`,
 and the builder runs first, so every read comes after.
 Declaring it this way keeps the type `Room` instead of `Room | None`,
@@ -755,9 +753,8 @@ then the connections between rooms, then the teleport pairs.
 Each stage depends on the one before it,
 so splitting them into labeled passes keeps the construction readable instead of tangling it into one loop.
 [Factory](27_Patterns--Factory.md#builder)
-counts this as one of the cases where *Builder* survives in Python,
-because construction here is genuinely a process rather than a single call.
-`GameBuilder` assembles the maze in three stages.
+counts this among the cases where *Builder* survives in Python,
+because construction here is a process rather than a single call.
 `run()` walks a string of moves, and `show_maze()` renders the current state:
 
 ```python
@@ -845,8 +842,8 @@ string_maze = """
 """.strip()
 ```
 
-Stage 3 pairs the teleports by target letter.
-The sort by target letter puts each pair of partners side by side.
+Stage 3 pairs the teleports.
+Sorting by target letter puts each pair of partners side by side.
 `groupby(teleports, key=target)` then walks the sorted rooms in one pass,
 handing each run of matching letters to `pair = list(group)`.
 `assert len(pair) == 2, letter` checks a rule the maze layout must obey:
@@ -857,7 +854,7 @@ Without that check the build still stops,
 at `room1, room2 = pair` on the next line,
 with a `ValueError` about unpacking that does not name the letter.
 The `assert isinstance` lines that follow are for the type checker as much as for safety:
-each proves that the occupant really is a `Teleport` before the code touches `target_room`.
+each proves that the occupant is a `Teleport` before the code touches `target_room`.
 
 Stage 1 does test types,
 with `isinstance(occupant, Robot)` and `isinstance(occupant, Teleport)`.
@@ -938,7 +935,7 @@ keeps a room from entering the queue twice.
 Searching changes nothing.
 `solve()` reads doors and occupants and never calls `enter()`,
 so the robot eats no food and stays where it started.
-The path it returns is exactly the string `run()` expects:
+The path it returns is the string `run()` expects:
 
 ```python
 # robot_explorer/robot_demo.py
@@ -1006,10 +1003,10 @@ print(game.show_maze())
 
 The robot eats the food along its path, jumps through both teleports
 (`a`, then `b`), and reaches the `!` that ends the game.
-The teleports are not shortcuts here.
+The teleports are not shortcuts but the only way through.
 If `landing()` refuses them the way it refuses a `Wall`,
 `solve()` raises a `ValueError`:
-without the teleports no route to the `!` exists at all.
+without the teleports no route to the `!` exists.
 
 ### Testing the Walk
 
@@ -1120,8 +1117,7 @@ None of them needs concurrency.
 Two further resources on mazes:
 a survey of [algorithms to create mazes](https://en.wikipedia.org/wiki/Maze_generation_algorithm),
 and Craig Reynolds on [steering behavior for autonomous moving objects](https://www.red3d.com/cwr/steer/),
-which is where a robot that steered continuously,
-instead of planning a grid path before it moved, would start.
+the starting point for a robot that steers continuously instead of planning a grid path before it moves.
 
 ## Order from Noise
 
@@ -1129,7 +1125,7 @@ The two simulations so far confirm designs.
 The rats cover every reachable cell because `claim()` is atomic.
 The robot reaches the goal because polymorphism handles every encounter.
 Both times you know the outcome in advance and run the program to confirm it.
-This final example is different.
+The third example gives you only half the outcome.
 `amplitude()` fixes the shape the sand will trace: the curves are its zero set.
 No line of the code computes how two thousand independent random walks find that shape and stay there.
 That is simulation's other purpose,
@@ -1150,11 +1146,10 @@ Bowing a different spot rings the plate in a different mode and draws a differen
 The model needs almost nothing.
 `amplitude()` is the standing-wave field of a square plate ringing in mode `(m, n)`.
 Physics supplies the formula, an approximation for a plate with free edges.
-Treat it as given.
-All that matters here is its shape.
+Treat it as given; only its shape matters here.
 The field is zero along curves, and those curves are the nodal lines.
 A `Grain` is a position.
-All of the simulation's logic sits in `step()`.
+All the simulation's logic sits in `step()`.
 Every grain takes one random step,
 and the plate's vibration at that grain's location scales the step.
 Grains never look at each other and remember nothing.
@@ -1230,12 +1225,11 @@ class Plate:
 `agitation()` measures the mean vibration strength directly under the grains.
 Grains scattered at random feel the field's average, so agitation starts high.
 A grain resting on a nodal line feels zero.
-One number summarizes how settled the sand is.
+One number says how settled the sand is.
 `render()` draws grain density as characters,
 in the same spirit as `Blackboard.render()`,
 so the model can show its state without a window.
-The demo shakes the plate 1200 times,
-printing agitation at four checkpoints along the way:
+The demo shakes the plate 1200 times, printing agitation at four checkpoints:
 
 ```python
 # chladni_plate/chladni_demo.py
@@ -1304,7 +1298,7 @@ and no line of `step()`, ever names.
 
 ### Testing a Random Process
 
-A test cannot guess where a particular grain ends up after a million random kicks.
+A test cannot guess where a particular grain ends up after hundreds of random kicks.
 It pins down the aggregate instead.
 Shaking must collapse agitation, and no kick may throw a grain off the plate.
 Seeding `random.Random` makes any failure reproducible.
@@ -1337,8 +1331,7 @@ so you can watch individual grains mix while the collective figure forms.
 Every 200 frames the view switches the plate to a new mode.
 The old figure suddenly sits on loud regions of the new field.
 It bursts back into chaos, mixes, and condenses into a different figure.
-The order is not a property of the grains.
-It belongs to the field on which they sit.
+The order belongs not to the grains but to the field on which they sit.
 
 ```python
 # chladni_plate/chladni_view.py
@@ -1405,11 +1398,11 @@ global order arising from local rules that never mention it.
 The less the agents understand, the more the run can tell you,
 because the outcome lives in the interactions rather than the instructions.
 
-The model has a limit worth naming.
+The model has one limit.
 Run it longer and agitation never stops falling:
 a grain moves roughly five orders of magnitude less per step at 20,000 steps than it does at 100.
 The nodal lines keep thinning as long as the plate shakes,
-so the number of steps you run sets their width in any one run, not the plate.
+so in any one run the step count, not the plate, sets their width.
 Real sand on a real bowed plate settles into a moving equilibrium instead of freezing.
 Exercise 7 asks you to tell the physics from the rule that models it:
 swap `amplitude()`'s formula for a membrane's,
