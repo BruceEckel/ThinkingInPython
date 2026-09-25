@@ -324,8 +324,9 @@ populate the pool eagerly or guard the insert with a lock.
 Both pools so far hold their objects forever.
 `@cache` keeps strong references to every argument and result,
 and `Color._pool` grows with every new color.
-Tile kinds and colors are small sets, so holding them forever costs little.
-When the set keeps growing, such as symbols in a long-running parser,
+A map has a handful of tile kinds and a program usually draws from a small palette,
+so holding them forever costs little.
+When the set of values keeps growing, such as symbols in a long-running parser,
 the pool becomes a memory leak.
 `weakref.WeakValueDictionary`,
 the [live-instance registry](10_Foundations--Cleanup.md#watching-objects-without-holding-them),
