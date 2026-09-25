@@ -213,7 +213,7 @@ and a reader who writes this in their own code meets that report instead of the 
 
 This is the same idea as in [Static Types](08_Foundations--Static_Types.md#type-hints):
 put the meaning in the type.
-Python's humbler form of the same idea is `int | None`.
+Python's humbler form is `int | None`.
 Both force the caller to unpack, but `None` says only "no answer,"
 while an `Err` carries the reason for the failure.
 Use `| None` when absence needs no explanation,
@@ -301,7 +301,7 @@ if __name__ == "__main__":
 #: 4 Ok(answer=4)
 ```
 
-Each step returns early when it encounters an `Err`.
+`composed()` returns early when a step returns an `Err`.
 The check names `Err`, one of the two concrete classes,
 because `Result` is a `type` alias rather than a class:
 `isinstance(a, Result)` fails the type checker and, if run anyway,
@@ -346,9 +346,8 @@ if __name__ == "__main__":
 ```
 
 The two agree on every input, and the exception version is shorter.
-What the exception version can't do:
-report which step failed as anything but a message to parse,
-or survive past the `except` clause as data,
+It also says less: it reports which step failed only as a message to parse,
+and no failure survives past the `except` clause as data,
 the way `sum_type.py` keeps every result in a list at the start of this chapter.
 
 ## Composing With bind
@@ -398,7 +397,7 @@ all with the same `bind()`.
 One mistake to expect when you start chaining:
 `bind()` requires each step to return a `Result`.
 If you feed it a plain function, say `.bind(str)`,
-the type checker rejects that call immediately, because `str` returns a `str`,
+the type checker rejects that call, because `str` returns a `str`,
 and `bind()` expects a `Result`.
 To chain a plain function, wrap its return value: `.bind(lambda x: Ok(str(x)))`.
 Libraries like `returns` name that pattern `map()`,
@@ -407,7 +406,7 @@ and exercise 2's `map_error()` is the same idea aimed at the error side.
 
 A second mistake: every step's error type feeds the same `E`.
 `Result[A, E]` names one error type for the whole chain.
-If one step's `Err` carries a different type than an earlier step's,
+If one step's `Err` carries a type different from an earlier step's,
 the chain returns a union of both types,
 and the annotation you wrote no longer names that wider type.
 Keep a chain's error type the same at every step,
@@ -474,7 +473,7 @@ if __name__ == "__main__":
 ```
 
 Each lambda's parameter is the previous step's answer,
-and the answers stay reachable because the nesting keeps them in scope:
+and the nesting keeps every earlier answer in scope:
 `a` is still visible inside the inner lambda where `b` arrives.
 A flat sequence of `bind()` calls cannot give you that,
 because each step sees only the value handed to it.
@@ -512,7 +511,7 @@ so it's the only one that reaches `add()`.
 
 Short-circuiting is right for a dependent chain,
 where each step needs the previous step's answer,
-as `composing_with_bind.py` does above.
+as in `composing_with_bind.py` above.
 `func_a()`, `func_b()`, and `func_c()` here take independent inputs instead,
 so stopping at the first `Err` discards whatever the later steps would have found,
 the same loss the exceptions in the opening section cause.
@@ -520,8 +519,9 @@ Exercise 3 asks you to collect every failure instead of stopping at the first.
 
 Three inputs cost three levels of nesting,
 and the shape gets worse with each one you add.
-[The returns Library](#the-returns-library), covered at the end of this chapter,
-offers do-notation as a flatter alternative to this nesting.
+[The returns Library](#the-returns-library)
+at the end of this chapter offers do-notation,
+a flatter alternative to this nesting.
 
 Testing confirms that `combined()` returns the correct value,
 or the first failure in the chain:
@@ -596,8 +596,7 @@ if __name__ == "__main__":
 
 `parse()` still reads like a normal function that returns an `int`,
 but `@safe` has changed its return type to `Result[int, Exception]`.
-The caller cannot ignore the failure,
-because it must unpack the `Result` to reach the number.
+The caller must unpack the `Result` to reach the number.
 That error type is the base of the ordinary exception hierarchy,
 not a specific failure.
 The `Result[int, str]` earlier in this chapter names exactly what could go wrong;
@@ -736,7 +735,7 @@ except ValueError as e:
 ```
 
 The bare `raise` re-raises the same object,
-so the type stays `ValueError` and the original traceback survives undisturbed.
+so the type stays `ValueError` and the original traceback survives.
 Notes accumulate: as the stack unwinds,
 each frame that knows something the raiser did not can add its own line.
 They live in a list called `__notes__`,
