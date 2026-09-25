@@ -9,9 +9,8 @@ A cache from `functools`, or a sliding window from `itertools`,
 is code the library wrote for you,
 already correct on the edge case you would otherwise miss.
 A function that shares no state is already safe to run in parallel.
-And code built from small,
-checkable pieces is code you can reason about by substitution,
-the same way you check a line of algebra.
+And you can reason about code built from small,
+checkable pieces by substitution, the same way you check a line of algebra.
 In the functional style you keep loops, classes, and mutation,
 notice when a piece of code can depend on its arguments alone,
 and then write it that way.
@@ -81,7 +80,7 @@ A cache can store its results,
 because the same arguments always produce the same answer.
 That makes [`functools.cache`](41_Functional--Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
-And a pure function tests with a single assertion and no fixture,
+And you test a pure function with a single assertion and no fixture,
 since it holds no state to set up or restore:
 
 ```python
@@ -156,13 +155,13 @@ two parts of a program can share one without coordinating,
 and concurrent code needs no lock to read it.
 
 That safety has a cost, and the cost is copying.
-Python's immutable types share no structure:
+Python's immutable types share no structure.
 `moved = Point(p.x + 10, p.y)` above builds a new `Point`,
 and changing one field of a large tuple or frozen dataclass means rebuilding the whole value,
 not patching one slot in place.
 Copying a two-field `Point` takes so little time that you can ignore it.
-A large structure that changes often copies the whole value on every change,
-and that time and memory are the cost of the coordination immutability removes.
+A large structure that changes often copies the whole value on every change.
+That time and memory are the price of sharing without coordination.
 
 ### Immutability in Annotations
 
@@ -191,8 +190,8 @@ print(MAX_SIZE, total([1, 2, 3]))
 
 The annotation is a constraint the type checker enforces,
 even when the caller passes a mutable `list`.
-Writing `MAX_SIZE = 200` later, or `values.append(4)` inside `total()`,
-is a type error.
+The type checker rejects `MAX_SIZE = 200` written later in the module,
+and rejects `values.append(4)` inside `total()`.
 The constraint binds one side.
 `Sequence[int]` declares that `total()` only reads its argument.
 The caller keeps its `list` and can append to it at any time,
@@ -239,12 +238,13 @@ Equality based on *contents* removes hashing, not mutability by itself.
 A plain class instance is mutable and still hashes, by identity,
 so it works as a dictionary key.
 A `list` and an unfrozen `@dataclass` both compare by contents,
-so Python sets their `__hash__` to `None`:
-the dictionary that stored a key could no longer find it once its contents changed.
-Freezing a dataclass lets it keep contents-based equality and a hash at the same time,
-and [`@record`](18_Techniques--Performance.md#record) freezes `Point`.
-That combination is why a value that must be a dictionary key, a cache entry,
-or a shared read across threads is normally a tuple or a record.
+so a dictionary that stored one as a key could not find it again once its contents changed.
+Python therefore sets their `__hash__` to `None`.
+Freezing a dataclass lets it keep contents-based equality and a hash at the same time.
+[`@record`](18_Techniques--Performance.md#record) freezes `Point`,
+which is why `Point(3, 4)` can key `distances`.
+Contents-based equality together with a stable hash is why a dictionary key,
+a cache entry, or a value shared across threads is normally a tuple or a record.
 
 ## Functions as First-Class Objects
 
@@ -312,8 +312,8 @@ Supporting a new operator means adding a row to the table,
 whether the literal holds that row or a later line adds it,
 as the `operations["%"]` line does here.
 The dispatch code itself never changes.
-A key the table has no row for raises a plain `KeyError`,
-where an `if`/`elif` chain normally ends in an `else`.
+A lookup of a missing key raises a plain `KeyError`.
+An `if`/`elif` chain handles that case with a trailing `else`.
 The same structure underlies [the dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary)
 and the plugin registries that let a program grow without editing its core.
 
@@ -372,18 +372,18 @@ Returning a function is the other half of the definition.
 [Closures](#closures) covers it below.
 
 The `list()` calls do real work.
-`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators),
-so `print(map(...))` shows `<map object at 0x...>` instead of values,
+`map()` and `filter()` return [one-shot iterators](23_Patterns--Iterators.md#generators).
+`print(map(...))` therefore shows `<map object at 0x...>` instead of values,
 and a second pass over the same object silently produces nothing.
 `sorted()` is the exception:
 it must read every element before it can order any of them,
 so it always returns a list.
 
-The lambdas above exist to show the machinery,
-and for these cases Python offers a lookalike you should usually prefer,
+The lambdas above exist to show the machinery.
+For these cases Python offers a lookalike you should usually prefer,
 the [comprehension](16_Techniques--Comprehensions.md).
-`[n * n for n in numbers]` says what `map()` plus a fresh lambda says,
-more directly, and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
+`[n * n for n in numbers]` says more directly what `map()` plus a fresh lambda says,
+and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same way.
 `map()` and `filter()` are the better choice when the function already exists.
 `map(str.strip, lines)` reads better than `[line.strip() for line in lines]` because the name says what the comprehension repeats.
 The two also return different things.
@@ -391,8 +391,8 @@ The comprehension builds a finished list.
 `map()` returns an iterator you can pass to the next stage without building the list.
 A generator expression from that chapter is the comprehension's lazy form,
 and removes that difference.
-The rule of thumb: existing function, use the higher-order form;
-expression you write inline, use the comprehension.
+The rule of thumb is to use the higher-order form when the function already exists,
+and the comprehension when you would write the expression inline.
 `sorted()`'s `key` has no comprehension equivalent,
 so it is a higher-order argument either way.
 
@@ -441,7 +441,7 @@ The last two lines show the captured value directly:
 `double` and `triple` are the same code holding different captured values.
 A closure is the functional answer to "an object with one method and some stored data."
 
-`multiply()` reads `factor` rather than receiving it, yet it stays pure:
+`multiply()` reads `factor` rather than receiving it, yet it stays pure.
 `factor` never changes after capture,
 so the same argument always produces the same answer.
 That is the difference between a captured constant and the global `balance` that makes `withdraw()` unpredictable.
@@ -492,10 +492,9 @@ so `count += 1` on its own makes `count` a fresh local variable.
 The statement then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
-Forgetting it is the usual mistake when a closure first needs to assign to a captured name,
-and the runtime message names a local variable
-("cannot access local variable 'count' where it is not associated with a value")
-instead of the missing declaration.
+Forgetting it is the usual mistake when a closure first assigns to a captured name.
+The runtime message names a local variable instead of the missing declaration:
+"cannot access local variable 'count' where it is not associated with a value".
 The type checker's report is the more useful one.
 If you delete the `nonlocal` line,
 `ty` reports `Name 'count' used when not defined` on the `count += 1` line.
@@ -525,8 +524,8 @@ print(square.func.__name__, square.keywords)
 each with one argument already supplied.
 The keyword does real work here.
 `partial(power, 2)` binds `base` instead,
-because positional arguments fill from the left,
-and `square(5)` then computes `2 ** 5`.
+because positional arguments fill from the left.
+`square(5)` would then compute `2 ** 5`.
 Partial application turns a general function into the specific one a caller needs.
 `multiplier()` in [Closures](#closures) does the same by hand,
 a factory that fixes one argument and returns a function expecting the rest.
@@ -537,8 +536,9 @@ Use partial application when an API expects a function of one argument and you h
 Unlike a lambda, `partial()` keeps the bound arguments as data you can inspect,
 through its `.func`, `.args`, and `.keywords` attributes.
 It also binds their values when you build it,
-where a lambda created in a loop reads each captured name at call time,
-the late-binding surprise [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)'s `late_binding.py` demonstrates.
+where a lambda created in a loop reads each captured name at call time.
+`late_binding.py` in [Function Objects](28_Patterns--Function_Objects.md#the-late-binding-trap)
+demonstrates that late-binding trap.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
@@ -566,18 +566,18 @@ print(percent.args)
 #: (0, Placeholder, 100)
 ```
 
-`percent` fixes the bounds and leaves the middle argument open,
-the specialization a hand-written wrapper supplied before 3.14.
+`percent` fixes the bounds and leaves the middle argument open.
+Before 3.14, a hand-written wrapper supplied that specialization.
 A `Placeholder` reserves the position and leaves the value to the caller:
 calling `percent()` with no argument raises a `TypeError`.
-The library also rejects a *trailing* placeholder, for the opposite reason:
+The library also rejects a *trailing* placeholder, for the opposite reason.
 `partial()` already appends the call's arguments after the bound ones,
-so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`,
-and the marker would add nothing.
+so `partial(clamp, 0, Placeholder)` would mean the same as `partial(clamp, 0)`.
+The marker would add nothing.
 
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
-`ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types,
-so `ty` reports `Placeholder` as a value of the wrong type,
+`ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types.
+It therefore reports `Placeholder` as a value of the wrong type,
 and types the resulting callable as one that takes no arguments.
 The runtime behaves correctly.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime.
@@ -617,13 +617,13 @@ print(compose(label, increment_then_double)(10))
 then doubles.
 Each piece stays small and pure,
 and you combine them without changing either one.
-The type parameters matter on the second `print()`:
-the type checker verifies that `label` accepts what `increment_then_double` produces,
+The type parameters matter on the second `print()`.
+The type checker verifies that `label` accepts what `increment_then_double` produces,
 and types the composed function `(int) -> str` rather than `(int) -> int`.
 
 You grow a composition by adding a stage.
-Each stage is also testable on its own,
-and a larger behavior is a new named composition of existing stages.
+Each stage is also testable on its own.
+A larger behavior is a new named composition of existing stages.
 When a requirement changes,
 you insert or swap a single stage and the others stay as they were.
 
@@ -674,8 +674,8 @@ The input list stays unchanged, so you can recompute the whole report, cache it,
 or run it on another core with no coordination.
 
 All of it is ordinary Python,
-written so that each piece depends on its arguments alone,
-and the chapters ahead build on that single property.
+written so that each piece depends on its arguments alone.
+The chapters ahead build on that single property.
 
 ## Exercises
 
