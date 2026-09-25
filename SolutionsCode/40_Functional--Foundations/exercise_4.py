@@ -1,14 +1,18 @@
 # exercise_4.py
-def compose(f, g):
-    def composed(x):
+from collections.abc import Callable
+
+def compose[T, U, V](
+    f: Callable[[U], V], g: Callable[[T], U]
+) -> Callable[[T], V]:
+    def composed(x: T) -> V:
         return f(g(x))
     return composed
 
-def increment(n):
+def increment(n: int) -> int:
     return n + 1
-def double(n):
+def double(n: int) -> int:
     return n * 2
-def square(n):
+def square(n: int) -> int:
     return n * n
 
 increment_then_double = compose(double, increment)
