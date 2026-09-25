@@ -200,8 +200,8 @@ print(x.squared)
 #: 25
 ```
 
-Be careful with caching.
-Changing an attribute the property read doesn't recalculate the cached result.
+The cached result outlives its inputs:
+changing an attribute the property read leaves the stored value as it was.
 The escape hatch is `del x.squared`.
 Deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
@@ -640,7 +640,7 @@ The second line is what unsorted input costs you:
 `sorted(data, key=keyfunc)` before `groupby(data, key=keyfunc)` is the fix,
 with the same key function both times.
 
-The `list(g)` in the comprehension is there for a reason.
+The comprehension's `list(g)` earns its place.
 Each group is a view onto the one underlying iterator,
 so advancing to the next group invalidates the previous group's view.
 `list(groupby(data))` therefore returns three keys paired with three empty iterators:
@@ -796,7 +796,7 @@ looks at the same idea from the perspective of memory and speed.
 
 Laziness matters most at scale.
 A generator pipeline can process a multi-gigabyte file or a live network stream one item at a time,
-so memory use doesn't grow with the size of the source.
+so memory use stays flat whatever the size of the source.
 Stages chain together without building intermediate lists between them,
 and a consumer that stops early, such as `any()` or `next()`,
 keeps the upstream stages from computing the items it never reaches.
@@ -825,6 +825,11 @@ print(sys.getrecursionlimit())
 ```
 
 A `for` loop computes this same factorial in about the same number of lines and stays clear of that limit.
+Python does not optimize tail calls and limits the call stack,
+so deep recursion raises a `RecursionError`.
+`sys.setrecursionlimit()` lifts that ceiling when the depth is genuine,
+but it is the wrong answer for a long flat sequence,
+where a loop or one of the `itertools` tools is the better choice.
 For counting down to zero, the loop is as fast and as short as the recursion.
 Recursion pays off once the problem branches rather than repeats,
 as the next example shows.
@@ -838,12 +843,6 @@ the recursion states the definition, and the cache removes the repetition.
 
 A different reason to recurse: some problems are naturally self-similar,
 such as walking a tree, with no repeated subproblem and so no need for a cache.
-Python does not optimize tail calls and limits the call stack,
-so deep recursion raises a `RecursionError`.
-`sys.setrecursionlimit()` lifts that ceiling when the depth is genuine,
-but it is the wrong answer for a long flat sequence,
-where a loop or one of the `itertools` tools is the better choice.
-
 Code that walks a tree, nested data,
 or a directory reads best when its shape matches the data's shape.
 The function handles one node and trusts itself for the rest:
@@ -997,7 +996,7 @@ and those triples produce the repeats.
 `group_rounds()` covers the pairs with no rotation and no fixed player:
 a shuffle, then a greedy choice repeated until the roster runs out.
 Called with `size=3`, the same function schedules trios instead.
-Seven students do not split evenly into threes,
+Seven students make two threes with one left over,
 so one group grows to four rather than leaving anyone out,
 the same join-instead-of-sit-out choice the pair rounds make above.
 
