@@ -30,6 +30,9 @@ the marked end. `shorten_line()` does it for a `<line>`, and
 `shorten_path_end()` and `shorten_path_start()` for path data of `M`,
 `L`, `Q`, and `C` segments (a `<polyline>`'s points are `M` then `L`s),
 cutting a curve at the arc length so the head stays on the curve.
+Shortening by `trim` alone puts the tip on the border, so aim the edge a
+few units short of it first: `tight_tips()` fails a tip closer than
+`MIN_GAP` to the box or circle it points at.
 """
 from __future__ import annotations
 
@@ -251,6 +254,102 @@ def mismatched_heads(svg: str) -> list[str]:
 MIN_LINE = 8.0
 LINE_RE = re.compile(r'<line\b[^>]*\bx1="([-\d.]+)"[^>]*\by1="([-\d.]+)"'
                      r'[^>]*\bx2="([-\d.]+)"[^>]*\by2="([-\d.]+)"[^>]*/>')
+
+
+# A head's tip stops this far short of the box or circle it points at, or
+# more; the book's figures leave 4. How far each head's tip reaches past
+# the line's end (the shape's front minus refX): the diamond and the V
+# anchor at their front.
+MIN_GAP = 3.0
+TIP_REACH: dict[str, float] = {
+    "filled": 12.4, "hollow": 16.4, "open": 0.0, "diamond": 0.0}
+END_RE = re.compile(r'marker-end="url\(#([^)]+)\)"')
+TAG_RE = re.compile(r"<(\w+)")
+NUM_ATTR_RE = re.compile(r'\b([\w-]+)="(-?[\d.]+)"')
+POINTS_RE = re.compile(r'\bpoints="([^"]*)"')
+D_RE = re.compile(r'\bd="([^"]*)"')
+SHAPE_RE = re.compile(r"<(?:rect|circle)\b[^>]*>", re.DOTALL)
+VIEWBOX_W_RE = re.compile(
+    r'<svg\b[^>]*\bviewBox="[-\d.]+ [-\d.]+ ([\d.]+)', re.DOTALL)
+
+
+def _edge_points(edge: str) -> list[Point]:
+    tag = TAG_RE.match(edge)
+    kind = tag.group(1) if tag else ""
+    nums = dict(NUM_ATTR_RE.findall(edge))
+    if kind == "line":
+        return [(float(nums["x1"]), float(nums["y1"])),
+                (float(nums["x2"]), float(nums["y2"]))]
+    if kind == "polyline":
+        m = POINTS_RE.search(edge)
+        vals = [float(v) for v in re.findall(r"-?[\d.]+", m.group(1))] if m else []
+        return list(zip(vals[::2], vals[1::2]))
+    m = D_RE.search(edge)
+    return [p for _, pts in _parse_path(m.group(1)) for p in pts] if m else []
+
+
+def _shapes(svg: str) -> list[tuple[str, tuple[float, ...]]]:
+    """Each box and circle an edge could point at, skipping a background
+    rect as wide as the viewBox."""
+    m = VIEWBOX_W_RE.search(svg)
+    width = float(m.group(1)) if m else math.inf
+    out: list[tuple[str, tuple[float, ...]]] = []
+    for s in SHAPE_RE.finditer(svg):
+        a = {k: float(v) for k, v in NUM_ATTR_RE.findall(s.group())}
+        if s.group().startswith("<rect"):
+            w, h = a.get("width", 0), a.get("height", 0)
+            if w < width - 1:
+                out.append(("rect", (a.get("x", 0), a.get("y", 0), w, h)))
+        else:
+            out.append(("circle", (a.get("cx", 0), a.get("cy", 0),
+                                   a.get("r", 0))))
+    return out
+
+
+def _gap(p: Point, kind: str, s: tuple[float, ...]) -> float:
+    """From `p` to the shape's border, negative inside it."""
+    if kind == "circle":
+        return math.dist(p, (s[0], s[1])) - s[2]
+    x, y, w, h = s
+    dx = max(x - p[0], 0, p[0] - (x + w))
+    dy = max(y - p[1], 0, p[1] - (y + h))
+    if dx or dy:
+        return math.hypot(dx, dy)
+    return -min(p[0] - x, x + w - p[0], p[1] - y, y + h - p[1])
+
+
+def tight_tips(svg: str, min_gap: float = MIN_GAP) -> list[str]:
+    """Each end-marker tip closer than `min_gap` to the nearest box or
+    circle, as `tip x,y: gap G`.
+
+    The tip is the line's end plus the head's `TIP_REACH` along the last
+    segment. An edge drawn to its target's border and then trimmed by
+    `trim` puts the tip back on the border; the check catches that.
+    Start markers are not checked, since a start diamond sits on its
+    owner.
+    """
+    kinds = marker_kinds(svg)
+    shapes = _shapes(svg)
+    out: list[str] = []
+    for m in EDGE_RE.finditer(svg):
+        use = END_RE.search(m.group())
+        kind = kinds.get(use.group(1)) if use else None
+        if kind is None or not shapes:
+            continue
+        pts = _edge_points(m.group())
+        if len(pts) < 2:
+            continue
+        end = pts[-1]
+        back = next((p for p in reversed(pts) if p != end), end)
+        length = math.dist(back, end) or 1
+        reach = TIP_REACH[kind] / length
+        tip = (end[0] + (end[0] - back[0]) * reach,
+               end[1] + (end[1] - back[1]) * reach)
+        gap = min(_gap(tip, k, s) for k, s in shapes)
+        if gap < min_gap:
+            out.append(f"tip {tip[0]:.1f},{tip[1]:.1f}: "
+                       f"gap {round(gap, 1) + 0.0:.1f}")  # no -0.0
+    return out
 
 
 def short_edges(svg: str) -> list[str]:

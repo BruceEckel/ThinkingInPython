@@ -91,6 +91,20 @@ class Node:
         s = min(sx, sy)
         return self.cx + dx * s, self.cy + dy * s
 
+    def entry(self, x1: float, y1: float, x2: float, y2: float,
+              pad: float = 0.0) -> tuple[float, float]:
+        """Where the line from (x1, y1) through (x2, y2) first meets this
+        box grown by `pad` on every side."""
+        t_in = -math.inf
+        for p0, d, lo, hi in (
+                (x1, x2 - x1, self.cx - self.w / 2 - pad,
+                 self.cx + self.w / 2 + pad),
+                (y1, y2 - y1, self.cy - self.h / 2 - pad,
+                 self.cy + self.h / 2 + pad)):
+            if d:
+                t_in = max(t_in, min((lo - p0) / d, (hi - p0) / d))
+        return x1 + (x2 - x1) * t_in, y1 + (y2 - y1) * t_in
+
     def svg(self) -> str:
         rx = 4
         stroke, width, dash, fill_text, weight = BOX, 1.3, "", INK, ""
@@ -157,6 +171,9 @@ def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
     if e.shift:
         x1, y1 = x1 + nx * e.shift, y1 + ny * e.shift
         x2, y2 = x2 + nx * e.shift, y2 + ny * e.shift
+        # Shifted sideways, a slanted edge's end slides toward the box;
+        # aim it at the padded border again.
+        x2, y2 = b.entry(x1, y1, x2, y2, 4)
     stroke, width, dash, head = STYLES[e.kind]
     marker = f'marker-end="url(#{pid}-{head})"'
     # The line stops short by the head's length, and the head reaches the box.

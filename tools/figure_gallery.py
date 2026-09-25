@@ -18,6 +18,9 @@ another color, fails the build, so a new figure cannot bring back an
 old shape or a black head on a gray line. So does a marked edge whose
 line is shorter than `arrowheads.MIN_LINE`: two boxes set too close
 leave the head alone between them, with no line to say dashed or heavy.
+And so does a head whose tip comes closer than `arrowheads.MIN_GAP` to
+the box or circle it points at (`tight_tips()`), except in the figures
+`TIP_GAP_EXEMPT` names with the reason.
 
 Text is measured too (`tools/svg_text.py`): text that runs past the
 `viewBox`, where every renderer cuts it off, or into other text fails
@@ -56,7 +59,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools import build_epub, build_site
-from tools.arrowheads import marker_kinds, mismatched_heads, short_edges
+from tools.arrowheads import (MIN_GAP, marker_kinds, mismatched_heads,
+                              short_edges, tight_tips)
 from tools.svg_text import clipped, collisions
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
@@ -143,6 +147,7 @@ class Style:
     marker_kinds: dict[str, str | None] = field(default_factory=dict)
     mismatched: list[str] = field(default_factory=list)
     short: list[str] = field(default_factory=list)
+    tight: list[str] = field(default_factory=list)
     clipped: list[str] = field(default_factory=list)
     collisions: list[tuple[str, str]] = field(default_factory=list)
 
@@ -188,8 +193,17 @@ class Style:
                        + ", ".join(self.mismatched))
         out += [f"edge too short to show its line: {e}"
                 for e in self.short]
+        out += [f"arrowhead within {MIN_GAP:g} of its target: {t}"
+                for t in self.tight]
         out += self.text_faults
         return out
+
+
+# Figures whose arrowheads may come closer than MIN_GAP to a shape, and why.
+TIP_GAP_EXEMPT: dict[str, str] = {
+    "double_dispatch": "a sequence diagram's messages meet their "
+                       "activation bars",
+}
 
 
 @dataclass
@@ -217,8 +231,9 @@ def _uniq(items: list[str]) -> list[str]:
     return [s for s in seen if s]
 
 
-def read_style(text: str) -> Style:
-    """The distinct drawing attributes in an SVG's source."""
+def read_style(text: str, name: str = "") -> Style:
+    """The distinct drawing attributes in an SVG's source; `name` is the
+    figure's stem, for `TIP_GAP_EXEMPT`."""
     m = VIEWBOX_RE.search(text)
     uses: dict[str, int] = {}
     for u in MARKER_USE_RE.findall(text):
@@ -237,6 +252,7 @@ def read_style(text: str) -> Style:
         marker_kinds=marker_kinds(text),
         mismatched=mismatched_heads(text),
         short=short_edges(text),
+        tight=[] if name in TIP_GAP_EXEMPT else tight_tips(text),
         clipped=clipped(text),
         collisions=collisions(text),
     )
@@ -267,7 +283,8 @@ def scan(docs_dirs: list[Path] | None = None,
                 if name not in refs]
     for fig in figures:
         if fig.path and fig.path.suffix.lower() == ".svg":
-            fig.style = read_style(fig.path.read_text(encoding="utf-8"))
+            fig.style = read_style(
+                fig.path.read_text(encoding="utf-8"), fig.name)
     figures.sort(key=lambda f: f.sort_key)
     return figures
 
@@ -534,6 +551,12 @@ def main(argv: list[str] | None = None) -> int:
         assert f.style
         print(f"  SHORT EDGE in {f.name}.svg: " + "; ".join(f.style.short)
               + " (move the boxes apart)")
+    tight = [f for f in figures if f.style and f.style.tight]
+    for f in tight:
+        assert f.style
+        print(f"  ARROWHEAD TOUCHES in {f.name}.svg: "
+              + "; ".join(f.style.tight)
+              + f" (aim the edge {MIN_GAP + 1:g} short of the border)")
     crowded = [f for f in figures if f.style and f.style.text_faults]
     for f in crowded:
         assert f.style
@@ -541,7 +564,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  TEXT in {f.name}.svg: {fault}")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing or odd or clash or stubby or crowded else 0
+    return 1 if missing or odd or clash or stubby or tight or crowded else 0
 
 
 if __name__ == "__main__":

@@ -1,14 +1,15 @@
 """Tests for tools/arrowheads.py: the check knows the four standard heads
 in any color and rejects anything else, a head matches its line's
-color, and shortening an edge takes off the length asked for while
+color, a tip stops short of its target, and shortening an edge takes off the length asked for while
 keeping the head on the edge's line."""
 from __future__ import annotations
 import math
 import pytest
-from tools.arrowheads import (HEADS, MIN_LINE, marker_def, marker_kinds,
-                              mismatched_heads, reverse_path, short_edges,
-                              shorten_curve, shorten_line, shorten_path_end,
-                              shorten_path_start)
+from tools.arrowheads import (HEADS, MIN_GAP, MIN_LINE, marker_def,
+                              marker_kinds, mismatched_heads, reverse_path,
+                              short_edges, shorten_curve, shorten_line,
+                              shorten_path_end, shorten_path_start,
+                              tight_tips)
 
 
 def test_every_standard_head_is_recognized_in_any_color() -> None:
@@ -69,3 +70,39 @@ def test_an_edge_must_show_a_line_behind_its_head() -> None:
              'marker-end="url(#m)"/>'
            + '<line x1="0" y1="0" x2="0" y2="2" stroke="#c8bfb0"/>')
     assert short_edges(svg) == ["0,0 -> 0,7"]
+
+
+def test_a_tip_on_the_border_is_tight_and_one_four_off_is_not() -> None:
+    box = '<rect x="100" y="0" width="50" height="40"/>'
+    reach = HEADS["filled"].trim  # the filled head reaches as far as it trims
+    touching = (f'<line x1="0" y1="20" x2="{100 - reach}" y2="20" '
+                'marker-end="url(#m)"/>')
+    clear = (f'<line x1="0" y1="30" x2="{96 - reach}" y2="30" '
+             'marker-end="url(#m)"/>')
+    svg = marker_def("m", "filled", "#1a1612") + box + touching + clear
+    assert tight_tips(svg) == ["tip 100.0,20.0: gap 0.0"]
+
+
+def test_tight_tips_reads_circles_and_polylines() -> None:
+    svg = (marker_def("m", "filled", "#1a1612")
+           + '<circle cx="100" cy="0" r="20"/>'
+           + '<polyline points="0,50 60,50 60,0 67.6,0" '
+             'marker-end="url(#m)"/>')
+    assert tight_tips(svg) == ["tip 80.0,0.0: gap 0.0"]
+
+
+def test_a_start_diamond_may_sit_on_its_owner() -> None:
+    svg = (marker_def("d", "diamond", "#1a1612")
+           + '<rect x="0" y="0" width="40" height="40"/>'
+           + '<line x1="40" y1="20" x2="120" y2="20" '
+             'marker-start="url(#d)"/>')
+    assert tight_tips(svg) == []
+
+
+def test_a_background_rect_is_not_a_target() -> None:
+    svg = ('<svg viewBox="0 0 200 100">'
+           + marker_def("m", "filled", "#1a1612")
+           + '<rect x="0" y="0" width="200" height="100"/>'
+           + '<line x1="10" y1="50" x2="60" y2="50" marker-end="url(#m)"/>'
+           + "</svg>")
+    assert MIN_GAP > 0 and tight_tips(svg) == []
