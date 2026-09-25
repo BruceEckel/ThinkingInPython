@@ -28,11 +28,11 @@
   <text x="268" y="45" font-size="11" fill="#7a6e62" text-anchor="middle">Teleport target="b"</text>
 
   <!-- off-map doors converge on the single shared EDGE room -->
-  <polyline points="200,78 200,20 440,20 440,167 447.6,167" fill="none" stroke="#7a6e62"
+  <polyline points="200,78 200,20 436,20 436,167 443.6,167" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
-  <polyline points="392,134 440,134 440,192 447.6,192" fill="none" stroke="#7a6e62"
+  <polyline points="392,134 436,134 436,192 443.6,192" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
-  <polyline points="72,302 72,345 440,345 440,217 447.6,217" fill="none" stroke="#7a6e62"
+  <polyline points="72,302 72,345 436,345 436,217 443.6,217" fill="none" stroke="#7a6e62"
             stroke-width="1.1" marker-end="url(#mz-tri-muted)"/>
 
   <!-- room markers -->

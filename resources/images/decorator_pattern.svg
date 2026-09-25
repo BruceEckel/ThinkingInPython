@@ -17,19 +17,19 @@
   </defs>
 
   <!-- realization: Margherita, Hawaiian, and Topping implement Pizza -->
-  <line x1="105" y1="190" x2="414.1" y2="115.8" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="105" y1="190" x2="405.7" y2="117.8" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
-  <line x1="305" y1="190" x2="445.4" y2="119.4" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="305" y1="190" x2="441.5" y2="121.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
-  <line x1="535" y1="190" x2="506.7" y2="127" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="535" y1="190" x2="507.6" y2="129" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#dp-tri-muted)"/>
 
   <!-- inheritance: Garlic, Olives, and Feta extend Topping -->
-  <line x1="435" y1="350" x2="468.8" y2="314" stroke="#1a1612" stroke-width="1.2"
+  <line x1="435" y1="350" x2="465.1" y2="318" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
-  <line x1="625" y1="350" x2="549.5" y2="309.7" stroke="#1a1612" stroke-width="1.2"
+  <line x1="625" y1="350" x2="557" y2="313.7" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
-  <line x1="815" y1="350" x2="606" y2="305.4" stroke="#1a1612" stroke-width="1.2"
+  <line x1="815" y1="350" x2="624.9" y2="309.4" stroke="#1a1612" stroke-width="1.2"
         marker-end="url(#dp-tri)"/>
 
   <!-- aggregation: Topping "has a" Pizza -->

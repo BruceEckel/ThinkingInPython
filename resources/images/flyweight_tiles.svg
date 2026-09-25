@@ -13,13 +13,13 @@
   </defs>
 
   <!-- convergence lines: representative cells to shared Tile objects -->
-  <polyline points="135,200 135,225 480,225 480,55 507.6,55" fill="none"
+  <polyline points="135,200 135,225 476,225 476,55 503.6,55" fill="none"
             stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fw-tri-muted)"/>
-  <polyline points="135,40 135,15 480,15 480,135 507.6,135" fill="none"
+  <polyline points="135,40 135,15 476,15 476,135 503.6,135" fill="none"
             stroke="#8b1a1a" stroke-width="1.2" marker-end="url(#fw-tri-red)"/>
-  <polyline points="273,200 273,235 495,235 495,135 507.6,135" fill="none"
+  <polyline points="273,200 273,235 491,235 491,135 503.6,135" fill="none"
             stroke="#8b1a1a" stroke-width="1.2" marker-end="url(#fw-tri-red)"/>
-  <polyline points="43,200 43,245 500,245 500,215 507.6,215" fill="none"
+  <polyline points="43,200 43,245 496,245 496,215 503.6,215" fill="none"
             stroke="#7a6e62" stroke-width="1.1" marker-end="url(#fw-tri-muted)"/>
 
   <text x="300" y="12" font-size="11" fill="#8b1a1a" text-anchor="middle">field[0][2]</text>

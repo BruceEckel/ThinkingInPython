@@ -8,7 +8,8 @@ guessing coordinates, and the labels drifted until one sat a hundred
 units from its edge. Here a transition names its two states, how far its
 curve bows, and where along the curve its label goes; the script
 computes the endpoints on each circle, the curve, the label's side, and
-the arrowhead trim from `tools/arrowheads.py`.
+the arrowhead trim from `tools/arrowheads.py`. Each tip stops `TIP_GAP`
+short of its target circle, as the hand-drawn figures leave a gap.
 
     uv run python -m tools.state_machine_figure            # write it
     uv run python -m tools.state_machine_figure --check    # report drift
@@ -45,6 +46,8 @@ MARK = "#8b1a1a"
 OUT = ROOT / "resources" / "images" / "stateMachine.svg"
 VIEW_BOX = "40 -100 770 740"
 GAP = 8
+# How far short of a state's circle each arrowhead's tip stops.
+TIP_GAP = 4
 LINE_HEIGHT = 13.5
 TRIM = HEADS["filled"].trim
 
@@ -57,9 +60,9 @@ class State:
     stroke: str = INK
     width: float = 1.6
 
-    def rim(self, angle: float) -> tuple[float, float]:
-        return (self.x + self.r * math.cos(angle),
-                self.y + self.r * math.sin(angle))
+    def rim(self, angle: float, out: float = 0) -> tuple[float, float]:
+        r = self.r + out
+        return (self.x + r * math.cos(angle), self.y + r * math.sin(angle))
 
 
 STATES: dict[str, State] = {
@@ -137,7 +140,7 @@ def transition_svg(t: Transition) -> str:
     angle = math.atan2(b.y - a.y, b.x - a.x)
     side = 1 if t.bend >= 0 else -1
     s = a.rim(angle - t.spread * side)
-    e = b.rim(angle + math.pi + t.spread * side)
+    e = b.rim(angle + math.pi + t.spread * side, TIP_GAP)
     length = math.dist(s, e)
     nx, ny = (e[1] - s[1]) / length, -(e[0] - s[0]) / length
     c = ((s[0] + e[0]) / 2 + 2 * t.bend * nx,
@@ -161,7 +164,7 @@ def transition_svg(t: Transition) -> str:
 def loop_svg() -> str:
     st = STATES[LOOP_STATE]
     s = st.rim(math.radians(-120))
-    e = st.rim(math.radians(-60))
+    e = st.rim(math.radians(-60), TIP_GAP)
     top = st.y - st.r - 75
     _, c1, c2, e = shorten_curve(
         [s, (st.x - 70, top), (st.x + 70, top), e], TRIM)
@@ -187,7 +190,7 @@ def render() -> str:
     body += ("  <!-- initial-state marker -->\n"
              f'  <circle cx="{q.x:g}" cy="{top - 40:g}" r="6" fill="{INK}"/>\n'
              f'  <line x1="{q.x:g}" y1="{top - 34:g}" x2="{q.x:g}" '
-             f'y2="{top - TRIM:.1f}" stroke="{INK}" stroke-width="1.4" '
+             f'y2="{top - TIP_GAP - TRIM:.1f}" stroke="{INK}" stroke-width="1.4" '
              f'marker-end="url(#sm-ink)"/>\n')
     body += "".join(transition_svg(t) for t in TRANSITIONS) + loop_svg()
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{VIEW_BOX}"\n'

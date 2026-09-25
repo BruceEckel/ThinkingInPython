@@ -23,56 +23,56 @@
   <text x="720" y="505" font-size="13.5" font-weight="bold" fill="#1a1612" text-anchor="middle">WANT_MORE</text>
   <!-- initial-state marker -->
   <circle cx="110" cy="240" r="6" fill="#1a1612"/>
-  <line x1="110" y1="246" x2="110" y2="267.6" stroke="#1a1612" stroke-width="1.4" marker-end="url(#sm-ink)"/>
+  <line x1="110" y1="246" x2="110" y2="263.6" stroke="#1a1612" stroke-width="1.4" marker-end="url(#sm-ink)"/>
   <!-- QUIESCENT -> COLLECTING -->
-  <path d="M143.4,292.8 Q209.1,198.6 318.9,170.1" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="265" y="163" font-size="11.5" fill="#8b1a1a" text-anchor="end">Money</text>
-  <text x="265" y="176" font-size="11" fill="#7a6e62" text-anchor="end">/ add_money</text>
+  <path d="M143.4,292.8 Q207.1,199.4 315.1,171.5" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="263" y="164" font-size="11.5" fill="#8b1a1a" text-anchor="end">Money</text>
+  <text x="263" y="177" font-size="11" fill="#7a6e62" text-anchor="end">/ add_money</text>
   <!-- COLLECTING -> QUIESCENT -->
-  <path d="M345.2,188.7 Q279.1,282.6 169.2,310.6" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="210" y="317" font-size="11.5" fill="#8b1a1a" text-anchor="start">Quit</text>
-  <text x="210" y="330" font-size="11" fill="#7a6e62" text-anchor="start">/ refund</text>
+  <path d="M345.2,188.7 Q281.1,281.8 173.0,309.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="213" y="315" font-size="11.5" fill="#8b1a1a" text-anchor="start">Quit</text>
+  <text x="213" y="329" font-size="11" fill="#7a6e62" text-anchor="start">/ refund</text>
   <!-- COLLECTING -> SELECTING -->
-  <path d="M372.2,201.4 Q342.3,249.3 376.2,288.8" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="354" y="260" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
-  <text x="354" y="274" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <path d="M372.2,201.4 Q341.5,247.1 374.5,285.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="353" y="258" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
+  <text x="353" y="271" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
   <!-- SELECTING -> COLLECTING -->
-  <path d="M418.7,292.7 Q446.9,243.7 411.5,205.5" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="438" y="191" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
-  <text x="438" y="205" font-size="11.5" fill="#8b1a1a" text-anchor="start">[too_expensive]</text>
-  <text x="438" y="218" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
+  <path d="M418.7,292.7 Q447.6,245.9 413.3,209.0" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="439" y="193" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
+  <text x="439" y="207" font-size="11.5" fill="#8b1a1a" text-anchor="start">[too_expensive]</text>
+  <text x="439" y="220" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
   <!-- SELECTING -> UNAVAILABLE -->
-  <path d="M467.4,341.5 Q580.9,330.2 669.0,259.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="583" y="331" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
-  <text x="583" y="344" font-size="11.5" fill="#8b1a1a" text-anchor="start">[sold_out]</text>
-  <text x="583" y="358" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
+  <path d="M467.4,341.5 Q579.1,331.4 665.8,261.7" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="581" y="332" font-size="11.5" fill="#8b1a1a" text-anchor="start">SecondDigit</text>
+  <text x="581" y="346" font-size="11.5" fill="#8b1a1a" text-anchor="start">[sold_out]</text>
+  <text x="581" y="359" font-size="11" fill="#7a6e62" text-anchor="start">/ clear</text>
   <!-- UNAVAILABLE -> SELECTING -->
-  <path d="M668.6,227.6 Q554.9,237.5 465.9,307.2" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="593" y="226" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
-  <text x="593" y="239" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
+  <path d="M668.6,227.6 Q556.7,236.3 469.1,304.8" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="594" y="224" font-size="11.5" fill="#8b1a1a" text-anchor="end">FirstDigit</text>
+  <text x="594" y="238" font-size="11" fill="#7a6e62" text-anchor="end">/ choose_row</text>
   <!-- SELECTING -> WANT_MORE -->
-  <path d="M454.3,387.4 Q541.6,466.8 656.8,487.6" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="551" y="473" font-size="11.5" fill="#8b1a1a" text-anchor="end">SecondDigit</text>
-  <text x="551" y="486" font-size="11.5" fill="#8b1a1a" text-anchor="end">[else]</text>
-  <text x="551" y="500" font-size="11" fill="#7a6e62" text-anchor="end">/ dispense</text>
+  <path d="M454.3,387.4 Q539.6,466.3 652.9,486.8" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="548" y="472" font-size="11.5" fill="#8b1a1a" text-anchor="end">SecondDigit</text>
+  <text x="548" y="486" font-size="11.5" fill="#8b1a1a" text-anchor="end">[else]</text>
+  <text x="548" y="499" font-size="11" fill="#7a6e62" text-anchor="end">/ dispense</text>
   <!-- WANT_MORE -> SELECTING -->
-  <path d="M680.3,466.5 Q594.0,386.0 479.0,363.7" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="627" y="396" font-size="11.5" fill="#8b1a1a" text-anchor="start">FirstDigit</text>
-  <text x="627" y="410" font-size="11" fill="#7a6e62" text-anchor="start">/ choose_row</text>
+  <path d="M680.3,466.5 Q596.0,386.5 483.0,364.5" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="629" y="397" font-size="11.5" fill="#8b1a1a" text-anchor="start">FirstDigit</text>
+  <text x="629" y="410" font-size="11" fill="#7a6e62" text-anchor="start">/ choose_row</text>
   <!-- SELECTING -> QUIESCENT -->
-  <path d="M352.5,357.7 Q256.9,403.6 168.7,349.9" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="253" y="396" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="253" y="410" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
+  <path d="M352.5,357.7 Q259.0,404.0 172.5,351.0" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="255" y="397" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="255" y="410" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
   <!-- UNAVAILABLE -> QUIESCENT -->
-  <path d="M672.6,198.7 Q304.9,-338.3 148.6,282.9" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="354" y="-73" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="354" y="-60" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
+  <path d="M672.6,198.7 Q308.8,-340.1 151.5,280.1" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="356" y="-75" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="356" y="-61" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
   <!-- WANT_MORE -> QUIESCENT -->
-  <path d="M670.8,516.8 Q330.7,728.0 147.8,379.3" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
-  <text x="364" y="605" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
-  <text x="364" y="618" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
+  <path d="M670.8,516.8 Q333.1,729.9 150.4,382.4" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <text x="366" y="607" font-size="11.5" fill="#8b1a1a" text-anchor="middle">Quit</text>
+  <text x="366" y="620" font-size="11" fill="#7a6e62" text-anchor="middle">/ refund</text>
   <!-- COLLECTING self-loop -->
-  <path d="M354.0,105.0 C312.1,27.0 436.9,23.2 411.1,93.7" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
+  <path d="M354.0,105.0 C312.2,27.2 436.3,23.2 413.0,90.2" fill="none" stroke="#7a6e62" stroke-width="1.2" marker-end="url(#sm-muted)"/>
   <text x="436" y="44" font-size="11.5" fill="#8b1a1a" text-anchor="start">Money</text>
   <text x="436" y="58" font-size="11" fill="#7a6e62" text-anchor="start">/ add_money</text>
 </svg>
