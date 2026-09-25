@@ -13,10 +13,10 @@
   </defs>
 
   <!-- inheritance: Aluminum, Paper, Glass, Cardboard extend Trash -->
-  <line x1="95" y1="190" x2="353.7" y2="139.2" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
+  <line x1="95" y1="190" x2="331" y2="138.5" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
   <line x1="265" y1="190" x2="403" y2="141.4" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
   <line x1="435" y1="190" x2="474.9" y2="147.9" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
-  <line x1="605" y1="190" x2="548.2" y2="146" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
+  <line x1="605" y1="190" x2="581.2" y2="149.2" stroke="#1a1612" stroke-width="1.2" marker-end="url(#ts-tri)"/>
 
   <!-- fan-in: each subclass sorts by type(t) into one dict of bins -->
   <line x1="95" y1="280" x2="95" y2="310" stroke="#7a6e62" stroke-width="1"/>

@@ -13,13 +13,13 @@
   </defs>
 
   <!-- realization: Surrogate and each Implementation derive from Interface -->
-  <line x1="90" y1="130" x2="277.1" y2="78.4" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="90" y1="130" x2="251.4" y2="78" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri-muted)"/>
   <line x1="280" y1="130" x2="317.6" y2="86.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri-muted)"/>
   <line x1="470" y1="130" x2="396.9" y2="82.9" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri-muted)"/>
-  <line x1="640" y1="130" x2="433.9" y2="78" stroke="#7a6e62" stroke-width="1.2"
+  <line x1="640" y1="130" x2="448.8" y2="77.4" stroke="#7a6e62" stroke-width="1.2"
         stroke-dasharray="5,4" marker-end="url(#sg-tri-muted)"/>
 
   <!-- Interface -->

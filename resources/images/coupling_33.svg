@@ -30,8 +30,8 @@
   <text x="372.0" y="219.2" font-size="12" fill="#1a1612" text-anchor="middle">Bee</text>
   <line x1="142.0" y1="63.0" x2="307.6" y2="63.0" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-solid)"/>
   <text x="231.0" y="55.0" font-size="10.5" fill="#8b1a1a" text-anchor="middle">pollinate, eat</text>
-  <line x1="322.0" y1="125.8" x2="156.0" y2="81.8" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-solid)"/>
-  <text x="209.0" y="116.2" font-size="10.5" fill="#8b1a1a" text-anchor="middle">visit</text>
+  <line x1="322.0" y1="127.4" x2="156.1" y2="88.8" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-solid)"/>
+  <text x="209.0" y="120.7" font-size="10.5" fill="#8b1a1a" text-anchor="middle">visit</text>
   <line x1="85.0" y1="194.0" x2="85.0" y2="102.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-hollow)"/>
   <line x1="372.0" y1="118.0" x2="372.0" y2="102.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-hollow)"/>
   <line x1="372.0" y1="194.0" x2="372.0" y2="178.4" stroke="#1a1612" stroke-width="1.3" marker-end="url(#c33-hollow)"/>
