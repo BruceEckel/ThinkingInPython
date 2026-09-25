@@ -8,8 +8,12 @@ class DampPaper(Paper):
         if isinstance(item, Rock):
             return Outcome.DRAW  # Too soggy to wrap
         return super().compete(item)
+    def eval_rock(self, item: Any) -> Outcome:
+        return Outcome.DRAW  # Rock's side of the same draw
 
 print(DampPaper().compete(Rock()))
+#: draw
+print(Rock().compete(DampPaper()))
 #: draw
 print(DampPaper().compete(Scissors()))
 #: lose
