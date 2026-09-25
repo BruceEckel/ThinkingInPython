@@ -77,8 +77,8 @@ a state that nests containers inside containers copies the whole structure on ev
 
 ## The Classic Memento
 
-Every classic memento, as *GoF Design Patterns* presents the pattern,
-is some version of copying the state before it changes.
+As *GoF Design Patterns* presents the pattern,
+every classic memento is some version of copying the state before it changes.
 Here the originator is a `Sketch` that accumulates strokes in a list.
 Its memento converts that list to a tuple,
 so the snapshot is immutable while the originator stays mutable.
@@ -147,8 +147,9 @@ Wrapping the tuple in a one-field data class makes `Memento` a class of its own 
 A parameter typed `tuple[str, ...]` still accepts any tuple of strings,
 whatever built it.
 A parameter typed `Memento` accepts the class alone,
-and building one takes an import of `Memento` and a call to it,
 so the type checker reports a caretaker that passes some other tuple by mistake.
+Building a `Memento` takes an import of the class and a call to it,
+so no caretaker makes one by accident.
 `Memento` is a [record](18_Techniques--Performance.md#record),
 so reassigning `checkpoint.strokes` raises `FrozenInstanceError` at runtime.
 Neither guarantee stops code holding a `Memento` from reading `.strokes`,
@@ -198,8 +199,8 @@ and the type checker reports the plain tuple before the program runs.
 If you run the program anyway,
 it raises `AttributeError` at the first line that reads `.strokes`.
 The checker rejects the assignment to `checkpoint.strokes` too,
-and the runtime raises `FrozenInstanceError`: a record freezes the attribute,
-not just the tuple inside it.
+and the runtime raises `FrozenInstanceError`.
+A record freezes the attribute, not just the tuple inside it.
 
 ### Testing the Sketch
 
@@ -306,10 +307,11 @@ The stroke comes from `"".join([...])` because the compiler interns a literal li
 and interning makes the identity check print `True` for a copied string too.
 
 A single `draw()` allocates one tuple.
-A `History` that keeps every past state keeps every one of those tuples alive,
-and once a field grows by one element per edit the way `strokes` does,
+A caretaker that keeps every past state, the `History` class below,
+keeps every one of those tuples alive.
+Once a field grows by one element per edit, the way `strokes` does,
 the `n`-th edit builds a tuple of `n` pointers,
-so `k` edits held in `_past` cost `O(k^2)` pointers in total, not `O(k)`.
+so `k` edits held in the history cost `O(k^2)` pointers in total, not `O(k)`.
 
 ```python
 # growth_cost.py
@@ -335,8 +337,8 @@ or switch to *Command*-based undo, which stores an edit instead of a state.
 
 [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 argues that freezing removes what encapsulation protected.
-That section also explains why `strokes` is a tuple rather than a list:
-freezing blocks assignment to the field,
+That section also explains why `strokes` is a tuple rather than a list.
+Freezing blocks assignment to the field,
 not changes to the object the field holds,
 so a record holding a list lets that list change,
 as `frozen_leaky.py` shows there.
@@ -367,10 +369,10 @@ def test_replace_carries_other_fields() -> None:
 
 ## The Caretaker: a Generic History
 
-The caretaker reads no field of the states it holds, frozen or mutable:
-opacity is the pattern's whole point,
-and `History[S]` below works as written on the classic `Memento` from `sketch.py`.
-The classic form already has opacity.
+The caretaker reads no field of the states it holds, frozen or mutable,
+since opacity is the pattern's whole point.
+`History[S]` below works as written on the classic `Memento` from `sketch.py`,
+because the classic form already has opacity.
 What immutability removes is the explicit `save()` and `restore()` at every edit,
 since a state that keeps its value is already a memento.
 Undo and redo are two stacks of past and future states,
@@ -442,20 +444,19 @@ and make the popped state the present.
 `apply()` exists because `do()` alone leaves work to the caller.
 `do()` takes a finished state,
 so every call site must build that state from `history.present` and then pass the result to `do()`.
-Build a new state and keep it in a variable of your own,
-and the history stays as it was: nothing mutates,
-so every other state stays valid,
+If you build a new state and keep it in a variable of your own,
+the history stays as it was.
+Nothing mutates, so every other state stays valid,
 and the program runs on with the history one state short.
 `apply()` takes the edit instead of its result.
 It reads `present` itself and passes whatever the edit returns straight to `do()`,
-so every call site does both steps.
+so both steps happen at every call site.
 `do()` stays public for a state that other code builds,
 as `history_classic.py` shows below.
 
 `undo()` and `redo()` trust the caller:
-undoing an empty past raises `IndexError` from `pop()`,
-and that `pop()` comes first,
-so an undo that raises leaves the history as it was.
+undoing an empty past raises `IndexError` from `pop()`.
+That `pop()` comes first, so an undo that raises leaves the history as it was.
 `can_undo()` and `can_redo()` exist so a caller checks first,
 which is what an editor uses to gray out the menu item.
 `History` stores whole states and moves them between stacks,
@@ -467,8 +468,8 @@ A `History` of lists is a stack of aliases, the bug that opens this chapter.
 
 `History` holds the classic form as well.
 The classic `Memento` from `sketch.py` is already immutable,
-so the same generic caretaker holds snapshots of the mutable `Sketch`,
-with the surrounding code calling `save()` and `restore()`,
+so the same generic caretaker holds snapshots of the mutable `Sketch`.
+The surrounding code calls `save()` and `restore()`,
 the two calls a frozen state makes redundant:
 
 ```python
@@ -528,9 +529,10 @@ the *Command* variation that [Function Objects](28_Patterns--Function_Objects.md
 mentions.
 *Command*-based undo saves memory when a snapshot is large,
 and needs an inverse written and tested for every action.
-Try snapshot-based undo first:
-immutable states share every value an edit carries over, as `sharing.py` shows,
-and switch to *Command* once the `O(k^2)` pointers `growth_cost.py` counts grow too large to hold.
+Try snapshot-based undo first,
+since immutable states share every value an edit carries over,
+as `sharing.py` shows.
+Switch to *Command* once the `O(k^2)` pointers `growth_cost.py` counts grow too large to hold.
 
 ## Restoring Part of a State {#restoring-part-of-a-state}
 
@@ -615,8 +617,8 @@ not by the shape that class had at save time.
 If the state class gains, loses, or renames a field before the load,
 `pickle.loads()` still succeeds.
 The error comes later, from whatever reads a field the bytes never carried.
-The listing simulates that drift,
-and puts the class in its own module because in reality a class drifts between two runs of a program:
+The listing simulates that drift.
+It puts the class in its own module because in reality a class drifts between two runs of a program:
 
 ```python
 # sketch_v1.py
@@ -673,7 +675,7 @@ The fields go straight into the object's `__dict__`, past the frozen check:
 and pickle writes `__dict__` directly.
 `title` is absent, since the old bytes never had one.
 The same shortcut skips `__post_init__()`,
-so a memento saved before a validated field existed can load a value nothing ever validated.
+so a memento saved before a field gained its validation loads a value that the validation never saw.
 `restored.strokes` works because both versions agree on that field.
 `restored.title` raises `AttributeError` when anything reads it,
 often far from the line that called `pickle.loads()`.
@@ -684,15 +686,14 @@ matching the class on load to the class on save is your job.
 
 Deleting a field raises no exception at all: the old bytes load,
 and every later read succeeds.
-`pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute,
-an entry that no field declares,
+`pickle.loads()` writes the dropped name into the object's `__dict__` as a ghost attribute.
+The class declares no such field,
 so `getattr()` finds it while `repr()` omits it and `==` ignores it.
-The loaded object is equal to, and hashes the same as,
-one built fresh from `SketchV1`.
+The loaded object equals one built fresh from `SketchV1` and hashes the same.
 The added-field drift above raises `AttributeError` when something reads the new field.
 This one raises nothing, and the data is wrong.
-Renaming a field is a delete and an add at once, and does both:
-the old name becomes a ghost and the new one is missing,
+Renaming a field is a delete and an add at once, with both effects.
+The old name becomes a ghost, and the new one is missing,
 so `repr()` itself raises `AttributeError`.
 Running the same substitution backwards shows this case:
 
@@ -715,8 +716,8 @@ print(restored == SketchV1(("circle",)))
 ```
 
 Each print contradicts the one before it.
-The `repr()` shows a one-field object while the `__dict__` shows two entries,
-and the loaded object is `==` to a `SketchV1` built with strokes alone,
+The `repr()` shows a one-field object while the `__dict__` shows two entries.
+The loaded object is `==` to a `SketchV1` built with strokes alone,
 so every later comparison treats them as the same.
 
 ### Schema Migrations and Safer Formats
@@ -741,8 +742,8 @@ so pickle's security risk does not apply.
 
 Version control is the *Memento* pattern applied to a whole file tree.
 A git commit is an immutable snapshot of your whole tree,
-checkout is `restore()`,
-and git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.
+and checkout is `restore()`.
+Git shares unchanged content between commits just as the immutable `Drawing` states in `History` share their unchanged strokes.
 Databases provide savepoints, mementos scoped to a transaction.
 Multiplayer games snapshot the world so they can rewind and replay when a late packet arrives.
 Whenever you see rewind, rollback, or restore, something is producing mementos.
