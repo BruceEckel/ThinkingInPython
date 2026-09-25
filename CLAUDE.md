@@ -355,7 +355,10 @@ function names, plus the `CAPTIONS` dict with the Markdown captions
 (code spans on the identifiers, because the pattern-name gate reads a
 bare "Proxy" or "Observer" in a caption as an unitalicized pattern
 name). Edit the spec and run `make fix-coupling-panels`; never edit
-one of these SVGs by hand. `make coupling-panels` (in `gate`,
+one of these SVGs by hand. Chapter 21's `coupling_gallery.svg` comes
+from the same file (`GALLERY`, a `Cell` per pattern, since
+2026-09-25); the section's other three figures are still hand-drawn.
+`make coupling-panels` (in `gate`,
 `verify-ch`, and `sweep`) fails when a committed SVG differs from what
 the spec draws, so a listing rename that misses the spec is loud. The
 2026-09-23 verification of all fourteen found two recurring mistakes

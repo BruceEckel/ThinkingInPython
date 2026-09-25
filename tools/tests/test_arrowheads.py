@@ -5,8 +5,8 @@ keeping the head on the edge's line."""
 from __future__ import annotations
 import math
 import pytest
-from tools.arrowheads import (HEADS, marker_def, marker_kinds,
-                              mismatched_heads, reverse_path,
+from tools.arrowheads import (HEADS, MIN_LINE, marker_def, marker_kinds,
+                              mismatched_heads, reverse_path, short_edges,
                               shorten_curve, shorten_line, shorten_path_end,
                               shorten_path_start)
 
@@ -59,3 +59,13 @@ def test_a_head_must_match_the_color_of_its_line() -> None:
            + '<path d="M0,0 L9,9" stroke="#7a6e62" '
              'marker-end="url(#ink)"/>')
     assert mismatched_heads(svg) == ["ink"]
+
+
+def test_an_edge_must_show_a_line_behind_its_head() -> None:
+    svg = (marker_def("m", "filled", "#1a1612")
+           + f'<line x1="0" y1="0" x2="0" y2="{MIN_LINE - 1}" '
+             'stroke="#1a1612" marker-end="url(#m)"/>'
+           + '<line x1="0" y1="0" x2="0" y2="30" stroke="#1a1612" '
+             'marker-end="url(#m)"/>'
+           + '<line x1="0" y1="0" x2="0" y2="2" stroke="#c8bfb0"/>')
+    assert short_edges(svg) == ["0,0 -> 0,7"]

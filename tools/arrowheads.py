@@ -244,3 +244,22 @@ def mismatched_heads(svg: str) -> list[str]:
                     and mid not in out):
                 out.append(mid)
     return out
+
+
+# An edge must show this much line behind its head, or the head sits
+# alone between two boxes and the edge's kind (dashed, heavy) is lost.
+MIN_LINE = 8.0
+LINE_RE = re.compile(r'<line\b[^>]*\bx1="([-\d.]+)"[^>]*\by1="([-\d.]+)"'
+                     r'[^>]*\bx2="([-\d.]+)"[^>]*\by2="([-\d.]+)"[^>]*/>')
+
+
+def short_edges(svg: str) -> list[str]:
+    """Each marked `<line>` shorter than `MIN_LINE`, as `x1,y1 -> x2,y2`."""
+    out = []
+    for m in LINE_RE.finditer(svg):
+        if not USE_RE.search(m.group()):
+            continue
+        x1, y1, x2, y2 = (float(v) for v in m.groups())
+        if math.dist((x1, y1), (x2, y2)) < MIN_LINE:
+            out.append(f"{x1:g},{y1:g} -> {x2:g},{y2:g}")
+    return out

@@ -13,7 +13,9 @@ Every panel is a `Panel` in `PANELS`, keyed by chapter number: its
 nodes, its edges, and the "heavy edges" note under the drawing. The
 names in a panel are the names in that chapter's listings, so a listing
 rename means editing the spec here and regenerating, never editing an
-SVG by hand:
+SVG by hand. Chapter 21's `coupling_gallery.svg`, its six patterns in
+the same notation, is generated here too, from the `Cell` specs in
+`GALLERY`:
 
     uv run python -m tools.coupling_panels            # write all
     uv run python -m tools.coupling_panels --check    # report drift
@@ -254,8 +256,8 @@ C1, C2, C3 = 20, 172, 324
 R1, R2, R3 = 48, 108, 168
 
 
-def divider(x: float) -> str:
-    return (f'  <line x1="{x}" y1="40" x2="{x}" y2="212" stroke="{BOX}" '
+def divider(x: float, bottom: float = 212) -> str:
+    return (f'  <line x1="{x}" y1="40" x2="{x}" y2="{bottom:g}" stroke="{BOX}" '
             f'stroke-width="1" stroke-dasharray="4,4"/>\n')
 
 
@@ -295,19 +297,20 @@ PANELS: dict[int, Panel] = {
         "Template Method",
         "MyApp inherits ApplicationFramework's internals, while "
         "run_framework() names only the Step signature its two functions satisfy",
-        (Node("ApplicationFramework", C1, R1, w=180, kind="mark", sub="run()"),
-         Node("MyApp", C1, R3, w=180),
-         Node("run_framework()", 256, R1, w=160, kind="mark"),
-         Node("Step", 288, R2, w=96, kind="interface",
+        (Node("ApplicationFramework", C1, 44, w=180, kind="mark", sub="run()"),
+         Node("MyApp", C1, 192, w=180),
+         Node("run_framework()", 256, 44, w=160, kind="mark"),
+         Node("Step", 271, 118, w=130, kind="interface",
               sub="Callable[[], None]"),
-         Node("two lambdas", 256, R3, w=160)),
+         Node("two lambdas", 256, 192, w=160)),
         (Edge("MyApp", "ApplicationFramework", "inherit",
               label="overrides two steps", dx=70, dy=4),
          Edge("run_framework()", "Step", "thin"),
          Edge("two lambdas", "Step", "realize")),
         "left: the inherit edge is the widest rung; right: the same algorithm "
         "with one thin edge.",
-        extra=(divider(228),),
+        height=262,
+        extra=(divider(228, 236),),
     ),
     26: Panel(
         "Surrogate",
@@ -438,11 +441,11 @@ PANELS: dict[int, Panel] = {
         "Visitor",
         "Flower names only Visitor and Pollinator names only Flower, so no "
         "visitor names a concrete flower",
-        (Node("Flower", C1, R1, w=110, kind="mark", sub="cannot change"),
-         Node("Visitor", C3, R1, w=96, kind="interface"),
-         Node("Chrysanthemum", C1, R3, w=130),
-         Node("Pollinator", C3, R2 + 6, w=96),
-         Node("Bee", C3, R3 + 6, w=96)),
+        (Node("Flower", C1, 44, w=110, kind="mark", sub="cannot change"),
+         Node("Visitor", C3, 44, w=96, kind="interface"),
+         Node("Chrysanthemum", C1, 196, w=130),
+         Node("Pollinator", C3, 120, w=96),
+         Node("Bee", C3, 196, w=96)),
         (Edge("Flower", "Visitor", "thin", label="pollinate, eat", dy=-8),
          Edge("Pollinator", "Flower", "thin", label="visit", dx=-24, dy=14),
          Edge("Chrysanthemum", "Flower", "inherit"),
@@ -450,6 +453,7 @@ PANELS: dict[int, Panel] = {
          Edge("Bee", "Pollinator", "inherit")),
         "heavy edges: 0. Each side names the other's base, and the second "
         "dispatch is a method on Flower.",
+        height=266,
     ),
     34: Panel(
         "Composite",
@@ -545,9 +549,135 @@ CAPTIONS: dict[int, str] = {
 }
 
 
+@dataclass(frozen=True)
+class Cell:
+    """One pattern in chapter 21's gallery, at column `col` and row `row`."""
+    title: str
+    col: int
+    row: int
+    nodes: tuple[Node, ...]
+    edges: tuple[Edge, ...]
+    note: str
+
+
+# Chapter 21's coupling_gallery.svg: six patterns in the panel notation,
+# three to a row. Nodes carry absolute coordinates; a cell is GALLERY_W
+# wide and GALLERY_H tall, and stacked boxes sit 36 apart so every edge
+# shows a line behind its head.
+GALLERY_W, GALLERY_H = 250, 270
+GALLERY_TITLE = ("Six patterns drawn only as coupling: which part names a "
+                 "concrete class, which names an interface, and which "
+                 "satisfies one")
+GALLERY: tuple[Cell, ...] = (
+    Cell("Strategy", 0, 0,
+         (Node("Context", 30, 64, w=84, h=40, kind="mark"),
+          Node("Strategy", 150, 64, w=96, h=40, kind="interface"),
+          Node("Max", 100, 164, w=70, h=34, size=11),
+          Node("Sum", 178, 164, w=70, h=34, size=11)),
+         (Edge("Context", "Strategy", "thin"),
+          Edge("Max", "Strategy", "realize"),
+          Edge("Sum", "Strategy", "realize")),
+         "heavy edges: 0"),
+    Cell("Observer", 1, 0,
+         (Node("Subject", 272, 64, w=90, h=40, kind="mark"),
+          Node("Observer", 412, 64, w=90, h=40, kind="interface"),
+          Node("Display", 412, 164, w=90, h=34, size=11)),
+         (Edge("Subject", "Observer", "thin", label="notify"),
+          Edge("Display", "Observer", "realize"),
+          Edge("Display", "Subject", "heavy", label="attach",
+               dx=-30, dy=12)),
+         "heavy edges: 1, toward the stable part"),
+    Cell("Factory Method", 2, 0,
+         (Node("Client", 530, 50, w=80, h=36, kind="mark"),
+          Node("Creator", 660, 50, w=86, h=36, kind="interface", size=11),
+          Node("Product", 530, 122, w=80, h=36, kind="interface", size=11),
+          Node("PdfCreator", 660, 122, w=86, h=36, size=10.5),
+          Node("PdfProduct", 530, 194, w=80, h=36, size=10.5)),
+         (Edge("Client", "Creator", "thin"),
+          Edge("Client", "Product", "thin"),
+          Edge("PdfCreator", "Creator", "realize"),
+          Edge("PdfProduct", "Product", "realize"),
+          Edge("PdfCreator", "PdfProduct", "heavy", label="creates",
+               dx=12, dy=18)),
+         "heavy edges: 1, moved out of Client"),
+    Cell("Adapter", 0, 1,
+         (Node("Client", 30, 320, w=80, h=40, kind="mark"),
+          Node("Target", 150, 320, w=96, h=40, kind="interface"),
+          Node("Adapter", 150, 396, w=96, h=34, size=11),
+          Node("Adaptee", 150, 466, w=96, h=34, size=11)),
+         (Edge("Client", "Target", "thin"),
+          Edge("Adapter", "Target", "realize"),
+          Edge("Adapter", "Adaptee", "heavy")),
+         "heavy edges: 1, inside Adapter"),
+    Cell("Decorator", 1, 1,
+         (Node("Client", 280, 320, w=80, h=40, kind="mark"),
+          Node("Component", 400, 320, w=96, h=40, kind="interface",
+               size=11),
+          Node("Pizza", 280, 440, w=80, h=34, size=11),
+          Node("Topping", 400, 440, w=96, h=34, size=11)),
+         (Edge("Client", "Component", "thin"),
+          Edge("Pizza", "Component", "realize"),
+          Edge("Topping", "Component", "realize", shift=-14),
+          Edge("Topping", "Component", "thin", label="wraps", shift=14,
+               dx=34, dy=4)),
+         "heavy edges: 0"),
+    Cell("Visitor", 2, 1,
+         (Node("Element", 530, 316, w=80, h=36, kind="interface", size=11),
+          Node("Visitor", 660, 316, w=86, h=36, kind="interface", size=11),
+          Node("Pricer", 660, 388, w=86, h=36, kind="mark"),
+          Node("Add", 522, 460, w=62, h=30, size=10.5),
+          Node("Mul", 602, 460, w=62, h=30, size=10.5),
+          Node("Num", 682, 460, w=62, h=30, size=10.5)),
+         (Edge("Element", "Visitor", "thin", label="accept"),
+          Edge("Pricer", "Visitor", "realize"),
+          Edge("Add", "Element", "realize"),
+          Edge("Pricer", "Add", "heavy"),
+          Edge("Mul", "Element", "realize"),
+          Edge("Pricer", "Mul", "heavy"),
+          Edge("Num", "Element", "realize"),
+          Edge("Pricer", "Num", "heavy")),
+         "heavy edges: 3, all in Pricer"),
+)
+
+
+def render_gallery(pid: str = "gl") -> str:
+    height = 2 * GALLERY_H + 34
+    b = ""
+    for cell in GALLERY:
+        x0, y0 = 18 + GALLERY_W * cell.col, GALLERY_H * cell.row
+        b += text(x0, y0 + 26, cell.title, 13, INK, bold=True, italic=True)
+        b += (f'  <line x1="{x0}" y1="{y0 + 32}" x2="{x0 + 230}" '
+              f'y2="{y0 + 32}" stroke="{BOX}" stroke-width="0.8"/>\n')
+        nodes = {n.name: n for n in cell.nodes}
+        for n in cell.nodes:
+            b += n.svg()
+        for e in cell.edges:
+            b += edge_svg(e, nodes, pid)
+        b += text(x0, y0 + 256, cell.note, 10.5, MUTED)
+    # The legend runs along the bottom, one sample per edge kind.
+    y = 2 * GALLERY_H + 12
+    for x, kind, label in ((20, "heavy", "names a concrete class"),
+                           (230, "thin", "names an interface"),
+                           (410, "realize", "satisfies it")):
+        stroke, width, dash, head = STYLES[kind]
+        end = x + 36 - HEADS[MARKERS[head][0]].trim
+        b += (f'  <line x1="{x}" y1="{y}" x2="{end:g}" y2="{y}" '
+              f'stroke="{stroke}" stroke-width="{width}"{dash} '
+              f'marker-end="url(#{pid}-{head})"/>\n')
+        b += text(x + 42, y + 4, label, 10.5, MUTED)
+    b += (f'  <rect x="550" y="{y - 8}" width="26" height="16" fill="none" '
+          f'stroke="{MARK}" stroke-width="1.6" rx="3"/>\n')
+    b += text(584, y + 4, "the part kept free of change", 10.5, MUTED)
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" '
+            f'viewBox="0 0 770 {height}"\n     {FONT}>\n'
+            f"  <title>{GALLERY_TITLE}</title>\n" + defs(pid) + b + "</svg>\n")
+
+
 def render_all() -> dict[Path, str]:
-    return {IMAGES / f"coupling_{ch}.svg": p.svg(f"c{ch}")
-            for ch, p in sorted(PANELS.items())}
+    out = {IMAGES / f"coupling_{ch}.svg": p.svg(f"c{ch}")
+           for ch, p in sorted(PANELS.items())}
+    out[IMAGES / "coupling_gallery.svg"] = render_gallery()
+    return out
 
 
 def rasterize(out_dir: Path) -> int:

@@ -15,7 +15,9 @@ Every `<marker>` must be one of the book's four arrowheads in
 color of the line that carries it; the style line names each marker's
 kind, and a marker that matches none of them, or one on a line of
 another color, fails the build, so a new figure cannot bring back an
-old shape or a black head on a gray line.
+old shape or a black head on a gray line. So does a marked edge whose
+line is shorter than `arrowheads.MIN_LINE`: two boxes set too close
+leave the head alone between them, with no line to say dashed or heavy.
 
 Text is measured too (`tools/svg_text.py`): text that runs past the
 `viewBox`, where every renderer cuts it off, or into other text fails
@@ -54,7 +56,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from tools import build_epub, build_site
-from tools.arrowheads import marker_kinds, mismatched_heads
+from tools.arrowheads import marker_kinds, mismatched_heads, short_edges
 from tools.svg_text import clipped, collisions
 from tools.build_site import IMAGES_SRC
 from tools.config import BUILD_DIR, CHAPTERS_DIR, ROOT
@@ -140,6 +142,7 @@ class Style:
     marker_uses: dict[str, int] = field(default_factory=dict)
     marker_kinds: dict[str, str | None] = field(default_factory=dict)
     mismatched: list[str] = field(default_factory=list)
+    short: list[str] = field(default_factory=list)
     clipped: list[str] = field(default_factory=list)
     collisions: list[tuple[str, str]] = field(default_factory=list)
 
@@ -183,6 +186,8 @@ class Style:
         if self.mismatched:
             out.append("arrowhead color differs from its line: "
                        + ", ".join(self.mismatched))
+        out += [f"edge too short to show its line: {e}"
+                for e in self.short]
         out += self.text_faults
         return out
 
@@ -231,6 +236,7 @@ def read_style(text: str) -> Style:
         marker_uses=uses,
         marker_kinds=marker_kinds(text),
         mismatched=mismatched_heads(text),
+        short=short_edges(text),
         clipped=clipped(text),
         collisions=collisions(text),
     )
@@ -523,6 +529,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  ARROWHEAD COLOR in {f.name}.svg: "
               + ", ".join(f.style.mismatched)
               + " sit on lines of another color (add a marker per color)")
+    stubby = [f for f in figures if f.style and f.style.short]
+    for f in stubby:
+        assert f.style
+        print(f"  SHORT EDGE in {f.name}.svg: " + "; ".join(f.style.short)
+              + " (move the boxes apart)")
     crowded = [f for f in figures if f.style and f.style.text_faults]
     for f in crowded:
         assert f.style
@@ -530,7 +541,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  TEXT in {f.name}.svg: {fault}")
     if args.open:
         webbrowser.open(index.as_uri())
-    return 1 if missing or odd or clash or crowded else 0
+    return 1 if missing or odd or clash or stubby or crowded else 0
 
 
 if __name__ == "__main__":
