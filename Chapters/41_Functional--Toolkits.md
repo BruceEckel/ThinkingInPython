@@ -78,9 +78,9 @@ where every branch recomputes the whole subtree beneath it.
 [Caching](18_Techniques--Performance.md#caching)
 runs both versions side by side, and [Recursion](#recursion)
 comes back to why the recursive form is worth keeping.
-Fibonacci also has an iterative form that needs neither recursion nor a cache:
-`a, b = b, a + b` in a loop.
-It stays the running example here because it keeps the point about caching small:
+An iterative Fibonacci, `a, b = b, a + b` in a loop,
+needs neither recursion nor a cache;
+the recursive one stays the running example here because it keeps the point about caching small:
 the branching and the repeated subproblem are what matter, not the arithmetic.
 
 One trap: decorating a method with `@cache` keys every entry on `self`,
@@ -203,10 +203,11 @@ print(x.squared)
 
 The stored result stays when an input changes:
 `x.n = 10` leaves `squared` at `25`.
-`del x.squared` resets it.
-Deleting the cached attribute discards the stored value,
+`del x.squared` resets it:
+deleting the cached attribute discards the stored value,
 and the next access recomputes it from the current state.
-A first access from two threads at once is a race, too.
+
+A first access from two threads at once is a race.
 `cached_property` takes no lock,
 so both threads can find an empty slot and both run the property's code.
 
@@ -240,14 +241,13 @@ print(greet.__name__, "-", greet.__doc__)
 ```
 
 If you delete the `@wraps(func)` line,
-that same `print()` reports `wrapper - None`.
+that same `print()` reports `wrapper - None`,
+and so does every tool that reports a function by its name or docstring,
+`help()` among them.
 The name `greet` refers to `wrapper` either way;
 `wraps()` is what copies the original's name and docstring onto it.
-Everything that reads those attributes then reads the wrapper's: `help()`,
-`inspect.signature()`,
-and any tool that reports a function by its name or docstring.
 `wraps()` also sets `greet.__wrapped__` to the original function,
-so a tool that wants the original can reach it.
+so a tool that wants the original, such as `inspect.signature()`, can reach it.
 
 ### `cmp_to_key`
 
@@ -790,6 +790,7 @@ Each `computing square N` line appears the moment `islice()` pulls that value,
 one at a time, the same way any `for` loop consumes a generator.
 The fifth `computing square` line is the last,
 because `islice()` asks for exactly five.
+
 `list(squares())[:5]` looks equivalent and is a different program.
 It builds the whole list before slicing, so it asks `squares()` for every value.
 `squares()` never runs out, so the program never reaches the slice.
@@ -994,13 +995,14 @@ print(next(group_rounds(["Ana", "Bo"], 5)))
 
 Called with `size=2`,
 `group_rounds()` covers all `21` possible pairs across the seven rounds,
-at the cost of `14` repeat meetings.
+with no rotation and no fixed player: a shuffle,
+then a greedy choice repeated until the pool is empty.
+The coverage costs `14` repeat meetings.
 An odd roster leaves one player over,
 so each round adds that player to an existing pair.
 A triple holds three meetings where a pair holds one,
 and those two extra meetings a round, over seven rounds, are the `14` repeats.
-`group_rounds()` covers the pairs with no rotation and no fixed player:
-a shuffle, then a greedy choice repeated until the pool is empty.
+
 Called with `size=3`, the same function schedules trios instead.
 Seven students make two threes with one left over, so one group grows to four.
 That is the same join-instead-of-sit-out choice the pair rounds make above.
@@ -1030,14 +1032,16 @@ The general version needs memory, where the circle method needs a round number:
 which pair sits where in round `r` follows from `r` alone.
 `group_rounds()` needs the `history` `Counter`,
 because no formula takes a round number and returns the grouping of arbitrary size that keeps every pair's meeting count lowest.
+To reach round `100`,
+`group_rounds()` therefore generates rounds `0` through `99` first;
+the circle method computes round `100` directly, from its arithmetic alone.
+[Recursion](#recursion) makes the same choice, memory for generality,
+when the problem outgrows a loop's counter and needs a stack.
+
 `group_rounds()` remains deterministic in the sense that matters for testing.
 The same `students`, `size`,
 and `seed` always produce the same infinite sequence of rounds,
 since `random.Random(seed)` draws every number from its own seeded state.
-To reach round `100`, `group_rounds()` generates rounds `0` through `99` first;
-the circle method computes round `100` directly, from its arithmetic alone.
-[Recursion](#recursion) makes the same choice, memory for generality,
-when the problem outgrows a loop's counter and needs a stack.
 
 ## Choosing From the Toolkits
 
