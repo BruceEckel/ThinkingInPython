@@ -85,7 +85,7 @@ is not.
 The third is an exception,
 which propagates from callee to caller the same way and appears in no signature either.
 People argue about whether an exception makes a function *impure*,
-so it gets the next section to itself.
+so that argument gets the next section to itself.
 
 ## Are Exceptions Impure?
 
@@ -118,7 +118,7 @@ Two schools of thought exist:
     you can replace the function call with the crash itself, and the program behaves the same.
 
 2.  **Functional**: Exceptions bypass normal control flow,
-    which makes code difficult to reason about,
+    and that bypass makes code difficult to reason about,
     so functional programming avoids them altogether.
     A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
@@ -198,7 +198,7 @@ expect(ValueError, slope, 10, -1)
 #: [ValueError] run cannot be negative: -1
 ```
 
-This works, and it needs no new type.
+Catching the exception works, and it needs no new type.
 But it guards only the exceptions `slope()`'s `try` names.
 `validate()` raises `ValueError` for a negative `run`,
 and the `try` around it catches only `ZeroDivisionError`.
@@ -277,7 +277,8 @@ A `Result` turns it into a value, a `try` catches it,
 and `NonZero` moves it to the one line that builds the value.
 They differ in how many functions must know about it.
 
-Standard practice combines the first and third:
+Standard practice combines the first and third,
+the `Result` and the restrictive type:
 parse untrusted input into the restrictive type at the boundary,
 using a `Result` to report a bad value instead of raising one,
 and let every function past that boundary take `NonZero` and stay total:
@@ -317,8 +318,8 @@ for text in ["2", "0"]:
 and `@safe` turns that failure into a `Result` its caller must unpack.
 Past that one `match`, `slope()` never checks anything:
 `NonZero` already guarantees `run.value` isn't 0.
-One technique handles the input a caller doesn't trust,
-the other lets every function downstream trust what it receives.
+The `Result` handles the input a caller doesn't trust,
+and `NonZero` lets every function downstream trust what it receives.
 
 ## A Program Can Never Be Pure
 
@@ -395,7 +396,7 @@ A test must run in an environment it controls,
 and an untracked Effect is part of the environment outside that control.
 Every Effect you isolate is one your tests can control.
 
-All of this depends on knowing where the Effects are.
+Every one of those benefits depends on knowing where the Effects are.
 In a small program you find them by inspection.
 As programs grow, inspection stops scaling.
 The rest of this chapter is about what replaces it.
@@ -602,7 +603,7 @@ Only a runtime failure verifies the wiring.
 Python has one mechanism that propagates on its own.
 A [`ContextVar`](19_Techniques--Concurrency.md#context-that-follows-the-call-chain)
 holds a value for the current task,
-and any function called under it reads the value without receiving it as an argument.
+and any function the task calls reads the value without receiving it as an argument.
 That is the automatic propagation the parameter list lacks,
 but the `ContextVar` removes the parameter along with the one benefit the parameter provided.
 `greet(ask, tell)` states its Effects in its signature,
@@ -685,8 +686,8 @@ and the row that remains holds the Effects the handler bodies perform:
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
 
-That separation is the core of every Effect system.
-The code that requests an Effect stands apart from the code that performs it,
+Separating the request from its fulfillment is the core of every Effect system:
+the code that requests an Effect stands apart from the code that performs it,
 and a handler sits between them.
 `greet()` names `ask` and `tell` without deciding what either one means.
 The handler decides, and a different handler decides differently.
@@ -697,8 +698,9 @@ the rest of the computation from that point forward.
 An `except` block has two options, catch or propagate,
 and both discard the continuation.
 A handler can resume the continuation once,
-which behaves like a normal function return.
-It can discard the continuation, which behaves like an exception.
+and the operation then behaves like a normal function return.
+It can discard the continuation,
+and the operation then behaves like an exception.
 It can even invoke the continuation several times,
 which is how native systems express retries and backtracking as ordinary handlers.
 *Algebraic effects* is the name for this design:
@@ -765,7 +767,7 @@ object Main extends ZIOAppDefault:
 
 The three type parameters of `ZIO[Tell, Nothing, Unit]` carry the Effect information.
 `Tell` is the environment the computation requires.
-`Nothing` is the error type, meaning this one cannot fail.
+`Nothing` is the error type, meaning `hello` cannot fail.
 `Unit` is what it produces on success.
 The signature does the same job as Koka's Effect row.
 It tells you what `hello` needs, what can go wrong, and what comes back.
@@ -920,7 +922,7 @@ Declaring a dependency you never bind is a type error.
 Calling an effectful function from one annotated as pure is a type error.
 That is tracking, interface separation, and delayed binding,
 the three properties of a full EMS, inside Python's existing type system.
-That chapter builds it up one step at a time.
+That chapter builds those three parts up one step at a time.
 
 The guarantee has a limit.
 Stateless verifies that the Effects you *declare* propagate consistently.
@@ -933,7 +935,7 @@ checking the ones you left out takes the language.
 
 Could Python itself gain Effect tracking,
 so that a tool infers every declaration instead of you writing it?
-The annotation syntax could carry it:
+The annotation syntax could carry the Effect row:
 imagine a signature that declares its Effects the way `async def` already declares one.
 The hard part is propagation, not syntax.
 A type checker must compute the Effect row of every function from the functions it calls,
@@ -996,7 +998,7 @@ and it has been normal for so long that it goes unnoticed.
 Like every hand-tracked concern before it, this one stops scaling.
 
 An Effect Management System moves the bookkeeping into the type system.
-The function signature answers the questions this chapter raised earlier:
+The function signature answers the questions from [Effect Management Systems](#effect-management-systems):
 what does this function depend on, what does it change, what can go wrong.
 The compiler checks every composition,
 comparing each callee's Effects with the caller's declaration at each call.
@@ -1019,8 +1021,8 @@ puts it to work.
 1.  Write the production bindings for `ask_tell.py`:
     a `Console` class whose `ask()` calls `input()` and whose `tell()` calls `print()`,
     and run `greet(Console(), Console())` interactively.
-    Confirm `greet()` itself requires no change,
-    which is what delayed binding provides.
+    Confirm `greet()` itself requires no change:
+    serving a new context without edits is what delayed binding provides.
 2.  Do the bookkeeping the chapter describes.
     Starting from `bookkeeping_scales.py`, add a `Log` Effect
     (a protocol with `log(message)`) used by a new helper that `greet()` calls,
