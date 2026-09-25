@@ -16,7 +16,8 @@ and [*State Machine*](31_Patterns--State_Machines.md) are one such pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
 A design rarely needs both at once.
-The body of this book argues that several of these patterns dissolve in Python
+Several of the patterns that exist only for a language's limits,
+the body of this book argues, dissolve in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables follow each source's own grouping,
@@ -24,8 +25,7 @@ so each name sits where its source puts it.
 That includes GoF's [*Creational*/*Structural*/*Behavioral* split](21_Patterns--Design_Patterns.md#pattern-taxonomy),
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for the other two.
-A few idioms below belong to no single source.
-This chapter groups them by what they share instead:
+A few idioms below belong to no single source and sit instead in three groups by what they share:
 language idioms tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
 The rest sits in Other Patterns and Idioms, whose rows share no trait.
@@ -36,8 +36,8 @@ A name without a link leaves that pattern to the literature.
 
 ## Finding a Pattern by Problem
 
-The tables below group by source.
-Use this section's table when you know the problem but not the name.
+The tables below group by source,
+so use this section's table when you know the problem but not the name.
 
 | If the problem is | Look at |
 |-------------------|---------|
