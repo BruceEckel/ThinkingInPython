@@ -133,7 +133,8 @@ class Node:
 
 @dataclass(frozen=True)
 class Edge:
-    """`kind` is heavy, thin, realize, inherit, or checked."""
+    """`kind` is heavy, thin, realize, inherit, or checked. `corner`
+    aims the edge at the target's corner nearest the source."""
     a: str
     b: str
     kind: str = "thin"
@@ -142,6 +143,7 @@ class Edge:
     dy: float = -6
     shift: float = 0
     bend: float = 0
+    corner: bool = False
 
 
 STYLES: dict[str, tuple[str, float, str, str]] = {
@@ -163,8 +165,14 @@ MARKERS: dict[str, tuple[str, str]] = {
 
 def edge_svg(e: Edge, nodes: dict[str, Node], pid: str) -> str:
     a, b = nodes[e.a], nodes[e.b]
-    x1, y1 = a.edge_point(b.cx, b.cy, 2)
-    x2, y2 = b.edge_point(a.cx, a.cy, 4)
+    if e.corner:
+        # Aim at the target's padded corner nearest the source.
+        x2 = b.cx + math.copysign(b.w / 2 + 4, a.cx - b.cx)
+        y2 = b.cy + math.copysign(b.h / 2 + 4, a.cy - b.cy)
+        x1, y1 = a.edge_point(x2, y2, 2)
+    else:
+        x1, y1 = a.edge_point(b.cx, b.cy, 2)
+        x2, y2 = b.edge_point(a.cx, a.cy, 4)
     dx, dy = x2 - x1, y2 - y1
     length = math.hypot(dx, dy) or 1
     nx, ny = -dy / length, dx / length
@@ -377,7 +385,7 @@ PANELS: dict[int, Panel] = {
               sub="command()")),
         (Edge("macro", "no_more()", "heavy"),
          Edge("macro", "ceased()", "heavy"),
-         Edge("macro", "fjords()", "heavy"),
+         Edge("macro", "fjords()", "heavy", corner=True),
          Edge("no_more()", "Command", "realize"),
          Edge("ceased()", "Command", "realize"),
          Edge("fjords()", "Command", "realize"),
