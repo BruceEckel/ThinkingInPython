@@ -244,7 +244,8 @@ The `Result` in `drive()`'s signature states the intent.
 Nothing verifies it.
 
 `interview()` does not know where the answers originate.
-It has no dictionary, no `input()` call, and no network connection.
+Its body is three questions and a `return`,
+with no dictionary and no `input()` call.
 It states what it needs and waits.
 `drive()` decides how to meet those needs,
 and it takes the answers as a parameter.
@@ -344,7 +345,7 @@ print(list(report(["red", "green", "blue"])))
 `emit()` is a `Generator[str, None, int]`: it yields strings, receives nothing,
 and returns the `int` total it accumulates while iterating.
 
-The return channel is how a generator reports to whichever generator delegated to it,
+The return channel lets a generator report to whichever generator delegated to it,
 so `report()` learns something `emit()` computed while neither of them knows who is driving.
 
 Any iterable can follow `yield from`,
@@ -482,7 +483,7 @@ Only the generator portion changed.
 As the `SendType` it is the value the driver sends in,
 which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` hands back when it finishes,
-which `yield from` produces as the value of the whole `yield from` expression.
+which becomes the value of the whole `yield from` expression.
 The inner generator asks one question and hands back one answer,
 so both channels carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
@@ -495,7 +496,7 @@ The answer `drive()` sends back arrives inside `ask()`,
 which also knows nothing about where it originated.
 A single loop at the edge of the program interprets Effects yielded anywhere inside it.
 `yield from` also returns the inner generator's value,
-and that is why `name` and `town` read like ordinary assignments.
+so `name` and `town` read like ordinary assignments.
 
 ### Composing Is Not Interpreting
 
@@ -540,7 +541,7 @@ so the call merges one more pair into `ANSWERS` with the dictionary union operat
 `yield from` replaces `drive()` as the consumer of `interview()`,
 but not as its runner.
 Something must still call `next()` and `send()` at the top,
-and that is why the example ends with a `drive()` call.
+so the example ends with a `drive()` call.
 However deep you stack delegations, the number of drivers stays at one.
 
 `drive()` and `yield from` differ in how they respond to a request.
@@ -557,7 +558,7 @@ but they hand that value to different places.
 `yield from` feeds it to the enclosing generator as the value of the expression,
 after which that generator keeps running.
 
-`yield from` composes descriptions and a driver interprets them.
+`yield from` composes descriptions, and a driver interprets them.
 A program can hold any number of descriptions and needs one driver,
 at its outermost edge.
 
@@ -632,7 +633,7 @@ expect(RuntimeError, s.close)
 `stubborn()` instead answers `GeneratorExit` with another `yield`,
 so `close()` raises `RuntimeError: generator ignored GeneratorExit` rather than returning quietly.
 A driver that abandons a live generator shuts it down with `close()`,
-so a generator meant to be driven by others must let `GeneratorExit` end it.
+so a generator written for others to drive must let `GeneratorExit` end it.
 
 ## The Driver You Already Use
 
@@ -696,7 +697,7 @@ The output interleaves the two tasks,
 though neither mentions the other and no threads exist.
 Each `yield` is a task agreeing to pause so the others can run.
 
-`task_runner()` only ever calls `next()`,
+`task_runner()` calls only `next()`,
 so it takes turns without answering anything.
 Giving each job a question closes the loop: turn-taking and question-answering,
 together:
@@ -803,8 +804,8 @@ That is the question the next chapter puts into the type system.
     Run `ty check` and the script, and explain both results.
     Which one told you more,
     and what does the type checker say if `profile` carries no annotation?
-5.  `report()` in `yield_from_return.py` yields but does not return.
-    Rewrite it to also return the character count,
+5.  `report()` in `yield_from_return.py` yields but returns nothing.
+    Rewrite it to return the character count as well,
     and give it the full annotation.
     Then write a caller that delegates to it with `yield from` and yields that count in a line of its own,
     and say which type parameter each of the two values traveled through.
