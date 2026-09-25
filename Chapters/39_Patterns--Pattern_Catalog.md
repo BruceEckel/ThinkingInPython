@@ -15,9 +15,9 @@ and several exist only to work around limits of a particular language.
 and [*State Machine*](31_Patterns--State_Machines.md) are one overlapping pair.
 *State* changes an object's behavior when its internal state changes.
 *State Machine* drives an object through a fixed set of states in response to inputs.
-A design rarely needs both at once.
-Several of the patterns that exist only for a language's limits,
-the body of this book argues, dissolve in Python
+*State Machine* builds on *State*: each state chooses its successor,
+so the object advances without the client choosing.
+The body of this book argues that several of the patterns written around a language's limits dissolve in Python
 ([Design Patterns](21_Patterns--Design_Patterns.md#when-a-pattern-dissolves) says why).
 
 The tables follow each source's own grouping,
@@ -26,9 +26,9 @@ One of those groupings is GoF's [*Creational*/*Structural*/*Behavioral* split](2
 which [Design Patterns](21_Patterns--Design_Patterns.md)
 accepts for *Creational* and questions for *Structural* and *Behavioral*.
 A few idioms below belong to no single source and sit instead in three groups by what they share:
-language idioms tied to C++ or Java's limits, functional idioms,
+language idioms, most of them tied to C++ or Java's limits, functional idioms,
 and the patterns that supply a collaborator from outside.
-The rest sits in Other Patterns and Idioms, whose rows share no trait.
+Everything else sits in Other Patterns and Idioms, whose rows share no trait.
 The source and group tables list their rows alphabetically,
 and for the classic patterns that is also GoF's own order.
 When this book covers a pattern, its name links to that coverage.
@@ -56,14 +56,14 @@ so use this section's table when you know the problem but not the name.
 | Resolving behavior from the runtime types of two objects | *Double Dispatch* |
 | Structuring recursive or tree-shaped data | *Composite*, *Interpreter*, *Visitor* |
 | Keeping the number of objects down | *Flyweight*, *Multiton*, *Object Pool*, *Singleton* |
-| Saving and restoring state | *Memento*, *Event Sourcing*, *Unit of Work*, *Identity Map* |
+| Saving and restoring state | *Memento*, *Event Sourcing* |
 | Reacting to change | *Observer*, *Publish-Subscribe Channel*, *Model-View-Controller* |
 | Coordinating concurrent work | *Thread Pool*, *Producer-Consumer*, *Future/Promise*, *Active Object*, *Reactor* |
 | Keeping a program running when a dependency fails | *Circuit Breaker*, *Retry*, *Bulkhead*, *Timeout*, *Dead Letter Channel* |
 | Moving data across a boundary | *Data Transfer Object*, *Message Translator*, *Gateway*, *Data Mapper* |
-| Persisting domain objects to a database | *Active Record*, *Repository*, *Table Module*, *Lazy Load* |
+| Persisting domain objects to a database | *Active Record*, *Repository*, *Table Module*, *Lazy Load*, *Unit of Work*, *Identity Map* |
 | Organizing application logic by request or use case | *Transaction Script*, *Domain Model*, *Service Layer*, *Front Controller* |
-| Modeling a value, amount, or special case instead of null | *Value Object*, *Money*, *Special Case* |
+| Modeling a value, amount, or special case instead of null | *Value Object*, *Money*, *Special Case*, *Null Object* |
 | Routing or transforming a message | *Content-Based Router*, *Message Router*, *Splitter*, *Aggregator* |
 | Connecting an application to a messaging system | *Message*, *Message Channel*, *Message Endpoint*, *Point-to-Point Channel* |
 | Supplying a collaborator from outside, an application of Inversion of Control | *Dependency Injection*, *Service Locator*, *Strategy* |
@@ -129,11 +129,11 @@ so use this section's table when you know the problem but not the name.
 
 | Pattern | Intent |
 |---------|--------|
-| [*Blackboard*](38_Patterns--Simulation.md) | Let independent components cooperate through a shared data store. |
+| [*Blackboard*](38_Patterns--Simulation.md#the-rat-and-the-blackboard) | Let independent components cooperate through a shared data store. |
 | *Broker* | Coordinate requests and replies between distributed components. |
 | *Layers* | Stack responsibilities so each layer uses only the one beneath it. |
 | *Microkernel* | Keep a minimal core and add capability through plug-ins. |
-| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md) | Separate data, presentation, and input handling. |
+| [*Model-View-Controller* (MVC)](30_Patterns--Observer.md#where-the-controller-goes) | Separate data, presentation, and input handling. |
 | [*Pipes and Filters*](23_Patterns--Iterators.md#reusable-algorithms) | Process a stream through a chain of independent transforms. |
 | *Presentation-Abstraction-Control* (PAC) | Build interactive systems from cooperating agents, each split three ways. |
 | [*Reflection*](17_Techniques--Metaprogramming.md) | Let a program inspect and adjust its own structure at runtime. |
@@ -167,7 +167,7 @@ so use this section's table when you know the problem but not the name.
 |---------|--------|
 | *Aggregator* | Combine related messages into one. |
 | *Content-Based Router* | Route by inspecting the message content. |
-| *Dead Letter Channel* | Hold messages that no one can deliver or process. |
+| *Dead Letter Channel* | Hold messages the messaging system cannot deliver. |
 | *Message* | Package data to send over a channel. |
 | *Message Channel* | Connect senders and receivers through a logical pipe. |
 | *Message Endpoint* | Connect an application to the messaging system. |
@@ -210,7 +210,7 @@ so use this section's table when you know the problem but not the name.
 |---------|--------|
 | [*Function Composition*](40_Functional--Foundations.md#composing-functions) | Build a function by passing one function's output to the next. |
 | [*Memoization*](41_Functional--Toolkits.md#cache) | Cache a function's results keyed by its arguments. |
-| [*Monad*](42_Functional--Error_Handling.md) | Sequence computations inside a context such as optionality, error, or async. |
+| [*Monad*](42_Functional--Error_Handling.md#composing-with-bind) | Sequence computations inside a context such as optionality, error, or async. |
 | [*Partial Application*](40_Functional--Foundations.md#partial-application) | Fix some of a function's arguments and get a function expecting the rest. |
 
 ## Dependency Supply
