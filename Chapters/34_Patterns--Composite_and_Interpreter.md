@@ -163,13 +163,14 @@ That works because Python evaluates annotations and `type` aliases lazily,
 the [deferred evaluation](08_Foundations--Static_Types.md#self-and-forward-references).
 The alias can therefore sit below the classes it unites,
 where it reads as a summary of them rather than as a forward declaration.
+
 Every function over the type repeats its recursion.
 `Directory` contains `Node`s,
 so `disk_usage()` and `walk()` call themselves on each entry.
 Each `match` needs one case per member of the union and no more.
 
-`disk_usage()` accepts a lone `File`, a subtree, or the whole tree.
-What changed from `filesystem_classic.py` is only where the operations live.
+`disk_usage()` still accepts a lone `File`, a subtree, or the whole tree;
+what changed from `filesystem_classic.py` is only where the operations live.
 `disk_usage()` and `walk()` are ordinary functions outside the node classes,
 so a new operation is a new function, and the nodes never change.
 In the classic version a new node type is one class and a new operation is a method in every class.
@@ -193,8 +194,8 @@ A record freezes the binding of the field,
 and the list it holds keeps its `append()`,
 as [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 demonstrates.
-The demo builds `src` first, then places it inside `root`.
-`src` stays as built, so sharing subtrees is safe.
+With the tuple, sharing a subtree is safe: the demo builds `src` first,
+then places it inside `root`, and `src` stays as built.
 
 ```python
 # test_filesystem.py
@@ -240,6 +241,7 @@ A tree whose shape follows a grammar is an *abstract syntax tree* (AST).
 Python's own compiler builds one of these for every source file.
 `ast.parse()` returns it to you as node objects,
 and `ast.NodeVisitor` walks them in the style of [*Visitor*](33_Patterns--Visitor.md).
+
 *Interpreter* is *Composite* applied to language.
 Representing each construct as a node type turns evaluation into a tree walk.
 
@@ -326,6 +328,7 @@ and the `Expr` annotation declares to the type checker that `self` is a member o
 `ty` accepts a `self` annotation narrower than the class.
 Pyright and mypy require the declared type of `self` to be a supertype of its class,
 so under either of them the portable form leaves `self` implicit and writes `cast(Expr, self)` at each construction.
+
 Writing `x + 1` produces an `Add`,
 so ordinary Python arithmetic notation constructs the AST.
 The reflected forms `__radd__()` and `__rmul__()` handle an integer on the left,
@@ -364,6 +367,7 @@ When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
 the library sets `eq=False` on the dataclass, giving up structural comparison,
 and writes its own `__eq__()`.
 This chapter keeps structural comparison; a class gets one or the other.
+
 `and`, `or`, and `not` belong to Python alone.
 Python tests the operand's truth value;
 then `and` and `or` return one of the two objects, and `not` returns a `bool`.
@@ -408,8 +412,9 @@ if __name__ == "__main__":
 #: 7 21
 ```
 
-Data classes generate `__eq__()`, so two trees compare by value.
-The demo confirms that the operators build the tree you assemble by hand.
+The demo confirms that the operators build the tree you assemble by hand:
+data classes generate `__eq__()`,
+so `expr == by_hand` compares the two trees by value.
 Printing `expr.left` shows the nesting: the `Add` at the root holds a `Mul`,
 which holds a `Num` and a `Var`.
 The second `print()` line evaluates that same `expr` twice,
@@ -418,22 +423,21 @@ Building `2 * x + 1` does not compute a number.
 It builds a tree, so `expr` is a value you can pass to `evaluate()` under different variable bindings,
 as many times as you like.
 An unbound variable raises a `KeyError`, naming the variable.
-The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters).
-That keeps the parameter name out of the variable namespace,
-so an expression can use `e` as a variable.
 
-`**env` has a memory cost for that convenience at the call site.
+`**env` gives the call site `evaluate(expr, x=3)` rather than `evaluate(expr, {"x": 3})`,
+and that convenience has a memory cost.
 Each recursive call packs a fresh dict from `**env`,
 so the live dicts at any moment total the tree's depth times the number of bound variables.
 The cost matters most on the deep trees this chapter warns about later,
 which can run thousands of levels.
 `**env` is also why the `/` is there.
-With `e` positional-only, `e=5` lands in `env`,
+The `/` makes `e` [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
+which keeps the parameter name out of the variable namespace,
+so an expression can use `e` as a variable: `e=5` lands in `env`,
 and `test_e_is_available_as_a_variable()` below confirms that it binds the variable.
 A `dict[str, int]` parameter passes the same bindings by reference at every call,
 and it would spare both the `/` and this explanation.
-This chapter keeps `**env` for the call site:
-`evaluate(expr, x=3)` rather than `evaluate(expr, {"x": 3})`.
+This chapter keeps `**env` for the call site.
 
 ```python
 # test_evaluate.py
@@ -657,9 +661,6 @@ so the walker is yours to write.
 A [`t`-string](02_Foundations--Tour.md#t-strings) evaluates to a `Template`:
 a stream of two node kinds,
 the literal `str` pieces the author typed and the `Interpolation` objects holding the values.
-Iteration skips the empty literal pieces,
-so `t"{a}{b}"` yields two `Interpolation` objects and no strings.
-`template.strings` keeps the empty slots when the alternation matters.
 Iterating a `Template` is flat.
 `for piece in template` yields exactly one level of `str` and `Interpolation` objects,
 so the walk itself is a loop rather than a recursion.
@@ -675,6 +676,9 @@ Iterating a `Template` produces `str | Interpolation`,
 a closed union like `Node` with two members,
 so an `isinstance` test narrows it as well as a `match` does.
 The `else` branch is the `str` case.
+Iteration skips the empty literal pieces,
+so `t"{a}{b}"` yields two `Interpolation` objects and no strings;
+`template.strings` keeps the empty slots when the alternation matters.
 The structure is data, and its meaning is whatever a function computes from it:
 
 ```python
