@@ -16,6 +16,7 @@ as the following framework for a basic state machine shows.
 You call `run()` on a state to perform its behavior,
 and you pass an "input" object to the state's `next()`,
 which returns the state to enter next.
+
 The chapter shows two designs that differ in one way: in the first,
 each `State` object decides its own next state; in the second,
 a single table holds every transition.
@@ -218,9 +219,10 @@ trap.run_all([MouseAction.ESCAPES])
 ```
 
 `MouseTrap` holds all the possible states as class attributes and sets up the initial state.
-Each state is one shared object.
-A state class stores nothing,
+Each state is one shared object: a state class stores nothing,
 so a single `Waiting` serves every `MouseTrap` and every visit to that state.
+The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
+
 Each `next()` is a `match` on the event:
 a `case` for every input the state recognizes,
 and a `case _` that returns the state the machine is in.
@@ -229,7 +231,6 @@ Python looks up a name inside a function when the function runs,
 not when its `def` executes.
 By the time anything calls `next()`,
 the whole module has run and `MouseTrap` exists.
-The code at the bottom of the file builds a `MouseTrap` and runs it through the whole sequence of moves read from the text file.
 
 `StateMachine`'s constructor runs the initial state,
 the construction-starts-the-engine choice that [*Template Method* warns against](25_Patterns--Template_Method.md#dont-start-the-engine-in-the-constructor).
@@ -389,12 +390,11 @@ expect(RuntimeError, trap2.run_all, [MouseAction.ESCAPES])
 ```
 
 The output matches the first version's, move for move.
-
-With many `State` classes to maintain,
+The source is what changed: with many `State` classes to maintain,
 the tables read more easily than the `match` statements.
-`next()` raises its `RuntimeError` `from None`.
-Chaining keeps the `KeyError`,
-which only repeats the event the message already names.
+
+`next()` raises its `RuntimeError` `from None`,
+because the chained `KeyError` would only repeat the event the message already names.
 
 ### An Unexpected Input
 
@@ -512,8 +512,6 @@ The listing writes `StateMachine` by hand rather than as a `@dataclass`,
 because a generated `__init__()` names each parameter after its field.
 This constructor renames what it stores: the caller passes `initial`,
 but the attribute is `state`, which `handle()` updates.
-`NoTransition` derives from `RuntimeError`,
-so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 Several candidate transitions can share one `(state, input)` key.
 Their conditions tell them apart.
@@ -523,6 +521,8 @@ A row whose condition is `None` matches every time,
 so it belongs last in its group, as the `else` for the rows above it.
 When every condition in a group returns `False`,
 `handle()` raises the same `NoTransition` a missing key raises.
+`NoTransition` derives from `RuntimeError`,
+so a caller can catch the specific failure instead of every `RuntimeError` an action method might raise.
 
 ### A Vending Machine
 
@@ -709,6 +709,7 @@ Too expensive returns to `COLLECTING` with the money still inserted,
 while sold out goes to `UNAVAILABLE`.
 The state names the condition;
 the message alone leaves you inferring it from the quantity.
+
 The last three events insert a dime and pick the same sold-out slot again,
 this time with too little money for it as well.
 Both conditions are now true,
@@ -906,6 +907,7 @@ if __name__ == "__main__":
 `send()` hands each event to `handle()` and catches the `NoTransition` that a rejected click raises
 (a selection before any money, say),
 so the GUI shows a message instead of the traceback `tkinter` would otherwise print.
+
 The button loop builds sixteen commands with `partial(select, r, c)` rather than a lambda.
 Sixteen lambdas closing over `r` and `c` would all read the loop's final values,
 the [late-binding trap](28_Patterns--Function_Objects.md#the-late-binding-trap).
@@ -921,7 +923,7 @@ Each-state-decides suits a machine whose states do something and have few transi
 The state class holds both the action and the transitions,
 so reading `mouse_trap_states.py`'s `Luring` tells you what luring does and which states can follow it.
 Adding a state is one class.
-It reads best when the transitions are obvious from the state's own name.
+The design reads best when the transitions are obvious from the state's own name.
 An action that must run on every entry into one state belongs in that state's `run()`,
 written once; sounding a chime whenever the trap reaches `Holding` is such an action.
 
