@@ -354,7 +354,7 @@ so a caller sees the same thing from each.
 `compute_and_discard()` still takes measurably longer,
 because Python runs every loop you write, worthless or not.
 A perfectly pure computation, followed to its logical end,
-heats the processor and does nothing else.
+is a space heater with extra steps.
 
 Effects are not a defect to design away.
 They are the reason a program exists.
