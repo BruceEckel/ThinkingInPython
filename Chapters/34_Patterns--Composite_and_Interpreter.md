@@ -5,7 +5,7 @@ so you can treat a single object and a group of objects uniformly.
 The *Interpreter* pattern represents sentences in a small language as trees,
 then evaluates them.
 *GoF Design Patterns* presents them as separate patterns,
-but the second is the first with meaning attached.
+but *Interpreter* is *Composite* with meaning attached.
 In Python both reduce to one technique:
 a union of frozen data classes for the nodes,
 and recursive functions that `match` on them.
@@ -246,7 +246,7 @@ and `ast.NodeVisitor` walks them in the style of [*Visitor*](33_Patterns--Visito
 Representing each construct as a node type turns evaluation into a tree walk.
 
 In most languages the pattern needs a class per construct and a parser to build the trees.
-Python shrinks the first and removes the second, for one specific case:
+Python shrinks the classes and removes the parser, for one specific case:
 sentences written as Python source, with operands that are already nodes.
 A data class declares a node in three lines,
 and operator overloading lets Python's own parser build the trees.
@@ -362,18 +362,19 @@ so an expression written with them builds nodes instead of computing.
 Attribute lookup finds a class's own method before an inherited one,
 so that generated `__eq__()` shadows anything `Operators` defines.
 `expr.py` leaves `==` alone; the nodes compare by value,
-which the demo below and its tests rely on.
+and `evaluate.py`'s demo and its tests rely on that comparison.
 When a library's `==` must build a node, as SQLAlchemy's `col == 5` does,
 the library sets `eq=False` on the dataclass, giving up structural comparison,
 and writes its own `__eq__()`.
-This chapter keeps structural comparison; a class gets one or the other.
+This chapter keeps structural comparison;
+a class gets either that or an `==` that builds a node, never both.
 
 `and`, `or`, and `not` belong to Python alone.
 Python tests the operand's truth value;
 then `and` and `or` return one of the two objects, and `not` returns a `bool`.
 `x and y` evaluates to `y`, builds nothing, and reports no error.
-An expression language that needs boolean operators overloads `&` and `|`,
-which is why a Pandas filter reads `(a > 1) & (b > 2)`.
+An expression language that needs boolean operators overloads `&` and `|` instead,
+so a Pandas filter reads `(a > 1) & (b > 2)`.
 The parentheses change the parse.
 `&` binds tighter than `>`, so bare `a > 1 & b > 2` parses `1 & b` first.
 
@@ -500,8 +501,8 @@ if __name__ == "__main__":
 #: ((x + 1) * (x + 2))
 ```
 
-This is the ability [*Visitor*](33_Patterns--Visitor.md) exists to provide:
-new operations over a fixed hierarchy, defined outside it.
+Adding `to_infix()` without editing a node class is the ability [*Visitor*](33_Patterns--Visitor.md)
+exists to provide: new operations over a fixed hierarchy, defined outside it.
 The `match` version needs no `accept()` method and no visitor classes.
 Unlike `singledispatch`, it binds the nodes' fields in the patterns.
 
@@ -568,7 +569,7 @@ so Python adds them to `5` before any node exists.
 `simplify()` would then receive a `Num(5)` already folded.
 `Num(2)` is already a node,
 so `+` dispatches to `Operators.__add__()` and builds an `Add` for `simplify()` to fold back down.
-This is the limit of using the host parser:
+The folded `2 + 3` is the limit of using the host parser:
 an operator builds a node when either operand is one,
 and does plain arithmetic otherwise.
 
@@ -591,12 +592,12 @@ so `(0 * y) + x` keeps its zero.
 The left child is a `Mul`,
 and only becomes a `Num` once something simplifies it.
 Simplifying both children first, then matching the results,
-applies the rule to the `Num(0)` the recursion just produced,
-which is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
+applies the rule to the `Num(0)` the recursion just produced;
+simplifying first is how the demo's `((1 * x) + (0 * y))` collapses to `x`.
 
 `frozen=True` blocks every field assignment,
 so `simplify()` never edits the input.
-It returns a new tree that shares unchanged subtrees with the original.
+`simplify()` returns a new tree that shares unchanged subtrees with the original.
 The `is` guard in each `case _` returns the node it received when both children simplified to themselves.
 
 ```python
@@ -754,7 +755,7 @@ Written as an f-string,
 the same line is one finished `str` with the attack already inside it.
 The only remaining defense is inspecting the result to guess which characters the program wrote and which a user did.
 
-That is the general argument for handing a consumer the structure instead of the answer.
+The injection attempt makes the general argument for handing a consumer the structure instead of the answer.
 A finished string no longer records which characters the program wrote and which a user did,
 and the safety decision depends on that distinction.
 Textbooks usually present the *Interpreter* pattern as a way to add operations to a language.
