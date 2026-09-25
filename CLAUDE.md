@@ -30,6 +30,24 @@ Chapter 18's Rust section has real PyO3/maturin crates under `rust/`. The root
 `Makefile` never enters `rust/` and never requires a Rust toolchain, so
 `verify`/`gate`/`all`/`ci` work with no Rust installed. Details: `rust/CLAUDE.md`.
 
+## Cloud sessions: tools/cloud-setup.sh
+
+A Claude Code cloud session starts from a fresh Ubuntu 24.04 VM whose
+stock `uv` (0.8.17) cannot fetch Python 3.15, so nothing that goes
+through `uv run` works until the environment's setup script installs
+the toolchain. `tools/cloud-setup.sh` (since 2026-09-25) is that
+script's source: paste it into the environment's Setup script field,
+and paste it again after editing it, since the environment keeps its
+own copy. It installs uv and Python 3.15, Vale, an SVG rasterizer,
+and pandoc from PyPI, apt, and the Go module proxy, because the
+session's GitHub proxy refuses release downloads from any repository
+not attached to the session, at every network access level, and
+`make tools-check-full`'s Linux lines for pandoc, typst, and Vale
+download exactly those. typst and gh stay out; the script's header
+says why. Check a change with `make tools-check-full` in the first new
+session. The VM is Linux, so the seeded-simulation trap below applies
+to any `#:` marker a cloud `make verify` rewrites.
+
 ## Deep-reviewing a chapter
 
 The full deep-review procedure (editing pass, teaching pass, style
