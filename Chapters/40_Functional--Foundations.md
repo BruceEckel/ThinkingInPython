@@ -3,8 +3,8 @@
 This chapter begins the book's exploration of functional programming.
 The ideas are useful before you learn their names.
 A pure function cannot corrupt state you forgot about.
-A bug in it reproduces from the arguments alone,
-and it needs no mock or fixture to test.
+A bug in a pure function reproduces from the arguments alone,
+and the function needs no mock or fixture to test.
 A cache from `functools`, or a sliding window from `itertools`,
 is code the library wrote for you,
 already correct on the edge case you would otherwise miss.
@@ -76,7 +76,7 @@ You can call it from many threads at once,
 because it shares no state to corrupt.
 [Automatic Parallelism](43_Functional--Confidence.md#automatic-parallelism)
 turns that safety into speed.
-A cache can store its results,
+A cache can store the function's results,
 because the same arguments always produce the same answer.
 That makes [`functools.cache`](41_Functional--Toolkits.md#cache)
 safe on a pure function, and wrong on an impure one.
@@ -199,7 +199,7 @@ including from another thread while `total()` is running.
 `Final` freezes the binding, and only the binding:
 if you declare `CONFIG: Final[list[int]] = [...]`,
 `CONFIG.append(...)` still succeeds, for the type checker and at runtime alike.
-That is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
+Freezing only the binding is the shallow-freezing lesson of [Rethinking Objects](20_Patterns--Rethinking_Objects.md#the-immutability-solution)
 again, with `Final` in place of `frozen=True`.
 For an immutable value, make the value's own type immutable,
 `Final[tuple[int, ...]]`: the tuple guards the contents,
@@ -242,7 +242,7 @@ so a dictionary that stored one as a key could not find it again once its conten
 Python therefore sets their `__hash__` to `None`.
 Freezing a dataclass lets it keep contents-based equality and a hash at the same time.
 [`@record`](18_Techniques--Performance.md#record) freezes `Point`,
-which is why `Point(3, 4)` can key `distances`.
+so `Point(3, 4)` can key `distances`.
 Contents-based equality together with a stable hash is why a dictionary key,
 a cache entry, or a value shared across threads is normally a tuple or a record.
 
@@ -319,7 +319,7 @@ and the plugin registries that let a program grow without editing its core.
 
 [Pattern Matching](13_Techniques--Pattern_Matching.md)
 solves the same `if`/`elif` problem with `match`,
-and the two differ in one way that decides between them.
+and `match` and the table differ in one way that decides between them.
 A `match` is code: adding an operator means editing the function,
 and the type checker verifies every case.
 The table is data: adding an operator means adding a row,
@@ -332,7 +332,7 @@ and a table when the set should grow from outside.
 A *lambda* is an unnamed function written as a single expression,
 introduced in [Functions](05_Foundations--Functions.md#lambdas).
 The higher-order functions in this section take lambdas as inline arguments,
-where they fit best.
+where a lambda fits best.
 A lambda's value is locality.
 When a transformation is one short expression,
 a lambda keeps it at the call site, where the reader already is,
@@ -387,11 +387,11 @@ and `[n for n in numbers if n % 2 == 0]` replaces the `filter()` call the same w
 `map()` and `filter()` are the better choice when the function already exists.
 `map(str.strip, lines)` reads better than `[line.strip() for line in lines]` because the name says what the comprehension repeats.
 
-Beyond how they read, the two forms return different things.
+Beyond how they read, a comprehension and `map()` return different things.
 The comprehension builds a finished list.
 `map()` returns an iterator you can pass to the next stage without building the list.
-A generator expression from that chapter is the comprehension's lazy form,
-and removes that difference.
+A [generator expression](16_Techniques--Comprehensions.md#generator-expressions)
+is the comprehension's lazy form, and removes that difference.
 The rule of thumb is to use the higher-order form when the function already exists,
 and the comprehension when you would write the expression inline.
 `sorted()`'s `key` has no comprehension equivalent,
@@ -404,10 +404,12 @@ and you supply only the part that differs from one use to the next.
 You stop rewriting the same loop,
 and with it the off-by-one and accumulator-initialization mistakes a hand-written loop allows.
 
-The idea also applies the other way around.
-A function that takes a function can wrap it with operations like timing,
-retries, or logging.
-A decorator does this, as [Decorators](14_Techniques--Decorators.md) shows.
+A higher-order function can also work the other way around:
+instead of containing the loop,
+it wraps the function it receives with operations like timing, retries,
+or logging.
+A decorator does that wrapping, as [Decorators](14_Techniques--Decorators.md)
+shows.
 
 ## Closures
 
@@ -446,14 +448,15 @@ A closure is the functional answer to "an object with one method and some stored
 `multiply()` reads `factor` rather than receiving it, yet it stays pure.
 `factor` never changes after capture,
 so the same argument always produces the same answer.
-That is the difference between a captured constant and the global `balance` that makes `withdraw()` unpredictable.
+A captured constant differs from the global `balance` that makes `withdraw()` unpredictable in exactly that way:
+nothing changes it after capture.
 
 A closure fits when you want to configure behavior once, reuse it,
 and keep its configuration private.
 Once the factory returns,
 the inner function's scope is the one place the captured variable has a name,
 so the inner function alone can read or rebind it.
-That gives you encapsulation without declaring a class:
+That privacy gives you encapsulation without declaring a class:
 
 ```python
 # make_counter.py
@@ -483,7 +486,7 @@ a closure is one way to let exactly one function change it.
 
 The privacy is Python's usual kind, a convention.
 `inspect.getclosurevars(tally).nonlocals` reports `{'count': 3}`,
-and `tally.__closure__[0].cell_contents = 100` rewrites it.
+and `tally.__closure__[0].cell_contents = 100` rewrites `count`.
 Like the single leading underscore,
 a closure states an intention that the language does not enforce.
 
@@ -491,11 +494,11 @@ The `nonlocal` statement lets `increment()` assign to the captured variable.
 Reading a captured name, as `multiply()` reads `factor`, needs no declaration.
 But any assignment to a name inside a function makes that name local,
 so `count += 1` on its own makes `count` a fresh local variable.
-The statement then reads that local before anything has assigned it,
+`count += 1` then reads that local before anything has assigned it,
 and the call fails with `UnboundLocalError`.
 `nonlocal count` redirects the assignment to the enclosing function's variable.
 
-Forgetting it is the usual mistake when a closure first assigns to a captured name.
+Forgetting the declaration is the usual mistake when a closure first assigns to a captured name.
 The runtime message names a local variable instead of the missing declaration:
 "cannot access local variable 'count' where it is not associated with a value".
 The type checker's report is the more useful one.
@@ -546,7 +549,7 @@ demonstrates that late-binding trap.
 
 ### Leaving a Gap with `Placeholder` {#leaving-a-gap-with-placeholder}
 
-Binding `exponent` above works because `power()` accepts it by keyword.
+Binding `exponent` in `partial.py` works because `power()` accepts it by keyword.
 For a function whose parameters are [positional-only](05_Foundations--Functions.md#positional-only-and-keyword-only-parameters),
 position is the only way to bind an argument,
 and `partial()` fills positional arguments from the left, so before 3.14,
@@ -582,7 +585,7 @@ The marker would add nothing.
 The `# type: ignore` comments mark a type checker limitation rather than a code problem.
 The stub for `partial()` does not yet describe what `Placeholder` does at runtime,
 so `ty` checks the three arguments in `partial(clamp, 0, Placeholder, 100)` against `clamp`'s declared parameter types.
-It therefore reports `Placeholder` as a value of the wrong type,
+`ty` therefore reports `Placeholder` as a value of the wrong type,
 and types the resulting callable as one that takes no arguments.
 The runtime behaves correctly.
 
