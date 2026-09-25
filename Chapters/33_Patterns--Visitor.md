@@ -6,11 +6,11 @@ People can confuse the two by looking at the implementation rather than the inte
 ![`Flower` names only `Visitor` and `Pollinator` names only `Flower`, so no visitor names a concrete flower](_images/coupling_33)
 
 *Visitor* assumes you have a primary class hierarchy you cannot change.
-Perhaps it's from another vendor and you can't touch its source.
+Perhaps it's from another vendor and you can't edit its source.
 However, you'd like to add new polymorphic methods to it.
 Normally you'd add something to the base class interface,
 but that's not an option.
-How do you get around this?
+How do you add them without editing the base class?
 
 ## The Classic Visitor
 
@@ -22,10 +22,10 @@ typically called `accept()`,
 which takes an object from a secondary hierarchy called `Visitor`.
 `accept()` calls the visitor's `visit()` and passes itself in.
 The visitor's type chooses which `visit()` runs.
-A new `Visitor` subclass that reuses an existing operation costs the primary hierarchy nothing.
-A genuinely new operation is not free;
+A new `Visitor` subclass that reuses an existing operation adds no code to the primary hierarchy.
+A genuinely new operation does add code;
 [The Price of the Empty Base](#the-price-of-the-empty-base)
-below shows what it costs in Python:
+below shows which hierarchy carries it in Python:
 
 ```python
 # flower_visitors.py
@@ -108,27 +108,28 @@ if __name__ == "__main__":
 #: Chrysanthemum is toxic to Worm
 ```
 
-`flower_gen()` draws the concrete classes from `Flower.__subclasses__()`,
+`flower_gen()` reads the concrete classes from `Flower.__subclasses__()`,
 the same registry-free enumeration as [Factory](27_Patterns--Factory.md#simple-factory-method).
 The `accept()`/`visit()` pair is the *double dispatch*.
-`accept()` hands the concrete flower to the visitor,
+`accept()` passes the concrete flower to the visitor,
 `visit()` resolves the visitor's type,
 and the `pollinate()` or `eat()` call inside `visit()` resolves the flower's type.
 In the classic pattern every element class overrides `accept()`,
 which resolves the element's type.
 Here one inherited `accept()` is enough,
 because the `pollinate()` or `eat()` call resolves the flower's type a step later.
-The last line of output shows both dispatches doing visible work.
+The last line of output is the one where both dispatches change the result.
 `Chrysanthemum` overrides `eat()`
 (chrysanthemums really do produce a natural insecticide),
 so that line depends on both unknown types at once:
 the worm's type chooses `eat()`,
 and the flower's type chooses which `eat()` runs.
 If you delete the override, the program still runs.
-The flower-side dispatch goes back to having nothing to say.
+Every flower then resolves to the same `Flower.eat()`,
+so the flower-side dispatch no longer changes any line of output.
 
 The output above shows results, not mechanism.
-Printing the qualified name of the method each hop reaches makes the pair visible:
+Printing the qualified name of the method each dispatch resolves to makes the pair visible:
 
 ```python
 # dispatch_trace.py
@@ -145,17 +146,18 @@ for flower in (Chrysanthemum(), Gladiolus()):
 #: Gladiolus eaten by Worm
 ```
 
-The first hop reaches `Predator.visit` rather than `Worm.visit`,
+The first dispatch resolves to `Predator.visit` rather than `Worm.visit`,
 because `Worm` inherits the operation from the class that defines it.
-For `Chrysanthemum` the second hop reaches the override,
-and for `Gladiolus` it reaches `Flower.eat`:
-the flower-side dispatch has nothing to say, and the output now shows it.
+For `Chrysanthemum` the second dispatch resolves to the override,
+and for `Gladiolus` it resolves to `Flower.eat`:
+the flower-side dispatch selects the inherited method,
+and the output now shows it.
 
 ## The Price of the Empty Base
 
 One annotation in `flower_visitors.py` looks like a shortcut and is not.
 `accept()` types its visitor as `Any` because the `Visitor` base class declares no `visit()` method:
-declaring that parameter as `Visitor` instead fails the type checker.
+declaring that parameter as `Visitor` instead makes `ty` report `visitor.visit` as an unresolved attribute.
 The classic pattern fixes this by declaring `visit()` abstract on the visitor base.
 A `Protocol` removes the `Any` at the cost of two new lines:
 
@@ -167,22 +169,22 @@ A `Protocol` removes the `Any` at the cost of two new lines:
             visitor.visit(self)
 
 The chapter keeps `Any` because the empty `Visitor` base is what the classic pattern looks like,
-and seeing the price is part of the point.
-The price is that nothing checks the visitor side:
+and showing what the `Any` gives up is part of the point.
+What it gives up is every check on the visitor side:
 `Gladiolus().accept(Bug())` passes the type checker and fails at runtime with `AttributeError: 'Bug' object has no attribute 'visit'`.
-That is the same gap the `Any` in `paper_scissors_rock.py` leaves in [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods).
+The `Any` in `paper_scissors_rock.py` leaves a missing `eval_*()` method unchecked the same way in [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#two-dispatches-through-methods).
 This `Any` is a choice,
 unlike the one in [Data Transfer Objects](22_Patterns--Data_Transfer_Objects.md#a-hand-rolled-messenger),
 where a bag of attributes named at runtime leaves no precise type to write.
 
-Notice where the behavior lives.
+Notice which hierarchy holds the behavior.
 The classic pattern overloads `visit()` once per flower type and keeps each operation's body in the visitor,
 so it adds only `accept()` to the primary hierarchy.
 Python has no method overloading,
 since a second `def visit()` replaces the first.
 This version therefore puts the type-specific behavior in `pollinate()` and `eat()` on the flowers instead,
 and the visitors choose between them.
-So in Python the primary hierarchy ends up carrying the operations the pattern exists to keep out of it.
+So in Python the primary hierarchy holds the operations the pattern exists to keep out of it.
 
 ## The Pythonic Visitor: singledispatch
 
@@ -248,7 +250,7 @@ if __name__ == "__main__":
 ```
 
 `@nectar.register` reads the annotation on the implementation's first parameter:
-`flower: Gladiolus` files that implementation under `Gladiolus`.
+`flower: Gladiolus` stores that implementation in the dispatch table under the key `Gladiolus`.
 A union annotation, `flower: Gladiolus | Ranunculus`,
 registers one implementation for several types at once.
 Each registered implementation takes the name `_`.
@@ -257,31 +259,31 @@ so the name carries no meaning.
 `_` is the conventional placeholder for a name nobody uses.
 Reusing `_` for every registration is safe:
 `@nectar.register` stores the function in its dispatch table before the next `def _` rebinds the name,
-so nothing goes missing.
+so every implementation stays in the table.
 
-Nothing touches `Flower`.
+Nothing edits `Flower`.
 Each operation is a separate function,
 and the `@singledispatch` default handles any type you have not registered.
 Dispatch follows inheritance:
 an unregistered subclass uses its nearest registered ancestor,
 falling back to the base implementation only when no registered ancestor exists
-(the tests below pin this down).
+(the tests below check each case).
 
 The listing's last two output lines inspect the dispatch table the decorator built.
 `nectar.registry` maps each registered type to its implementation,
 and `nectar.dispatch(cls)` reports the implementation to which `cls` resolves.
 Nothing registers `Ranunculus`,
 so it resolves to the same implementation `Flower` does,
-the one filed under `object`.
+the one stored under `object`.
 
 The default is also the risk.
-A new `Flower` subclass that nobody registers gets the default answer with no exception and no static complaint,
-so a forgotten registration shows up as a wrong result rather than a failure.
-The default reaches further than `Flower`, too:
+A new `Flower` subclass that nobody registers gets the default answer with no exception and no checker report,
+so a forgotten registration produces a wrong result rather than a failure.
+The default also accepts arguments outside `Flower`:
 `@singledispatch` registers the base implementation under `object`,
 not under the `Flower` in its annotation,
 so `nectar(42)` returns `42: no nectar`.
-`ty` and Pyright do not object either,
+`ty` and Pyright report nothing either,
 because the dispatcher that `@singledispatch` builds declares its parameters as `Any`.
 Only mypy rejects `nectar(42)`,
 since mypy's built-in `singledispatch` plugin checks the call against the base function's signature.
@@ -289,8 +291,8 @@ When no sensible answer exists for an unregistered type,
 give the base function a `raise NotImplementedError(f"no nectar rule for {type(flower).__name__}")` instead of a fallback string.
 A forgotten registration then fails at its first call.
 A `match` over a closed union of types, with `assert_never()` in the `case _`,
-goes further and lets the type checker [catch the omission](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)
-instead, at the price of a set of types no one else can extend.
+goes further and lets the type checker [report the omission](34_Patterns--Composite_and_Interpreter.md#a-composite-of-data-classes)
+instead, but only over a closed set of types that no one else can extend.
 Adding a new operation is a new function.
 Adding a new flower is a class,
 plus one registration for each operation that needs more than the default.
@@ -351,15 +353,16 @@ def test_dispatch_follows_inheritance() -> None:
 ### Where Visitor Still Fits
 
 *Visitor* still has a place:
-when the elements must drive the traversal themselves from inside `accept()`,
+when the loop over the elements must run inside their own `accept()`,
 or when a framework you do not own already calls that method.
 But in Python that is rare.
 [Pattern Refactoring](37_Patterns--Pattern_Refactoring.md#one-singledispatch-function-per-operation)'s recycling-note example reaches the same conclusion:
-`singledispatch` is the open-method mechanism that *Visitor* fakes.
+`singledispatch` adds an operation to a hierarchy from outside it,
+which *Visitor* can only imitate with `accept()`.
 
 A minimal example shows the traversal case.
-`Corsage.accept()` visits each of its elements and recurses into any nested `Corsage`,
-so nothing outside the object drives the walk:
+`Corsage.accept()` calls `accept()` on each of its elements and recurses into any nested `Corsage`,
+so no code outside the object loops over the elements:
 
 ```python
 # recursive_accept.py
@@ -384,17 +387,18 @@ if __name__ == "__main__":
 ```
 
 The recursive call works because `Corsage` and `Flower` both define `accept()`,
-so the loop in `Corsage.accept()` calls it without knowing whether an element is a flower or another corsage.
-`flower_gen()` drives the earlier traversal from outside, one flower at a time.
-Here `accept()` drives it,
-the situation where the classic pattern still earns its keep.
+so the loop in `Corsage.accept()` calls it on each element without checking whether the element is a flower or another corsage.
+In `flower_visitors.py` the loop that calls `accept()` sits outside the hierarchy,
+in the main block, and takes one flower at a time from `flower_gen()`.
+Here the loop runs inside `accept()`,
+the situation where the classic pattern still fits.
 
 ## One Dispatch Is Enough
 
 *Visitor* dispatches twice, and `singledispatch` dispatches once.
-The trade loses nothing.
+The one dispatch resolves everything the two did.
 The second dispatch in the classic pattern exists not because two types are unknown,
-but because the operation has nowhere else to live.
+but because the operation must be a method on some class.
 The visitor's type stands in for the operation,
 so the language must resolve that type at runtime along with the element's type.
 Once an operation can be a function defined outside the hierarchy,
