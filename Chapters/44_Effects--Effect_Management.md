@@ -115,7 +115,7 @@ Two schools of thought exist:
     A bottom value stands for a computation that never produces an ordinary value.
     Because ⊥ is a value in the theory, raising an error that nothing catches
     is referentially transparent:
-    you can replace the function call with the crash itself, and the program's behavior doesn't change.
+    you can replace the function call with the crash itself, and the program behaves the same.
 
 2.  **Functional**: Exceptions bypass normal control flow,
     which makes code difficult to reason about,
@@ -123,7 +123,7 @@ Two schools of thought exist:
     A *Total Function* returns errors as data in explicit wrapper types instead of raising them,
     as you saw in [Error Handling](42_Functional--Error_Handling.md).
 
-The argument over purity does not settle the question this chapter asks.
+The argument over purity leaves this chapter's question open.
 If you write a function `a()` that calls a function `b()` that raises an exception,
 then `a()` raises that exception too, unless `a()` catches it,
 and `a()`'s signature says nothing about it.
@@ -140,7 +140,7 @@ Here are three ways to do it.
 Wrap the answer and the failure in a `Result`,
 the way [Error Handling](42_Functional--Error_Handling.md#turning-exceptions-into-results)
 does.
-This chapter imports the shared helpers `result.py` and `safe.py` directly instead of rebuilding them.
+This chapter imports that chapter's `result.py` and `safe.py` helpers unchanged.
 If you decorate the original `slope()`, unchanged,
 every exception it raises becomes a value instead of a crash:
 
@@ -165,14 +165,13 @@ for args in [(10, 2), (10, 0)]:
 
 `@safe` catches whatever `slope()` raises, so the fix is the decorator,
 not a change to the function it wraps.
-`slope()` is now total,
-and the caller must unpack the `Result` to reach the number.
-No exception propagates out of the decorated `slope()`.
+`slope()` is now total: every call returns a `Result`,
+and the caller must unpack it to reach the number.
 
 ### Catch the Exception You Expect
 
 If you catch and handle the exception within the function,
-it never propagates to a caller, so it is not an Effect.
+it stays inside that function, so it is not an Effect.
 `slope()` can catch the one exception it names and turn the failure into an ordinary `float`,
 its existing return type, instead of introducing a new type:
 
@@ -227,8 +226,8 @@ C++ reduced its version to a single bit: whether a function throws at all.
 The third approach removes the failure instead of handling it.
 [Data Classes as Types](12_Techniques--Data_Classes_as_Types.md#a-type-is-a-set-of-values)
 makes illegal values impossible to construct.
-If you give `run` a type that cannot hold zero,
-`slope()` never needs to check for zero:
+If you give `run` a type that excludes zero,
+the check moves out of `slope()` and into the type:
 
 ```python
 # slope_nonzero.py
@@ -253,8 +252,7 @@ with expected(ValueError):
 #: [ValueError] NonZero cannot hold 0
 ```
 
-The check still runs, but only once,
-in `__post_init__()` when `NonZero(...)` builds the value.
+The check runs once, in `__post_init__()`, when `NonZero(...)` builds the value.
 Every function that receives a `NonZero`, including `slope()`,
 inherits that guarantee.
 `slope()` can never divide by zero,
@@ -455,7 +453,7 @@ A full EMS does three things:
 The first item can stand alone,
 and the difference between it and the whole list matters in the chapters that follow.
 *Effect tracking* tells you which Effects a function can perform.
-A system that stops at tracking still tells you whether a function is pure,
+Tracking alone tells you whether a function is pure,
 and names the kinds of impurity a caller takes on.
 Effect management is tracking plus the second and third items.
 Once an Effect is an interface and a caller binds the implementation later,
@@ -595,7 +593,7 @@ you edit every signature on the path: `greet()`, `session()`, `menu()`,
 and `main()`, plus the new function that logs, five signatures in all.
 Exercise 2 walks through that edit and counts what each signature gains.
 Dependency injection frameworks relocate this bookkeeping into a wiring layer,
-but you still must tell the injector what every function needs,
+but you must tell the injector what every function needs,
 and tell it again when that changes.
 Only a runtime failure verifies the wiring.
 
@@ -682,7 +680,7 @@ and the row that remains holds the Effects the handler bodies perform,
 A test installs a different handler, one that returns a fixed name,
 and `greet()` runs unchanged.
 The compiler rejects a program that performs an Effect with no handler in scope,
-so a running program never performs an Effect that has no handler.
+so every Effect a running program performs has a handler.
 
 That separation is the core of every Effect system.
 The code that requests an Effect stands apart from the code that performs it,
@@ -878,9 +876,8 @@ print(asyncio.run(description), ran)
 ```
 
 Calling `greet()` builds a coroutine object, a description of work,
-and runs none of it.
-The empty list shows that the body never ran.
-The description executes only when something awaits it or hands it to `asyncio.run()`.
+and `ran` stays empty.
+The body runs only when something awaits the description or hands it to `asyncio.run()`.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
 opened with the same demonstration.
 That is the library Effect system model.
@@ -996,8 +993,8 @@ Like every hand-tracked concern before it, this one stops scaling.
 An Effect Management System moves the bookkeeping into the type system.
 The function signature answers the questions this chapter raised earlier:
 what does this function depend on, what does it change, what can go wrong.
-Composition stops being a guess,
-because the compiler compares each callee's Effects with the caller's declaration at every call.
+The compiler checks every composition,
+comparing each callee's Effects with the caller's declaration at each call.
 The languages that do this today are young,
 and the libraries that retrofit it are demanding.
 That was true of every solution to every previous barrier at this stage.
