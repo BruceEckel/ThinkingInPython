@@ -2,8 +2,8 @@
 
 This chapter follows one problem through several designs.
 A first solution solves it,
-then you ask "what will change?" and reshape the design to absorb that change cheaply.
-This is the spirit of Martin Fowler's *Refactoring*,
+then you ask "what will change?" and reshape the design so that kind of change touches one place.
+This is Martin Fowler's *Refactoring*,
 applied to patterns rather than single statements.
 
 It is also a Python lesson.
@@ -12,14 +12,14 @@ single dispatch, closed classes, and types that are not values.
 Python's classes stay open, its types are values,
 and `functools.singledispatch` adds an operation from outside a class,
 so some of those patterns become unnecessary.
-This chapter points out each one as the example reaches it.
+This chapter names each one at the point where the example would otherwise need it.
 
 The example is a trash sorting simulation, and it evolves across the chapter:
-one design, then a requirement that breaks it,
+one design, then a requirement that makes it report wrong totals,
 then a reshaping that absorbs the change,
-then a second axis of change the reshaped design does not touch.
+then a second axis of change that the reshaped design leaves unsolved.
 Read that evolution as a template for your own designs,
-which can start as an adequate fit for one problem and grow into a flexible fit for a class of problems.
+which can start as an adequate fit for one problem and become a flexible fit for a class of problems.
 
 ## Simulating a Trash Recycler
 
@@ -30,7 +30,7 @@ and you must recover the type of each piece to sort it.
 
 ### The `Trash` Hierarchy
 
-In the `Trash` hierarchy, each material carries a per-pound `value`.
+In the `Trash` hierarchy, each material class declares a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically,
 and a `create()` method builds an instance from a material name,
@@ -102,14 +102,14 @@ the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real
 belong to the class, so they stay out of it.
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
-The subclasses omit the annotation because the name and its type carry over from the base declaration;
-restating `ClassVar[float]` also keeps [the type checker's guard on the override](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
+The subclasses omit the annotation because they inherit the name and its type from the base declaration;
+restating `ClassVar[float]` also keeps [the type checker rejecting an assignment through an instance](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
 
 A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
 `sum_value()` is an ordinary function.
 It reads `t.value` and `t.weight` polymorphically,
-and never asks what type a piece is.
+and never checks what type a piece is.
 
 Testing confirms that each subclass registers itself,
 `create()` builds one by name,
@@ -212,7 +212,7 @@ Glass:3.0
 
 ## The First Cut: Checking Every Type
 
-The most obvious way to sort is to look at each piece and discover its type using `match`
+The most obvious way to sort is to test each piece for its type using `match`
 (the `rtti` in the file name is *run-time type identification*, the C++ name for discovering a type at runtime):
 
 ```python
@@ -252,7 +252,7 @@ When a new material joins the system, say `Plastic`,
 you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
-may expect `assert_never()` to make the type checker catch the missed case.
+may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking works on a *closed* union,
 and `Trash` is deliberately open, which is the point of the registry,
 so `assert_never()` has nothing to check against here.
@@ -262,17 +262,17 @@ warns against.
 A sorter over an open set must find the bin without naming any type,
 and the next section builds one.
 Testing for one type, or a small subset that needs special handling, is fine.
-Testing for all of them means you do dispatch's job by hand.
-A `case _:` wildcard could catch what the named cases miss:
-`case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a crash.
-The wildcard is worth adding, and the flaw survives it:
+Testing for all of them means you write the type-to-bin lookup by hand.
+A `case _:` wildcard could match what the named cases miss:
+`case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
+The wildcard is worth adding, and the flaw remains:
 every new material still means editing this `match`,
 where `bins[type(t)]` needs no edit at all.
 
 That is the argument.
 Here is the requirement that makes it concrete.
 The plant starts accepting plastic,
-which arrives as a new material class and some new lines in the data:
+which means a new material class and some new lines in the data:
 
 ```text
 # plastic.dat
@@ -326,12 +326,12 @@ print(f"parsed {len(pieces)}, binned {binned}")
 Nothing fails.
 The parser builds two `Plastic` objects, the sorter matches neither,
 and the report totals the trash it recognized.
-Two of four pieces reach a bin,
+The loop appends two of the four pieces to a bin,
 and the sixty pounds of plastic never appears in the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
-The leak is in the `match`.
-The registry accepts `Plastic` the moment its `class` statement runs,
+The `match` is the statement that loses them.
+`__init_subclass__()` registers `Plastic` the moment its `class` statement runs,
 and without that `class` statement,
 `create()` raises a `KeyError` at the first `Plastic:` line, loudly,
 at parse time.
@@ -365,8 +365,8 @@ for kind, items in bins.items():
 #: Total value = 120.08
 ```
 
-`type(t)` is the perfect key because it adapts to new types,
-including ones added at runtime.
+`type(t)` is the right key because every new class is a new key,
+including one defined at runtime.
 The loop has no list of materials to maintain and no case to forget.
 The key is the *exact* class.
 That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
@@ -375,18 +375,18 @@ and it first appeared in the event bus in [Function Objects](28_Patterns--Functi
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's: usually what a sorter needs,
 but keep it in mind before you subclass a material.
-Subclasses are another place where the two sorters disagree:
+Subclasses are another place where the two sorters differ:
 `case Aluminum()` matches any subclass,
-so `recycle_rtti.py` files a `CrushedAluminum` under `Aluminum`.
+so `recycle_rtti.py` puts a `CrushedAluminum` in the `Aluminum` bin.
 Swapping the `match` for the dictionary is a redesign, not a rename.
 
-The `defaultdict(list)` creates a bin the first time a material turns up.
+The `defaultdict(list)` creates a bin the first time the loop reads a piece of that material.
 `Bins` is an alias for a plain `dict`,
 so a type checker accepts `bins: Bins = {}` too,
 and that version raises a `KeyError` on the first piece of trash.
 
 Point this sorter at `plastic.dat`,
-the file that defeats the `match` in `plastic_dropped.py`.
+the file whose plastic the `match` in `plastic_dropped.py` drops.
 The listing defines `Plastic` the same way `plastic_dropped.py` does:
 
 ```python
@@ -417,16 +417,16 @@ print(f"parsed {len(pieces)}, binned {binned}")
 #: parsed 4, binned 4
 ```
 
-Every piece reaches a bin, plastic included: `parsed 4, binned 4`.
+The loop bins every piece, plastic included: `parsed 4, binned 4`.
 Defining `Plastic` and naming the new data file are the only changes to the program's logic.
 The sorting loop needs no edit,
 unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
-So far the chapter has made new *types* cheap.
+So far a new *type* has cost one class definition and no other edit.
 The other axis of change is adding new *operations*,
-and a design that makes new types cheap ordinarily makes new operations expensive:
+and a design that adds a type without editing existing code ordinarily adds an operation only by editing every type:
 that trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-expression-problem).
 
 ### A Method on Every Material
@@ -435,7 +435,7 @@ Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.
 Now the safety officer wants a disposal hazard printed beside it.
 That is a second operation that varies by material,
-and the obvious home for it is a method on each material class:
+and the obvious place for it is a method on each material class:
 
 ```python
 # note_methods.py
@@ -493,9 +493,9 @@ print(f"classes edited for one operation: {len(edited)}")
 #: classes edited for one operation: 3
 ```
 
-Both operations answer correctly, and the cost is the last line.
-One new question costs an edit to all three material classes,
-and the question after it costs three more edits.
+Both operations answer correctly, and the last line counts the edits.
+One new question is an edit to all three material classes,
+and the question after it is three more edits.
 Those edits sit in each class body, as `note_methods.py` shows;
 in the real program they go in `trash.py`.
 A method belongs in the body of its own class by design:
@@ -503,13 +503,13 @@ you can assign a function onto a class from outside,
 but behavior scattered that way is unmaintainable.
 A plant that buys its material classes from a supplier has no class body to edit.
 
-The method form is a real option, not a strawman:
+The method form is a real option, not an example built to fail:
 this hierarchy is small and the book owns every subclass,
 so `note()` on each material is a fair choice here.
-The method wins while you own the hierarchy and the operations stay few:
-each subclass answers for itself,
+The method is the better choice while you own the hierarchy and the operations stay few:
+each subclass defines its own answer,
 with no separate table to keep in step with the class list.
-It loses once the hierarchy belongs to someone else,
+It is the worse choice once the hierarchy belongs to someone else,
 or once operations start to outnumber materials.
 
 ### One `singledispatch` Function per Operation
@@ -517,9 +517,9 @@ or once operations start to outnumber materials.
 [*Visitor*](33_Patterns--Visitor.md)
 is the classic way to add an operation without editing the classes,
 and it is elaborate: a visitor class, an `accept()` method on every element,
-and double dispatch to reach the right overload,
+and double dispatch to select the right overload,
 all to work around a language that cannot add a method to a class from outside.
-`functools.singledispatch` reaches the same implementation in one call,
+`functools.singledispatch` selects the same implementation in one call,
 and any module can register an implementation for a new type.
 
 In Python, a single-dispatch function implements *Visitor*:
@@ -556,18 +556,19 @@ for cls in Trash.registry.values():
 Each implementation above takes the name `_`.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explains that placeholder.
-`recycling_note()` is a new operation that lives outside the `Trash` hierarchy.
+`recycling_note()` is a new operation defined outside the `Trash` hierarchy.
 `Paper` has no registered note, so it falls through to the base function.
 That fallback is also the risk:
 a material nobody registers gets the default answer,
-with no exception at runtime and no complaint from the type checker.
-Here "no special handling" is a genuine answer, so the fallback earns its keep.
+with no exception at runtime and no report from the type checker.
+Here "no special handling" is a genuine answer for `Paper`,
+so the fallback is correct.
 When no default makes sense,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 
-Now give the safety officer's question the same treatment.
-It arrives as its own file, and edits no material class:
+Now write the safety officer's question the same way.
+It goes in its own file, and edits no material class:
 
 ```python
 # disposal_hazard.py
@@ -599,14 +600,14 @@ print(f"classes edited for one operation: {len(edited)}")
 ```
 
 The counter reads zero.
-`hazard()` reaches every material through the registry,
+The loop reads every material from the registry, `hazard()` answers for each,
 and `trash.py` stays untouched.
-A third question and a fourth cost one more file each,
-where `note_methods.py` charges one edit per material every time.
+A third question and a fourth are one more file each,
+where `note_methods.py` needs one edit per material every time.
 Adding a `Plastic` material means defining the class,
 plus one registration for each operation that must answer differently for plastic.
 Python still has the expression problem,
-but both sides now cost a line instead of an edit spread across classes.
+but each side is now one line instead of an edit spread across classes.
 
 `singledispatch` is for behavior that differs by type.
 The earlier `sum_value()` does the same thing for every type,
@@ -615,11 +616,11 @@ For an operation that belongs on an object and still varies by type,
 [`functools.singledispatchmethod`](41_Functional--Toolkits.md#singledispatchmethod)
 provides the same dispatch in method form.
 
-The chapter now holds two kinds of dispatch that disagree about subclasses.
+The chapter now holds two kinds of dispatch that treat subclasses differently.
 `bins[type(t)]` keys on the exact class,
 so a `CrushedAluminum` derived from `Aluminum` gets a bin of its own.
 `singledispatch` resolves through the [MRO](07_Foundations--Classes.md#method-resolution-order),
-so that same piece answers with `Aluminum`'s note.
+so `recycling_note()` returns `Aluminum`'s note for that same piece.
 Each is right for its job.
 [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-type-or-many)
 draws the same distinction between a table keyed by class and dispatch that follows inheritance.
@@ -633,13 +634,13 @@ here new types versus new operations,
 and choosing the lightest construct that isolates it.
 This chapter met each vector through a concrete requirement:
 plastic for new types, and the disposal hazard for new operations.
-Each vector costs a single line at the point of use:
+Each vector takes a single line at the point of use:
 `bins[type(t)]` absorbs a new material,
-and one `@recycling_note.register` teaches an existing operation about it.
+and one `@recycling_note.register` adds the new material's answer to an existing operation.
 Neither is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
-Keep a pattern only when it stays useful after the language has done its part.
+Keep a pattern only when it still does something a language feature does not.
 
 ## Exercises
 
