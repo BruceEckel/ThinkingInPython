@@ -132,9 +132,9 @@ The first call must therefore be `next()`:
 
 A suspended generator holds its frame:
 the position in the body and every local variable.
-`interview()`'s locals `name` and `town` survive two `send()` calls with no attribute or container to hold them,
-because resuming continues an existing computation rather than starting a new one.
-The frame is the generator's state.
+`interview()`'s locals `name` and `town` survive two `send()` calls,
+because resuming continues an existing computation.
+The frame holds them, and the frame is the generator's state.
 
 `next(i)` is equivalent to `i.send(None)`:
 
@@ -153,11 +153,11 @@ so both lines start from the beginning and produce the first question.
 The `# type: ignore` marks a real mismatch:
 `interview()` declares `Answer` as its `SendType`,
 and `None` is not an `Answer`.
-The type checker rejects the priming `send()` even though the interpreter accepts it.
-The equivalence holds only at runtime,
-and the annotation has no way to state it, so a driver primes with `next()`.
+The type checker rejects the priming `send()` even though the interpreter accepts it,
+because the annotation has no way to make an exception for the first call.
+A driver therefore primes with `next()`.
 
-The `NewType` definitions prevent accidental transposition.
+The `NewType` definitions catch a transposed annotation.
 If you mistakenly annotate the generator as `Generator[Answer, Question, Result]`,
 `ty` reports nine errors in three groups of three.
 All three `yield Question(...)` expressions yield a `Question` where the annotation declares an `Answer`.
@@ -221,8 +221,7 @@ if __name__ == "__main__":
 #: result = 'Alice of Wonderland, friend Rabbit'
 ```
 
-The listing imports the generator unchanged.
-Only the driver is new.
+The listing imports the generator unchanged; the driver is new.
 The first line of output describes what `interview()` produced:
 an ordinary `generator` object whose `__name__` is the function's name.
 That `__name__` exists on the object at runtime but not in the `Generator` type,
@@ -238,9 +237,9 @@ so only the `send()` call sits there.
 Any other code that could raise it, such as an exhausted answer source,
 belongs outside.
 
-The type checker verifies only two of those three parameters.
+The type checker verifies two of those three parameters.
 `StopIteration.value`'s type is `Any`,
-so a type checker accepts `return stop.value` no matter what return type `drive()` declares.
+so a type checker accepts `return stop.value` under any return type `drive()` declares.
 The `Result` in `drive()`'s signature states the intent.
 Nothing verifies it.
 
@@ -259,7 +258,7 @@ One generator, one driver.
 No annotation states that pairing, but the runtime enforces it:
 a generator resumed from two threads at once raises `ValueError: generator already executing` rather than interleaving.
 [Concurrency](19_Techniques--Concurrency.md#sharing-an-iterator-between-threads)
-shows the failure and `threading.synchronized_iterator()`,
+shows that error and `threading.synchronized_iterator()`,
 which serializes the conversation.
 
 ## `yield from` Composes Descriptions
@@ -306,10 +305,9 @@ Each `yield from` runs its target until that generator finishes,
 so the line delegating to `one()` contributes one value and the line delegating to `three()` contributes three.
 The target decides how many values each delegation contributes.
 The `from` is what delegates.
-Without it, `yield one()` yields the generator object itself as a single value.
-"Exhausted" describes where the delegation ends,
-not when the driver receives each value.
-The inner generator still yields each value only when the driver requests the next one.
+A bare `yield one()` yields the generator object itself as a single value.
+"Exhausted" describes where the delegation ends.
+The inner generator yields each value one at a time, as the driver requests it.
 
 Exhaustion is transitive.
 `top()` delegates to `outer()`, which delegates to `one()` and `three()`,
@@ -322,7 +320,8 @@ A `yield from` expression evaluates to the inner generator's return value,
 not its yielded values.
 The yielded values pass through to the driver.
 Here, `report()` captures the return value from `yield from emit(items)` into `size`.
-`report()` returns nothing and only yields:
+`report()` itself is a one-way generator,
+annotated with the short `Iterator[str]` form:
 
 ```python
 # yield_from_return.py
@@ -358,7 +357,7 @@ so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 ### The Send Channel
 
 The `SendType` is the type of the value a caller sends back into the generator.
-A generator that receives values but produces no final result needs no `ReturnType`:
+A generator that receives values and returns `None` can leave the `ReturnType` at its default:
 
 ```python
 # yield_from_send.py
@@ -390,7 +389,7 @@ except StopIteration:
 #: both() is exhausted
 ```
 
-`collect()` yields prompts, receives numbers, and returns nothing,
+`collect()` yields prompts, receives numbers, and returns `None`,
 so its type is `Generator[str, int, None]`.
 An omitted `ReturnType` defaults to `None`,
 so the annotation shortens to `Generator[str, int]`.
@@ -409,7 +408,7 @@ A single `send()` therefore ends one inner generator and produces the first prom
 The driver sees `StopIteration` only when `both()` finishes its last delegation.
 
 Writing the loop by hand is the natural first attempt,
-and it discards every sent value without an error:
+and it silently discards every sent value:
 
 ```python
 # manual_forwarding.py
@@ -479,8 +478,8 @@ if __name__ == "__main__":
 #: Alice of Wonderland, friend Rabbit
 ```
 
-`drive()` arrives unchanged from `two_way_generator.py` and never references `ask()`.
-Only the generator portion changed.
+`drive()` is the same function as in `two_way_generator.py` and never references `ask()`.
+The generator portion is what changed.
 
 `ask()` uses `Answer` in two of the three positions, for two different reasons.
 As the `SendType` it is the value the driver sends in,
@@ -552,7 +551,7 @@ However deep you stack delegations, the number of drivers stays at one.
 The generator yields a `Question`, `drive()` looks it up,
 and no other code receives it.
 `yield from` answers nothing.
-It relays the request upward and passes the reply back down untouched,
+It relays the request upward and passes the reply back down intact,
 so `survey()` contains no code that reads a `Question`.
 
 `StopIteration` divides `drive()` and `yield from` along that same line.
@@ -573,7 +572,7 @@ and `yield from` relays both:
 `throw()` raises its exception inside the innermost generator rather than in the delegating one,
 and a `close()` unwinds every frame in the chain.
 [A Basic Context Manager](15_Techniques--Context_Managers.md#a-basic-context-manager)
-shows this already, without naming it:
+shows this already, described from the `with` block's side:
 "Python resumes the generator by raising the block's exception at the `yield`."
 `throw()` is that same resumption, called directly instead of by a `with` block:
 
@@ -697,16 +696,15 @@ queues the generator it builds, and hands the function back unchanged,
 the [registering-decorator shape](14_Techniques--Decorators.md#decorating-classes).
 `task_runner()` gives the front task one `next()` per turn.
 A task that yields moves to the back of the queue.
-One that finishes raises `StopIteration` and never rejoins the queue.
+One that finishes raises `StopIteration`, and the runner drops it.
 The output interleaves the two tasks,
 though neither names the other and no threads exist.
 Each `yield` suspends its task and returns control to `task_runner()`,
 which then runs the next one.
 
-`task_runner()` calls only `next()`,
-so it takes turns without answering anything.
-Giving each job a question combines the two, turn-taking and question-answering,
-in one loop:
+`task_runner()` calls `next()` and takes turns;
+`drive()` calls `send()` and answers questions.
+Giving each job a question combines the two in one loop:
 
 ```python
 # task_runner_send.py
@@ -765,10 +763,10 @@ and delivers the runner's answer on every later turn.
 `Job`'s `SendType` is `str`, not `str | None`,
 so the priming call needs the `# type: ignore` from `send_none_is_next.py` again:
 `to_send.pop(job)` returns `str | None`,
-and no annotation states that it is `None` only on a generator's first turn.
+and no annotation ties the `None` to a generator's first turn.
 `download()` reads what it receives, into `reply`.
-`index()`'s `yield` statements ignore what they receive;
-a task that only takes turns is free to ignore the send channel.
+`index()` discards what it receives,
+as a task that only takes turns is free to do.
 The queue still rotates task to task,
 and now the runner also does `drive()`'s work,
 answering each request before the next turn.
