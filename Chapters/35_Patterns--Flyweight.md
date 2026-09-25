@@ -44,7 +44,8 @@ The listing parses each value from a string for a reason.
 The compiler pools equal constants within one code object, so with literals
 (`low, low2 = 256, 256`) even `100000 is 100000` prints `True`.
 That sharing comes from the pooling, not from the integer cache.
-(That pooling is also why Python warns about `is` on a literal.)
+Because the result of `is` on a literal depends on details like this pooling,
+Python emits a `SyntaxWarning` for it.
 Parsing at runtime builds the integer after compilation,
 so any sharing that remains comes from the cache.
 
@@ -204,7 +205,7 @@ def test_direct_construction_bypasses_pool() -> None:
 
 ### Freezing the Shared Tile
 
-Freezing `Tile` lets clients share it.
+Freezing `Tile` is what makes sharing it safe.
 A frozen tile keeps its values for its whole life,
 so every cell that shares it reads the same values on every visit.
 
@@ -261,16 +262,17 @@ if __name__ == "__main__":
 
 The construction syntax stays the same,
 so a caller sees an ordinary constructor call and receives a shared object.
-CPython's small-integer cache works the same way.
+`int("256")` works the same way:
+an ordinary constructor call returns a cached object.
 
-The bookkeeping is by hand, and `__new__()` adds a rule of its own.
+You write the bookkeeping yourself, and `__new__()` brings a rule of its own.
 When `__new__()` returns an instance of the class, as it does here,
 Python calls `__init__()` on it,
 so an `__init__()` re-runs on the cached instance at every construction.
 This class therefore leaves `__init__()` to `object`:
 `Color` overrides `__new__()` alone, so the call reaches `object.__init__()`,
 which accepts the three arguments and discards them.
-A `@dataclass` would generate an `__init__()`, and the re-run with it.
+A `@dataclass` would generate an `__init__()` and bring the re-run back with it.
 That re-run re-assigns the same components,
 so with three plain fields the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
@@ -282,10 +284,11 @@ so printing a `Color` shows the default `object.__repr__()`.
 The default `__eq__()` suits a perfectly interned type:
 equal values are the same object, so the identity comparison answers correctly.
 `@dataclass(init=False)` could restore those two generated methods,
-but each consequence pulls in another.
-The generated `__eq__()` sets `__hash__` to `None`.
+but each fix forces the next.
+The generated `__eq__()` sets `__hash__` to `None`,
+so a `Color` could no longer be a dict key or a set member.
 `frozen=True` brings the hash back,
-and then forces `object.__setattr__()` for the by-hand assignment in `__new__()`.
+and then the by-hand assignment in `__new__()` must go through `object.__setattr__()`.
 
 A `defaultdict` calls its `default_factory` with no arguments,
 and building a `Color` needs the three components,
@@ -534,7 +537,7 @@ Combine mechanisms when more than one requirement applies.
 ## Flyweights in the Wild
 
 Compilers and interpreters intern identifiers so that scope lookups compare pointers instead of characters.
-Dataframe libraries such as Pandas and Polars offer categorical types.
+Dataframe libraries such as pandas and Polars offer categorical types.
 A column of a million country names stores small integer codes that index into a pool of distinct strings.
 Text systems share one glyph object per character and font,
 with each occurrence supplying its own position.
