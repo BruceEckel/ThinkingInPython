@@ -16,7 +16,7 @@ It yields a request, suspends, and continues when a caller sends the answer.
 This chapter covers the full three-channel annotation,
 the loop that carries such a conversation, and `yield from`,
 which composes generators that never name their driver.
-The next chapter builds an Effect system on all three,
+[Stateless](46_Effects--Stateless.md) builds an Effect system on all three,
 and this chapter stands on its own.
 
 ## Annotating a Generator
@@ -236,16 +236,16 @@ so the `# type: ignore` on that line suppresses the diagnostic.
 and `stop.value` in the `except` clause becomes the `Result` that `drive()` returns.
 The `answers` map keys on `Question` and holds `Answer`s.
 
-Inside the `try`, `StopIteration` means the conversation finished,
-so only the `send()` call sits there.
-Any other code that could raise it belongs outside,
-such as `next()` on an exhausted answer source.
-
 The type checker verifies two of those three parameters.
 `StopIteration.value`'s type is `Any`,
 so a type checker accepts `return stop.value` under any return type `drive()` declares.
 The `Result` in `drive()`'s signature states the intent.
 Nothing verifies it.
+
+Inside the `try`, `StopIteration` means the conversation finished,
+so only the `send()` call sits there.
+Any other code that could raise it belongs outside,
+such as `next()` on an exhausted answer source.
 
 `interview()` names no source for its answers.
 Its body is three questions and a `return`,
@@ -354,8 +354,9 @@ The return channel delivers a value from a generator to the generator that deleg
 and neither function names the driver.
 
 Any iterable can follow `yield from`,
-but only a generator supplies a return value.
-A list has no return channel,
+and the expression takes its value from the `StopIteration` that ends the iteration.
+A generator's `return` sets that value.
+A list's iterator never does,
 so `v = yield from [1, 2, 3]` yields the three items and sets `v` to `None`.
 
 ### The Send Channel
@@ -491,7 +492,7 @@ As the `SendType` it is the value the driver sends in,
 which arrives as the value of the `yield` expression and binds to `answer`.
 As the `ReturnType` it is the value `ask()` returns when it finishes,
 which becomes the value of the whole `yield from` expression,
-so `name` and `town` read like ordinary assignments.
+so `interview()`'s three assignments read like ordinary ones.
 The inner generator yields one question and returns one answer,
 so both channels carry an `Answer`.
 `interview()` keeps `Result` as its `ReturnType`,
@@ -617,6 +618,46 @@ the `finally` block runs, and the generator ends.
 Nothing prints the `GeneratorExit` itself,
 because `close()` catches it and returns `None` once the generator finishes.
 
+Through a `yield from`, the same two calls reach the innermost generator:
+
+```python
+# throw_through.py
+from collections.abc import Generator
+
+def inner() -> Generator[str]:
+    try:
+        yield "inner ready"
+    except ValueError as e:
+        print(f"inner caught: {e}")
+        yield "inner recovered"
+    finally:
+        print("inner cleanup")
+
+def outer() -> Generator[str]:
+    try:
+        yield from inner()
+    finally:
+        print("outer cleanup")
+
+g = outer()
+print(next(g))
+#: inner ready
+print(g.throw(ValueError("bad input")))
+#: inner caught: bad input
+#: inner recovered
+g.close()
+#: inner cleanup
+#: outer cleanup
+```
+
+`g.throw()` goes to `outer()`, but `inner()` prints the `caught` line.
+`yield from` passes the exception down to the `yield` where `inner()` waits,
+and `inner()`'s `except` clause handles it,
+so `outer()` never sees the `ValueError`.
+`g.close()` raises `GeneratorExit` in `inner()` first,
+and the cleanup lines print from the inside out.
+A driver holding only the outermost generator can still stop and clean up every frame beneath it.
+
 A generator can catch `GeneratorExit` and yield again instead of letting it end the frame.
 Doing so makes `close()` raise:
 
@@ -646,7 +687,7 @@ so a generator written for others to drive must let `GeneratorExit` end it.
 
 ## The Driver You Already Use
 
-The next chapter builds on three ideas from this one.
+[Stateless](46_Effects--Stateless.md) builds on three ideas from this one.
 A generator function builds a description instead of doing work.
 `yield` makes that description two-way,
 so the description can ask for something.
@@ -780,14 +821,16 @@ answering each request before the next turn.
 
 You have run a driver like `drive()` many times.
 [Concurrency](19_Techniques--Concurrency.md#asyncio-mechanics)
-presents `await` and the event loop as a way to overlap waiting,
-and does not describe the mechanism.
+describes `await` as suspending a task until the event loop resumes it,
+without showing the protocol underneath.
 The mechanism is the two halves `task_runner_send.py` just combined:
 `task_runner()`'s turn-taking and `drive()`'s question-answering, in one loop.
 A coroutine object offers `send()`, `throw()`, and `close()`,
 as a generator does.
-`await` suspends the coroutine and yields a request to the loop.
-The loop supplies the answer once it has one and resumes the coroutine by sending it back.
+`await` suspends the coroutine and yields a request, a `Future`,
+to the task that drives it.
+When the `Future` has a result, the loop resumes the coroutine,
+and the `await` expression evaluates to that result.
 `asyncio.run()` is the single interpreter at the edge of the program.
 That is why an `await` in a function makes every caller `async` in turn:
 the requests must reach the loop.
