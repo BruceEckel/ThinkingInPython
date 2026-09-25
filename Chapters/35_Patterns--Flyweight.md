@@ -3,7 +3,7 @@
 Some programs need enormous numbers of fine-grained objects:
 the characters in a document, the tiles in a game map,
 the strings in a compiler's symbol table.
-The *Flyweight* pattern supports them by sharing.
+The *Flyweight* pattern supports such programs by sharing.
 Instead of many objects,
 you keep one object per distinct value and reference it many times.
 
@@ -37,7 +37,7 @@ Both `int("256")` calls return the same cached object,
 while each `int("100000")` call builds a fresh one.
 The cache covers a fixed range of values chosen at CPython build time.
 The range usually quoted is `-5` through `256`, but each build picks its own.
-This one caches up to 1024,
+This build caches up to 1024,
 so the example that needs a fresh object uses `100000` rather than `257`.
 
 The listing parses each value from a string for a reason.
@@ -167,7 +167,7 @@ the type checker rejects the mismatch.
 `tile()` declares its parameter a `Symbol` and trusts the declaration,
 so the boundary is `to_symbol()`,
 the one function that takes a `str` and returns a `Symbol`.
-It checks membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
+`to_symbol()` checks membership in `SPECS` at runtime and raises a `KeyError` for a character outside it.
 The type checker narrows on the same guard: `SPECS` has key type `Symbol`,
 so past the guard `char` is a `Symbol`,
 and `return char` satisfies the declared return type as written.
@@ -274,7 +274,7 @@ A `@dataclass` would generate an `__init__()`, and the re-run with it.
 That re-run re-assigns the same components,
 so with three plain fields the object stays as it was.
 Once a field has a `default_factory` or `__post_init__()` has a side effect,
-the re-run repeats both on an object that is already finished.
+the re-run repeats that factory call or that side effect on an object that is already finished.
 
 `Tile`'s `@record` generates its `__repr__()` and `__eq__()`;
 `Color` keeps `object`'s versions,
@@ -295,7 +295,7 @@ so the first request for a set of components builds the object and every later o
 whether `Color` or a subclass asks.
 Key the pool by `(cls, red, green, blue)` if you need to subclass.
 
-The two forms differ in one guarantee.
+The factory `tile()` and the interning `Color` differ in one guarantee.
 `tile()` interns the calls that go through it,
 and a direct `Tile("~", "water", False)` bypasses it,
 building a second object equal to the pooled water tile.
@@ -509,7 +509,8 @@ the member the `match` leaves out, and adding that case clears the diagnostic.
 The enum gives up loading at runtime: `tile()` could load `SPECS` from a file,
 while `Tile.GRASS` is source code.
 The [table-driven state machine](31_Patterns--State_Machines.md#table-driven-state-machine)
-builds on the same fixed set, using its members as shared, comparable states.
+builds on an `Enum` the same way, using the enum's members as shared,
+comparable states.
 
 ## Which Pool Should You Use?
 
