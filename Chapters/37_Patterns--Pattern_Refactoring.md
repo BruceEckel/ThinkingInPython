@@ -3,10 +3,10 @@
 This chapter follows one problem through several designs.
 A first solution solves it,
 then you ask "what will change?" and reshape the design so that kind of change touches one place.
-This is Martin Fowler's *Refactoring*,
+That reshaping is Martin Fowler's *Refactoring*,
 applied to patterns rather than single statements.
 
-It is also a Python lesson.
+The chapter is also a Python lesson.
 Many patterns in *GoF Design Patterns* work around the limitations of statically typed languages:
 single dispatch, closed classes, and types that are not values.
 Python's classes stay open, its types are values,
@@ -33,7 +33,7 @@ and you must recover the type of each piece to sort it.
 In the `Trash` hierarchy, each material class declares a per-pound `value`.
 The base class keeps a `registry` of its subclasses,
 which `__init_subclass__()` fills automatically.
-Its `create()` method is the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
+The base class's `create()` method is the [dictionary factory](27_Patterns--Factory.md#the-pythonic-factory-a-dictionary):
 it builds an instance from a material name.
 
 ![Each Trash subclass registers itself, and each bin takes a class as its key](_images/trash_sorter)
@@ -101,7 +101,7 @@ Call it as `Trash.create()`.
 
 `@record` builds `__init__()` from the bare `weight: float` annotation alone:
 the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real-classvar)
-belong to the class, so they stay out of it.
+belong to the class, so they stay out of `__init__()`.
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
 A subclass's bare `value = 1.67` inherits the name and its type from the base declaration,
@@ -263,8 +263,8 @@ may expect `assert_never()` to make the type checker report the missed case.
 Exhaustiveness checking needs a *closed* union to compare the cases against,
 but `Trash` is deliberately open: the registry exists to accept new subclasses.
 This `match` runs over an open set,
-which [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
-warns against.
+and [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
+warns against a `match` over an open set.
 
 A `case _:` wildcard could catch a new material:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
@@ -329,7 +329,7 @@ print(f"parsed {len(pieces)}, binned {binned}")
 
 Nothing fails.
 The parser builds two `Plastic` objects, the `match` lets both fall through,
-and the report totals the trash it recognized.
+and the report totals the trash the `match` recognized.
 The loop appends two of the four pieces to a bin,
 so the sixty pounds of plastic vanish from the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
@@ -371,16 +371,16 @@ for kind, items in bins.items():
 `type(t)` is the right key because every new class is a new key,
 including one defined at runtime.
 The loop has no list of materials to maintain and no case to forget.
-That is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
+`bins[type(t)]` is the same dictionary-probe dispatch as the tables in [State Machines](31_Patterns--State_Machines.md#the-engine)
 and [*Multiple Dispatching*](32_Patterns--Multiple_Dispatching.md#one-lookup-in-a-table).
-It first appeared in the event bus in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
+That dispatch first appeared in the event bus in [Function Objects](28_Patterns--Function_Objects.md#an-event-bus-handlers-keyed-by-type).
 
 The key is the *exact* class.
 If you derive `CrushedAluminum` from `Aluminum`,
 it sorts into its own bin rather than its parent's.
-That is usually what a sorter needs,
-but keep it in mind before you subclass a material.
-Subclasses are another place where the two sorters differ:
+A bin per exact class is usually what a sorter needs,
+but keep that key in mind before you subclass a material.
+Subclasses are another place where `recycle_rtti.py` and `recycle_dict.py` differ:
 `case Aluminum()` matches any subclass,
 so `recycle_rtti.py` puts a `CrushedAluminum` in the `Aluminum` bin.
 Swapping the `match` for the dictionary is a redesign, not a rename.
@@ -440,7 +440,7 @@ That trade is the [expression problem](13_Techniques--Pattern_Matching.md#the-ex
 
 Here is the requirement that makes the second axis concrete.
 The plant already prints a recycling instruction for each material.
-Now the safety officer wants a disposal hazard printed beside it.
+Now the safety officer wants a disposal hazard printed beside the instruction.
 That is a second operation that varies by material.
 The obvious place for it is a method on each material class:
 
@@ -664,7 +664,7 @@ Keep a pattern where it does more than a language feature does.
     and explain what changed.
 4.  Derive `CrushedAluminum` from `Aluminum`,
     add it to the data `recycle_dict.py` reads,
-    then run that and `recycling_note.py`.
+    then run `recycle_dict.py` and `recycling_note.py`.
     Explain why it gets its own bin but not its own note.
     Then change `recycle_dict.py` so a subclass shares its parent's bin,
     without naming any material in the sorting loop.
