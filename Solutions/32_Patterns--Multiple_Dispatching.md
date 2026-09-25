@@ -657,6 +657,11 @@ def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
         return Outcome.DRAW  # Too soggy to wrap a rock
     return Outcome.WIN
 
+def rock_vs_paper(item1: Item, item2: Item) -> Outcome:
+    if isinstance(item2, Paper) and item2.wet:
+        return Outcome.DRAW  # The same soggy draw
+    return Outcome.LOSE
+
 OUTCOME: Final[
     dict[tuple[type[Item], type[Item]], Cell]] = {
     (Paper, Rock): paper_vs_rock,
@@ -666,19 +671,21 @@ OUTCOME: Final[
     (Scissors, Rock): always(Outcome.LOSE),
     (Scissors, Scissors): always(Outcome.DRAW),
     (Rock, Scissors): always(Outcome.WIN),
-    (Rock, Paper): always(Outcome.LOSE),
+    (Rock, Paper): rock_vs_paper,
     (Rock, Rock): always(Outcome.DRAW),
 }
 
 for item1, item2 in [
     (Paper(), Rock()),
     (Paper(wet=True), Rock()),
+    (Rock(), Paper(wet=True)),
     (Scissors(), Paper()),
     (Rock(), Rock()),
 ]:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 #: Paper <--> Rock : win
 #: WetPaper <--> Rock : draw
+#: Rock <--> WetPaper : draw
 #: Scissors <--> Paper : win
 #: Rock <--> Rock : draw
 ```
@@ -692,12 +699,14 @@ stand behind it. That answers the part of the question about keeping
 the syntax of a method call over a table.
 
 `always()` is what keeps the table readable. It returns a closure
-over one `Outcome` that ignores both operands, so the eight
+over one `Outcome` that ignores both operands, so the seven
 combinations with a fixed answer stay one line each and still read as
-a table of answers. Only the cell that needs code looks like code.
+a table of answers. Only the cells that need code look like code.
 
 The `(Paper, Rock)` cell receives both items, so it can consult
-`item1.wet`. That is the first of the two reasons the chapter gives
+`item1.wet`. The `(Rock, Paper)` cell consults `item2.wet`, because
+one duel has two orders and each order has its own cell; without it,
+a rock that calls `compete()` would still beat wet paper. That is the first of the two reasons the chapter gives
 for preferring the double-dispatch version: behavior that reads the
 object's own state. A cell holding a function answers it. Whatever
 `Paper.eval_rock()` can read, `paper_vs_rock()` can read too,
@@ -709,13 +718,13 @@ types exactly: an `Origami(Paper)` finds no row at all, callable or
 not, and the fix is to write `Origami`'s rows rather than to override
 one. Changing a cell changes it for every `Item`, since `OUTCOME` is
 one shared dictionary. `paper_scissors_rock_subclass.py`'s
-`DampPaper` gets its exception by overriding `compete()`, and this
-version has nothing to override: `compete()` is defined once on
-`Item`.
+`DampPaper` gets its exception by overriding `compete()` and
+`eval_rock()`, and this version has nothing to override: `compete()`
+is defined once on `Item`.
 
-One cost comes with the change. `paper_vs_rock()` takes two `Item`s,
-because every cell must, so it recovers `Paper` with an
-`isinstance()` test. That is the type test the chapter warns about in
+One cost comes with the change. `paper_vs_rock()` and
+`rock_vs_paper()` take two `Item`s, because every cell must, so each
+recovers `Paper` with an `isinstance()` test. That is the type test the chapter warns about in
 the ladder version, and here it sits inside one cell rather than
 running through every class, which is the difference between a test
 you write once and a test every new `Item` forces you to edit.

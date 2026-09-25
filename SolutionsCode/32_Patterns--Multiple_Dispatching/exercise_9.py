@@ -35,6 +35,11 @@ def paper_vs_rock(item1: Item, item2: Item) -> Outcome:
         return Outcome.DRAW  # Too soggy to wrap a rock
     return Outcome.WIN
 
+def rock_vs_paper(item1: Item, item2: Item) -> Outcome:
+    if isinstance(item2, Paper) and item2.wet:
+        return Outcome.DRAW  # The same soggy draw
+    return Outcome.LOSE
+
 OUTCOME: Final[
     dict[tuple[type[Item], type[Item]], Cell]] = {
     (Paper, Rock): paper_vs_rock,
@@ -44,18 +49,20 @@ OUTCOME: Final[
     (Scissors, Rock): always(Outcome.LOSE),
     (Scissors, Scissors): always(Outcome.DRAW),
     (Rock, Scissors): always(Outcome.WIN),
-    (Rock, Paper): always(Outcome.LOSE),
+    (Rock, Paper): rock_vs_paper,
     (Rock, Rock): always(Outcome.DRAW),
 }
 
 for item1, item2 in [
     (Paper(), Rock()),
     (Paper(wet=True), Rock()),
+    (Rock(), Paper(wet=True)),
     (Scissors(), Paper()),
     (Rock(), Rock()),
 ]:
     print(f"{item1} <--> {item2} : {item1.compete(item2)}")
 #: Paper <--> Rock : win
 #: WetPaper <--> Rock : draw
+#: Rock <--> WetPaper : draw
 #: Scissors <--> Paper : win
 #: Rock <--> Rock : draw

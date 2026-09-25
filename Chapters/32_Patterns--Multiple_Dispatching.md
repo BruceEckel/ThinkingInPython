@@ -186,10 +186,11 @@ A richer game reads the caller's state through it.
 
 Those `Any` annotations turn off static checking.
 `Item` declares `__str__()` alone,
-so the choices for the parameter are `Any` or a `Protocol` naming all four methods.
+so the parameter takes `Any` unless something declares all four methods:
+`Item` itself, as abstract methods, or a `Protocol`.
 With `Any`, a class that supplies eight of the nine answers passes the type checker,
 and Python raises an `AttributeError` at the first duel that calls the ninth.
-A `Protocol` listing the four methods restores the checking,
+Declaring the four methods restores the checking,
 at the price of a declaration that repeats every class's method names.
 The table version keeps the checking and declares each name once.
 Its answers are rows in one dictionary,
@@ -260,8 +261,10 @@ the same as a single object.
 
 The lookup shares two properties with the [table-driven state machine](31_Patterns--State_Machines.md#the-engine).
 It matches classes exactly, so a subclass of `Paper` needs rows of its own.
-And a missing pair raises a `KeyError` at the first duel that needs it,
+And a missing pair fails at the first duel that needs it,
 the fail-fast policy that suits a table you are still filling in.
+Here the failure is the dictionary's own `KeyError`,
+where the state machine's engine raises `NoTransition`.
 Adding `Lizard` in exercise 1 puts you in that situation.
 
 Exact matching surprises people.
@@ -391,12 +394,12 @@ so the second `@register` silently overwrites the first's entry for `Rock`.
 so both duels return the same answer,
 even though each registration went through its own class.
 
-### Methods or Table
+## Methods or Table
 
 The version most programmers write first is neither the methods nor the table:
 it is an `isinstance()` ladder inside `compete()`,
 testing the opponent's type case by case.
-It works, and it combines the drawbacks of both.
+It works, and it keeps the method version's cost without its benefit.
 The type tests repeat in every class, as in the method version,
 and the programmer resolves by hand what dispatch would resolve for free.
 Every new `Item` forces an edit to every ladder.
@@ -414,7 +417,8 @@ exercise 9 builds that version.
 Use the double-dispatch version when the behavior for a combination belongs to the class rather than to the pairing:
 when it reads the object's own state,
 or when a subclass should be able to override one combination and inherit the rest.
-A subclass can do that by overriding `compete()` itself:
+A combination has two sides, one for each order of the duel,
+so the subclass overrides `compete()` for its own side and one `eval_*()` method for the other:
 
 ```python
 # paper_scissors_rock_subclass.py
@@ -427,17 +431,34 @@ class DampPaper(Paper):
         if isinstance(item, Rock):
             return Outcome.DRAW  # Too soggy to wrap
         return super().compete(item)
+    def eval_rock(self, item: Any) -> Outcome:
+        return Outcome.DRAW  # Rock's side of the same draw
 
 print(DampPaper().compete(Rock()))
+#: draw
+print(Rock().compete(DampPaper()))
 #: draw
 print(DampPaper().compete(Scissors()))
 #: lose
 ```
 
-`DampPaper` overrides its outcome against `Rock` and inherits every other combination from `Paper` through `super().compete(item)`.
-In the table version,
-the same change edits one cell of the shared `OUTCOME` dictionary,
-and every `Item` sees the new cell.
+`DampPaper`'s own result against `Rock` comes from `Rock.eval_paper()`,
+a method `DampPaper` cannot change,
+so its `compete()` answers before making that call.
+`Rock`'s result against a `DampPaper` comes from `DampPaper.eval_rock()`,
+an ordinary override.
+Both overrides are necessary.
+Without `eval_rock()`,
+the inherited `Paper.eval_rock()` still reports that the rock loses,
+and the two orders of one duel disagree.
+Every other combination comes from `Paper` unchanged,
+through `super().compete(item)` and the inherited `eval_*()` methods.
+
+The table version has no comparable override.
+The lookup matches classes exactly,
+so `DampPaper` inherits none of `Paper`'s rows.
+It needs seven rows of its own, five of them copies of `Paper`'s,
+and editing `Paper`'s rows instead changes the game for every `Paper`.
 
 ## Testing Both Versions
 
@@ -517,7 +538,7 @@ The first call dispatches on `a`'s type, the fallback on `b`'s.
 That is double dispatching, built into the language.
 The fallback is how a type written decades after `int` can add itself to an `int` on the left.
 
-Every arithmetic and bitwise operator has a reflected form,
+Every binary arithmetic and bitwise operator has a reflected form,
 named by inserting an `r` before the operator's name: `__rsub__()`,
 `__rmul__()`, `__rtruediv__()`.
 The in-place forms, `__iadd__()` and its siblings, are a separate family:
@@ -684,9 +705,10 @@ Everywhere else you choose between writing a second dispatch in methods and repl
     `OUTCOME[type(self), type(item)](self, item)`.
     The call site stays `item1.compete(item2)`.
     Write a helper that wraps a constant `Outcome` in a callable,
-    so the eight unchanged cells stay one line each.
-    Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` cell read it:
-    dry paper wraps the rock and wins, wet paper is too soggy and draws.
+    so the seven unchanged cells stay one line each.
+    Then give `Paper` a `wet` attribute and make the `(Paper, Rock)` and `(Rock, Paper)` cells read it:
+    dry paper wraps the rock and wins, wet paper is too soggy and draws,
+    whichever of the two calls `compete()`.
     The chapter gives two reasons for preferring the double-dispatch version.
     Say which one this change answers, and which one survives it.
-10. Modify Exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
+10. Modify exercise 8 to use the table lookup technique of `paper_scissors_rock_table.py`.
