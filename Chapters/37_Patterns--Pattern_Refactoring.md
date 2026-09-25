@@ -102,8 +102,8 @@ the two [`ClassVar` attributes](12_Techniques--Data_Classes_as_Types.md#d-a-real
 belong to the class, so they stay out of it.
 Each subclass's `value = ...` line creates a class attribute of its own,
 separate from `Trash.value` and from its siblings'.
-The subclasses omit the annotation because they inherit the name and its type from the base declaration;
-restating `ClassVar[float]` also keeps [the type checker rejecting an assignment through an instance](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
+A subclass's bare `value = 1.67` inherits the name and its type from the base declaration;
+restating `ClassVar[float]` on the override also keeps [the type checker rejecting an assignment through an instance](09_Foundations--Class_Attributes.md#classvar-and-inheritance).
 
 A new recyclable type costs one class definition.
 It registers itself, and `create()` builds it.
@@ -253,20 +253,19 @@ you must find every `case` statement that enumerates specific types.
 Each one you miss silently drops trash on the floor.
 Readers of [*Composite* and *Interpreter*](34_Patterns--Composite_and_Interpreter.md)
 may expect `assert_never()` to make the type checker report the missed case.
-Exhaustiveness checking works on a *closed* union,
-and `Trash` is deliberately open, which is the point of the registry,
-so `assert_never()` has nothing to check against here.
+Exhaustiveness checking needs a *closed* union to compare the cases against,
+and `Trash` is deliberately open, which is the point of the registry.
 This `match` runs over an open set,
 which [Pattern Matching](13_Techniques--Pattern_Matching.md#when-not-to-match)
 warns against.
-A sorter over an open set must find the bin without naming any type,
+A sorter over an open set must let each piece choose its own bin,
 and the next section builds one.
 Testing for one type, or a small subset that needs special handling, is fine.
 Testing for all of them means you write the type-to-bin lookup by hand.
-A `case _:` wildcard could match what the named cases miss:
+A `case _:` wildcard could catch a new material:
 `case _: raise ValueError(f"unsorted {type(t).__name__}")` turns the silent drop into a `ValueError`.
 The wildcard is worth adding, and the flaw remains:
-every new material still means editing this `match`,
+every new material means editing this `match`,
 where `bins[type(t)]` needs no edit at all.
 
 That is the argument.
@@ -324,10 +323,10 @@ print(f"parsed {len(pieces)}, binned {binned}")
 ```
 
 Nothing fails.
-The parser builds two `Plastic` objects, the sorter matches neither,
+The parser builds two `Plastic` objects, the `match` lets both fall through,
 and the report totals the trash it recognized.
 The loop appends two of the four pieces to a bin,
-and the sixty pounds of plastic never appears in the totals the plant uses.
+and the sixty pounds of plastic vanish from the totals the plant uses.
 "Silently drop trash on the floor" means a number that is wrong and looks right,
 not an exception to debug.
 The `match` is the statement that loses them.
@@ -418,9 +417,11 @@ print(f"parsed {len(pieces)}, binned {binned}")
 ```
 
 The loop bins every piece, plastic included: `parsed 4, binned 4`.
-Defining `Plastic` and naming the new data file are the only changes to the program's logic.
-The sorting loop needs no edit,
-unlike the `match` in `recycle_rtti.py` and `plastic_dropped.py`.
+The program changed in two places:
+the `Plastic` definition and the data file's name.
+The sorting line, `bins[type(t)].append(t)`,
+is unchanged from `recycle_dict.py`,
+while the `match` in `recycle_rtti.py` and `plastic_dropped.py` would need a new `case`.
 
 ## Adding Operations: Visitor, and Why Python Skips It
 
@@ -500,7 +501,7 @@ Those edits sit in each class body, as `note_methods.py` shows;
 in the real program they go in `trash.py`.
 A method belongs in the body of its own class by design:
 you can assign a function onto a class from outside,
-but behavior scattered that way is unmaintainable.
+but a reader of the class then has to search every module for the behavior assigned onto it.
 A plant that buys its material classes from a supplier has no class body to edit.
 
 The method form is a real option, not an example built to fail:
@@ -557,13 +558,13 @@ Each implementation above takes the name `_`.
 [*Visitor*](33_Patterns--Visitor.md#the-pythonic-visitor-singledispatch)
 explains that placeholder.
 `recycling_note()` is a new operation defined outside the `Trash` hierarchy.
-`Paper` has no registered note, so it falls through to the base function.
-That fallback is also the risk:
-a material nobody registers gets the default answer,
+Three materials register a note, and `Paper`, the fourth,
+falls through to the base function.
+That fallback is also the risk: a forgotten material gets the default answer,
 with no exception at runtime and no report from the type checker.
 Here "no special handling" is a genuine answer for `Paper`,
 so the fallback is correct.
-When no default makes sense,
+When every material needs an answer of its own,
 the *Visitor* chapter advises making the base function raise `NotImplementedError`,
 so a forgotten registration fails at the first call.
 
@@ -628,7 +629,8 @@ draws the same distinction between a table keyed by class and dispatch that foll
 ## Choosing the Lightest Construct
 
 Design patterns are about separating things that change from things that stay the same.
-Polymorphism is one way to do that, but not the only one.
+Polymorphism is one way to do that;
+this chapter used a dictionary keyed by type and a `singledispatch` function.
 The deeper skill is spotting the [*vector of change*](21_Patterns--Design_Patterns.md#the-vector-of-change),
 here new types versus new operations,
 and choosing the lightest construct that isolates it.
@@ -640,7 +642,7 @@ and one `@recycling_note.register` adds the new material's answer to an existing
 Neither is a pattern in the GoF sense.
 In Python the lightest construct is often a language feature,
 not a multi-class pattern.
-Keep a pattern only when it still does something a language feature does not.
+Keep a pattern where it does more than a language feature does.
 
 ## Exercises
 
