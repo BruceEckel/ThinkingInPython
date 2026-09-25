@@ -347,10 +347,8 @@ if __name__ == "__main__":
 
 The two `composed()` functions agree on every input,
 and the exception version is shorter, but it says less:
-it reports which step failed as a message to parse,
-and only when the raiser wrote the step into the message:
-input 3's `division by zero` names no step at all.
-The failure disappears when the `except` clause ends,
+it reports a failure as a message to parse,
+and the failure disappears when the `except` clause ends,
 whereas `sum_type.py` at the start of this chapter keeps every result in a list.
 
 ## Composing With bind
@@ -854,7 +852,8 @@ reuses this `Result` machinery to convert Effects.
     and `@safe` no longer returns it as an `Err`.
 5.  Write `load_setting(name, text)` that returns `Result[int, Exception]` and attaches a note naming the setting.
     Chain two of them with `bind()` and print the notes from whichever one failed.
-    What happens to the note the successful call would have added?
+    Does the successful call carry a note?
+    Why or why not?
 6.  Rewrite `func_a()`, `func_b()`,
     and `func_c()` to return `int | None` instead of `Result[int, str]`,
     and adjust `composing.py` to match.
